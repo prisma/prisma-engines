@@ -1,6 +1,20 @@
 #![deny(unsafe_code, rust_2018_idioms)]
 
 //! See the docs on [ParserDatabase](/struct.ParserDatabase.html).
+//!
+//! ## Terminology
+//!
+//! Names:
+//!
+//! - _mapped name_: the name inside an `@map()` or `@@map()` attribute of a model, field, enum or
+//!   enum value. This is used to determine what the name of the Prisma schema item is in the
+//!   database.
+//! - _database name_: the name in the database, once both the name of the item and the mapped
+//!   name have been taken into account. The logic is always the same: if a mapped name is defined,
+//!   then the database name is the mapped name, otherwise it is the name of the item.
+//! - _foreign key name_: the name inside the `map: ...` argument inside an `@relation()`
+//!   attribute. This is taken as the database name of the constraint backing the relation, on the
+//!   connectors where that makes sense.
 
 pub mod value_validator;
 pub mod walkers;
