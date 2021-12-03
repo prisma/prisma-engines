@@ -1,12 +1,12 @@
 use super::helpers::*;
-use crate::ast::helper::get_sort_index_of_attribute;
-use crate::ast::SchemaAst;
-use crate::Datasource;
-use crate::{ast, ast::renderer::*};
-use crate::{ValidatedDatamodel, ValidatedMissingFields};
+use crate::{Datasource, ValidatedDatamodel, ValidatedMissingFields};
 use enumflags2::BitFlags;
 use pest::{iterators::Pair, Parser};
-use schema_ast::parser::{PrismaDatamodelParser, Rule};
+use schema_ast::{
+    ast::{self, SchemaAst},
+    parser::{PrismaDatamodelParser, Rule},
+    renderer::*,
+};
 
 pub struct Reformatter<'a> {
     input: &'a str,

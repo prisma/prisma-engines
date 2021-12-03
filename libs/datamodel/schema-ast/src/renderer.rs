@@ -2,9 +2,25 @@ mod string_builder;
 mod table;
 
 use crate::ast;
-use crate::ast::{helper::get_sort_index_of_attribute, Attribute, WithDocumentation};
+use crate::ast::{Attribute, WithDocumentation};
+
 pub use string_builder::StringBuilder;
 pub use table::TableFormat;
+
+/// Get the sort order for an attribute, in the canonical sorting order.
+pub fn get_sort_index_of_attribute(is_field_attribute: bool, attribute_name: &str) -> usize {
+    // this must match the order defined for rendering in libs/datamodel/core/src/transform/attributes/mod.rs
+    let correct_order: &[&str] = if is_field_attribute {
+        &["id", "unique", "default", "updatedAt", "map", "relation"]
+    } else {
+        &["id", "unique", "index", "fulltext", "map"]
+    };
+
+    correct_order
+        .iter()
+        .position(|p| attribute_name.trim_start_matches('@').starts_with(p))
+        .unwrap_or(usize::MAX)
+}
 
 pub trait LineWriteable {
     fn write(&mut self, param: &str);
@@ -396,7 +412,7 @@ impl<'a> Renderer<'a> {
         Self::render_value(target, &arg.value);
     }
 
-    pub(crate) fn render_value_to_string(val: &ast::Expression) -> String {
+    pub fn render_value_to_string(val: &ast::Expression) -> String {
         let mut builder = StringBuilder::new();
         Self::render_value(&mut builder, val);
         builder.to_string()
