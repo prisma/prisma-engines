@@ -1,0 +1,1 @@
+initSidebarItems({"fn":[["get_sort_index_of_attribute","Get the sort order for an attribute, in the canonical sorting order."]],"struct":[["Renderer",""],["StringBuilder",""],["TableFormat",""]],"trait":[["LineWriteable",""]]});

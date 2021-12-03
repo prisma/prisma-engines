@@ -8,7 +8,18 @@
 <span id="8"> 8</span>
 <span id="9"> 9</span>
 <span id="10">10</span>
+<span id="11">11</span>
+<span id="12">12</span>
+<span id="13">13</span>
+<span id="14">14</span>
+<span id="15">15</span>
+<span id="16">16</span>
+<span id="17">17</span>
 </pre><pre class="rust"><code><span class="doccomment">//! The Prisma Schema AST.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! - The `ast` module defines the AST data structure.</span>
+<span class="doccomment">//! - The `parser` module is responsible from going from a source string to an AST.</span>
+<span class="doccomment">//! - The `renderer` module is responsible for rendering an AST to a string.</span>
 
 <span class="attribute">#![<span class="ident">deny</span>(<span class="ident">rust_2018_idioms</span>, <span class="ident">unsafe_code</span>)]</span>
 
@@ -18,6 +29,9 @@
 
 <span class="doccomment">/// String -&gt; AST</span>
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">parser</span>;
+
+<span class="doccomment">/// AST -&gt; String</span>
+<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">renderer</span>;
 </code></pre></div>
 </section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="schema_ast" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>
     <script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script>

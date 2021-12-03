@@ -16,16 +16,13 @@
 <span id="16">16</span>
 <span id="17">17</span>
 <span id="18">18</span>
-<span id="19">19</span>
-<span id="20">20</span>
 </pre><pre class="rust"><code><span class="doccomment">//! This module contains the data structures and parsing function for the AST of a Prisma schema.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! Most of this code has been moved to the schema-ast crate so other crates in the datamodel</span>
+<span class="doccomment">//! folder ar free to depend on it.</span>
+<span class="doccomment">//!</span>
 <span class="doccomment">//! The responsibilities of the sub modules are as following:</span>
-<span class="doccomment">//! * `parser`: Exposes the parse function that turns a String input into an AST.</span>
 <span class="doccomment">//! * `reformat`: Exposes a Formatter for Prisma files. This is used e.g. by the VS Code Extension.</span>
-<span class="doccomment">//! * `renderer`: Turns an AST into a Prisma Schema String.</span>
-<span class="kw">mod</span> <span class="ident">helper</span>;
-<span class="kw">mod</span> <span class="ident">renderer</span>;
-
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">reformat</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">schema_ast</span>::{
     <span class="ident">ast</span>::{
@@ -36,8 +33,7 @@
     <span class="ident">parser::parse_schema</span>,
 };
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="ident">renderer::Renderer</span>;
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="ident">schema_ast::ast</span>::<span class="kw-2">*</span>;
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="ident">schema_ast</span>::{<span class="ident">ast</span>::<span class="kw-2">*</span>, <span class="ident">renderer::Renderer</span>};
 </code></pre></div>
 </section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="datamodel" data-search-index-js="../../../search-index.js" data-search-js="../../../search.js"></div>
     <script src="../../../main.js"></script><script src="../../../source-script.js"></script><script src="../../../source-files.js"></script>

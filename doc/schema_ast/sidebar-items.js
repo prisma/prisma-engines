@@ -1,1 +1,1 @@
-initSidebarItems({"mod":[["ast","The AST data structure. It aims to faithfully represent the syntax of a Prisma Schema, with source span information."],["parser","String -> AST"]]});
+initSidebarItems({"mod":[["ast","The AST data structure. It aims to faithfully represent the syntax of a Prisma Schema, with source span information."],["parser","String -> AST"],["renderer","AST -> String"]]});
