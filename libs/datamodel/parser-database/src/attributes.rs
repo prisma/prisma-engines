@@ -650,8 +650,8 @@ fn model_unique<'ast>(
             None => None,
         };
 
-        if let Some(err) = is_client_name_valid(args.span(), &ast_model.name.name, name, "@@unique") {
-            ctx.push_error(err);
+        if let Some(name) = name {
+            validate_client_name(args.span(), &ast_model.name.name, name, "@@unique", ctx);
         }
 
         db_name
@@ -1013,9 +1013,7 @@ fn get_name_argument<'ast>(args: &mut Arguments<'ast>, ctx: &mut Context<'ast>) 
     None
 }
 
-fn is_client_name_valid(span: Span, object_name: &str, name: Option<&str>, attribute: &str) -> Option<DatamodelError> {
-    let name = if let Some(n) = name { n } else { return None };
-
+fn validate_client_name(span: Span, object_name: &str, name: &str, attribute: &str, ctx: &mut Context<'_>) {
     // only Alphanumeric characters and underscore are allowed due to this making its way into the client API
     // todo what about starting with a number or underscore?
     let is_valid = name
@@ -1023,10 +1021,10 @@ fn is_client_name_valid(span: Span, object_name: &str, name: Option<&str>, attri
         .all(|c| c == '_' || c.is_ascii_digit() || c.is_ascii_alphabetic());
 
     if is_valid {
-        return None;
+        return;
     }
 
-    Some(DatamodelError::new_model_validation_error(
+    ctx.push_error(DatamodelError::new_model_validation_error(
         &format!(
             "The `name` property within the `{}` attribute only allows for the following characters: `_a-zA-Z0-9`.",
             attribute
