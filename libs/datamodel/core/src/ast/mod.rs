@@ -1,11 +1,10 @@
 //! This module contains the data structures and parsing function for the AST of a Prisma schema.
+//!
+//! Most of this code has been moved to the schema-ast crate so other crates in the datamodel
+//! folder ar free to depend on it.
+//!
 //! The responsibilities of the sub modules are as following:
-//! * `parser`: Exposes the parse function that turns a String input into an AST.
 //! * `reformat`: Exposes a Formatter for Prisma files. This is used e.g. by the VS Code Extension.
-//! * `renderer`: Turns an AST into a Prisma Schema String.
-mod helper;
-mod renderer;
-
 pub mod reformat;
 pub use schema_ast::{
     ast::{
@@ -16,5 +15,4 @@ pub use schema_ast::{
     parser::parse_schema,
 };
 
-pub(crate) use renderer::Renderer;
-pub(crate) use schema_ast::ast::*;
+pub(crate) use schema_ast::{ast::*, renderer::Renderer};
