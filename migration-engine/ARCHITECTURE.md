@@ -308,3 +308,32 @@ migrations differently (e.g. with transactions). Small differences between dev
 and prod databases, data migrations triggering unique constraint
 violations/foreign key errors/nullability errors, failing type casts, etc. can
 cause the same migration to fail in one environment and succeed in another.
+
+### Could Migrate detect when multiple incompatible changes are developed in different branches?
+
+Example: Alice deletes the `User.birthday` field in her branch, and Bob changes
+the type of `User.birthday` from `String` to `DateTime` in his branch. Alices
+merges, then Bob merges. On a SQL database, Bob's migration will crash because
+it tries to change a field that does not exist (because Alice's migration
+deleted the field).
+
+Can that sort of scenario happen with Migrate? Couldn't Migrate help users
+prevent this kind of issues?
+
+The following answer is not a statement of principle that is never going to
+change, but here was our reasoning when we chose _not_ to try and mitigate
+these issues in Migrate.
+
+- Most other tools that have been used in production for many years
+  (ActiveRecord, Flyway, etc.) do not try to mitigate this, and this is not
+  seen as a major design flaw. Empirically, these problems seem to happen very
+  rarely.
+
+- There are multiple mitigating factor that make these scenarios unlikely:
+    - If you run the migrations at all before deploying them (basic CI), they
+      will fail and you will have to fix them.
+    - Same if the two authors are working on the same branch
+    - A bonus of having the Prisma schema is that this is guaranteed to be a
+      merge conflict in the schema, which should prompt questions (team members
+      disagreeing on the datamodel)
+
