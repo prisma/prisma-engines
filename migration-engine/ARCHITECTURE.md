@@ -162,10 +162,22 @@ Also see the [public
 documentation](https://www.prisma.io/docs/guides/database/production-troubleshooting)
 on this topic.
 
+### What is the recommended workflow for data migrations in Migrate?
+
+Our stance is that you should completely separate data migrations from schema
+migrations, and use a different tool / workflow for data migrations. It's of
+course fine to use SQL inside your schema migrations for small data migrations
+on a small project, but it's not what we would recommend.
+
+Data migrations inside schema migrations make your schema migrations longer
+running and generally riskier. It is more work to do data migrations
+separately, but it derisks schema migrations.
+
 ### Why does Migrate not do data migrations in TypeScript?
 
 One important reason is that we believe data and schema migrations should be
-separated, they should not run at the same time (see resource 1).
+separated, they should not run at the same time (see the previous question and
+resource 1).
 
 One other assumption with Prisma Migrate is that since we are an abstraction
 over the database, and support many of them, we'll never cover 100% of the
@@ -308,3 +320,32 @@ migrations differently (e.g. with transactions). Small differences between dev
 and prod databases, data migrations triggering unique constraint
 violations/foreign key errors/nullability errors, failing type casts, etc. can
 cause the same migration to fail in one environment and succeed in another.
+
+### Could Migrate detect when multiple incompatible changes are developed in different branches?
+
+Example: Alice deletes the `User.birthday` field in her branch, and Bob changes
+the type of `User.birthday` from `String` to `DateTime` in his branch. Alices
+merges, then Bob merges. On a SQL database, Bob's migration will crash because
+it tries to change a field that does not exist (because Alice's migration
+deleted the field).
+
+Can that sort of scenario happen with Migrate? Couldn't Migrate help users
+prevent this kind of issues?
+
+The following answer is not a statement of principle that is never going to
+change, but here was our reasoning when we chose _not_ to try and mitigate
+these issues in Migrate.
+
+- Most other tools that have been used in production for many years
+  (ActiveRecord, Flyway, etc.) do not try to mitigate this, and this is not
+  seen as a major design flaw. Empirically, these problems seem to happen very
+  rarely.
+
+- There are multiple mitigating factor that make these scenarios unlikely:
+    - If you run the migrations at all before deploying them (basic CI), they
+      will fail and you will have to fix them.
+    - Same if the two authors are working on the same branch
+    - A bonus of having the Prisma schema is that this is guaranteed to be a
+      merge conflict in the schema, which should prompt questions (team members
+      disagreeing on the datamodel)
+
