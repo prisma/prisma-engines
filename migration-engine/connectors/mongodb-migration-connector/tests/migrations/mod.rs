@@ -1,2 +1,2 @@
-mod migrations;
 mod test_api;
+mod tests;

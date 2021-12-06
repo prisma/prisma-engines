@@ -435,7 +435,7 @@ fn defaults_must_work(api: TestApi) {
     let id = user_table.columns.first().unwrap();
 
     assert_eq!("id", &id.name);
-    assert_eq!(false, id.auto_increment);
+    assert!(!id.auto_increment);
 
     let expected_type = ColumnType {
         full_data_type: int_full_data_type(&api).into(),
