@@ -180,6 +180,10 @@ pub trait Connector: Send + Sync {
         self.has_capability(ConnectorCapability::Json)
     }
 
+    fn supports_json_lists(&self) -> bool {
+        self.has_capability(ConnectorCapability::JsonLists)
+    }
+
     fn supports_auto_increment(&self) -> bool {
         self.has_capability(ConnectorCapability::AutoIncrement)
     }
@@ -276,6 +280,7 @@ capabilities!(
     Enums,
     EnumArrayPush,
     Json,
+    JsonLists,
     AutoIncrement,
     RelationFieldsInArbitraryOrder,
     CompositeTypes,

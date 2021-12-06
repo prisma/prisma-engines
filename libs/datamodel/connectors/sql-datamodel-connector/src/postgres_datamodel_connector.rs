@@ -96,6 +96,7 @@ const CAPABILITIES: &[ConnectorCapability] = &[
     ConnectorCapability::QueryRaw,
     ConnectorCapability::RelationFieldsInArbitraryOrder,
     ConnectorCapability::ScalarLists,
+    ConnectorCapability::JsonLists,
     ConnectorCapability::UpdateableId,
     ConnectorCapability::WritableAutoincField,
     ConnectorCapability::UsingHashIndex,

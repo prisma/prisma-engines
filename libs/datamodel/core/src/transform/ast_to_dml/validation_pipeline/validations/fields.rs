@@ -271,19 +271,32 @@ pub(super) fn validate_default(field: ScalarFieldWalker<'_, '_>, ctx: &mut Conte
 }
 
 pub(super) fn validate_scalar_field_connector_specific(field: ScalarFieldWalker<'_, '_>, ctx: &mut Context<'_>) {
-    if matches!(field.scalar_field_type(), ScalarFieldType::BuiltInScalar(t) if t.is_json())
-        && !ctx.connector.supports_json()
-    {
-        ctx.push_error(DatamodelError::new_field_validation_error(
-            &format!(
-                "Field `{}` in model `{}` can't be of type Json. The current connector does not support the Json type.",
+    if matches!(field.scalar_field_type(), ScalarFieldType::BuiltInScalar(t) if t.is_json()) {
+        if !ctx.connector.supports_json() {
+            ctx.push_error(DatamodelError::new_field_validation_error(
+                &format!(
+                    "Field `{}` in model `{}` can't be of type Json. The current connector does not support the Json type.",
+                    field.name(),
+                    field.model().name()
+                ),
+                field.model().name(),
                 field.name(),
-                field.model().name()
-            ),
-            field.model().name(),
-            field.name(),
-            field.ast_field().span,
-        ));
+                field.ast_field().span,
+            ));
+        }
+
+        if field.ast_field().arity.is_list() && !ctx.connector.supports_json_lists() {
+            ctx.push_error(DatamodelError::new_field_validation_error(
+                &format!(
+                    "Field `{}` in model `{}` can't be of type Json[]. The current connector does not support the Json List type.",
+                    field.name(),
+                    field.model().name()
+                ),
+                field.model().name(),
+                field.name(),
+                field.ast_field().span,
+            ));
+        }
     }
 
     if field.ast_field().arity.is_list() && !ctx.connector.supports_scalar_lists() {

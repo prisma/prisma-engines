@@ -238,3 +238,35 @@ fn resolve_enum_field() {
     role_enum.assert_has_value("PRO");
     role_enum.assert_has_value("USER");
 }
+
+#[test]
+fn json_list_type_must_work_for_some_connectors() {
+    let dml = indoc! {r#"
+        model User {
+          id   Int    @id
+          json_list Json[]
+        }
+    "#};
+
+    let error = datamodel::parse_schema(&format!("{}\n{}", COCKROACHDB_SOURCE, dml))
+        .map(drop)
+        .unwrap_err();
+
+    let expectation = expect![[r#"
+        [1;91merror[0m: [1mError validating field `json_list` in model `User`: Field `json_list` in model `User` can't be of type Json[]. The current connector does not support the Json List type.[0m
+          [1;94m-->[0m  [4mschema.prisma:14[0m
+        [1;94m   | [0m
+        [1;94m13 | [0m  id   Int    @id
+        [1;94m14 | [0m  [1;91mjson_list Json[][0m
+        [1;94m15 | [0m}
+        [1;94m   | [0m
+    "#]];
+
+    expectation.assert_eq(&error);
+
+    // Postgres does support it
+    parse(&format!("{}\n{}", POSTGRES_SOURCE, dml))
+        .assert_has_model("User")
+        .assert_has_scalar_field("json_list")
+        .assert_base_type(&ScalarType::Json);
+}

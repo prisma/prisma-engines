@@ -21,6 +21,7 @@ const CAPABILITIES: &[ConnectorCapability] = &[
     ConnectorCapability::RelationFieldsInArbitraryOrder,
     ConnectorCapability::CreateMany,
     ConnectorCapability::ScalarLists,
+    ConnectorCapability::JsonLists,
     ConnectorCapability::InsensitiveFilters,
     ConnectorCapability::CompositeTypes,
     ConnectorCapability::FullTextIndex,
