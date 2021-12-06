@@ -6,7 +6,7 @@ use crate::{
     Table, View,
 };
 use quaint::{ast::Value, prelude::Queryable};
-use std::{any::type_name, borrow::Cow, collections::BTreeMap, convert::TryInto, fmt::Debug};
+use std::{any::type_name, borrow::Cow, collections::BTreeMap, convert::TryInto, fmt::Debug, path::Path};
 use tracing::trace;
 
 pub struct SqlSchemaDescriber<'a> {
@@ -104,7 +104,11 @@ impl<'a> SqlSchemaDescriber<'a> {
             .map(|row| {
                 row.get("file")
                     .and_then(|x| x.to_string())
-                    .and_then(|x| x.split('/').last().map(|x| x.to_string()))
+                    .and_then(|x| {
+                        Path::new(&x)
+                            .file_name()
+                            .map(|name| name.to_string_lossy().into_owned())
+                    })
                     .expect("convert schema names")
             })
             .collect();
