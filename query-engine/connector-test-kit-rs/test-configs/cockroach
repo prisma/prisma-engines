@@ -1,5 +1,4 @@
 {
-    "connector": "postgres",
-    "version": "cockroach",
+    "connector": "cockroachdb",
     "runner": "direct"
 }

@@ -236,7 +236,7 @@ mod interactive_tx {
           &runner,
           "query { findManyTestModel { id }}",
           // Postgres and Mongo abort transactions, data is lost.
-          Postgres(_) | MongoDb(_) => vec![r#"{"data":{"findManyTestModel":[]}}"#],
+          Postgres(_) | MongoDb(_) | CockroachDb => vec![r#"{"data":{"findManyTestModel":[]}}"#],
           // Partial data still there because a batch will not be auto-rolled back by other connectors.
           _ => vec![r#"{"data":{"findManyTestModel":[{"id":1},{"id":2}]}}"#]
         );
