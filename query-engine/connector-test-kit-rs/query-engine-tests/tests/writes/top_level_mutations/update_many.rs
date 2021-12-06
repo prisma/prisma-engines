@@ -156,7 +156,7 @@ mod update_many {
         );
 
         // Todo: Mongo divisions are broken
-        if !matches!(runner.connector(), ConnectorTag::MongoDb(_)) {
+        if !matches!(runner.connector_version(), ConnectorVersion::MongoDb(_)) {
             // optInts before this op are now: null/0, 4, 6
             is_one_of!(
                 query_number_operation(&runner, "optInt", "divide", "3").await?,

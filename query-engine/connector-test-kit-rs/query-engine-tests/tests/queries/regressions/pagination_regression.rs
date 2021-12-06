@@ -92,8 +92,8 @@ mod pagination_regr {
             orderBy: [{ field: desc }, { id: asc }]
           ) { id }
           }"#,
-          [Sqlite, SqlServer, MySql, MongoDb] => r#"{"data":{"findManyTestModel":[{"id":4}]}}"#,
-          [Postgres] => r#"{"data":{"findManyTestModel":[{"id":4},{"id":5}]}}"#
+          Postgres(_) => vec![r#"{"data":{"findManyTestModel":[{"id":4},{"id":5}]}}"#],
+          _ => vec![r#"{"data":{"findManyTestModel":[{"id":4}]}}"#]
         );
 
         Ok(())
@@ -118,8 +118,8 @@ mod pagination_regr {
             orderBy: [{ field: desc }, { id: asc }]
           ) { id }
           }"#,
-          [Postgres] => r#"{"data":{"findManyTestModel":[{"id":2}]}}"#,
-          [Sqlite, MongoDb, MySql, SqlServer] => r#"{"data":{"findManyTestModel":[{"id":2},{"id":1}]}}"#
+          Postgres(_) => vec![r#"{"data":{"findManyTestModel":[{"id":2}]}}"#],
+          _ => vec![r#"{"data":{"findManyTestModel":[{"id":2},{"id":1}]}}"#]
         );
 
         Ok(())

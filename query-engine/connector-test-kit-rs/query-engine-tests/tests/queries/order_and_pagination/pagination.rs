@@ -838,15 +838,15 @@ mod pagination {
         // 6 => C C D C <- take
         //
         // Because the final result gets reversed again to restore original order, the result possibilities are the same as #2, just reversed.
-        match_connector_result!(
-          &runner,
-          r#"query {
+        insta::assert_snapshot!(
+          run_query!(
+            &runner,
+            r#"query {
               findManyTestModel(cursor: { id: 4 }, take: -3, skip: 1, orderBy: [{ fieldA: desc }, { fieldB: asc }, { fieldC: asc }, { fieldD: desc }]) {
                 id
               }
-          }"#,
-          [SqlServer] => r#"{"data":{"findManyTestModel":[{"id":6},{"id":5},{"id":3}]}}"#,
-          [MongoDb, Sqlite, Postgres, MySql, SqlServer] => r#"{"data":{"findManyTestModel":[{"id":6},{"id":5}]}}"#
+            }"#),
+          @r###"{"data":{"findManyTestModel":[{"id":6},{"id":5}]}}"###
         );
 
         Ok(())

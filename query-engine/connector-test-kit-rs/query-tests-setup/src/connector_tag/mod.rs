@@ -7,13 +7,13 @@ mod vitess;
 
 use datamodel_connector::ConnectorCapability;
 use enum_dispatch::enum_dispatch;
-use mongodb::*;
+pub use mongodb::*;
 pub use mysql::*;
-use postgres::*;
-use sql_server::*;
-use sqlite::*;
+pub use postgres::*;
+pub use sql_server::*;
+pub use sqlite::*;
 use std::{convert::TryFrom, fmt};
-use vitess::*;
+pub use vitess::*;
 
 use crate::{datamodel_rendering::DatamodelRenderer, TestConfig, TestError};
 
@@ -67,15 +67,68 @@ pub enum ConnectorTag {
     Vitess(VitessConnectorTag),
 }
 
+#[derive(Debug, Clone)]
+pub enum ConnectorVersion {
+    SqlServer(Option<SqlServerVersion>),
+    Postgres(Option<PostgresVersion>),
+    MySql(Option<MySqlVersion>),
+    MongoDb(Option<MongoDbVersion>),
+    Sqlite,
+    Vitess(Option<VitessVersion>),
+}
+
+impl From<&ConnectorTag> for ConnectorVersion {
+    fn from(connector: &ConnectorTag) -> Self {
+        match connector {
+            ConnectorTag::SqlServer(c) => ConnectorVersion::SqlServer(c.version()),
+            ConnectorTag::Postgres(c) => ConnectorVersion::Postgres(c.version()),
+            ConnectorTag::MySql(c) => ConnectorVersion::MySql(c.version()),
+            ConnectorTag::MongoDb(c) => ConnectorVersion::MongoDb(c.version()),
+            ConnectorTag::Sqlite(_) => ConnectorVersion::Sqlite,
+            ConnectorTag::Vitess(c) => ConnectorVersion::Vitess(c.version()),
+        }
+    }
+}
+
 impl fmt::Display for ConnectorTag {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let printable = match self {
-            ConnectorTag::SqlServer(_) => "SQL Server",
-            ConnectorTag::Postgres(_) => "PostgreSQL",
-            ConnectorTag::MySql(_) => "MySQL",
-            ConnectorTag::MongoDb(_) => "MongoDB",
-            ConnectorTag::Sqlite(_) => "SQLite",
-            ConnectorTag::Vitess(_) => "Vitess",
+            Self::SqlServer(_) => "SQL Server",
+            Self::Postgres(_) => "PostgreSQL",
+            Self::MySql(_) => "MySQL",
+            Self::MongoDb(_) => "MongoDB",
+            Self::Sqlite(_) => "SQLite",
+            Self::Vitess(_) => "Vitess",
+        };
+
+        write!(f, "{}", printable)
+    }
+}
+
+impl fmt::Display for ConnectorVersion {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let printable = match self {
+            Self::SqlServer(v) => match v {
+                Some(v) => format!("SQL Server ({})", v.to_string()),
+                None => "SQL Server (unknown)".to_string(),
+            },
+            Self::Postgres(v) => match v {
+                Some(v) => format!("PostgreSQL ({})", v.to_string()),
+                None => "PostgreSQL (unknown)".to_string(),
+            },
+            Self::MySql(v) => match v {
+                Some(v) => format!("MySQL ({})", v.to_string()),
+                None => "MySQL (unknown)".to_string(),
+            },
+            Self::MongoDb(v) => match v {
+                Some(v) => format!("MongoDB ({})", v.to_string()),
+                None => "MongoDB (unknown)".to_string(),
+            },
+            Self::Sqlite => "SQLite".to_string(),
+            Self::Vitess(v) => match v {
+                Some(v) => format!("Vitess ({})", v.to_string()),
+                None => "Vitess (unknown)".to_string(),
+            },
         };
 
         write!(f, "{}", printable)

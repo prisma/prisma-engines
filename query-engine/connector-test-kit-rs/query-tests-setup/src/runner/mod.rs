@@ -7,7 +7,7 @@ pub use direct::*;
 pub use node_api::*;
 use query_core::{QueryExecutor, TxId};
 
-use crate::{ConnectorTag, QueryResult, TestError, TestResult};
+use crate::{ConnectorTag, ConnectorVersion, QueryResult, TestError, TestResult};
 use colored::*;
 
 #[async_trait::async_trait]
@@ -94,6 +94,14 @@ impl Runner {
     pub fn connector(&self) -> &ConnectorTag {
         match self {
             Runner::Direct(r) => r.connector(),
+            Runner::NodeApi(_) => todo!(),
+            Runner::Binary(_) => todo!(),
+        }
+    }
+
+    pub fn connector_version(&self) -> ConnectorVersion {
+        match self {
+            Runner::Direct(r) => ConnectorVersion::from(r.connector()),
             Runner::NodeApi(_) => todo!(),
             Runner::Binary(_) => todo!(),
         }

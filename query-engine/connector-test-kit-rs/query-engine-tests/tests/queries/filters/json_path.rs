@@ -195,9 +195,9 @@ mod json_path {
             ]
         );
 
-        match runner.connector() {
+        match runner.connector_version() {
             // MariaDB does not support finding arrays in arrays, unlike MySQL
-            ConnectorTag::MySql(mysql) if mysql.version() == Some(&MySqlVersion::MariaDb) => {
+            ConnectorVersion::MySql(Some(MySqlVersion::MariaDb)) => {
                 insta::assert_snapshot!(
                     run_query!(
                         runner,
@@ -667,10 +667,10 @@ mod json_path {
     }
 
     fn json_path(runner: &Runner) -> &'static str {
-        match runner.connector() {
-            ConnectorTag::Postgres(_) => r#"path: ["a", "b"]"#,
-            ConnectorTag::MySql(_) => r#"path: "$.a.b""#,
-            x => unreachable!("JSON filtering is not supported on {}", x),
+        match runner.connector_version() {
+            ConnectorVersion::Postgres(_) => r#"path: ["a", "b"]"#,
+            ConnectorVersion::MySql(_) => r#"path: "$.a.b""#,
+            x => unreachable!("JSON filtering is not supported on {:?}", x),
         }
     }
 }

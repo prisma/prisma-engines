@@ -30,8 +30,8 @@ mod one2one_req {
           @r###"{"data":{"createOneParent":{"id":1}}}"###
         );
 
-        match runner.connector() {
-            ConnectorTag::MongoDb(_) => assert_error!(
+        match runner.connector_version() {
+            ConnectorVersion::MongoDb(_) => assert_error!(
                 runner,
                 "mutation { deleteOneParent(where: { id: 1 }) { id }}",
                 2014,
@@ -76,8 +76,8 @@ mod one2one_opt {
           @r###"{"data":{"createOneParent":{"id":1}}}"###
         );
 
-        match runner.connector() {
-            ConnectorTag::MongoDb(_) => assert_error!(
+        match runner.connector_version() {
+            ConnectorVersion::MongoDb(_) => assert_error!(
                 runner,
                 "mutation { deleteOneParent(where: { id: 1 }) { id }}",
                 2014,
@@ -148,8 +148,8 @@ mod one2many_req {
           @r###"{"data":{"createOneParent":{"id":1}}}"###
         );
 
-        match runner.connector() {
-            ConnectorTag::MongoDb(_) => assert_error!(
+        match runner.connector_version() {
+            ConnectorVersion::MongoDb(_) => assert_error!(
                 runner,
                 "mutation { deleteOneParent(where: { id: 1 }) { id }}",
                 2014,
@@ -220,8 +220,8 @@ mod one2many_opt {
           @r###"{"data":{"createOneParent":{"id":1}}}"###
         );
 
-        match runner.connector() {
-            ConnectorTag::MongoDb(_) => assert_error!(
+        match runner.connector_version() {
+            ConnectorVersion::MongoDb(_) => assert_error!(
                 runner,
                 "mutation { deleteOneParent(where: { id: 1 }) { id }}",
                 2014,

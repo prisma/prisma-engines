@@ -79,6 +79,11 @@ impl SqlServerConnectorTag {
             },
         ]
     }
+
+    /// Get a reference to the sql server connector tag's version.
+    pub fn version(&self) -> Option<SqlServerVersion> {
+        self.version
+    }
 }
 
 impl PartialEq for SqlServerConnectorTag {

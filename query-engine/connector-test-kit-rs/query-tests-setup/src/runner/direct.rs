@@ -6,7 +6,7 @@ use std::{env, sync::Arc};
 
 pub(crate) type Executor = Box<dyn QueryExecutor + Send + Sync>;
 
-/// Direct engine runner.
+/// Direct engine runner.   
 pub struct DirectRunner {
     executor: Executor,
     query_schema: QuerySchemaRef,
