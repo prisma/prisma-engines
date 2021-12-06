@@ -7,7 +7,7 @@ use std::path::Path;
 fn main() {
     let common = read_file("./src/common.rs");
     let query = read_file("./src/query_engine.rs");
-    let files = vec![common, query];
+    let files = &[common, query];
 
     // Read the files and generate a list of errors for our dmmf
     let error_src = user_facing_error_parsing::parse_files(files);

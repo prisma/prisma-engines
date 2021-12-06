@@ -24,7 +24,7 @@ include!(concat!(env!("OUT_DIR"), "/user_error_list.rs"));
 // This isn't really needed but is added for clarity to make
 // what is happening a little more obvious. The error_list() is generated
 // in the build.rs.
-pub fn known_errors() -> Vec<UserErrorType> {
+pub fn known_errors() -> &'static [UserErrorType] {
     error_list()
 }
 

@@ -30,7 +30,7 @@ pub fn derive_user_facing_error(input: proc_macro::TokenStream) -> proc_macro::T
     };
 
     let fields = field_idents.iter().map(|field| {
-        let key = format!("{}", field);
+        let key = field.to_string();
         quote::quote! {
            error_fields.insert(#key.to_string(), serde_json::to_value(&self.#field).unwrap());
         }

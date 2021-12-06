@@ -13,7 +13,7 @@ pub struct DataModelMetaFormat {
     pub data_model: serde_json::Value,
     pub schema: DmmfSchema,
     pub mappings: DmmfOperationMappings,
-    pub errors: Vec<user_facing_errors::UserErrorType>,
+    pub errors: &'static [user_facing_errors::UserErrorType],
 }
 
 /// Model operations are serialized as an array of objects, each one

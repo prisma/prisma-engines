@@ -15,7 +15,7 @@ use syn::{Attribute, ItemStruct};
 ///         ])
 ///     }
 ///
-pub fn parse_files(srcs: Vec<String>) -> String {
+pub fn parse_files(srcs: &[String]) -> String {
     let errors: Vec<_> = vec![];
 
     let error_infos = srcs.iter().fold(errors, |mut errors, src| {
@@ -38,12 +38,12 @@ pub fn parse_files(srcs: Vec<String>) -> String {
 
     let output_file = quote::quote! {
 
-        pub fn error_list() -> Vec<UserErrorType> {
-            Vec::from([
+        pub fn error_list() -> &'static [UserErrorType] {
+            &[
                 #(
                     #error_infos
                 ),*
-            ])
+            ]
 
         }
     };
