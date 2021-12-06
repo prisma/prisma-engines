@@ -403,7 +403,7 @@ mod tests {
     #[test]
     fn test_empty_cap_does_not_contain() {
         let cap = ConnectorCapabilities::empty();
-        assert_eq!(cap.supports_any(&[ConnectorCapability::JsonFilteringJsonPath]), false);
+        assert!(!cap.supports_any(&[ConnectorCapability::JsonFilteringJsonPath]));
     }
 
     #[test]
@@ -413,7 +413,7 @@ mod tests {
             ConnectorCapability::JsonFilteringJsonPath,
             ConnectorCapability::JsonFilteringArrayPath,
         ]);
-        assert_eq!(cap.supports_any(&[ConnectorCapability::JsonFilteringJsonPath]), true);
+        assert!(cap.supports_any(&[ConnectorCapability::JsonFilteringJsonPath]));
     }
 
     #[test]
@@ -423,13 +423,10 @@ mod tests {
             ConnectorCapability::JsonFilteringJsonPath,
             ConnectorCapability::JsonFilteringArrayPath,
         ]);
-        assert_eq!(
-            cap.supports_any(&[
-                ConnectorCapability::JsonFilteringJsonPath,
-                ConnectorCapability::JsonFilteringArrayPath
-            ]),
-            true
-        );
+        assert!(cap.supports_any(&[
+            ConnectorCapability::JsonFilteringJsonPath,
+            ConnectorCapability::JsonFilteringArrayPath,
+        ]));
     }
 
     #[test]
@@ -438,6 +435,6 @@ mod tests {
             ConnectorCapability::PrimaryKeySortOrderDefinition,
             ConnectorCapability::JsonFilteringArrayPath,
         ]);
-        assert_eq!(cap.supports_any(&[ConnectorCapability::JsonFilteringJsonPath]), false);
+        assert!(!cap.supports_any(&[ConnectorCapability::JsonFilteringJsonPath]));
     }
 }

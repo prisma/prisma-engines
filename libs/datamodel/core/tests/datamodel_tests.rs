@@ -21,6 +21,7 @@ pub enum Provider {
     Sqlite,
     SqlServer,
     Mongo,
+    Cockroach,
 }
 
 fn with_header(dm: &str, provider: Provider, preview_features: &[&str]) -> String {
@@ -30,6 +31,7 @@ fn with_header(dm: &str, provider: Provider, preview_features: &[&str]) -> Strin
         Provider::Sqlite => ("sqlite", "file"),
         Provider::Mysql => ("mysql", "mysql"),
         Provider::SqlServer => ("sqlserver", "sqlserver"),
+        Provider::Cockroach => ("cockroachdb", "cockroachdb"),
     };
 
     let preview_features = if preview_features.is_empty() {
