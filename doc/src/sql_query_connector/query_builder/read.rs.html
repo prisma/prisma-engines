@@ -267,6 +267,9 @@
 <span id="267">267</span>
 <span id="268">268</span>
 <span id="269">269</span>
+<span id="270">270</span>
+<span id="271">271</span>
+<span id="272">272</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">cursor_condition</span>, <span class="ident">filter_conversion::AliasedCondition</span>, <span class="ident">model_extensions</span>::<span class="kw-2">*</span>, <span class="ident">nested_aggregations</span>, <span class="ident">ordering</span>,
     <span class="ident">sql_trace::SqlTraceComment</span>,
@@ -521,7 +524,10 @@
             <span class="ident">AggregationSelection::Field</span>(<span class="ident">field</span>) =&gt; <span class="macro">vec!</span>[<span class="ident">field</span>.<span class="ident">clone</span>()],
             <span class="ident">AggregationSelection::Count</span> { <span class="ident">all</span>: <span class="kw">_</span>, <span class="ident">fields</span> } =&gt; {
                 <span class="kw">if</span> <span class="ident">fields</span>.<span class="ident">is_empty</span>() {
-                    <span class="ident">model</span>.<span class="ident">primary_identifier</span>().<span class="ident">scalar_fields</span>().<span class="ident">collect</span>()
+                    <span class="ident">model</span>
+                        .<span class="ident">primary_identifier</span>()
+                        .<span class="ident">as_scalar_fields</span>()
+                        .<span class="ident">expect</span>(<span class="string">&quot;Primary identifier has non-scalar fields.&quot;</span>)
                 } <span class="kw">else</span> {
                     <span class="ident">fields</span>.<span class="ident">clone</span>()
                 }

@@ -339,7 +339,7 @@
         <span class="ident">validation_pipeline::context::Context</span>,
     },
 };
-<span class="kw">use</span> <span class="ident">datamodel_connector::ConnectorCapability</span>;
+<span class="kw">use</span> <span class="ident">datamodel_connector</span>::{<span class="ident">walker_ext_traits</span>::<span class="kw-2">*</span>, <span class="ident">ConnectorCapability</span>};
 
 <span class="doccomment">/// Different databases validate index and unique constraint names in a certain namespace.</span>
 <span class="doccomment">/// Validates index and unique constraint names against the database requirements.</span>
@@ -424,7 +424,7 @@
         <span class="kw">return</span>;
     }
 
-    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">IndexAlgorithm::Hash</span>) <span class="op">=</span> <span class="ident">index</span>.<span class="ident">attribute</span>().<span class="ident">algorithm</span> {
+    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">IndexAlgorithm::Hash</span>) <span class="op">=</span> <span class="ident">index</span>.<span class="ident">algorithm</span>() {
         <span class="kw">let</span> <span class="ident">message</span> <span class="op">=</span> <span class="string">&quot;The given type argument is not supported with the current connector&quot;</span>;
         <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="ident">index</span>
             .<span class="ident">ast_attribute</span>()
@@ -441,7 +441,7 @@
         <span class="kw">return</span>;
     }
 
-    <span class="kw">if</span> <span class="ident">index</span>.<span class="ident">attribute</span>().<span class="ident">is_fulltext</span>() {
+    <span class="kw">if</span> <span class="ident">index</span>.<span class="ident">is_fulltext</span>() {
         <span class="kw">let</span> <span class="ident">message</span> <span class="op">=</span> <span class="string">&quot;You must enable `fullTextIndex` preview feature to be able to define a @@fulltext index.&quot;</span>;
 
         <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="ident">index</span>
@@ -461,7 +461,7 @@
         <span class="kw">return</span>;
     }
 
-    <span class="kw">if</span> <span class="ident">index</span>.<span class="ident">attribute</span>().<span class="ident">is_fulltext</span>() {
+    <span class="kw">if</span> <span class="ident">index</span>.<span class="ident">is_fulltext</span>() {
         <span class="kw">let</span> <span class="ident">message</span> <span class="op">=</span> <span class="string">&quot;Defining fulltext indexes is not supported with the current connector.&quot;</span>;
 
         <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="ident">index</span>
@@ -481,7 +481,7 @@
         <span class="kw">return</span>;
     }
 
-    <span class="kw">if</span> <span class="ident">index</span>.<span class="ident">attribute</span>().<span class="ident">algorithm</span>.<span class="ident">is_some</span>() {
+    <span class="kw">if</span> <span class="ident">index</span>.<span class="ident">algorithm</span>().<span class="ident">is_some</span>() {
         <span class="kw">let</span> <span class="ident">message</span> <span class="op">=</span> <span class="string">&quot;You must enable `extendedIndexes` preview feature to be able to define the index type.&quot;</span>;
 
         <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="ident">index</span>
@@ -503,7 +503,7 @@
         <span class="kw">return</span>;
     }
 
-    <span class="kw">if</span> <span class="op">!</span><span class="ident">index</span>.<span class="ident">attribute</span>().<span class="ident">is_fulltext</span>() {
+    <span class="kw">if</span> <span class="op">!</span><span class="ident">index</span>.<span class="ident">is_fulltext</span>() {
         <span class="kw">return</span>;
     }
 
@@ -532,7 +532,7 @@
         <span class="kw">return</span>;
     }
 
-    <span class="kw">if</span> <span class="op">!</span><span class="ident">index</span>.<span class="ident">attribute</span>().<span class="ident">is_fulltext</span>() {
+    <span class="kw">if</span> <span class="op">!</span><span class="ident">index</span>.<span class="ident">is_fulltext</span>() {
         <span class="kw">return</span>;
     }
 
@@ -572,7 +572,7 @@
         <span class="kw">return</span>;
     }
 
-    <span class="kw">if</span> <span class="op">!</span><span class="ident">index</span>.<span class="ident">attribute</span>().<span class="ident">is_fulltext</span>() {
+    <span class="kw">if</span> <span class="op">!</span><span class="ident">index</span>.<span class="ident">is_fulltext</span>() {
         <span class="kw">return</span>;
     }
 
@@ -631,7 +631,7 @@
         <span class="kw">return</span>;
     }
 
-    <span class="kw">if</span> <span class="op">!</span><span class="ident">index</span>.<span class="ident">attribute</span>().<span class="ident">algorithm</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">alg</span><span class="op">|</span> <span class="ident">alg</span>.<span class="ident">is_hash</span>()).<span class="ident">unwrap_or</span>(<span class="bool-val">false</span>) {
+    <span class="kw">if</span> <span class="op">!</span><span class="ident">index</span>.<span class="ident">algorithm</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">alg</span><span class="op">|</span> <span class="ident">alg</span>.<span class="ident">is_hash</span>()).<span class="ident">unwrap_or</span>(<span class="bool-val">false</span>) {
         <span class="kw">return</span>;
     }
 
@@ -652,7 +652,7 @@
         <span class="ident">validate_db_name</span>(
             <span class="ident">index</span>.<span class="ident">model</span>().<span class="ident">name</span>(),
             <span class="ident">ast_attribute</span>,
-            <span class="ident">index</span>.<span class="ident">database_name</span>(),
+            <span class="ident">index</span>.<span class="ident">mapped_name</span>(),
             <span class="ident">ctx</span>,
             <span class="op">!</span><span class="ident">index</span>.<span class="ident">is_defined_on_field</span>(),
         )

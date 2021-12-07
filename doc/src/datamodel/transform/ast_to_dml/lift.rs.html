@@ -448,23 +448,13 @@
 <span id="448">448</span>
 <span id="449">449</span>
 <span id="450">450</span>
-<span id="451">451</span>
-<span id="452">452</span>
-<span id="453">453</span>
-<span id="454">454</span>
-<span id="455">455</span>
-<span id="456">456</span>
-<span id="457">457</span>
-<span id="458">458</span>
-<span id="459">459</span>
-<span id="460">460</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">ast</span>, <span class="ident">dml</span>,
     <span class="ident">transform::ast_to_dml::db</span>::{<span class="self">self</span>, <span class="ident">walkers</span>::<span class="kw-2">*</span>, <span class="ident">IndexAlgorithm</span>},
     <span class="ident">IndexField</span>, <span class="ident">PrimaryKeyField</span>,
 };
 <span class="kw">use</span> <span class="ident">::dml::composite_type</span>::{<span class="ident">CompositeType</span>, <span class="ident">CompositeTypeField</span>, <span class="ident">CompositeTypeFieldType</span>};
-<span class="kw">use</span> <span class="ident">datamodel_connector</span>::{<span class="ident">Connector</span>, <span class="ident">ReferentialIntegrity</span>};
+<span class="kw">use</span> <span class="ident">datamodel_connector</span>::{<span class="ident">walker_ext_traits</span>::<span class="kw-2">*</span>, <span class="ident">Connector</span>, <span class="ident">ReferentialIntegrity</span>};
 <span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
 
 <span class="doccomment">/// Helper for lifting a datamodel.</span>
@@ -535,18 +525,13 @@
     ) {
         <span class="kw">let</span> <span class="ident">active_connector</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">connector</span>;
         <span class="kw">let</span> <span class="ident">referential_integrity</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">referential_integrity</span>;
-        <span class="kw">let</span> <span class="ident">common_dml_fields</span> <span class="op">=</span> <span class="op">|</span><span class="ident">field</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">dml::RelationField</span>,
-                                 <span class="ident">attributes</span>: <span class="kw-2">&amp;</span><span class="ident"><span class="kw">super</span>::db::RelationField</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-                                 <span class="ident">relation_field</span>: <span class="ident">RelationFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">|</span> {
+        <span class="kw">let</span> <span class="ident">common_dml_fields</span> <span class="op">=</span> <span class="op">|</span><span class="ident">field</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">dml::RelationField</span>, <span class="ident">relation_field</span>: <span class="ident">RelationFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">|</span> {
             <span class="kw">let</span> <span class="ident">ast_field</span> <span class="op">=</span> <span class="ident">relation_field</span>.<span class="ident">ast_field</span>();
-            <span class="ident">field</span>.<span class="ident">relation_info</span>.<span class="ident">on_delete</span> <span class="op">=</span> <span class="ident">attributes</span>.<span class="ident">on_delete</span>;
-            <span class="ident">field</span>.<span class="ident">relation_info</span>.<span class="ident">on_update</span> <span class="op">=</span> <span class="ident">attributes</span>.<span class="ident">on_update</span>;
+            <span class="ident">field</span>.<span class="ident">relation_info</span>.<span class="ident">on_delete</span> <span class="op">=</span> <span class="ident">relation_field</span>.<span class="ident">explicit_on_delete</span>();
+            <span class="ident">field</span>.<span class="ident">relation_info</span>.<span class="ident">on_update</span> <span class="op">=</span> <span class="ident">relation_field</span>.<span class="ident">explicit_on_update</span>();
             <span class="ident">field</span>.<span class="ident">relation_info</span>.<span class="ident">name</span> <span class="op">=</span> <span class="ident">relation_field</span>.<span class="ident">relation_name</span>().<span class="ident">to_string</span>();
             <span class="ident">field</span>.<span class="ident">documentation</span> <span class="op">=</span> <span class="ident">ast_field</span>.<span class="ident">documentation</span>.<span class="ident">clone</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">comment</span><span class="op">|</span> <span class="ident">comment</span>.<span class="ident">text</span>);
-            <span class="ident">field</span>.<span class="ident">is_ignored</span> <span class="op">=</span> <span class="ident">attributes</span>.<span class="ident">is_ignored</span>;
-            <span class="ident">field</span>.<span class="ident">relation_info</span>.<span class="ident">fk_name</span> <span class="op">=</span> <span class="ident">relation_field</span>
-                .<span class="ident">final_foreign_key_name</span>(<span class="ident">active_connector</span>)
-                .<span class="ident">map</span>(<span class="op">|</span><span class="ident">cow</span><span class="op">|</span> <span class="ident">cow</span>.<span class="ident">into_owned</span>());
+            <span class="ident">field</span>.<span class="ident">is_ignored</span> <span class="op">=</span> <span class="ident">relation_field</span>.<span class="ident">is_ignored</span>();
             <span class="ident">field</span>.<span class="ident">supports_restrict_action</span>(
                 <span class="ident">active_connector</span>.<span class="ident">supports_referential_action</span>(<span class="kw-2">&amp;</span><span class="ident">referential_integrity</span>, <span class="ident">dml::ReferentialAction::Restrict</span>),
             );
@@ -564,13 +549,14 @@
 
                         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">relation_field</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">relation_field</span>) <span class="op">=</span> <span class="ident">relation</span>.<span class="ident">forward_relation_field</span>() {
                             <span class="comment">// Construct a relation field in the DML for an existing relation field in the source.</span>
-                            <span class="kw">let</span> <span class="ident">attributes</span> <span class="op">=</span> <span class="ident">relation_field</span>.<span class="ident">attributes</span>();
                             <span class="kw">let</span> <span class="ident">arity</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">lift_field_arity</span>(<span class="kw-2">&amp;</span><span class="ident">relation_field</span>.<span class="ident">ast_field</span>().<span class="ident">arity</span>);
                             <span class="kw">let</span> <span class="ident">referential_arity</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">lift_field_arity</span>(<span class="kw-2">&amp;</span><span class="ident">relation_field</span>.<span class="ident">referential_arity</span>());
                             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">field</span> <span class="op">=</span>
                                 <span class="ident">dml::RelationField::new</span>(<span class="ident">relation_field</span>.<span class="ident">name</span>(), <span class="ident">arity</span>, <span class="ident">referential_arity</span>, <span class="ident">relation_info</span>);
 
-                            <span class="ident">common_dml_fields</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">field</span>, <span class="ident">attributes</span>, <span class="ident">relation_field</span>);
+                            <span class="ident">field</span>.<span class="ident">relation_info</span>.<span class="ident">fk_name</span> <span class="op">=</span>
+                                <span class="prelude-val">Some</span>(<span class="ident">relation_field</span>.<span class="ident">final_foreign_key_name</span>(<span class="ident">active_connector</span>).<span class="ident">into_owned</span>());
+                            <span class="ident">common_dml_fields</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">field</span>, <span class="ident">relation_field</span>);
                             <span class="ident">field_ids_for_sorting</span>.<span class="ident">insert</span>(
                                 (<span class="ident">relation_field</span>.<span class="ident">model</span>().<span class="ident">name</span>(), <span class="ident">relation_field</span>.<span class="ident">name</span>()),
                                 <span class="ident">relation_field</span>.<span class="ident">field_id</span>(),
@@ -609,7 +595,7 @@
                                     <span class="kw">let</span> <span class="ident">field_type</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">lift_scalar_field_type</span>(
                                         <span class="ident">field</span>.<span class="ident">blueprint</span>.<span class="ident">ast_field</span>(),
                                         <span class="kw-2">&amp;</span><span class="ident">field</span>.<span class="ident">tpe</span>,
-                                        <span class="ident">field</span>.<span class="ident">blueprint</span>.<span class="ident">attributes</span>(),
+                                        <span class="ident">field</span>.<span class="ident">blueprint</span>,
                                     );
                                     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">scalar_field</span> <span class="op">=</span> <span class="ident">dml::ScalarField::new_generated</span>(<span class="kw-2">&amp;</span><span class="ident">field</span>.<span class="ident">name</span>, <span class="ident">field_type</span>);
                                     <span class="ident">scalar_field</span>.<span class="ident">arity</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">relation_field</span>.<span class="ident">arity</span>.<span class="ident">is_required</span>() {
@@ -640,13 +626,12 @@
 
                         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">field</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">relation_field</span>) <span class="op">=</span> <span class="ident">relation</span>.<span class="ident">back_relation_field</span>() {
                             <span class="kw">let</span> <span class="ident">ast_field</span> <span class="op">=</span> <span class="ident">relation_field</span>.<span class="ident">ast_field</span>();
-                            <span class="kw">let</span> <span class="ident">attributes</span> <span class="op">=</span> <span class="ident">relation_field</span>.<span class="ident">attributes</span>();
                             <span class="kw">let</span> <span class="ident">arity</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">lift_field_arity</span>(<span class="kw-2">&amp;</span><span class="ident">ast_field</span>.<span class="ident">arity</span>);
                             <span class="kw">let</span> <span class="ident">referential_arity</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">lift_field_arity</span>(<span class="kw-2">&amp;</span><span class="ident">relation_field</span>.<span class="ident">referential_arity</span>());
                             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">field</span> <span class="op">=</span>
                                 <span class="ident">dml::RelationField::new</span>(<span class="ident">relation_field</span>.<span class="ident">name</span>(), <span class="ident">arity</span>, <span class="ident">referential_arity</span>, <span class="ident">relation_info</span>);
 
-                            <span class="ident">common_dml_fields</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">field</span>, <span class="ident">attributes</span>, <span class="ident">relation_field</span>);
+                            <span class="ident">common_dml_fields</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">field</span>, <span class="ident">relation_field</span>);
 
                             <span class="ident">field_ids_for_sorting</span>.<span class="ident">insert</span>(
                                 (<span class="ident">relation_field</span>.<span class="ident">model</span>().<span class="ident">name</span>(), <span class="ident">relation_field</span>.<span class="ident">name</span>()),
@@ -675,14 +660,13 @@
                 <span class="ident">RefinedRelationWalker::ImplicitManyToMany</span>(<span class="ident">relation</span>) =&gt; {
                     <span class="kw">for</span> <span class="ident">relation_field</span> <span class="kw">in</span> [<span class="ident">relation</span>.<span class="ident">field_a</span>(), <span class="ident">relation</span>.<span class="ident">field_b</span>()] {
                         <span class="kw">let</span> <span class="ident">ast_field</span> <span class="op">=</span> <span class="ident">relation_field</span>.<span class="ident">ast_field</span>();
-                        <span class="kw">let</span> <span class="ident">attributes</span> <span class="op">=</span> <span class="ident">relation_field</span>.<span class="ident">attributes</span>();
                         <span class="kw">let</span> <span class="ident">arity</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">lift_field_arity</span>(<span class="kw-2">&amp;</span><span class="ident">ast_field</span>.<span class="ident">arity</span>);
                         <span class="kw">let</span> <span class="ident">relation_info</span> <span class="op">=</span> <span class="ident">dml::RelationInfo::new</span>(<span class="ident">relation_field</span>.<span class="ident">related_model</span>().<span class="ident">name</span>());
                         <span class="kw">let</span> <span class="ident">referential_arity</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">lift_field_arity</span>(<span class="kw-2">&amp;</span><span class="ident">relation_field</span>.<span class="ident">referential_arity</span>());
                         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">field</span> <span class="op">=</span>
                             <span class="ident">dml::RelationField::new</span>(<span class="ident">relation_field</span>.<span class="ident">name</span>(), <span class="ident">arity</span>, <span class="ident">referential_arity</span>, <span class="ident">relation_info</span>);
 
-                        <span class="ident">common_dml_fields</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">field</span>, <span class="ident">attributes</span>, <span class="ident">relation_field</span>);
+                        <span class="ident">common_dml_fields</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">field</span>, <span class="ident">relation_field</span>);
 
                         <span class="kw">let</span> <span class="ident">primary_key</span> <span class="op">=</span> <span class="ident">relation_field</span>.<span class="ident">related_model</span>().<span class="ident">primary_key</span>().<span class="ident">unwrap</span>();
                         <span class="ident">field</span>.<span class="ident">relation_info</span>.<span class="ident">references</span> <span class="op">=</span>
@@ -740,23 +724,23 @@
         <span class="kw">let</span> <span class="ident">walker</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">db</span>.<span class="ident">walk_model</span>(<span class="ident">model_id</span>);
 
         <span class="ident">model</span>.<span class="ident">documentation</span> <span class="op">=</span> <span class="ident">ast_model</span>.<span class="ident">documentation</span>.<span class="ident">clone</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">comment</span><span class="op">|</span> <span class="ident">comment</span>.<span class="ident">text</span>);
-        <span class="ident">model</span>.<span class="ident">database_name</span> <span class="op">=</span> <span class="ident">walker</span>.<span class="ident">attributes</span>().<span class="ident">mapped_name</span>.<span class="ident">map</span>(<span class="ident">String::from</span>);
-        <span class="ident">model</span>.<span class="ident">is_ignored</span> <span class="op">=</span> <span class="ident">walker</span>.<span class="ident">attributes</span>().<span class="ident">is_ignored</span>;
+        <span class="ident">model</span>.<span class="ident">database_name</span> <span class="op">=</span> <span class="ident">walker</span>.<span class="ident">mapped_name</span>().<span class="ident">map</span>(<span class="ident">String::from</span>);
+        <span class="ident">model</span>.<span class="ident">is_ignored</span> <span class="op">=</span> <span class="ident">walker</span>.<span class="ident">is_ignored</span>();
 
         <span class="ident">model</span>.<span class="ident">primary_key</span> <span class="op">=</span> <span class="ident">walker</span>.<span class="ident">primary_key</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">pk</span><span class="op">|</span> <span class="ident">dml::PrimaryKeyDefinition</span> {
             <span class="ident">name</span>: <span class="ident">pk</span>.<span class="ident">name</span>().<span class="ident">map</span>(<span class="ident">String::from</span>),
             <span class="ident">db_name</span>: <span class="ident">pk</span>.<span class="ident">final_database_name</span>(<span class="self">self</span>.<span class="ident">connector</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">into_owned</span>()),
             <span class="ident">fields</span>: <span class="ident">pk</span>
-                .<span class="ident">iter_ast_fields</span>()
-                .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">field</span>, <span class="ident">sort_order</span>, <span class="ident">length</span>)<span class="op">|</span>
+                .<span class="ident">scalar_field_attributes</span>()
+                .<span class="ident">map</span>(<span class="op">|</span><span class="ident">field</span><span class="op">|</span>
                     <span class="comment">//TODO (extended indexes) here it is ok to pass sort and length with out a preview flag</span>
                     <span class="comment">// check since this is coming from the ast and the parsing would reject the args without</span>
                     <span class="comment">// the flag set</span>
                     <span class="comment">// When we start using the extra args here could be a place to fill in the defaults. </span>
                     <span class="ident">PrimaryKeyField</span> {
-                    <span class="ident">name</span>: <span class="ident">field</span>.<span class="ident">name</span>.<span class="ident">name</span>.<span class="ident">to_owned</span>(),
-                    <span class="ident">sort_order</span>,
-                    <span class="ident">length</span>,
+                    <span class="ident">name</span>: <span class="ident">field</span>.<span class="ident">as_scalar_field</span>().<span class="ident">name</span>().<span class="ident">to_owned</span>(),
+                    <span class="ident">sort_order</span>: <span class="ident">field</span>.<span class="ident">sort_order</span>(),
+                    <span class="ident">length</span>: <span class="ident">field</span>.<span class="ident">length</span>(),
                 })
                 .<span class="ident">collect</span>(),
             <span class="ident">defined_on_field</span>: <span class="ident">pk</span>.<span class="ident">is_defined_on_field</span>(),
@@ -768,63 +752,60 @@
                 <span class="macro">assert!</span>(<span class="ident">idx</span>.<span class="ident">fields</span>().<span class="ident">len</span>() <span class="op">!</span><span class="op">=</span> <span class="number">0</span>);
 
                 <span class="kw">let</span> <span class="ident">fields</span> <span class="op">=</span> <span class="ident">idx</span>
-                    .<span class="ident">attribute</span>()
-                    .<span class="ident">fields</span>
-                    .<span class="ident">iter</span>()
+                    .<span class="ident">scalar_field_attributes</span>()
                     .<span class="ident">map</span>(<span class="op">|</span><span class="ident">field</span><span class="op">|</span> <span class="ident">IndexField</span> {
-                        <span class="ident">name</span>: <span class="self">self</span>.<span class="ident">db</span>.<span class="ident">ast</span>()[<span class="ident">model_id</span>][<span class="ident">field</span>.<span class="ident">field_id</span>].<span class="ident">name</span>.<span class="ident">name</span>.<span class="ident">clone</span>(),
-                        <span class="ident">sort_order</span>: <span class="ident">field</span>.<span class="ident">sort_order</span>,
-                        <span class="ident">length</span>: <span class="ident">field</span>.<span class="ident">length</span>,
+                        <span class="ident">name</span>: <span class="ident">field</span>.<span class="ident">as_scalar_field</span>().<span class="ident">name</span>().<span class="ident">to_owned</span>(),
+                        <span class="ident">sort_order</span>: <span class="ident">field</span>.<span class="ident">sort_order</span>(),
+                        <span class="ident">length</span>: <span class="ident">field</span>.<span class="ident">length</span>(),
                     })
                     .<span class="ident">collect</span>();
 
-                <span class="kw">let</span> <span class="ident">tpe</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">idx</span>.<span class="ident">attribute</span>().<span class="ident">r#type</span> {
+                <span class="kw">let</span> <span class="ident">tpe</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">idx</span>.<span class="ident">index_type</span>() {
                     <span class="ident">db::IndexType::Unique</span> =&gt; <span class="ident">dml::IndexType::Unique</span>,
                     <span class="ident">db::IndexType::Normal</span> =&gt; <span class="ident">dml::IndexType::Normal</span>,
                     <span class="ident">db::IndexType::Fulltext</span> =&gt; <span class="ident">dml::IndexType::Fulltext</span>,
                 };
 
-                <span class="kw">let</span> <span class="ident">algorithm</span> <span class="op">=</span> <span class="ident">idx</span>.<span class="ident">attribute</span>().<span class="ident">algorithm</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">using</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">using</span> {
+                <span class="kw">let</span> <span class="ident">algorithm</span> <span class="op">=</span> <span class="ident">idx</span>.<span class="ident">algorithm</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">using</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">using</span> {
                     <span class="ident">IndexAlgorithm::BTree</span> =&gt; <span class="ident">dml::IndexAlgorithm::BTree</span>,
                     <span class="ident">IndexAlgorithm::Hash</span> =&gt; <span class="ident">dml::IndexAlgorithm::Hash</span>,
                 });
 
                 <span class="ident">dml::IndexDefinition</span> {
-                    <span class="ident">name</span>: <span class="ident">idx</span>.<span class="ident">attribute</span>().<span class="ident">name</span>.<span class="ident">map</span>(<span class="ident">String::from</span>),
+                    <span class="ident">name</span>: <span class="ident">idx</span>.<span class="ident">name</span>().<span class="ident">map</span>(<span class="ident">String::from</span>),
                     <span class="ident">db_name</span>: <span class="prelude-val">Some</span>(<span class="ident">idx</span>.<span class="ident">final_database_name</span>(<span class="self">self</span>.<span class="ident">connector</span>).<span class="ident">into_owned</span>()),
                     <span class="ident">fields</span>,
                     <span class="ident">tpe</span>,
                     <span class="ident">algorithm</span>,
-                    <span class="ident">defined_on_field</span>: <span class="ident">idx</span>.<span class="ident">attribute</span>().<span class="ident">source_field</span>.<span class="ident">is_some</span>(),
+                    <span class="ident">defined_on_field</span>: <span class="ident">idx</span>.<span class="ident">is_defined_on_field</span>(),
                 }
             })
             .<span class="ident">collect</span>();
 
         <span class="kw">for</span> <span class="ident">scalar_field</span> <span class="kw">in</span> <span class="ident">walker</span>.<span class="ident">scalar_fields</span>() {
             <span class="kw">let</span> <span class="ident">field_id</span> <span class="op">=</span> <span class="ident">scalar_field</span>.<span class="ident">field_id</span>();
-            <span class="kw">let</span> <span class="ident">attributes</span> <span class="op">=</span> <span class="ident">scalar_field</span>.<span class="ident">attributes</span>();
             <span class="kw">let</span> <span class="ident">ast_field</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">ast_model</span>[<span class="ident">field_id</span>];
             <span class="kw">let</span> <span class="ident">arity</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">lift_field_arity</span>(<span class="kw-2">&amp;</span><span class="ident">ast_field</span>.<span class="ident">arity</span>);
-            <span class="kw">let</span> <span class="ident">field_type</span> <span class="op">=</span> <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">attributes</span>.<span class="ident">r#type</span> {
+            <span class="kw">let</span> <span class="ident">field_type</span> <span class="op">=</span> <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">scalar_field</span>.<span class="ident">scalar_field_type</span>() {
                 <span class="ident">db::ScalarFieldType::CompositeType</span>(<span class="ident">ctid</span>) =&gt; {
                     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">field</span> <span class="op">=</span> <span class="ident">dml::CompositeField::new</span>();
                     <span class="ident">field</span>.<span class="ident">composite_type</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">db</span>.<span class="ident">ast</span>()[<span class="kw-2">*</span><span class="ident">ctid</span>].<span class="ident">name</span>.<span class="ident">name</span>.<span class="ident">to_owned</span>();
                     <span class="ident">field</span>.<span class="ident">documentation</span> <span class="op">=</span> <span class="ident">ast_field</span>.<span class="ident">documentation</span>.<span class="ident">clone</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">comment</span><span class="op">|</span> <span class="ident">comment</span>.<span class="ident">text</span>);
-                    <span class="ident">field</span>.<span class="ident">is_ignored</span> <span class="op">=</span> <span class="ident">attributes</span>.<span class="ident">is_ignored</span>;
-                    <span class="ident">field</span>.<span class="ident">database_name</span> <span class="op">=</span> <span class="ident">attributes</span>.<span class="ident">mapped_name</span>.<span class="ident">map</span>(<span class="ident">String::from</span>);
+                    <span class="ident">field</span>.<span class="ident">is_ignored</span> <span class="op">=</span> <span class="ident">scalar_field</span>.<span class="ident">is_ignored</span>();
+                    <span class="ident">field</span>.<span class="ident">database_name</span> <span class="op">=</span> <span class="ident">scalar_field</span>.<span class="ident">mapped_name</span>().<span class="ident">map</span>(<span class="ident">String::from</span>);
 
                     <span class="ident">model</span>.<span class="ident">add_field</span>(<span class="ident">dml::Field::CompositeField</span>(<span class="ident">field</span>));
                     <span class="kw">continue</span>;
                 }
-                <span class="kw">_</span> =&gt; <span class="self">self</span>.<span class="ident">lift_scalar_field_type</span>(<span class="ident">ast_field</span>, <span class="kw-2">&amp;</span><span class="ident">attributes</span>.<span class="ident">r#type</span>, <span class="ident">attributes</span>),
+                <span class="kw">_</span> =&gt; <span class="self">self</span>.<span class="ident">lift_scalar_field_type</span>(<span class="ident">ast_field</span>, <span class="kw-2">&amp;</span><span class="ident">scalar_field</span>.<span class="ident">scalar_field_type</span>(), <span class="ident">scalar_field</span>),
             };
 
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">field</span> <span class="op">=</span> <span class="ident">dml::ScalarField::new</span>(<span class="kw-2">&amp;</span><span class="ident">ast_field</span>.<span class="ident">name</span>.<span class="ident">name</span>, <span class="ident">arity</span>, <span class="ident">field_type</span>);
 
             <span class="ident">field</span>.<span class="ident">documentation</span> <span class="op">=</span> <span class="ident">ast_field</span>.<span class="ident">documentation</span>.<span class="ident">clone</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">comment</span><span class="op">|</span> <span class="ident">comment</span>.<span class="ident">text</span>);
-            <span class="ident">field</span>.<span class="ident">is_ignored</span> <span class="op">=</span> <span class="ident">attributes</span>.<span class="ident">is_ignored</span>;
-            <span class="ident">field</span>.<span class="ident">is_updated_at</span> <span class="op">=</span> <span class="ident">attributes</span>.<span class="ident">is_updated_at</span>;
-            <span class="ident">field</span>.<span class="ident">database_name</span> <span class="op">=</span> <span class="ident">attributes</span>.<span class="ident">mapped_name</span>.<span class="ident">map</span>(<span class="ident">String::from</span>);
+            <span class="ident">field</span>.<span class="ident">is_ignored</span> <span class="op">=</span> <span class="ident">scalar_field</span>.<span class="ident">is_ignored</span>();
+            <span class="ident">field</span>.<span class="ident">is_updated_at</span> <span class="op">=</span> <span class="ident">scalar_field</span>.<span class="ident">is_updated_at</span>();
+            <span class="ident">field</span>.<span class="ident">database_name</span> <span class="op">=</span> <span class="ident">scalar_field</span>.<span class="ident">mapped_name</span>().<span class="ident">map</span>(<span class="ident">String::from</span>);
             <span class="ident">field</span>.<span class="ident">default_value</span> <span class="op">=</span> <span class="ident">scalar_field</span>.<span class="ident">default_value</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">d</span><span class="op">|</span> <span class="ident">dml::DefaultValue</span> {
                 <span class="ident">kind</span>: <span class="ident">d</span>.<span class="ident">default</span>().<span class="ident">kind</span>().<span class="ident">clone</span>(),
                 <span class="ident">db_name</span>: <span class="prelude-val">Some</span>(<span class="ident">d</span>.<span class="ident">constraint_name</span>(<span class="self">self</span>.<span class="ident">connector</span>).<span class="ident">into</span>())
@@ -876,7 +857,7 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">ast_field</span>: <span class="kw-2">&amp;</span><span class="ident">ast::Field</span>,
         <span class="ident">scalar_field_type</span>: <span class="kw-2">&amp;</span><span class="ident">db::ScalarFieldType</span>,
-        <span class="ident">scalar_field_data</span>: <span class="kw-2">&amp;</span><span class="ident">db::ScalarField</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
+        <span class="ident">scalar_field</span>: <span class="ident">ScalarFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
     ) -&gt; <span class="ident">dml::FieldType</span> {
         <span class="kw">match</span> <span class="ident">scalar_field_type</span> {
             <span class="ident">db::ScalarFieldType::CompositeType</span>(<span class="kw">_</span>) =&gt; {
@@ -892,13 +873,12 @@
             <span class="ident">db::ScalarFieldType::Alias</span>(<span class="ident">top_id</span>) =&gt; {
                 <span class="kw">let</span> <span class="ident">alias</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">db</span>.<span class="ident">ast</span>()[<span class="kw-2">*</span><span class="ident">top_id</span>];
                 <span class="kw">let</span> <span class="ident">scalar_field_type</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">db</span>.<span class="ident">alias_scalar_field_type</span>(<span class="ident">top_id</span>);
-                <span class="self">self</span>.<span class="ident">lift_scalar_field_type</span>(<span class="ident">alias</span>, <span class="ident">scalar_field_type</span>, <span class="ident">scalar_field_data</span>)
+                <span class="self">self</span>.<span class="ident">lift_scalar_field_type</span>(<span class="ident">alias</span>, <span class="ident">scalar_field_type</span>, <span class="ident">scalar_field</span>)
             }
             <span class="ident">db::ScalarFieldType::BuiltInScalar</span>(<span class="ident">scalar_type</span>) =&gt; {
-                <span class="kw">let</span> <span class="ident">native_type</span> <span class="op">=</span> <span class="ident">scalar_field_data</span>
-                    .<span class="ident">native_type</span>
-                    .<span class="ident">as_ref</span>()
-                    .<span class="ident">map</span>(<span class="op">|</span>(<span class="kw">_</span>, <span class="ident">name</span>, <span class="ident">args</span>, <span class="kw">_</span>)<span class="op">|</span> <span class="self">self</span>.<span class="ident">connector</span>.<span class="ident">parse_native_type</span>(<span class="ident">name</span>, <span class="ident">args</span>.<span class="ident">clone</span>()).<span class="ident">unwrap</span>());
+                <span class="kw">let</span> <span class="ident">native_type</span> <span class="op">=</span> <span class="ident">scalar_field</span>
+                    .<span class="ident">raw_native_type</span>()
+                    .<span class="ident">map</span>(<span class="op">|</span>(<span class="kw">_</span>, <span class="ident">name</span>, <span class="ident">args</span>, <span class="kw">_</span>)<span class="op">|</span> <span class="self">self</span>.<span class="ident">connector</span>.<span class="ident">parse_native_type</span>(<span class="ident">name</span>, <span class="ident">args</span>.<span class="ident">to_owned</span>()).<span class="ident">unwrap</span>());
                 <span class="ident">dml::FieldType::Scalar</span>(<span class="ident">scalar_type</span>.<span class="ident">to_owned</span>(), <span class="prelude-val">None</span>, <span class="ident">native_type</span>)
             }
         }

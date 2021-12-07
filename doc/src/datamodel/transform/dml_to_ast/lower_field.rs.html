@@ -284,18 +284,15 @@
 <span id="284">284</span>
 <span id="285">285</span>
 <span id="286">286</span>
-<span id="287">287</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::common::constraint_names::ConstraintNames</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::common::preview_features::PreviewFeature</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::common::RelationNames</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::transform::dml_to_ast::LowerDmlToAst</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::{
+</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">ast</span>::{<span class="self">self</span>, <span class="ident">Attribute</span>, <span class="ident">Span</span>},
-    <span class="ident">dml</span>, <span class="ident">Datasource</span>, <span class="ident">Field</span>, <span class="ident">Ignorable</span>, <span class="ident">SortOrder</span>,
+    <span class="ident">common</span>::{<span class="ident">constraint_names::ConstraintNames</span>, <span class="ident">preview_features::PreviewFeature</span>, <span class="ident">RelationNames</span>},
+    <span class="ident">dml</span>,
+    <span class="ident">transform::dml_to_ast::LowerDmlToAst</span>,
+    <span class="ident">Datasource</span>, <span class="ident">Field</span>, <span class="ident">Ignorable</span>, <span class="ident">SortOrder</span>,
 };
-<span class="kw">use</span> <span class="ident">::dml::traits::WithName</span>;
+<span class="kw">use</span> <span class="ident">::dml</span>::{<span class="ident">prisma_value</span>, <span class="ident">traits::WithName</span>, <span class="ident">PrismaValue</span>};
 <span class="kw">use</span> <span class="ident">datamodel_connector</span>::{<span class="ident">Connector</span>, <span class="ident">EmptyDatamodelConnector</span>};
-<span class="kw">use</span> <span class="ident">prisma_value::PrismaValue</span>;
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">LowerDmlToAst</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
     <span class="doccomment">/// Internal: Lowers a field&#39;s arity.</span>
@@ -569,6 +566,7 @@
             ),
             <span class="ident">PrismaValue::Xml</span>(<span class="ident">val</span>) =&gt; <span class="ident">ast::Expression::StringValue</span>(<span class="ident">val</span>.<span class="ident">to_string</span>(), <span class="ident">ast::Span::empty</span>()),
             <span class="ident">PrismaValue::Bytes</span>(<span class="ident">b</span>) =&gt; <span class="ident">ast::Expression::StringValue</span>(<span class="ident">prisma_value::encode_bytes</span>(<span class="ident">b</span>), <span class="ident">ast::Span::empty</span>()),
+            <span class="ident">PrismaValue::Object</span>(<span class="kw">_</span>) =&gt; <span class="macro">unreachable!</span>(), <span class="comment">// There&#39;s no concept of object values in the PSL right now.</span>
         }
     }
 }

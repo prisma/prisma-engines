@@ -204,6 +204,11 @@
 <span id="204">204</span>
 <span id="205">205</span>
 <span id="206">206</span>
+<span id="207">207</span>
+<span id="208">208</span>
+<span id="209">209</span>
+<span id="210">210</span>
+<span id="211">211</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">sql_datamodel_connector::SqlDatamodelConnectors</span>;
 
 <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
@@ -359,6 +364,11 @@
                 <span class="ident">capabilities</span>,
             },
         ]
+    }
+
+    <span class="doccomment">/// Get a reference to the postgres connector tag&#39;s version.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">version</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">PostgresVersion</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">version</span>
     }
 }
 

@@ -239,12 +239,12 @@
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">QueryArguments</span> {
     <span class="kw">pub</span> <span class="ident">model</span>: <span class="ident">ModelRef</span>,
-    <span class="kw">pub</span> <span class="ident">cursor</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">RecordProjection</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">cursor</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">SelectionResult</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">take</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">i64</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">skip</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">i64</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">filter</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Filter</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">order_by</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">OrderBy</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">distinct</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ModelProjection</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">distinct</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">FieldSelection</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">ignore_skip</span>: <span class="ident">bool</span>,
     <span class="kw">pub</span> <span class="ident">ignore_take</span>: <span class="ident">bool</span>,
 }

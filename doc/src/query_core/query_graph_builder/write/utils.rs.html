@@ -1021,7 +1021,7 @@
 };
 <span class="kw">use</span> <span class="ident">connector</span>::{<span class="ident">DatasourceFieldName</span>, <span class="ident">Filter</span>, <span class="ident">RecordFilter</span>, <span class="ident">WriteArgs</span>};
 <span class="kw">use</span> <span class="ident">datamodel::ReferentialAction</span>;
-<span class="kw">use</span> <span class="ident">prisma_models</span>::{<span class="ident">ModelProjection</span>, <span class="ident">ModelRef</span>, <span class="ident">PrismaValue</span>, <span class="ident">RelationFieldRef</span>};
+<span class="kw">use</span> <span class="ident">prisma_models</span>::{<span class="ident">FieldSelection</span>, <span class="ident">ModelRef</span>, <span class="ident">PrismaValue</span>, <span class="ident">RelationFieldRef</span>, <span class="ident">SelectionResult</span>};
 <span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
 
 <span class="doccomment">/// Coerces single values (`ParsedInputValue::Single` and `ParsedInputValue::Map`) into a vector.</span>
@@ -1041,12 +1041,12 @@
     )
 }
 
-<span class="doccomment">/// Produces a non-failing read query that fetches the requested projection of records for a given filterable.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">read_ids_infallible</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">model</span>: <span class="ident">ModelRef</span>, <span class="ident">projection</span>: <span class="ident">ModelProjection</span>, <span class="ident">filter</span>: <span class="ident">T</span>) -&gt; <span class="ident">Query</span>
+<span class="doccomment">/// Produces a non-failing read query that fetches the requested selection of records for a given filterable.</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">read_ids_infallible</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">model</span>: <span class="ident">ModelRef</span>, <span class="ident">selection</span>: <span class="ident">FieldSelection</span>, <span class="ident">filter</span>: <span class="ident">T</span>) -&gt; <span class="ident">Query</span>
 <span class="kw">where</span>
     <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Filter</span><span class="op">&gt;</span>,
 {
-    <span class="kw">let</span> <span class="ident">selected_fields</span> <span class="op">=</span> <span class="ident">get_selected_fields</span>(<span class="kw-2">&amp;</span><span class="ident">model</span>, <span class="ident">projection</span>);
+    <span class="kw">let</span> <span class="ident">selected_fields</span> <span class="op">=</span> <span class="ident">get_selected_fields</span>(<span class="kw-2">&amp;</span><span class="ident">model</span>, <span class="ident">selection</span>);
     <span class="kw">let</span> <span class="ident">filter</span>: <span class="ident">Filter</span> <span class="op">=</span> <span class="ident">filter</span>.<span class="ident">into</span>();
 
     <span class="kw">let</span> <span class="ident">read_query</span> <span class="op">=</span> <span class="ident">ReadQuery::ManyRecordsQuery</span>(<span class="ident">ManyRecordsQuery</span> {
@@ -1063,14 +1063,14 @@
     <span class="ident">Query::Read</span>(<span class="ident">read_query</span>)
 }
 
-<span class="kw">fn</span> <span class="ident">get_selected_fields</span>(<span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>, <span class="ident">projection</span>: <span class="ident">ModelProjection</span>) -&gt; <span class="ident">ModelProjection</span> {
+<span class="kw">fn</span> <span class="ident">get_selected_fields</span>(<span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>, <span class="ident">selection</span>: <span class="ident">FieldSelection</span>) -&gt; <span class="ident">FieldSelection</span> {
     <span class="comment">// Always fetch the primary identifier as well.</span>
     <span class="kw">let</span> <span class="ident">primary_model_id</span> <span class="op">=</span> <span class="ident">model</span>.<span class="ident">primary_identifier</span>();
 
-    <span class="kw">if</span> <span class="ident">projection</span> <span class="op">!</span><span class="op">=</span> <span class="ident">primary_model_id</span> {
-        <span class="ident">primary_model_id</span>.<span class="ident">merge</span>(<span class="ident">projection</span>)
+    <span class="kw">if</span> <span class="ident">selection</span> <span class="op">!</span><span class="op">=</span> <span class="ident">primary_model_id</span> {
+        <span class="ident">primary_model_id</span>.<span class="ident">merge</span>(<span class="ident">selection</span>)
     } <span class="kw">else</span> {
-        <span class="ident">projection</span>
+        <span class="ident">selection</span>
     }
 }
 
@@ -1112,7 +1112,7 @@
 {
     <span class="kw">let</span> <span class="ident">parent_model_id</span> <span class="op">=</span> <span class="ident">parent_relation_field</span>.<span class="ident">model</span>().<span class="ident">primary_identifier</span>();
     <span class="kw">let</span> <span class="ident">parent_linking_fields</span> <span class="op">=</span> <span class="ident">parent_relation_field</span>.<span class="ident">linking_fields</span>();
-    <span class="kw">let</span> <span class="ident">projection</span> <span class="op">=</span> <span class="ident">parent_model_id</span>.<span class="ident">merge</span>(<span class="ident">parent_linking_fields</span>);
+    <span class="kw">let</span> <span class="ident">selection</span> <span class="op">=</span> <span class="ident">parent_model_id</span>.<span class="ident">merge</span>(<span class="ident">parent_linking_fields</span>);
     <span class="kw">let</span> <span class="ident">child_model</span> <span class="op">=</span> <span class="ident">parent_relation_field</span>.<span class="ident">related_model</span>();
 
     <span class="kw">let</span> <span class="ident">selected_fields</span> <span class="op">=</span> <span class="ident">get_selected_fields</span>(
@@ -1124,7 +1124,7 @@
         <span class="ident">name</span>: <span class="string">&quot;find_children_by_parent&quot;</span>.<span class="ident">to_owned</span>(),
         <span class="ident">alias</span>: <span class="prelude-val">None</span>,
         <span class="ident">parent_field</span>: <span class="ident">Arc::clone</span>(<span class="ident">parent_relation_field</span>),
-        <span class="ident">parent_projections</span>: <span class="prelude-val">None</span>,
+        <span class="ident">parent_results</span>: <span class="prelude-val">None</span>,
         <span class="ident">args</span>: (<span class="ident">child_model</span>, <span class="ident">filter</span>).<span class="ident">into</span>(),
         <span class="ident">selected_fields</span>,
         <span class="ident">aggregation_selections</span>: <span class="macro">vec!</span>[],
@@ -1135,11 +1135,11 @@
     <span class="ident">graph</span>.<span class="ident">create_edge</span>(
         <span class="ident">parent_node</span>,
         <span class="kw-2">&amp;</span><span class="ident">read_children_node</span>,
-        <span class="ident">QueryGraphDependency::ParentProjection</span>(
-            <span class="ident">projection</span>,
-            <span class="ident">Box::new</span>(<span class="op">|</span><span class="kw-2">mut</span> <span class="ident">read_children_node</span>, <span class="ident">projections</span><span class="op">|</span> {
+        <span class="ident">QueryGraphDependency::ProjectedDataDependency</span>(
+            <span class="ident">selection</span>,
+            <span class="ident">Box::new</span>(<span class="op">|</span><span class="kw-2">mut</span> <span class="ident">read_children_node</span>, <span class="ident">selections</span><span class="op">|</span> {
                 <span class="kw">if</span> <span class="kw">let</span> <span class="ident">Node::Query</span>(<span class="ident">Query::Read</span>(<span class="ident">ReadQuery::RelatedRecordsQuery</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">rq</span>))) <span class="op">=</span> <span class="ident">read_children_node</span> {
-                    <span class="ident">rq</span>.<span class="ident">parent_projections</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">projections</span>);
+                    <span class="ident">rq</span>.<span class="ident">parent_results</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">selections</span>);
                 };
 
                 <span class="prelude-val">Ok</span>(<span class="ident">read_children_node</span>)
@@ -1230,7 +1230,7 @@
     <span class="ident">graph</span>.<span class="ident">create_edge</span>(
         <span class="kw-2">&amp;</span><span class="ident">read_existing_children</span>,
         <span class="kw-2">&amp;</span><span class="ident">if_node</span>,
-        <span class="ident">QueryGraphDependency::ParentProjection</span>(
+        <span class="ident">QueryGraphDependency::ProjectedDataDependency</span>(
             <span class="ident">child_model_identifier</span>.<span class="ident">clone</span>(),
             <span class="ident">Box::new</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">if_node</span>, <span class="ident">child_ids</span><span class="op">|</span> {
                 <span class="comment">// If the other side (&quot;child&quot;) requires the connection, we need to make sure that there isn&#39;t a child already connected</span>
@@ -1257,7 +1257,7 @@
     <span class="ident">graph</span>.<span class="ident">create_edge</span>(
         <span class="kw-2">&amp;</span><span class="ident">read_existing_children</span>,
         <span class="kw-2">&amp;</span><span class="ident">update_existing_child</span>,
-        <span class="ident">QueryGraphDependency::ParentProjection</span>(<span class="ident">child_model_identifier</span>, <span class="ident">Box::new</span>(<span class="kw">move</span> <span class="op">|</span><span class="kw-2">mut</span> <span class="ident">update_existing_child</span>, <span class="kw-2">mut</span> <span class="ident">child_ids</span><span class="op">|</span> {
+        <span class="ident">QueryGraphDependency::ProjectedDataDependency</span>(<span class="ident">child_model_identifier</span>, <span class="ident">Box::new</span>(<span class="kw">move</span> <span class="op">|</span><span class="kw-2">mut</span> <span class="ident">update_existing_child</span>, <span class="kw-2">mut</span> <span class="ident">child_ids</span><span class="op">|</span> {
             <span class="comment">// This has to succeed or the if-then node wouldn&#39;t trigger.</span>
             <span class="kw">let</span> <span class="ident">child_id</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">child_ids</span>.<span class="ident">pop</span>() {
                 <span class="prelude-val">Some</span>(<span class="ident">pid</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">pid</span>),
@@ -1268,7 +1268,7 @@
             }<span class="question-mark">?</span>;
 
             <span class="kw">if</span> <span class="kw">let</span> <span class="ident">Node::Query</span>(<span class="ident">Query::Write</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">wq</span>)) <span class="op">=</span> <span class="ident">update_existing_child</span> {
-                <span class="ident">wq</span>.<span class="ident">inject_projection_into_args</span>(<span class="ident">child_linking_fields</span>.<span class="ident">empty_record_projection</span>())
+                <span class="ident">wq</span>.<span class="ident">inject_result_into_args</span>(<span class="ident">SelectionResult::from</span>(<span class="kw-2">&amp;</span><span class="ident">child_linking_fields</span>));
             }
 
             <span class="kw">if</span> <span class="kw">let</span> <span class="ident">Node::Query</span>(<span class="ident">Query::Write</span>(<span class="ident">WriteQuery::UpdateManyRecords</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">ur</span>))) <span class="op">=</span> <span class="ident">update_existing_child</span> {
@@ -1398,7 +1398,7 @@
     <span class="ident">graph</span>.<span class="ident">create_edge</span>(
         <span class="kw-2">&amp;</span><span class="ident">read_node</span>,
         <span class="kw-2">&amp;</span><span class="ident">noop_node</span>,
-        <span class="ident">QueryGraphDependency::ParentProjection</span>(
+        <span class="ident">QueryGraphDependency::ProjectedDataDependency</span>(
             <span class="ident">child_model_identifier</span>,
             <span class="ident">Box::new</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">noop_node</span>, <span class="ident">child_ids</span><span class="op">|</span> {
                 <span class="kw">if</span> <span class="op">!</span><span class="ident">child_ids</span>.<span class="ident">is_empty</span>() {
@@ -1421,18 +1421,18 @@
 <span class="doccomment">/// Recurses into the deletion emulation to ensure that subsequent deletions are handled correctly as well.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// ```text</span>
-<span class="doccomment">///    ┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─    </span>
-<span class="doccomment">///            Parent       │   </span>
+<span class="doccomment">///    ┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─</span>
+<span class="doccomment">///            Parent       │</span>
 <span class="doccomment">///    │  (ids to delete)    ─ ┐</span>
-<span class="doccomment">///     ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ┘   </span>
+<span class="doccomment">///     ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ┘</span>
 <span class="doccomment">///               │            │</span>
-<span class="doccomment">///               ▼             </span>
+<span class="doccomment">///               ▼</span>
 <span class="doccomment">///    ┌────────────────────┐  │</span>
-<span class="doccomment">///    │Find Connected Model│   </span>
+<span class="doccomment">///    │Find Connected Model│</span>
 <span class="doccomment">/// ┌──│     (Cascade)      │  │</span>
-<span class="doccomment">/// │  └────────────────────┘   </span>
+<span class="doccomment">/// │  └────────────────────┘</span>
 <span class="doccomment">/// │             │            │</span>
-<span class="doccomment">/// │             ▼             </span>
+<span class="doccomment">/// │             ▼</span>
 <span class="doccomment">/// │┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ │</span>
 <span class="doccomment">/// │  ┌────────────────────┐ │</span>
 <span class="doccomment">/// ││ │  Insert onDelete   │  │</span>
@@ -1442,16 +1442,16 @@
 <span class="doccomment">/// ││ │  Connected Model.  │  │</span>
 <span class="doccomment">/// │  └────────────────────┘ │</span>
 <span class="doccomment">/// │└ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ │</span>
-<span class="doccomment">/// │             │             </span>
+<span class="doccomment">/// │             │</span>
 <span class="doccomment">/// │             ▼            │</span>
-<span class="doccomment">/// │  ┌────────────────────┐   </span>
+<span class="doccomment">/// │  ┌────────────────────┐</span>
 <span class="doccomment">/// └─▶│  Delete children   │  │</span>
-<span class="doccomment">///    └────────────────────┘   </span>
+<span class="doccomment">///    └────────────────────┘</span>
 <span class="doccomment">///               │            │</span>
-<span class="doccomment">///               ▼             </span>
+<span class="doccomment">///               ▼</span>
 <span class="doccomment">///    ┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─   │</span>
 <span class="doccomment">///            Delete       │◀─</span>
-<span class="doccomment">///    └ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─    </span>
+<span class="doccomment">///    └ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─</span>
 <span class="doccomment">/// ```</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">emulate_on_delete_cascade</span>(
     <span class="ident">graph</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">QueryGraph</span>,
@@ -1487,7 +1487,7 @@
     <span class="ident">graph</span>.<span class="ident">create_edge</span>(
         <span class="kw-2">&amp;</span><span class="ident">dependent_records_node</span>,
         <span class="kw-2">&amp;</span><span class="ident">delete_dependents_node</span>,
-        <span class="ident">QueryGraphDependency::ParentProjection</span>(
+        <span class="ident">QueryGraphDependency::ProjectedDataDependency</span>(
             <span class="ident">child_model_identifier</span>.<span class="ident">clone</span>(),
             <span class="ident">Box::new</span>(<span class="kw">move</span> <span class="op">|</span><span class="kw-2">mut</span> <span class="ident">delete_dependents_node</span>, <span class="ident">dependent_ids</span><span class="op">|</span> {
                 <span class="kw">if</span> <span class="kw">let</span> <span class="ident">Node::Query</span>(<span class="ident">Query::Write</span>(<span class="ident">WriteQuery::DeleteManyRecords</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">dmr</span>))) <span class="op">=</span> <span class="ident">delete_dependents_node</span> {
@@ -1588,7 +1588,7 @@
     <span class="ident">graph</span>.<span class="ident">create_edge</span>(
         <span class="kw-2">&amp;</span><span class="ident">dependent_records_node</span>,
         <span class="kw-2">&amp;</span><span class="ident">set_null_dependents_node</span>,
-        <span class="ident">QueryGraphDependency::ParentProjection</span>(
+        <span class="ident">QueryGraphDependency::ProjectedDataDependency</span>(
             <span class="ident">child_model_identifier</span>.<span class="ident">clone</span>(),
             <span class="ident">Box::new</span>(<span class="kw">move</span> <span class="op">|</span><span class="kw-2">mut</span> <span class="ident">set_null_dependents_node</span>, <span class="ident">dependent_ids</span><span class="op">|</span> {
                 <span class="kw">if</span> <span class="kw">let</span> <span class="ident">Node::Query</span>(<span class="ident">Query::Write</span>(<span class="ident">WriteQuery::UpdateManyRecords</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">dmr</span>))) <span class="op">=</span> <span class="ident">set_null_dependents_node</span>
@@ -1708,7 +1708,7 @@
     <span class="ident">graph</span>.<span class="ident">create_edge</span>(
         <span class="kw-2">&amp;</span><span class="ident">dependent_records_node</span>,
         <span class="kw-2">&amp;</span><span class="ident">set_null_dependents_node</span>,
-        <span class="ident">QueryGraphDependency::ParentProjection</span>(
+        <span class="ident">QueryGraphDependency::ProjectedDataDependency</span>(
             <span class="ident">child_model_identifier</span>.<span class="ident">clone</span>(),
             <span class="ident">Box::new</span>(<span class="kw">move</span> <span class="op">|</span><span class="kw-2">mut</span> <span class="ident">set_null_dependents_node</span>, <span class="ident">dependent_ids</span><span class="op">|</span> {
                 <span class="kw">if</span> <span class="kw">let</span> <span class="ident">Node::Query</span>(<span class="ident">Query::Write</span>(<span class="ident">WriteQuery::UpdateManyRecords</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">dmr</span>))) <span class="op">=</span> <span class="ident">set_null_dependents_node</span>
@@ -1786,42 +1786,42 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// Resulting graph (all emulations):</span>
 <span class="doccomment">/// ```text</span>
-<span class="doccomment">///    ┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─                                                                                                      </span>
-<span class="doccomment">///            Parent       │                                                                                                     </span>
-<span class="doccomment">///    │  (ids to update)                                                                                                         </span>
-<span class="doccomment">///     ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ┘                                                                                                     </span>
-<span class="doccomment">///               │                                                                                                               </span>
-<span class="doccomment">///               ▼                                                                                                               </span>
-<span class="doccomment">///    ┌────────────────────┐                                                                                                     </span>
-<span class="doccomment">/// ┌ ─│     Join node      │─────────────────┬─────────────────────────────┬────────────────────────────────────────┐            </span>
-<span class="doccomment">///    └────────────────────┘                 │                             │                                        │            </span>
-<span class="doccomment">/// │             │                           │                             │                                        │            </span>
-<span class="doccomment">///               │                           │                             │                                        │            </span>
-<span class="doccomment">/// │             ▼                           ▼                             ▼                                        ▼            </span>
-<span class="doccomment">///    ┌────────────────────┐      ┌────────────────────┐        ┌────────────────────┐                   ┌────────────────────┐  </span>
-<span class="doccomment">/// │  │Find Connected Model│      │Find Connected Model│        │Find Connected Model│                   │Find Connected Model│  </span>
-<span class="doccomment">///    │    A (Restrict)    │      │    B (Restrict)    │     ┌──│    C (SetNull)     │                ┌──│    D (Cascade)     │  </span>
-<span class="doccomment">/// │  └────────────────────┘      └────────────────────┘     │  └────────────────────┘                │  └────────────────────┘  </span>
-<span class="doccomment">///               │                           │               │             │                          │             │            </span>
-<span class="doccomment">/// │      Fail if│&gt; 0                 Fail if│&gt; 0            │             ▼                          │             │            </span>
-<span class="doccomment">///               │                           │               │┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─               │             ▼            </span>
+<span class="doccomment">///    ┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─</span>
+<span class="doccomment">///            Parent       │</span>
+<span class="doccomment">///    │  (ids to update)</span>
+<span class="doccomment">///     ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ┘</span>
+<span class="doccomment">///               │</span>
+<span class="doccomment">///               ▼</span>
+<span class="doccomment">///    ┌────────────────────┐</span>
+<span class="doccomment">/// ┌ ─│     Join node      │─────────────────┬─────────────────────────────┬────────────────────────────────────────┐</span>
+<span class="doccomment">///    └────────────────────┘                 │                             │                                        │</span>
+<span class="doccomment">/// │             │                           │                             │                                        │</span>
+<span class="doccomment">///               │                           │                             │                                        │</span>
+<span class="doccomment">/// │             ▼                           ▼                             ▼                                        ▼</span>
+<span class="doccomment">///    ┌────────────────────┐      ┌────────────────────┐        ┌────────────────────┐                   ┌────────────────────┐</span>
+<span class="doccomment">/// │  │Find Connected Model│      │Find Connected Model│        │Find Connected Model│                   │Find Connected Model│</span>
+<span class="doccomment">///    │    A (Restrict)    │      │    B (Restrict)    │     ┌──│    C (SetNull)     │                ┌──│    D (Cascade)     │</span>
+<span class="doccomment">/// │  └────────────────────┘      └────────────────────┘     │  └────────────────────┘                │  └────────────────────┘</span>
+<span class="doccomment">///               │                           │               │             │                          │             │</span>
+<span class="doccomment">/// │      Fail if│&gt; 0                 Fail if│&gt; 0            │             ▼                          │             │</span>
+<span class="doccomment">///               │                           │               │┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─               │             ▼</span>
 <span class="doccomment">/// │             ▼                           ▼               │  ┌────────────────────┐ │              │┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─</span>
 <span class="doccomment">///    ┌────────────────────┐      ┌────────────────────┐     ││ │  Insert onUpdate   │                │  ┌────────────────────┐ │</span>
-<span class="doccomment">/// │  │       Empty        │      │       Empty        │     │  │ emulation subtree  │ │              ││ │  Insert onUpdate   │  </span>
+<span class="doccomment">/// │  │       Empty        │      │       Empty        │     │  │ emulation subtree  │ │              ││ │  Insert onUpdate   │</span>
 <span class="doccomment">///    └────────────────────┘      └────────────────────┘     ││ │for relations using │                │  │ emulation subtree  │ │</span>
-<span class="doccomment">/// │             │                           │               │  │the foreign key that│ │              ││ │ for all relations  │  </span>
+<span class="doccomment">/// │             │                           │               │  │the foreign key that│ │              ││ │ for all relations  │</span>
 <span class="doccomment">///               │                           │               ││ │    was updated.    │                │  │   pointing to D.   │ │</span>
-<span class="doccomment">/// │             │                           │               │  └────────────────────┘ │              ││ └────────────────────┘  </span>
+<span class="doccomment">/// │             │                           │               │  └────────────────────┘ │              ││ └────────────────────┘</span>
 <span class="doccomment">///               │                           │               │└ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─               │ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ┘</span>
-<span class="doccomment">/// │             │                           │               │             │                          │             │            </span>
-<span class="doccomment">///               │                           │               │             │                          │             │            </span>
-<span class="doccomment">/// │             ▼                           │               │             ▼                          │             ▼            </span>
-<span class="doccomment">///    ┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─                  │               │  ┌────────────────────┐                │  ┌────────────────────┐  </span>
-<span class="doccomment">/// └ ▶        Update       │◀────────────────┘               │  │ Update Cs (set FK  │                └─▶│     Update Cs      │  </span>
-<span class="doccomment">///    └ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─                                  └─▶│       null)        │                   └────────────────────┘  </span>
-<span class="doccomment">///               ▲                                              └────────────────────┘                              │            </span>
-<span class="doccomment">///               │                                                         │                                        │            </span>
-<span class="doccomment">///               └─────────────────────────────────────────────────────────┴────────────────────────────────────────┘            </span>
+<span class="doccomment">/// │             │                           │               │             │                          │             │</span>
+<span class="doccomment">///               │                           │               │             │                          │             │</span>
+<span class="doccomment">/// │             ▼                           │               │             ▼                          │             ▼</span>
+<span class="doccomment">///    ┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─                  │               │  ┌────────────────────┐                │  ┌────────────────────┐</span>
+<span class="doccomment">/// └ ▶        Update       │◀────────────────┘               │  │ Update Cs (set FK  │                └─▶│     Update Cs      │</span>
+<span class="doccomment">///    └ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─                                  └─▶│       null)        │                   └────────────────────┘</span>
+<span class="doccomment">///               ▲                                              └────────────────────┘                              │</span>
+<span class="doccomment">///               │                                                         │                                        │</span>
+<span class="doccomment">///               └─────────────────────────────────────────────────────────┴────────────────────────────────────────┘</span>
 <span class="doccomment">/// ```</span>
 <span class="attribute">#[<span class="ident">tracing::instrument</span>(<span class="ident">skip</span>(<span class="ident">graph</span>, <span class="ident">model_to_update</span>, <span class="ident">parent_node</span>, <span class="ident">child_node</span>))]</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">insert_emulated_on_update_with_intermediary_node</span>(
@@ -1845,7 +1845,7 @@
     <span class="ident">graph</span>.<span class="ident">create_edge</span>(
         <span class="kw-2">&amp;</span><span class="ident">parent_node</span>,
         <span class="kw-2">&amp;</span><span class="ident">join_node</span>,
-        <span class="ident">QueryGraphDependency::ParentProjection</span>(
+        <span class="ident">QueryGraphDependency::ProjectedDataDependency</span>(
             <span class="ident">model_to_update</span>.<span class="ident">primary_identifier</span>(),
             <span class="ident">Box::new</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">return_node</span>, <span class="ident">parent_ids</span><span class="op">|</span> {
                 <span class="kw">if</span> <span class="kw">let</span> <span class="ident">Node::Flow</span>(<span class="ident">Flow::Return</span>(<span class="kw">_</span>)) <span class="op">=</span> <span class="ident">return_node</span> {
@@ -1924,17 +1924,17 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// ```text</span>
 <span class="comment">//    ┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─</span>
-<span class="doccomment">///            Parent       │   </span>
+<span class="doccomment">///            Parent       │</span>
 <span class="doccomment">///    │  (ids to update)    ─ ┐</span>
-<span class="doccomment">///     ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ┘   </span>
+<span class="doccomment">///     ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ┘</span>
 <span class="doccomment">///               │            │</span>
-<span class="doccomment">///               ▼             </span>
+<span class="doccomment">///               ▼</span>
 <span class="doccomment">///    ┌────────────────────┐  │</span>
-<span class="doccomment">///    │Find Connected Model│   </span>
+<span class="doccomment">///    │Find Connected Model│</span>
 <span class="doccomment">/// ┌──│     (Cascade)      │  │</span>
-<span class="doccomment">/// │  └────────────────────┘   </span>
+<span class="doccomment">/// │  └────────────────────┘</span>
 <span class="doccomment">/// │             │            │</span>
-<span class="doccomment">/// │             ▼             </span>
+<span class="doccomment">/// │             ▼</span>
 <span class="doccomment">/// │┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ │</span>
 <span class="doccomment">/// │  ┌────────────────────┐ │</span>
 <span class="doccomment">/// ││ │  Insert onUpdate   │  │</span>
@@ -1944,17 +1944,17 @@
 <span class="doccomment">/// ││ │  Connected Model.  │  │</span>
 <span class="doccomment">/// │  └────────────────────┘ │</span>
 <span class="doccomment">/// │└ ─ ─ ─ ─ ─ ─│─ ─ ─ ─ ─ ─ │</span>
-<span class="doccomment">/// │             │             </span>
+<span class="doccomment">/// │             │</span>
 <span class="doccomment">/// │             │            │</span>
-<span class="doccomment">/// │             ▼             </span>
+<span class="doccomment">/// │             ▼</span>
 <span class="doccomment">/// │  ┌────────────────────┐  │</span>
-<span class="doccomment">/// └─▶│  Update children   │   </span>
+<span class="doccomment">/// └─▶│  Update children   │</span>
 <span class="doccomment">///    └────────────────────┘  │</span>
-<span class="doccomment">///               │             </span>
+<span class="doccomment">///               │</span>
 <span class="doccomment">///               ▼            │</span>
-<span class="doccomment">///    ┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─    </span>
+<span class="doccomment">///    ┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─</span>
 <span class="doccomment">///            Update       │◀ ┘</span>
-<span class="doccomment">///    └ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─    </span>
+<span class="doccomment">///    └ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─</span>
 <span class="doccomment">/// ```</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">emulate_on_update_cascade</span>(
     <span class="ident">graph</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">QueryGraph</span>,
@@ -2010,7 +2010,7 @@
     <span class="ident">graph</span>.<span class="ident">create_edge</span>(
         <span class="kw-2">&amp;</span><span class="ident">dependent_records_node</span>,
         <span class="kw-2">&amp;</span><span class="ident">update_dependents_node</span>,
-        <span class="ident">QueryGraphDependency::ParentProjection</span>(
+        <span class="ident">QueryGraphDependency::ProjectedDataDependency</span>(
             <span class="ident">child_model_identifier</span>.<span class="ident">clone</span>(),
             <span class="ident">Box::new</span>(<span class="kw">move</span> <span class="op">|</span><span class="kw-2">mut</span> <span class="ident">update_dependents_node</span>, <span class="ident">dependent_ids</span><span class="op">|</span> {
                 <span class="kw">if</span> <span class="kw">let</span> <span class="ident">Node::Query</span>(<span class="ident">Query::Write</span>(<span class="ident">WriteQuery::UpdateManyRecords</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">dmr</span>))) <span class="op">=</span> <span class="ident">update_dependents_node</span> {

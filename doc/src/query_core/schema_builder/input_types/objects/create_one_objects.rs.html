@@ -284,6 +284,13 @@
 <span id="284">284</span>
 <span id="285">285</span>
 <span id="286">286</span>
+<span id="287">287</span>
+<span id="288">288</span>
+<span id="289">289</span>
+<span id="290">290</span>
+<span id="291">291</span>
+<span id="292">292</span>
+<span id="293">293</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident">prisma_models::dml::DefaultValue</span>;
 
@@ -402,7 +409,9 @@
 
                 <span class="kw">let</span> <span class="ident">all_required_scalar_fields_have_defaults</span> <span class="op">=</span> <span class="ident">rf</span>
                     .<span class="ident">linking_fields</span>()
-                    .<span class="ident">scalar_fields</span>()
+                    .<span class="ident">as_scalar_fields</span>()
+                    .<span class="ident">expect</span>(<span class="string">&quot;Expected linking fields to be scalar.&quot;</span>)
+                    .<span class="ident">into_iter</span>()
                     .<span class="ident">all</span>(<span class="op">|</span><span class="ident">scalar_field</span><span class="op">|</span> <span class="ident">scalar_field</span>.<span class="ident">default_value</span>.<span class="ident">is_some</span>());
 
                 <span class="kw">let</span> <span class="ident">input_field</span> <span class="op">=</span> <span class="ident">input_field</span>(<span class="ident">rf</span>.<span class="ident">name</span>.<span class="ident">clone</span>(), <span class="ident">InputType::object</span>(<span class="ident">input_object</span>), <span class="prelude-val">None</span>);
@@ -452,7 +461,10 @@
     <span class="kw">let</span> <span class="ident">linking_fields</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">parent_field</span>) <span class="op">=</span> <span class="ident">parent_field</span> {
         <span class="kw">let</span> <span class="ident">child_field</span> <span class="op">=</span> <span class="ident">parent_field</span>.<span class="ident">related_field</span>();
         <span class="kw">if</span> <span class="ident">child_field</span>.<span class="ident">is_inlined_on_enclosing_model</span>() {
-            <span class="ident">child_field</span>.<span class="ident">linking_fields</span>().<span class="ident">scalar_fields</span>().<span class="ident">collect</span>()
+            <span class="ident">child_field</span>
+                .<span class="ident">linking_fields</span>()
+                .<span class="ident">as_scalar_fields</span>()
+                .<span class="ident">expect</span>(<span class="string">&quot;Expected linking fields to be scalar.&quot;</span>)
         } <span class="kw">else</span> {
             <span class="macro">vec!</span>[]
         }
@@ -534,7 +546,9 @@
 
                 <span class="kw">let</span> <span class="ident">all_required_scalar_fields_have_defaults</span> <span class="op">=</span> <span class="ident">rf</span>
                     .<span class="ident">linking_fields</span>()
-                    .<span class="ident">scalar_fields</span>()
+                    .<span class="ident">as_scalar_fields</span>()
+                    .<span class="ident">expect</span>(<span class="string">&quot;Expected linking fields to be scalar.&quot;</span>)
+                    .<span class="ident">into_iter</span>()
                     .<span class="ident">all</span>(<span class="op">|</span><span class="ident">scalar_field</span><span class="op">|</span> <span class="ident">scalar_field</span>.<span class="ident">default_value</span>.<span class="ident">is_some</span>());
 
                 <span class="kw">let</span> <span class="ident">input_field</span> <span class="op">=</span> <span class="ident">input_field</span>(<span class="ident">rf</span>.<span class="ident">name</span>.<span class="ident">clone</span>(), <span class="ident">InputType::object</span>(<span class="ident">input_object</span>), <span class="prelude-val">None</span>);

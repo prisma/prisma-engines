@@ -543,7 +543,7 @@
     <span class="ident">query_graph</span>::{<span class="ident">Node</span>, <span class="ident">NodeRef</span>, <span class="ident">QueryGraph</span>, <span class="ident">QueryGraphDependency</span>},
     <span class="ident">ParsedInputMap</span>, <span class="ident">ParsedInputValue</span>, <span class="ident">QueryResult</span>,
 };
-<span class="kw">use</span> <span class="ident">connector</span>::{<span class="ident">Filter</span>, <span class="ident">IdFilter</span>};
+<span class="kw">use</span> <span class="ident">connector</span>::{<span class="ident">Filter</span>, <span class="ident">IntoFilter</span>};
 <span class="kw">use</span> <span class="ident">itertools::Itertools</span>;
 <span class="kw">use</span> <span class="ident">prisma_models</span>::{<span class="ident">ModelRef</span>, <span class="ident">RelationFieldRef</span>};
 <span class="kw">use</span> <span class="ident">std::convert::TryInto</span>;
@@ -716,7 +716,7 @@
         <span class="ident">graph</span>.<span class="ident">create_edge</span>(
             <span class="kw-2">&amp;</span><span class="ident">parent_node</span>,
             <span class="kw-2">&amp;</span><span class="ident">read_children_node</span>,
-            <span class="ident">QueryGraphDependency::ParentProjection</span>(
+            <span class="ident">QueryGraphDependency::ProjectedDataDependency</span>(
                 <span class="ident">child_link</span>,
                 <span class="ident">Box::new</span>(<span class="kw">move</span> <span class="op">|</span><span class="kw-2">mut</span> <span class="ident">read_children_node</span>, <span class="kw-2">mut</span> <span class="ident">child_links</span><span class="op">|</span> {
                     <span class="kw">let</span> <span class="ident">child_link</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">child_links</span>.<span class="ident">pop</span>() {
@@ -728,7 +728,7 @@
                     }<span class="question-mark">?</span>;
 
                     <span class="kw">if</span> <span class="kw">let</span> <span class="ident">Node::Query</span>(<span class="ident">Query::Write</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">wq</span>)) <span class="op">=</span> <span class="ident">read_children_node</span> {
-                        <span class="ident">wq</span>.<span class="ident">inject_projection_into_args</span>(<span class="ident">parent_link</span>.<span class="ident">assimilate</span>(<span class="ident">child_link</span>)<span class="question-mark">?</span>);
+                        <span class="ident">wq</span>.<span class="ident">inject_result_into_args</span>(<span class="ident">parent_link</span>.<span class="ident">assimilate</span>(<span class="ident">child_link</span>)<span class="question-mark">?</span>);
                     }
 
                     <span class="prelude-val">Ok</span>(<span class="ident">read_children_node</span>)
@@ -746,7 +746,7 @@
         <span class="ident">graph</span>.<span class="ident">create_edge</span>(
             <span class="kw-2">&amp;</span><span class="ident">parent_node</span>,
             <span class="kw-2">&amp;</span><span class="ident">update_node</span>,
-            <span class="ident">QueryGraphDependency::ParentProjection</span>(
+            <span class="ident">QueryGraphDependency::ProjectedDataDependency</span>(
                 <span class="ident">parent_link</span>,
                 <span class="ident">Box::new</span>(<span class="kw">move</span> <span class="op">|</span><span class="kw-2">mut</span> <span class="ident">update_node</span>, <span class="kw-2">mut</span> <span class="ident">parent_links</span><span class="op">|</span> {
                     <span class="kw">let</span> <span class="ident">parent_link</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">parent_links</span>.<span class="ident">pop</span>() {
@@ -758,7 +758,7 @@
                     }<span class="question-mark">?</span>;
 
                     <span class="kw">if</span> <span class="kw">let</span> <span class="ident">Node::Query</span>(<span class="ident">Query::Write</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">wq</span>)) <span class="op">=</span> <span class="ident">update_node</span> {
-                        <span class="ident">wq</span>.<span class="ident">inject_projection_into_args</span>(<span class="ident">child_link</span>.<span class="ident">assimilate</span>(<span class="ident">parent_link</span>)<span class="question-mark">?</span>)
+                        <span class="ident">wq</span>.<span class="ident">inject_result_into_args</span>(<span class="ident">child_link</span>.<span class="ident">assimilate</span>(<span class="ident">parent_link</span>)<span class="question-mark">?</span>)
                     }
 
                     <span class="prelude-val">Ok</span>(<span class="ident">update_node</span>)
@@ -772,7 +772,7 @@
         <span class="ident">graph</span>.<span class="ident">create_edge</span>(
             <span class="kw-2">&amp;</span><span class="ident">update_node</span>,
             <span class="kw-2">&amp;</span><span class="ident">check_node</span>,
-            <span class="ident">QueryGraphDependency::ParentResult</span>(<span class="ident">Box::new</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">check_node</span>, <span class="ident">parent_result</span><span class="op">|</span> {
+            <span class="ident">QueryGraphDependency::DataDependency</span>(<span class="ident">Box::new</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">check_node</span>, <span class="ident">parent_result</span><span class="op">|</span> {
                 <span class="kw">let</span> <span class="ident">query_result</span> <span class="op">=</span> <span class="ident">parent_result</span>.<span class="ident">as_query_result</span>().<span class="ident">unwrap</span>();
 
                 <span class="kw">if</span> <span class="kw">let</span> <span class="ident">QueryResult::Count</span>(<span class="ident">c</span>) <span class="op">=</span> <span class="ident">query_result</span> {
@@ -923,7 +923,7 @@
     <span class="ident">graph</span>.<span class="ident">create_edge</span>(
         <span class="kw-2">&amp;</span><span class="ident">parent_node</span>,
         <span class="kw-2">&amp;</span><span class="ident">read_new_child_node</span>,
-        <span class="ident">QueryGraphDependency::ParentProjection</span>(
+        <span class="ident">QueryGraphDependency::ProjectedDataDependency</span>(
             <span class="ident">child_linking_fields</span>.<span class="ident">clone</span>(),
             <span class="ident">Box::new</span>(<span class="kw">move</span> <span class="op">|</span><span class="kw-2">mut</span> <span class="ident">read_new_child_node</span>, <span class="kw-2">mut</span> <span class="ident">child_links</span><span class="op">|</span> {
                 <span class="comment">// This takes care of cases where the relation is inlined, CREATE ONLY. See doc comment for explanation.</span>
@@ -938,7 +938,7 @@
 
 
                     <span class="kw">if</span> <span class="kw">let</span> <span class="ident">Node::Query</span>(<span class="ident">Query::Write</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">wq</span>)) <span class="op">=</span> <span class="ident">read_new_child_node</span> {
-                        <span class="ident">wq</span>.<span class="ident">inject_projection_into_args</span>(<span class="ident">parent_linking_fields</span>.<span class="ident">assimilate</span>(<span class="ident">child_link</span>)<span class="question-mark">?</span>);
+                        <span class="ident">wq</span>.<span class="ident">inject_result_into_args</span>(<span class="ident">parent_linking_fields</span>.<span class="ident">assimilate</span>(<span class="ident">child_link</span>)<span class="question-mark">?</span>);
                     }
                 }
 
@@ -969,7 +969,7 @@
         <span class="ident">graph</span>.<span class="ident">create_edge</span>(
             <span class="kw-2">&amp;</span><span class="ident">read_new_child_node</span>,
             <span class="kw-2">&amp;</span><span class="ident">update_children_node</span>,
-            <span class="ident">QueryGraphDependency::ParentProjection</span>(
+            <span class="ident">QueryGraphDependency::ProjectedDataDependency</span>(
                 <span class="ident">child_model_identifier</span>,
                 <span class="ident">Box::new</span>(<span class="kw">move</span> <span class="op">|</span><span class="kw-2">mut</span> <span class="ident">update_children_node</span>, <span class="kw-2">mut</span> <span class="ident">child_ids</span><span class="op">|</span> {
                     <span class="kw">let</span> <span class="ident">child_id</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">child_ids</span>.<span class="ident">pop</span>() {
@@ -996,7 +996,7 @@
         <span class="ident">graph</span>.<span class="ident">create_edge</span>(
              <span class="kw-2">&amp;</span><span class="ident">parent_node</span>,
              <span class="kw-2">&amp;</span><span class="ident">update_children_node</span>,
-             <span class="ident">QueryGraphDependency::ParentProjection</span>(<span class="ident">parent_linking_fields</span>, <span class="ident">Box::new</span>(<span class="kw">move</span> <span class="op">|</span><span class="kw-2">mut</span> <span class="ident">update_children_node</span>, <span class="kw-2">mut</span> <span class="ident">parent_links</span><span class="op">|</span> {
+             <span class="ident">QueryGraphDependency::ProjectedDataDependency</span>(<span class="ident">parent_linking_fields</span>, <span class="ident">Box::new</span>(<span class="kw">move</span> <span class="op">|</span><span class="kw-2">mut</span> <span class="ident">update_children_node</span>, <span class="kw-2">mut</span> <span class="ident">parent_links</span><span class="op">|</span> {
                  <span class="kw">let</span> <span class="ident">parent_link</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">parent_links</span>.<span class="ident">pop</span>() {
                      <span class="prelude-val">Some</span>(<span class="ident">link</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">link</span>),
                      <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">QueryGraphBuilderError::RecordNotFound</span>(<span class="macro">format!</span>(
@@ -1008,7 +1008,7 @@
                  }<span class="question-mark">?</span>;
 
                  <span class="kw">if</span> <span class="kw">let</span> <span class="ident">Node::Query</span>(<span class="ident">Query::Write</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">wq</span>)) <span class="op">=</span> <span class="ident">update_children_node</span> {
-                     <span class="ident">wq</span>.<span class="ident">inject_projection_into_args</span>(<span class="ident">child_linking_fields</span>.<span class="ident">assimilate</span>(<span class="ident">parent_link</span>)<span class="question-mark">?</span>);
+                     <span class="ident">wq</span>.<span class="ident">inject_result_into_args</span>(<span class="ident">child_linking_fields</span>.<span class="ident">assimilate</span>(<span class="ident">parent_link</span>)<span class="question-mark">?</span>);
                  }
 
                  <span class="prelude-val">Ok</span>(<span class="ident">update_children_node</span>)
@@ -1027,7 +1027,7 @@
         <span class="ident">graph</span>.<span class="ident">create_edge</span>(
             <span class="kw-2">&amp;</span><span class="ident">read_new_child_node</span>,
             <span class="kw-2">&amp;</span><span class="ident">update_parent_node</span>,
-            <span class="ident">QueryGraphDependency::ParentProjection</span>(<span class="ident">child_linking_fields</span>, <span class="ident">Box::new</span>(<span class="kw">move</span> <span class="op">|</span><span class="kw-2">mut</span> <span class="ident">update_parent_node</span>, <span class="kw-2">mut</span> <span class="ident">child_links</span><span class="op">|</span> {
+            <span class="ident">QueryGraphDependency::ProjectedDataDependency</span>(<span class="ident">child_linking_fields</span>, <span class="ident">Box::new</span>(<span class="kw">move</span> <span class="op">|</span><span class="kw-2">mut</span> <span class="ident">update_parent_node</span>, <span class="kw-2">mut</span> <span class="ident">child_links</span><span class="op">|</span> {
                 <span class="kw">let</span> <span class="ident">child_link</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">child_links</span>.<span class="ident">pop</span>() {
                     <span class="prelude-val">Some</span>(<span class="ident">link</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">link</span>),
                     <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">QueryGraphBuilderError::RecordNotFound</span>(<span class="macro">format!</span>(
@@ -1039,7 +1039,7 @@
                 }<span class="question-mark">?</span>;
 
                 <span class="kw">if</span> <span class="kw">let</span> <span class="ident">Node::Query</span>(<span class="ident">Query::Write</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">wq</span>)) <span class="op">=</span> <span class="ident">update_parent_node</span> {
-                    <span class="ident">wq</span>.<span class="ident">inject_projection_into_args</span>(<span class="ident">parent_linking_fields</span>.<span class="ident">assimilate</span>(<span class="ident">child_link</span>)<span class="question-mark">?</span>);
+                    <span class="ident">wq</span>.<span class="ident">inject_result_into_args</span>(<span class="ident">parent_linking_fields</span>.<span class="ident">assimilate</span>(<span class="ident">child_link</span>)<span class="question-mark">?</span>);
                 }
 
                 <span class="prelude-val">Ok</span>(<span class="ident">update_parent_node</span>)
@@ -1054,7 +1054,7 @@
         <span class="ident">graph</span>.<span class="ident">create_edge</span>(
             <span class="kw-2">&amp;</span><span class="ident">parent_node</span>,
             <span class="kw-2">&amp;</span><span class="ident">update_parent_node</span>,
-            <span class="ident">QueryGraphDependency::ParentProjection</span>(<span class="ident">parent_model_identifier</span>, <span class="ident">Box::new</span>(<span class="kw">move</span> <span class="op">|</span><span class="kw-2">mut</span> <span class="ident">update_parent_node</span>, <span class="kw-2">mut</span> <span class="ident">parent_ids</span><span class="op">|</span> {
+            <span class="ident">QueryGraphDependency::ProjectedDataDependency</span>(<span class="ident">parent_model_identifier</span>, <span class="ident">Box::new</span>(<span class="kw">move</span> <span class="op">|</span><span class="kw-2">mut</span> <span class="ident">update_parent_node</span>, <span class="kw-2">mut</span> <span class="ident">parent_ids</span><span class="op">|</span> {
                 <span class="kw">let</span> <span class="ident">parent_id</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">parent_ids</span>.<span class="ident">pop</span>() {
                     <span class="prelude-val">Some</span>(<span class="ident">pid</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">pid</span>),
                     <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">QueryGraphBuilderError::RecordNotFound</span>(<span class="macro">format!</span>(

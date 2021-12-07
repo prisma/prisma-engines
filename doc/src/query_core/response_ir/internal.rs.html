@@ -545,19 +545,19 @@
 <span class="kw">use</span> <span class="ident">connector</span>::{<span class="ident">AggregationResult</span>, <span class="ident">RelAggregationResult</span>, <span class="ident">RelAggregationRow</span>};
 <span class="kw">use</span> <span class="ident">indexmap::IndexMap</span>;
 <span class="kw">use</span> <span class="ident">itertools::Itertools</span>;
-<span class="kw">use</span> <span class="ident">prisma_models</span>::{<span class="ident">PrismaValue</span>, <span class="ident">RecordProjection</span>};
+<span class="kw">use</span> <span class="ident">prisma_models</span>::{<span class="ident">PrismaValue</span>, <span class="ident">SelectionResult</span>};
 <span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">borrow::Borrow</span>, <span class="ident">collections::HashMap</span>};
 
 <span class="doccomment">/// A grouping of items to their parent record.</span>
 <span class="doccomment">/// The item implicitly holds the information of the type of item contained.</span>
 <span class="doccomment">/// E.g., if the output type of a field designates a single object, the item will be</span>
 <span class="doccomment">/// Item::Map(map), if it&#39;s a list, Item::List(list), etc. (hence &quot;checked&quot;)</span>
-<span class="kw">type</span> <span class="ident">CheckedItemsWithParents</span> <span class="op">=</span> <span class="ident">IndexMap</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">RecordProjection</span><span class="op">&gt;</span>, <span class="ident">Item</span><span class="op">&gt;</span>;
+<span class="kw">type</span> <span class="ident">CheckedItemsWithParents</span> <span class="op">=</span> <span class="ident">IndexMap</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">SelectionResult</span><span class="op">&gt;</span>, <span class="ident">Item</span><span class="op">&gt;</span>;
 
 <span class="doccomment">/// A grouping of items to their parent record.</span>
 <span class="doccomment">/// As opposed to the checked mapping, this map isn&#39;t holding final information about</span>
 <span class="doccomment">/// the contained items, i.e. the Items are all unchecked.</span>
-<span class="kw">type</span> <span class="ident">UncheckedItemsWithParents</span> <span class="op">=</span> <span class="ident">IndexMap</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">RecordProjection</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Item</span><span class="op">&gt;</span><span class="op">&gt;</span>;
+<span class="kw">type</span> <span class="ident">UncheckedItemsWithParents</span> <span class="op">=</span> <span class="ident">IndexMap</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">SelectionResult</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Item</span><span class="op">&gt;</span><span class="op">&gt;</span>;
 
 <span class="doccomment">/// The query validation makes sure that the output selection already has the correct shape.</span>
 <span class="doccomment">/// This means that we can make the following assumptions:</span>
@@ -847,7 +847,7 @@
     <span class="comment">// Write all fields, nested and list fields unordered into a map, afterwards order all into the final order.</span>
     <span class="comment">// If nothing is written to the object, write null instead.</span>
     <span class="kw">for</span> (<span class="ident">r_index</span>, <span class="ident">record</span>) <span class="kw">in</span> <span class="ident">result</span>.<span class="ident">scalars</span>.<span class="ident">records</span>.<span class="ident">into_iter</span>().<span class="ident">enumerate</span>() {
-        <span class="kw">let</span> <span class="ident">record_id</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">record</span>.<span class="ident">projection</span>(<span class="kw-2">&amp;</span><span class="ident">scalar_db_field_names</span>, <span class="kw-2">&amp;</span><span class="ident">model</span>.<span class="ident">primary_identifier</span>())<span class="question-mark">?</span>);
+        <span class="kw">let</span> <span class="ident">record_id</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">record</span>.<span class="ident">extract_selection_result</span>(<span class="kw-2">&amp;</span><span class="ident">scalar_db_field_names</span>, <span class="kw-2">&amp;</span><span class="ident">model</span>.<span class="ident">primary_identifier</span>())<span class="question-mark">?</span>);
 
         <span class="kw">if</span> <span class="op">!</span><span class="ident">object_mapping</span>.<span class="ident">contains_key</span>(<span class="kw-2">&amp;</span><span class="ident">record</span>.<span class="ident">parent_id</span>) {
             <span class="ident">object_mapping</span>.<span class="ident">insert</span>(<span class="ident">record</span>.<span class="ident">parent_id</span>.<span class="ident">clone</span>(), <span class="ident">Vec::new</span>());
@@ -912,7 +912,7 @@
 <span class="doccomment">/// Unwraps are safe due to query validation.</span>
 <span class="attribute">#[<span class="ident">tracing::instrument</span>(<span class="ident">skip</span>(<span class="ident">record_id</span>, <span class="ident">items_with_parent</span>, <span class="ident">into</span>, <span class="ident">enclosing_type</span>))]</span>
 <span class="kw">fn</span> <span class="ident">write_nested_items</span>(
-    <span class="ident">record_id</span>: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">RecordProjection</span><span class="op">&gt;</span>,
+    <span class="ident">record_id</span>: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">SelectionResult</span><span class="op">&gt;</span>,
     <span class="ident">items_with_parent</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">CheckedItemsWithParents</span><span class="op">&gt;</span>,
     <span class="ident">into</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">Item</span><span class="op">&gt;</span>,
     <span class="ident">enclosing_type</span>: <span class="kw-2">&amp;</span><span class="ident">ObjectTypeStrongRef</span>,

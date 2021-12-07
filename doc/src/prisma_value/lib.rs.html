@@ -331,7 +331,21 @@
 <span id="331">331</span>
 <span id="332">332</span>
 <span id="333">333</span>
+<span id="334">334</span>
+<span id="335">335</span>
+<span id="336">336</span>
+<span id="337">337</span>
+<span id="338">338</span>
+<span id="339">339</span>
+<span id="340">340</span>
+<span id="341">341</span>
+<span id="342">342</span>
+<span id="343">343</span>
+<span id="344">344</span>
+<span id="345">345</span>
+<span id="346">346</span>
 </pre><pre class="rust"><code><span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">arithmetic</span>;
+
 <span class="kw">mod</span> <span class="ident">error</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;sql-ext&quot;</span>)]</span>
 <span class="kw">mod</span> <span class="ident">sql_ext</span>;
@@ -358,6 +372,9 @@
     <span class="ident">List</span>(<span class="ident">PrismaListValue</span>),
     <span class="ident">Json</span>(<span class="ident">String</span>),
     <span class="ident">Xml</span>(<span class="ident">String</span>),
+
+    <span class="doccomment">/// A collections of key-value pairs constituting an object.</span>
+    <span class="ident">Object</span>(<span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">String</span>, <span class="ident">PrismaValue</span>)<span class="op">&gt;</span>),
 
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">serialize_with</span> <span class="op">=</span> <span class="string">&quot;serialize_null&quot;</span>)]</span>
     <span class="ident">Null</span>,
@@ -581,6 +598,15 @@
                 <span class="ident">as_string</span>.<span class="ident">fmt</span>(<span class="ident">f</span>)
             }
             <span class="ident">PrismaValue::Bytes</span>(<span class="ident">b</span>) =&gt; <span class="ident">encode_bytes</span>(<span class="ident">b</span>).<span class="ident">fmt</span>(<span class="ident">f</span>),
+            <span class="ident">PrismaValue::Object</span>(<span class="ident">pairs</span>) =&gt; {
+                <span class="kw">let</span> <span class="ident">joined</span> <span class="op">=</span> <span class="ident">pairs</span>
+                    .<span class="ident">iter</span>()
+                    .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">key</span>, <span class="ident">value</span>)<span class="op">|</span> <span class="macro">format!</span>(<span class="string">r#&quot;&quot;{}&quot;: {}&quot;#</span>, <span class="ident">key</span>, <span class="ident">value</span>))
+                    .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>()
+                    .<span class="ident">join</span>(<span class="string">&quot;, &quot;</span>);
+
+                <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{{ {} }}&quot;</span>, <span class="ident">joined</span>)
+            }
         }
     }
 }

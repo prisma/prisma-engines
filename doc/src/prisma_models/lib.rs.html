@@ -41,7 +41,13 @@
 <span id="41">41</span>
 <span id="42">42</span>
 <span id="43">43</span>
+<span id="44">44</span>
+<span id="45">45</span>
+<span id="46">46</span>
+<span id="47">47</span>
+<span id="48">48</span>
 </pre><pre class="rust"><code><span class="attribute">#![<span class="ident">deny</span>(<span class="ident">warnings</span>)]</span>
+<span class="attribute">#![<span class="ident">allow</span>(<span class="ident">rustdoc::broken_intra_doc_links</span>)]</span>
 <span class="attribute">#![<span class="ident">allow</span>(<span class="ident">clippy::from_over_into</span>)]</span>
 
 <span class="kw">mod</span> <span class="ident">builders</span>;
@@ -49,6 +55,7 @@
 <span class="kw">mod</span> <span class="ident">error</span>;
 <span class="kw">mod</span> <span class="ident">extensions</span>;
 <span class="kw">mod</span> <span class="ident">field</span>;
+<span class="kw">mod</span> <span class="ident">field_selection</span>;
 <span class="kw">mod</span> <span class="ident">fields</span>;
 <span class="kw">mod</span> <span class="ident">index</span>;
 <span class="kw">mod</span> <span class="ident">internal_data_model</span>;
@@ -60,6 +67,7 @@
 <span class="kw">mod</span> <span class="ident">projections</span>;
 <span class="kw">mod</span> <span class="ident">record</span>;
 <span class="kw">mod</span> <span class="ident">relation</span>;
+<span class="kw">mod</span> <span class="ident">selection_result</span>;
 
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">pk</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">prelude</span>;
@@ -69,6 +77,7 @@
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">datamodel::dml</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">error</span>::<span class="kw-2">*</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">field</span>::<span class="kw-2">*</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">field_selection</span>::<span class="kw-2">*</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">fields</span>::<span class="kw-2">*</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">index</span>::<span class="kw-2">*</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">internal_data_model</span>::<span class="kw-2">*</span>;
@@ -79,6 +88,7 @@
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">projections</span>::<span class="kw-2">*</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">record</span>::<span class="kw-2">*</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">relation</span>::<span class="kw-2">*</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">selection_result</span>::<span class="kw-2">*</span>;
 
 <span class="comment">// reexport</span>
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">prisma_value</span>::<span class="kw-2">*</span>;

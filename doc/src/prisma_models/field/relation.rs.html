@@ -286,6 +286,12 @@
 <span id="286">286</span>
 <span id="287">287</span>
 <span id="288">288</span>
+<span id="289">289</span>
+<span id="290">290</span>
+<span id="291">291</span>
+<span id="292">292</span>
+<span id="293">293</span>
+<span id="294">294</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::prelude</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident">datamodel</span>::{<span class="ident">FieldArity</span>, <span class="ident">ReferentialAction</span>, <span class="ident">RelationInfo</span>};
 <span class="kw">use</span> <span class="ident">once_cell::sync::OnceCell</span>;
@@ -323,7 +329,7 @@
         <span class="macro">matches!</span>(<span class="self">self</span>.<span class="ident">arity</span>, <span class="ident">FieldArity::Required</span>)
     }
 
-    <span class="doccomment">/// Returns the `ModelProjection` used for this relation fields model.</span>
+    <span class="doccomment">/// Returns the `FieldSelection` used for this relation fields model.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ## What is the model projection of a relation field?</span>
     <span class="doccomment">/// The set of fields required by the relation (**on the model of the relation field**) to be able to link the related records.</span>
@@ -331,7 +337,7 @@
     <span class="doccomment">/// In case of a many-to-many relation field, we can make the assumption that the primary identifier of the enclosing model</span>
     <span class="doccomment">/// is the set of linking fields, as this is how Prisma many-to-many works and we only support implicit join tables (i.e. m:n)</span>
     <span class="doccomment">/// in the Prisma style.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">linking_fields</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">ModelProjection</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">linking_fields</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">FieldSelection</span> {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">relation</span>().<span class="ident">is_many_to_many</span>() {
             <span class="self">self</span>.<span class="ident">model</span>().<span class="ident">primary_identifier</span>()
         } <span class="kw">else</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">relation_info</span>.<span class="ident">references</span>.<span class="ident">is_empty</span>() {
@@ -356,9 +362,9 @@
                 })
                 .<span class="ident">collect</span>();
 
-            <span class="ident">ModelProjection::new</span>(<span class="ident">referenced_fields</span>)
+            <span class="ident">FieldSelection::from</span>(<span class="ident">referenced_fields</span>)
         } <span class="kw">else</span> {
-            <span class="ident">ModelProjection::new</span>(<span class="macro">vec!</span>[<span class="ident">Arc::new</span>(<span class="self">self</span>.<span class="ident">clone</span>()).<span class="ident">into</span>()])
+            <span class="ident">FieldSelection::from</span>(<span class="self">self</span>)
         }
     }
 
@@ -470,7 +476,10 @@
     <span class="comment">// Todo This is provisionary.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">left_scalars</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ScalarFieldRef</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">relation</span>().<span class="ident">is_many_to_many</span>() {
-            <span class="self">self</span>.<span class="ident">model</span>().<span class="ident">primary_identifier</span>().<span class="ident">scalar_fields</span>().<span class="ident">collect</span>()
+            <span class="self">self</span>.<span class="ident">model</span>()
+                .<span class="ident">primary_identifier</span>()
+                .<span class="ident">as_scalar_fields</span>()
+                .<span class="ident">expect</span>(<span class="string">&quot;Left scalars contain non-scalar selections.&quot;</span>)
         } <span class="kw">else</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_inlined_on_enclosing_model</span>() {
             <span class="self">self</span>.<span class="ident">scalar_fields</span>()
         } <span class="kw">else</span> {
@@ -486,7 +495,10 @@
             <span class="kw">let</span> <span class="ident">related_model</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">related_model</span>();
 
             <span class="kw">if</span> <span class="ident">related_field</span>.<span class="ident">relation_info</span>.<span class="ident">fields</span>.<span class="ident">is_empty</span>() {
-                <span class="ident">related_model</span>.<span class="ident">primary_identifier</span>().<span class="ident">scalar_fields</span>().<span class="ident">collect</span>()
+                <span class="ident">related_model</span>
+                    .<span class="ident">primary_identifier</span>()
+                    .<span class="ident">as_scalar_fields</span>()
+                    .<span class="ident">expect</span>(<span class="string">&quot;Right scalars contain non-scalar selections.&quot;</span>)
             } <span class="kw">else</span> {
                 <span class="ident">related_field</span>
                     .<span class="ident">relation_info</span>

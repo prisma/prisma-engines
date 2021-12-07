@@ -855,7 +855,6 @@
 <span id="855">855</span>
 <span id="856">856</span>
 <span id="857">857</span>
-<span id="858">858</span>
 </pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">error</span>;
 <span class="kw">mod</span> <span class="ident">formatters</span>;
 <span class="kw">mod</span> <span class="ident">guard</span>;
@@ -868,10 +867,10 @@
 <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">interpreter::ExpressionResult</span>, <span class="ident">FilteredQuery</span>, <span class="ident">ManyRecordsQuery</span>, <span class="ident">Query</span>, <span class="ident">QueryGraphBuilderResult</span>, <span class="ident">ReadQuery</span>,
 };
-<span class="kw">use</span> <span class="ident">connector</span>::{<span class="ident">IdFilter</span>, <span class="ident">QueryArguments</span>};
+<span class="kw">use</span> <span class="ident">connector</span>::{<span class="ident">IntoFilter</span>, <span class="ident">QueryArguments</span>};
 <span class="kw">use</span> <span class="ident">guard</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident">petgraph</span>::{<span class="ident">graph</span>::<span class="kw-2">*</span>, <span class="ident">visit::EdgeRef</span> <span class="kw">as</span> <span class="ident">PEdgeRef</span>, <span class="kw-2">*</span>};
-<span class="kw">use</span> <span class="ident">prisma_models</span>::{<span class="ident">ModelProjection</span>, <span class="ident">ModelRef</span>, <span class="ident">RecordProjection</span>};
+<span class="kw">use</span> <span class="ident">prisma_models</span>::{<span class="ident">FieldSelection</span>, <span class="ident">ModelRef</span>, <span class="ident">SelectionResult</span>};
 <span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">borrow::Borrow</span>, <span class="ident">collections::HashSet</span>, <span class="ident">fmt</span>};
 
 <span class="kw">pub</span> <span class="kw">type</span> <span class="ident">QueryGraphResult</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">QueryGraphError</span><span class="op">&gt;</span>;
@@ -910,8 +909,8 @@
     <span class="doccomment">/// Possible outgoing edges are `then` and `else`, each at most once, with `then` required to be present.</span>
     <span class="ident">If</span>(<span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">FnOnce</span>() -&gt; <span class="ident">bool</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span><span class="op">&gt;</span>),
 
-    <span class="doccomment">/// Returns a fixed set of record projections.</span>
-    <span class="ident">Return</span>(<span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">RecordProjection</span><span class="op">&gt;</span><span class="op">&gt;</span>),
+    <span class="doccomment">/// Returns a fixed set of results at runtime.</span>
+    <span class="ident">Return</span>(<span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">SelectionResult</span><span class="op">&gt;</span><span class="op">&gt;</span>),
 }
 
 <span class="kw">impl</span> <span class="ident">Flow</span> {
@@ -935,8 +934,8 @@
 }
 
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">DiffNode</span> {
-    <span class="kw">pub</span> <span class="ident">left</span>: <span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">RecordProjection</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">right</span>: <span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">RecordProjection</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">left</span>: <span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">SelectionResult</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">right</span>: <span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">SelectionResult</span><span class="op">&gt;</span>,
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
@@ -963,10 +962,10 @@
     }
 }
 
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">ParentProjectionFn</span> <span class="op">=</span>
-    <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">FnOnce</span>(<span class="ident">Node</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">RecordProjection</span><span class="op">&gt;</span>) -&gt; <span class="ident">QueryGraphBuilderResult</span><span class="op">&lt;</span><span class="ident">Node</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span><span class="op">&gt;</span>;
+<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">ProjectedDataDependencyFn</span> <span class="op">=</span>
+    <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">FnOnce</span>(<span class="ident">Node</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">SelectionResult</span><span class="op">&gt;</span>) -&gt; <span class="ident">QueryGraphBuilderResult</span><span class="op">&lt;</span><span class="ident">Node</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span><span class="op">&gt;</span>;
 
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">ParentResultFn</span> <span class="op">=</span>
+<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">DataDependencyFn</span> <span class="op">=</span>
     <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">FnOnce</span>(<span class="ident">Node</span>, <span class="kw-2">&amp;</span><span class="ident">ExpressionResult</span>) -&gt; <span class="ident">QueryGraphBuilderResult</span><span class="op">&lt;</span><span class="ident">Node</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span><span class="op">&gt;</span>;
 
 <span class="doccomment">/// Stored on the edges of the QueryGraph, a QueryGraphDependency contains information on how children are connected to their parents,</span>
@@ -975,20 +974,19 @@
     <span class="doccomment">/// Simple dependency indicating order of execution. Effectively an ordering and reachability tool for now.</span>
     <span class="ident">ExecutionOrder</span>,
 
-    <span class="doccomment">/// Performs a transformation on the child node based on the raw parent query result.</span>
-    <span class="doccomment">/// Does not move the result to the closure, but provides a reference.</span>
-    <span class="ident">ParentResult</span>(<span class="ident">ParentResultFn</span>),
+    <span class="doccomment">/// Performs a transformation on the target node based on the source node result..</span>
+    <span class="ident">DataDependency</span>(<span class="ident">DataDependencyFn</span>),
 
-    <span class="doccomment">/// More specialized version of `ParentResult` with more guarantees and side effects.</span>
+    <span class="doccomment">/// More specialized version of `DataDependency` with more guarantees and side effects.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Performs a transformation on the child node based on the requested projection of the parent result (represented as a single merged `ModelProjection`).</span>
-    <span class="doccomment">/// Assumes that the parent result can be converted into the requested projection, else a runtime error will occur.</span>
-    <span class="doccomment">/// The `ModelProjection` is used to determine the set of values to extract from the parent result.</span>
+    <span class="doccomment">/// Performs a transformation on the target node based on the requested selection on the source result (represented as a single merged `FieldSelection`).</span>
+    <span class="doccomment">/// Assumes that the source result can be converted into the requested selection, else a runtime error will occur.</span>
+    <span class="doccomment">/// The `FieldSelection` is used to determine the set of values to extract from the source result.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Important note: As opposed to `ParentResult`, this dependency guarantees that if the closure is called, the parent result was projected successfully.</span>
-    <span class="doccomment">/// To achieve that, the query graph is post-processed in the `finalize` and reloads are injected at points where a projection is not fulfilled.</span>
+    <span class="doccomment">/// Important note: As opposed to `DataDependency`, this dependency guarantees that if the closure is called, the source result contains at least the requested selection.</span>
+    <span class="doccomment">/// To achieve that, the query graph is post-processed in the `finalize` and reloads are injected at points where a selection is not fulfilled.</span>
     <span class="doccomment">/// See `insert_reloads` for more information.</span>
-    <span class="ident">ParentProjection</span>(<span class="ident">ModelProjection</span>, <span class="ident">ParentProjectionFn</span>),
+    <span class="ident">ProjectedDataDependency</span>(<span class="ident">FieldSelection</span>, <span class="ident">ProjectedDataDependencyFn</span>), <span class="comment">// [Composites] todo rename</span>
 
     <span class="doccomment">/// Only valid in the context of a `If` control flow node.</span>
     <span class="ident">Then</span>,
@@ -1508,13 +1506,13 @@
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="doccomment">/// Traverses the graph and ensures that return nodes have correct `ParentProjection` dependencies on their incoming edges.</span>
+    <span class="doccomment">/// Traverses the graph and ensures that return nodes have correct `ProjectedDataDependency`s on their incoming edges.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Steps:</span>
-    <span class="doccomment">/// - Collect &amp; merge the outgoing edge dependencies into a single `ModelProjection`</span>
+    <span class="doccomment">/// - Collect &amp; merge the outgoing edge dependencies into a single `FieldSelection`</span>
     <span class="doccomment">/// - Transform the incoming edge dependencies of the return nodes with the merged outgoing edge dependencies of the previous step</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// This ensures that children nodes of return nodes have the proper projections at their disposal.</span>
+    <span class="doccomment">/// This ensures that children nodes of return nodes have the proper data dependencies at their disposal.</span>
     <span class="doccomment">/// In case the parent nodes of return nodes do not have a field selection that fullfils the new dependency,</span>
     <span class="doccomment">/// a reload node will be inserted in between the parent and the return node by the `insert_reloads` method.</span>
     <span class="attribute">#[<span class="ident">tracing::instrument</span>(<span class="ident">skip</span>(<span class="self">self</span>))]</span>
@@ -1534,41 +1532,41 @@
 
         <span class="kw">for</span> <span class="ident">return_node</span> <span class="kw">in</span> <span class="ident">return_nodes</span> {
             <span class="kw">let</span> <span class="ident">out_edges</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">outgoing_edges</span>(<span class="kw-2">&amp;</span><span class="ident">return_node</span>);
-            <span class="kw">let</span> <span class="ident">dependencies</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ModelProjection</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">out_edges</span>
+            <span class="kw">let</span> <span class="ident">dependencies</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">FieldSelection</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">out_edges</span>
                 .<span class="ident">into_iter</span>()
                 .<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">edge</span><span class="op">|</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">edge_content</span>(<span class="kw-2">&amp;</span><span class="ident">edge</span>).<span class="ident">unwrap</span>() {
-                    <span class="ident">QueryGraphDependency::ParentProjection</span>(<span class="kw-2">ref</span> <span class="ident">requested_projection</span>, <span class="kw">_</span>) =&gt; {
-                        <span class="prelude-val">Some</span>(<span class="ident">requested_projection</span>.<span class="ident">clone</span>())
+                    <span class="ident">QueryGraphDependency::ProjectedDataDependency</span>(<span class="kw-2">ref</span> <span class="ident">requested_selection</span>, <span class="kw">_</span>) =&gt; {
+                        <span class="prelude-val">Some</span>(<span class="ident">requested_selection</span>.<span class="ident">clone</span>())
                     }
                     <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
                 })
                 .<span class="ident">collect</span>();
-            <span class="kw">let</span> <span class="ident">dependencies</span> <span class="op">=</span> <span class="ident">ModelProjection::union</span>(<span class="ident">dependencies</span>);
+            <span class="kw">let</span> <span class="ident">dependencies</span> <span class="op">=</span> <span class="ident">FieldSelection::union</span>(<span class="ident">dependencies</span>);
 
-            <span class="comment">// Assumption: We currently always have at most one single incoming ParentProjection edge</span>
+            <span class="comment">// Assumption: We currently always have at most one single incoming ProjectedDataDependency edge</span>
             <span class="comment">// connected to return nodes. This will break if we ever have more.</span>
             <span class="kw">let</span> <span class="ident">in_edges</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">incoming_edges</span>(<span class="kw-2">&amp;</span><span class="ident">return_node</span>);
-            <span class="kw">let</span> <span class="ident">in_parent_projection_edge</span> <span class="op">=</span> <span class="ident">in_edges</span>.<span class="ident">into_iter</span>().<span class="ident">find</span>(<span class="op">|</span><span class="ident">edge</span><span class="op">|</span> {
+            <span class="kw">let</span> <span class="ident">incoming_dep_edge</span> <span class="op">=</span> <span class="ident">in_edges</span>.<span class="ident">into_iter</span>().<span class="ident">find</span>(<span class="op">|</span><span class="ident">edge</span><span class="op">|</span> {
                 <span class="macro">matches!</span>(
                     <span class="self">self</span>.<span class="ident">edge_content</span>(<span class="ident">edge</span>),
-                    <span class="prelude-val">Some</span>(<span class="ident">QueryGraphDependency::ParentProjection</span>(<span class="kw">_</span>, <span class="kw">_</span>))
+                    <span class="prelude-val">Some</span>(<span class="ident">QueryGraphDependency::ProjectedDataDependency</span>(<span class="kw">_</span>, <span class="kw">_</span>))
                 )
             });
 
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">incoming_edge</span>) <span class="op">=</span> <span class="ident">in_parent_projection_edge</span> {
+            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">incoming_edge</span>) <span class="op">=</span> <span class="ident">incoming_dep_edge</span> {
                 <span class="kw">let</span> <span class="ident">source</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">edge_source</span>(<span class="kw-2">&amp;</span><span class="ident">incoming_edge</span>);
                 <span class="kw">let</span> <span class="ident">target</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">edge_target</span>(<span class="kw-2">&amp;</span><span class="ident">incoming_edge</span>);
                 <span class="kw">let</span> <span class="ident">content</span> <span class="op">=</span> <span class="self">self</span>
                     .<span class="ident">remove_edge</span>(<span class="ident">incoming_edge</span>)
                     .<span class="ident">expect</span>(<span class="string">&quot;Expected edges between marked nodes to be non-empty.&quot;</span>);
 
-                <span class="kw">if</span> <span class="kw">let</span> <span class="ident">QueryGraphDependency::ParentProjection</span>(<span class="ident">existing</span>, <span class="ident">transformer</span>) <span class="op">=</span> <span class="ident">content</span> {
+                <span class="kw">if</span> <span class="kw">let</span> <span class="ident">QueryGraphDependency::ProjectedDataDependency</span>(<span class="ident">existing</span>, <span class="ident">transformer</span>) <span class="op">=</span> <span class="ident">content</span> {
                     <span class="kw">let</span> <span class="ident">merged_dependencies</span> <span class="op">=</span> <span class="ident">dependencies</span>.<span class="ident">merge</span>(<span class="ident">existing</span>);
 
                     <span class="self">self</span>.<span class="ident">create_edge</span>(
                         <span class="kw-2">&amp;</span><span class="ident">source</span>,
                         <span class="kw-2">&amp;</span><span class="ident">target</span>,
-                        <span class="ident">QueryGraphDependency::ParentProjection</span>(<span class="ident">merged_dependencies</span>, <span class="ident">transformer</span>),
+                        <span class="ident">QueryGraphDependency::ProjectedDataDependency</span>(<span class="ident">merged_dependencies</span>, <span class="ident">transformer</span>),
                     )<span class="question-mark">?</span>;
                 }
             }
@@ -1579,10 +1577,10 @@
 
     <span class="doccomment">/// Traverses the query graph and checks if reloads of nodes are necessary.</span>
     <span class="doccomment">/// Whether or not a node needs to be reloaded is determined based on the</span>
-    <span class="doccomment">/// outgoing edges of parent-projection-based transformers, as those hold the `ModelProjection`s</span>
-    <span class="doccomment">/// all records of the parent result need to contain in order to satisfy dependencies.</span>
+    <span class="doccomment">/// incoming `ProjectedDataDependency` edge transformers, as those hold the `FieldSelection`s</span>
+    <span class="doccomment">/// all records of the source result need to contain in order to satisfy dependencies.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// If a node needs to be reloaded, ALL edges going out from the reloaded node need to be repointed, not</span>
+    <span class="doccomment">/// If a node needs to be reloaded, ALL edges going out from the reloaded node need to be rewired, not</span>
     <span class="doccomment">/// only unsatified ones.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ## Example</span>
@@ -1627,11 +1625,11 @@
     <span class="doccomment">/// The edges from `Parent` to all dependent children are removed from the graph and reinserted in order</span>
     <span class="doccomment">/// on the reload node.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// The `Reload` node is always a find many query.</span>
+    <span class="doccomment">/// The `Reload` node is always a &quot;find many&quot; query.</span>
     <span class="doccomment">/// Unwraps are safe because we&#39;re operating on the unprocessed state of the graph (`Expressionista` changes that).</span>
     <span class="attribute">#[<span class="ident">tracing::instrument</span>(<span class="ident">skip</span>(<span class="self">self</span>))]</span>
     <span class="kw">fn</span> <span class="ident">insert_reloads</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident">QueryGraphResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">reloads</span>: <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">NodeRef</span>, <span class="ident">ModelRef</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ModelProjection</span><span class="op">&gt;</span>)<span class="op">&gt;</span> <span class="op">=</span> <span class="self">self</span>
+        <span class="kw">let</span> <span class="ident">reloads</span>: <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">NodeRef</span>, <span class="ident">ModelRef</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">FieldSelection</span><span class="op">&gt;</span>)<span class="op">&gt;</span> <span class="op">=</span> <span class="self">self</span>
             .<span class="ident">graph</span>
             .<span class="ident">node_indices</span>()
             .<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">ix</span><span class="op">|</span> {
@@ -1640,18 +1638,18 @@
                 <span class="kw">if</span> <span class="kw">let</span> <span class="ident">Node::Query</span>(<span class="ident">q</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">node_content</span>(<span class="kw-2">&amp;</span><span class="ident">node</span>).<span class="ident">unwrap</span>() {
                     <span class="kw">let</span> <span class="ident">edges</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">outgoing_edges</span>(<span class="kw-2">&amp;</span><span class="ident">node</span>);
 
-                    <span class="kw">let</span> <span class="ident">unsatisfied_dependencies</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ModelProjection</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">edges</span>
+                    <span class="kw">let</span> <span class="ident">unsatisfied_dependencies</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">FieldSelection</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">edges</span>
                         .<span class="ident">into_iter</span>()
                         .<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">edge</span><span class="op">|</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">edge_content</span>(<span class="kw-2">&amp;</span><span class="ident">edge</span>).<span class="ident">unwrap</span>() {
-                            <span class="ident">QueryGraphDependency::ParentProjection</span>(<span class="kw-2">ref</span> <span class="ident">requested_projection</span>, <span class="kw">_</span>)
-                                <span class="kw">if</span> <span class="op">!</span><span class="ident">q</span>.<span class="ident">returns</span>(<span class="ident">requested_projection</span>) =&gt;
+                            <span class="ident">QueryGraphDependency::ProjectedDataDependency</span>(<span class="kw-2">ref</span> <span class="ident">requested_selection</span>, <span class="kw">_</span>)
+                                <span class="kw">if</span> <span class="op">!</span><span class="ident">q</span>.<span class="ident">returns</span>(<span class="ident">requested_selection</span>) =&gt;
                             {
                                 <span class="macro">trace!</span>(
-                                    <span class="string">&quot;Query {:?} does not return requested projection {:?} and will be reloaded.&quot;</span>,
+                                    <span class="string">&quot;Query {:?} does not return requested selection {:?} and will be reloaded.&quot;</span>,
                                     <span class="ident">q</span>,
-                                    <span class="ident">requested_projection</span>.<span class="ident">names</span>().<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>()
+                                    <span class="ident">requested_selection</span>.<span class="ident">prisma_names</span>().<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>()
                                 );
-                                <span class="prelude-val">Some</span>(<span class="ident">requested_projection</span>.<span class="ident">clone</span>())
+                                <span class="prelude-val">Some</span>(<span class="ident">requested_selection</span>.<span class="ident">clone</span>())
                             }
                             <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
                         })
@@ -1678,7 +1676,7 @@
                 <span class="ident">alias</span>: <span class="prelude-val">None</span>,
                 <span class="ident">model</span>: <span class="ident">model</span>.<span class="ident">clone</span>(),
                 <span class="ident">args</span>: <span class="ident">QueryArguments::new</span>(<span class="ident">model</span>),
-                <span class="ident">selected_fields</span>: <span class="ident">ModelProjection::union</span>(<span class="ident">identifiers</span>),
+                <span class="ident">selected_fields</span>: <span class="ident">FieldSelection::union</span>(<span class="ident">identifiers</span>),
                 <span class="ident">nested</span>: <span class="macro">vec!</span>[],
                 <span class="ident">selection_order</span>: <span class="macro">vec!</span>[],
                 <span class="ident">aggregation_selections</span>: <span class="macro">vec!</span>[],
@@ -1690,11 +1688,11 @@
             <span class="self">self</span>.<span class="ident">create_edge</span>(
                 <span class="kw-2">&amp;</span><span class="ident">node</span>,
                 <span class="kw-2">&amp;</span><span class="ident">reload_node</span>,
-                <span class="ident">QueryGraphDependency::ParentProjection</span>(
+                <span class="ident">QueryGraphDependency::ProjectedDataDependency</span>(
                     <span class="ident">primary_model_id</span>,
-                    <span class="ident">Box::new</span>(<span class="op">|</span><span class="kw-2">mut</span> <span class="ident">reload_node</span>, <span class="ident">parent_projections</span><span class="op">|</span> {
+                    <span class="ident">Box::new</span>(<span class="op">|</span><span class="kw-2">mut</span> <span class="ident">reload_node</span>, <span class="ident">parent_result</span><span class="op">|</span> {
                         <span class="kw">if</span> <span class="kw">let</span> <span class="ident">Node::Query</span>(<span class="ident">Query::Read</span>(<span class="ident">ReadQuery::ManyRecordsQuery</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">mr</span>))) <span class="op">=</span> <span class="ident">reload_node</span> {
-                            <span class="ident">mr</span>.<span class="ident">set_filter</span>(<span class="ident">parent_projections</span>.<span class="ident">filter</span>());
+                            <span class="ident">mr</span>.<span class="ident">set_filter</span>(<span class="ident">parent_result</span>.<span class="ident">filter</span>());
                         }
 
                         <span class="prelude-val">Ok</span>(<span class="ident">reload_node</span>)

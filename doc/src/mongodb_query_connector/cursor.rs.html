@@ -212,7 +212,7 @@
 <span id="212">212</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">orderby::OrderByData</span>, <span class="ident">IntoBson</span>};
 <span class="kw">use</span> <span class="ident">mongodb::bson</span>::{<span class="ident">doc</span>, <span class="ident">Document</span>};
-<span class="kw">use</span> <span class="ident">prisma_models</span>::{<span class="ident">OrderBy</span>, <span class="ident">RecordProjection</span>, <span class="ident">SortOrder</span>};
+<span class="kw">use</span> <span class="ident">prisma_models</span>::{<span class="ident">OrderBy</span>, <span class="ident">SelectionResult</span>, <span class="ident">SortOrder</span>};
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">CursorData</span> {
@@ -230,7 +230,7 @@
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Default</span>)]</span>
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">CursorBuilder</span> {
     <span class="doccomment">/// The field-value combination the cursor .</span>
-    <span class="ident">cursor</span>: <span class="ident">RecordProjection</span>,
+    <span class="ident">cursor</span>: <span class="ident">SelectionResult</span>,
 
     <span class="doccomment">/// Ordering to use. Influences how cursor conditions are build.</span>
     <span class="doccomment">/// Relies on the `OrderByBuilder` to compute the joins and prepare</span>
@@ -243,7 +243,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">CursorBuilder</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">cursor</span>: <span class="ident">RecordProjection</span>, <span class="ident">order</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">OrderBy</span><span class="op">&gt;</span>, <span class="ident">reverse</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">cursor</span>: <span class="ident">SelectionResult</span>, <span class="ident">order</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">OrderBy</span><span class="op">&gt;</span>, <span class="ident">reverse</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">let</span> <span class="ident">order_data</span> <span class="op">=</span> <span class="ident">OrderByData::from_list</span>(<span class="ident">order</span>);
 
         <span class="self">Self</span> {

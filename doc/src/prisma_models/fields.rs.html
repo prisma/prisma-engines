@@ -233,7 +233,6 @@
     <span class="ident">primary_key</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">PrimaryKey</span><span class="op">&gt;</span>,
     <span class="ident">scalar</span>: <span class="ident">OnceCell</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ScalarFieldWeak</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="ident">relation</span>: <span class="ident">OnceCell</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">RelationFieldWeak</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">_composite</span>: <span class="ident">OnceCell</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">CompositeFieldWeak</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="ident">model</span>: <span class="ident">ModelWeakRef</span>,
     <span class="comment">// created_at: OnceCell&lt;Option&lt;ScalarFieldRef&gt;&gt;,</span>
     <span class="ident">updated_at</span>: <span class="ident">OnceCell</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ScalarFieldRef</span><span class="op">&gt;</span><span class="op">&gt;</span>,
@@ -246,7 +245,6 @@
             <span class="ident">primary_key</span>,
             <span class="ident">scalar</span>: <span class="ident">OnceCell::new</span>(),
             <span class="ident">relation</span>: <span class="ident">OnceCell::new</span>(),
-            <span class="ident">_composite</span>: <span class="ident">OnceCell::new</span>(),
             <span class="comment">// created_at: OnceCell::new(),</span>
             <span class="ident">updated_at</span>: <span class="ident">OnceCell::new</span>(),
             <span class="ident">model</span>,
@@ -374,7 +372,8 @@
             .<span class="ident">find</span>(<span class="op">|</span><span class="ident">field</span><span class="op">|</span> <span class="ident">field</span>.<span class="ident">name</span>() <span class="op">==</span> <span class="ident">name</span>)
             .<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">DomainError::FieldNotFound</span> {
                 <span class="ident">name</span>: <span class="ident">name</span>.<span class="ident">to_string</span>(),
-                <span class="ident">model</span>: <span class="self">self</span>.<span class="ident">model</span>().<span class="ident">name</span>.<span class="ident">clone</span>(),
+                <span class="ident">container_name</span>: <span class="self">self</span>.<span class="ident">model</span>().<span class="ident">name</span>.<span class="ident">clone</span>(),
+                <span class="ident">container_type</span>: <span class="string">&quot;model&quot;</span>,
             })
     }
 
@@ -385,7 +384,8 @@
             .<span class="ident">find</span>(<span class="op">|</span><span class="ident">field</span><span class="op">|</span> <span class="ident">field</span>.<span class="ident">name</span> <span class="op">==</span> <span class="ident">name</span>)
             .<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">DomainError::ScalarFieldNotFound</span> {
                 <span class="ident">name</span>: <span class="ident">name</span>.<span class="ident">to_string</span>(),
-                <span class="ident">model</span>: <span class="self">self</span>.<span class="ident">model</span>().<span class="ident">name</span>.<span class="ident">clone</span>(),
+                <span class="ident">container_name</span>: <span class="self">self</span>.<span class="ident">model</span>().<span class="ident">name</span>.<span class="ident">clone</span>(),
+                <span class="ident">container_type</span>: <span class="string">&quot;model&quot;</span>,
             })
     }
 

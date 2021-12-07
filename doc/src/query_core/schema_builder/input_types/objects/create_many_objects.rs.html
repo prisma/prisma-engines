@@ -62,6 +62,9 @@
 <span id="62">62</span>
 <span id="63">63</span>
 <span id="64">64</span>
+<span id="65">65</span>
+<span id="66">66</span>
+<span id="67">67</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident">datamodel_connector::ConnectorCapability</span>;
 
@@ -89,7 +92,10 @@
     <span class="kw">let</span> <span class="ident">linking_fields</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">parent_field</span>) <span class="op">=</span> <span class="ident">parent_field</span> {
         <span class="kw">let</span> <span class="ident">child_field</span> <span class="op">=</span> <span class="ident">parent_field</span>.<span class="ident">related_field</span>();
         <span class="kw">if</span> <span class="ident">child_field</span>.<span class="ident">is_inlined_on_enclosing_model</span>() {
-            <span class="ident">child_field</span>.<span class="ident">linking_fields</span>().<span class="ident">scalar_fields</span>().<span class="ident">collect</span>()
+            <span class="ident">child_field</span>
+                .<span class="ident">linking_fields</span>()
+                .<span class="ident">as_scalar_fields</span>()
+                .<span class="ident">expect</span>(<span class="string">&quot;Expected linking fields to be scalar.&quot;</span>)
         } <span class="kw">else</span> {
             <span class="macro">vec!</span>[]
         }

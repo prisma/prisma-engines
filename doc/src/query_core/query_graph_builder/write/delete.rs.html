@@ -132,7 +132,7 @@
     <span class="ident">graph</span>.<span class="ident">create_edge</span>(
         <span class="kw-2">&amp;</span><span class="ident">read_node</span>,
         <span class="kw-2">&amp;</span><span class="ident">delete_node</span>,
-        <span class="ident">QueryGraphDependency::ParentProjection</span>(
+        <span class="ident">QueryGraphDependency::ProjectedDataDependency</span>(
             <span class="ident">model</span>.<span class="ident">primary_identifier</span>(),
             <span class="ident">Box::new</span>(<span class="op">|</span><span class="ident">delete_node</span>, <span class="ident">parent_ids</span><span class="op">|</span> {
                 <span class="kw">if</span> <span class="op">!</span><span class="ident">parent_ids</span>.<span class="ident">is_empty</span>() {

@@ -80,8 +80,6 @@
 <span id="80">80</span>
 <span id="81">81</span>
 <span id="82">82</span>
-<span id="83">83</span>
-<span id="84">84</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">parent_container::ParentContainer</span>, <span class="ident">CompositeTypeRef</span>, <span class="ident">ScalarFieldRef</span>};
 <span class="kw">use</span> <span class="ident">datamodel::FieldArity</span>;
 <span class="kw">use</span> <span class="ident">std</span>::{
@@ -96,8 +94,8 @@
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CompositeField</span> {
     <span class="kw">pub</span> <span class="ident">name</span>: <span class="ident">String</span>,
-    <span class="kw">pub</span> <span class="ident">db_name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">typ</span>: <span class="ident">CompositeTypeRef</span>,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">db_name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">arity</span>: <span class="ident">FieldArity</span>,
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">container</span>: <span class="ident">ParentContainer</span>,
 }
@@ -111,11 +109,9 @@
         <span class="macro">matches!</span>(<span class="self">self</span>.<span class="ident">arity</span>, <span class="ident">FieldArity::Required</span>)
     }
 
-    <span class="comment">// pub fn model(&amp;self) -&gt; ModelRef {</span>
-    <span class="comment">//     self.model</span>
-    <span class="comment">//         .upgrade()</span>
-    <span class="comment">//         .expect(&quot;Model does not exist anymore. Parent model got deleted without deleting the child.&quot;)</span>
-    <span class="comment">// }</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">db_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
+        <span class="self">self</span>.<span class="ident">db_name</span>.<span class="ident">as_deref</span>().<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">name</span>.<span class="ident">as_str</span>())
+    }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">scalar_fields</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ScalarFieldRef</span><span class="op">&gt;</span> {
         <span class="comment">// let fields = self.fields.get_or_init(|| {</span>

@@ -243,15 +243,6 @@
 <span id="243">243</span>
 <span id="244">244</span>
 <span id="245">245</span>
-<span id="246">246</span>
-<span id="247">247</span>
-<span id="248">248</span>
-<span id="249">249</span>
-<span id="250">250</span>
-<span id="251">251</span>
-<span id="252">252</span>
-<span id="253">253</span>
-<span id="254">254</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">diagnostics::DatamodelError</span>,
@@ -288,7 +279,7 @@
         <span class="kw">_</span> =&gt; <span class="kw">return</span>,
     };
 
-    <span class="kw">if</span> <span class="ident">is_empty_fields</span>(<span class="ident">forward</span>.<span class="ident">attributes</span>().<span class="ident">fields</span>.<span class="ident">as_deref</span>()) <span class="op">&amp;&amp;</span> <span class="ident">is_empty_fields</span>(<span class="ident">back</span>.<span class="ident">attributes</span>().<span class="ident">fields</span>.<span class="ident">as_deref</span>()) {
+    <span class="kw">if</span> <span class="ident">is_empty_fields</span>(<span class="ident">forward</span>.<span class="ident">referencing_fields</span>()) <span class="op">&amp;&amp;</span> <span class="ident">is_empty_fields</span>(<span class="ident">back</span>.<span class="ident">referencing_fields</span>()) {
         <span class="kw">let</span> <span class="ident">message</span> <span class="op">=</span> <span class="macro">format!</span>(
             <span class="string">&quot;The relation fields `{}` on Model `{}` and `{}` on Model `{}` do not provide the `fields` argument in the {} attribute. You have to provide it on one of the two fields.&quot;</span>,
             <span class="ident">forward</span>.<span class="ident">name</span>(), <span class="ident">forward</span>.<span class="ident">model</span>().<span class="ident">name</span>(), <span class="ident">back</span>.<span class="ident">name</span>(), <span class="kw-2">&amp;</span><span class="ident">back</span>.<span class="ident">model</span>().<span class="ident">name</span>(), <span class="ident">RELATION_ATTRIBUTE_NAME_WITH_AT</span>
@@ -314,9 +305,7 @@
         ));
     }
 
-    <span class="kw">if</span> <span class="ident">is_empty_fields</span>(<span class="ident">forward</span>.<span class="ident">attributes</span>().<span class="ident">references</span>.<span class="ident">as_deref</span>())
-        <span class="op">&amp;&amp;</span> <span class="ident">is_empty_fields</span>(<span class="ident">back</span>.<span class="ident">attributes</span>().<span class="ident">references</span>.<span class="ident">as_deref</span>())
-    {
+    <span class="kw">if</span> <span class="ident">is_empty_fields</span>(<span class="ident">forward</span>.<span class="ident">referenced_fields</span>()) <span class="op">&amp;&amp;</span> <span class="ident">is_empty_fields</span>(<span class="ident">back</span>.<span class="ident">referenced_fields</span>()) {
         <span class="kw">let</span> <span class="ident">message</span> <span class="op">=</span> <span class="macro">format!</span>(
             <span class="string">&quot;The relation fields `{}` on Model `{}` and `{}` on Model `{}` do not provide the `references` argument in the {} attribute. You have to provide it on one of the two fields.&quot;</span>,
             <span class="ident">forward</span>.<span class="ident">name</span>(), <span class="ident">forward</span>.<span class="ident">model</span>().<span class="ident">name</span>(), <span class="ident">back</span>.<span class="ident">name</span>(), <span class="ident">back</span>.<span class="ident">model</span>().<span class="ident">name</span>(), <span class="ident">RELATION_ATTRIBUTE_NAME_WITH_AT</span>
@@ -353,9 +342,7 @@
         <span class="kw">_</span> =&gt; <span class="kw">return</span>,
     };
 
-    <span class="kw">if</span> <span class="op">!</span><span class="ident">is_empty_fields</span>(<span class="ident">forward</span>.<span class="ident">attributes</span>().<span class="ident">references</span>.<span class="ident">as_deref</span>())
-        <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">is_empty_fields</span>(<span class="ident">back</span>.<span class="ident">attributes</span>().<span class="ident">references</span>.<span class="ident">as_deref</span>())
-    {
+    <span class="kw">if</span> <span class="op">!</span><span class="ident">is_empty_fields</span>(<span class="ident">forward</span>.<span class="ident">referenced_fields</span>()) <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">is_empty_fields</span>(<span class="ident">back</span>.<span class="ident">referenced_fields</span>()) {
         <span class="kw">let</span> <span class="ident">message</span> <span class="op">=</span> <span class="macro">format!</span>(
             <span class="string">&quot;The relation fields `{}` on Model `{}` and `{}` on Model `{}` both provide the `references` argument in the {} attribute. You have to provide it only on one of the two fields.&quot;</span>,
             <span class="ident">forward</span>.<span class="ident">name</span>(), <span class="ident">forward</span>.<span class="ident">model</span>().<span class="ident">name</span>(), <span class="ident">back</span>.<span class="ident">name</span>(), <span class="ident">back</span>.<span class="ident">model</span>().<span class="ident">name</span>(), <span class="ident">RELATION_ATTRIBUTE_NAME_WITH_AT</span>
@@ -374,8 +361,7 @@
         ));
     }
 
-    <span class="kw">if</span> <span class="op">!</span><span class="ident">is_empty_fields</span>(<span class="ident">forward</span>.<span class="ident">attributes</span>().<span class="ident">fields</span>.<span class="ident">as_deref</span>()) <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">is_empty_fields</span>(<span class="ident">back</span>.<span class="ident">attributes</span>().<span class="ident">fields</span>.<span class="ident">as_deref</span>())
-    {
+    <span class="kw">if</span> <span class="op">!</span><span class="ident">is_empty_fields</span>(<span class="ident">forward</span>.<span class="ident">referencing_fields</span>()) <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">is_empty_fields</span>(<span class="ident">back</span>.<span class="ident">referencing_fields</span>()) {
         <span class="kw">let</span> <span class="ident">message</span> <span class="op">=</span> <span class="macro">format!</span>(
             <span class="string">&quot;The relation fields `{}` on Model `{}` and `{}` on Model `{}` both provide the `fields` argument in the {} attribute. You have to provide it only on one of the two fields.&quot;</span>,
             <span class="ident">forward</span>.<span class="ident">name</span>(), <span class="ident">forward</span>.<span class="ident">model</span>().<span class="ident">name</span>(), <span class="ident">back</span>.<span class="ident">name</span>(), <span class="ident">back</span>.<span class="ident">model</span>().<span class="ident">name</span>(), <span class="ident">RELATION_ATTRIBUTE_NAME_WITH_AT</span>
@@ -402,8 +388,8 @@
         <span class="kw">_</span> =&gt; <span class="kw">return</span>,
     };
 
-    <span class="kw">if</span> (<span class="ident">forward</span>.<span class="ident">attributes</span>().<span class="ident">on_delete</span>.<span class="ident">is_some</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">forward</span>.<span class="ident">attributes</span>().<span class="ident">on_update</span>.<span class="ident">is_some</span>())
-        <span class="op">&amp;&amp;</span> (<span class="ident">back</span>.<span class="ident">attributes</span>().<span class="ident">on_delete</span>.<span class="ident">is_some</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">back</span>.<span class="ident">attributes</span>().<span class="ident">on_update</span>.<span class="ident">is_some</span>())
+    <span class="kw">if</span> (<span class="ident">forward</span>.<span class="ident">explicit_on_delete</span>().<span class="ident">is_some</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">forward</span>.<span class="ident">explicit_on_update</span>().<span class="ident">is_some</span>())
+        <span class="op">&amp;&amp;</span> (<span class="ident">back</span>.<span class="ident">explicit_on_delete</span>().<span class="ident">is_some</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">back</span>.<span class="ident">explicit_on_update</span>().<span class="ident">is_some</span>())
     {
         <span class="comment">// We show the error on both fields</span>
         <span class="kw">let</span> <span class="ident">message</span> <span class="op">=</span> <span class="macro">format!</span>(
@@ -427,7 +413,7 @@
             <span class="ident">RELATION_ATTRIBUTE_NAME</span>,
             <span class="ident">forward</span>.<span class="ident">ast_field</span>().<span class="ident">span</span>,
         ));
-    } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">back</span>.<span class="ident">attributes</span>().<span class="ident">on_delete</span>.<span class="ident">is_some</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">back</span>.<span class="ident">attributes</span>().<span class="ident">on_update</span>.<span class="ident">is_some</span>() {
+    } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">back</span>.<span class="ident">explicit_on_delete</span>().<span class="ident">is_some</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">back</span>.<span class="ident">explicit_on_update</span>().<span class="ident">is_some</span>() {
         <span class="kw">let</span> <span class="ident">message</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="macro">format!</span>(
             <span class="string">&quot;The relation field `{}` on Model `{}` must not specify the `onDelete` or `onUpdate` argument in the {} attribute. You must only specify it on the opposite field `{}` on model `{}`.&quot;</span>,
             <span class="ident">back</span>.<span class="ident">name</span>(), <span class="ident">back</span>.<span class="ident">model</span>().<span class="ident">name</span>(), <span class="ident">RELATION_ATTRIBUTE_NAME_WITH_AT</span>, <span class="ident">forward</span>.<span class="ident">name</span>(), <span class="ident">forward</span>.<span class="ident">model</span>().<span class="ident">name</span>()
@@ -449,9 +435,7 @@
         <span class="kw">_</span> =&gt; <span class="kw">return</span>,
     };
 
-    <span class="kw">if</span> <span class="op">!</span><span class="ident">is_empty_fields</span>(<span class="ident">forward</span>.<span class="ident">attributes</span>().<span class="ident">fields</span>.<span class="ident">as_deref</span>())
-        <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">is_empty_fields</span>(<span class="ident">back</span>.<span class="ident">attributes</span>().<span class="ident">references</span>.<span class="ident">as_deref</span>())
-    {
+    <span class="kw">if</span> <span class="op">!</span><span class="ident">is_empty_fields</span>(<span class="ident">forward</span>.<span class="ident">referencing_fields</span>()) <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">is_empty_fields</span>(<span class="ident">back</span>.<span class="ident">referenced_fields</span>()) {
         <span class="kw">let</span> <span class="ident">message</span> <span class="op">=</span> <span class="macro">format!</span>(
             <span class="string">&quot;The relation field `{}` on Model `{}` provides the `fields` argument in the {} attribute. And the related field `{}` on Model `{}` provides the `references` argument. You must provide both arguments on the same side.&quot;</span>,
             <span class="ident">forward</span>.<span class="ident">name</span>(), <span class="ident">forward</span>.<span class="ident">model</span>().<span class="ident">name</span>(), <span class="ident">RELATION_ATTRIBUTE_NAME_WITH_AT</span>, <span class="ident">back</span>.<span class="ident">name</span>(), <span class="ident">back</span>.<span class="ident">model</span>().<span class="ident">name</span>(),
@@ -470,9 +454,7 @@
         ));
     }
 
-    <span class="kw">if</span> <span class="op">!</span><span class="ident">is_empty_fields</span>(<span class="ident">forward</span>.<span class="ident">attributes</span>().<span class="ident">references</span>.<span class="ident">as_deref</span>())
-        <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">is_empty_fields</span>(<span class="ident">back</span>.<span class="ident">attributes</span>().<span class="ident">fields</span>.<span class="ident">as_deref</span>())
-    {
+    <span class="kw">if</span> <span class="op">!</span><span class="ident">is_empty_fields</span>(<span class="ident">forward</span>.<span class="ident">referenced_fields</span>()) <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">is_empty_fields</span>(<span class="ident">back</span>.<span class="ident">referencing_fields</span>()) {
         <span class="kw">let</span> <span class="ident">message</span> <span class="op">=</span> <span class="macro">format!</span>(
             <span class="string">&quot;The relation field `{}` on Model `{}` provides the `references` argument in the {} attribute. And the related field `{}` on Model `{}` provides the `fields` argument. You must provide both arguments on the same side.&quot;</span>,
             <span class="ident">forward</span>.<span class="ident">name</span>(), <span class="ident">forward</span>.<span class="ident">model</span>().<span class="ident">name</span>(), <span class="ident">RELATION_ATTRIBUTE_NAME_WITH_AT</span>, <span class="ident">back</span>.<span class="ident">name</span>(), <span class="ident">back</span>.<span class="ident">model</span>().<span class="ident">name</span>(),

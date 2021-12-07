@@ -759,11 +759,6 @@
 <span id="759">759</span>
 <span id="760">760</span>
 <span id="761">761</span>
-<span id="762">762</span>
-<span id="763">763</span>
-<span id="764">764</span>
-<span id="765">765</span>
-<span id="766">766</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model_extensions</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident">connector_interface::filter</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident">prisma_models::prelude</span>::<span class="kw-2">*</span>;
@@ -1001,7 +996,7 @@
 <span class="kw">impl</span> <span class="ident">AliasedCondition</span> <span class="kw">for</span> <span class="ident">RelationFilter</span> {
     <span class="doccomment">/// Conversion from a `RelationFilter` to a query condition tree. Aliased when in a nested `SELECT`.</span>
     <span class="kw">fn</span> <span class="ident">aliased_cond</span>(<span class="self">self</span>, <span class="ident">alias</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Alias</span><span class="op">&gt;</span>) -&gt; <span class="ident">ConditionTree</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">ids</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">field</span>.<span class="ident">model</span>().<span class="ident">primary_identifier</span>().<span class="ident">as_columns</span>();
+        <span class="kw">let</span> <span class="ident">ids</span> <span class="op">=</span> <span class="ident">ModelProjection::from</span>(<span class="self">self</span>.<span class="ident">field</span>.<span class="ident">model</span>().<span class="ident">primary_identifier</span>()).<span class="ident">as_columns</span>();
         <span class="kw">let</span> <span class="ident">columns</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Column</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">alias</span> {
             <span class="prelude-val">Some</span>(<span class="ident">alias</span>) =&gt; <span class="ident">ids</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">table</span>(<span class="ident">alias</span>.<span class="ident">to_string</span>(<span class="prelude-val">None</span>))).<span class="ident">collect</span>(),
             <span class="prelude-val">None</span> =&gt; <span class="ident">ids</span>.<span class="ident">collect</span>(),
@@ -1041,10 +1036,7 @@
             .<span class="ident">collect</span>();
 
         <span class="kw">let</span> <span class="ident">related_table</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">field</span>.<span class="ident">related_model</span>().<span class="ident">as_table</span>();
-        <span class="kw">let</span> <span class="ident">related_join_columns</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="self">self</span>
-            .<span class="ident">field</span>
-            .<span class="ident">related_field</span>()
-            .<span class="ident">linking_fields</span>()
+        <span class="kw">let</span> <span class="ident">related_join_columns</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">ModelProjection::from</span>(<span class="self">self</span>.<span class="ident">field</span>.<span class="ident">related_field</span>().<span class="ident">linking_fields</span>())
             .<span class="ident">as_columns</span>()
             .<span class="ident">map</span>(<span class="op">|</span><span class="ident">col</span><span class="op">|</span> <span class="ident">col</span>.<span class="ident">table</span>(<span class="ident">alias</span>.<span class="ident">to_string</span>(<span class="prelude-val">Some</span>(<span class="ident">AliasMode::Join</span>))))
             .<span class="ident">collect</span>();
@@ -1122,9 +1114,7 @@
                 .<span class="ident">columns</span>(<span class="ident">columns</span>)
                 .<span class="ident">and_where</span>(<span class="ident">columns_not_null</span>);
 
-            <span class="kw">let</span> <span class="ident">id_columns</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Column</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> <span class="self">self</span>
-                .<span class="ident">field</span>
-                .<span class="ident">linking_fields</span>()
+            <span class="kw">let</span> <span class="ident">id_columns</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Column</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">ModelProjection::from</span>(<span class="self">self</span>.<span class="ident">field</span>.<span class="ident">linking_fields</span>())
                 .<span class="ident">as_columns</span>()
                 .<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">opt_table</span>(<span class="ident">alias</span>.<span class="ident">clone</span>()))
                 .<span class="ident">collect</span>();

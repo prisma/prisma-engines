@@ -80,7 +80,7 @@
 <span id="80">80</span>
 <span id="81">81</span>
 <span id="82">82</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">prisma_models</span>::{<span class="ident">Relation</span>, <span class="ident">RelationField</span>, <span class="ident">RelationLinkManifestation</span>, <span class="ident">RelationSide</span>};
+</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">prisma_models</span>::{<span class="ident">ModelProjection</span>, <span class="ident">Relation</span>, <span class="ident">RelationField</span>, <span class="ident">RelationLinkManifestation</span>, <span class="ident">RelationSide</span>};
 <span class="kw">use</span> <span class="ident">quaint</span>::{<span class="ident">ast::Table</span>, <span class="ident">prelude::Column</span>};
 <span class="kw">use</span> <span class="ident">RelationLinkManifestation</span>::<span class="kw-2">*</span>;
 
@@ -115,7 +115,7 @@
         <span class="kw">match</span> (<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">relation</span>().<span class="ident">manifestation</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">relation_side</span>) {
             (<span class="ident">RelationTable</span>(<span class="kw-2">ref</span> <span class="ident">m</span>), <span class="ident">RelationSide::A</span>) =&gt; <span class="ident">ColumnIterator::from</span>(<span class="macro">vec!</span>[<span class="ident">m</span>.<span class="ident">model_b_column</span>.<span class="ident">clone</span>().<span class="ident">into</span>()]),
             (<span class="ident">RelationTable</span>(<span class="kw-2">ref</span> <span class="ident">m</span>), <span class="ident">RelationSide::B</span>) =&gt; <span class="ident">ColumnIterator::from</span>(<span class="macro">vec!</span>[<span class="ident">m</span>.<span class="ident">model_a_column</span>.<span class="ident">clone</span>().<span class="ident">into</span>()]),
-            <span class="kw">_</span> =&gt; <span class="self">self</span>.<span class="ident">linking_fields</span>().<span class="ident">as_columns</span>(),
+            <span class="kw">_</span> =&gt; <span class="ident">ModelProjection::from</span>(<span class="self">self</span>.<span class="ident">linking_fields</span>()).<span class="ident">as_columns</span>(),
         }
     }
 
@@ -123,7 +123,7 @@
         <span class="kw">match</span> (<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">relation</span>().<span class="ident">manifestation</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">relation_side</span>) {
             (<span class="ident">RelationTable</span>(<span class="kw-2">ref</span> <span class="ident">m</span>), <span class="ident">RelationSide::A</span>) =&gt; <span class="ident">ColumnIterator::from</span>(<span class="macro">vec!</span>[<span class="ident">m</span>.<span class="ident">model_a_column</span>.<span class="ident">clone</span>().<span class="ident">into</span>()]),
             (<span class="ident">RelationTable</span>(<span class="kw-2">ref</span> <span class="ident">m</span>), <span class="ident">RelationSide::B</span>) =&gt; <span class="ident">ColumnIterator::from</span>(<span class="macro">vec!</span>[<span class="ident">m</span>.<span class="ident">model_b_column</span>.<span class="ident">clone</span>().<span class="ident">into</span>()]),
-            <span class="kw">_</span> =&gt; <span class="self">self</span>.<span class="ident">model</span>().<span class="ident">primary_identifier</span>().<span class="ident">as_columns</span>(),
+            <span class="kw">_</span> =&gt; <span class="ident">ModelProjection::from</span>(<span class="self">self</span>.<span class="ident">model</span>().<span class="ident">primary_identifier</span>()).<span class="ident">as_columns</span>(),
         }
     }
 

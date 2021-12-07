@@ -367,7 +367,7 @@
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">RecordFilter</span> {
     <span class="kw">pub</span> <span class="ident">filter</span>: <span class="ident">Filter</span>,
-    <span class="kw">pub</span> <span class="ident">selectors</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">RecordProjection</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">selectors</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">SelectionResult</span><span class="op">&gt;</span><span class="op">&gt;</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">RecordFilter</span> {
@@ -388,8 +388,8 @@
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">RecordProjection</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">RecordFilter</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">selectors</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">RecordProjection</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
+<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">SelectionResult</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">RecordFilter</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">selectors</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">SelectionResult</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">filter</span>: <span class="ident">Filter::empty</span>(),
             <span class="ident">selectors</span>: <span class="prelude-val">Some</span>(<span class="ident">selectors</span>),
@@ -397,8 +397,8 @@
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">RecordProjection</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">RecordFilter</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">selector</span>: <span class="ident">RecordProjection</span>) -&gt; <span class="self">Self</span> {
+<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">SelectionResult</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">RecordFilter</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">selector</span>: <span class="ident">SelectionResult</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">filter</span>: <span class="ident">Filter::empty</span>(),
             <span class="ident">selectors</span>: <span class="prelude-val">Some</span>(<span class="macro">vec!</span>[<span class="ident">selector</span>]),
@@ -538,12 +538,12 @@
     <span class="doccomment">/// - The `ModelRef` represents the datamodel and its relations.</span>
     <span class="doccomment">/// - The `Filter` defines what item we want back and is guaranteed to be</span>
     <span class="doccomment">///   defined to filter at most one item by the core.</span>
-    <span class="doccomment">/// - The `SelectedFields` defines the values to be returned.</span>
+    <span class="doccomment">/// - The `FieldSelection` defines the values to be returned.</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_single_record</span>(
         <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
         <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>,
         <span class="ident">filter</span>: <span class="kw-2">&amp;</span><span class="ident">Filter</span>,
-        <span class="ident">selected_fields</span>: <span class="kw-2">&amp;</span><span class="ident">ModelProjection</span>,
+        <span class="ident">selected_fields</span>: <span class="kw-2">&amp;</span><span class="ident">FieldSelection</span>,
         <span class="ident">aggregation_selections</span>: <span class="kw-2">&amp;</span>[<span class="ident">RelAggregationSelection</span>],
     ) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">SingleRecord</span><span class="op">&gt;</span><span class="op">&gt;</span>;
 
@@ -551,13 +551,13 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// - The `ModelRef` represents the datamodel and its relations.</span>
     <span class="doccomment">/// - The `QueryArguments` defines various constraints (see docs for detailed explanation).</span>
-    <span class="doccomment">/// - The `SelectedFields` defines the fields (e.g. columns or document fields)</span>
+    <span class="doccomment">/// - The `FieldSelection` defines the fields (e.g. columns or document fields)</span>
     <span class="doccomment">///   to be returned as a projection of fields of the model it queries.</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_many_records</span>(
         <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
         <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>,
         <span class="ident">query_arguments</span>: <span class="ident">QueryArguments</span>,
-        <span class="ident">selected_fields</span>: <span class="kw-2">&amp;</span><span class="ident">ModelProjection</span>,
+        <span class="ident">selected_fields</span>: <span class="kw-2">&amp;</span><span class="ident">FieldSelection</span>,
         <span class="ident">aggregation_selections</span>: <span class="kw-2">&amp;</span>[<span class="ident">RelAggregationSelection</span>],
     ) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">ManyRecords</span><span class="op">&gt;</span>;
 
@@ -571,8 +571,8 @@
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_related_m2m_record_ids</span>(
         <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
         <span class="ident">from_field</span>: <span class="kw-2">&amp;</span><span class="ident">RelationFieldRef</span>,
-        <span class="ident">from_record_ids</span>: <span class="kw-2">&amp;</span>[<span class="ident">RecordProjection</span>],
-    ) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">RecordProjection</span>, <span class="ident">RecordProjection</span>)<span class="op">&gt;</span><span class="op">&gt;</span>;
+        <span class="ident">from_record_ids</span>: <span class="kw-2">&amp;</span>[<span class="ident">SelectionResult</span>],
+    ) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">SelectionResult</span>, <span class="ident">SelectionResult</span>)<span class="op">&gt;</span><span class="op">&gt;</span>;
 
     <span class="doccomment">/// Aggregates records for a specific model based on the given selections.</span>
     <span class="doccomment">/// Whether or not the aggregations can be executed in a single query or</span>
@@ -592,7 +592,7 @@
 <span class="attribute">#[<span class="ident">async_trait</span>]</span>
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">WriteOperations</span> {
     <span class="doccomment">/// Insert a single record to the database.</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">create_record</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>, <span class="ident">args</span>: <span class="ident">WriteArgs</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">RecordProjection</span><span class="op">&gt;</span>;
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">create_record</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>, <span class="ident">args</span>: <span class="ident">WriteArgs</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">SelectionResult</span><span class="op">&gt;</span>;
 
     <span class="doccomment">/// Inserts many records at once into the database.</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">create_records</span>(
@@ -609,7 +609,7 @@
         <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>,
         <span class="ident">record_filter</span>: <span class="ident">RecordFilter</span>,
         <span class="ident">args</span>: <span class="ident">WriteArgs</span>,
-    ) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">RecordProjection</span><span class="op">&gt;</span><span class="op">&gt;</span>;
+    ) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">SelectionResult</span><span class="op">&gt;</span><span class="op">&gt;</span>;
 
     <span class="doccomment">/// Delete records in the `Model` with the given `Filter`.</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">delete_records</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>, <span class="ident">record_filter</span>: <span class="ident">RecordFilter</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>;
@@ -620,16 +620,16 @@
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">m2m_connect</span>(
         <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
         <span class="ident">field</span>: <span class="kw-2">&amp;</span><span class="ident">RelationFieldRef</span>,
-        <span class="ident">parent_id</span>: <span class="kw-2">&amp;</span><span class="ident">RecordProjection</span>,
-        <span class="ident">child_ids</span>: <span class="kw-2">&amp;</span>[<span class="ident">RecordProjection</span>],
+        <span class="ident">parent_id</span>: <span class="kw-2">&amp;</span><span class="ident">SelectionResult</span>,
+        <span class="ident">child_ids</span>: <span class="kw-2">&amp;</span>[<span class="ident">SelectionResult</span>],
     ) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span>;
 
     <span class="doccomment">/// Disconnect the children from the parent (m2m relation only).</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">m2m_disconnect</span>(
         <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
         <span class="ident">field</span>: <span class="kw-2">&amp;</span><span class="ident">RelationFieldRef</span>,
-        <span class="ident">parent_id</span>: <span class="kw-2">&amp;</span><span class="ident">RecordProjection</span>,
-        <span class="ident">child_ids</span>: <span class="kw-2">&amp;</span>[<span class="ident">RecordProjection</span>],
+        <span class="ident">parent_id</span>: <span class="kw-2">&amp;</span><span class="ident">SelectionResult</span>,
+        <span class="ident">child_ids</span>: <span class="kw-2">&amp;</span>[<span class="ident">SelectionResult</span>],
     ) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span>;
 
     <span class="doccomment">/// Execute the raw query in the database as-is. The `parameters` are</span>

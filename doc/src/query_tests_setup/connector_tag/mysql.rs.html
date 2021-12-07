@@ -157,8 +157,8 @@
 
 <span class="kw">impl</span> <span class="ident">MySqlConnectorTag</span> {
     <span class="doccomment">/// Get a reference to the MySQL connector tag&#39;s version.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">version</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">MySqlVersion</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">version</span>.<span class="ident">as_ref</span>()
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">version</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">MySqlVersion</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">version</span>
     }
 }
 

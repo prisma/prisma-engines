@@ -213,7 +213,7 @@
     <span class="self">self</span> <span class="kw">as</span> <span class="ident">connector</span>, <span class="ident">filter::Filter</span>, <span class="ident">AggregationRow</span>, <span class="ident">AggregationSelection</span>, <span class="ident">QueryArguments</span>, <span class="ident">ReadOperations</span>,
     <span class="ident">RecordFilter</span>, <span class="ident">Transaction</span>, <span class="ident">WriteArgs</span>, <span class="ident">WriteOperations</span>,
 };
-<span class="kw">use</span> <span class="ident">prisma_models::prelude</span>::<span class="kw-2">*</span>;
+<span class="kw">use</span> <span class="ident">prisma_models</span>::{<span class="ident">prelude</span>::<span class="kw-2">*</span>, <span class="ident">SelectionResult</span>};
 <span class="kw">use</span> <span class="ident">prisma_value::PrismaValue</span>;
 <span class="kw">use</span> <span class="ident">quaint::prelude::ConnectionInfo</span>;
 
@@ -271,11 +271,11 @@
         <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
         <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>,
         <span class="ident">filter</span>: <span class="kw-2">&amp;</span><span class="ident">Filter</span>,
-        <span class="ident">selected_fields</span>: <span class="kw-2">&amp;</span><span class="ident">ModelProjection</span>,
+        <span class="ident">selected_fields</span>: <span class="kw-2">&amp;</span><span class="ident">FieldSelection</span>,
         <span class="ident">aggr_selections</span>: <span class="kw-2">&amp;</span>[<span class="ident">RelAggregationSelection</span>],
     ) -&gt; <span class="ident">connector::Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">SingleRecord</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="ident">catch</span>(<span class="self">self</span>.<span class="ident">connection_info</span>.<span class="ident">clone</span>(), <span class="kw">async</span> <span class="kw">move</span> {
-            <span class="ident">read::get_single_record</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">inner</span>, <span class="ident">model</span>, <span class="ident">filter</span>, <span class="ident">selected_fields</span>, <span class="ident">aggr_selections</span>).<span class="kw">await</span>
+            <span class="ident">read::get_single_record</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">inner</span>, <span class="ident">model</span>, <span class="ident">filter</span>, <span class="kw-2">&amp;</span><span class="ident">selected_fields</span>.<span class="ident">into</span>(), <span class="ident">aggr_selections</span>).<span class="kw">await</span>
         })
         .<span class="kw">await</span>
     }
@@ -284,7 +284,7 @@
         <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
         <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>,
         <span class="ident">query_arguments</span>: <span class="ident">QueryArguments</span>,
-        <span class="ident">selected_fields</span>: <span class="kw-2">&amp;</span><span class="ident">ModelProjection</span>,
+        <span class="ident">selected_fields</span>: <span class="kw-2">&amp;</span><span class="ident">FieldSelection</span>,
         <span class="ident">aggr_selections</span>: <span class="kw-2">&amp;</span>[<span class="ident">RelAggregationSelection</span>],
     ) -&gt; <span class="ident">connector::Result</span><span class="op">&lt;</span><span class="ident">ManyRecords</span><span class="op">&gt;</span> {
         <span class="ident">catch</span>(<span class="self">self</span>.<span class="ident">connection_info</span>.<span class="ident">clone</span>(), <span class="kw">async</span> <span class="kw">move</span> {
@@ -292,7 +292,7 @@
                 <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">inner</span>,
                 <span class="ident">model</span>,
                 <span class="ident">query_arguments</span>,
-                <span class="ident">selected_fields</span>,
+                <span class="kw-2">&amp;</span><span class="ident">selected_fields</span>.<span class="ident">into</span>(),
                 <span class="ident">aggr_selections</span>,
                 <span class="ident">SqlInfo::from</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">connection_info</span>),
             )
@@ -304,8 +304,8 @@
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_related_m2m_record_ids</span>(
         <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
         <span class="ident">from_field</span>: <span class="kw-2">&amp;</span><span class="ident">RelationFieldRef</span>,
-        <span class="ident">from_record_ids</span>: <span class="kw-2">&amp;</span>[<span class="ident">RecordProjection</span>],
-    ) -&gt; <span class="ident">connector::Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">RecordProjection</span>, <span class="ident">RecordProjection</span>)<span class="op">&gt;</span><span class="op">&gt;</span> {
+        <span class="ident">from_record_ids</span>: <span class="kw-2">&amp;</span>[<span class="ident">SelectionResult</span>],
+    ) -&gt; <span class="ident">connector::Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">SelectionResult</span>, <span class="ident">SelectionResult</span>)<span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="ident">catch</span>(<span class="self">self</span>.<span class="ident">connection_info</span>.<span class="ident">clone</span>(), <span class="kw">async</span> <span class="kw">move</span> {
             <span class="ident">read::get_related_m2m_record_ids</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">inner</span>, <span class="ident">from_field</span>, <span class="ident">from_record_ids</span>).<span class="kw">await</span>
         })
@@ -329,7 +329,7 @@
 
 <span class="attribute">#[<span class="ident">async_trait</span>]</span>
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;tx</span><span class="op">&gt;</span> <span class="ident">WriteOperations</span> <span class="kw">for</span> <span class="ident">SqlConnectorTransaction</span><span class="op">&lt;</span><span class="lifetime">&#39;tx</span><span class="op">&gt;</span> {
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">create_record</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>, <span class="ident">args</span>: <span class="ident">WriteArgs</span>) -&gt; <span class="ident">connector::Result</span><span class="op">&lt;</span><span class="ident">RecordProjection</span><span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">create_record</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>, <span class="ident">args</span>: <span class="ident">WriteArgs</span>) -&gt; <span class="ident">connector::Result</span><span class="op">&lt;</span><span class="ident">SelectionResult</span><span class="op">&gt;</span> {
         <span class="ident">catch</span>(<span class="self">self</span>.<span class="ident">connection_info</span>.<span class="ident">clone</span>(), <span class="kw">async</span> <span class="kw">move</span> {
             <span class="ident">write::create_record</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">inner</span>, <span class="ident">model</span>, <span class="ident">args</span>).<span class="kw">await</span>
         })
@@ -360,7 +360,7 @@
         <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>,
         <span class="ident">record_filter</span>: <span class="ident">RecordFilter</span>,
         <span class="ident">args</span>: <span class="ident">WriteArgs</span>,
-    ) -&gt; <span class="ident">connector::Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">RecordProjection</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="ident">connector::Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">SelectionResult</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="ident">catch</span>(<span class="self">self</span>.<span class="ident">connection_info</span>.<span class="ident">clone</span>(), <span class="kw">async</span> <span class="kw">move</span> {
             <span class="ident">write::update_records</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">inner</span>, <span class="ident">model</span>, <span class="ident">record_filter</span>, <span class="ident">args</span>).<span class="kw">await</span>
         })
@@ -377,8 +377,8 @@
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">m2m_connect</span>(
         <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
         <span class="ident">field</span>: <span class="kw-2">&amp;</span><span class="ident">RelationFieldRef</span>,
-        <span class="ident">parent_id</span>: <span class="kw-2">&amp;</span><span class="ident">RecordProjection</span>,
-        <span class="ident">child_ids</span>: <span class="kw-2">&amp;</span>[<span class="ident">RecordProjection</span>],
+        <span class="ident">parent_id</span>: <span class="kw-2">&amp;</span><span class="ident">SelectionResult</span>,
+        <span class="ident">child_ids</span>: <span class="kw-2">&amp;</span>[<span class="ident">SelectionResult</span>],
     ) -&gt; <span class="ident">connector::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="ident">catch</span>(<span class="self">self</span>.<span class="ident">connection_info</span>.<span class="ident">clone</span>(), <span class="kw">async</span> <span class="kw">move</span> {
             <span class="ident">write::m2m_connect</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">inner</span>, <span class="ident">field</span>, <span class="ident">parent_id</span>, <span class="ident">child_ids</span>).<span class="kw">await</span>
@@ -389,8 +389,8 @@
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">m2m_disconnect</span>(
         <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
         <span class="ident">field</span>: <span class="kw-2">&amp;</span><span class="ident">RelationFieldRef</span>,
-        <span class="ident">parent_id</span>: <span class="kw-2">&amp;</span><span class="ident">RecordProjection</span>,
-        <span class="ident">child_ids</span>: <span class="kw-2">&amp;</span>[<span class="ident">RecordProjection</span>],
+        <span class="ident">parent_id</span>: <span class="kw-2">&amp;</span><span class="ident">SelectionResult</span>,
+        <span class="ident">child_ids</span>: <span class="kw-2">&amp;</span>[<span class="ident">SelectionResult</span>],
     ) -&gt; <span class="ident">connector::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="ident">catch</span>(<span class="self">self</span>.<span class="ident">connection_info</span>.<span class="ident">clone</span>(), <span class="kw">async</span> <span class="kw">move</span> {
             <span class="ident">write::m2m_disconnect</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">inner</span>, <span class="ident">field</span>, <span class="ident">parent_id</span>, <span class="ident">child_ids</span>).<span class="kw">await</span>

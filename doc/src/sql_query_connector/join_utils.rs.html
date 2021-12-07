@@ -304,9 +304,9 @@
 ) -&gt; <span class="ident">AliasedJoin</span> {
     <span class="kw">let</span> <span class="ident">relation_table</span> <span class="op">=</span> <span class="ident">rf</span>.<span class="ident">as_table</span>();
     <span class="kw">let</span> <span class="ident">model_a</span> <span class="op">=</span> <span class="ident">rf</span>.<span class="ident">model</span>();
-    <span class="kw">let</span> <span class="ident">a_ids</span> <span class="op">=</span> <span class="ident">rf</span>.<span class="ident">model</span>().<span class="ident">primary_identifier</span>();
+    <span class="kw">let</span> <span class="ident">a_ids</span>: <span class="ident">ModelProjection</span> <span class="op">=</span> <span class="ident">rf</span>.<span class="ident">model</span>().<span class="ident">primary_identifier</span>().<span class="ident">into</span>();
     <span class="kw">let</span> <span class="ident">a_columns</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">a_ids</span>.<span class="ident">as_columns</span>().<span class="ident">collect</span>();
-    <span class="kw">let</span> <span class="ident">b_ids</span> <span class="op">=</span> <span class="ident">rf</span>.<span class="ident">related_model</span>().<span class="ident">primary_identifier</span>();
+    <span class="kw">let</span> <span class="ident">b_ids</span>: <span class="ident">ModelProjection</span> <span class="op">=</span> <span class="ident">rf</span>.<span class="ident">related_model</span>().<span class="ident">primary_identifier</span>().<span class="ident">into</span>();
 
     <span class="comment">// + SELECT A.id FROM A</span>
     <span class="kw">let</span> <span class="ident">query</span> <span class="op">=</span> <span class="ident">Select::from_table</span>(<span class="ident">model_a</span>.<span class="ident">as_table</span>()).<span class="ident">columns</span>(<span class="ident">a_columns</span>.<span class="ident">clone</span>());

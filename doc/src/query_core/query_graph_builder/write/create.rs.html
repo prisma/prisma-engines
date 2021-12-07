@@ -126,7 +126,7 @@
     <span class="ident">query_graph</span>::{<span class="ident">Node</span>, <span class="ident">NodeRef</span>, <span class="ident">QueryGraph</span>, <span class="ident">QueryGraphDependency</span>},
     <span class="ident">ArgumentListLookup</span>, <span class="ident">ConnectorContext</span>, <span class="ident">ParsedField</span>, <span class="ident">ParsedInputList</span>, <span class="ident">ParsedInputMap</span>,
 };
-<span class="kw">use</span> <span class="ident">connector::IdFilter</span>;
+<span class="kw">use</span> <span class="ident">connector::IntoFilter</span>;
 <span class="kw">use</span> <span class="ident">prisma_models::ModelRef</span>;
 <span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">convert::TryInto</span>, <span class="ident">sync::Arc</span>};
 <span class="kw">use</span> <span class="ident">write_args_parser</span>::<span class="kw-2">*</span>;
@@ -156,7 +156,7 @@
     <span class="ident">graph</span>.<span class="ident">create_edge</span>(
         <span class="kw-2">&amp;</span><span class="ident">create_node</span>,
         <span class="kw-2">&amp;</span><span class="ident">read_node</span>,
-        <span class="ident">QueryGraphDependency::ParentProjection</span>(
+        <span class="ident">QueryGraphDependency::ProjectedDataDependency</span>(
             <span class="ident">model</span>.<span class="ident">primary_identifier</span>(),
             <span class="ident">Box::new</span>(<span class="kw">move</span> <span class="op">|</span><span class="kw-2">mut</span> <span class="ident">read_node</span>, <span class="kw-2">mut</span> <span class="ident">parent_ids</span><span class="op">|</span> {
                 <span class="kw">let</span> <span class="ident">parent_id</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">parent_ids</span>.<span class="ident">pop</span>() {

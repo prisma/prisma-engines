@@ -5,41 +5,41 @@ Those checks fail at runtime and are inserted between <code>parent_node</code> a
 <p>This function is usually part of a delete (<code>deleteOne</code> or <code>deleteMany</code>).
 Expects <code>parent_node</code> to return one or more IDs (for records of <code>model</code>) to be checked.</p>
 <p>Resulting graph (all emulations):</p>
-<div class="example-wrap"><pre class="language-text"><code>   ┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─                                                                                                      
-           Parent       │                                                                                                     
-   │  (ids to update)                                                                                                         
-    ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ┘                                                                                                     
-              │                                                                                                               
-              ▼                                                                                                               
-   ┌────────────────────┐                                                                                                     
-┌ ─│     Join node      │─────────────────┬─────────────────────────────┬────────────────────────────────────────┐            
-   └────────────────────┘                 │                             │                                        │            
-│             │                           │                             │                                        │            
-              │                           │                             │                                        │            
-│             ▼                           ▼                             ▼                                        ▼            
-   ┌────────────────────┐      ┌────────────────────┐        ┌────────────────────┐                   ┌────────────────────┐  
-│  │Find Connected Model│      │Find Connected Model│        │Find Connected Model│                   │Find Connected Model│  
-   │    A (Restrict)    │      │    B (Restrict)    │     ┌──│    C (SetNull)     │                ┌──│    D (Cascade)     │  
-│  └────────────────────┘      └────────────────────┘     │  └────────────────────┘                │  └────────────────────┘  
-              │                           │               │             │                          │             │            
-│      Fail if│&gt; 0                 Fail if│&gt; 0            │             ▼                          │             │            
-              │                           │               │┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─               │             ▼            
+<div class="example-wrap"><pre class="language-text"><code>   ┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─
+           Parent       │
+   │  (ids to update)
+    ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ┘
+              │
+              ▼
+   ┌────────────────────┐
+┌ ─│     Join node      │─────────────────┬─────────────────────────────┬────────────────────────────────────────┐
+   └────────────────────┘                 │                             │                                        │
+│             │                           │                             │                                        │
+              │                           │                             │                                        │
+│             ▼                           ▼                             ▼                                        ▼
+   ┌────────────────────┐      ┌────────────────────┐        ┌────────────────────┐                   ┌────────────────────┐
+│  │Find Connected Model│      │Find Connected Model│        │Find Connected Model│                   │Find Connected Model│
+   │    A (Restrict)    │      │    B (Restrict)    │     ┌──│    C (SetNull)     │                ┌──│    D (Cascade)     │
+│  └────────────────────┘      └────────────────────┘     │  └────────────────────┘                │  └────────────────────┘
+              │                           │               │             │                          │             │
+│      Fail if│&gt; 0                 Fail if│&gt; 0            │             ▼                          │             │
+              │                           │               │┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─               │             ▼
 │             ▼                           ▼               │  ┌────────────────────┐ │              │┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─
    ┌────────────────────┐      ┌────────────────────┐     ││ │  Insert onUpdate   │                │  ┌────────────────────┐ │
-│  │       Empty        │      │       Empty        │     │  │ emulation subtree  │ │              ││ │  Insert onUpdate   │  
+│  │       Empty        │      │       Empty        │     │  │ emulation subtree  │ │              ││ │  Insert onUpdate   │
    └────────────────────┘      └────────────────────┘     ││ │for relations using │                │  │ emulation subtree  │ │
-│             │                           │               │  │the foreign key that│ │              ││ │ for all relations  │  
+│             │                           │               │  │the foreign key that│ │              ││ │ for all relations  │
               │                           │               ││ │    was updated.    │                │  │   pointing to D.   │ │
-│             │                           │               │  └────────────────────┘ │              ││ └────────────────────┘  
+│             │                           │               │  └────────────────────┘ │              ││ └────────────────────┘
               │                           │               │└ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─               │ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ┘
-│             │                           │               │             │                          │             │            
-              │                           │               │             │                          │             │            
-│             ▼                           │               │             ▼                          │             ▼            
-   ┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─                  │               │  ┌────────────────────┐                │  ┌────────────────────┐  
-└ ▶        Update       │◀────────────────┘               │  │ Update Cs (set FK  │                └─▶│     Update Cs      │  
-   └ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─                                  └─▶│       null)        │                   └────────────────────┘  
-              ▲                                              └────────────────────┘                              │            
-              │                                                         │                                        │            
-              └─────────────────────────────────────────────────────────┴────────────────────────────────────────┘            </code></pre></div></div></details></section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../../../" data-current-crate="query_engine_tests" data-search-index-js="../../../../../search-index.js" data-search-js="../../../../../search.js"></div>
+│             │                           │               │             │                          │             │
+              │                           │               │             │                          │             │
+│             ▼                           │               │             ▼                          │             ▼
+   ┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─                  │               │  ┌────────────────────┐                │  ┌────────────────────┐
+└ ▶        Update       │◀────────────────┘               │  │ Update Cs (set FK  │                └─▶│     Update Cs      │
+   └ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─                                  └─▶│       null)        │                   └────────────────────┘
+              ▲                                              └────────────────────┘                              │
+              │                                                         │                                        │
+              └─────────────────────────────────────────────────────────┴────────────────────────────────────────┘</code></pre></div></div></details></section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../../../" data-current-crate="query_engine_tests" data-search-index-js="../../../../../search-index.js" data-search-js="../../../../../search.js"></div>
     <script src="../../../../../main.js"></script>
 </body></html>

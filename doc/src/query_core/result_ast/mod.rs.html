@@ -52,11 +52,11 @@
 <span id="52">52</span>
 <span id="53">53</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">connector</span>::{<span class="ident">AggregationRow</span>, <span class="ident">QueryArguments</span>, <span class="ident">RelAggregationRow</span>};
-<span class="kw">use</span> <span class="ident">prisma_models</span>::{<span class="ident">ManyRecords</span>, <span class="ident">ModelRef</span>, <span class="ident">RecordProjection</span>};
+<span class="kw">use</span> <span class="ident">prisma_models</span>::{<span class="ident">ManyRecords</span>, <span class="ident">ModelRef</span>, <span class="ident">SelectionResult</span>};
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">QueryResult</span> {
-    <span class="ident">Id</span>(<span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">RecordProjection</span><span class="op">&gt;</span>),
+    <span class="ident">Id</span>(<span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">SelectionResult</span><span class="op">&gt;</span>),
     <span class="ident">Count</span>(<span class="ident">usize</span>),
     <span class="ident">RecordSelection</span>(<span class="ident">Box</span><span class="op">&lt;</span><span class="ident">RecordSelection</span><span class="op">&gt;</span>),
     <span class="ident">Json</span>(<span class="ident">serde_json::Value</span>),

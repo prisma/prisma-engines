@@ -109,8 +109,6 @@
 <span id="109">109</span>
 <span id="110">110</span>
 <span id="111">111</span>
-<span id="112">112</span>
-<span id="113">113</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">diagnostics::DatamodelError</span>,
@@ -154,7 +152,7 @@
     };
 
     <span class="comment">// fields argument should not be empty</span>
-    <span class="kw">if</span> <span class="ident">is_empty_fields</span>(<span class="ident">forward</span>.<span class="ident">attributes</span>().<span class="ident">fields</span>.<span class="ident">as_deref</span>()) {
+    <span class="kw">if</span> <span class="ident">is_empty_fields</span>(<span class="ident">forward</span>.<span class="ident">referencing_fields</span>()) {
         <span class="kw">let</span> <span class="ident">message</span> <span class="op">=</span> <span class="macro">format!</span>(
             <span class="string">&quot;The relation field `{}` on Model `{}` must specify the `fields` argument in the {} attribute. {}&quot;</span>,
             <span class="ident">forward</span>.<span class="ident">name</span>(),
@@ -171,7 +169,7 @@
     }
 
     <span class="comment">// references argument should not be empty</span>
-    <span class="kw">if</span> <span class="ident">is_empty_fields</span>(<span class="ident">forward</span>.<span class="ident">attributes</span>().<span class="ident">references</span>.<span class="ident">as_deref</span>()) {
+    <span class="kw">if</span> <span class="ident">is_empty_fields</span>(<span class="ident">forward</span>.<span class="ident">referenced_fields</span>()) {
         <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_attribute_validation_error</span>(
             <span class="kw-2">&amp;</span><span class="macro">format!</span>(
                 <span class="string">&quot;The relation field `{}` on Model `{}` must specify the `references` argument in the {} attribute.&quot;</span>,
@@ -184,9 +182,7 @@
         ));
     }
 
-    <span class="kw">if</span> <span class="op">!</span><span class="ident">is_empty_fields</span>(<span class="ident">back</span>.<span class="ident">attributes</span>().<span class="ident">fields</span>.<span class="ident">as_deref</span>())
-        <span class="op">|</span><span class="op">|</span> <span class="op">!</span><span class="ident">is_empty_fields</span>(<span class="ident">back</span>.<span class="ident">attributes</span>().<span class="ident">references</span>.<span class="ident">as_deref</span>())
-    {
+    <span class="kw">if</span> <span class="op">!</span><span class="ident">is_empty_fields</span>(<span class="ident">back</span>.<span class="ident">referencing_fields</span>()) <span class="op">|</span><span class="op">|</span> <span class="op">!</span><span class="ident">is_empty_fields</span>(<span class="ident">back</span>.<span class="ident">referenced_fields</span>()) {
         <span class="kw">let</span> <span class="ident">message</span> <span class="op">=</span> <span class="macro">format!</span>(
             <span class="string">&quot;The relation field `{}` on Model `{}` must not specify the `fields` or `references` argument in the {} attribute. You must only specify it on the opposite field `{}` on model `{}`.&quot;</span>,
             <span class="ident">back</span>.<span class="ident">name</span>(),
@@ -211,7 +207,7 @@
         <span class="kw">_</span> =&gt; <span class="kw">return</span>,
     };
 
-    <span class="kw">if</span> <span class="ident">back</span>.<span class="ident">attributes</span>().<span class="ident">on_delete</span>.<span class="ident">is_some</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">back</span>.<span class="ident">attributes</span>().<span class="ident">on_update</span>.<span class="ident">is_some</span>() {
+    <span class="kw">if</span> <span class="ident">back</span>.<span class="ident">explicit_on_delete</span>().<span class="ident">is_some</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">back</span>.<span class="ident">explicit_on_update</span>().<span class="ident">is_some</span>() {
         <span class="kw">let</span> <span class="ident">message</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="macro">format!</span>(
             <span class="string">&quot;The relation field `{}` on Model `{}` must not specify the `onDelete` or `onUpdate` argument in the {} attribute. You must only specify it on the opposite field `{}` on model `{}`, or in case of a many to many relation, in an explicit join table.&quot;</span>,
             <span class="ident">back</span>.<span class="ident">name</span>(), <span class="ident">back</span>.<span class="ident">model</span>().<span class="ident">name</span>(), <span class="ident">RELATION_ATTRIBUTE_NAME_WITH_AT</span>, <span class="ident">forward</span>.<span class="ident">name</span>(), <span class="ident">forward</span>.<span class="ident">model</span>().<span class="ident">name</span>(),

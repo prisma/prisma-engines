@@ -205,16 +205,7 @@
 <span id="205">205</span>
 <span id="206">206</span>
 <span id="207">207</span>
-<span id="208">208</span>
-<span id="209">209</span>
-<span id="210">210</span>
-<span id="211">211</span>
-<span id="212">212</span>
-<span id="213">213</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">DomainError</span>, <span class="ident">ModelProjection</span>, <span class="ident">OrderBy</span>, <span class="ident">PrismaValue</span>, <span class="ident">PrismaValueExtensions</span>, <span class="ident">RecordProjection</span>, <span class="ident">ScalarFieldRef</span>,
-    <span class="ident">SortOrder</span>,
-};
+</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">DomainError</span>, <span class="ident">FieldSelection</span>, <span class="ident">ModelProjection</span>, <span class="ident">OrderBy</span>, <span class="ident">PrismaValue</span>, <span class="ident">SelectionResult</span>, <span class="ident">SortOrder</span>};
 <span class="kw">use</span> <span class="ident">itertools::Itertools</span>;
 <span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
 
@@ -238,8 +229,9 @@
         <span class="self">Self</span> { <span class="ident">record</span>, <span class="ident">field_names</span> }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">projection</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">projection</span>: <span class="kw-2">&amp;</span><span class="ident">ModelProjection</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">RecordProjection</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">record</span>.<span class="ident">projection</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">field_names</span>, <span class="ident">projection</span>)
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">extract_selection_result</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">extraction_selection</span>: <span class="kw-2">&amp;</span><span class="ident">FieldSelection</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">SelectionResult</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">record</span>
+            .<span class="ident">extract_selection_result</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">field_names</span>, <span class="ident">extraction_selection</span>)
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_field_value</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">field</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">PrismaValue</span><span class="op">&gt;</span> {
@@ -261,23 +253,10 @@
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">empty</span>(<span class="ident">selected_fields</span>: <span class="kw-2">&amp;</span><span class="ident">ModelProjection</span>) -&gt; <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">empty</span>(<span class="ident">selected_fields</span>: <span class="kw-2">&amp;</span><span class="ident">FieldSelection</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">records</span>: <span class="ident">Vec::new</span>(),
-            <span class="ident">field_names</span>: <span class="ident">selected_fields</span>.<span class="ident">names</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">n</span><span class="op">|</span> <span class="ident">n</span>.<span class="ident">to_string</span>()).<span class="ident">collect</span>(),
-        }
-    }
-
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_projection</span>(<span class="ident">projection</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">PrismaValue</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">selected_fields</span>: <span class="kw-2">&amp;</span><span class="ident">ModelProjection</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">records</span>: <span class="ident">projection</span>
-                .<span class="ident">into_iter</span>()
-                .<span class="ident">map</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">Record</span> {
-                    <span class="ident">values</span>: <span class="ident">v</span>,
-                    <span class="ident">parent_id</span>: <span class="prelude-val">None</span>,
-                })
-                .<span class="ident">collect</span>(),
-            <span class="ident">field_names</span>: <span class="ident">selected_fields</span>.<span class="ident">db_names</span>().<span class="ident">collect</span>(),
+            <span class="ident">field_names</span>: <span class="ident">selected_fields</span>.<span class="ident">prisma_names</span>().<span class="ident">collect</span>(),
         }
     }
 
@@ -314,10 +293,11 @@
         <span class="self">self</span>.<span class="ident">records</span>.<span class="ident">push</span>(<span class="ident">record</span>);
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">projections</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">model_projection</span>: <span class="kw-2">&amp;</span><span class="ident">ModelProjection</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">RecordProjection</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="doccomment">/// Builds `SelectionResults` from this `ManyRecords` based on the given FieldSelection.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">extract_selection_results</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">selections</span>: <span class="kw-2">&amp;</span><span class="ident">FieldSelection</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">SelectionResult</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">records</span>
             .<span class="ident">iter</span>()
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">record</span><span class="op">|</span> <span class="ident">record</span>.<span class="ident">projection</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">field_names</span>, <span class="ident">model_projection</span>))
+            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">record</span><span class="op">|</span> <span class="ident">record</span>.<span class="ident">extract_selection_result</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">field_names</span>, <span class="ident">selections</span>))
             .<span class="ident">collect</span>()
     }
 
@@ -348,10 +328,25 @@
     }
 }
 
+<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span>(<span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">PrismaValue</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="kw-2">&amp;</span><span class="ident">FieldSelection</span>)<span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ManyRecords</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>((<span class="ident">values</span>, <span class="ident">selected_fields</span>): (<span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">PrismaValue</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="kw-2">&amp;</span><span class="ident">FieldSelection</span>)) -&gt; <span class="self">Self</span> {
+        <span class="self">Self</span> {
+            <span class="ident">records</span>: <span class="ident">values</span>
+                .<span class="ident">into_iter</span>()
+                .<span class="ident">map</span>(<span class="op">|</span><span class="ident">value</span><span class="op">|</span> <span class="ident">Record</span> {
+                    <span class="ident">values</span>: <span class="ident">value</span>,
+                    <span class="ident">parent_id</span>: <span class="prelude-val">None</span>,
+                })
+                .<span class="ident">collect</span>(),
+            <span class="ident">field_names</span>: <span class="ident">selected_fields</span>.<span class="ident">db_names</span>().<span class="ident">collect</span>(),
+        }
+    }
+}
+
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Default</span>, <span class="ident">Clone</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Hash</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Record</span> {
     <span class="kw">pub</span> <span class="ident">values</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">PrismaValue</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">parent_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">RecordProjection</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">parent_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">SelectionResult</span><span class="op">&gt;</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">Record</span> {
@@ -362,29 +357,24 @@
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">projection</span>(
+    <span class="doccomment">/// Extract a `SelectionResult` from this `Record`</span>
+    <span class="doccomment">/// `field_names`: Database names of the fields contained in this `Record`.</span>
+    <span class="doccomment">/// `selected_fields`: The selection to extract.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">extract_selection_result</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">field_names</span>: <span class="kw-2">&amp;</span>[<span class="ident">String</span>],
-        <span class="ident">model_projection</span>: <span class="kw-2">&amp;</span><span class="ident">ModelProjection</span>,
-    ) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">RecordProjection</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">pairs</span>: <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">ScalarFieldRef</span>, <span class="ident">PrismaValue</span>)<span class="op">&gt;</span> <span class="op">=</span> <span class="ident">model_projection</span>
-            .<span class="ident">fields</span>()
+        <span class="ident">extraction_selection</span>: <span class="kw-2">&amp;</span><span class="ident">FieldSelection</span>,
+    ) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">SelectionResult</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">pairs</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">extraction_selection</span>
+            .<span class="ident">selections</span>()
             .<span class="ident">into_iter</span>()
-            .<span class="ident">flat_map</span>(<span class="op">|</span><span class="ident">field</span><span class="op">|</span> {
-                <span class="ident">field</span>.<span class="ident">scalar_fields</span>().<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">field</span><span class="op">|</span> {
-                    <span class="self">self</span>.<span class="ident">get_field_value</span>(<span class="ident">field_names</span>, <span class="ident">field</span>.<span class="ident">db_name</span>()).<span class="ident">map</span>(<span class="op">|</span><span class="ident">val</span><span class="op">|</span> {
-                        <span class="kw">let</span> <span class="ident">coerced</span> <span class="op">=</span> <span class="ident">val</span>
-                            .<span class="ident">clone</span>()
-                            .<span class="ident">coerce</span>(<span class="kw-2">&amp;</span><span class="ident">field</span>.<span class="ident">type_identifier</span>)
-                            .<span class="ident">expect</span>(<span class="string">&quot;Invalid coercion encountered&quot;</span>);
-
-                        (<span class="ident">field</span>, <span class="ident">coerced</span>)
-                    })
-                })
+            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">selection</span><span class="op">|</span> {
+                <span class="self">self</span>.<span class="ident">get_field_value</span>(<span class="ident">field_names</span>, <span class="ident">selection</span>.<span class="ident">db_name</span>())
+                    .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">val</span><span class="op">|</span> <span class="prelude-val">Ok</span>((<span class="ident">selection</span>.<span class="ident">clone</span>(), <span class="ident">selection</span>.<span class="ident">coerce_value</span>(<span class="ident">val</span>.<span class="ident">clone</span>())<span class="question-mark">?</span>)))
             })
             .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>()<span class="question-mark">?</span>;
 
-        <span class="prelude-val">Ok</span>(<span class="ident">RecordProjection</span> { <span class="ident">pairs</span> })
+        <span class="prelude-val">Ok</span>(<span class="ident">SelectionResult::new</span>(<span class="ident">pairs</span>))
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">identifying_values</span>(
@@ -410,17 +400,15 @@
         <span class="kw">let</span> <span class="ident">index</span> <span class="op">=</span> <span class="ident">field_names</span>.<span class="ident">iter</span>().<span class="ident">position</span>(<span class="op">|</span><span class="ident">r</span><span class="op">|</span> <span class="ident">r</span> <span class="op">==</span> <span class="ident">field</span>).<span class="ident">map</span>(<span class="prelude-val">Ok</span>).<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> {
             <span class="prelude-val">Err</span>(<span class="ident">DomainError::FieldNotFound</span> {
                 <span class="ident">name</span>: <span class="ident">field</span>.<span class="ident">to_string</span>(),
-                <span class="ident">model</span>: <span class="macro">format!</span>(
-                    <span class="string">&quot;Field not found in record {:?}. Field names are: {:?}, looking for: {:?}&quot;</span>,
-                    <span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw-2">&amp;</span><span class="ident">field_names</span>, <span class="ident">field</span>
-                ),
+                <span class="ident">container_type</span>: <span class="string">&quot;field&quot;</span>,
+                <span class="ident">container_name</span>: <span class="macro">format!</span>(<span class="string">&quot;Record values: {:?}. Field names: {:?}.&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw-2">&amp;</span><span class="ident">field_names</span>),
             })
         })<span class="question-mark">?</span>;
 
         <span class="prelude-val">Ok</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">values</span>[<span class="ident">index</span>])
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_parent_id</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">parent_id</span>: <span class="ident">RecordProjection</span>) {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_parent_id</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">parent_id</span>: <span class="ident">SelectionResult</span>) {
         <span class="self">self</span>.<span class="ident">parent_id</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">parent_id</span>);
     }
 }

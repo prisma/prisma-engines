@@ -255,7 +255,7 @@
         <span class="ident">graph</span>.<span class="ident">create_edge</span>(
             <span class="kw-2">&amp;</span><span class="ident">find_child_records_node</span>,
             <span class="kw-2">&amp;</span><span class="ident">delete_many_node</span>,
-            <span class="ident">QueryGraphDependency::ParentProjection</span>(
+            <span class="ident">QueryGraphDependency::ProjectedDataDependency</span>(
                 <span class="ident">child_model_identifier</span>,
                 <span class="ident">Box::new</span>(<span class="kw">move</span> <span class="op">|</span><span class="kw-2">mut</span> <span class="ident">delete_many_node</span>, <span class="ident">child_ids</span><span class="op">|</span> {
                     <span class="kw">if</span> <span class="ident">child_ids</span>.<span class="ident">len</span>() <span class="op">!</span><span class="op">=</span> <span class="ident">filter_len</span> {
@@ -301,7 +301,7 @@
             <span class="ident">graph</span>.<span class="ident">create_edge</span>(
                 <span class="kw-2">&amp;</span><span class="ident">find_child_records_node</span>,
                 <span class="kw-2">&amp;</span><span class="ident">delete_record_node</span>,
-                <span class="ident">QueryGraphDependency::ParentProjection</span>(
+                <span class="ident">QueryGraphDependency::ProjectedDataDependency</span>(
                     <span class="ident">child_model_identifier</span>,
                     <span class="ident">Box::new</span>(<span class="kw">move</span> <span class="op">|</span><span class="kw-2">mut</span> <span class="ident">delete_record_node</span>, <span class="kw-2">mut</span> <span class="ident">child_ids</span><span class="op">|</span> {
                         <span class="kw">let</span> <span class="ident">child_id</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">child_ids</span>.<span class="ident">pop</span>() {
@@ -361,7 +361,7 @@
         <span class="ident">graph</span>.<span class="ident">create_edge</span>(
             <span class="kw-2">&amp;</span><span class="ident">find_child_records_node</span>,
             <span class="kw-2">&amp;</span><span class="ident">delete_many_node</span>,
-            <span class="ident">QueryGraphDependency::ParentProjection</span>(
+            <span class="ident">QueryGraphDependency::ProjectedDataDependency</span>(
                 <span class="ident">child_model_identifier</span>.<span class="ident">clone</span>(),
                 <span class="ident">Box::new</span>(<span class="kw">move</span> <span class="op">|</span><span class="kw-2">mut</span> <span class="ident">delete_many_node</span>, <span class="ident">child_ids</span><span class="op">|</span> {
                     <span class="kw">if</span> <span class="kw">let</span> <span class="ident">Node::Query</span>(<span class="ident">Query::Write</span>(<span class="ident">WriteQuery::DeleteManyRecords</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">dmr</span>))) <span class="op">=</span> <span class="ident">delete_many_node</span> {
