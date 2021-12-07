@@ -16,10 +16,8 @@ pub fn get_query_schema(datamodel_string: &str) -> (QuerySchema, datamodel::dml:
 
     let capabilities = datasource
         .map(|ds| ds.capabilities())
-        .unwrap_or(ConnectorCapabilities::empty());
-    let referential_integrity = datasource
-        .map(|ds| ds.referential_integrity())
-        .unwrap_or(ReferentialIntegrity::default());
+        .unwrap_or_else(ConnectorCapabilities::empty());
+    let referential_integrity = datasource.map(|ds| ds.referential_integrity()).unwrap_or_default();
 
     let internal_ref = InternalDataModelBuilder::from(&dm).build("db".to_owned());
     let schema = schema_builder::build(
