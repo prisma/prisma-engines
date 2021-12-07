@@ -1,4 +1,5 @@
 #![deny(warnings)]
+#![allow(rustdoc::broken_intra_doc_links)]
 #![allow(clippy::from_over_into)]
 
 mod builders;
