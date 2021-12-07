@@ -211,6 +211,14 @@
 <span id="211">211</span>
 <span id="212">212</span>
 <span id="213">213</span>
+<span id="214">214</span>
+<span id="215">215</span>
+<span id="216">216</span>
+<span id="217">217</span>
+<span id="218">218</span>
+<span id="219">219</span>
+<span id="220">220</span>
+<span id="221">221</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">super</span>::database_name::validate_db_name</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">common::preview_features::PreviewFeature</span>,
@@ -321,7 +329,7 @@
             .<span class="ident">scalar_field_attributes</span>()
             .<span class="ident">any</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">sort_order</span>().<span class="ident">is_some</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">length</span>().<span class="ident">is_some</span>())
         {
-            <span class="kw">let</span> <span class="ident">message</span> <span class="op">=</span> <span class="string">&quot;The sort and length args are not yet available&quot;</span>;
+            <span class="kw">let</span> <span class="ident">message</span> <span class="op">=</span> <span class="string">&quot;You must enable `extendedIndexes` preview feature to use sort or length parameters.&quot;</span>;
             <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="ident">pk</span>.<span class="ident">ast_attribute</span>().<span class="ident">span</span>;
 
             <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_attribute_validation_error</span>(<span class="ident">message</span>, <span class="string">&quot;id&quot;</span>, <span class="ident">span</span>));
@@ -331,6 +339,10 @@
 
 <span class="doccomment">/// The database must support the primary key length prefix for it to be allowed in the data model.</span>
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">primary_key_length_prefix_supported</span>(<span class="ident">model</span>: <span class="ident">ModelWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
+    <span class="kw">if</span> <span class="op">!</span><span class="ident">ctx</span>.<span class="ident">preview_features</span>.<span class="ident">contains</span>(<span class="ident">PreviewFeature::ExtendedIndexes</span>) {
+        <span class="kw">return</span>;
+    }
+
     <span class="kw">if</span> <span class="ident">ctx</span>
         .<span class="ident">connector</span>
         .<span class="ident">has_capability</span>(<span class="ident">ConnectorCapability::IndexColumnLengthPrefixing</span>)
@@ -350,6 +362,10 @@
 
 <span class="doccomment">/// Not every database is allowing sort definition in the primary key.</span>
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">primary_key_sort_order_supported</span>(<span class="ident">model</span>: <span class="ident">ModelWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
+    <span class="kw">if</span> <span class="op">!</span><span class="ident">ctx</span>.<span class="ident">preview_features</span>.<span class="ident">contains</span>(<span class="ident">PreviewFeature::ExtendedIndexes</span>) {
+        <span class="kw">return</span>;
+    }
+
     <span class="kw">if</span> <span class="ident">ctx</span>
         .<span class="ident">connector</span>
         .<span class="ident">has_capability</span>(<span class="ident">ConnectorCapability::PrimaryKeySortOrderDefinition</span>)
