@@ -138,6 +138,14 @@ impl QueryArguments {
             .iter()
             .any(|o| o.field.unique() && o.path.iter().all(|r| r.relation().is_one_to_one()));
 
+        let has_optional_relation = on_relation
+            .iter()
+            .any(|o| o.path.iter().any(|r| r.arity == dml::FieldArity::Optional));
+
+        if has_optional_relation {
+            return false;
+        }
+
         source_contains_unique || order_by_contains_unique_index || relations_contain_1to1_unique
     }
 
