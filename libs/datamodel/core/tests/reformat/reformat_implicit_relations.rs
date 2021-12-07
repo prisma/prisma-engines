@@ -1258,7 +1258,7 @@ fn issue_10118() {
 
         model Referral {
           id     String @id @default(cuid()) @db.Char(30)
-          user   User   @relation("UserToReferral", fields: [userId], references: [id], map: "Referral__fkey")
+          user   User   @relation("UserToReferral", fields: [userId], references: [id])
           userId String @db.Char(30)
         }
     "#]];

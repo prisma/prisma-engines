@@ -104,8 +104,7 @@ impl<'a> LiftAstToDml<'a> {
                             let mut field =
                                 dml::RelationField::new(relation_field.name(), arity, referential_arity, relation_info);
 
-                            field.relation_info.fk_name =
-                                Some(relation_field.final_foreign_key_name(active_connector).into_owned());
+                            field.relation_info.fk_name = Some(relation.constraint_name(active_connector).into_owned());
                             common_dml_fields(&mut field, relation_field);
                             field_ids_for_sorting.insert(
                                 (relation_field.model().name(), relation_field.name()),

@@ -47,25 +47,6 @@ impl<'db> DefaultValueExt<'db> for DefaultValueWalker<'_, 'db> {
     }
 }
 
-pub trait RelationFieldWalkerExt<'ast> {
-    fn final_foreign_key_name(self, connector: &dyn Connector) -> Cow<'ast, str>;
-}
-
-impl<'ast> RelationFieldWalkerExt<'ast> for RelationFieldWalker<'ast, '_> {
-    fn final_foreign_key_name(self, connector: &dyn Connector) -> Cow<'ast, str> {
-        self.explicit_mapped_name().map(Cow::Borrowed).unwrap_or_else(|| {
-            let column_names: Vec<&str> = self
-                .fields()
-                .into_iter()
-                .flatten()
-                .map(|f| f.final_database_name())
-                .collect();
-            let table_name = self.model().final_database_name();
-            ConstraintNames::foreign_key_constraint_name(table_name, &column_names, connector).into()
-        })
-    }
-}
-
 pub trait PrimaryKeyWalkerExt<'ast> {
     fn final_database_name(self, connector: &dyn Connector) -> Option<Cow<'ast, str>>;
 }
@@ -114,11 +95,17 @@ impl<'ast> InlineRelationWalkerExt<'ast> for InlineRelationWalker<'ast, '_> {
     fn constraint_name(self, connector: &dyn Connector) -> Cow<'ast, str> {
         self.foreign_key_name().map(Cow::Borrowed).unwrap_or_else(|| {
             let model_database_name = self.referencing_model().final_database_name();
-            let field_names: Vec<&str> = match self.referencing_fields() {
-                ReferencingFields::Concrete(fields) => fields.map(|f| f.final_database_name()).collect(),
-                _ => Vec::new(),
-            };
-            ConstraintNames::foreign_key_constraint_name(model_database_name, &field_names, connector).into()
+            match self.referencing_fields() {
+                ReferencingFields::Concrete(fields) => {
+                    let field_names: Vec<&str> = fields.map(|f| f.final_database_name()).collect();
+                    ConstraintNames::foreign_key_constraint_name(model_database_name, &field_names, connector).into()
+                }
+                ReferencingFields::Inferred(fields) => {
+                    let field_names: Vec<&str> = fields.iter().map(|f| f.name.as_str()).collect();
+                    ConstraintNames::foreign_key_constraint_name(model_database_name, &field_names, connector).into()
+                }
+                ReferencingFields::NA => unreachable!(),
+            }
         })
     }
 }
