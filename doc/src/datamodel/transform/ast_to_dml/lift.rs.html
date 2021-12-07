@@ -447,7 +447,6 @@
 <span id="447">447</span>
 <span id="448">448</span>
 <span id="449">449</span>
-<span id="450">450</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">ast</span>, <span class="ident">dml</span>,
     <span class="ident">transform::ast_to_dml::db</span>::{<span class="self">self</span>, <span class="ident">walkers</span>::<span class="kw-2">*</span>, <span class="ident">IndexAlgorithm</span>},
@@ -554,8 +553,7 @@
                             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">field</span> <span class="op">=</span>
                                 <span class="ident">dml::RelationField::new</span>(<span class="ident">relation_field</span>.<span class="ident">name</span>(), <span class="ident">arity</span>, <span class="ident">referential_arity</span>, <span class="ident">relation_info</span>);
 
-                            <span class="ident">field</span>.<span class="ident">relation_info</span>.<span class="ident">fk_name</span> <span class="op">=</span>
-                                <span class="prelude-val">Some</span>(<span class="ident">relation_field</span>.<span class="ident">final_foreign_key_name</span>(<span class="ident">active_connector</span>).<span class="ident">into_owned</span>());
+                            <span class="ident">field</span>.<span class="ident">relation_info</span>.<span class="ident">fk_name</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">relation</span>.<span class="ident">constraint_name</span>(<span class="ident">active_connector</span>).<span class="ident">into_owned</span>());
                             <span class="ident">common_dml_fields</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">field</span>, <span class="ident">relation_field</span>);
                             <span class="ident">field_ids_for_sorting</span>.<span class="ident">insert</span>(
                                 (<span class="ident">relation_field</span>.<span class="ident">model</span>().<span class="ident">name</span>(), <span class="ident">relation_field</span>.<span class="ident">name</span>()),

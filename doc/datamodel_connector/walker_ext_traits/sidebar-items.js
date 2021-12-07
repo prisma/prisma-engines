@@ -1,1 +1,1 @@
-initSidebarItems({"trait":[["CompleteInlineRelationWalkerExt",""],["DefaultValueExt",""],["IndexWalkerExt",""],["InlineRelationWalkerExt",""],["PrimaryKeyWalkerExt",""],["RelationFieldWalkerExt",""]]});
+initSidebarItems({"trait":[["CompleteInlineRelationWalkerExt",""],["DefaultValueExt",""],["IndexWalkerExt",""],["InlineRelationWalkerExt",""],["PrimaryKeyWalkerExt",""]]});
