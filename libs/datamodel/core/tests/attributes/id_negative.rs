@@ -531,13 +531,13 @@ fn id_does_not_allow_sort_or_index_unless_extended_indexes_are_on() {
     let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
-        [1;91merror[0m: [1mError parsing attribute "@id": The sort and length args are not yet available[0m
+        [1;91merror[0m: [1mError parsing attribute "@id": You must enable `extendedIndexes` preview feature to use sort or length parameters.[0m
           [1;94m-->[0m  [4mschema.prisma:17[0m
         [1;94m   | [0m
         [1;94m16 | [0m         
         [1;94m17 | [0m         @@[1;91mid([firstName, middleName(length: 1), lastName])[0m
         [1;94m   | [0m
-        [1;91merror[0m: [1mError parsing attribute "@id": The sort and length args are not yet available[0m
+        [1;91merror[0m: [1mError parsing attribute "@id": You must enable `extendedIndexes` preview feature to use sort or length parameters.[0m
           [1;94m-->[0m  [4mschema.prisma:21[0m
         [1;94m   | [0m
         [1;94m20 | [0m     model Blog {
@@ -682,6 +682,29 @@ fn mongodb_does_not_allow_id_sort_argument() {
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@id": The sort argument is not supported in the primary key with the current connector[0m
+          [1;94m-->[0m  [4mschema.prisma:12[0m
+        [1;94m   | [0m
+        [1;94m11 | [0mmodel A {
+        [1;94m12 | [0m  id String @[1;91mid(sort: Desc)[0m @map("_id") @test.ObjectId
+        [1;94m   | [0m
+    "#]];
+
+    expectation.assert_eq(&error)
+}
+
+#[test]
+fn mongodb_does_not_allow_id_sort_argument_without_preview_flag() {
+    let dml = indoc! {r#"
+        model A {
+          id String @id(sort: Desc) @map("_id") @test.ObjectId
+        }
+    "#};
+
+    let schema = with_header(dml, Provider::Mongo, &["mongoDb"]);
+    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+
+    let expectation = expect![[r#"
+        [1;91merror[0m: [1mError parsing attribute "@id": You must enable `extendedIndexes` preview feature to use sort or length parameters.[0m
           [1;94m-->[0m  [4mschema.prisma:12[0m
         [1;94m   | [0m
         [1;94m11 | [0mmodel A {
@@ -852,6 +875,29 @@ fn mongodb_does_not_allow_id_length_prefix() {
 
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@id": The length argument is not supported in the primary key with the current connector[0m
+          [1;94m-->[0m  [4mschema.prisma:12[0m
+        [1;94m   | [0m
+        [1;94m11 | [0mmodel A {
+        [1;94m12 | [0m  id String @[1;91mid(length: 10)[0m @map("_id") @test.ObjectId
+        [1;94m   | [0m
+    "#]];
+
+    expectation.assert_eq(&error)
+}
+
+#[test]
+fn mongodb_does_not_allow_id_length_prefix_without_preview_flag() {
+    let dml = indoc! {r#"
+        model A {
+          id String @id(length: 10) @map("_id") @test.ObjectId
+        }
+    "#};
+
+    let schema = with_header(dml, Provider::Mongo, &["mongoDb"]);
+    let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
+
+    let expectation = expect![[r#"
+        [1;91merror[0m: [1mError parsing attribute "@id": You must enable `extendedIndexes` preview feature to use sort or length parameters.[0m
           [1;94m-->[0m  [4mschema.prisma:12[0m
         [1;94m   | [0m
         [1;94m11 | [0mmodel A {

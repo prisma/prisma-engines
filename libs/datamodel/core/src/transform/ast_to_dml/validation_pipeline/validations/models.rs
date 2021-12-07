@@ -108,7 +108,7 @@ pub(crate) fn uses_sort_or_length_on_primary_without_preview_flag(model: ModelWa
             .scalar_field_attributes()
             .any(|f| f.sort_order().is_some() || f.length().is_some())
         {
-            let message = "The sort and length args are not yet available";
+            let message = "You must enable `extendedIndexes` preview feature to use sort or length parameters.";
             let span = pk.ast_attribute().span;
 
             ctx.push_error(DatamodelError::new_attribute_validation_error(message, "id", span));
@@ -118,6 +118,10 @@ pub(crate) fn uses_sort_or_length_on_primary_without_preview_flag(model: ModelWa
 
 /// The database must support the primary key length prefix for it to be allowed in the data model.
 pub(crate) fn primary_key_length_prefix_supported(model: ModelWalker<'_, '_>, ctx: &mut Context<'_>) {
+    if !ctx.preview_features.contains(PreviewFeature::ExtendedIndexes) {
+        return;
+    }
+
     if ctx
         .connector
         .has_capability(ConnectorCapability::IndexColumnLengthPrefixing)
@@ -137,6 +141,10 @@ pub(crate) fn primary_key_length_prefix_supported(model: ModelWalker<'_, '_>, ct
 
 /// Not every database is allowing sort definition in the primary key.
 pub(crate) fn primary_key_sort_order_supported(model: ModelWalker<'_, '_>, ctx: &mut Context<'_>) {
+    if !ctx.preview_features.contains(PreviewFeature::ExtendedIndexes) {
+        return;
+    }
+
     if ctx
         .connector
         .has_capability(ConnectorCapability::PrimaryKeySortOrderDefinition)
