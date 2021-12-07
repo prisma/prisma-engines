@@ -104,7 +104,6 @@ impl<'ast, 'db> InlineRelationWalker<'ast, 'db> {
                 let walker = CompleteInlineRelationWalker {
                     side_a: (self.referencing_model().model_id, field_a.field_id),
                     side_b: (self.referenced_model().model_id, field_b.field_id),
-                    relation: &self.db.relations.relations_storage[self.relation_id],
                     db: self.db,
                 };
 
@@ -138,14 +137,14 @@ impl<'ast, 'db> InlineRelationWalker<'ast, 'db> {
                                 InferredField {
                                     name,
                                     arity: existing_field.ast_field().arity,
-                                    tpe: existing_field.attributes().r#type,
+                                    tpe: existing_field.scalar_field_type(),
                                     blueprint: field,
                                 }
                             } else {
                                 InferredField {
                                     name,
                                     arity: ast::FieldArity::Optional,
-                                    tpe: field.attributes().r#type,
+                                    tpe: field.scalar_field_type(),
                                     blueprint: field,
                                 }
                             }
@@ -206,8 +205,7 @@ impl<'ast, 'db> InlineRelationWalker<'ast, 'db> {
 
     /// The contents of the `map: ...` argument of the `@relation` attribute.
     pub fn foreign_key_name(self) -> Option<&'ast str> {
-        self.forward_relation_field()
-            .and_then(|field| field.explicit_mapped_name())
+        self.forward_relation_field().and_then(|field| field.foreign_key_name())
     }
 
     pub fn back_relation_field(self) -> Option<RelationFieldWalker<'ast, 'db>> {
@@ -279,7 +277,6 @@ impl<'ast, 'db> ImplicitManyToManyRelationWalker<'ast, 'db> {
 pub struct CompleteInlineRelationWalker<'ast, 'db> {
     pub(crate) side_a: (ast::ModelId, ast::FieldId),
     pub(crate) side_b: (ast::ModelId, ast::FieldId),
-    pub(crate) relation: &'db Relation<'ast>,
     pub(crate) db: &'db ParserDatabase<'ast>,
 }
 
@@ -372,12 +369,6 @@ impl<'ast, 'db> CompleteInlineRelationWalker<'ast, 'db> {
     /// fields is required.
     pub fn referential_arity(self) -> ast::FieldArity {
         self.referencing_field().referential_arity()
-    }
-
-    /// 1:1, 1:n or m:n
-    #[allow(dead_code)]
-    pub(crate) fn relation_type(self) -> RelationType {
-        self.relation.r#type()
     }
 }
 

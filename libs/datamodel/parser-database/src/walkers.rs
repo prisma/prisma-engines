@@ -1,3 +1,11 @@
+//! Convenient access to a datamodel as understood by ParserDatabase.
+//!
+//! The walkers:
+//! - Know about specific types and what kind they are (models, enums, etc.)
+//! - Know about attributes and which ones are defined and allowed in a Prisma schema.
+//! - Know about relations.
+//! - Do not know anything about connectors, they are generic.
+
 mod composite_type;
 mod field;
 mod index;
@@ -18,6 +26,7 @@ use super::ParserDatabase;
 use crate::ast;
 
 impl<'ast> ParserDatabase<'ast> {
+    /// Find a model by ID.
     pub fn walk_model(&self, model_id: ast::ModelId) -> ModelWalker<'ast, '_> {
         ModelWalker {
             model_id,
@@ -26,6 +35,7 @@ impl<'ast> ParserDatabase<'ast> {
         }
     }
 
+    /// Walk all the models in the schema.
     pub fn walk_models(&self) -> impl Iterator<Item = ModelWalker<'ast, '_>> + '_ {
         self.ast()
             .iter_tops()
@@ -33,10 +43,12 @@ impl<'ast> ParserDatabase<'ast> {
             .map(move |model_id| self.walk_model(model_id))
     }
 
+    /// Walk a specific composite type by ID.
     pub fn walk_composite_type(&self, ctid: ast::CompositeTypeId) -> CompositeTypeWalker<'ast, '_> {
         CompositeTypeWalker { ctid, db: self }
     }
 
+    /// Walk all the composite types in the schema.
     pub fn walk_composite_types(&self) -> impl Iterator<Item = CompositeTypeWalker<'ast, '_>> + '_ {
         self.ast()
             .iter_tops()
@@ -44,6 +56,8 @@ impl<'ast> ParserDatabase<'ast> {
             .map(move |ctid| CompositeTypeWalker { ctid, db: self })
     }
 
+    /// Walk all the relations in the schema. A relation may be defined by one or two fields; in
+    /// both cases, it is still a single relation.
     pub fn walk_relations(&self) -> impl Iterator<Item = RelationWalker<'ast, '_>> + '_ {
         (0..self.relations.relations_storage.len()).map(move |relation_id| RelationWalker { db: self, relation_id })
     }
@@ -62,7 +76,6 @@ impl<'ast> ParserDatabase<'ast> {
                         side_a: (model_a, field_a),
                         side_b: (model_b, field_b),
                         db: self,
-                        relation,
                     })
             })
     }

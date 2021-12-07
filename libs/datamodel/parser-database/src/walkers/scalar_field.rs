@@ -1,3 +1,5 @@
+#![deny(missing_docs)]
+
 use super::ModelWalker;
 use crate::{
     ast,
@@ -10,6 +12,7 @@ use dml::{
     model::SortOrder,
 };
 
+/// A scalar field, as part of a model.
 #[derive(Copy, Clone)]
 pub struct ScalarFieldWalker<'ast, 'db> {
     pub(crate) model_id: ast::ModelId,
@@ -27,43 +30,52 @@ impl<'ast, 'db> PartialEq for ScalarFieldWalker<'ast, 'db> {
 impl<'ast, 'db> Eq for ScalarFieldWalker<'ast, 'db> {}
 
 impl<'ast, 'db> ScalarFieldWalker<'ast, 'db> {
+    /// The ID of the field node in the AST.
     pub fn field_id(self) -> ast::FieldId {
         self.field_id
     }
 
+    /// The field node in the AST.
     pub fn ast_field(self) -> &'ast ast::Field {
         &self.db.ast[self.model_id][self.field_id]
     }
 
+    /// The name of the field.
     pub fn name(self) -> &'ast str {
         self.ast_field().name()
     }
 
+    /// The `@default()` AST attribute on the field, if any.
     pub fn default_attribute(self) -> Option<&'ast ast::Attribute> {
         self.scalar_field.default_attribute
     }
 
-    pub fn final_database_name(self) -> &'ast str {
+    /// The final database name of the field. See crate docs for explanations on database names.
+    pub fn database_name(self) -> &'ast str {
         self.attributes().mapped_name.unwrap_or_else(|| self.name())
     }
 
+    /// Does the field have an `@default(autoincrement())` attribute?
     pub fn is_autoincrement(self) -> bool {
         matches!(&self.scalar_field.default.as_ref().map(|d| d.kind()), Some(DefaultKind::Expression(expr)) if expr.is_autoincrement())
     }
 
+    /// Is there an `@ignore` attribute on the field?
     pub fn is_ignored(self) -> bool {
         self.attributes().is_ignored
     }
 
+    /// Is the field optional / nullable?
     pub fn is_optional(self) -> bool {
         self.ast_field().arity.is_optional()
     }
 
+    /// Is there an `@updateAt` attribute on the field?
     pub fn is_updated_at(self) -> bool {
         self.attributes().is_updated_at
     }
 
-    pub(crate) fn attributes(self) -> &'db ScalarField<'ast> {
+    fn attributes(self) -> &'db ScalarField<'ast> {
         self.scalar_field
     }
 
@@ -72,6 +84,7 @@ impl<'ast, 'db> ScalarFieldWalker<'ast, 'db> {
         self.attributes().mapped_name
     }
 
+    /// The model that contains the field.
     pub fn model(self) -> ModelWalker<'ast, 'db> {
         ModelWalker {
             model_id: self.model_id,
@@ -90,10 +103,12 @@ impl<'ast, 'db> ScalarFieldWalker<'ast, 'db> {
             .map(move |(datasource_name, name, args, span)| (*datasource_name, *name, args.as_slice(), *span))
     }
 
+    /// Is the type of the field `Unsupported("...")`?
     pub fn is_unsupported(self) -> bool {
         matches!(self.ast_field().field_type, ast::FieldType::Unsupported(_, _))
     }
 
+    /// The `@default()` attribute of the field, if any.
     pub fn default_value(self) -> Option<DefaultValueWalker<'ast, 'db>> {
         self.attributes().default.as_ref().map(|d| DefaultValueWalker {
             model_id: self.model_id,
@@ -103,10 +118,12 @@ impl<'ast, 'db> ScalarFieldWalker<'ast, 'db> {
         })
     }
 
+    /// The type of the field.
     pub fn scalar_field_type(self) -> ScalarFieldType {
         self.attributes().r#type
     }
 
+    /// The type of the field in case it is a scalar type (not an enum, not a composite type).
     pub fn scalar_type(self) -> Option<dml::scalars::ScalarType> {
         let mut tpe = &self.scalar_field.r#type;
 
@@ -120,6 +137,7 @@ impl<'ast, 'db> ScalarFieldWalker<'ast, 'db> {
     }
 }
 
+/// An `@default()` attribute on a field.
 #[derive(Clone, Copy)]
 pub struct DefaultValueWalker<'ast, 'db> {
     model_id: ast::ModelId,
@@ -129,14 +147,18 @@ pub struct DefaultValueWalker<'ast, 'db> {
 }
 
 impl<'ast, 'db> DefaultValueWalker<'ast, 'db> {
+    /// The DML DefaultValue.
     pub fn default(self) -> &'db DefaultValue {
         self.default
     }
 
+    /// The mapped name of the default value. Not applicable to all connectors. See crate docs for
+    /// details on maped names.
     pub fn mapped_name(self) -> Option<&'db str> {
         self.default.db_name()
     }
 
+    /// The field of the default.
     pub fn field(self) -> ScalarFieldWalker<'ast, 'db> {
         ScalarFieldWalker {
             model_id: self.model_id,
@@ -147,6 +169,7 @@ impl<'ast, 'db> DefaultValueWalker<'ast, 'db> {
     }
 }
 
+/// A scalar field as referenced in a key specification (id, index or unique).
 #[derive(Copy, Clone)]
 pub struct ScalarFieldAttributeWalker<'ast, 'db> {
     pub(crate) model_id: ast::ModelId,
@@ -160,10 +183,12 @@ impl<'ast, 'db> ScalarFieldAttributeWalker<'ast, 'db> {
         &self.fields[self.field_arg_id]
     }
 
+    /// The length argument on the field.
     pub fn length(self) -> Option<u32> {
         self.args().length
     }
 
+    /// The underlying scalar field.
     pub fn as_scalar_field(self) -> ScalarFieldWalker<'ast, 'db> {
         ScalarFieldWalker {
             model_id: self.model_id,
@@ -173,6 +198,7 @@ impl<'ast, 'db> ScalarFieldAttributeWalker<'ast, 'db> {
         }
     }
 
+    /// The sort order (asc or desc) on the field.
     pub fn sort_order(&self) -> Option<SortOrder> {
         self.args().sort_order
     }

@@ -101,13 +101,6 @@ pub(super) enum RelationAttributes {
     OneToMany(OneToManyRelationFields),
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub(crate) enum RelationType {
-    ImplicitManyToMany,
-    OneToOne,
-    OneToMany,
-}
-
 #[derive(PartialOrd, Ord, PartialEq, Eq, Debug)]
 pub(crate) struct Relation<'ast> {
     /// The `name` argument in `@relation`.
@@ -130,14 +123,6 @@ impl<'ast> Relation<'ast> {
                 Some((*field_a, *field_b))
             }
             _ => None,
-        }
-    }
-
-    pub(super) fn r#type(&self) -> RelationType {
-        match self.attributes {
-            RelationAttributes::ImplicitManyToMany { .. } => RelationType::ImplicitManyToMany,
-            RelationAttributes::OneToOne(_) => RelationType::OneToOne,
-            RelationAttributes::OneToMany(_) => RelationType::OneToMany,
         }
     }
 }

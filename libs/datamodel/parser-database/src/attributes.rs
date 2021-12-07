@@ -297,7 +297,7 @@ fn visit_relation_field_attributes<'ast>(
 ) {
     ctx.visit_attributes(&ast_field.attributes, |attributes, ctx| {
         // @relation
-        // Relation attributes are not required _yet_ at this stage. The schema has to be parseable for standardization.
+        // Relation attributes are not required at this stage.
         attributes.visit_optional_single("relation", ctx, |relation_args, ctx| {
             visit_relation(relation_args, model_id, relation_field, ctx)
         });
@@ -744,6 +744,8 @@ fn visit_relation<'ast>(
     relation_field: &mut RelationField<'ast>,
     ctx: &mut Context<'ast>,
 ) {
+    relation_field.relation_attribute = Some(args.attribute());
+
     if let Some(fields) = args.optional_arg("fields") {
         let fields = match resolve_field_array_without_args(&fields, args.span(), model_id, ctx) {
             Ok(fields) => fields,

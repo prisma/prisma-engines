@@ -1,3 +1,7 @@
+#![deny(missing_docs)]
+
+//! See [ValueValidator](./struct.ValueValidator.html).
+
 use crate::ast::{self, Expression, Span};
 use chrono::{DateTime, FixedOffset};
 use diagnostics::DatamodelError;
@@ -12,6 +16,7 @@ use std::error;
 /// validating it.
 #[derive(Debug)]
 pub struct ValueValidator<'a> {
+    /// The underlying AST expression.
     pub value: &'a ast::Expression,
 }
 
@@ -311,7 +316,9 @@ impl<'a> ValueValidator<'a> {
     }
 }
 
+/// ValueValidator for lists of values.
 pub trait ValueListValidator {
+    /// Try to unwrap the value as a list of strings.
     fn to_str_vec(&self) -> Result<Vec<String>, DatamodelError>;
 }
 

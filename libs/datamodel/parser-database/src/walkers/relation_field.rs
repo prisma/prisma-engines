@@ -11,6 +11,7 @@ use std::{
     hash::{Hash, Hasher},
 };
 
+/// A relation field on a model in the schema.
 #[derive(Copy, Clone)]
 pub struct RelationFieldWalker<'ast, 'db> {
     pub(crate) model_id: ast::ModelId,
@@ -35,18 +36,22 @@ impl<'ast, 'db> Hash for RelationFieldWalker<'ast, 'db> {
 }
 
 impl<'ast, 'db> RelationFieldWalker<'ast, 'db> {
+    /// The ID of the AST node of the field.
     pub fn field_id(self) -> ast::FieldId {
         self.field_id
     }
 
-    pub fn explicit_mapped_name(self) -> Option<&'ast str> {
+    /// The foreign key name of the relation (`@relation(map: ...)`).
+    pub fn foreign_key_name(self) -> Option<&'ast str> {
         self.attributes().fk_name
     }
 
+    /// The field name.
     pub fn name(self) -> &'ast str {
         self.ast_field().name()
     }
 
+    /// The AST node of the field.
     pub fn ast_field(self) -> &'ast ast::Field {
         &self.db.ast[self.model_id][self.field_id]
     }
@@ -55,10 +60,12 @@ impl<'ast, 'db> RelationFieldWalker<'ast, 'db> {
         self.relation_field
     }
 
+    /// The onDelete argument on the relation.
     pub fn explicit_on_delete(self) -> Option<ReferentialAction> {
         self.attributes().on_delete
     }
 
+    /// The onUpdate argument on the relation.
     pub fn explicit_on_update(self) -> Option<ReferentialAction> {
         self.attributes().on_update
     }
@@ -68,10 +75,12 @@ impl<'ast, 'db> RelationFieldWalker<'ast, 'db> {
         self.relation_field.name
     }
 
+    /// Is there an `@ignore` attribute on the field?
     pub fn is_ignored(self) -> bool {
         self.relation_field.is_ignored
     }
 
+    /// The model containing the field.
     pub fn model(self) -> ModelWalker<'ast, 'db> {
         ModelWalker {
             model_id: self.model_id,
@@ -80,10 +89,16 @@ impl<'ast, 'db> RelationFieldWalker<'ast, 'db> {
         }
     }
 
+    /// The `@relation` attribute in the field AST.
+    pub fn relation_attribute(self) -> Option<&'ast ast::Attribute> {
+        self.attributes().relation_attribute
+    }
+
     pub(crate) fn references_model(self, other: ast::ModelId) -> bool {
         self.relation_field.referenced_model == other
     }
 
+    /// The model referenced by the relation.
     pub fn related_model(self) -> ModelWalker<'ast, 'db> {
         let model_id = self.relation_field.referenced_model;
 
@@ -94,6 +109,7 @@ impl<'ast, 'db> RelationFieldWalker<'ast, 'db> {
         }
     }
 
+    /// The fields in the `@relation(references: ...)` argument.
     pub fn referenced_fields(self) -> Option<impl ExactSizeIterator<Item = ScalarFieldWalker<'ast, 'db>> + 'db> {
         self.attributes().references.as_ref().map(|references| {
             references
