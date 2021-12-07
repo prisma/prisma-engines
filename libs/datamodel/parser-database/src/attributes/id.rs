@@ -80,8 +80,8 @@ pub(super) fn model<'ast>(
         let db_name = primary_key_constraint_name(args, ctx);
         let name = super::get_name_argument(args, ctx);
 
-        if let Some(err) = super::is_client_name_valid(args.span(), &ast_model.name.name, name, "@@id") {
-            ctx.push_error(err);
+        if let Some(name) = name {
+            super::validate_client_name(args.span(), &ast_model.name.name, name, "@@id", ctx);
         }
 
         (name, db_name)

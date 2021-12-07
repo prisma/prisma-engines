@@ -2836,8 +2836,6 @@ dependencies = [
  "chrono",
  "diagnostics",
  "dml",
- "once_cell",
- "regex",
  "schema-ast",
 ]
 

@@ -28,7 +28,7 @@ impl<'a> ValueValidator<'a> {
     /// value wrapped by this instance.
     fn construct_type_mismatch_error(&self, expected_type: &str) -> DatamodelError {
         let description = String::from(self.value.describe_value_type());
-        DatamodelError::new_type_mismatch_error(expected_type, &description, &self.raw(), self.span())
+        DatamodelError::new_type_mismatch_error(expected_type, &description, &self.value.to_string(), self.span())
     }
 
     /// Creates a value parser error
@@ -42,9 +42,9 @@ impl<'a> ValueValidator<'a> {
             Ok(val) => Ok(val),
             Err(err) => Err(DatamodelError::new_value_parser_error(
                 expected_type,
-                format!("{}", err).as_ref(),
-                &self.raw(),
-                self.span(),
+                &err.to_string(),
+                &self.value.to_string(),
+                self.value.span(),
             )),
         }
     }
@@ -69,12 +69,6 @@ impl<'a> ValueValidator<'a> {
         }
     }
 
-    /// Accesses the raw string representation
-    /// of the wrapped value.
-    pub fn raw(&self) -> String {
-        self.value.to_string()
-    }
-
     /// Accesses the span of the wrapped value.
     pub fn span(&self) -> ast::Span {
         self.value.span()
@@ -82,13 +76,12 @@ impl<'a> ValueValidator<'a> {
 
     /// Tries to convert the wrapped value to a Prisma String.
     pub fn as_str(&self) -> Result<&'a str, DatamodelError> {
-        match &self.value {
-            ast::Expression::StringValue(value, _) => Ok(value),
-            _ => Err(self.construct_type_mismatch_error("String")),
-        }
+        self.as_string_literal()
+            .map(|(s, _)| s)
+            .ok_or_else(|| self.construct_type_mismatch_error("String"))
     }
 
-    /// returns true if this argument is derived from an env() function
+    /// Returns true if this argument is derived from an env() function
     pub fn is_from_env(&self) -> bool {
         self.value.is_env_expression()
     }
@@ -111,7 +104,7 @@ impl<'a> ValueValidator<'a> {
     }
 
     /// Tries to convert the wrapped value to a Prisma Boolean.
-    pub fn as_bool(&self) -> Result<bool, DatamodelError> {
+    fn as_bool(&self) -> Result<bool, DatamodelError> {
         match &self.value {
             ast::Expression::BooleanValue(value, _) => self.wrap_error_from_result(value.parse::<bool>(), "boolean"),
             // this case is just here because `as_bool_from_env` passes a StringValue
@@ -131,7 +124,7 @@ impl<'a> ValueValidator<'a> {
     }
 
     /// Unwraps the value as an array of constants.
-    pub fn as_constant_array(&self) -> Result<Vec<&'a str>, DatamodelError> {
+    pub(crate) fn as_constant_array(&self) -> Result<Vec<&'a str>, DatamodelError> {
         if let ast::Expression::Array(values, _) = &self.value {
             values
                 .iter()
@@ -144,7 +137,7 @@ impl<'a> ValueValidator<'a> {
     }
 
     /// Unwraps the wrapped value as a constant literal.
-    pub fn as_constant_literal(&self) -> Result<&'a str, DatamodelError> {
+    pub(crate) fn as_constant_literal(&self) -> Result<&'a str, DatamodelError> {
         match &self.value {
             ast::Expression::ConstantValue(value, _) => Ok(value),
             ast::Expression::BooleanValue(value, _) => Ok(value),
@@ -154,7 +147,9 @@ impl<'a> ValueValidator<'a> {
 
     #[allow(clippy::type_complexity)]
     /// Unwraps the value as an array of constants.
-    pub fn as_field_array_with_args(&self) -> Result<Vec<(&'a str, Option<SortOrder>, Option<u32>)>, DatamodelError> {
+    pub(crate) fn as_field_array_with_args(
+        &self,
+    ) -> Result<Vec<(&'a str, Option<SortOrder>, Option<u32>)>, DatamodelError> {
         if let ast::Expression::Array(values, _) = &self.value {
             values
                 .iter()
@@ -166,7 +161,7 @@ impl<'a> ValueValidator<'a> {
         }
     }
 
-    pub fn as_field_with_args(&self) -> Result<(&'a str, Option<SortOrder>, Option<u32>), DatamodelError> {
+    fn as_field_with_args(&self) -> Result<(&'a str, Option<SortOrder>, Option<u32>), DatamodelError> {
         match &self.value {
             Expression::ConstantValue(field_name, _) => Ok((field_name, None, None)),
             Expression::FieldWithArgs(field_name, args, _) => {
@@ -179,7 +174,7 @@ impl<'a> ValueValidator<'a> {
     }
 
     /// Unwraps the wrapped value as a constant literal.
-    pub fn field_args(args: &[ast::Argument]) -> Result<(Option<SortOrder>, Option<u32>), DatamodelError> {
+    fn field_args(args: &[ast::Argument]) -> Result<(Option<SortOrder>, Option<u32>), DatamodelError> {
         let sort = args
             .iter()
             .find(|arg| arg.name.name == "sort")
@@ -217,7 +212,7 @@ impl<'a> ValueValidator<'a> {
     }
 
     /// Unwraps the wrapped value as a referential action.
-    pub fn as_referential_action(&self) -> Result<ReferentialAction, DatamodelError> {
+    pub(crate) fn as_referential_action(&self) -> Result<ReferentialAction, DatamodelError> {
         match self.as_constant_literal()? {
             "Cascade" => Ok(ReferentialAction::Cascade),
             "Restrict" => Ok(ReferentialAction::Restrict),
@@ -252,7 +247,10 @@ impl<'a> ValueValidator<'a> {
         }
     }
 
-    pub fn as_default_value_for_scalar_type(&self, scalar_type: ScalarType) -> Result<DefaultValue, DatamodelError> {
+    pub(crate) fn as_default_value_for_scalar_type(
+        &self,
+        scalar_type: ScalarType,
+    ) -> Result<DefaultValue, DatamodelError> {
         match &self.value {
             ast::Expression::Function(name, args, _) => {
                 let prisma_args = match args.as_slice() {
@@ -270,7 +268,7 @@ impl<'a> ValueValidator<'a> {
                         return Err(DatamodelError::new_validation_error(msg, self.span()));
                     }
                 };
-                let generator = self.get_value_generator(name, prisma_args)?;
+                let generator = self.get_value_generator(name.to_owned(), prisma_args)?;
 
                 generator
                     .check_compatibility_with_scalar_type(scalar_type)
@@ -286,11 +284,11 @@ impl<'a> ValueValidator<'a> {
     }
 
     /// Try to interpret the expression as a string literal.
-    pub fn as_string_literal(&self) -> Option<(&str, Span)> {
+    pub fn as_string_literal(&self) -> Option<(&'a str, Span)> {
         self.value.as_string_value()
     }
 
-    pub fn as_value_generator(&self) -> Result<ValueGenerator, DatamodelError> {
+    pub(crate) fn as_value_generator(&self) -> Result<ValueGenerator, DatamodelError> {
         match &self.value {
             ast::Expression::Function(name, args, _) => {
                 let prisma_args = match args.as_slice() {
@@ -301,31 +299,24 @@ impl<'a> ValueValidator<'a> {
                     [] => vec![],
                     _ => return Err(self.construct_type_mismatch_error("String or empty")),
                 };
-                self.get_value_generator(name, prisma_args)
+                self.get_value_generator(name.to_owned(), prisma_args)
             }
             _ => Err(self.construct_type_mismatch_error("function")),
         }
     }
 
-    fn get_value_generator(&self, name: &str, args: Vec<PrismaValue>) -> Result<ValueGenerator, DatamodelError> {
-        ValueGenerator::new(name.to_string(), args)
+    fn get_value_generator(&self, name: String, args: Vec<PrismaValue>) -> Result<ValueGenerator, DatamodelError> {
+        ValueGenerator::new(name, args)
             .map_err(|err_msg| DatamodelError::new_functional_evaluation_error(&err_msg, self.span()))
     }
 }
 
 pub trait ValueListValidator {
     fn to_str_vec(&self) -> Result<Vec<String>, DatamodelError>;
-    fn to_literal_vec(&self) -> Result<Vec<String>, DatamodelError>;
 }
 
 impl ValueListValidator for Vec<ValueValidator<'_>> {
     fn to_str_vec(&self) -> Result<Vec<String>, DatamodelError> {
         self.iter().map(|val| Ok(val.as_str()?.to_owned())).collect()
-    }
-
-    fn to_literal_vec(&self) -> Result<Vec<String>, DatamodelError> {
-        self.iter()
-            .map(|val| val.as_constant_literal().map(String::from))
-            .collect()
     }
 }
