@@ -114,7 +114,7 @@ jobs:
             target
           key: me-ie-${{ runner.os }}-${{ matrix.database.name }}-cargo-${{ hashFiles('**/Cargo.lock') }}
 
-      - run: cargo test -p introspection-engine-tests
+      - run: cargo test -p introspection-engine-tests --release
         if: ${{ !matrix.database.single_threaded }}
         env:
           CLICOLOR_FORCE: 1
