@@ -116,8 +116,8 @@ pub struct TestApiArgs {
     db: &'static DbUnderTest,
 }
 
-const EMPTY_PREVIEW_FEATURES: &'static [&'static str] = &[];
-const COCKROACH_PREVIEW_FEATURES: &'static [&'static str] = &["cockroachdb"];
+const EMPTY_PREVIEW_FEATURES: &[&str] = &[];
+const COCKROACH_PREVIEW_FEATURES: &[&str] = &["cockroachdb"];
 
 impl TestApiArgs {
     pub fn new(test_function_name: &'static str, preview_features: &'static [&'static str]) -> Self {
