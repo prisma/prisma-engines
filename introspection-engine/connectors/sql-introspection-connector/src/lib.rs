@@ -190,6 +190,7 @@ impl SqlFamilyTrait for IntrospectionContext {
     fn sql_family(&self) -> SqlFamily {
         match self.source.active_provider.as_str() {
             "postgresql" => SqlFamily::Postgres,
+            "cockroachdb" => SqlFamily::Postgres,
             "sqlite" => SqlFamily::Sqlite,
             "sqlserver" => SqlFamily::Mssql,
             "mysql" => SqlFamily::Mysql,
