@@ -1,3 +1,5 @@
+#[deny(missing_docs)]
+
 use crate::{
     ast::{self, FieldArity},
     types::RelationField,

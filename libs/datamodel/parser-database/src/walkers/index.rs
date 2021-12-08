@@ -1,10 +1,11 @@
-use super::{ModelWalker, ScalarFieldAttributeWalker, ScalarFieldWalker};
 use crate::{
     ast,
     types::{IndexAlgorithm, IndexAttribute},
+    walkers::{ModelWalker, ScalarFieldAttributeWalker, ScalarFieldWalker},
     ParserDatabase,
 };
 
+/// An index, unique or fulltext attribute.
 #[derive(Copy, Clone)]
 pub struct IndexWalker<'ast, 'db> {
     pub(crate) model_id: ast::ModelId,
@@ -14,10 +15,18 @@ pub struct IndexWalker<'ast, 'db> {
 }
 
 impl<'ast, 'db> IndexWalker<'ast, 'db> {
+    /// The mapped name of the index.
+    ///
+    /// ```
+    /// @@index([a, b], map: "theName")
+    ///                      ^^^^^^^^^
+    /// ```
     pub fn mapped_name(self) -> Option<&'ast str> {
         self.index_attribute.db_name
     }
 
+    /// The attribute name: `"unique"` for `@unique` and `@@unique`, and `"index"` for `@index` and
+    /// `@@index`.
     pub fn attribute_name(self) -> &'static str {
         if self.is_unique() {
             "unique"
@@ -30,6 +39,12 @@ impl<'ast, 'db> IndexWalker<'ast, 'db> {
         self.attribute().r#type
     }
 
+    /// The `name` argument of the index attribute. The database client name.
+    ///
+    /// ```
+    /// @@index([a, b], map: "theName")
+    ///                      ^^^^^^^^^
+    /// ```
     pub fn name(self) -> Option<&'ast str> {
         self.index_attribute.name
     }
@@ -38,6 +53,7 @@ impl<'ast, 'db> IndexWalker<'ast, 'db> {
         self.attribute().algorithm
     }
 
+    /// The AST node of the index/unique attribute.
     pub fn ast_attribute(self) -> Option<&'ast ast::Attribute> {
         self.index
     }
@@ -83,14 +99,17 @@ impl<'ast, 'db> IndexWalker<'ast, 'db> {
         self.index_attribute.source_field.is_some()
     }
 
+    /// Is this an `@(@)unique`?
     pub fn is_unique(self) -> bool {
         self.index_attribute.is_unique()
     }
 
+    /// Is this an `@(@)fulltext`?
     pub fn is_fulltext(self) -> bool {
         self.index_attribute.is_fulltext()
     }
 
+    /// The model the index is defined on.
     pub fn model(self) -> ModelWalker<'ast, 'db> {
         ModelWalker {
             model_id: self.model_id,
