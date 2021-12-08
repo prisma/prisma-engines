@@ -292,8 +292,6 @@
 <span id="292">292</span>
 <span id="293">293</span>
 <span id="294">294</span>
-<span id="295">295</span>
-<span id="296">296</span>
 </pre><pre class="rust"><code><span class="doccomment">//! This crate is responsible for parsing, rendering and formatting a Prisma Schema.</span>
 <span class="doccomment">//! A Prisma Schema consists out of two parts:</span>
 <span class="doccomment">//! 1. The `Datamodel` part refers to the model and enum definitions.</span>
@@ -388,7 +386,7 @@
 <span class="kw">use</span> <span class="ident">diagnostics</span>::{<span class="ident">Diagnostics</span>, <span class="ident">Validated</span>};
 <span class="kw">use</span> <span class="ident">enumflags2::BitFlags</span>;
 <span class="kw">use</span> <span class="ident">transform</span>::{
-    <span class="ident">ast_to_dml</span>::{<span class="ident">DatasourceLoader</span>, <span class="ident">GeneratorLoader</span>, <span class="ident">ValidationPipeline</span>},
+    <span class="ident">ast_to_dml</span>::{<span class="ident">validate</span>, <span class="ident">DatasourceLoader</span>, <span class="ident">GeneratorLoader</span>},
     <span class="ident">dml_to_ast</span>::{<span class="self">self</span>, <span class="ident">GeneratorSerializer</span>, <span class="ident">LowerDmlToAst</span>},
 };
 
@@ -442,9 +440,7 @@
 
     <span class="ident">diagnostics</span>.<span class="ident">to_result</span>()<span class="question-mark">?</span>;
 
-    <span class="kw">let</span> <span class="ident">validator</span> <span class="op">=</span> <span class="ident">ValidationPipeline::new</span>(<span class="kw-2">&amp;</span><span class="ident">datasources</span>, <span class="ident">preview_features</span>);
-
-    <span class="kw">match</span> <span class="ident">validator</span>.<span class="ident">validate</span>(<span class="kw-2">&amp;</span><span class="ident">ast</span>, <span class="ident">transform</span>) {
+    <span class="kw">match</span> <span class="ident">validate</span>(<span class="kw-2">&amp;</span><span class="ident">ast</span>, <span class="kw-2">&amp;</span><span class="ident">datasources</span>, <span class="ident">preview_features</span>, <span class="ident">transform</span>) {
         <span class="prelude-val">Ok</span>(<span class="kw-2">mut</span> <span class="ident">src</span>) =&gt; {
             <span class="ident">src</span>.<span class="ident">warnings</span>.<span class="ident">append</span>(<span class="ident">diagnostics</span>.<span class="ident">warnings_mut</span>());
             <span class="prelude-val">Ok</span>(<span class="ident">Validated</span> {

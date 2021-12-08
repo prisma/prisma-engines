@@ -109,6 +109,21 @@
 <span id="109">109</span>
 <span id="110">110</span>
 <span id="111">111</span>
+<span id="112">112</span>
+<span id="113">113</span>
+<span id="114">114</span>
+<span id="115">115</span>
+<span id="116">116</span>
+<span id="117">117</span>
+<span id="118">118</span>
+<span id="119">119</span>
+<span id="120">120</span>
+<span id="121">121</span>
+<span id="122">122</span>
+<span id="123">123</span>
+<span id="124">124</span>
+<span id="125">125</span>
+<span id="126">126</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::constraint_names::ConstraintNames</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::Connector</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">ReferentialAction</span>, <span class="ident">ReferentialIntegrity</span>};
@@ -218,6 +233,21 @@
                 <span class="ident">ReferencingFields::NA</span> =&gt; <span class="macro">unreachable!</span>(),
             }
         })
+    }
+}
+
+<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">ScalarFieldWalkerExt</span> {
+    <span class="doccomment">/// This will return None when:</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// - There is no native type attribute on the field.</span>
+    <span class="doccomment">/// - The native type attribute is not valid for the connector.</span>
+    <span class="kw">fn</span> <span class="ident">native_type_instance</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">connector</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">Connector</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">dml::native_type_instance::NativeTypeInstance</span><span class="op">&gt;</span>;
+}
+
+<span class="kw">impl</span> <span class="ident">ScalarFieldWalkerExt</span> <span class="kw">for</span> <span class="ident">ScalarFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">native_type_instance</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">connector</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">Connector</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">dml::native_type_instance::NativeTypeInstance</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">raw_native_type</span>()
+            .<span class="ident">and_then</span>(<span class="op">|</span>(<span class="kw">_</span>, <span class="ident">name</span>, <span class="ident">args</span>, <span class="kw">_</span>)<span class="op">|</span> <span class="ident">connector</span>.<span class="ident">parse_native_type</span>(<span class="ident">name</span>, <span class="ident">args</span>.<span class="ident">to_owned</span>()).<span class="ident">ok</span>())
     }
 }
 </code></pre></div>

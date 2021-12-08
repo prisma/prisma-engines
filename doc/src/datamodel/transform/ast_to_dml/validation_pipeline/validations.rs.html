@@ -146,6 +146,7 @@
 <span id="146">146</span>
 <span id="147">147</span>
 <span id="148">148</span>
+<span id="149">149</span>
 </pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">autoincrement</span>;
 <span class="kw">mod</span> <span class="ident">composite_types</span>;
 <span class="kw">mod</span> <span class="ident">constraint_namespace</span>;
@@ -180,6 +181,7 @@
         <span class="ident">models::primary_key_length_prefix_supported</span>(<span class="ident">model</span>, <span class="ident">ctx</span>);
         <span class="ident">models::primary_key_sort_order_supported</span>(<span class="ident">model</span>, <span class="ident">ctx</span>);
         <span class="ident">models::only_one_fulltext_attribute_allowed</span>(<span class="ident">model</span>, <span class="ident">ctx</span>);
+        <span class="ident">models::connector_specific</span>(<span class="ident">model</span>, <span class="ident">ctx</span>);
         <span class="ident">autoincrement::validate_auto_increment</span>(<span class="ident">model</span>, <span class="ident">ctx</span>);
 
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">pk</span>) <span class="op">=</span> <span class="ident">model</span>.<span class="ident">primary_key</span>() {
