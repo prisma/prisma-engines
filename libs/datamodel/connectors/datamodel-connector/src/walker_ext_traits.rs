@@ -38,7 +38,7 @@ impl<'db> DefaultValueExt<'db> for DefaultValueWalker<'_, 'db> {
         self.mapped_name().map(Cow::from).unwrap_or_else(|| {
             let name = ConstraintNames::default_name(
                 self.field().model().final_database_name(),
-                self.field().final_database_name(),
+                self.field().database_name(),
                 connector,
             );
 
@@ -97,7 +97,7 @@ impl<'ast> InlineRelationWalkerExt<'ast> for InlineRelationWalker<'ast, '_> {
             let model_database_name = self.referencing_model().final_database_name();
             match self.referencing_fields() {
                 ReferencingFields::Concrete(fields) => {
-                    let field_names: Vec<&str> = fields.map(|f| f.final_database_name()).collect();
+                    let field_names: Vec<&str> = fields.map(|f| f.database_name()).collect();
                     ConstraintNames::foreign_key_constraint_name(model_database_name, &field_names, connector).into()
                 }
                 ReferencingFields::Inferred(fields) => {

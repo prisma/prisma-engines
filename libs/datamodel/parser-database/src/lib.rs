@@ -1,6 +1,6 @@
 #![deny(unsafe_code, rust_2018_idioms)]
 
-//! See the docs on [ParserDatabase](/struct.ParserDatabase.html).
+//! See the docs on [ParserDatabase](./struct.ParserDatabase.html).
 //!
 //! ## Terminology
 //!
