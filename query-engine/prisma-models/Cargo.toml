@@ -5,7 +5,7 @@ authors = [
   "Marcus Böhm <boehm@prisma.io>",
   "Katharina Fey <kookie@spacekookie.de>",
 ]
-edition = "2018"
+edition = "2021"
 name = "prisma-models"
 version = "0.0.0"
 
