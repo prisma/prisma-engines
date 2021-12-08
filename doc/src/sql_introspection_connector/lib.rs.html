@@ -197,6 +197,7 @@
 <span id="197">197</span>
 <span id="198">198</span>
 <span id="199">199</span>
+<span id="200">200</span>
 </pre><pre class="rust"><code><span class="attribute">#![<span class="ident">allow</span>(<span class="ident">clippy::vec_init_then_push</span>)]</span>
 
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">calculate_datamodel</span>; <span class="comment">// only exported to be able to unit test it</span>
@@ -389,6 +390,7 @@
     <span class="kw">fn</span> <span class="ident">sql_family</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">SqlFamily</span> {
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">source</span>.<span class="ident">active_provider</span>.<span class="ident">as_str</span>() {
             <span class="string">&quot;postgresql&quot;</span> =&gt; <span class="ident">SqlFamily::Postgres</span>,
+            <span class="string">&quot;cockroachdb&quot;</span> =&gt; <span class="ident">SqlFamily::Postgres</span>,
             <span class="string">&quot;sqlite&quot;</span> =&gt; <span class="ident">SqlFamily::Sqlite</span>,
             <span class="string">&quot;sqlserver&quot;</span> =&gt; <span class="ident">SqlFamily::Mssql</span>,
             <span class="string">&quot;mysql&quot;</span> =&gt; <span class="ident">SqlFamily::Mysql</span>,
