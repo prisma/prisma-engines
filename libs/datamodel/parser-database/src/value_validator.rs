@@ -2,14 +2,19 @@
 
 //! See [ValueValidator](./struct.ValueValidator.html).
 
-use crate::ast::{self, Expression, Span};
+use crate::{
+    ast::{self, Expression, Span},
+    types::SortOrder,
+};
 use chrono::{DateTime, FixedOffset};
 use diagnostics::DatamodelError;
 use dml::{
     default_value::{DefaultValue, ValueGenerator},
-    model::SortOrder,
+    prisma_value,
+    relation_info::ReferentialAction,
+    scalars::ScalarType,
+    PrismaValue,
 };
-use dml::{prisma_value, relation_info::ReferentialAction, scalars::ScalarType, PrismaValue};
 use std::error;
 
 /// Wraps a value and provides convenience methods for

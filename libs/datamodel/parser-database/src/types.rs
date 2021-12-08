@@ -1,5 +1,4 @@
 use crate::{context::Context, walkers::CompositeTypeFieldWalker, walkers::CompositeTypeWalker, DatamodelError};
-use dml::model::SortOrder;
 use schema_ast::ast;
 use std::{
     collections::{BTreeMap, HashMap},
@@ -517,5 +516,17 @@ fn field_type<'ast>(field: &'ast ast::Field, ctx: &mut Context<'ast>) -> Result<
         Some((_, ast::Top::Generator(_))) | Some((_, ast::Top::Source(_))) => unreachable!(),
         None => Err(supported),
         _ => unreachable!(),
+    }
+}
+
+#[derive(Debug, Clone, Copy)]
+pub enum SortOrder {
+    Asc,
+    Desc,
+}
+
+impl Default for SortOrder {
+    fn default() -> Self {
+        Self::Asc
     }
 }

@@ -288,7 +288,7 @@ impl<'a> LiftAstToDml<'a> {
                     // When we start using the extra args here could be a place to fill in the defaults. 
                     PrimaryKeyField {
                     name: field.as_scalar_field().name().to_owned(),
-                    sort_order: field.sort_order(),
+                    sort_order: field.sort_order().map(parser_database_sort_order_to_dml_sort_order),
                     length: field.length(),
                 })
                 .collect(),
@@ -304,7 +304,7 @@ impl<'a> LiftAstToDml<'a> {
                     .scalar_field_attributes()
                     .map(|field| IndexField {
                         name: field.as_scalar_field().name().to_owned(),
-                        sort_order: field.sort_order(),
+                        sort_order: field.sort_order().map(parser_database_sort_order_to_dml_sort_order),
                         length: field.length(),
                     })
                     .collect();
@@ -445,5 +445,12 @@ impl<'a> LiftAstToDml<'a> {
                 unreachable!()
             }
         }
+    }
+}
+
+fn parser_database_sort_order_to_dml_sort_order(sort_order: parser_database::SortOrder) -> dml::SortOrder {
+    match sort_order {
+        parser_database::SortOrder::Asc => dml::SortOrder::Asc,
+        parser_database::SortOrder::Desc => dml::SortOrder::Desc,
     }
 }

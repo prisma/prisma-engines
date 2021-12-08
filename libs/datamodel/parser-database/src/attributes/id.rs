@@ -1,13 +1,11 @@
 use super::FieldResolutionError;
-use crate::attributes::resolve_field_array_with_args;
-use crate::types::FieldWithArgs;
 use crate::{
     ast,
+    attributes::resolve_field_array_with_args,
     context::{Arguments, Context},
-    types::{IdAttribute, ModelAttributes},
+    types::{FieldWithArgs, IdAttribute, ModelAttributes, SortOrder},
     DatamodelError,
 };
-use dml::model::SortOrder;
 
 /// @@id on models
 pub(super) fn model<'ast>(
