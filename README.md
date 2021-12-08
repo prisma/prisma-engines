@@ -15,7 +15,7 @@ Quaint is an abstraction over certain SQL databases. It provides:
 ### Documentation
 
 - [Released](https://docs.rs/quaint)
-- [Master](https://prisma.github.io/quaint/quaint/index.html)
+- [Main](https://prisma.github.io/quaint/quaint/index.html)
 
 ### Feature flags
 

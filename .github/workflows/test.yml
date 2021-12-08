@@ -2,7 +2,7 @@ name: Cargo tests
 on:
   push:
     branches:
-      - master
+      - main
   pull_request:
 jobs:
   clippy:
@@ -13,7 +13,6 @@ jobs:
       - uses: actions/checkout@v1
       - uses: actions-rs/toolchain@v1
         with:
-            toolchain: stable
             components: clippy
             override: true
       - name: Install dependencies
@@ -30,7 +29,6 @@ jobs:
       - uses: actions/checkout@v2
       - uses: actions-rs/toolchain@v1
         with:
-          toolchain: stable
           components: rustfmt
           override: true
       - uses: mbrobbel/rustfmt-check@master
@@ -66,8 +64,6 @@ jobs:
       - uses: actions/checkout@v2
 
       - uses: actions-rs/toolchain@v1
-        with:
-          toolchain: stable
 
       - uses: actions/cache@v2
         with:
@@ -91,14 +87,12 @@ jobs:
   rustdoc:
     needs: [clippy, format, cargo-test]
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/master'
+    if: github.ref == 'refs/heads/main'
 
     steps:
       - uses: actions/checkout@v2
 
       - uses: actions-rs/toolchain@v1
-        with:
-          toolchain: nightly
 
       - uses: actions/cache@v2
         with:
