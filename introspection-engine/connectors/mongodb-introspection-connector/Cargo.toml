@@ -1,12 +1,10 @@
 [package]
 name = "mongodb-introspection-connector"
 version = "0.1.0"
-edition = "2018"
-
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+edition = "2021"
 
 [dependencies]
-mongodb = { git="https://github.com/mongodb/mongo-rust-driver.git", rev = "8e55cb2", features = ["bson-chrono-0_4", "bson-uuid-0_8"] }
+mongodb = { git = "https://github.com/mongodb/mongo-rust-driver.git", rev = "8e55cb2", features = ["bson-chrono-0_4", "bson-uuid-0_8"] }
 thiserror = "1.0"
 async-trait = "0.1"
 datamodel = { path = "../../../libs/datamodel/core" }

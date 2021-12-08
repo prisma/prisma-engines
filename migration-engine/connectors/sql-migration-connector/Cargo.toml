@@ -1,6 +1,6 @@
 [package]
 authors = ["Marcus Böhm <boehm@prisma.io>"]
-edition = "2018"
+edition = "2021"
 name = "sql-migration-connector"
 version = "0.1.0"
 
