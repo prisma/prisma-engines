@@ -28,7 +28,7 @@ mod types;
 
 pub use names::reserved_model_names;
 pub use schema_ast::ast;
-pub use types::{IndexAlgorithm, IndexType, ScalarFieldType, SortOrder};
+pub use types::{IndexAlgorithm, IndexType, ScalarFieldType, ScalarType, SortOrder};
 
 use self::{context::Context, relations::Relations, types::Types};
 use diagnostics::{DatamodelError, Diagnostics};

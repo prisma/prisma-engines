@@ -530,3 +530,34 @@ impl Default for SortOrder {
         Self::Asc
     }
 }
+
+/// Prisma's builtin scalar types.
+#[derive(Debug, Copy, Clone)]
+pub enum ScalarType {
+    Int,
+    BigInt,
+    Float,
+    Boolean,
+    String,
+    DateTime,
+    Json,
+    Bytes,
+    Decimal,
+}
+
+impl ScalarType {
+    pub(crate) fn try_from_str(s: &str) -> Option<ScalarType> {
+        match s {
+            "Int" => Some(ScalarType::Int),
+            "BigInt" => Some(ScalarType::BigInt),
+            "Float" => Some(ScalarType::Float),
+            "Boolean" => Some(ScalarType::Boolean),
+            "String" => Some(ScalarType::String),
+            "DateTime" => Some(ScalarType::DateTime),
+            "Json" => Some(ScalarType::Json),
+            "Bytes" => Some(ScalarType::Bytes),
+            "Decimal" => Some(ScalarType::Decimal),
+            _ => None,
+        }
+    }
+}
