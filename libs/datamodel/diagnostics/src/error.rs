@@ -93,7 +93,7 @@ pub enum DatamodelError {
   LegacyParserError { message: String, span: Span },
 
   #[error("{}", message)]
-  ConnectorError {message: String, span: Span },
+  ConnectorError { message: String, span: Span },
 
   #[error("{}", message)]
   FunctionalEvaluationError { message: String, span: Span },

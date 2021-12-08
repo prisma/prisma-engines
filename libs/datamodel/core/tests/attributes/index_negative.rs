@@ -808,7 +808,7 @@ fn fulltext_index_sort_attribute() {
 fn hash_index_doesnt_work_on_mongo() {
     let dml = indoc! {r#"
         model A {
-          id Int @id
+          id Int @id @map("_id")
           a  Int
 
           @@index([a], type: Hash)

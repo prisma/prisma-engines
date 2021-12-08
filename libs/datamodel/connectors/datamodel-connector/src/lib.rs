@@ -9,11 +9,12 @@ mod referential_integrity;
 
 pub use diagnostics::connector_error;
 pub use empty_connector::EmptyDatamodelConnector;
+pub use parser_database;
 pub use referential_integrity::ReferentialIntegrity;
 
 use crate::connector_error::{ConnectorError, ConnectorErrorFactory, ErrorKind};
 use dml::{
-    model::Model, native_type_constructor::NativeTypeConstructor, native_type_instance::NativeTypeInstance,
+    native_type_constructor::NativeTypeConstructor, native_type_instance::NativeTypeInstance,
     relation_info::ReferentialAction, scalars::ScalarType,
 };
 use enumflags2::BitFlags;
@@ -87,7 +88,7 @@ pub trait Connector: Send + Sync {
     ) {
     }
 
-    fn validate_model(&self, _: &Model, _: &mut Vec<ConnectorError>) {}
+    fn validate_model(&self, _model: parser_database::walkers::ModelWalker<'_, '_>, _: &mut Vec<ConnectorError>) {}
 
     /// The scopes in which a constraint name should be validated. If empty, doesn't check for name
     /// clashes in the validation phase.
