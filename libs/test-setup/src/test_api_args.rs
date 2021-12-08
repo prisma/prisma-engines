@@ -61,15 +61,25 @@ static DB_UNDER_TEST: Lazy<Result<DbUnderTest, String>> = Lazy::new(|| {
                 shadow_database_url,
             })
         }
-        "postgresql" | "postgres" => Ok(DbUnderTest {
-            tags: postgres::get_postgres_tags(&database_url)?,
-            database_url,
-            capabilities: Capabilities::Enums
-                | Capabilities::Json
-                | Capabilities::ScalarLists
-                | Capabilities::CreateDatabase,
-            provider: "postgresql",
-            shadow_database_url,
+        "postgresql" | "postgres" => Ok({
+            let tags = postgres::get_postgres_tags(&database_url)?;
+
+            let provider = if tags.contains(Tags::Cockroach) {
+                "cockroachdb"
+            } else {
+                "postgresql"
+            };
+
+            DbUnderTest {
+                tags,
+                database_url,
+                capabilities: Capabilities::Enums
+                    | Capabilities::Json
+                    | Capabilities::ScalarLists
+                    | Capabilities::CreateDatabase,
+                provider,
+                shadow_database_url,
+            }
         }),
         "sqlserver" => Ok(DbUnderTest {
             tags: mssql::get_mssql_tags(&database_url)?,
@@ -105,6 +115,9 @@ pub struct TestApiArgs {
     preview_features: &'static [&'static str],
     db: &'static DbUnderTest,
 }
+
+const EMPTY_PREVIEW_FEATURES: &[&str] = &[];
+const COCKROACH_PREVIEW_FEATURES: &[&str] = &["cockroachdb"];
 
 impl TestApiArgs {
     pub fn new(test_function_name: &'static str, preview_features: &'static [&'static str]) -> Self {
@@ -151,10 +164,17 @@ impl TestApiArgs {
     }
 
     pub fn datasource_block<'a>(&'a self, url: &'a str, params: &'a [(&'a str, &'a str)]) -> DatasourceBlock<'a> {
+        let preview_features = if self.db.provider == "cockroachdb" {
+            COCKROACH_PREVIEW_FEATURES
+        } else {
+            EMPTY_PREVIEW_FEATURES
+        };
+
         DatasourceBlock {
             provider: self.db.provider,
             url,
             params,
+            preview_features,
         }
     }
 
@@ -175,6 +195,7 @@ pub struct DatasourceBlock<'a> {
     provider: &'a str,
     url: &'a str,
     params: &'a [(&'a str, &'a str)],
+    preview_features: &'static [&'static str],
 }
 
 impl<'a> DatasourceBlock<'a> {
@@ -182,9 +203,30 @@ impl<'a> DatasourceBlock<'a> {
         self.url
     }
 }
+fn generator_block(preview_features: &'static [&'static str]) -> String {
+    let preview_features: Vec<String> = preview_features.iter().map(|pf| format!(r#""{}""#, pf)).collect();
+
+    let preview_feature_string = if preview_features.is_empty() {
+        "".to_string()
+    } else {
+        format!("\npreviewFeatures = [{}]", preview_features.join(", "))
+    };
+
+    format!(
+        r#"generator generated_test_preview_flags {{
+                 provider = "prisma-client-js"{}
+               }}"#,
+        preview_feature_string
+    )
+}
 
 impl Display for DatasourceBlock<'_> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        if !self.preview_features.is_empty() {
+            f.write_str(&generator_block(self.preview_features))?;
+            f.write_str("\n")?;
+        };
+
         f.write_str("datasource db {\n    provider = \"")?;
         f.write_str(self.provider)?;
         f.write_str("\"\n    url = \"")?;
