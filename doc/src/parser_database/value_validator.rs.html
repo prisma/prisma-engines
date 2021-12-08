@@ -320,7 +320,18 @@
 <span id="320">320</span>
 <span id="321">321</span>
 <span id="322">322</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ast</span>::{<span class="self">self</span>, <span class="ident">Expression</span>, <span class="ident">Span</span>};
+<span id="323">323</span>
+<span id="324">324</span>
+<span id="325">325</span>
+<span id="326">326</span>
+<span id="327">327</span>
+<span id="328">328</span>
+<span id="329">329</span>
+</pre><pre class="rust"><code><span class="attribute">#![<span class="ident">deny</span>(<span class="ident">missing_docs</span>)]</span>
+
+<span class="doccomment">//! See [ValueValidator](./struct.ValueValidator.html).</span>
+
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ast</span>::{<span class="self">self</span>, <span class="ident">Expression</span>, <span class="ident">Span</span>};
 <span class="kw">use</span> <span class="ident">chrono</span>::{<span class="ident">DateTime</span>, <span class="ident">FixedOffset</span>};
 <span class="kw">use</span> <span class="ident">diagnostics::DatamodelError</span>;
 <span class="kw">use</span> <span class="ident">dml</span>::{
@@ -334,6 +345,7 @@
 <span class="doccomment">/// validating it.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ValueValidator</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
+    <span class="doccomment">/// The underlying AST expression.</span>
     <span class="kw">pub</span> <span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">ast::Expression</span>,
 }
 
@@ -633,7 +645,9 @@
     }
 }
 
+<span class="doccomment">/// ValueValidator for lists of values.</span>
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">ValueListValidator</span> {
+    <span class="doccomment">/// Try to unwrap the value as a list of strings.</span>
     <span class="kw">fn</span> <span class="ident">to_str_vec</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>, <span class="ident">DatamodelError</span><span class="op">&gt;</span>;
 }
 

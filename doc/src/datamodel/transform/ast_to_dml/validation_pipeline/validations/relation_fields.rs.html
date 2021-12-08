@@ -399,7 +399,7 @@
 }
 
 <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">map</span>(<span class="ident">field</span>: <span class="ident">RelationFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
-    <span class="kw">if</span> <span class="ident">field</span>.<span class="ident">explicit_mapped_name</span>().<span class="ident">is_none</span>() {
+    <span class="kw">if</span> <span class="ident">field</span>.<span class="ident">foreign_key_name</span>().<span class="ident">is_none</span>() {
         <span class="kw">return</span>;
     }
 
@@ -424,7 +424,7 @@
         <span class="ident">validate_db_name</span>(
             <span class="ident">field</span>.<span class="ident">model</span>().<span class="ident">name</span>(),
             <span class="ident">relation_attr</span>,
-            <span class="ident">field</span>.<span class="ident">explicit_mapped_name</span>(),
+            <span class="ident">field</span>.<span class="ident">foreign_key_name</span>(),
             <span class="ident">ctx</span>,
             <span class="bool-val">false</span>,
         );

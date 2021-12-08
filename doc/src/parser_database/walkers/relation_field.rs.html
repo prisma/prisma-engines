@@ -238,6 +238,22 @@
 <span id="238">238</span>
 <span id="239">239</span>
 <span id="240">240</span>
+<span id="241">241</span>
+<span id="242">242</span>
+<span id="243">243</span>
+<span id="244">244</span>
+<span id="245">245</span>
+<span id="246">246</span>
+<span id="247">247</span>
+<span id="248">248</span>
+<span id="249">249</span>
+<span id="250">250</span>
+<span id="251">251</span>
+<span id="252">252</span>
+<span id="253">253</span>
+<span id="254">254</span>
+<span id="255">255</span>
+<span id="256">256</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">ast</span>::{<span class="self">self</span>, <span class="ident">FieldArity</span>},
     <span class="ident">types::RelationField</span>,
@@ -251,6 +267,7 @@
     <span class="ident">hash</span>::{<span class="ident">Hash</span>, <span class="ident">Hasher</span>},
 };
 
+<span class="doccomment">/// A relation field on a model in the schema.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">RelationFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">model_id</span>: <span class="ident">ast::ModelId</span>,
@@ -275,18 +292,22 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;db</span><span class="op">&gt;</span> <span class="ident">RelationFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
+    <span class="doccomment">/// The ID of the AST node of the field.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">field_id</span>(<span class="self">self</span>) -&gt; <span class="ident">ast::FieldId</span> {
         <span class="self">self</span>.<span class="ident">field_id</span>
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">explicit_mapped_name</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;ast</span> <span class="ident">str</span><span class="op">&gt;</span> {
+    <span class="doccomment">/// The foreign key name of the relation (`@relation(map: ...)`).</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">foreign_key_name</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;ast</span> <span class="ident">str</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">attributes</span>().<span class="ident">fk_name</span>
     }
 
+    <span class="doccomment">/// The field name.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">name</span>(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;ast</span> <span class="ident">str</span> {
         <span class="self">self</span>.<span class="ident">ast_field</span>().<span class="ident">name</span>()
     }
 
+    <span class="doccomment">/// The AST node of the field.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ast_field</span>(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;ast</span> <span class="ident">ast::Field</span> {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">db</span>.<span class="ident">ast</span>[<span class="self">self</span>.<span class="ident">model_id</span>][<span class="self">self</span>.<span class="ident">field_id</span>]
     }
@@ -295,10 +316,12 @@
         <span class="self">self</span>.<span class="ident">relation_field</span>
     }
 
+    <span class="doccomment">/// The onDelete argument on the relation.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">explicit_on_delete</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ReferentialAction</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">attributes</span>().<span class="ident">on_delete</span>
     }
 
+    <span class="doccomment">/// The onUpdate argument on the relation.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">explicit_on_update</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ReferentialAction</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">attributes</span>().<span class="ident">on_update</span>
     }
@@ -308,10 +331,12 @@
         <span class="self">self</span>.<span class="ident">relation_field</span>.<span class="ident">name</span>
     }
 
+    <span class="doccomment">/// Is there an `@ignore` attribute on the field?</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_ignored</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">relation_field</span>.<span class="ident">is_ignored</span>
     }
 
+    <span class="doccomment">/// The model containing the field.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">model</span>(<span class="self">self</span>) -&gt; <span class="ident">ModelWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
         <span class="ident">ModelWalker</span> {
             <span class="ident">model_id</span>: <span class="self">self</span>.<span class="ident">model_id</span>,
@@ -320,10 +345,16 @@
         }
     }
 
+    <span class="doccomment">/// The `@relation` attribute in the field AST.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">relation_attribute</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;ast</span> <span class="ident">ast::Attribute</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">attributes</span>().<span class="ident">relation_attribute</span>
+    }
+
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">references_model</span>(<span class="self">self</span>, <span class="ident">other</span>: <span class="ident">ast::ModelId</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">relation_field</span>.<span class="ident">referenced_model</span> <span class="op">==</span> <span class="ident">other</span>
     }
 
+    <span class="doccomment">/// The model referenced by the relation.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">related_model</span>(<span class="self">self</span>) -&gt; <span class="ident">ModelWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">model_id</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">relation_field</span>.<span class="ident">referenced_model</span>;
 
@@ -334,6 +365,7 @@
         }
     }
 
+    <span class="doccomment">/// The fields in the `@relation(references: ...)` argument.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">referenced_fields</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw">impl</span> <span class="ident">ExactSizeIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">ScalarFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;db</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">attributes</span>().<span class="ident">references</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">references</span><span class="op">|</span> {
             <span class="ident">references</span>

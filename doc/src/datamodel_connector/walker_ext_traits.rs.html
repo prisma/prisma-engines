@@ -149,7 +149,7 @@
         <span class="self">self</span>.<span class="ident">mapped_name</span>().<span class="ident">map</span>(<span class="ident">Cow::from</span>).<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> {
             <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">ConstraintNames::default_name</span>(
                 <span class="self">self</span>.<span class="ident">field</span>().<span class="ident">model</span>().<span class="ident">final_database_name</span>(),
-                <span class="self">self</span>.<span class="ident">field</span>().<span class="ident">final_database_name</span>(),
+                <span class="self">self</span>.<span class="ident">field</span>().<span class="ident">database_name</span>(),
                 <span class="ident">connector</span>,
             );
 
@@ -208,7 +208,7 @@
             <span class="kw">let</span> <span class="ident">model_database_name</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">referencing_model</span>().<span class="ident">final_database_name</span>();
             <span class="kw">match</span> <span class="self">self</span>.<span class="ident">referencing_fields</span>() {
                 <span class="ident">ReferencingFields::Concrete</span>(<span class="ident">fields</span>) =&gt; {
-                    <span class="kw">let</span> <span class="ident">field_names</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">fields</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">final_database_name</span>()).<span class="ident">collect</span>();
+                    <span class="kw">let</span> <span class="ident">field_names</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">fields</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">database_name</span>()).<span class="ident">collect</span>();
                     <span class="ident">ConstraintNames::foreign_key_constraint_name</span>(<span class="ident">model_database_name</span>, <span class="kw-2">&amp;</span><span class="ident">field_names</span>, <span class="ident">connector</span>).<span class="ident">into</span>()
                 }
                 <span class="ident">ReferencingFields::Inferred</span>(<span class="ident">fields</span>) =&gt; {

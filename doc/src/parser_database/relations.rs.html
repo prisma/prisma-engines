@@ -307,21 +307,6 @@
 <span id="307">307</span>
 <span id="308">308</span>
 <span id="309">309</span>
-<span id="310">310</span>
-<span id="311">311</span>
-<span id="312">312</span>
-<span id="313">313</span>
-<span id="314">314</span>
-<span id="315">315</span>
-<span id="316">316</span>
-<span id="317">317</span>
-<span id="318">318</span>
-<span id="319">319</span>
-<span id="320">320</span>
-<span id="321">321</span>
-<span id="322">322</span>
-<span id="323">323</span>
-<span id="324">324</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">ast</span>,
     {<span class="ident">context::Context</span>, <span class="ident">types::RelationField</span>},
@@ -425,13 +410,6 @@
     <span class="ident">OneToMany</span>(<span class="ident">OneToManyRelationFields</span>),
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum</span> <span class="ident">RelationType</span> {
-    <span class="ident">ImplicitManyToMany</span>,
-    <span class="ident">OneToOne</span>,
-    <span class="ident">OneToMany</span>,
-}
-
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">Relation</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span> {
     <span class="doccomment">/// The `name` argument in `@relation`.</span>
@@ -454,14 +432,6 @@
                 <span class="prelude-val">Some</span>((<span class="kw-2">*</span><span class="ident">field_a</span>, <span class="kw-2">*</span><span class="ident">field_b</span>))
             }
             <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
-        }
-    }
-
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">r#type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">RelationType</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">attributes</span> {
-            <span class="ident">RelationAttributes::ImplicitManyToMany</span> { .. } =&gt; <span class="ident">RelationType::ImplicitManyToMany</span>,
-            <span class="ident">RelationAttributes::OneToOne</span>(<span class="kw">_</span>) =&gt; <span class="ident">RelationType::OneToOne</span>,
-            <span class="ident">RelationAttributes::OneToMany</span>(<span class="kw">_</span>) =&gt; <span class="ident">RelationType::OneToMany</span>,
         }
     }
 }

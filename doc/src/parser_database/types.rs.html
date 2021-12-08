@@ -517,6 +517,8 @@
 <span id="517">517</span>
 <span id="518">518</span>
 <span id="519">519</span>
+<span id="520">520</span>
+<span id="521">521</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">context::Context</span>, <span class="ident">walkers::CompositeTypeFieldWalker</span>, <span class="ident">walkers::CompositeTypeWalker</span>, <span class="ident">DatamodelError</span>};
 <span class="kw">use</span> <span class="ident">dml::model::SortOrder</span>;
 <span class="kw">use</span> <span class="ident">schema_ast::ast</span>;
@@ -643,6 +645,7 @@
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">is_ignored</span>: <span class="ident">bool</span>,
     <span class="doccomment">/// The fk_name _explicitly present_ in the AST through the map argument.</span>
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">fk_name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;ast</span> <span class="ident">str</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">relation_attribute</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;ast</span> <span class="ident">ast::Attribute</span><span class="op">&gt;</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">RelationField</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
@@ -656,6 +659,7 @@
             <span class="ident">name</span>: <span class="prelude-val">None</span>,
             <span class="ident">is_ignored</span>: <span class="bool-val">false</span>,
             <span class="ident">fk_name</span>: <span class="prelude-val">None</span>,
+            <span class="ident">relation_attribute</span>: <span class="prelude-val">None</span>,
         }
     }
 }

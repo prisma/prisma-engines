@@ -67,7 +67,28 @@
 <span id="67">67</span>
 <span id="68">68</span>
 <span id="69">69</span>
-</pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">composite_type</span>;
+<span id="70">70</span>
+<span id="71">71</span>
+<span id="72">72</span>
+<span id="73">73</span>
+<span id="74">74</span>
+<span id="75">75</span>
+<span id="76">76</span>
+<span id="77">77</span>
+<span id="78">78</span>
+<span id="79">79</span>
+<span id="80">80</span>
+<span id="81">81</span>
+<span id="82">82</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Convenient access to a datamodel as understood by ParserDatabase.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! The walkers:</span>
+<span class="doccomment">//! - Know about specific types and what kind they are (models, enums, etc.)</span>
+<span class="doccomment">//! - Know about attributes and which ones are defined and allowed in a Prisma schema.</span>
+<span class="doccomment">//! - Know about relations.</span>
+<span class="doccomment">//! - Do not know anything about connectors, they are generic.</span>
+
+<span class="kw">mod</span> <span class="ident">composite_type</span>;
 <span class="kw">mod</span> <span class="ident">field</span>;
 <span class="kw">mod</span> <span class="ident">index</span>;
 <span class="kw">mod</span> <span class="ident">model</span>;
@@ -87,6 +108,7 @@
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ast</span>;
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span> <span class="ident">ParserDatabase</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span> {
+    <span class="doccomment">/// Find a model by ID.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">walk_model</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">model_id</span>: <span class="ident">ast::ModelId</span>) -&gt; <span class="ident">ModelWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
         <span class="ident">ModelWalker</span> {
             <span class="ident">model_id</span>,
@@ -95,6 +117,7 @@
         }
     }
 
+    <span class="doccomment">/// Walk all the models in the schema.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">walk_models</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">ModelWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;_</span> {
         <span class="self">self</span>.<span class="ident">ast</span>()
             .<span class="ident">iter_tops</span>()
@@ -102,10 +125,12 @@
             .<span class="ident">map</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">model_id</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">walk_model</span>(<span class="ident">model_id</span>))
     }
 
+    <span class="doccomment">/// Walk a specific composite type by ID.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">walk_composite_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">ctid</span>: <span class="ident">ast::CompositeTypeId</span>) -&gt; <span class="ident">CompositeTypeWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
         <span class="ident">CompositeTypeWalker</span> { <span class="ident">ctid</span>, <span class="ident">db</span>: <span class="self">self</span> }
     }
 
+    <span class="doccomment">/// Walk all the composite types in the schema.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">walk_composite_types</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">CompositeTypeWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;_</span> {
         <span class="self">self</span>.<span class="ident">ast</span>()
             .<span class="ident">iter_tops</span>()
@@ -113,6 +138,8 @@
             .<span class="ident">map</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">ctid</span><span class="op">|</span> <span class="ident">CompositeTypeWalker</span> { <span class="ident">ctid</span>, <span class="ident">db</span>: <span class="self">self</span> })
     }
 
+    <span class="doccomment">/// Walk all the relations in the schema. A relation may be defined by one or two fields; in</span>
+    <span class="doccomment">/// both cases, it is still a single relation.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">walk_relations</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">RelationWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;_</span> {
         (<span class="number">0</span>..<span class="self">self</span>.<span class="ident">relations</span>.<span class="ident">relations_storage</span>.<span class="ident">len</span>()).<span class="ident">map</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">relation_id</span><span class="op">|</span> <span class="ident">RelationWalker</span> { <span class="ident">db</span>: <span class="self">self</span>, <span class="ident">relation_id</span> })
     }
@@ -131,7 +158,6 @@
                         <span class="ident">side_a</span>: (<span class="ident">model_a</span>, <span class="ident">field_a</span>),
                         <span class="ident">side_b</span>: (<span class="ident">model_b</span>, <span class="ident">field_b</span>),
                         <span class="ident">db</span>: <span class="self">self</span>,
-                        <span class="ident">relation</span>,
                     })
             })
     }
