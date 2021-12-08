@@ -32,6 +32,7 @@ pub(super) fn validate(ctx: &mut Context<'_>, relation_transformation_enabled: b
         models::primary_key_length_prefix_supported(model, ctx);
         models::primary_key_sort_order_supported(model, ctx);
         models::only_one_fulltext_attribute_allowed(model, ctx);
+        models::connector_specific(model, ctx);
         autoincrement::validate_auto_increment(model, ctx);
 
         if let Some(pk) = model.primary_key() {

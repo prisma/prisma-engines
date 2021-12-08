@@ -1,11 +1,13 @@
 use datamodel_connector::{
     connector_error::ConnectorError,
     helper::{args_vec_from_opt, parse_one_opt_u32, parse_one_u32, parse_two_opt_u32},
+    parser_database::walkers::ModelWalker,
+    walker_ext_traits::*,
     Connector, ConnectorCapability, ConstraintScope, ReferentialIntegrity,
 };
 use dml::{
-    field::FieldType, model::Model, native_type_constructor::NativeTypeConstructor,
-    native_type_instance::NativeTypeInstance, relation_info::ReferentialAction, scalars::ScalarType,
+    native_type_constructor::NativeTypeConstructor, native_type_instance::NativeTypeInstance,
+    relation_info::ReferentialAction, scalars::ScalarType,
 };
 use enumflags2::BitFlags;
 use native_types::MySqlType::{self, *};
@@ -251,29 +253,21 @@ impl Connector for MySqlDatamodelConnector {
         }
     }
 
-    fn validate_model(&self, model: &Model, errors: &mut Vec<ConnectorError>) {
-        for index_definition in model.indices.iter() {
-            let fields = index_definition
-                .fields
-                .iter()
-                .map(|f| model.find_field(&f.name).unwrap())
-                .zip(index_definition.fields.iter());
-
-            for (f, definition) in fields {
-                if let FieldType::Scalar(_, _, Some(native_type)) = f.field_type() {
-                    let native_type_name = native_type.name.as_str();
-
-                    if NATIVE_TYPES_THAT_CAN_NOT_BE_USED_IN_KEY_SPECIFICATION.contains(&native_type_name) {
+    fn validate_model(&self, model: ModelWalker<'_, '_>, errors: &mut Vec<ConnectorError>) {
+        for index in model.indexes() {
+            for field in index.scalar_field_attributes() {
+                if let Some(native_type) = field.as_scalar_field().native_type_instance(self) {
+                    if NATIVE_TYPES_THAT_CAN_NOT_BE_USED_IN_KEY_SPECIFICATION.contains(&native_type.name.as_str()) {
                         // Length defined, so we allow the index.
-                        if definition.length.is_some() {
+                        if field.length().is_some() {
                             continue;
                         }
 
-                        if index_definition.is_fulltext() {
+                        if index.is_fulltext() {
                             continue;
                         }
 
-                        if index_definition.is_unique() {
+                        if index.is_unique() {
                             errors.push(
                                 self.native_instance_error(&native_type)
                                     .new_incompatible_native_type_with_unique(),
@@ -291,21 +285,19 @@ impl Connector for MySqlDatamodelConnector {
             }
         }
 
-        if let Some(pk) = &model.primary_key {
-            for id_field in pk.fields.iter() {
-                let field = model.find_field(&id_field.name).unwrap();
-
-                if let FieldType::Scalar(_, _, Some(native_type)) = field.field_type() {
-                    let native_type_name = native_type.name.as_str();
-
-                    if NATIVE_TYPES_THAT_CAN_NOT_BE_USED_IN_KEY_SPECIFICATION.contains(&native_type_name) {
+        if let Some(pk) = model.primary_key() {
+            for id_field in pk.scalar_field_attributes() {
+                if let Some(native_type_instance) = id_field.as_scalar_field().native_type_instance(self) {
+                    if NATIVE_TYPES_THAT_CAN_NOT_BE_USED_IN_KEY_SPECIFICATION
+                        .contains(&native_type_instance.name.as_str())
+                    {
                         // Length defined, so we allow the index.
-                        if id_field.length.is_some() {
+                        if id_field.length().is_some() {
                             continue;
                         }
 
                         errors.push(
-                            self.native_instance_error(&native_type)
+                            self.native_instance_error(&native_type_instance)
                                 .new_incompatible_native_type_with_id(),
                         );
 

@@ -109,3 +109,18 @@ impl<'ast> InlineRelationWalkerExt<'ast> for InlineRelationWalker<'ast, '_> {
         })
     }
 }
+
+pub trait ScalarFieldWalkerExt {
+    /// This will return None when:
+    ///
+    /// - There is no native type attribute on the field.
+    /// - The native type attribute is not valid for the connector.
+    fn native_type_instance(&self, connector: &dyn Connector) -> Option<dml::native_type_instance::NativeTypeInstance>;
+}
+
+impl ScalarFieldWalkerExt for ScalarFieldWalker<'_, '_> {
+    fn native_type_instance(&self, connector: &dyn Connector) -> Option<dml::native_type_instance::NativeTypeInstance> {
+        self.raw_native_type()
+            .and_then(|(_, name, args, _)| connector.parse_native_type(name, args.to_owned()).ok())
+    }
+}

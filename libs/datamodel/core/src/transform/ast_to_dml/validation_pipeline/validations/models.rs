@@ -219,3 +219,15 @@ pub(crate) fn primary_key_connector_specific(model: ModelWalker<'_, '_>, ctx: &m
         ));
     }
 }
+
+pub(super) fn connector_specific(model: ModelWalker<'_, '_>, ctx: &mut Context<'_>) {
+    let mut errors = Vec::new();
+    ctx.connector.validate_model(model, &mut errors);
+
+    for error in errors {
+        ctx.push_error(DatamodelError::new_connector_error(
+            &error.to_string(),
+            model.ast_model().span,
+        ));
+    }
+}
