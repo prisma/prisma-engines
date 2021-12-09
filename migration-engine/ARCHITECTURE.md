@@ -1,7 +1,30 @@
 # Prisma Migrate Architecture
 
-This document will be maintained and expanded over time. It is in the very
-early days and mostly contains the Migrate design FAQ.
+## Concepts
+
+### Core / Connector
+
+Migrate exposes the same API on all supported databases. That API is defined by
+the `migration-core` crate in the `migration-engine/core` directory. The core
+itself is a thin layer that orchestrates functionality provided by connectors —
+with one connector per supported database. The API they implement is defined in
+the `migration-connector` crate. Most of the logic of the migration engine
+lives in the connectors. Currently, we only have built-in connectors that live
+in this repository.
+
+### Diffing and migrations
+
+Migrate has two main blocks of functionality:
+
+1. At its core, it is a traditional migrations system like ActiveRecord
+   migrations or Flyway. You can create migration files, and it will apply
+   them, and track what was applied or not using a migrations table in the
+   database. The migrations are plain SQL files on SQL connectors.
+2. Like other tools (for example skeema), it can _understand_ database schemas
+   and generate migrations based on its understanding: your Prisma is in state
+   A, but your database is in state B; Migrate can generate a migration from B
+   to A (this is part of `migrate dev`). Generating a migration between two
+   schemas is called **diffing** in the Migration Engine.
 
 ## FAQ
 
