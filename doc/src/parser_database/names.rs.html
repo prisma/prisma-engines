@@ -190,19 +190,17 @@
 <span id="190">190</span>
 <span id="191">191</span>
 <span id="192">192</span>
-<span id="193">193</span>
-</pre><pre class="rust"><code><span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">reserved_model_names</span>;
+</pre><pre class="rust"><code><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod</span> <span class="ident">reserved_model_names</span>;
+
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">reserved_model_names::is_reserved_type_name</span>;
 
 <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">ast</span>::{<span class="self">self</span>, <span class="ident">Argument</span>, <span class="ident">TopId</span>, <span class="ident">WithAttributes</span>, <span class="ident">WithIdentifier</span>},
+    <span class="ident">types::ScalarType</span>,
     <span class="ident">Context</span>, <span class="ident">DatamodelError</span>,
 };
-<span class="kw">use</span> <span class="ident">dml::scalars::ScalarType</span>;
 <span class="kw">use</span> <span class="ident">reserved_model_names</span>::{<span class="ident">validate_enum_name</span>, <span class="ident">validate_model_name</span>};
-<span class="kw">use</span> <span class="ident">std</span>::{
-    <span class="ident">collections</span>::{<span class="ident">BTreeMap</span>, <span class="ident">HashMap</span>, <span class="ident">HashSet</span>},
-    <span class="ident">str::FromStr</span>,
-};
+<span class="kw">use</span> <span class="ident">std::collections</span>::{<span class="ident">BTreeMap</span>, <span class="ident">HashMap</span>, <span class="ident">HashSet</span>};
 
 <span class="doccomment">/// Resolved names for use in the validation process.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Default</span>)]</span>
@@ -337,7 +335,7 @@
 }
 
 <span class="kw">fn</span> <span class="ident">assert_is_not_a_reserved_scalar_type</span>(<span class="ident">ident</span>: <span class="kw-2">&amp;</span><span class="ident">ast::Identifier</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
-    <span class="kw">if</span> <span class="ident">ScalarType::from_str</span>(<span class="kw-2">&amp;</span><span class="ident">ident</span>.<span class="ident">name</span>).<span class="ident">is_ok</span>() {
+    <span class="kw">if</span> <span class="ident">ScalarType::try_from_str</span>(<span class="kw-2">&amp;</span><span class="ident">ident</span>.<span class="ident">name</span>).<span class="ident">is_some</span>() {
         <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_reserved_scalar_type_error</span>(<span class="kw-2">&amp;</span><span class="ident">ident</span>.<span class="ident">name</span>, <span class="ident">ident</span>.<span class="ident">span</span>));
     }
 }

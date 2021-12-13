@@ -84,8 +84,10 @@
 <span id="84">84</span>
 <span id="85">85</span>
 <span id="86">86</span>
+<span id="87">87</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">ast</span>, <span class="ident">DatamodelError</span>, <span class="ident">Diagnostics</span>};
 
+<span class="doccomment">/// Is this a valid type name for the Prisma client API?</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_reserved_type_name</span>(<span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">bool</span> {
     <span class="ident">RESERVED_NAMES</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">name</span>)
 }

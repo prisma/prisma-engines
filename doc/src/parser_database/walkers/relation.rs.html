@@ -387,6 +387,14 @@
 <span id="387">387</span>
 <span id="388">388</span>
 <span id="389">389</span>
+<span id="390">390</span>
+<span id="391">391</span>
+<span id="392">392</span>
+<span id="393">393</span>
+<span id="394">394</span>
+<span id="395">395</span>
+<span id="396">396</span>
+<span id="397">397</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">ModelWalker</span>, <span class="ident">RelationFieldWalker</span>, <span class="ident">RelationName</span>, <span class="ident">ScalarFieldWalker</span>};
 <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">ast</span>,
@@ -434,6 +442,7 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;db</span><span class="op">&gt;</span> <span class="ident">RefinedRelationWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
+    <span class="doccomment">/// Try interpreting this relation as an inline (1:n or 1:1 — without join table) relation.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_inline</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">InlineRelationWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;db</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span> {
             <span class="ident">RefinedRelationWalker::Inline</span>(<span class="ident">inline</span>) =&gt; <span class="prelude-val">Some</span>(<span class="kw-2">*</span><span class="ident">inline</span>),
@@ -443,6 +452,7 @@
 }
 
 <span class="doccomment">/// A scalar inferred by loose/magic reformatting</span>
+<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">missing_docs</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">InferredField</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
     <span class="kw">pub</span> <span class="ident">name</span>: <span class="ident">String</span>,
     <span class="kw">pub</span> <span class="ident">arity</span>: <span class="ident">ast::FieldArity</span>,
@@ -450,9 +460,13 @@
     <span class="kw">pub</span> <span class="ident">blueprint</span>: <span class="ident">ScalarFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;db</span><span class="op">&gt;</span>,
 }
 
+<span class="doccomment">/// The scalar fields on the concrete side relation.</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ReferencingFields</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
+    <span class="doccomment">/// Existing scalar fields</span>
     <span class="ident">Concrete</span>(<span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">ExactSizeIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">ScalarFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;db</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;db</span><span class="op">&gt;</span>),
+    <span class="doccomment">/// Inferred scalar fields</span>
     <span class="ident">Inferred</span>(<span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">InferredField</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;db</span><span class="op">&gt;</span><span class="op">&gt;</span>),
+    <span class="doccomment">/// Error</span>
     <span class="ident">NA</span>,
 }
 
@@ -502,10 +516,8 @@
         }
     }
 
-    <span class="comment">// Should only be used for lifting</span>
+    <span class="doccomment">/// Should only be used for lifting. The referencing fields (including possibly inferred ones).</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">referencing_fields</span>(<span class="self">self</span>) -&gt; <span class="ident">ReferencingFields</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
-        <span class="comment">// use crate::common::NameNormalizer;</span>
-
         <span class="self">self</span>.<span class="ident">forward_relation_field</span>()
             .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">rf</span><span class="op">|</span> <span class="ident">rf</span>.<span class="ident">fields</span>())
             .<span class="ident">map</span>(<span class="op">|</span><span class="ident">fields</span><span class="op">|</span> <span class="ident">ReferencingFields::Concrete</span>(<span class="ident">Box::new</span>(<span class="ident">fields</span>)))
@@ -544,7 +556,7 @@
             })
     }
 
-    <span class="comment">// Should only be used for lifting</span>
+    <span class="doccomment">/// Should only be used for lifting. The referenced fields. Inferred or specified.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">referenced_fields</span>(<span class="self">self</span>) -&gt; <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">ScalarFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;db</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">forward_relation_field</span>()
             .<span class="ident">and_then</span>(
@@ -563,6 +575,7 @@
             })
     }
 
+    <span class="doccomment">/// The forward relation field (the relation field on model A, the referencing model).</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">forward_relation_field</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">RelationFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;db</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">model</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">referencing_model</span>();
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">get</span>().<span class="ident">attributes</span> {
@@ -575,6 +588,7 @@
         }
     }
 
+    <span class="doccomment">/// The arity of the forward relation field.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">forward_relation_field_arity</span>(<span class="self">self</span>) -&gt; <span class="ident">ast::FieldArity</span> {
         <span class="self">self</span>.<span class="ident">forward_relation_field</span>()
             .<span class="ident">map</span>(<span class="op">|</span><span class="ident">rf</span><span class="op">|</span> <span class="ident">rf</span>.<span class="ident">ast_field</span>().<span class="ident">arity</span>)
@@ -597,6 +611,7 @@
         <span class="self">self</span>.<span class="ident">forward_relation_field</span>().<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">field</span><span class="op">|</span> <span class="ident">field</span>.<span class="ident">foreign_key_name</span>())
     }
 
+    <span class="doccomment">/// The back relation field, or virtual relation field (on model B, the referenced model).</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">back_relation_field</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">RelationFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;db</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">model</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">referenced_model</span>();
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">get</span>().<span class="ident">attributes</span> {
@@ -669,6 +684,7 @@
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">db</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">ParserDatabase</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span>,
 }
 
+<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">missing_docs</span>)]</span>
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;db</span><span class="op">&gt;</span> <span class="ident">CompleteInlineRelationWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
     <span class="doccomment">/// The model that defines the relation fields and actions.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">referencing_model</span>(<span class="self">self</span>) -&gt; <span class="ident">ModelWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;db</span><span class="op">&gt;</span> {

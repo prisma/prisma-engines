@@ -444,9 +444,6 @@
 <span id="444">444</span>
 <span id="445">445</span>
 <span id="446">446</span>
-<span id="447">447</span>
-<span id="448">448</span>
-<span id="449">449</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">ast</span>, <span class="ident">dml</span>,
     <span class="ident">transform::ast_to_dml::db</span>::{<span class="self">self</span>, <span class="ident">walkers</span>::<span class="kw-2">*</span>, <span class="ident">IndexAlgorithm</span>},
@@ -489,20 +486,16 @@
         <span class="comment">// (model_idx, field_name) -&gt; sort_key</span>
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">field_ids_for_sorting</span>: <span class="ident">HashMap</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="kw-2">&amp;</span><span class="ident">str</span>), <span class="ident">ast::FieldId</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">HashMap::new</span>();
 
-        <span class="kw">for</span> (<span class="ident">top_id</span>, <span class="ident">ast_obj</span>) <span class="kw">in</span> <span class="self">self</span>.<span class="ident">db</span>.<span class="ident">ast</span>().<span class="ident">iter_tops</span>() {
-            <span class="kw">match</span> (<span class="ident">top_id</span>, <span class="ident">ast_obj</span>) {
-                (<span class="ident">ast::TopId::Enum</span>(<span class="ident">id</span>), <span class="ident">ast::Top::Enum</span>(<span class="ident">en</span>)) =&gt; <span class="ident">schema</span>.<span class="ident">add_enum</span>(<span class="self">self</span>.<span class="ident">lift_enum</span>(<span class="ident">id</span>, <span class="ident">en</span>)),
-                (<span class="ident">ast::TopId::Model</span>(<span class="ident">model_id</span>), <span class="ident">ast::Top::Model</span>(<span class="ident">ty</span>)) =&gt; {
-                    <span class="ident">schema</span>.<span class="ident">add_model</span>(<span class="self">self</span>.<span class="ident">lift_model</span>(<span class="ident">model_id</span>, <span class="ident">ty</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">field_ids_for_sorting</span>))
-                }
-                (<span class="ident">ast::TopId::CompositeType</span>(<span class="ident">ct_id</span>), <span class="ident">ast::Top::CompositeType</span>(<span class="kw">_</span>)) =&gt; {
-                    <span class="ident">schema</span>.<span class="ident">composite_types</span>.<span class="ident">push</span>(<span class="self">self</span>.<span class="ident">lift_composite_type</span>(<span class="ident">ct_id</span>))
-                }
-                (<span class="kw">_</span>, <span class="ident">ast::Top::Source</span>(<span class="kw">_</span>)) =&gt; { <span class="comment">/* Source blocks are explicitly ignored by the validator */</span> }
-                (<span class="kw">_</span>, <span class="ident">ast::Top::Generator</span>(<span class="kw">_</span>)) =&gt; { <span class="comment">/* Generator blocks are explicitly ignored by the validator */</span> }
-                (<span class="kw">_</span>, <span class="ident">ast::Top::Type</span>(<span class="kw">_</span>)) =&gt; { <span class="comment">/* Type blocks are inlined */</span> }
-                <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(),
-            }
+        <span class="kw">for</span> <span class="ident">model</span> <span class="kw">in</span> <span class="self">self</span>.<span class="ident">db</span>.<span class="ident">walk_models</span>() {
+            <span class="ident">schema</span>.<span class="ident">add_model</span>(<span class="self">self</span>.<span class="ident">lift_model</span>(<span class="ident">model</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">field_ids_for_sorting</span>));
+        }
+
+        <span class="kw">for</span> <span class="ident">composite_type</span> <span class="kw">in</span> <span class="self">self</span>.<span class="ident">db</span>.<span class="ident">walk_composite_types</span>() {
+            <span class="ident">schema</span>.<span class="ident">composite_types</span>.<span class="ident">push</span>(<span class="self">self</span>.<span class="ident">lift_composite_type</span>(<span class="ident">composite_type</span>))
+        }
+
+        <span class="kw">for</span> <span class="ident">r#enum</span> <span class="kw">in</span> <span class="self">self</span>.<span class="ident">db</span>.<span class="ident">walk_enums</span>() {
+            <span class="ident">schema</span>.<span class="ident">add_enum</span>(<span class="self">self</span>.<span class="ident">lift_enum</span>(<span class="ident">r#enum</span>))
         }
 
         <span class="self">self</span>.<span class="ident">lift_relations</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">schema</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">field_ids_for_sorting</span>);
@@ -689,9 +682,8 @@
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">lift_composite_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">ct_id</span>: <span class="ident">ast::CompositeTypeId</span>) -&gt; <span class="ident">CompositeType</span> {
+    <span class="kw">fn</span> <span class="ident">lift_composite_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">walker</span>: <span class="ident">CompositeTypeWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">CompositeType</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">fields</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
-        <span class="kw">let</span> <span class="ident">walker</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">db</span>.<span class="ident">walk_composite_type</span>(<span class="ident">ct_id</span>);
 
         <span class="kw">for</span> <span class="ident">field</span> <span class="kw">in</span> <span class="ident">walker</span>.<span class="ident">fields</span>() {
             <span class="kw">let</span> <span class="ident">field</span> <span class="op">=</span> <span class="ident">CompositeTypeField</span> {
@@ -714,12 +706,11 @@
     <span class="doccomment">/// Internal: Validates a model AST node and lifts it to a DML model.</span>
     <span class="kw">fn</span> <span class="ident">lift_model</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">model_id</span>: <span class="ident">ast::ModelId</span>,
-        <span class="ident">ast_model</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">ast::Model</span>,
+        <span class="ident">walker</span>: <span class="ident">ModelWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
         <span class="ident">field_ids_for_sorting</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">HashMap</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>), <span class="ident">ast::FieldId</span><span class="op">&gt;</span>,
     ) -&gt; <span class="ident">dml::Model</span> {
+        <span class="kw">let</span> <span class="ident">ast_model</span> <span class="op">=</span> <span class="ident">walker</span>.<span class="ident">ast_model</span>();
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">model</span> <span class="op">=</span> <span class="ident">dml::Model::new</span>(<span class="ident">ast_model</span>.<span class="ident">name</span>.<span class="ident">name</span>.<span class="ident">clone</span>(), <span class="prelude-val">None</span>);
-        <span class="kw">let</span> <span class="ident">walker</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">db</span>.<span class="ident">walk_model</span>(<span class="ident">model_id</span>);
 
         <span class="ident">model</span>.<span class="ident">documentation</span> <span class="op">=</span> <span class="ident">ast_model</span>.<span class="ident">documentation</span>.<span class="ident">clone</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">comment</span><span class="op">|</span> <span class="ident">comment</span>.<span class="ident">text</span>);
         <span class="ident">model</span>.<span class="ident">database_name</span> <span class="op">=</span> <span class="ident">walker</span>.<span class="ident">mapped_name</span>().<span class="ident">map</span>(<span class="ident">String::from</span>);
@@ -737,7 +728,7 @@
                     <span class="comment">// When we start using the extra args here could be a place to fill in the defaults. </span>
                     <span class="ident">PrimaryKeyField</span> {
                     <span class="ident">name</span>: <span class="ident">field</span>.<span class="ident">as_scalar_field</span>().<span class="ident">name</span>().<span class="ident">to_owned</span>(),
-                    <span class="ident">sort_order</span>: <span class="ident">field</span>.<span class="ident">sort_order</span>(),
+                    <span class="ident">sort_order</span>: <span class="ident">field</span>.<span class="ident">sort_order</span>().<span class="ident">map</span>(<span class="ident">parser_database_sort_order_to_dml_sort_order</span>),
                     <span class="ident">length</span>: <span class="ident">field</span>.<span class="ident">length</span>(),
                 })
                 .<span class="ident">collect</span>(),
@@ -753,7 +744,7 @@
                     .<span class="ident">scalar_field_attributes</span>()
                     .<span class="ident">map</span>(<span class="op">|</span><span class="ident">field</span><span class="op">|</span> <span class="ident">IndexField</span> {
                         <span class="ident">name</span>: <span class="ident">field</span>.<span class="ident">as_scalar_field</span>().<span class="ident">name</span>().<span class="ident">to_owned</span>(),
-                        <span class="ident">sort_order</span>: <span class="ident">field</span>.<span class="ident">sort_order</span>(),
+                        <span class="ident">sort_order</span>: <span class="ident">field</span>.<span class="ident">sort_order</span>().<span class="ident">map</span>(<span class="ident">parser_database_sort_order_to_dml_sort_order</span>),
                         <span class="ident">length</span>: <span class="ident">field</span>.<span class="ident">length</span>(),
                     })
                     .<span class="ident">collect</span>();
@@ -818,27 +809,23 @@
     }
 
     <span class="doccomment">/// Internal: Validates an enum AST node.</span>
-    <span class="kw">fn</span> <span class="ident">lift_enum</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">enum_id</span>: <span class="ident">ast::EnumId</span>, <span class="ident">ast_enum</span>: <span class="kw-2">&amp;</span><span class="ident">ast::Enum</span>) -&gt; <span class="ident">dml::Enum</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">en</span> <span class="op">=</span> <span class="ident">dml::Enum::new</span>(<span class="kw-2">&amp;</span><span class="ident">ast_enum</span>.<span class="ident">name</span>.<span class="ident">name</span>, <span class="macro">vec!</span>[]);
+    <span class="kw">fn</span> <span class="ident">lift_enum</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">r#enum</span>: <span class="ident">EnumWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">dml::Enum</span> {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">en</span> <span class="op">=</span> <span class="ident">dml::Enum::new</span>(<span class="ident">r#enum</span>.<span class="ident">name</span>(), <span class="macro">vec!</span>[]);
 
-        <span class="kw">for</span> (<span class="ident">value_idx</span>, <span class="ident">ast_enum_value</span>) <span class="kw">in</span> <span class="ident">ast_enum</span>.<span class="ident">values</span>.<span class="ident">iter</span>().<span class="ident">enumerate</span>() {
-            <span class="ident">en</span>.<span class="ident">add_value</span>(<span class="self">self</span>.<span class="ident">lift_enum_value</span>(<span class="ident">ast_enum_value</span>, <span class="ident">enum_id</span>, <span class="ident">value_idx</span> <span class="kw">as</span> <span class="ident">u32</span>));
+        <span class="kw">for</span> <span class="ident">value</span> <span class="kw">in</span> <span class="ident">r#enum</span>.<span class="ident">values</span>() {
+            <span class="ident">en</span>.<span class="ident">add_value</span>(<span class="self">self</span>.<span class="ident">lift_enum_value</span>(<span class="ident">value</span>));
         }
 
-        <span class="ident">en</span>.<span class="ident">documentation</span> <span class="op">=</span> <span class="ident">ast_enum</span>.<span class="ident">documentation</span>.<span class="ident">clone</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">comment</span><span class="op">|</span> <span class="ident">comment</span>.<span class="ident">text</span>);
-        <span class="ident">en</span>.<span class="ident">database_name</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">db</span>.<span class="ident">get_enum_database_name</span>(<span class="ident">enum_id</span>).<span class="ident">map</span>(<span class="ident">String::from</span>);
+        <span class="ident">en</span>.<span class="ident">documentation</span> <span class="op">=</span> <span class="ident">r#enum</span>.<span class="ident">ast_enum</span>().<span class="ident">documentation</span>.<span class="ident">clone</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">comment</span><span class="op">|</span> <span class="ident">comment</span>.<span class="ident">text</span>);
+        <span class="ident">en</span>.<span class="ident">database_name</span> <span class="op">=</span> <span class="ident">r#enum</span>.<span class="ident">mapped_name</span>().<span class="ident">map</span>(<span class="ident">String::from</span>);
         <span class="ident">en</span>
     }
 
     <span class="doccomment">/// Internal: Lifts an enum value AST node.</span>
-    <span class="kw">fn</span> <span class="ident">lift_enum_value</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">ast_value</span>: <span class="kw-2">&amp;</span><span class="ident">ast::EnumValue</span>, <span class="ident">enum_id</span>: <span class="ident">ast::EnumId</span>, <span class="ident">value_idx</span>: <span class="ident">u32</span>) -&gt; <span class="ident">dml::EnumValue</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">enum_value</span> <span class="op">=</span> <span class="ident">dml::EnumValue::new</span>(<span class="kw-2">&amp;</span><span class="ident">ast_value</span>.<span class="ident">name</span>.<span class="ident">name</span>);
-        <span class="ident">enum_value</span>.<span class="ident">documentation</span> <span class="op">=</span> <span class="ident">ast_value</span>.<span class="ident">documentation</span>.<span class="ident">clone</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">comment</span><span class="op">|</span> <span class="ident">comment</span>.<span class="ident">text</span>);
-        <span class="ident">enum_value</span>.<span class="ident">database_name</span> <span class="op">=</span> <span class="self">self</span>
-            .<span class="ident">db</span>
-            .<span class="ident">get_enum_value_database_name</span>(<span class="ident">enum_id</span>, <span class="ident">value_idx</span>)
-            .<span class="ident">map</span>(<span class="ident">String::from</span>);
-
+    <span class="kw">fn</span> <span class="ident">lift_enum_value</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="ident">EnumValueWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">dml::EnumValue</span> {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">enum_value</span> <span class="op">=</span> <span class="ident">dml::EnumValue::new</span>(<span class="ident">value</span>.<span class="ident">name</span>());
+        <span class="ident">enum_value</span>.<span class="ident">documentation</span> <span class="op">=</span> <span class="ident">value</span>.<span class="ident">documentation</span>().<span class="ident">map</span>(<span class="ident">String::from</span>);
+        <span class="ident">enum_value</span>.<span class="ident">database_name</span> <span class="op">=</span> <span class="ident">value</span>.<span class="ident">mapped_name</span>().<span class="ident">map</span>(<span class="ident">String::from</span>);
         <span class="ident">enum_value</span>
     }
 
@@ -894,6 +881,13 @@
                 <span class="macro">unreachable!</span>()
             }
         }
+    }
+}
+
+<span class="kw">fn</span> <span class="ident">parser_database_sort_order_to_dml_sort_order</span>(<span class="ident">sort_order</span>: <span class="ident">parser_database::SortOrder</span>) -&gt; <span class="ident">dml::SortOrder</span> {
+    <span class="kw">match</span> <span class="ident">sort_order</span> {
+        <span class="ident">parser_database::SortOrder::Asc</span> =&gt; <span class="ident">dml::SortOrder::Asc</span>,
+        <span class="ident">parser_database::SortOrder::Desc</span> =&gt; <span class="ident">dml::SortOrder::Desc</span>,
     }
 }
 </code></pre></div>

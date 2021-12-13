@@ -181,6 +181,14 @@
 <span id="181">181</span>
 <span id="182">182</span>
 <span id="183">183</span>
+<span id="184">184</span>
+<span id="185">185</span>
+<span id="186">186</span>
+<span id="187">187</span>
+<span id="188">188</span>
+<span id="189">189</span>
+<span id="190">190</span>
+<span id="191">191</span>
 </pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">argument</span>;
 <span class="kw">mod</span> <span class="ident">attribute</span>;
 <span class="kw">mod</span> <span class="ident">comment</span>;
@@ -333,9 +341,17 @@
 }
 
 <span class="kw">impl</span> <span class="ident">TopId</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_model_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ModelId</span><span class="op">&gt;</span> {
+    <span class="doccomment">/// Try to interpret the top as an enum.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_enum_id</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">EnumId</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">TopId::Model</span>(<span class="ident">model_id</span>) =&gt; <span class="prelude-val">Some</span>(<span class="kw-2">*</span><span class="ident">model_id</span>),
+            <span class="ident">TopId::Enum</span>(<span class="ident">id</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">id</span>),
+            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+        }
+    }
+
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_model_id</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ModelId</span><span class="op">&gt;</span> {
+        <span class="kw">match</span> <span class="self">self</span> {
+            <span class="ident">TopId::Model</span>(<span class="ident">model_id</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">model_id</span>),
             <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
         }
     }

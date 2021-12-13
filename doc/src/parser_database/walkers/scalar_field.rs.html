@@ -198,24 +198,14 @@
 <span id="198">198</span>
 <span id="199">199</span>
 <span id="200">200</span>
-<span id="201">201</span>
-<span id="202">202</span>
-<span id="203">203</span>
-<span id="204">204</span>
-<span id="205">205</span>
-</pre><pre class="rust"><code><span class="attribute">#![<span class="ident">deny</span>(<span class="ident">missing_docs</span>)]</span>
-
-<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::ModelWalker</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::{
+</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">ast</span>,
-    <span class="ident">types</span>::{<span class="ident">FieldWithArgs</span>, <span class="ident">ScalarField</span>},
+    <span class="ident">types</span>::{<span class="ident">FieldWithArgs</span>, <span class="ident">ScalarField</span>, <span class="ident">SortOrder</span>},
+    <span class="ident">walkers::ModelWalker</span>,
     <span class="ident">ParserDatabase</span>, <span class="ident">ScalarFieldType</span>,
 };
 <span class="kw">use</span> <span class="ident">diagnostics::Span</span>;
-<span class="kw">use</span> <span class="ident">dml</span>::{
-    <span class="ident">default_value</span>::{<span class="ident">DefaultKind</span>, <span class="ident">DefaultValue</span>},
-    <span class="ident">model::SortOrder</span>,
-};
+<span class="kw">use</span> <span class="ident">dml::default_value</span>::{<span class="ident">DefaultKind</span>, <span class="ident">DefaultValue</span>};
 
 <span class="doccomment">/// A scalar field, as part of a model.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>)]</span>

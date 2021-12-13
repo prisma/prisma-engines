@@ -327,18 +327,24 @@
 <span id="327">327</span>
 <span id="328">328</span>
 <span id="329">329</span>
-</pre><pre class="rust"><code><span class="attribute">#![<span class="ident">deny</span>(<span class="ident">missing_docs</span>)]</span>
+<span id="330">330</span>
+<span id="331">331</span>
+<span id="332">332</span>
+</pre><pre class="rust"><code><span class="doccomment">//! See [ValueValidator](./struct.ValueValidator.html).</span>
 
-<span class="doccomment">//! See [ValueValidator](./struct.ValueValidator.html).</span>
-
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ast</span>::{<span class="self">self</span>, <span class="ident">Expression</span>, <span class="ident">Span</span>};
+<span class="kw">use</span> <span class="kw">crate</span>::{
+    <span class="ident">ast</span>::{<span class="self">self</span>, <span class="ident">Expression</span>, <span class="ident">Span</span>},
+    <span class="ident">types::SortOrder</span>,
+};
 <span class="kw">use</span> <span class="ident">chrono</span>::{<span class="ident">DateTime</span>, <span class="ident">FixedOffset</span>};
 <span class="kw">use</span> <span class="ident">diagnostics::DatamodelError</span>;
 <span class="kw">use</span> <span class="ident">dml</span>::{
     <span class="ident">default_value</span>::{<span class="ident">DefaultValue</span>, <span class="ident">ValueGenerator</span>},
-    <span class="ident">model::SortOrder</span>,
+    <span class="ident">prisma_value</span>,
+    <span class="ident">relation_info::ReferentialAction</span>,
+    <span class="ident">scalars::ScalarType</span>,
+    <span class="ident">PrismaValue</span>,
 };
-<span class="kw">use</span> <span class="ident">dml</span>::{<span class="ident">prisma_value</span>, <span class="ident">relation_info::ReferentialAction</span>, <span class="ident">scalars::ScalarType</span>, <span class="ident">PrismaValue</span>};
 <span class="kw">use</span> <span class="ident">std::error</span>;
 
 <span class="doccomment">/// Wraps a value and provides convenience methods for</span>
