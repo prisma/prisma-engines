@@ -25,8 +25,8 @@ impl<'ast, 'db> IndexWalker<'ast, 'db> {
         self.index_attribute.db_name
     }
 
-    /// The attribute name: `"unique"` for `@unique` and `@@unique`, and `"index"` for `@index` and
-    /// `@@index`.
+    /// The attribute name: `"unique"` for `@@unique`, `"fulltext"` for `@@fultext` and `"index"`
+    /// for `@index` and `@@index`.
     pub fn attribute_name(self) -> &'static str {
         if self.is_unique() {
             "unique"
@@ -42,7 +42,7 @@ impl<'ast, 'db> IndexWalker<'ast, 'db> {
     /// The `name` argument of the index attribute. The database client name.
     ///
     /// ```
-    /// @@index([a, b], map: "theName")
+    /// @@index([a, b], name: "theName")
     ///                      ^^^^^^^^^
     /// ```
     pub fn name(self) -> Option<&'ast str> {
@@ -99,12 +99,12 @@ impl<'ast, 'db> IndexWalker<'ast, 'db> {
         self.index_attribute.source_field.is_some()
     }
 
-    /// Is this an `@(@)unique`?
+    /// Is this an `@@unique`?
     pub fn is_unique(self) -> bool {
         self.index_attribute.is_unique()
     }
 
-    /// Is this an `@(@)fulltext`?
+    /// Is this an `@@fulltext`?
     pub fn is_fulltext(self) -> bool {
         self.index_attribute.is_fulltext()
     }
