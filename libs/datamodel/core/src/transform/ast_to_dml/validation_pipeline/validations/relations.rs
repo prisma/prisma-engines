@@ -17,6 +17,7 @@ use crate::{
 };
 use datamodel_connector::{walker_ext_traits::*, Connector, ConnectorCapability, ReferentialIntegrity};
 use itertools::Itertools;
+use parser_database::walkers::RelationFieldWalker;
 use std::{
     collections::{BTreeSet, HashMap, HashSet},
     rc::Rc,
@@ -298,15 +299,17 @@ pub(super) fn multiple_cascading_paths(relation: CompleteInlineRelationWalker<'_
         return;
     }
 
-    if !relation
-        .on_delete(ctx.connector, ctx.referential_integrity)
-        .triggers_modification()
-        && !relation.on_update().triggers_modification()
-    {
+    let triggers_modifications = |relation: &CompleteInlineRelationWalker<'_, '_>| {
+        relation
+            .on_delete(ctx.connector, ctx.referential_integrity)
+            .triggers_modification()
+            || relation.on_update().triggers_modification()
+    };
+
+    if !triggers_modifications(&relation) {
         return;
     }
 
-    let mut visited = HashSet::new();
     let parent_model = relation.referencing_model();
 
     // Gather all paths from this model to any other model, skipping
@@ -320,20 +323,21 @@ pub(super) fn multiple_cascading_paths(relation: CompleteInlineRelationWalker<'_
     let mut next_relations: Vec<_> = relation
         .referencing_model()
         .complete_inline_relations_from()
-        .filter(|relation| {
-            relation
-                .on_delete(ctx.connector, ctx.referential_integrity)
-                .triggers_modification()
-                || relation.on_update().triggers_modification()
+        .filter(triggers_modifications)
+        .map(|relation| {
+            (
+                relation,
+                Rc::new(VisitedRelation::root(relation)),
+                HashSet::<RelationFieldWalker<'_, '_>>::new(),
+            )
         })
-        .map(|relation| (relation, Rc::new(VisitedRelation::root(relation))))
         .collect();
 
-    while let Some((next_relation, visited_relations)) = next_relations.pop() {
+    while let Some((next_relation, visited_relations, mut current_path)) = next_relations.pop() {
         let model = next_relation.referencing_model();
         let related_model = next_relation.referenced_model();
 
-        visited.insert(next_relation.referencing_field());
+        current_path.insert(next_relation.referencing_field());
 
         // Self-relations are detected elsewhere.
         if model == related_model {
@@ -347,8 +351,15 @@ pub(super) fn multiple_cascading_paths(relation: CompleteInlineRelationWalker<'_
 
         let mut forward_relations = related_model
             .complete_inline_relations_from()
-            .filter(|relation| !visited.contains(&relation.referencing_field()))
-            .map(|relation| (relation, Rc::new(visited_relations.link_next(relation))))
+            .filter(triggers_modifications)
+            .filter(|relation| !current_path.contains(&relation.referencing_field()))
+            .map(|relation| {
+                (
+                    relation,
+                    Rc::new(visited_relations.link_next(relation)),
+                    current_path.clone(),
+                )
+            })
             .peekable();
 
         // If the related model does not have any paths to other models, we
@@ -356,9 +367,6 @@ pub(super) fn multiple_cascading_paths(relation: CompleteInlineRelationWalker<'_
         // inspection.
         if forward_relations.peek().is_none() {
             paths.push(visited_relations.link_next(next_relation));
-
-            // We want to re-visit the same fields if coming from another path.
-            visited.clear();
 
             continue;
         }
