@@ -304,7 +304,8 @@ mod scalar_lists {
         assert_error!(
             &runner,
             r#"mutation { updateOneScalarModel(where: { id: 1 }, data: { enums: { push: A }}) { id }}"#,
-            2009
+            2009,
+            "`Mutation.updateOneScalarModel.data.ScalarModelUpdateInput.enums`: Unable to match input value to any allowed input type for the field."
         );
 
         Ok(())

@@ -1,10 +1,10 @@
 use datamodel_connector::{
     connector_error::ConnectorError,
     helper::{arg_vec_from_opt, args_vec_from_opt, parse_one_opt_u32, parse_two_opt_u32},
-    Connector, ConnectorCapability, ConstraintScope, ReferentialIntegrity,
+    parser_database, Connector, ConnectorCapability, ConstraintScope, ReferentialIntegrity,
 };
 use dml::{
-    model::Model, native_type_constructor::NativeTypeConstructor, native_type_instance::NativeTypeInstance,
+    native_type_constructor::NativeTypeConstructor, native_type_instance::NativeTypeInstance,
     relation_info::ReferentialAction, scalars::ScalarType,
 };
 use enumflags2::BitFlags;
@@ -63,7 +63,8 @@ const NATIVE_TYPE_CONSTRUCTORS: &[NativeTypeConstructor] = &[
 ];
 
 const CONSTRAINT_SCOPES: &[ConstraintScope] = &[
-    ConstraintScope::GlobalPrimaryKeyKeyIndex,
+    // Globally indices and unique constraints
+    ConstraintScope::GlobalKeyIndex,
     ConstraintScope::ModelPrimaryKeyKeyIndexForeignKey,
 ];
 
@@ -211,7 +212,8 @@ impl Connector for CockroachDatamodelConnector {
         }
     }
 
-    fn validate_model(&self, _model: &Model, _errors: &mut Vec<ConnectorError>) {}
+    fn validate_model(&self, _model: parser_database::walkers::ModelWalker<'_, '_>, _errors: &mut Vec<ConnectorError>) {
+    }
 
     fn constraint_violation_scopes(&self) -> &'static [ConstraintScope] {
         CONSTRAINT_SCOPES

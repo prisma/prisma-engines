@@ -410,10 +410,9 @@ mod tests {
     fn test_cap_with_others_does_not_contain() {
         let cap = ConnectorCapabilities::new(vec![
             ConnectorCapability::PrimaryKeySortOrderDefinition,
-            ConnectorCapability::JsonFilteringJsonPath,
             ConnectorCapability::JsonFilteringArrayPath,
         ]);
-        assert!(cap.supports_any(&[ConnectorCapability::JsonFilteringJsonPath]));
+        assert!(!cap.supports_any(&[ConnectorCapability::JsonFilteringJsonPath]));
     }
 
     #[test]
