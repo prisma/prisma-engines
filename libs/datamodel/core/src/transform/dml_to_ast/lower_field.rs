@@ -54,10 +54,10 @@ impl<'a> LowerDmlToAst<'a> {
         attributes: &mut Vec<Attribute>,
         datasource: &Datasource,
     ) {
-        if datasource
-            .active_connector
-            .native_type_is_default_for_scalar_type(native_type.serialized_native_type.clone(), scalar_type)
-        {
+        if datasource.active_connector.native_type_is_default_for_scalar_type(
+            native_type.serialized_native_type.clone(),
+            &dml_scalar_type_to_parser_database_scalar_type(*scalar_type),
+        ) {
             return;
         }
 
@@ -282,5 +282,19 @@ impl<'a> LowerDmlToAst<'a> {
             PrismaValue::Bytes(b) => ast::Expression::StringValue(prisma_value::encode_bytes(b), ast::Span::empty()),
             PrismaValue::Object(_) => unreachable!(), // There's no concept of object values in the PSL right now.
         }
+    }
+}
+
+fn dml_scalar_type_to_parser_database_scalar_type(st: dml::ScalarType) -> parser_database::ScalarType {
+    match st {
+        dml::ScalarType::Int => parser_database::ScalarType::Int,
+        dml::ScalarType::BigInt => parser_database::ScalarType::BigInt,
+        dml::ScalarType::Float => parser_database::ScalarType::Float,
+        dml::ScalarType::Boolean => parser_database::ScalarType::Boolean,
+        dml::ScalarType::String => parser_database::ScalarType::String,
+        dml::ScalarType::DateTime => parser_database::ScalarType::DateTime,
+        dml::ScalarType::Json => parser_database::ScalarType::Json,
+        dml::ScalarType::Bytes => parser_database::ScalarType::Bytes,
+        dml::ScalarType::Decimal => parser_database::ScalarType::Decimal,
     }
 }

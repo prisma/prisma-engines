@@ -2,12 +2,10 @@ mod mongodb_types;
 
 use datamodel_connector::{
     connector_error::{ConnectorError, ErrorKind},
-    parser_database, Connector, ConnectorCapability, ReferentialIntegrity,
+    parser_database, Connector, ConnectorCapability, NativeTypeConstructor, ReferentialAction, ReferentialIntegrity,
+    ScalarType,
 };
-use dml::{
-    default_value::DefaultKind, native_type_instance::NativeTypeInstance, relation_info::ReferentialAction,
-    scalars::ScalarType,
-};
+use dml::{default_value::DefaultKind, native_type_instance::NativeTypeInstance};
 use enumflags2::BitFlags;
 use mongodb_types::*;
 use native_types::MongoDbType;
@@ -115,20 +113,16 @@ impl Connector for MongoDbDatamodelConnector {
         }
     }
 
-    fn available_native_type_constructors(&self) -> &'static [dml::native_type_constructor::NativeTypeConstructor] {
+    fn available_native_type_constructors(&self) -> &'static [NativeTypeConstructor] {
         NATIVE_TYPE_CONSTRUCTORS
     }
 
-    fn default_native_type_for_scalar_type(&self, scalar_type: &dml::scalars::ScalarType) -> serde_json::Value {
+    fn default_native_type_for_scalar_type(&self, scalar_type: &ScalarType) -> serde_json::Value {
         let native_type = default_for(scalar_type);
         serde_json::to_value(native_type).expect("MongoDB native type to JSON failed")
     }
 
-    fn native_type_is_default_for_scalar_type(
-        &self,
-        native_type: serde_json::Value,
-        scalar_type: &dml::scalars::ScalarType,
-    ) -> bool {
+    fn native_type_is_default_for_scalar_type(&self, native_type: serde_json::Value, scalar_type: &ScalarType) -> bool {
         let default_native_type = default_for(scalar_type);
         let native_type: MongoDbType =
             serde_json::from_value(native_type).expect("MongoDB native type from JSON failed");
@@ -154,7 +148,7 @@ impl Connector for MongoDbDatamodelConnector {
         todo!()
     }
 
-    fn scalar_type_for_native_type(&self, _native_type: serde_json::Value) -> dml::scalars::ScalarType {
+    fn scalar_type_for_native_type(&self, _native_type: serde_json::Value) -> ScalarType {
         // Out of scope for MVP
         todo!()
     }

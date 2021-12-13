@@ -3,12 +3,10 @@ use datamodel_connector::{
     helper::{args_vec_from_opt, parse_one_opt_u32, parse_one_u32, parse_two_opt_u32},
     parser_database::walkers::ModelWalker,
     walker_ext_traits::*,
-    Connector, ConnectorCapability, ConstraintScope, ReferentialIntegrity,
+    Connector, ConnectorCapability, ConstraintScope, NativeTypeConstructor, ReferentialAction, ReferentialIntegrity,
+    ScalarType,
 };
-use dml::{
-    native_type_constructor::NativeTypeConstructor, native_type_instance::NativeTypeInstance,
-    relation_info::ReferentialAction, scalars::ScalarType,
-};
+use dml::native_type_instance::NativeTypeInstance;
 use enumflags2::BitFlags;
 use native_types::MySqlType::{self, *};
 
@@ -248,7 +246,7 @@ impl Connector for MySqlDatamodelConnector {
             VarChar(length) if length > 65535 => {
                 errors.push(error.new_argument_m_out_of_range_error("M can range from 0 to 65,535."))
             }
-            Bit(n) if n > 1 && scalar_type.is_boolean() => {
+            Bit(n) if n > 1 && matches!(scalar_type, ScalarType::Boolean) => {
                 errors.push(error.new_argument_m_out_of_range_error("only Bit(1) can be used as Boolean."))
             }
             _ => (),

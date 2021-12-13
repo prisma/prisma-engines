@@ -1,5 +1,7 @@
-use datamodel_connector::connector_error::{ConnectorError, ErrorKind};
-use dml::{native_type_constructor::NativeTypeConstructor, scalars::ScalarType};
+use datamodel_connector::{
+    connector_error::{ConnectorError, ErrorKind},
+    NativeTypeConstructor, ScalarType,
+};
 use native_types::MongoDbType;
 use once_cell::sync::Lazy;
 use std::collections::HashMap;

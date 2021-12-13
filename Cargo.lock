@@ -2836,6 +2836,7 @@ dependencies = [
  "chrono",
  "diagnostics",
  "dml",
+ "enumflags2",
  "schema-ast",
 ]
 

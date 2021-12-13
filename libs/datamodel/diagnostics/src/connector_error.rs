@@ -145,7 +145,7 @@ pub enum ErrorKind {
     )]
     IncompatibleNativeType {
         native_type: String,
-        field_type: String,
+        field_type: &'static str,
         expected_types: String,
     },
 

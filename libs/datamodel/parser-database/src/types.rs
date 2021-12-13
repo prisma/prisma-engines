@@ -4,7 +4,6 @@ use std::{
     collections::{BTreeMap, HashMap},
     fmt,
     rc::Rc,
-    str::FromStr,
 };
 
 pub(super) fn resolve_types(ctx: &mut Context<'_>) {
@@ -75,14 +74,14 @@ enum FieldType {
 }
 
 /// The type of a scalar field, parsed and categorized.
-#[derive(Debug, Clone, Copy, PartialEq)]
+#[derive(Debug, Clone, Copy)]
 pub enum ScalarFieldType {
     /// A composite type
     CompositeType(ast::CompositeTypeId),
     /// An enum
     Enum(ast::EnumId),
     /// A Prisma scalar type
-    BuiltInScalar(dml::scalars::ScalarType),
+    BuiltInScalar(ScalarType),
     /// A type alias
     Alias(ast::AliasId),
     /// An `Unsupported("...")` type
@@ -91,7 +90,7 @@ pub enum ScalarFieldType {
 
 impl ScalarFieldType {
     /// Try to interpret this field type as a known Prisma scalar type.
-    pub fn as_builtin_scalar(self) -> Option<dml::scalars::ScalarType> {
+    pub fn as_builtin_scalar(self) -> Option<ScalarType> {
         match self {
             ScalarFieldType::BuiltInScalar(s) => Some(s),
             _ => None,
@@ -119,8 +118,8 @@ pub(crate) struct ScalarField<'ast> {
 #[derive(Debug)]
 pub(crate) struct RelationField<'ast> {
     pub(crate) referenced_model: ast::ModelId,
-    pub(crate) on_delete: Option<dml::relation_info::ReferentialAction>,
-    pub(crate) on_update: Option<dml::relation_info::ReferentialAction>,
+    pub(crate) on_delete: Option<crate::ReferentialAction>,
+    pub(crate) on_update: Option<crate::ReferentialAction>,
     /// The fields _explicitly present_ in the AST.
     pub(crate) fields: Option<Vec<ast::FieldId>>,
     /// The `references` fields _explicitly present_ in the AST.
@@ -164,7 +163,12 @@ pub(crate) struct ModelAttributes<'ast> {
     pub(crate) mapped_name: Option<&'ast str>,
 }
 
-/// A type of index.
+/// A type of index as defined by the `type: ...` argument on an index attribute.
+///
+/// ```ignore
+/// @@index([a, b], type: Hash)
+///                 ^^^^^^^^^^
+/// ```
 #[derive(Debug, Clone, Copy)]
 pub enum IndexAlgorithm {
     /// Binary tree index (the default in most databases)
@@ -186,7 +190,7 @@ impl Default for IndexAlgorithm {
     }
 }
 
-/// The different typees of indexes supported in the Prisma Schema Language.
+/// The different types of indexes supported in the Prisma Schema Language.
 #[derive(Debug, Clone, Copy)]
 pub enum IndexType {
     /// @@index
@@ -511,7 +515,7 @@ fn field_type<'ast>(field: &'ast ast::Field, ctx: &mut Context<'ast>) -> Result<
         ast::FieldType::Unsupported(_, _) => return Ok(FieldType::Scalar(ScalarFieldType::Unsupported)),
     };
 
-    if let Ok(tpe) = dml::scalars::ScalarType::from_str(supported) {
+    if let Some(tpe) = ScalarType::try_from_str(supported) {
         return Ok(FieldType::Scalar(ScalarFieldType::BuiltInScalar(tpe)));
     }
 
@@ -550,7 +554,7 @@ impl Default for SortOrder {
 }
 
 /// Prisma's builtin scalar types.
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Copy, Clone, PartialEq, Hash, Eq)]
 #[allow(missing_docs)]
 pub enum ScalarType {
     Int,
@@ -565,6 +569,21 @@ pub enum ScalarType {
 }
 
 impl ScalarType {
+    /// The string representation of the scalar type in the schema.
+    pub fn as_str(&self) -> &'static str {
+        match self {
+            ScalarType::Int => "Int",
+            ScalarType::BigInt => "BigInt",
+            ScalarType::Float => "Float",
+            ScalarType::Boolean => "Boolean",
+            ScalarType::String => "String",
+            ScalarType::DateTime => "DateTime",
+            ScalarType::Json => "Json",
+            ScalarType::Bytes => "Bytes",
+            ScalarType::Decimal => "Decimal",
+        }
+    }
+
     pub(crate) fn try_from_str(s: &str) -> Option<ScalarType> {
         match s {
             "Int" => Some(ScalarType::Int),
@@ -577,6 +596,22 @@ impl ScalarType {
             "Bytes" => Some(ScalarType::Bytes),
             "Decimal" => Some(ScalarType::Decimal),
             _ => None,
+        }
+    }
+}
+
+impl From<dml::scalars::ScalarType> for ScalarType {
+    fn from(st: dml::scalars::ScalarType) -> ScalarType {
+        match st {
+            dml::scalars::ScalarType::Int => ScalarType::Int,
+            dml::scalars::ScalarType::BigInt => ScalarType::BigInt,
+            dml::scalars::ScalarType::Float => ScalarType::Float,
+            dml::scalars::ScalarType::Boolean => ScalarType::Boolean,
+            dml::scalars::ScalarType::String => ScalarType::String,
+            dml::scalars::ScalarType::DateTime => ScalarType::DateTime,
+            dml::scalars::ScalarType::Json => ScalarType::Json,
+            dml::scalars::ScalarType::Bytes => ScalarType::Bytes,
+            dml::scalars::ScalarType::Decimal => ScalarType::Decimal,
         }
     }
 }

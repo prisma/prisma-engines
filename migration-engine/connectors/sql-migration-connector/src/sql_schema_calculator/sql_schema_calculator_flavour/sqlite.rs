@@ -1,6 +1,6 @@
 use super::SqlSchemaCalculatorFlavour;
 use crate::flavour::SqliteFlavour;
-use datamodel::{walkers::ScalarFieldWalker, ScalarType};
+use datamodel::{datamodel_connector::ScalarType, walkers::ScalarFieldWalker};
 
 impl SqlSchemaCalculatorFlavour for SqliteFlavour {
     fn default_native_type_for_scalar_type(&self, scalar_type: &ScalarType) -> serde_json::Value {

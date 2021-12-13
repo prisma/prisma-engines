@@ -1,9 +1,9 @@
 use datamodel_connector::ConstraintScope;
-use datamodel_connector::{connector_error::ConnectorError, Connector, ConnectorCapability, ReferentialIntegrity};
-use dml::{
-    native_type_constructor::NativeTypeConstructor, native_type_instance::NativeTypeInstance,
-    relation_info::ReferentialAction, scalars::ScalarType,
+use datamodel_connector::{
+    connector_error::ConnectorError, parser_database::ScalarType, Connector, ConnectorCapability,
+    NativeTypeConstructor, ReferentialAction, ReferentialIntegrity,
 };
+use dml::native_type_instance::NativeTypeInstance;
 use enumflags2::BitFlags;
 use std::borrow::Cow;
 
