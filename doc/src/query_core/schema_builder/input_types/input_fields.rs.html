@@ -551,7 +551,7 @@
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">object_fields</span> <span class="op">=</span>
                 <span class="macro">vec!</span>[<span class="ident">input_field</span>(<span class="ident">operations::SET</span>, <span class="ident">list_input_type</span>.<span class="ident">clone</span>(), <span class="prelude-val">None</span>).<span class="ident">optional_if</span>(<span class="op">!</span><span class="ident">is_create</span>)];
 
-            <span class="kw">if</span> <span class="op">!</span><span class="ident">is_create</span> {
+            <span class="kw">if</span> <span class="op">!</span><span class="ident">is_create</span> <span class="op">&amp;&amp;</span> <span class="ident">ctx</span>.<span class="ident">has_capability</span>(<span class="ident">ConnectorCapability::EnumArrayPush</span>) {
                 <span class="ident">object_fields</span>.<span class="ident">push</span>(
                     <span class="ident">input_field</span>(
                         <span class="ident">operations::PUSH</span>,

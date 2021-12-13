@@ -382,6 +382,61 @@
 <span id="382">382</span>
 <span id="383">383</span>
 <span id="384">384</span>
+<span id="385">385</span>
+<span id="386">386</span>
+<span id="387">387</span>
+<span id="388">388</span>
+<span id="389">389</span>
+<span id="390">390</span>
+<span id="391">391</span>
+<span id="392">392</span>
+<span id="393">393</span>
+<span id="394">394</span>
+<span id="395">395</span>
+<span id="396">396</span>
+<span id="397">397</span>
+<span id="398">398</span>
+<span id="399">399</span>
+<span id="400">400</span>
+<span id="401">401</span>
+<span id="402">402</span>
+<span id="403">403</span>
+<span id="404">404</span>
+<span id="405">405</span>
+<span id="406">406</span>
+<span id="407">407</span>
+<span id="408">408</span>
+<span id="409">409</span>
+<span id="410">410</span>
+<span id="411">411</span>
+<span id="412">412</span>
+<span id="413">413</span>
+<span id="414">414</span>
+<span id="415">415</span>
+<span id="416">416</span>
+<span id="417">417</span>
+<span id="418">418</span>
+<span id="419">419</span>
+<span id="420">420</span>
+<span id="421">421</span>
+<span id="422">422</span>
+<span id="423">423</span>
+<span id="424">424</span>
+<span id="425">425</span>
+<span id="426">426</span>
+<span id="427">427</span>
+<span id="428">428</span>
+<span id="429">429</span>
+<span id="430">430</span>
+<span id="431">431</span>
+<span id="432">432</span>
+<span id="433">433</span>
+<span id="434">434</span>
+<span id="435">435</span>
+<span id="436">436</span>
+<span id="437">437</span>
+<span id="438">438</span>
+<span id="439">439</span>
 </pre><pre class="rust"><code><span class="attribute">#![<span class="ident">deny</span>(<span class="ident">rust_2018_idioms</span>, <span class="ident">unsafe_code</span>)]</span>
 
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">constraint_names</span>;
@@ -564,6 +619,10 @@
         <span class="self">self</span>.<span class="ident">has_capability</span>(<span class="ident">ConnectorCapability::Json</span>)
     }
 
+    <span class="kw">fn</span> <span class="ident">supports_json_lists</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="ident">has_capability</span>(<span class="ident">ConnectorCapability::JsonLists</span>)
+    }
+
     <span class="kw">fn</span> <span class="ident">supports_auto_increment</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">has_capability</span>(<span class="ident">ConnectorCapability::AutoIncrement</span>)
     }
@@ -658,7 +717,9 @@
     <span class="ident">ScalarLists</span>,
     <span class="ident">RelationsOverNonUniqueCriteria</span>,
     <span class="ident">Enums</span>,
+    <span class="ident">EnumArrayPush</span>,
     <span class="ident">Json</span>,
+    <span class="ident">JsonLists</span>,
     <span class="ident">AutoIncrement</span>,
     <span class="ident">RelationFieldsInArbitraryOrder</span>,
     <span class="ident">CompositeTypes</span>,
@@ -686,6 +747,7 @@
     <span class="ident">JsonFiltering</span>,
     <span class="ident">JsonFilteringJsonPath</span>,
     <span class="ident">JsonFilteringArrayPath</span>,
+    <span class="ident">JsonFilteringAlphanumeric</span>,
     <span class="ident">CompoundIds</span>,
     <span class="ident">AnyId</span>, <span class="comment">// Any (or combination of) uniques and not only id fields can constitute an id for a model.</span>
     <span class="ident">QueryRaw</span>,
@@ -710,6 +772,12 @@
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">capability</span>: <span class="ident">ConnectorCapability</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">capabilities</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">capability</span>)
+    }
+
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">supports_any</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">capabilities</span>: <span class="kw-2">&amp;</span>[<span class="ident">ConnectorCapability</span>]) -&gt; <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="ident">capabilities</span>
+            .<span class="ident">iter</span>()
+            .<span class="ident">any</span>(<span class="op">|</span><span class="ident">connector_capability</span><span class="op">|</span> <span class="ident">capabilities</span>.<span class="ident">contains</span>(<span class="ident">connector_capability</span>))
     }
 }
 
@@ -764,6 +832,48 @@
                 <span class="ident">model_name</span>
             )),
         }
+    }
+}
+
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
+<span class="kw">mod</span> <span class="ident">tests</span> {
+    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
+
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">test_empty_cap_does_not_contain</span>() {
+        <span class="kw">let</span> <span class="ident">cap</span> <span class="op">=</span> <span class="ident">ConnectorCapabilities::empty</span>();
+        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">cap</span>.<span class="ident">supports_any</span>(<span class="kw-2">&amp;</span>[<span class="ident">ConnectorCapability::JsonFilteringJsonPath</span>]));
+    }
+
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">test_cap_with_others_does_not_contain</span>() {
+        <span class="kw">let</span> <span class="ident">cap</span> <span class="op">=</span> <span class="ident">ConnectorCapabilities::new</span>(<span class="macro">vec!</span>[
+            <span class="ident">ConnectorCapability::PrimaryKeySortOrderDefinition</span>,
+            <span class="ident">ConnectorCapability::JsonFilteringArrayPath</span>,
+        ]);
+        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">cap</span>.<span class="ident">supports_any</span>(<span class="kw-2">&amp;</span>[<span class="ident">ConnectorCapability::JsonFilteringJsonPath</span>]));
+    }
+
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">test_cap_with_others_does_contain</span>() {
+        <span class="kw">let</span> <span class="ident">cap</span> <span class="op">=</span> <span class="ident">ConnectorCapabilities::new</span>(<span class="macro">vec!</span>[
+            <span class="ident">ConnectorCapability::PrimaryKeySortOrderDefinition</span>,
+            <span class="ident">ConnectorCapability::JsonFilteringJsonPath</span>,
+            <span class="ident">ConnectorCapability::JsonFilteringArrayPath</span>,
+        ]);
+        <span class="macro">assert!</span>(<span class="ident">cap</span>.<span class="ident">supports_any</span>(<span class="kw-2">&amp;</span>[
+            <span class="ident">ConnectorCapability::JsonFilteringJsonPath</span>,
+            <span class="ident">ConnectorCapability::JsonFilteringArrayPath</span>,
+        ]));
+    }
+
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">test_does_contain</span>() {
+        <span class="kw">let</span> <span class="ident">cap</span> <span class="op">=</span> <span class="ident">ConnectorCapabilities::new</span>(<span class="macro">vec!</span>[
+            <span class="ident">ConnectorCapability::PrimaryKeySortOrderDefinition</span>,
+            <span class="ident">ConnectorCapability::JsonFilteringArrayPath</span>,
+        ]);
+        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">cap</span>.<span class="ident">supports_any</span>(<span class="kw-2">&amp;</span>[<span class="ident">ConnectorCapability::JsonFilteringJsonPath</span>]));
     }
 }
 </code></pre></div>

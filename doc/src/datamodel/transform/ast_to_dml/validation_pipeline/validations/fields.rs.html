@@ -339,6 +339,19 @@
 <span id="339">339</span>
 <span id="340">340</span>
 <span id="341">341</span>
+<span id="342">342</span>
+<span id="343">343</span>
+<span id="344">344</span>
+<span id="345">345</span>
+<span id="346">346</span>
+<span id="347">347</span>
+<span id="348">348</span>
+<span id="349">349</span>
+<span id="350">350</span>
+<span id="351">351</span>
+<span id="352">352</span>
+<span id="353">353</span>
+<span id="354">354</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::{
     <span class="ident">constraint_namespace::ConstraintName</span>,
     <span class="ident">database_name::validate_db_name</span>,
@@ -612,19 +625,32 @@
 }
 
 <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">validate_scalar_field_connector_specific</span>(<span class="ident">field</span>: <span class="ident">ScalarFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
-    <span class="kw">if</span> <span class="macro">matches!</span>(<span class="ident">field</span>.<span class="ident">scalar_field_type</span>(), <span class="ident">ScalarFieldType::BuiltInScalar</span>(<span class="ident">t</span>) <span class="kw">if</span> <span class="ident">t</span>.<span class="ident">is_json</span>())
-        <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">ctx</span>.<span class="ident">connector</span>.<span class="ident">supports_json</span>()
-    {
-        <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_field_validation_error</span>(
-            <span class="kw-2">&amp;</span><span class="macro">format!</span>(
-                <span class="string">&quot;Field `{}` in model `{}` can&#39;t be of type Json. The current connector does not support the Json type.&quot;</span>,
+    <span class="kw">if</span> <span class="macro">matches!</span>(<span class="ident">field</span>.<span class="ident">scalar_field_type</span>(), <span class="ident">ScalarFieldType::BuiltInScalar</span>(<span class="ident">t</span>) <span class="kw">if</span> <span class="ident">t</span>.<span class="ident">is_json</span>()) {
+        <span class="kw">if</span> <span class="op">!</span><span class="ident">ctx</span>.<span class="ident">connector</span>.<span class="ident">supports_json</span>() {
+            <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_field_validation_error</span>(
+                <span class="kw-2">&amp;</span><span class="macro">format!</span>(
+                    <span class="string">&quot;Field `{}` in model `{}` can&#39;t be of type Json. The current connector does not support the Json type.&quot;</span>,
+                    <span class="ident">field</span>.<span class="ident">name</span>(),
+                    <span class="ident">field</span>.<span class="ident">model</span>().<span class="ident">name</span>()
+                ),
+                <span class="ident">field</span>.<span class="ident">model</span>().<span class="ident">name</span>(),
                 <span class="ident">field</span>.<span class="ident">name</span>(),
-                <span class="ident">field</span>.<span class="ident">model</span>().<span class="ident">name</span>()
-            ),
-            <span class="ident">field</span>.<span class="ident">model</span>().<span class="ident">name</span>(),
-            <span class="ident">field</span>.<span class="ident">name</span>(),
-            <span class="ident">field</span>.<span class="ident">ast_field</span>().<span class="ident">span</span>,
-        ));
+                <span class="ident">field</span>.<span class="ident">ast_field</span>().<span class="ident">span</span>,
+            ));
+        }
+
+        <span class="kw">if</span> <span class="ident">field</span>.<span class="ident">ast_field</span>().<span class="ident">arity</span>.<span class="ident">is_list</span>() <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">ctx</span>.<span class="ident">connector</span>.<span class="ident">supports_json_lists</span>() {
+            <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_field_validation_error</span>(
+                <span class="kw-2">&amp;</span><span class="macro">format!</span>(
+                    <span class="string">&quot;Field `{}` in model `{}` can&#39;t be of type Json[]. The current connector does not support the Json List type.&quot;</span>,
+                    <span class="ident">field</span>.<span class="ident">name</span>(),
+                    <span class="ident">field</span>.<span class="ident">model</span>().<span class="ident">name</span>()
+                ),
+                <span class="ident">field</span>.<span class="ident">model</span>().<span class="ident">name</span>(),
+                <span class="ident">field</span>.<span class="ident">name</span>(),
+                <span class="ident">field</span>.<span class="ident">ast_field</span>().<span class="ident">span</span>,
+            ));
+        }
     }
 
     <span class="kw">if</span> <span class="ident">field</span>.<span class="ident">ast_field</span>().<span class="ident">arity</span>.<span class="ident">is_list</span>() <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">ctx</span>.<span class="ident">connector</span>.<span class="ident">supports_scalar_lists</span>() {

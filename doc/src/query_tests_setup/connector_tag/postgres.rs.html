@@ -193,22 +193,6 @@
 <span id="193">193</span>
 <span id="194">194</span>
 <span id="195">195</span>
-<span id="196">196</span>
-<span id="197">197</span>
-<span id="198">198</span>
-<span id="199">199</span>
-<span id="200">200</span>
-<span id="201">201</span>
-<span id="202">202</span>
-<span id="203">203</span>
-<span id="204">204</span>
-<span id="205">205</span>
-<span id="206">206</span>
-<span id="207">207</span>
-<span id="208">208</span>
-<span id="209">209</span>
-<span id="210">210</span>
-<span id="211">211</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">sql_datamodel_connector::SqlDatamodelConnectors</span>;
 
 <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
@@ -259,14 +243,6 @@
                 <span class="string">&quot;postgresql://postgres:prisma@test-db-pgbouncer:6432/db?schema={}&amp;pgbouncer=true&quot;</span>,
                 <span class="ident">database</span>
             ),
-            <span class="comment">// Use the same database and schema name for CockroachDB - unfortunately CockroachDB</span>
-            <span class="comment">// can&#39;t handle 1 schema per test in a database well at this point in time.</span>
-            <span class="prelude-val">Some</span>(<span class="ident">PostgresVersion::Cockroach</span>) <span class="kw">if</span> <span class="ident">is_ci</span> =&gt; {
-                <span class="macro">format!</span>(
-                    <span class="string">&quot;postgresql://prisma@test-db-postgres-cockroach:26257/{0}?schema={0}&quot;</span>,
-                    <span class="ident">database</span>
-                )
-            }
 
             <span class="prelude-val">Some</span>(<span class="ident">PostgresVersion::V9</span>) =&gt; <span class="macro">format!</span>(<span class="string">&quot;postgresql://postgres:prisma@127.0.0.1:5431/db?schema={}&quot;</span>, <span class="ident">database</span>),
             <span class="prelude-val">Some</span>(<span class="ident">PostgresVersion::V10</span>) =&gt; <span class="macro">format!</span>(<span class="string">&quot;postgresql://postgres:prisma@127.0.0.1:5432/db?schema={}&quot;</span>, <span class="ident">database</span>),
@@ -274,7 +250,6 @@
             <span class="prelude-val">Some</span>(<span class="ident">PostgresVersion::V12</span>) =&gt; <span class="macro">format!</span>(<span class="string">&quot;postgresql://postgres:prisma@127.0.0.1:5434/db?schema={}&quot;</span>, <span class="ident">database</span>),
             <span class="prelude-val">Some</span>(<span class="ident">PostgresVersion::V13</span>) =&gt; <span class="macro">format!</span>(<span class="string">&quot;postgresql://postgres:prisma@127.0.0.1:5435/db?schema={}&quot;</span>, <span class="ident">database</span>),
             <span class="prelude-val">Some</span>(<span class="ident">PostgresVersion::V14</span>) =&gt; <span class="macro">format!</span>(<span class="string">&quot;postgresql://postgres:prisma@127.0.0.1:5437/db?schema={}&quot;</span>, <span class="ident">database</span>),
-            <span class="prelude-val">Some</span>(<span class="ident">PostgresVersion::Cockroach</span>) =&gt; <span class="macro">format!</span>(<span class="string">&quot;postgresql://prisma@127.0.0.1:26257/{0}?schema={0}&quot;</span>, <span class="ident">database</span>),
             <span class="prelude-val">Some</span>(<span class="ident">PostgresVersion::PgBouncer</span>) =&gt; <span class="macro">format!</span>(
                 <span class="string">&quot;postgresql://postgres:prisma@127.0.0.1:6432/db?schema={}&amp;pgbouncer=true&quot;</span>,
                 <span class="ident">database</span>
@@ -298,7 +273,7 @@
     }
 
     <span class="kw">fn</span> <span class="ident">requires_teardown</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="macro">matches!</span>(<span class="self">self</span>.<span class="ident">version</span>, <span class="prelude-val">Some</span>(<span class="ident">PostgresVersion::Cockroach</span>))
+        <span class="bool-val">false</span>
     }
 }
 
@@ -311,7 +286,6 @@
     <span class="ident">V13</span>,
     <span class="ident">V14</span>,
     <span class="ident">PgBouncer</span>,
-    <span class="ident">Cockroach</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">PostgresConnectorTag</span> {
@@ -356,10 +330,6 @@
                 <span class="ident">capabilities</span>: <span class="ident">capabilities</span>.<span class="ident">clone</span>(),
             },
             <span class="self">Self</span> {
-                <span class="ident">version</span>: <span class="prelude-val">Some</span>(<span class="ident">PostgresVersion::Cockroach</span>),
-                <span class="ident">capabilities</span>: <span class="ident">capabilities</span>.<span class="ident">clone</span>(),
-            },
-            <span class="self">Self</span> {
                 <span class="ident">version</span>: <span class="prelude-val">Some</span>(<span class="ident">PostgresVersion::PgBouncer</span>),
                 <span class="ident">capabilities</span>,
             },
@@ -393,7 +363,6 @@
             <span class="string">&quot;13&quot;</span> =&gt; <span class="ident"><span class="self">Self</span>::V13</span>,
             <span class="string">&quot;14&quot;</span> =&gt; <span class="ident"><span class="self">Self</span>::V14</span>,
             <span class="string">&quot;pgbouncer&quot;</span> =&gt; <span class="ident"><span class="self">Self</span>::PgBouncer</span>,
-            <span class="string">&quot;cockroach&quot;</span> =&gt; <span class="ident"><span class="self">Self</span>::Cockroach</span>,
             <span class="kw">_</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">TestError::parse_error</span>(<span class="macro">format!</span>(<span class="string">&quot;Unknown Postgres version `{}`&quot;</span>, <span class="ident">s</span>))),
         };
 
@@ -411,7 +380,6 @@
             <span class="ident">PostgresVersion::V13</span> =&gt; <span class="string">&quot;13&quot;</span>,
             <span class="ident">PostgresVersion::V14</span> =&gt; <span class="string">&quot;14&quot;</span>,
             <span class="ident">PostgresVersion::PgBouncer</span> =&gt; <span class="string">&quot;pgbouncer&quot;</span>,
-            <span class="ident">PostgresVersion::Cockroach</span> =&gt; <span class="string">&quot;cockroach&quot;</span>,
         }
         .<span class="ident">to_owned</span>()
     }

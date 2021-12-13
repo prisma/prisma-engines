@@ -205,13 +205,23 @@
 <span id="205">205</span>
 <span id="206">206</span>
 <span id="207">207</span>
-</pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">mongodb</span>;
+<span id="208">208</span>
+<span id="209">209</span>
+<span id="210">210</span>
+<span id="211">211</span>
+<span id="212">212</span>
+<span id="213">213</span>
+<span id="214">214</span>
+<span id="215">215</span>
+</pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">cockroachdb</span>;
+<span class="kw">mod</span> <span class="ident">mongodb</span>;
 <span class="kw">mod</span> <span class="ident">mysql</span>;
 <span class="kw">mod</span> <span class="ident">postgres</span>;
 <span class="kw">mod</span> <span class="ident">sql_server</span>;
 <span class="kw">mod</span> <span class="ident">sqlite</span>;
 <span class="kw">mod</span> <span class="ident">vitess</span>;
 
+<span class="kw">use</span> <span class="ident">cockroachdb</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident">datamodel_connector::ConnectorCapability</span>;
 <span class="kw">use</span> <span class="ident">enum_dispatch::enum_dispatch</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">mongodb</span>::<span class="kw-2">*</span>;
@@ -272,6 +282,7 @@
     <span class="ident">MongoDb</span>(<span class="ident">MongoDbConnectorTag</span>),
     <span class="ident">Sqlite</span>(<span class="ident">SqliteConnectorTag</span>),
     <span class="ident">Vitess</span>(<span class="ident">VitessConnectorTag</span>),
+    <span class="ident">Cockroach</span>(<span class="ident">CockroachDbConnectorTag</span>),
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
@@ -281,6 +292,7 @@
     <span class="ident">MySql</span>(<span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">MySqlVersion</span><span class="op">&gt;</span>),
     <span class="ident">MongoDb</span>(<span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">MongoDbVersion</span><span class="op">&gt;</span>),
     <span class="ident">Sqlite</span>,
+    <span class="ident">CockroachDb</span>,
     <span class="ident">Vitess</span>(<span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">VitessVersion</span><span class="op">&gt;</span>),
 }
 
@@ -292,6 +304,7 @@
             <span class="ident">ConnectorTag::MySql</span>(<span class="ident">c</span>) =&gt; <span class="ident">ConnectorVersion::MySql</span>(<span class="ident">c</span>.<span class="ident">version</span>()),
             <span class="ident">ConnectorTag::MongoDb</span>(<span class="ident">c</span>) =&gt; <span class="ident">ConnectorVersion::MongoDb</span>(<span class="ident">c</span>.<span class="ident">version</span>()),
             <span class="ident">ConnectorTag::Sqlite</span>(<span class="kw">_</span>) =&gt; <span class="ident">ConnectorVersion::Sqlite</span>,
+            <span class="ident">ConnectorTag::Cockroach</span>(<span class="kw">_</span>) =&gt; <span class="ident">ConnectorVersion::CockroachDb</span>,
             <span class="ident">ConnectorTag::Vitess</span>(<span class="ident">c</span>) =&gt; <span class="ident">ConnectorVersion::Vitess</span>(<span class="ident">c</span>.<span class="ident">version</span>()),
         }
     }
@@ -306,6 +319,7 @@
             <span class="ident"><span class="self">Self</span>::MongoDb</span>(<span class="kw">_</span>) =&gt; <span class="string">&quot;MongoDB&quot;</span>,
             <span class="ident"><span class="self">Self</span>::Sqlite</span>(<span class="kw">_</span>) =&gt; <span class="string">&quot;SQLite&quot;</span>,
             <span class="ident"><span class="self">Self</span>::Vitess</span>(<span class="kw">_</span>) =&gt; <span class="string">&quot;Vitess&quot;</span>,
+            <span class="ident"><span class="self">Self</span>::Cockroach</span>(<span class="kw">_</span>) =&gt; <span class="string">&quot;CockroachDB&quot;</span>,
         };
 
         <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">printable</span>)
@@ -336,6 +350,7 @@
                 <span class="prelude-val">Some</span>(<span class="ident">v</span>) =&gt; <span class="macro">format!</span>(<span class="string">&quot;Vitess ({})&quot;</span>, <span class="ident">v</span>.<span class="ident">to_string</span>()),
                 <span class="prelude-val">None</span> =&gt; <span class="string">&quot;Vitess (unknown)&quot;</span>.<span class="ident">to_string</span>(),
             },
+            <span class="ident"><span class="self">Self</span>::CockroachDb</span> =&gt; <span class="string">&quot;CockroachDb&quot;</span>.<span class="ident">to_string</span>(),
         };
 
         <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">printable</span>)
@@ -352,6 +367,7 @@
             .<span class="ident">chain</span>(<span class="ident">MySqlConnectorTag::all</span>().<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="ident"><span class="self">Self</span>::MySql</span>))
             .<span class="ident">chain</span>(<span class="ident">MongoDbConnectorTag::all</span>().<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="ident"><span class="self">Self</span>::MongoDb</span>))
             .<span class="ident">chain</span>(<span class="ident">SqliteConnectorTag::all</span>().<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="ident"><span class="self">Self</span>::Sqlite</span>))
+            .<span class="ident">chain</span>(<span class="ident">CockroachDbConnectorTag::all</span>().<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="ident"><span class="self">Self</span>::Cockroach</span>))
             .<span class="ident">collect</span>()
     }
 
@@ -401,7 +417,7 @@
         <span class="kw">let</span> <span class="ident">tag</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">connector</span>.<span class="ident">to_lowercase</span>().<span class="ident">as_str</span>() {
             <span class="string">&quot;sqlite&quot;</span> =&gt; <span class="ident"><span class="self">Self</span>::Sqlite</span>(<span class="ident">SqliteConnectorTag::new</span>()),
             <span class="string">&quot;sqlserver&quot;</span> =&gt; <span class="ident"><span class="self">Self</span>::SqlServer</span>(<span class="ident">SqlServerConnectorTag::new</span>(<span class="ident">version</span>)<span class="question-mark">?</span>),
-            <span class="string">&quot;cockroach&quot;</span> =&gt; <span class="ident"><span class="self">Self</span>::Postgres</span>(<span class="ident">PostgresConnectorTag::new</span>(<span class="ident">version</span>)<span class="question-mark">?</span>),
+            <span class="string">&quot;cockroach&quot;</span> <span class="op">|</span> <span class="string">&quot;cockroachdb&quot;</span> =&gt; <span class="ident"><span class="self">Self</span>::Cockroach</span>(<span class="ident">CockroachDbConnectorTag::new</span>()),
             <span class="string">&quot;postgres&quot;</span> =&gt; <span class="ident"><span class="self">Self</span>::Postgres</span>(<span class="ident">PostgresConnectorTag::new</span>(<span class="ident">version</span>)<span class="question-mark">?</span>),
             <span class="string">&quot;mysql&quot;</span> =&gt; <span class="ident"><span class="self">Self</span>::MySql</span>(<span class="ident">MySqlConnectorTag::new</span>(<span class="ident">version</span>)<span class="question-mark">?</span>),
             <span class="string">&quot;mongodb&quot;</span> =&gt; <span class="ident"><span class="self">Self</span>::MongoDb</span>(<span class="ident">MongoDbConnectorTag::new</span>(<span class="ident">version</span>)<span class="question-mark">?</span>),

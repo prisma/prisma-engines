@@ -12,14 +12,18 @@
 <span id="12">12</span>
 <span id="13">13</span>
 <span id="14">14</span>
+<span id="15">15</span>
+<span id="16">16</span>
 </pre><pre class="rust"><code><span class="doccomment">//! This library aims to provide an exhaustive definition of all available native types for the databases Prisma supports.</span>
 <span class="doccomment">//! There&#39;s one enum definition per database which lists all available types for the respective database.</span>
+<span class="kw">mod</span> <span class="ident">cockroach</span>;
 <span class="kw">mod</span> <span class="ident">mongodb</span>;
 <span class="kw">mod</span> <span class="ident">mssql</span>;
 <span class="kw">mod</span> <span class="ident">mysql</span>;
 <span class="kw">mod</span> <span class="ident">native_type</span>;
 <span class="kw">mod</span> <span class="ident">postgres</span>;
 
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">cockroach::CockroachType</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">mongodb::MongoDbType</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">mssql::MsSqlType</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">mssql::MsSqlTypeParameter</span>;

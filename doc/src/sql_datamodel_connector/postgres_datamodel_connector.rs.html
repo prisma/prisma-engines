@@ -333,6 +333,9 @@
 <span id="333">333</span>
 <span id="334">334</span>
 <span id="335">335</span>
+<span id="336">336</span>
+<span id="337">337</span>
+<span id="338">338</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">datamodel_connector</span>::{
     <span class="ident">connector_error::ConnectorError</span>,
     <span class="ident">helper</span>::{<span class="ident">arg_vec_from_opt</span>, <span class="ident">args_vec_from_opt</span>, <span class="ident">parse_one_opt_u32</span>, <span class="ident">parse_two_opt_u32</span>},
@@ -420,15 +423,18 @@
     <span class="ident">ConnectorCapability::CreateManyWriteableAutoIncId</span>,
     <span class="ident">ConnectorCapability::CreateSkipDuplicates</span>,
     <span class="ident">ConnectorCapability::Enums</span>,
+    <span class="ident">ConnectorCapability::EnumArrayPush</span>,
     <span class="ident">ConnectorCapability::FullTextSearchWithoutIndex</span>,
     <span class="ident">ConnectorCapability::InsensitiveFilters</span>,
     <span class="ident">ConnectorCapability::Json</span>,
     <span class="ident">ConnectorCapability::JsonFilteringArrayPath</span>,
+    <span class="ident">ConnectorCapability::JsonFilteringAlphanumeric</span>,
     <span class="ident">ConnectorCapability::NamedForeignKeys</span>,
     <span class="ident">ConnectorCapability::NamedPrimaryKeys</span>,
     <span class="ident">ConnectorCapability::QueryRaw</span>,
     <span class="ident">ConnectorCapability::RelationFieldsInArbitraryOrder</span>,
     <span class="ident">ConnectorCapability::ScalarLists</span>,
+    <span class="ident">ConnectorCapability::JsonLists</span>,
     <span class="ident">ConnectorCapability::UpdateableId</span>,
     <span class="ident">ConnectorCapability::WritableAutoincField</span>,
     <span class="ident">ConnectorCapability::UsingHashIndex</span>,

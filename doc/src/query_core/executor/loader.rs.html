@@ -247,7 +247,7 @@
 
             <span class="prelude-val">Ok</span>(<span class="ident">db_name</span>)
         }
-        <span class="ident">POSTGRES_SOURCE_NAME</span> =&gt; {
+        <span class="ident">POSTGRES_SOURCE_NAME</span> <span class="op">|</span> <span class="ident">COCKROACHDB_SOURCE_NAME</span> =&gt; {
             <span class="kw">let</span> <span class="ident">url</span> <span class="op">=</span> <span class="ident">Url::parse</span>(<span class="ident">url</span>)<span class="question-mark">?</span>;
             <span class="kw">let</span> <span class="ident">params</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">String</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">url</span>.<span class="ident">query_pairs</span>().<span class="ident">into_owned</span>().<span class="ident">collect</span>();
 
