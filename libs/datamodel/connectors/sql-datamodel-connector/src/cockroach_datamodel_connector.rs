@@ -62,11 +62,7 @@ const NATIVE_TYPE_CONSTRUCTORS: &[NativeTypeConstructor] = &[
     NativeTypeConstructor::without_args(JSON_B_TYPE_NAME, &[ScalarType::Json]),
 ];
 
-const CONSTRAINT_SCOPES: &[ConstraintScope] = &[
-    // Globally indices and unique constraints
-    ConstraintScope::GlobalKeyIndex,
-    ConstraintScope::ModelPrimaryKeyKeyIndexForeignKey,
-];
+const CONSTRAINT_SCOPES: &[ConstraintScope] = &[ConstraintScope::ModelPrimaryKeyKeyIndexForeignKey];
 
 const CAPABILITIES: &[ConnectorCapability] = &[
     ConnectorCapability::AdvancedJsonNullability,
