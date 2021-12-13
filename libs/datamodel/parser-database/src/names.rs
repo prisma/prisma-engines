@@ -1,4 +1,6 @@
-pub mod reserved_model_names;
+pub(crate) mod reserved_model_names;
+
+pub use reserved_model_names::is_reserved_type_name;
 
 use crate::{
     ast::{self, Argument, TopId, WithAttributes, WithIdentifier},

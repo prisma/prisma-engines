@@ -45,6 +45,7 @@ pub enum RefinedRelationWalker<'ast, 'db> {
 }
 
 impl<'ast, 'db> RefinedRelationWalker<'ast, 'db> {
+    /// Try interpreting this relation as an inline (1:n or 1:1 — without join table) relation.
     pub fn as_inline(&self) -> Option<InlineRelationWalker<'ast, 'db>> {
         match self {
             RefinedRelationWalker::Inline(inline) => Some(*inline),
@@ -54,6 +55,7 @@ impl<'ast, 'db> RefinedRelationWalker<'ast, 'db> {
 }
 
 /// A scalar inferred by loose/magic reformatting
+#[allow(missing_docs)]
 pub struct InferredField<'ast, 'db> {
     pub name: String,
     pub arity: ast::FieldArity,
@@ -61,9 +63,13 @@ pub struct InferredField<'ast, 'db> {
     pub blueprint: ScalarFieldWalker<'ast, 'db>,
 }
 
+/// The scalar fields on the concrete side relation.
 pub enum ReferencingFields<'ast, 'db> {
+    /// Existing scalar fields
     Concrete(Box<dyn ExactSizeIterator<Item = ScalarFieldWalker<'ast, 'db>> + 'db>),
+    /// Inferred scalar fields
     Inferred(Vec<InferredField<'ast, 'db>>),
+    /// Error
     NA,
 }
 
@@ -113,10 +119,8 @@ impl<'ast, 'db> InlineRelationWalker<'ast, 'db> {
         }
     }
 
-    // Should only be used for lifting
+    /// Should only be used for lifting. The referencing fields (including possibly inferred ones).
     pub fn referencing_fields(self) -> ReferencingFields<'ast, 'db> {
-        // use crate::common::NameNormalizer;
-
         self.forward_relation_field()
             .and_then(|rf| rf.fields())
             .map(|fields| ReferencingFields::Concrete(Box::new(fields)))
@@ -155,7 +159,7 @@ impl<'ast, 'db> InlineRelationWalker<'ast, 'db> {
             })
     }
 
-    // Should only be used for lifting
+    /// Should only be used for lifting. The referenced fields. Inferred or specified.
     pub fn referenced_fields(self) -> Box<dyn Iterator<Item = ScalarFieldWalker<'ast, 'db>> + 'db> {
         self.forward_relation_field()
             .and_then(
@@ -174,6 +178,7 @@ impl<'ast, 'db> InlineRelationWalker<'ast, 'db> {
             })
     }
 
+    /// The forward relation field (the relation field on model A, the referencing model).
     pub fn forward_relation_field(self) -> Option<RelationFieldWalker<'ast, 'db>> {
         let model = self.referencing_model();
         match self.get().attributes {
@@ -186,6 +191,7 @@ impl<'ast, 'db> InlineRelationWalker<'ast, 'db> {
         }
     }
 
+    /// The arity of the forward relation field.
     pub fn forward_relation_field_arity(self) -> ast::FieldArity {
         self.forward_relation_field()
             .map(|rf| rf.ast_field().arity)
@@ -208,6 +214,7 @@ impl<'ast, 'db> InlineRelationWalker<'ast, 'db> {
         self.forward_relation_field().and_then(|field| field.foreign_key_name())
     }
 
+    /// The back relation field, or virtual relation field (on model B, the referenced model).
     pub fn back_relation_field(self) -> Option<RelationFieldWalker<'ast, 'db>> {
         let model = self.referenced_model();
         match self.get().attributes {
@@ -280,6 +287,7 @@ pub struct CompleteInlineRelationWalker<'ast, 'db> {
     pub(crate) db: &'db ParserDatabase<'ast>,
 }
 
+#[allow(missing_docs)]
 impl<'ast, 'db> CompleteInlineRelationWalker<'ast, 'db> {
     /// The model that defines the relation fields and actions.
     pub fn referencing_model(self) -> ModelWalker<'ast, 'db> {

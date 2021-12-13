@@ -1,5 +1,3 @@
-#![deny(missing_docs)]
-
 use crate::{ast, types, ParserDatabase, ScalarFieldType};
 
 /// A composite type, introduced with the `type` keyword in the schema.

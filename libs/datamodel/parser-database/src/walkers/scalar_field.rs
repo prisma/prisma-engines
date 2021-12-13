@@ -1,5 +1,3 @@
-#![deny(missing_docs)]
-
 use crate::{
     ast,
     types::{FieldWithArgs, ScalarField, SortOrder},

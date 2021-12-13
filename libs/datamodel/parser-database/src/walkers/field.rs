@@ -6,12 +6,14 @@ enum InnerWalker<'ast, 'db> {
     Relation(RelationFieldWalker<'ast, 'db>),
 }
 
+/// A model field, scalar or relation.
 #[derive(Clone, Copy)]
 pub struct FieldWalker<'ast, 'db> {
     inner: InnerWalker<'ast, 'db>,
 }
 
 impl<'ast, 'db> FieldWalker<'ast, 'db> {
+    /// The field name.
     pub fn name(self) -> &'ast str {
         match self.inner {
             InnerWalker::Scalar(f) => f.name(),
@@ -19,6 +21,7 @@ impl<'ast, 'db> FieldWalker<'ast, 'db> {
         }
     }
 
+    /// The model name.
     pub fn model(self) -> ModelWalker<'ast, 'db> {
         match self.inner {
             InnerWalker::Scalar(f) => f.model(),

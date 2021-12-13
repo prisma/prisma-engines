@@ -35,11 +35,12 @@ impl<'ast, 'db> IndexWalker<'ast, 'db> {
         }
     }
 
+    /// The index type.
     pub fn index_type(self) -> crate::types::IndexType {
         self.attribute().r#type
     }
 
-    /// The `name` argument of the index attribute. The database client name.
+    /// The `name` argument of the index attribute. The client name.
     ///
     /// ```
     /// @@index([a, b], name: "theName")
@@ -49,6 +50,7 @@ impl<'ast, 'db> IndexWalker<'ast, 'db> {
         self.index_attribute.name
     }
 
+    /// The index algorithm, if a specific one was specified for the index.
     pub fn algorithm(self) -> Option<IndexAlgorithm> {
         self.attribute().algorithm
     }
@@ -62,6 +64,7 @@ impl<'ast, 'db> IndexWalker<'ast, 'db> {
         self.index_attribute
     }
 
+    /// The scalar fields covered by the index.
     pub fn fields(self) -> impl ExactSizeIterator<Item = ScalarFieldWalker<'ast, 'db>> + 'db {
         self.index_attribute
             .fields
@@ -74,6 +77,7 @@ impl<'ast, 'db> IndexWalker<'ast, 'db> {
             })
     }
 
+    /// The scalar fields covered by the index, and their arguments.
     pub fn scalar_field_attributes(self) -> impl ExactSizeIterator<Item = ScalarFieldAttributeWalker<'ast, 'db>> + 'db {
         self.attribute()
             .fields

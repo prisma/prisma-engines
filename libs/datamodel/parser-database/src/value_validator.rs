@@ -1,5 +1,3 @@
-#![deny(missing_docs)]
-
 //! See [ValueValidator](./struct.ValueValidator.html).
 
 use crate::{

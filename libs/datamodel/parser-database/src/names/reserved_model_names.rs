@@ -1,5 +1,6 @@
 use crate::{ast, DatamodelError, Diagnostics};
 
+/// Is this a valid type name for the Prisma client API?
 pub fn is_reserved_type_name(name: &str) -> bool {
     RESERVED_NAMES.contains(&name)
 }
