@@ -1,3 +1,4 @@
+mod cockroachdb;
 mod mongodb;
 mod mysql;
 mod postgres;
@@ -5,6 +6,7 @@ mod sql_server;
 mod sqlite;
 mod vitess;
 
+use cockroachdb::*;
 use datamodel_connector::ConnectorCapability;
 use enum_dispatch::enum_dispatch;
 pub use mongodb::*;
@@ -65,6 +67,7 @@ pub enum ConnectorTag {
     MongoDb(MongoDbConnectorTag),
     Sqlite(SqliteConnectorTag),
     Vitess(VitessConnectorTag),
+    Cockroach(CockroachDbConnectorTag),
 }
 
 #[derive(Debug, Clone)]
@@ -74,6 +77,7 @@ pub enum ConnectorVersion {
     MySql(Option<MySqlVersion>),
     MongoDb(Option<MongoDbVersion>),
     Sqlite,
+    CockroachDb,
     Vitess(Option<VitessVersion>),
 }
 
@@ -85,6 +89,7 @@ impl From<&ConnectorTag> for ConnectorVersion {
             ConnectorTag::MySql(c) => ConnectorVersion::MySql(c.version()),
             ConnectorTag::MongoDb(c) => ConnectorVersion::MongoDb(c.version()),
             ConnectorTag::Sqlite(_) => ConnectorVersion::Sqlite,
+            ConnectorTag::Cockroach(_) => ConnectorVersion::CockroachDb,
             ConnectorTag::Vitess(c) => ConnectorVersion::Vitess(c.version()),
         }
     }
@@ -99,6 +104,7 @@ impl fmt::Display for ConnectorTag {
             Self::MongoDb(_) => "MongoDB",
             Self::Sqlite(_) => "SQLite",
             Self::Vitess(_) => "Vitess",
+            Self::Cockroach(_) => "CockroachDB",
         };
 
         write!(f, "{}", printable)
@@ -129,6 +135,7 @@ impl fmt::Display for ConnectorVersion {
                 Some(v) => format!("Vitess ({})", v.to_string()),
                 None => "Vitess (unknown)".to_string(),
             },
+            Self::CockroachDb => "CockroachDb".to_string(),
         };
 
         write!(f, "{}", printable)
@@ -145,6 +152,7 @@ impl ConnectorTag {
             .chain(MySqlConnectorTag::all().into_iter().map(Self::MySql))
             .chain(MongoDbConnectorTag::all().into_iter().map(Self::MongoDb))
             .chain(SqliteConnectorTag::all().into_iter().map(Self::Sqlite))
+            .chain(CockroachDbConnectorTag::all().into_iter().map(Self::Cockroach))
             .collect()
     }
 
@@ -194,7 +202,7 @@ impl TryFrom<(&str, Option<&str>)> for ConnectorTag {
         let tag = match connector.to_lowercase().as_str() {
             "sqlite" => Self::Sqlite(SqliteConnectorTag::new()),
             "sqlserver" => Self::SqlServer(SqlServerConnectorTag::new(version)?),
-            "cockroach" => Self::Postgres(PostgresConnectorTag::new(version)?),
+            "cockroach" | "cockroachdb" => Self::Cockroach(CockroachDbConnectorTag::new()),
             "postgres" => Self::Postgres(PostgresConnectorTag::new(version)?),
             "mysql" => Self::MySql(MySqlConnectorTag::new(version)?),
             "mongodb" => Self::MongoDb(MongoDbConnectorTag::new(version)?),

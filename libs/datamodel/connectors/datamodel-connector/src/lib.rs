@@ -180,6 +180,10 @@ pub trait Connector: Send + Sync {
         self.has_capability(ConnectorCapability::Json)
     }
 
+    fn supports_json_lists(&self) -> bool {
+        self.has_capability(ConnectorCapability::JsonLists)
+    }
+
     fn supports_auto_increment(&self) -> bool {
         self.has_capability(ConnectorCapability::AutoIncrement)
     }
@@ -274,7 +278,9 @@ capabilities!(
     ScalarLists,
     RelationsOverNonUniqueCriteria,
     Enums,
+    EnumArrayPush,
     Json,
+    JsonLists,
     AutoIncrement,
     RelationFieldsInArbitraryOrder,
     CompositeTypes,
@@ -302,6 +308,7 @@ capabilities!(
     JsonFiltering,
     JsonFilteringJsonPath,
     JsonFilteringArrayPath,
+    JsonFilteringAlphanumeric,
     CompoundIds,
     AnyId, // Any (or combination of) uniques and not only id fields can constitute an id for a model.
     QueryRaw,
@@ -326,6 +333,12 @@ impl ConnectorCapabilities {
 
     pub fn contains(&self, capability: ConnectorCapability) -> bool {
         self.capabilities.contains(&capability)
+    }
+
+    pub fn supports_any(&self, capabilities: &[ConnectorCapability]) -> bool {
+        self.capabilities
+            .iter()
+            .any(|connector_capability| capabilities.contains(connector_capability))
     }
 }
 
@@ -380,5 +393,47 @@ impl ConstraintScope {
                 model_name
             )),
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_empty_cap_does_not_contain() {
+        let cap = ConnectorCapabilities::empty();
+        assert!(!cap.supports_any(&[ConnectorCapability::JsonFilteringJsonPath]));
+    }
+
+    #[test]
+    fn test_cap_with_others_does_not_contain() {
+        let cap = ConnectorCapabilities::new(vec![
+            ConnectorCapability::PrimaryKeySortOrderDefinition,
+            ConnectorCapability::JsonFilteringArrayPath,
+        ]);
+        assert!(!cap.supports_any(&[ConnectorCapability::JsonFilteringJsonPath]));
+    }
+
+    #[test]
+    fn test_cap_with_others_does_contain() {
+        let cap = ConnectorCapabilities::new(vec![
+            ConnectorCapability::PrimaryKeySortOrderDefinition,
+            ConnectorCapability::JsonFilteringJsonPath,
+            ConnectorCapability::JsonFilteringArrayPath,
+        ]);
+        assert!(cap.supports_any(&[
+            ConnectorCapability::JsonFilteringJsonPath,
+            ConnectorCapability::JsonFilteringArrayPath,
+        ]));
+    }
+
+    #[test]
+    fn test_does_contain() {
+        let cap = ConnectorCapabilities::new(vec![
+            ConnectorCapability::PrimaryKeySortOrderDefinition,
+            ConnectorCapability::JsonFilteringArrayPath,
+        ]);
+        assert!(!cap.supports_any(&[ConnectorCapability::JsonFilteringJsonPath]));
     }
 }

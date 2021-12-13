@@ -51,54 +51,6 @@ fn scalar_list_support() {
 }
 
 #[test]
-fn unique_index_names_support() {
-    let dml = indoc! {r#"
-        datasource db {
-          provider = "cockroachdb"
-          url = "postgres://"
-        }
-
-        generator js {
-            provider = "prisma-client-js"
-            previewFeatures = ["cockroachdb"]
-        }
-
-        model User {
-          id         Int @id
-          neighborId Int
-
-          @@index([id], name: "metaId")
-        }
-
-        model Post {
-          id Int @id
-          optionId Int
-
-          @@index([id], name: "metaId")
-        }
-    "#};
-
-    let error = datamodel::parse_schema(dml).map(drop).unwrap_err();
-
-    let expectation = expect![[r#"
-        [1;91merror[0m: [1mError parsing attribute "@index": The given constraint name `metaId` has to be unique in the following namespace: global for primary key, indexes and unique constraints. Please provide a different name using the `map` argument.[0m
-          [1;94m-->[0m  [4mschema.prisma:15[0m
-        [1;94m   | [0m
-        [1;94m14 | [0m
-        [1;94m15 | [0m  @@index([id], [1;91mname: "metaId"[0m)
-        [1;94m   | [0m
-        [1;91merror[0m: [1mError parsing attribute "@index": The given constraint name `metaId` has to be unique in the following namespace: global for primary key, indexes and unique constraints. Please provide a different name using the `map` argument.[0m
-          [1;94m-->[0m  [4mschema.prisma:22[0m
-        [1;94m   | [0m
-        [1;94m21 | [0m
-        [1;94m22 | [0m  @@index([id], [1;91mname: "metaId"[0m)
-        [1;94m   | [0m
-    "#]];
-
-    expectation.assert_eq(&error);
-}
-
-#[test]
 fn json_support() {
     let dml = indoc! {r#"
         datasource db {
@@ -237,7 +189,7 @@ fn does_not_support_composite_types() {
     let err = datamodel::parse_schema(schema).unwrap_err();
 
     let expected = expect![[r#"
-        [1;91merror[0m: [1mError validating: Composite types are not supported on Postgres.[0m
+        [1;91merror[0m: [1mError validating: Composite types are not supported on Cockroach.[0m
           [1;94m-->[0m  [4mschema.prisma:12[0m
         [1;94m   | [0m
         [1;94m11 | [0m

@@ -92,7 +92,7 @@ mod pagination_regr {
             orderBy: [{ field: desc }, { id: asc }]
           ) { id }
           }"#,
-          Postgres(_) => vec![r#"{"data":{"findManyTestModel":[{"id":4},{"id":5}]}}"#],
+          Postgres(_) | CockroachDb => vec![r#"{"data":{"findManyTestModel":[{"id":4},{"id":5}]}}"#],
           _ => vec![r#"{"data":{"findManyTestModel":[{"id":4}]}}"#]
         );
 
@@ -118,7 +118,7 @@ mod pagination_regr {
             orderBy: [{ field: desc }, { id: asc }]
           ) { id }
           }"#,
-          Postgres(_) => vec![r#"{"data":{"findManyTestModel":[{"id":2}]}}"#],
+          Postgres(_) | CockroachDb => vec![r#"{"data":{"findManyTestModel":[{"id":2}]}}"#],
           _ => vec![r#"{"data":{"findManyTestModel":[{"id":2},{"id":1}]}}"#]
         );
 

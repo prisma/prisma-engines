@@ -261,7 +261,7 @@ where
             let mut object_fields =
                 vec![input_field(operations::SET, list_input_type.clone(), None).optional_if(!is_create)];
 
-            if !is_create {
+            if !is_create && ctx.has_capability(ConnectorCapability::EnumArrayPush) {
                 object_fields.push(
                     input_field(
                         operations::PUSH,

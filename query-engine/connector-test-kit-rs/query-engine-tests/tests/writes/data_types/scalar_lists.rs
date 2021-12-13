@@ -295,6 +295,22 @@ mod scalar_lists {
         Ok(())
     }
 
+    // Test that Cockroach will not work with enum push
+    #[connector_test(only(Cockroach))]
+    async fn cockroachdb_doesnot_support_enum_push(runner: Runner) -> TestResult<()> {
+        create_row(&runner, r#"{ id: 1 }"#).await?;
+        create_row(&runner, r#"{ id: 2 }"#).await?;
+
+        assert_error!(
+            &runner,
+            r#"mutation { updateOneScalarModel(where: { id: 1 }, data: { enums: { push: A }}) { id }}"#,
+            2009,
+            "`Mutation.updateOneScalarModel.data.ScalarModelUpdateInput.enums`: Unable to match input value to any allowed input type for the field."
+        );
+
+        Ok(())
+    }
+
     async fn create_row(runner: &Runner, data: &str) -> TestResult<()> {
         runner
             .query(format!("mutation {{ createOneScalarModel(data: {}) {{ id }} }}", data))

@@ -515,6 +515,27 @@ mod json_path {
         Ok(())
     }
 
+    #[connector_test(schema(pg_json), only(Cockroach))]
+    async fn cockroach_errors_on_json_gt_lt(runner: Runner) -> TestResult<()> {
+        let query = format!(
+            r#"query {{
+            findManyTestModel(
+                where: {{
+                    AND: [
+                        {{ json: {{ {}, gte: "1" }} }},
+                        {{ json: {{ {}, lt: "3" }} }},
+                    ]
+                }}
+            ) {{ json }}
+        }}"#,
+            json_path(&runner),
+            json_path(&runner)
+        );
+
+        assert_error!(&runner, query, 2009);
+        Ok(())
+    }
+
     // CockroachDB does not support JSON comparisons (https://github.com/cockroachdb/cockroach/issues/49144).
     #[connector_test(only(Postgres), exclude(Cockroach))]
     async fn gt_gte(runner: Runner) -> TestResult<()> {
@@ -668,7 +689,7 @@ mod json_path {
 
     fn json_path(runner: &Runner) -> &'static str {
         match runner.connector_version() {
-            ConnectorVersion::Postgres(_) => r#"path: ["a", "b"]"#,
+            ConnectorVersion::Postgres(_) | ConnectorVersion::CockroachDb => r#"path: ["a", "b"]"#,
             ConnectorVersion::MySql(_) => r#"path: "$.a.b""#,
             x => unreachable!("JSON filtering is not supported on {:?}", x),
         }

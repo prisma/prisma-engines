@@ -72,7 +72,7 @@ pub fn db_name(source: &Datasource, url: &str) -> crate::Result<String> {
 
             Ok(db_name)
         }
-        POSTGRES_SOURCE_NAME => {
+        POSTGRES_SOURCE_NAME | COCKROACHDB_SOURCE_NAME => {
             let url = Url::parse(url)?;
             let params: HashMap<String, String> = url.query_pairs().into_owned().collect();
 
