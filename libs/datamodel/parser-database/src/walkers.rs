@@ -7,6 +7,7 @@
 //! - Do not know anything about connectors, they are generic.
 
 mod composite_type;
+mod r#enum;
 mod field;
 mod index;
 mod model;
@@ -18,6 +19,7 @@ pub use composite_type::*;
 pub use field::*;
 pub use index::*;
 pub use model::*;
+pub use r#enum::*;
 pub use relation::*;
 pub use relation_field::*;
 pub use scalar_field::*;
@@ -25,9 +27,24 @@ pub use scalar_field::*;
 use super::ParserDatabase;
 use crate::ast;
 
+/// A generic walker. Only walkers intantiated with a concrete ID type (`I`) are useful.
+#[derive(Clone, Copy)]
+pub struct Walker<'ast, 'db, I> {
+    db: &'db crate::ParserDatabase<'ast>,
+    id: I,
+}
+
 impl<'ast> ParserDatabase<'ast> {
+    /// Walk all enums in the schema.
+    pub fn walk_enums(&self) -> impl Iterator<Item = EnumWalker<'ast, '_>> {
+        self.ast()
+            .iter_tops()
+            .filter_map(|(top_id, _)| top_id.as_enum_id())
+            .map(move |enum_id| Walker { db: self, id: enum_id })
+    }
+
     /// Find a model by ID.
-    pub fn walk_model(&self, model_id: ast::ModelId) -> ModelWalker<'ast, '_> {
+    pub(crate) fn walk_model(&self, model_id: ast::ModelId) -> ModelWalker<'ast, '_> {
         ModelWalker {
             model_id,
             db: self,

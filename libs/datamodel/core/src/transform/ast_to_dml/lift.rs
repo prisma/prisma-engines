@@ -40,20 +40,16 @@ impl<'a> LiftAstToDml<'a> {
         // (model_idx, field_name) -> sort_key
         let mut field_ids_for_sorting: HashMap<(&str, &str), ast::FieldId> = HashMap::new();
 
-        for (top_id, ast_obj) in self.db.ast().iter_tops() {
-            match (top_id, ast_obj) {
-                (ast::TopId::Enum(id), ast::Top::Enum(en)) => schema.add_enum(self.lift_enum(id, en)),
-                (ast::TopId::Model(model_id), ast::Top::Model(ty)) => {
-                    schema.add_model(self.lift_model(model_id, ty, &mut field_ids_for_sorting))
-                }
-                (ast::TopId::CompositeType(ct_id), ast::Top::CompositeType(_)) => {
-                    schema.composite_types.push(self.lift_composite_type(ct_id))
-                }
-                (_, ast::Top::Source(_)) => { /* Source blocks are explicitly ignored by the validator */ }
-                (_, ast::Top::Generator(_)) => { /* Generator blocks are explicitly ignored by the validator */ }
-                (_, ast::Top::Type(_)) => { /* Type blocks are inlined */ }
-                _ => unreachable!(),
-            }
+        for model in self.db.walk_models() {
+            schema.add_model(self.lift_model(model, &mut field_ids_for_sorting));
+        }
+
+        for composite_type in self.db.walk_composite_types() {
+            schema.composite_types.push(self.lift_composite_type(composite_type))
+        }
+
+        for r#enum in self.db.walk_enums() {
+            schema.add_enum(self.lift_enum(r#enum))
         }
 
         self.lift_relations(&mut schema, &mut field_ids_for_sorting);
@@ -240,9 +236,8 @@ impl<'a> LiftAstToDml<'a> {
         }
     }
 
-    fn lift_composite_type(&self, ct_id: ast::CompositeTypeId) -> CompositeType {
+    fn lift_composite_type(&self, walker: CompositeTypeWalker<'_, '_>) -> CompositeType {
         let mut fields = Vec::new();
-        let walker = self.db.walk_composite_type(ct_id);
 
         for field in walker.fields() {
             let field = CompositeTypeField {
@@ -265,12 +260,11 @@ impl<'a> LiftAstToDml<'a> {
     /// Internal: Validates a model AST node and lifts it to a DML model.
     fn lift_model(
         &self,
-        model_id: ast::ModelId,
-        ast_model: &'a ast::Model,
+        walker: ModelWalker<'a, '_>,
         field_ids_for_sorting: &mut HashMap<(&'a str, &'a str), ast::FieldId>,
     ) -> dml::Model {
+        let ast_model = walker.ast_model();
         let mut model = dml::Model::new(ast_model.name.name.clone(), None);
-        let walker = self.db.walk_model(model_id);
 
         model.documentation = ast_model.documentation.clone().map(|comment| comment.text);
         model.database_name = walker.mapped_name().map(String::from);
@@ -369,27 +363,23 @@ impl<'a> LiftAstToDml<'a> {
     }
 
     /// Internal: Validates an enum AST node.
-    fn lift_enum(&self, enum_id: ast::EnumId, ast_enum: &ast::Enum) -> dml::Enum {
-        let mut en = dml::Enum::new(&ast_enum.name.name, vec![]);
+    fn lift_enum(&self, r#enum: EnumWalker<'_, '_>) -> dml::Enum {
+        let mut en = dml::Enum::new(r#enum.name(), vec![]);
 
-        for (value_idx, ast_enum_value) in ast_enum.values.iter().enumerate() {
-            en.add_value(self.lift_enum_value(ast_enum_value, enum_id, value_idx as u32));
+        for value in r#enum.values() {
+            en.add_value(self.lift_enum_value(value));
         }
 
-        en.documentation = ast_enum.documentation.clone().map(|comment| comment.text);
-        en.database_name = self.db.get_enum_database_name(enum_id).map(String::from);
+        en.documentation = r#enum.ast_enum().documentation.clone().map(|comment| comment.text);
+        en.database_name = r#enum.mapped_name().map(String::from);
         en
     }
 
     /// Internal: Lifts an enum value AST node.
-    fn lift_enum_value(&self, ast_value: &ast::EnumValue, enum_id: ast::EnumId, value_idx: u32) -> dml::EnumValue {
-        let mut enum_value = dml::EnumValue::new(&ast_value.name.name);
-        enum_value.documentation = ast_value.documentation.clone().map(|comment| comment.text);
-        enum_value.database_name = self
-            .db
-            .get_enum_value_database_name(enum_id, value_idx)
-            .map(String::from);
-
+    fn lift_enum_value(&self, value: EnumValueWalker<'_, '_>) -> dml::EnumValue {
+        let mut enum_value = dml::EnumValue::new(value.name());
+        enum_value.documentation = value.documentation().map(String::from);
+        enum_value.database_name = value.mapped_name().map(String::from);
         enum_value
     }
 

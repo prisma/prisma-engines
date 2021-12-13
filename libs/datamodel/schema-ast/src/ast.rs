@@ -150,9 +150,17 @@ pub enum TopId {
 }
 
 impl TopId {
-    pub fn as_model_id(&self) -> Option<ModelId> {
+    /// Try to interpret the top as an enum.
+    pub fn as_enum_id(self) -> Option<EnumId> {
         match self {
-            TopId::Model(model_id) => Some(*model_id),
+            TopId::Enum(id) => Some(id),
+            _ => None,
+        }
+    }
+
+    pub fn as_model_id(self) -> Option<ModelId> {
+        match self {
+            TopId::Model(model_id) => Some(model_id),
             _ => None,
         }
     }

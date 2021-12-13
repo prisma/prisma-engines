@@ -17,7 +17,7 @@ pub struct IndexWalker<'ast, 'db> {
 impl<'ast, 'db> IndexWalker<'ast, 'db> {
     /// The mapped name of the index.
     ///
-    /// ```
+    /// ```ignore
     /// @@index([a, b], map: "theName")
     ///                      ^^^^^^^^^
     /// ```
@@ -42,7 +42,7 @@ impl<'ast, 'db> IndexWalker<'ast, 'db> {
 
     /// The `name` argument of the index attribute. The client name.
     ///
-    /// ```
+    /// ```ignore
     /// @@index([a, b], name: "theName")
     ///                      ^^^^^^^^^
     /// ```

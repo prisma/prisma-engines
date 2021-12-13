@@ -21,7 +21,7 @@ impl<'ast, 'db> PrimaryKeyWalker<'ast, 'db> {
 
     /// The mapped name of the id.
     ///
-    /// ```
+    /// ```ignore
     /// @@id([a, b], map: "theName")
     ///                   ^^^^^^^^^
     /// ```
@@ -45,7 +45,7 @@ impl<'ast, 'db> PrimaryKeyWalker<'ast, 'db> {
 
     /// The `name` argument of the id attribute. The client name.
     ///
-    /// ```
+    /// ```ignore
     /// @@id([a, b], name: "theName")
     ///                    ^^^^^^^^^
     /// ```

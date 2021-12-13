@@ -128,20 +128,7 @@ impl<'ast> ParserDatabase<'ast> {
     }
 
     /// Find a specific field in a specific model.
-    pub fn find_model_field(&self, model_id: ast::ModelId, field_name: &str) -> Option<ast::FieldId> {
+    fn find_model_field(&self, model_id: ast::ModelId, field_name: &str) -> Option<ast::FieldId> {
         self.names.model_fields.get(&(model_id, field_name)).cloned()
-    }
-
-    /// Get the mapped name of an enum.
-    pub fn get_enum_database_name(&self, enum_id: ast::EnumId) -> Option<&'ast str> {
-        self.types.enum_attributes[&enum_id].mapped_name
-    }
-
-    /// Get the mapped name of an enum value.
-    pub fn get_enum_value_database_name(&self, enum_id: ast::EnumId, value_idx: u32) -> Option<&'ast str> {
-        self.types.enum_attributes[&enum_id]
-            .mapped_values
-            .get(&value_idx)
-            .cloned()
     }
 }
