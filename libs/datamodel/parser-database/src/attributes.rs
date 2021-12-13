@@ -7,12 +7,12 @@ use crate::{
     context::{Arguments, Context},
     types::{
         EnumAttributes, FieldWithArgs, IndexAlgorithm, IndexAttribute, IndexType, ModelAttributes, RelationField,
-        ScalarField, ScalarFieldType,
+        ScalarField, ScalarFieldType, SortOrder,
     },
     DatamodelError, ValueValidator,
 };
 use diagnostics::Span;
-use dml::{self, model::SortOrder, PrismaValue};
+use dml::{self, PrismaValue};
 
 pub(super) fn resolve_attributes(ctx: &mut Context<'_>) {
     for top in ctx.db.ast.iter_tops() {

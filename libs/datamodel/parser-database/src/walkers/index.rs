@@ -1,10 +1,11 @@
-use super::{ModelWalker, ScalarFieldAttributeWalker, ScalarFieldWalker};
 use crate::{
     ast,
     types::{IndexAlgorithm, IndexAttribute},
+    walkers::{ModelWalker, ScalarFieldAttributeWalker, ScalarFieldWalker},
     ParserDatabase,
 };
 
+/// An index, unique or fulltext attribute.
 #[derive(Copy, Clone)]
 pub struct IndexWalker<'ast, 'db> {
     pub(crate) model_id: ast::ModelId,
@@ -14,10 +15,18 @@ pub struct IndexWalker<'ast, 'db> {
 }
 
 impl<'ast, 'db> IndexWalker<'ast, 'db> {
+    /// The mapped name of the index.
+    ///
+    /// ```ignore
+    /// @@index([a, b], map: "theName")
+    ///                      ^^^^^^^^^
+    /// ```
     pub fn mapped_name(self) -> Option<&'ast str> {
         self.index_attribute.db_name
     }
 
+    /// The attribute name: `"unique"` for `@@unique`, `"fulltext"` for `@@fultext` and `"index"`
+    /// for `@index` and `@@index`.
     pub fn attribute_name(self) -> &'static str {
         if self.is_unique() {
             "unique"
@@ -26,18 +35,27 @@ impl<'ast, 'db> IndexWalker<'ast, 'db> {
         }
     }
 
+    /// The index type.
     pub fn index_type(self) -> crate::types::IndexType {
         self.attribute().r#type
     }
 
+    /// The `name` argument of the index attribute. The client name.
+    ///
+    /// ```ignore
+    /// @@index([a, b], name: "theName")
+    ///                      ^^^^^^^^^
+    /// ```
     pub fn name(self) -> Option<&'ast str> {
         self.index_attribute.name
     }
 
+    /// The index algorithm, if a specific one was specified for the index.
     pub fn algorithm(self) -> Option<IndexAlgorithm> {
         self.attribute().algorithm
     }
 
+    /// The AST node of the index/unique attribute.
     pub fn ast_attribute(self) -> Option<&'ast ast::Attribute> {
         self.index
     }
@@ -46,6 +64,7 @@ impl<'ast, 'db> IndexWalker<'ast, 'db> {
         self.index_attribute
     }
 
+    /// The scalar fields covered by the index.
     pub fn fields(self) -> impl ExactSizeIterator<Item = ScalarFieldWalker<'ast, 'db>> + 'db {
         self.index_attribute
             .fields
@@ -58,6 +77,7 @@ impl<'ast, 'db> IndexWalker<'ast, 'db> {
             })
     }
 
+    /// The scalar fields covered by the index, and their arguments.
     pub fn scalar_field_attributes(self) -> impl ExactSizeIterator<Item = ScalarFieldAttributeWalker<'ast, 'db>> + 'db {
         self.attribute()
             .fields
@@ -83,14 +103,17 @@ impl<'ast, 'db> IndexWalker<'ast, 'db> {
         self.index_attribute.source_field.is_some()
     }
 
+    /// Is this an `@@unique`?
     pub fn is_unique(self) -> bool {
         self.index_attribute.is_unique()
     }
 
+    /// Is this an `@@fulltext`?
     pub fn is_fulltext(self) -> bool {
         self.index_attribute.is_fulltext()
     }
 
+    /// The model the index is defined on.
     pub fn model(self) -> ModelWalker<'ast, 'db> {
         ModelWalker {
             model_id: self.model_id,

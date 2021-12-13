@@ -1,5 +1,4 @@
 use crate::{context::Context, walkers::CompositeTypeFieldWalker, walkers::CompositeTypeWalker, DatamodelError};
-use dml::model::SortOrder;
 use schema_ast::ast;
 use std::{
     collections::{BTreeMap, HashMap},
@@ -75,16 +74,23 @@ enum FieldType {
     Scalar(ScalarFieldType),
 }
 
+/// The type of a scalar field, parsed and categorized.
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum ScalarFieldType {
+    /// A composite type
     CompositeType(ast::CompositeTypeId),
+    /// An enum
     Enum(ast::EnumId),
+    /// A Prisma scalar type
     BuiltInScalar(dml::scalars::ScalarType),
+    /// A type alias
     Alias(ast::AliasId),
+    /// An `Unsupported("...")` type
     Unsupported,
 }
 
 impl ScalarFieldType {
+    /// Try to interpret this field type as a known Prisma scalar type.
     pub fn as_builtin_scalar(self) -> Option<dml::scalars::ScalarType> {
         match self {
             ScalarFieldType::BuiltInScalar(s) => Some(s),
@@ -158,13 +164,17 @@ pub(crate) struct ModelAttributes<'ast> {
     pub(crate) mapped_name: Option<&'ast str>,
 }
 
+/// A type of index.
 #[derive(Debug, Clone, Copy)]
 pub enum IndexAlgorithm {
+    /// Binary tree index (the default in most databases)
     BTree,
+    /// Hash index
     Hash,
 }
 
 impl IndexAlgorithm {
+    /// Is this a hash index?
     pub fn is_hash(self) -> bool {
         matches!(self, Self::Hash)
     }
@@ -176,10 +186,14 @@ impl Default for IndexAlgorithm {
     }
 }
 
+/// The different typees of indexes supported in the Prisma Schema Language.
 #[derive(Debug, Clone, Copy)]
 pub enum IndexType {
+    /// @@index
     Normal,
+    /// @(@)unique
     Unique,
+    /// @(@)fulltext
     Fulltext,
 }
 
@@ -517,5 +531,52 @@ fn field_type<'ast>(field: &'ast ast::Field, ctx: &mut Context<'ast>) -> Result<
         Some((_, ast::Top::Generator(_))) | Some((_, ast::Top::Source(_))) => unreachable!(),
         None => Err(supported),
         _ => unreachable!(),
+    }
+}
+
+/// The sort order of an index.
+#[derive(Debug, Clone, Copy)]
+pub enum SortOrder {
+    /// ASCending
+    Asc,
+    /// DESCending
+    Desc,
+}
+
+impl Default for SortOrder {
+    fn default() -> Self {
+        Self::Asc
+    }
+}
+
+/// Prisma's builtin scalar types.
+#[derive(Debug, Copy, Clone)]
+#[allow(missing_docs)]
+pub enum ScalarType {
+    Int,
+    BigInt,
+    Float,
+    Boolean,
+    String,
+    DateTime,
+    Json,
+    Bytes,
+    Decimal,
+}
+
+impl ScalarType {
+    pub(crate) fn try_from_str(s: &str) -> Option<ScalarType> {
+        match s {
+            "Int" => Some(ScalarType::Int),
+            "BigInt" => Some(ScalarType::BigInt),
+            "Float" => Some(ScalarType::Float),
+            "Boolean" => Some(ScalarType::Boolean),
+            "String" => Some(ScalarType::String),
+            "DateTime" => Some(ScalarType::DateTime),
+            "Json" => Some(ScalarType::Json),
+            "Bytes" => Some(ScalarType::Bytes),
+            "Decimal" => Some(ScalarType::Decimal),
+            _ => None,
+        }
     }
 }

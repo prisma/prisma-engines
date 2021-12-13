@@ -1,16 +1,11 @@
-#![deny(missing_docs)]
-
-use super::ModelWalker;
 use crate::{
     ast,
-    types::{FieldWithArgs, ScalarField},
+    types::{FieldWithArgs, ScalarField, SortOrder},
+    walkers::ModelWalker,
     ParserDatabase, ScalarFieldType,
 };
 use diagnostics::Span;
-use dml::{
-    default_value::{DefaultKind, DefaultValue},
-    model::SortOrder,
-};
+use dml::default_value::{DefaultKind, DefaultValue};
 
 /// A scalar field, as part of a model.
 #[derive(Copy, Clone)]

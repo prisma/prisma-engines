@@ -85,7 +85,7 @@ mod transform;
 pub use crate::dml::*;
 pub use configuration::{Configuration, Datasource, Generator, StringFromEnvVar};
 pub use diagnostics;
-pub use parser_database::reserved_model_names;
+pub use parser_database::is_reserved_type_name;
 
 use crate::{ast::SchemaAst, common::preview_features::PreviewFeature};
 use ast::reformat::MissingField;

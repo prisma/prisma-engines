@@ -126,6 +126,13 @@ impl<'ast, 'db> RelationFieldWalker<'ast, 'db> {
             .unwrap_or_else(|| RelationName::generated(self.model().name(), self.related_model().name()))
     }
 
+    /// The arity to enforce, based on the arity of the fields. If any referencing field is
+    /// required, this will be required.
+    ///
+    /// Prisma allows setting the relation field as optional, even if one of the
+    /// underlying scalar fields is required. For the purpose of referential
+    /// actions, we count the relation field required if any of the underlying
+    /// fields is required.
     pub fn referential_arity(self) -> FieldArity {
         let some_required = self
             .fields()
@@ -150,10 +157,12 @@ impl<'ast, 'db> RelationFieldWalker<'ast, 'db> {
         matches!(self.related_model().primary_key(), Some(pk) if pk.contains_exactly_fields_by_id(&[*singular_referenced_id]))
     }
 
+    /// The fields in the `fields: [...]` argument in the forward relation field.
     pub fn referencing_fields(self) -> Option<impl ExactSizeIterator<Item = ScalarFieldWalker<'ast, 'db>>> {
         self.fields()
     }
 
+    /// The fields in the `fields: [...]` argument in the forward relation field.
     pub fn fields(self) -> Option<impl ExactSizeIterator<Item = ScalarFieldWalker<'ast, 'db>>> {
         let model_id = self.model_id;
         let attributes = self.attributes();
@@ -168,9 +177,12 @@ impl<'ast, 'db> RelationFieldWalker<'ast, 'db> {
     }
 }
 
+/// The relation name.
 #[derive(Debug, Clone)]
 pub enum RelationName<'ast> {
+    /// A relation name specified in the AST.
     Explicit(&'ast str),
+    /// An inferred relation name.
     Generated(String),
 }
 

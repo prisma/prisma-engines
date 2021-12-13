@@ -1,6 +1,12 @@
-#![deny(unsafe_code, rust_2018_idioms)]
+#![deny(unsafe_code, rust_2018_idioms, missing_docs)]
 
 //! See the docs on [ParserDatabase](./struct.ParserDatabase.html).
+//!
+//! ## Scope
+//!
+//! The ParserDatbase is tasked with gathering information about the schema. It is _connector
+//! agnostic_: it gathers information and performs generic validations, leaving connector-specific
+//! validations to later phases in datamodel core.
 //!
 //! ## Terminology
 //!
@@ -16,7 +22,6 @@
 //!   attribute. This is taken as the database name of the constraint backing the relation, on the
 //!   connectors where that makes sense.
 
-pub mod value_validator;
 pub mod walkers;
 
 mod attributes;
@@ -25,15 +30,16 @@ mod indexes;
 mod names;
 mod relations;
 mod types;
+mod value_validator;
 
-pub use names::reserved_model_names;
+pub use names::is_reserved_type_name;
 pub use schema_ast::ast;
-pub use types::{IndexAlgorithm, IndexType, ScalarFieldType};
+pub use types::{IndexAlgorithm, IndexType, ScalarFieldType, ScalarType, SortOrder};
+pub use value_validator::{ValueListValidator, ValueValidator};
 
 use self::{context::Context, relations::Relations, types::Types};
 use diagnostics::{DatamodelError, Diagnostics};
 use names::Names;
-use value_validator::ValueValidator;
 
 /// ParserDatabase is a container for a Schema AST, together with information
 /// gathered during schema validation. Each validation step enriches the
@@ -111,26 +117,18 @@ impl<'ast> ParserDatabase<'ast> {
         ctx.finish()
     }
 
+    /// The fully resolved (non alias) scalar field type of an alias. .
     pub fn alias_scalar_field_type(&self, alias_id: &ast::AliasId) -> &ScalarFieldType {
         &self.types.type_aliases[alias_id]
     }
 
+    /// The parsed AST.
     pub fn ast(&self) -> &'ast ast::SchemaAst {
         self.ast
     }
 
-    pub fn find_model_field(&self, model_id: ast::ModelId, field_name: &str) -> Option<ast::FieldId> {
+    /// Find a specific field in a specific model.
+    fn find_model_field(&self, model_id: ast::ModelId, field_name: &str) -> Option<ast::FieldId> {
         self.names.model_fields.get(&(model_id, field_name)).cloned()
-    }
-
-    pub fn get_enum_database_name(&self, enum_id: ast::EnumId) -> Option<&'ast str> {
-        self.types.enum_attributes[&enum_id].mapped_name
-    }
-
-    pub fn get_enum_value_database_name(&self, enum_id: ast::EnumId, value_idx: u32) -> Option<&'ast str> {
-        self.types.enum_attributes[&enum_id]
-            .mapped_values
-            .get(&value_idx)
-            .cloned()
     }
 }

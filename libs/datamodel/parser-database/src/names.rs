@@ -1,15 +1,14 @@
-pub mod reserved_model_names;
+pub(crate) mod reserved_model_names;
+
+pub use reserved_model_names::is_reserved_type_name;
 
 use crate::{
     ast::{self, Argument, TopId, WithAttributes, WithIdentifier},
+    types::ScalarType,
     Context, DatamodelError,
 };
-use dml::scalars::ScalarType;
 use reserved_model_names::{validate_enum_name, validate_model_name};
-use std::{
-    collections::{BTreeMap, HashMap, HashSet},
-    str::FromStr,
-};
+use std::collections::{BTreeMap, HashMap, HashSet};
 
 /// Resolved names for use in the validation process.
 #[derive(Default)]
@@ -144,7 +143,7 @@ fn duplicate_top_error(existing: &ast::Top, duplicate: &ast::Top) -> DatamodelEr
 }
 
 fn assert_is_not_a_reserved_scalar_type(ident: &ast::Identifier, ctx: &mut Context<'_>) {
-    if ScalarType::from_str(&ident.name).is_ok() {
+    if ScalarType::try_from_str(&ident.name).is_some() {
         ctx.push_error(DatamodelError::new_reserved_scalar_type_error(&ident.name, ident.span));
     }
 }
