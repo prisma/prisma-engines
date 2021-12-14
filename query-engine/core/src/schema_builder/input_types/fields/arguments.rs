@@ -1,6 +1,7 @@
 use super::*;
 use constants::args;
 use datamodel_connector::ConnectorCapability;
+use objects::*;
 
 /// Builds "where" argument.
 pub(crate) fn where_argument(ctx: &mut BuilderContext, model: &ModelRef) -> InputField {

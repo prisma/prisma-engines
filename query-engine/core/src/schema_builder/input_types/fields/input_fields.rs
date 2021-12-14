@@ -1,3 +1,4 @@
+use super::objects::*;
 use super::*;
 use constants::{args, operations};
 use datamodel_connector::ConnectorCapability;
