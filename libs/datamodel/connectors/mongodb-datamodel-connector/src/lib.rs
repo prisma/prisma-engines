@@ -41,7 +41,7 @@ impl Connector for MongoDbDatamodelConnector {
         CAPABILITIES
     }
 
-    fn constraint_name_length(&self) -> usize {
+    fn max_identifier_length(&self) -> usize {
         127
     }
 

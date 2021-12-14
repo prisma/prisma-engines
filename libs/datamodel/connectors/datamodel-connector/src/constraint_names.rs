@@ -40,7 +40,7 @@ impl ConstraintNames {
 
     pub(crate) fn primary_key_name(table_name: &str, connector: &dyn Connector) -> String {
         let suffix = "_pkey";
-        let limit = connector.constraint_name_length();
+        let limit = connector.max_identifier_length();
 
         let trimmed = if table_name.len() >= limit - 5 {
             table_name.split_at(limit - 5).0
@@ -83,7 +83,7 @@ impl ConstraintNames {
         suffix: &'static str,
         connector: &dyn Connector,
     ) -> String {
-        let limit = connector.constraint_name_length();
+        let limit = connector.max_identifier_length();
 
         let mut out = String::with_capacity(table_name.len() + column_names.len() + suffix.len());
 
@@ -104,7 +104,7 @@ impl ConstraintNames {
     }
 
     pub fn default_name(table_name: &str, column_name: &str, connector: &dyn Connector) -> String {
-        let limit = connector.constraint_name_length();
+        let limit = connector.max_identifier_length();
         let joined = format!("{}_{}", table_name, column_name);
 
         let trimmed = if joined.len() >= limit - 3 {
@@ -143,7 +143,7 @@ impl ConstraintNames {
         connector: &dyn Connector,
     ) -> String {
         let fk_suffix = "_fkey";
-        let limit = connector.constraint_name_length();
+        let limit = connector.max_identifier_length();
 
         let joined = format!("{}_{}", table_name, column_names.join("_"));
 
@@ -165,10 +165,10 @@ impl ConstraintNames {
         double_at: bool,
     ) -> Option<DatamodelError> {
         if let Some(name) = name {
-            if name.len() > connector.constraint_name_length() {
+            if name.len() > connector.max_identifier_length() {
                 let ats = if double_at { "@@" } else { "@" };
                 return Some(DatamodelError::new_model_validation_error(
-                    &format!("The constraint name '{}' specified in the `map` argument for the `{}{}` constraint is too long for your chosen provider. The maximum allowed length is {} bytes.", name, ats, attribute, connector.constraint_name_length()),
+                    &format!("The constraint name '{}' specified in the `map` argument for the `{}{}` constraint is too long for your chosen provider. The maximum allowed length is {} bytes.", name, ats, attribute, connector.max_identifier_length()),
                     object_name,
                     span,
                 ));
