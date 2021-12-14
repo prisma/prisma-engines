@@ -5,7 +5,7 @@ use datamodel::{ast, diagnostics::DatamodelError};
 fn should_fail_on_invalid_precision_for_decimal_type() {
     fn error_msg(type_name: &str) -> String {
         format!(
-            "Argument M is out of range for Native type {} of Cockroach: Precision must be positive with a maximum value of 1000.",
+            "Argument M is out of range for Native type {} of CockroachDB: Precision must be positive with a maximum value of 1000.",
             type_name
         )
     }
@@ -18,7 +18,7 @@ fn should_fail_on_invalid_precision_for_decimal_type() {
 fn should_fail_on_invalid_precision_for_time_types() {
     fn error_msg(type_name: &str) -> String {
         format!(
-            "Argument M is out of range for Native type {} of Cockroach: M can range from 0 to 6.",
+            "Argument M is out of range for Native type {} of CockroachDB: M can range from 0 to 6.",
             type_name
         )
     }
@@ -35,7 +35,7 @@ fn should_fail_on_invalid_precision_for_time_types() {
 fn should_fail_on_argument_out_of_range_for_bit_data_types() {
     fn error_msg(type_name: &str) -> String {
         format!(
-            "Argument M is out of range for Native type {} of Cockroach: M must be a positive integer.",
+            "Argument M is out of range for Native type {} of CockroachDB: M must be a positive integer.",
             type_name
         )
     }
@@ -68,7 +68,7 @@ fn should_fail_on_native_type_decimal_when_scale_is_bigger_than_precision() {
     let error = parse_error(dml);
 
     error.assert_is(DatamodelError::new_connector_error(
-        "The scale must not be larger than the precision for the Decimal(2,4) native type in Cockroach.",
+        "The scale must not be larger than the precision for the Decimal(2,4) native type in CockroachDB.",
         ast::Span::new(299, 329),
     ));
 }
