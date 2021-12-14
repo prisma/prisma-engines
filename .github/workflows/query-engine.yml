@@ -4,6 +4,7 @@ on:
     branches:
       - master
   pull_request:
+
 jobs:
   rust-vitess-tests:
     name: "Rust test suite: ${{ matrix.database }} on Linux"
@@ -23,7 +24,7 @@ jobs:
       RUST_BACKTRACE: 1
       CLICOLOR_FORCE: 1
 
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, buildjet-4vcpu-ubuntu-2004]
     steps:
       - uses: actions/checkout@v2
 
