@@ -24,7 +24,7 @@ jobs:
       RUST_BACKTRACE: 1
       CLICOLOR_FORCE: 1
 
-    runs-on: [self-hosted, buildjet-16vcpu-ubuntu-2004]
+    runs-on: [self-hosted, buildjet-32vcpu-ubuntu-2004]
     steps:
       - uses: actions/checkout@v2
 
