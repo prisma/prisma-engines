@@ -189,7 +189,7 @@ fn does_not_support_composite_types() {
     let err = datamodel::parse_schema(schema).unwrap_err();
 
     let expected = expect![[r#"
-        [1;91merror[0m: [1mError validating: Composite types are not supported on Cockroach.[0m
+        [1;91merror[0m: [1mError validating: Composite types are not supported on CockroachDB.[0m
           [1;94m-->[0m  [4mschema.prisma:12[0m
         [1;94m   | [0m
         [1;94m11 | [0m

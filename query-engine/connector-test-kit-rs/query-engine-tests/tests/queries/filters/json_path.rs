@@ -508,14 +508,14 @@ mod json_path {
     }
 
     // CockroachDB does not support JSON comparisons (https://github.com/cockroachdb/cockroach/issues/49144).
-    #[connector_test(schema(pg_json), only(Postgres), exclude(Cockroach))]
+    #[connector_test(schema(pg_json), only(Postgres), exclude(CockroachDb))]
     async fn gt_gte_pg_json(runner: Runner) -> TestResult<()> {
         gt_gte_runner(runner).await?;
 
         Ok(())
     }
 
-    #[connector_test(schema(pg_json), only(Cockroach))]
+    #[connector_test(schema(pg_json), only(CockroachDb))]
     async fn cockroach_errors_on_json_gt_lt(runner: Runner) -> TestResult<()> {
         let query = format!(
             r#"query {{
@@ -537,7 +537,7 @@ mod json_path {
     }
 
     // CockroachDB does not support JSON comparisons (https://github.com/cockroachdb/cockroach/issues/49144).
-    #[connector_test(only(Postgres), exclude(Cockroach))]
+    #[connector_test(only(Postgres), exclude(CockroachDb))]
     async fn gt_gte(runner: Runner) -> TestResult<()> {
         gt_gte_runner(runner).await?;
 
@@ -589,7 +589,7 @@ mod json_path {
     }
 
     // CockroachDB does not support JSON comparisons (https://github.com/cockroachdb/cockroach/issues/49144).
-    #[connector_test(schema(pg_json), only(Postgres), exclude(Cockroach))]
+    #[connector_test(schema(pg_json), only(Postgres), exclude(CockroachDb))]
     async fn lt_lte_pg_json(runner: Runner) -> TestResult<()> {
         lt_lte_runner(runner).await?;
 
@@ -597,7 +597,7 @@ mod json_path {
     }
 
     // CockroachDB does not support JSON comparisons (https://github.com/cockroachdb/cockroach/issues/49144).
-    #[connector_test(only(Postgres), exclude(Cockroach))]
+    #[connector_test(only(Postgres), exclude(CockroachDb))]
     async fn lt_lte(runner: Runner) -> TestResult<()> {
         lt_lte_runner(runner).await?;
 
@@ -648,7 +648,7 @@ mod json_path {
     }
 
     // CockroachDB does not support JSON comparisons (https://github.com/cockroachdb/cockroach/issues/49144).
-    #[connector_test(schema(pg_json), only(Postgres), exclude(Cockroach))]
+    #[connector_test(schema(pg_json), only(Postgres), exclude(CockroachDb))]
     async fn multi_filtering_pg_json(runner: Runner) -> TestResult<()> {
         multi_filtering_runner(runner).await?;
 
@@ -656,7 +656,7 @@ mod json_path {
     }
 
     // CockroachDB does not support JSON comparisons (https://github.com/cockroachdb/cockroach/issues/49144).
-    #[connector_test(only(Postgres), exclude(Cockroach))]
+    #[connector_test(only(Postgres), exclude(CockroachDb))]
     async fn multi_filtering(runner: Runner) -> TestResult<()> {
         multi_filtering_runner(runner).await?;
 

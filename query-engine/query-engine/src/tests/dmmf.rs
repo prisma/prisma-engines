@@ -3,7 +3,7 @@ use crate::{
     opt::{CliOpt, PrismaOpt, Subcommand},
     PrismaResult,
 };
-use datamodel_connector::{ConnectorCapabilities, ReferentialIntegrity};
+use datamodel_connector::ConnectorCapabilities;
 use prisma_models::InternalDataModelBuilder;
 use query_core::{schema_builder, BuildMode, QuerySchema};
 use serial_test::serial;
@@ -16,7 +16,7 @@ pub fn get_query_schema(datamodel_string: &str) -> (QuerySchema, datamodel::dml:
 
     let capabilities = datasource
         .map(|ds| ds.capabilities())
-        .unwrap_or_else(ConnectorCapabilities::empty());
+        .unwrap_or_else(|| ConnectorCapabilities::empty());
     let referential_integrity = datasource.map(|ds| ds.referential_integrity()).unwrap_or_default();
 
     let internal_ref = InternalDataModelBuilder::from(&dm).build("db".to_owned());

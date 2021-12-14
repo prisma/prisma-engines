@@ -136,7 +136,7 @@ async fn database_description_for_mysql_8_should_work(api: &TestApi) -> TestResu
     Ok(())
 }
 
-#[test_connector(tags(Postgres), exclude(Cockroach))]
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
 async fn database_description_for_postgres_should_work(api: &TestApi) -> TestResult {
     setup_blog(&api.barrel()).await?;
 

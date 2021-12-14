@@ -64,7 +64,7 @@ static DB_UNDER_TEST: Lazy<Result<DbUnderTest, String>> = Lazy::new(|| {
         "postgresql" | "postgres" => Ok({
             let tags = postgres::get_postgres_tags(&database_url)?;
 
-            let provider = if tags.contains(Tags::Cockroach) {
+            let provider = if tags.contains(Tags::CockroachDb) {
                 "cockroachdb"
             } else {
                 "postgresql"

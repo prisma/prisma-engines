@@ -123,7 +123,7 @@ mod update_many {
     }
 
     // "An updateMany mutation" should "correctly apply all number operations for Int"
-    #[connector_test(exclude(Cockroach))]
+    #[connector_test(exclude(CockroachDb))]
     async fn apply_number_ops_for_int(runner: Runner) -> TestResult<()> {
         create_row(&runner, r#"{ id: 1, optStr: "str1" }"#).await?;
         create_row(&runner, r#"{ id: 2, optStr: "str2", optInt: 2 }"#).await?;
@@ -188,7 +188,7 @@ mod update_many {
 
     // CockroachDB does not support the "divide" operator as is.
     // See https://github.com/cockroachdb/cockroach/issues/41448.
-    #[connector_test(only(Cockroach))]
+    #[connector_test(only(CockroachDb))]
     async fn apply_number_ops_for_int_cockroach(runner: Runner) -> TestResult<()> {
         create_row(&runner, r#"{ id: 1, optStr: "str1" }"#).await?;
         create_row(&runner, r#"{ id: 2, optStr: "str2", optInt: 2 }"#).await?;

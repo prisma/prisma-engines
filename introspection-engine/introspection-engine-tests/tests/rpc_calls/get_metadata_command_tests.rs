@@ -15,7 +15,7 @@ async fn metadata_for_mysql_should_work(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(tags(Postgres), exclude(Cockroach))]
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
 async fn metadata_for_postgres_should_work(api: &TestApi) -> TestResult {
     setup(&api.barrel(), api.schema_name()).await?;
 
@@ -27,7 +27,7 @@ async fn metadata_for_postgres_should_work(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(tags(Cockroach))]
+#[test_connector(tags(CockroachDb))]
 async fn metadata_for_cockroach_should_work(api: &TestApi) -> TestResult {
     setup(&api.barrel(), api.schema_name()).await?;
 

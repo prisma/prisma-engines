@@ -536,7 +536,7 @@ fn column_type_migrations_should_not_implicitly_drop_compound_indexes(api: TestA
     });
 }
 
-#[test_connector(tags(Postgres), exclude(Cockroach), preview_features("extendedIndexes"))]
+#[test_connector(tags(Postgres), exclude(CockroachDb), preview_features("extendedIndexes"))]
 fn hash_index(api: TestApi) {
     let dm = formatdoc! {r#"
         {}
@@ -888,7 +888,7 @@ fn removal_descending_unique(api: TestApi) {
     });
 }
 
-#[test_connector(tags(Postgres), exclude(Cockroach))]
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
 fn index_algo_should_not_change_without_preview_feature(api: TestApi) {
     let sql = indoc! {r#"
         CREATE TABLE "A" (

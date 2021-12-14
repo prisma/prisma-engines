@@ -186,7 +186,7 @@ fn uuids_do_not_generate_drift_issue_5282(api: TestApi) {
 }
 
 // CockroachDB does not support uuid-ossp functions in a separate schema.
-#[test_connector(tags(Postgres), exclude(Cockroach))]
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
 fn functions_with_schema_prefix_in_dbgenerated_are_idempotent(api: TestApi) {
     api.raw_cmd(r#"CREATE SCHEMA "myschema"; CREATE EXTENSION IF NOT EXISTS "uuid-ossp" WITH SCHEMA "myschema";"#);
 

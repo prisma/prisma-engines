@@ -149,7 +149,7 @@ impl TestApi {
 
     /// Returns true only when testing on cockroach.
     pub fn is_cockroach(&self) -> bool {
-        self.tags().contains(Tags::Cockroach)
+        self.tags().contains(Tags::CockroachDb)
     }
 
     /// Returns true only when testing on sqlite.

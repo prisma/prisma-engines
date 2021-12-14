@@ -195,7 +195,7 @@ mod atomic_number_ops {
     }
 
     // "A nested updateOne mutation" should "correctly apply all number operations for Int"
-    #[connector_test(schema(schema_3), exclude(Cockroach))]
+    #[connector_test(schema(schema_3), exclude(CockroachDb))]
     async fn nested_update_int_ops(runner: Runner) -> TestResult<()> {
         create_test_model(&runner, 1, None, None).await?;
         create_test_model(&runner, 2, Some(3), None).await?;
@@ -265,7 +265,7 @@ mod atomic_number_ops {
 
     // CockroachDB does not support the "divide" operator as is.
     // See https://github.com/cockroachdb/cockroach/issues/41448.
-    #[connector_test(schema(schema_3), only(Cockroach))]
+    #[connector_test(schema(schema_3), only(CockroachDb))]
     async fn nested_update_int_ops_cockroach(runner: Runner) -> TestResult<()> {
         create_test_model(&runner, 1, None, None).await?;
         create_test_model(&runner, 2, Some(3), None).await?;

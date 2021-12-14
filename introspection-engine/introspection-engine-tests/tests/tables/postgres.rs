@@ -87,7 +87,7 @@ async fn a_table_with_descending_index(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(tags(Postgres), exclude(Cockroach), preview_features("extendedIndexes"))]
+#[test_connector(tags(Postgres), exclude(CockroachDb), preview_features("extendedIndexes"))]
 async fn a_table_with_a_hash_index(api: &TestApi) -> TestResult {
     let setup = indoc! {r#"
        CREATE TABLE "A" (
@@ -115,7 +115,7 @@ async fn a_table_with_a_hash_index(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(tags(Postgres), exclude(Cockroach))]
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
 async fn a_table_with_a_hash_index_no_preview(api: &TestApi) -> TestResult {
     let setup = indoc! {r#"
        CREATE TABLE "A" (
