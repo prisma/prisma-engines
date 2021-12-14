@@ -1160,10 +1160,10 @@
 }
 
 <span class="comment">// Examples (postgres): 1, 1::INT, &#39;1&#39;::INT, -1::INT, &#39;-1&#39;::INT</span>
-<span class="comment">// Examples (cockroach): 1:::INT, &#39;1&#39;:::INT, (-1):::INT, (&#39;-1&#39;):::INT</span>
+<span class="comment">// Examples (CockroachDb)): 1:::INT, &#39;1&#39;:::INT, (-1):::INT, (&#39;-1&#39;):::INT</span>
 <span class="kw">static</span> <span class="ident">PG_RE_NUM</span>: <span class="ident">Lazy</span><span class="op">&lt;</span><span class="ident">Regex</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Lazy::new</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">Regex::new</span>(<span class="string">r&quot;^\(?&#39;?(-?\d+)&#39;?\)?(:{2,3}.*)?$&quot;</span>).<span class="ident">expect</span>(<span class="string">&quot;compile regex&quot;</span>));
 <span class="comment">// Examples (postgres): 5.3, 5.3::FLOAT, -5.3, &#39;-5.3&#39;::FLOAT</span>
-<span class="comment">// Examples (cockroach): 5.3:::FLOAT8, (-5.3):::FLOAT8</span>
+<span class="comment">// Examples (CockroachDb)): 5.3:::FLOAT8, (-5.3):::FLOAT8</span>
 <span class="kw">static</span> <span class="ident">PG_RE_FLOAT</span>: <span class="ident">Lazy</span><span class="op">&lt;</span><span class="ident">Regex</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Lazy::new</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">Regex::new</span>(<span class="string">r&quot;^\(?&#39;?([^:&#39;)]+)&#39;?\)?(:{2,3}.*)?$&quot;</span>).<span class="ident">expect</span>(<span class="string">&quot;compile regex&quot;</span>));
 
 <span class="kw">impl</span> <span class="ident">Parser</span> <span class="kw">for</span> <span class="ident">SqlSchemaDescriber</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
