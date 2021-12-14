@@ -104,7 +104,7 @@ pub struct CockroachDatamodelConnector;
 
 impl Connector for CockroachDatamodelConnector {
     fn name(&self) -> &str {
-        "Cockroach"
+        "CockroachDB"
     }
 
     fn capabilities(&self) -> &'static [ConnectorCapability] {

@@ -35,7 +35,7 @@ impl ConnectorTagInterface for CockroachDbConnectorTag {
     }
 
     fn as_parse_pair(&self) -> (String, Option<String>) {
-        ("cockroach".to_owned(), None)
+        ("cockroachdb".to_owned(), None)
     }
 
     fn is_versioned(&self) -> bool {
