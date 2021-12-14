@@ -7,7 +7,7 @@ use query_engine_tests::*;
     suite = "setnull_onD_1to1_req",
     schema(required),
     only(Postgres),
-    exclude(Cockroachdb)
+    exclude(CockroachDb)
 )]
 mod one2one_req {
     fn required() -> String {
@@ -99,7 +99,7 @@ mod one2one_opt {
     suite = "setnull_onD_1toM_req",
     schema(required),
     only(Postgres),
-    exclude(Cockroachdb)
+    exclude(CockroachDb)
 )]
 mod one2many_req {
     fn required() -> String {
