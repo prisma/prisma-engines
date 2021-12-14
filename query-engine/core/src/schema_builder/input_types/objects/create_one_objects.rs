@@ -62,6 +62,9 @@ fn checked_create_input_type(
     // Compute input fields for relational fields.
     let mut relational_fields = relation_input_fields_for_checked_create(ctx, model, parent_field);
 
+    // Compute input fields for composite fields.
+    // let mut composite_fields =
+
     fields.append(&mut relational_fields);
 
     input_object.set_fields(fields);
