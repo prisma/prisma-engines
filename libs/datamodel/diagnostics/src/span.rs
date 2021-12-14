@@ -6,13 +6,19 @@ pub struct Span {
 }
 
 impl Span {
+    /// Constructor.
     pub fn new(start: usize, end: usize) -> Span {
         Span { start, end }
     }
 
-    // Creates a new empty span.
+    /// Creates a new empty span.
     pub fn empty() -> Span {
         Span { start: 0, end: 0 }
+    }
+
+    /// Is the given position inside the span? (boundaries included)
+    pub fn contains(&self, position: usize) -> bool {
+        position >= self.start && position <= self.end
     }
 
     /// Adds an offset to a span.

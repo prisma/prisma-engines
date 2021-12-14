@@ -11,6 +11,7 @@ mod r#enum;
 mod field;
 mod index;
 mod model;
+mod position;
 mod relation;
 mod relation_field;
 mod scalar_field;
@@ -19,13 +20,13 @@ pub use composite_type::*;
 pub use field::*;
 pub use index::*;
 pub use model::*;
+pub use position::*;
 pub use r#enum::*;
 pub use relation::*;
 pub use relation_field::*;
 pub use scalar_field::*;
 
-use super::ParserDatabase;
-use crate::ast;
+use crate::{ast, ParserDatabase};
 
 /// A generic walker. Only walkers intantiated with a concrete ID type (`I`) are useful.
 #[derive(Clone, Copy)]

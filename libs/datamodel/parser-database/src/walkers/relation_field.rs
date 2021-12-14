@@ -11,7 +11,7 @@ use std::{
 };
 
 /// A relation field on a model in the schema.
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, Debug)]
 pub struct RelationFieldWalker<'ast, 'db> {
     pub(crate) model_id: ast::ModelId,
     pub(crate) field_id: ast::FieldId,

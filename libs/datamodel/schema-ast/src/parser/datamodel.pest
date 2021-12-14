@@ -72,10 +72,12 @@ attribute = { (attribute_name ~ attribute_arguments | attribute_name) }
 // This is a poor-mans version of name spacing. This is currently used for native types.
 attribute_name = @{ (maybe_empty_identifier ~ ".")? ~ maybe_empty_identifier }
 // If arguments are supplied there might multiple unnahmed arguments (see decimal native type).
-attribute_arguments = { "(" ~ (((argument | argument_value) ~ ("," ~ (argument | argument_value))*)?) ~ ")" }
+attribute_arguments = { "(" ~ (argument ~ ("," ~ argument)*)? ~ ")" }
 
-argument = { (argument_name ~ ":" ~ argument_value) }
-argument_name = { (!":" ~ non_empty_identifier)+ }
+argument = _{ named_argument | empty_argument | argument_value }
+empty_argument = { argument_name ~ ":" }
+named_argument = { argument_name ~ ":" ~ argument_value }
+argument_name = { non_empty_identifier }
 argument_value = { expression }
 
 // ######################################

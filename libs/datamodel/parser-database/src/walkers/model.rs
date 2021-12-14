@@ -15,7 +15,7 @@ use crate::{
 use std::hash::{Hash, Hasher};
 
 /// A `model` declaration in the Prisma schema.
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, Debug)]
 pub struct ModelWalker<'ast, 'db> {
     pub(super) model_id: ast::ModelId,
     pub(super) db: &'db ParserDatabase<'ast>,

@@ -1,0 +1,17 @@
+datasource db {
+    provider = "sqlserver"
+    url = env("DATABASE_URL")
+}
+
+model TestB {
+    id String @id
+    name Int
+}
+
+model Test {
+    id   Int @id
+    bId  Int
+    // The user started typing Casc
+    b    TestB @relation(onDelete: Cas<|>)
+}
+

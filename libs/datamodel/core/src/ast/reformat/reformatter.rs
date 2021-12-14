@@ -731,10 +731,12 @@ impl<'a> Reformatter<'a> {
     ) {
         let mut builder = StringBuilder::new();
 
+        debug_assert_eq!(token.as_rule(), Rule::attribute_arguments);
+
         for current in token.clone().into_inner() {
             match current.as_rule() {
                 // This is a named arg.
-                Rule::argument => {
+                Rule::named_argument => {
                     if !builder.line_empty() {
                         builder.write(", ");
                     }
@@ -910,6 +912,7 @@ impl<'a> Reformatter<'a> {
     }
 
     fn reformat_field_with_args(target: &mut dyn LineWriteable, token: &Token<'_>) {
+        debug_assert_eq!(token.as_rule(), Rule::field_with_args);
         let mut has_seen_one_argument = false;
 
         for current in token.clone().into_inner() {
@@ -918,7 +921,7 @@ impl<'a> Reformatter<'a> {
                     target.write(current.as_str());
                     target.write("(");
                 }
-                Rule::argument => {
+                Rule::named_argument => {
                     if has_seen_one_argument {
                         target.write(", ");
                     }

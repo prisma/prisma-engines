@@ -7,7 +7,7 @@ use crate::{
 use diagnostics::Span;
 
 /// A scalar field, as part of a model.
-#[derive(Copy, Clone)]
+#[derive(Debug, Copy, Clone)]
 pub struct ScalarFieldWalker<'ast, 'db> {
     pub(crate) model_id: ast::ModelId,
     pub(crate) field_id: ast::FieldId,

@@ -1,4 +1,6 @@
-use super::{CompositeType, Enum, Field, GeneratorConfig, Identifier, Model, SourceConfig};
+use crate::ast::{
+    traits::WithSpan, CompositeType, Enum, Field, GeneratorConfig, Identifier, Model, SourceConfig, Span,
+};
 
 /// Enum for distinguishing between top-level entries
 #[derive(Debug, Clone, PartialEq)]
@@ -77,6 +79,19 @@ impl Top {
         match self {
             Top::Source(source) => Some(source),
             _ => None,
+        }
+    }
+}
+
+impl WithSpan for Top {
+    fn span(&self) -> &Span {
+        match self {
+            Top::CompositeType(ct) => &ct.span,
+            Top::Enum(en) => en.span(),
+            Top::Model(model) => model.span(),
+            Top::Source(source) => source.span(),
+            Top::Generator(gen) => gen.span(),
+            Top::Type(ty) => ty.span(),
         }
     }
 }

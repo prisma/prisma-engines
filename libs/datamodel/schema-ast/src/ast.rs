@@ -5,6 +5,7 @@ mod composite_type;
 mod r#enum;
 mod expression;
 mod field;
+mod find_at_position;
 mod generator_config;
 mod identifier;
 mod model;
@@ -13,12 +14,13 @@ mod top;
 mod traits;
 
 pub use argument::Argument;
-pub use attribute::Attribute;
+pub use attribute::{Attribute, EmptyArgument};
 pub use comment::Comment;
 pub use composite_type::{CompositeType, CompositeTypeId};
 pub use diagnostics::Span;
 pub use expression::Expression;
 pub use field::{Field, FieldArity, FieldType};
+pub use find_at_position::*;
 pub use generator_config::GeneratorConfig;
 pub use identifier::Identifier;
 pub use model::{FieldId, Model};
@@ -53,7 +55,7 @@ impl SchemaAst {
         self.iter_models().find(|(_, m)| m.name.name == model).map(|(_, m)| m)
     }
 
-    pub fn iter_models(&self) -> impl Iterator<Item = (ModelId, &Model)> {
+    fn iter_models(&self) -> impl Iterator<Item = (ModelId, &Model)> {
         self.iter_tops().filter_map(|(top_id, top)| match (top_id, top) {
             (TopId::Model(model_id), Top::Model(model)) => Some((model_id, model)),
             _ => None,
@@ -61,18 +63,10 @@ impl SchemaAst {
     }
 
     pub fn iter_tops(&self) -> impl Iterator<Item = (TopId, &Top)> {
-        self.tops.iter().enumerate().map(|(top_idx, top)| {
-            let top_id = match top {
-                Top::Enum(_) => TopId::Enum(EnumId(top_idx as u32)),
-                Top::Model(_) => TopId::Model(ModelId(top_idx as u32)),
-                Top::Source(_) => TopId::Source(SourceId(top_idx as u32)),
-                Top::Generator(_) => TopId::Generator(GeneratorId(top_idx as u32)),
-                Top::Type(_) => TopId::Alias(AliasId(top_idx as u32)),
-                Top::CompositeType(_) => TopId::CompositeType(CompositeTypeId(top_idx as u32)),
-            };
-
-            (top_id, top)
-        })
+        self.tops
+            .iter()
+            .enumerate()
+            .map(|(top_idx, top)| (top_idx_to_top_id(top_idx, top), top))
     }
 
     pub fn sources(&self) -> impl Iterator<Item = &SourceConfig> {
@@ -187,5 +181,16 @@ impl std::ops::Index<TopId> for SchemaAst {
         };
 
         &self.tops[idx as usize]
+    }
+}
+
+fn top_idx_to_top_id(top_idx: usize, top: &Top) -> TopId {
+    match top {
+        Top::Enum(_) => TopId::Enum(EnumId(top_idx as u32)),
+        Top::Model(_) => TopId::Model(ModelId(top_idx as u32)),
+        Top::Source(_) => TopId::Source(SourceId(top_idx as u32)),
+        Top::Generator(_) => TopId::Generator(GeneratorId(top_idx as u32)),
+        Top::Type(_) => TopId::Alias(AliasId(top_idx as u32)),
+        Top::CompositeType(_) => TopId::CompositeType(CompositeTypeId(top_idx as u32)),
     }
 }

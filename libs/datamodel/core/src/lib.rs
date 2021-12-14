@@ -86,7 +86,9 @@ pub use crate::dml::*;
 pub use configuration::{Configuration, Datasource, Generator, StringFromEnvVar};
 pub use datamodel_connector;
 pub use diagnostics;
+pub use parser_database;
 pub use parser_database::is_reserved_type_name;
+pub use schema_ast;
 
 use crate::{ast::SchemaAst, common::preview_features::PreviewFeature};
 use ast::reformat::MissingField;
