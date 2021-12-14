@@ -12,8 +12,8 @@ jobs:
       fail-fast: false
       matrix:
         database:
-          - "vitess_5_7"
-          - "vitess_8_0"
+          #- "vitess_5_7"
+          #- "vitess_8_0"
           - "cockroach"
 
     env:
@@ -43,6 +43,6 @@ jobs:
       #       target
       #     key: query-engine-rust-${{ runner.os }}-cargo-vitess-${{ matrix.version }}-${{ hashFiles('**/Cargo.lock') }}
 
-      - run: export WORKSPACE_ROOT=$(pwd) && cargo test --package query-engine-tests -- --test-threads=1
+      - run: export WORKSPACE_ROOT=$(pwd) && cargo test --package query-engine-tests #-- --test-threads=1
         env:
           CLICOLOR_FORCE: 1
