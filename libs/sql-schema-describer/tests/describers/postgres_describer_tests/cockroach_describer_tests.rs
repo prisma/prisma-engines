@@ -1,7 +1,7 @@
 use crate::test_api::*;
 use sql_schema_describer::{ColumnTypeFamily, IndexColumn, SQLSortOrder};
 
-#[test_connector(tags(Cockroach))]
+#[test_connector(tags(CockroachDb))]
 fn views_can_be_described(api: TestApi) {
     let full_sql = r#"
         CREATE TABLE a (a_id int);
@@ -19,7 +19,7 @@ fn views_can_be_described(api: TestApi) {
     assert_eq!(expected_sql, view.definition.unwrap());
 }
 
-#[test_connector(tags(Cockroach))]
+#[test_connector(tags(CockroachDb))]
 fn all_postgres_column_types_must_work(api: TestApi) {
     let migration = r#"
         CREATE TYPE "mood" AS ENUM ('sad', 'ok', 'happy');
@@ -208,7 +208,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
     });
 }
 
-#[test_connector(tags(Cockroach))]
+#[test_connector(tags(CockroachDb))]
 fn cockroach_multi_field_indexes_must_be_inferred_in_the_right_order(api: TestApi) {
     let schema = format!(
         r##"

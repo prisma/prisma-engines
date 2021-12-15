@@ -3,7 +3,12 @@
 use indoc::indoc;
 use query_engine_tests::*;
 
-#[test_suite(suite = "setnull_onU_1to1_req", schema(required), only(Postgres), exclude(Cockroach))]
+#[test_suite(
+    suite = "setnull_onU_1to1_req",
+    schema(required),
+    only(Postgres),
+    exclude(CockroachDb)
+)]
 mod one2one_req {
     fn required() -> String {
         let schema = indoc! {
@@ -353,7 +358,12 @@ mod one2one_opt {
     }
 }
 
-#[test_suite(suite = "setnull_onU_1toM_req", schema(required), only(Postgres), exclude(Cockroach))]
+#[test_suite(
+    suite = "setnull_onU_1toM_req",
+    schema(required),
+    only(Postgres),
+    exclude(CockroachDb)
+)]
 mod one2many_req {
     fn required() -> String {
         let schema = indoc! {

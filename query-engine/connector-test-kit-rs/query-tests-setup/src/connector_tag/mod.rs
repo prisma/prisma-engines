@@ -135,7 +135,7 @@ impl fmt::Display for ConnectorVersion {
                 Some(v) => format!("Vitess ({})", v.to_string()),
                 None => "Vitess (unknown)".to_string(),
             },
-            Self::CockroachDb => "CockroachDb".to_string(),
+            Self::CockroachDb => "CockroachDB".to_string(),
         };
 
         write!(f, "{}", printable)
@@ -202,7 +202,7 @@ impl TryFrom<(&str, Option<&str>)> for ConnectorTag {
         let tag = match connector.to_lowercase().as_str() {
             "sqlite" => Self::Sqlite(SqliteConnectorTag::new()),
             "sqlserver" => Self::SqlServer(SqlServerConnectorTag::new(version)?),
-            "cockroach" | "cockroachdb" => Self::Cockroach(CockroachDbConnectorTag::new()),
+            "cockroachdb" => Self::Cockroach(CockroachDbConnectorTag::new()),
             "postgres" => Self::Postgres(PostgresConnectorTag::new(version)?),
             "mysql" => Self::MySql(MySqlConnectorTag::new(version)?),
             "mongodb" => Self::MongoDb(MongoDbConnectorTag::new(version)?),

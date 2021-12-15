@@ -104,7 +104,7 @@ impl TestApi {
     }
 
     pub fn is_cockroach(&self) -> bool {
-        self.tags().contains(Tags::Cockroach)
+        self.tags().contains(Tags::CockroachDb)
     }
 
     pub fn is_mysql8(&self) -> bool {

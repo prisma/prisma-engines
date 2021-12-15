@@ -348,7 +348,7 @@ async fn a_table_with_a_multi_column_non_unique_index(api: &TestApi) -> TestResu
 }
 
 // SQLite does not have a serial type that's not a primary key.
-#[test_connector(exclude(Sqlite, Mysql, Cockroach))]
+#[test_connector(exclude(Sqlite, Mysql, CockroachDb))]
 async fn a_table_with_non_id_autoincrement(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
@@ -377,7 +377,7 @@ async fn a_table_with_non_id_autoincrement(api: &TestApi) -> TestResult {
 // Cockroach can return non-deterministic results if the UNIQUE constraint is defined twice
 // (it does not collapse similar unique constraints). This variation does not include the
 // doubly defined unique constraint.
-#[test_connector(tags(Cockroach))]
+#[test_connector(tags(CockroachDb))]
 async fn a_table_with_non_id_autoincrement_cockroach(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
@@ -475,7 +475,7 @@ async fn default_values(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(tags(Postgres), exclude(Cockroach, Postgres14))]
+#[test_connector(tags(Postgres), exclude(CockroachDb, Postgres14))]
 async fn pg_default_value_as_dbgenerated(api: &TestApi) -> TestResult {
     let sequence = "CREATE SEQUENCE test_seq START 1".to_string();
     api.database().execute_raw(&sequence, &[]).await?;
@@ -662,7 +662,7 @@ async fn a_table_with_partial_indexes_should_ignore_them(api: &TestApi) -> TestR
     Ok(())
 }
 
-#[test_connector(tags(Postgres), exclude(Cockroach))]
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
 async fn introspecting_a_table_with_json_type_must_work(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
@@ -687,7 +687,7 @@ async fn introspecting_a_table_with_json_type_must_work(api: &TestApi) -> TestRe
     Ok(())
 }
 
-#[test_connector(tags(Cockroach))]
+#[test_connector(tags(CockroachDb))]
 async fn introspecting_a_table_with_json_type_must_work_cockroach(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
@@ -971,7 +971,7 @@ async fn unique_and_id_on_same_field_works_mssql(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(tags(Postgres), exclude(Cockroach))]
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
 // If multiple constraints are created in the create table statement Postgres seems to collapse them
 // into the first named one. So on the db level there will be one named really_must_be_different that
 // is both unique and primary. We only render it as @id then.

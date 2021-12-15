@@ -41,7 +41,7 @@ async fn sequences_should_work(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(tags(Postgres), exclude(Cockroach))]
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
 async fn dbgenerated_type_casts_should_work(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(move |migration| {
@@ -63,7 +63,7 @@ async fn dbgenerated_type_casts_should_work(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(tags(Cockroach))]
+#[test_connector(tags(CockroachDb))]
 async fn dbgenerated_type_casts_should_work_cockroach(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(move |migration| {
@@ -85,7 +85,7 @@ async fn dbgenerated_type_casts_should_work_cockroach(api: &TestApi) -> TestResu
     Ok(())
 }
 
-#[test_connector(tags(Postgres), exclude(Cockroach))]
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
 async fn pg_xml_indexes_are_skipped(api: &TestApi) -> TestResult {
     let create_table = format!(
         "CREATE TABLE \"{schema_name}\".xml_test (id SERIAL PRIMARY KEY, data XML)",

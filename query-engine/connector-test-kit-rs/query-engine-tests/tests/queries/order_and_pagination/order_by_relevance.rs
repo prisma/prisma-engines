@@ -1,6 +1,6 @@
 use query_engine_tests::*;
 
-#[test_suite(schema(schema), capabilities(FullTextSearchWithoutIndex), exclude(Cockroach))]
+#[test_suite(schema(schema), capabilities(FullTextSearchWithoutIndex), exclude(CockroachDb))]
 mod order_by_relevance {
     use indoc::indoc;
     use query_engine_tests::{assert_error, run_query};

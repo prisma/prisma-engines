@@ -53,7 +53,7 @@ fn function_expressions_as_dbgenerated_work(api: TestApi) {
     });
 }
 
-#[test_connector(tags(Postgres), exclude(Cockroach))]
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
 fn default_dbgenerated_with_type_definitions_should_work(api: TestApi) {
     let dm = r#"
         model A {
@@ -70,7 +70,7 @@ fn default_dbgenerated_with_type_definitions_should_work(api: TestApi) {
     });
 }
 
-#[test_connector(tags(Cockroach))]
+#[test_connector(tags(CockroachDb))]
 fn default_dbgenerated_with_type_definitions_should_work_cockroach(api: TestApi) {
     let dm = r#"
         model A {
@@ -87,7 +87,7 @@ fn default_dbgenerated_with_type_definitions_should_work_cockroach(api: TestApi)
     });
 }
 
-#[test_connector(tags(Postgres), exclude(Cockroach))]
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
 fn default_dbgenerated_should_work(api: TestApi) {
     let dm = r#"
         model A {
@@ -104,7 +104,7 @@ fn default_dbgenerated_should_work(api: TestApi) {
     });
 }
 
-#[test_connector(tags(Cockroach))]
+#[test_connector(tags(CockroachDb))]
 fn default_dbgenerated_should_work_cockroach(api: TestApi) {
     let dm = r#"
         model A {
@@ -121,7 +121,7 @@ fn default_dbgenerated_should_work_cockroach(api: TestApi) {
     });
 }
 
-#[test_connector(tags(Postgres), exclude(Cockroach))]
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
 fn uuid_default(api: TestApi) {
     let dm = r#"
         model A {
@@ -141,7 +141,7 @@ fn uuid_default(api: TestApi) {
     });
 }
 
-#[test_connector(tags(Cockroach))]
+#[test_connector(tags(CockroachDb))]
 fn uuid_default_cockroach(api: TestApi) {
     let dm = r#"
         model A {

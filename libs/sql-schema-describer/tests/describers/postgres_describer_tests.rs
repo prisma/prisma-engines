@@ -7,7 +7,7 @@ use native_types::{NativeType, PostgresType};
 use pretty_assertions::assert_eq;
 use sql_schema_describer::*;
 
-#[test_connector(tags(Postgres), exclude(Cockroach))]
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
 fn views_can_be_described(api: TestApi) {
     let full_sql = r#"
         CREATE TABLE a (a_id int);
@@ -25,7 +25,7 @@ fn views_can_be_described(api: TestApi) {
     assert_eq!(expected_sql, view.definition.unwrap());
 }
 
-#[test_connector(tags(Postgres), exclude(Cockroach))]
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
 fn all_postgres_column_types_must_work(api: TestApi) {
     let mut migration = Migration::new().schema(api.schema_name());
     migration.create_table("User", move |t| {
@@ -687,7 +687,7 @@ fn postgres_sequences_must_work(api: TestApi) {
     assert_eq!(got_seq, &Sequence { name: "test".into() },);
 }
 
-#[test_connector(tags(Postgres), exclude(Cockroach))]
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
 fn postgres_multi_field_indexes_must_be_inferred_in_the_right_order(api: TestApi) {
     let schema = format!(
         r##"

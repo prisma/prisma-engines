@@ -2,7 +2,7 @@ use query_engine_tests::*;
 
 // CockroachDB does not support FullTextSearchWithoutIndex, despite having that capability
 // as it inherits PostgreSQL's capabilities.
-#[test_suite(schema(schema), capabilities(FullTextSearchWithoutIndex), exclude(Cockroach))]
+#[test_suite(schema(schema), capabilities(FullTextSearchWithoutIndex), exclude(CockroachDb))]
 mod search_filter {
     use indoc::indoc;
     use query_engine_tests::run_query;
