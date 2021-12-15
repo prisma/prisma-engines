@@ -98,6 +98,12 @@ mod order_by_dependent_pag {
             }"#,
             // Depends on how null values are handled.
             MongoDb(_) | Sqlite | MySql(_) => vec![r#"{"data":{"findManyModelA":[{"id":1,"b":{"id":1}},{"id":2,"b":{"id":2}}]}}"#],
+            CockroachDb => vec![
+                // NULLS FIRST
+                r#"{"data":{"findManyModelA":[{"id":1,"b":{"id":1}},{"id":2,"b":{"id":2}}]}}"#,
+                // NULLS LAST
+                r#"{"data":{"findManyModelA":[{"id":1,"b":{"id":1}},{"id":2,"b":{"id":2}},{"id":3,"b":null}]}}"#
+            ],
             _ => vec![r#"{"data":{"findManyModelA":[{"id":1,"b":{"id":1}},{"id":2,"b":{"id":2}},{"id":3,"b":null}]}}"#]
         );
 
@@ -167,6 +173,12 @@ mod order_by_dependent_pag {
             }"#,
             // Depends on how null values are handled.
             MongoDb(_) | Sqlite | MySql(_) => vec![r#"{"data":{"findManyModelA":[{"id":1,"b":{"c":{"id":1}}}]}}"#],
+            CockroachDb => vec![
+                // NULLS FIRST
+                r#"{"data":{"findManyModelA":[{"id":1,"b":{"c":{"id":1}}}]}}"#,
+                // NULLS LAST
+                r#"{"data":{"findManyModelA":[{"id":1,"b":{"c":{"id":1}}},{"id":3,"b":null},{"id":2,"b":{"c":null}}]}}"#,
+            ],
             _ => vec![r#"{"data":{"findManyModelA":[{"id":1,"b":{"c":{"id":1}}},{"id":2,"b":{"c":null}},{"id":3,"b":null}]}}"#]
         );
 
@@ -249,7 +261,12 @@ mod order_by_dependent_pag {
             }"#,
             // Depends on how null values are handled.
             MongoDb(_) | MySql(_) | Sqlite => vec![r#"{"data":{"findManyModelA":[{"id":1,"b":{"c":{"a":{"id":3}}}},{"id":2,"b":{"c":{"a":{"id":4}}}}]}}"#],
-            CockroachDb => vec![r#"{"data":{"findManyModelA":[{"id":1,"b":{"c":{"a":{"id":3}}}},{"id":2,"b":{"c":{"a":{"id":4}}}},{"id":4,"b":null},{"id":3,"b":null}]}}"#],
+            CockroachDb => vec![
+                // NULLS FIRST
+                r#"{"data":{"findManyModelA":[{"id":1,"b":{"c":{"a":{"id":3}}}},{"id":2,"b":{"c":{"a":{"id":4}}}}]}}"#,
+                // NULLS LAST
+                r#"{"data":{"findManyModelA":[{"id":1,"b":{"c":{"a":{"id":3}}}},{"id":2,"b":{"c":{"a":{"id":4}}}},{"id":3,"b":null},{"id":4,"b":null}]}}"#,
+            ],
             _ => vec![r#"{"data":{"findManyModelA":[{"id":1,"b":{"c":{"a":{"id":3}}}},{"id":2,"b":{"c":{"a":{"id":4}}}},{"id":3,"b":null},{"id":4,"b":null}]}}"#]
         );
 
@@ -278,6 +295,12 @@ mod order_by_dependent_pag {
                 }
               }
             }"#,
+            CockroachDb => vec![
+                // NULLS FIRST
+                r#"{"data":{"findManyModelA":[{"id":2,"b":{"c":{"a":{"id":4}}}},{"id":1,"b":{"c":{"a":{"id":3}}}},{"id":3,"b":null},{"id":4,"b":null}]}}"#,
+                // NULLS LAST
+                r#"{"data":{"findManyModelA":[{"id":2,"b":{"c":{"a":{"id":4}}}},{"id":1,"b":{"c":{"a":{"id":3}}}}]}}"#
+            ],
             Postgres(_) => vec![r#"{"data":{"findManyModelA":[{"id":2,"b":{"c":{"a":{"id":4}}}},{"id":1,"b":{"c":{"a":{"id":3}}}}]}}"#],
             // Depends on how null values are handled.
             _ => vec![
