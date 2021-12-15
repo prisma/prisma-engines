@@ -176,7 +176,7 @@ mod one2many_opt {
     }
 }
 
-#[test_suite(schema(schema))]
+#[test_suite(schema(schema), exclude(SqlServer))]
 mod multiple_cascading_paths {
     use indoc::indoc;
     use query_engine_tests::run_query;
