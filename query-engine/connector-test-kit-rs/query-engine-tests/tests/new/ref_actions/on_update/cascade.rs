@@ -386,3 +386,125 @@ mod one2many_opt {
         Ok(())
     }
 }
+
+#[test_suite(schema(schema))]
+mod multiple_cascading_paths {
+    use indoc::indoc;
+    use query_engine_tests::run_query;
+
+    fn schema() -> String {
+        let schema = indoc! {
+            r#"model User {
+                #id(id, Int, @id)
+                idd Int @unique
+                comments Comment[]
+                posts    Post[]
+              }
+              
+              model Post {
+                #id(id, Int, @id)
+                authorId Int
+                author   User      @relation(fields: [authorId], references: [idd], onUpdate: Cascade)
+                comments Comment[]
+              }
+              
+              model Comment {
+                #id(id, Int, @id)
+                writtenById Int
+                postId      Int
+                writtenBy   User @relation(fields: [writtenById], references: [idd], onUpdate: Cascade)
+                post        Post @relation(fields: [postId], references: [id], onUpdate: Cascade)
+              }
+              "#
+        };
+
+        schema.to_owned()
+    }
+
+    // Ensure multiple cascading paths to the same model don't end up updating the same model twice and error out
+    // The two paths are:
+    //   - User -> Comment
+    //   - User -> Post -> Comment
+    #[connector_test]
+    async fn should_work(runner: Runner) -> TestResult<()> {
+        run_query!(
+            &runner,
+            r#"mutation {
+            createOneUser(
+              data: {
+                id: 1
+                idd: 1,
+                posts: {
+                  create: {
+                    id: 1,
+                    comments: {
+                      create: {
+                        id: 1,
+                        writtenBy: {
+                          connect: { idd: 1 }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            ) {
+              id
+            }
+          }
+          "#
+        );
+        // A second user is created to ensure that it won't be touched by the cascade update
+        run_query!(
+            &runner,
+            r#"mutation {
+                createOneUser(
+                  data: {
+                    id: 3
+                    idd: 3,
+                    posts: {
+                      create: {
+                        id: 3,
+                        comments: {
+                          create: {
+                            id: 3,
+                            writtenBy: {
+                              connect: { idd: 3 }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                ) {
+                  id
+                }
+              }
+          "#
+        );
+
+        run_query!(
+            &runner,
+            r#"mutation {
+            updateOneUser(where: { id: 1 }, data: { idd: 2 }) {
+              id
+            }
+          }"#
+        );
+
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"{
+            findManyUser {
+              id
+              idd
+              comments { id, writtenById }
+              posts { id, authorId }
+            }
+          }
+          "#),
+          @r###"{"data":{"findManyUser":[{"id":1,"idd":2,"comments":[{"id":1,"writtenById":2}],"posts":[{"id":1,"authorId":2}]},{"id":3,"idd":3,"comments":[{"id":3,"writtenById":3}],"posts":[{"id":3,"authorId":3}]}]}}"###
+        );
+
+        Ok(())
+    }
+}
