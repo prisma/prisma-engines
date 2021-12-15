@@ -80,6 +80,11 @@ impl<'ast, 'db> RelationFieldWalker<'ast, 'db> {
         self.relation_field.is_ignored
     }
 
+    /// Is the field required? (not optional, not list)
+    pub fn is_required(self) -> bool {
+        self.ast_field().arity.is_required()
+    }
+
     /// The model containing the field.
     pub fn model(self) -> ModelWalker<'ast, 'db> {
         ModelWalker {

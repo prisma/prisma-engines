@@ -134,6 +134,7 @@ pub(super) fn validate(ctx: &mut Context<'_>, relation_transformation_enabled: b
                         // Run these validations last to prevent validation spam.
                         relations::one_to_one::fields_references_mixups(relation, ctx);
                         relations::one_to_one::back_relation_arity_is_optional(relation, ctx);
+                        relations::one_to_one::fields_and_references_on_wrong_side(relation, ctx);
                     } else {
                         relations::one_to_many::both_sides_are_defined(relation, ctx);
                         relations::one_to_many::fields_and_references_are_defined(relation, ctx);

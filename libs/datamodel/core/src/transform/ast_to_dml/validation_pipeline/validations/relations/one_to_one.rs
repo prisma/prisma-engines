@@ -243,3 +243,26 @@ pub(crate) fn back_relation_arity_is_optional(relation: InlineRelationWalker<'_,
         ));
     }
 }
+
+pub(crate) fn fields_and_references_on_wrong_side(relation: InlineRelationWalker<'_, '_>, ctx: &mut Context<'_>) {
+    let (forward, back) = match (relation.forward_relation_field(), relation.back_relation_field()) {
+        (Some(forward), Some(back)) if ctx.diagnostics.errors().is_empty() => (forward, back),
+        _ => return,
+    };
+
+    if forward.is_required() && (back.referencing_fields().is_some() || back.referenced_fields().is_some()) {
+        let message = format!(
+            "The relation field `{back_model}.{back_field}` defines the `fields` and/or `references` argument. You must set them on the required side of the relation (`{forward_model}.{forward_field}`) in order for the constraints to be enforced. Alternatively, you can change this field to be required and the opposite optional, or make both sides of the relation optional.",
+            back_model = back.model().name(),
+            back_field = back.name(),
+            forward_model = forward.model().name(),
+            forward_field = forward.name(),
+        );
+
+        ctx.push_error(DatamodelError::new_attribute_validation_error(
+            &message,
+            RELATION_ATTRIBUTE_NAME,
+            back.ast_field().span,
+        ));
+    }
+}
