@@ -2,16 +2,14 @@
 
 use crate::{
     ast::{self, Expression, Span},
-    types::SortOrder,
+    relations::ReferentialAction,
+    types::{ScalarType, SortOrder},
 };
 use chrono::{DateTime, FixedOffset};
 use diagnostics::DatamodelError;
 use dml::{
     default_value::{DefaultValue, ValueGenerator},
-    prisma_value,
-    relation_info::ReferentialAction,
-    scalars::ScalarType,
-    PrismaValue,
+    prisma_value, PrismaValue,
 };
 use std::error;
 
@@ -279,7 +277,7 @@ impl<'a> ValueValidator<'a> {
                 let generator = self.get_value_generator(name.to_owned(), prisma_args)?;
 
                 generator
-                    .check_compatibility_with_scalar_type(scalar_type)
+                    .check_compatibility_with_scalar_type(scalar_type.as_str().parse().unwrap())
                     .map_err(|err_msg| DatamodelError::new_functional_evaluation_error(&err_msg, self.span()))?;
 
                 Ok(DefaultValue::new_expression(generator))

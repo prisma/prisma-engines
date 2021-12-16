@@ -7,7 +7,6 @@ pub mod default_value;
 pub mod r#enum;
 pub mod field;
 pub mod model;
-pub mod native_type_constructor;
 pub mod native_type_instance;
 pub mod relation_info;
 pub mod scalars;

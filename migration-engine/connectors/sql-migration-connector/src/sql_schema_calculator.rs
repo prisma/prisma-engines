@@ -273,7 +273,10 @@ fn column_for_scalar_field(field: &ScalarFieldWalker<'_>, flavour: &dyn SqlFlavo
                 auto_increment: false,
             }
         }
-        TypeWalker::Base(scalar_type) => (scalar_type, flavour.default_native_type_for_scalar_type(&scalar_type)),
+        TypeWalker::Base(scalar_type) => (
+            scalar_type,
+            flavour.default_native_type_for_scalar_type(&scalar_type.into()),
+        ),
         TypeWalker::NativeType(scalar_type, instance) => (scalar_type, instance.serialized_native_type.clone()),
         TypeWalker::Unsupported(description) => {
             let default = field.default_value().and_then(db_generated).map(|mut default| {

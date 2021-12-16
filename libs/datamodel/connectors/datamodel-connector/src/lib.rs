@@ -5,22 +5,22 @@ pub mod helper;
 pub mod walker_ext_traits;
 
 mod empty_connector;
+mod native_type_constructor;
 mod referential_integrity;
 
 pub use diagnostics::connector_error;
 pub use empty_connector::EmptyDatamodelConnector;
-pub use parser_database;
+pub use native_type_constructor::NativeTypeConstructor;
+pub use parser_database::{self, ReferentialAction, ScalarType};
 pub use referential_integrity::ReferentialIntegrity;
 
 use crate::connector_error::{ConnectorError, ConnectorErrorFactory, ErrorKind};
-use dml::{
-    native_type_constructor::NativeTypeConstructor, native_type_instance::NativeTypeInstance,
-    relation_info::ReferentialAction, scalars::ScalarType,
-};
+use dml::native_type_instance::NativeTypeInstance;
 use enumflags2::BitFlags;
 use std::{borrow::Cow, collections::BTreeMap, str::FromStr};
 
 pub trait Connector: Send + Sync {
+    /// The name of the connector. Can be used in error messages.
     fn name(&self) -> &str;
 
     fn capabilities(&self) -> &'static [ConnectorCapability];

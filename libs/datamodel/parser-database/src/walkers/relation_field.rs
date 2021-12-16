@@ -2,9 +2,8 @@ use crate::{
     ast::{self, FieldArity},
     types::RelationField,
     walkers::{ModelWalker, ScalarFieldWalker},
-    ParserDatabase,
+    ParserDatabase, ReferentialAction,
 };
-use dml::relation_info::ReferentialAction;
 use std::{
     borrow::Cow,
     fmt,

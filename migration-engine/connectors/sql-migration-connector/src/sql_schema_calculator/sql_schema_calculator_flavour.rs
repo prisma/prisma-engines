@@ -4,9 +4,10 @@ mod postgres;
 mod sqlite;
 
 use datamodel::{
+    datamodel_connector::ScalarType,
     walkers::ModelWalker,
     walkers::{RelationFieldWalker, ScalarFieldWalker},
-    Datamodel, FieldArity, ReferentialAction, ScalarType,
+    Datamodel, FieldArity, ReferentialAction,
 };
 use sql_schema_describer::{self as sql, ColumnArity, ColumnType, ColumnTypeFamily};
 

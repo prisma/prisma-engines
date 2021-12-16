@@ -9,7 +9,7 @@ use crate::{
     transform::ast_to_dml::{
         db::{
             walkers::{FieldWalker, ScalarFieldAttributeWalker, ScalarFieldWalker},
-            ScalarFieldType,
+            ScalarFieldType, ScalarType,
         },
         validation_pipeline::context::Context,
     },
@@ -19,7 +19,6 @@ use datamodel_connector::{
     walker_ext_traits::*,
     ConnectorCapability,
 };
-use dml::scalars::ScalarType;
 use itertools::Itertools;
 
 pub(super) fn validate_client_name(field: FieldWalker<'_, '_>, names: &Names<'_>, ctx: &mut Context<'_>) {
@@ -196,8 +195,8 @@ pub(super) fn validate_native_type_arguments(field: ScalarFieldWalker<'_, '_>, c
         ctx.push_error(DatamodelError::new_connector_error(
             &ConnectorError::from_kind(ErrorKind::IncompatibleNativeType {
                 native_type: type_name.to_owned(),
-                field_type: scalar_type.to_string(),
-                expected_types: constructor.prisma_types.iter().map(|s| s.to_string()).join(" or "),
+                field_type: scalar_type.as_str(),
+                expected_types: constructor.prisma_types.iter().map(|s| s.as_str()).join(" or "),
             })
             .to_string(),
             span,
@@ -271,14 +270,17 @@ pub(super) fn validate_default(field: ScalarFieldWalker<'_, '_>, ctx: &mut Conte
 }
 
 pub(super) fn validate_scalar_field_connector_specific(field: ScalarFieldWalker<'_, '_>, ctx: &mut Context<'_>) {
-    if matches!(field.scalar_field_type(), ScalarFieldType::BuiltInScalar(t) if t.is_json()) {
+    if matches!(
+        field.scalar_field_type(),
+        ScalarFieldType::BuiltInScalar(ScalarType::Json)
+    ) {
         if !ctx.connector.supports_json() {
             ctx.push_error(DatamodelError::new_field_validation_error(
                 &format!(
-                    "Field `{}` in model `{}` can't be of type Json. The current connector does not support the Json type.",
-                    field.name(),
-                    field.model().name()
-                ),
+                "Field `{}` in model `{}` can't be of type Json. The current connector does not support the Json type.",
+                field.name(),
+                field.model().name(),
+            ),
                 field.model().name(),
                 field.name(),
                 field.ast_field().span,
@@ -345,7 +347,7 @@ pub(super) fn validate_unsupported_field_type(field: ScalarFieldWalker<'_, '_>, 
 
             let msg = format!(
                         "The type `Unsupported(\"{}\")` you specified in the type definition for the field `{}` is supported as a native type by Prisma. Please use the native type notation `{} @{}.{}` for full support.",
-                        unsupported_lit, field.name(), prisma_type.to_string(), &source.name, native_type.render()
+                        unsupported_lit, field.name(), prisma_type.as_str(), &source.name, native_type.render()
                     );
 
             ctx.push_error(DatamodelError::new_validation_error(msg, field.ast_field().span));

@@ -1,9 +1,4 @@
-use super::{ModelWalker, RelationFieldWalker, RelationName, ScalarFieldWalker};
-use crate::{
-    ast,
-    {relations::*, ParserDatabase, ScalarFieldType},
-};
-use dml::relation_info::ReferentialAction;
+use crate::{ast, relations::*, walkers::*, ParserDatabase, ScalarFieldType};
 
 /// A relation that has the minimal amount of information for us to create one. Useful for
 /// validation purposes. Holds all possible relation types.

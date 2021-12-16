@@ -179,7 +179,7 @@ fn visit_scalar_field_attributes<'ast>(
 
         // @updatedAt
         attributes.visit_optional_single("updatedAt", ctx, |args, ctx| {
-            if !matches!(scalar_field_data.r#type, ScalarFieldType::BuiltInScalar(tpe) if tpe.is_datetime()) {
+            if !matches!(scalar_field_data.r#type, ScalarFieldType::BuiltInScalar(crate::ScalarType::DateTime)) {
                 ctx.push_error(args.new_attribute_validation_error(
                     "Fields that are marked with @updatedAt must be of type DateTime." ));
 

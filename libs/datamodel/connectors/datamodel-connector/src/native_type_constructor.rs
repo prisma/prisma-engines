@@ -1,7 +1,6 @@
-use super::scalars::ScalarType;
+use crate::ScalarType;
 
-/// represents an available native type
-#[derive(serde::Serialize)]
+/// Represents an available native type.
 pub struct NativeTypeConstructor {
     /// The name that is used in the Prisma schema when declaring the native type
     pub name: &'static str,

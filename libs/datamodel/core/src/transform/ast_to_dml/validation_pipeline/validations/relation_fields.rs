@@ -2,7 +2,10 @@ use crate::{
     ast,
     diagnostics::DatamodelError,
     transform::ast_to_dml::{
-        db::walkers::{ModelWalker, RelationFieldWalker, RelationName},
+        db::{
+            walkers::{ModelWalker, RelationFieldWalker, RelationName},
+            ReferentialAction,
+        },
         validation_pipeline::context::Context,
     },
 };
@@ -140,16 +143,17 @@ pub(super) fn ignored_related_model(field: RelationFieldWalker<'_, '_>, ctx: &mu
 pub(super) fn referential_actions(field: RelationFieldWalker<'_, '_>, ctx: &mut Context<'_>) {
     let connector = ctx.connector;
     let referential_integrity = ctx.referential_integrity;
-    let msg = |action| {
+    let msg = |action: ReferentialAction| {
         let allowed_values = connector
             .referential_actions(&referential_integrity)
             .iter()
-            .map(|f| format!("`{}`", f))
+            .map(|f| format!("`{}`", f.as_str()))
             .join(", ");
 
         format!(
             "Invalid referential action: `{}`. Allowed values: ({})",
-            action, allowed_values,
+            action.as_str(),
+            allowed_values,
         )
     };
 

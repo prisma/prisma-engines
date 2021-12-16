@@ -1,6 +1,6 @@
 use crate::{
     ast,
-    types::{FieldWithArgs, ScalarField, SortOrder},
+    types::{FieldWithArgs, ScalarField, ScalarType, SortOrder},
     walkers::ModelWalker,
     ParserDatabase, ScalarFieldType,
 };
@@ -119,7 +119,7 @@ impl<'ast, 'db> ScalarFieldWalker<'ast, 'db> {
     }
 
     /// The type of the field in case it is a scalar type (not an enum, not a composite type).
-    pub fn scalar_type(self) -> Option<dml::scalars::ScalarType> {
+    pub fn scalar_type(self) -> Option<ScalarType> {
         let mut tpe = &self.scalar_field.r#type;
 
         loop {
