@@ -1,35 +1,48 @@
+#![deny(rust_2018_idioms, unsafe_code, missing_docs)]
+
+//! This crate implements JSON-RPC over standard IO. It uses tokio for async IO, and jsonrpc_core
+//! for the JSON-RPC part.
+//!
+//! Notifications in the Client are not supported yet.
+
 use jsonrpc_core::{IoHandler, MethodCall, Request};
 use serde::{Deserialize, Serialize};
 use std::{
     collections::HashMap,
-    sync::{
-        atomic::{AtomicU64, Ordering},
-        Arc,
-    },
+    io,
+    sync::atomic::{AtomicU64, Ordering},
 };
 use tokio::{
     io::{AsyncBufReadExt, AsyncRead, AsyncWrite, AsyncWriteExt},
     sync::{mpsc, oneshot},
 };
 
-#[derive(Debug)]
-pub struct Client(Arc<ClientInner>, AtomicU64);
+static REQUEST_ID_COUNTER: AtomicU64 = AtomicU64::new(0);
+
+/// A handle to a connected client you can use to send requests.
+#[derive(Debug, Clone)]
+pub struct Client {
+    request_sender: mpsc::Sender<(MethodCall, oneshot::Sender<jsonrpc_core::Output>)>,
+}
+
+/// Constructor a JSON-RPC client. Returns a tuple: the client you can use to send requests, and
+/// the adapter you must pass to `run_with_client()` to connect the client to the proper IO.
+pub fn new_client() -> (Client, ClientAdapter) {
+    let (request_sender, request_receiver) = mpsc::channel(30);
+    let client = Client { request_sender };
+    let adapter = ClientAdapter { request_receiver };
+
+    (client, adapter)
+}
 
 impl Client {
-    pub fn new() -> (Client, ClientAdapter) {
-        let (request_sender, request_receiver) = mpsc::channel(30);
-        let client = Client(Arc::new(ClientInner { request_sender }), Default::default());
-        let adapter = ClientAdapter { request_receiver };
-
-        (client, adapter)
-    }
-
+    /// Asynchronously send a JSON-RPC request.
     pub async fn call<Req, Res>(&self, method: String, params: Req) -> jsonrpc_core::Result<Res>
     where
         Req: serde::Serialize,
         Res: serde::de::DeserializeOwned,
     {
-        let id = self.1.fetch_add(1, Ordering::Relaxed);
+        let id = REQUEST_ID_COUNTER.fetch_add(1, Ordering::Relaxed);
         let json_params = serde_json::to_value(params).map_err(|_err| jsonrpc_core::Error::invalid_request())?;
         let params = match json_params {
             jsonrpc_core::Value::Array(arr) => jsonrpc_core::Params::Array(arr),
@@ -43,7 +56,7 @@ impl Client {
             id: jsonrpc_core::Id::Num(id),
         };
         let (response_sender, response_receiver) = oneshot::channel();
-        self.0.request_sender.send((request, response_sender)).await.unwrap();
+        self.request_sender.send((request, response_sender)).await.unwrap();
 
         let response = response_receiver.await.unwrap();
 
@@ -54,14 +67,9 @@ impl Client {
     }
 }
 
-// The other side of the channels.
+/// The other side of the channels. Only used as a handle to be passed into run_with_client().
 pub struct ClientAdapter {
     request_receiver: mpsc::Receiver<(MethodCall, oneshot::Sender<jsonrpc_core::Output>)>,
-}
-
-#[derive(Debug)]
-struct ClientInner {
-    request_sender: mpsc::Sender<(MethodCall, oneshot::Sender<jsonrpc_core::Output>)>,
 }
 
 #[derive(Serialize, Deserialize)]
@@ -71,12 +79,16 @@ enum Message {
     Response(jsonrpc_core::Output),
 }
 
+/// Start doing JSON-RPC over stdio. The future will only return once stdin is closed or another
+/// IO error happens.
 pub async fn run_with_client(request_handler: &IoHandler, adapter: ClientAdapter) -> std::io::Result<()> {
     run_with_io(request_handler, tokio::io::stdin(), tokio::io::stdout(), adapter).await
 }
 
+/// Start doing JSON-RPC over stdio, server-only. The future will only return once stdin is closed
+/// or another IO error happens.
 pub async fn run(request_handler: &IoHandler) -> std::io::Result<()> {
-    let (_client, client_adapter) = Client::new();
+    let (_client, client_adapter) = new_client();
     run_with_io(request_handler, tokio::io::stdin(), tokio::io::stdout(), client_adapter).await
 }
 
@@ -93,37 +105,55 @@ async fn run_with_io(
 
     loop {
         tokio::select! {
-            next_line = input_lines.next_line() => {
-                let next_line = if let Some(next_line) = next_line? {
-                    next_line
-                } else {
-                    return Ok(())
-                };
-
-                match serde_json::from_str::<Message>(&next_line)? {
-                    Message::Request(request) => {
-                        let response = handle_request(handler, request).await;
-                        output.write_all(response.as_bytes()).await?;
-                        output.write_all(b"\n").await?;
-                        output.flush().await?;
-                    }
-                    Message::Response(response) => {
-                        if let Some(chan) = in_flight.remove(response.id()) {
-                            chan.send(response).expect("Response channel broken");
-                        }
-                    }
-                }
-            }
+            next_line = input_lines.next_line() => { handle_stdin_next_line(next_line, &mut output, handler, &mut in_flight).await? }
             next_request = client_adapter.request_receiver.recv() => {
-                let (next_request, channel) = next_request.unwrap();
-                in_flight.insert(next_request.id.clone(), channel);
-                let request_json = serde_json::to_string(&next_request)?;
-                output.write_all(request_json.as_bytes()).await?;
-                output.write_all(b"\n").await?;
-                output.flush().await?;
+                handle_next_client_request(next_request, &mut output, &mut in_flight).await?
             }
         }
     }
+}
+
+async fn handle_next_client_request<T: AsyncWrite + Unpin>(
+    next_request: Option<(jsonrpc_core::MethodCall, oneshot::Sender<jsonrpc_core::Output>)>,
+    output: &mut tokio::io::BufWriter<T>,
+    in_flight: &mut HashMap<jsonrpc_core::Id, oneshot::Sender<jsonrpc_core::Output>>,
+) -> io::Result<()> {
+    let (next_request, channel) = next_request.unwrap();
+    in_flight.insert(next_request.id.clone(), channel);
+    let request_json = serde_json::to_string(&next_request)?;
+    output.write_all(request_json.as_bytes()).await?;
+    output.write_all(b"\n").await?;
+    output.flush().await?;
+    Ok(())
+}
+
+async fn handle_stdin_next_line<T: AsyncWrite + Unpin>(
+    next_line: io::Result<Option<String>>,
+    output: &mut tokio::io::BufWriter<T>,
+    handler: &IoHandler,
+    in_flight: &mut HashMap<jsonrpc_core::Id, oneshot::Sender<jsonrpc_core::Output>>,
+) -> io::Result<()> {
+    let next_line = if let Some(next_line) = next_line? {
+        next_line
+    } else {
+        return Ok(());
+    };
+
+    match serde_json::from_str::<Message>(&next_line)? {
+        Message::Request(request) => {
+            let response = handle_request(handler, request).await;
+            output.write_all(response.as_bytes()).await?;
+            output.write_all(b"\n").await?;
+            output.flush().await?;
+        }
+        Message::Response(response) => {
+            if let Some(chan) = in_flight.remove(response.id()) {
+                chan.send(response).expect("Response channel broken");
+            }
+        }
+    }
+
+    Ok(())
 }
 
 /// Process a request asynchronously
