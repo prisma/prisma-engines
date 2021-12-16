@@ -112,13 +112,13 @@ pub(super) fn validate(ctx: &mut Context<'_>, relation_transformation_enabled: b
             // 1:1, 1:n
             RefinedRelationWalker::Inline(relation) => {
                 if let Some(relation) = relation.as_complete() {
-                    relations::same_length_in_referencing_and_referenced(relation, ctx);
                     relations::cycles(relation, ctx);
                     relations::multiple_cascading_paths(relation, ctx);
-                    relations::references_unique_fields(relation, ctx);
-                    relations::referencing_fields_in_correct_order(relation, ctx);
                 }
 
+                relations::references_unique_fields(relation, ctx);
+                relations::same_length_in_referencing_and_referenced(relation, ctx);
+                relations::referencing_fields_in_correct_order(relation, ctx);
                 relations::field_arity(relation, ctx);
                 relations::referencing_scalar_field_types(relation, ctx);
                 relations::has_a_unique_constraint_name(&names, relation, ctx);

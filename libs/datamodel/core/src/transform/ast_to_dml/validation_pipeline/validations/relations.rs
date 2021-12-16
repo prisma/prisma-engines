@@ -107,34 +107,36 @@ pub(super) fn field_arity(relation: InlineRelationWalker<'_, '_>, ctx: &mut Cont
 }
 
 /// The `fields` and `references` arguments should hold the same number of fields.
-pub(super) fn same_length_in_referencing_and_referenced(
-    relation: CompleteInlineRelationWalker<'_, '_>,
-    ctx: &mut Context<'_>,
-) {
-    if relation.referenced_fields().len() == 0 || relation.referencing_fields().len() == 0 {
+pub(super) fn same_length_in_referencing_and_referenced(relation: InlineRelationWalker<'_, '_>, ctx: &mut Context<'_>) {
+    let relation_field = if let Some(forward) = relation.forward_relation_field() {
+        forward
+    } else {
         return;
+    };
+
+    match (relation_field.referencing_fields(), relation_field.referenced_fields()) {
+        (Some(fields), Some(references)) if fields.len() != references.len() => {
+            ctx.push_error(DatamodelError::new_validation_error(
+                "You must specify the same number of fields in `fields` and `references`.".to_owned(),
+                relation_field.relation_attribute().unwrap().span,
+            ));
+        }
+        _ => (),
     }
-
-    if relation.referenced_fields().len() == relation.referencing_fields().len() {
-        return;
-    }
-
-    let ast_field = relation.referencing_field().ast_field();
-    let span = ast_field.span_for_attribute("relation").unwrap_or(ast_field.span);
-
-    ctx.push_error(DatamodelError::new_validation_error(
-        "You must specify the same number of fields in `fields` and `references`.".to_owned(),
-        span,
-    ));
 }
 
 /// Some connectors expect us to refer only unique fields from the foreign key.
-pub(super) fn references_unique_fields(relation: CompleteInlineRelationWalker<'_, '_>, ctx: &mut Context<'_>) {
-    if relation.referenced_fields().len() == 0 || !ctx.diagnostics.errors().is_empty() {
+pub(super) fn references_unique_fields(relation: InlineRelationWalker<'_, '_>, ctx: &mut Context<'_>) {
+    let relation_field = if let Some(rf) = relation.forward_relation_field() {
+        rf
+    } else {
         return;
-    }
+    };
 
-    if ctx.connector.supports_relations_over_non_unique_criteria() {
+    if relation_field.referenced_fields().map(|f| f.len() == 0).unwrap_or(true)
+        || !ctx.diagnostics.errors().is_empty()
+        || ctx.connector.supports_relations_over_non_unique_criteria()
+    {
         return;
     }
 
@@ -158,27 +160,40 @@ pub(super) fn references_unique_fields(relation: CompleteInlineRelationWalker<'_
             relation.referenced_model().name(),
             relation.referenced_fields().map(|f| f.name()).join(", ")
         ),
-        relation.referencing_field().ast_field().span
+        relation_field.ast_field().span
     ));
 }
 
 /// Some connectors want the fields and references in the same order.
-pub(super) fn referencing_fields_in_correct_order(
-    relation: CompleteInlineRelationWalker<'_, '_>,
-    ctx: &mut Context<'_>,
-) {
-    if relation.referenced_fields().len() == 0 || !ctx.diagnostics.errors().is_empty() {
+pub(super) fn referencing_fields_in_correct_order(relation: InlineRelationWalker<'_, '_>, ctx: &mut Context<'_>) {
+    let relation_field = if let Some(rf) = relation.forward_relation_field() {
+        rf
+    } else {
+        return;
+    };
+
+    if relation_field
+        .referenced_fields()
+        .map(|fields| fields.len() <= 1)
+        .unwrap_or(true)
+        || !ctx.diagnostics.errors().is_empty()
+    {
         return;
     }
 
-    if ctx.connector.allows_relation_fields_in_arbitrary_order() || relation.referenced_fields().len() == 1 {
+    if ctx.connector.allows_relation_fields_in_arbitrary_order() {
         return;
     }
 
     let reference_order_correct = relation.referenced_model().unique_criterias().any(|criteria| {
         let criteria_fields = criteria.fields().map(|f| f.name());
 
-        if criteria_fields.len() != relation.referenced_fields().len() {
+        if criteria_fields.len()
+            != relation_field
+                .referenced_fields()
+                .map(|fields| fields.len())
+                .unwrap_or(0)
+        {
             return false;
         }
 
@@ -196,7 +211,7 @@ pub(super) fn referencing_fields_in_correct_order(
             relation.referenced_model().name(),
             relation.referenced_fields().map(|f| f.name()).join(", ")
         ),
-        relation.referencing_field().ast_field().span
+        relation_field.ast_field().span
     ));
 }
 
