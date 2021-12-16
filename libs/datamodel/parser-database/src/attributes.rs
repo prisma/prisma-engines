@@ -1,9 +1,10 @@
+mod default;
 mod id;
 mod map;
 mod native_types;
 
 use crate::{
-    ast::{self, WithName},
+    ast,
     context::{Arguments, Context},
     types::{
         EnumAttributes, FieldWithArgs, IndexAlgorithm, IndexAttribute, IndexType, ModelAttributes, RelationField,
@@ -12,7 +13,6 @@ use crate::{
     DatamodelError, ValueValidator,
 };
 use diagnostics::Span;
-use dml::{self, PrismaValue};
 
 pub(super) fn resolve_attributes(ctx: &mut Context<'_>) {
     for top in ctx.db.ast.iter_tops() {
@@ -194,7 +194,7 @@ fn visit_scalar_field_attributes<'ast>(
 
         // @default
         attributes.visit_optional_single("default", ctx, |args, ctx| {
-            visit_field_default(args, scalar_field_data, model_id, field_id, ctx);
+            default::visit_field_default(args, scalar_field_data, model_id, field_id, ctx);
         });
 
         if let ScalarFieldType::BuiltInScalar(_scalar_type) = scalar_field_data.r#type {
@@ -272,23 +272,6 @@ fn visit_field_unique<'ast>(
     ))
 }
 
-fn default_value_constraint_name<'ast>(args: &mut Arguments<'ast>, ctx: &mut Context<'ast>) -> Option<String> {
-    let db_name = match args.optional_arg("map").map(|name| name.as_str()) {
-        Some(Ok("")) => {
-            ctx.push_error(args.new_attribute_validation_error("The `map` argument cannot be an empty string."));
-            None
-        }
-        Some(Ok(name)) => Some(name.into()),
-        Some(Err(err)) => {
-            ctx.push_error(err);
-            None
-        }
-        None => None,
-    };
-
-    db_name
-}
-
 fn visit_relation_field_attributes<'ast>(
     model_id: ast::ModelId,
     ast_field: &'ast ast::Field,
@@ -363,126 +346,6 @@ fn visit_relation_field_attributes<'ast>(
             ));
         });
     });
-}
-
-/// @default on scalar fields
-fn visit_field_default<'ast>(
-    args: &mut Arguments<'ast>,
-    field_data: &mut ScalarField<'ast>,
-    model_id: ast::ModelId,
-    field_id: ast::FieldId,
-    ctx: &mut Context<'ast>,
-) {
-    let value = match args.default_arg("value") {
-        Ok(value) => value,
-        Err(err) => return ctx.push_error(err),
-    };
-
-    let ast_model = &ctx.db.ast[model_id];
-    let ast_field = &ast_model[field_id];
-    if ast_field.arity.is_list() {
-        return ctx.push_error(args.new_attribute_validation_error("Cannot set a default value on list field."));
-    }
-
-    // Error on `dbgenerated("")
-    if let Some(generator) = value.as_value_generator().ok().filter(|val| val.is_dbgenerated()) {
-        if generator.as_dbgenerated() == Some("") {
-            ctx.push_error(args.new_attribute_validation_error(
-                "dbgenerated() takes either no argument, or a single nonempty string argument.",
-            ));
-        }
-    }
-
-    // Resolve the default to a dml::DefaultValue. We must loop in order to
-    // resolve type aliases.
-    let mut r#type = field_data.r#type;
-
-    loop {
-        match r#type {
-            ScalarFieldType::CompositeType(ctid) => {
-                let ct_name = ctx.db.walk_composite_type(ctid).name();
-                ctx.push_error(DatamodelError::new_composite_type_field_validation_error(
-                    "Defaults inside composite types are not supported",
-                    ct_name,
-                    &ast_field.name.name,
-                    args.span(),
-                ));
-            }
-            ScalarFieldType::Enum(enum_id) => {
-                match value.as_constant_literal() {
-                    Ok(value) => {
-                        if ctx.db.ast[enum_id].values.iter().any(|v| v.name() == value) {
-                            let mut default =
-                                dml::default_value::DefaultValue::new_single(PrismaValue::Enum(value.to_owned()));
-
-                            if let Some(name) = default_value_constraint_name(args, ctx) {
-                                default.set_db_name(name);
-                            }
-
-                            field_data.default = Some(default);
-                            field_data.default_attribute = Some(args.attribute());
-                        } else {
-                            ctx.push_error(args.new_attribute_validation_error(
-                                "The defined default value is not a valid value of the enum specified for the field.",
-                            ))
-                        }
-                    }
-                    Err(err) => {
-                        match value.as_value_generator() {
-                            Ok(generator) if generator.is_dbgenerated() => {
-                                let mut default = dml::default_value::DefaultValue::new_expression(generator);
-
-                                if let Some(name) = default_value_constraint_name(args, ctx) {
-                                    default.set_db_name(name);
-                                }
-
-                                field_data.default = Some(default);
-                                field_data.default_attribute = Some(args.attribute());
-                            }
-                            Ok(_) | Err(_) => ctx.push_error(args.new_attribute_validation_error(&err.to_string())),
-                        };
-                    }
-                };
-            }
-            ScalarFieldType::BuiltInScalar(scalar_type) => {
-                match value.as_default_value_for_scalar_type(scalar_type) {
-                    Ok(mut default) => {
-                        if args.has_arg("map") && default.is_autoincrement() {
-                            ctx.push_error(args.new_attribute_validation_error(
-                                "Naming an autoincrement default value is not allowed.",
-                            ))
-                        }
-
-                        if let Some(name) = default_value_constraint_name(args, ctx) {
-                            default.set_db_name(name);
-                        }
-
-                        field_data.default = Some(default);
-                        field_data.default_attribute = Some(args.attribute());
-                    }
-                    Err(err) => ctx.push_error(args.new_attribute_validation_error(&err.to_string())),
-                }
-            }
-            ScalarFieldType::Alias(alias_id) => {
-                r#type = ctx.db.types.type_aliases[&alias_id];
-                continue;
-            }
-            ScalarFieldType::Unsupported => {
-                match value.as_value_generator() {
-                    Ok(generator) if generator.is_dbgenerated() => {
-                        field_data.default = Some(dml::default_value::DefaultValue::new_expression(generator));
-                        field_data.default_attribute = Some(args.attribute());
-                    }
-                    Ok(_) => ctx.push_error(args.new_attribute_validation_error(
-                        "Only @default(dbgenerated()) can be used for Unsupported types.",
-                    )),
-                    Err(err) => ctx.push_error(args.new_attribute_validation_error(&err.to_string())),
-                }
-            }
-        }
-
-        break;
-    }
 }
 
 fn visit_model_ignore(model_id: ast::ModelId, model_data: &mut ModelAttributes<'_>, ctx: &mut Context<'_>) {

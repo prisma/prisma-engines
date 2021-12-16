@@ -355,7 +355,7 @@ impl<'a> LiftAstToDml<'a> {
             field.is_updated_at = scalar_field.is_updated_at();
             field.database_name = scalar_field.mapped_name().map(String::from);
             field.default_value = scalar_field.default_value().map(|d| dml::DefaultValue {
-                kind: d.default().kind().clone(),
+                kind: d.dml_default_kind(),
                 db_name: Some(d.constraint_name(self.connector).into())
                     .filter(|_| self.connector.supports_named_default_values()),
             });

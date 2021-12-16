@@ -1,11 +1,10 @@
 use crate::{
     ast,
-    types::{FieldWithArgs, ScalarField, ScalarType, SortOrder},
+    types::{DefaultAttribute, FieldWithArgs, ScalarField, ScalarType, SortOrder},
     walkers::ModelWalker,
     ParserDatabase, ScalarFieldType,
 };
 use diagnostics::Span;
-use dml::default_value::{DefaultKind, DefaultValue};
 
 /// A scalar field, as part of a model.
 #[derive(Copy, Clone)]
@@ -42,7 +41,7 @@ impl<'ast, 'db> ScalarFieldWalker<'ast, 'db> {
 
     /// The `@default()` AST attribute on the field, if any.
     pub fn default_attribute(self) -> Option<&'ast ast::Attribute> {
-        self.scalar_field.default_attribute
+        self.scalar_field.default.as_ref().map(|d| d.default_attribute)
     }
 
     /// The final database name of the field. See crate docs for explanations on database names.
@@ -52,7 +51,10 @@ impl<'ast, 'db> ScalarFieldWalker<'ast, 'db> {
 
     /// Does the field have an `@default(autoincrement())` attribute?
     pub fn is_autoincrement(self) -> bool {
-        matches!(&self.scalar_field.default.as_ref().map(|d| d.kind()), Some(DefaultKind::Expression(expr)) if expr.is_autoincrement())
+        matches!(
+            &self.scalar_field.default.as_ref().map(|d| d.value),
+            Some(ast::Expression::Function(funcname, args, _)) if args.is_empty() && funcname == "autoincrement"
+        )
     }
 
     /// Is there an `@ignore` attribute on the field?
@@ -138,22 +140,42 @@ pub struct DefaultValueWalker<'ast, 'db> {
     model_id: ast::ModelId,
     field_id: ast::FieldId,
     db: &'db ParserDatabase<'ast>,
-    default: &'db DefaultValue,
+    default: &'db DefaultAttribute<'ast>,
 }
 
 impl<'ast, 'db> DefaultValueWalker<'ast, 'db> {
-    /// The DML DefaultValue.
-    pub fn default(self) -> &'db DefaultValue {
-        self.default
+    /// The AST node of the attribute.
+    pub fn ast_attribute(self) -> &'ast ast::Attribute {
+        self.default.default_attribute
+    }
+
+    /// The value expression in the `@default` attribute.
+    ///
+    /// ```ignore
+    /// score Int @default(0)
+    ///                    ^
+    /// ```
+    pub fn value(self) -> &'ast ast::Expression {
+        self.default.value
     }
 
     /// The mapped name of the default value. Not applicable to all connectors. See crate docs for
-    /// details on maped names.
-    pub fn mapped_name(self) -> Option<&'db str> {
-        self.default.db_name()
+    /// details on mapped names.
+    ///
+    /// ```ignore
+    /// name String @default("george", map: "name_default_to_george")
+    ///                                     ^^^^^^^^^^^^^^^^^^^^^^^^
+    /// ```
+    pub fn mapped_name(self) -> Option<&'ast str> {
+        self.default.mapped_name
     }
 
-    /// The field of the default.
+    /// The field carrying the default attribute.
+    ///
+    /// ```ignore
+    /// name String @default("george")
+    /// ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    /// ```
     pub fn field(self) -> ScalarFieldWalker<'ast, 'db> {
         ScalarFieldWalker {
             model_id: self.model_id,
@@ -179,11 +201,28 @@ impl<'ast, 'db> ScalarFieldAttributeWalker<'ast, 'db> {
     }
 
     /// The length argument on the field.
+    ///
+    /// ```ignore
+    /// @@index(name(length: 10))
+    ///                      ^^
+    /// ```
     pub fn length(self) -> Option<u32> {
         self.args().length
     }
 
     /// The underlying scalar field.
+    ///
+    /// ```ignore
+    /// model Test {
+    ///   id          Int @id
+    ///   name        String
+    ///   ^^^^^^^^^^^^^^^^^^
+    ///   kind        Int
+    ///
+    ///   @@index([name])
+    /// }
+    ///
+    /// ```
     pub fn as_scalar_field(self) -> ScalarFieldWalker<'ast, 'db> {
         ScalarFieldWalker {
             model_id: self.model_id,
@@ -194,6 +233,11 @@ impl<'ast, 'db> ScalarFieldAttributeWalker<'ast, 'db> {
     }
 
     /// The sort order (asc or desc) on the field.
+    ///
+    /// ```ignore
+    /// @@index(name(sort: Desc))
+    ///                    ^^^^
+    /// ```
     pub fn sort_order(&self) -> Option<SortOrder> {
         self.args().sort_order
     }

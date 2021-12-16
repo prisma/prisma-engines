@@ -275,7 +275,7 @@ fn column_for_scalar_field(field: &ScalarFieldWalker<'_>, flavour: &dyn SqlFlavo
         }
         TypeWalker::Base(scalar_type) => (
             scalar_type,
-            flavour.default_native_type_for_scalar_type(&scalar_type.into()),
+            flavour.default_native_type_for_scalar_type(&datamodel_connector::convert_from_scalar_type(scalar_type)),
         ),
         TypeWalker::NativeType(scalar_type, instance) => (scalar_type, instance.serialized_native_type.clone()),
         TypeWalker::Unsupported(description) => {

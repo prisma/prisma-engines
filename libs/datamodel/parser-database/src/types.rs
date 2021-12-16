@@ -99,12 +99,18 @@ impl ScalarFieldType {
 }
 
 #[derive(Debug)]
+pub(crate) struct DefaultAttribute<'ast> {
+    pub(crate) mapped_name: Option<&'ast str>,
+    pub(crate) value: &'ast ast::Expression,
+    pub(crate) default_attribute: &'ast ast::Attribute,
+}
+
+#[derive(Debug)]
 pub(crate) struct ScalarField<'ast> {
     pub(crate) r#type: ScalarFieldType,
     pub(crate) is_ignored: bool,
     pub(crate) is_updated_at: bool,
-    pub(crate) default: Option<dml::default_value::DefaultValue>,
-    pub(crate) default_attribute: Option<&'ast ast::Attribute>,
+    pub(crate) default: Option<DefaultAttribute<'ast>>,
     /// @map
     pub(crate) mapped_name: Option<&'ast str>,
     /// Native type name and arguments
@@ -263,7 +269,6 @@ fn visit_model<'ast>(model_id: ast::ModelId, ast_model: &'ast ast::Model, ctx: &
                     is_ignored: false,
                     is_updated_at: false,
                     default: None,
-                    default_attribute: None,
                     mapped_name: None,
                     native_type: None,
                 };
@@ -596,22 +601,6 @@ impl ScalarType {
             "Bytes" => Some(ScalarType::Bytes),
             "Decimal" => Some(ScalarType::Decimal),
             _ => None,
-        }
-    }
-}
-
-impl From<dml::scalars::ScalarType> for ScalarType {
-    fn from(st: dml::scalars::ScalarType) -> ScalarType {
-        match st {
-            dml::scalars::ScalarType::Int => ScalarType::Int,
-            dml::scalars::ScalarType::BigInt => ScalarType::BigInt,
-            dml::scalars::ScalarType::Float => ScalarType::Float,
-            dml::scalars::ScalarType::Boolean => ScalarType::Boolean,
-            dml::scalars::ScalarType::String => ScalarType::String,
-            dml::scalars::ScalarType::DateTime => ScalarType::DateTime,
-            dml::scalars::ScalarType::Json => ScalarType::Json,
-            dml::scalars::ScalarType::Bytes => ScalarType::Bytes,
-            dml::scalars::ScalarType::Decimal => ScalarType::Decimal,
         }
     }
 }

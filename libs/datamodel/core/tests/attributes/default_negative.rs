@@ -67,7 +67,7 @@ fn must_error_if_default_value_type_mismatch() {
     let error = datamodel::parse_schema(dml).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
-        [1;91merror[0m: [1mError parsing attribute "@default": Expected a String value, but received numeric value `3`.[0m
+        [1;91merror[0m: [1mError parsing attribute "@default": Expected a String value, but found `3`.[0m
           [1;94m-->[0m  [4mschema.prisma:3[0m
         [1;94m   | [0m
         [1;94m 2 | [0m  id Int @id
@@ -79,7 +79,7 @@ fn must_error_if_default_value_type_mismatch() {
 }
 
 #[test]
-fn must_error_if_default_value_parser_error() {
+fn datetime_defaults_must_be_valid_rfc3339() {
     let dml = indoc! {r#"
         model Model {
           id Int @id
@@ -90,11 +90,11 @@ fn must_error_if_default_value_parser_error() {
     let error = datamodel::parse_schema(dml).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
-        [1;91merror[0m: [1mError parsing attribute "@default": Expected a datetime value, but failed while parsing ""Hugo"": input contains invalid characters.[0m
+        [1;91merror[0m: [1mError parsing attribute "@default": Parse error: "Hugo" is not a valid rfc3339 datetime string. (input contains invalid characters)[0m
           [1;94m-->[0m  [4mschema.prisma:3[0m
         [1;94m   | [0m
         [1;94m 2 | [0m  id Int @id
-        [1;94m 3 | [0m  rel DateTime @[1;91mdefault("Hugo")[0m
+        [1;94m 3 | [0m  rel DateTime @default([1;91m"Hugo"[0m)
         [1;94m   | [0m
     "#]];
 
@@ -113,7 +113,7 @@ fn must_error_if_unknown_function_is_used() {
     let error = datamodel::parse_schema(dml).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
-        [1;91merror[0m: [1mError parsing attribute "@default": The function unknown_function is not a known function.[0m
+        [1;91merror[0m: [1mError parsing attribute "@default": The function `unknown_function` is not a known function. You can read about the available functions here: https://pris.ly/d/attribute-functions[0m
           [1;94m-->[0m  [4mschema.prisma:3[0m
         [1;94m   | [0m
         [1;94m 2 | [0m  id Int @id
@@ -305,7 +305,7 @@ fn must_error_if_scalar_default_on_unsupported() {
     let error = datamodel::parse_schema(dml).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
-        [1;91merror[0m: [1mError parsing attribute "@default": Expected a function value, but received numeric value `12`.[0m
+        [1;91merror[0m: [1mError parsing attribute "@default": Only @default(dbgenerated()) can be used for Unsupported types.[0m
           [1;94m-->[0m  [4mschema.prisma:8[0m
         [1;94m   | [0m
         [1;94m 7 | [0m  id      Int @id
@@ -328,7 +328,7 @@ fn must_error_if_non_string_expression_in_function_default() {
     let error = datamodel::parse_schema(dml).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
-        [1;91merror[0m: [1mError parsing attribute "@default": Error validating: DefaultValue function parsing failed. The function arg should only be empty or a single String. Got: `cuid()`. You can read about the available functions here: https://pris.ly/d/attribute-functions[0m
+        [1;91merror[0m: [1mError parsing attribute "@default": The `autoincrement` function does not take any argument. Consider changing this default to `autoincrement()`.[0m
           [1;94m-->[0m  [4mschema.prisma:3[0m
         [1;94m   | [0m
         [1;94m 2 | [0m  id      Int @id
@@ -351,7 +351,7 @@ fn must_error_if_non_string_expression_in_function_default_2() {
     let error = datamodel::parse_schema(dml).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
-        [1;91merror[0m: [1mError parsing attribute "@default": Error validating: DefaultValue function parsing failed. The function arg should only be empty or a single String. Got: `5`. You can read about the available functions here: https://pris.ly/d/attribute-functions[0m
+        [1;91merror[0m: [1mError parsing attribute "@default": `dbgenerated()` takes a single String argument[0m
           [1;94m-->[0m  [4mschema.prisma:3[0m
         [1;94m   | [0m
         [1;94m 2 | [0m  id      Int @id
@@ -707,6 +707,121 @@ fn must_error_on_dbgenerated_default_on_non_native_type_on_mongodb() {
         [1;94m13 | [0m            id Int @id @map("_id")
         [1;94m14 | [0m            [1;91mnickname String @default(dbgenerated())[0m
         [1;94m15 | [0m        }
+        [1;94m   | [0m
+    "#]];
+
+    expected.assert_eq(&error)
+}
+
+#[test]
+fn json_defaults_must_be_valid_json() {
+    let schema = r#"
+        model Test {
+            id Int @id
+            name Json @default("not json")
+        }
+    "#;
+
+    let error = datamodel::parse_schema(schema).map(drop).unwrap_err();
+
+    let expected = expect![[r#"
+        [1;91merror[0m: [1mError parsing attribute "@default": Parse error: "not json" is not a valid JSON string. (expected ident at line 1 column 2)[0m
+          [1;94m-->[0m  [4mschema.prisma:4[0m
+        [1;94m   | [0m
+        [1;94m 3 | [0m            id Int @id
+        [1;94m 4 | [0m            name Json @default([1;91m"not json"[0m)
+        [1;94m   | [0m
+    "#]];
+
+    expected.assert_eq(&error)
+}
+
+#[test]
+fn bytes_defaults_must_be_base64() {
+    let schema = r#"
+        model Test {
+            id Int @id
+            name Bytes @default("not base64")
+        }
+    "#;
+
+    let error = datamodel::parse_schema(schema).map(drop).unwrap_err();
+
+    let expected = expect![[r#"
+        [1;91merror[0m: [1mError parsing attribute "@default": Parse error: "not base64" is not a valid base64 string. (Could not convert from `base64 encoded bytes` to `PrismaValue::Bytes`)[0m
+          [1;94m-->[0m  [4mschema.prisma:4[0m
+        [1;94m   | [0m
+        [1;94m 3 | [0m            id Int @id
+        [1;94m 4 | [0m            name Bytes @default([1;91m"not base64"[0m)
+        [1;94m   | [0m
+    "#]];
+
+    expected.assert_eq(&error)
+}
+
+#[test]
+fn int_defaults_must_not_contain_decimal_point() {
+    let schema = r#"
+        model Test {
+            id Int @id
+            score Int @default(3.14)
+        }
+    "#;
+
+    let error = datamodel::parse_schema(schema).map(drop).unwrap_err();
+
+    let expected = expect![[r#"
+        [1;91merror[0m: [1mError parsing attribute "@default": Parse error: "3.14" is not a valid integer. (invalid digit found in string)[0m
+          [1;94m-->[0m  [4mschema.prisma:4[0m
+        [1;94m   | [0m
+        [1;94m 3 | [0m            id Int @id
+        [1;94m 4 | [0m            score Int @default([1;91m3.14[0m)
+        [1;94m   | [0m
+    "#]];
+
+    expected.assert_eq(&error)
+}
+
+#[test]
+fn bigint_defaults_must_not_contain_decimal_point() {
+    let schema = r#"
+        model Test {
+            id Int @id
+            score BigInt @default(3.14)
+        }
+    "#;
+
+    let error = datamodel::parse_schema(schema).map(drop).unwrap_err();
+
+    let expected = expect![[r#"
+        [1;91merror[0m: [1mError parsing attribute "@default": Parse error: "3.14" is not a valid integer. (invalid digit found in string)[0m
+          [1;94m-->[0m  [4mschema.prisma:4[0m
+        [1;94m   | [0m
+        [1;94m 3 | [0m            id Int @id
+        [1;94m 4 | [0m            score BigInt @default([1;91m3.14[0m)
+        [1;94m   | [0m
+    "#]];
+
+    expected.assert_eq(&error)
+}
+
+#[test]
+fn boolean_defaults_must_be_true_or_false() {
+    let schema = r#"
+        model Test {
+            id Int @id
+            isEdible Boolean @default(True)
+        }
+    "#;
+
+    let error = datamodel::parse_schema(schema).map(drop).unwrap_err();
+
+    let expected = expect![[r#"
+        [1;91merror[0m: [1mError parsing attribute "@default": Expected a Boolean value, but found `True`.[0m
+          [1;94m-->[0m  [4mschema.prisma:4[0m
+        [1;94m   | [0m
+        [1;94m 3 | [0m            id Int @id
+        [1;94m 4 | [0m            isEdible Boolean @[1;91mdefault(True)[0m
         [1;94m   | [0m
     "#]];
 
