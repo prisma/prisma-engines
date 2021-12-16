@@ -44,11 +44,13 @@
 <span id="44">44</span>
 <span id="45">45</span>
 <span id="46">46</span>
+<span id="47">47</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">super</span>::SqlSchemaCalculatorFlavour</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::flavour::MysqlFlavour</span>;
 <span class="kw">use</span> <span class="ident">datamodel</span>::{
+    <span class="ident">datamodel_connector::ScalarType</span>,
     <span class="ident">walkers</span>::{<span class="ident">walk_scalar_fields</span>, <span class="ident">ScalarFieldWalker</span>},
-    <span class="ident">Datamodel</span>, <span class="ident">ScalarType</span>,
+    <span class="ident">Datamodel</span>,
 };
 <span class="kw">use</span> <span class="ident">sql_schema_describer</span> <span class="kw">as</span> <span class="ident">sql</span>;
 

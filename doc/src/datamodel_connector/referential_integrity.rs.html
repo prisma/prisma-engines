@@ -55,11 +55,9 @@
 <span id="55">55</span>
 <span id="56">56</span>
 <span id="57">57</span>
-<span id="58">58</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::fmt</span>;
-
-<span class="kw">use</span> <span class="ident">dml::relation_info::ReferentialAction</span>;
+</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ReferentialAction</span>;
 <span class="kw">use</span> <span class="ident">enumflags2</span>::{<span class="ident">bitflags</span>, <span class="ident">BitFlags</span>};
+<span class="kw">use</span> <span class="ident">std::fmt</span>;
 
 <span class="doccomment">/// Defines the part of the stack where referential actions are handled.</span>
 <span class="attribute">#[<span class="ident">bitflags</span>]</span>

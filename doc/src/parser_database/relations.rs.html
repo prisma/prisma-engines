@@ -307,10 +307,60 @@
 <span id="307">307</span>
 <span id="308">308</span>
 <span id="309">309</span>
+<span id="310">310</span>
+<span id="311">311</span>
+<span id="312">312</span>
+<span id="313">313</span>
+<span id="314">314</span>
+<span id="315">315</span>
+<span id="316">316</span>
+<span id="317">317</span>
+<span id="318">318</span>
+<span id="319">319</span>
+<span id="320">320</span>
+<span id="321">321</span>
+<span id="322">322</span>
+<span id="323">323</span>
+<span id="324">324</span>
+<span id="325">325</span>
+<span id="326">326</span>
+<span id="327">327</span>
+<span id="328">328</span>
+<span id="329">329</span>
+<span id="330">330</span>
+<span id="331">331</span>
+<span id="332">332</span>
+<span id="333">333</span>
+<span id="334">334</span>
+<span id="335">335</span>
+<span id="336">336</span>
+<span id="337">337</span>
+<span id="338">338</span>
+<span id="339">339</span>
+<span id="340">340</span>
+<span id="341">341</span>
+<span id="342">342</span>
+<span id="343">343</span>
+<span id="344">344</span>
+<span id="345">345</span>
+<span id="346">346</span>
+<span id="347">347</span>
+<span id="348">348</span>
+<span id="349">349</span>
+<span id="350">350</span>
+<span id="351">351</span>
+<span id="352">352</span>
+<span id="353">353</span>
+<span id="354">354</span>
+<span id="355">355</span>
+<span id="356">356</span>
+<span id="357">357</span>
+<span id="358">358</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">ast</span>,
     {<span class="ident">context::Context</span>, <span class="ident">types::RelationField</span>},
 };
+<span class="kw">use</span> <span class="ident">enumflags2::bitflags</span>;
 <span class="kw">use</span> <span class="ident">std::collections::BTreeSet</span>;
 
 <span class="doccomment">/// Detect relation types and construct relation objects to the database.</span>
@@ -615,6 +665,54 @@
         <span class="ident">evidence</span>.<span class="ident">model_id</span>,
         <span class="ident">relation_idx</span>,
     ));
+}
+
+<span class="doccomment">/// Describes what happens when related nodes are deleted.</span>
+<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">u8</span>)]</span>
+<span class="attribute">#[<span class="ident">bitflags</span>]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Copy</span>, <span class="ident">PartialEq</span>, <span class="ident">Clone</span>)]</span>
+<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ReferentialAction</span> {
+    <span class="doccomment">/// Deletes record if dependent record is deleted. Updates relation scalar</span>
+    <span class="doccomment">/// fields if referenced scalar fields of the dependent record are updated.</span>
+    <span class="doccomment">/// Prevents operation (both updates and deletes) from succeeding if any</span>
+    <span class="doccomment">/// records are connected.</span>
+    <span class="ident">Cascade</span>,
+    <span class="doccomment">/// Prevents operation (both updates and deletes) from succeeding if any</span>
+    <span class="doccomment">/// records are connected. This behavior will always result in a runtime</span>
+    <span class="doccomment">/// error for required relations.</span>
+    <span class="ident">Restrict</span>,
+    <span class="doccomment">/// Behavior is database specific. Either defers throwing an integrity check</span>
+    <span class="doccomment">/// error until the end of the transaction or errors immediately. If</span>
+    <span class="doccomment">/// deferred, this makes it possible to temporarily violate integrity in a</span>
+    <span class="doccomment">/// transaction while making sure that subsequent operations in the</span>
+    <span class="doccomment">/// transaction restore integrity.</span>
+    <span class="ident">NoAction</span>,
+    <span class="doccomment">/// Sets relation scalar fields to null if the relation is deleted or</span>
+    <span class="doccomment">/// updated. This will always result in a runtime error if one or more of the</span>
+    <span class="doccomment">/// relation scalar fields are required.</span>
+    <span class="ident">SetNull</span>,
+    <span class="doccomment">/// Sets relation scalar fields to their default values on update or delete</span>
+    <span class="doccomment">/// of relation. Will always result in a runtime error if no defaults are</span>
+    <span class="doccomment">/// provided for any relation scalar fields.</span>
+    <span class="ident">SetDefault</span>,
+}
+
+<span class="kw">impl</span> <span class="ident">ReferentialAction</span> {
+    <span class="doccomment">/// True if the action modifies the related items.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">triggers_modification</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+        <span class="op">!</span><span class="macro">matches!</span>(<span class="self">self</span>, <span class="ident"><span class="self">Self</span>::NoAction</span> <span class="op">|</span> <span class="ident"><span class="self">Self</span>::Restrict</span>)
+    }
+
+    <span class="doccomment">/// The string representation of the referential action in the schema.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_str</span>(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
+        <span class="kw">match</span> <span class="self">self</span> {
+            <span class="ident">ReferentialAction::Cascade</span> =&gt; <span class="string">&quot;Cascade&quot;</span>,
+            <span class="ident">ReferentialAction::Restrict</span> =&gt; <span class="string">&quot;Restrict&quot;</span>,
+            <span class="ident">ReferentialAction::NoAction</span> =&gt; <span class="string">&quot;NoAction&quot;</span>,
+            <span class="ident">ReferentialAction::SetNull</span> =&gt; <span class="string">&quot;SetNull&quot;</span>,
+            <span class="ident">ReferentialAction::SetDefault</span> =&gt; <span class="string">&quot;SetDefault&quot;</span>,
+        }
+    }
 }
 </code></pre></div>
 </section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="parser_database" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>

@@ -26,7 +26,7 @@
 <span id="26">26</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">super</span>::SqlSchemaCalculatorFlavour</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::flavour::PostgresFlavour</span>;
-<span class="kw">use</span> <span class="ident">datamodel</span>::{<span class="ident">walkers::ScalarFieldWalker</span>, <span class="ident">Datamodel</span>, <span class="ident">ScalarType</span>, <span class="ident">WithDatabaseName</span>};
+<span class="kw">use</span> <span class="ident">datamodel</span>::{<span class="ident">datamodel_connector::ScalarType</span>, <span class="ident">walkers::ScalarFieldWalker</span>, <span class="ident">Datamodel</span>, <span class="ident">WithDatabaseName</span>};
 <span class="kw">use</span> <span class="ident">sql_schema_describer</span>::{<span class="self">self</span> <span class="kw">as</span> <span class="ident">sql</span>};
 
 <span class="kw">impl</span> <span class="ident">SqlSchemaCalculatorFlavour</span> <span class="kw">for</span> <span class="ident">PostgresFlavour</span> {

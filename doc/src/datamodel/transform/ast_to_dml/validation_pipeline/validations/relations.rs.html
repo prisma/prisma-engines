@@ -535,6 +535,8 @@
 <span id="535">535</span>
 <span id="536">536</span>
 <span id="537">537</span>
+<span id="538">538</span>
+<span id="539">539</span>
 </pre><pre class="rust"><code><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">mod</span> <span class="ident">many_to_many</span>;
 <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">mod</span> <span class="ident">one_to_many</span>;
 <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">mod</span> <span class="ident">one_to_one</span>;
@@ -997,14 +999,16 @@
         (<span class="prelude-val">Some</span>(<span class="ident">on_delete</span>), <span class="prelude-val">Some</span>(<span class="ident">on_update</span>)) =&gt; {
             <span class="macro">format!</span>(
                 <span class="string">&quot;{} (Implicit default `onDelete`: `{}`, and `onUpdate`: `{}`)&quot;</span>,
-                <span class="ident">msg</span>, <span class="ident">on_delete</span>, <span class="ident">on_update</span>
+                <span class="ident">msg</span>,
+                <span class="ident">on_delete</span>.<span class="ident">as_str</span>(),
+                <span class="ident">on_update</span>.<span class="ident">as_str</span>()
             )
         }
         (<span class="prelude-val">Some</span>(<span class="ident">on_delete</span>), <span class="prelude-val">None</span>) =&gt; {
-            <span class="macro">format!</span>(<span class="string">&quot;{} (Implicit default `onDelete`: `{}`)&quot;</span>, <span class="ident">msg</span>, <span class="ident">on_delete</span>)
+            <span class="macro">format!</span>(<span class="string">&quot;{} (Implicit default `onDelete`: `{}`)&quot;</span>, <span class="ident">msg</span>, <span class="ident">on_delete</span>.<span class="ident">as_str</span>())
         }
         (<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="ident">on_update</span>)) =&gt; {
-            <span class="macro">format!</span>(<span class="string">&quot;{} (Implicit default `onUpdate`: `{}`)&quot;</span>, <span class="ident">msg</span>, <span class="ident">on_update</span>)
+            <span class="macro">format!</span>(<span class="string">&quot;{} (Implicit default `onUpdate`: `{}`)&quot;</span>, <span class="ident">msg</span>, <span class="ident">on_update</span>.<span class="ident">as_str</span>())
         }
         (<span class="prelude-val">None</span>, <span class="prelude-val">None</span>) =&gt; <span class="ident">msg</span>.<span class="ident">to_string</span>(),
     };

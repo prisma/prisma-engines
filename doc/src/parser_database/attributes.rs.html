@@ -1216,7 +1216,7 @@
 
         <span class="comment">// @updatedAt</span>
         <span class="ident">attributes</span>.<span class="ident">visit_optional_single</span>(<span class="string">&quot;updatedAt&quot;</span>, <span class="ident">ctx</span>, <span class="op">|</span><span class="ident">args</span>, <span class="ident">ctx</span><span class="op">|</span> {
-            <span class="kw">if</span> <span class="op">!</span><span class="macro">matches!</span>(<span class="ident">scalar_field_data</span>.<span class="ident">r#type</span>, <span class="ident">ScalarFieldType::BuiltInScalar</span>(<span class="ident">tpe</span>) <span class="kw">if</span> <span class="ident">tpe</span>.<span class="ident">is_datetime</span>()) {
+            <span class="kw">if</span> <span class="op">!</span><span class="macro">matches!</span>(<span class="ident">scalar_field_data</span>.<span class="ident">r#type</span>, <span class="ident">ScalarFieldType::BuiltInScalar</span>(<span class="ident"><span class="kw">crate</span>::ScalarType::DateTime</span>)) {
                 <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">args</span>.<span class="ident">new_attribute_validation_error</span>(
                     <span class="string">&quot;Fields that are marked with @updatedAt must be of type DateTime.&quot;</span> ));
 

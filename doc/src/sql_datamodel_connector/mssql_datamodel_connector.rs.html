@@ -425,20 +425,14 @@
 <span id="425">425</span>
 <span id="426">426</span>
 <span id="427">427</span>
-<span id="428">428</span>
-<span id="429">429</span>
-<span id="430">430</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">datamodel_connector::helper</span>::{<span class="ident">arg_vec_from_opt</span>, <span class="ident">args_vec_from_opt</span>, <span class="ident">parse_one_opt_u32</span>, <span class="ident">parse_two_opt_u32</span>};
-<span class="kw">use</span> <span class="ident">datamodel_connector</span>::{
+</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">datamodel_connector</span>::{
     <span class="ident">connector_error</span>::{<span class="ident">ConnectorError</span>, <span class="ident">ErrorKind</span>},
-    <span class="ident">parser_database</span>,
+    <span class="ident">helper</span>::{<span class="ident">arg_vec_from_opt</span>, <span class="ident">args_vec_from_opt</span>, <span class="ident">parse_one_opt_u32</span>, <span class="ident">parse_two_opt_u32</span>},
+    <span class="ident">parser_database</span>::{<span class="self">self</span>, <span class="ident">ScalarType</span>},
     <span class="ident">walker_ext_traits</span>::<span class="kw-2">*</span>,
-    <span class="ident">Connector</span>, <span class="ident">ConnectorCapability</span>, <span class="ident">ConstraintScope</span>, <span class="ident">ReferentialIntegrity</span>,
+    <span class="ident">Connector</span>, <span class="ident">ConnectorCapability</span>, <span class="ident">ConstraintScope</span>, <span class="ident">NativeTypeConstructor</span>, <span class="ident">ReferentialAction</span>, <span class="ident">ReferentialIntegrity</span>,
 };
-<span class="kw">use</span> <span class="ident">dml</span>::{
-    <span class="ident">native_type_constructor::NativeTypeConstructor</span>, <span class="ident">native_type_instance::NativeTypeInstance</span>,
-    <span class="ident">relation_info::ReferentialAction</span>, <span class="ident">scalars::ScalarType</span>,
-};
+<span class="kw">use</span> <span class="ident">dml::native_type_instance::NativeTypeInstance</span>;
 <span class="kw">use</span> <span class="ident">enumflags2::BitFlags</span>;
 <span class="kw">use</span> <span class="ident">native_types</span>::{<span class="ident">MsSqlType</span>, <span class="ident">MsSqlTypeParameter</span>};
 <span class="kw">use</span> <span class="ident">once_cell::sync::Lazy</span>;

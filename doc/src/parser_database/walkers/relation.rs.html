@@ -390,17 +390,7 @@
 <span id="390">390</span>
 <span id="391">391</span>
 <span id="392">392</span>
-<span id="393">393</span>
-<span id="394">394</span>
-<span id="395">395</span>
-<span id="396">396</span>
-<span id="397">397</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">ModelWalker</span>, <span class="ident">RelationFieldWalker</span>, <span class="ident">RelationName</span>, <span class="ident">ScalarFieldWalker</span>};
-<span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">ast</span>,
-    {<span class="ident">relations</span>::<span class="kw-2">*</span>, <span class="ident">ParserDatabase</span>, <span class="ident">ScalarFieldType</span>},
-};
-<span class="kw">use</span> <span class="ident">dml::relation_info::ReferentialAction</span>;
+</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">ast</span>, <span class="ident">relations</span>::<span class="kw-2">*</span>, <span class="ident">walkers</span>::<span class="kw-2">*</span>, <span class="ident">ParserDatabase</span>, <span class="ident">ScalarFieldType</span>};
 
 <span class="doccomment">/// A relation that has the minimal amount of information for us to create one. Useful for</span>
 <span class="doccomment">/// validation purposes. Holds all possible relation types.</span>

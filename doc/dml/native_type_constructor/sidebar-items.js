@@ -1,1 +1,0 @@
-initSidebarItems({"struct":[["NativeTypeConstructor","represents an available native type"]]});

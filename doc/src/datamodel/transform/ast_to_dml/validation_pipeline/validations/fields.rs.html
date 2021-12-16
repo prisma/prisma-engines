@@ -352,6 +352,8 @@
 <span id="352">352</span>
 <span id="353">353</span>
 <span id="354">354</span>
+<span id="355">355</span>
+<span id="356">356</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::{
     <span class="ident">constraint_namespace::ConstraintName</span>,
     <span class="ident">database_name::validate_db_name</span>,
@@ -363,7 +365,7 @@
     <span class="ident">transform::ast_to_dml</span>::{
         <span class="ident">db</span>::{
             <span class="ident">walkers</span>::{<span class="ident">FieldWalker</span>, <span class="ident">ScalarFieldAttributeWalker</span>, <span class="ident">ScalarFieldWalker</span>},
-            <span class="ident">ScalarFieldType</span>,
+            <span class="ident">ScalarFieldType</span>, <span class="ident">ScalarType</span>,
         },
         <span class="ident">validation_pipeline::context::Context</span>,
     },
@@ -373,7 +375,6 @@
     <span class="ident">walker_ext_traits</span>::<span class="kw-2">*</span>,
     <span class="ident">ConnectorCapability</span>,
 };
-<span class="kw">use</span> <span class="ident">dml::scalars::ScalarType</span>;
 <span class="kw">use</span> <span class="ident">itertools::Itertools</span>;
 
 <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">validate_client_name</span>(<span class="ident">field</span>: <span class="ident">FieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">names</span>: <span class="kw-2">&amp;</span><span class="ident">Names</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
@@ -550,8 +551,8 @@
         <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_connector_error</span>(
             <span class="kw-2">&amp;</span><span class="ident">ConnectorError::from_kind</span>(<span class="ident">ErrorKind::IncompatibleNativeType</span> {
                 <span class="ident">native_type</span>: <span class="ident">type_name</span>.<span class="ident">to_owned</span>(),
-                <span class="ident">field_type</span>: <span class="ident">scalar_type</span>.<span class="ident">to_string</span>(),
-                <span class="ident">expected_types</span>: <span class="ident">constructor</span>.<span class="ident">prisma_types</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">to_string</span>()).<span class="ident">join</span>(<span class="string">&quot; or &quot;</span>),
+                <span class="ident">field_type</span>: <span class="ident">scalar_type</span>.<span class="ident">as_str</span>(),
+                <span class="ident">expected_types</span>: <span class="ident">constructor</span>.<span class="ident">prisma_types</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">as_str</span>()).<span class="ident">join</span>(<span class="string">&quot; or &quot;</span>),
             })
             .<span class="ident">to_string</span>(),
             <span class="ident">span</span>,
@@ -625,14 +626,17 @@
 }
 
 <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">validate_scalar_field_connector_specific</span>(<span class="ident">field</span>: <span class="ident">ScalarFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
-    <span class="kw">if</span> <span class="macro">matches!</span>(<span class="ident">field</span>.<span class="ident">scalar_field_type</span>(), <span class="ident">ScalarFieldType::BuiltInScalar</span>(<span class="ident">t</span>) <span class="kw">if</span> <span class="ident">t</span>.<span class="ident">is_json</span>()) {
+    <span class="kw">if</span> <span class="macro">matches!</span>(
+        <span class="ident">field</span>.<span class="ident">scalar_field_type</span>(),
+        <span class="ident">ScalarFieldType::BuiltInScalar</span>(<span class="ident">ScalarType::Json</span>)
+    ) {
         <span class="kw">if</span> <span class="op">!</span><span class="ident">ctx</span>.<span class="ident">connector</span>.<span class="ident">supports_json</span>() {
             <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_field_validation_error</span>(
                 <span class="kw-2">&amp;</span><span class="macro">format!</span>(
-                    <span class="string">&quot;Field `{}` in model `{}` can&#39;t be of type Json. The current connector does not support the Json type.&quot;</span>,
-                    <span class="ident">field</span>.<span class="ident">name</span>(),
-                    <span class="ident">field</span>.<span class="ident">model</span>().<span class="ident">name</span>()
-                ),
+                <span class="string">&quot;Field `{}` in model `{}` can&#39;t be of type Json. The current connector does not support the Json type.&quot;</span>,
+                <span class="ident">field</span>.<span class="ident">name</span>(),
+                <span class="ident">field</span>.<span class="ident">model</span>().<span class="ident">name</span>(),
+            ),
                 <span class="ident">field</span>.<span class="ident">model</span>().<span class="ident">name</span>(),
                 <span class="ident">field</span>.<span class="ident">name</span>(),
                 <span class="ident">field</span>.<span class="ident">ast_field</span>().<span class="ident">span</span>,
@@ -699,7 +703,7 @@
 
             <span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span> <span class="macro">format!</span>(
                         <span class="string">&quot;The type `Unsupported(\&quot;{}\&quot;)` you specified in the type definition for the field `{}` is supported as a native type by Prisma. Please use the native type notation `{} @{}.{}` for full support.&quot;</span>,
-                        <span class="ident">unsupported_lit</span>, <span class="ident">field</span>.<span class="ident">name</span>(), <span class="ident">prisma_type</span>.<span class="ident">to_string</span>(), <span class="kw-2">&amp;</span><span class="ident">source</span>.<span class="ident">name</span>, <span class="ident">native_type</span>.<span class="ident">render</span>()
+                        <span class="ident">unsupported_lit</span>, <span class="ident">field</span>.<span class="ident">name</span>(), <span class="ident">prisma_type</span>.<span class="ident">as_str</span>(), <span class="kw-2">&amp;</span><span class="ident">source</span>.<span class="ident">name</span>, <span class="ident">native_type</span>.<span class="ident">render</span>()
                     );
 
             <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_validation_error</span>(<span class="ident">msg</span>, <span class="ident">field</span>.<span class="ident">ast_field</span>().<span class="ident">span</span>));

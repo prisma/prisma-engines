@@ -214,11 +214,18 @@
 <span id="214">214</span>
 <span id="215">215</span>
 <span id="216">216</span>
+<span id="217">217</span>
+<span id="218">218</span>
+<span id="219">219</span>
+<span id="220">220</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">ast</span>,
     <span class="ident">diagnostics::DatamodelError</span>,
     <span class="ident">transform::ast_to_dml</span>::{
-        <span class="ident">db::walkers</span>::{<span class="ident">ModelWalker</span>, <span class="ident">RelationFieldWalker</span>, <span class="ident">RelationName</span>},
+        <span class="ident">db</span>::{
+            <span class="ident">walkers</span>::{<span class="ident">ModelWalker</span>, <span class="ident">RelationFieldWalker</span>, <span class="ident">RelationName</span>},
+            <span class="ident">ReferentialAction</span>,
+        },
         <span class="ident">validation_pipeline::context::Context</span>,
     },
 };
@@ -356,16 +363,17 @@
 <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">referential_actions</span>(<span class="ident">field</span>: <span class="ident">RelationFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
     <span class="kw">let</span> <span class="ident">connector</span> <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">connector</span>;
     <span class="kw">let</span> <span class="ident">referential_integrity</span> <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">referential_integrity</span>;
-    <span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span> <span class="op">|</span><span class="ident">action</span><span class="op">|</span> {
+    <span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span> <span class="op">|</span><span class="ident">action</span>: <span class="ident">ReferentialAction</span><span class="op">|</span> {
         <span class="kw">let</span> <span class="ident">allowed_values</span> <span class="op">=</span> <span class="ident">connector</span>
             .<span class="ident">referential_actions</span>(<span class="kw-2">&amp;</span><span class="ident">referential_integrity</span>)
             .<span class="ident">iter</span>()
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="macro">format!</span>(<span class="string">&quot;`{}`&quot;</span>, <span class="ident">f</span>))
+            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="macro">format!</span>(<span class="string">&quot;`{}`&quot;</span>, <span class="ident">f</span>.<span class="ident">as_str</span>()))
             .<span class="ident">join</span>(<span class="string">&quot;, &quot;</span>);
 
         <span class="macro">format!</span>(
             <span class="string">&quot;Invalid referential action: `{}`. Allowed values: ({})&quot;</span>,
-            <span class="ident">action</span>, <span class="ident">allowed_values</span>,
+            <span class="ident">action</span>.<span class="ident">as_str</span>(),
+            <span class="ident">allowed_values</span>,
         )
     };
 

@@ -64,15 +64,17 @@
 <span id="64">64</span>
 <span id="65">65</span>
 <span id="66">66</span>
+<span id="67">67</span>
 </pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">mssql</span>;
 <span class="kw">mod</span> <span class="ident">mysql</span>;
 <span class="kw">mod</span> <span class="ident">postgres</span>;
 <span class="kw">mod</span> <span class="ident">sqlite</span>;
 
 <span class="kw">use</span> <span class="ident">datamodel</span>::{
+    <span class="ident">datamodel_connector::ScalarType</span>,
     <span class="ident">walkers::ModelWalker</span>,
     <span class="ident">walkers</span>::{<span class="ident">RelationFieldWalker</span>, <span class="ident">ScalarFieldWalker</span>},
-    <span class="ident">Datamodel</span>, <span class="ident">FieldArity</span>, <span class="ident">ReferentialAction</span>, <span class="ident">ScalarType</span>,
+    <span class="ident">Datamodel</span>, <span class="ident">FieldArity</span>, <span class="ident">ReferentialAction</span>,
 };
 <span class="kw">use</span> <span class="ident">sql_schema_describer</span>::{<span class="self">self</span> <span class="kw">as</span> <span class="ident">sql</span>, <span class="ident">ColumnArity</span>, <span class="ident">ColumnType</span>, <span class="ident">ColumnTypeFamily</span>};
 

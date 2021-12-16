@@ -334,19 +334,15 @@
 <span id="334">334</span>
 <span id="335">335</span>
 <span id="336">336</span>
-<span id="337">337</span>
-<span id="338">338</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">datamodel_connector</span>::{
     <span class="ident">connector_error::ConnectorError</span>,
     <span class="ident">helper</span>::{<span class="ident">arg_vec_from_opt</span>, <span class="ident">args_vec_from_opt</span>, <span class="ident">parse_one_opt_u32</span>, <span class="ident">parse_two_opt_u32</span>},
     <span class="ident">parser_database::walkers::ModelWalker</span>,
     <span class="ident">walker_ext_traits</span>::<span class="kw-2">*</span>,
-    <span class="ident">Connector</span>, <span class="ident">ConnectorCapability</span>, <span class="ident">ConstraintScope</span>, <span class="ident">ReferentialIntegrity</span>,
+    <span class="ident">Connector</span>, <span class="ident">ConnectorCapability</span>, <span class="ident">ConstraintScope</span>, <span class="ident">NativeTypeConstructor</span>, <span class="ident">ReferentialAction</span>, <span class="ident">ReferentialIntegrity</span>,
+    <span class="ident">ScalarType</span>,
 };
-<span class="kw">use</span> <span class="ident">dml</span>::{
-    <span class="ident">native_type_constructor::NativeTypeConstructor</span>, <span class="ident">native_type_instance::NativeTypeInstance</span>,
-    <span class="ident">relation_info::ReferentialAction</span>, <span class="ident">scalars::ScalarType</span>,
-};
+<span class="kw">use</span> <span class="ident">dml::native_type_instance::NativeTypeInstance</span>;
 <span class="kw">use</span> <span class="ident">enumflags2::BitFlags</span>;
 <span class="kw">use</span> <span class="ident">native_types::PostgresType</span>::{<span class="self">self</span>, <span class="kw-2">*</span>};
 

@@ -75,9 +75,7 @@
 <span id="75">75</span>
 <span id="76">76</span>
 <span id="77">77</span>
-<span id="78">78</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">connector_error::ConnectorError</span>, <span class="ident">Connector</span>, <span class="ident">ConnectorCapability</span>};
-<span class="kw">use</span> <span class="ident">dml::relation_info::ReferentialAction</span>;
+</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">connector_error::ConnectorError</span>, <span class="ident">Connector</span>, <span class="ident">ConnectorCapability</span>, <span class="ident">ReferentialAction</span>, <span class="ident">ScalarType</span>};
 <span class="kw">use</span> <span class="ident">enumflags2::BitFlags</span>;
 
 <span class="doccomment">/// A [Connector](/trait.Connector.html) implementor meant to</span>
@@ -105,22 +103,22 @@
         <span class="ident">usize::MAX</span>
     }
 
-    <span class="kw">fn</span> <span class="ident">available_native_type_constructors</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [<span class="ident">dml::native_type_constructor::NativeTypeConstructor</span>] {
+    <span class="kw">fn</span> <span class="ident">available_native_type_constructors</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [<span class="ident"><span class="kw">crate</span>::native_type_constructor::NativeTypeConstructor</span>] {
         <span class="kw-2">&amp;</span>[]
     }
 
-    <span class="kw">fn</span> <span class="ident">scalar_type_for_native_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_native_type</span>: <span class="ident">serde_json::Value</span>) -&gt; <span class="ident">dml::scalars::ScalarType</span> {
-        <span class="ident">dml::scalars::ScalarType::String</span>
+    <span class="kw">fn</span> <span class="ident">scalar_type_for_native_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_native_type</span>: <span class="ident">serde_json::Value</span>) -&gt; <span class="ident">ScalarType</span> {
+        <span class="ident">ScalarType::String</span>
     }
 
-    <span class="kw">fn</span> <span class="ident">default_native_type_for_scalar_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_scalar_type</span>: <span class="kw-2">&amp;</span><span class="ident">dml::scalars::ScalarType</span>) -&gt; <span class="ident">serde_json::Value</span> {
+    <span class="kw">fn</span> <span class="ident">default_native_type_for_scalar_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_scalar_type</span>: <span class="kw-2">&amp;</span><span class="ident">ScalarType</span>) -&gt; <span class="ident">serde_json::Value</span> {
         <span class="ident">serde_json::Value::Null</span>
     }
 
     <span class="kw">fn</span> <span class="ident">native_type_is_default_for_scalar_type</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">_native_type</span>: <span class="ident">serde_json::Value</span>,
-        <span class="ident">_scalar_type</span>: <span class="kw-2">&amp;</span><span class="ident">dml::scalars::ScalarType</span>,
+        <span class="ident">_scalar_type</span>: <span class="kw-2">&amp;</span><span class="ident">ScalarType</span>,
     ) -&gt; <span class="ident">bool</span> {
         <span class="bool-val">false</span>
     }
