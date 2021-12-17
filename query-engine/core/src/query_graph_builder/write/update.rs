@@ -112,6 +112,13 @@ pub fn update_many_records(
         ));
         let update_many_node = update_many_record_node(graph, connector_ctx, Filter::empty(), model.clone(), data_map)?;
 
+        utils::preserve_referential_integrity_on_update(
+            graph,
+            connector_ctx,
+            &model,
+            &pre_read_node,
+            &update_many_node,
+        )?;
         utils::insert_emulated_on_update(graph, connector_ctx, &model, &pre_read_node, &update_many_node)?;
 
         graph.create_edge(

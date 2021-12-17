@@ -1047,6 +1047,10 @@ pub fn preserve_referential_integrity_on_update(
                 })
                 .collect();
 
+            if fks_to_be_updated.is_empty() {
+                return None;
+            }
+
             // We don't preserve referential integrity if any of the foreign keys were updated
             // with something else than a value. Division, multiplication, addition, etc ... isn't supported.
             let has_complex_fk_updates = fks_to_be_updated.values().any(|write_expr| !write_expr.is_value());

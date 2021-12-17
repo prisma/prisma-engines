@@ -41,7 +41,7 @@ mod emulate_ref_integrity {
 
     // Updating foreign keys to a record that exist should work
     #[connector_test]
-    async fn referenced_records_exist(runner: Runner) -> TestResult<()> {
+    async fn referenced_records_exist_one(runner: Runner) -> TestResult<()> {
         create_row(
             &runner,
             r#"{
@@ -82,9 +82,54 @@ mod emulate_ref_integrity {
         Ok(())
     }
 
+    // Updating foreign keys (of many records) to a record that exist should work
+    #[connector_test]
+    async fn referenced_records_exist_many(runner: Runner) -> TestResult<()> {
+        create_row(
+            &runner,
+            r#"{
+                  id: 1
+                  uniq_1: 1
+                  uniq_2: 1
+                  post: { create: { id: 1 } }
+                  comments: { create: [
+                    { id: 1, post: { connect: { id: 1 } } },
+                    { id: 2, post: { connect: { id: 1 } } }
+                  ] }
+                }"#,
+        )
+        .await?;
+
+        create_row(
+            &runner,
+            r#"{
+                    id: 2
+                    uniq_1: 3
+                    uniq_2: 1
+                    post: { create: { id: 3 } }
+                    comments: { create: [
+                      { id: 3, post: { connect: { id: 3 } } }
+                    ]}
+                }"#,
+        )
+        .await?;
+
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"mutation { updateManyComment(data: { writtenById_1: 3 }) { count } }"#),
+          @r###"{"data":{"updateManyComment":{"count":3}}}"###
+        );
+
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"{ findManyUser { id comments { id } } }"#),
+          @r###"{"data":{"findManyUser":[{"id":1,"comments":[]},{"id":2,"comments":[{"id":2},{"id":1},{"id":3}]}]}}"###
+        );
+
+        Ok(())
+    }
+
     // Updating foreign keys to a record that does not exist should fail
     #[connector_test]
-    async fn violates_required_relation(runner: Runner) -> TestResult<()> {
+    async fn violates_required_relation_one(runner: Runner) -> TestResult<()> {
         create_row(
             &runner,
             r#"{
@@ -144,9 +189,71 @@ mod emulate_ref_integrity {
         Ok(())
     }
 
+    // Updating foreign keys (of many records) to a record that does not exist should fail
+    #[connector_test]
+    async fn violates_required_relation_many(runner: Runner) -> TestResult<()> {
+        create_row(
+            &runner,
+            r#"{
+                  id: 1
+                  uniq_1: 1
+                  uniq_2: 1
+                  post: { create: { id: 1 } }
+                  comments: { create: [
+                    { id: 1, post: { connect: { id: 1 } } },
+                    { id: 2, post: { connect: { id: 1 } } }
+                  ] }
+                }"#,
+        )
+        .await?;
+
+        create_row(
+            &runner,
+            r#"{
+                  id: 2
+                  uniq_1: 3
+                  uniq_2: 1
+                  post: { create: { id: 2 } }
+                  comments: { create: [
+                    { id: 3, post: { connect: { id: 2 } } }
+                  ]}
+                }"#,
+        )
+        .await?;
+
+        // Can fail on `Comment.writtenBy` or `Comment.post` since there is
+        // - no `User` with [uniq_1: 5, uniq_2: 1]
+        // - nor `Post` with `id: 5`
+        assert_error!(
+            runner,
+            r#"mutation { updateManyComment(data: { writtenById_1: 5 }) { count } }"#,
+            2014,
+            "The change you are trying to make would violate the required relation"
+        );
+
+        // Does _not_ fail on `Comment.writtenBy` but on `Comment.post` since there _is_ a `User` with [uniq_1: 3, uniq_2: 1]
+        // but no `Post` with `id: 3`
+        assert_error!(
+                runner,
+                r#"mutation { updateManyComment(data: { writtenById_1: 3 }) { count } }"#,
+                2014,
+                "The change you are trying to make would violate the required relation 'CommentToPost' between the `Comment` and `Post` models."
+            );
+
+        // Does _not_ fail on `Comment.post` since `Comment.writtenById_2` is not part of its fks
+        assert_error!(
+              runner,
+              r#"mutation { updateManyComment(data: { writtenById_2: 5 }) { count } }"#,
+              2014,
+              "The change you are trying to make would violate the required relation 'CommentToUser' between the `Comment` and `User` models."
+          );
+
+        Ok(())
+    }
+
     // Updating foreign keys with anything else than `set` should not trigger emulation
     #[connector_test]
-    async fn no_support_for_complex_updates(runner: Runner) -> TestResult<()> {
+    async fn no_support_for_complex_updates_one(runner: Runner) -> TestResult<()> {
         create_row(
             &runner,
             r#"{
@@ -165,6 +272,62 @@ mod emulate_ref_integrity {
         insta::assert_snapshot!(
           run_query!(&runner, r#"mutation { updateOneComment(where: { id: 1 }, data: { writtenById_1: { increment: 10 } }) { id writtenById_1 } }"#),
           @r###"{"data":{"updateOneComment":{"id":1,"writtenById_1":11}}}"###
+        );
+
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"mutation { updateOneComment(where: { id: 1 }, data: { writtenById_1: { decrement: 1 } }) { id writtenById_1 } }"#),
+          @r###"{"data":{"updateOneComment":{"id":1,"writtenById_1":10}}}"###
+        );
+
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"mutation { updateOneComment(where: { id: 1 }, data: { writtenById_1: { divide: 2 } }) { id writtenById_1 } }"#),
+          @r###"{"data":{"updateOneComment":{"id":1,"writtenById_1":5}}}"###
+        );
+
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"mutation { updateOneComment(where: { id: 1 }, data: { writtenById_1: { multiply: 2 } }) { id writtenById_1 } }"#),
+          @r###"{"data":{"updateOneComment":{"id":1,"writtenById_1":10}}}"###
+        );
+
+        Ok(())
+    }
+
+    // Updating foreign keys (of many records) with anything else than `set` should not trigger emulation
+    #[connector_test]
+    async fn no_support_for_complex_updates_many(runner: Runner) -> TestResult<()> {
+        create_row(
+            &runner,
+            r#"{
+                  id: 1
+                  uniq_1: 1
+                  uniq_2: 1
+                  post: { create: { id: 1 } }
+                  comments: { create: [
+                    { id: 1, post: { connect: { id: 1 } } },
+                    { id: 2, post: { connect: { id: 1 } } }
+                  ] }
+                }"#,
+        )
+        .await?;
+
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"mutation { updateManyComment(data: { writtenById_1: { increment: 10 } }) { count } }"#),
+          @r###"{"data":{"updateManyComment":{"count":2}}}"###
+        );
+
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"mutation { updateManyComment(data: { writtenById_1: { decrement: 1 } }) { count } }"#),
+          @r###"{"data":{"updateManyComment":{"count":2}}}"###
+        );
+
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"mutation { updateManyComment(data: { writtenById_1: { divide: 2 } }) { count } }"#),
+          @r###"{"data":{"updateManyComment":{"count":2}}}"###
+        );
+
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"mutation { updateManyComment(data: { writtenById_1: { multiply: 2 } }) { count } }"#),
+          @r###"{"data":{"updateManyComment":{"count":2}}}"###
         );
 
         Ok(())
