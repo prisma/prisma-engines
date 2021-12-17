@@ -1,8 +1,10 @@
-use indoc::indoc;
 use query_engine_tests::*;
 
 #[test_suite(suite = "cascade_onD_1to1_req", schema(required))]
 mod one2one_req {
+    use indoc::indoc;
+    use query_engine_tests::run_query;
+
     fn required() -> String {
         let schema = indoc! {
             r#"model Parent {
@@ -44,6 +46,9 @@ mod one2one_req {
 
 #[test_suite(suite = "cascade_onD_1to1_opt", schema(optional))]
 mod one2one_opt {
+    use indoc::indoc;
+    use query_engine_tests::run_query;
+
     fn optional() -> String {
         let schema = indoc! {
             r#"model Parent {
@@ -85,6 +90,9 @@ mod one2one_opt {
 
 #[test_suite(suite = "cascade_onD_1toM_req", schema(required))]
 mod one2many_req {
+    use indoc::indoc;
+    use query_engine_tests::run_query;
+
     fn required() -> String {
         let schema = indoc! {
             r#"model Parent {
@@ -126,6 +134,9 @@ mod one2many_req {
 
 #[test_suite(suite = "cascade_onD_1toM_opt", schema(optional))]
 mod one2many_opt {
+    use indoc::indoc;
+    use query_engine_tests::run_query;
+
     fn optional() -> String {
         let schema = indoc! {
             r#"model Parent {
@@ -159,6 +170,142 @@ mod one2many_opt {
         insta::assert_snapshot!(
             run_query!(&runner, "query { findManyChild { id }}"),
             @r###"{"data":{"findManyChild":[]}}"###
+        );
+
+        Ok(())
+    }
+}
+
+#[test_suite(schema(schema), exclude(SqlServer))]
+mod multiple_cascading_paths {
+    use indoc::indoc;
+    use query_engine_tests::run_query;
+
+    fn schema() -> String {
+        let schema = indoc! {
+            r#"model User {
+                #id(id, Int, @id)
+                comments Comment[]
+                posts    Post[]
+              }
+              
+              model Post {
+                #id(id, Int, @id)
+                authorId Int
+                author   User      @relation(fields: [authorId], references: [id], onDelete: Cascade)
+                comments Comment[]
+              }
+              
+              model Comment {
+                #id(id, Int, @id)
+                writtenById Int
+                postId      Int
+                writtenBy   User @relation(fields: [writtenById], references: [id], onDelete: Cascade)
+                post        Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+              }
+              "#
+        };
+
+        schema.to_owned()
+    }
+
+    // Ensure multiple cascading paths to the same model don't end up updating the same model twice and error out
+    // The two paths are:
+    //   - User -> Comment
+    //   - User -> Post -> Comment
+    #[connector_test]
+    async fn should_work(runner: Runner) -> TestResult<()> {
+        run_query!(
+            &runner,
+            r#"mutation {
+            createOneUser(
+              data: {
+                id: 1
+                posts: {
+                  create: {
+                    id: 1,
+                    comments: {
+                      create: {
+                        id: 1,
+                        writtenBy: {
+                          connect: { id: 1 }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            ) {
+              id
+            }
+          }
+          "#
+        );
+        // A second user is created to ensure that it won't be touched by the cascade delete
+        run_query!(
+            &runner,
+            r#"mutation {
+              createOneUser(
+                data: {
+                  id: 2
+                  posts: {
+                    create: {
+                      id: 2,
+                      comments: {
+                        create: {
+                          id: 2,
+                          writtenBy: {
+                            connect: { id: 2 }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              ) {
+                id
+              }
+            }
+          "#
+        );
+
+        run_query!(
+            &runner,
+            r#"mutation {
+              deleteOneUser(where: { id: 1 }) {
+                id
+              }
+            }"#
+        );
+
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"{
+            findManyUser {
+              id
+            }
+          }
+          "#),
+          @r###"{"data":{"findManyUser":[{"id":2}]}}"###
+        );
+
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"{
+            findManyPost {
+              id
+            }
+          }
+          "#),
+          @r###"{"data":{"findManyPost":[{"id":2}]}}"###
+        );
+
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"{
+            findManyComment{
+              id
+            }
+          }
+          "#),
+          @r###"{"data":{"findManyComment":[{"id":2}]}}"###
         );
 
         Ok(())

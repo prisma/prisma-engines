@@ -19,7 +19,7 @@ fn adding_mutual_references_on_existing_tables_works(api: TestApi) {
             id Int
             name String @unique
             b_email String
-            brel B @relation("AtoB", fields: [b_email], references: [email])
+            brel B @relation("AtoB", fields: [b_email], references: [email], onUpdate: Restrict)
             b    B[] @relation("BtoA")
         }
 

@@ -1,8 +1,10 @@
-use indoc::indoc;
 use query_engine_tests::*;
 
 #[test_suite(suite = "cascade_onU_1to1_req", schema(required))]
 mod one2one_req {
+    use indoc::indoc;
+    use query_engine_tests::run_query;
+
     fn required() -> String {
         let schema = indoc! {
             r#"model Parent {
@@ -129,6 +131,9 @@ mod one2one_req {
 
 #[test_suite(suite = "cascade_onU_1to1_opt", schema(optional))]
 mod one2one_opt {
+    use indoc::indoc;
+    use query_engine_tests::run_query;
+
     fn optional() -> String {
         let schema = indoc! {
             r#"model Parent {
@@ -257,6 +262,9 @@ mod one2one_opt {
 
 #[test_suite(suite = "cascade_onU_1toM_req", schema(required))]
 mod one2many_req {
+    use indoc::indoc;
+    use query_engine_tests::run_query;
+
     fn required() -> String {
         let schema = indoc! {
             r#"model Parent {
@@ -299,6 +307,9 @@ mod one2many_req {
 
 #[test_suite(suite = "cascade_onU_1toM_opt", schema(optional))]
 mod one2many_opt {
+    use indoc::indoc;
+    use query_engine_tests::run_query;
+
     fn optional() -> String {
         let schema = indoc! {
             r#"model Parent {
@@ -381,6 +392,128 @@ mod one2many_opt {
         insta::assert_snapshot!(
           run_query!(&runner, r#"query { findManyChild { id parent_uniq_1 parent_uniq_2 }}"#),
           @r###"{"data":{"findManyChild":[{"id":1,"parent_uniq_1":"u3","parent_uniq_2":"u2"}]}}"###
+        );
+
+        Ok(())
+    }
+}
+
+#[test_suite(schema(schema), exclude(SqlServer))]
+mod multiple_cascading_paths {
+    use indoc::indoc;
+    use query_engine_tests::run_query;
+
+    fn schema() -> String {
+        let schema = indoc! {
+            r#"model User {
+                #id(id, Int, @id)
+                uniq Int @unique
+                comments Comment[]
+                posts    Post[]
+              }
+              
+              model Post {
+                #id(id, Int, @id)
+                authorId Int
+                author   User      @relation(fields: [authorId], references: [uniq], onUpdate: Cascade)
+                comments Comment[]
+              }
+              
+              model Comment {
+                #id(id, Int, @id)
+                writtenById Int
+                postId      Int
+                writtenBy   User @relation(fields: [writtenById], references: [uniq], onUpdate: Cascade)
+                post        Post @relation(fields: [postId], references: [id], onUpdate: Cascade)
+              }
+              "#
+        };
+
+        schema.to_owned()
+    }
+
+    // Ensure multiple cascading paths to the same model don't end up updating the same model twice and error out
+    // The two paths are:
+    //   - User -> Comment
+    //   - User -> Post -> Comment
+    #[connector_test]
+    async fn should_work(runner: Runner) -> TestResult<()> {
+        run_query!(
+            &runner,
+            r#"mutation {
+            createOneUser(
+              data: {
+                id: 1
+                uniq: 1,
+                posts: {
+                  create: {
+                    id: 1,
+                    comments: {
+                      create: {
+                        id: 1,
+                        writtenBy: {
+                          connect: { uniq: 1 }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            ) {
+              id
+            }
+          }
+          "#
+        );
+        // A second user is created to ensure that it won't be touched by the cascade update
+        run_query!(
+            &runner,
+            r#"mutation {
+                createOneUser(
+                  data: {
+                    id: 3
+                    uniq: 3,
+                    posts: {
+                      create: {
+                        id: 3,
+                        comments: {
+                          create: {
+                            id: 3,
+                            writtenBy: {
+                              connect: { uniq: 3 }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                ) {
+                  id
+                }
+              }
+          "#
+        );
+
+        run_query!(
+            &runner,
+            r#"mutation {
+            updateOneUser(where: { id: 1 }, data: { uniq: 2 }) {
+              id
+            }
+          }"#
+        );
+
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"{
+            findManyUser(orderBy: { id: asc }) {
+              id
+              uniq
+              comments { id, writtenById }
+              posts { id, authorId }
+            }
+          }
+          "#),
+          @r###"{"data":{"findManyUser":[{"id":1,"uniq":2,"comments":[{"id":1,"writtenById":2}],"posts":[{"id":1,"authorId":2}]},{"id":3,"uniq":3,"comments":[{"id":3,"writtenById":3}],"posts":[{"id":3,"authorId":3}]}]}}"###
         );
 
         Ok(())

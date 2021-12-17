@@ -244,20 +244,21 @@ pub async fn delete_records<'conn>(
         .next()
         .unwrap();
 
-    let filter = if let Some(selectors) = record_filter.selectors {
-        let ids = selectors
+    let ids = if let Some(selectors) = record_filter.selectors {
+        selectors
             .into_iter()
             .map(|p| (&id_field, p.values().next().unwrap()).into_bson())
-            .collect::<crate::Result<Vec<_>>>()?;
-
-        doc! { id_field.db_name(): { "$in": ids } }
+            .collect::<crate::Result<Vec<_>>>()?
     } else {
         let filter = convert_filter(record_filter.filter, false, false)?;
-        let ids = find_ids(coll.clone(), session, model, filter).await?;
-
-        doc! { id_field.db_name(): { "$in": ids } }
+        find_ids(coll.clone(), session, model, filter).await?
     };
 
+    if ids.is_empty() {
+        return Ok(0);
+    }
+
+    let filter = doc! { id_field.db_name(): { "$in": ids } };
     let delete_result = coll.delete_many_with_session(filter, None, session).await?;
 
     Ok(delete_result.deleted_count as usize)
