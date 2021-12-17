@@ -9,6 +9,7 @@ migration-connector = { path = "../connectors/migration-connector" }
 migration-core = { path = "../core", features = ["sql", "mongodb"] }
 user-facing-errors = { path = "../../libs/user-facing-errors" }
 
+async-trait = "0.1.0"
 backtrace = "0.3.59"
 base64 = "0.13"
 json-rpc-stdio = { path = "../../libs/json-rpc-stdio" }

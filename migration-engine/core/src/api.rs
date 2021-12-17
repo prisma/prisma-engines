@@ -65,6 +65,9 @@ pub trait GenericApi: Send + Sync + 'static {
     /// The command behind `prisma db push`.
     async fn schema_push(&self, input: &SchemaPushInput) -> CoreResult<SchemaPushOutput>;
 
+    /// Set the `ConnectorHost` to use.
+    fn set_host(&mut self, host: Box<dyn migration_connector::ConnectorHost>);
+
     /// Access to the migration connector.
     fn connector(&self) -> &dyn MigrationConnector;
 }
@@ -183,5 +186,9 @@ impl<C: MigrationConnector> GenericApi for C {
         schema_push(input, self)
             .instrument(tracing::info_span!("SchemaPush"))
             .await
+    }
+
+    fn set_host(&mut self, host: Box<dyn migration_connector::ConnectorHost>) {
+        MigrationConnector::set_host(self, host)
     }
 }

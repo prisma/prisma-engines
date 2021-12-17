@@ -32,16 +32,18 @@ const AVAILABLE_COMMANDS: &[&str] = &[
 
 /// Initialize a JSON-RPC ready migration engine API. This entails starting
 /// a database connection.
-pub async fn rpc_api(datamodel: &str) -> CoreResult<IoHandler> {
+pub async fn rpc_api(datamodel: &str, host: Box<dyn migration_connector::ConnectorHost>) -> CoreResult<IoHandler> {
     let mut io_handler = IoHandler::default();
-    let executor = Arc::new(crate::migration_api(datamodel)?);
+    let mut api = crate::migration_api(datamodel)?;
+    api.set_host(host);
+    let api = Arc::new(api);
 
-    executor.ensure_connection_validity().await?;
+    api.ensure_connection_validity().await?;
 
     for cmd in AVAILABLE_COMMANDS {
-        let executor = executor.clone();
+        let api = api.clone();
         io_handler.add_method(cmd, move |params: Params| {
-            Box::pin(run_command(executor.clone(), cmd, params))
+            Box::pin(run_command(api.clone(), cmd, params))
         });
     }
 

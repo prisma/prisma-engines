@@ -4,8 +4,6 @@
 //! The top-level library crate for the migration engine.
 
 pub mod commands;
-#[doc(hidden)]
-pub mod query_engine;
 
 mod api;
 mod core_error;
@@ -15,12 +13,6 @@ pub use self::{api::GenericApi, core_error::*, rpc::rpc_api};
 
 pub use core_error::*;
 pub use migration_connector;
-
-#[cfg(not(target_arch = "wasm32"))]
-pub use native::*;
-
-#[cfg(not(target_arch = "wasm32"))]
-mod native;
 
 use datamodel::{
     common::{
@@ -47,7 +39,7 @@ use mongodb_migration_connector::MongoDbMigrationConnector;
 use sql_migration_connector::SqlMigrationConnector;
 
 /// Top-level constructor for the migration engine API.
-pub async fn migration_api(datamodel: &str) -> CoreResult<Box<dyn api::GenericApi>> {
+pub fn migration_api(datamodel: &str) -> CoreResult<Box<dyn api::GenericApi>> {
     let (source, url, preview_features, shadow_database_url) = parse_configuration(datamodel)?;
 
     match source.active_provider.as_str() {

@@ -118,6 +118,8 @@ impl MigrationConnector for MongoDbMigrationConnector {
         Ok(())
     }
 
+    fn set_host(&mut self, _host: Box<dyn migration_connector::ConnectorHost>) {}
+
     async fn validate_migrations(
         &self,
         _migrations: &[migration_connector::migrations_directory::MigrationDirectory],
