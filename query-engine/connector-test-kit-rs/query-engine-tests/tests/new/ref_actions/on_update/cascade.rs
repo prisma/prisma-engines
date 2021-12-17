@@ -407,7 +407,7 @@ mod multiple_cascading_paths {
         let schema = indoc! {
             r#"model User {
                 #id(id, Int, @id)
-                idd Int @unique
+                uniq Int @unique
                 comments Comment[]
                 posts    Post[]
               }
@@ -415,7 +415,7 @@ mod multiple_cascading_paths {
               model Post {
                 #id(id, Int, @id)
                 authorId Int
-                author   User      @relation(fields: [authorId], references: [idd], onUpdate: Cascade)
+                author   User      @relation(fields: [authorId], references: [uniq], onUpdate: Cascade)
                 comments Comment[]
               }
               
@@ -423,7 +423,7 @@ mod multiple_cascading_paths {
                 #id(id, Int, @id)
                 writtenById Int
                 postId      Int
-                writtenBy   User @relation(fields: [writtenById], references: [idd], onUpdate: Cascade)
+                writtenBy   User @relation(fields: [writtenById], references: [uniq], onUpdate: Cascade)
                 post        Post @relation(fields: [postId], references: [id], onUpdate: Cascade)
               }
               "#
@@ -444,7 +444,7 @@ mod multiple_cascading_paths {
             createOneUser(
               data: {
                 id: 1
-                idd: 1,
+                uniq: 1,
                 posts: {
                   create: {
                     id: 1,
@@ -452,7 +452,7 @@ mod multiple_cascading_paths {
                       create: {
                         id: 1,
                         writtenBy: {
-                          connect: { idd: 1 }
+                          connect: { uniq: 1 }
                         }
                       }
                     }
@@ -472,7 +472,7 @@ mod multiple_cascading_paths {
                 createOneUser(
                   data: {
                     id: 3
-                    idd: 3,
+                    uniq: 3,
                     posts: {
                       create: {
                         id: 3,
@@ -480,7 +480,7 @@ mod multiple_cascading_paths {
                           create: {
                             id: 3,
                             writtenBy: {
-                              connect: { idd: 3 }
+                              connect: { uniq: 3 }
                             }
                           }
                         }
@@ -497,7 +497,7 @@ mod multiple_cascading_paths {
         run_query!(
             &runner,
             r#"mutation {
-            updateOneUser(where: { id: 1 }, data: { idd: 2 }) {
+            updateOneUser(where: { id: 1 }, data: { uniq: 2 }) {
               id
             }
           }"#
@@ -507,13 +507,13 @@ mod multiple_cascading_paths {
           run_query!(&runner, r#"{
             findManyUser(orderBy: { id: asc }) {
               id
-              idd
+              uniq
               comments { id, writtenById }
               posts { id, authorId }
             }
           }
           "#),
-          @r###"{"data":{"findManyUser":[{"id":1,"idd":2,"comments":[{"id":1,"writtenById":2}],"posts":[{"id":1,"authorId":2}]},{"id":3,"idd":3,"comments":[{"id":3,"writtenById":3}],"posts":[{"id":3,"authorId":3}]}]}}"###
+          @r###"{"data":{"findManyUser":[{"id":1,"uniq":2,"comments":[{"id":1,"writtenById":2}],"posts":[{"id":1,"authorId":2}]},{"id":3,"uniq":3,"comments":[{"id":3,"writtenById":3}],"posts":[{"id":3,"authorId":3}]}]}}"###
         );
 
         Ok(())
