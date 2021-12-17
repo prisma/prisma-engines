@@ -1164,3 +1164,53 @@ fn reformatting_extended_indexes_works() {
     let result = Reformatter::new(input).reformat_to_string();
     expected.assert_eq(&result);
 }
+
+#[test]
+fn reformatting_with_empty_indexes() {
+    let schema = r#"
+        generator js {
+          provider        = "prisma-client-js"
+          previewFeatures = ["fullTextIndex", "extendedIndexes"]
+        }
+
+        datasource db {
+          provider = "mysql"
+          url      = env("DATABASE_URL")
+        }
+
+        model Fulltext {
+          id      Int    @id
+          title   String @db.VarChar(255)
+          content String @db.Text
+
+          @@fulltext(fields:[], map: "a")
+          @@index(fields: [ ], map: "b")
+          @@unique(fields: [])
+        }
+    "#;
+
+    let expected = expect![[r#"
+        generator js {
+          provider        = "prisma-client-js"
+          previewFeatures = ["fullTextIndex", "extendedIndexes"]
+        }
+
+        datasource db {
+          provider = "mysql"
+          url      = env("DATABASE_URL")
+        }
+
+        model Fulltext {
+          id      Int    @id
+          title   String @db.VarChar(255)
+          content String @db.Text
+
+          @@unique(fields: [])
+          @@index(fields: [], map: "b")
+          @@fulltext(fields: [], map: "a")
+        }
+    "#]];
+
+    let result = Reformatter::new(schema).reformat_to_string();
+    expected.assert_eq(&result);
+}

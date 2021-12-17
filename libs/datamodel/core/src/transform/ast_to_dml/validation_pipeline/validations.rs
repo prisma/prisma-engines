@@ -68,6 +68,7 @@ pub(super) fn validate(ctx: &mut Context<'_>, relation_transformation_enabled: b
         }
 
         for index in model.indexes() {
+            indexes::has_fields(index, ctx);
             indexes::has_a_unique_constraint_name(index, &names, ctx);
             indexes::uses_length_or_sort_without_preview_flag(index, ctx);
             indexes::field_length_prefix_supported(index, ctx);
