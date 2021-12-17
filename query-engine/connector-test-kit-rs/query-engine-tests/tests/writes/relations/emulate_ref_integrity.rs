@@ -39,6 +39,36 @@ mod emulate_ref_integrity {
         schema.to_owned()
     }
 
+    fn nested() -> String {
+        let schema = indoc! {
+            r#"model User {
+              #id(id, Int, @id)
+              uniq     Int       @unique
+
+              comments Comment[]
+              post     Post?
+            }
+            
+            model Post {
+              #id(id, Int, @id)
+              authorId Int
+              author   User    @relation(fields: [authorId], references: [uniq])
+            
+              commentId Int
+              comment   Comment @relation(fields: [commentId], references: [id])
+            }
+            
+            model Comment {
+              #id(id, Int, @id)
+              post        Post?
+              writtenById Int
+              writtenBy   User  @relation(fields: [writtenById], references: [uniq])
+            }"#
+        };
+
+        schema.to_owned()
+    }
+
     // Updating foreign keys to a record that exist should work
     #[connector_test]
     async fn referenced_records_exist_one(runner: Runner) -> TestResult<()> {
@@ -122,6 +152,69 @@ mod emulate_ref_integrity {
         insta::assert_snapshot!(
           run_query!(&runner, r#"{ findManyUser { id comments { id } } }"#),
           @r###"{"data":{"findManyUser":[{"id":1,"comments":[]},{"id":2,"comments":[{"id":2},{"id":1},{"id":3}]}]}}"###
+        );
+
+        Ok(())
+    }
+
+    // Nested updating foreign keys to a record that exist should work
+    #[connector_test(schema(nested))]
+    async fn referenced_records_exist_nested(runner: Runner) -> TestResult<()> {
+        create_row(
+            &runner,
+            r#"{
+                  id: 1,
+                  uniq: 1,
+                  comments: {
+                    create: {
+                      id: 1,
+                      post: {
+                        create: {
+                          id: 1
+                          author: { connect: { id: 1 } }
+                        }
+                      }
+                    }
+                  }
+                }"#,
+        )
+        .await?;
+        create_row(
+            &runner,
+            r#"{
+                id: 2,
+                uniq: 2,
+                comments: {
+                  create: {
+                    id: 2,
+                    post: {
+                      create: {
+                        id: 2
+                        author: { connect: { id: 2 } }
+                      }
+                    }
+                  }
+                }
+              }"#,
+        )
+        .await?;
+
+        // `User` with `uniq`: 2 exists
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"mutation {
+            updateOneUser(
+              where: { id: 1 },
+              data: { post: { update: { comment: { update: { writtenById: 2 } } } } }
+            ) {
+              id
+            }
+          }"#),
+          @r###"{"data":{"updateOneUser":{"id":1}}}"###
+        );
+
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"{ findManyUser { id comments { id } } }"#),
+          @r###"{"data":{"findManyUser":[{"id":1,"comments":[]},{"id":2,"comments":[{"id":1},{"id":2}]}]}}"###
         );
 
         Ok(())
@@ -251,6 +344,46 @@ mod emulate_ref_integrity {
         Ok(())
     }
 
+    // Nested updating foreign keys to a record that does not exist should fail
+    #[connector_test(schema(nested))]
+    async fn violates_required_relation_nested(runner: Runner) -> TestResult<()> {
+        create_row(
+            &runner,
+            r#"{
+                    id: 1,
+                    uniq: 1,
+                    comments: {
+                      create: {
+                        id: 1,
+                        post: {
+                          create: {
+                            id: 1
+                            author: { connect: { id: 1 } }
+                          }
+                        }
+                      }
+                    }
+                  }"#,
+        )
+        .await?;
+
+        assert_error!(
+            runner,
+            r#"mutation {
+              updateOneUser(
+                where: { id: 1 },
+                data: { post: { update: { comment: { update: { writtenById: 2 } } } } }
+              ) {
+                id
+              }
+            }"#,
+            2014,
+            "The change you are trying to make would violate the required relation 'CommentToUser' between the `Comment` and `User` models"
+        );
+
+        Ok(())
+    }
+
     // Updating foreign keys with anything else than `set` should not trigger emulation
     #[connector_test]
     async fn no_support_for_complex_updates_one(runner: Runner) -> TestResult<()> {
@@ -310,24 +443,95 @@ mod emulate_ref_integrity {
         )
         .await?;
 
-        insta::assert_snapshot!(
-          run_query!(&runner, r#"mutation { updateManyComment(data: { writtenById_1: { increment: 10 } }) { count } }"#),
-          @r###"{"data":{"updateManyComment":{"count":2}}}"###
+        run_query!(
+            &runner,
+            r#"mutation { updateManyComment(data: { writtenById_1: { increment: 10 } }) { count } }"#
+        );
+        run_query!(
+            &runner,
+            r#"mutation { updateManyComment(data: { writtenById_1: { decrement: 1 } }) { count } }"#
+        );
+        run_query!(
+            &runner,
+            r#"mutation { updateManyComment(data: { writtenById_1: { divide: 2 } }) { count } }"#
+        );
+        run_query!(
+            &runner,
+            r#"mutation { updateManyComment(data: { writtenById_1: { multiply: 2 } }) { count } }"#
         );
 
-        insta::assert_snapshot!(
-          run_query!(&runner, r#"mutation { updateManyComment(data: { writtenById_1: { decrement: 1 } }) { count } }"#),
-          @r###"{"data":{"updateManyComment":{"count":2}}}"###
+        Ok(())
+    }
+
+    // Nested updating foreign keys with anything else than `set` should not trigger emulation
+    #[connector_test(schema(nested))]
+    async fn no_support_for_complex_updates_nested(runner: Runner) -> TestResult<()> {
+        create_row(
+            &runner,
+            r#"{
+                      id: 1,
+                      uniq: 1,
+                      comments: {
+                        create: {
+                          id: 1,
+                          post: {
+                            create: {
+                              id: 1
+                              author: { connect: { id: 1 } }
+                            }
+                          }
+                        }
+                      }
+                  }"#,
+        )
+        .await?;
+
+        run_query!(
+            &runner,
+            r#"mutation {
+              updateOneUser(
+                where: { id: 1 },
+                data: { post: { update: { comment: { update: { writtenById: { increment: 10 } } } } } }
+              ) {
+                id
+              }
+            }"#
         );
 
-        insta::assert_snapshot!(
-          run_query!(&runner, r#"mutation { updateManyComment(data: { writtenById_1: { divide: 2 } }) { count } }"#),
-          @r###"{"data":{"updateManyComment":{"count":2}}}"###
+        run_query!(
+            &runner,
+            r#"mutation {
+              updateOneUser(
+                where: { id: 1 },
+                data: { post: { update: { comment: { update: { writtenById: { decrement: 1 } } } } } }
+              ) {
+                id
+              }
+          }"#
         );
 
-        insta::assert_snapshot!(
-          run_query!(&runner, r#"mutation { updateManyComment(data: { writtenById_1: { multiply: 2 } }) { count } }"#),
-          @r###"{"data":{"updateManyComment":{"count":2}}}"###
+        run_query!(
+            &runner,
+            r#"mutation {
+              updateOneUser(
+                where: { id: 1 },
+                data: { post: { update: { comment: { update: { writtenById: { divide: 2 } } } } } }
+              ) {
+                id
+              }
+            }"#
+        );
+
+        run_query!(
+            &runner,
+            r#"mutation {
+              updateOneUser(
+                where: { id: 1 },
+                data: { post: { update: { comment: { update: { writtenById: { multiply: 2 } } } } } }
+              ) {
+                id
+              }
+            }"#
         );
 
         Ok(())

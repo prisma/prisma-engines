@@ -97,6 +97,13 @@ pub fn nested_update(
             ),
         )?;
 
+        utils::preserve_referential_integrity_on_update(
+            graph,
+            connector_ctx,
+            &child_model,
+            &find_child_records_node,
+            &update_node,
+        )?;
         utils::insert_emulated_on_update(
             graph,
             connector_ctx,
