@@ -54,7 +54,7 @@ pub(super) fn visit_field_default<'ast>(
             }
             ScalarFieldType::Enum(enum_id) => {
                 match value.value {
-                    ast::Expression::ConstantValue(enum_value, _) | ast::Expression::BooleanValue(enum_value, _) => {
+                    ast::Expression::ConstantValue(enum_value, _) => {
                         if ctx.db.ast[enum_id].values.iter().any(|v| v.name() == enum_value) {
                             accept()
                         } else {
@@ -115,8 +115,16 @@ fn validate_builtin_scalar_type_default(
         | (ScalarType::Float, ast::Expression::NumericValue(_, _))
         | (ScalarType::DateTime, ast::Expression::StringValue(_, _))
         | (ScalarType::Decimal, ast::Expression::NumericValue(_, _))
-        | (ScalarType::Decimal, ast::Expression::StringValue(_, _))
-        | (ScalarType::Boolean, ast::Expression::BooleanValue(_, _)) => accept(),
+        | (ScalarType::Decimal, ast::Expression::StringValue(_, _)) => accept(),
+
+        (ScalarType::Boolean, ast::Expression::ConstantValue(val, span)) => match val.as_str() {
+            "true" | "false" => accept(),
+            _ => ctx.push_error(DatamodelError::new_attribute_validation_error(
+                "A boolean literal must be `true` or `false`.",
+                "default",
+                *span,
+            )),
+        },
 
         // Functions
         (_, ast::Expression::Function(funcname, _, _)) if funcname == FN_AUTOINCREMENT && mapped_name.is_some() => {

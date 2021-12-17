@@ -67,8 +67,11 @@ impl<'ast> DefaultValueExt<'ast> for DefaultValueWalker<'ast, '_> {
                 Some(ScalarType::Decimal) => DefaultKind::Single(PrismaValue::Float(num.parse().unwrap())),
                 other => unreachable!("{:?}", other),
             },
-            ast::Expression::BooleanValue(b, _) => DefaultKind::Single(PrismaValue::Boolean(b.parse().unwrap())),
-            ast::Expression::ConstantValue(v, _) => DefaultKind::Single(PrismaValue::Enum(v.to_owned())),
+            ast::Expression::ConstantValue(v, _) => match self.field().scalar_type() {
+                Some(ScalarType::Boolean) => DefaultKind::Single(PrismaValue::Boolean(v.parse().unwrap())),
+                None => DefaultKind::Single(PrismaValue::Enum(v.to_owned())),
+                other => unreachable!("{:?}", other),
+            },
             ast::Expression::StringValue(v, _) => match self.field().scalar_type() {
                 Some(ScalarType::DateTime) => DefaultKind::Single(PrismaValue::DateTime(v.parse().unwrap())),
                 Some(ScalarType::String) => DefaultKind::Single(PrismaValue::String(v.parse().unwrap())),

@@ -100,7 +100,6 @@ fn rule_to_string(rule: Rule) -> &'static str {
         Rule::maybe_empty_identifier => "alphanumeric identifier",
         Rule::numeric_literal => "numeric literal",
         Rule::string_literal => "string literal",
-        Rule::boolean_literal => "boolean literal",
         Rule::constant_literal => "literal",
         Rule::array_expression => "array",
         Rule::expression => "expression",
@@ -160,8 +159,6 @@ fn rule_to_string(rule: Rule) -> &'static str {
         Rule::string_interpolate_escape => "string interpolation",
         Rule::string_raw => "unescaped string",
         Rule::string_content => "string contents",
-        Rule::boolean_true => "boolean true",
-        Rule::boolean_false => "boolean false",
         Rule::doc_content => "documentation comment content",
     }
 }

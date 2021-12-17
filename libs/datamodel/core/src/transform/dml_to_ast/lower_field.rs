@@ -263,8 +263,8 @@ impl<'a> LowerDmlToAst<'a> {
 
     pub fn lower_prisma_value(pv: &PrismaValue) -> ast::Expression {
         match pv {
-            PrismaValue::Boolean(true) => ast::Expression::BooleanValue(String::from("true"), ast::Span::empty()),
-            PrismaValue::Boolean(false) => ast::Expression::BooleanValue(String::from("false"), ast::Span::empty()),
+            PrismaValue::Boolean(true) => ast::Expression::ConstantValue(String::from("true"), ast::Span::empty()),
+            PrismaValue::Boolean(false) => ast::Expression::ConstantValue(String::from("false"), ast::Span::empty()),
             PrismaValue::String(value) => Self::lower_string(value),
             PrismaValue::Enum(value) => ast::Expression::ConstantValue(value.clone(), ast::Span::empty()),
             PrismaValue::DateTime(value) => Self::lower_string(value),

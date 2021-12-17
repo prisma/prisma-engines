@@ -817,11 +817,11 @@ fn boolean_defaults_must_be_true_or_false() {
     let error = datamodel::parse_schema(schema).map(drop).unwrap_err();
 
     let expected = expect![[r#"
-        [1;91merror[0m: [1mError parsing attribute "@default": Expected a Boolean value, but found `True`.[0m
+        [1;91merror[0m: [1mError parsing attribute "@default": A boolean literal must be `true` or `false`.[0m
           [1;94m-->[0m  [4mschema.prisma:4[0m
         [1;94m   | [0m
         [1;94m 3 | [0m            id Int @id
-        [1;94m 4 | [0m            isEdible Boolean @[1;91mdefault(True)[0m
+        [1;94m 4 | [0m            isEdible Boolean @default([1;91mTrue[0m)
         [1;94m   | [0m
     "#]];
 
