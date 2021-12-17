@@ -30,12 +30,16 @@ impl TestApi {
     }
 
     fn run(&self, args: &[&str]) -> Output {
-        Command::new(env!("CARGO_BIN_EXE_migration-engine"))
+        Command::new(self.migration_engine_bin_path())
             .arg("cli")
             .args(args)
             .env("RUST_LOG", "INFO")
             .output()
             .unwrap()
+    }
+
+    fn migration_engine_bin_path(&self) -> &'static str {
+        env!("CARGO_BIN_EXE_migration-engine")
     }
 }
 
@@ -262,4 +266,45 @@ fn tls_errors_must_be_mapped_in_the_cli(api: TestApi) {
     assert!(
         stderr.contains("Error opening a TLS connection: error performing TLS handshake: server does not support TLS")
     );
+}
+
+#[test_connector(tags(Postgres))]
+fn basic_jsonrpc_roundtrip_works(api: TestApi) {
+    use std::io::{BufRead, BufReader, Write as _};
+    let tmpdir = tempfile::tempdir().unwrap();
+    let tmpfile = tmpdir.path().join("datamodel");
+    let datamodel = r#"
+        datasource db {
+            provider = "postgres"
+            url = env("TEST_DATABASE_URL")
+        }
+    "#;
+    std::fs::create_dir_all(&tmpdir).unwrap();
+    std::fs::write(&tmpfile, datamodel).unwrap();
+    let mut process = Command::new(api.migration_engine_bin_path())
+        .arg("--datamodel")
+        .arg(&tmpfile)
+        .env("RUST_LOG", "INFO")
+        .stdin(std::process::Stdio::piped())
+        .stdout(std::process::Stdio::piped())
+        .stderr(std::process::Stdio::piped())
+        .spawn()
+        .unwrap();
+    let stdin = process.stdin.as_mut().unwrap();
+    let mut stdout = BufReader::new(process.stdout.as_mut().unwrap());
+
+    for _ in 0..2 {
+        writeln!(
+            stdin,
+            r#"{{ "jsonrpc": "2.0", "method": "getDatabaseVersion", "params": {{ }}, "id": 1 }}"#,
+        )
+        .unwrap();
+
+        let mut response = String::new();
+        stdout.read_line(&mut response).unwrap();
+
+        assert!(response.contains("PostgreSQL"));
+    }
+
+    process.kill().unwrap();
 }

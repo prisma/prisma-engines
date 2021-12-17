@@ -1909,6 +1909,8 @@ name = "json-rpc-stdio"
 version = "0.1.0"
 dependencies = [
  "jsonrpc-core",
+ "serde",
+ "serde_json",
  "tokio",
  "tracing",
 ]

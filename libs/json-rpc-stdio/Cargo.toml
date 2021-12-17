@@ -6,5 +6,7 @@ edition = "2021"
 
 [dependencies]
 jsonrpc-core = "17"
-tokio = { version = "1.0", features = ["io-std", "io-util"] }
-tracing = "0.1"
+serde_json = "1.0"
+serde = { version = "1.0", features = ["derive"] }
+tokio = { version = "1.0", features = ["io-std", "io-util", "macros", "sync"] }
+tracing = "0.1.12"
