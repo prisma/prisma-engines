@@ -37,6 +37,7 @@ pub fn update_record(
             filter,
         ));
 
+        utils::preserve_referential_integrity_on_update(graph, connector_ctx, &model, &read_parent_node, &update_node)?;
         utils::insert_emulated_on_update(graph, connector_ctx, &model, &read_parent_node, &update_node)?;
 
         graph.create_edge(

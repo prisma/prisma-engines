@@ -59,6 +59,23 @@ pub enum WriteExpression {
     Divide(PrismaValue),
 }
 
+impl WriteExpression {
+    pub fn as_value(&self) -> Option<&PrismaValue> {
+        if let Self::Value(v) = self {
+            Some(v)
+        } else {
+            None
+        }
+    }
+
+    /// Returns `true` if the write expression is [`Value`].
+    ///
+    /// [`Value`]: WriteExpression::Value
+    pub fn is_value(&self) -> bool {
+        matches!(self, Self::Value(..))
+    }
+}
+
 impl From<PrismaValue> for WriteExpression {
     fn from(pv: PrismaValue) -> Self {
         WriteExpression::Value(pv)

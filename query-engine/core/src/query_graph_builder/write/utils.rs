@@ -3,10 +3,11 @@ use crate::{
     query_graph::{Flow, Node, NodeRef, QueryGraph, QueryGraphDependency},
     ConnectorContext, ParsedInputValue, QueryGraphBuilderError, QueryGraphBuilderResult,
 };
-use connector::{DatasourceFieldName, Filter, RecordFilter, WriteArgs};
+use connector::{DatasourceFieldName, Filter, RecordFilter, ScalarCompare, WriteArgs};
 use datamodel::ReferentialAction;
-use prisma_models::{FieldSelection, ModelRef, PrismaValue, RelationFieldRef, SelectionResult};
-use std::sync::Arc;
+use itertools::Itertools;
+use prisma_models::{FieldSelection, ModelRef, PrismaValue, RelationFieldRef, SelectedField, SelectionResult};
+use std::{collections::HashMap, sync::Arc};
 
 /// Coerces single values (`ParsedInputValue::Single` and `ParsedInputValue::Map`) into a vector.
 /// Simply unpacks `ParsedInputValue::List`.
@@ -1011,6 +1012,120 @@ pub fn emulate_on_update_cascade(
         child_node,
         QueryGraphDependency::ExecutionOrder,
     )?;
+
+    Ok(())
+}
+
+#[allow(clippy::mutable_key_type)]
+pub fn preserve_referential_integrity_on_update(
+    graph: &mut QueryGraph,
+    connector_ctx: &ConnectorContext,
+    model_to_update: &ModelRef,
+    read_node: &NodeRef,
+    update_node: &NodeRef,
+) -> QueryGraphBuilderResult<()> {
+    // If the connector uses the `ReferentialIntegrity::ForeignKeys` mode, we do not do any checks / emulation.
+    if connector_ctx.referential_integrity.uses_foreign_keys() {
+        return Ok(());
+    }
+
+    let update_args = extract_update_args(graph.node_content(update_node).unwrap());
+    let relations = model_to_update.fields().relation();
+    let relations_to_update: HashMap<_, _> = relations
+        .into_iter()
+        // We only pick inlined relations. Updating the primary keys would trigger referential actions.
+        // Referential integrity only needs to be preserved when updating the foreign keys of the inlined side
+        .filter(|rf| rf.is_inlined_on_enclosing_model())
+        .filter_map(|rf| {
+            let fks_to_be_updated: HashMap<_, _> = rf
+                .scalar_fields()
+                .into_iter()
+                .filter_map(|fk| {
+                    update_args
+                        .get_field_value(fk.db_name())
+                        .map(|write_expr| (fk, write_expr.clone()))
+                })
+                .collect();
+
+            // We don't preserve referential integrity if any of the foreign keys were updated
+            // with something else than a value. Division, multiplication, addition, etc ... isn't supported.
+            let has_complex_fk_updates = fks_to_be_updated.values().any(|write_expr| !write_expr.is_value());
+
+            if has_complex_fk_updates {
+                return None;
+            }
+
+            Some((rf, fks_to_be_updated))
+        })
+        .collect();
+
+    for (rf, fks_to_be_updated) in relations_to_update {
+        let rf_clone = rf.clone();
+        let child_model = rf.related_model();
+        let child_model_identifier = rf.related_model().primary_identifier();
+
+        let ensure_referenced_record_exist_node = graph.create_node(read_ids_infallible(
+            child_model.clone(),
+            child_model_identifier.clone(),
+            Filter::empty(),
+        ));
+
+        graph.create_edge(
+                &read_node,
+                &ensure_referenced_record_exist_node,
+                QueryGraphDependency::ProjectedDataDependency(
+                    rf.linking_fields(),
+                    Box::new(move |mut ensure_referenced_record_exist_node, mut parents_fks| {
+                        let parent_fks = match parents_fks.pop() {
+                            Some(id) => Ok(id),
+                            None => Err(QueryGraphBuilderError::RecordNotFound(format!(
+                                "No '{}' record was found to ensure referential integrity on one-to-one relation '{}'.'{}'.",
+                                rf.model().name, child_model.name, rf.name
+                            ))),
+                        }?;
+
+                        let filters = rf.scalar_fields().into_iter().zip(rf.referenced_fields()).map(|(fk, pk)| {
+                            // If the fk is part of the update args, use its update value for the corresponding primary key
+                            let fk_value = if let Some(write_expr) = fks_to_be_updated.get(&fk) {
+                                write_expr.as_value().unwrap().clone()
+                            // Otherwise, use the foreign key value that was fetched by the parent read for the corresponding primary key
+                            } else if let Some(pv) = parent_fks.get(&SelectedField::Scalar(fk)) {
+                                pv.clone()
+                            } else {
+                                unreachable!()
+                            };
+
+                            pk.equals(fk_value)
+                        }).collect_vec();
+
+                        if let Node::Query(Query::Read(ReadQuery::ManyRecordsQuery(ref mut mrq))) = ensure_referenced_record_exist_node {
+                            mrq.add_filter(Filter::and(filters));
+                        };
+
+                        Ok(ensure_referenced_record_exist_node)
+                    }),
+                ),
+            )?;
+
+        let noop_node = graph.create_node(Node::Empty);
+
+        graph.create_edge(
+            &ensure_referenced_record_exist_node,
+            &noop_node,
+            QueryGraphDependency::ProjectedDataDependency(
+                child_model_identifier,
+                Box::new(|noop_node, referenced_records_ids| {
+                    // The record that would be referenced by Parent model _after_ the update is done does not exist.
+                    // This would break referential integrity, so we error out.
+                    if referenced_records_ids.is_empty() {
+                        return Err(QueryGraphBuilderError::RelationViolation((rf_clone).into()));
+                    }
+
+                    Ok(noop_node)
+                }),
+            ),
+        )?;
+    }
 
     Ok(())
 }

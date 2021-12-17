@@ -1,5 +1,6 @@
 mod compound_fks_mixed_requiredness;
 mod deeply_nested_self_rel;
+mod emulate_ref_integrity;
 mod optional_rel;
 mod rel_defaults;
 mod rel_design;
