@@ -115,14 +115,7 @@ pub(crate) fn many_records_arguments(
 
     let mut args = vec![
         where_argument(ctx, &model),
-        order_by_argument(
-            ctx,
-            &model,
-            true,
-            false,
-            ctx.has_feature(&PreviewFeature::FullTextSearch)
-                && ctx.has_capability(ConnectorCapability::FullTextSearchWithoutIndex),
-        ),
+        order_by_argument(ctx, &model, true, false, ctx.can_full_text_search()),
         input_field(args::CURSOR, unique_input_type, None).optional(),
         input_field(args::TAKE, InputType::int(), None).optional(),
         input_field(args::SKIP, InputType::int(), None).optional(),

@@ -111,6 +111,7 @@ const CAPABILITIES: &[ConnectorCapability] = &[
     ConnectorCapability::AdvancedJsonNullability,
     ConnectorCapability::IndexColumnLengthPrefixing,
     ConnectorCapability::FullTextIndex,
+    ConnectorCapability::FullTextSearchWithIndex,
     ConnectorCapability::MultipleFullTextAttributesPerModel,
 ];
 

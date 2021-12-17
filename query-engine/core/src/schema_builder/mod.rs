@@ -124,6 +124,12 @@ impl BuilderContext {
     pub fn cache_output_type(&mut self, ident: Identifier, typ: ObjectTypeStrongRef) {
         self.cache.output_types.insert(ident, typ);
     }
+
+    pub fn can_full_text_search(&self) -> bool {
+        self.has_feature(&PreviewFeature::FullTextSearch)
+            && (self.has_capability(ConnectorCapability::FullTextSearchWithoutIndex)
+                || self.has_capability(ConnectorCapability::FullTextSearchWithIndex))
+    }
 }
 
 #[derive(Debug)]

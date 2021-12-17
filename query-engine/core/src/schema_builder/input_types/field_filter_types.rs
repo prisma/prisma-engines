@@ -326,9 +326,7 @@ fn string_filters(ctx: &mut BuilderContext, mapped_type: InputType) -> impl Iter
         input_field(filters::ENDS_WITH, mapped_type.clone(), None).optional(),
     ];
 
-    if ctx.has_feature(&PreviewFeature::FullTextSearch)
-        && ctx.has_capability(ConnectorCapability::FullTextSearchWithoutIndex)
-    {
+    if ctx.can_full_text_search() {
         string_filters.push(input_field(filters::SEARCH, mapped_type, None).optional());
     }
 
