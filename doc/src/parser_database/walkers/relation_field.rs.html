@@ -265,6 +265,11 @@
 <span id="265">265</span>
 <span id="266">266</span>
 <span id="267">267</span>
+<span id="268">268</span>
+<span id="269">269</span>
+<span id="270">270</span>
+<span id="271">271</span>
+<span id="272">272</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">ast</span>::{<span class="self">self</span>, <span class="ident">FieldArity</span>},
     <span class="ident">types::RelationField</span>,
@@ -344,6 +349,11 @@
     <span class="doccomment">/// Is there an `@ignore` attribute on the field?</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_ignored</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">relation_field</span>.<span class="ident">is_ignored</span>
+    }
+
+    <span class="doccomment">/// Is the field required? (not optional, not list)</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_required</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="ident">ast_field</span>().<span class="ident">arity</span>.<span class="ident">is_required</span>()
     }
 
     <span class="doccomment">/// The model containing the field.</span>

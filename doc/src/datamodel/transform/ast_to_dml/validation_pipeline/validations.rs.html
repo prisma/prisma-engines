@@ -147,6 +147,7 @@
 <span id="147">147</span>
 <span id="148">148</span>
 <span id="149">149</span>
+<span id="150">150</span>
 </pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">autoincrement</span>;
 <span class="kw">mod</span> <span class="ident">composite_types</span>;
 <span class="kw">mod</span> <span class="ident">constraint_namespace</span>;
@@ -283,6 +284,7 @@
                         <span class="comment">// Run these validations last to prevent validation spam.</span>
                         <span class="ident">relations::one_to_one::fields_references_mixups</span>(<span class="ident">relation</span>, <span class="ident">ctx</span>);
                         <span class="ident">relations::one_to_one::back_relation_arity_is_optional</span>(<span class="ident">relation</span>, <span class="ident">ctx</span>);
+                        <span class="ident">relations::one_to_one::fields_and_references_on_wrong_side</span>(<span class="ident">relation</span>, <span class="ident">ctx</span>);
                     } <span class="kw">else</span> {
                         <span class="ident">relations::one_to_many::both_sides_are_defined</span>(<span class="ident">relation</span>, <span class="ident">ctx</span>);
                         <span class="ident">relations::one_to_many::fields_and_references_are_defined</span>(<span class="ident">relation</span>, <span class="ident">ctx</span>);
