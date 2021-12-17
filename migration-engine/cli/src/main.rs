@@ -48,7 +48,7 @@ async fn main() {
     }
 }
 
-pub fn set_panic_hook() {
+fn set_panic_hook() {
     std::panic::set_hook(Box::new(move |panic_info| {
         let message = panic_info
             .payload()
