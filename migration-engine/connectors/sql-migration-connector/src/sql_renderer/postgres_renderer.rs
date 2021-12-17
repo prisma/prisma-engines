@@ -691,7 +691,7 @@ fn render_default(default: &DefaultValue) -> Cow<'_, str> {
             out.push_str(&escape_string_literal(json_value));
             out.push('\'');
             Cow::Owned(out)
-        },
+        }
         DefaultKind::Value(val) => val.to_string().into(),
         DefaultKind::Sequence(_) => Default::default(),
     }
