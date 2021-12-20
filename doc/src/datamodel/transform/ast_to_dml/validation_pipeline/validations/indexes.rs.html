@@ -329,6 +329,23 @@
 <span id="329">329</span>
 <span id="330">330</span>
 <span id="331">331</span>
+<span id="332">332</span>
+<span id="333">333</span>
+<span id="334">334</span>
+<span id="335">335</span>
+<span id="336">336</span>
+<span id="337">337</span>
+<span id="338">338</span>
+<span id="339">339</span>
+<span id="340">340</span>
+<span id="341">341</span>
+<span id="342">342</span>
+<span id="343">343</span>
+<span id="344">344</span>
+<span id="345">345</span>
+<span id="346">346</span>
+<span id="347">347</span>
+<span id="348">348</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">constraint_namespace::ConstraintName</span>, <span class="ident">database_name::validate_db_name</span>};
 <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">ast::Span</span>,
@@ -340,6 +357,7 @@
     },
 };
 <span class="kw">use</span> <span class="ident">datamodel_connector</span>::{<span class="ident">walker_ext_traits</span>::<span class="kw-2">*</span>, <span class="ident">ConnectorCapability</span>};
+<span class="kw">use</span> <span class="ident">schema_ast::ast</span>::{<span class="ident">WithName</span>, <span class="ident">WithSpan</span>};
 
 <span class="doccomment">/// Different databases validate index and unique constraint names in a certain namespace.</span>
 <span class="doccomment">/// Validates index and unique constraint names against the database requirements.</span>
@@ -659,7 +677,23 @@
     }
 }
 
-<span class="comment">//TODO(extended indices) add db specific validations to sort and length</span>
+<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">has_fields</span>(<span class="ident">index</span>: <span class="ident">IndexWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
+    <span class="kw">if</span> <span class="ident">index</span>.<span class="ident">fields</span>().<span class="ident">len</span>() <span class="op">&gt;</span> <span class="number">0</span> {
+        <span class="kw">return</span>;
+    }
+
+    <span class="kw">let</span> <span class="ident">attr</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">attribute</span>) <span class="op">=</span> <span class="ident">index</span>.<span class="ident">ast_attribute</span>() {
+        <span class="ident">attribute</span>
+    } <span class="kw">else</span> {
+        <span class="kw">return</span>;
+    };
+
+    <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_attribute_validation_error</span>(
+        <span class="string">&quot;The list of fields in an index cannot be empty. Please specify at least one field.&quot;</span>,
+        <span class="ident">attr</span>.<span class="ident">name</span>(),
+        <span class="kw-2">*</span><span class="ident">attr</span>.<span class="ident">span</span>(),
+    ))
+}
 </code></pre></div>
 </section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../../../../" data-current-crate="datamodel" data-search-index-js="../../../../../../search-index.js" data-search-js="../../../../../../search.js"></div>
     <script src="../../../../../../main.js"></script><script src="../../../../../../source-script.js"></script><script src="../../../../../../source-files.js"></script>

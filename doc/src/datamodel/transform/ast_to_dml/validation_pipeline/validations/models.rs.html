@@ -231,6 +231,20 @@
 <span id="231">231</span>
 <span id="232">232</span>
 <span id="233">233</span>
+<span id="234">234</span>
+<span id="235">235</span>
+<span id="236">236</span>
+<span id="237">237</span>
+<span id="238">238</span>
+<span id="239">239</span>
+<span id="240">240</span>
+<span id="241">241</span>
+<span id="242">242</span>
+<span id="243">243</span>
+<span id="244">244</span>
+<span id="245">245</span>
+<span id="246">246</span>
+<span id="247">247</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">super</span>::database_name::validate_db_name</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">common::preview_features::PreviewFeature</span>,
@@ -463,6 +477,20 @@
             <span class="ident">model</span>.<span class="ident">ast_model</span>().<span class="ident">span</span>,
         ));
     }
+}
+
+<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">id_has_fields</span>(<span class="ident">model</span>: <span class="ident">ModelWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
+    <span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">id</span>) <span class="op">=</span> <span class="ident">model</span>.<span class="ident">primary_key</span>() { <span class="ident">id</span> } <span class="kw">else</span> { <span class="kw">return</span> };
+
+    <span class="kw">if</span> <span class="ident">id</span>.<span class="ident">fields</span>().<span class="ident">len</span>() <span class="op">&gt;</span> <span class="number">0</span> {
+        <span class="kw">return</span>;
+    }
+
+    <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_attribute_validation_error</span>(
+        <span class="string">&quot;The list of fields in an `@@id()` attribute cannot be empty. Please specify at least one field.&quot;</span>,
+        <span class="string">&quot;id&quot;</span>,
+        <span class="ident">id</span>.<span class="ident">ast_attribute</span>().<span class="ident">span</span>,
+    ))
 }
 </code></pre></div>
 </section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../../../../" data-current-crate="datamodel" data-search-index-js="../../../../../../search-index.js" data-search-js="../../../../../../search.js"></div>

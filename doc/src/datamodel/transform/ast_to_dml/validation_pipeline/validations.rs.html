@@ -148,6 +148,8 @@
 <span id="148">148</span>
 <span id="149">149</span>
 <span id="150">150</span>
+<span id="151">151</span>
+<span id="152">152</span>
 </pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">autoincrement</span>;
 <span class="kw">mod</span> <span class="ident">composite_types</span>;
 <span class="kw">mod</span> <span class="ident">constraint_namespace</span>;
@@ -178,6 +180,7 @@
         <span class="ident">models::has_a_strict_unique_criteria</span>(<span class="ident">model</span>, <span class="ident">ctx</span>);
         <span class="ident">models::has_a_unique_primary_key_name</span>(<span class="ident">model</span>, <span class="kw-2">&amp;</span><span class="ident">names</span>, <span class="ident">ctx</span>);
         <span class="ident">models::uses_sort_or_length_on_primary_without_preview_flag</span>(<span class="ident">model</span>, <span class="ident">ctx</span>);
+        <span class="ident">models::id_has_fields</span>(<span class="ident">model</span>, <span class="ident">ctx</span>);
         <span class="ident">models::primary_key_connector_specific</span>(<span class="ident">model</span>, <span class="ident">ctx</span>);
         <span class="ident">models::primary_key_length_prefix_supported</span>(<span class="ident">model</span>, <span class="ident">ctx</span>);
         <span class="ident">models::primary_key_sort_order_supported</span>(<span class="ident">model</span>, <span class="ident">ctx</span>);
@@ -218,6 +221,7 @@
         }
 
         <span class="kw">for</span> <span class="ident">index</span> <span class="kw">in</span> <span class="ident">model</span>.<span class="ident">indexes</span>() {
+            <span class="ident">indexes::has_fields</span>(<span class="ident">index</span>, <span class="ident">ctx</span>);
             <span class="ident">indexes::has_a_unique_constraint_name</span>(<span class="ident">index</span>, <span class="kw-2">&amp;</span><span class="ident">names</span>, <span class="ident">ctx</span>);
             <span class="ident">indexes::uses_length_or_sort_without_preview_flag</span>(<span class="ident">index</span>, <span class="ident">ctx</span>);
             <span class="ident">indexes::field_length_prefix_supported</span>(<span class="ident">index</span>, <span class="ident">ctx</span>);
