@@ -1,5 +1,6 @@
 #![deny(rust_2018_idioms, unsafe_code)]
 
+pub mod capabilities;
 pub mod constraint_names;
 pub mod helper;
 pub mod walker_ext_traits;
@@ -8,7 +9,8 @@ mod empty_connector;
 mod native_type_constructor;
 mod referential_integrity;
 
-pub use diagnostics::connector_error;
+pub use self::capabilities::{ConnectorCapabilities, ConnectorCapability};
+pub use diagnostics::{connector_error, DatamodelError, Diagnostics};
 pub use empty_connector::EmptyDatamodelConnector;
 pub use native_type_constructor::NativeTypeConstructor;
 pub use parser_database::{self, ReferentialAction, ScalarType};
@@ -17,13 +19,20 @@ pub use referential_integrity::ReferentialIntegrity;
 use crate::connector_error::{ConnectorError, ConnectorErrorFactory, ErrorKind};
 use dml::native_type_instance::NativeTypeInstance;
 use enumflags2::BitFlags;
-use std::{borrow::Cow, collections::BTreeMap, str::FromStr};
+use std::{borrow::Cow, collections::BTreeMap};
 
 pub trait Connector: Send + Sync {
     /// The name of the connector. Can be used in error messages.
     fn name(&self) -> &str;
 
+    // Capabilities
+
+    /// The static list of capabilities for the connector.
     fn capabilities(&self) -> &'static [ConnectorCapability];
+
+    fn has_capability(&self, capability: ConnectorCapability) -> bool {
+        self.capabilities().contains(&capability)
+    }
 
     /// The maximum length of constraint names in bytes. Connectors without a
     /// limit should return usize::MAX.
@@ -42,10 +51,6 @@ pub trait Connector: Send + Sync {
     /// The default referential integrity mode to assume for this connector.
     fn default_referential_integrity(&self) -> ReferentialIntegrity {
         ReferentialIntegrity::ForeignKeys
-    }
-
-    fn has_capability(&self, capability: ConnectorCapability) -> bool {
-        self.capabilities().contains(&capability)
     }
 
     fn referential_actions(&self, referential_integrity: &ReferentialIntegrity) -> BitFlags<ReferentialAction>;
@@ -70,15 +75,6 @@ pub trait Connector: Send + Sync {
         self.referential_actions(integrity).contains(action)
     }
 
-    fn validate_field_default_without_native_type(
-        &self,
-        _field_name: &str,
-        _scalar_type: &ScalarType,
-        _default: Option<&dml::default_value::DefaultKind>,
-        _errors: &mut Vec<ConnectorError>,
-    ) {
-    }
-
     /// Validate that the arguments passed to a native type attribute are valid.
     fn validate_native_type_arguments(
         &self,
@@ -88,7 +84,7 @@ pub trait Connector: Send + Sync {
     ) {
     }
 
-    fn validate_model(&self, _model: parser_database::walkers::ModelWalker<'_, '_>, _: &mut Vec<ConnectorError>) {}
+    fn validate_model(&self, _model: parser_database::walkers::ModelWalker<'_, '_>, _: &mut diagnostics::Diagnostics) {}
 
     /// The scopes in which a constraint name should be validated. If empty, doesn't check for name
     /// clashes in the validation phase.
@@ -233,112 +229,19 @@ pub trait Connector: Send + Sync {
     fn validate_url(&self, url: &str) -> Result<(), String>;
 }
 
-/// Not all Databases are created equal. Hence connectors for our datasources support different capabilities.
-/// These are used during schema validation. E.g. if a connector does not support enums an error will be raised.
-macro_rules! capabilities {
-    ($( $variant:ident $(,)? ),*) => {
-        #[derive(Debug, Clone, Copy, PartialEq)]
-        pub enum ConnectorCapability {
-            $(
-                $variant,
-            )*
-        }
-
-        impl std::fmt::Display for ConnectorCapability {
-            fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-                let name = match self {
-                    $(
-                        Self::$variant => stringify!($variant),
-                    )*
-                };
-
-                write!(f, "{}", name)
-            }
-        }
-
-        impl FromStr for ConnectorCapability {
-            type Err = String;
-
-            fn from_str(s: &str) -> Result<Self, Self::Err> {
-                match s {
-                    $(
-                        stringify!($variant) => Ok(Self::$variant),
-                    )*
-                    _ => Err(format!("{} is not a known connector capability.", s)),
-                }
-            }
-        }
-    };
-}
-
-// Capabilities describe what functionality connectors are able to provide.
-// Some are used only by the query engine, some are used only by the datamodel parser.
-capabilities!(
-    // General capabilities, not specific to any part of Prisma.
-    ScalarLists,
-    RelationsOverNonUniqueCriteria,
-    Enums,
-    EnumArrayPush,
-    Json,
-    JsonLists,
-    AutoIncrement,
-    RelationFieldsInArbitraryOrder,
-    CompositeTypes,
-    //Start of ME/IE only capabilities
-    AutoIncrementAllowedOnNonId,
-    AutoIncrementMultipleAllowed,
-    AutoIncrementNonIndexedAllowed,
-    NamedPrimaryKeys,
-    NamedForeignKeys,
-    ReferenceCycleDetection,
-    NamedDefaultValues,
-    IndexColumnLengthPrefixing,
-    PrimaryKeySortOrderDefinition,
-    UsingHashIndex,
-    FullTextIndex,
-    SortOrderInFullTextIndex,
-    MultipleFullTextAttributesPerModel,
-    // Start of query-engine-only Capabilities
-    InsensitiveFilters,
-    CreateMany,
-    CreateManyWriteableAutoIncId,
-    WritableAutoincField,
-    CreateSkipDuplicates,
-    UpdateableId,
-    JsonFiltering,
-    JsonFilteringJsonPath,
-    JsonFilteringArrayPath,
-    JsonFilteringAlphanumeric,
-    CompoundIds,
-    AnyId, // Any (or combination of) uniques and not only id fields can constitute an id for a model.
-    QueryRaw,
-    FullTextSearchWithoutIndex,
-    AdvancedJsonNullability, // Database distinguishes between their null type and JSON null.
-);
-
-/// Contains all capabilities that the connector is able to serve.
-#[derive(Debug)]
-pub struct ConnectorCapabilities {
-    pub capabilities: Vec<ConnectorCapability>,
-}
-
-impl ConnectorCapabilities {
-    pub fn empty() -> Self {
-        Self { capabilities: vec![] }
-    }
-
-    pub fn new(capabilities: Vec<ConnectorCapability>) -> Self {
-        Self { capabilities }
-    }
-
-    pub fn contains(&self, capability: ConnectorCapability) -> bool {
-        self.capabilities.contains(&capability)
-    }
-
-    pub fn supports_any(&self, capabilities: &[ConnectorCapability]) -> bool {
-        self.capabilities
-            .iter()
-            .any(|connector_capability| capabilities.contains(connector_capability))
+/// (temporary) bridge between dml::scalars::ScalarType and parser_database::ScalarType. Avoid
+/// relying on this if you can.
+pub fn convert_from_scalar_type(st: dml::scalars::ScalarType) -> ScalarType {
+    match st {
+        dml::scalars::ScalarType::Int => ScalarType::Int,
+        dml::scalars::ScalarType::BigInt => ScalarType::BigInt,
+        dml::scalars::ScalarType::Float => ScalarType::Float,
+        dml::scalars::ScalarType::Boolean => ScalarType::Boolean,
+        dml::scalars::ScalarType::String => ScalarType::String,
+        dml::scalars::ScalarType::DateTime => ScalarType::DateTime,
+        dml::scalars::ScalarType::Json => ScalarType::Json,
+        dml::scalars::ScalarType::Bytes => ScalarType::Bytes,
+        dml::scalars::ScalarType::Decimal => ScalarType::Decimal,
     }
 }
 
@@ -393,63 +296,5 @@ impl ConstraintScope {
                 model_name
             )),
         }
-    }
-}
-
-/// (temporary) bridge between dml::scalars::ScalarType and parser_database::ScalarType. Avoid
-/// relying on this if you can.
-pub fn convert_from_scalar_type(st: dml::scalars::ScalarType) -> ScalarType {
-    match st {
-        dml::scalars::ScalarType::Int => ScalarType::Int,
-        dml::scalars::ScalarType::BigInt => ScalarType::BigInt,
-        dml::scalars::ScalarType::Float => ScalarType::Float,
-        dml::scalars::ScalarType::Boolean => ScalarType::Boolean,
-        dml::scalars::ScalarType::String => ScalarType::String,
-        dml::scalars::ScalarType::DateTime => ScalarType::DateTime,
-        dml::scalars::ScalarType::Json => ScalarType::Json,
-        dml::scalars::ScalarType::Bytes => ScalarType::Bytes,
-        dml::scalars::ScalarType::Decimal => ScalarType::Decimal,
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_empty_cap_does_not_contain() {
-        let cap = ConnectorCapabilities::empty();
-        assert!(!cap.supports_any(&[ConnectorCapability::JsonFilteringJsonPath]));
-    }
-
-    #[test]
-    fn test_cap_with_others_does_not_contain() {
-        let cap = ConnectorCapabilities::new(vec![
-            ConnectorCapability::PrimaryKeySortOrderDefinition,
-            ConnectorCapability::JsonFilteringArrayPath,
-        ]);
-        assert!(!cap.supports_any(&[ConnectorCapability::JsonFilteringJsonPath]));
-    }
-
-    #[test]
-    fn test_cap_with_others_does_contain() {
-        let cap = ConnectorCapabilities::new(vec![
-            ConnectorCapability::PrimaryKeySortOrderDefinition,
-            ConnectorCapability::JsonFilteringJsonPath,
-            ConnectorCapability::JsonFilteringArrayPath,
-        ]);
-        assert!(cap.supports_any(&[
-            ConnectorCapability::JsonFilteringJsonPath,
-            ConnectorCapability::JsonFilteringArrayPath,
-        ]));
-    }
-
-    #[test]
-    fn test_does_contain() {
-        let cap = ConnectorCapabilities::new(vec![
-            ConnectorCapability::PrimaryKeySortOrderDefinition,
-            ConnectorCapability::JsonFilteringArrayPath,
-        ]);
-        assert!(!cap.supports_any(&[ConnectorCapability::JsonFilteringJsonPath]));
     }
 }

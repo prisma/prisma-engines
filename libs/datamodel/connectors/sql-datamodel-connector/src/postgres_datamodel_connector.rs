@@ -3,8 +3,8 @@ use datamodel_connector::{
     helper::{arg_vec_from_opt, args_vec_from_opt, parse_one_opt_u32, parse_two_opt_u32},
     parser_database::walkers::ModelWalker,
     walker_ext_traits::*,
-    Connector, ConnectorCapability, ConstraintScope, NativeTypeConstructor, ReferentialAction, ReferentialIntegrity,
-    ScalarType,
+    Connector, ConnectorCapability, ConstraintScope, Diagnostics, NativeTypeConstructor, ReferentialAction,
+    ReferentialIntegrity, ScalarType,
 };
 use dml::native_type_instance::NativeTypeInstance;
 use enumflags2::BitFlags;
@@ -223,7 +223,14 @@ impl Connector for PostgresDatamodelConnector {
         }
     }
 
-    fn validate_model(&self, model: ModelWalker<'_, '_>, errors: &mut Vec<ConnectorError>) {
+    fn validate_model(&self, model: ModelWalker<'_, '_>, errors: &mut Diagnostics) {
+        let mut push_error = |err: ConnectorError| {
+            errors.push_error(datamodel_connector::DatamodelError::ConnectorError {
+                message: err.to_string(),
+                span: model.ast_model().span,
+            });
+        };
+
         for index in model.indexes() {
             for field in index.fields() {
                 if let Some(native_type) = field.native_type_instance(self) {
@@ -232,9 +239,9 @@ impl Connector for PostgresDatamodelConnector {
 
                     if r#type == PostgresType::Xml {
                         if index.is_unique() {
-                            errors.push(error.new_incompatible_native_type_with_unique())
+                            push_error(error.new_incompatible_native_type_with_unique())
                         } else {
-                            errors.push(error.new_incompatible_native_type_with_index())
+                            push_error(error.new_incompatible_native_type_with_index())
                         };
 
                         break;

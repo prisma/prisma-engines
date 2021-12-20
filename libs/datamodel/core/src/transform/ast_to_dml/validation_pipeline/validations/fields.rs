@@ -323,27 +323,6 @@ pub(super) fn validate_default(field: ScalarFieldWalker<'_, '_>, ctx: &mut Conte
         }
         _ => (),
     }
-
-    // Connector-specific validations.
-
-    let mut errors = Vec::new();
-    let default = field.default_value().map(|d| d.dml_default_kind());
-
-    if field.raw_native_type().is_none() {
-        ctx.connector.validate_field_default_without_native_type(
-            field.name(),
-            &scalar_type,
-            default.as_ref(),
-            &mut errors,
-        );
-    }
-
-    for error in errors {
-        ctx.push_error(DatamodelError::ConnectorError {
-            message: error.to_string(),
-            span: field.ast_field().span,
-        });
-    }
 }
 
 pub(super) fn validate_scalar_field_connector_specific(field: ScalarFieldWalker<'_, '_>, ctx: &mut Context<'_>) {
@@ -354,10 +333,10 @@ pub(super) fn validate_scalar_field_connector_specific(field: ScalarFieldWalker<
         if !ctx.connector.supports_json() {
             ctx.push_error(DatamodelError::new_field_validation_error(
                 &format!(
-                "Field `{}` in model `{}` can't be of type Json. The current connector does not support the Json type.",
-                field.name(),
-                field.model().name(),
-            ),
+                    "Field `{}` in model `{}` can't be of type Json. The current connector does not support the Json type.",
+                    field.name(),
+                    field.model().name(),
+                ),
                 field.model().name(),
                 field.name(),
                 field.ast_field().span,
