@@ -6,7 +6,9 @@ use crate::{
 use connector::{DatasourceFieldName, Filter, RecordFilter, ScalarCompare, WriteArgs};
 use datamodel::ReferentialAction;
 use itertools::Itertools;
-use prisma_models::{FieldSelection, ModelRef, PrismaValue, RelationFieldRef, SelectedField, SelectionResult};
+use prisma_models::{
+    FieldSelection, ModelRef, PrismaValue, RelationFieldRef, ScalarFieldRef, SelectedField, SelectionResult,
+};
 use std::{collections::HashMap, sync::Arc};
 
 /// Coerces single values (`ParsedInputValue::Single` and `ParsedInputValue::Map`) into a vector.
@@ -1031,98 +1033,111 @@ pub fn preserve_referential_integrity_on_update(
 
     let update_args = extract_update_args(graph.node_content(update_node).unwrap());
     let relations = model_to_update.fields().relation();
-    let relations_to_update: HashMap<_, _> = relations
+    let relations_to_update: Vec<_> = relations
         .into_iter()
-        // We only pick inlined relations. Updating the primary keys would trigger referential actions.
+        // We only pick required inlined relations. Updating the primary keys would trigger referential actions.
         // Referential integrity only needs to be preserved when updating the foreign keys of the inlined side
         .filter(|rf| rf.is_inlined_on_enclosing_model())
-        .filter_map(|rf| {
-            let fks_to_be_updated: HashMap<_, _> = rf
-                .scalar_fields()
-                .into_iter()
-                .filter_map(|fk| {
-                    update_args
-                        .get_field_value(fk.db_name())
-                        .map(|write_expr| (fk, write_expr.clone()))
-                })
-                .collect();
-
-            if fks_to_be_updated.is_empty() {
-                return None;
-            }
-
-            // We don't preserve referential integrity if any of the foreign keys were updated
-            // with something else than a value. Division, multiplication, addition, etc ... isn't supported.
-            let has_complex_fk_updates = fks_to_be_updated.values().any(|write_expr| !write_expr.is_value());
-
-            if has_complex_fk_updates {
-                return None;
-            }
-
-            Some((rf, fks_to_be_updated))
-        })
+        .filter_map(|rf| find_fks_to_be_updated(rf, update_args))
         .collect();
 
     for (rf, fks_to_be_updated) in relations_to_update {
-        let rf_clone = rf.clone();
         let child_model = rf.related_model();
         let child_model_identifier = rf.related_model().primary_identifier();
+        let fks = rf.scalar_fields();
+        let pks = rf.referenced_fields();
 
-        let ensure_referenced_record_exist_node = graph.create_node(read_ids_infallible(
-            child_model.clone(),
+        let read_referenced_record_node = graph.create_node(read_ids_infallible(
+            child_model,
             child_model_identifier.clone(),
             Filter::empty(),
         ));
 
-        graph.create_edge(
+        let if_node = graph.create_node(Flow::default_if());
+
+        // Closures force us to clone those variables below outside of the closures.
+        // We use this ugly hack to enable cloning what needs to be cloned, without coming up with silly variable names
+        {
+            let fks_to_be_updated = fks_to_be_updated.clone();
+            let fks = fks.clone();
+
+            graph.create_edge(
                 &read_node,
-                &ensure_referenced_record_exist_node,
+                &if_node,
                 QueryGraphDependency::ProjectedDataDependency(
                     rf.linking_fields(),
-                    Box::new(move |mut ensure_referenced_record_exist_node, mut parents_fks| {
-                        let parent_fks = match parents_fks.pop() {
+                    Box::new(move |if_node, mut parents_fks| {
+                        let parent_fk_values = match parents_fks.pop() {
                             Some(id) => Ok(id),
-                            None => Err(QueryGraphBuilderError::RecordNotFound(format!(
-                                "No '{}' record was found to ensure referential integrity on one-to-one relation '{}'.'{}'.",
-                                rf.model().name, child_model.name, rf.name
-                            ))),
+                            None => Err(QueryGraphBuilderError::RecordNotFound(
+                                "Record to update not found.".to_string(),
+                            )),
                         }?;
 
-                        let filters = rf.scalar_fields().into_iter().zip(rf.referenced_fields()).map(|(fk, pk)| {
-                            // If the fk is part of the update args, use its update value for the corresponding primary key
-                            let fk_value = if let Some(write_expr) = fks_to_be_updated.get(&fk) {
-                                write_expr.as_value().unwrap().clone()
-                            // Otherwise, use the foreign key value that was fetched by the parent read for the corresponding primary key
-                            } else if let Some(pv) = parent_fks.get(&SelectedField::Scalar(fk)) {
-                                pv.clone()
-                            } else {
-                                unreachable!()
-                            };
+                        // If any of the foreign keys values are `NULL`, do not attempt to preserve referential integrity
+                        let has_null_fk_values = fks
+                            .into_iter()
+                            .map(|fk| get_newest_fk_value(fk, &parent_fk_values, &fks_to_be_updated))
+                            .any(|fk_value| fk_value == PrismaValue::Null);
 
-                            pk.equals(fk_value)
-                        }).collect_vec();
-
-                        if let Node::Query(Query::Read(ReadQuery::ManyRecordsQuery(ref mut mrq))) = ensure_referenced_record_exist_node {
-                            mrq.add_filter(Filter::and(filters));
-                        };
-
-                        Ok(ensure_referenced_record_exist_node)
+                        if let Node::Flow(Flow::If(_)) = if_node {
+                            Ok(Node::Flow(Flow::If(Box::new(move || !has_null_fk_values))))
+                        } else {
+                            Ok(if_node)
+                        }
                     }),
                 ),
             )?;
+        }
 
-        let noop_node = graph.create_node(Node::Empty);
+        graph.create_edge(&if_node, &read_referenced_record_node, QueryGraphDependency::Then)?;
 
         graph.create_edge(
+            &read_node,
+            &read_referenced_record_node,
+            QueryGraphDependency::ProjectedDataDependency(
+                rf.linking_fields(),
+                Box::new(move |mut read_referenced_record_node, mut parents_fks| {
+                    let parent_fk_values = match parents_fks.pop() {
+                        Some(id) => Ok(id),
+                        None => Err(QueryGraphBuilderError::RecordNotFound(
+                            "Record to update not found.".to_string(),
+                        )),
+                    }?;
+
+                    let filters = fks
+                        .into_iter()
+                        .zip(pks)
+                        .map(|(fk, pk)| {
+                            let fk_value = get_newest_fk_value(fk, &parent_fk_values, &fks_to_be_updated);
+
+                            pk.equals(fk_value)
+                        })
+                        .collect_vec();
+
+                    if let Node::Query(Query::Read(ReadQuery::ManyRecordsQuery(ref mut mrq))) =
+                        read_referenced_record_node
+                    {
+                        mrq.add_filter(Filter::and(filters));
+                    };
+
+                    Ok(read_referenced_record_node)
+                }),
+            ),
+        )?;
+
+        let ensure_referenced_record_exist_node = graph.create_node(Node::Empty);
+
+        graph.create_edge(
+            &read_referenced_record_node,
             &ensure_referenced_record_exist_node,
-            &noop_node,
             QueryGraphDependency::ProjectedDataDependency(
                 child_model_identifier,
                 Box::new(|noop_node, referenced_records_ids| {
                     // The record that would be referenced by Parent model _after_ the update is done does not exist.
                     // This would break referential integrity, so we error out.
                     if referenced_records_ids.is_empty() {
-                        return Err(QueryGraphBuilderError::RelationViolation((rf_clone).into()));
+                        return Err(QueryGraphBuilderError::RelationViolation((rf).into()));
                     }
 
                     Ok(noop_node)
@@ -1132,4 +1147,51 @@ pub fn preserve_referential_integrity_on_update(
     }
 
     Ok(())
+}
+
+/// Given a relation field (inline-side), find the foreign keys that are going to be updated (by value)
+fn find_fks_to_be_updated(
+    rf: RelationFieldRef,
+    update_args: &WriteArgs,
+) -> Option<(RelationFieldRef, HashMap<ScalarFieldRef, PrismaValue>)> {
+    let mut fks_to_be_updated: HashMap<ScalarFieldRef, PrismaValue> = HashMap::new();
+
+    for fk in rf.scalar_fields() {
+        if let Some(write_expr) = update_args.get_field_value(fk.db_name()) {
+            // If any of the update expressions are not values (but multiplications, divisions, etc..)
+            // Then skip the relation field entirely
+            if let Some(pv) = write_expr.as_value() {
+                fks_to_be_updated.insert(fk, pv.clone());
+            } else {
+                return None;
+            }
+        // If the foreign key is not part of the update args, then continue to the next one
+        } else {
+            continue;
+        }
+    }
+
+    // If no foreign keys were found in the update args, skip the relation field
+    if fks_to_be_updated.is_empty() {
+        return None;
+    }
+
+    Some((rf, fks_to_be_updated))
+}
+
+/// Given a set of old and new foreign keys, pick the newest one
+fn get_newest_fk_value(
+    fk: ScalarFieldRef,
+    old_fks: &SelectionResult,
+    new_fks: &HashMap<ScalarFieldRef, PrismaValue>,
+) -> PrismaValue {
+    // If the fk is part of the update args, use its update value for the corresponding primary key
+    if let Some(pv) = new_fks.get(&fk) {
+        pv.clone()
+    // Otherwise, use the foreign key value that was fetched by the parent read for the corresponding primary key
+    } else if let Some(pv) = old_fks.get(&SelectedField::Scalar(fk)) {
+        pv.clone()
+    } else {
+        unreachable!()
+    }
 }
