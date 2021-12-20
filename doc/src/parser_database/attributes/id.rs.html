@@ -196,15 +196,9 @@
 <span id="196">196</span>
 <span id="197">197</span>
 <span id="198">198</span>
-<span id="199">199</span>
-<span id="200">200</span>
-<span id="201">201</span>
-<span id="202">202</span>
-<span id="203">203</span>
-<span id="204">204</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">super</span>::FieldResolutionError</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">ast</span>,
+    <span class="ident">ast</span>::{<span class="self">self</span>, <span class="ident">WithSpan</span>},
     <span class="ident">attributes::resolve_field_array_with_args</span>,
     <span class="ident">context</span>::{<span class="ident">Arguments</span>, <span class="ident">Context</span>},
     <span class="ident">types</span>::{<span class="ident">FieldWithArgs</span>, <span class="ident">IdAttribute</span>, <span class="ident">ModelAttributes</span>, <span class="ident">SortOrder</span>},
@@ -376,16 +370,10 @@
     };
 
     <span class="kw">if</span> <span class="kw">let</span> <span class="ident">ast::FieldArity::List</span> <span class="op">|</span> <span class="ident">ast::FieldArity::Optional</span> <span class="op">=</span> <span class="ident">ast_field</span>.<span class="ident">arity</span> {
-        <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="ident">ast_field</span>
-            .<span class="ident">attributes</span>
-            .<span class="ident">iter</span>()
-            .<span class="ident">find</span>(<span class="op">|</span><span class="ident">attr</span><span class="op">|</span> <span class="ident">attr</span>.<span class="ident">is_id</span>())
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">id</span><span class="op">|</span> <span class="ident">id</span>.<span class="ident">span</span>)
-            .<span class="ident">unwrap_or</span>(<span class="ident">ast_field</span>.<span class="ident">span</span>);
         <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_attribute_validation_error</span>(
             <span class="string">&quot;Fields that are marked as id must be required.&quot;</span>,
             <span class="string">&quot;id&quot;</span>,
-            <span class="ident">span</span>,
+            <span class="kw-2">*</span><span class="ident">pk</span>.<span class="ident">source_attribute</span>.<span class="ident">span</span>(),
         ))
     }
 }

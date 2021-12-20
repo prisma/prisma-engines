@@ -140,7 +140,7 @@
     }
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_panic_hook</span>() {
+<span class="kw">fn</span> <span class="ident">set_panic_hook</span>() {
     <span class="ident">std::panic::set_hook</span>(<span class="ident">Box::new</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">panic_info</span><span class="op">|</span> {
         <span class="kw">let</span> <span class="ident">message</span> <span class="op">=</span> <span class="ident">panic_info</span>
             .<span class="ident">payload</span>()
