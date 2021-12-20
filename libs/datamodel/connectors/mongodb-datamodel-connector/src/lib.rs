@@ -2,8 +2,9 @@ mod mongodb_types;
 
 use datamodel_connector::{
     connector_error::{ConnectorError, ErrorKind},
-    parser_database, Connector, ConnectorCapability, NativeTypeConstructor, ReferentialAction, ReferentialIntegrity,
-    ScalarType,
+    parser_database,
+    walker_ext_traits::*,
+    Connector, ConnectorCapability, NativeTypeConstructor, ReferentialAction, ReferentialIntegrity, ScalarType,
 };
 use dml::{default_value::DefaultKind, native_type_instance::NativeTypeInstance};
 use enumflags2::BitFlags;
@@ -51,11 +52,10 @@ impl Connector for MongoDbDatamodelConnector {
         &self,
         field_name: &str,
         _scalar_type: &ScalarType,
-        default: Option<&dml::default_value::DefaultValue>,
+        default: Option<&dml::default_value::DefaultKind>,
         errors: &mut Vec<ConnectorError>,
     ) {
-        if !matches!(default.map(|d| d.kind()), Some(dml::default_value::DefaultKind::Expression(expr)) if expr.is_dbgenerated())
-        {
+        if !matches!(default, Some(dml::default_value::DefaultKind::Expression(expr)) if expr.is_dbgenerated()) {
             return;
         }
 
@@ -96,7 +96,7 @@ impl Connector for MongoDbDatamodelConnector {
             }
 
             if field.raw_native_type().is_none()
-                && matches!(field.default_value().map(|v| v.default().kind()), Some(DefaultKind::Expression(expr)) if expr.is_dbgenerated())
+                && matches!(field.default_value().map(|v| v.dml_default_kind()), Some(DefaultKind::Expression(expr)) if expr.is_dbgenerated())
             {
                 errors.push(ConnectorError::from_kind(ErrorKind::FieldValidationError {
                     field: field.name().to_owned(),

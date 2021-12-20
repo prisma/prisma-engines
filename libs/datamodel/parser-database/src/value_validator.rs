@@ -3,14 +3,9 @@
 use crate::{
     ast::{self, Expression, Span},
     relations::ReferentialAction,
-    types::{ScalarType, SortOrder},
+    types::SortOrder,
 };
-use chrono::{DateTime, FixedOffset};
 use diagnostics::DatamodelError;
-use dml::{
-    default_value::{DefaultValue, ValueGenerator},
-    prisma_value, PrismaValue,
-};
 use std::error;
 
 /// Wraps a value and provides convenience methods for
@@ -23,9 +18,6 @@ pub struct ValueValidator<'a> {
 
 impl<'a> ValueValidator<'a> {
     /// Creates a new instance by wrapping a value.
-    ///
-    /// If the value is a function expression, it is evaluated
-    /// recursively.
     pub fn new(value: &'a ast::Expression) -> ValueValidator<'a> {
         ValueValidator { value }
     }
@@ -55,26 +47,6 @@ impl<'a> ValueValidator<'a> {
         }
     }
 
-    /// Attempts to parse the wrapped value as a given Prisma scalar type.
-    pub fn as_type(&self, scalar_type: ScalarType) -> Result<PrismaValue, DatamodelError> {
-        match scalar_type {
-            ScalarType::Int => self.as_int().map(PrismaValue::Int),
-            ScalarType::Float | ScalarType::Decimal => self
-                .as_float()
-                .and_then(|s| Ok(PrismaValue::Float(self.wrap_error_from_result(s.parse(), "numeric")?))),
-            ScalarType::Boolean => self.as_bool().map(PrismaValue::Boolean),
-            ScalarType::DateTime => self.as_date_time().map(PrismaValue::DateTime),
-            ScalarType::String | ScalarType::Json => self.as_str().map(String::from).map(PrismaValue::String),
-            ScalarType::Bytes => self.as_str().and_then(|s| {
-                prisma_value::decode_bytes(s).map(PrismaValue::Bytes).map_err(|_| {
-                    DatamodelError::new_validation_error(format!("Invalid base64 string '{}'.", s), self.span())
-                })
-            }),
-
-            ScalarType::BigInt => self.as_int().map(PrismaValue::BigInt),
-        }
-    }
-
     /// Accesses the span of the wrapped value.
     pub fn span(&self) -> ast::Span {
         self.value.span()
@@ -97,35 +69,6 @@ impl<'a> ValueValidator<'a> {
         match &self.value {
             ast::Expression::NumericValue(value, _) => self.wrap_error_from_result(value.parse::<i64>(), "numeric"),
             _ => Err(self.construct_type_mismatch_error("numeric")),
-        }
-    }
-
-    /// Some(_) if this is a numeric value (can be a string or numeric literal).
-    fn as_float(&self) -> Result<&'a str, DatamodelError> {
-        match &self.value {
-            ast::Expression::StringValue(value, _) => Ok(value),
-            ast::Expression::NumericValue(value, _) => Ok(value),
-            _ => Err(self.construct_type_mismatch_error("numeric")),
-        }
-    }
-
-    /// Tries to convert the wrapped value to a Prisma Boolean.
-    fn as_bool(&self) -> Result<bool, DatamodelError> {
-        match &self.value {
-            ast::Expression::BooleanValue(value, _) => self.wrap_error_from_result(value.parse::<bool>(), "boolean"),
-            // this case is just here because `as_bool_from_env` passes a StringValue
-            ast::Expression::StringValue(value, _) => self.wrap_error_from_result(value.parse::<bool>(), "boolean"),
-            _ => Err(self.construct_type_mismatch_error("boolean")),
-        }
-    }
-
-    /// Tries to convert the wrapped value to a Prisma DateTime.
-    fn as_date_time(&self) -> Result<DateTime<FixedOffset>, DatamodelError> {
-        match &self.value {
-            ast::Expression::StringValue(value, _) => {
-                self.wrap_error_from_result(DateTime::parse_from_rfc3339(value), "datetime")
-            }
-            _ => Err(self.construct_type_mismatch_error("dateTime")),
         }
     }
 
@@ -184,7 +127,7 @@ impl<'a> ValueValidator<'a> {
         let sort = args
             .iter()
             .find(|arg| arg.name.name == "sort")
-            .map(|arg| match arg.value.extract_constant_value() {
+            .map(|arg| match arg.value.as_constant_value() {
                 Some(("Asc", _)) => Ok(Some(SortOrder::Asc)),
                 Some(("Desc", _)) => Ok(Some(SortOrder::Desc)),
                 None => Ok(None),
@@ -253,67 +196,9 @@ impl<'a> ValueValidator<'a> {
         }
     }
 
-    pub(crate) fn as_default_value_for_scalar_type(
-        &self,
-        scalar_type: ScalarType,
-    ) -> Result<DefaultValue, DatamodelError> {
-        match &self.value {
-            ast::Expression::Function(name, args, _) => {
-                let prisma_args = match args.as_slice() {
-                    [Expression::StringValue(_, _)] => {
-                        let x = ValueValidator::new(args.first().unwrap()).as_type(ScalarType::String)?;
-                        vec![x]
-                    }
-                    [] => vec![],
-                    _ => {
-                        let msg = format!(
-                            "DefaultValue function parsing failed. The function arg should only be empty or a single String. Got: `{}`. You can read about the available functions here: https://pris.ly/d/attribute-functions",
-                            args.iter().map(|arg| arg.to_string()).collect::<Vec<_>>().join(",")
-                        );
-
-                        return Err(DatamodelError::new_validation_error(msg, self.span()));
-                    }
-                };
-                let generator = self.get_value_generator(name.to_owned(), prisma_args)?;
-
-                generator
-                    .check_compatibility_with_scalar_type(scalar_type.as_str().parse().unwrap())
-                    .map_err(|err_msg| DatamodelError::new_functional_evaluation_error(&err_msg, self.span()))?;
-
-                Ok(DefaultValue::new_expression(generator))
-            }
-            _ => {
-                let x = ValueValidator::new(self.value).as_type(scalar_type)?;
-                Ok(DefaultValue::new_single(x))
-            }
-        }
-    }
-
     /// Try to interpret the expression as a string literal.
     pub fn as_string_literal(&self) -> Option<(&'a str, Span)> {
         self.value.as_string_value()
-    }
-
-    pub(crate) fn as_value_generator(&self) -> Result<ValueGenerator, DatamodelError> {
-        match &self.value {
-            ast::Expression::Function(name, args, _) => {
-                let prisma_args = match args.as_slice() {
-                    [Expression::StringValue(_, _)] => {
-                        let x = ValueValidator::new(args.first().unwrap()).as_type(ScalarType::String)?;
-                        vec![x]
-                    }
-                    [] => vec![],
-                    _ => return Err(self.construct_type_mismatch_error("String or empty")),
-                };
-                self.get_value_generator(name.to_owned(), prisma_args)
-            }
-            _ => Err(self.construct_type_mismatch_error("function")),
-        }
-    }
-
-    fn get_value_generator(&self, name: String, args: Vec<PrismaValue>) -> Result<ValueGenerator, DatamodelError> {
-        ValueGenerator::new(name, args)
-            .map_err(|err_msg| DatamodelError::new_functional_evaluation_error(&err_msg, self.span()))
     }
 }
 

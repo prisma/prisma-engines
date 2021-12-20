@@ -52,9 +52,16 @@ impl Expression {
         }
     }
 
-    pub fn extract_constant_value(&self) -> Option<(&str, Span)> {
+    pub fn as_constant_value(&self) -> Option<(&str, Span)> {
         match self {
             Expression::ConstantValue(s, span) => Some((s, *span)),
+            _ => None,
+        }
+    }
+
+    pub fn as_numeric_value(&self) -> Option<(&str, Span)> {
+        match self {
+            Expression::NumericValue(s, span) => Some((s, *span)),
             _ => None,
         }
     }

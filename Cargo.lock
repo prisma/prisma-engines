@@ -2834,10 +2834,7 @@ dependencies = [
 name = "parser-database"
 version = "0.1.0"
 dependencies = [
- "bigdecimal",
- "chrono",
  "diagnostics",
- "dml",
  "enumflags2",
  "schema-ast",
 ]
