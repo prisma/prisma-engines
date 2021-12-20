@@ -48,7 +48,7 @@ impl SchemaAst {
         SchemaAst { tops: Vec::new() }
     }
 
-    // Deprecated. Use ParserDatabase instead where possible.
+    /// Deprecated. Use ParserDatabase instead where possible.
     pub fn find_model(&self, model: &str) -> Option<&Model> {
         self.iter_models().find(|(_, m)| m.name.name == model).map(|(_, m)| m)
     }

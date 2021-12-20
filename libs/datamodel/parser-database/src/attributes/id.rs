@@ -1,6 +1,6 @@
 use super::FieldResolutionError;
 use crate::{
-    ast,
+    ast::{self, WithSpan},
     attributes::resolve_field_array_with_args,
     context::{Arguments, Context},
     types::{FieldWithArgs, IdAttribute, ModelAttributes, SortOrder},
@@ -172,16 +172,10 @@ pub(super) fn validate_id_field_arities(
     };
 
     if let ast::FieldArity::List | ast::FieldArity::Optional = ast_field.arity {
-        let span = ast_field
-            .attributes
-            .iter()
-            .find(|attr| attr.is_id())
-            .map(|id| id.span)
-            .unwrap_or(ast_field.span);
         ctx.push_error(DatamodelError::new_attribute_validation_error(
             "Fields that are marked as id must be required.",
             "id",
-            span,
+            *pk.source_attribute.span(),
         ))
     }
 }
