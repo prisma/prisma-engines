@@ -62,6 +62,7 @@ impl SchemaAst {
         })
     }
 
+    /// Iterate over all the top-level items in the schema.
     pub fn iter_tops(&self) -> impl Iterator<Item = (TopId, &Top)> {
         self.tops
             .iter()
@@ -69,10 +70,12 @@ impl SchemaAst {
             .map(|(top_idx, top)| (top_idx_to_top_id(top_idx, top), top))
     }
 
+    /// Iterate over all the datasource blocks in the schema.
     pub fn sources(&self) -> impl Iterator<Item = &SourceConfig> {
         self.tops.iter().filter_map(|top| top.as_source())
     }
 
+    /// Iterate over all the generator blocks in the schema.
     pub fn generators(&self) -> impl Iterator<Item = &GeneratorConfig> {
         self.tops.iter().filter_map(|top| top.as_generator())
     }
@@ -135,11 +138,17 @@ pub struct SourceId(u32);
 /// syntax to resolve the id to an `ast::Top`.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub enum TopId {
+    /// A composite type
     CompositeType(CompositeTypeId),
+    /// A model declaration
     Model(ModelId),
+    /// An enum declaration
     Enum(EnumId),
+    /// A type alias
     Alias(AliasId),
+    /// A generator block
     Generator(GeneratorId),
+    /// A datasource block
     Source(SourceId),
 }
 
@@ -152,6 +161,7 @@ impl TopId {
         }
     }
 
+    /// Try to interpret the top as a model.
     pub fn as_model_id(self) -> Option<ModelId> {
         match self {
             TopId::Model(model_id) => Some(model_id),
@@ -159,6 +169,7 @@ impl TopId {
         }
     }
 
+    /// Try to interpret the top as a composite type.
     pub fn as_composite_type_id(&self) -> Option<CompositeTypeId> {
         match self {
             TopId::CompositeType(ctid) => Some(*ctid),

@@ -9,8 +9,9 @@ use super::{
     ScalarFieldWalker,
 };
 use crate::{
-    ast,
-    {types::ModelAttributes, ParserDatabase},
+    ast::{self, WithName},
+    types::ModelAttributes,
+    ParserDatabase,
 };
 use std::hash::{Hash, Hasher};
 

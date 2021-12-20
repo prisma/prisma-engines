@@ -1,5 +1,5 @@
 use crate::{
-    ast,
+    ast::{self, WithName},
     context::{Arguments, Context},
     types::{CompositeTypeField, ModelAttributes, ScalarField},
     DatamodelError,

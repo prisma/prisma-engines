@@ -52,10 +52,6 @@ impl Model {
     pub fn find_field_bang(&self, name: &str) -> &Field {
         self.find_field(name).unwrap()
     }
-
-    pub fn name(&self) -> &str {
-        &self.name.name
-    }
 }
 
 impl WithIdentifier for Model {

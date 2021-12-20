@@ -1,6 +1,6 @@
 use super::FieldResolutionError;
 use crate::{
-    ast::{self, WithSpan},
+    ast::{self, WithName, WithSpan},
     attributes::resolve_field_array_with_args,
     context::{Arguments, Context},
     types::{FieldWithArgs, IdAttribute, ModelAttributes, SortOrder},

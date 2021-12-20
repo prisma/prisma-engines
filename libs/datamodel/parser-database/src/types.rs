@@ -1,5 +1,5 @@
 use crate::{context::Context, walkers::CompositeTypeFieldWalker, walkers::CompositeTypeWalker, DatamodelError};
-use schema_ast::ast;
+use schema_ast::ast::{self, WithName};
 use std::{
     collections::{BTreeMap, HashMap},
     fmt,

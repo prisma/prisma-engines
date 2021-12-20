@@ -1,6 +1,7 @@
 use crate::ast::{self, top_idx_to_top_id, traits::*};
 
 impl ast::SchemaAst {
+    /// Find the AST node at the given position (byte offset).
     pub fn find_at_position(&self, position: usize) -> SchemaPosition<'_> {
         self.find_top_at_position(position)
             .map(|top_id| match top_id {
