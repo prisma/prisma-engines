@@ -975,3 +975,52 @@ fn fulltext_index_fields_must_follow_each_other_in_mongo() {
 
     expectation.assert_eq(&error)
 }
+
+#[test]
+fn index_without_fields_must_error() {
+    let schema = r#"
+        generator js {
+          provider        = "prisma-client-js"
+          previewFeatures = ["fullTextIndex", "extendedIndexes"]
+        }
+
+        datasource db {
+          provider = "mysql"
+          url      = env("DATABASE_URL")
+        }
+
+        model Fulltext {
+          id      Int    @id
+          title   String @db.VarChar(255)
+          content String @db.Text
+
+          @@fulltext(fields:[], map: "a")
+          @@index(fields: [ ], map: "b")
+          @@unique(fields: [])
+        }
+    "#;
+
+    let expected = expect![[r#"
+        [1;91merror[0m: [1mError parsing attribute "@index": The list of fields in an index cannot be empty. Please specify at least one field.[0m
+          [1;94m-->[0m  [4mschema.prisma:18[0m
+        [1;94m   | [0m
+        [1;94m17 | [0m          @@fulltext(fields:[], map: "a")
+        [1;94m18 | [0m          @@[1;91mindex(fields: [ ], map: "b")[0m
+        [1;94m   | [0m
+        [1;91merror[0m: [1mError parsing attribute "@unique": The list of fields in an index cannot be empty. Please specify at least one field.[0m
+          [1;94m-->[0m  [4mschema.prisma:19[0m
+        [1;94m   | [0m
+        [1;94m18 | [0m          @@index(fields: [ ], map: "b")
+        [1;94m19 | [0m          @@[1;91munique(fields: [])[0m
+        [1;94m   | [0m
+        [1;91merror[0m: [1mError parsing attribute "@fulltext": The list of fields in an index cannot be empty. Please specify at least one field.[0m
+          [1;94m-->[0m  [4mschema.prisma:17[0m
+        [1;94m   | [0m
+        [1;94m16 | [0m
+        [1;94m17 | [0m          @@[1;91mfulltext(fields:[], map: "a")[0m
+        [1;94m   | [0m
+    "#]];
+
+    let error = datamodel::parse_schema(schema).map(drop).unwrap_err();
+    expected.assert_eq(&error);
+}

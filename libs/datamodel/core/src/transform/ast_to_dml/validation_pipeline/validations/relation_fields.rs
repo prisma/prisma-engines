@@ -1,5 +1,5 @@
 use crate::{
-    ast,
+    ast::{self, WithName},
     diagnostics::DatamodelError,
     transform::ast_to_dml::{
         db::{

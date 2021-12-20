@@ -231,3 +231,17 @@ pub(super) fn connector_specific(model: ModelWalker<'_, '_>, ctx: &mut Context<'
         ));
     }
 }
+
+pub(super) fn id_has_fields(model: ModelWalker<'_, '_>, ctx: &mut Context<'_>) {
+    let id = if let Some(id) = model.primary_key() { id } else { return };
+
+    if id.fields().len() > 0 {
+        return;
+    }
+
+    ctx.push_error(DatamodelError::new_attribute_validation_error(
+        "The list of fields in an `@@id()` attribute cannot be empty. Please specify at least one field.",
+        "id",
+        id.ast_attribute().span,
+    ))
+}

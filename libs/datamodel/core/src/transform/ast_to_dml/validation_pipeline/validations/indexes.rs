@@ -9,6 +9,7 @@ use crate::{
     },
 };
 use datamodel_connector::{walker_ext_traits::*, ConnectorCapability};
+use schema_ast::ast::{WithName, WithSpan};
 
 /// Different databases validate index and unique constraint names in a certain namespace.
 /// Validates index and unique constraint names against the database requirements.
@@ -328,4 +329,20 @@ pub(super) fn has_valid_mapped_name(index: IndexWalker<'_, '_>, ctx: &mut Contex
     }
 }
 
-//TODO(extended indices) add db specific validations to sort and length
+pub(super) fn has_fields(index: IndexWalker<'_, '_>, ctx: &mut Context<'_>) {
+    if index.fields().len() > 0 {
+        return;
+    }
+
+    let attr = if let Some(attribute) = index.ast_attribute() {
+        attribute
+    } else {
+        return;
+    };
+
+    ctx.push_error(DatamodelError::new_attribute_validation_error(
+        "The list of fields in an index cannot be empty. Please specify at least one field.",
+        attr.name(),
+        *attr.span(),
+    ))
+}

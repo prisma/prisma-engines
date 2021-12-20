@@ -1,4 +1,4 @@
-use crate::ast;
+use crate::ast::{self, WithName};
 use crate::ValueValidator;
 use crate::{DatamodelError, Diagnostics};
 use std::collections::HashMap;
