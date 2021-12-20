@@ -505,7 +505,7 @@
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_dbgenerated</span>(<span class="ident">description</span>: <span class="ident">String</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">if</span> <span class="ident">description</span>.<span class="ident">trim_matches</span>(<span class="ident">char::from</span>(<span class="number">0</span>)).<span class="ident">is_empty</span>() {
+        <span class="kw">if</span> <span class="ident">description</span>.<span class="ident">trim_matches</span>(<span class="string">&#39;\0&#39;</span>).<span class="ident">is_empty</span>() {
             <span class="ident">ValueGenerator::new</span>(<span class="string">&quot;dbgenerated&quot;</span>.<span class="ident">to_owned</span>(), <span class="ident">Vec::new</span>()).<span class="ident">unwrap</span>()
         } <span class="kw">else</span> {
             <span class="ident">ValueGenerator::new</span>(<span class="string">&quot;dbgenerated&quot;</span>.<span class="ident">to_owned</span>(), <span class="macro">vec!</span>[<span class="ident">PrismaValue::String</span>(<span class="ident">description</span>)]).<span class="ident">unwrap</span>()

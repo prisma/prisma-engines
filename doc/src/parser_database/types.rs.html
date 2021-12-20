@@ -604,17 +604,6 @@
 <span id="604">604</span>
 <span id="605">605</span>
 <span id="606">606</span>
-<span id="607">607</span>
-<span id="608">608</span>
-<span id="609">609</span>
-<span id="610">610</span>
-<span id="611">611</span>
-<span id="612">612</span>
-<span id="613">613</span>
-<span id="614">614</span>
-<span id="615">615</span>
-<span id="616">616</span>
-<span id="617">617</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">context::Context</span>, <span class="ident">walkers::CompositeTypeFieldWalker</span>, <span class="ident">walkers::CompositeTypeWalker</span>, <span class="ident">DatamodelError</span>};
 <span class="kw">use</span> <span class="ident">schema_ast::ast</span>;
 <span class="kw">use</span> <span class="ident">std</span>::{
@@ -716,12 +705,18 @@
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">DefaultAttribute</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">mapped_name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;ast</span> <span class="ident">str</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;ast</span> <span class="ident">ast::Expression</span>,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">default_attribute</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;ast</span> <span class="ident">ast::Attribute</span>,
+}
+
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">ScalarField</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span> {
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">r#type</span>: <span class="ident">ScalarFieldType</span>,
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">is_ignored</span>: <span class="ident">bool</span>,
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">is_updated_at</span>: <span class="ident">bool</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">default</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">dml::default_value::DefaultValue</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">default_attribute</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;ast</span> <span class="ident">ast::Attribute</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">default</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">DefaultAttribute</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="doccomment">/// @map</span>
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">mapped_name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;ast</span> <span class="ident">str</span><span class="op">&gt;</span>,
     <span class="doccomment">/// Native type name and arguments</span>
@@ -880,7 +875,6 @@
                     <span class="ident">is_ignored</span>: <span class="bool-val">false</span>,
                     <span class="ident">is_updated_at</span>: <span class="bool-val">false</span>,
                     <span class="ident">default</span>: <span class="prelude-val">None</span>,
-                    <span class="ident">default_attribute</span>: <span class="prelude-val">None</span>,
                     <span class="ident">mapped_name</span>: <span class="prelude-val">None</span>,
                     <span class="ident">native_type</span>: <span class="prelude-val">None</span>,
                 };
@@ -1213,22 +1207,6 @@
             <span class="string">&quot;Bytes&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">ScalarType::Bytes</span>),
             <span class="string">&quot;Decimal&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">ScalarType::Decimal</span>),
             <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
-        }
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">dml::scalars::ScalarType</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ScalarType</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">st</span>: <span class="ident">dml::scalars::ScalarType</span>) -&gt; <span class="ident">ScalarType</span> {
-        <span class="kw">match</span> <span class="ident">st</span> {
-            <span class="ident">dml::scalars::ScalarType::Int</span> =&gt; <span class="ident">ScalarType::Int</span>,
-            <span class="ident">dml::scalars::ScalarType::BigInt</span> =&gt; <span class="ident">ScalarType::BigInt</span>,
-            <span class="ident">dml::scalars::ScalarType::Float</span> =&gt; <span class="ident">ScalarType::Float</span>,
-            <span class="ident">dml::scalars::ScalarType::Boolean</span> =&gt; <span class="ident">ScalarType::Boolean</span>,
-            <span class="ident">dml::scalars::ScalarType::String</span> =&gt; <span class="ident">ScalarType::String</span>,
-            <span class="ident">dml::scalars::ScalarType::DateTime</span> =&gt; <span class="ident">ScalarType::DateTime</span>,
-            <span class="ident">dml::scalars::ScalarType::Json</span> =&gt; <span class="ident">ScalarType::Json</span>,
-            <span class="ident">dml::scalars::ScalarType::Bytes</span> =&gt; <span class="ident">ScalarType::Bytes</span>,
-            <span class="ident">dml::scalars::ScalarType::Decimal</span> =&gt; <span class="ident">ScalarType::Decimal</span>,
         }
     }
 }
