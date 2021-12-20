@@ -4,6 +4,14 @@ on:
     branches:
       - master
   pull_request:
+
+env:
+  LOG_LEVEL: "info"
+  LOG_QUERIES: "y"
+  RUST_LOG_FORMAT: "devel"
+  RUST_BACKTRACE: 1
+  CLICOLOR_FORCE: 1
+      
 jobs:
   rust-vitess-tests:
     name: "Rust test suite: ${{ matrix.database }} on Linux"
@@ -14,13 +22,6 @@ jobs:
         database:
           - "vitess_5_7"
           - "vitess_8_0"
-
-    env:
-      LOG_LEVEL: "info"
-      LOG_QUERIES: "y"
-      RUST_LOG_FORMAT: "devel"
-      RUST_BACKTRACE: 1
-      CLICOLOR_FORCE: 1
 
     runs-on: ubuntu-latest
     steps:
@@ -45,3 +46,29 @@ jobs:
       - run: export WORKSPACE_ROOT=$(pwd) && cargo test --package query-engine-tests -- --test-threads=1
         env:
           CLICOLOR_FORCE: 1
+
+  rust-cockroach-tests:
+    name: "Rust test suite: ${{ matrix.database }} on Linux"
+
+    strategy:
+      fail-fast: false
+      matrix:
+        database:
+          - "cockroach"
+
+    runs-on: [self-hosted, buildjet-32vcpu-ubuntu-2004]
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: "Start ${{ matrix.database }}"
+        run: make dev-${{ matrix.database }}
+
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          default: true
+
+      - run: export WORKSPACE_ROOT=$(pwd) && cargo test --package query-engine-tests
+        env:
+          CLICOLOR_FORCE: 1
+          SIMPLE_TEST_MODE: 1
