@@ -121,7 +121,6 @@ impl GeneratorLoader {
 
             let value = match &prop.value {
                 ast::Expression::NumericValue(val, _) => val.clone(),
-                ast::Expression::BooleanValue(val, _) => val.clone(),
                 ast::Expression::StringValue(val, _) => val.clone(),
                 ast::Expression::ConstantValue(val, _) => val.clone(),
                 ast::Expression::Function(_, _, _) => String::from("(function)"),

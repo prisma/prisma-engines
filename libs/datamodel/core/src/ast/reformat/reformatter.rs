@@ -777,7 +777,6 @@ impl<'a> Reformatter<'a> {
         match val {
             ast::Expression::Array(vals, _) => Self::render_expression_array(target, vals),
             ast::Expression::FieldWithArgs(ident, vals, _) => Self::render_constant_value_w_args(target, ident, vals),
-            ast::Expression::BooleanValue(val, _) => target.write(val),
             ast::Expression::ConstantValue(val, _) => target.write(val),
             ast::Expression::NumericValue(val, _) => target.write(val),
             ast::Expression::StringValue(val, _) => Self::render_str(target, val),
@@ -875,7 +874,6 @@ impl<'a> Reformatter<'a> {
             match current.as_rule() {
                 Rule::numeric_literal => target.write(current.as_str()),
                 Rule::string_literal => target.write(current.as_str()),
-                Rule::boolean_literal => target.write(current.as_str()),
                 Rule::constant_literal => target.write(current.as_str()),
                 Rule::function => Self::reformat_function_expression(target, &current),
                 Rule::array_expression => Self::reformat_array_expression(target, &current),

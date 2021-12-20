@@ -9,7 +9,6 @@ pub fn parse_expression(token: &Token<'_>) -> Expression {
     match first_child.as_rule() {
         Rule::numeric_literal => Expression::NumericValue(first_child.as_str().to_string(), span),
         Rule::string_literal => Expression::StringValue(parse_string_literal(&first_child), span),
-        Rule::boolean_literal => Expression::BooleanValue(first_child.as_str().to_string(), span),
         Rule::constant_literal => Expression::ConstantValue(first_child.as_str().to_string(), span),
         Rule::field_with_args => parse_field_with_args(&first_child),
         Rule::function => parse_function(&first_child),

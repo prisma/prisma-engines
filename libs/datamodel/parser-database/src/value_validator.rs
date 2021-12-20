@@ -89,7 +89,6 @@ impl<'a> ValueValidator<'a> {
     pub(crate) fn as_constant_literal(&self) -> Result<&'a str, DatamodelError> {
         match &self.value {
             ast::Expression::ConstantValue(value, _) => Ok(value),
-            ast::Expression::BooleanValue(value, _) => Ok(value),
             _ => Err(self.construct_type_mismatch_error("constant literal")),
         }
     }
