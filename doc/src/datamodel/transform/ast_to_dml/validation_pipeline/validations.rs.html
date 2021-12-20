@@ -264,13 +264,13 @@
             <span class="comment">// 1:1, 1:n</span>
             <span class="ident">RefinedRelationWalker::Inline</span>(<span class="ident">relation</span>) =&gt; {
                 <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">relation</span>) <span class="op">=</span> <span class="ident">relation</span>.<span class="ident">as_complete</span>() {
-                    <span class="ident">relations::same_length_in_referencing_and_referenced</span>(<span class="ident">relation</span>, <span class="ident">ctx</span>);
                     <span class="ident">relations::cycles</span>(<span class="ident">relation</span>, <span class="ident">ctx</span>);
                     <span class="ident">relations::multiple_cascading_paths</span>(<span class="ident">relation</span>, <span class="ident">ctx</span>);
-                    <span class="ident">relations::references_unique_fields</span>(<span class="ident">relation</span>, <span class="ident">ctx</span>);
-                    <span class="ident">relations::referencing_fields_in_correct_order</span>(<span class="ident">relation</span>, <span class="ident">ctx</span>);
                 }
 
+                <span class="ident">relations::references_unique_fields</span>(<span class="ident">relation</span>, <span class="ident">ctx</span>);
+                <span class="ident">relations::same_length_in_referencing_and_referenced</span>(<span class="ident">relation</span>, <span class="ident">ctx</span>);
+                <span class="ident">relations::referencing_fields_in_correct_order</span>(<span class="ident">relation</span>, <span class="ident">ctx</span>);
                 <span class="ident">relations::field_arity</span>(<span class="ident">relation</span>, <span class="ident">ctx</span>);
                 <span class="ident">relations::referencing_scalar_field_types</span>(<span class="ident">relation</span>, <span class="ident">ctx</span>);
                 <span class="ident">relations::has_a_unique_constraint_name</span>(<span class="kw-2">&amp;</span><span class="ident">names</span>, <span class="ident">relation</span>, <span class="ident">ctx</span>);

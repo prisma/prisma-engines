@@ -292,6 +292,8 @@
 <span id="292">292</span>
 <span id="293">293</span>
 <span id="294">294</span>
+<span id="295">295</span>
+<span id="296">296</span>
 </pre><pre class="rust"><code><span class="doccomment">//! This crate is responsible for parsing, rendering and formatting a Prisma Schema.</span>
 <span class="doccomment">//! A Prisma Schema consists out of two parts:</span>
 <span class="doccomment">//! 1. The `Datamodel` part refers to the model and enum definitions.</span>
@@ -380,7 +382,9 @@
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">configuration</span>::{<span class="ident">Configuration</span>, <span class="ident">Datasource</span>, <span class="ident">Generator</span>, <span class="ident">StringFromEnvVar</span>};
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">datamodel_connector</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">diagnostics</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">parser_database</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">parser_database::is_reserved_type_name</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">schema_ast</span>;
 
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">ast::SchemaAst</span>, <span class="ident">common::preview_features::PreviewFeature</span>};
 <span class="kw">use</span> <span class="ident">ast::reformat::MissingField</span>;

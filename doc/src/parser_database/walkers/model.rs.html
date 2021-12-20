@@ -268,6 +268,7 @@
 <span id="268">268</span>
 <span id="269">269</span>
 <span id="270">270</span>
+<span id="271">271</span>
 </pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">primary_key</span>;
 <span class="kw">mod</span> <span class="ident">unique_criteria</span>;
 
@@ -279,13 +280,14 @@
     <span class="ident">ScalarFieldWalker</span>,
 };
 <span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">ast</span>,
-    {<span class="ident">types::ModelAttributes</span>, <span class="ident">ParserDatabase</span>},
+    <span class="ident">ast</span>::{<span class="self">self</span>, <span class="ident">WithName</span>},
+    <span class="ident">types::ModelAttributes</span>,
+    <span class="ident">ParserDatabase</span>,
 };
 <span class="kw">use</span> <span class="ident">std::hash</span>::{<span class="ident">Hash</span>, <span class="ident">Hasher</span>};
 
 <span class="doccomment">/// A `model` declaration in the Prisma schema.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ModelWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
     <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">model_id</span>: <span class="ident">ast::ModelId</span>,
     <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">db</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">ParserDatabase</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span>,

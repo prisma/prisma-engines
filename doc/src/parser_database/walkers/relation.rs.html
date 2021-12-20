@@ -441,7 +441,7 @@
     }
 }
 
-<span class="doccomment">/// A scalar inferred by loose/magic reformatting</span>
+<span class="doccomment">/// A scalar inferred by loose/magic reformatting.</span>
 <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">missing_docs</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">InferredField</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
     <span class="kw">pub</span> <span class="ident">name</span>: <span class="ident">String</span>,
@@ -450,7 +450,7 @@
     <span class="kw">pub</span> <span class="ident">blueprint</span>: <span class="ident">ScalarFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;db</span><span class="op">&gt;</span>,
 }
 
-<span class="doccomment">/// The scalar fields on the concrete side relation.</span>
+<span class="doccomment">/// The scalar fields on the concrete side of the relation.</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ReferencingFields</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
     <span class="doccomment">/// Existing scalar fields</span>
     <span class="ident">Concrete</span>(<span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">ExactSizeIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">ScalarFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;db</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;db</span><span class="op">&gt;</span>),

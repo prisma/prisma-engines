@@ -904,7 +904,7 @@
 <span class="kw">mod</span> <span class="ident">native_types</span>;
 
 <span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">ast</span>,
+    <span class="ident">ast</span>::{<span class="self">self</span>, <span class="ident">WithName</span>, <span class="ident">WithSpan</span>},
     <span class="ident">context</span>::{<span class="ident">Arguments</span>, <span class="ident">Context</span>},
     <span class="ident">types</span>::{
         <span class="ident">EnumAttributes</span>, <span class="ident">FieldWithArgs</span>, <span class="ident">IndexAlgorithm</span>, <span class="ident">IndexAttribute</span>, <span class="ident">IndexType</span>, <span class="ident">ModelAttributes</span>, <span class="ident">RelationField</span>,
@@ -1258,7 +1258,7 @@
             <span class="ident">DatamodelError::new_attribute_validation_error</span>(
                 <span class="string">&quot;Fields on an already ignored Model do not need an `@ignore` annotation.&quot;</span>,
                 <span class="string">&quot;ignore&quot;</span>,
-                <span class="ident">ctx</span>.<span class="ident">db</span>.<span class="ident">ast</span>[<span class="ident">model_id</span>][<span class="ident">field_id</span>].<span class="ident">span</span>,
+                <span class="kw-2">*</span><span class="ident">ctx</span>.<span class="ident">db</span>.<span class="ident">ast</span>[<span class="ident">model_id</span>][<span class="ident">field_id</span>].<span class="ident">span</span>(),
             )
         })
         .<span class="ident">collect</span>();

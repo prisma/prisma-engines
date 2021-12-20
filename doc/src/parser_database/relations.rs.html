@@ -356,6 +356,19 @@
 <span id="356">356</span>
 <span id="357">357</span>
 <span id="358">358</span>
+<span id="359">359</span>
+<span id="360">360</span>
+<span id="361">361</span>
+<span id="362">362</span>
+<span id="363">363</span>
+<span id="364">364</span>
+<span id="365">365</span>
+<span id="366">366</span>
+<span id="367">367</span>
+<span id="368">368</span>
+<span id="369">369</span>
+<span id="370">370</span>
+<span id="371">371</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">ast</span>,
     {<span class="ident">context::Context</span>, <span class="ident">types::RelationField</span>},
@@ -711,6 +724,19 @@
             <span class="ident">ReferentialAction::NoAction</span> =&gt; <span class="string">&quot;NoAction&quot;</span>,
             <span class="ident">ReferentialAction::SetNull</span> =&gt; <span class="string">&quot;SetNull&quot;</span>,
             <span class="ident">ReferentialAction::SetDefault</span> =&gt; <span class="string">&quot;SetDefault&quot;</span>,
+        }
+    }
+
+    <span class="doccomment">/// The documentation string to display in autocompletion / editor hints.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">documentation</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
+        <span class="kw">match</span> <span class="self">self</span> {
+            <span class="ident">ReferentialAction::Cascade</span> =&gt; <span class="string">&quot;Delete the child records when the parent record is deleted.&quot;</span>,
+            <span class="ident">ReferentialAction::Restrict</span> =&gt; <span class="string">&quot;Prevent deleting a parent record as long as it is referenced.&quot;</span>,
+            <span class="ident">ReferentialAction::NoAction</span> =&gt; <span class="string">&quot;Prevent deleting a parent record as long as it is referenced.&quot;</span>,
+            <span class="ident">ReferentialAction::SetNull</span> =&gt; <span class="string">&quot;Set the referencing fields to NULL when the referenced record is deleted.&quot;</span>,
+            <span class="ident">ReferentialAction::SetDefault</span> =&gt; {
+                <span class="string">&quot;Set the referencing field&#39;s value to the default when the referenced record is deleted.&quot;</span>
+            }
         }
     }
 }

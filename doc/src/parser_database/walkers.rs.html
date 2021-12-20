@@ -96,7 +96,6 @@
 <span id="96">96</span>
 <span id="97">97</span>
 <span id="98">98</span>
-<span id="99">99</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Convenient access to a datamodel as understood by ParserDatabase.</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! The walkers:</span>
@@ -123,8 +122,7 @@
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">relation_field</span>::<span class="kw-2">*</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">scalar_field</span>::<span class="kw-2">*</span>;
 
-<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::ParserDatabase</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ast</span>;
+<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">ast</span>, <span class="ident">ParserDatabase</span>};
 
 <span class="doccomment">/// A generic walker. Only walkers intantiated with a concrete ID type (`I`) are useful.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
