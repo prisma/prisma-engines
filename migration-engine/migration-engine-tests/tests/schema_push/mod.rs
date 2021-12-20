@@ -371,30 +371,25 @@ fn duplicate_constraint_names_across_models_work_on_mysql(api: TestApi) {
 fn implicit_relations_indices_are_not_renamed_unnecessarily(api: TestApi) {
     let dm = api.datamodel_with_provider(
         r#"
-     model UserThisIsWayTooLongAndWillLeadToProblemsDownTheRoadWeHaventRunIntoThisYetButItMightBeABigProblem {
+     model UserThisIsWayTooLongAndWillLeadToProblemsDownTheRoad {
         id          Int @id
-        posts       PostThisIsWayTooLongAndWillLeadToProblemsDownTheRoadWeHaventRunIntoThisYetButItMightBeABigProblem[]
+        posts       PostThisIsWayTooLongAndWillLeadToProblemsDownTheRoad[]
      }
 
-     model PostThisIsWayTooLongAndWillLeadToProblemsDownTheRoadWeHaventRunIntoThisYetButItMightBeABigProblem {
+     model PostThisIsWayTooLongAndWillLeadToProblemsDownTheRoad {
         id          Int @id
-        users       UserThisIsWayTooLongAndWillLeadToProblemsDownTheRoadWeHaventRunIntoThisYetButItMightBeABigProblem[]
+        users       UserThisIsWayTooLongAndWillLeadToProblemsDownTheRoad[]
      }
      "#,
     );
-
-    // api.schema_push_w_datasource(dm).send().assert_green();
-    // api.schema_push_w_datasource(dm).send().assert_no_steps();
 
     let dir = api.create_migrations_directory();
 
     api.create_migration("initial", &dm, &dir)
         .send_sync()
         .assert_migration_directories_count(1);
-    // .assert_migration("initial", |migration| migration.assert_contents(""));
 
-    api.create_migration("no-op", &dm, &dir)
+    api.create_migration("no_op", &dm, &dir)
         .send_sync()
-        .assert_migration_directories_count(2)
-        .assert_migration("no-op", |migration| migration.assert_contents(""));
+        .assert_migration_directories_count(1);
 }

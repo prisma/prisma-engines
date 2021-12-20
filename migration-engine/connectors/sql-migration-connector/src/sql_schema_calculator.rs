@@ -216,7 +216,7 @@ fn calculate_relation_tables<'a>(
             ];
 
             sql::Table {
-                name: table_name,
+                name: table_name[..configuration.max_identifier_length() - 1].to_string(),
                 columns,
                 indices: indexes,
                 primary_key: None,
