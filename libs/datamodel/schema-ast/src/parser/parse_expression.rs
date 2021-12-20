@@ -1,9 +1,11 @@
-use super::helpers::{parsing_catch_all, Token, TokenExtensions};
-use super::parse_attribute::parse_attribute_arg;
-use super::Rule;
+use super::{
+    helpers::{parsing_catch_all, Token, TokenExtensions},
+    Rule,
+};
 use crate::ast::*;
+use crate::parser::parse_attribute::parse_attribute_arg;
 
-pub fn parse_expression(token: &Token<'_>) -> Expression {
+pub(crate) fn parse_expression(token: &Token<'_>) -> Expression {
     let first_child = token.first_relevant_child();
     let span = Span::from(first_child.as_span());
     match first_child.as_rule() {
@@ -21,13 +23,19 @@ pub fn parse_expression(token: &Token<'_>) -> Expression {
 }
 
 fn parse_field_with_args(token: &Token<'_>) -> Expression {
+    debug_assert_eq!(token.as_rule(), Rule::field_with_args);
     let mut name: Option<String> = None;
     let mut arguments: Vec<Argument> = vec![];
 
     for current in token.relevant_children() {
         match current.as_rule() {
             Rule::non_empty_identifier => name = Some(current.as_str().to_string()),
-            Rule::argument => arguments.push(parse_attribute_arg(&current)),
+            Rule::named_argument => arguments.push(parse_attribute_arg(&current)),
+            Rule::argument_value => arguments.push(Argument {
+                name: Identifier::new(""),
+                value: parse_arg_value(&current),
+                span: current.as_span().into(),
+            }),
             _ => parsing_catch_all(&current, "constant literal arg"),
         }
     }
@@ -72,7 +80,8 @@ fn parse_array(token: &Token<'_>) -> Expression {
     Expression::Array(elements, Span::from(token.as_span()))
 }
 
-pub fn parse_arg_value(token: &Token<'_>) -> Expression {
+pub(crate) fn parse_arg_value(token: &Token<'_>) -> Expression {
+    debug_assert_eq!(token.as_rule(), Rule::argument_value);
     let current = token.first_relevant_child();
     match current.as_rule() {
         Rule::expression => parse_expression(&current),

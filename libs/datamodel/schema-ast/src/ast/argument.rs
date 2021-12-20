@@ -1,4 +1,4 @@
-use super::{Expression, Identifier, Span, WithIdentifier};
+use super::{Expression, Identifier, Span, WithIdentifier, WithSpan};
 use std::fmt::{Display, Formatter};
 
 /// An argument, either for attributes, or for keys in source blocks.
@@ -83,5 +83,11 @@ impl Argument {
 
     pub fn is_unnamed(&self) -> bool {
         self.name.name.is_empty()
+    }
+}
+
+impl WithSpan for Argument {
+    fn span(&self) -> &Span {
+        &self.span
     }
 }

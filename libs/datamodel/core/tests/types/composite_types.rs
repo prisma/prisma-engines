@@ -181,6 +181,7 @@ fn composite_types_are_parsed_without_error() {
                                             },
                                         },
                                         arguments: [],
+                                        empty_arguments: [],
                                         span: Span {
                                             start: 175,
                                             end: 177,

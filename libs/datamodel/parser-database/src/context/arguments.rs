@@ -44,6 +44,14 @@ impl<'a> Arguments<'a> {
             ))
         }
 
+        for arg in &attribute.empty_arguments {
+            errors.push_error(DatamodelError::new_attribute_validation_error(
+                &format!("The `{}` argument is missing a value.", arg.name.name),
+                attribute.name(),
+                arg.name.span,
+            ))
+        }
+
         errors.to_result()
     }
 

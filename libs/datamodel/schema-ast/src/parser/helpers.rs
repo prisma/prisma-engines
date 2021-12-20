@@ -3,6 +3,7 @@ use crate::ast::{Identifier, Span};
 
 pub type Token<'a> = pest::iterators::Pair<'a, Rule>;
 
+#[track_caller]
 pub fn parsing_catch_all(token: &Token<'_>, kind: &str) {
     match token.as_rule() {
         Rule::comment | Rule::comment_and_new_line | Rule::comment_block | Rule::doc_comment_and_new_line => {}

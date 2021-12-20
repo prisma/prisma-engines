@@ -72,10 +72,12 @@ attribute = { (attribute_name ~ attribute_arguments | attribute_name) }
 // This is a poor-mans version of name spacing. This is currently used for native types.
 attribute_name = @{ (maybe_empty_identifier ~ ".")? ~ maybe_empty_identifier }
 // If arguments are supplied there might multiple unnahmed arguments (see decimal native type).
-attribute_arguments = { "(" ~ (((argument | argument_value) ~ ("," ~ (argument | argument_value))*)?) ~ ")" }
+attribute_arguments = { "(" ~ (argument ~ ("," ~ argument)*)? ~ ")" }
 
-argument = { (argument_name ~ ":" ~ argument_value) }
-argument_name = { (!":" ~ non_empty_identifier)+ }
+argument = _{ named_argument | empty_argument | argument_value }
+empty_argument = { argument_name ~ ":" }
+named_argument = { argument_name ~ ":" ~ argument_value }
+argument_name = { non_empty_identifier }
 argument_value = { expression }
 
 // ######################################
@@ -122,7 +124,7 @@ BLOCK_LEVEL_CATCH_ALL = { !BLOCK_CLOSE ~ CATCH_ALL }
 function = { non_empty_identifier ~ "(" ~ (expression ~ ("," ~ expression)*)? ~ ")" }
 field_with_args = {  non_empty_identifier ~ "(" ~ argument ~ ("," ~ argument)*  ~")"}
 array_expression = { "[" ~ (expression ~ ( "," ~ expression )*)? ~ "]" }
-expression = { field_with_args | array_expression | function | numeric_literal | string_literal | constant_literal }
+expression = { function | field_with_args | array_expression | numeric_literal | string_literal | constant_literal }
 
 // ######################################
 // Literals / Values

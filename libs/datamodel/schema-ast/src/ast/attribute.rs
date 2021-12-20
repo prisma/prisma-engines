@@ -1,5 +1,18 @@
 use super::{Argument, Identifier, Span, WithIdentifier, WithSpan};
 
+/// An argument with a name but no value. Example:
+///
+/// ```ignore
+/// @relation(onDelete: )
+/// ```
+///
+/// This is of course invalid, but we parse it in order to provide better diagnostics and
+/// for autocompletion.
+#[derive(Debug, Clone, PartialEq)]
+pub struct EmptyArgument {
+    pub name: Identifier,
+}
+
 /// An attribute (following `@` or `@@``) on a model, model field, enum, enum value or composite
 /// type field.
 #[derive(Debug, Clone, PartialEq)]
@@ -18,6 +31,13 @@ pub struct Attribute {
     ///         ^^^^^^^^^^^^^^^^^^^^^^^^
     /// ```
     pub arguments: Vec<Argument>,
+    /// The arguments without a value:
+    ///
+    /// ```ignore
+    /// @default("george", map: )
+    ///                    ^^^^
+    /// ```
+    pub empty_arguments: Vec<EmptyArgument>,
     /// The AST span of the node.
     pub span: Span,
 }
@@ -29,6 +49,7 @@ impl Attribute {
             name: Identifier::new(name),
             arguments,
             span: Span::empty(),
+            empty_arguments: Vec::new(),
         }
     }
 

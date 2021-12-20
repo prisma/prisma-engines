@@ -1,17 +1,26 @@
-use super::{CompositeType, Enum, Field, GeneratorConfig, Identifier, Model, SourceConfig};
+use crate::ast::{
+    traits::WithSpan, CompositeType, Enum, Field, GeneratorConfig, Identifier, Model, SourceConfig, Span,
+};
 
 /// Enum for distinguishing between top-level entries
 #[derive(Debug, Clone, PartialEq)]
 pub enum Top {
+    /// A composite type
     CompositeType(CompositeType),
+    /// An enum declaration
     Enum(Enum),
+    /// A model declaration
     Model(Model),
+    /// A datasource block
     Source(SourceConfig),
+    /// A generator block
     Generator(GeneratorConfig),
+    /// A type alias
     Type(Field),
 }
 
 impl Top {
+    /// A string saying what kind of item this is.
     pub fn get_type(&self) -> &str {
         match self {
             Top::CompositeType(_) => "composite type",
@@ -23,6 +32,7 @@ impl Top {
         }
     }
 
+    /// The name of the item.
     pub fn identifier(&self) -> &Identifier {
         match self {
             Top::CompositeType(ct) => &ct.name,
@@ -34,10 +44,12 @@ impl Top {
         }
     }
 
+    /// The name of the item.
     pub fn name(&self) -> &str {
         &self.identifier().name
     }
 
+    /// Try to interpret the item as a composite type declaration.
     pub fn as_composite_type(&self) -> Option<&CompositeType> {
         match self {
             Top::CompositeType(ct) => Some(ct),
@@ -45,6 +57,7 @@ impl Top {
         }
     }
 
+    /// Try to interpret the item as a model declaration.
     pub fn as_model(&self) -> Option<&Model> {
         match self {
             Top::Model(model) => Some(model),
@@ -52,6 +65,7 @@ impl Top {
         }
     }
 
+    /// Try to interpret the item as an enum declaration.
     pub fn as_enum(&self) -> Option<&Enum> {
         match self {
             Top::Enum(r#enum) => Some(r#enum),
@@ -59,6 +73,7 @@ impl Top {
         }
     }
 
+    /// Try to interpret the item as a generator block.
     pub fn as_generator(&self) -> Option<&GeneratorConfig> {
         match self {
             Top::Generator(gen) => Some(gen),
@@ -66,6 +81,7 @@ impl Top {
         }
     }
 
+    /// Try to interpret the item as a type alias.
     pub fn as_type_alias(&self) -> Option<&Field> {
         match self {
             Top::Type(r#type) => Some(r#type),
@@ -73,10 +89,24 @@ impl Top {
         }
     }
 
+    /// Try to interpret the item as a datasource block.
     pub fn as_source(&self) -> Option<&SourceConfig> {
         match self {
             Top::Source(source) => Some(source),
             _ => None,
+        }
+    }
+}
+
+impl WithSpan for Top {
+    fn span(&self) -> &Span {
+        match self {
+            Top::CompositeType(ct) => &ct.span,
+            Top::Enum(en) => en.span(),
+            Top::Model(model) => model.span(),
+            Top::Source(source) => source.span(),
+            Top::Generator(gen) => gen.span(),
+            Top::Type(ty) => ty.span(),
         }
     }
 }

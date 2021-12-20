@@ -4,7 +4,7 @@ mod map;
 mod native_types;
 
 use crate::{
-    ast,
+    ast::{self, WithName, WithSpan},
     context::{Arguments, Context},
     types::{
         EnumAttributes, FieldWithArgs, IndexAlgorithm, IndexAttribute, IndexType, ModelAttributes, RelationField,
@@ -358,7 +358,7 @@ fn visit_model_ignore(model_id: ast::ModelId, model_data: &mut ModelAttributes<'
             DatamodelError::new_attribute_validation_error(
                 "Fields on an already ignored Model do not need an `@ignore` annotation.",
                 "ignore",
-                ctx.db.ast[model_id][field_id].span,
+                *ctx.db.ast[model_id][field_id].span(),
             )
         })
         .collect();

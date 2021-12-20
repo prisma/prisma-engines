@@ -133,3 +133,9 @@ impl<'ast> ParserDatabase<'ast> {
         self.names.model_fields.get(&(model_id, field_name)).cloned()
     }
 }
+
+impl std::fmt::Debug for ParserDatabase<'_> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str("ParserDatabase { ... }")
+    }
+}

@@ -355,4 +355,17 @@ impl ReferentialAction {
             ReferentialAction::SetDefault => "SetDefault",
         }
     }
+
+    /// The documentation string to display in autocompletion / editor hints.
+    pub fn documentation(&self) -> &'static str {
+        match self {
+            ReferentialAction::Cascade => "Delete the child records when the parent record is deleted.",
+            ReferentialAction::Restrict => "Prevent deleting a parent record as long as it is referenced.",
+            ReferentialAction::NoAction => "Prevent deleting a parent record as long as it is referenced.",
+            ReferentialAction::SetNull => "Set the referencing fields to NULL when the referenced record is deleted.",
+            ReferentialAction::SetDefault => {
+                "Set the referencing field's value to the default when the referenced record is deleted."
+            }
+        }
+    }
 }

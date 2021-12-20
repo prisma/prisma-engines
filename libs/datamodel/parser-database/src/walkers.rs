@@ -24,8 +24,7 @@ pub use relation::*;
 pub use relation_field::*;
 pub use scalar_field::*;
 
-use super::ParserDatabase;
-use crate::ast;
+use crate::{ast, ParserDatabase};
 
 /// A generic walker. Only walkers intantiated with a concrete ID type (`I`) are useful.
 #[derive(Clone, Copy)]

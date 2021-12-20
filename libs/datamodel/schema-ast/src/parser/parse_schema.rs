@@ -108,6 +108,8 @@ fn rule_to_string(rule: Rule) -> &'static str {
         Rule::field_with_args => "field with arguments",
         Rule::argument_value => "argument value",
         Rule::argument => "argument",
+        Rule::named_argument => "named argument",
+        Rule::empty_argument => "empty argument",
         Rule::attribute_arguments => "attribute arguments",
         Rule::attribute_name => "attribute name",
         Rule::attribute => "attribute",
