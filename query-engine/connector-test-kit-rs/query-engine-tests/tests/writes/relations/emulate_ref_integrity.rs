@@ -150,8 +150,8 @@ mod emulate_ref_integrity {
         );
 
         insta::assert_snapshot!(
-          run_query!(&runner, r#"{ findManyUser { id comments { id } } }"#),
-          @r###"{"data":{"findManyUser":[{"id":1,"comments":[]},{"id":2,"comments":[{"id":2},{"id":1},{"id":3}]}]}}"###
+          run_query!(&runner, r#"{ findManyUser { id comments(orderBy: { id: asc }) { id } } }"#),
+          @r###"{"data":{"findManyUser":[{"id":1,"comments":[]},{"id":2,"comments":[{"id":1},{"id":2},{"id":3}]}]}}"###
         );
 
         Ok(())
