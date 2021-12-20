@@ -513,7 +513,6 @@
 <span id="513">513</span>
 <span id="514">514</span>
 <span id="515">515</span>
-<span id="516">516</span>
 </pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">string_builder</span>;
 <span class="kw">mod</span> <span class="ident">table</span>;
 
@@ -938,7 +937,6 @@
         <span class="kw">match</span> <span class="ident">val</span> {
             <span class="ident">ast::Expression::Array</span>(<span class="ident">vals</span>, <span class="kw">_</span>) =&gt; <span class="ident"><span class="self">Self</span>::render_expression_array</span>(<span class="ident">target</span>, <span class="ident">vals</span>),
             <span class="ident">ast::Expression::FieldWithArgs</span>(<span class="ident">ident</span>, <span class="ident">vals</span>, <span class="kw">_</span>) =&gt; <span class="ident"><span class="self">Self</span>::render_field_with_args</span>(<span class="ident">target</span>, <span class="ident">ident</span>, <span class="ident">vals</span>),
-            <span class="ident">ast::Expression::BooleanValue</span>(<span class="ident">val</span>, <span class="kw">_</span>) =&gt; <span class="ident">target</span>.<span class="ident">write</span>(<span class="ident">val</span>),
             <span class="ident">ast::Expression::ConstantValue</span>(<span class="ident">val</span>, <span class="kw">_</span>) =&gt; <span class="ident">target</span>.<span class="ident">write</span>(<span class="ident">val</span>),
             <span class="ident">ast::Expression::NumericValue</span>(<span class="ident">val</span>, <span class="kw">_</span>) =&gt; <span class="ident">target</span>.<span class="ident">write</span>(<span class="ident">val</span>),
             <span class="ident">ast::Expression::StringValue</span>(<span class="ident">val</span>, <span class="kw">_</span>) =&gt; <span class="ident"><span class="self">Self</span>::render_str</span>(<span class="ident">target</span>, <span class="ident">val</span>),

@@ -173,6 +173,9 @@
 <span id="173">173</span>
 <span id="174">174</span>
 <span id="175">175</span>
+<span id="176">176</span>
+<span id="177">177</span>
+<span id="178">178</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">constraint_names::ConstraintNames</span>, <span class="ident">Connector</span>, <span class="ident">ReferentialAction</span>, <span class="ident">ReferentialIntegrity</span>};
 <span class="kw">use</span> <span class="ident">parser_database</span>::{<span class="ident">ast</span>, <span class="ident">walkers</span>::<span class="kw-2">*</span>, <span class="ident">ScalarType</span>};
 <span class="kw">use</span> <span class="ident">std::borrow::Cow</span>;
@@ -242,8 +245,11 @@
                 <span class="prelude-val">Some</span>(<span class="ident">ScalarType::Decimal</span>) =&gt; <span class="ident">DefaultKind::Single</span>(<span class="ident">PrismaValue::Float</span>(<span class="ident">num</span>.<span class="ident">parse</span>().<span class="ident">unwrap</span>())),
                 <span class="ident">other</span> =&gt; <span class="macro">unreachable!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="ident">other</span>),
             },
-            <span class="ident">ast::Expression::BooleanValue</span>(<span class="ident">b</span>, <span class="kw">_</span>) =&gt; <span class="ident">DefaultKind::Single</span>(<span class="ident">PrismaValue::Boolean</span>(<span class="ident">b</span>.<span class="ident">parse</span>().<span class="ident">unwrap</span>())),
-            <span class="ident">ast::Expression::ConstantValue</span>(<span class="ident">v</span>, <span class="kw">_</span>) =&gt; <span class="ident">DefaultKind::Single</span>(<span class="ident">PrismaValue::Enum</span>(<span class="ident">v</span>.<span class="ident">to_owned</span>())),
+            <span class="ident">ast::Expression::ConstantValue</span>(<span class="ident">v</span>, <span class="kw">_</span>) =&gt; <span class="kw">match</span> <span class="self">self</span>.<span class="ident">field</span>().<span class="ident">scalar_type</span>() {
+                <span class="prelude-val">Some</span>(<span class="ident">ScalarType::Boolean</span>) =&gt; <span class="ident">DefaultKind::Single</span>(<span class="ident">PrismaValue::Boolean</span>(<span class="ident">v</span>.<span class="ident">parse</span>().<span class="ident">unwrap</span>())),
+                <span class="prelude-val">None</span> =&gt; <span class="ident">DefaultKind::Single</span>(<span class="ident">PrismaValue::Enum</span>(<span class="ident">v</span>.<span class="ident">to_owned</span>())),
+                <span class="ident">other</span> =&gt; <span class="macro">unreachable!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="ident">other</span>),
+            },
             <span class="ident">ast::Expression::StringValue</span>(<span class="ident">v</span>, <span class="kw">_</span>) =&gt; <span class="kw">match</span> <span class="self">self</span>.<span class="ident">field</span>().<span class="ident">scalar_type</span>() {
                 <span class="prelude-val">Some</span>(<span class="ident">ScalarType::DateTime</span>) =&gt; <span class="ident">DefaultKind::Single</span>(<span class="ident">PrismaValue::DateTime</span>(<span class="ident">v</span>.<span class="ident">parse</span>().<span class="ident">unwrap</span>())),
                 <span class="prelude-val">Some</span>(<span class="ident">ScalarType::String</span>) =&gt; <span class="ident">DefaultKind::Single</span>(<span class="ident">PrismaValue::String</span>(<span class="ident">v</span>.<span class="ident">parse</span>().<span class="ident">unwrap</span>())),
