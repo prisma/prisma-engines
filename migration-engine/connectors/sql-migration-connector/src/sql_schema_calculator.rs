@@ -177,13 +177,14 @@ fn calculate_relation_tables<'a>(
                 },
             ];
 
-            //TODO(matthias) This needs to respect the max length on the connector
-
             let indexes = vec![
                 sql::Index {
                     name: format!(
                         "{}_AB_unique",
-                        &table_name[..configuration.max_identifier_length() - 11]
+                        table_name
+                            .chars()
+                            .take(configuration.max_identifier_length() - 11)
+                            .collect::<String>()
                     ),
                     columns: vec![
                         sql::IndexColumn::new(m2m.model_a_column()),
@@ -193,7 +194,13 @@ fn calculate_relation_tables<'a>(
                     algorithm: None,
                 },
                 sql::Index {
-                    name: format!("{}_B_index", &table_name[..configuration.max_identifier_length() - 9]),
+                    name: format!(
+                        "{}_B_index",
+                        table_name
+                            .chars()
+                            .take(configuration.max_identifier_length() - 9)
+                            .collect::<String>()
+                    ),
                     columns: vec![sql::IndexColumn::new(m2m.model_b_column())],
                     tpe: sql::IndexType::Normal,
                     algorithm: None,
@@ -216,7 +223,10 @@ fn calculate_relation_tables<'a>(
             ];
 
             sql::Table {
-                name: table_name[..configuration.max_identifier_length() - 1].to_string(),
+                name: table_name
+                    .chars()
+                    .take(configuration.max_identifier_length() - 1)
+                    .collect::<String>(),
                 columns,
                 indices: indexes,
                 primary_key: None,
