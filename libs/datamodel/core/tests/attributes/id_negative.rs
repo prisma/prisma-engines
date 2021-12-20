@@ -1094,3 +1094,36 @@ fn length_argument_does_not_work_with_int() {
 
     expectation.assert_eq(&error)
 }
+
+#[test]
+fn empty_fields_must_error() {
+    let schema = r#"
+        generator js {
+          provider        = "prisma-client-js"
+          previewFeatures = ["fullTextIndex", "extendedIndexes"]
+        }
+
+        datasource db {
+          provider = "mysql"
+          url      = env("DATABASE_URL")
+        }
+
+        model Fulltext {
+          number      Int    
+          name        String @db.VarChar(255)
+          @@id([])
+        }
+    "#;
+
+    let expected = expect![[r#"
+        [1;91merror[0m: [1mError parsing attribute "@id": The list of fields in an `@@id()` attribute cannot be empty. Please specify at least one field.[0m
+          [1;94m-->[0m  [4mschema.prisma:15[0m
+        [1;94m   | [0m
+        [1;94m14 | [0m          name        String @db.VarChar(255)
+        [1;94m15 | [0m          @@[1;91mid([])[0m
+        [1;94m   | [0m
+    "#]];
+
+    let error = datamodel::parse_schema(schema).map(drop).unwrap_err();
+    expected.assert_eq(&error);
+}

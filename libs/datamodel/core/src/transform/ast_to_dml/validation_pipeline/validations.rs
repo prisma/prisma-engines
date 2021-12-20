@@ -28,6 +28,7 @@ pub(super) fn validate(ctx: &mut Context<'_>, relation_transformation_enabled: b
         models::has_a_strict_unique_criteria(model, ctx);
         models::has_a_unique_primary_key_name(model, &names, ctx);
         models::uses_sort_or_length_on_primary_without_preview_flag(model, ctx);
+        models::id_has_fields(model, ctx);
         models::primary_key_connector_specific(model, ctx);
         models::primary_key_length_prefix_supported(model, ctx);
         models::primary_key_sort_order_supported(model, ctx);
