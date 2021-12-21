@@ -1046,6 +1046,10 @@
 <span id="1046">1046</span>
 <span id="1047">1047</span>
 <span id="1048">1048</span>
+<span id="1049">1049</span>
+<span id="1050">1050</span>
+<span id="1051">1051</span>
+<span id="1052">1052</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Postgres schema description.</span>
 
 <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
@@ -1847,9 +1851,13 @@
                         <span class="ident">ColumnTypeFamily::DateTime</span> =&gt; {
                             <span class="kw">match</span> <span class="ident">default_string</span>.<span class="ident">to_lowercase</span>().<span class="ident">as_str</span>() {
                                 <span class="string">&quot;now()&quot;</span>
+                                <span class="op">|</span> <span class="string">&quot;now():::timestamp&quot;</span>
+                                <span class="op">|</span> <span class="string">&quot;now():::timestamptz&quot;</span>
+                                <span class="op">|</span> <span class="string">&quot;now():::date&quot;</span>
                                 <span class="op">|</span> <span class="string">&quot;current_timestamp&quot;</span>
                                 <span class="op">|</span> <span class="string">&quot;current_timestamp():::timestamp&quot;</span>
-                                <span class="op">|</span> <span class="string">&quot;current_timestamp():::timestamptz&quot;</span> =&gt; <span class="ident">DefaultValue::now</span>(),
+                                <span class="op">|</span> <span class="string">&quot;current_timestamp():::timestamptz&quot;</span>
+                                <span class="op">|</span> <span class="string">&quot;current_timestamp():::date&quot;</span> =&gt; <span class="ident">DefaultValue::now</span>(),
                                 <span class="kw">_</span> =&gt; <span class="ident">DefaultValue::db_generated</span>(<span class="ident">default_string</span>), <span class="comment">//todo parse values</span>
                             }
                         }
