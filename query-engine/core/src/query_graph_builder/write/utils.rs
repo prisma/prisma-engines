@@ -1021,7 +1021,7 @@ pub fn emulate_on_update_cascade(
 /// Inserts nodes in the graph (_before_ an update node) to preserve referential integrity when any foreign keys are about to be updated.
 /// Foreign keys need to reference an existing record. Before the update is performed, we check that the new set of foreign keys points to an actual record.
 /// If they don't, we abort the query and error out. In the case of optional relations, the check is skipped if any of the foreign keys are set to `NULL`.
-/// 
+///
 /// ```text
 ///    ┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─    
 ///         Parent (Read node)    │   
@@ -1052,7 +1052,7 @@ pub fn emulate_on_update_cascade(
 ///                  │               │
 ///                  ▼                
 ///       ┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─      │
-///               Update       │◀ ─ ─ 
+///               Update       │◀ ─ ─
 ///       └ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─       
 /// ```
 #[allow(clippy::mutable_key_type)]
