@@ -29,7 +29,7 @@ pub mod args {
 }
 
 pub mod operations {
-    // nested operations
+    // nested operations and composites
     pub const CONNECT: &str = "connect";
     pub const CREATE: &str = "create";
     pub const CREATE_MANY: &str = "createMany";
@@ -42,7 +42,7 @@ pub mod operations {
     pub const UPSERT: &str = "upsert";
     pub const SET: &str = "set";
 
-    // scalar lists
+    // scalar lists and composites
     pub const PUSH: &str = "push";
 
     // numbers
