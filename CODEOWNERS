@@ -1,0 +1,13 @@
+# This file is organized in alphabetical order.
+
+/introspection-engine @migrations-team
+
+/libs/json-rpc-stdio @migrations-team
+/libs/sql-ddl @migrations-team
+/libs/sql-schema-describer @migrations-team
+/libs/test-macros @migrations-team
+/libs/test-setup @migrations-team
+
+/migration-engine @migrations-team
+
+/prisma-fmt @migrations-team
