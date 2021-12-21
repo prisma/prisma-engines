@@ -18,7 +18,7 @@ pub struct TextSearch<'a> {
 ///
 /// assert_eq!(
 ///    "SELECT \"recipes\".* FROM \"recipes\" \
-///     WHERE to_tsvector(\"name\"|| ' ' ||\"ingredients\") @@ to_tsquery($1)", sql
+///     WHERE to_tsvector(concat_ws(' ', \"name\",\"ingredients\")) @@ to_tsquery($1)", sql
 /// );
 ///
 /// assert_eq!(params, vec![Value::from("chicken")]);
