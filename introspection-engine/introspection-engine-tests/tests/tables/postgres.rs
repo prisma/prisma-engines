@@ -151,9 +151,9 @@ async fn introspecting_now_functions(api: &TestApi) -> TestResult {
            timestamp Timestamp Default now(),
            timestamp_tz Timestamp with time zone Default now(),
            date date Default now(),
-           timestamp_2 Timestamp Default current_timestamp(),
-           timestamp_tz_2 Timestamp with time zone Default current_timestamp(),
-           date_2 date Default current_timestamp()
+           timestamp_2 Timestamp Default current_timestamp,
+           timestamp_tz_2 Timestamp with time zone Default current_timestamp,
+           date_2 date Default current_timestamp
         );
 
        "#};
