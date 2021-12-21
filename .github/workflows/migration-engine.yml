@@ -2,7 +2,7 @@ name: Introspection Engine + Migration Engine + sql_schema_describer
 on:
   push:
     branches:
-      - master
+      - main
   pull_request:
 jobs:
   test-mongodb-introspection-and-migration-connector:
