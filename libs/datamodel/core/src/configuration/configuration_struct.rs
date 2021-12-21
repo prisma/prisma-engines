@@ -29,6 +29,13 @@ impl Configuration {
         self.datasources.first().map(|source| source.referential_integrity())
     }
 
+    pub fn max_identifier_length(&self) -> usize {
+        self.datasources
+            .first()
+            .map(|source| source.active_connector.max_identifier_length())
+            .unwrap_or(usize::MAX)
+    }
+
     pub fn preview_features(&self) -> BitFlags<PreviewFeature> {
         self.generators
             .iter()

@@ -22,7 +22,7 @@ impl Connector for EmptyDatamodelConnector {
         ]
     }
 
-    fn constraint_name_length(&self) -> usize {
+    fn max_identifier_length(&self) -> usize {
         usize::MAX
     }
 

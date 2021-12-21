@@ -126,7 +126,7 @@ impl Connector for PostgresDatamodelConnector {
     /// The maximum length of postgres identifiers, in bytes.
     ///
     /// Reference: <https://www.postgresql.org/docs/12/limits.html>
-    fn constraint_name_length(&self) -> usize {
+    fn max_identifier_length(&self) -> usize {
         63
     }
 

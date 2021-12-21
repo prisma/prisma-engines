@@ -27,7 +27,7 @@ pub trait Connector: Send + Sync {
 
     /// The maximum length of constraint names in bytes. Connectors without a
     /// limit should return usize::MAX.
-    fn constraint_name_length(&self) -> usize;
+    fn max_identifier_length(&self) -> usize;
 
     // Referential integrity
 

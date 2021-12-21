@@ -139,7 +139,7 @@ impl Connector for MySqlDatamodelConnector {
         CAPABILITIES
     }
 
-    fn constraint_name_length(&self) -> usize {
+    fn max_identifier_length(&self) -> usize {
         64
     }
 
