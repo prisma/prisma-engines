@@ -183,7 +183,7 @@ fn calculate_relation_tables<'a>(
                         "{}_AB_unique",
                         table_name
                             .chars()
-                            .take(configuration.max_identifier_length() - 11)
+                            .take(configuration.max_identifier_length() - 10)
                             .collect::<String>()
                     ),
                     columns: vec![
@@ -198,7 +198,7 @@ fn calculate_relation_tables<'a>(
                         "{}_B_index",
                         table_name
                             .chars()
-                            .take(configuration.max_identifier_length() - 9)
+                            .take(configuration.max_identifier_length() - 8)
                             .collect::<String>()
                     ),
                     columns: vec![sql::IndexColumn::new(m2m.model_b_column())],
@@ -225,7 +225,7 @@ fn calculate_relation_tables<'a>(
             sql::Table {
                 name: table_name
                     .chars()
-                    .take(configuration.max_identifier_length() - 1)
+                    .take(configuration.max_identifier_length())
                     .collect::<String>(),
                 columns,
                 indices: indexes,
