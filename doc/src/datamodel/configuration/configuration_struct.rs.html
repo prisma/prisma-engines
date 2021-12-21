@@ -57,6 +57,13 @@
 <span id="57">57</span>
 <span id="58">58</span>
 <span id="59">59</span>
+<span id="60">60</span>
+<span id="61">61</span>
+<span id="62">62</span>
+<span id="63">63</span>
+<span id="64">64</span>
+<span id="65">65</span>
+<span id="66">66</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">Datasource</span>, <span class="ident">Generator</span>};
 <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">common::preview_features::PreviewFeature</span>,
@@ -86,6 +93,13 @@
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">referential_integrity</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ReferentialIntegrity</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">datasources</span>.<span class="ident">first</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">source</span><span class="op">|</span> <span class="ident">source</span>.<span class="ident">referential_integrity</span>())
+    }
+
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">max_identifier_length</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
+        <span class="self">self</span>.<span class="ident">datasources</span>
+            .<span class="ident">first</span>()
+            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">source</span><span class="op">|</span> <span class="ident">source</span>.<span class="ident">active_connector</span>.<span class="ident">max_identifier_length</span>())
+            .<span class="ident">unwrap_or</span>(<span class="ident">usize::MAX</span>)
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">preview_features</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">BitFlags</span><span class="op">&lt;</span><span class="ident">PreviewFeature</span><span class="op">&gt;</span> {

@@ -219,7 +219,7 @@
 
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">primary_key_name</span>(<span class="ident">table_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">connector</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">Connector</span>) -&gt; <span class="ident">String</span> {
         <span class="kw">let</span> <span class="ident">suffix</span> <span class="op">=</span> <span class="string">&quot;_pkey&quot;</span>;
-        <span class="kw">let</span> <span class="ident">limit</span> <span class="op">=</span> <span class="ident">connector</span>.<span class="ident">constraint_name_length</span>();
+        <span class="kw">let</span> <span class="ident">limit</span> <span class="op">=</span> <span class="ident">connector</span>.<span class="ident">max_identifier_length</span>();
 
         <span class="kw">let</span> <span class="ident">trimmed</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">table_name</span>.<span class="ident">len</span>() <span class="op">&gt;</span><span class="op">=</span> <span class="ident">limit</span> <span class="op">-</span> <span class="number">5</span> {
             <span class="ident">table_name</span>.<span class="ident">split_at</span>(<span class="ident">limit</span> <span class="op">-</span> <span class="number">5</span>).<span class="number">0</span>
@@ -262,7 +262,7 @@
         <span class="ident">suffix</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>,
         <span class="ident">connector</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">Connector</span>,
     ) -&gt; <span class="ident">String</span> {
-        <span class="kw">let</span> <span class="ident">limit</span> <span class="op">=</span> <span class="ident">connector</span>.<span class="ident">constraint_name_length</span>();
+        <span class="kw">let</span> <span class="ident">limit</span> <span class="op">=</span> <span class="ident">connector</span>.<span class="ident">max_identifier_length</span>();
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">out</span> <span class="op">=</span> <span class="ident">String::with_capacity</span>(<span class="ident">table_name</span>.<span class="ident">len</span>() <span class="op">+</span> <span class="ident">column_names</span>.<span class="ident">len</span>() <span class="op">+</span> <span class="ident">suffix</span>.<span class="ident">len</span>());
 
@@ -283,7 +283,7 @@
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">default_name</span>(<span class="ident">table_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">column_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">connector</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">Connector</span>) -&gt; <span class="ident">String</span> {
-        <span class="kw">let</span> <span class="ident">limit</span> <span class="op">=</span> <span class="ident">connector</span>.<span class="ident">constraint_name_length</span>();
+        <span class="kw">let</span> <span class="ident">limit</span> <span class="op">=</span> <span class="ident">connector</span>.<span class="ident">max_identifier_length</span>();
         <span class="kw">let</span> <span class="ident">joined</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;{}_{}&quot;</span>, <span class="ident">table_name</span>, <span class="ident">column_name</span>);
 
         <span class="kw">let</span> <span class="ident">trimmed</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">joined</span>.<span class="ident">len</span>() <span class="op">&gt;</span><span class="op">=</span> <span class="ident">limit</span> <span class="op">-</span> <span class="number">3</span> {
@@ -322,7 +322,7 @@
         <span class="ident">connector</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">Connector</span>,
     ) -&gt; <span class="ident">String</span> {
         <span class="kw">let</span> <span class="ident">fk_suffix</span> <span class="op">=</span> <span class="string">&quot;_fkey&quot;</span>;
-        <span class="kw">let</span> <span class="ident">limit</span> <span class="op">=</span> <span class="ident">connector</span>.<span class="ident">constraint_name_length</span>();
+        <span class="kw">let</span> <span class="ident">limit</span> <span class="op">=</span> <span class="ident">connector</span>.<span class="ident">max_identifier_length</span>();
 
         <span class="kw">let</span> <span class="ident">joined</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;{}_{}&quot;</span>, <span class="ident">table_name</span>, <span class="ident">column_names</span>.<span class="ident">join</span>(<span class="string">&quot;_&quot;</span>));
 
@@ -344,10 +344,10 @@
         <span class="ident">double_at</span>: <span class="ident">bool</span>,
     ) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">DatamodelError</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">name</span>) <span class="op">=</span> <span class="ident">name</span> {
-            <span class="kw">if</span> <span class="ident">name</span>.<span class="ident">len</span>() <span class="op">&gt;</span> <span class="ident">connector</span>.<span class="ident">constraint_name_length</span>() {
+            <span class="kw">if</span> <span class="ident">name</span>.<span class="ident">len</span>() <span class="op">&gt;</span> <span class="ident">connector</span>.<span class="ident">max_identifier_length</span>() {
                 <span class="kw">let</span> <span class="ident">ats</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">double_at</span> { <span class="string">&quot;@@&quot;</span> } <span class="kw">else</span> { <span class="string">&quot;@&quot;</span> };
                 <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">DatamodelError::new_model_validation_error</span>(
-                    <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;The constraint name &#39;{}&#39; specified in the `map` argument for the `{}{}` constraint is too long for your chosen provider. The maximum allowed length is {} bytes.&quot;</span>, <span class="ident">name</span>, <span class="ident">ats</span>, <span class="ident">attribute</span>, <span class="ident">connector</span>.<span class="ident">constraint_name_length</span>()),
+                    <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;The constraint name &#39;{}&#39; specified in the `map` argument for the `{}{}` constraint is too long for your chosen provider. The maximum allowed length is {} bytes.&quot;</span>, <span class="ident">name</span>, <span class="ident">ats</span>, <span class="ident">attribute</span>, <span class="ident">connector</span>.<span class="ident">max_identifier_length</span>()),
                     <span class="ident">object_name</span>,
                     <span class="ident">span</span>,
                 ));
