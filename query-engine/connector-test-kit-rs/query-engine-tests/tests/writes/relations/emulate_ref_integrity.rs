@@ -19,7 +19,6 @@ mod emulate_ref_integrity {
             
             model Post {
               #id(id, Int, @id)
-              name       String?
               authorId_1 Int
               authorId_2 Int
               author     User      @relation(fields: [authorId_1, authorId_2], references: [uniq_1, uniq_2], onUpdate: Cascade, onDelete: Cascade)
@@ -28,7 +27,6 @@ mod emulate_ref_integrity {
             
             model Comment {
               #id(id, Int, @id)
-              name          String?
               writtenById_1 Int
               writtenById_2 Int
               writtenBy     User?   @relation(fields: [writtenById_1, writtenById_2], references: [uniq_1, uniq_2], onUpdate: Cascade, onDelete: Cascade)
@@ -532,6 +530,72 @@ mod emulate_ref_integrity {
                 id
               }
             }"#
+        );
+
+        Ok(())
+    }
+
+    fn nullable_fks() -> String {
+        let schema = indoc! {
+            r#"model User {
+              #id(id, Int, @id)
+              uniq_1     Int
+              uniq_2     Int
+              comments Comment[]
+            
+              @@unique([uniq_1, uniq_2])
+            }
+
+            model Comment {
+              #id(id, Int, @id)
+              writtenById_1 Int?
+              writtenById_2 Int?
+              writtenBy     User?   @relation(fields: [writtenById_1, writtenById_2], references: [uniq_1, uniq_2], onUpdate: Cascade, onDelete: Cascade)
+            }"#
+        };
+
+        schema.to_owned()
+    }
+
+    #[connector_test(schema(nullable_fks))]
+    async fn skip_check_if_null_foreign_key(runner: Runner) -> TestResult<()> {
+        create_row(
+            &runner,
+            r#"{
+                  id: 1,
+                  uniq_1: 1,
+                  uniq_2: 1,
+                  comments: {
+                    create: { id: 1 }
+                  }
+              }"#,
+        )
+        .await?;
+
+        // Update both foreign keys to a null value, check is skipped
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"mutation { updateOneComment(where: { id: 1 }, data: { writtenById_1: null, writtenById_2: null  }) { id writtenById_1 writtenById_2 }}"#),
+          @r###"{"data":{"updateOneComment":{"id":1,"writtenById_1":null,"writtenById_2":null}}}"###
+        );
+
+        // One of the foreign key is still NULL, check is skipped
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"mutation { updateOneComment(where: { id: 1 }, data: { writtenById_1: 1 }) { id writtenById_1 writtenById_2 }}"#),
+          @r###"{"data":{"updateOneComment":{"id":1,"writtenById_1":1,"writtenById_2":null}}}"###
+        );
+
+        // None of the foreign keys are NULL anymore, we run the check and it doesn't point to an existing record
+        assert_error!(
+            runner,
+            r#"mutation { updateOneComment(where: { id: 1 }, data: { writtenById_1: 1, writtenById_2: 2 }) { id writtenById_1 writtenById_2 }}"#,
+            2014,
+            "The change you are trying to make would violate the required relation 'CommentToUser' between the `Comment` and `User` models."
+        );
+
+        // None of the foreign keys are NULL anymore, we run the check and it points to an existing record
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"mutation { updateOneComment(where: { id: 1 }, data: { writtenById_1: 1, writtenById_2: 1 }) { id writtenById_1 writtenById_2 }}"#),
+          @r###"{"data":{"updateOneComment":{"id":1,"writtenById_1":1,"writtenById_2":1}}}"###
         );
 
         Ok(())

@@ -1018,6 +1018,43 @@ pub fn emulate_on_update_cascade(
     Ok(())
 }
 
+/// Inserts nodes in the graph (_before_ an update node) to preserve referential integrity when any foreign keys are about to be updated.
+/// Foreign keys need to reference an existing record. Before the update is performed, we check that the new set of foreign keys points to an actual record.
+/// If they don't, we abort the query and error out. In the case of optional relations, the check is skipped if any of the foreign keys are set to `NULL`.
+/// 
+/// ```text
+///    ┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─    
+///         Parent (Read node)    │   
+/// ┌ ─│  (ids and foreign keys)   ─ ┐
+///     ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ┘   
+/// │                │               │
+///   ┌ ─ ─ ─ ─ ─ ─ ─▼─ ─ ─ ─ ─ ─ ─   
+/// │  ┌──────────────────────────┐│ │
+///   ││            If            │   
+/// │  │(no foreign keys are NULL)││ │
+///   │└──────────────────────────┘   
+/// │                │             │ │
+///   │            Then               
+/// │                │             │ │
+///   │              ▼                
+/// │  ┌──────────────────────────┐│ │
+///  ─▶│Find new referenced record│   
+///    └──────────────────────────┘│ │
+///   │              │                
+///                  │             │ │
+///   │              ▼                
+///    ┌──────────────────────────┐│ │
+///   ││ Check referenced record  │   
+///    │          exist           ││ │
+///   ││         (Empty)          │   
+///    └──────────────────────────┘│ │
+///   └ ─ ─ ─ ─ ─ ─ ─│─ ─ ─ ─ ─ ─ ─   
+///                  │               │
+///                  ▼                
+///       ┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─      │
+///               Update       │◀ ─ ─ 
+///       └ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─       
+/// ```
 #[allow(clippy::mutable_key_type)]
 pub fn preserve_referential_integrity_on_update(
     graph: &mut QueryGraph,
@@ -1052,14 +1089,13 @@ pub fn preserve_referential_integrity_on_update(
             child_model_identifier.clone(),
             Filter::empty(),
         ));
+        let has_nullable_foreign_keys = fks.iter().any(|fk| !fk.is_required());
 
-        let if_node = graph.create_node(Flow::default_if());
-
-        // Closures force us to clone those variables below outside of the closures.
-        // We use this ugly hack to enable cloning what needs to be cloned, without coming up with silly variable names
-        {
+        if has_nullable_foreign_keys {
             let fks_to_be_updated = fks_to_be_updated.clone();
             let fks = fks.clone();
+
+            let if_node = graph.create_node(Flow::default_if());
 
             graph.create_edge(
                 &read_node,
@@ -1088,9 +1124,9 @@ pub fn preserve_referential_integrity_on_update(
                     }),
                 ),
             )?;
-        }
 
-        graph.create_edge(&if_node, &read_referenced_record_node, QueryGraphDependency::Then)?;
+            graph.create_edge(&if_node, &read_referenced_record_node, QueryGraphDependency::Then)?;
+        }
 
         graph.create_edge(
             &read_node,
@@ -1133,14 +1169,14 @@ pub fn preserve_referential_integrity_on_update(
             &ensure_referenced_record_exist_node,
             QueryGraphDependency::ProjectedDataDependency(
                 child_model_identifier,
-                Box::new(|noop_node, referenced_records_ids| {
+                Box::new(|ensure_referenced_record_exist_node, referenced_records_ids| {
                     // The record that would be referenced by Parent model _after_ the update is done does not exist.
                     // This would break referential integrity, so we error out.
                     if referenced_records_ids.is_empty() {
                         return Err(QueryGraphBuilderError::RelationViolation((rf).into()));
                     }
 
-                    Ok(noop_node)
+                    Ok(ensure_referenced_record_exist_node)
                 }),
             ),
         )?;
@@ -1179,7 +1215,7 @@ fn find_fks_to_be_updated(
     Some((rf, fks_to_be_updated))
 }
 
-/// Given a set of old and new foreign keys, pick the newest one
+/// Given a set of old (existing foreign keys) and new foreign keys (ones that are about to be updated), pick the newest one
 fn get_newest_fk_value(
     fk: ScalarFieldRef,
     old_fks: &SelectionResult,
