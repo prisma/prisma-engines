@@ -142,3 +142,37 @@ async fn a_table_with_a_hash_index_no_preview(api: &TestApi) -> TestResult {
 
     Ok(())
 }
+
+#[test_connector(tags(Postgres))]
+async fn introspecting_now_functions(api: &TestApi) -> TestResult {
+    let setup = indoc! {r#"
+       CREATE TABLE "A" (
+           id INTEGER NOT NULL Primary Key,
+           timestamp Timestamp Default now(),
+           timestamp_tz Timestamp with time zone Default now(),
+           date date Default now(),
+           timestamp_2 Timestamp Default current_timestamp,
+           timestamp_tz_2 Timestamp with time zone Default current_timestamp,
+           date_2 date Default current_timestamp
+        );
+
+       "#};
+
+    api.raw_cmd(setup).await;
+
+    let expectation = expect![[r#"
+        model A {
+          id             Int       @id
+          timestamp      DateTime? @default(now()) @db.Timestamp(6)
+          timestamp_tz   DateTime? @default(now()) @db.Timestamptz(6)
+          date           DateTime? @default(now()) @db.Date
+          timestamp_2    DateTime? @default(now()) @db.Timestamp(6)
+          timestamp_tz_2 DateTime? @default(now()) @db.Timestamptz(6)
+          date_2         DateTime? @default(now()) @db.Date
+        }
+    "#]];
+
+    expectation.assert_eq(&api.introspect_dml().await?);
+
+    Ok(())
+}
