@@ -43,5 +43,4 @@ SUBCOMMANDS:
     can-connect-to-database    Does the database connection string work?
     create-database            Create an empty database defined in the configuration string
     help                       Prints this message or the help of the given subcommand(s)
-    qe-setup                   Set up the database for connector-test-kit
 ```

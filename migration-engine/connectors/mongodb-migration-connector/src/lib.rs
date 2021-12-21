@@ -46,21 +46,6 @@ impl MongoDbMigrationConnector {
         Ok(client)
     }
 
-    /// Only for qe_setup. This should disappear soon.
-    pub async fn create_collections(&self, schema: &datamodel::dml::Datamodel) -> ConnectorResult<()> {
-        let client = self.client().await?;
-
-        for model in &schema.models {
-            client
-                .database()
-                .create_collection(model.database_name.as_deref().unwrap_or(&model.name), None)
-                .await
-                .unwrap();
-        }
-
-        Ok(())
-    }
-
     async fn mongodb_schema_from_diff_target(&self, target: DiffTarget<'_>) -> ConnectorResult<MongoSchema> {
         match target {
             DiffTarget::Datamodel((_config, schema)) => Ok(schema_calculator::calculate(schema)),

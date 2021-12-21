@@ -12,7 +12,7 @@ sql-datamodel-connector = { path = "../../../libs/datamodel/connectors/sql-datam
 prisma-models = { path = "../../prisma-models" }
 lazy_static = "1.4"
 enum_dispatch = "0.3"
-migration-core = { path = "../../../migration-engine/core", features = ["sql", "mongodb"] }
+qe-setup = { path = "../../../migration-engine/qe-setup" }
 request-handlers = { path = "../../request-handlers" }
 tokio = "1.0"
 query-core = { path = "../../core" }

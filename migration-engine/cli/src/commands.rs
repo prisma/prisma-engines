@@ -25,7 +25,7 @@ impl Cli {
 
     pub(crate) async fn run_inner(self) -> Result<String, ConnectorError> {
         let datamodel = datasource_from_database_str(&self.datasource)?;
-        let api = migration_api(&datamodel).await?;
+        let api = migration_api(&datamodel)?;
         match self.command {
             CliCommand::CreateDatabase => {
                 let db_name = api.create_database().await?;

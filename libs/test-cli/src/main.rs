@@ -211,7 +211,7 @@ async fn main() -> anyhow::Result<()> {
         }
         Command::ResetDatabase(cmd) => {
             let schema = read_datamodel_from_file(&cmd.schema_path).context("Error reading the schema from file")?;
-            let api = migration_core::migration_api(&schema).await?;
+            let api = migration_core::migration_api(&schema)?;
 
             api.reset().await?;
         }
@@ -219,7 +219,7 @@ async fn main() -> anyhow::Result<()> {
             let prisma_schema =
                 read_datamodel_from_file(&cmd.schema_path).context("Error reading the schema from file")?;
 
-            let api = migration_core::migration_api(&prisma_schema).await?;
+            let api = migration_core::migration_api(&prisma_schema)?;
 
             let input = CreateMigrationInput {
                 migrations_directory_path: cmd.migrations_path,
@@ -234,7 +234,7 @@ async fn main() -> anyhow::Result<()> {
             let prisma_schema =
                 read_datamodel_from_file(&cmd.schema_path).context("Error reading the schema from file")?;
 
-            let api = migration_core::migration_api(&prisma_schema).await?;
+            let api = migration_core::migration_api(&prisma_schema)?;
             api.apply_migrations(&cmd.into()).await?;
         }
     }
@@ -332,7 +332,7 @@ async fn generate_dmmf(cmd: &DmmfCommand) -> anyhow::Result<()> {
 
 async fn schema_push(cmd: &SchemaPush) -> anyhow::Result<()> {
     let schema = read_datamodel_from_file(&cmd.schema_path).context("Error reading the schema from file")?;
-    let api = migration_core::migration_api(&schema).await?;
+    let api = migration_core::migration_api(&schema)?;
 
     let response = api
         .schema_push(&SchemaPushInput {
@@ -383,7 +383,7 @@ async fn schema_push(cmd: &SchemaPush) -> anyhow::Result<()> {
 
 async fn migrate_diff(cmd: &MigrateDiff) -> anyhow::Result<()> {
     let datamodel = read_datamodel_from_file(&cmd.schema_path).context("Error reading the schema from file")?;
-    let api = migration_core::migration_api(&datamodel).await?;
+    let api = migration_core::migration_api(&datamodel)?;
 
     let (configuration, datamodel) = datamodel::parse_schema(&datamodel)
         .map_err(|diagnostics| io::Error::new(io::ErrorKind::InvalidInput, diagnostics))?;

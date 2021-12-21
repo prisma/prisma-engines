@@ -364,29 +364,6 @@ impl SqlFlavour for MysqlFlavour {
         Ok(())
     }
 
-    async fn qe_setup(&self, database_str: &str) -> ConnectorResult<()> {
-        let mut url = Url::parse(database_str).map_err(ConnectorError::url_parse_error)?;
-        url.set_path("/mysql");
-
-        let conn = connect(&url.to_string()).await?;
-        let db_name = self.url.dbname();
-
-        let query = format!("DROP DATABASE IF EXISTS `{}`", db_name);
-        conn.raw_cmd(&query).await?;
-
-        let query = format!(
-            "CREATE DATABASE `{}` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;",
-            db_name
-        );
-        conn.raw_cmd(&query).await?;
-
-        Ok(())
-    }
-
-    async fn qe_teardown(&self, _database_str: &str) -> ConnectorResult<()> {
-        Ok(())
-    }
-
     async fn reset(&self, connection: &Connection) -> ConnectorResult<()> {
         if self.is_vitess() {
             return Err(ConnectorError::from_msg(
