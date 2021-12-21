@@ -201,6 +201,19 @@ impl From<my::Error> for Error {
             my::Error::Server(ServerError {
                 ref message,
                 code,
+                state: _,
+            }) if code == 1191 => {
+                let kind = ErrorKind::MissingFullTextSearchIndex;
+                let mut builder = Error::builder(kind);
+
+                builder.set_original_code(code.to_string());
+                builder.set_original_message(message);
+
+                builder.build()
+            }
+            my::Error::Server(ServerError {
+                ref message,
+                code,
                 ref state,
             }) => {
                 let kind = ErrorKind::QueryError(

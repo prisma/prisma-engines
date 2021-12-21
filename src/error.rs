@@ -242,6 +242,9 @@ pub enum ErrorKind {
 
     #[error("Error creating UUID, {}", _0)]
     UUIDError(String),
+
+    #[error("Cannot find a FULLTEXT index to use for the search")]
+    MissingFullTextSearchIndex,
 }
 
 impl ErrorKind {

@@ -12,7 +12,7 @@ mod minimum;
 mod row_number;
 #[cfg(all(feature = "json", feature = "postgresql"))]
 mod row_to_json;
-#[cfg(feature = "postgresql")]
+#[cfg(any(feature = "postgresql", feature = "mysql"))]
 mod search;
 mod sum;
 mod upper;
@@ -31,7 +31,7 @@ pub use minimum::*;
 pub use row_number::*;
 #[cfg(all(feature = "json", feature = "postgresql"))]
 pub use row_to_json::*;
-#[cfg(feature = "postgresql")]
+#[cfg(any(feature = "postgresql", feature = "mysql"))]
 pub use search::*;
 pub use sum::*;
 pub use upper::*;
@@ -67,7 +67,7 @@ pub(crate) enum FunctionType<'a> {
     JsonExtractLastArrayElem(JsonExtractLastArrayElem<'a>),
     #[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
     JsonExtractFirstArrayElem(JsonExtractFirstArrayElem<'a>),
-    #[cfg(feature = "postgresql")]
+    #[cfg(any(feature = "postgresql", feature = "mysql"))]
     TextSearch(TextSearch<'a>),
     #[cfg(feature = "postgresql")]
     TextSearchRelevance(TextSearchRelevance<'a>),
@@ -97,7 +97,7 @@ function!(JsonExtractLastArrayElem);
 #[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
 function!(JsonExtractFirstArrayElem);
 
-#[cfg(feature = "postgresql")]
+#[cfg(any(feature = "postgresql", feature = "mysql"))]
 function!(TextSearch);
 
 #[cfg(feature = "postgresql")]

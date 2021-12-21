@@ -117,10 +117,10 @@ pub trait Visitor<'a> {
     #[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
     fn visit_json_type_equals(&mut self, left: Expression<'a>, json_type: JsonType) -> Result;
 
-    #[cfg(feature = "postgresql")]
+    #[cfg(any(feature = "postgresql", feature = "mysql"))]
     fn visit_text_search(&mut self, text_search: TextSearch<'a>) -> Result;
 
-    #[cfg(feature = "postgresql")]
+    #[cfg(any(feature = "postgresql", feature = "mysql"))]
     fn visit_matches(&mut self, left: Expression<'a>, right: std::borrow::Cow<'a, str>, not: bool) -> Result;
 
     /// A visit to a value we parameterize
@@ -1019,7 +1019,7 @@ pub trait Visitor<'a> {
             FunctionType::JsonExtractLastArrayElem(extract) => {
                 self.visit_json_extract_last_array_item(extract)?;
             }
-            #[cfg(feature = "postgresql")]
+            #[cfg(any(feature = "postgresql", feature = "mysql"))]
             FunctionType::TextSearch(text_search) => {
                 self.visit_text_search(text_search)?;
             }

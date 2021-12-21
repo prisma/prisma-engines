@@ -441,19 +441,38 @@ impl<'a> Visitor<'a> for Mysql<'a> {
         Ok(())
     }
 
-    #[cfg(feature = "postgresql")]
-    fn visit_text_search(&mut self, _text_search: crate::prelude::TextSearch<'a>) -> visitor::Result {
-        unimplemented!("Full-text search is not yet supported on MySQL")
+    #[cfg(any(feature = "postgresql", feature = "mysql"))]
+    fn visit_text_search(&mut self, text_search: crate::prelude::TextSearch<'a>) -> visitor::Result {
+        let len = text_search.exprs.len();
+        self.surround_with("MATCH (", ")", |s| {
+            for (i, expr) in text_search.exprs.into_iter().enumerate() {
+                s.visit_expression(expr)?;
+
+                if i < (len - 1) {
+                    s.write(",")?;
+                }
+            }
+
+            Ok(())
+        })
     }
 
-    #[cfg(feature = "postgresql")]
-    fn visit_matches(
-        &mut self,
-        _left: Expression<'a>,
-        _right: std::borrow::Cow<'a, str>,
-        _not: bool,
-    ) -> visitor::Result {
-        unimplemented!("Full-text search is not yet supported on MySQL")
+    #[cfg(any(feature = "postgresql", feature = "mysql"))]
+    fn visit_matches(&mut self, left: Expression<'a>, right: std::borrow::Cow<'a, str>, not: bool) -> visitor::Result {
+        if not {
+            self.write("(NOT ")?;
+        }
+
+        self.visit_expression(left)?;
+        self.surround_with("AGAINST (", " IN BOOLEAN MODE)", |s| {
+            s.visit_parameterized(Value::text(right))
+        })?;
+
+        if not {
+            self.write(")")?;
+        }
+
+        Ok(())
     }
 
     #[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
