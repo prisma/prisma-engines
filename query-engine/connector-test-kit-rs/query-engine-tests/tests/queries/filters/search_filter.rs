@@ -237,7 +237,7 @@ mod search_filter_with_index {
             &runner,
             "query { findManyTestModel(where: {fieldC: { search: \"Chicken\" }}) { id, fieldC }}",
             2030,
-            "Cannot find a FULLTEXT index"
+            "Cannot find a fulltext index"
         );
 
         Ok(())

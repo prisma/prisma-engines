@@ -146,7 +146,7 @@ pub enum SqlError {
     #[error("Query parameter limit exceeded error: {0}.")]
     QueryParameterLimitExceeded(String),
 
-    #[error("Cannot find a FULLTEXT index to use for the search")]
+    #[error("Cannot find a fulltext index to use for the search")]
     MissingFullTextSearchIndex,
 }
 

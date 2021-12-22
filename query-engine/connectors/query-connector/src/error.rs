@@ -210,7 +210,7 @@ pub enum ErrorKind {
     #[error("The query parameter limit supported by your database is exceeded: {0}.")]
     QueryParameterLimitExceeded(String),
 
-    #[error("Cannot find a FULLTEXT index to use for the search")]
+    #[error("Cannot find a fulltext index to use for the search")]
     MissingFullTextSearchIndex,
 }
 
