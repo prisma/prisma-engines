@@ -1082,16 +1082,16 @@ pub fn preserve_referential_integrity_on_update(
         let child_model = rf.related_model();
         let child_model_identifier = rf.related_model().primary_identifier();
         let fks = rf.scalar_fields();
-        let pks = rf.referenced_fields();
+        let referenced_fields = rf.referenced_fields();
+        let has_nullable_fks = fks.iter().any(|sf| !sf.is_required());
 
         let read_referenced_record_node = graph.create_node(read_ids_infallible(
             child_model,
             child_model_identifier.clone(),
             Filter::empty(),
         ));
-        let has_nullable_foreign_keys = fks.iter().any(|fk| !fk.is_required());
 
-        if has_nullable_foreign_keys {
+        if has_nullable_fks {
             let fks_to_be_updated = fks_to_be_updated.clone();
             let fks = fks.clone();
 
@@ -1101,9 +1101,9 @@ pub fn preserve_referential_integrity_on_update(
                 &read_node,
                 &if_node,
                 QueryGraphDependency::ProjectedDataDependency(
-                    rf.linking_fields(),
+                    rf.scalar_fields().into(),
                     Box::new(move |if_node, mut parents_fks| {
-                        let parent_fk_values = match parents_fks.pop() {
+                        let parent_fks = match parents_fks.pop() {
                             Some(id) => Ok(id),
                             None => Err(QueryGraphBuilderError::RecordNotFound(
                                 "Record to update not found.".to_string(),
@@ -1113,7 +1113,8 @@ pub fn preserve_referential_integrity_on_update(
                         // If any of the foreign keys values are `NULL`, do not attempt to preserve referential integrity
                         let has_null_fk_values = fks
                             .into_iter()
-                            .map(|fk| get_newest_fk_value(fk, &parent_fk_values, &fks_to_be_updated))
+                            // Unwrap is safe as the parent read is required to select the foreign keys
+                            .map(|fk| get_newest_fk_value(fk, &parent_fks, &fks_to_be_updated).unwrap())
                             .any(|fk_value| fk_value == PrismaValue::Null);
 
                         if let Node::Flow(Flow::If(_)) = if_node {
@@ -1132,9 +1133,9 @@ pub fn preserve_referential_integrity_on_update(
             &read_node,
             &read_referenced_record_node,
             QueryGraphDependency::ProjectedDataDependency(
-                rf.linking_fields(),
+                rf.scalar_fields().into(),
                 Box::new(move |mut read_referenced_record_node, mut parents_fks| {
-                    let parent_fk_values = match parents_fks.pop() {
+                    let parent_fks = match parents_fks.pop() {
                         Some(id) => Ok(id),
                         None => Err(QueryGraphBuilderError::RecordNotFound(
                             "Record to update not found.".to_string(),
@@ -1143,11 +1144,12 @@ pub fn preserve_referential_integrity_on_update(
 
                     let filters = fks
                         .into_iter()
-                        .zip(pks)
-                        .map(|(fk, pk)| {
-                            let fk_value = get_newest_fk_value(fk, &parent_fk_values, &fks_to_be_updated);
+                        .zip(referenced_fields)
+                        .map(|(fk, referenced_field)| {
+                            // Unwrap is safe as the parent read is required to select the foreign keys
+                            let fk_value = get_newest_fk_value(fk, &parent_fks, &fks_to_be_updated).unwrap();
 
-                            pk.equals(fk_value)
+                            referenced_field.equals(fk_value)
                         })
                         .collect_vec();
 
@@ -1185,7 +1187,8 @@ pub fn preserve_referential_integrity_on_update(
     Ok(())
 }
 
-/// Given a relation field (inline-side), find the foreign keys that are going to be updated (by value)
+/// Given a relation field (inline-side), find the scalars that are going to be updated (by value)
+#[allow(clippy::mutable_key_type)]
 fn find_fks_to_be_updated(
     rf: RelationFieldRef,
     update_args: &WriteArgs,
@@ -1201,13 +1204,10 @@ fn find_fks_to_be_updated(
             } else {
                 return None;
             }
-        // If the foreign key is not part of the update args, then continue to the next one
-        } else {
-            continue;
         }
     }
 
-    // If no foreign keys were found in the update args, skip the relation field
+    // If no relation scalars were found in the update args, skip the relation field
     if fks_to_be_updated.is_empty() {
         return None;
     }
@@ -1215,19 +1215,18 @@ fn find_fks_to_be_updated(
     Some((rf, fks_to_be_updated))
 }
 
-/// Given a set of old (existing foreign keys) and new foreign keys (ones that are about to be updated), pick the newest one
+/// Given a set of old (existing relation scalars) and new relation scalars (ones that are about to be updated), pick the newest one
+#[allow(clippy::mutable_key_type)]
 fn get_newest_fk_value(
-    fk: ScalarFieldRef,
-    old_fks: &SelectionResult,
-    new_fks: &HashMap<ScalarFieldRef, PrismaValue>,
-) -> PrismaValue {
-    // If the fk is part of the update args, use its update value for the corresponding primary key
-    if let Some(pv) = new_fks.get(&fk) {
-        pv.clone()
-    // Otherwise, use the foreign key value that was fetched by the parent read for the corresponding primary key
-    } else if let Some(pv) = old_fks.get(&SelectedField::Scalar(fk)) {
-        pv.clone()
+    rf_scalar: ScalarFieldRef,
+    old_scalars: &SelectionResult,
+    new_scalars: &HashMap<ScalarFieldRef, PrismaValue>,
+) -> Option<PrismaValue> {
+    // If the fk is part of the update args, use its update value for the corresponding referenced field
+    if let Some(pv) = new_scalars.get(&rf_scalar) {
+        Some(pv.clone())
+    // Otherwise, use the foreign key value that was fetched by the parent read for the corresponding referenced field
     } else {
-        unreachable!()
+        old_scalars.get(&SelectedField::Scalar(rf_scalar)).cloned()
     }
 }
