@@ -70,6 +70,14 @@
 <span id="70">70</span>
 <span id="71">71</span>
 <span id="72">72</span>
+<span id="73">73</span>
+<span id="74">74</span>
+<span id="75">75</span>
+<span id="76">76</span>
+<span id="77">77</span>
+<span id="78">78</span>
+<span id="79">79</span>
+<span id="80">80</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">Argument</span>, <span class="ident">Identifier</span>, <span class="ident">Span</span>, <span class="ident">WithIdentifier</span>, <span class="ident">WithSpan</span>};
 
 <span class="doccomment">/// An argument with a name but no value. Example:</span>
@@ -110,6 +118,13 @@
     <span class="doccomment">///                    ^^^^</span>
     <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="ident">empty_arguments</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">EmptyArgument</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// The trailing comma at the end of the arguments list.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```ignore</span>
+    <span class="doccomment">/// @relation(fields: [a, b], references: [id, name], )</span>
+    <span class="doccomment">///                                                 ^</span>
+    <span class="doccomment">/// ```</span>
+    <span class="kw">pub</span> <span class="ident">trailing_comma</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Span</span><span class="op">&gt;</span>,
     <span class="doccomment">/// The AST span of the node.</span>
     <span class="kw">pub</span> <span class="ident">span</span>: <span class="ident">Span</span>,
 }
@@ -122,6 +137,7 @@
             <span class="ident">arguments</span>,
             <span class="ident">span</span>: <span class="ident">Span::empty</span>(),
             <span class="ident">empty_arguments</span>: <span class="ident">Vec::new</span>(),
+            <span class="ident">trailing_comma</span>: <span class="prelude-val">None</span>,
         }
     }
 

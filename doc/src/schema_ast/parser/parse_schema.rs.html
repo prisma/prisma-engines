@@ -164,6 +164,7 @@
 <span id="164">164</span>
 <span id="165">165</span>
 <span id="166">166</span>
+<span id="167">167</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::{
     <span class="ident">helpers</span>::{<span class="ident">parsing_catch_all</span>, <span class="ident">TokenExtensions</span>},
     <span class="ident">parse_composite_type::parse_composite_type</span>,
@@ -295,6 +296,7 @@
         <span class="ident">Rule::comment_and_new_line</span> =&gt; <span class="string">&quot;comment and new line&quot;</span>,
         <span class="ident">Rule::comment_block</span> =&gt; <span class="string">&quot;comment block&quot;</span>,
         <span class="ident">Rule::number</span> =&gt; <span class="string">&quot;number&quot;</span>,
+        <span class="ident">Rule::trailing_comma</span> =&gt; <span class="string">&quot;trailing comma&quot;</span>,
 
         <span class="comment">// Those are helpers, so we get better error messages:</span>
         <span class="ident">Rule::BLOCK_OPEN</span> =&gt; <span class="string">&quot;Start of block (\&quot;{\&quot;)&quot;</span>,
