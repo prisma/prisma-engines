@@ -36,6 +36,7 @@ fn parse_field_with_args(token: &Token<'_>) -> Expression {
                 value: parse_arg_value(&current),
                 span: current.as_span().into(),
             }),
+            Rule::empty_argument => (),
             _ => parsing_catch_all(&current, "constant literal arg"),
         }
     }

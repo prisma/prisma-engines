@@ -16,6 +16,7 @@ scenarios! {
     default_map_end_of_args_list
     default_map_mssql
     empty_schema
+    extended_indexes_basic
     no_default_map_on_postgres
     referential_actions_end_of_args_list
     referential_actions_in_progress
