@@ -101,18 +101,18 @@ impl<'a> ValueValidator<'a> {
         if let ast::Expression::Array(values, _) = &self.value {
             values
                 .iter()
-                .map(|val| ValueValidator::new(val).as_field_with_args())
+                .map(|val| ValueValidator::new(val).as_function())
                 .collect()
         } else {
             // Single values are accepted as array literals, for example in `@relation(fields: userId)`.
-            Ok(vec![self.as_field_with_args()?])
+            Ok(vec![self.as_function()?])
         }
     }
 
-    fn as_field_with_args(&self) -> Result<(&'a str, Option<SortOrder>, Option<u32>), DatamodelError> {
+    fn as_function(&self) -> Result<(&'a str, Option<SortOrder>, Option<u32>), DatamodelError> {
         match &self.value {
             Expression::ConstantValue(field_name, _) => Ok((field_name, None, None)),
-            Expression::FieldWithArgs(field_name, args, _) => {
+            Expression::Function(field_name, args, _) => {
                 let (sort, length) = ValueValidator::field_args(args)?;
                 Ok((field_name, sort, length))
             }

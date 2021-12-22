@@ -421,7 +421,6 @@ impl<'a> Renderer<'a> {
     fn render_value(target: &mut dyn LineWriteable, val: &ast::Expression) {
         match val {
             ast::Expression::Array(vals, _) => Self::render_expression_array(target, vals),
-            ast::Expression::FieldWithArgs(ident, vals, _) => Self::render_field_with_args(target, ident, vals),
             ast::Expression::ConstantValue(val, _) => target.write(val),
             ast::Expression::NumericValue(val, _) => target.write(val),
             ast::Expression::StringValue(val, _) => Self::render_str(target, val),

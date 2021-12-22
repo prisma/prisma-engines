@@ -15,8 +15,6 @@ pub enum Expression {
     Function(String, Vec<Argument>, Span),
     /// An array of other values.
     Array(Vec<Expression>, Span),
-    /// A field that can contain a list of arguments.
-    FieldWithArgs(String, Vec<Argument>, Span),
 }
 
 impl fmt::Display for Expression {
@@ -32,10 +30,6 @@ impl fmt::Display for Expression {
             Expression::Array(vals, _) => {
                 let vals = vals.iter().map(ToString::to_string).collect::<Vec<_>>().join(",");
                 write!(f, "[{}]", vals)
-            }
-            Expression::FieldWithArgs(ident, vals, _) => {
-                let vals = vals.iter().map(ToString::to_string).collect::<Vec<_>>().join(",");
-                write!(f, "{}({})", ident, vals)
             }
         }
     }
@@ -70,7 +64,6 @@ impl Expression {
             Self::ConstantValue(_, span) => *span,
             Self::Function(_, _, span) => *span,
             Self::Array(_, span) => *span,
-            Self::FieldWithArgs(_, _, span) => *span,
         }
     }
 
@@ -89,10 +82,10 @@ impl Expression {
             Expression::ConstantValue(_, _) => "literal",
             Expression::Function(_, _, _) => "functional",
             Expression::Array(_, _) => "array",
-            Expression::FieldWithArgs(_, _, _) => "field with args",
         }
     }
 
+    /// Is this an array expression?
     pub fn is_array(&self) -> bool {
         matches!(self, Expression::Array(_, _))
     }

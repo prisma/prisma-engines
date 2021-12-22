@@ -71,7 +71,7 @@ fn expanded_id_capability_rendering_works_for_mysql() {
       }
     "#]];
 
-    let dml = datamodel::parse_datamodel(&dm).unwrap().subject;
+    let (_, dml) = datamodel::parse_schema(&dm).unwrap();
     let configuration = datamodel::parse_configuration(&dm).unwrap().subject;
     let rendered = datamodel::render_datamodel_to_string(&dml, Some(&configuration));
     expected.assert_eq(&rendered)

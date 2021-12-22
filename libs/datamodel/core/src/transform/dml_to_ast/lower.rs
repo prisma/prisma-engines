@@ -148,7 +148,7 @@ impl<'a> LowerDmlToAst<'a> {
                     (f.sort_order == Some(SortOrder::Desc)).then(|| ast::Argument::new_constant("sort", "Desc")),
                 );
 
-                ast::Expression::FieldWithArgs(f.name.to_string(), args, ast::Span::empty())
+                ast::Expression::Function(f.name.to_string(), args, ast::Span::empty())
             })
             .collect()
     }
@@ -177,7 +177,7 @@ impl<'a> LowerDmlToAst<'a> {
                     args.extend(ordering);
                 }
 
-                ast::Expression::FieldWithArgs(f.name.clone(), args, ast::Span::empty())
+                ast::Expression::Function(f.name.clone(), args, ast::Span::empty())
             })
             .collect()
     }
