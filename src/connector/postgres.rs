@@ -264,6 +264,10 @@ impl PostgresUrl {
         }
     }
 
+    pub(crate) fn options(&self) -> &str {
+        self.query_params.options.as_str()
+    }
+
     fn parse_query_params(url: &Url) -> Result<PostgresUrlQueryParams, Error> {
         let mut connection_limit = None;
         let mut schema = None;
@@ -281,6 +285,7 @@ impl PostgresUrl {
         let mut statement_cache_size = 500;
         let mut max_connection_lifetime = None;
         let mut max_idle_connection_lifetime = Some(Duration::from_secs(300));
+        let mut options = String::new();
 
         for (k, v) in url.query_pairs() {
             match k.as_ref() {
@@ -396,6 +401,9 @@ impl PostgresUrl {
                 "application_name" => {
                     application_name = Some(v.to_string());
                 }
+                "options" => {
+                    options = v.to_string();
+                }
                 _ => {
                     tracing::trace!(message = "Discarding connection string param", param = &*k);
                 }
@@ -421,6 +429,7 @@ impl PostgresUrl {
             max_connection_lifetime,
             max_idle_connection_lifetime,
             application_name,
+            options,
         })
     }
 
@@ -442,6 +451,7 @@ impl PostgresUrl {
         config.port(self.port());
         config.dbname(self.dbname());
         config.pgbouncer_mode(self.query_params.pg_bouncer);
+        config.options(self.options());
 
         if let Some(application_name) = self.application_name() {
             config.application_name(application_name);
@@ -472,6 +482,7 @@ pub(crate) struct PostgresUrlQueryParams {
     max_connection_lifetime: Option<Duration>,
     max_idle_connection_lifetime: Option<Duration>,
     application_name: Option<String>,
+    options: String,
 }
 
 impl PostgreSql {
@@ -752,6 +763,14 @@ mod tests {
         let url = PostgresUrl::new(Url::parse("postgresql:///dbname").unwrap()).unwrap();
         assert_eq!("dbname", url.dbname());
         assert_eq!("localhost", url.host());
+    }
+
+    #[test]
+    fn should_handle_options_field() {
+        let url = PostgresUrl::new(Url::parse("postgresql:///localhost:5432?options=--cluster%3Dmy_cluster").unwrap())
+            .unwrap();
+
+        assert_eq!("--cluster=my_cluster", url.options());
     }
 
     #[tokio::test]

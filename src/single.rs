@@ -86,6 +86,7 @@ impl Quaint {
     /// - `statement_cache_size`, number of prepared statements kept cached.
     ///   Defaults to 500, which means caching is off. If `pgbouncer` mode is enabled,
     ///   caching is always off.
+    /// - `options` Specifies command-line options to send to the server at connection start. [Read more](https://www.postgresql.org/docs/current/libpq-connect.html#LIBPQ-CONNECT-OPTIONS)
     ///
     /// MySQL:
     ///
