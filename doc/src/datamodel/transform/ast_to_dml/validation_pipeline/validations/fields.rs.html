@@ -410,27 +410,6 @@
 <span id="410">410</span>
 <span id="411">411</span>
 <span id="412">412</span>
-<span id="413">413</span>
-<span id="414">414</span>
-<span id="415">415</span>
-<span id="416">416</span>
-<span id="417">417</span>
-<span id="418">418</span>
-<span id="419">419</span>
-<span id="420">420</span>
-<span id="421">421</span>
-<span id="422">422</span>
-<span id="423">423</span>
-<span id="424">424</span>
-<span id="425">425</span>
-<span id="426">426</span>
-<span id="427">427</span>
-<span id="428">428</span>
-<span id="429">429</span>
-<span id="430">430</span>
-<span id="431">431</span>
-<span id="432">432</span>
-<span id="433">433</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::{
     <span class="ident">constraint_namespace::ConstraintName</span>,
     <span class="ident">database_name::validate_db_name</span>,
@@ -756,27 +735,6 @@
         }
         <span class="kw">_</span> =&gt; (),
     }
-
-    <span class="comment">// Connector-specific validations.</span>
-
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">errors</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
-    <span class="kw">let</span> <span class="ident">default</span> <span class="op">=</span> <span class="ident">field</span>.<span class="ident">default_value</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">d</span><span class="op">|</span> <span class="ident">d</span>.<span class="ident">dml_default_kind</span>());
-
-    <span class="kw">if</span> <span class="ident">field</span>.<span class="ident">raw_native_type</span>().<span class="ident">is_none</span>() {
-        <span class="ident">ctx</span>.<span class="ident">connector</span>.<span class="ident">validate_field_default_without_native_type</span>(
-            <span class="ident">field</span>.<span class="ident">name</span>(),
-            <span class="kw-2">&amp;</span><span class="ident">scalar_type</span>,
-            <span class="ident">default</span>.<span class="ident">as_ref</span>(),
-            <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">errors</span>,
-        );
-    }
-
-    <span class="kw">for</span> <span class="ident">error</span> <span class="kw">in</span> <span class="ident">errors</span> {
-        <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::ConnectorError</span> {
-            <span class="ident">message</span>: <span class="ident">error</span>.<span class="ident">to_string</span>(),
-            <span class="ident">span</span>: <span class="ident">field</span>.<span class="ident">ast_field</span>().<span class="ident">span</span>,
-        });
-    }
 }
 
 <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">validate_scalar_field_connector_specific</span>(<span class="ident">field</span>: <span class="ident">ScalarFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
@@ -787,10 +745,10 @@
         <span class="kw">if</span> <span class="op">!</span><span class="ident">ctx</span>.<span class="ident">connector</span>.<span class="ident">supports_json</span>() {
             <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_field_validation_error</span>(
                 <span class="kw-2">&amp;</span><span class="macro">format!</span>(
-                <span class="string">&quot;Field `{}` in model `{}` can&#39;t be of type Json. The current connector does not support the Json type.&quot;</span>,
-                <span class="ident">field</span>.<span class="ident">name</span>(),
-                <span class="ident">field</span>.<span class="ident">model</span>().<span class="ident">name</span>(),
-            ),
+                    <span class="string">&quot;Field `{}` in model `{}` can&#39;t be of type Json. The current connector does not support the Json type.&quot;</span>,
+                    <span class="ident">field</span>.<span class="ident">name</span>(),
+                    <span class="ident">field</span>.<span class="ident">model</span>().<span class="ident">name</span>(),
+                ),
                 <span class="ident">field</span>.<span class="ident">model</span>().<span class="ident">name</span>(),
                 <span class="ident">field</span>.<span class="ident">name</span>(),
                 <span class="ident">field</span>.<span class="ident">ast_field</span>().<span class="ident">span</span>,

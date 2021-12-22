@@ -295,12 +295,11 @@
 <span id="295">295</span>
 <span id="296">296</span>
 <span id="297">297</span>
-<span id="298">298</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">datamodel_connector</span>::{
     <span class="ident">connector_error::ConnectorError</span>,
     <span class="ident">helper</span>::{<span class="ident">arg_vec_from_opt</span>, <span class="ident">args_vec_from_opt</span>, <span class="ident">parse_one_opt_u32</span>, <span class="ident">parse_two_opt_u32</span>},
-    <span class="ident">parser_database</span>, <span class="ident">Connector</span>, <span class="ident">ConnectorCapability</span>, <span class="ident">ConstraintScope</span>, <span class="ident">NativeTypeConstructor</span>, <span class="ident">ReferentialAction</span>,
-    <span class="ident">ReferentialIntegrity</span>, <span class="ident">ScalarType</span>,
+    <span class="ident">parser_database</span>, <span class="ident">Connector</span>, <span class="ident">ConnectorCapability</span>, <span class="ident">ConstraintScope</span>, <span class="ident">Diagnostics</span>, <span class="ident">NativeTypeConstructor</span>,
+    <span class="ident">ReferentialAction</span>, <span class="ident">ReferentialIntegrity</span>, <span class="ident">ScalarType</span>,
 };
 <span class="kw">use</span> <span class="ident">dml::native_type_instance::NativeTypeInstance</span>;
 <span class="kw">use</span> <span class="ident">enumflags2::BitFlags</span>;
@@ -505,8 +504,7 @@
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">validate_model</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_model</span>: <span class="ident">parser_database::walkers::ModelWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">_errors</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ConnectorError</span><span class="op">&gt;</span>) {
-    }
+    <span class="kw">fn</span> <span class="ident">validate_model</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_model</span>: <span class="ident">parser_database::walkers::ModelWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">_diagnostics</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Diagnostics</span>) {}
 
     <span class="kw">fn</span> <span class="ident">constraint_violation_scopes</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [<span class="ident">ConstraintScope</span>] {
         <span class="ident">CONSTRAINT_SCOPES</span>

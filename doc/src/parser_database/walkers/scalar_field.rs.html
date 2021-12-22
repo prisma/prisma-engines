@@ -242,6 +242,11 @@
 <span id="242">242</span>
 <span id="243">243</span>
 <span id="244">244</span>
+<span id="245">245</span>
+<span id="246">246</span>
+<span id="247">247</span>
+<span id="248">248</span>
+<span id="249">249</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">ast</span>,
     <span class="ident">types</span>::{<span class="ident">DefaultAttribute</span>, <span class="ident">FieldWithArgs</span>, <span class="ident">ScalarField</span>, <span class="ident">ScalarType</span>, <span class="ident">SortOrder</span>},
@@ -401,6 +406,11 @@
     <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">value</span>(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;ast</span> <span class="ident">ast::Expression</span> {
         <span class="self">self</span>.<span class="ident">default</span>.<span class="ident">value</span>
+    }
+
+    <span class="doccomment">/// Is this an `@default(dbgenerated())`?</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_dbgenerated</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+        <span class="macro">matches!</span>(<span class="self">self</span>.<span class="ident">default</span>.<span class="ident">value</span>, <span class="ident">ast::Expression::Function</span>(<span class="ident">name</span>, <span class="kw">_</span>, <span class="kw">_</span>) <span class="kw">if</span> <span class="ident">name</span> <span class="op">==</span> <span class="string">&quot;dbgenerated&quot;</span>)
     }
 
     <span class="doccomment">/// The mapped name of the default value. Not applicable to all connectors. See crate docs for</span>

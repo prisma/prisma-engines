@@ -334,13 +334,20 @@
 <span id="334">334</span>
 <span id="335">335</span>
 <span id="336">336</span>
+<span id="337">337</span>
+<span id="338">338</span>
+<span id="339">339</span>
+<span id="340">340</span>
+<span id="341">341</span>
+<span id="342">342</span>
+<span id="343">343</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">datamodel_connector</span>::{
     <span class="ident">connector_error::ConnectorError</span>,
     <span class="ident">helper</span>::{<span class="ident">arg_vec_from_opt</span>, <span class="ident">args_vec_from_opt</span>, <span class="ident">parse_one_opt_u32</span>, <span class="ident">parse_two_opt_u32</span>},
     <span class="ident">parser_database::walkers::ModelWalker</span>,
     <span class="ident">walker_ext_traits</span>::<span class="kw-2">*</span>,
-    <span class="ident">Connector</span>, <span class="ident">ConnectorCapability</span>, <span class="ident">ConstraintScope</span>, <span class="ident">NativeTypeConstructor</span>, <span class="ident">ReferentialAction</span>, <span class="ident">ReferentialIntegrity</span>,
-    <span class="ident">ScalarType</span>,
+    <span class="ident">Connector</span>, <span class="ident">ConnectorCapability</span>, <span class="ident">ConstraintScope</span>, <span class="ident">Diagnostics</span>, <span class="ident">NativeTypeConstructor</span>, <span class="ident">ReferentialAction</span>,
+    <span class="ident">ReferentialIntegrity</span>, <span class="ident">ScalarType</span>,
 };
 <span class="kw">use</span> <span class="ident">dml::native_type_instance::NativeTypeInstance</span>;
 <span class="kw">use</span> <span class="ident">enumflags2::BitFlags</span>;
@@ -559,7 +566,14 @@
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">validate_model</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">model</span>: <span class="ident">ModelWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">errors</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ConnectorError</span><span class="op">&gt;</span>) {
+    <span class="kw">fn</span> <span class="ident">validate_model</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">model</span>: <span class="ident">ModelWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">errors</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Diagnostics</span>) {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">push_error</span> <span class="op">=</span> <span class="op">|</span><span class="ident">err</span>: <span class="ident">ConnectorError</span><span class="op">|</span> {
+            <span class="ident">errors</span>.<span class="ident">push_error</span>(<span class="ident">datamodel_connector::DatamodelError::ConnectorError</span> {
+                <span class="ident">message</span>: <span class="ident">err</span>.<span class="ident">to_string</span>(),
+                <span class="ident">span</span>: <span class="ident">model</span>.<span class="ident">ast_model</span>().<span class="ident">span</span>,
+            });
+        };
+
         <span class="kw">for</span> <span class="ident">index</span> <span class="kw">in</span> <span class="ident">model</span>.<span class="ident">indexes</span>() {
             <span class="kw">for</span> <span class="ident">field</span> <span class="kw">in</span> <span class="ident">index</span>.<span class="ident">fields</span>() {
                 <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">native_type</span>) <span class="op">=</span> <span class="ident">field</span>.<span class="ident">native_type_instance</span>(<span class="self">self</span>) {
@@ -568,9 +582,9 @@
 
                     <span class="kw">if</span> <span class="ident">r#type</span> <span class="op">==</span> <span class="ident">PostgresType::Xml</span> {
                         <span class="kw">if</span> <span class="ident">index</span>.<span class="ident">is_unique</span>() {
-                            <span class="ident">errors</span>.<span class="ident">push</span>(<span class="ident">error</span>.<span class="ident">new_incompatible_native_type_with_unique</span>())
+                            <span class="ident">push_error</span>(<span class="ident">error</span>.<span class="ident">new_incompatible_native_type_with_unique</span>())
                         } <span class="kw">else</span> {
-                            <span class="ident">errors</span>.<span class="ident">push</span>(<span class="ident">error</span>.<span class="ident">new_incompatible_native_type_with_index</span>())
+                            <span class="ident">push_error</span>(<span class="ident">error</span>.<span class="ident">new_incompatible_native_type_with_index</span>())
                         };
 
                         <span class="kw">break</span>;
