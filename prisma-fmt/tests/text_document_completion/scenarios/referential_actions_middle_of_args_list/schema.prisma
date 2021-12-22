@@ -1,0 +1,18 @@
+datasource db {
+  provider = "sqlserver"
+  url      = env("DATABASE_URL")
+}
+
+model TestB {
+  id   Int    @id
+  name Int
+  Test Test[]
+}
+
+model Test {
+  id      Int   @id
+  bId     Int
+  b       TestB @relation(fields: [testBId], onDelete: <|>, references: [id])
+  testBId Int
+}
+

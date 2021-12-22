@@ -73,3 +73,51 @@ fn empty_enum_attribute_arguments_are_rejected_with_nice_error() {
 
     expected.assert_eq(&parse_schema(schema).map(|_| ()).unwrap_err());
 }
+
+#[test]
+fn trailing_commas_without_space_are_rejected_with_nice_error() {
+    let schema = r#"
+        enum Colour {
+            RED
+            GREEN
+            BLUE
+
+            @@map(name: "color",)
+        }
+    "#;
+
+    let expected = expect![[r#"
+        [1;91merror[0m: [1mError parsing attribute "@map": Trailing commas are not valid in attribute arguments, please remove the comma.[0m
+          [1;94m-->[0m  [4mschema.prisma:7[0m
+        [1;94m   | [0m
+        [1;94m 6 | [0m
+        [1;94m 7 | [0m            @@map(name: "color"[1;91m,[0m)
+        [1;94m   | [0m
+    "#]];
+
+    expected.assert_eq(&parse_schema(schema).map(|_| ()).unwrap_err());
+}
+
+#[test]
+fn trailing_commas_with_space_are_rejected_with_nice_error() {
+    let schema = r#"
+        enum Colour {
+            RED
+            GREEN
+            BLUE
+
+            @@map(name: "color", )
+        }
+    "#;
+
+    let expected = expect![[r#"
+        [1;91merror[0m: [1mError parsing attribute "@map": Trailing commas are not valid in attribute arguments, please remove the comma.[0m
+          [1;94m-->[0m  [4mschema.prisma:7[0m
+        [1;94m   | [0m
+        [1;94m 6 | [0m
+        [1;94m 7 | [0m            @@map(name: "color"[1;91m,[0m )
+        [1;94m   | [0m
+    "#]];
+
+    expected.assert_eq(&parse_schema(schema).map(|_| ()).unwrap_err());
+}
