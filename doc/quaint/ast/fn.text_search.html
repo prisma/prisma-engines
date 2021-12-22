@@ -6,7 +6,7 @@
 
 <span class="macro">assert_eq!</span>(
    <span class="string">&quot;SELECT \&quot;recipes\&quot;.* FROM \&quot;recipes\&quot; \
-    WHERE to_tsvector(\&quot;name\&quot;|| &#39; &#39; ||\&quot;ingredients\&quot;) @@ to_tsquery($1)&quot;</span>, <span class="ident">sql</span>
+    WHERE to_tsvector(concat_ws(&#39; &#39;, \&quot;name\&quot;,\&quot;ingredients\&quot;)) @@ to_tsquery($1)&quot;</span>, <span class="ident">sql</span>
 );
 
 <span class="macro">assert_eq!</span>(<span class="ident">params</span>, <span class="macro">vec!</span>[<span class="ident">Value::from</span>(<span class="string">&quot;chicken&quot;</span>)]);</code></pre></div>

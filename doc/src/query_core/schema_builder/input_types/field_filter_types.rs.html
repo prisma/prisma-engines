@@ -478,8 +478,6 @@
 <span id="478">478</span>
 <span id="479">479</span>
 <span id="480">480</span>
-<span id="481">481</span>
-<span id="482">482</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::constants::json_null</span>;
 
 <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
@@ -808,9 +806,7 @@
         <span class="ident">input_field</span>(<span class="ident">filters::ENDS_WITH</span>, <span class="ident">mapped_type</span>.<span class="ident">clone</span>(), <span class="prelude-val">None</span>).<span class="ident">optional</span>(),
     ];
 
-    <span class="kw">if</span> <span class="ident">ctx</span>.<span class="ident">has_feature</span>(<span class="kw-2">&amp;</span><span class="ident">PreviewFeature::FullTextSearch</span>)
-        <span class="op">&amp;&amp;</span> <span class="ident">ctx</span>.<span class="ident">has_capability</span>(<span class="ident">ConnectorCapability::FullTextSearchWithoutIndex</span>)
-    {
+    <span class="kw">if</span> <span class="ident">ctx</span>.<span class="ident">can_full_text_search</span>() {
         <span class="ident">string_filters</span>.<span class="ident">push</span>(<span class="ident">input_field</span>(<span class="ident">filters::SEARCH</span>, <span class="ident">mapped_type</span>, <span class="prelude-val">None</span>).<span class="ident">optional</span>());
     }
 

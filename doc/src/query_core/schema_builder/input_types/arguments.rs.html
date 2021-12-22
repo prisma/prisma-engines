@@ -180,13 +180,6 @@
 <span id="180">180</span>
 <span id="181">181</span>
 <span id="182">182</span>
-<span id="183">183</span>
-<span id="184">184</span>
-<span id="185">185</span>
-<span id="186">186</span>
-<span id="187">187</span>
-<span id="188">188</span>
-<span id="189">189</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident">constants::args</span>;
 <span class="kw">use</span> <span class="ident">datamodel_connector::ConnectorCapability</span>;
@@ -304,14 +297,7 @@
 
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">args</span> <span class="op">=</span> <span class="macro">vec!</span>[
         <span class="ident">where_argument</span>(<span class="ident">ctx</span>, <span class="kw-2">&amp;</span><span class="ident">model</span>),
-        <span class="ident">order_by_argument</span>(
-            <span class="ident">ctx</span>,
-            <span class="kw-2">&amp;</span><span class="ident">model</span>,
-            <span class="bool-val">true</span>,
-            <span class="bool-val">false</span>,
-            <span class="ident">ctx</span>.<span class="ident">has_feature</span>(<span class="kw-2">&amp;</span><span class="ident">PreviewFeature::FullTextSearch</span>)
-                <span class="op">&amp;&amp;</span> <span class="ident">ctx</span>.<span class="ident">has_capability</span>(<span class="ident">ConnectorCapability::FullTextSearchWithoutIndex</span>),
-        ),
+        <span class="ident">order_by_argument</span>(<span class="ident">ctx</span>, <span class="kw-2">&amp;</span><span class="ident">model</span>, <span class="bool-val">true</span>, <span class="bool-val">false</span>, <span class="ident">ctx</span>.<span class="ident">can_full_text_search</span>()),
         <span class="ident">input_field</span>(<span class="ident">args::CURSOR</span>, <span class="ident">unique_input_type</span>, <span class="prelude-val">None</span>).<span class="ident">optional</span>(),
         <span class="ident">input_field</span>(<span class="ident">args::TAKE</span>, <span class="ident">InputType::int</span>(), <span class="prelude-val">None</span>).<span class="ident">optional</span>(),
         <span class="ident">input_field</span>(<span class="ident">args::SKIP</span>, <span class="ident">InputType::int</span>(), <span class="prelude-val">None</span>).<span class="ident">optional</span>(),
