@@ -52,6 +52,14 @@ impl<'a> Arguments<'a> {
             ))
         }
 
+        if let Some(span) = attribute.trailing_comma {
+            errors.push_error(DatamodelError::new_attribute_validation_error(
+                "Trailing commas are not valid in attribute arguments, please remove the comma.",
+                attribute.name(),
+                span,
+            ))
+        }
+
         errors.to_result()
     }
 
