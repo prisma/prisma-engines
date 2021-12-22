@@ -45,3 +45,4 @@ jobs:
       - run: export WORKSPACE_ROOT=$(pwd) && cargo test --package query-engine-tests -- --test-threads=1
         env:
           CLICOLOR_FORCE: 1
+
