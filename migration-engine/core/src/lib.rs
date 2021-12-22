@@ -9,6 +9,7 @@ mod core_error;
 pub mod commands;
 
 pub use core_error::*;
+pub use migration_connector;
 
 #[cfg(not(target_arch = "wasm32"))]
 mod native;

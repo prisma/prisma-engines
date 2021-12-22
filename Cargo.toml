@@ -15,6 +15,7 @@ members = [
   "migration-engine/connectors/mongodb-migration-connector",
   "migration-engine/core",
   "migration-engine/migration-engine-tests",
+  "migration-engine/qe-setup",
   "query-engine/connectors/query-connector",
   "query-engine/connectors/sql-query-connector",
   "query-engine/connectors/mongodb-query-connector",
