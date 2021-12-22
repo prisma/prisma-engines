@@ -157,12 +157,12 @@
 
 <span class="doccomment">/// Setup of everything as defined in the passed datamodel.</span>
 <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">setup_project</span>(<span class="ident">datamodel</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">TestResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-    <span class="prelude-val">Ok</span>(<span class="ident">migration_core::query_engine::setup</span>(<span class="ident">datamodel</span>).<span class="kw">await</span><span class="question-mark">?</span>)
+    <span class="prelude-val">Ok</span>(<span class="ident">qe_setup::setup</span>(<span class="ident">datamodel</span>).<span class="kw">await</span><span class="question-mark">?</span>)
 }
 
 <span class="doccomment">/// Teardown of a test setup.</span>
 <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">teardown_project</span>(<span class="ident">datamodel</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">TestResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-    <span class="prelude-val">Ok</span>(<span class="ident">migration_core::query_engine::teardown</span>(<span class="ident">datamodel</span>).<span class="kw">await</span><span class="question-mark">?</span>)
+    <span class="prelude-val">Ok</span>(<span class="ident">qe_setup::teardown</span>(<span class="ident">datamodel</span>).<span class="kw">await</span><span class="question-mark">?</span>)
 }
 
 <span class="doccomment">/// Helper method to allow a sync shell function to run the async test blocks.</span>
