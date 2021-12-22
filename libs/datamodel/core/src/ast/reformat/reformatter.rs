@@ -697,7 +697,7 @@ impl<'a> Reformatter<'a> {
                 Rule::doc_comment | Rule::doc_comment_and_new_line => {
                     panic!("Comments inside attributes not supported yet.")
                 }
-                Rule::attribute_arguments => {
+                Rule::arguments_list => {
                     if is_relation {
                         Self::reformat_attribute_args(target, &current, missing_args.clone())
                     } else {
@@ -731,7 +731,7 @@ impl<'a> Reformatter<'a> {
     ) {
         let mut builder = StringBuilder::new();
 
-        debug_assert_eq!(token.as_rule(), Rule::attribute_arguments);
+        debug_assert_eq!(token.as_rule(), Rule::arguments_list);
 
         for current in token.clone().into_inner() {
             match current.as_rule() {
@@ -817,7 +817,7 @@ impl<'a> Reformatter<'a> {
         }
         target.write("]");
     }
-    fn render_func(target: &mut StringBuilder, name: &str, vals: &[ast::Expression]) {
+    fn render_func(target: &mut StringBuilder, name: &str, vals: &[ast::Argument]) {
         target.write(name);
         target.write("(");
         for (idx, val) in vals.iter().enumerate() {
@@ -825,7 +825,7 @@ impl<'a> Reformatter<'a> {
                 target.write(", ");
             }
 
-            Self::render_value(target, val);
+            Self::render_argument(target, val);
         }
         target.write(")");
     }
@@ -879,7 +879,6 @@ impl<'a> Reformatter<'a> {
                 Rule::constant_literal => target.write(current.as_str()),
                 Rule::function => Self::reformat_function_expression(target, &current),
                 Rule::array_expression => Self::reformat_array_expression(target, &current),
-                Rule::field_with_args => Self::reformat_field_with_args(target, &current),
                 Rule::doc_comment | Rule::doc_comment_and_new_line => {
                     panic!("Comments inside expressions not supported yet.")
                 }
@@ -911,32 +910,32 @@ impl<'a> Reformatter<'a> {
         target.write("]");
     }
 
-    fn reformat_field_with_args(target: &mut dyn LineWriteable, token: &Token<'_>) {
-        debug_assert_eq!(token.as_rule(), Rule::field_with_args);
-        let mut has_seen_one_argument = false;
+    // fn reformat_field_with_args(target: &mut dyn LineWriteable, token: &Token<'_>) {
+    //     debug_assert_eq!(token.as_rule(), Rule::field_with_args);
+    //     let mut has_seen_one_argument = false;
 
-        for current in token.clone().into_inner() {
-            match current.as_rule() {
-                Rule::non_empty_identifier => {
-                    target.write(current.as_str());
-                    target.write("(");
-                }
-                Rule::named_argument => {
-                    if has_seen_one_argument {
-                        target.write(", ");
-                    }
-                    target.write(current.as_str());
-                    has_seen_one_argument = true;
-                }
-                Rule::doc_comment | Rule::doc_comment_and_new_line => {
-                    panic!("Comments inside expressions not supported yet.")
-                }
-                _ => Self::reformat_generic_token(target, &current),
-            }
-        }
+    //     for current in token.clone().into_inner() {
+    //         match current.as_rule() {
+    //             Rule::non_empty_identifier => {
+    //                 target.write(current.as_str());
+    //                 target.write("(");
+    //             }
+    //             Rule::named_argument => {
+    //                 if has_seen_one_argument {
+    //                     target.write(", ");
+    //                 }
+    //                 target.write(current.as_str());
+    //                 has_seen_one_argument = true;
+    //             }
+    //             Rule::doc_comment | Rule::doc_comment_and_new_line => {
+    //                 panic!("Comments inside expressions not supported yet.")
+    //             }
+    //             _ => Self::reformat_generic_token(target, &current),
+    //         }
+    //     }
 
-        target.write(")");
-    }
+    //     target.write(")");
+    // }
 
     fn reformat_function_expression(target: &mut dyn LineWriteable, token: &Token<'_>) {
         let mut has_seen_one_argument = false;

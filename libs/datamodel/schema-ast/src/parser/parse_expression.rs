@@ -1,9 +1,9 @@
 use super::{
     helpers::{parsing_catch_all, Token, TokenExtensions},
+    parse_attribute::parse_attribute_args,
     Rule,
 };
-use crate::ast::*;
-use crate::parser::parse_attribute::parse_attribute_arg;
+use crate::ast::{Argument, Expression, Span};
 
 pub(crate) fn parse_expression(token: &Token<'_>) -> Expression {
     let first_child = token.first_relevant_child();
@@ -12,7 +12,6 @@ pub(crate) fn parse_expression(token: &Token<'_>) -> Expression {
         Rule::numeric_literal => Expression::NumericValue(first_child.as_str().to_string(), span),
         Rule::string_literal => Expression::StringValue(parse_string_literal(&first_child), span),
         Rule::constant_literal => Expression::ConstantValue(first_child.as_str().to_string(), span),
-        Rule::field_with_args => parse_field_with_args(&first_child),
         Rule::function => parse_function(&first_child),
         Rule::array_expression => parse_array(&first_child),
         _ => unreachable!(
@@ -22,42 +21,18 @@ pub(crate) fn parse_expression(token: &Token<'_>) -> Expression {
     }
 }
 
-fn parse_field_with_args(token: &Token<'_>) -> Expression {
-    debug_assert_eq!(token.as_rule(), Rule::field_with_args);
-    let mut name: Option<String> = None;
-    let mut arguments: Vec<Argument> = vec![];
-
-    for current in token.relevant_children() {
-        match current.as_rule() {
-            Rule::non_empty_identifier => name = Some(current.as_str().to_string()),
-            Rule::named_argument => arguments.push(parse_attribute_arg(&current)),
-            Rule::argument_value => arguments.push(Argument {
-                name: Identifier::new(""),
-                value: parse_arg_value(&current),
-                span: current.as_span().into(),
-            }),
-            Rule::empty_argument => (),
-            _ => parsing_catch_all(&current, "constant literal arg"),
-        }
-    }
-
-    match name {
-        Some(name) => Expression::FieldWithArgs(name, arguments, Span::from(token.as_span())),
-        _ => unreachable!(
-            "Encountered impossible constant literal during parsing: {:?}",
-            token.as_str()
-        ),
-    }
-}
-
 fn parse_function(token: &Token<'_>) -> Expression {
     let mut name: Option<String> = None;
-    let mut arguments: Vec<Expression> = vec![];
+    let mut arguments: Vec<Argument> = Vec::new();
+    let mut empty_arguments = Vec::new();
+    let mut trailing_comma = None;
 
     for current in token.relevant_children() {
         match current.as_rule() {
             Rule::non_empty_identifier => name = Some(current.as_str().to_string()),
-            Rule::expression => arguments.push(parse_expression(&current)),
+            Rule::arguments_list => {
+                parse_attribute_args(&current, &mut arguments, &mut empty_arguments, &mut trailing_comma)
+            }
             _ => parsing_catch_all(&current, "function"),
         }
     }

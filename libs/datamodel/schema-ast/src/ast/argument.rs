@@ -25,6 +25,13 @@ impl Display for Argument {
 }
 
 impl Argument {
+    pub fn as_string_value(&self) -> Option<(&str, Span)> {
+        match (self.name.name.as_str(), &self.value) {
+            ("", Expression::StringValue(name, span)) => Some((name, *span)),
+            _ => None,
+        }
+    }
+
     pub fn new_string(name: &str, value: String) -> Argument {
         Argument {
             name: Identifier::new(name),
@@ -57,7 +64,7 @@ impl Argument {
         }
     }
 
-    pub fn new_function(name: &str, fn_name: &str, value: Vec<Expression>) -> Argument {
+    pub fn new_function(name: &str, fn_name: &str, value: Vec<Argument>) -> Argument {
         Argument {
             name: Identifier::new(name),
             value: Expression::Function(fn_name.to_string(), value, Span::empty()),

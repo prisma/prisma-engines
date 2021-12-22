@@ -15,7 +15,7 @@ pub fn parse_attribute(token: &Token<'_>) -> Attribute {
         match current.as_rule() {
             Rule::attribute => return parse_attribute(&current),
             Rule::attribute_name => name = Some(current.to_id()),
-            Rule::attribute_arguments => {
+            Rule::arguments_list => {
                 parse_attribute_args(&current, &mut arguments, &mut empty_arguments, &mut trailing_comma)
             }
             _ => parsing_catch_all(&current, "attribute"),
@@ -40,7 +40,7 @@ pub(crate) fn parse_attribute_args(
     empty_arguments: &mut Vec<EmptyArgument>,
     trailing_comma: &mut Option<Span>,
 ) {
-    debug_assert_eq!(token.as_rule(), Rule::attribute_arguments);
+    debug_assert_eq!(token.as_rule(), Rule::arguments_list);
     for current in token.relevant_children() {
         match current.as_rule() {
             // This is a named arg.

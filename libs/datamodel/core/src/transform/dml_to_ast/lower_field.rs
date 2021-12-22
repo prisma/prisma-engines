@@ -251,7 +251,16 @@ impl<'a> LowerDmlToAst<'a> {
         match dv.kind() {
             dml::DefaultKind::Single(v) => LowerDmlToAst::<'a>::lower_prisma_value(v),
             dml::DefaultKind::Expression(e) => {
-                let exprs = e.args().iter().map(LowerDmlToAst::<'a>::lower_prisma_value).collect();
+                let exprs = e
+                    .args()
+                    .iter()
+                    .map(LowerDmlToAst::<'a>::lower_prisma_value)
+                    .map(|expr| ast::Argument {
+                        name: ast::Identifier::new(""),
+                        value: expr,
+                        span: Span::empty(),
+                    })
+                    .collect();
                 ast::Expression::Function(e.name().to_string(), exprs, ast::Span::empty())
             }
         }

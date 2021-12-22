@@ -68,11 +68,10 @@ enum_value_declaration = { doc_comment_and_new_line* ~ (non_empty_identifier ~ (
 // ######################################
 block_level_attribute = { "@@" ~ attribute ~ doc_comment? ~ comment? ~ NEWLINE }
 // An attribute may have no arguments at all.
-attribute = { (attribute_name ~ attribute_arguments | attribute_name) }
+attribute = { attribute_name ~ arguments_list? }
 // This is a poor-mans version of name spacing. This is currently used for native types.
 attribute_name = @{ (maybe_empty_identifier ~ ".")? ~ maybe_empty_identifier }
-// If arguments are supplied there might multiple unnahmed arguments (see decimal native type).
-attribute_arguments = { "(" ~ (argument ~ ("," ~ argument)*)? ~ trailing_comma? ~ ")" }
+arguments_list = { "(" ~ (argument ~ ("," ~ argument)*)? ~ trailing_comma? ~ ")" }
 
 argument = _{ named_argument | empty_argument | argument_value }
 empty_argument = { argument_name ~ ":" }
@@ -122,10 +121,9 @@ BLOCK_LEVEL_CATCH_ALL = { !BLOCK_CLOSE ~ CATCH_ALL }
 // ######################################
 // Expressions & Functions
 // ######################################
-function = { non_empty_identifier ~ "(" ~ (expression ~ ("," ~ expression)*)? ~ ")" }
-field_with_args = {  non_empty_identifier ~ "(" ~ argument ~ ("," ~ argument)*  ~")"}
+function = { non_empty_identifier ~ arguments_list }
 array_expression = { "[" ~ (expression ~ ( "," ~ expression )*)? ~ "]" }
-expression = { function | field_with_args | array_expression | numeric_literal | string_literal | constant_literal }
+expression = { function | array_expression | numeric_literal | string_literal | constant_literal }
 
 // ######################################
 // Literals / Values

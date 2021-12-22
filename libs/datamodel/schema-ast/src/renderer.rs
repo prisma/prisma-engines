@@ -438,15 +438,15 @@ impl<'a> Renderer<'a> {
         }
     }
 
-    fn render_func(target: &mut dyn LineWriteable, name: &str, vals: &[ast::Expression]) {
+    fn render_func(target: &mut dyn LineWriteable, name: &str, args: &[ast::Argument]) {
         target.write(name);
         target.write("(");
-        for (idx, val) in vals.iter().enumerate() {
+        for (idx, arg) in args.iter().enumerate() {
             if idx > 0 {
                 target.write(", ");
             }
 
-            Self::render_value(target, val);
+            Self::render_argument(target, arg);
         }
         target.write(")");
     }

@@ -1,6 +1,4 @@
-use crate::ast;
-use crate::diagnostics::DatamodelError;
-use crate::transform::helpers::ValueValidator;
+use crate::{ast, diagnostics::DatamodelError};
 
 pub(crate) struct EnvFunction {
     var_name: String,
@@ -32,9 +30,16 @@ impl EnvFunction {
         }
 
         let var_wrapped = &args[0];
-        let var_name = ValueValidator::new(var_wrapped).as_str()?.to_owned();
-
-        Ok(Self { var_name })
+        if let Some((var_name, _)) = var_wrapped.as_string_value() {
+            Ok(Self {
+                var_name: var_name.to_owned(),
+            })
+        } else {
+            Err(DatamodelError::new_validation_error(
+                "The `env` function takes a single string argument.".to_owned(),
+                expr.span(),
+            ))
+        }
     }
 
     pub fn var_name(&self) -> &str {

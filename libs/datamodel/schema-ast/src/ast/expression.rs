@@ -12,7 +12,7 @@ pub enum Expression {
     /// This is used for representing builtin enums and boolean constants (true and false).
     ConstantValue(String, Span),
     /// A function with a name and arguments, which is evaluated at client side.
-    Function(String, Vec<Expression>, Span),
+    Function(String, Vec<Argument>, Span),
     /// An array of other values.
     Array(Vec<Expression>, Span),
     /// A field that can contain a list of arguments.

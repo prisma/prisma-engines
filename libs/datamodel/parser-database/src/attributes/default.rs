@@ -81,11 +81,8 @@ pub(super) fn visit_field_default<'ast>(
             }
             ScalarFieldType::Unsupported => {
                 match value.value {
-                    ast::Expression::Function(funcname, funcargs, _)
-                        if funcname == FN_DBGENERATED
-                            && matches!(funcargs.as_slice(), [ast::Expression::StringValue(_, _)]) =>
-                    {
-                        accept()
+                    ast::Expression::Function(funcname, funcargs, _) if funcname == FN_DBGENERATED => {
+                        validate_dbgenerated_args(&funcargs, &args, accept, ctx);
                     }
                     _ => ctx.push_error(args.new_attribute_validation_error(
                         "Only @default(dbgenerated()) can be used for Unsupported types.",
@@ -191,7 +188,7 @@ fn default_attribute_mapped_name<'ast>(args: &mut Arguments<'ast>, ctx: &mut Con
 
 fn validate_empty_function_args(
     fn_name: &str,
-    args: &[ast::Expression],
+    args: &[ast::Argument],
     arguments: &Arguments<'_>,
     mut accept: impl FnMut(),
     ctx: &mut Context<'_>,
@@ -207,20 +204,33 @@ fn validate_empty_function_args(
 }
 
 fn validate_dbgenerated_args(
-    args: &[ast::Expression],
+    args: &[ast::Argument],
     arguments: &Arguments<'_>,
     mut accept: impl FnMut(),
     ctx: &mut Context<'_>,
 ) {
-    match args {
-        [ast::Expression::StringValue(val, _)] if val.is_empty() => {
-            ctx.push_error(arguments.new_attribute_validation_error(
-                "dbgenerated() takes either no argument, or a single nonempty string argument.",
-            ));
+    match args.len() {
+        0 => accept(),
+        1 => {
+            let arg = &args[0];
+
+            if !arg.name.name.is_empty() {
+                ctx.push_error(
+                    arguments.new_attribute_validation_error("dbgenerated() does not take a named argument."),
+                )
+            }
+
+            match &arg.value {
+                ast::Expression::StringValue(val, _) if !val.is_empty() => accept(),
+                _ => {
+                    ctx.push_error(arguments.new_attribute_validation_error(
+                        "dbgenerated() takes either no argument, or a single nonempty string argument.",
+                    ));
+                }
+            }
         }
-        [] | [ast::Expression::StringValue(_, _)] => accept(),
         _ => ctx.push_error(arguments.new_attribute_validation_error("`dbgenerated()` takes a single String argument")), // let's not mention what we don't want to see.
-    }
+    };
 }
 
 const FN_AUTOINCREMENT: &str = "autoincrement";
