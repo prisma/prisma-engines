@@ -3,8 +3,8 @@ use datamodel_connector::{
     helper::{args_vec_from_opt, parse_one_opt_u32, parse_one_u32, parse_two_opt_u32},
     parser_database::walkers::ModelWalker,
     walker_ext_traits::*,
-    Connector, ConnectorCapability, ConstraintScope, NativeTypeConstructor, ReferentialAction, ReferentialIntegrity,
-    ScalarType,
+    Connector, ConnectorCapability, ConstraintScope, Diagnostics, NativeTypeConstructor, ReferentialAction,
+    ReferentialIntegrity, ScalarType,
 };
 use dml::native_type_instance::NativeTypeInstance;
 use enumflags2::BitFlags;
@@ -253,7 +253,14 @@ impl Connector for MySqlDatamodelConnector {
         }
     }
 
-    fn validate_model(&self, model: ModelWalker<'_, '_>, errors: &mut Vec<ConnectorError>) {
+    fn validate_model(&self, model: ModelWalker<'_, '_>, errors: &mut Diagnostics) {
+        let mut push_error = |err: ConnectorError| {
+            errors.push_error(datamodel_connector::DatamodelError::ConnectorError {
+                message: err.to_string(),
+                span: model.ast_model().span,
+            });
+        };
+
         for index in model.indexes() {
             for field in index.scalar_field_attributes() {
                 if let Some(native_type) = field.as_scalar_field().native_type_instance(self) {
@@ -268,12 +275,12 @@ impl Connector for MySqlDatamodelConnector {
                         }
 
                         if index.is_unique() {
-                            errors.push(
+                            push_error(
                                 self.native_instance_error(&native_type)
                                     .new_incompatible_native_type_with_unique(),
                             )
                         } else {
-                            errors.push(
+                            push_error(
                                 self.native_instance_error(&native_type)
                                     .new_incompatible_native_type_with_index(),
                             )
@@ -296,7 +303,7 @@ impl Connector for MySqlDatamodelConnector {
                             continue;
                         }
 
-                        errors.push(
+                        push_error(
                             self.native_instance_error(&native_type_instance)
                                 .new_incompatible_native_type_with_id(),
                         );

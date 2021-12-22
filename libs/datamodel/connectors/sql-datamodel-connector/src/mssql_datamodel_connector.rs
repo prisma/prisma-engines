@@ -3,7 +3,8 @@ use datamodel_connector::{
     helper::{arg_vec_from_opt, args_vec_from_opt, parse_one_opt_u32, parse_two_opt_u32},
     parser_database::{self, ScalarType},
     walker_ext_traits::*,
-    Connector, ConnectorCapability, ConstraintScope, NativeTypeConstructor, ReferentialAction, ReferentialIntegrity,
+    Connector, ConnectorCapability, ConstraintScope, Diagnostics, NativeTypeConstructor, ReferentialAction,
+    ReferentialIntegrity,
 };
 use dml::native_type_instance::NativeTypeInstance;
 use enumflags2::BitFlags;
@@ -261,7 +262,14 @@ impl Connector for MsSqlDatamodelConnector {
         }
     }
 
-    fn validate_model(&self, model: parser_database::walkers::ModelWalker<'_, '_>, errors: &mut Vec<ConnectorError>) {
+    fn validate_model(&self, model: parser_database::walkers::ModelWalker<'_, '_>, errors: &mut Diagnostics) {
+        let mut push_error = |err: ConnectorError| {
+            errors.push_error(datamodel_connector::DatamodelError::ConnectorError {
+                message: err.to_string(),
+                span: model.ast_model().span,
+            });
+        };
+
         for index in model.indexes() {
             for field in index.fields() {
                 if let Some(native_type) = field.native_type_instance(self) {
@@ -270,9 +278,9 @@ impl Connector for MsSqlDatamodelConnector {
 
                     if heap_allocated_types().contains(&r#type) {
                         if index.is_unique() {
-                            errors.push(error.new_incompatible_native_type_with_unique())
+                            push_error(error.new_incompatible_native_type_with_unique())
                         } else {
-                            errors.push(error.new_incompatible_native_type_with_index())
+                            push_error(error.new_incompatible_native_type_with_index())
                         };
                         break;
                     }
@@ -286,7 +294,7 @@ impl Connector for MsSqlDatamodelConnector {
                     let r#type: MsSqlType = native_type.deserialize_native_type();
 
                     if heap_allocated_types().contains(&r#type) {
-                        errors.push(
+                        push_error(
                             self.native_instance_error(&native_type)
                                 .new_incompatible_native_type_with_id(),
                         );
@@ -299,7 +307,7 @@ impl Connector for MsSqlDatamodelConnector {
                         message: String::from("Using Bytes type is not allowed in the model's id."),
                     };
 
-                    errors.push(ConnectorError { kind });
+                    push_error(ConnectorError { kind });
                     break;
                 }
             }

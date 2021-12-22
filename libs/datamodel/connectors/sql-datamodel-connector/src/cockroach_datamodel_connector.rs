@@ -1,8 +1,8 @@
 use datamodel_connector::{
     connector_error::ConnectorError,
     helper::{arg_vec_from_opt, args_vec_from_opt, parse_one_opt_u32, parse_two_opt_u32},
-    parser_database, Connector, ConnectorCapability, ConstraintScope, NativeTypeConstructor, ReferentialAction,
-    ReferentialIntegrity, ScalarType,
+    parser_database, Connector, ConnectorCapability, ConstraintScope, Diagnostics, NativeTypeConstructor,
+    ReferentialAction, ReferentialIntegrity, ScalarType,
 };
 use dml::native_type_instance::NativeTypeInstance;
 use enumflags2::BitFlags;
@@ -207,8 +207,7 @@ impl Connector for CockroachDatamodelConnector {
         }
     }
 
-    fn validate_model(&self, _model: parser_database::walkers::ModelWalker<'_, '_>, _errors: &mut Vec<ConnectorError>) {
-    }
+    fn validate_model(&self, _model: parser_database::walkers::ModelWalker<'_, '_>, _diagnostics: &mut Diagnostics) {}
 
     fn constraint_violation_scopes(&self) -> &'static [ConstraintScope] {
         CONSTRAINT_SCOPES
