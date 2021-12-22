@@ -145,6 +145,9 @@ pub enum SqlError {
 
     #[error("Query parameter limit exceeded error: {0}.")]
     QueryParameterLimitExceeded(String),
+
+    #[error("Cannot find a fulltext index to use for the search")]
+    MissingFullTextSearchIndex,
 }
 
 impl SqlError {
@@ -238,6 +241,7 @@ impl SqlError {
             SqlError::QueryParameterLimitExceeded(e) => {
                 ConnectorError::from_kind(ErrorKind::QueryParameterLimitExceeded(e))
             }
+            SqlError::MissingFullTextSearchIndex => ConnectorError::from_kind(ErrorKind::MissingFullTextSearchIndex),
         }
     }
 }
@@ -265,6 +269,8 @@ impl From<quaint::error::Error> for SqlError {
             QuaintKind::ForeignKeyConstraintViolation { constraint } => Self::ForeignKeyConstraintViolation {
                 constraint: constraint.into(),
             },
+
+            QuaintKind::MissingFullTextSearchIndex => Self::MissingFullTextSearchIndex,
 
             e @ QuaintKind::ConnectionError(_) => Self::ConnectionError(e),
             QuaintKind::ColumnReadFailure(e) => Self::ColumnReadFailure(e),
