@@ -29,7 +29,9 @@ pub(crate) async fn postgres_setup(url: String, prisma_schema: &str) -> Connecto
             .map_err(|e| ConnectorError::from_source(e, ""))?;
     }
     {
-        let api = migration_core::migration_api(prisma_schema)?;
+        //TODO: remove this once cockroachdb is supported in migrations
+        let prisma_schema2 = prisma_schema.replace("provider = \"cockroachdb\"", "provider = \"postgres\"");
+        let api = migration_core::migration_api(&prisma_schema2)?;
         // 2. create the database schema for given Prisma schema
         let (config, schema) = datamodel::parse_schema(prisma_schema).unwrap();
         let migration = api
