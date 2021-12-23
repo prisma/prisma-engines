@@ -59,22 +59,7 @@ fn build_order_scalar(
 }
 
 fn build_order_relevance(order_by: &OrderByRelevance, needs_reversed_order: bool) -> OrderByDefinition {
-    let columns: Vec<Expression> = order_by
-        .fields
-        .iter()
-        .map(|sf| {
-            if sf.is_required() {
-                sf.as_column().into()
-            } else {
-                // If the field is nullable, coalesce it with an empty string so that:
-                // - if all fields are nullable, the relevance will return 0
-                // - if only _some_ of the fields are nullable, it doesn't affect the relevance for fields that aren't null
-                let coalesce_params: Vec<Expression> = vec![sf.as_column().into(), Value::text("").into()];
-
-                coalesce(coalesce_params).into()
-            }
-        })
-        .collect();
+    let columns: Vec<Expression> = order_by.fields.iter().map(|sf| sf.as_column().into()).collect();
     let order_column: Expression = text_search_relevance(&columns, order_by.search.clone()).into();
     let order: Option<Order> = Some(order_by.sort_order.into_order(needs_reversed_order));
     let order_definition: OrderDefinition = (order_column.clone(), order);
