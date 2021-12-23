@@ -72,6 +72,8 @@
 <span id="72">72</span>
 <span id="73">73</span>
 <span id="74">74</span>
+<span id="75">75</span>
+<span id="76">76</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">migration_core::migration_connector</span>::{<span class="ident">ConnectorError</span>, <span class="ident">ConnectorResult</span>, <span class="ident">DiffTarget</span>};
 <span class="kw">use</span> <span class="ident">quaint</span>::{<span class="ident">prelude</span>::<span class="kw-2">*</span>, <span class="ident">single::Quaint</span>};
 <span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
@@ -103,7 +105,9 @@
             .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">ConnectorError::from_source</span>(<span class="ident">e</span>, <span class="string">&quot;&quot;</span>))<span class="question-mark">?</span>;
     }
     {
-        <span class="kw">let</span> <span class="ident">api</span> <span class="op">=</span> <span class="ident">migration_core::migration_api</span>(<span class="ident">prisma_schema</span>)<span class="question-mark">?</span>;
+        <span class="comment">//TODO: remove this once cockroachdb is supported in migrations</span>
+        <span class="kw">let</span> <span class="ident">prisma_schema2</span> <span class="op">=</span> <span class="ident">prisma_schema</span>.<span class="ident">replace</span>(<span class="string">&quot;provider = \&quot;cockroachdb\&quot;&quot;</span>, <span class="string">&quot;provider = \&quot;postgres\&quot;&quot;</span>);
+        <span class="kw">let</span> <span class="ident">api</span> <span class="op">=</span> <span class="ident">migration_core::migration_api</span>(<span class="kw-2">&amp;</span><span class="ident">prisma_schema2</span>)<span class="question-mark">?</span>;
         <span class="comment">// 2. create the database schema for given Prisma schema</span>
         <span class="kw">let</span> (<span class="ident">config</span>, <span class="ident">schema</span>) <span class="op">=</span> <span class="ident">datamodel::parse_schema</span>(<span class="ident">prisma_schema</span>).<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">migration</span> <span class="op">=</span> <span class="ident">api</span>
