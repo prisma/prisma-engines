@@ -39,6 +39,13 @@ impl ParentContainer {
         }
     }
 
+    pub fn name(&self) -> String {
+        match self {
+            ParentContainer::Model(model) => model.upgrade().unwrap().name.clone(),
+            ParentContainer::CompositeType(composite) => composite.upgrade().unwrap().name.clone(),
+        }
+    }
+
     pub fn find_field(&self, prisma_name: &str) -> Option<Field> {
         // Unwraps are safe: This can never fail, the models and composites are always available in memory.
         match self {

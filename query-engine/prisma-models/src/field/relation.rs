@@ -37,7 +37,7 @@ impl RelationField {
 
     /// Returns the `FieldSelection` used for this relation fields model.
     ///
-    /// ## What is the model projection of a relation field?
+    /// ## What is the field selection of a relation field?
     /// The set of fields required by the relation (**on the model of the relation field**) to be able to link the related records.
     ///
     /// In case of a many-to-many relation field, we can make the assumption that the primary identifier of the enclosing model

@@ -193,7 +193,12 @@ pub(crate) fn nested_update_input_field(ctx: &mut BuilderContext, parent_field: 
 }
 
 /// Builds scalar input fields using the mapper and the given, prefiltered, scalar fields.
-/// The mapper is responsible for mapping the fields to input types.
+///
+/// Arguments:
+/// `prefiltered_fields`: Scalar fields to map.
+/// `non_list_field_mapper`: Mapping function to map a non-list field to an input field.
+/// `list_field_mapper`: Mapping function to map a (scalar) list field to an input field.
+/// `with_defaults`: Controls whether or not the defined field defaults (if present) are carried over to the input field.
 pub(crate) fn scalar_input_fields<F, G>(
     ctx: &mut BuilderContext,
     prefiltered_fields: Vec<ScalarFieldRef>,

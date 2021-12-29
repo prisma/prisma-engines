@@ -2,10 +2,7 @@ use crate::pk::PrimaryKey;
 use crate::*;
 use itertools::Itertools;
 use once_cell::sync::OnceCell;
-use std::{
-    collections::BTreeSet,
-    sync::{Arc, Weak},
-};
+use std::{collections::BTreeSet, sync::Arc};
 
 #[derive(Debug, Clone)]
 pub struct Fields {
