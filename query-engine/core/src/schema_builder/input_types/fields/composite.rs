@@ -127,11 +127,3 @@ fn input_object_type(ctx: &mut BuilderContext, cf: &CompositeFieldRef, with_defa
     input_object.set_fields(fields);
     Arc::downgrade(&input_object)
 }
-
-// let mut fields = input_fields::scalar_input_fields(
-//     ctx,
-//     scalar_fields,
-//     field_create_input,
-//     |ctx, f, _| input_fields::scalar_list_input_field_mapper(ctx, model.name.clone(), "Create", f, true),
-//     true,
-// );
