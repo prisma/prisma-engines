@@ -167,7 +167,20 @@ pub async fn update_records<'conn>(
                     let vals = vals
                         .into_iter()
                         .map(|val| (field, val).into_bson())
-                        .collect::<crate::Result<Vec<_>>>()?;
+                        .collect::<crate::Result<Vec<_>>>()?
+                        .into_iter()
+                        .map(|bson_array| {
+                            // Strip the list from the BSON values. [Todo] This is unfortunately necessary right now due to how the
+                            // conversion is set up, we should clean that up at some point (move from traits to fns).
+                            if let Bson::Array(mut inner) = bson_array {
+                                inner.pop().unwrap()
+                            } else {
+                                // We know that it's a list field, so the result is always a BSON array.
+                                unreachable!()
+                            }
+                        })
+                        .collect();
+
                     let bson_array = Bson::Array(vals);
 
                     doc! {
@@ -185,8 +198,8 @@ pub async fn update_records<'conn>(
                     doc! {
                         "$set": { field_name: {
                             "$ifNull": [
-                                { "$concatArrays": [dollar_field_name, [bson_val.clone()]] },
-                                [bson_val]
+                                { "$concatArrays": [dollar_field_name, bson_val.clone()] },
+                                bson_val
                             ]
                         } }
                     }
