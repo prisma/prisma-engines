@@ -26,7 +26,6 @@ pub mod walkers;
 
 mod attributes;
 mod context;
-mod indexes;
 mod names;
 mod relations;
 mod types;
@@ -111,9 +110,6 @@ impl<'ast> ParserDatabase<'ast> {
 
         // Fourth step: relation inference
         relations::infer_relations(&mut ctx);
-
-        // Fifth step: infer implicit indices
-        indexes::infer_implicit_indexes(&mut ctx);
 
         ctx.finish()
     }

@@ -82,12 +82,4 @@ impl<'ast, 'db> PrimaryKeyWalker<'ast, 'db> {
         self.attribute.fields.len() == fields.len()
             && self.attribute.fields.iter().zip(fields).all(|(a, b)| a.field_id == *b)
     }
-
-    /// Do the constrained fields match exactly these?
-    pub(crate) fn contains_exactly_fields(
-        self,
-        fields: impl ExactSizeIterator<Item = ScalarFieldWalker<'ast, 'db>>,
-    ) -> bool {
-        self.attribute.fields.len() == fields.len() && self.fields().zip(fields).all(|(a, b)| a == b)
-    }
 }

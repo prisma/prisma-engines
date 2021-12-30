@@ -234,7 +234,7 @@ fn required_relation_field_must_error_if_it_is_virtual() {
 
     model Address {
         id     Int     @id
-        userId Int
+        userId Int     @unique
         user   User    @relation(fields: [userId], references: [id])
     }
     "#;
@@ -610,7 +610,7 @@ fn must_error_when_fields_argument_is_missing_for_one_to_one() {
 
     model Post {
         id     Int     @id
-        userId Int
+        userId Int     @unique
         user   User    @relation(references: [id])
     }
     "#;
@@ -619,7 +619,7 @@ fn must_error_when_fields_argument_is_missing_for_one_to_one() {
         [1;91merror[0m: [1mError parsing attribute "@relation": The relation fields `user` on Model `Post` and `post` on Model `User` do not provide the `fields` argument in the @relation attribute. You have to provide it on one of the two fields.[0m
           [1;94m-->[0m  [4mschema.prisma:11[0m
         [1;94m   | [0m
-        [1;94m10 | [0m        userId Int
+        [1;94m10 | [0m        userId Int     @unique
         [1;94m11 | [0m        [1;91muser   User    @relation(references: [id])[0m
         [1;94m12 | [0m    }
         [1;94m   | [0m
@@ -646,7 +646,7 @@ fn must_error_when_references_argument_is_missing_for_one_to_one() {
 
     model Post {
         id     Int     @id
-        userId Int
+        userId Int     @unique
         user   User    @relation(fields: [userId])
     }
     "#;
@@ -655,7 +655,7 @@ fn must_error_when_references_argument_is_missing_for_one_to_one() {
         [1;91merror[0m: [1mError parsing attribute "@relation": The relation fields `user` on Model `Post` and `post` on Model `User` do not provide the `references` argument in the @relation attribute. You have to provide it on one of the two fields.[0m
           [1;94m-->[0m  [4mschema.prisma:11[0m
         [1;94m   | [0m
-        [1;94m10 | [0m        userId Int
+        [1;94m10 | [0m        userId Int     @unique
         [1;94m11 | [0m        [1;91muser   User    @relation(fields: [userId])[0m
         [1;94m12 | [0m    }
         [1;94m   | [0m
@@ -683,7 +683,7 @@ fn must_error_when_fields_and_references_argument_are_placed_on_different_sides_
 
     model Post {
         id     Int     @id
-        userId Int
+        userId Int     @unique
         user   User    @relation(fields: [userId])
     }
     "#;
@@ -692,7 +692,7 @@ fn must_error_when_fields_and_references_argument_are_placed_on_different_sides_
         [1;91merror[0m: [1mError parsing attribute "@relation": The relation field `user` on Model `Post` provides the `fields` argument in the @relation attribute. And the related field `post` on Model `User` provides the `references` argument. You must provide both arguments on the same side.[0m
           [1;94m-->[0m  [4mschema.prisma:12[0m
         [1;94m   | [0m
-        [1;94m11 | [0m        userId Int
+        [1;94m11 | [0m        userId Int     @unique
         [1;94m12 | [0m        [1;91muser   User    @relation(fields: [userId])[0m
         [1;94m13 | [0m    }
         [1;94m   | [0m
@@ -720,7 +720,7 @@ fn must_error_when_fields_or_references_argument_is_placed_on_both_sides_for_one
 
     model Post {
         id     Int     @id
-        userId Int
+        userId Int     @unique
         user   User    @relation(fields: [userId], references: [id])
     }
     "#;
@@ -729,7 +729,7 @@ fn must_error_when_fields_or_references_argument_is_placed_on_both_sides_for_one
         [1;91merror[0m: [1mError parsing attribute "@relation": The relation fields `user` on Model `Post` and `post` on Model `User` both provide the `references` argument in the @relation attribute. You have to provide it only on one of the two fields.[0m
           [1;94m-->[0m  [4mschema.prisma:12[0m
         [1;94m   | [0m
-        [1;94m11 | [0m        userId Int
+        [1;94m11 | [0m        userId Int     @unique
         [1;94m12 | [0m        [1;91muser   User    @relation(fields: [userId], references: [id])[0m
         [1;94m13 | [0m    }
         [1;94m   | [0m
@@ -743,7 +743,7 @@ fn must_error_when_fields_or_references_argument_is_placed_on_both_sides_for_one
         [1;91merror[0m: [1mError parsing attribute "@relation": The relation fields `user` on Model `Post` and `post` on Model `User` both provide the `fields` argument in the @relation attribute. You have to provide it only on one of the two fields.[0m
           [1;94m-->[0m  [4mschema.prisma:12[0m
         [1;94m   | [0m
-        [1;94m11 | [0m        userId Int
+        [1;94m11 | [0m        userId Int     @unique
         [1;94m12 | [0m        [1;91muser   User    @relation(fields: [userId], references: [id])[0m
         [1;94m13 | [0m    }
         [1;94m   | [0m
@@ -764,7 +764,7 @@ fn must_error_for_required_one_to_one_self_relations() {
     let dml = r#"
     model User {
       id       Int  @id
-      friendId Int
+      friendId Int  @unique
       friend   User @relation("Friends", fields: friendId, references: id)
       friendOf User @relation("Friends")
     }
@@ -980,32 +980,32 @@ fn must_allow_relations_with_default_native_types_with_annotation_on_one_side() 
 
 #[test]
 fn a_one_on_one_relation_with_fields_on_the_wrong_side_should_not_pass() {
-    let schema = r#"
-datasource db {
-  provider = "postgresql"
-  url      = env("TEST_DATABASE_URL")
-}
+    let schema = indoc! {r#"
+        datasource db {
+          provider = "postgresql"
+          url      = env("TEST_DATABASE_URL")
+        }
 
-model Boom {
-  id         Int      @id
-  occurrence DateTime
-  bam        Bam
-}
+        model Boom {
+          id         Int      @id
+          occurrence DateTime
+          bam        Bam
+        }
 
-model Bam {
-  id        Int      @id
-  boomId    Int?
-  boom      Boom? @relation(fields: [boomId], references: [id])
-}
-    "#;
+        model Bam {
+          id        Int   @id
+          boomId    Int?
+          boom      Boom? @relation(fields: [boomId], references: [id])
+        }
+    "#};
 
     let expect = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@relation": The relation field `Bam.boom` defines the `fields` and/or `references` argument. You must set them on the required side of the relation (`Boom.bam`) in order for the constraints to be enforced. Alternatively, you can change this field to be required and the opposite optional, or make both sides of the relation optional.[0m
-          [1;94m-->[0m  [4mschema.prisma:16[0m
+          [1;94m-->[0m  [4mschema.prisma:15[0m
         [1;94m   | [0m
-        [1;94m15 | [0m  boomId    Int?
-        [1;94m16 | [0m  [1;91mboom      Boom? @relation(fields: [boomId], references: [id])[0m
-        [1;94m17 | [0m}
+        [1;94m14 | [0m  boomId    Int?
+        [1;94m15 | [0m  [1;91mboom      Boom? @relation(fields: [boomId], references: [id])[0m
+        [1;94m16 | [0m}
         [1;94m   | [0m
     "#]];
 

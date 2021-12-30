@@ -392,9 +392,9 @@ fn actions_should_be_defined_only_from_one_side() {
         }
 
         model B {
-            id Int @id
-            aId Int
-            a A @relation(fields: [aId], references: [id], onUpdate: NoAction, onDelete: NoAction)
+            id  Int @id
+            aId Int @unique
+            a A     @relation(fields: [aId], references: [id], onUpdate: NoAction, onDelete: NoAction)
         }
     "#};
 
@@ -409,8 +409,8 @@ fn actions_should_be_defined_only_from_one_side() {
         [1;91merror[0m: [1mError parsing attribute "@relation": The relation fields `a` on Model `B` and `b` on Model `A` both provide the `onDelete` or `onUpdate` argument in the @relation attribute. You have to provide it only on one of the two fields.[0m
           [1;94m-->[0m  [4mschema.prisma:14[0m
         [1;94m   | [0m
-        [1;94m13 | [0m    aId Int
-        [1;94m14 | [0m    [1;91ma A @relation(fields: [aId], references: [id], onUpdate: NoAction, onDelete: NoAction)[0m
+        [1;94m13 | [0m    aId Int @unique
+        [1;94m14 | [0m    [1;91ma A     @relation(fields: [aId], references: [id], onUpdate: NoAction, onDelete: NoAction)[0m
         [1;94m15 | [0m}
         [1;94m   | [0m
     "#]];
@@ -536,7 +536,7 @@ fn on_delete_cannot_be_defined_on_the_wrong_side_1_1() {
             id        Int      @id @default(autoincrement())
             cock      Chicken? @relation(name: "a_self_relation", onDelete: NoAction)
             hen       Chicken? @relation(name: "a_self_relation", fields: [chickenId], references: [id])
-            chickenId Int?
+            chickenId Int?     @unique
         }
     "#};
 
@@ -565,7 +565,7 @@ fn on_update_cannot_be_defined_on_the_wrong_side_1_1() {
             id        Int      @id @default(autoincrement())
             cock      Chicken? @relation(name: "a_self_relation", onUpdate: NoAction)
             hen       Chicken? @relation(name: "a_self_relation", fields: [chickenId], references: [id])
-            chickenId Int?
+            chickenId Int?     @unique
         }
     "#};
 

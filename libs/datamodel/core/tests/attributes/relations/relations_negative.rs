@@ -953,3 +953,129 @@ fn a_typoed_relation_should_fail_gracefully() {
 //         Span::new(389, 561),
 //     ));
 // }
+
+#[test]
+fn one_to_one_singular_scalar_missing_unique() {
+    let dml = indoc! {r#"
+        model A {
+          id   Int @id
+          b_id Int
+          b    B   @relation(fields: [b_id], references: [id])
+        }
+
+        model B {
+          id Int @id
+          a  A?
+        }
+    "#};
+
+    let expect = expect![[r#"
+        [1;91merror[0m: [1mError parsing attribute "@relation": A unique constraint is required to enforce the one-to-one relation. Please add a `@unique` attribute to the scalar field `b_id`.[0m
+          [1;94m-->[0m  [4mschema.prisma:4[0m
+        [1;94m   | [0m
+        [1;94m 3 | [0m  b_id Int
+        [1;94m 4 | [0m  [1;91mb    B   @relation(fields: [b_id], references: [id])[0m
+        [1;94m 5 | [0m}
+        [1;94m   | [0m
+    "#]];
+
+    expect.assert_eq(&datamodel::parse_schema(dml).map(drop).unwrap_err());
+}
+
+#[test]
+fn one_to_one_compound_scalar_missing_unique() {
+    let dml = indoc! {r#"
+        model A {
+          id    Int @id
+          b_id  Int
+          b_id2 Int
+          b     B   @relation(fields: [b_id, b_id2], references: [id, id2])
+        }
+
+        model B {
+          id  Int
+          id2 Int
+          a  A?
+
+          @@id([id, id2])
+        }
+    "#};
+
+    let expect = expect![[r#"
+        [1;91merror[0m: [1mError parsing attribute "@relation": A unique constraint is required to enforce the one-to-one relation. Please add an attribute `@@unique([b_id, b_id2])` to the `A` model.[0m
+          [1;94m-->[0m  [4mschema.prisma:5[0m
+        [1;94m   | [0m
+        [1;94m 4 | [0m  b_id2 Int
+        [1;94m 5 | [0m  [1;91mb     B   @relation(fields: [b_id, b_id2], references: [id, id2])[0m
+        [1;94m 6 | [0m}
+        [1;94m   | [0m
+    "#]];
+
+    expect.assert_eq(&datamodel::parse_schema(dml).map(drop).unwrap_err());
+}
+
+#[test]
+fn one_to_one_compound_scalar_wrong_uniques() {
+    let dml = indoc! {r#"
+        model A {
+          id    Int @id
+          b_id  Int @unique
+          b_id2 Int @unique
+          b     B   @relation(fields: [b_id, b_id2], references: [id, id2])
+        }
+
+        model B {
+          id  Int
+          id2 Int
+          a  A?
+
+          @@id([id, id2])
+        }
+    "#};
+
+    let expect = expect![[r#"
+        [1;91merror[0m: [1mError parsing attribute "@relation": A unique constraint is required to enforce the one-to-one relation. Please add an attribute `@@unique([b_id, b_id2])` to the `A` model.[0m
+          [1;94m-->[0m  [4mschema.prisma:5[0m
+        [1;94m   | [0m
+        [1;94m 4 | [0m  b_id2 Int @unique
+        [1;94m 5 | [0m  [1;91mb     B   @relation(fields: [b_id, b_id2], references: [id, id2])[0m
+        [1;94m 6 | [0m}
+        [1;94m   | [0m
+    "#]];
+
+    expect.assert_eq(&datamodel::parse_schema(dml).map(drop).unwrap_err());
+}
+
+#[test]
+fn one_to_one_compound_scalar_uniques_wrong_order() {
+    let dml = indoc! {r#"
+        model A {
+          id    Int @id
+          b_id  Int
+          b_id2 Int
+          b     B   @relation(fields: [b_id, b_id2], references: [id, id2])
+
+          @@unique([b_id2, b_id])
+        }
+
+        model B {
+          id  Int
+          id2 Int
+          a  A?
+
+          @@id([id, id2])
+        }
+    "#};
+
+    let expect = expect![[r#"
+        [1;91merror[0m: [1mError parsing attribute "@relation": A unique constraint is required to enforce the one-to-one relation. Please add an attribute `@@unique([b_id, b_id2])` to the `A` model.[0m
+          [1;94m-->[0m  [4mschema.prisma:5[0m
+        [1;94m   | [0m
+        [1;94m 4 | [0m  b_id2 Int
+        [1;94m 5 | [0m  [1;91mb     B   @relation(fields: [b_id, b_id2], references: [id, id2])[0m
+        [1;94m 6 | [0m
+        [1;94m   | [0m
+    "#]];
+
+    expect.assert_eq(&datamodel::parse_schema(dml).map(drop).unwrap_err());
+}

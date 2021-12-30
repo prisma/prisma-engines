@@ -132,6 +132,7 @@ pub(super) fn validate(ctx: &mut Context<'_>, relation_transformation_enabled: b
                         relations::one_to_one::fields_and_references_are_defined(relation, ctx);
                         relations::one_to_one::fields_and_references_defined_on_one_side_only(relation, ctx);
                         relations::one_to_one::referential_actions(relation, ctx);
+                        relations::one_to_one::referencing_with_unique_fields(relation, ctx);
 
                         // Run these validations last to prevent validation spam.
                         relations::one_to_one::fields_references_mixups(relation, ctx);

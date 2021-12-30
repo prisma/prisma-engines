@@ -15,6 +15,7 @@ fn test_dmmf_rendering() {
     ];
 
     for test_case in test_cases {
+        dbg!(test_case);
         println!("TESTING: {}", test_case);
         let datamodel_string = load_from_file(format!("{}.prisma", test_case).as_str());
         let dml = parse(&datamodel_string);

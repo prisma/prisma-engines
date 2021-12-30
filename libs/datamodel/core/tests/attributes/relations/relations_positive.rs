@@ -1,20 +1,20 @@
 use crate::common::*;
 use crate::{with_header, Provider};
-use datamodel::{dml, render_datamodel_to_string, IndexDefinition, IndexField, IndexType, ScalarType};
+use datamodel::{dml, ScalarType};
 
 #[test]
 fn must_add_referenced_fields_on_both_sides_for_many_to_many_relations() {
-    let dml = r#"
-    model User {
-        user_id Int    @id
-        posts   Post[]
-    }
+    let dml = indoc! {r#"
+        model User {
+          user_id Int    @id
+          posts   Post[]
+        }
 
-    model Post {
-        post_id Int    @id
-        users   User[]
-    }
-    "#;
+        model Post {
+          post_id Int    @id
+          users   User[]
+        }
+    "#};
 
     let schema = parse(dml);
 
@@ -30,79 +30,81 @@ fn must_add_referenced_fields_on_both_sides_for_many_to_many_relations() {
 
 #[test]
 fn settings_must_be_deteced() {
-    let dml = r#"
-    model Todo {
-      id       Int  @id
-      parentId Int?
-      
-      child_todos Todo[] @relation("MyRelation")
-      parent_todo Todo? @relation("MyRelation", fields: parentId, references: id)
-    }
-    "#;
+    let dml = indoc! {r#"
+        model Todo {
+          id       Int  @id
+          parentId Int?
+
+          child_todos Todo[] @relation("MyRelation")
+          parent_todo Todo? @relation("MyRelation", fields: parentId, references: id)
+        }
+    "#};
 
     let schema = parse(dml);
 
     let todo_model = schema.assert_has_model("Todo");
+
     todo_model
         .assert_has_relation_field("parent_todo")
         .assert_relation_to("Todo")
         .assert_relation_referenced_fields(&["id"])
         .assert_arity(&dml::FieldArity::Optional);
-    // TODO: bring `onDelete` back once `prisma migrate` is a thing
-    //        .assert_relation_delete_strategy(dml::OnDeleteStrategy::Cascade);
 }
 
 #[test]
 fn resolve_relation() {
-    let dml = r#"
-    model User {
-        id Int @id
-        firstName String
-        posts Post[]
-    }
+    let dml = indoc! {r#"
+        model User {
+          id        Int @id
+          firstName String
+          posts     Post[]
+        }
 
-    model Post {
-        id     Int    @id
-        text   String
-        userId Int
-        
-        user User @relation(fields: [userId], references: [id])
-    }
-    "#;
+        model Post {
+          id     Int    @id
+          text   String
+          userId Int
+          user   User @relation(fields: [userId], references: [id])
+        }
+    "#};
 
     let schema = parse(dml);
     let user_model = schema.assert_has_model("User");
+
     user_model
         .assert_has_scalar_field("firstName")
         .assert_base_type(&ScalarType::String);
+
     user_model
         .assert_has_relation_field("posts")
         .assert_relation_to("Post")
         .assert_arity(&dml::FieldArity::List);
 
     let post_model = schema.assert_has_model("Post");
+
     post_model
         .assert_has_scalar_field("text")
         .assert_base_type(&ScalarType::String);
+
     post_model.assert_has_relation_field("user").assert_relation_to("User");
 }
 
 #[test]
 fn resolve_related_field() {
-    let dml = r#"
-    model User {
-        id        Int    @id
-        firstName String @unique
-        posts Post[]
-    }
+    let dml = indoc! {r#"
+        model User {
+          id        Int    @id
+          firstName String @unique
+          posts Post[]
+        }
 
-    model Post {
-        id            Int    @id
-        text          String
-        userFirstName String
-        user          User   @relation(fields: [userFirstName], references: [firstName])
-    }
-    "#;
+        model Post {
+          id            Int    @id
+          text          String
+          userFirstName String
+          user          User   @relation(fields: [userFirstName], references: [firstName])
+        }
+    "#};
 
     let schema = parse(dml);
 
@@ -115,24 +117,24 @@ fn resolve_related_field() {
 
 #[test]
 fn resolve_related_fields() {
-    let dml = r#"
-    model User {
-        id Int @id
-        firstName String
-        lastName String
-        posts Post[]
-        
-        @@unique([firstName, lastName])
-    }
+    let dml = indoc! {r#"
+        model User {
+          id Int @id
+          firstName String
+          lastName String
+          posts Post[]
 
-    model Post {
-        id Int @id
-        text String
-        authorFirstName String
-        authorLastName  String
-        user            User @relation(fields: [authorFirstName, authorLastName], references: [firstName, lastName])
-    }
-    "#;
+          @@unique([firstName, lastName])
+        }
+
+        model Post {
+          id Int @id
+          text String
+          authorFirstName String
+          authorLastName  String
+          user            User @relation(fields: [authorFirstName, authorLastName], references: [firstName, lastName])
+        }
+    "#};
 
     let schema = parse(dml);
 
@@ -146,23 +148,23 @@ fn resolve_related_fields() {
 
 #[test]
 fn allow_multiple_relations() {
-    let dml = r#"
-    model User {
-        id         Int    @id
-        more_posts Post[] @relation(name: "more_posts")
-        posts      Post[]
-    }
+    let dml = indoc! {r#"
+        model User {
+          id         Int    @id
+          more_posts Post[] @relation(name: "more_posts")
+          posts      Post[]
+        }
 
-    model Post {
-        id            Int    @id
-        text          String
-        userId        Int
-        postingUserId Int
-        
-        user         User   @relation(fields: userId, references: id)
-        posting_user User   @relation(name: "more_posts", fields: postingUserId, references: id)
-    }
-    "#;
+        model Post {
+          id            Int    @id
+          text          String
+          userId        Int
+          postingUserId Int
+
+          user         User   @relation(fields: userId, references: id)
+          posting_user User   @relation(name: "more_posts", fields: postingUserId, references: id)
+        }
+    "#};
 
     let schema = parse(dml);
     let user_model = schema.assert_has_model("User");
@@ -197,19 +199,19 @@ fn allow_multiple_relations() {
 
 #[test]
 fn allow_complicated_self_relations() {
-    let dml = r#"
-    model User {
-        id     Int  @id
-        sonId  Int?
-        wifeId Int?
-        
-        son     User? @relation(name: "offspring", fields: sonId, references: id)
-        father  User? @relation(name: "offspring")
-        
-        husband User? @relation(name: "spouse")
-        wife    User? @relation(name: "spouse", fields: wifeId, references: id)
-    }
-    "#;
+    let dml = indoc! {r#"
+        model User {
+          id     Int  @id
+          sonId  Int? @unique
+          wifeId Int? @unique
+
+          son     User? @relation(name: "offspring", fields: sonId, references: id)
+          father  User? @relation(name: "offspring")
+
+          husband User? @relation(name: "spouse")
+          wife    User? @relation(name: "spouse", fields: wifeId, references: id)
+        }
+    "#};
 
     let schema = parse(dml);
     let user_model = schema.assert_has_model("User");
@@ -225,29 +227,26 @@ fn allow_complicated_self_relations() {
 
 #[test]
 fn allow_explicit_fk_name_definition() {
-    let dml = with_header(
-        r#"
-     model User {
-         user_id Int    @id
-         posts   Post[]
-     }
+    let dml = indoc! {r#"
+        model User {
+          user_id Int    @id
+          posts   Post[]
+        }
 
-     model Post {
-         post_id Int    @id
-         user_id Int
-         user    User    @relation(fields: user_id, references: user_id, map: "CustomFKName")
-     }
-     "#,
-        Provider::Postgres,
-        &[],
-    );
+        model Post {
+          post_id Int    @id
+          user_id Int
+          user    User    @relation(fields: user_id, references: user_id, map: "CustomFKName")
+        }
+    "#};
 
-    let schema = parse(&dml);
+    let schema = parse(&with_header(dml, Provider::Postgres, &[]));
 
     schema
         .assert_has_model("User")
         .assert_has_relation_field("posts")
         .assert_relation_fk_name(None);
+
     schema
         .assert_has_model("Post")
         .assert_has_relation_field("user")
@@ -257,29 +256,26 @@ fn allow_explicit_fk_name_definition() {
 
 #[test]
 fn allow_implicit_fk_name_definition() {
-    let dml = with_header(
-        r#"
-     model User {
-         user_id Int    @id
-         posts   Post[]
-     }
+    let dml = indoc! {r#"
+        model User {
+          user_id Int    @id
+          posts   Post[]
+        }
 
-     model Post {
-         post_id Int    @id
-         user_id Int
-         user    User    @relation(fields: user_id, references: user_id)
-     }
-     "#,
-        Provider::Postgres,
-        &[],
-    );
+        model Post {
+          post_id Int    @id
+          user_id Int
+          user    User    @relation(fields: user_id, references: user_id)
+        }
+    "#};
 
-    let schema = parse(&dml);
+    let schema = parse(&with_header(dml, Provider::Postgres, &[]));
 
     schema
         .assert_has_model("User")
         .assert_has_relation_field("posts")
         .assert_relation_fk_name(None);
+
     schema
         .assert_has_model("Post")
         .assert_has_relation_field("user")
@@ -289,33 +285,30 @@ fn allow_implicit_fk_name_definition() {
 
 #[test]
 fn implicit_fk_name_definition_with_mapped_models_and_fields() {
-    let dml = with_header(
-        r#"
-     model User {
-         user_id Int    @id  @map("user_id_map")
-         posts   Post[]
-         
-         @@map("UserMap")
-     }
+    let dml = indoc! {r#"
+        model User {
+          user_id Int    @id  @map("user_id_map")
+          posts   Post[]
 
-     model Post {
-         user    User    @relation(fields: user_id, references: user_id)
-         post_id Int    @id @map("post_id_map")
-         user_id Int        @map("user_id_map_on_post")    
-         
-         @@map("PostMap")
-     }
-     "#,
-        Provider::Postgres,
-        &[],
-    );
+          @@map("UserMap")
+        }
 
-    let schema = parse(&dml);
+        model Post {
+          user    User    @relation(fields: user_id, references: user_id)
+          post_id Int    @id @map("post_id_map")
+          user_id Int        @map("user_id_map_on_post")
+
+          @@map("PostMap")
+        }
+    "#};
+
+    let schema = parse(&with_header(dml, Provider::Postgres, &[]));
 
     schema
         .assert_has_model("User")
         .assert_has_relation_field("posts")
         .assert_relation_fk_name(None);
+
     schema
         .assert_has_model("Post")
         .assert_has_relation_field("user")
@@ -325,28 +318,24 @@ fn implicit_fk_name_definition_with_mapped_models_and_fields() {
 
 #[test]
 fn implicit_fk_name_definition_with_mapped_models_and_fields_other_order() {
-    let dml = with_header(
-        r#"
-     model User {
-         user_id Int    @id  @map("user_id_map")
-         posts   Post[]
-         
-         @@map("UserMap")
-     }
+    let dml = indoc! {r#"
+        model User {
+          user_id Int    @id  @map("user_id_map")
+          posts   Post[]
 
-     model Post {
-         post_id Int    @id @map("post_id_map")
-         user_id Int        @map("user_id_map_on_post")    
-         user    User    @relation(fields: user_id, references: user_id)
-         
-         @@map("PostMap")
-     }
-     "#,
-        Provider::Postgres,
-        &[],
-    );
+          @@map("UserMap")
+        }
 
-    let schema = parse(&dml);
+        model Post {
+          post_id Int  @id @map("post_id_map")
+          user_id Int  @map("user_id_map_on_post")
+          user    User @relation(fields: user_id, references: user_id)
+
+          @@map("PostMap")
+        }
+    "#};
+
+    let schema = parse(&with_header(dml, Provider::Postgres, &[]));
 
     schema
         .assert_has_model("User")
@@ -360,143 +349,89 @@ fn implicit_fk_name_definition_with_mapped_models_and_fields_other_order() {
 }
 
 #[test]
-fn implicit_unique_constraint_on_one_to_one() {
-    let dml = with_header(
-        indoc! {r#"
-        model User {
-          user_id Int    @id  @map("user_id_map")
-          post    Post?
-          
-          @@map("UserMap")
-        }
-        
-        model Post {
-          post_id Int    @id @map("post_id_map")
-          user_id Int    @map("user_id_map_on_post")    
-          user    User   @relation(fields: user_id, references: user_id)
-          
-          @@map("PostMap")
-        }
-    "#},
-        Provider::Postgres,
-        &[],
-    );
-
-    let schema = parse(&dml);
-
-    schema
-        .assert_has_model("User")
-        .assert_has_relation_field("post")
-        .assert_relation_fk_name(None);
-
-    schema
-        .assert_has_model("Post")
-        .assert_has_relation_field("user")
-        .assert_relation_referenced_fields(&["user_id"])
-        .assert_relation_fk_name(Some("PostMap_user_id_map_on_post_fkey".to_string()));
-
-    schema.assert_has_model("Post").assert_has_index(IndexDefinition {
-        name: None,
-        db_name: Some("PostMap_user_id_map_on_post_key".to_string()),
-        fields: vec![IndexField::new("user_id")],
-        tpe: IndexType::Unique,
-        defined_on_field: true,
-        algorithm: None,
-    });
-}
-
-#[test]
-fn implicit_unique_constraint_on_compound_one_to_one() {
-    let dml = with_header(
-        r#"
-     model User {
-         user_id_1  Int    
-         user_id_2  Int    
-         post       Post?
-         
-         @@id([user_id_1, user_id_2])
-     }
-
-     model Post {
-         post_id    Int    @id
-         user_id_1  Int      
-         user_id_2  Int      
-         user       User   @relation(fields: [user_id_1, user_id_2], references: [user_id_1, user_id_2])
-     }
-     "#,
-        Provider::Postgres,
-        &[],
-    );
-
-    let schema = parse(&dml);
-
-    schema
-        .assert_has_model("User")
-        .assert_has_relation_field("post")
-        .assert_relation_fk_name(None);
-    schema
-        .assert_has_model("Post")
-        .assert_has_relation_field("user")
-        .assert_relation_referenced_fields(&["user_id_1", "user_id_2"])
-        .assert_relation_fk_name(Some("Post_user_id_1_user_id_2_fkey".to_string()));
-
-    schema.assert_has_model("Post").assert_has_index(IndexDefinition {
-        name: None,
-        db_name: Some("Post_user_id_1_user_id_2_key".to_string()),
-        fields: vec![IndexField::new("user_id_1"), IndexField::new("user_id_2")],
-        tpe: IndexType::Unique,
-        defined_on_field: false,
-        algorithm: None,
-    });
-}
-
-#[test]
-fn no_unique_constraint_if_referring_the_pk() {
-    let dml = with_header(
-        indoc! {r#"
-        model Cat {
-          id      Int @id
-          collar  Collar?
-        }
-
-        model Collar {
-          id      Int @id
-          cat     Cat @relation(fields:[id], references: [id])
-        }
-    "#},
-        Provider::Postgres,
-        &[],
-    );
-
-    let expected = expect![[r#"
-        model Cat {
-          id     Int     @id
-          collar Collar?
-        }
-
-        model Collar {
-          id  Int @id
-          cat Cat @relation(fields: [id], references: [id])
-        }
-    "#]];
-
-    expected.assert_eq(&render_datamodel_to_string(&parse(&dml), None));
-}
-
-#[test]
 fn one_to_one_optional() {
-    let dml = r#"
+    let dml = indoc! {r#"
         model A {
           id Int @id
           b  B?
         }
 
         model B {
-          id   Int @id
-          a_id Int?
-          a    A? @relation(fields: [a_id], references: [id])
+          id   Int  @id
+          a_id Int? @unique
+          a    A?   @relation(fields: [a_id], references: [id])
         }
-    "#;
+    "#};
+
+    let schema = parse(dml);
+    schema.assert_has_model("A").assert_has_relation_field("b");
+    schema.assert_has_model("B").assert_has_relation_field("a");
+}
+
+#[test]
+fn one_to_one_pk_pk() {
+    let dml = indoc! {r#"
+        model A {
+          id Int @id
+          b  B?
+        }
+
+        model B {
+          id   Int  @id
+          a    A?   @relation(fields: [id], references: [id])
+        }
+    "#};
+
+    let schema = parse(dml);
+    schema.assert_has_model("A").assert_has_relation_field("b");
+    schema.assert_has_model("B").assert_has_relation_field("a");
+}
+
+#[test]
+fn one_to_one_compound_optional() {
+    let dml = indoc! {r#"
+        model A {
+          id  Int
+          id2 Int
+          b   B?
+
+          @@id([id, id2])
+        }
+
+        model B {
+          id    Int  @id
+          a_id  Int?
+          a_id2 Int?
+          a     A?   @relation(fields: [a_id, a_id2], references: [id, id2])
+
+          @@unique([a_id, a_id2])
+        }
+    "#};
+
+    let schema = parse(dml);
+    schema.assert_has_model("A").assert_has_relation_field("b");
+    schema.assert_has_model("B").assert_has_relation_field("a");
+}
+
+#[test]
+fn one_to_one_compound_pk_pk() {
+    let dml = indoc! {r#"
+        model A {
+          id  Int
+          id2 Int
+          b   B?
+
+          @@id([id, id2])
+        }
+
+        model B {
+          id  Int
+          id2 Int
+          a   A?  @relation(fields: [id, id2], references: [id, id2])
+
+          @@id([id, id2])
+        }
+    "#};
 
     let schema = parse(dml);
     schema.assert_has_model("A").assert_has_relation_field("b");
@@ -506,31 +441,31 @@ fn one_to_one_optional() {
 #[test]
 fn mongodb_inline_many_to_many_relations_are_allowed() {
     let schema = indoc! {r#"
-    datasource db {
-      provider = "mongodb"
-      url = env("DB_URL")
-    }
+        datasource db {
+          provider = "mongodb"
+          url = env("DB_URL")
+        }
 
-    generator js {
-      provider = "prisma-client-js"
-      previewFeatures = ["mongoDb"]
-    }
+        generator js {
+          provider = "prisma-client-js"
+          previewFeatures = ["mongoDb"]
+        }
 
-    model A {
-        id  String  @id @map("_id") @db.ObjectId
-        gql String?
+        model A {
+          id  String  @id @map("_id") @db.ObjectId
+          gql String?
 
-        b_ids String[] @db.Array(ObjectId)
-        bs    B[]      @relation(fields: [b_ids])
-    }
+          b_ids String[] @db.Array(ObjectId)
+          bs    B[]      @relation(fields: [b_ids])
+        }
 
-    model B {
-        id  String  @id @map("_id") @db.ObjectId
-        gql String?
+        model B {
+          id  String  @id @map("_id") @db.ObjectId
+          gql String?
 
-        a_ids String[] @db.Array(ObjectId)
-        as    A[]      @relation(fields: [a_ids])
-    }
+          a_ids String[] @db.Array(ObjectId)
+          as    A[]      @relation(fields: [a_ids])
+        }
     "#};
 
     let schema = parse(schema);

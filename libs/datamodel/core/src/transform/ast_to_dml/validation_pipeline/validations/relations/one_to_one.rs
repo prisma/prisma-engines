@@ -244,6 +244,7 @@ pub(crate) fn back_relation_arity_is_optional(relation: InlineRelationWalker<'_,
     }
 }
 
+/// Fields and references arguments must be on the non-optional side.
 pub(crate) fn fields_and_references_on_wrong_side(relation: InlineRelationWalker<'_, '_>, ctx: &mut Context<'_>) {
     let (forward, back) = match (relation.forward_relation_field(), relation.back_relation_field()) {
         (Some(forward), Some(back)) if ctx.diagnostics.errors().is_empty() => (forward, back),
@@ -265,4 +266,49 @@ pub(crate) fn fields_and_references_on_wrong_side(relation: InlineRelationWalker
             back.ast_field().span,
         ));
     }
+}
+
+/// The scalar fields on the referencing side must hold a unique constraint.
+pub(crate) fn referencing_with_unique_fields(relation: InlineRelationWalker<'_, '_>, ctx: &mut Context<'_>) {
+    let relation = match relation.as_complete() {
+        Some(r) => r,
+        None => return,
+    };
+
+    let model = relation.referencing_model();
+
+    let uses_unique_criteria = model.unique_criterias().any(|c| {
+        let sizes_match = c.fields().len() == relation.referencing_fields().len();
+        let fields_match = c.fields().zip(relation.referencing_fields()).all(|(a, b)| a == b);
+
+        sizes_match && fields_match
+    });
+
+    if uses_unique_criteria {
+        return;
+    }
+
+    let base = "A unique constraint is required to enforce the one-to-one relation.";
+    let mut fields = relation.referencing_fields().map(|f| f.name());
+
+    let message = match fields.len() {
+        0 => return,
+        1 => format!(
+            "{} Please add a `@unique` attribute to the scalar field `{}`.",
+            base,
+            fields.next().unwrap(),
+        ),
+        _ => format!(
+            "{} Please add an attribute `@@unique([{}])` to the `{}` model.",
+            base,
+            fields.join(", "),
+            model.name(),
+        ),
+    };
+
+    ctx.push_error(DatamodelError::new_attribute_validation_error(
+        &message,
+        RELATION_ATTRIBUTE_NAME,
+        relation.referencing_field().ast_field().span,
+    ));
 }

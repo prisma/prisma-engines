@@ -91,13 +91,6 @@ impl<'ast, 'db> IndexWalker<'ast, 'db> {
             })
     }
 
-    pub(crate) fn contains_exactly_fields(
-        self,
-        fields: impl ExactSizeIterator<Item = ScalarFieldWalker<'ast, 'db>>,
-    ) -> bool {
-        self.index_attribute.fields.len() == fields.len() && self.fields().zip(fields).all(|(a, b)| a == b)
-    }
-
     /// Whether the index is defined on a single field (otherwise: on the model).
     pub fn is_defined_on_field(self) -> bool {
         self.index_attribute.source_field.is_some()

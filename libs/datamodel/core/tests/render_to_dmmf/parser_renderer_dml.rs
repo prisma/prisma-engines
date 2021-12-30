@@ -23,7 +23,7 @@ fn test_parser_renderer_via_dml() {
         model Profile {
           id     Int    @id
           bio    String
-          userId Int
+          userId Int    @unique
           user   User   @relation(fields: [userId], references: [id])
 
           @@map("profile")
@@ -66,7 +66,7 @@ fn test_parser_renderer_via_dml() {
 
         model A {
           id  Int @id
-          bId Int
+          bId Int @unique
           b   B   @relation(fields: [bId], references: [id])
         }
 
