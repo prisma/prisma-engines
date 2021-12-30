@@ -69,7 +69,7 @@ pub(crate) enum FunctionType<'a> {
     JsonExtractFirstArrayElem(JsonExtractFirstArrayElem<'a>),
     #[cfg(any(feature = "postgresql", feature = "mysql"))]
     TextSearch(TextSearch<'a>),
-    #[cfg(feature = "postgresql")]
+    #[cfg(any(feature = "postgresql", feature = "mysql"))]
     TextSearchRelevance(TextSearchRelevance<'a>),
 }
 
@@ -100,7 +100,7 @@ function!(JsonExtractFirstArrayElem);
 #[cfg(any(feature = "postgresql", feature = "mysql"))]
 function!(TextSearch);
 
-#[cfg(feature = "postgresql")]
+#[cfg(any(feature = "postgresql", feature = "mysql"))]
 function!(TextSearchRelevance);
 
 function!(

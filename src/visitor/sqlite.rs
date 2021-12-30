@@ -271,6 +271,11 @@ impl<'a> Visitor<'a> for Sqlite<'a> {
         unimplemented!("Full-text search is not yet supported on SQLite")
     }
 
+    #[cfg(feature = "postgresql")]
+    fn visit_text_search_relevance(&mut self, _text_search_relevance: TextSearchRelevance<'a>) -> visitor::Result {
+        unimplemented!("Full-text search is not yet supported on SQLite")
+    }
+
     #[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
     fn visit_json_extract_last_array_item(&mut self, _extract: JsonExtractLastArrayElem<'a>) -> visitor::Result {
         unimplemented!("JSON filtering is not yet supported on SQLite")

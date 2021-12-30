@@ -54,14 +54,14 @@ pub struct TextSearchRelevance<'a> {
 ///
 /// assert_eq!(
 ///    "SELECT \"recipes\".* FROM \"recipes\" WHERE \
-///     ts_rank(to_tsvector(\"name\"|| ' ' ||\"ingredients\"), to_tsquery($1)) > $2", sql
+///     ts_rank(to_tsvector(concat_ws(' ', \"name\",\"ingredients\")), to_tsquery($1)) > $2", sql
 /// );
 ///
 /// assert_eq!(params, vec![Value::from("chicken"), Value::from(0.1)]);
 /// # Ok(())    
 /// # }
 /// ```
-#[cfg(feature = "postgresql")]
+#[cfg(any(feature = "postgresql", feature = "mysql"))]
 pub fn text_search_relevance<'a, E: Clone, Q>(exprs: &[E], query: Q) -> super::Function<'a>
 where
     E: Into<Expression<'a>>,

@@ -620,6 +620,14 @@ impl<'a> Visitor<'a> for Mssql<'a> {
         unimplemented!("Full-text search is not yet supported on MSSQL")
     }
 
+    #[cfg(feature = "postgresql")]
+    fn visit_text_search_relevance(
+        &mut self,
+        _text_search_relevance: crate::prelude::TextSearchRelevance<'a>,
+    ) -> visitor::Result {
+        unimplemented!("Full-text search is not yet supported on MSSQL")
+    }
+
     #[cfg(all(feature = "json", any(feature = "postgresql", feature = "mysql")))]
     fn visit_json_extract_last_array_item(
         &mut self,

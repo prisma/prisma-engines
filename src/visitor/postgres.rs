@@ -362,7 +362,6 @@ impl<'a> Visitor<'a> for Postgres<'a> {
         }
     }
 
-    #[cfg(feature = "postgresql")]
     fn visit_text_search(&mut self, text_search: crate::prelude::TextSearch<'a>) -> visitor::Result {
         let len = text_search.exprs.len();
         self.surround_with("to_tsvector(concat_ws(' ', ", "))", |s| {
@@ -378,7 +377,6 @@ impl<'a> Visitor<'a> for Postgres<'a> {
         })
     }
 
-    #[cfg(feature = "postgresql")]
     fn visit_matches(&mut self, left: Expression<'a>, right: std::borrow::Cow<'a, str>, not: bool) -> visitor::Result {
         if not {
             self.write("(NOT ")?;
@@ -391,6 +389,30 @@ impl<'a> Visitor<'a> for Postgres<'a> {
         if not {
             self.write(")")?;
         }
+
+        Ok(())
+    }
+
+    fn visit_text_search_relevance(&mut self, text_search_relevance: TextSearchRelevance<'a>) -> visitor::Result {
+        let len = text_search_relevance.exprs.len();
+        let exprs = text_search_relevance.exprs;
+        let query = text_search_relevance.query;
+
+        self.write("ts_rank(")?;
+        self.surround_with("to_tsvector(concat_ws(' ', ", "))", |s| {
+            for (i, expr) in exprs.into_iter().enumerate() {
+                s.visit_expression(expr)?;
+
+                if i < (len - 1) {
+                    s.write(",")?;
+                }
+            }
+
+            Ok(())
+        })?;
+        self.write(", ")?;
+        self.surround_with("to_tsquery(", ")", |s| s.visit_parameterized(Value::text(query)))?;
+        self.write(")")?;
 
         Ok(())
     }

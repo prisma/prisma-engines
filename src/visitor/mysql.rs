@@ -441,7 +441,6 @@ impl<'a> Visitor<'a> for Mysql<'a> {
         Ok(())
     }
 
-    #[cfg(any(feature = "postgresql", feature = "mysql"))]
     fn visit_text_search(&mut self, text_search: crate::prelude::TextSearch<'a>) -> visitor::Result {
         let len = text_search.exprs.len();
         self.surround_with("MATCH (", ")", |s| {
@@ -457,7 +456,6 @@ impl<'a> Visitor<'a> for Mysql<'a> {
         })
     }
 
-    #[cfg(any(feature = "postgresql", feature = "mysql"))]
     fn visit_matches(&mut self, left: Expression<'a>, right: std::borrow::Cow<'a, str>, not: bool) -> visitor::Result {
         if not {
             self.write("(NOT ")?;
@@ -471,6 +469,17 @@ impl<'a> Visitor<'a> for Mysql<'a> {
         if not {
             self.write(")")?;
         }
+
+        Ok(())
+    }
+
+    fn visit_text_search_relevance(&mut self, text_search_relevance: TextSearchRelevance<'a>) -> visitor::Result {
+        let exprs = text_search_relevance.exprs;
+        let query = text_search_relevance.query;
+
+        let text_search = TextSearch { exprs };
+
+        self.visit_matches(text_search.into(), query, false)?;
 
         Ok(())
     }
