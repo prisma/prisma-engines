@@ -169,14 +169,13 @@ pub async fn update_records<'conn>(
                         .map(|val| (field, val).into_bson())
                         .collect::<crate::Result<Vec<_>>>()?
                         .into_iter()
-                        .map(|bson_array| {
+                        .map(|bson| {
                             // Strip the list from the BSON values. [Todo] This is unfortunately necessary right now due to how the
-                            // conversion is set up, we should clean that up at some point (move from traits to fns).
-                            if let Bson::Array(mut inner) = bson_array {
+                            // conversion is set up with native types, we should clean that up at some point (move from traits to fns?).
+                            if let Bson::Array(mut inner) = bson {
                                 inner.pop().unwrap()
                             } else {
-                                // We know that it's a list field, so the result is always a BSON array.
-                                unreachable!()
+                                bson
                             }
                         })
                         .collect();
@@ -193,15 +192,20 @@ pub async fn update_records<'conn>(
                     }
                 }
                 val => {
-                    let bson_val = (field, val).into_bson()?;
+                    let bson_val = match (field, val).into_bson()? {
+                        bson @ Bson::Array(_) => bson,
+                        bson => Bson::Array(vec![bson]),
+                    };
 
                     doc! {
-                        "$set": { field_name: {
-                            "$ifNull": [
-                                { "$concatArrays": [dollar_field_name, bson_val.clone()] },
-                                bson_val
-                            ]
-                        } }
+                        "$set": {
+                            field_name: {
+                                "$ifNull": [
+                                    { "$concatArrays": [dollar_field_name, bson_val.clone()] },
+                                    bson_val
+                                ]
+                            }
+                        }
                     }
                 }
             },
