@@ -156,12 +156,6 @@
 <span id="156">156</span>
 <span id="157">157</span>
 <span id="158">158</span>
-<span id="159">159</span>
-<span id="160">160</span>
-<span id="161">161</span>
-<span id="162">162</span>
-<span id="163">163</span>
-<span id="164">164</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">connector_interface::error</span>::{<span class="ident">ConnectorError</span>, <span class="ident">ErrorKind</span>, <span class="ident">MultiError</span>};
 <span class="kw">use</span> <span class="ident">itertools::Itertools</span>;
 <span class="kw">use</span> <span class="ident">mongodb::error</span>::{<span class="ident">CommandError</span>, <span class="ident">Error</span> <span class="kw">as</span> <span class="ident">DriverError</span>};
@@ -178,10 +172,6 @@
     <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Failed to convert &#39;{}&#39; to &#39;{}&#39;.&quot;</span>, <span class="ident">from</span>, <span class="ident">to</span>)]</span>
     <span class="ident">ConversionError</span> { <span class="ident">from</span>: <span class="ident">String</span>, <span class="ident">to</span>: <span class="ident">String</span> },
 
-    <span class="doccomment">/// Unhanded behavior error.</span>
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Unhandled behavior: {0}.&quot;</span>)]</span>
-    <span class="ident">UnhandledError</span>(<span class="ident">String</span>),
-
     <span class="doccomment">/// ObjectID specific conversion error.</span>
     <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Malformed ObjectID: {0}.&quot;</span>)]</span>
     <span class="ident">MalformedObjectId</span>(<span class="ident">String</span>),
@@ -197,12 +187,10 @@
     <span class="ident">JsonError</span>(<span class="attribute">#[<span class="ident">from</span>]</span> <span class="ident">serde_json::Error</span>),
 }
 
-<span class="comment">// Error translation is WIP.</span>
 <span class="kw">impl</span> <span class="ident">MongoError</span> {
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_connector_error</span>(<span class="self">self</span>) -&gt; <span class="ident">ConnectorError</span> {
         <span class="kw">match</span> <span class="self">self</span> {
             <span class="ident">MongoError::Unsupported</span>(<span class="ident">feature</span>) =&gt; <span class="ident">ConnectorError::from_kind</span>(<span class="ident">ErrorKind::UnsupportedFeature</span>(<span class="ident">feature</span>)),
-            <span class="ident">MongoError::UnhandledError</span>(<span class="ident">reason</span>) =&gt; <span class="ident">ConnectorError::from_kind</span>(<span class="ident">ErrorKind::UnsupportedFeature</span>(<span class="ident">reason</span>)),
             <span class="ident">MongoError::UuidError</span>(<span class="ident">err</span>) =&gt; <span class="ident">ConnectorError::from_kind</span>(<span class="ident">ErrorKind::ConversionError</span>(<span class="ident">err</span>.<span class="ident">into</span>())),
             <span class="ident">MongoError::JsonError</span>(<span class="ident">err</span>) =&gt; <span class="ident">ConnectorError::from_kind</span>(<span class="ident">ErrorKind::ConversionError</span>(<span class="ident">err</span>.<span class="ident">into</span>())),
 

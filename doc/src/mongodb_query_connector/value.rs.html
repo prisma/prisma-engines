@@ -622,10 +622,10 @@
         (<span class="ident">TypeIdentifier::Json</span>, <span class="ident">bson</span>) =&gt; <span class="ident">PrismaValue::Json</span>(<span class="ident">serde_json::to_string</span>(<span class="kw-2">&amp;</span><span class="ident">bson</span>.<span class="ident">into_relaxed_extjson</span>())<span class="question-mark">?</span>),
 
         (<span class="ident">ident</span>, <span class="ident">bson</span>) =&gt; {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">MongoError::UnhandledError</span>(<span class="macro">format!</span>(
-                <span class="string">&quot;Converting BSON to type {:?}. Data: {:?}&quot;</span>,
-                <span class="ident">ident</span>, <span class="ident">bson</span>
-            )))
+            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">MongoError::ConversionError</span> {
+                <span class="ident">from</span>: <span class="ident">bson</span>.<span class="ident">to_string</span>(),
+                <span class="ident">to</span>: <span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="ident">ident</span>),
+            })
         }
     };
 
