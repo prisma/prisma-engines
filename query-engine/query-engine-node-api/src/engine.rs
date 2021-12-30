@@ -18,9 +18,8 @@ use tracing_opentelemetry::OpenTelemetrySpanExt;
 
 /// The main engine, that can be cloned between threads when using JavaScript
 /// promises.
-#[derive(Clone)]
 pub struct QueryEngine {
-    inner: Arc<RwLock<Inner>>,
+    inner: RwLock<Inner>,
 }
 
 /// The state of the engine.
@@ -167,7 +166,7 @@ impl QueryEngine {
         };
 
         Ok(Self {
-            inner: Arc::new(RwLock::new(Inner::Builder(builder))),
+            inner: RwLock::new(Inner::Builder(builder)),
         })
     }
 
