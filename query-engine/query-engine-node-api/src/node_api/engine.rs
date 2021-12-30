@@ -3,11 +3,15 @@ use napi_derive::napi;
 
 use crate::engine::ConstructorOptions;
 
+/// The Node API interface layer of the Query Engine.
 #[napi]
-pub struct QueryEngine(crate::engine::QueryEngine);
+pub struct QueryEngine {
+    inner: crate::engine::QueryEngine,
+}
 
 #[napi]
 impl QueryEngine {
+    /// Creates a new Query Engine, doesn't connect.
     #[napi(constructor)]
     pub fn new(env: Env, options: JsUnknown, callback: JsFunction) -> napi::Result<Self> {
         let params: ConstructorOptions = env.from_js_value(options)?;
@@ -21,59 +25,60 @@ impl QueryEngine {
 
         log_callback.unref(&env)?;
 
-        Ok(Self(crate::engine::QueryEngine::new(params, log_callback)?))
+        Ok(Self {
+            inner: crate::engine::QueryEngine::new(params, log_callback)?,
+        })
     }
 
+    /// Connect to the underlying database.
     #[napi]
     pub async fn connect(&self) -> napi::Result<()> {
-        let engine = self.0.clone();
-        engine.connect().await?;
+        self.inner.connect().await?;
         Ok(())
     }
 
+    /// Disconnect from the underlying database.
     #[napi]
     pub async fn disconnect(&self) -> napi::Result<()> {
-        let engine = self.0.clone();
-        engine.disconnect().await?;
+        self.inner.disconnect().await?;
         Ok(())
     }
 
+    /// Perform a GraphQL query.
     #[napi]
     pub async fn query(&self, body: String, trace: String, tx_id: Option<String>) -> napi::Result<String> {
-        let engine: crate::engine::QueryEngine = self.0.clone();
         let body = serde_json::from_str(&body)?;
         let trace = serde_json::from_str(&trace)?;
-        let response = engine.query(body, trace, tx_id).await?;
+        let response = self.inner.query(body, trace, tx_id).await?;
         let res = serde_json::to_string(&response)?;
         Ok(res)
     }
 
+    /// Return the underlying schema.
     #[napi]
     pub async fn sdl_schema(&self) -> napi::Result<String> {
-        let engine: crate::engine::QueryEngine = self.0.clone();
-        Ok(engine.sdl_schema().await?)
+        Ok(self.inner.sdl_schema().await?)
     }
 
+    /// Start a long-running transaction.
     #[napi]
     pub async fn start_transaction(&self, input: String, tx_id: String) -> napi::Result<String> {
-        let engine: crate::engine::QueryEngine = self.0.clone();
         let input = serde_json::from_str(&input)?;
         let trace = serde_json::from_str(&tx_id)?;
-        Ok(engine.start_tx(input, trace).await?)
+        Ok(self.inner.start_tx(input, trace).await?)
     }
 
+    /// Commit a long-running transaction.
     #[napi]
     pub async fn commit_transaction(&self, tx_id: String, trace: String) -> napi::Result<String> {
-        let engine: crate::engine::QueryEngine = self.0.clone();
-
         let trace = serde_json::from_str(&trace)?;
-        Ok(engine.commit_tx(tx_id, trace).await?)
+        Ok(self.inner.commit_tx(tx_id, trace).await?)
     }
 
+    /// Rollback a long-running transaction.
     #[napi]
     pub async fn rollback_transaction(&self, tx_id: String, trace: String) -> napi::Result<String> {
-        let engine: crate::engine::QueryEngine = self.0.clone();
         let trace = serde_json::from_str(&trace)?;
-        Ok(engine.rollback_tx(tx_id, trace).await?)
+        Ok(self.inner.rollback_tx(tx_id, trace).await?)
     }
 }
