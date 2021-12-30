@@ -2037,13 +2037,13 @@ dependencies = [
 
 [[package]]
 name = "napi"
-version = "2.0.0-beta.3"
+version = "2.0.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "47575d07581f1fe81a887d80a798695e563f080c55add8fca235f478aeff39fb"
+checksum = "c4cfe7fef533df6323a5aa17d75cb162850f2b045adabb9922bfbd234426a1bb"
 dependencies = [
  "ctor",
+ "lazy_static",
  "napi-sys",
- "once_cell",
  "serde",
  "serde_json",
  "tokio",
@@ -2058,9 +2058,9 @@ checksum = "ebd4419172727423cf30351406c54f6cc1b354a2cfb4f1dba3e6cd07f6d5522b"
 
 [[package]]
 name = "napi-derive"
-version = "2.0.0-beta.2"
+version = "2.0.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9b5920ba6c07f3a38e5810d427d460aae1227002ce419acd498c7163ba116ef7"
+checksum = "1fb47b1f5f021abe96fcb84e7977f46c0aa645904c18cdb7b3a031e61899bf48"
 dependencies = [
  "convert_case",
  "napi-derive-backend",
@@ -2071,9 +2071,9 @@ dependencies = [
 
 [[package]]
 name = "napi-derive-backend"
-version = "1.0.14"
+version = "1.0.21"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f00d3306b798257d191ab675ca66c2023f9a4fe8a3268e217bb376f7ec924a13"
+checksum = "487c39117657211e9bf93acade9363eac61ceead142e4906d15ff08d29fa448d"
 dependencies = [
  "convert_case",
  "proc-macro2",
@@ -3465,7 +3465,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e0bccbcf40c8938196944a3da0e133e031a33f4d6b72db3bda3cc556e361905d"
 dependencies = [
  "lazy_static",
- "parking_lot 0.10.2",
+ "parking_lot 0.11.2",
  "serial_test_derive",
 ]
 
@@ -4486,7 +4486,7 @@ version = "1.6.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "1f559b464de2e2bdabcac6a210d12e9b5a5973c251e102c44c585c71d51bd78e"
 dependencies = [
- "cfg-if 0.1.10",
+ "cfg-if 1.0.0",
  "rand 0.8.4",
  "static_assertions",
 ]
@@ -4802,18 +4802,9 @@ dependencies = [
 
 [[package]]
 name = "windows"
-version = "0.27.0"
+version = "0.29.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ebbc80318ebf919219a113c41deae34aa90198e4a15e93c810a9ea1aaa4c1a78"
-dependencies = [
- "windows-sys",
-]
-
-[[package]]
-name = "windows-sys"
-version = "0.27.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "39cae116ee11e4bce7c0a0425f2b0c866a91d86d209624b7707a7deea52da786"
+checksum = "aac7fef12f4b59cd0a29339406cc9203ab44e440ddff6b3f5a41455349fa9cf3"
 dependencies = [
  "windows_aarch64_msvc",
  "windows_i686_gnu",
@@ -4824,33 +4815,33 @@ dependencies = [
 
 [[package]]
 name = "windows_aarch64_msvc"
-version = "0.27.0"
+version = "0.29.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ec7d1649bbab232cde71148c6ef7bbe647f214d2154dd66347fada60de40cda7"
+checksum = "c3d027175d00b01e0cbeb97d6ab6ebe03b12330a35786cbaca5252b1c4bf5d9b"
 
 [[package]]
 name = "windows_i686_gnu"
-version = "0.27.0"
+version = "0.29.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b4eb20b59b93fc302839f3b0df3e61de7e9606b44cb54cbeb68d71cf137309fa"
+checksum = "8793f59f7b8e8b01eda1a652b2697d87b93097198ae85f823b969ca5b89bba58"
 
 [[package]]
 name = "windows_i686_msvc"
-version = "0.27.0"
+version = "0.29.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "40331d8ef3e4dcdc8982eb7de16e1f09b86f5384626a56b3a99c2a51b88ff98e"
+checksum = "8602f6c418b67024be2996c512f5f995de3ba417f4c75af68401ab8756796ae4"
 
 [[package]]
 name = "windows_x86_64_gnu"
-version = "0.27.0"
+version = "0.29.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5937d290e39c3308147d9b877c5fa741c50f4121ea78d2d20c4a138ad365464a"
+checksum = "f3d615f419543e0bd7d2b3323af0d86ff19cbc4f816e6453f36a2c2ce889c354"
 
 [[package]]
 name = "windows_x86_64_msvc"
-version = "0.27.0"
+version = "0.29.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "dee1b76aec4e2bead4758a181b663c37af0de7ec56fe6837c10215b8d6a1635f"
+checksum = "11d95421d9ed3672c280884da53201a5c46b7b2765ca6faf34b0d71cf34a3561"
 
 [[package]]
 name = "winreg"
