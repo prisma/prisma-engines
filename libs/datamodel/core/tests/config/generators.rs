@@ -1,3 +1,5 @@
+use datamodel::Datamodel;
+
 use crate::common::*;
 
 #[test]
@@ -419,4 +421,46 @@ fn empty_preview_features_array_with_empty_space_should_work() {
     let (config, _) = datamodel::parse_schema(schema).unwrap();
 
     assert!(config.preview_features().is_empty());
+}
+
+#[test]
+fn empty_preview_features_are_kept_when_rendering() {
+    let schema = indoc! {r#"
+       generator js1 {
+         provider = "a_cat"
+         previewFeatures = []
+       }
+    "#};
+
+    let config = parse_configuration(schema);
+    let rendered = datamodel::render_datamodel_and_config_to_string(&Datamodel::default(), &config);
+
+    let expected = expect![[r#"
+       generator js1 {
+         provider        = "a_cat"
+         previewFeatures = []
+       }
+    "#]];
+
+    expected.assert_eq(&rendered);
+}
+
+#[test]
+fn not_defining_preview_features_should_not_add_them_as_empty_when_rendering() {
+    let schema = indoc! {r#"
+       generator js1 {
+         provider = "a_cat"
+       }
+    "#};
+
+    let config = parse_configuration(schema);
+    let rendered = datamodel::render_datamodel_and_config_to_string(&Datamodel::default(), &config);
+
+    let expected = expect![[r#"
+       generator js1 {
+         provider = "a_cat"
+       }
+    "#]];
+
+    expected.assert_eq(&rendered);
 }

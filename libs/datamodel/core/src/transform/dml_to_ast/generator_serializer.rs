@@ -17,20 +17,20 @@ impl GeneratorSerializer {
     }
 
     fn lower_generator(generator: &Generator) -> ast::GeneratorConfig {
-        let mut arguments: Vec<ast::Argument> = vec![super::lower_string_from_env_var("provider", &generator.provider)];
+        let mut properties: Vec<ast::Argument> =
+            vec![super::lower_string_from_env_var("provider", &generator.provider)];
 
         if let Some(output) = &generator.output {
-            arguments.push(super::lower_string_from_env_var("output", output));
+            properties.push(super::lower_string_from_env_var("output", output));
         }
 
-        if !&generator.preview_features.is_empty() {
-            let features: Vec<ast::Expression> = generator
-                .preview_features
+        if let Some(ref features) = dbg!(&generator.preview_features) {
+            let features: Vec<ast::Expression> = features
                 .iter()
                 .map(|f| ast::Expression::StringValue(f.to_string(), ast::Span::empty()))
                 .collect::<Vec<ast::Expression>>();
 
-            arguments.push(ast::Argument::new_array("previewFeatures", features));
+            properties.push(dbg!(ast::Argument::new_array("previewFeatures", features)));
         }
 
         let platform_values: Vec<ast::Expression> = generator
@@ -38,17 +38,18 @@ impl GeneratorSerializer {
             .iter()
             .map(|p| lower_string_from_env_var("binaryTargets", p).value)
             .collect();
+
         if !platform_values.is_empty() {
-            arguments.push(ast::Argument::new_array("binaryTargets", platform_values));
+            properties.push(ast::Argument::new_array("binaryTargets", platform_values));
         }
 
         for (key, value) in &generator.config {
-            arguments.push(ast::Argument::new_string(key, value.to_string()));
+            properties.push(ast::Argument::new_string(key, value.to_string()));
         }
 
         ast::GeneratorConfig {
             name: ast::Identifier::new(&generator.name),
-            properties: arguments,
+            properties,
             documentation: generator.documentation.clone().map(|text| ast::Comment { text }),
             span: ast::Span::empty(),
         }
