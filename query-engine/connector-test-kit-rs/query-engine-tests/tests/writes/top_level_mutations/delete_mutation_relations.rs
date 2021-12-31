@@ -45,6 +45,7 @@ mod delete_mutation_relations {
     // "a P1 to C1  relation " should "succeed when trying to delete the parent"
     #[relation_link_test(on_parent = "ToOneOpt", on_child = "ToOneOpt")]
     async fn p1_c1_no_children(runner: &Runner, t: &DatamodelWithParams) -> TestResult<()> {
+        dbg!(t);
         runner
             .query(format!(
                 r#" mutation {{
@@ -372,7 +373,7 @@ mod delete_mutation_relations {
                 #id(id, Int, @id)
 
                 s         String  @unique
-                parentId  Int?
+                parentId  Int?    @unique
                 parentOpt Parent? @relation(fields: [parentId], references: [id])
                }"#
         };
@@ -387,7 +388,7 @@ mod delete_mutation_relations {
                 #m2m(childrenOpt, Child[], Int)
 
                 p            String     @unique
-                stepChildId  Int?
+                stepChildId  Int?       @unique
                 stepChildOpt StepChild? @relation(fields: [stepChildId], references: [id])
                }
 

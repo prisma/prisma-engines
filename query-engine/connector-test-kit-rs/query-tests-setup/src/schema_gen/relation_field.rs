@@ -25,6 +25,14 @@ impl RelationField {
         }
     }
 
+    pub fn is_many(&self) -> bool {
+        match self {
+            RelationField::ToOneOpt { .. } => false,
+            RelationField::ToOneReq { .. } => false,
+            RelationField::ToMany { .. } => true,
+        }
+    }
+
     pub fn field_name(&self) -> String {
         match self {
             RelationField::ToOneOpt { child } => match child {

@@ -165,8 +165,8 @@ pub fn schema_with_relation(
                             let datamodel = indoc::formatdoc! {"
                                 model Parent {{
                                     p             String    @unique
-                                    p_1           String
-                                    p_2           String
+                                    p_1           String    @unique
+                                    p_2           String    @unique
                                     {parent_field}
                                     non_unique    String?
                                     {parent_id}
@@ -176,8 +176,8 @@ pub fn schema_with_relation(
 
                                 model Child {{
                                     c              String    @unique
-                                    c_1            String
-                                    c_2            String
+                                    c_1            String    @unique
+                                    c_2            String    @unique
                                     {child_field}
                                     non_unique     String?
                                     {child_id}
@@ -232,18 +232,23 @@ fn render_relation_fields(
 
         (rendered_parent, rendered_child)
     } else {
-        let rendered_parent = format!(
+        let mut rendered_parent = format!(
             "{} {} {}",
             parent.field_name(),
             parent.type_name(),
             parent_ref_to_child.render()
         );
+
         let rendered_child = format!(
             "{} {} {}",
             child.field_name(),
             child.type_name(),
             child_ref_to_parent.render()
         );
+
+        if !parent.is_many() && !child.is_many() {
+            rendered_parent.push_str(parent_ref_to_child.compound_unique_index());
+        }
 
         (rendered_parent, rendered_child)
     }

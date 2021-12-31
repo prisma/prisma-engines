@@ -30,6 +30,21 @@ impl<'a> RelationReference<'a> {
         }
     }
 
+    pub(crate) fn compound_unique_index(&self) -> &'static str {
+        match self {
+            RelationReference::SimpleChildId(_) => "",
+            RelationReference::SimpleParentId(_) => "",
+            RelationReference::CompoundParentId(_) => "\n @@unique([parent_id_1, parent_id_2])",
+            RelationReference::CompoundChildId(_) => "\n @@unique([child_id_1, child_id_2])",
+            RelationReference::ParentReference(_) => "",
+            RelationReference::CompoundParentReference(_) => "\n @@unique([parent_p_1, parent_p_2])",
+            RelationReference::ChildReference(_) => "",
+            RelationReference::CompoundChildReference(_) => "\n @@unique([child_c_1, child_c_2])",
+            RelationReference::IdReference => "",
+            RelationReference::NoRef => "",
+        }
+    }
+
     fn render_simple_child_id(&self, rf: &RelationField) -> String {
         match rf.is_list() {
             true => "@relation(references: [id])".to_string(),
@@ -59,9 +74,9 @@ impl<'a> RelationReference<'a> {
 
     fn render_compound_child_id(&self, rf: &RelationField) -> String {
         match rf.is_list() {
-          true => "@relation(references: [id_1, id_2])".to_string(),
-          false => format!("@relation(fields: [child_id_1, child_id_2], references: [id_1, id_2])\n child_id_1 String{}\n child_id_2 String{}", rf.optional_suffix(), rf.optional_suffix()),
-      }
+            true => "@relation(references: [id_1, id_2])".to_string(),
+            false => format!("@relation(fields: [child_id_1, child_id_2], references: [id_1, id_2])\n child_id_1 String{}\n child_id_2 String{}", rf.optional_suffix(), rf.optional_suffix()),
+        }
     }
 
     fn render_parent_ref(&self, rf: &RelationField) -> String {
