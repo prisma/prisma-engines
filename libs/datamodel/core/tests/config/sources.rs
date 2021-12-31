@@ -524,7 +524,8 @@ fn fail_when_preview_features_are_declared() {
           [1;94m-->[0m  [4mschema.prisma:4[0m
         [1;94m   | [0m
         [1;94m 3 | [0m  url = "mysql://"
-        [1;94m 4 | [0m  previewFeatures = [1;91m["foo"][0m
+        [1;94m 4 | [0m  [1;91mpreviewFeatures = ["foo"][0m
+        [1;94m 5 | [0m}
         [1;94m   | [0m
     "#]];
 
@@ -583,7 +584,8 @@ fn referential_integrity_without_preview_feature_errors() {
           [1;94m-->[0m  [4mschema.prisma:3[0m
         [1;94m   | [0m
         [1;94m 2 | [0m  provider = "sqlserver"
-        [1;94m 3 | [0m  referentialIntegrity = [1;91m"prisma"[0m
+        [1;94m 3 | [0m  [1;91mreferentialIntegrity = "prisma"[0m
+        [1;94m 4 | [0m  url = "mysql://root:prisma@localhost:3306/mydb"
         [1;94m   | [0m
     "#]];
 
