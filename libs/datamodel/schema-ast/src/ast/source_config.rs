@@ -1,4 +1,4 @@
-use super::{ConfigBlockProperty, Comment, Identifier, Span, WithDocumentation, WithIdentifier, WithSpan};
+use super::{Comment, ConfigBlockProperty, Identifier, Span, WithDocumentation, WithIdentifier, WithSpan};
 
 /// A source block declaration.
 #[derive(Debug, Clone)]

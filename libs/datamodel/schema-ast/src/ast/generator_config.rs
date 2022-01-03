@@ -1,5 +1,5 @@
-use crate::ast::config::ConfigBlockProperty;
 use super::{Comment, Identifier, Span, WithDocumentation, WithIdentifier, WithSpan};
+use crate::ast::config::ConfigBlockProperty;
 
 /// A Generator block declaration.
 #[derive(Debug, Clone)]

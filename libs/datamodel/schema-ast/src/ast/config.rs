@@ -1,4 +1,4 @@
-use crate::ast::{Span, WithSpan, Identifier, Expression};
+use crate::ast::{Expression, Identifier, Span, WithSpan};
 
 /// A named property in a config block.
 ///
@@ -37,4 +37,3 @@ impl WithSpan for ConfigBlockProperty {
         &self.span
     }
 }
-

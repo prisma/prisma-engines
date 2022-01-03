@@ -58,12 +58,6 @@ pub struct Argument {
     pub span: Span,
 }
 
-// impl WithIdentifier for Argument {
-//     fn identifier(&self) -> &Identifier {
-//         &self.name
-//     }
-// }
-
 impl Display for Argument {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         if let Some(name) = &self.name {

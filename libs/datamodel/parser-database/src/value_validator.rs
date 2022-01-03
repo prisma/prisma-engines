@@ -99,10 +99,7 @@ impl<'a> ValueValidator<'a> {
         &self,
     ) -> Result<Vec<(&'a str, Option<SortOrder>, Option<u32>)>, DatamodelError> {
         if let ast::Expression::Array(values, _) = &self.value {
-            values
-                .iter()
-                .map(|val| ValueValidator::new(val).as_func())
-                .collect()
+            values.iter().map(|val| ValueValidator::new(val).as_func()).collect()
         } else {
             // Single values are accepted as array literals, for example in `@relation(fields: userId)`.
             Ok(vec![self.as_func()?])
@@ -131,8 +128,7 @@ impl<'a> ValueValidator<'a> {
                 Some(("Desc", _)) => Ok(Some(SortOrder::Desc)),
                 None => Ok(None),
                 _ => Err(DatamodelError::ParserError {
-                    expected: vec!["Asc", "Desc"],
-                    expected_str: "Asc, Desc".to_string(),
+                    expected_str: "Asc, Desc".to_owned(),
                     span: arg.span,
                 }),
             })
@@ -144,12 +140,10 @@ impl<'a> ValueValidator<'a> {
             .find(|arg| arg.name.as_ref().map(|n| n.name.as_str()) == Some("length"))
             .map(|arg| match &arg.value {
                 Expression::NumericValue(s, _) => s.parse::<u32>().map_err(|_| DatamodelError::ParserError {
-                    expected: vec![],
                     expected_str: "valid integer".to_string(),
                     span: arg.span,
                 }),
                 _ => Err(DatamodelError::ParserError {
-                    expected: vec![],
                     expected_str: "valid integer".to_string(),
                     span: arg.span,
                 }),

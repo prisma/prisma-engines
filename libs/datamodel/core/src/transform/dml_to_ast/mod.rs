@@ -17,10 +17,10 @@ fn lower_string_from_env_var(arg_name: &str, string_from_env: &StringFromEnvVar)
         Some(ref env_var) => {
             let values = ast::ArgumentsList {
                 arguments: vec![ast::Argument::new_unnamed(ast::Expression::StringValue(
-                env_var.to_string(),
-                ast::Span::empty(),
-            ))],
-                    ..Default::default()
+                    env_var.to_string(),
+                    ast::Span::empty(),
+                ))],
+                ..Default::default()
             };
             ast::ConfigBlockProperty {
                 name: ast::Identifier::new(arg_name),

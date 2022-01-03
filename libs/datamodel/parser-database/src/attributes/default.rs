@@ -225,7 +225,7 @@ fn validate_dbgenerated_args(
             ));
         }
         None | Some(ast::Expression::StringValue(_, _)) => accept(),
-        _ => return bail(),
+        _ => bail(),
     }
 }
 

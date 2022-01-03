@@ -5,10 +5,7 @@ use super::{
 };
 use crate::ast;
 
-pub(crate) fn parse_arguments_list(
-    token: &Token<'_>,
-    arguments: &mut ast::ArgumentsList,
-) {
+pub(crate) fn parse_arguments_list(token: &Token<'_>, arguments: &mut ast::ArgumentsList) {
     debug_assert_eq!(token.as_rule(), Rule::arguments_list);
     for current in token.relevant_children() {
         match current.as_rule() {
@@ -27,7 +24,9 @@ pub(crate) fn parse_arguments_list(
                     .into_inner()
                     .find(|tok| tok.as_rule() == Rule::argument_name)
                     .unwrap();
-                arguments.empty_arguments.push(ast::EmptyArgument { name: name.to_id() })
+                arguments
+                    .empty_arguments
+                    .push(ast::EmptyArgument { name: name.to_id() })
             }
             Rule::trailing_comma => {
                 arguments.trailing_comma = Some(current.as_span().into());
