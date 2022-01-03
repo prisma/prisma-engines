@@ -1,6 +1,30 @@
 use indoc::indoc;
 use introspection_engine_tests::test_api::*;
 
+#[test_connector(tags(Sqlite))]
+async fn a_table_with_string_column(api: &TestApi) -> TestResult {
+    let setup = indoc! {r#"
+        CREATE TABLE "A" (
+           id INTEGER NOT NULL,
+           a  STRING  NOT NULL,
+           CONSTRAINT A_pkey PRIMARY KEY (id)
+        );
+    "#};
+
+    api.raw_cmd(setup).await;
+
+    let expectation = expect![[r#"
+        model A {
+          id Int    @id @default(autoincrement())
+          a  String
+        }
+    "#]];
+
+    expectation.assert_eq(&api.introspect_dml().await?);
+
+    Ok(())
+}
+
 #[test_connector(tags(Sqlite), preview_features("extendedIndexes"))]
 async fn a_table_with_descending_unique(api: &TestApi) -> TestResult {
     let setup = indoc! {r#"

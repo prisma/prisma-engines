@@ -526,6 +526,7 @@ fn get_column_type(tpe: &str, arity: ColumnArity) -> ColumnType {
         "serial" => ColumnTypeFamily::Int,
         "boolean" => ColumnTypeFamily::Boolean,
         "text" => ColumnTypeFamily::String,
+        "string" => ColumnTypeFamily::String,
         s if s.contains("char") => ColumnTypeFamily::String,
         s if s.contains("numeric") => ColumnTypeFamily::Decimal,
         s if s.contains("decimal") => ColumnTypeFamily::Decimal,
@@ -544,6 +545,7 @@ fn get_column_type(tpe: &str, arity: ColumnArity) -> ColumnType {
         "int[]" => ColumnTypeFamily::Int,
         "integer[]" => ColumnTypeFamily::Int,
         "text[]" => ColumnTypeFamily::String,
+        "string[]" => ColumnTypeFamily::String,
         // NUMERIC type affinity
         data_type if data_type.starts_with("decimal") => ColumnTypeFamily::Decimal,
         data_type => ColumnTypeFamily::Unsupported(data_type.into()),
