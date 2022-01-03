@@ -1,4 +1,5 @@
-use super::{Argument, Comment, Identifier, Span, WithDocumentation, WithIdentifier, WithSpan};
+use crate::ast::config::ConfigBlockProperty;
+use super::{Comment, Identifier, Span, WithDocumentation, WithIdentifier, WithSpan};
 
 /// A Generator block declaration.
 #[derive(Debug, Clone)]
@@ -6,7 +7,7 @@ pub struct GeneratorConfig {
     /// Name of this generator.
     pub name: Identifier,
     /// Top-level configuration properties for this generator.
-    pub properties: Vec<Argument>,
+    pub properties: Vec<ConfigBlockProperty>,
     /// The comments for this generator block.
     pub documentation: Option<Comment>,
     /// The location of this generator block in the text representation.

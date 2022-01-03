@@ -1,7 +1,7 @@
 mod argument;
 mod attribute;
 mod comment;
-mod composite_type;
+mod config; mod composite_type;
 mod r#enum;
 mod expression;
 mod field;
@@ -13,6 +13,7 @@ mod source_config;
 mod top;
 mod traits;
 
+pub use config::ConfigBlockProperty;
 pub use argument::Argument;
 pub use attribute::{Attribute, EmptyArgument};
 pub use comment::Comment;
