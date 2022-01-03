@@ -109,8 +109,6 @@ BLOCK_CLOSE = { "}" }
 ENUM_KEYWORD = _{ "enum" }
 GENERATOR_KEYWORD = _{ "generator" }
 DATASOURCE_KEYWORD = _{ "datasource" }
-INTERPOLATION_START = _{ "${" }
-INTERPOLATION_END = _{ "}" }
 
 // rules that we want to handle explicitly
 MODEL_KEYWORD = { "model" }
@@ -134,31 +132,12 @@ number = @{ ASCII_DIGIT+ }
 
 numeric_literal = @{ ("-")? ~ ASCII_DIGIT+ ~("." ~ ASCII_DIGIT+)? }
 
-// String, with support for escaped stuff and interpolations.
-string_escaped_predefined = { "n" | "r" | "t" | "\\" | "0" | "\"" | "'" | SPACE_SEPARATOR | INTERPOLATION_START }
+// String literals with support for escaped characters.
+string_escaped_predefined = { "n" | "r" | "t" | "\\" | "0" | "\"" | "'" | SPACE_SEPARATOR }
 string_escape = { "\\" ~ string_escaped_predefined }
-// This is only used to escape the parser. The string above is still treated as atomic.
-string_interpolate_escape = !{ (INTERPOLATION_START ~ expression ~ INTERPOLATION_END) }
-string_raw = { (!("\\" | "\"" | NEWLINE | INTERPOLATION_START ) ~ (ANY))+ }
-string_content = ${ (string_raw | string_escape | string_interpolate_escape)* }
+// This is only used to escape in the parser. The string above is still treated as atomic.
+string_raw = { (!("\\" | "\"" | NEWLINE ) ~ ANY)+ }
+string_content = ${ (string_raw | string_escape )* }
 string_literal = { "\"" ~ string_content ~ "\"" }
 
 constant_literal = @{ non_empty_identifier }
-
-// ######################################
-// String Interpolation
-// Called separately, but falls back to expression.
-// ######################################
-// We can safely assume that our strings are stripped of their "s and
-// that strings do not contain new lines.
-
-// Greedy match escaped interpolation or any char. Do not match interpolation.
-string_any = @{ ANY }
-string_escaped_interpolation = @{ "\\"  ~ INTERPOLATION_START }
-// String is marked as compound atomic. We do not allow whitespace or similar.
-string_interpolated = ${ SOI ~ (
-                            // This is basically everything except an expression, using the escape trick from above.
-                            (!(INTERPOLATION_START) ~ ( string_escaped_interpolation | string_any))+ |
-                            // This is an expression. It's no more atomic.
-                            string_interpolate_escape
-                        )* ~ EOI }
