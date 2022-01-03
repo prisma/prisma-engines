@@ -252,12 +252,14 @@ impl<'a> SqlSchemaDescriber<'a> {
                 };
 
                 let pk_col = row.get("pk").and_then(|x| x.as_i64()).expect("primary key");
+
                 let col = Column {
                     name: row.get("name").and_then(|x| x.to_string()).expect("name"),
                     tpe,
                     default,
                     auto_increment: false,
                 };
+
                 if pk_col > 0 {
                     pk_cols.insert(pk_col, col.name.clone());
                 }
@@ -280,6 +282,7 @@ impl<'a> SqlSchemaDescriber<'a> {
         } else {
             let mut columns: Vec<PrimaryKeyColumn> = vec![];
             let mut col_idxs: Vec<&i64> = pk_cols.keys().collect();
+
             col_idxs.sort_unstable();
 
             for i in col_idxs {
@@ -296,6 +299,9 @@ impl<'a> SqlSchemaDescriber<'a> {
                                  is auto incrementing"
                         );
                         col.auto_increment = true;
+                        // It is impossible to write a null value to an
+                        // autoincrementing primary key column.
+                        col.tpe.arity = ColumnArity::Required;
                     }
                 }
             }
