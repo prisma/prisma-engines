@@ -82,3 +82,17 @@ fn creating_a_model_with_a_non_autoincrement_id_column_is_idempotent(api: TestAp
     api.schema_push_w_datasource(dm).send().assert_green();
     api.schema_push_w_datasource(dm).send().assert_green().assert_no_steps();
 }
+
+#[test_connector(tags(Sqlite))]
+fn treat_nullable_integer_primary_key_as_required(api: TestApi) {
+    let schema = r#"CREATE TABLE "a" ("id" INTEGER NULL, PRIMARY KEY("id"));"#;
+    api.raw_cmd(schema);
+
+    let dm = r#"
+        model a {
+          id Int @id @default(autoincrement())
+        }
+    "#;
+
+    api.schema_push_w_datasource(dm).send().assert_green().assert_no_steps();
+}
