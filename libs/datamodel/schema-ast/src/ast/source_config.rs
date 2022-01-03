@@ -1,7 +1,7 @@
 use super::{Argument, Comment, Identifier, Span, WithDocumentation, WithIdentifier, WithSpan};
 
 /// A source block declaration.
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone)]
 pub struct SourceConfig {
     /// Name of this source.
     pub name: Identifier,

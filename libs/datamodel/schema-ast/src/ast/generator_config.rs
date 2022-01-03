@@ -1,7 +1,7 @@
 use super::{Argument, Comment, Identifier, Span, WithDocumentation, WithIdentifier, WithSpan};
 
 /// A Generator block declaration.
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone)]
 pub struct GeneratorConfig {
     /// Name of this generator.
     pub name: Identifier,

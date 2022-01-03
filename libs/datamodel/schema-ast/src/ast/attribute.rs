@@ -8,14 +8,14 @@ use super::{Argument, Identifier, Span, WithIdentifier, WithSpan};
 ///
 /// This is of course invalid, but we parse it in order to provide better diagnostics and
 /// for autocompletion.
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone)]
 pub struct EmptyArgument {
     pub name: Identifier,
 }
 
 /// An attribute (following `@` or `@@``) on a model, model field, enum, enum value or composite
 /// type field.
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone)]
 pub struct Attribute {
     /// The name of the attribute:
     ///

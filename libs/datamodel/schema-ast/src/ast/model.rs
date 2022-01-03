@@ -21,7 +21,7 @@ impl std::ops::Index<FieldId> for Model {
 }
 
 /// A model declaration.
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone)]
 pub struct Model {
     /// The name of the model.
     pub name: Identifier,

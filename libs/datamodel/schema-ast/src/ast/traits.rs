@@ -33,10 +33,12 @@ pub trait WithDocumentation {
     fn is_commented_out(&self) -> bool;
 }
 
+/// An AST node with a name.
 impl<T> WithName for T
 where
     T: WithIdentifier,
 {
+    /// The name token of the node.
     fn name(&self) -> &str {
         &self.identifier().name
     }

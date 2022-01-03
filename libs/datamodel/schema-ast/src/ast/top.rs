@@ -3,7 +3,7 @@ use crate::ast::{
 };
 
 /// Enum for distinguishing between top-level entries
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone)]
 pub enum Top {
     /// A composite type
     CompositeType(CompositeType),

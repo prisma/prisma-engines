@@ -2,7 +2,7 @@ use super::{Expression, Identifier, Span, WithIdentifier, WithSpan};
 use std::fmt::{Display, Formatter};
 
 /// An argument, either for attributes, or for keys in source blocks.
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone)]
 pub struct Argument {
     /// Name of the argument.
     pub name: Identifier,

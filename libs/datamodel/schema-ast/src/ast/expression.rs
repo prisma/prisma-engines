@@ -2,7 +2,7 @@ use super::{Argument, Span};
 use std::fmt;
 
 /// Represents arbitrary, even nested, expressions.
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone)]
 pub enum Expression {
     /// Any numeric value e.g. floats or ints.
     NumericValue(String, Span),
