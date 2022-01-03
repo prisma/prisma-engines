@@ -1,6 +1,6 @@
 use crate::{common::preview_features::PreviewFeature, configuration::StringFromEnvVar};
 use enumflags2::BitFlags;
-use serde::Serialize;
+use serde::{Serialize, Serializer};
 use std::collections::HashMap;
 
 #[derive(Debug, Serialize, Clone)]
@@ -14,15 +14,28 @@ pub struct Generator {
     #[serde(default)]
     pub binary_targets: Vec<StringFromEnvVar>,
 
-    #[serde(default)]
-    pub preview_features: Vec<PreviewFeature>,
+    #[serde(default, serialize_with = "mcf_preview_features")]
+    pub preview_features: Option<Vec<PreviewFeature>>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub documentation: Option<String>,
 }
 
+pub fn mcf_preview_features<S>(feat: &Option<Vec<PreviewFeature>>, s: S) -> Result<S::Ok, S::Error>
+where
+    S: Serializer,
+{
+    match feat {
+        Some(feats) => feats.serialize(s),
+        None => Vec::<String>::new().serialize(s),
+    }
+}
+
 impl Generator {
     pub fn preview_features(&self) -> BitFlags<PreviewFeature> {
-        self.preview_features.iter().copied().collect()
+        match self.preview_features {
+            Some(ref preview_features) => preview_features.iter().copied().collect(),
+            None => BitFlags::empty(),
+        }
     }
 }
