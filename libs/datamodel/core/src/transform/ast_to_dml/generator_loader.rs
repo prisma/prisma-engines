@@ -1,11 +1,9 @@
+use parser_database::ast;
+
 use super::super::helpers::*;
 use crate::{
-    ast::{self, WithSpan},
-    common::preview_features::GENERATOR,
-    configuration::Generator,
-    diagnostics::*,
-    transform::ast_to_dml::common::parse_and_validate_preview_features,
-    StringFromEnvVar,
+    ast::WithSpan, common::preview_features::GENERATOR, configuration::Generator, diagnostics::*,
+    transform::ast_to_dml::common::parse_and_validate_preview_features, StringFromEnvVar,
 };
 use std::{collections::HashMap, convert::TryFrom};
 
@@ -47,9 +45,14 @@ impl GeneratorLoader {
             .map(|arg| (arg.name.name.as_str(), ValueValidator::new(&arg.value)))
             .collect();
 
-        if let Some(val) = args.get(ENGINE_TYPE_KEY) {
-            if let Err(err) = StringFromEnvVar::try_from(val.value) {
-                diagnostics.push_error(err);
+        if let Some(expr) = args.get(ENGINE_TYPE_KEY) {
+            if !expr.value.is_string() {
+                diagnostics.push_error(DatamodelError::new_type_mismatch_error(
+                    "String",
+                    expr.value.describe_value_type(),
+                    &expr.value.to_string(),
+                    expr.span(),
+                ))
             }
         }
 
