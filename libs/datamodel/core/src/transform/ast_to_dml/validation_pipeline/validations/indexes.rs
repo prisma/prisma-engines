@@ -23,7 +23,7 @@ pub(super) fn has_a_unique_constraint_name(
 
     for violation in names
         .constraint_namespace
-        .scope_violations(model.model_id(), ConstraintName::Index(name.as_ref()))
+        .constraint_name_scope_violations(model.model_id(), ConstraintName::Index(name.as_ref()))
     {
         let message = format!(
             "The given constraint name `{}` has to be unique in the following namespace: {}. Please provide a different name using the `map` argument.",
@@ -44,6 +44,40 @@ pub(super) fn has_a_unique_constraint_name(
             index.attribute_name(),
             span,
         ));
+    }
+}
+
+/// The custom name argument makes its way into the generated client API. Therefore the name argument
+/// needs to be unique per model. It can be found on the primary key or unique indexes.
+pub(super) fn unique_index_has_a_unique_custom_name_per_model(
+    index: IndexWalker<'_, '_>,
+    names: &super::Names<'_>,
+    ctx: &mut Context<'_>,
+) {
+    let model = index.model();
+
+    if let Some(name) = index.name() {
+        if names
+            .constraint_namespace
+            .local_custom_name_scope_violations(model.model_id(), name.as_ref())
+        {
+            let message = format!(
+                "The given custom name `{}` has to be unique on the model. Please provide a different name for the `name` argument.",
+                name,
+            );
+
+            let span = index
+                .ast_attribute()
+                .map(|a| {
+                    let from_arg = a.span_for_argument("name");
+                    from_arg.unwrap_or(a.span)
+                })
+                .unwrap_or_else(|| model.ast_model().span);
+
+            ctx.push_error(DatamodelError::new_attribute_validation_error(
+                &message, "@unique", span,
+            ));
+        }
     }
 }
 
