@@ -1,6 +1,6 @@
 use super::super::helpers::*;
 use crate::{
-    ast::{self, Span, WithSpan},
+    ast::{self, WithSpan},
     common::preview_features::GENERATOR,
     configuration::Generator,
     diagnostics::*,
@@ -95,22 +95,18 @@ impl GeneratorLoader {
             .or_else(|| args.get(EXPERIMENTAL_FEATURES_KEY))
             .map(|v| (v.as_array().to_str_vec(), v.span()));
 
-        let (raw_preview_features, span) = match preview_features_arg {
-            Some((Ok(arr), span)) => (arr, span),
-            Some((Err(err), span)) => {
-                diagnostics.push_error(err);
-                (Vec::new(), span)
+        let preview_features = match preview_features_arg {
+            Some((Ok(arr), span)) => {
+                let (features, mut diag) = parse_and_validate_preview_features(arr, &GENERATOR, span);
+                diagnostics.append(&mut diag);
+
+                Some(features)
             }
-            None => (Vec::new(), Span::empty()),
-        };
-
-        let preview_features = if !raw_preview_features.is_empty() {
-            let (features, mut diag) = parse_and_validate_preview_features(raw_preview_features, &GENERATOR, span);
-            diagnostics.append(&mut diag);
-
-            features
-        } else {
-            vec![]
+            Some((Err(err), _)) => {
+                diagnostics.push_error(err);
+                None
+            }
+            None => None,
         };
 
         for prop in &ast_generator.properties {

@@ -159,6 +159,11 @@ impl<'ast, 'db> DefaultValueWalker<'ast, 'db> {
         self.default.value
     }
 
+    /// Is this an `@default(dbgenerated())`?
+    pub fn is_dbgenerated(self) -> bool {
+        matches!(self.default.value, ast::Expression::Function(name, _, _) if name == "dbgenerated")
+    }
+
     /// The mapped name of the default value. Not applicable to all connectors. See crate docs for
     /// details on mapped names.
     ///

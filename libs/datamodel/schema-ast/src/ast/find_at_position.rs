@@ -101,10 +101,14 @@ impl<'ast> FieldPosition<'ast> {
                 spans.sort_by_key(|(_, span)| span.start);
                 let mut arg_name = None;
 
-                for (name, span) in spans {
+                for (name, _) in spans.iter().take_while(|(_, span)| span.start < position) {
+                    arg_name = Some(*name);
+                }
+
+                // If the cursor is after a trailing comma, we're not in an argument.
+                if let Some(span) = attr.trailing_comma {
                     if position > span.start {
-                        arg_name = Some(name);
-                        break;
+                        arg_name = None;
                     }
                 }
 

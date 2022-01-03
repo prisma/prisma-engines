@@ -82,6 +82,10 @@ impl ConnectorError {
                     message: message.clone(),
                 },
             )),
+
+            ErrorKind::MissingFullTextSearchIndex => Some(KnownError::new(
+                user_facing_errors::query_engine::MissingFullTextSearchIndex {},
+            )),
             _ => None,
         };
 
@@ -205,6 +209,9 @@ pub enum ErrorKind {
 
     #[error("The query parameter limit supported by your database is exceeded: {0}.")]
     QueryParameterLimitExceeded(String),
+
+    #[error("Cannot find a fulltext index to use for the search")]
+    MissingFullTextSearchIndex,
 }
 
 impl From<DomainError> for ConnectorError {

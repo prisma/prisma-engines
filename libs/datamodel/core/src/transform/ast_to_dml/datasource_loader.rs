@@ -65,10 +65,10 @@ impl DatasourceLoader {
         let args: HashMap<_, _> = ast_source
             .properties
             .iter()
-            .map(|arg| (arg.name.name.as_str(), ValueValidator::new(&arg.value)))
+            .map(|arg| (arg.name.name.as_str(), (arg.span, ValueValidator::new(&arg.value))))
             .collect();
 
-        let provider_arg = match args.get("provider") {
+        let (_, provider_arg) = match args.get("provider") {
             Some(provider) => provider,
             None => {
                 diagnostics.push_error(DatamodelError::new_source_argument_not_found_error(
@@ -108,7 +108,7 @@ impl DatasourceLoader {
             Some((provider, _)) => provider,
         };
 
-        let url_arg = match args.get(URL_KEY) {
+        let (_, url_arg) = match args.get(URL_KEY) {
             Some(url_arg) => url_arg,
             None => {
                 diagnostics.push_error(DatamodelError::new_source_argument_not_found_error(
@@ -131,7 +131,7 @@ impl DatasourceLoader {
         let shadow_database_url_arg = args.get(SHADOW_DATABASE_URL_KEY);
 
         let shadow_database_url: Option<(StringFromEnvVar, Span)> =
-            if let Some(shadow_database_url_arg) = shadow_database_url_arg.as_ref() {
+            if let Some((_, shadow_database_url_arg)) = shadow_database_url_arg.as_ref() {
                 match StringFromEnvVar::try_from(shadow_database_url_arg.value) {
                     Ok(shadow_database_url) => Some(shadow_database_url)
                         .filter(|s| !s.as_literal().map(|lit| lit.is_empty()).unwrap_or(false))
@@ -182,7 +182,7 @@ impl DatasourceLoader {
             {
                 let span = args
                     .get("referentialIntegrity")
-                    .map(|v| v.span())
+                    .map(|(_, v)| v.span())
                     .unwrap_or_else(Span::empty);
 
                 let supported_values = active_connector
@@ -229,17 +229,17 @@ generator client {
 "#;
 
 fn get_referential_integrity(
-    args: &HashMap<&str, ValueValidator<'_>>,
+    args: &HashMap<&str, (Span, ValueValidator<'_>)>,
     preview_features: BitFlags<PreviewFeature>,
     source: &SourceConfig,
     diagnostics: &mut Diagnostics,
 ) -> Option<ReferentialIntegrity> {
-    args.get("referentialIntegrity").and_then(|value| {
+    args.get("referentialIntegrity").and_then(|(span, value)| {
         if !preview_features.contains(PreviewFeature::ReferentialIntegrity) {
             diagnostics.push_error(DatamodelError::new_source_validation_error(
                 REFERENTIAL_INTEGRITY_PREVIEW_FEATURE_ERR,
                 &source.name.name,
-                value.span(),
+                *span,
             ));
 
             None
@@ -269,12 +269,12 @@ fn get_referential_integrity(
     })
 }
 
-fn preview_features_guardrail(args: &HashMap<&str, ValueValidator<'_>>, diagnostics: &mut Diagnostics) {
+fn preview_features_guardrail(args: &HashMap<&str, (Span, ValueValidator<'_>)>, diagnostics: &mut Diagnostics) {
     let arg = args.get(PREVIEW_FEATURES_KEY);
 
     if let Some(val) = arg {
-        let span = val.span();
-        if let Ok(features) = val.as_array().to_str_vec() {
+        let span = val.0;
+        if let Ok(features) = val.1.as_array().to_str_vec() {
             if features.is_empty() {
                 return;
             }

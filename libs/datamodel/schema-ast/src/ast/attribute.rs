@@ -38,6 +38,13 @@ pub struct Attribute {
     ///                    ^^^^
     /// ```
     pub empty_arguments: Vec<EmptyArgument>,
+    /// The trailing comma at the end of the arguments list.
+    ///
+    /// ```ignore
+    /// @relation(fields: [a, b], references: [id, name], )
+    ///                                                 ^
+    /// ```
+    pub trailing_comma: Option<Span>,
     /// The AST span of the node.
     pub span: Span,
 }
@@ -50,6 +57,7 @@ impl Attribute {
             arguments,
             span: Span::empty(),
             empty_arguments: Vec::new(),
+            trailing_comma: None,
         }
     }
 

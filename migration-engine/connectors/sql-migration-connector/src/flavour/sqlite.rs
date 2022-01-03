@@ -99,16 +99,6 @@ impl SqlFlavour for SqliteFlavour {
         Ok(())
     }
 
-    async fn qe_setup(&self, _database_url: &str) -> ConnectorResult<()> {
-        use std::fs::File;
-        File::create(&self.file_path).expect("Failed to truncate SQLite database");
-        Ok(())
-    }
-
-    async fn qe_teardown(&self, _database_str: &str) -> ConnectorResult<()> {
-        Ok(())
-    }
-
     async fn reset(&self, connection: &Connection) -> ConnectorResult<()> {
         let connection_info = connection.connection_info();
         let file_path = connection_info.file_path().unwrap();

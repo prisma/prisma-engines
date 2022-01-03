@@ -325,38 +325,6 @@ impl SqlFlavour for MssqlFlavour {
         Ok(())
     }
 
-    async fn qe_setup(&self, database_str: &str) -> ConnectorResult<()> {
-        let (db_name, master_uri) = Self::master_url(database_str)?;
-        let conn = connect(&master_uri).await?;
-
-        // Without these, our poor connection gets deadlocks if other schemas
-        // are modified while we introspect.
-        let allow_snapshot_isolation = format!(
-            "ALTER DATABASE [{db_name}] SET ALLOW_SNAPSHOT_ISOLATION ON",
-            db_name = db_name
-        );
-
-        conn.raw_cmd(&allow_snapshot_isolation).await.unwrap();
-
-        self.reset(&conn).await?;
-
-        conn.raw_cmd(&format!(
-            "DROP SCHEMA IF EXISTS {}",
-            conn.connection_info().schema_name()
-        ))
-        .await?;
-
-        conn.raw_cmd(&format!("CREATE SCHEMA {}", conn.connection_info().schema_name(),))
-            .await
-            .unwrap();
-
-        Ok(())
-    }
-
-    async fn qe_teardown(&self, _database_str: &str) -> ConnectorResult<()> {
-        Ok(())
-    }
-
     async fn ensure_connection_validity(&self, connection: &Connection) -> ConnectorResult<()> {
         connection.raw_cmd("SELECT 1").await?;
 

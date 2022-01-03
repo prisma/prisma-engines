@@ -1781,7 +1781,7 @@ async fn re_introspecting_custom_compound_id_names(api: &TestApi) -> TestResult 
 
              @@id([first, last], name: "compound", map: "User.something@invalid-and/weird")
          }
-         
+
          model User2 {
              first  Int
              last   Int
@@ -1798,7 +1798,7 @@ async fn re_introspecting_custom_compound_id_names(api: &TestApi) -> TestResult 
 
              @@id([first, last], name: "compound", map: "User.something@invalid-and/weird")
          }
-         
+
          model User2 {
              first  Int
              last   Int

@@ -366,3 +366,30 @@ fn duplicate_constraint_names_across_models_work_on_mysql(api: TestApi) {
 
     api.schema_push_w_datasource(plain_dm).send().assert_green();
 }
+
+#[test_connector(tags(Postgres))]
+fn implicit_relations_indices_are_not_renamed_unnecessarily(api: TestApi) {
+    let dm = api.datamodel_with_provider(
+        r#"
+     model UserThisIsWayTooLongAndWillLeadToProblemsDownTheRoad {
+        id          Int @id
+        posts       PostThisIsWayTooLongAndWillLeadToProblemsDownTheRoad[]
+     }
+
+     model PostThisIsWayTooLongAndWillLeadToProblemsDownTheRoad {
+        id          Int @id
+        users       UserThisIsWayTooLongAndWillLeadToProblemsDownTheRoad[]
+     }
+     "#,
+    );
+
+    let dir = api.create_migrations_directory();
+
+    api.create_migration("initial", &dm, &dir)
+        .send_sync()
+        .assert_migration_directories_count(1);
+
+    api.create_migration("no_op", &dm, &dir)
+        .send_sync()
+        .assert_migration_directories_count(1);
+}

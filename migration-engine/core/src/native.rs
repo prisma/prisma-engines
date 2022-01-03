@@ -1,22 +1,21 @@
 mod rpc;
 
-pub mod query_engine;
-
 pub use crate::api::GenericApi;
 pub use rpc::rpc_api;
 
 use crate::{api, CoreError, CoreResult};
-use datamodel::{
-    common::{
-        preview_features::PreviewFeature,
-        provider_names::{MSSQL_SOURCE_NAME, MYSQL_SOURCE_NAME, POSTGRES_SOURCE_NAME, SQLITE_SOURCE_NAME},
-    },
-    Datasource,
+#[cfg(feature = "sql")]
+use datamodel::common::provider_names::{
+    MSSQL_SOURCE_NAME, MYSQL_SOURCE_NAME, POSTGRES_SOURCE_NAME, SQLITE_SOURCE_NAME,
 };
+use datamodel::{common::preview_features::PreviewFeature, Datasource};
 use enumflags2::BitFlags;
+#[cfg(feature = "sql")]
 use migration_connector::ConnectorError;
+#[cfg(feature = "sql")]
 use sql_migration_connector::SqlMigrationConnector;
 use std::env;
+#[cfg(feature = "sql")]
 use user_facing_errors::{common::InvalidConnectionString, KnownError};
 
 #[cfg(feature = "mongodb")]
@@ -25,7 +24,8 @@ use datamodel::common::provider_names::MONGODB_SOURCE_NAME;
 use mongodb_migration_connector::MongoDbMigrationConnector;
 
 /// Top-level constructor for the migration engine API.
-pub async fn migration_api(datamodel: &str) -> CoreResult<Box<dyn api::GenericApi>> {
+pub fn migration_api(datamodel: &str) -> CoreResult<Box<dyn api::GenericApi>> {
+    #[allow(unused_variables)]
     let (source, url, preview_features, shadow_database_url) = parse_configuration(datamodel)?;
 
     match source.active_provider.as_str() {

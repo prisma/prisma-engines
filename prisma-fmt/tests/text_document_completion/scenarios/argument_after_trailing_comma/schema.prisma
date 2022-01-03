@@ -1,0 +1,19 @@
+datasource db {
+  provider = "sqlserver"
+  url      = env("DATABASE_URL")
+}
+
+model TestB {
+  id   Int    @id
+  name Int
+  Test Test[]
+}
+
+model Test {
+  id      Int   @id
+  bId     Int
+  // We should _not_ get any completion here, we're not in the onDelete argument.
+  b       TestB @relation(fields: [testBId], references: [id], onDelete: Casc, <|>)
+  testBId Int
+}
+

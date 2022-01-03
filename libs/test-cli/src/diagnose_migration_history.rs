@@ -10,7 +10,7 @@ impl DiagnoseMigrationHistory {
         };
         let schema = crate::read_datamodel_from_file(&self.schema_path)?;
 
-        let engine = migration_core::migration_api(&schema).await?;
+        let engine = migration_core::migration_api(&schema)?;
 
         let output = engine.diagnose_migration_history(&input).await?;
 

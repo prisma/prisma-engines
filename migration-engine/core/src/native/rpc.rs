@@ -34,7 +34,7 @@ const AVAILABLE_COMMANDS: &[&str] = &[
 /// a database connection.
 pub async fn rpc_api(datamodel: &str) -> CoreResult<IoHandler> {
     let mut io_handler = IoHandler::default();
-    let executor = Arc::new(crate::migration_api(datamodel).await?);
+    let executor = Arc::new(crate::migration_api(datamodel)?);
 
     executor.ensure_connection_validity().await?;
 

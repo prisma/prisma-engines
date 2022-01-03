@@ -1,0 +1,22 @@
+[package]
+name = "qe-setup"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+datamodel = { path = "../../libs/datamodel/core" }
+migration-core = { path = "../core", features = ["sql"] }
+
+enumflags2 = "*"
+mongodb = { git = "https://github.com/mongodb/mongo-rust-driver.git", rev = "8e55cb2" }
+url = "2"
+connection-string = "*"
+
+[dependencies.quaint]
+git = "https://github.com/prisma/quaint"
+features = [
+    "sqlite",
+    "postgresql",
+    "mysql",
+    "mssql",
+]

@@ -799,9 +799,13 @@ impl<'a> SqlSchemaDescriber<'a> {
                         ColumnTypeFamily::DateTime => {
                             match default_string.to_lowercase().as_str() {
                                 "now()"
+                                | "now():::timestamp"
+                                | "now():::timestamptz"
+                                | "now():::date"
                                 | "current_timestamp"
                                 | "current_timestamp():::timestamp"
-                                | "current_timestamp():::timestamptz" => DefaultValue::now(),
+                                | "current_timestamp():::timestamptz"
+                                | "current_timestamp():::date" => DefaultValue::now(),
                                 _ => DefaultValue::db_generated(default_string), //todo parse values
                             }
                         }

@@ -129,6 +129,7 @@ fn rule_to_string(rule: Rule) -> &'static str {
         Rule::comment_and_new_line => "comment and new line",
         Rule::comment_block => "comment block",
         Rule::number => "number",
+        Rule::trailing_comma => "trailing comma",
 
         // Those are helpers, so we get better error messages:
         Rule::BLOCK_OPEN => "Start of block (\"{\")",
