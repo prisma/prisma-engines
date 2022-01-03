@@ -140,5 +140,7 @@ fn infer_namespaces<'ast>(db: &ParserDatabase<'ast>, connector: &dyn Connector) 
         }
     }
 
+    namespaces.add_local_custom_names_for_primary_keys_and_uniques(db);
+
     namespaces
 }

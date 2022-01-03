@@ -43,7 +43,7 @@ pub(super) fn has_a_unique_constraint_name(
 
     for violation in names
         .constraint_namespace
-        .scope_violations(model.model_id(), ConstraintName::Relation(name.as_ref()))
+        .constraint_name_scope_violations(model.model_id(), ConstraintName::Relation(name.as_ref()))
     {
         let span = relation
             .forward_relation_field()

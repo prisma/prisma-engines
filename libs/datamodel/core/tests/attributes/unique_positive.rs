@@ -472,3 +472,43 @@ fn mapping_unique_to_a_field_name_should_work() {
         algorithm: None,
     });
 }
+
+#[test]
+fn duplicate_custom_names_on_different_model_should_work() {
+    let dml = r#"
+     model User {
+         name           String            
+         identification Int
+
+         @@unique([name, identification], name: "duplicateUnique", map: "onUser")
+     }
+     
+     model Post {
+         name           String            
+         identification Int
+
+         @@unique([name, identification], name: "duplicateUnique", map: "onPost")
+     }
+     "#;
+
+    let datamodel = parse(dml);
+    let user = datamodel.assert_has_model("User");
+    user.assert_has_index(IndexDefinition {
+        name: Some("duplicateUnique".to_string()),
+        db_name: Some("onUser".to_string()),
+        fields: vec![IndexField::new("name"), IndexField::new("identification")],
+        tpe: IndexType::Unique,
+        defined_on_field: false,
+        algorithm: None,
+    });
+
+    let post = datamodel.assert_has_model("Post");
+    post.assert_has_index(IndexDefinition {
+        name: Some("duplicateUnique".to_string()),
+        db_name: Some("onPost".to_string()),
+        fields: vec![IndexField::new("name"), IndexField::new("identification")],
+        tpe: IndexType::Unique,
+        defined_on_field: false,
+        algorithm: None,
+    });
+}

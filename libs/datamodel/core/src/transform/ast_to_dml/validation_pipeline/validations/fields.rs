@@ -71,7 +71,7 @@ pub(super) fn has_a_unique_default_constraint_name(
 
     for violation in names
         .constraint_namespace
-        .scope_violations(field.model().model_id(), ConstraintName::Default(name.as_ref()))
+        .constraint_name_scope_violations(field.model().model_id(), ConstraintName::Default(name.as_ref()))
     {
         let message = format!(
             "The given constraint name `{}` has to be unique in the following namespace: {}. Please provide a different name using the `map` argument.",
