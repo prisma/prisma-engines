@@ -7,7 +7,7 @@ pub(super) fn visit_native_type_attribute<'ast>(
     scalar_field: &mut ScalarField<'ast>,
 ) {
     let args = &attr.arguments;
-    let args: Vec<String> = args.iter().map(|arg| arg.value.to_string()).collect();
+    let args: Vec<String> = args.arguments.iter().map(|arg| arg.value.to_string()).collect();
 
     scalar_field.native_type = Some((datasource_name, type_name, args, attr.span))
 }

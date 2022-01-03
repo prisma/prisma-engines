@@ -1,4 +1,4 @@
-use super::{Argument, Span};
+use crate::ast::{self, Span};
 use std::fmt;
 
 /// Represents arbitrary, even nested, expressions.
@@ -8,15 +8,13 @@ pub enum Expression {
     NumericValue(String, Span),
     /// Any string value.
     StringValue(String, Span),
-    /// Any literal constant, basically a string which was not inside "...".
-    /// This is used for representing builtin enums and boolean constants (true and false).
+    /// Any literal constant, basically a string which was not inside "...". This is used for
+    /// representing builtin enums and boolean constants (true and false).
     ConstantValue(String, Span),
-    /// A function with a name and arguments, which is evaluated at client side.
-    Function(String, Vec<Expression>, Span),
+    /// A function call like node with a name and arguments.
+    Function(String, ast::ArgumentsList, Span),
     /// An array of other values.
     Array(Vec<Expression>, Span),
-    /// A field that can contain a list of arguments.
-    FieldWithArgs(String, Vec<Argument>, Span),
 }
 
 impl fmt::Display for Expression {
@@ -32,10 +30,6 @@ impl fmt::Display for Expression {
             Expression::Array(vals, _) => {
                 let vals = vals.iter().map(ToString::to_string).collect::<Vec<_>>().join(",");
                 write!(f, "[{}]", vals)
-            }
-            Expression::FieldWithArgs(ident, vals, _) => {
-                let vals = vals.iter().map(ToString::to_string).collect::<Vec<_>>().join(",");
-                write!(f, "{}({})", ident, vals)
             }
         }
     }
@@ -56,6 +50,13 @@ impl Expression {
         }
     }
 
+    pub fn as_function(&self) -> Option<(&str, &ast::ArgumentsList, Span)> {
+        match self {
+            Expression::Function(name, args, span) => Some((name, args, *span)),
+            _ => None,
+        }
+    }
+
     pub fn as_numeric_value(&self) -> Option<(&str, Span)> {
         match self {
             Expression::NumericValue(s, span) => Some((s, *span)),
@@ -70,7 +71,6 @@ impl Expression {
             Self::ConstantValue(_, span) => *span,
             Self::Function(_, _, span) => *span,
             Self::Array(_, span) => *span,
-            Self::FieldWithArgs(_, _, span) => *span,
         }
     }
 
@@ -89,7 +89,6 @@ impl Expression {
             Expression::ConstantValue(_, _) => "literal",
             Expression::Function(_, _, _) => "functional",
             Expression::Array(_, _) => "array",
-            Expression::FieldWithArgs(_, _, _) => "field with args",
         }
     }
 

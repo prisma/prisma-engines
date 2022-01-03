@@ -101,19 +101,19 @@ impl<'a> ValueValidator<'a> {
         if let ast::Expression::Array(values, _) = &self.value {
             values
                 .iter()
-                .map(|val| ValueValidator::new(val).as_field_with_args())
+                .map(|val| ValueValidator::new(val).as_func())
                 .collect()
         } else {
             // Single values are accepted as array literals, for example in `@relation(fields: userId)`.
-            Ok(vec![self.as_field_with_args()?])
+            Ok(vec![self.as_func()?])
         }
     }
 
-    fn as_field_with_args(&self) -> Result<(&'a str, Option<SortOrder>, Option<u32>), DatamodelError> {
+    fn as_func(&self) -> Result<(&'a str, Option<SortOrder>, Option<u32>), DatamodelError> {
         match &self.value {
             Expression::ConstantValue(field_name, _) => Ok((field_name, None, None)),
-            Expression::FieldWithArgs(field_name, args, _) => {
-                let (sort, length) = ValueValidator::field_args(args)?;
+            Expression::Function(field_name, args, _) => {
+                let (sort, length) = ValueValidator::field_args(&args.arguments)?;
                 Ok((field_name, sort, length))
             }
 
@@ -125,7 +125,7 @@ impl<'a> ValueValidator<'a> {
     fn field_args(args: &[ast::Argument]) -> Result<(Option<SortOrder>, Option<u32>), DatamodelError> {
         let sort = args
             .iter()
-            .find(|arg| arg.name.name == "sort")
+            .find(|arg| arg.name.as_ref().map(|n| n.name.as_str()) == Some("sort"))
             .map(|arg| match arg.value.as_constant_value() {
                 Some(("Asc", _)) => Ok(Some(SortOrder::Asc)),
                 Some(("Desc", _)) => Ok(Some(SortOrder::Desc)),
@@ -141,7 +141,7 @@ impl<'a> ValueValidator<'a> {
 
         let length = args
             .iter()
-            .find(|arg| arg.name.name == "length")
+            .find(|arg| arg.name.as_ref().map(|n| n.name.as_str()) == Some("length"))
             .map(|arg| match &arg.value {
                 Expression::NumericValue(s, _) => s.parse::<u32>().map_err(|_| DatamodelError::ParserError {
                     expected: vec![],

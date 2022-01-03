@@ -395,7 +395,7 @@ impl<'a> Renderer<'a> {
         self.end_line();
     }
 
-    fn render_arguments(target: &mut dyn LineWriteable, args: &[ast::Argument]) {
+    fn render_arguments(target: &mut dyn LineWriteable, args: &ast::ArgumentsList) {
         for (idx, arg) in args.iter().enumerate() {
             if idx > 0 {
                 target.write(", ");
@@ -405,8 +405,8 @@ impl<'a> Renderer<'a> {
     }
 
     fn render_argument(target: &mut dyn LineWriteable, arg: &ast::Argument) {
-        if !arg.name.name.is_empty() {
-            target.write(&arg.name.name);
+        if let Some(arg_name) = &arg.name {
+            target.write(&arg_name.name);
             target.write(": ");
         }
         Self::render_value(target, &arg.value);
@@ -421,7 +421,6 @@ impl<'a> Renderer<'a> {
     fn render_value(target: &mut dyn LineWriteable, val: &ast::Expression) {
         match val {
             ast::Expression::Array(vals, _) => Self::render_expression_array(target, vals),
-            ast::Expression::FieldWithArgs(ident, vals, _) => Self::render_field_with_args(target, ident, vals),
             ast::Expression::ConstantValue(val, _) => target.write(val),
             ast::Expression::NumericValue(val, _) => target.write(val),
             ast::Expression::StringValue(val, _) => Self::render_str(target, val),
@@ -429,25 +428,10 @@ impl<'a> Renderer<'a> {
         };
     }
 
-    fn render_field_with_args(target: &mut dyn LineWriteable, ident: &str, vals: &[ast::Argument]) {
-        target.write(ident);
-        if !vals.is_empty() {
-            target.write("(");
-            Self::render_arguments(target, vals);
-            target.write(")");
-        }
-    }
-
-    fn render_func(target: &mut dyn LineWriteable, name: &str, vals: &[ast::Expression]) {
+    fn render_func(target: &mut dyn LineWriteable, name: &str, args: &ast::ArgumentsList) {
         target.write(name);
         target.write("(");
-        for (idx, val) in vals.iter().enumerate() {
-            if idx > 0 {
-                target.write(", ");
-            }
-
-            Self::render_value(target, val);
-        }
+        Self::render_arguments(target, args);
         target.write(")");
     }
 

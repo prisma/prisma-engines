@@ -64,7 +64,7 @@ pub(super) fn visit_field_default<'ast>(
                         }
                     }
                     ast::Expression::Function(funcname, funcargs, _) if funcname == FN_DBGENERATED => {
-                        validate_dbgenerated_args(funcargs, args, accept, ctx);
+                        validate_dbgenerated_args(&funcargs.arguments, args, accept, ctx);
                     }
                     value => ctx.push_error(args.new_attribute_validation_error(&format!(
                         "Expected a an enum value, but found `{bad_value}`.",
@@ -81,11 +81,8 @@ pub(super) fn visit_field_default<'ast>(
             }
             ScalarFieldType::Unsupported => {
                 match value.value {
-                    ast::Expression::Function(funcname, funcargs, _)
-                        if funcname == FN_DBGENERATED
-                            && matches!(funcargs.as_slice(), [ast::Expression::StringValue(_, _)]) =>
-                    {
-                        accept()
+                    ast::Expression::Function(funcname, funcargs, _) if funcname == FN_DBGENERATED => {
+                        validate_dbgenerated_args(&funcargs.arguments, args, accept, ctx);
                     }
                     _ => ctx.push_error(args.new_attribute_validation_error(
                         "Only @default(dbgenerated()) can be used for Unsupported types.",
@@ -134,19 +131,19 @@ fn validate_builtin_scalar_type_default(
         | (ScalarType::BigInt, ast::Expression::Function(funcname, funcargs, _))
             if funcname == FN_AUTOINCREMENT =>
         {
-            validate_empty_function_args(funcname, funcargs, args, accept, ctx)
+            validate_empty_function_args(funcname, &funcargs.arguments, args, accept, ctx)
         }
         (ScalarType::String, ast::Expression::Function(funcname, funcargs, _))
             if funcname == FN_UUID || funcname == FN_CUID =>
         {
-            validate_empty_function_args(funcname, funcargs, args, accept, ctx)
+            validate_empty_function_args(funcname, &funcargs.arguments, args, accept, ctx)
         }
         (ScalarType::DateTime, ast::Expression::Function(funcname, funcargs, _)) if funcname == FN_NOW => {
-            validate_empty_function_args(FN_NOW, funcargs, args, accept, ctx)
+            validate_empty_function_args(FN_NOW, &funcargs.arguments, args, accept, ctx)
         }
 
         (_, ast::Expression::Function(funcname, funcargs, _)) if funcname == FN_DBGENERATED => {
-            validate_dbgenerated_args(funcargs, args, accept, ctx)
+            validate_dbgenerated_args(&funcargs.arguments, args, accept, ctx)
         }
 
         (_, ast::Expression::Function(funcname, _, _)) if !KNOWN_FUNCTIONS.contains(&funcname.as_str()) => {
@@ -191,7 +188,7 @@ fn default_attribute_mapped_name<'ast>(args: &mut Arguments<'ast>, ctx: &mut Con
 
 fn validate_empty_function_args(
     fn_name: &str,
-    args: &[ast::Expression],
+    args: &[ast::Argument],
     arguments: &Arguments<'_>,
     mut accept: impl FnMut(),
     ctx: &mut Context<'_>,
@@ -207,19 +204,28 @@ fn validate_empty_function_args(
 }
 
 fn validate_dbgenerated_args(
-    args: &[ast::Expression],
+    args: &[ast::Argument],
     arguments: &Arguments<'_>,
     mut accept: impl FnMut(),
     ctx: &mut Context<'_>,
 ) {
-    match args {
-        [ast::Expression::StringValue(val, _)] if val.is_empty() => {
+    let mut bail = || {
+        // let's not mention what we don't want to see.
+        ctx.push_error(arguments.new_attribute_validation_error("`dbgenerated()` takes a single String argument"))
+    };
+
+    if args.len() > 1 {
+        bail()
+    }
+
+    match args.get(0).map(|arg| &arg.value) {
+        Some(ast::Expression::StringValue(val, _)) if val.is_empty() => {
             ctx.push_error(arguments.new_attribute_validation_error(
                 "dbgenerated() takes either no argument, or a single nonempty string argument.",
             ));
         }
-        [] | [ast::Expression::StringValue(_, _)] => accept(),
-        _ => ctx.push_error(arguments.new_attribute_validation_error("`dbgenerated()` takes a single String argument")), // let's not mention what we don't want to see.
+        None | Some(ast::Expression::StringValue(_, _)) => accept(),
+        _ => return bail(),
     }
 }
 

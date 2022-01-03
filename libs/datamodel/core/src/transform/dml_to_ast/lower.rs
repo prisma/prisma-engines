@@ -148,7 +148,18 @@ impl<'a> LowerDmlToAst<'a> {
                     (f.sort_order == Some(SortOrder::Desc)).then(|| ast::Argument::new_constant("sort", "Desc")),
                 );
 
-                ast::Expression::FieldWithArgs(f.name.to_string(), args, ast::Span::empty())
+                if args.is_empty() {
+                    ast::Expression::ConstantValue(f.name.clone(), ast::Span::empty())
+                } else {
+                    ast::Expression::Function(
+                        f.name.clone(),
+                        ast::ArgumentsList {
+                            arguments: args,
+                            ..Default::default()
+                        },
+                        ast::Span::empty(),
+                    )
+                }
             })
             .collect()
     }
@@ -177,7 +188,18 @@ impl<'a> LowerDmlToAst<'a> {
                     args.extend(ordering);
                 }
 
-                ast::Expression::FieldWithArgs(f.name.clone(), args, ast::Span::empty())
+                if args.is_empty() {
+                    ast::Expression::ConstantValue(f.name.clone(), ast::Span::empty())
+                } else {
+                    ast::Expression::Function(
+                        f.name.clone(),
+                        ast::ArgumentsList {
+                            arguments: args,
+                            ..Default::default()
+                        },
+                        ast::Span::empty(),
+                    )
+                }
             })
             .collect()
     }

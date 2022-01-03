@@ -42,8 +42,9 @@ impl<'ast> DefaultValueExt<'ast> for DefaultValueWalker<'ast, '_> {
         match self.value() {
             ast::Expression::Function(funcname, args, _) if funcname == "dbgenerated" => {
                 DefaultKind::Expression(ValueGenerator::new_dbgenerated(
-                    args.get(0)
-                        .and_then(|arg| arg.as_string_value())
+                    args.arguments
+                        .get(0)
+                        .and_then(|arg| arg.value.as_string_value())
                         .map(|(val, _)| val.to_owned())
                         .unwrap_or_else(String::new),
                 ))

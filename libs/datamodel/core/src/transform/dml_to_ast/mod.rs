@@ -15,7 +15,13 @@ use crate::{ast, configuration::StringFromEnvVar};
 fn lower_string_from_env_var(arg_name: &str, string_from_env: &StringFromEnvVar) -> ast::ConfigBlockProperty {
     match string_from_env.as_env_var() {
         Some(ref env_var) => {
-            let values = vec![ast::Expression::StringValue(env_var.to_string(), ast::Span::empty())];
+            let values = ast::ArgumentsList {
+                arguments: vec![ast::Argument::new_unnamed(ast::Expression::StringValue(
+                env_var.to_string(),
+                ast::Span::empty(),
+            ))],
+                    ..Default::default()
+            };
             ast::ConfigBlockProperty {
                 name: ast::Identifier::new(arg_name),
                 value: ast::Expression::Function("env".to_owned(), values, ast::Span::empty()),

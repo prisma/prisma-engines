@@ -289,6 +289,21 @@ fn must_error_if_using_non_indexed_auto_increment_on_mysql() {
 }
 
 #[test]
+fn must_error_on_arguments_in_autoincrement() {
+    let input = indoc!(
+        r#"
+        model Category {
+          id Int @id @default(autoincrement(name: "meow"))
+        }"#
+    );
+
+    let expected = expect![[]];
+
+    expected.assert_eq(&datamodel::parse_schema(input).map(drop).unwrap_err());
+}
+
+
+#[test]
 fn must_error_if_scalar_default_on_unsupported() {
     let dml = indoc! {r#"
         datasource db1 {

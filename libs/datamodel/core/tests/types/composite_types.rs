@@ -180,9 +180,11 @@ fn composite_types_are_parsed_without_error() {
                                                 end: 177,
                                             },
                                         },
-                                        arguments: [],
-                                        empty_arguments: [],
-                                        trailing_comma: None,
+                                        arguments: ArgumentsList {
+                                            arguments: [],
+                                            empty_arguments: [],
+                                            trailing_comma: None,
+                                        },
                                         span: Span {
                                             start: 175,
                                             end: 177,
