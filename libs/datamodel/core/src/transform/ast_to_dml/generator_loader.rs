@@ -14,6 +14,8 @@ const OUTPUT_KEY: &str = "output";
 const BINARY_TARGETS_KEY: &str = "binaryTargets";
 const EXPERIMENTAL_FEATURES_KEY: &str = "experimentalFeatures";
 const PREVIEW_FEATURES_KEY: &str = "previewFeatures";
+const ENGINE_TYPE_KEY: &str = "engineType";
+
 const FIRST_CLASS_PROPERTIES: &[&str] = &[
     PROVIDER_KEY,
     OUTPUT_KEY,
@@ -44,6 +46,12 @@ impl GeneratorLoader {
             .iter()
             .map(|arg| (arg.name.name.as_str(), ValueValidator::new(&arg.value)))
             .collect();
+
+        if let Some(val) = args.get(ENGINE_TYPE_KEY) {
+            if let Err(err) = StringFromEnvVar::try_from(val.value) {
+                diagnostics.push_error(err);
+            }
+        }
 
         let provider = match args.get(PROVIDER_KEY) {
             Some(val) => match StringFromEnvVar::try_from(val.value) {
