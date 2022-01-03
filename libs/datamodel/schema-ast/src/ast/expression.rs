@@ -96,4 +96,8 @@ impl Expression {
     pub fn is_array(&self) -> bool {
         matches!(self, Expression::Array(_, _))
     }
+
+    pub fn is_string(&self) -> bool {
+        matches!(self, Expression::StringValue(_, _))
+    }
 }
