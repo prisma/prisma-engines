@@ -177,6 +177,9 @@
 <span id="177">177</span>
 <span id="178">178</span>
 <span id="179">179</span>
+<span id="180">180</span>
+<span id="181">181</span>
+<span id="182">182</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">::dml::model::IndexAlgorithm</span>;
 
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ast</span>::{<span class="ident">Argument</span>, <span class="ident">Attribute</span>};
@@ -198,12 +201,15 @@
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">pk</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">model</span>.<span class="ident">primary_key</span> {
             <span class="kw">if</span> <span class="op">!</span><span class="ident">pk</span>.<span class="ident">defined_on_field</span> {
                 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">args</span> <span class="op">=</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">preview_features</span>.<span class="ident">contains</span>(<span class="ident">PreviewFeature::ExtendedIndexes</span>) {
-                    <span class="macro">vec!</span>[<span class="ident">ast::Argument::new_array</span>(<span class="string">&quot;&quot;</span>, <span class="ident">LowerDmlToAst::pk_field_array</span>(<span class="kw-2">&amp;</span><span class="ident">pk</span>.<span class="ident">fields</span>))]
+                    <span class="macro">vec!</span>[<span class="ident">ast::Argument::new_unnamed</span>(<span class="ident">ast::Expression::Array</span>(
+                        <span class="ident">LowerDmlToAst::pk_field_array</span>(<span class="kw-2">&amp;</span><span class="ident">pk</span>.<span class="ident">fields</span>),
+                        <span class="ident">ast::Span::empty</span>(),
+                    ))]
                 } <span class="kw">else</span> {
-                    <span class="macro">vec!</span>[<span class="ident">ast::Argument::new_array</span>(
-                        <span class="string">&quot;&quot;</span>,
+                    <span class="macro">vec!</span>[<span class="ident">ast::Argument::new_unnamed</span>(<span class="ident">ast::Expression::Array</span>(
                         <span class="ident">LowerDmlToAst::field_array</span>(<span class="kw-2">&amp;</span><span class="ident">pk</span>.<span class="ident">fields</span>.<span class="ident">clone</span>().<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">name</span>).<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>()),
-                    )]
+                        <span class="ident">ast::Span::empty</span>(),
+                    ))]
                 };
 
                 <span class="kw">if</span> <span class="ident">pk</span>.<span class="ident">name</span>.<span class="ident">is_some</span>() {
@@ -288,15 +294,15 @@
 
     <span class="kw">fn</span> <span class="ident">fields_argument</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">index_def</span>: <span class="kw-2">&amp;</span><span class="ident">IndexDefinition</span>, <span class="ident">always_render_sort_order</span>: <span class="ident">bool</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Argument</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">preview_features</span>.<span class="ident">contains</span>(<span class="ident">PreviewFeature::ExtendedIndexes</span>) {
-            <span class="macro">vec!</span>[<span class="ident">ast::Argument::new_array</span>(
-                <span class="string">&quot;&quot;</span>,
+            <span class="macro">vec!</span>[<span class="ident">ast::Argument::new_unnamed</span>(<span class="ident">ast::Expression::Array</span>(
                 <span class="ident">LowerDmlToAst::index_field_array</span>(<span class="kw-2">&amp;</span><span class="ident">index_def</span>.<span class="ident">fields</span>, <span class="ident">always_render_sort_order</span>),
-            )]
+                <span class="ident">ast::Span::empty</span>(),
+            ))]
         } <span class="kw">else</span> {
-            <span class="macro">vec!</span>[<span class="ident">ast::Argument::new_array</span>(
-                <span class="string">&quot;&quot;</span>,
+            <span class="macro">vec!</span>[<span class="ident">ast::Argument::new_unnamed</span>(<span class="ident">ast::Expression::Array</span>(
                 <span class="ident">LowerDmlToAst::field_array</span>(<span class="kw-2">&amp;</span><span class="ident">index_def</span>.<span class="ident">fields</span>.<span class="ident">clone</span>().<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">name</span>).<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>()),
-            )]
+                <span class="ident">ast::Span::empty</span>(),
+            ))]
         }
     }
 

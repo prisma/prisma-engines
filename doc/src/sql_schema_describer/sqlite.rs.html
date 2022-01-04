@@ -580,6 +580,12 @@
 <span id="580">580</span>
 <span id="581">581</span>
 <span id="582">582</span>
+<span id="583">583</span>
+<span id="584">584</span>
+<span id="585">585</span>
+<span id="586">586</span>
+<span id="587">587</span>
+<span id="588">588</span>
 </pre><pre class="rust"><code><span class="doccomment">//! SQLite description.</span>
 <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">common::purge_dangling_foreign_keys</span>, <span class="ident">getters::Getter</span>, <span class="ident">parsers::Parser</span>, <span class="ident">Column</span>, <span class="ident">ColumnArity</span>, <span class="ident">ColumnType</span>,
@@ -834,12 +840,14 @@
                 };
 
                 <span class="kw">let</span> <span class="ident">pk_col</span> <span class="op">=</span> <span class="ident">row</span>.<span class="ident">get</span>(<span class="string">&quot;pk&quot;</span>).<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">x</span>.<span class="ident">as_i64</span>()).<span class="ident">expect</span>(<span class="string">&quot;primary key&quot;</span>);
+
                 <span class="kw">let</span> <span class="ident">col</span> <span class="op">=</span> <span class="ident">Column</span> {
                     <span class="ident">name</span>: <span class="ident">row</span>.<span class="ident">get</span>(<span class="string">&quot;name&quot;</span>).<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">x</span>.<span class="ident">to_string</span>()).<span class="ident">expect</span>(<span class="string">&quot;name&quot;</span>),
                     <span class="ident">tpe</span>,
                     <span class="ident">default</span>,
                     <span class="ident">auto_increment</span>: <span class="bool-val">false</span>,
                 };
+
                 <span class="kw">if</span> <span class="ident">pk_col</span> <span class="op">&gt;</span> <span class="number">0</span> {
                     <span class="ident">pk_cols</span>.<span class="ident">insert</span>(<span class="ident">pk_col</span>, <span class="ident">col</span>.<span class="ident">name</span>.<span class="ident">clone</span>());
                 }
@@ -862,6 +870,7 @@
         } <span class="kw">else</span> {
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">columns</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">PrimaryKeyColumn</span><span class="op">&gt;</span> <span class="op">=</span> <span class="macro">vec!</span>[];
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">col_idxs</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">i64</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">pk_cols</span>.<span class="ident">keys</span>().<span class="ident">collect</span>();
+
             <span class="ident">col_idxs</span>.<span class="ident">sort_unstable</span>();
 
             <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="ident">col_idxs</span> {
@@ -878,6 +887,9 @@
                                  is auto incrementing&quot;</span>
                         );
                         <span class="ident">col</span>.<span class="ident">auto_increment</span> <span class="op">=</span> <span class="bool-val">true</span>;
+                        <span class="comment">// It is impossible to write a null value to an</span>
+                        <span class="comment">// autoincrementing primary key column.</span>
+                        <span class="ident">col</span>.<span class="ident">tpe</span>.<span class="ident">arity</span> <span class="op">=</span> <span class="ident">ColumnArity::Required</span>;
                     }
                 }
             }

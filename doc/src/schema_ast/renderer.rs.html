@@ -497,22 +497,6 @@
 <span id="497">497</span>
 <span id="498">498</span>
 <span id="499">499</span>
-<span id="500">500</span>
-<span id="501">501</span>
-<span id="502">502</span>
-<span id="503">503</span>
-<span id="504">504</span>
-<span id="505">505</span>
-<span id="506">506</span>
-<span id="507">507</span>
-<span id="508">508</span>
-<span id="509">509</span>
-<span id="510">510</span>
-<span id="511">511</span>
-<span id="512">512</span>
-<span id="513">513</span>
-<span id="514">514</span>
-<span id="515">515</span>
 </pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">string_builder</span>;
 <span class="kw">mod</span> <span class="ident">table</span>;
 
@@ -910,7 +894,7 @@
         <span class="self">self</span>.<span class="ident">end_line</span>();
     }
 
-    <span class="kw">fn</span> <span class="ident">render_arguments</span>(<span class="ident">target</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw">dyn</span> <span class="ident">LineWriteable</span>, <span class="ident">args</span>: <span class="kw-2">&amp;</span>[<span class="ident">ast::Argument</span>]) {
+    <span class="kw">fn</span> <span class="ident">render_arguments</span>(<span class="ident">target</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw">dyn</span> <span class="ident">LineWriteable</span>, <span class="ident">args</span>: <span class="kw-2">&amp;</span><span class="ident">ast::ArgumentsList</span>) {
         <span class="kw">for</span> (<span class="ident">idx</span>, <span class="ident">arg</span>) <span class="kw">in</span> <span class="ident">args</span>.<span class="ident">iter</span>().<span class="ident">enumerate</span>() {
             <span class="kw">if</span> <span class="ident">idx</span> <span class="op">&gt;</span> <span class="number">0</span> {
                 <span class="ident">target</span>.<span class="ident">write</span>(<span class="string">&quot;, &quot;</span>);
@@ -920,8 +904,8 @@
     }
 
     <span class="kw">fn</span> <span class="ident">render_argument</span>(<span class="ident">target</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw">dyn</span> <span class="ident">LineWriteable</span>, <span class="ident">arg</span>: <span class="kw-2">&amp;</span><span class="ident">ast::Argument</span>) {
-        <span class="kw">if</span> <span class="op">!</span><span class="ident">arg</span>.<span class="ident">name</span>.<span class="ident">name</span>.<span class="ident">is_empty</span>() {
-            <span class="ident">target</span>.<span class="ident">write</span>(<span class="kw-2">&amp;</span><span class="ident">arg</span>.<span class="ident">name</span>.<span class="ident">name</span>);
+        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">arg_name</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">arg</span>.<span class="ident">name</span> {
+            <span class="ident">target</span>.<span class="ident">write</span>(<span class="kw-2">&amp;</span><span class="ident">arg_name</span>.<span class="ident">name</span>);
             <span class="ident">target</span>.<span class="ident">write</span>(<span class="string">&quot;: &quot;</span>);
         }
         <span class="ident"><span class="self">Self</span>::render_value</span>(<span class="ident">target</span>, <span class="kw-2">&amp;</span><span class="ident">arg</span>.<span class="ident">value</span>);
@@ -936,7 +920,6 @@
     <span class="kw">fn</span> <span class="ident">render_value</span>(<span class="ident">target</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw">dyn</span> <span class="ident">LineWriteable</span>, <span class="ident">val</span>: <span class="kw-2">&amp;</span><span class="ident">ast::Expression</span>) {
         <span class="kw">match</span> <span class="ident">val</span> {
             <span class="ident">ast::Expression::Array</span>(<span class="ident">vals</span>, <span class="kw">_</span>) =&gt; <span class="ident"><span class="self">Self</span>::render_expression_array</span>(<span class="ident">target</span>, <span class="ident">vals</span>),
-            <span class="ident">ast::Expression::FieldWithArgs</span>(<span class="ident">ident</span>, <span class="ident">vals</span>, <span class="kw">_</span>) =&gt; <span class="ident"><span class="self">Self</span>::render_field_with_args</span>(<span class="ident">target</span>, <span class="ident">ident</span>, <span class="ident">vals</span>),
             <span class="ident">ast::Expression::ConstantValue</span>(<span class="ident">val</span>, <span class="kw">_</span>) =&gt; <span class="ident">target</span>.<span class="ident">write</span>(<span class="ident">val</span>),
             <span class="ident">ast::Expression::NumericValue</span>(<span class="ident">val</span>, <span class="kw">_</span>) =&gt; <span class="ident">target</span>.<span class="ident">write</span>(<span class="ident">val</span>),
             <span class="ident">ast::Expression::StringValue</span>(<span class="ident">val</span>, <span class="kw">_</span>) =&gt; <span class="ident"><span class="self">Self</span>::render_str</span>(<span class="ident">target</span>, <span class="ident">val</span>),
@@ -944,25 +927,10 @@
         };
     }
 
-    <span class="kw">fn</span> <span class="ident">render_field_with_args</span>(<span class="ident">target</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw">dyn</span> <span class="ident">LineWriteable</span>, <span class="ident">ident</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">vals</span>: <span class="kw-2">&amp;</span>[<span class="ident">ast::Argument</span>]) {
-        <span class="ident">target</span>.<span class="ident">write</span>(<span class="ident">ident</span>);
-        <span class="kw">if</span> <span class="op">!</span><span class="ident">vals</span>.<span class="ident">is_empty</span>() {
-            <span class="ident">target</span>.<span class="ident">write</span>(<span class="string">&quot;(&quot;</span>);
-            <span class="ident"><span class="self">Self</span>::render_arguments</span>(<span class="ident">target</span>, <span class="ident">vals</span>);
-            <span class="ident">target</span>.<span class="ident">write</span>(<span class="string">&quot;)&quot;</span>);
-        }
-    }
-
-    <span class="kw">fn</span> <span class="ident">render_func</span>(<span class="ident">target</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw">dyn</span> <span class="ident">LineWriteable</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">vals</span>: <span class="kw-2">&amp;</span>[<span class="ident">ast::Expression</span>]) {
+    <span class="kw">fn</span> <span class="ident">render_func</span>(<span class="ident">target</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw">dyn</span> <span class="ident">LineWriteable</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">args</span>: <span class="kw-2">&amp;</span><span class="ident">ast::ArgumentsList</span>) {
         <span class="ident">target</span>.<span class="ident">write</span>(<span class="ident">name</span>);
         <span class="ident">target</span>.<span class="ident">write</span>(<span class="string">&quot;(&quot;</span>);
-        <span class="kw">for</span> (<span class="ident">idx</span>, <span class="ident">val</span>) <span class="kw">in</span> <span class="ident">vals</span>.<span class="ident">iter</span>().<span class="ident">enumerate</span>() {
-            <span class="kw">if</span> <span class="ident">idx</span> <span class="op">&gt;</span> <span class="number">0</span> {
-                <span class="ident">target</span>.<span class="ident">write</span>(<span class="string">&quot;, &quot;</span>);
-            }
-
-            <span class="ident"><span class="self">Self</span>::render_value</span>(<span class="ident">target</span>, <span class="ident">val</span>);
-        }
+        <span class="ident"><span class="self">Self</span>::render_arguments</span>(<span class="ident">target</span>, <span class="ident">args</span>);
         <span class="ident">target</span>.<span class="ident">write</span>(<span class="string">&quot;)&quot;</span>);
     }
 

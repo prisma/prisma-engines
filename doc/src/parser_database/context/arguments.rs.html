@@ -103,6 +103,24 @@
 <span id="103">103</span>
 <span id="104">104</span>
 <span id="105">105</span>
+<span id="106">106</span>
+<span id="107">107</span>
+<span id="108">108</span>
+<span id="109">109</span>
+<span id="110">110</span>
+<span id="111">111</span>
+<span id="112">112</span>
+<span id="113">113</span>
+<span id="114">114</span>
+<span id="115">115</span>
+<span id="116">116</span>
+<span id="117">117</span>
+<span id="118">118</span>
+<span id="119">119</span>
+<span id="120">120</span>
+<span id="121">121</span>
+<span id="122">122</span>
+<span id="123">123</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ast</span>::{<span class="self">self</span>, <span class="ident">WithName</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ValueValidator</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">DatamodelError</span>, <span class="ident">Diagnostics</span>};
@@ -112,7 +130,7 @@
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Default</span>)]</span>
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">Arguments</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
     <span class="ident">attribute</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">ast::Attribute</span><span class="op">&gt;</span>,
-    <span class="ident">args</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">ast::Argument</span><span class="op">&gt;</span>, <span class="comment">// the _remaining_ arguments</span>
+    <span class="ident">args</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span><span class="op">&gt;</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">ast::Argument</span><span class="op">&gt;</span>, <span class="comment">// the _remaining_ arguments</span>
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Arguments</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
@@ -121,12 +139,12 @@
         <span class="kw">let</span> <span class="ident">arguments</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">attribute</span>.<span class="ident">arguments</span>;
         <span class="self">self</span>.<span class="ident">attribute</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">attribute</span>);
         <span class="self">self</span>.<span class="ident">args</span>.<span class="ident">clear</span>();
-        <span class="self">self</span>.<span class="ident">args</span>.<span class="ident">reserve</span>(<span class="ident">arguments</span>.<span class="ident">len</span>());
+        <span class="self">self</span>.<span class="ident">args</span>.<span class="ident">reserve</span>(<span class="ident">arguments</span>.<span class="ident">arguments</span>.<span class="ident">len</span>());
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">errors</span> <span class="op">=</span> <span class="ident">Diagnostics::new</span>();
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">unnamed_arguments</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
 
-        <span class="kw">for</span> <span class="ident">arg</span> <span class="kw">in</span> <span class="ident">arguments</span> {
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">existing_argument</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">args</span>.<span class="ident">insert</span>(<span class="ident">arg</span>.<span class="ident">name</span>.<span class="ident">name</span>.<span class="ident">as_str</span>(), <span class="ident">arg</span>) {
+        <span class="kw">for</span> <span class="ident">arg</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">arguments</span>.<span class="ident">arguments</span> {
+            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">existing_argument</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">args</span>.<span class="ident">insert</span>(<span class="ident">arg</span>.<span class="ident">name</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">n</span><span class="op">|</span> <span class="ident">n</span>.<span class="ident">name</span>.<span class="ident">as_str</span>()), <span class="ident">arg</span>) {
                 <span class="kw">if</span> <span class="ident">arg</span>.<span class="ident">is_unnamed</span>() {
                     <span class="kw">if</span> <span class="ident">unnamed_arguments</span>.<span class="ident">is_empty</span>() {
                         <span class="kw">let</span> <span class="ident">rendered</span> <span class="op">=</span> <span class="ident">schema_ast::renderer::Renderer::render_value_to_string</span>(<span class="kw-2">&amp;</span><span class="ident">existing_argument</span>.<span class="ident">value</span>);
@@ -136,7 +154,10 @@
                     <span class="kw">let</span> <span class="ident">rendered</span> <span class="op">=</span> <span class="ident">schema_ast::renderer::Renderer::render_value_to_string</span>(<span class="kw-2">&amp;</span><span class="ident">arg</span>.<span class="ident">value</span>);
                     <span class="ident">unnamed_arguments</span>.<span class="ident">push</span>(<span class="ident">rendered</span>)
                 } <span class="kw">else</span> {
-                    <span class="ident">errors</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_duplicate_argument_error</span>(<span class="kw-2">&amp;</span><span class="ident">arg</span>.<span class="ident">name</span>.<span class="ident">name</span>, <span class="ident">arg</span>.<span class="ident">span</span>));
+                    <span class="ident">errors</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_duplicate_argument_error</span>(
+                        <span class="kw-2">&amp;</span><span class="ident">arg</span>.<span class="ident">name</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>().<span class="ident">name</span>,
+                        <span class="ident">arg</span>.<span class="ident">span</span>,
+                    ));
                 }
             }
         }
@@ -149,20 +170,32 @@
             ))
         }
 
-        <span class="kw">for</span> <span class="ident">arg</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">attribute</span>.<span class="ident">empty_arguments</span> {
-            <span class="ident">errors</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_attribute_validation_error</span>(
-                <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;The `{}` argument is missing a value.&quot;</span>, <span class="ident">arg</span>.<span class="ident">name</span>.<span class="ident">name</span>),
-                <span class="ident">attribute</span>.<span class="ident">name</span>(),
-                <span class="ident">arg</span>.<span class="ident">name</span>.<span class="ident">span</span>,
-            ))
-        }
+        <span class="comment">// The arguments lists of the attribute and all nested function expression.</span>
+        <span class="kw">let</span> <span class="ident">all_arguments_lists</span> <span class="op">=</span> <span class="ident">std::iter::once</span>(<span class="kw-2">&amp;</span><span class="ident">attribute</span>.<span class="ident">arguments</span>).<span class="ident">chain</span>(
+            <span class="ident">attribute</span>
+                .<span class="ident">arguments</span>
+                .<span class="ident">arguments</span>
+                .<span class="ident">iter</span>()
+                .<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">arg</span><span class="op">|</span> <span class="ident">arg</span>.<span class="ident">value</span>.<span class="ident">as_function</span>())
+                .<span class="ident">map</span>(<span class="op">|</span>(<span class="kw">_</span>, <span class="ident">args</span>, <span class="kw">_</span>)<span class="op">|</span> <span class="ident">args</span>),
+        );
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">span</span>) <span class="op">=</span> <span class="ident">attribute</span>.<span class="ident">trailing_comma</span> {
-            <span class="ident">errors</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_attribute_validation_error</span>(
-                <span class="string">&quot;Trailing commas are not valid in attribute arguments, please remove the comma.&quot;</span>,
-                <span class="ident">attribute</span>.<span class="ident">name</span>(),
-                <span class="ident">span</span>,
-            ))
+        <span class="kw">for</span> <span class="ident">args</span> <span class="kw">in</span> <span class="ident">all_arguments_lists</span> {
+            <span class="kw">for</span> <span class="ident">arg</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">args</span>.<span class="ident">empty_arguments</span> {
+                <span class="ident">errors</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_attribute_validation_error</span>(
+                    <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;The `{}` argument is missing a value.&quot;</span>, <span class="ident">arg</span>.<span class="ident">name</span>.<span class="ident">name</span>),
+                    <span class="ident">attribute</span>.<span class="ident">name</span>(),
+                    <span class="ident">arg</span>.<span class="ident">name</span>.<span class="ident">span</span>,
+                ))
+            }
+
+            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">span</span>) <span class="op">=</span> <span class="ident">args</span>.<span class="ident">trailing_comma</span> {
+                <span class="ident">errors</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_attribute_validation_error</span>(
+                    <span class="string">&quot;Trailing commas are not valid in attribute arguments, please remove the comma.&quot;</span>,
+                    <span class="ident">attribute</span>.<span class="ident">name</span>(),
+                    <span class="ident">span</span>,
+                ))
+            }
         }
 
         <span class="ident">errors</span>.<span class="ident">to_result</span>()
@@ -175,7 +208,10 @@
     <span class="doccomment">/// Call this at the end of validation. It will report errors for each argument that was not used by the validators.</span>
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">check_for_unused_arguments</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">errors</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Diagnostics</span>) {
         <span class="kw">for</span> <span class="ident">arg</span> <span class="kw">in</span> <span class="self">self</span>.<span class="ident">args</span>.<span class="ident">values</span>() {
-            <span class="ident">errors</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_unused_argument_error</span>(<span class="kw-2">&amp;</span><span class="ident">arg</span>.<span class="ident">name</span>.<span class="ident">name</span>, <span class="ident">arg</span>.<span class="ident">span</span>));
+            <span class="ident">errors</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_unused_argument_error</span>(
+                <span class="ident">arg</span>.<span class="ident">name</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">n</span><span class="op">|</span> <span class="ident">n</span>.<span class="ident">name</span>.<span class="ident">as_str</span>()).<span class="ident">unwrap_or</span>(<span class="string">&quot;&quot;</span>),
+                <span class="ident">arg</span>.<span class="ident">span</span>,
+            ));
         }
     }
 
@@ -184,15 +220,15 @@
         <span class="self">self</span>.<span class="ident">attribute</span>().<span class="ident">span</span>
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">optional_arg</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ValueValidator</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">args</span>.<span class="ident">remove</span>(<span class="ident">name</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">arg</span><span class="op">|</span> <span class="ident">ValueValidator::new</span>(<span class="kw-2">&amp;</span><span class="ident">arg</span>.<span class="ident">value</span>))
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">optional_arg</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ValueValidator</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">args</span>.<span class="ident">remove</span>(<span class="kw-2">&amp;</span><span class="prelude-val">Some</span>(<span class="ident">name</span>)).<span class="ident">map</span>(<span class="op">|</span><span class="ident">arg</span><span class="op">|</span> <span class="ident">ValueValidator::new</span>(<span class="kw-2">&amp;</span><span class="ident">arg</span>.<span class="ident">value</span>))
     }
 
     <span class="doccomment">/// Gets the arg with the given name, or if it is not found, the first unnamed argument.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Use this to implement unnamed argument behavior.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">default_arg</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ValueValidator</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>, <span class="ident">DatamodelError</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> (<span class="self">self</span>.<span class="ident">args</span>.<span class="ident">remove</span>(<span class="ident">name</span>), <span class="self">self</span>.<span class="ident">args</span>.<span class="ident">remove</span>(<span class="string">&quot;&quot;</span>)) {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">default_arg</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ValueValidator</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>, <span class="ident">DatamodelError</span><span class="op">&gt;</span> {
+        <span class="kw">match</span> (<span class="self">self</span>.<span class="ident">args</span>.<span class="ident">remove</span>(<span class="kw-2">&amp;</span><span class="prelude-val">Some</span>(<span class="ident">name</span>)), <span class="self">self</span>.<span class="ident">args</span>.<span class="ident">remove</span>(<span class="kw-2">&amp;</span><span class="prelude-val">None</span>)) {
             (<span class="prelude-val">Some</span>(<span class="ident">arg</span>), <span class="prelude-val">None</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">ValueValidator::new</span>(<span class="kw-2">&amp;</span><span class="ident">arg</span>.<span class="ident">value</span>)),
             (<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="ident">arg</span>)) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">ValueValidator::new</span>(<span class="kw-2">&amp;</span><span class="ident">arg</span>.<span class="ident">value</span>)),
             (<span class="prelude-val">Some</span>(<span class="ident">arg</span>), <span class="prelude-val">Some</span>(<span class="kw">_</span>)) =&gt; <span class="prelude-val">Err</span>(<span class="ident">DatamodelError::new_duplicate_default_argument_error</span>(<span class="ident">name</span>, <span class="ident">arg</span>.<span class="ident">span</span>)),
@@ -204,7 +240,7 @@
         <span class="ident">DatamodelError::new_attribute_validation_error</span>(<span class="ident">message</span>, <span class="self">self</span>.<span class="ident">attribute</span>().<span class="ident">name</span>(), <span class="self">self</span>.<span class="ident">span</span>())
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">optional_default_arg</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ValueValidator</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">optional_default_arg</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ValueValidator</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">default_arg</span>(<span class="ident">name</span>).<span class="ident">ok</span>()
     }
 }

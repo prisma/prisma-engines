@@ -75,7 +75,7 @@
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">Attribute</span>, <span class="ident">Comment</span>, <span class="ident">Identifier</span>, <span class="ident">Span</span>, <span class="ident">WithAttributes</span>, <span class="ident">WithDocumentation</span>, <span class="ident">WithIdentifier</span>, <span class="ident">WithSpan</span>};
 
 <span class="doccomment">/// An enum declaration.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Enum</span> {
     <span class="doccomment">/// The name of the enum.</span>
     <span class="kw">pub</span> <span class="ident">name</span>: <span class="ident">Identifier</span>,
@@ -118,7 +118,7 @@
 }
 
 <span class="doccomment">/// An enum value definition.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">EnumValue</span> {
     <span class="doccomment">/// The name of the enum value as it will be exposed by the api.</span>
     <span class="kw">pub</span> <span class="ident">name</span>: <span class="ident">Identifier</span>,

@@ -34,15 +34,15 @@
 <span id="34">34</span>
 <span id="35">35</span>
 <span id="36">36</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">Argument</span>, <span class="ident">Comment</span>, <span class="ident">Identifier</span>, <span class="ident">Span</span>, <span class="ident">WithDocumentation</span>, <span class="ident">WithIdentifier</span>, <span class="ident">WithSpan</span>};
+</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">Comment</span>, <span class="ident">ConfigBlockProperty</span>, <span class="ident">Identifier</span>, <span class="ident">Span</span>, <span class="ident">WithDocumentation</span>, <span class="ident">WithIdentifier</span>, <span class="ident">WithSpan</span>};
 
 <span class="doccomment">/// A source block declaration.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SourceConfig</span> {
     <span class="doccomment">/// Name of this source.</span>
     <span class="kw">pub</span> <span class="ident">name</span>: <span class="ident">Identifier</span>,
     <span class="doccomment">/// Top-level configuration properties for this source.</span>
-    <span class="kw">pub</span> <span class="ident">properties</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Argument</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">properties</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ConfigBlockProperty</span><span class="op">&gt;</span>,
     <span class="doccomment">/// The comments for this source block.</span>
     <span class="kw">pub</span> <span class="ident">documentation</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Comment</span><span class="op">&gt;</span>,
     <span class="doccomment">/// The location of this source block in the text representation.</span>

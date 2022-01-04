@@ -182,6 +182,28 @@
 <span id="182">182</span>
 <span id="183">183</span>
 <span id="184">184</span>
+<span id="185">185</span>
+<span id="186">186</span>
+<span id="187">187</span>
+<span id="188">188</span>
+<span id="189">189</span>
+<span id="190">190</span>
+<span id="191">191</span>
+<span id="192">192</span>
+<span id="193">193</span>
+<span id="194">194</span>
+<span id="195">195</span>
+<span id="196">196</span>
+<span id="197">197</span>
+<span id="198">198</span>
+<span id="199">199</span>
+<span id="200">200</span>
+<span id="201">201</span>
+<span id="202">202</span>
+<span id="203">203</span>
+<span id="204">204</span>
+<span id="205">205</span>
+<span id="206">206</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::common::preview_features::PreviewFeature</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">ast</span>, <span class="ident">dml</span>, <span class="ident">Datasource</span>, <span class="ident">IndexField</span>, <span class="ident">PrimaryKeyField</span>, <span class="ident">SortOrder</span>};
 <span class="kw">use</span> <span class="ident">enumflags2::BitFlags</span>;
@@ -332,7 +354,18 @@
                     (<span class="ident">f</span>.<span class="ident">sort_order</span> <span class="op">==</span> <span class="prelude-val">Some</span>(<span class="ident">SortOrder::Desc</span>)).<span class="ident">then</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">ast::Argument::new_constant</span>(<span class="string">&quot;sort&quot;</span>, <span class="string">&quot;Desc&quot;</span>)),
                 );
 
-                <span class="ident">ast::Expression::FieldWithArgs</span>(<span class="ident">f</span>.<span class="ident">name</span>.<span class="ident">to_string</span>(), <span class="ident">args</span>, <span class="ident">ast::Span::empty</span>())
+                <span class="kw">if</span> <span class="ident">args</span>.<span class="ident">is_empty</span>() {
+                    <span class="ident">ast::Expression::ConstantValue</span>(<span class="ident">f</span>.<span class="ident">name</span>.<span class="ident">clone</span>(), <span class="ident">ast::Span::empty</span>())
+                } <span class="kw">else</span> {
+                    <span class="ident">ast::Expression::Function</span>(
+                        <span class="ident">f</span>.<span class="ident">name</span>.<span class="ident">clone</span>(),
+                        <span class="ident">ast::ArgumentsList</span> {
+                            <span class="ident">arguments</span>: <span class="ident">args</span>,
+                            ..<span class="ident">Default::default</span>()
+                        },
+                        <span class="ident">ast::Span::empty</span>(),
+                    )
+                }
             })
             .<span class="ident">collect</span>()
     }
@@ -361,7 +394,18 @@
                     <span class="ident">args</span>.<span class="ident">extend</span>(<span class="ident">ordering</span>);
                 }
 
-                <span class="ident">ast::Expression::FieldWithArgs</span>(<span class="ident">f</span>.<span class="ident">name</span>.<span class="ident">clone</span>(), <span class="ident">args</span>, <span class="ident">ast::Span::empty</span>())
+                <span class="kw">if</span> <span class="ident">args</span>.<span class="ident">is_empty</span>() {
+                    <span class="ident">ast::Expression::ConstantValue</span>(<span class="ident">f</span>.<span class="ident">name</span>.<span class="ident">clone</span>(), <span class="ident">ast::Span::empty</span>())
+                } <span class="kw">else</span> {
+                    <span class="ident">ast::Expression::Function</span>(
+                        <span class="ident">f</span>.<span class="ident">name</span>.<span class="ident">clone</span>(),
+                        <span class="ident">ast::ArgumentsList</span> {
+                            <span class="ident">arguments</span>: <span class="ident">args</span>,
+                            ..<span class="ident">Default::default</span>()
+                        },
+                        <span class="ident">ast::Span::empty</span>(),
+                    )
+                }
             })
             .<span class="ident">collect</span>()
     }

@@ -49,7 +49,7 @@
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ast</span>::{<span class="ident">Comment</span>, <span class="ident">Field</span>, <span class="ident">FieldId</span>, <span class="ident">Identifier</span>, <span class="ident">SchemaAst</span>, <span class="ident">Span</span>};
 
 <span class="doccomment">/// A composite type declaration.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CompositeType</span> {
     <span class="doccomment">/// The name of the type.</span>
     <span class="kw">pub</span> <span class="ident">name</span>: <span class="ident">Identifier</span>,

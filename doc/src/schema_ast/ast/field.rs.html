@@ -121,7 +121,7 @@
     <span class="ident">Attribute</span>, <span class="ident">Comment</span>, <span class="ident">Identifier</span>, <span class="ident">Span</span>, <span class="ident">WithAttributes</span>, <span class="ident">WithDocumentation</span>, <span class="ident">WithIdentifier</span>, <span class="ident">WithName</span>, <span class="ident">WithSpan</span>,
 };
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Field</span> {
     <span class="doccomment">/// The field&#39;s type.</span>
     <span class="kw">pub</span> <span class="ident">field_type</span>: <span class="ident">FieldType</span>,
@@ -146,7 +146,7 @@
             .<span class="ident">iter</span>()
             .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">a</span><span class="op">|</span> <span class="ident">a</span>.<span class="ident">name</span>() <span class="op">==</span> <span class="ident">attribute</span>)
             .<span class="ident">flat_map</span>(<span class="op">|</span><span class="ident">a</span><span class="op">|</span> <span class="ident">a</span>.<span class="ident">arguments</span>.<span class="ident">iter</span>())
-            .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">a</span><span class="op">|</span> <span class="ident">a</span>.<span class="ident">name</span>() <span class="op">==</span> <span class="ident">argument</span>)
+            .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">a</span><span class="op">|</span> <span class="ident">a</span>.<span class="ident">name</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">n</span><span class="op">|</span> <span class="ident">n</span>.<span class="ident">name</span>.<span class="ident">as_str</span>()) <span class="op">==</span> <span class="prelude-val">Some</span>(<span class="ident">argument</span>))
             .<span class="ident">map</span>(<span class="op">|</span><span class="ident">a</span><span class="op">|</span> <span class="ident">a</span>.<span class="ident">span</span>)
             .<span class="ident">next</span>()
     }
