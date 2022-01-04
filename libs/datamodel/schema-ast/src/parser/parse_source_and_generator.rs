@@ -9,7 +9,7 @@ use diagnostics::{DatamodelError, Diagnostics};
 
 pub(crate) fn parse_source(token: &Token<'_>, diagnostics: &mut Diagnostics) -> SourceConfig {
     let mut name: Option<Identifier> = None;
-    let mut properties: Vec<Argument> = vec![];
+    let mut properties = Vec::new();
     let mut comment: Option<Comment> = None;
 
     for current in token.relevant_children() {
@@ -41,7 +41,7 @@ pub(crate) fn parse_source(token: &Token<'_>, diagnostics: &mut Diagnostics) -> 
 
 pub fn parse_generator(token: &Token<'_>, diagnostics: &mut Diagnostics) -> GeneratorConfig {
     let mut name: Option<Identifier> = None;
-    let mut properties: Vec<Argument> = vec![];
+    let mut properties: Vec<ConfigBlockProperty> = vec![];
     let mut comments: Vec<String> = Vec::new();
 
     for current in token.relevant_children() {
@@ -72,7 +72,7 @@ pub fn parse_generator(token: &Token<'_>, diagnostics: &mut Diagnostics) -> Gene
     }
 }
 
-fn parse_key_value(token: &Token<'_>) -> Argument {
+fn parse_key_value(token: &Token<'_>) -> ConfigBlockProperty {
     let mut name: Option<Identifier> = None;
     let mut value: Option<Expression> = None;
 
@@ -88,7 +88,7 @@ fn parse_key_value(token: &Token<'_>) -> Argument {
     }
 
     match (name, value) {
-        (Some(name), Some(value)) => Argument {
+        (Some(name), Some(value)) => ConfigBlockProperty {
             name,
             value,
             span: Span::from(token.as_span()),

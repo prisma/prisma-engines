@@ -289,6 +289,27 @@ fn must_error_if_using_non_indexed_auto_increment_on_mysql() {
 }
 
 #[test]
+fn must_error_on_arguments_in_autoincrement() {
+    let input = indoc!(
+        r#"
+        model Category {
+          id Int @id @default(autoincrement(name: "meow"))
+        }"#
+    );
+
+    let expected = expect![[r#"
+        [1;91merror[0m: [1mError parsing attribute "@default": The `autoincrement` function does not take any argument. Consider changing this default to `autoincrement()`.[0m
+          [1;94m-->[0m  [4mschema.prisma:2[0m
+        [1;94m   | [0m
+        [1;94m 1 | [0mmodel Category {
+        [1;94m 2 | [0m  id Int @id @[1;91mdefault(autoincrement(name: "meow"))[0m
+        [1;94m   | [0m
+    "#]];
+
+    expected.assert_eq(&datamodel::parse_schema(input).map(drop).unwrap_err());
+}
+
+#[test]
 fn must_error_if_scalar_default_on_unsupported() {
     let dml = indoc! {r#"
         datasource db1 {

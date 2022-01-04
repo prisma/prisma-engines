@@ -87,7 +87,7 @@ pub enum DatamodelError {
   ScalarTypeNotFoundError { type_name: String, span: Span },
 
   #[error("Unexpected token. Expected one of: {}", expected_str)]
-  ParserError { expected: Vec<&'static str>, expected_str: String, span: Span },
+  ParserError { expected_str: String, span: Span },
 
   #[error("{}", message)]
   LegacyParserError { message: String, span: Span },
@@ -373,12 +373,8 @@ impl DatamodelError {
         }
     }
 
-    pub fn new_parser_error(expected: &[&'static str], span: Span) -> DatamodelError {
-        DatamodelError::ParserError {
-            expected: expected.to_owned(),
-            expected_str: expected.join(", "),
-            span,
-        }
+    pub fn new_parser_error(expected_str: String, span: Span) -> DatamodelError {
+        DatamodelError::ParserError { expected_str, span }
     }
 
     pub fn new_functional_evaluation_error(message: &str, span: Span) -> DatamodelError {

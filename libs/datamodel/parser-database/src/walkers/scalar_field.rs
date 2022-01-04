@@ -53,7 +53,7 @@ impl<'ast, 'db> ScalarFieldWalker<'ast, 'db> {
     pub fn is_autoincrement(self) -> bool {
         matches!(
             &self.scalar_field.default.as_ref().map(|d| d.value),
-            Some(ast::Expression::Function(funcname, args, _)) if args.is_empty() && funcname == "autoincrement"
+            Some(ast::Expression::Function(funcname, args, _)) if args.arguments.is_empty() && funcname == "autoincrement"
         )
     }
 

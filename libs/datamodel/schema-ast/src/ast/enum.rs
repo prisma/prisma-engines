@@ -1,7 +1,7 @@
 use super::{Attribute, Comment, Identifier, Span, WithAttributes, WithDocumentation, WithIdentifier, WithSpan};
 
 /// An enum declaration.
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone)]
 pub struct Enum {
     /// The name of the enum.
     pub name: Identifier,
@@ -44,7 +44,7 @@ impl WithDocumentation for Enum {
 }
 
 /// An enum value definition.
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone)]
 pub struct EnumValue {
     /// The name of the enum value as it will be exposed by the api.
     pub name: Identifier,

@@ -24,15 +24,15 @@ impl EnvFunction {
             ));
         };
 
-        if args.len() != 1 {
+        if args.arguments.len() != 1 {
             return Err(DatamodelError::new_functional_evaluation_error(
                 "Exactly one string parameter must be passed to the env function.",
                 expr.span(),
             ));
         }
 
-        let var_wrapped = &args[0];
-        let var_name = ValueValidator::new(var_wrapped).as_str()?.to_owned();
+        let var_wrapped = &args.arguments[0];
+        let var_name = ValueValidator::new(&var_wrapped.value).as_str()?.to_owned();
 
         Ok(Self { var_name })
     }

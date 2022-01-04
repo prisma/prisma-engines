@@ -2,7 +2,7 @@ use super::{
     Attribute, Comment, Identifier, Span, WithAttributes, WithDocumentation, WithIdentifier, WithName, WithSpan,
 };
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone)]
 pub struct Field {
     /// The field's type.
     pub field_type: FieldType,
@@ -27,7 +27,7 @@ impl Field {
             .iter()
             .filter(|a| a.name() == attribute)
             .flat_map(|a| a.arguments.iter())
-            .filter(|a| a.name() == argument)
+            .filter(|a| a.name.as_ref().map(|n| n.name.as_str()) == Some(argument))
             .map(|a| a.span)
             .next()
     }

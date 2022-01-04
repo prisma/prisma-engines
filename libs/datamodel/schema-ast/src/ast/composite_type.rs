@@ -1,7 +1,7 @@
 use crate::ast::{Comment, Field, FieldId, Identifier, SchemaAst, Span};
 
 /// A composite type declaration.
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone)]
 pub struct CompositeType {
     /// The name of the type.
     pub name: Identifier,

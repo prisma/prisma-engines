@@ -88,14 +88,15 @@ impl<'ast> FieldPosition<'ast> {
             if attr.span().contains(position) {
                 // We can't go by Span::contains() because we also care about the empty space
                 // between arguments and that's hard to capture in the pest grammar.
-                let mut spans: Vec<(&str, ast::Span)> = attr
+                let mut spans: Vec<(Option<&str>, ast::Span)> = attr
                     .arguments
                     .iter()
-                    .map(|arg| (arg.name(), *arg.span()))
+                    .map(|arg| (arg.name.as_ref().map(|n| n.name.as_str()), *arg.span()))
                     .chain(
-                        attr.empty_arguments
+                        attr.arguments
+                            .empty_arguments
                             .iter()
-                            .map(|arg| (arg.name.name.as_str(), *arg.name.span())),
+                            .map(|arg| (Some(arg.name.name.as_str()), *arg.name.span())),
                     )
                     .collect();
                 spans.sort_by_key(|(_, span)| span.start);
@@ -106,13 +107,13 @@ impl<'ast> FieldPosition<'ast> {
                 }
 
                 // If the cursor is after a trailing comma, we're not in an argument.
-                if let Some(span) = attr.trailing_comma {
+                if let Some(span) = attr.arguments.trailing_comma {
                     if position > span.start {
                         arg_name = None;
                     }
                 }
 
-                return FieldPosition::Attribute(attr.name(), attr_idx, arg_name);
+                return FieldPosition::Attribute(attr.name(), attr_idx, arg_name.flatten());
             }
         }
 

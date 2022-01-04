@@ -3,7 +3,7 @@ pub(crate) mod reserved_model_names;
 pub use reserved_model_names::is_reserved_type_name;
 
 use crate::{
-    ast::{self, Argument, TopId, WithAttributes, WithIdentifier},
+    ast::{self, ConfigBlockProperty, TopId, WithAttributes, WithIdentifier},
     types::ScalarType,
     Context, DatamodelError,
 };
@@ -150,7 +150,7 @@ fn assert_is_not_a_reserved_scalar_type(ident: &ast::Identifier, ctx: &mut Conte
 
 fn check_for_duplicate_properties<'a>(
     top: &ast::Top,
-    props: &'a [Argument],
+    props: &'a [ConfigBlockProperty],
     tmp_names: &mut HashSet<&'a str>,
     ctx: &mut Context<'_>,
 ) {
@@ -160,7 +160,7 @@ fn check_for_duplicate_properties<'a>(
             ctx.push_error(DatamodelError::new_duplicate_config_key_error(
                 &format!("{} \"{}\"", top.get_type(), top.name()),
                 &arg.name.name,
-                arg.identifier().span,
+                arg.name.span,
             ));
         }
     }

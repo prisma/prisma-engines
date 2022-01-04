@@ -17,7 +17,7 @@ impl GeneratorSerializer {
     }
 
     fn lower_generator(generator: &Generator) -> ast::GeneratorConfig {
-        let mut properties: Vec<ast::Argument> =
+        let mut properties: Vec<ast::ConfigBlockProperty> =
             vec![super::lower_string_from_env_var("provider", &generator.provider)];
 
         if let Some(output) = &generator.output {
@@ -30,7 +30,11 @@ impl GeneratorSerializer {
                 .map(|f| ast::Expression::StringValue(f.to_string(), ast::Span::empty()))
                 .collect::<Vec<ast::Expression>>();
 
-            properties.push(dbg!(ast::Argument::new_array("previewFeatures", features)));
+            properties.push(ast::ConfigBlockProperty {
+                name: ast::Identifier::new("previewFeatures"),
+                value: ast::Expression::Array(features, ast::Span::empty()),
+                span: ast::Span::empty(),
+            })
         }
 
         let platform_values: Vec<ast::Expression> = generator
@@ -40,11 +44,19 @@ impl GeneratorSerializer {
             .collect();
 
         if !platform_values.is_empty() {
-            properties.push(ast::Argument::new_array("binaryTargets", platform_values));
+            properties.push(ast::ConfigBlockProperty {
+                name: ast::Identifier::new("binaryTargets"),
+                value: ast::Expression::Array(platform_values, ast::Span::empty()),
+                span: ast::Span::empty(),
+            });
         }
 
         for (key, value) in &generator.config {
-            properties.push(ast::Argument::new_string(key, value.to_string()));
+            properties.push(ast::ConfigBlockProperty {
+                name: ast::Identifier::new(key),
+                value: ast::Expression::StringValue(value.to_owned(), ast::Span::empty()),
+                span: ast::Span::empty(),
+            });
         }
 
         ast::GeneratorConfig {
