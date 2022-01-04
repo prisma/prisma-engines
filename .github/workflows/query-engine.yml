@@ -2,7 +2,7 @@ name: Query Engine
 on:
   push:
     branches:
-      - master
+      - main
   pull_request:
 jobs:
   rust-vitess-tests:
