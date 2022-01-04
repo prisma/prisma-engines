@@ -256,8 +256,7 @@ impl<'a> Reformatter<'a> {
                     };
                 }
                 Rule::enum_declaration => self.reformat_enum(target, &current),
-                Rule::source_block => self.reformat_datasource(target, &current),
-                Rule::generator_block => self.reformat_generator(target, &current),
+                Rule::config_block => self.reformat_config_block(target, &current),
                 Rule::type_alias => {
                     if !types_mode {
                         panic!("Renderer not in type mode.");
@@ -279,29 +278,21 @@ impl<'a> Reformatter<'a> {
         target.write("");
     }
 
-    fn reformat_datasource(&self, target: &mut Renderer<'_>, token: &Token<'_>) {
+    fn reformat_config_block(&self, target: &mut Renderer<'_>, token: &Token<'_>) {
+        let keyword = token
+            .clone()
+            .into_inner()
+            .find(|p| [Rule::GENERATOR_KEYWORD, Rule::DATASOURCE_KEYWORD].contains(&p.as_rule()))
+            .map(|tok| tok.as_str())
+            .unwrap();
+
         self.reformat_block_element(
-            "datasource",
+            keyword,
             target,
             token,
             &(|table, _, token, _| match token.as_rule() {
                 Rule::key_value => Self::reformat_key_value(table, token),
                 _ => Self::reformat_generic_token(table, token),
-            }),
-        );
-    }
-
-    fn reformat_generator(&self, target: &mut Renderer<'_>, token: &Token<'_>) {
-        self.reformat_block_element(
-            "generator",
-            target,
-            token,
-            &(|table, _, token, _| {
-                //
-                match token.as_rule() {
-                    Rule::key_value => Self::reformat_key_value(table, token),
-                    _ => Self::reformat_generic_token(table, token),
-                }
             }),
         );
     }
@@ -375,7 +366,7 @@ impl<'a> Reformatter<'a> {
 
     fn reformat_block_element(
         &self,
-        block_type: &'static str,
+        block_type: &'a str,
         renderer: &'a mut Renderer<'_>,
         token: &'a Token<'_>,
         the_fn: &(dyn Fn(&mut TableFormat, &mut Renderer<'_>, &Token<'_>, &str) + 'a),
@@ -388,7 +379,7 @@ impl<'a> Reformatter<'a> {
 
     fn reformat_block_element_internal(
         &self,
-        block_type: &'static str,
+        block_type: &'a str,
         renderer: &'a mut Renderer<'_>,
         token: &'a Token<'_>,
         the_fn: &(dyn Fn(&mut TableFormat, &mut Renderer<'_>, &Token<'_>, &str) + 'a),
@@ -406,7 +397,7 @@ impl<'a> Reformatter<'a> {
 
         for current in token.clone().into_inner() {
             match current.as_rule() {
-                Rule::MODEL_KEYWORD | Rule::TYPE_KEYWORD => (),
+                Rule::MODEL_KEYWORD | Rule::TYPE_KEYWORD | Rule::GENERATOR_KEYWORD | Rule::DATASOURCE_KEYWORD => (),
                 Rule::BLOCK_OPEN => {
                     block_has_opened = true;
                 }

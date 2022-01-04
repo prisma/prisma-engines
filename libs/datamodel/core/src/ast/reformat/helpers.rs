@@ -12,8 +12,7 @@ impl TokenExtensions for Token<'_> {
             self.as_rule(),
             Rule::model_declaration
                 | Rule::enum_declaration
-                | Rule::source_block
-                | Rule::generator_block
+                | Rule::config_block
                 | Rule::type_alias
                 | Rule::comment_block
         )

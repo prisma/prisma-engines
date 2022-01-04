@@ -7,68 +7,43 @@ use super::{
 use crate::ast::*;
 use diagnostics::{DatamodelError, Diagnostics};
 
-pub(crate) fn parse_source(token: &Token<'_>, diagnostics: &mut Diagnostics) -> SourceConfig {
+pub(crate) fn parse_config_block(token: &Token<'_>, diagnostics: &mut Diagnostics) -> Top {
     let mut name: Option<Identifier> = None;
     let mut properties = Vec::new();
     let mut comment: Option<Comment> = None;
+    let mut kw = None;
 
     for current in token.relevant_children() {
         match current.as_rule() {
             Rule::non_empty_identifier => name = Some(current.to_id()),
             Rule::key_value => properties.push(parse_key_value(&current)),
             Rule::comment_block => comment = parse_comment_block(&current),
+            Rule::DATASOURCE_KEYWORD | Rule::GENERATOR_KEYWORD => kw = Some(current.as_str()),
             Rule::BLOCK_LEVEL_CATCH_ALL => diagnostics.push_error(DatamodelError::new_validation_error(
-                "This line is not a valid definition within a datasource.".to_owned(),
+                format!(
+                    "This line is not a valid definition within a {}.",
+                    kw.unwrap_or("configuration block")
+                ),
                 current.as_span().into(),
             )),
             _ => parsing_catch_all(&current, "source"),
         }
     }
 
-    match name {
-        Some(name) => SourceConfig {
-            name,
+    match kw {
+        Some("datasource") => Top::Source(SourceConfig {
+            name: name.unwrap(),
             properties,
             documentation: comment,
             span: Span::from(token.as_span()),
-        },
-        _ => panic!(
-            "Encountered impossible source declaration during parsing, name is missing: {:?}",
-            token.as_str()
-        ),
-    }
-}
-
-pub fn parse_generator(token: &Token<'_>, diagnostics: &mut Diagnostics) -> GeneratorConfig {
-    let mut name: Option<Identifier> = None;
-    let mut properties: Vec<ConfigBlockProperty> = vec![];
-    let mut comments: Vec<String> = Vec::new();
-
-    for current in token.relevant_children() {
-        match current.as_rule() {
-            Rule::non_empty_identifier => name = Some(current.to_id()),
-            Rule::key_value => properties.push(parse_key_value(&current)),
-            Rule::doc_comment => comments.push(parse_doc_comment(&current)),
-            Rule::doc_comment_and_new_line => comments.push(parse_doc_comment(&current)),
-            Rule::BLOCK_LEVEL_CATCH_ALL => diagnostics.push_error(DatamodelError::new_validation_error(
-                "This line is not a valid definition within a generator.".to_owned(),
-                current.as_span().into(),
-            )),
-            _ => parsing_catch_all(&current, "generator"),
-        }
-    }
-
-    match name {
-        Some(name) => GeneratorConfig {
-            name,
+        }),
+        Some("generator") => Top::Generator(GeneratorConfig {
+            name: name.unwrap(),
             properties,
-            documentation: doc_comments_to_string(&comments),
+            documentation: comment,
             span: Span::from(token.as_span()),
-        },
-        _ => panic!(
-            "Encountered impossible generator declaration during parsing, name is missing: {:?}",
-            token.as_str()
-        ),
+        }),
+        _ => unreachable!(),
     }
 }
 
@@ -93,7 +68,7 @@ fn parse_key_value(token: &Token<'_>) -> ConfigBlockProperty {
             value,
             span: Span::from(token.as_span()),
         },
-        _ => panic!(
+        _ => unreachable!(
             "Encountered impossible source property declaration during parsing: {:?}",
             token.as_str()
         ),

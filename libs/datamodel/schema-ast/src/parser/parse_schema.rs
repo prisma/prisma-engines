@@ -3,7 +3,7 @@ use super::{
     parse_composite_type::parse_composite_type,
     parse_enum::parse_enum,
     parse_model::parse_model,
-    parse_source_and_generator::{parse_generator, parse_source},
+    parse_source_and_generator::parse_config_block,
     parse_types::parse_type_alias,
     PrismaDatamodelParser, Rule,
 };
@@ -36,8 +36,9 @@ pub fn parse_schema(datamodel_string: &str, diagnostics: &mut Diagnostics) -> Sc
 
                     },
                     Rule::enum_declaration => top_level_definitions.push(Top::Enum(parse_enum(&current, diagnostics))),
-                    Rule::source_block => top_level_definitions.push(Top::Source(parse_source(&current, diagnostics))),
-                    Rule::generator_block => top_level_definitions.push(Top::Generator(parse_generator(&current, diagnostics))),
+                    Rule::config_block => {
+                        top_level_definitions.push(parse_config_block(&current, diagnostics));
+                    },
                     Rule::type_alias => {
                         diagnostics.push_warning(DatamodelWarning::DeprecatedTypeAlias { span: current.as_span().into() });
                         top_level_definitions.push(Top::Type(parse_type_alias(&current)))
