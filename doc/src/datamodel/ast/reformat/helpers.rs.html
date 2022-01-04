@@ -34,7 +34,6 @@
 <span id="34">34</span>
 <span id="35">35</span>
 <span id="36">36</span>
-<span id="37">37</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">schema_ast</span>::{<span class="ident">parser::Rule</span>, <span class="ident">renderer::LineWriteable</span>};
 
 <span class="kw">pub</span> <span class="kw">type</span> <span class="ident">Token</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">pest::iterators::Pair</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">Rule</span><span class="op">&gt;</span>;
@@ -49,8 +48,7 @@
             <span class="self">self</span>.<span class="ident">as_rule</span>(),
             <span class="ident">Rule::model_declaration</span>
                 <span class="op">|</span> <span class="ident">Rule::enum_declaration</span>
-                <span class="op">|</span> <span class="ident">Rule::source_block</span>
-                <span class="op">|</span> <span class="ident">Rule::generator_block</span>
+                <span class="op">|</span> <span class="ident">Rule::config_block</span>
                 <span class="op">|</span> <span class="ident">Rule::type_alias</span>
                 <span class="op">|</span> <span class="ident">Rule::comment_block</span>
         )
