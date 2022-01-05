@@ -5,10 +5,10 @@ use datamodel_connector::{
     walker_ext_traits::*,
     Connector, ConnectorCapability, ConstraintScope, Diagnostics, NativeTypeConstructor, ReferentialAction,
     ReferentialIntegrity,
+    NativeTypeInstance,
 };
-use dml::native_type_instance::NativeTypeInstance;
 use enumflags2::BitFlags;
-use native_types::{MsSqlType, MsSqlTypeParameter};
+use native_types::{MsSqlType, MsSqlTypeParameter, NativeType};
 use once_cell::sync::Lazy;
 use std::borrow::Cow;
 
@@ -355,7 +355,7 @@ impl Connector for MsSqlDatamodelConnector {
             _ => return Err(ConnectorError::new_native_type_parser_error(name)),
         };
 
-        Ok(NativeTypeInstance::new(name, cloned_args, &native_type))
+        Ok(NativeTypeInstance::new(name, cloned_args, native_type.to_json()))
     }
 
     fn introspect_native_type(&self, native_type: serde_json::Value) -> Result<NativeTypeInstance, ConnectorError> {
@@ -396,7 +396,7 @@ impl Connector for MsSqlDatamodelConnector {
             Ok(NativeTypeInstance::new(
                 constructor.name,
                 stringified_args,
-                &native_type,
+                native_type.to_json(),
             ))
         } else {
             Err(self.native_str_error(constructor_name).native_type_name_unknown())

@@ -443,7 +443,11 @@ pub(crate) fn calculate_scalar_field_type_with_native_types(column: &Column, ctx
                     .active_connector
                     .introspect_native_type(native_type.clone())
                     .unwrap();
-                FieldType::Scalar(scal_type, None, Some(native_type_instance))
+                FieldType::Scalar(scal_type, None, Some(datamodel::dml::NativeTypeInstance {
+                    args: native_type_instance.args,
+                    serialized_native_type: native_type_instance.serialized_native_type,
+                    name: native_type_instance.name,
+                }))
             }
         },
         field_type => field_type,

@@ -4,12 +4,13 @@ use datamodel_connector::{
     connector_error::{ConnectorError, ErrorKind},
     parser_database::walkers::*,
     walker_ext_traits::*,
-    Connector, ConnectorCapability, NativeTypeConstructor, ReferentialAction, ReferentialIntegrity, ScalarType,
+    Connector, ConnectorCapability, NativeTypeConstructor, NativeTypeInstance, ReferentialAction, ReferentialIntegrity,
+    ScalarType,
 };
-use dml::{default_value::DefaultKind, native_type_instance::NativeTypeInstance};
+use dml::default_value::DefaultKind;
 use enumflags2::BitFlags;
 use mongodb_types::*;
-use native_types::MongoDbType;
+use native_types::{MongoDbType, NativeType};
 use std::result::Result as StdResult;
 
 const CAPABILITIES: &[ConnectorCapability] = &[
@@ -143,16 +144,16 @@ impl Connector for MongoDbDatamodelConnector {
         &self,
         name: &str,
         args: Vec<String>,
-    ) -> Result<dml::native_type_instance::NativeTypeInstance> {
+    ) -> Result<NativeTypeInstance> {
         let mongo_type = mongo_type_from_input(name, &args)?;
 
-        Ok(NativeTypeInstance::new(name, args, &mongo_type))
+        Ok(NativeTypeInstance::new(name, args, mongo_type.to_json()))
     }
 
     fn introspect_native_type(
         &self,
         _native_type: serde_json::Value,
-    ) -> Result<dml::native_type_instance::NativeTypeInstance> {
+    ) -> Result<NativeTypeInstance> {
         // Out of scope for MVP
         todo!()
     }

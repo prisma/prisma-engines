@@ -1,8 +1,8 @@
-use native_types::NativeType;
 use serde::de::DeserializeOwned;
+use std::fmt;
 
 /// represents an instance of a native type declared in the Prisma schema
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug)]
 pub struct NativeTypeInstance {
     /// the name of the native type used in the Prisma schema
     pub name: String,
@@ -12,12 +12,26 @@ pub struct NativeTypeInstance {
     pub serialized_native_type: serde_json::Value,
 }
 
+impl fmt::Display for NativeTypeInstance {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.write_str(&self.name)?;
+
+        if !self.args.is_empty() {
+            f.write_str("(")?;
+            f.write_str(&self.args.join(","))?;
+            f.write_str(")")?;
+        }
+
+        Ok(())
+    }
+}
+
 impl NativeTypeInstance {
-    pub fn new(name: &str, args: Vec<String>, native_type: &dyn NativeType) -> Self {
+    pub fn new(name: &str, args: Vec<String>, serialized_native_type: serde_json::Value) -> Self {
         NativeTypeInstance {
             name: name.to_string(),
             args,
-            serialized_native_type: native_type.to_json(),
+            serialized_native_type,
         }
     }
 

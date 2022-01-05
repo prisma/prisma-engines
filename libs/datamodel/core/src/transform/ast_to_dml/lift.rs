@@ -426,7 +426,7 @@ impl<'a> LiftAstToDml<'a> {
                 dml::FieldType::Scalar(
                     parser_database_scalar_type_to_dml_scalar_type(*scalar_type),
                     None,
-                    native_type,
+                    native_type.map(datamodel_connector_native_type_to_dml_native_type),
                 )
             }
         }
@@ -468,4 +468,14 @@ fn parser_database_referential_action_to_dml_referential_action(
 
 fn parser_database_scalar_type_to_dml_scalar_type(st: parser_database::ScalarType) -> dml::ScalarType {
     st.as_str().parse().unwrap()
+}
+
+fn datamodel_connector_native_type_to_dml_native_type(
+    instance: datamodel_connector::NativeTypeInstance,
+) -> dml::NativeTypeInstance {
+    dml::NativeTypeInstance {
+        name: instance.name,
+        args: instance.args,
+        serialized_native_type: instance.serialized_native_type,
+    }
 }

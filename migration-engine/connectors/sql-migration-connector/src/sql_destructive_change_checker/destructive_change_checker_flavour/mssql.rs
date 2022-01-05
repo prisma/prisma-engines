@@ -9,7 +9,6 @@ use crate::{
     sql_migration::{AlterColumn, ColumnTypeChange},
     sql_schema_differ::ColumnChanges,
 };
-use sql_datamodel_connector::SqlDatamodelConnectors;
 use sql_schema_describer::walkers::ColumnWalker;
 
 #[async_trait::async_trait]
@@ -46,14 +45,13 @@ impl DestructiveChangeCheckerFlavour for MssqlFlavour {
         match type_change {
             Some(ColumnTypeChange::SafeCast) | None => (),
             Some(ColumnTypeChange::RiskyCast) => {
-                let datamodel_connector = SqlDatamodelConnectors::MSSQL;
                 let previous_type = match &columns.previous().column_type().native_type {
-                    Some(tpe) => datamodel_connector.render_native_type(tpe.clone()),
+                    Some(tpe) => tpe.to_string(),
                     _ => format!("{:?}", columns.previous().column_type_family()),
                 };
 
                 let next_type = match &columns.next().column_type().native_type {
-                    Some(tpe) => datamodel_connector.render_native_type(tpe.clone()),
+                    Some(tpe) => tpe.to_string(),
                     _ => format!("{:?}", columns.next().column_type_family()),
                 };
 

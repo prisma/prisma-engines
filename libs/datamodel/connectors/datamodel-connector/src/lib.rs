@@ -5,11 +5,12 @@ pub mod constraint_names;
 pub mod helper;
 pub mod walker_ext_traits;
 
+mod native_type_instance;
 mod empty_connector;
 mod native_type_constructor;
 mod referential_integrity;
 
-pub use self::capabilities::{ConnectorCapabilities, ConnectorCapability};
+pub use self::{native_type_instance::NativeTypeInstance, capabilities::{ConnectorCapabilities, ConnectorCapability}};
 pub use diagnostics::{connector_error, DatamodelError, Diagnostics};
 pub use empty_connector::EmptyDatamodelConnector;
 pub use native_type_constructor::NativeTypeConstructor;
@@ -17,7 +18,6 @@ pub use parser_database::{self, ReferentialAction, ScalarType};
 pub use referential_integrity::ReferentialIntegrity;
 
 use crate::connector_error::{ConnectorError, ConnectorErrorFactory, ErrorKind};
-use dml::native_type_instance::NativeTypeInstance;
 use enumflags2::BitFlags;
 use std::{borrow::Cow, collections::BTreeMap};
 
@@ -115,12 +115,6 @@ pub trait Connector: Send + Sync {
     /// This function is used during Schema parsing to calculate the concrete native type.
     fn parse_native_type(&self, name: &str, args: Vec<String>) -> Result<NativeTypeInstance, ConnectorError>;
 
-    /// This function is used in ME for error messages
-    fn render_native_type(&self, native_type: serde_json::Value) -> String {
-        let instance = self.introspect_native_type(native_type).unwrap();
-        instance.render()
-    }
-
     /// This function is used during introspection to turn an introspected native type into an instance that can be put into the Prisma schema.
     fn introspect_native_type(&self, native_type: serde_json::Value) -> Result<NativeTypeInstance, ConnectorError>;
 
@@ -207,7 +201,7 @@ pub trait Connector: Send + Sync {
     fn native_instance_error(&self, instance: &NativeTypeInstance) -> ConnectorErrorFactory {
         ConnectorErrorFactory {
             connector: self.name().to_owned(),
-            native_type: instance.render(),
+            native_type: instance.to_string(),
         }
     }
 

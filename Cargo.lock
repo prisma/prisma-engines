@@ -976,6 +976,7 @@ dependencies = [
  "dml",
  "enumflags2",
  "parser-database",
+ "serde",
  "serde_json",
  "url",
 ]

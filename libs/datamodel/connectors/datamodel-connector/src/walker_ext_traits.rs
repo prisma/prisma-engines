@@ -1,4 +1,4 @@
-use crate::{constraint_names::ConstraintNames, Connector, ReferentialAction, ReferentialIntegrity};
+use crate::{constraint_names::ConstraintNames, Connector, ReferentialAction, NativeTypeInstance, ReferentialIntegrity};
 use parser_database::{ast, walkers::*, ScalarType};
 use std::borrow::Cow;
 
@@ -168,11 +168,11 @@ pub trait ScalarFieldWalkerExt {
     ///
     /// - There is no native type attribute on the field.
     /// - The native type attribute is not valid for the connector.
-    fn native_type_instance(&self, connector: &dyn Connector) -> Option<dml::native_type_instance::NativeTypeInstance>;
+    fn native_type_instance(&self, connector: &dyn Connector) -> Option<NativeTypeInstance>;
 }
 
 impl ScalarFieldWalkerExt for ScalarFieldWalker<'_, '_> {
-    fn native_type_instance(&self, connector: &dyn Connector) -> Option<dml::native_type_instance::NativeTypeInstance> {
+    fn native_type_instance(&self, connector: &dyn Connector) -> Option<NativeTypeInstance> {
         self.raw_native_type()
             .and_then(|(_, name, args, _)| connector.parse_native_type(name, args.to_owned()).ok())
     }
