@@ -129,59 +129,8 @@
 <span id="129">129</span>
 <span id="130">130</span>
 <span id="131">131</span>
-<span id="132">132</span>
-<span id="133">133</span>
-<span id="134">134</span>
-<span id="135">135</span>
-<span id="136">136</span>
-<span id="137">137</span>
-<span id="138">138</span>
-<span id="139">139</span>
-<span id="140">140</span>
-<span id="141">141</span>
-<span id="142">142</span>
-<span id="143">143</span>
-<span id="144">144</span>
-<span id="145">145</span>
-<span id="146">146</span>
-<span id="147">147</span>
-<span id="148">148</span>
-<span id="149">149</span>
-<span id="150">150</span>
-<span id="151">151</span>
-<span id="152">152</span>
-<span id="153">153</span>
-<span id="154">154</span>
-<span id="155">155</span>
-<span id="156">156</span>
-<span id="157">157</span>
-<span id="158">158</span>
-<span id="159">159</span>
-<span id="160">160</span>
-<span id="161">161</span>
-<span id="162">162</span>
-<span id="163">163</span>
-<span id="164">164</span>
-<span id="165">165</span>
-<span id="166">166</span>
-<span id="167">167</span>
-<span id="168">168</span>
-<span id="169">169</span>
-<span id="170">170</span>
-<span id="171">171</span>
-<span id="172">172</span>
-<span id="173">173</span>
-<span id="174">174</span>
-<span id="175">175</span>
-<span id="176">176</span>
-<span id="177">177</span>
-<span id="178">178</span>
-<span id="179">179</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::Connector</span>;
 <span class="kw">use</span> <span class="ident">diagnostics</span>::{<span class="ident">DatamodelError</span>, <span class="ident">Span</span>};
-<span class="kw">use</span> <span class="ident">dml::model</span>::{<span class="ident">IndexDefinition</span>, <span class="ident">Model</span>};
-<span class="kw">use</span> <span class="ident">dml::relation_info::RelationInfo</span>;
-<span class="kw">use</span> <span class="ident">dml</span>::{<span class="ident">model::PrimaryKeyDefinition</span>, <span class="ident">traits::WithDatabaseName</span>};
 
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ConstraintNames</span>;
 
@@ -213,11 +162,7 @@
     <span class="doccomment">/// seq for sequences</span>
     <span class="doccomment">///</span>
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">primary_key_name_matches</span>(<span class="ident">pk</span>: <span class="kw-2">&amp;</span><span class="ident">PrimaryKeyDefinition</span>, <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">Model</span>, <span class="ident">connector</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">Connector</span>) -&gt; <span class="ident">bool</span> {
-        <span class="ident">pk</span>.<span class="ident">db_name</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>() <span class="op">==</span> <span class="kw-2">&amp;</span><span class="ident">ConstraintNames::primary_key_name</span>(<span class="ident">model</span>.<span class="ident">final_database_name</span>(), <span class="ident">connector</span>)
-    }
-
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">primary_key_name</span>(<span class="ident">table_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">connector</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">Connector</span>) -&gt; <span class="ident">String</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">primary_key_name</span>(<span class="ident">table_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">connector</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">Connector</span>) -&gt; <span class="ident">String</span> {
         <span class="kw">let</span> <span class="ident">suffix</span> <span class="op">=</span> <span class="string">&quot;_pkey&quot;</span>;
         <span class="kw">let</span> <span class="ident">limit</span> <span class="op">=</span> <span class="ident">connector</span>.<span class="ident">max_identifier_length</span>();
 
@@ -230,28 +175,12 @@
         <span class="macro">format!</span>(<span class="string">&quot;{}{}&quot;</span>, <span class="ident">trimmed</span>, <span class="ident">suffix</span>)
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">index_name_matches</span>(<span class="ident">idx</span>: <span class="kw-2">&amp;</span><span class="ident">IndexDefinition</span>, <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">Model</span>, <span class="ident">connector</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">Connector</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">let</span> <span class="ident">column_names</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">idx</span>
-            .<span class="ident">fields</span>
-            .<span class="ident">iter</span>()
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">field</span><span class="op">|</span> <span class="ident">model</span>.<span class="ident">find_scalar_field</span>(<span class="kw-2">&amp;</span><span class="ident">field</span>.<span class="ident">name</span>).<span class="ident">unwrap</span>().<span class="ident">final_database_name</span>())
-            .<span class="ident">collect</span>();
-
-        <span class="kw">let</span> <span class="ident">expected</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">idx</span>.<span class="ident">is_unique</span>() {
-            <span class="ident"><span class="self">Self</span>::unique_index_name</span>(<span class="ident">model</span>.<span class="ident">final_database_name</span>(), <span class="kw-2">&amp;</span><span class="ident">column_names</span>, <span class="ident">connector</span>)
-        } <span class="kw">else</span> {
-            <span class="ident"><span class="self">Self</span>::non_unique_index_name</span>(<span class="ident">model</span>.<span class="ident">final_database_name</span>(), <span class="kw-2">&amp;</span><span class="ident">column_names</span>, <span class="ident">connector</span>)
-        };
-
-        <span class="ident">idx</span>.<span class="ident">db_name</span>.<span class="ident">as_deref</span>().<span class="ident">unwrap</span>() <span class="op">==</span> <span class="ident">expected</span>
-    }
-
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">unique_index_name</span>(<span class="ident">table_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">column_names</span>: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="ident">str</span>], <span class="ident">connector</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">Connector</span>) -&gt; <span class="ident">String</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">unique_index_name</span>(<span class="ident">table_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">column_names</span>: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="ident">str</span>], <span class="ident">connector</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">Connector</span>) -&gt; <span class="ident">String</span> {
         <span class="kw">const</span> <span class="ident">UNIQUE_SUFFIX</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;_key&quot;</span>;
         <span class="ident"><span class="self">Self</span>::index_name_impl</span>(<span class="ident">table_name</span>, <span class="ident">column_names</span>, <span class="ident">UNIQUE_SUFFIX</span>, <span class="ident">connector</span>)
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">non_unique_index_name</span>(<span class="ident">table_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">column_names</span>: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="ident">str</span>], <span class="ident">connector</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">Connector</span>) -&gt; <span class="ident">String</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">non_unique_index_name</span>(<span class="ident">table_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">column_names</span>: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="ident">str</span>], <span class="ident">connector</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">Connector</span>) -&gt; <span class="ident">String</span> {
         <span class="kw">const</span> <span class="ident">INDEX_SUFFIX</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;_idx&quot;</span>;
         <span class="ident"><span class="self">Self</span>::index_name_impl</span>(<span class="ident">table_name</span>, <span class="ident">column_names</span>, <span class="ident">INDEX_SUFFIX</span>, <span class="ident">connector</span>)
     }
@@ -295,32 +224,7 @@
         <span class="macro">format!</span>(<span class="string">&quot;{}_df&quot;</span>, <span class="ident">trimmed</span>)
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">foreign_key_name_matches</span>(<span class="ident">ri</span>: <span class="kw-2">&amp;</span><span class="ident">RelationInfo</span>, <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">Model</span>, <span class="ident">connector</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">Connector</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">let</span> <span class="ident">column_names</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">ri</span>
-            .<span class="ident">fields</span>
-            .<span class="ident">iter</span>()
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">field_name</span><span class="op">|</span> {
-                <span class="comment">// We cannot unwrap here, due to us re-introspecting relations</span>
-                <span class="comment">// and if we&#39;re not using foreign keys, we might copy a relation</span>
-                <span class="comment">// that is not valid anymore. We still want to write that to the</span>
-                <span class="comment">// file and let user fix it, but if we unwrap here, we will</span>
-                <span class="comment">// panic.</span>
-                <span class="ident">model</span>
-                    .<span class="ident">find_scalar_field</span>(<span class="ident">field_name</span>)
-                    .<span class="ident">map</span>(<span class="op">|</span><span class="ident">field</span><span class="op">|</span> <span class="ident">field</span>.<span class="ident">final_database_name</span>())
-                    .<span class="ident">unwrap_or</span>(<span class="ident">field_name</span>)
-            })
-            .<span class="ident">collect</span>();
-
-        <span class="ident">ri</span>.<span class="ident">fk_name</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>()
-            <span class="op">==</span> <span class="kw-2">&amp;</span><span class="ident">ConstraintNames::foreign_key_constraint_name</span>(<span class="ident">model</span>.<span class="ident">final_database_name</span>(), <span class="kw-2">&amp;</span><span class="ident">column_names</span>, <span class="ident">connector</span>)
-    }
-
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">foreign_key_constraint_name</span>(
-        <span class="ident">table_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-        <span class="ident">column_names</span>: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="ident">str</span>],
-        <span class="ident">connector</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">Connector</span>,
-    ) -&gt; <span class="ident">String</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">foreign_key_constraint_name</span>(<span class="ident">table_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">column_names</span>: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="ident">str</span>], <span class="ident">connector</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">Connector</span>) -&gt; <span class="ident">String</span> {
         <span class="kw">let</span> <span class="ident">fk_suffix</span> <span class="op">=</span> <span class="string">&quot;_fkey&quot;</span>;
         <span class="kw">let</span> <span class="ident">limit</span> <span class="op">=</span> <span class="ident">connector</span>.<span class="ident">max_identifier_length</span>();
 

@@ -512,6 +512,14 @@
 <span id="512">512</span>
 <span id="513">513</span>
 <span id="514">514</span>
+<span id="515">515</span>
+<span id="516">516</span>
+<span id="517">517</span>
+<span id="518">518</span>
+<span id="519">519</span>
+<span id="520">520</span>
+<span id="521">521</span>
+<span id="522">522</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::Dedup</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::SqlError</span>;
 <span class="kw">use</span> <span class="ident">datamodel::IndexAlgorithm</span>;
@@ -957,7 +965,15 @@
                     .<span class="ident">active_connector</span>
                     .<span class="ident">introspect_native_type</span>(<span class="ident">native_type</span>.<span class="ident">clone</span>())
                     .<span class="ident">unwrap</span>();
-                <span class="ident">FieldType::Scalar</span>(<span class="ident">scal_type</span>, <span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="ident">native_type_instance</span>))
+                <span class="ident">FieldType::Scalar</span>(
+                    <span class="ident">scal_type</span>,
+                    <span class="prelude-val">None</span>,
+                    <span class="prelude-val">Some</span>(<span class="ident">datamodel::dml::NativeTypeInstance</span> {
+                        <span class="ident">args</span>: <span class="ident">native_type_instance</span>.<span class="ident">args</span>,
+                        <span class="ident">serialized_native_type</span>: <span class="ident">native_type_instance</span>.<span class="ident">serialized_native_type</span>,
+                        <span class="ident">name</span>: <span class="ident">native_type_instance</span>.<span class="ident">name</span>,
+                    }),
+                )
             }
         },
         <span class="ident">field_type</span> =&gt; <span class="ident">field_type</span>,

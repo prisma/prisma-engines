@@ -18,7 +18,7 @@
 
 <span class="kw">impl</span> <span class="ident">SqlSchemaCalculatorFlavour</span> <span class="kw">for</span> <span class="ident">SqliteFlavour</span> {
     <span class="kw">fn</span> <span class="ident">default_native_type_for_scalar_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">scalar_type</span>: <span class="kw-2">&amp;</span><span class="ident">ScalarType</span>) -&gt; <span class="ident">serde_json::Value</span> {
-        <span class="ident">sql_datamodel_connector::SqlDatamodelConnectors::SQLITE</span>.<span class="ident">default_native_type_for_scalar_type</span>(<span class="ident">scalar_type</span>)
+        <span class="ident">sql_datamodel_connector::SQLITE</span>.<span class="ident">default_native_type_for_scalar_type</span>(<span class="ident">scalar_type</span>)
     }
 
     <span class="comment">// Integer primary keys on SQLite are automatically assigned the rowid, which means they are automatically autoincrementing.</span>

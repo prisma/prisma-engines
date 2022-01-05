@@ -469,6 +469,69 @@
 <span id="469">469</span>
 <span id="470">470</span>
 <span id="471">471</span>
+<span id="472">472</span>
+<span id="473">473</span>
+<span id="474">474</span>
+<span id="475">475</span>
+<span id="476">476</span>
+<span id="477">477</span>
+<span id="478">478</span>
+<span id="479">479</span>
+<span id="480">480</span>
+<span id="481">481</span>
+<span id="482">482</span>
+<span id="483">483</span>
+<span id="484">484</span>
+<span id="485">485</span>
+<span id="486">486</span>
+<span id="487">487</span>
+<span id="488">488</span>
+<span id="489">489</span>
+<span id="490">490</span>
+<span id="491">491</span>
+<span id="492">492</span>
+<span id="493">493</span>
+<span id="494">494</span>
+<span id="495">495</span>
+<span id="496">496</span>
+<span id="497">497</span>
+<span id="498">498</span>
+<span id="499">499</span>
+<span id="500">500</span>
+<span id="501">501</span>
+<span id="502">502</span>
+<span id="503">503</span>
+<span id="504">504</span>
+<span id="505">505</span>
+<span id="506">506</span>
+<span id="507">507</span>
+<span id="508">508</span>
+<span id="509">509</span>
+<span id="510">510</span>
+<span id="511">511</span>
+<span id="512">512</span>
+<span id="513">513</span>
+<span id="514">514</span>
+<span id="515">515</span>
+<span id="516">516</span>
+<span id="517">517</span>
+<span id="518">518</span>
+<span id="519">519</span>
+<span id="520">520</span>
+<span id="521">521</span>
+<span id="522">522</span>
+<span id="523">523</span>
+<span id="524">524</span>
+<span id="525">525</span>
+<span id="526">526</span>
+<span id="527">527</span>
+<span id="528">528</span>
+<span id="529">529</span>
+<span id="530">530</span>
+<span id="531">531</span>
+<span id="532">532</span>
+<span id="533">533</span>
+<span id="534">534</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">ast</span>, <span class="ident">dml</span>,
     <span class="ident">transform::ast_to_dml::db</span>::{<span class="self">self</span>, <span class="ident">walkers</span>::<span class="kw-2">*</span>, <span class="ident">IndexAlgorithm</span>},
@@ -826,7 +889,7 @@
             <span class="ident">field</span>.<span class="ident">is_updated_at</span> <span class="op">=</span> <span class="ident">scalar_field</span>.<span class="ident">is_updated_at</span>();
             <span class="ident">field</span>.<span class="ident">database_name</span> <span class="op">=</span> <span class="ident">scalar_field</span>.<span class="ident">mapped_name</span>().<span class="ident">map</span>(<span class="ident">String::from</span>);
             <span class="ident">field</span>.<span class="ident">default_value</span> <span class="op">=</span> <span class="ident">scalar_field</span>.<span class="ident">default_value</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">d</span><span class="op">|</span> <span class="ident">dml::DefaultValue</span> {
-                <span class="ident">kind</span>: <span class="ident">d</span>.<span class="ident">dml_default_kind</span>(),
+                <span class="ident">kind</span>: <span class="ident">dml_default_kind</span>(<span class="ident">d</span>),
                 <span class="ident">db_name</span>: <span class="prelude-val">Some</span>(<span class="ident">d</span>.<span class="ident">constraint_name</span>(<span class="self">self</span>.<span class="ident">connector</span>).<span class="ident">into</span>())
                     .<span class="ident">filter</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">connector</span>.<span class="ident">supports_named_default_values</span>()),
             });
@@ -897,7 +960,7 @@
                 <span class="ident">dml::FieldType::Scalar</span>(
                     <span class="ident">parser_database_scalar_type_to_dml_scalar_type</span>(<span class="kw-2">*</span><span class="ident">scalar_type</span>),
                     <span class="prelude-val">None</span>,
-                    <span class="ident">native_type</span>,
+                    <span class="ident">native_type</span>.<span class="ident">map</span>(<span class="ident">datamodel_connector_native_type_to_dml_native_type</span>),
                 )
             }
         }
@@ -939,6 +1002,69 @@
 
 <span class="kw">fn</span> <span class="ident">parser_database_scalar_type_to_dml_scalar_type</span>(<span class="ident">st</span>: <span class="ident">parser_database::ScalarType</span>) -&gt; <span class="ident">dml::ScalarType</span> {
     <span class="ident">st</span>.<span class="ident">as_str</span>().<span class="ident">parse</span>().<span class="ident">unwrap</span>()
+}
+
+<span class="kw">fn</span> <span class="ident">datamodel_connector_native_type_to_dml_native_type</span>(
+    <span class="ident">instance</span>: <span class="ident">datamodel_connector::NativeTypeInstance</span>,
+) -&gt; <span class="ident">dml::NativeTypeInstance</span> {
+    <span class="ident">dml::NativeTypeInstance</span> {
+        <span class="ident">name</span>: <span class="ident">instance</span>.<span class="ident">name</span>,
+        <span class="ident">args</span>: <span class="ident">instance</span>.<span class="ident">args</span>,
+        <span class="ident">serialized_native_type</span>: <span class="ident">instance</span>.<span class="ident">serialized_native_type</span>,
+    }
+}
+
+<span class="kw">fn</span> <span class="ident">dml_default_kind</span>(<span class="ident">default_value</span>: <span class="ident">DefaultValueWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">dml::DefaultKind</span> {
+    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::dml</span>::{<span class="ident">DefaultKind</span>, <span class="ident">PrismaValue</span>, <span class="ident">ValueGenerator</span>};
+    <span class="kw">use</span> <span class="ident">parser_database::ScalarType</span>;
+
+    <span class="comment">// This has all been validated in parser-database, so unwrapping is always safe.</span>
+    <span class="kw">match</span> <span class="ident">default_value</span>.<span class="ident">value</span>() {
+        <span class="ident">ast::Expression::Function</span>(<span class="ident">funcname</span>, <span class="ident">args</span>, <span class="kw">_</span>) <span class="kw">if</span> <span class="ident">funcname</span> <span class="op">==</span> <span class="string">&quot;dbgenerated&quot;</span> =&gt; {
+            <span class="ident">DefaultKind::Expression</span>(<span class="ident">ValueGenerator::new_dbgenerated</span>(
+                <span class="ident">args</span>.<span class="ident">arguments</span>
+                    .<span class="ident">get</span>(<span class="number">0</span>)
+                    .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">arg</span><span class="op">|</span> <span class="ident">arg</span>.<span class="ident">value</span>.<span class="ident">as_string_value</span>())
+                    .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">val</span>, <span class="kw">_</span>)<span class="op">|</span> <span class="ident">val</span>.<span class="ident">to_owned</span>())
+                    .<span class="ident">unwrap_or_else</span>(<span class="ident">String::new</span>),
+            ))
+        }
+        <span class="ident">ast::Expression::Function</span>(<span class="ident">funcname</span>, <span class="ident">_args</span>, <span class="kw">_</span>) <span class="kw">if</span> <span class="ident">funcname</span> <span class="op">==</span> <span class="string">&quot;autoincrement&quot;</span> =&gt; {
+            <span class="ident">DefaultKind::Expression</span>(<span class="ident">ValueGenerator::new_autoincrement</span>())
+        }
+        <span class="ident">ast::Expression::Function</span>(<span class="ident">funcname</span>, <span class="ident">_args</span>, <span class="kw">_</span>) <span class="kw">if</span> <span class="ident">funcname</span> <span class="op">==</span> <span class="string">&quot;uuid&quot;</span> =&gt; {
+            <span class="ident">DefaultKind::Expression</span>(<span class="ident">ValueGenerator::new_uuid</span>())
+        }
+        <span class="ident">ast::Expression::Function</span>(<span class="ident">funcname</span>, <span class="ident">_args</span>, <span class="kw">_</span>) <span class="kw">if</span> <span class="ident">funcname</span> <span class="op">==</span> <span class="string">&quot;cuid&quot;</span> =&gt; {
+            <span class="ident">DefaultKind::Expression</span>(<span class="ident">ValueGenerator::new_cuid</span>())
+        }
+        <span class="ident">ast::Expression::Function</span>(<span class="ident">funcname</span>, <span class="ident">_args</span>, <span class="kw">_</span>) <span class="kw">if</span> <span class="ident">funcname</span> <span class="op">==</span> <span class="string">&quot;now&quot;</span> =&gt; {
+            <span class="ident">DefaultKind::Expression</span>(<span class="ident">ValueGenerator::new_now</span>())
+        }
+        <span class="ident">ast::Expression::NumericValue</span>(<span class="ident">num</span>, <span class="kw">_</span>) =&gt; <span class="kw">match</span> <span class="ident">default_value</span>.<span class="ident">field</span>().<span class="ident">scalar_type</span>() {
+            <span class="prelude-val">Some</span>(<span class="ident">ScalarType::Int</span>) =&gt; <span class="ident">DefaultKind::Single</span>(<span class="ident">PrismaValue::Int</span>(<span class="ident">num</span>.<span class="ident">parse</span>().<span class="ident">unwrap</span>())),
+            <span class="prelude-val">Some</span>(<span class="ident">ScalarType::BigInt</span>) =&gt; <span class="ident">DefaultKind::Single</span>(<span class="ident">PrismaValue::BigInt</span>(<span class="ident">num</span>.<span class="ident">parse</span>().<span class="ident">unwrap</span>())),
+            <span class="prelude-val">Some</span>(<span class="ident">ScalarType::Float</span>) =&gt; <span class="ident">DefaultKind::Single</span>(<span class="ident">PrismaValue::Float</span>(<span class="ident">num</span>.<span class="ident">parse</span>().<span class="ident">unwrap</span>())),
+            <span class="prelude-val">Some</span>(<span class="ident">ScalarType::Decimal</span>) =&gt; <span class="ident">DefaultKind::Single</span>(<span class="ident">PrismaValue::Float</span>(<span class="ident">num</span>.<span class="ident">parse</span>().<span class="ident">unwrap</span>())),
+            <span class="ident">other</span> =&gt; <span class="macro">unreachable!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="ident">other</span>),
+        },
+        <span class="ident">ast::Expression::ConstantValue</span>(<span class="ident">v</span>, <span class="kw">_</span>) =&gt; <span class="kw">match</span> <span class="ident">default_value</span>.<span class="ident">field</span>().<span class="ident">scalar_type</span>() {
+            <span class="prelude-val">Some</span>(<span class="ident">ScalarType::Boolean</span>) =&gt; <span class="ident">DefaultKind::Single</span>(<span class="ident">PrismaValue::Boolean</span>(<span class="ident">v</span>.<span class="ident">parse</span>().<span class="ident">unwrap</span>())),
+            <span class="prelude-val">None</span> =&gt; <span class="ident">DefaultKind::Single</span>(<span class="ident">PrismaValue::Enum</span>(<span class="ident">v</span>.<span class="ident">to_owned</span>())),
+            <span class="ident">other</span> =&gt; <span class="macro">unreachable!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="ident">other</span>),
+        },
+        <span class="ident">ast::Expression::StringValue</span>(<span class="ident">v</span>, <span class="kw">_</span>) =&gt; <span class="kw">match</span> <span class="ident">default_value</span>.<span class="ident">field</span>().<span class="ident">scalar_type</span>() {
+            <span class="prelude-val">Some</span>(<span class="ident">ScalarType::DateTime</span>) =&gt; <span class="ident">DefaultKind::Single</span>(<span class="ident">PrismaValue::DateTime</span>(<span class="ident">v</span>.<span class="ident">parse</span>().<span class="ident">unwrap</span>())),
+            <span class="prelude-val">Some</span>(<span class="ident">ScalarType::String</span>) =&gt; <span class="ident">DefaultKind::Single</span>(<span class="ident">PrismaValue::String</span>(<span class="ident">v</span>.<span class="ident">parse</span>().<span class="ident">unwrap</span>())),
+            <span class="prelude-val">Some</span>(<span class="ident">ScalarType::Json</span>) =&gt; <span class="ident">DefaultKind::Single</span>(<span class="ident">PrismaValue::Json</span>(<span class="ident">v</span>.<span class="ident">parse</span>().<span class="ident">unwrap</span>())),
+            <span class="prelude-val">Some</span>(<span class="ident">ScalarType::Decimal</span>) =&gt; <span class="ident">DefaultKind::Single</span>(<span class="ident">PrismaValue::Float</span>(<span class="ident">v</span>.<span class="ident">parse</span>().<span class="ident">unwrap</span>())),
+            <span class="prelude-val">Some</span>(<span class="ident">ScalarType::Bytes</span>) =&gt; {
+                <span class="ident">DefaultKind::Single</span>(<span class="ident">PrismaValue::Bytes</span>(<span class="ident">::dml::prisma_value::decode_bytes</span>(<span class="ident">v</span>).<span class="ident">unwrap</span>()))
+            }
+            <span class="ident">other</span> =&gt; <span class="macro">unreachable!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="ident">other</span>),
+        },
+        <span class="ident">other</span> =&gt; <span class="macro">unreachable!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="ident">other</span>),
+    }
 }
 </code></pre></div>
 </section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="datamodel" data-search-index-js="../../../../search-index.js" data-search-js="../../../../search.js"></div>

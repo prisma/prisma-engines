@@ -295,15 +295,20 @@
 <span id="295">295</span>
 <span id="296">296</span>
 <span id="297">297</span>
+<span id="298">298</span>
+<span id="299">299</span>
+<span id="300">300</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">datamodel_connector</span>::{
     <span class="ident">connector_error::ConnectorError</span>,
     <span class="ident">helper</span>::{<span class="ident">arg_vec_from_opt</span>, <span class="ident">args_vec_from_opt</span>, <span class="ident">parse_one_opt_u32</span>, <span class="ident">parse_two_opt_u32</span>},
     <span class="ident">parser_database</span>, <span class="ident">Connector</span>, <span class="ident">ConnectorCapability</span>, <span class="ident">ConstraintScope</span>, <span class="ident">Diagnostics</span>, <span class="ident">NativeTypeConstructor</span>,
-    <span class="ident">ReferentialAction</span>, <span class="ident">ReferentialIntegrity</span>, <span class="ident">ScalarType</span>,
+    <span class="ident">NativeTypeInstance</span>, <span class="ident">ReferentialAction</span>, <span class="ident">ReferentialIntegrity</span>, <span class="ident">ScalarType</span>,
 };
-<span class="kw">use</span> <span class="ident">dml::native_type_instance::NativeTypeInstance</span>;
 <span class="kw">use</span> <span class="ident">enumflags2::BitFlags</span>;
-<span class="kw">use</span> <span class="ident">native_types::CockroachType</span>::{<span class="self">self</span>, <span class="kw-2">*</span>};
+<span class="kw">use</span> <span class="ident">native_types</span>::{
+    <span class="ident">CockroachType</span>::{<span class="self">self</span>, <span class="kw-2">*</span>},
+    <span class="ident">NativeType</span>,
+};
 
 <span class="kw">const</span> <span class="ident">SMALL_INT_TYPE_NAME</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;SmallInt&quot;</span>;
 <span class="kw">const</span> <span class="ident">INTEGER_TYPE_NAME</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;Integer&quot;</span>;
@@ -484,7 +489,8 @@
         <span class="ident">_scalar_type</span>: <span class="kw-2">&amp;</span><span class="ident">ScalarType</span>,
         <span class="ident">errors</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ConnectorError</span><span class="op">&gt;</span>,
     ) {
-        <span class="kw">let</span> <span class="ident">native_type</span>: <span class="ident">CockroachType</span> <span class="op">=</span> <span class="ident">native_type_instance</span>.<span class="ident">deserialize_native_type</span>();
+        <span class="kw">let</span> <span class="ident">native_type</span>: <span class="ident">CockroachType</span> <span class="op">=</span>
+            <span class="ident">serde_json::from_value</span>(<span class="ident">native_type_instance</span>.<span class="ident">serialized_native_type</span>.<span class="ident">clone</span>()).<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">error</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">native_instance_error</span>(<span class="ident">native_type_instance</span>);
 
         <span class="kw">match</span> <span class="ident">native_type</span> {
@@ -545,7 +551,7 @@
             <span class="kw">_</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ConnectorError::new_native_type_parser_error</span>(<span class="ident">name</span>)),
         };
 
-        <span class="prelude-val">Ok</span>(<span class="ident">NativeTypeInstance::new</span>(<span class="ident">name</span>, <span class="ident">cloned_args</span>, <span class="kw-2">&amp;</span><span class="ident">native_type</span>))
+        <span class="prelude-val">Ok</span>(<span class="ident">NativeTypeInstance::new</span>(<span class="ident">name</span>, <span class="ident">cloned_args</span>, <span class="ident">native_type</span>.<span class="ident">to_json</span>()))
     }
 
     <span class="kw">fn</span> <span class="ident">introspect_native_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">native_type</span>: <span class="ident">serde_json::Value</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">NativeTypeInstance</span>, <span class="ident">ConnectorError</span><span class="op">&gt;</span> {
@@ -578,7 +584,7 @@
         };
 
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">constructor</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">find_native_type_constructor</span>(<span class="ident">constructor_name</span>) {
-            <span class="prelude-val">Ok</span>(<span class="ident">NativeTypeInstance::new</span>(<span class="ident">constructor</span>.<span class="ident">name</span>, <span class="ident">args</span>, <span class="kw-2">&amp;</span><span class="ident">native_type</span>))
+            <span class="prelude-val">Ok</span>(<span class="ident">NativeTypeInstance::new</span>(<span class="ident">constructor</span>.<span class="ident">name</span>, <span class="ident">args</span>, <span class="ident">native_type</span>.<span class="ident">to_json</span>()))
         } <span class="kw">else</span> {
             <span class="prelude-val">Err</span>(<span class="self">self</span>.<span class="ident">native_str_error</span>(<span class="ident">constructor_name</span>).<span class="ident">native_type_name_unknown</span>())
         }

@@ -499,6 +499,10 @@
 <span id="499">499</span>
 <span id="500">500</span>
 <span id="501">501</span>
+<span id="502">502</span>
+<span id="503">503</span>
+<span id="504">504</span>
+<span id="505">505</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">super</span>::SqlFlavour</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">connection_wrapper</span>::{<span class="ident">connect</span>, <span class="ident">quaint_error_to_connector_error</span>, <span class="ident">Connection</span>},
@@ -640,6 +644,10 @@
         <span class="comment">// https://dev.mysql.com/doc/refman/8.0/en/locking-functions.html</span>
         <span class="kw">let</span> <span class="ident">query</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;SELECT GET_LOCK(&#39;prisma_migrate&#39;, {})&quot;</span>, <span class="ident">ADVISORY_LOCK_TIMEOUT</span>.<span class="ident">as_secs</span>());
         <span class="prelude-val">Ok</span>(<span class="ident">connection</span>.<span class="ident">raw_cmd</span>(<span class="kw-2">&amp;</span><span class="ident">query</span>).<span class="kw">await</span><span class="question-mark">?</span>)
+    }
+
+    <span class="kw">fn</span> <span class="ident">datamodel_connector</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="kw">dyn</span> <span class="ident">datamodel::datamodel_connector::Connector</span> {
+        <span class="ident">sql_datamodel_connector::MYSQL</span>
     }
 
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">run_query_script</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">sql</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">connection</span>: <span class="kw-2">&amp;</span><span class="ident">Connection</span>) -&gt; <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {

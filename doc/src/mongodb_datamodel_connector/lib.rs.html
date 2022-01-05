@@ -170,26 +170,17 @@
 <span id="170">170</span>
 <span id="171">171</span>
 <span id="172">172</span>
-<span id="173">173</span>
-<span id="174">174</span>
-<span id="175">175</span>
-<span id="176">176</span>
-<span id="177">177</span>
-<span id="178">178</span>
-<span id="179">179</span>
-<span id="180">180</span>
 </pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">mongodb_types</span>;
 
 <span class="kw">use</span> <span class="ident">datamodel_connector</span>::{
     <span class="ident">connector_error</span>::{<span class="ident">ConnectorError</span>, <span class="ident">ErrorKind</span>},
-    <span class="ident">parser_database::walkers</span>::<span class="kw-2">*</span>,
-    <span class="ident">walker_ext_traits</span>::<span class="kw-2">*</span>,
-    <span class="ident">Connector</span>, <span class="ident">ConnectorCapability</span>, <span class="ident">NativeTypeConstructor</span>, <span class="ident">ReferentialAction</span>, <span class="ident">ReferentialIntegrity</span>, <span class="ident">ScalarType</span>,
+    <span class="ident">parser_database</span>::{<span class="ident">ast::Expression</span>, <span class="ident">walkers</span>::<span class="kw-2">*</span>},
+    <span class="ident">Connector</span>, <span class="ident">ConnectorCapability</span>, <span class="ident">NativeTypeConstructor</span>, <span class="ident">NativeTypeInstance</span>, <span class="ident">ReferentialAction</span>, <span class="ident">ReferentialIntegrity</span>,
+    <span class="ident">ScalarType</span>,
 };
-<span class="kw">use</span> <span class="ident">dml</span>::{<span class="ident">default_value::DefaultKind</span>, <span class="ident">native_type_instance::NativeTypeInstance</span>};
 <span class="kw">use</span> <span class="ident">enumflags2::BitFlags</span>;
 <span class="kw">use</span> <span class="ident">mongodb_types</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident">native_types::MongoDbType</span>;
+<span class="kw">use</span> <span class="ident">native_types</span>::{<span class="ident">MongoDbType</span>, <span class="ident">NativeType</span>};
 <span class="kw">use</span> <span class="ident">std::result::Result</span> <span class="kw">as</span> <span class="ident">StdResult</span>;
 
 <span class="kw">const</span> <span class="ident">CAPABILITIES</span>: <span class="kw-2">&amp;</span>[<span class="ident">ConnectorCapability</span>] <span class="op">=</span> <span class="kw-2">&amp;</span>[
@@ -285,7 +276,7 @@
             }
 
             <span class="kw">if</span> <span class="ident">field</span>.<span class="ident">raw_native_type</span>().<span class="ident">is_none</span>()
-                <span class="op">&amp;&amp;</span> <span class="macro">matches!</span>(<span class="ident">field</span>.<span class="ident">default_value</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">v</span>.<span class="ident">dml_default_kind</span>()), <span class="prelude-val">Some</span>(<span class="ident">DefaultKind::Expression</span>(<span class="ident">expr</span>)) <span class="kw">if</span> <span class="ident">expr</span>.<span class="ident">is_dbgenerated</span>())
+                <span class="op">&amp;&amp;</span> <span class="macro">matches!</span>(<span class="ident">field</span>.<span class="ident">default_value</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">v</span>.<span class="ident">value</span>()), <span class="prelude-val">Some</span>(<span class="ident">Expression::Function</span>(<span class="ident">fn_name</span>,<span class="kw">_</span>,<span class="kw">_</span>)) <span class="kw">if</span> <span class="ident">fn_name</span> <span class="op">==</span> <span class="string">&quot;dbgenerated&quot;</span>)
             {
                 <span class="ident">push_error</span>(<span class="ident">ConnectorError::from_kind</span>(<span class="ident">ErrorKind::FieldValidationError</span> {
                     <span class="ident">field</span>: <span class="ident">field</span>.<span class="ident">name</span>().<span class="ident">to_owned</span>(),
@@ -319,20 +310,13 @@
         <span class="kw-2">&amp;</span><span class="ident">native_type</span> <span class="op">==</span> <span class="ident">default_native_type</span>
     }
 
-    <span class="kw">fn</span> <span class="ident">parse_native_type</span>(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-        <span class="ident">args</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">dml::native_type_instance::NativeTypeInstance</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">parse_native_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">args</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">NativeTypeInstance</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">mongo_type</span> <span class="op">=</span> <span class="ident">mongo_type_from_input</span>(<span class="ident">name</span>, <span class="kw-2">&amp;</span><span class="ident">args</span>)<span class="question-mark">?</span>;
 
-        <span class="prelude-val">Ok</span>(<span class="ident">NativeTypeInstance::new</span>(<span class="ident">name</span>, <span class="ident">args</span>, <span class="kw-2">&amp;</span><span class="ident">mongo_type</span>))
+        <span class="prelude-val">Ok</span>(<span class="ident">NativeTypeInstance::new</span>(<span class="ident">name</span>, <span class="ident">args</span>, <span class="ident">mongo_type</span>.<span class="ident">to_json</span>()))
     }
 
-    <span class="kw">fn</span> <span class="ident">introspect_native_type</span>(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">_native_type</span>: <span class="ident">serde_json::Value</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">dml::native_type_instance::NativeTypeInstance</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">introspect_native_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_native_type</span>: <span class="ident">serde_json::Value</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">NativeTypeInstance</span><span class="op">&gt;</span> {
         <span class="comment">// Out of scope for MVP</span>
         <span class="macro">todo!</span>()
     }

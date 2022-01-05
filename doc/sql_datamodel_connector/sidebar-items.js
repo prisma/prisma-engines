@@ -1,1 +1,1 @@
-initSidebarItems({"struct":[["SqlDatamodelConnectors",""]]});
+initSidebarItems({"constant":[["COCKROACH",""],["MSSQL",""],["MYSQL",""],["POSTGRES",""],["SQLITE",""]]});

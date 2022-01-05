@@ -191,11 +191,7 @@
 <span id="191">191</span>
 <span id="192">192</span>
 <span id="193">193</span>
-<span id="194">194</span>
-<span id="195">195</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">sql_datamodel_connector::SqlDatamodelConnectors</span>;
-
-<span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
+</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">datamodel_rendering::SqlDatamodelRenderer</span>, <span class="ident">TestError</span>, <span class="ident">TestResult</span>};
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Default</span>, <span class="ident">Clone</span>)]</span>
@@ -386,7 +382,7 @@
 }
 
 <span class="kw">fn</span> <span class="ident">postgres_capabilities</span>() -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ConnectorCapability</span><span class="op">&gt;</span> {
-    <span class="ident">SqlDatamodelConnectors::POSTGRES</span>.<span class="ident">capabilities</span>().<span class="ident">to_owned</span>()
+    <span class="ident">sql_datamodel_connector::POSTGRES</span>.<span class="ident">capabilities</span>().<span class="ident">to_owned</span>()
 }
 </code></pre></div>
 </section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="query_tests_setup" data-search-index-js="../../../search-index.js" data-search-js="../../../search.js"></div>

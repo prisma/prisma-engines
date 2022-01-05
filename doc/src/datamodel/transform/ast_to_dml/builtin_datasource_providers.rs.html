@@ -98,12 +98,10 @@
 <span id="98"> 98</span>
 <span id="99"> 99</span>
 <span id="100">100</span>
-<span id="101">101</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">super</span>::datasource_provider::DatasourceProvider</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::common::provider_names</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident">datamodel_connector::Connector</span>;
 <span class="kw">use</span> <span class="ident">mongodb_datamodel_connector::MongoDbDatamodelConnector</span>;
-<span class="kw">use</span> <span class="ident">sql_datamodel_connector::SqlDatamodelConnectors</span>;
 
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SqliteDatasourceProvider</span>;
 
@@ -117,7 +115,7 @@
     }
 
     <span class="kw">fn</span> <span class="ident">connector</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="kw">dyn</span> <span class="ident">Connector</span> {
-        <span class="ident">SqlDatamodelConnectors::SQLITE</span>
+        <span class="ident">sql_datamodel_connector::SQLITE</span>
     }
 }
 
@@ -133,7 +131,7 @@
     }
 
     <span class="kw">fn</span> <span class="ident">connector</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="kw">dyn</span> <span class="ident">Connector</span> {
-        <span class="ident">SqlDatamodelConnectors::COCKROACH</span>
+        <span class="ident">sql_datamodel_connector::COCKROACH</span>
     }
 }
 
@@ -149,7 +147,7 @@
     }
 
     <span class="kw">fn</span> <span class="ident">connector</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="kw">dyn</span> <span class="ident">Connector</span> {
-        <span class="ident">SqlDatamodelConnectors::POSTGRES</span>
+        <span class="ident">sql_datamodel_connector::POSTGRES</span>
     }
 }
 
@@ -165,7 +163,7 @@
     }
 
     <span class="kw">fn</span> <span class="ident">connector</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="kw">dyn</span> <span class="ident">Connector</span> {
-        <span class="ident">SqlDatamodelConnectors::MYSQL</span>
+        <span class="ident">sql_datamodel_connector::MYSQL</span>
     }
 }
 
@@ -181,7 +179,7 @@
     }
 
     <span class="kw">fn</span> <span class="ident">connector</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="kw">dyn</span> <span class="ident">Connector</span> {
-        <span class="ident">SqlDatamodelConnectors::MSSQL</span>
+        <span class="ident">sql_datamodel_connector::MSSQL</span>
     }
 }
 

@@ -123,62 +123,10 @@
 <span id="123">123</span>
 <span id="124">124</span>
 <span id="125">125</span>
-<span id="126">126</span>
-<span id="127">127</span>
-<span id="128">128</span>
-<span id="129">129</span>
-<span id="130">130</span>
-<span id="131">131</span>
-<span id="132">132</span>
-<span id="133">133</span>
-<span id="134">134</span>
-<span id="135">135</span>
-<span id="136">136</span>
-<span id="137">137</span>
-<span id="138">138</span>
-<span id="139">139</span>
-<span id="140">140</span>
-<span id="141">141</span>
-<span id="142">142</span>
-<span id="143">143</span>
-<span id="144">144</span>
-<span id="145">145</span>
-<span id="146">146</span>
-<span id="147">147</span>
-<span id="148">148</span>
-<span id="149">149</span>
-<span id="150">150</span>
-<span id="151">151</span>
-<span id="152">152</span>
-<span id="153">153</span>
-<span id="154">154</span>
-<span id="155">155</span>
-<span id="156">156</span>
-<span id="157">157</span>
-<span id="158">158</span>
-<span id="159">159</span>
-<span id="160">160</span>
-<span id="161">161</span>
-<span id="162">162</span>
-<span id="163">163</span>
-<span id="164">164</span>
-<span id="165">165</span>
-<span id="166">166</span>
-<span id="167">167</span>
-<span id="168">168</span>
-<span id="169">169</span>
-<span id="170">170</span>
-<span id="171">171</span>
-<span id="172">172</span>
-<span id="173">173</span>
-<span id="174">174</span>
-<span id="175">175</span>
-<span id="176">176</span>
-<span id="177">177</span>
-<span id="178">178</span>
-<span id="179">179</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">constraint_names::ConstraintNames</span>, <span class="ident">Connector</span>, <span class="ident">ReferentialAction</span>, <span class="ident">ReferentialIntegrity</span>};
-<span class="kw">use</span> <span class="ident">parser_database</span>::{<span class="ident">ast</span>, <span class="ident">walkers</span>::<span class="kw-2">*</span>, <span class="ident">ScalarType</span>};
+</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{
+    <span class="ident">constraint_names::ConstraintNames</span>, <span class="ident">Connector</span>, <span class="ident">NativeTypeInstance</span>, <span class="ident">ReferentialAction</span>, <span class="ident">ReferentialIntegrity</span>,
+};
+<span class="kw">use</span> <span class="ident">parser_database</span>::{<span class="ident">ast</span>, <span class="ident">walkers</span>::<span class="kw-2">*</span>};
 <span class="kw">use</span> <span class="ident">std::borrow::Cow</span>;
 
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">IndexWalkerExt</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span> {
@@ -207,65 +155,9 @@
 
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">DefaultValueExt</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span> {
     <span class="kw">fn</span> <span class="ident">constraint_name</span>(<span class="self">self</span>, <span class="ident">connector</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">Connector</span>) -&gt; <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="ident">str</span><span class="op">&gt;</span>;
-    <span class="kw">fn</span> <span class="ident">dml_default_kind</span>(<span class="self">self</span>) -&gt; <span class="ident">dml::default_value::DefaultKind</span>;
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span> <span class="ident">DefaultValueExt</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">DefaultValueWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">dml_default_kind</span>(<span class="self">self</span>) -&gt; <span class="ident">dml::default_value::DefaultKind</span> {
-        <span class="kw">use</span> <span class="ident">dml</span>::{
-            <span class="ident">default_value</span>::{<span class="ident">DefaultKind</span>, <span class="ident">ValueGenerator</span>},
-            <span class="ident">prisma_value::PrismaValue</span>,
-        };
-
-        <span class="comment">// This has all been validated in parser-database, so unwrapping is always safe.</span>
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">value</span>() {
-            <span class="ident">ast::Expression::Function</span>(<span class="ident">funcname</span>, <span class="ident">args</span>, <span class="kw">_</span>) <span class="kw">if</span> <span class="ident">funcname</span> <span class="op">==</span> <span class="string">&quot;dbgenerated&quot;</span> =&gt; {
-                <span class="ident">DefaultKind::Expression</span>(<span class="ident">ValueGenerator::new_dbgenerated</span>(
-                    <span class="ident">args</span>.<span class="ident">arguments</span>
-                        .<span class="ident">get</span>(<span class="number">0</span>)
-                        .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">arg</span><span class="op">|</span> <span class="ident">arg</span>.<span class="ident">value</span>.<span class="ident">as_string_value</span>())
-                        .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">val</span>, <span class="kw">_</span>)<span class="op">|</span> <span class="ident">val</span>.<span class="ident">to_owned</span>())
-                        .<span class="ident">unwrap_or_else</span>(<span class="ident">String::new</span>),
-                ))
-            }
-            <span class="ident">ast::Expression::Function</span>(<span class="ident">funcname</span>, <span class="ident">_args</span>, <span class="kw">_</span>) <span class="kw">if</span> <span class="ident">funcname</span> <span class="op">==</span> <span class="string">&quot;autoincrement&quot;</span> =&gt; {
-                <span class="ident">DefaultKind::Expression</span>(<span class="ident">ValueGenerator::new_autoincrement</span>())
-            }
-            <span class="ident">ast::Expression::Function</span>(<span class="ident">funcname</span>, <span class="ident">_args</span>, <span class="kw">_</span>) <span class="kw">if</span> <span class="ident">funcname</span> <span class="op">==</span> <span class="string">&quot;uuid&quot;</span> =&gt; {
-                <span class="ident">DefaultKind::Expression</span>(<span class="ident">ValueGenerator::new_uuid</span>())
-            }
-            <span class="ident">ast::Expression::Function</span>(<span class="ident">funcname</span>, <span class="ident">_args</span>, <span class="kw">_</span>) <span class="kw">if</span> <span class="ident">funcname</span> <span class="op">==</span> <span class="string">&quot;cuid&quot;</span> =&gt; {
-                <span class="ident">DefaultKind::Expression</span>(<span class="ident">ValueGenerator::new_cuid</span>())
-            }
-            <span class="ident">ast::Expression::Function</span>(<span class="ident">funcname</span>, <span class="ident">_args</span>, <span class="kw">_</span>) <span class="kw">if</span> <span class="ident">funcname</span> <span class="op">==</span> <span class="string">&quot;now&quot;</span> =&gt; {
-                <span class="ident">DefaultKind::Expression</span>(<span class="ident">ValueGenerator::new_now</span>())
-            }
-            <span class="ident">ast::Expression::NumericValue</span>(<span class="ident">num</span>, <span class="kw">_</span>) =&gt; <span class="kw">match</span> <span class="self">self</span>.<span class="ident">field</span>().<span class="ident">scalar_type</span>() {
-                <span class="prelude-val">Some</span>(<span class="ident">ScalarType::Int</span>) =&gt; <span class="ident">DefaultKind::Single</span>(<span class="ident">PrismaValue::Int</span>(<span class="ident">num</span>.<span class="ident">parse</span>().<span class="ident">unwrap</span>())),
-                <span class="prelude-val">Some</span>(<span class="ident">ScalarType::BigInt</span>) =&gt; <span class="ident">DefaultKind::Single</span>(<span class="ident">PrismaValue::BigInt</span>(<span class="ident">num</span>.<span class="ident">parse</span>().<span class="ident">unwrap</span>())),
-                <span class="prelude-val">Some</span>(<span class="ident">ScalarType::Float</span>) =&gt; <span class="ident">DefaultKind::Single</span>(<span class="ident">PrismaValue::Float</span>(<span class="ident">num</span>.<span class="ident">parse</span>().<span class="ident">unwrap</span>())),
-                <span class="prelude-val">Some</span>(<span class="ident">ScalarType::Decimal</span>) =&gt; <span class="ident">DefaultKind::Single</span>(<span class="ident">PrismaValue::Float</span>(<span class="ident">num</span>.<span class="ident">parse</span>().<span class="ident">unwrap</span>())),
-                <span class="ident">other</span> =&gt; <span class="macro">unreachable!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="ident">other</span>),
-            },
-            <span class="ident">ast::Expression::ConstantValue</span>(<span class="ident">v</span>, <span class="kw">_</span>) =&gt; <span class="kw">match</span> <span class="self">self</span>.<span class="ident">field</span>().<span class="ident">scalar_type</span>() {
-                <span class="prelude-val">Some</span>(<span class="ident">ScalarType::Boolean</span>) =&gt; <span class="ident">DefaultKind::Single</span>(<span class="ident">PrismaValue::Boolean</span>(<span class="ident">v</span>.<span class="ident">parse</span>().<span class="ident">unwrap</span>())),
-                <span class="prelude-val">None</span> =&gt; <span class="ident">DefaultKind::Single</span>(<span class="ident">PrismaValue::Enum</span>(<span class="ident">v</span>.<span class="ident">to_owned</span>())),
-                <span class="ident">other</span> =&gt; <span class="macro">unreachable!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="ident">other</span>),
-            },
-            <span class="ident">ast::Expression::StringValue</span>(<span class="ident">v</span>, <span class="kw">_</span>) =&gt; <span class="kw">match</span> <span class="self">self</span>.<span class="ident">field</span>().<span class="ident">scalar_type</span>() {
-                <span class="prelude-val">Some</span>(<span class="ident">ScalarType::DateTime</span>) =&gt; <span class="ident">DefaultKind::Single</span>(<span class="ident">PrismaValue::DateTime</span>(<span class="ident">v</span>.<span class="ident">parse</span>().<span class="ident">unwrap</span>())),
-                <span class="prelude-val">Some</span>(<span class="ident">ScalarType::String</span>) =&gt; <span class="ident">DefaultKind::Single</span>(<span class="ident">PrismaValue::String</span>(<span class="ident">v</span>.<span class="ident">parse</span>().<span class="ident">unwrap</span>())),
-                <span class="prelude-val">Some</span>(<span class="ident">ScalarType::Json</span>) =&gt; <span class="ident">DefaultKind::Single</span>(<span class="ident">PrismaValue::Json</span>(<span class="ident">v</span>.<span class="ident">parse</span>().<span class="ident">unwrap</span>())),
-                <span class="prelude-val">Some</span>(<span class="ident">ScalarType::Decimal</span>) =&gt; <span class="ident">DefaultKind::Single</span>(<span class="ident">PrismaValue::Float</span>(<span class="ident">v</span>.<span class="ident">parse</span>().<span class="ident">unwrap</span>())),
-                <span class="prelude-val">Some</span>(<span class="ident">ScalarType::Bytes</span>) =&gt; {
-                    <span class="ident">DefaultKind::Single</span>(<span class="ident">PrismaValue::Bytes</span>(<span class="ident">dml::prisma_value::decode_bytes</span>(<span class="ident">v</span>).<span class="ident">unwrap</span>()))
-                }
-                <span class="ident">other</span> =&gt; <span class="macro">unreachable!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="ident">other</span>),
-            },
-            <span class="ident">other</span> =&gt; <span class="macro">unreachable!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="ident">other</span>),
-        }
-    }
-
     <span class="kw">fn</span> <span class="ident">constraint_name</span>(<span class="self">self</span>, <span class="ident">connector</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">Connector</span>) -&gt; <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="ident">str</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">mapped_name</span>().<span class="ident">map</span>(<span class="ident">Cow::from</span>).<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> {
             <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">ConstraintNames::default_name</span>(
@@ -347,11 +239,11 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// - There is no native type attribute on the field.</span>
     <span class="doccomment">/// - The native type attribute is not valid for the connector.</span>
-    <span class="kw">fn</span> <span class="ident">native_type_instance</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">connector</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">Connector</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">dml::native_type_instance::NativeTypeInstance</span><span class="op">&gt;</span>;
+    <span class="kw">fn</span> <span class="ident">native_type_instance</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">connector</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">Connector</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">NativeTypeInstance</span><span class="op">&gt;</span>;
 }
 
 <span class="kw">impl</span> <span class="ident">ScalarFieldWalkerExt</span> <span class="kw">for</span> <span class="ident">ScalarFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">native_type_instance</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">connector</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">Connector</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">dml::native_type_instance::NativeTypeInstance</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">native_type_instance</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">connector</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">Connector</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">NativeTypeInstance</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">raw_native_type</span>()
             .<span class="ident">and_then</span>(<span class="op">|</span>(<span class="kw">_</span>, <span class="ident">name</span>, <span class="ident">args</span>, <span class="kw">_</span>)<span class="op">|</span> <span class="ident">connector</span>.<span class="ident">parse_native_type</span>(<span class="ident">name</span>, <span class="ident">args</span>.<span class="ident">to_owned</span>()).<span class="ident">ok</span>())
     }
