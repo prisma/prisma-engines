@@ -3,22 +3,22 @@
   "items": [
     {
       "label": "Cascade",
-      "kind": 21,
+      "kind": 13,
       "documentation": "Delete the child records when the parent record is deleted."
     },
     {
       "label": "NoAction",
-      "kind": 21,
+      "kind": 13,
       "documentation": "Prevent deleting a parent record as long as it is referenced."
     },
     {
       "label": "SetNull",
-      "kind": 21,
+      "kind": 13,
       "documentation": "Set the referencing fields to NULL when the referenced record is deleted."
     },
     {
       "label": "SetDefault",
-      "kind": 21,
+      "kind": 13,
       "documentation": "Set the referencing field's value to the default when the referenced record is deleted."
     }
   ]

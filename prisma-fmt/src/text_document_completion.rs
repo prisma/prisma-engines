@@ -103,7 +103,7 @@ fn push_ast_completions(
             for referential_action in connector.referential_actions(&referential_integrity).iter() {
                 items.push(CompletionItem {
                     label: referential_action.as_str().to_owned(),
-                    kind: Some(CompletionItemKind::CONSTANT),
+                    kind: Some(CompletionItemKind::ENUM),
                     detail: None, // what is the difference between detail and documentation?
                     documentation: Some(Documentation::String(referential_action.documentation().to_owned())),
                     ..Default::default()
