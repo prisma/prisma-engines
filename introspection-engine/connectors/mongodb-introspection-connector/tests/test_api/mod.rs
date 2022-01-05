@@ -1,6 +1,9 @@
-use datamodel::common::preview_features::PreviewFeature;
+use datamodel::{ast::SchemaAst, common::preview_features::PreviewFeature, parser_database::ParserDatabase};
+use datamodel_connector::Diagnostics;
 use enumflags2::BitFlags;
-use introspection_connector::{CompositeTypeDepth, IntrospectionConnector, IntrospectionContext, Warning};
+use introspection_connector::{
+    CompositeTypeDepth, IntrospectionConnector, IntrospectionContext, IntrospectionSettings, Warning,
+};
 use mongodb::{Client, Database};
 use mongodb_introspection_connector::MongoDbIntrospectionConnector;
 use names::Generator;
@@ -88,10 +91,18 @@ where
     let mut config = datamodel::parse_configuration(&datamodel_string).unwrap();
     let datamodel = datamodel::parse_datamodel(&datamodel_string).unwrap();
 
-    let ctx = IntrospectionContext {
+    let settings = IntrospectionSettings {
         source: config.subject.datasources.pop().unwrap(),
         composite_type_depth,
         preview_features,
+    };
+
+    let ast = SchemaAst::empty();
+    let (db, _) = ParserDatabase::new(&ast, Diagnostics::new());
+
+    let context = IntrospectionContext {
+        input_datamodel: Datamodel::new(),
+        db,
     };
 
     RT.block_on(async move {
@@ -103,7 +114,7 @@ where
             database.drop(None).await.unwrap();
         }
 
-        let res = connector.introspect(&datamodel.subject, ctx).await;
+        let res = connector.introspect(&context, settings).await;
         database.drop(None).await.unwrap();
 
         let res = res.unwrap();

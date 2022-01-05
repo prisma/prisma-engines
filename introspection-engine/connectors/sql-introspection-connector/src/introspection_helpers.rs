@@ -6,7 +6,7 @@ use datamodel::{
     FieldType, IndexDefinition, IndexField, Model, PrimaryKeyField, ReferentialAction, RelationField, RelationInfo,
     ScalarField, ScalarType, SortOrder, ValueGenerator as VG,
 };
-use introspection_connector::IntrospectionContext;
+use introspection_connector::IntrospectionSettings;
 use sql_schema_describer::SQLIndexAlgorithm;
 use sql_schema_describer::{
     Column, ColumnArity, ColumnTypeFamily, ForeignKey, Index, IndexType, SQLSortOrder, SqlSchema, Table,
@@ -126,7 +126,7 @@ pub fn calculate_many_to_many_field(
     RelationField::new(&name, FieldArity::List, FieldArity::List, relation_info)
 }
 
-pub(crate) fn calculate_index(index: &Index, ctx: &IntrospectionContext) -> IndexDefinition {
+pub(crate) fn calculate_index(index: &Index, ctx: &IntrospectionSettings) -> IndexDefinition {
     debug!("Handling index  {:?}", index);
     let tpe = match index.tpe {
         IndexType::Unique => datamodel::dml::IndexType::Unique,
@@ -180,7 +180,7 @@ pub(crate) fn calculate_index(index: &Index, ctx: &IntrospectionContext) -> Inde
     }
 }
 
-pub(crate) fn calculate_scalar_field(table: &Table, column: &Column, ctx: &IntrospectionContext) -> ScalarField {
+pub(crate) fn calculate_scalar_field(table: &Table, column: &Column, ctx: &IntrospectionSettings) -> ScalarField {
     debug!("Handling column {:?}", column);
 
     let field_type = calculate_scalar_field_type_with_native_types(column, ctx);
@@ -430,7 +430,7 @@ pub(crate) fn calculate_scalar_field_type_for_native_type(column: &Column) -> Fi
     }
 }
 
-pub(crate) fn calculate_scalar_field_type_with_native_types(column: &Column, ctx: &IntrospectionContext) -> FieldType {
+pub(crate) fn calculate_scalar_field_type_with_native_types(column: &Column, ctx: &IntrospectionSettings) -> FieldType {
     debug!("Calculating native field type for '{}'", column.name);
     let scalar_type = calculate_scalar_field_type_for_native_type(column);
 

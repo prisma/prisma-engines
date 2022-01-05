@@ -1,4 +1,6 @@
 pub use super::TestResult;
+use datamodel::parser_database::ParserDatabase;
+use datamodel_connector::Diagnostics;
 pub use expect_test::expect;
 pub use test_macros::test_connector;
 pub use test_setup::{BitFlags, Capabilities, Tags};
@@ -8,7 +10,7 @@ use datamodel::common::preview_features::PreviewFeature;
 use datamodel::{Configuration, Datamodel};
 use introspection_connector::{
     CompositeTypeDepth, ConnectorResult, DatabaseMetadata, IntrospectionConnector, IntrospectionContext,
-    IntrospectionResult, Version,
+    IntrospectionResult, IntrospectionSettings, Version,
 };
 use migration_connector::MigrationConnector;
 use quaint::{
@@ -125,14 +127,31 @@ impl TestApi {
     async fn test_introspect_internal(&self, data_model: Datamodel) -> ConnectorResult<IntrospectionResult> {
         let config = self.configuration();
 
-        let ctx = IntrospectionContext {
+        let settings = IntrospectionSettings {
             preview_features: self.preview_features(),
             source: config.datasources.into_iter().next().unwrap(),
             composite_type_depth: CompositeTypeDepth::Infinite,
         };
 
+        let (db, diagnostics) = ParserDatabase::new(&schema_ast, Diagnostics::new());
+
+        if diagnostics.has_errors() {
+            return Err(Error::DatamodelError(diagnostics.to_pretty_string("schema.prisma", &schema)).into());
+        }
+
+        let settings = IntrospectionSettings {
+            preview_features: config2.preview_features(),
+            source: config2.datasources.into_iter().next().unwrap(),
+            composite_type_depth,
+        };
+
+        let context = IntrospectionContext {
+            input_datamodel: data_model,
+            db,
+        };
+
         self.api
-            .introspect(&data_model, ctx)
+            .introspect(&context, settings)
             .instrument(tracing::info_span!("introspect"))
             .await
     }

@@ -4,7 +4,7 @@ use crate::introspection_helpers::{
 };
 use crate::SqlFamilyTrait;
 use datamodel::{Datamodel, Model};
-use introspection_connector::{IntrospectionContext, Version, Warning};
+use introspection_connector::{IntrospectionSettings, Version, Warning};
 use native_types::{MySqlType, PostgresType};
 use quaint::connector::SqlFamily;
 use sql_schema_describer::{Column, ForeignKey, ForeignKeyAction, PrimaryKey, SqlSchema, Table};
@@ -50,7 +50,7 @@ const MYSQL_TYPES: &[MySqlType] = &[
 ];
 
 impl VersionChecker {
-    pub fn new(schema: &SqlSchema, ctx: &IntrospectionContext) -> VersionChecker {
+    pub fn new(schema: &SqlSchema, ctx: &IntrospectionSettings) -> VersionChecker {
         VersionChecker {
             sql_family: ctx.sql_family(),
             has_migration_table: schema.tables.iter().any(is_old_migration_table),

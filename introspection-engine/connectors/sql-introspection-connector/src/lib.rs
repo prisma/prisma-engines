@@ -14,12 +14,11 @@ mod version_checker;
 mod warnings;
 
 use datamodel::common::preview_features::PreviewFeature;
-use datamodel::Datamodel;
 use enumflags2::BitFlags;
 pub use error::*;
 use introspection_connector::{
     ConnectorError, ConnectorResult, DatabaseMetadata, ErrorKind, IntrospectionConnector, IntrospectionContext,
-    IntrospectionResult,
+    IntrospectionResult, IntrospectionSettings,
 };
 use quaint::prelude::SqlFamily;
 use quaint::{prelude::ConnectionInfo, single::Quaint};
@@ -148,16 +147,15 @@ impl IntrospectionConnector for SqlIntrospectionConnector {
 
     async fn introspect(
         &self,
-        previous_data_model: &Datamodel,
-        ctx: IntrospectionContext,
+        ctx: &IntrospectionContext<'_>,
+        settings: IntrospectionSettings,
     ) -> ConnectorResult<IntrospectionResult> {
         let sql_schema = self.catch(self.describe()).await?;
         tracing::debug!("SQL Schema Describer is done: {:?}", sql_schema);
 
-        let introspection_result = calculate_datamodel::calculate_datamodel(&sql_schema, previous_data_model, ctx)
-            .map_err(|sql_introspection_error| {
-                sql_introspection_error.into_connector_error(self.connection.connection_info())
-            })?;
+        let introspection_result = calculate_datamodel::calculate_datamodel(&sql_schema, ctx, settings).map_err(
+            |sql_introspection_error| sql_introspection_error.into_connector_error(self.connection.connection_info()),
+        )?;
 
         tracing::debug!("Calculating datamodel is done: {:?}", introspection_result.data_model);
 
@@ -186,7 +184,7 @@ trait SqlFamilyTrait {
     fn sql_family(&self) -> SqlFamily;
 }
 
-impl SqlFamilyTrait for IntrospectionContext {
+impl SqlFamilyTrait for IntrospectionSettings {
     fn sql_family(&self) -> SqlFamily {
         match self.source.active_provider.as_str() {
             "postgresql" => SqlFamily::Postgres,

@@ -1,12 +1,13 @@
 use crate::error::Error;
-use datamodel::{Configuration, Datamodel};
+use datamodel::{ast::SchemaAst, datamodel_connector::Diagnostics, Configuration, Datamodel};
 use introspection_connector::{
     CompositeTypeDepth, ConnectorResult, DatabaseMetadata, IntrospectionConnector, IntrospectionContext,
-    IntrospectionResultOutput,
+    IntrospectionResultOutput, IntrospectionSettings,
 };
 use jsonrpc_core::BoxFuture;
 use jsonrpc_derive::rpc;
 use mongodb_introspection_connector::MongoDbIntrospectionConnector;
+use parser_database::ParserDatabase;
 use serde_derive::*;
 use sql_introspection_connector::SqlIntrospectionConnector;
 
@@ -105,21 +106,29 @@ impl RpcImpl {
     ) -> RpcResult<IntrospectionResultOutput> {
         let (config, url, connector) = RpcImpl::load_connector(&schema).await?;
 
-        let input_data_model = if !force {
-            Self::parse_datamodel(&schema)?
+        let (input_data_model, schema_ast) = if !force {
+            (Self::parse_datamodel(&schema)?, Self::parse_schema_ast(&schema)?)
         } else {
-            Datamodel::new()
+            (Datamodel::new(), SchemaAst::empty())
         };
+
+        let (db, diagnostics) = ParserDatabase::new(&schema_ast, Diagnostics::new());
+
+        if diagnostics.has_errors() {
+            return Err(Error::DatamodelError(diagnostics.to_pretty_string("schema.prisma", &schema)).into());
+        }
 
         let (config2, _, _) = RpcImpl::load_connector(&schema).await?;
 
-        let ctx = IntrospectionContext {
+        let settings = IntrospectionSettings {
             preview_features: config2.preview_features(),
             source: config2.datasources.into_iter().next().unwrap(),
             composite_type_depth,
         };
 
-        let result = match connector.introspect(&input_data_model, ctx).await {
+        let context = IntrospectionContext::new(input_data_model, db);
+
+        let result = match connector.introspect(&context, settings).await {
             Ok(introspection_result) => {
                 if introspection_result.data_model.is_empty() {
                     Err(Error::IntrospectionResultEmpty(url.to_string()))
@@ -147,6 +156,14 @@ impl RpcImpl {
             .map_err(|err| Error::DatamodelError(err.to_pretty_string("schema.prisma", schema)))?;
 
         Ok(final_dm)
+    }
+
+    /// This function parses the provided schema and returns the contained AST Schema.
+    pub fn parse_schema_ast(schema: &str) -> RpcResult<SchemaAst> {
+        let ast = datamodel::parse_schema_ast(schema)
+            .map_err(|err| Error::DatamodelError(err.to_pretty_string("schema.prisma", schema)))?;
+
+        Ok(ast)
     }
 
     pub async fn list_databases_internal(schema: String) -> RpcResult<Vec<String>> {

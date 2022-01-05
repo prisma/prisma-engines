@@ -1,6 +1,7 @@
 use crate::test_api::*;
-use datamodel::Datamodel;
-use introspection_connector::{IntrospectionConnector, IntrospectionContext};
+use datamodel::{ast::SchemaAst, parser_database::ParserDatabase, Datamodel};
+use datamodel_connector::Diagnostics;
+use introspection_connector::{IntrospectionConnector, IntrospectionContext, IntrospectionSettings};
 use mongodb_introspection_connector::MongoDbIntrospectionConnector;
 
 #[test]
@@ -44,14 +45,23 @@ fn using_without_preview_feature_enabled() {
 
             let mut config = datamodel::parse_configuration(&dml).unwrap();
 
-            let ctx = IntrospectionContext {
+            let settings = IntrospectionSettings {
                 source: config.subject.datasources.pop().unwrap(),
                 composite_type_depth: Default::default(),
                 preview_features: Default::default(),
             };
 
+            let ast = SchemaAst::empty();
+            let (db, _) = ParserDatabase::new(&ast, Diagnostics::new());
+
+            let context = IntrospectionContext {
+                input_datamodel: Datamodel::new(),
+                db,
+            };
+
             let connector = MongoDbIntrospectionConnector::new(&*CONN_STR).await?;
-            connector.introspect(&Datamodel::new(), ctx).await
+
+            connector.introspect(&context, settings).await
         })
         .unwrap_err();
 

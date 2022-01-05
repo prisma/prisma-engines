@@ -3,17 +3,19 @@ use crate::introspection_helpers::{
 };
 use crate::{warnings::*, SqlFamilyTrait};
 use datamodel::{Datamodel, DefaultValue, Field, FieldType, Ignorable, ValueGenerator, WithName};
-use introspection_connector::{IntrospectionContext, Warning};
+use introspection_connector::{IntrospectionContext, IntrospectionSettings, Warning};
 use prisma_value::PrismaValue;
 use std::cmp::Ordering::{self, Equal, Greater, Less};
 use std::collections::{BTreeSet, HashMap};
 
 pub fn enrich(
-    old_data_model: &Datamodel,
+    context: &IntrospectionContext<'_>,
     new_data_model: &mut Datamodel,
-    ctx: &IntrospectionContext,
+    ctx: &IntrospectionSettings,
     warnings: &mut Vec<Warning>,
 ) {
+    let old_data_model = context.input_datamodel();
+
     // Keep @relation attributes even if the database doesn't use foreign keys
     if !ctx.foreign_keys_enabled() {
         merge_relation_fields(old_data_model, new_data_model, warnings);
@@ -24,7 +26,7 @@ pub fn enrich(
     merge_custom_index_names(old_data_model, new_data_model, warnings);
     merge_changed_primary_key_names(old_data_model, new_data_model, warnings);
     merge_changed_scalar_key_names(old_data_model, new_data_model, warnings);
-    merge_changed_relation_field_names(old_data_model, new_data_model);
+    merge_changed_relation_field_names(context, new_data_model);
     merge_changed_relation_names(old_data_model, new_data_model);
     merge_changed_enum_names(old_data_model, new_data_model, warnings);
     merge_changed_enum_values(old_data_model, new_data_model, warnings);
@@ -344,7 +346,9 @@ fn merge_changed_scalar_key_names(
 }
 
 //always keep old virtual relationfield names
-fn merge_changed_relation_field_names(old_data_model: &Datamodel, new_data_model: &mut Datamodel) {
+fn merge_changed_relation_field_names(ctx: &IntrospectionContext, new_data_model: &mut Datamodel) {
+    let old_data_model = ctx.input_datamodel();
+
     let mut changed_relation_field_names = vec![];
 
     for new_model in new_data_model.models() {
@@ -515,7 +519,7 @@ fn merge_changed_enum_values(old_data_model: &Datamodel, new_data_model: &mut Da
 }
 
 //mysql enum names
-fn merge_mysql_enum_names(old_data_model: &Datamodel, new_data_model: &mut Datamodel, ctx: &IntrospectionContext) {
+fn merge_mysql_enum_names(old_data_model: &Datamodel, new_data_model: &mut Datamodel, ctx: &IntrospectionSettings) {
     let mut changed_mysql_enum_names = vec![];
 
     if ctx.sql_family().is_mysql() {

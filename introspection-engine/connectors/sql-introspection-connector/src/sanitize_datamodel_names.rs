@@ -3,7 +3,7 @@ use datamodel::{
     is_reserved_type_name, Datamodel, DefaultKind, DefaultValue, Field, FieldType, IndexField, Model, PrimaryKeyField,
     ValueGenerator, WithDatabaseName, WithName,
 };
-use introspection_connector::IntrospectionContext;
+use introspection_connector::IntrospectionSettings;
 use once_cell::sync::Lazy;
 use prisma_value::PrismaValue;
 use quaint::prelude::SqlFamily;
@@ -15,7 +15,7 @@ static EMPTY_ENUM_PLACEHOLDER: &str = "EMPTY_ENUM_VALUE";
 static RE_START: Lazy<Regex> = Lazy::new(|| Regex::new("^[^a-zA-Z]+").unwrap());
 static RE: Lazy<Regex> = Lazy::new(|| Regex::new("[^_a-zA-Z0-9]").unwrap());
 
-pub fn sanitize_datamodel_names(datamodel: &mut Datamodel, ctx: &IntrospectionContext) {
+pub fn sanitize_datamodel_names(datamodel: &mut Datamodel, ctx: &IntrospectionSettings) {
     let enum_renames = sanitize_models(datamodel, ctx);
     sanitize_enums(datamodel, &enum_renames);
 }
@@ -41,7 +41,10 @@ pub fn sanitization_leads_to_duplicate_names(datamodel: &Datamodel) -> bool {
 }
 
 // Todo: Sanitizing might need to be adjusted to also change the fields in the RelationInfo
-fn sanitize_models(datamodel: &mut Datamodel, ctx: &IntrospectionContext) -> HashMap<String, (String, Option<String>)> {
+fn sanitize_models(
+    datamodel: &mut Datamodel,
+    ctx: &IntrospectionSettings,
+) -> HashMap<String, (String, Option<String>)> {
     let mut enum_renames = HashMap::new();
 
     for model in datamodel.models_mut() {

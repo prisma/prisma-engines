@@ -5,12 +5,12 @@ mod warnings;
 use enumflags2::BitFlags;
 pub use error::*;
 
-use datamodel::{common::preview_features::PreviewFeature, Datamodel};
+use datamodel::common::preview_features::PreviewFeature;
 use futures::TryStreamExt;
 use indoc::formatdoc;
 use introspection_connector::{
     ConnectorError, ConnectorResult, DatabaseMetadata, ErrorKind, IntrospectionConnector, IntrospectionContext,
-    IntrospectionResult,
+    IntrospectionResult, IntrospectionSettings,
 };
 use mongodb::{Client, Database};
 use mongodb_schema_describer::MongoSchema;
@@ -117,11 +117,10 @@ impl IntrospectionConnector for MongoDbIntrospectionConnector {
 
     async fn introspect(
         &self,
-        // TODO: Re-introspection.
-        _existing_data_model: &Datamodel,
-        ctx: IntrospectionContext,
+        _ctx: &IntrospectionContext<'_>,
+        settings: IntrospectionSettings,
     ) -> ConnectorResult<IntrospectionResult> {
-        if !ctx.preview_features.contains(PreviewFeature::MongoDb) {
+        if !settings.preview_features.contains(PreviewFeature::MongoDb) {
             let mut error = ConnectorError::from_kind(ErrorKind::PreviewFeatureNotEnabled(
                 "MongoDB introspection connector (experimental feature, needs to be enabled)",
             ));
@@ -133,8 +132,8 @@ impl IntrospectionConnector for MongoDbIntrospectionConnector {
             return Err(error);
         }
 
-        let schema = self.describe(ctx.preview_features).await?;
+        let schema = self.describe(settings.preview_features).await?;
 
-        Ok(sampler::sample(self.database(), ctx.composite_type_depth, schema).await?)
+        Ok(sampler::sample(self.database(), settings.composite_type_depth, schema).await?)
     }
 }

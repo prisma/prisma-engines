@@ -11,7 +11,7 @@ use datamodel::{
     common::preview_features::PreviewFeature, dml, walkers::find_model_by_db_name, Datamodel, Field, Model,
     PrimaryKeyDefinition, PrimaryKeyField, RelationField, SortOrder,
 };
-use introspection_connector::IntrospectionContext;
+use introspection_connector::IntrospectionSettings;
 use sql_schema_describer::{SQLSortOrder, SqlSchema, Table};
 use tracing::debug;
 
@@ -19,7 +19,7 @@ pub fn introspect(
     schema: &SqlSchema,
     version_check: &mut VersionChecker,
     data_model: &mut Datamodel,
-    ctx: &IntrospectionContext,
+    ctx: &IntrospectionSettings,
 ) -> Result<(), SqlError> {
     // collect m2m table names
     let m2m_tables: Vec<String> = schema

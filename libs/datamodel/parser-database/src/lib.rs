@@ -128,6 +128,11 @@ impl<'ast> ParserDatabase<'ast> {
         self.ast
     }
 
+    /// Is the AST having any data.
+    pub fn is_empty(&self) -> bool {
+        self.ast.is_empty()
+    }
+
     /// Find a specific field in a specific model.
     fn find_model_field(&self, model_id: ast::ModelId, field_name: &str) -> Option<ast::FieldId> {
         self.names.model_fields.get(&(model_id, field_name)).cloned()

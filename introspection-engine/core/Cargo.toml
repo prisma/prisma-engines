@@ -10,6 +10,7 @@ vendored-openssl = ["sql-introspection-connector/vendored-openssl"]
 # Please keep the pyramid form
 [dependencies]
 datamodel = { path = "../../libs/datamodel/core" }
+parser-database = { path = "../../libs/datamodel/parser-database/" }
 user-facing-errors = { path = "../../libs/user-facing-errors" }
 introspection-connector = { path = "../connectors/introspection-connector" }
 sql-introspection-connector = { path = "../connectors/sql-introspection-connector" }

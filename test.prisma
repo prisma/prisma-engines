@@ -1,0 +1,13 @@
+datasource ds {
+  provider = "sqlite"
+  url      = "file:dev.db"
+}
+
+model A {
+  id   Int    @id
+  data String @default("foo")
+}
+
+model B {
+  id Int @id
+}

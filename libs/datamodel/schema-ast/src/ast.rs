@@ -52,6 +52,11 @@ impl SchemaAst {
         SchemaAst { tops: Vec::new() }
     }
 
+    /// True if the AST has no data.
+    pub fn is_empty(&self) -> bool {
+        self.tops.is_empty()
+    }
+
     /// Deprecated. Use ParserDatabase instead where possible.
     pub fn find_model(&self, model: &str) -> Option<&Model> {
         self.iter_models().find(|(_, m)| m.name.name == model).map(|(_, m)| m)

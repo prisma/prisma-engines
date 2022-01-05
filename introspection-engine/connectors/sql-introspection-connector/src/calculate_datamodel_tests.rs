@@ -8,7 +8,7 @@ mod tests {
     };
     use enumflags2::BitFlags;
     use expect_test::expect;
-    use introspection_connector::IntrospectionContext;
+    use introspection_connector::IntrospectionSettings;
     use native_types::{NativeType, PostgresType};
     use pretty_assertions::assert_eq;
     use sql_datamodel_connector::SqlDatamodelConnectors;
@@ -17,7 +17,7 @@ mod tests {
         IndexType, PrimaryKey, PrimaryKeyColumn, Sequence, SqlSchema, Table,
     };
 
-    fn postgres_context() -> IntrospectionContext {
+    fn postgres_context() -> IntrospectionSettings {
         let source = Datasource {
             name: "Postgres".to_string(),
             active_provider: "postgresql".into(),
@@ -30,7 +30,7 @@ mod tests {
             referential_integrity: None,
         };
 
-        IntrospectionContext {
+        IntrospectionSettings {
             source,
             composite_type_depth: Default::default(),
             preview_features: BitFlags::empty(),

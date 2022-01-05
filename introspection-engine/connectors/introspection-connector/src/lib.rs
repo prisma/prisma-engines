@@ -2,6 +2,7 @@ mod error;
 
 use core::fmt;
 use datamodel::common::preview_features::PreviewFeature;
+use datamodel::parser_database::ParserDatabase;
 use datamodel::{Datamodel, Datasource};
 use enumflags2::BitFlags;
 pub use error::{ConnectorError, ErrorKind};
@@ -22,8 +23,8 @@ pub trait IntrospectionConnector: Send + Sync + 'static {
 
     async fn introspect(
         &self,
-        existing_data_model: &Datamodel,
-        ctx: IntrospectionContext,
+        context: &IntrospectionContext<'_>,
+        settings: IntrospectionSettings,
     ) -> ConnectorResult<IntrospectionResult>;
 }
 
@@ -80,13 +81,36 @@ impl fmt::Display for IntrospectionResultOutput {
     }
 }
 
-pub struct IntrospectionContext {
+pub struct IntrospectionContext<'ast> {
+    input_datamodel: Datamodel,
+    db: ParserDatabase<'ast>,
+}
+
+impl<'ast> IntrospectionContext<'ast> {
+    pub fn new(input_datamodel: Datamodel, db: ParserDatabase<'ast>) -> Self {
+        Self { input_datamodel, db }
+    }
+
+    pub fn input_datamodel(&self) -> &Datamodel {
+        &self.input_datamodel
+    }
+
+    pub fn db(&self) -> &ParserDatabase<'ast> {
+        &self.db
+    }
+
+    pub fn has_existing_data_model(&self) -> bool {
+        !self.db.is_empty()
+    }
+}
+
+pub struct IntrospectionSettings {
     pub source: Datasource,
     pub composite_type_depth: CompositeTypeDepth,
     pub preview_features: BitFlags<PreviewFeature>,
 }
 
-impl IntrospectionContext {
+impl IntrospectionSettings {
     pub fn foreign_keys_enabled(&self) -> bool {
         self.source.referential_integrity().uses_foreign_keys()
     }
