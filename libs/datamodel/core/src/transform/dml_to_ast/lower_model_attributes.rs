@@ -1,13 +1,11 @@
-use ::dml::model::IndexAlgorithm;
-
 use crate::ast::{Argument, Attribute};
-use crate::common::constraint_names::ConstraintNames;
 use crate::common::preview_features::PreviewFeature;
 use crate::transform::dml_to_ast::LowerDmlToAst;
 use crate::{
     ast::{self, Span},
     dml, Ignorable, IndexDefinition, IndexType, Model, SortOrder, WithDatabaseName,
 };
+use ::dml::model::IndexAlgorithm;
 
 impl<'a> LowerDmlToAst<'a> {
     /// Internal: Lowers a model's attributes.
@@ -39,7 +37,7 @@ impl<'a> LowerDmlToAst<'a> {
 
                 if pk.db_name.is_some() {
                     if let Some(src) = self.datasource {
-                        if !ConstraintNames::primary_key_name_matches(pk, model, &*src.active_connector) {
+                        if !super::primary_key_name_matches(pk, model, &*src.active_connector) {
                             args.push(ast::Argument::new(
                                 "map",
                                 ast::Expression::StringValue(String::from(pk.db_name.as_ref().unwrap()), Span::empty()),
@@ -133,7 +131,7 @@ impl<'a> LowerDmlToAst<'a> {
         let field = index_def.fields.first().unwrap();
 
         if let Some(src) = self.datasource {
-            if !ConstraintNames::index_name_matches(index_def, model, &*src.active_connector) {
+            if !super::index_name_matches(index_def, model, &*src.active_connector) {
                 args.push(ast::Argument::new(
                     "map",
                     ast::Expression::StringValue(String::from(index_def.db_name.as_ref().unwrap()), Span::empty()),
@@ -159,7 +157,7 @@ impl<'a> LowerDmlToAst<'a> {
 
     pub(crate) fn push_index_map_argument(&self, model: &Model, index_def: &IndexDefinition, args: &mut Vec<Argument>) {
         if let Some(src) = self.datasource {
-            if !ConstraintNames::index_name_matches(index_def, model, &*src.active_connector) {
+            if !super::index_name_matches(index_def, model, &*src.active_connector) {
                 args.push(ast::Argument::new(
                     "map",
                     ast::Expression::StringValue(String::from(index_def.db_name.as_ref().unwrap()), Span::empty()),

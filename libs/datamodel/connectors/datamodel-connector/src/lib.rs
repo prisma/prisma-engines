@@ -223,22 +223,6 @@ pub trait Connector: Send + Sync {
     fn validate_url(&self, url: &str) -> Result<(), String>;
 }
 
-/// (temporary) bridge between dml::scalars::ScalarType and parser_database::ScalarType. Avoid
-/// relying on this if you can.
-pub fn convert_from_scalar_type(st: dml::scalars::ScalarType) -> ScalarType {
-    match st {
-        dml::scalars::ScalarType::Int => ScalarType::Int,
-        dml::scalars::ScalarType::BigInt => ScalarType::BigInt,
-        dml::scalars::ScalarType::Float => ScalarType::Float,
-        dml::scalars::ScalarType::Boolean => ScalarType::Boolean,
-        dml::scalars::ScalarType::String => ScalarType::String,
-        dml::scalars::ScalarType::DateTime => ScalarType::DateTime,
-        dml::scalars::ScalarType::Json => ScalarType::Json,
-        dml::scalars::ScalarType::Bytes => ScalarType::Bytes,
-        dml::scalars::ScalarType::Decimal => ScalarType::Decimal,
-    }
-}
-
 #[derive(Debug, Clone, Copy, Eq, PartialEq, Ord, PartialOrd)]
 pub enum ConstraintType {
     PrimaryKey,

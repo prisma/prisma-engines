@@ -87,7 +87,7 @@ impl<'a> LowerDmlToAst<'a> {
                 let pk = model.primary_key.as_ref().unwrap();
                 if let Some(src) = self.datasource {
                     if pk.db_name.is_some()
-                        && !ConstraintNames::primary_key_name_matches(pk, model, &*src.active_connector)
+                        && !super::primary_key_name_matches(pk, model, &*src.active_connector)
                     {
                         args.push(ast::Argument::new(
                             "map",
@@ -227,7 +227,7 @@ impl<'a> LowerDmlToAst<'a> {
 
             if let Some(fk_name) = &relation_info.fk_name {
                 if let Some(src) = self.datasource {
-                    if !ConstraintNames::foreign_key_name_matches(relation_info, model, &*src.active_connector) {
+                    if !super::foreign_key_name_matches(relation_info, model, &*src.active_connector) {
                         args.push(ast::Argument::new(
                             "map",
                             ast::Expression::StringValue(String::from(fk_name), Span::empty()),
@@ -312,3 +312,4 @@ fn dml_scalar_type_to_parser_database_scalar_type(st: dml::ScalarType) -> parser
         dml::ScalarType::Decimal => parser_database::ScalarType::Decimal,
     }
 }
+
