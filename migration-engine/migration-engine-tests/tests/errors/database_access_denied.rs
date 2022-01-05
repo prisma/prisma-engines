@@ -1,4 +1,4 @@
-use migration_engine_tests::multi_engine_test_api::*;
+use migration_engine_tests::{multi_engine_test_api::*, test_api::rpc_api};
 use serde_json::json;
 use test_macros::test_connector;
 use url::Url;
@@ -23,7 +23,7 @@ fn database_access_denied_must_return_a_proper_error_in_rpc(api: TestApi) {
         url,
     );
 
-    let error = api.block_on(migration_core::rpc_api(&dm)).map(|_| ()).unwrap_err();
+    let error = api.block_on(rpc_api(&dm)).unwrap_err();
     let json_error = serde_json::to_value(&error.to_user_facing()).unwrap();
 
     let expected = json!({

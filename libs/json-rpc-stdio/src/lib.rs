@@ -5,7 +5,7 @@
 //!
 //! Notifications in the Client are not supported yet.
 
-use jsonrpc_core::{IoHandler, MethodCall, Request};
+use jsonrpc_core::{IoHandler, MethodCall, Notification, Request};
 use serde::{Deserialize, Serialize};
 use std::{
     collections::HashMap,
@@ -22,6 +22,7 @@ static REQUEST_ID_COUNTER: AtomicU64 = AtomicU64::new(0);
 /// A handle to a connected client you can use to send requests.
 #[derive(Debug, Clone)]
 pub struct Client {
+    notification_sender: mpsc::Sender<Notification>,
     request_sender: mpsc::Sender<(MethodCall, oneshot::Sender<jsonrpc_core::Output>)>,
 }
 
@@ -29,13 +30,41 @@ pub struct Client {
 /// the adapter you must pass to `run_with_client()` to connect the client to the proper IO.
 pub fn new_client() -> (Client, ClientAdapter) {
     let (request_sender, request_receiver) = mpsc::channel(30);
-    let client = Client { request_sender };
-    let adapter = ClientAdapter { request_receiver };
+    let (notification_sender, notification_receiver) = mpsc::channel(30);
+    let client = Client {
+        request_sender,
+        notification_sender,
+    };
+
+    let adapter = ClientAdapter {
+        request_receiver,
+        notification_receiver,
+    };
 
     (client, adapter)
 }
 
 impl Client {
+    /// Asynchronously send a JSON-RPC notification.
+    pub async fn notify<Req>(&self, method: String, params: Req) -> jsonrpc_core::Result<()>
+    where
+        Req: serde::Serialize,
+    {
+        let json_params = serde_json::to_value(params).map_err(|_err| jsonrpc_core::Error::invalid_request())?;
+        let params = match json_params {
+            jsonrpc_core::Value::Array(arr) => jsonrpc_core::Params::Array(arr),
+            jsonrpc_core::Value::Object(obj) => jsonrpc_core::Params::Map(obj),
+            _ => return Err(jsonrpc_core::Error::invalid_request()),
+        };
+        let notification = jsonrpc_core::Notification {
+            jsonrpc: Some(jsonrpc_core::Version::V2),
+            method,
+            params,
+        };
+        self.notification_sender.send(notification).await.unwrap();
+        Ok(())
+    }
+
     /// Asynchronously send a JSON-RPC request.
     pub async fn call<Req, Res>(&self, method: String, params: Req) -> jsonrpc_core::Result<Res>
     where
@@ -70,6 +99,7 @@ impl Client {
 /// The other side of the channels. Only used as a handle to be passed into run_with_client().
 pub struct ClientAdapter {
     request_receiver: mpsc::Receiver<(MethodCall, oneshot::Sender<jsonrpc_core::Output>)>,
+    notification_receiver: mpsc::Receiver<Notification>,
 }
 
 #[derive(Serialize, Deserialize)]
@@ -109,6 +139,9 @@ async fn run_with_io(
             next_request = client_adapter.request_receiver.recv() => {
                 handle_next_client_request(next_request, &mut output, &mut in_flight).await?
             }
+            next_notification = client_adapter.notification_receiver.recv() => {
+                handle_next_client_notification(next_notification, &mut output).await?
+            }
         }
     }
 }
@@ -120,8 +153,20 @@ async fn handle_next_client_request<T: AsyncWrite + Unpin>(
 ) -> io::Result<()> {
     let (next_request, channel) = next_request.unwrap();
     in_flight.insert(next_request.id.clone(), channel);
-    let request_json = serde_json::to_string(&next_request)?;
-    output.write_all(request_json.as_bytes()).await?;
+    let request_json = serde_json::to_vec(&next_request)?;
+    output.write_all(&request_json).await?;
+    output.write_all(b"\n").await?;
+    output.flush().await?;
+    Ok(())
+}
+
+async fn handle_next_client_notification<T: AsyncWrite + Unpin>(
+    next_notification: Option<Notification>,
+    output: &mut tokio::io::BufWriter<T>,
+) -> io::Result<()> {
+    let next_notification = next_notification.unwrap();
+    let request_json = serde_json::to_vec(&next_notification)?;
+    output.write_all(&request_json).await?;
     output.write_all(b"\n").await?;
     output.flush().await?;
     Ok(())

@@ -21,6 +21,13 @@ use std::{
 use tempfile::TempDir;
 use test_setup::{DatasourceBlock, TestApiArgs};
 
+/// For error testing.
+pub async fn rpc_api(schema: &str) -> ConnectorResult<()> {
+    migration_core::rpc_api(schema, Box::new(migration_connector::EmptyHost))
+        .await
+        .map(drop)
+}
+
 pub struct TestApi {
     root: RootTestApi,
     connector: SqlMigrationConnector,

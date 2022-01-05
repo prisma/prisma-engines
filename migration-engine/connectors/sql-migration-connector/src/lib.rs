@@ -35,6 +35,7 @@ pub struct SqlMigrationConnector {
     flavour: Box<dyn SqlFlavour + Send + Sync + 'static>,
     shadow_database_connection_string: Option<String>,
     preview_features: BitFlags<PreviewFeature>,
+    host: Box<dyn ConnectorHost>,
 }
 
 impl SqlMigrationConnector {
@@ -58,6 +59,7 @@ impl SqlMigrationConnector {
             flavour,
             shadow_database_connection_string,
             preview_features,
+            host: Box::new(EmptyHost),
         })
     }
 
@@ -218,6 +220,10 @@ impl SqlMigrationConnector {
 
 #[async_trait::async_trait]
 impl MigrationConnector for SqlMigrationConnector {
+    fn set_host(&mut self, host: Box<dyn migration_connector::ConnectorHost>) {
+        self.host = host;
+    }
+
     fn connector_type(&self) -> &'static str {
         self.connection_info.sql_family().as_str()
     }

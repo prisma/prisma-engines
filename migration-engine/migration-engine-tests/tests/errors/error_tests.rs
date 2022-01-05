@@ -1,5 +1,4 @@
 use indoc::{formatdoc, indoc};
-use migration_core::rpc_api;
 use migration_engine_tests::test_api::*;
 use pretty_assertions::assert_eq;
 use quaint::prelude::Insert;

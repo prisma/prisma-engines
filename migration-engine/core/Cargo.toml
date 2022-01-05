@@ -22,5 +22,6 @@ tracing-futures = "0.2"
 url = "2.1.1"
 
 [features]
+default = ["sql"]
 mongodb = ["mongodb-migration-connector"]
 sql = ["sql-migration-connector"]

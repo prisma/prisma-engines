@@ -73,6 +73,16 @@ fn set_panic_hook() {
     }));
 }
 
+struct JsonRpcHost;
+
+#[async_trait::async_trait]
+impl migration_connector::ConnectorHost for JsonRpcHost {
+    async fn print(&self, text: &str) -> migration_connector::ConnectorResult<()> {
+        tracing::info!(migrate_action = "log", "{}", text);
+        Ok(())
+    }
+}
+
 async fn start_engine(datamodel_location: &str) {
     use std::io::Read as _;
 
@@ -82,7 +92,7 @@ async fn start_engine(datamodel_location: &str) {
     let mut datamodel = String::new();
     file.read_to_string(&mut datamodel).unwrap();
 
-    match rpc_api(&datamodel).await {
+    match rpc_api(&datamodel, Box::new(JsonRpcHost)).await {
         // Block the thread and handle IO in async until EOF.
         Ok(api) => json_rpc_stdio::run(&api).await.unwrap(),
         Err(err) => {

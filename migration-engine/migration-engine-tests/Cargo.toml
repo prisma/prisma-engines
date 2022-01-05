@@ -21,6 +21,7 @@ test-macros = { path = "../../libs/test-macros" }
 test-setup = { path = "../../libs/test-setup" }
 prisma-value = { path = "../../libs/prisma-value" }
 
+async-trait = "0.1.0"
 bigdecimal = "0.2"
 chrono = "0.4.15"
 enumflags2 = "0.7"
