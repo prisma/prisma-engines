@@ -5,12 +5,15 @@ pub mod constraint_names;
 pub mod helper;
 pub mod walker_ext_traits;
 
-mod native_type_instance;
 mod empty_connector;
 mod native_type_constructor;
+mod native_type_instance;
 mod referential_integrity;
 
-pub use self::{native_type_instance::NativeTypeInstance, capabilities::{ConnectorCapabilities, ConnectorCapability}};
+pub use self::{
+    capabilities::{ConnectorCapabilities, ConnectorCapability},
+    native_type_instance::NativeTypeInstance,
+};
 pub use diagnostics::{connector_error, DatamodelError, Diagnostics};
 pub use empty_connector::EmptyDatamodelConnector;
 pub use native_type_constructor::NativeTypeConstructor;

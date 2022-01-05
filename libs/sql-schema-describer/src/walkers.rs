@@ -98,7 +98,7 @@ impl<'a> ColumnWalker<'a> {
     }
 
     /// The full column type.
-    pub fn column_type(&self) -> &'a ColumnType {
+    pub fn column_type(self) -> &'a ColumnType {
         &self.column().tpe
     }
 

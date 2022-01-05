@@ -1,8 +1,7 @@
 use datamodel_connector::ConstraintScope;
 use datamodel_connector::{
     connector_error::ConnectorError, parser_database::ScalarType, Connector, ConnectorCapability,
-    NativeTypeConstructor, ReferentialAction, ReferentialIntegrity,
-    NativeTypeInstance,
+    NativeTypeConstructor, NativeTypeInstance, ReferentialAction, ReferentialIntegrity,
 };
 use enumflags2::BitFlags;
 use std::borrow::Cow;

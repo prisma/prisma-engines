@@ -75,6 +75,10 @@ impl SqlFlavour for SqliteFlavour {
         Ok(connection.raw_cmd(sql).await?)
     }
 
+    fn datamodel_connector(&self) -> &'static dyn datamodel::datamodel_connector::Connector {
+        sql_datamodel_connector::SQLITE
+    }
+
     async fn drop_database(&self, database_url: &str) -> ConnectorResult<()> {
         let file_path = match ConnectionInfo::from_url(database_url) {
             Ok(ConnectionInfo::Sqlite { file_path, .. }) => file_path,

@@ -1,6 +1,6 @@
 use super::DestructiveChangeCheckerFlavour;
 use crate::{
-    flavour::PostgresFlavour,
+    flavour::{PostgresFlavour, SqlFlavour},
     pair::Pair,
     sql_destructive_change_checker::{
         destructive_check_plan::DestructiveCheckPlan, unexecutable_step_check::UnexecutableStepCheck,
@@ -46,15 +46,8 @@ impl DestructiveChangeCheckerFlavour for PostgresFlavour {
             )
         }
 
-        let previous_type = match &columns.previous().column_type().native_type {
-            Some(tpe) => tpe.to_string(),
-            _ => format!("{:?}", columns.previous().column_type_family()),
-        };
-
-        let next_type = match &columns.next().column_type().native_type {
-            Some(tpe) => tpe.to_string(),
-            _ => format!("{:?}", columns.next().column_type_family()),
-        };
+        let previous_type = super::display_column_type(columns.previous, self.datamodel_connector());
+        let next_type = super::display_column_type(columns.next, self.datamodel_connector());
 
         match type_change {
             None | Some(ColumnTypeChange::SafeCast) => (),

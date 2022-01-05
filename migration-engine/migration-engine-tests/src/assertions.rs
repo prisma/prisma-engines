@@ -4,6 +4,7 @@ mod quaint_result_set_ext;
 pub use migration_assertions::*;
 pub use quaint_result_set_ext::*;
 
+use datamodel_connector::Connector;
 use pretty_assertions::assert_eq;
 use prisma_value::PrismaValue;
 use sql_schema_describer::{
@@ -442,8 +443,11 @@ impl<'a> ColumnAssertion<'a> {
         self
     }
 
-    pub fn assert_native_type(self, expected: &str) -> Self {
-        let found = self.column.tpe.native_type.as_ref().unwrap().to_string();
+    pub fn assert_native_type(self, expected: &str, connector: &dyn Connector) -> Self {
+        let found = connector
+            .introspect_native_type(self.column.tpe.native_type.clone().unwrap())
+            .unwrap()
+            .to_string();
         assert!(
             found == expected,
             "Assertion failed. Expected the column native type for `{}` to be `{:?}`, found `{:?}`",

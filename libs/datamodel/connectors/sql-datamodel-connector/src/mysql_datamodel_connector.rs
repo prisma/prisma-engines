@@ -7,7 +7,10 @@ use datamodel_connector::{
     ReferentialAction, ReferentialIntegrity, ScalarType,
 };
 use enumflags2::BitFlags;
-use native_types::{MySqlType::{self, *}, NativeType};
+use native_types::{
+    MySqlType::{self, *},
+    NativeType,
+};
 
 const INT_TYPE_NAME: &str = "Int";
 const UNSIGNED_INT_TYPE_NAME: &str = "UnsignedInt";
@@ -224,7 +227,8 @@ impl Connector for MySqlDatamodelConnector {
         scalar_type: &ScalarType,
         errors: &mut Vec<ConnectorError>,
     ) {
-        let native_type: MySqlType = native_type_instance.deserialize_native_type();
+        let native_type: MySqlType =
+            serde_json::from_value(native_type_instance.serialized_native_type.clone()).unwrap();
         let error = self.native_instance_error(native_type_instance);
 
         match native_type {

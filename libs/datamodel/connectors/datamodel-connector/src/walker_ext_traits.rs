@@ -1,5 +1,7 @@
-use crate::{constraint_names::ConstraintNames, Connector, ReferentialAction, NativeTypeInstance, ReferentialIntegrity};
-use parser_database::{ast, walkers::*, ScalarType};
+use crate::{
+    constraint_names::ConstraintNames, Connector, NativeTypeInstance, ReferentialAction, ReferentialIntegrity,
+};
+use parser_database::{ast, walkers::*};
 use std::borrow::Cow;
 
 pub trait IndexWalkerExt<'ast> {
@@ -28,65 +30,9 @@ impl<'ast> IndexWalkerExt<'ast> for IndexWalker<'ast, '_> {
 
 pub trait DefaultValueExt<'ast> {
     fn constraint_name(self, connector: &dyn Connector) -> Cow<'ast, str>;
-    fn dml_default_kind(self) -> dml::default_value::DefaultKind;
 }
 
 impl<'ast> DefaultValueExt<'ast> for DefaultValueWalker<'ast, '_> {
-    fn dml_default_kind(self) -> dml::default_value::DefaultKind {
-        use dml::{
-            default_value::{DefaultKind, ValueGenerator},
-            prisma_value::PrismaValue,
-        };
-
-        // This has all been validated in parser-database, so unwrapping is always safe.
-        match self.value() {
-            ast::Expression::Function(funcname, args, _) if funcname == "dbgenerated" => {
-                DefaultKind::Expression(ValueGenerator::new_dbgenerated(
-                    args.arguments
-                        .get(0)
-                        .and_then(|arg| arg.value.as_string_value())
-                        .map(|(val, _)| val.to_owned())
-                        .unwrap_or_else(String::new),
-                ))
-            }
-            ast::Expression::Function(funcname, _args, _) if funcname == "autoincrement" => {
-                DefaultKind::Expression(ValueGenerator::new_autoincrement())
-            }
-            ast::Expression::Function(funcname, _args, _) if funcname == "uuid" => {
-                DefaultKind::Expression(ValueGenerator::new_uuid())
-            }
-            ast::Expression::Function(funcname, _args, _) if funcname == "cuid" => {
-                DefaultKind::Expression(ValueGenerator::new_cuid())
-            }
-            ast::Expression::Function(funcname, _args, _) if funcname == "now" => {
-                DefaultKind::Expression(ValueGenerator::new_now())
-            }
-            ast::Expression::NumericValue(num, _) => match self.field().scalar_type() {
-                Some(ScalarType::Int) => DefaultKind::Single(PrismaValue::Int(num.parse().unwrap())),
-                Some(ScalarType::BigInt) => DefaultKind::Single(PrismaValue::BigInt(num.parse().unwrap())),
-                Some(ScalarType::Float) => DefaultKind::Single(PrismaValue::Float(num.parse().unwrap())),
-                Some(ScalarType::Decimal) => DefaultKind::Single(PrismaValue::Float(num.parse().unwrap())),
-                other => unreachable!("{:?}", other),
-            },
-            ast::Expression::ConstantValue(v, _) => match self.field().scalar_type() {
-                Some(ScalarType::Boolean) => DefaultKind::Single(PrismaValue::Boolean(v.parse().unwrap())),
-                None => DefaultKind::Single(PrismaValue::Enum(v.to_owned())),
-                other => unreachable!("{:?}", other),
-            },
-            ast::Expression::StringValue(v, _) => match self.field().scalar_type() {
-                Some(ScalarType::DateTime) => DefaultKind::Single(PrismaValue::DateTime(v.parse().unwrap())),
-                Some(ScalarType::String) => DefaultKind::Single(PrismaValue::String(v.parse().unwrap())),
-                Some(ScalarType::Json) => DefaultKind::Single(PrismaValue::Json(v.parse().unwrap())),
-                Some(ScalarType::Decimal) => DefaultKind::Single(PrismaValue::Float(v.parse().unwrap())),
-                Some(ScalarType::Bytes) => {
-                    DefaultKind::Single(PrismaValue::Bytes(dml::prisma_value::decode_bytes(v).unwrap()))
-                }
-                other => unreachable!("{:?}", other),
-            },
-            other => unreachable!("{:?}", other),
-        }
-    }
-
     fn constraint_name(self, connector: &dyn Connector) -> Cow<'ast, str> {
         self.mapped_name().map(Cow::from).unwrap_or_else(|| {
             let name = ConstraintNames::default_name(

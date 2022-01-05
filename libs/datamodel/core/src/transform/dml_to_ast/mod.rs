@@ -38,11 +38,7 @@ fn lower_string_from_env_var(arg_name: &str, string_from_env: &StringFromEnvVar)
     }
 }
 
-fn primary_key_name_matches(
-    pk: &PrimaryKeyDefinition,
-    model: &Model,
-    connector: &dyn Connector,
-) -> bool {
+fn primary_key_name_matches(pk: &PrimaryKeyDefinition, model: &Model, connector: &dyn Connector) -> bool {
     pk.db_name.as_ref().unwrap() == &ConstraintNames::primary_key_name(model.final_database_name(), connector)
 }
 

@@ -973,10 +973,8 @@ name = "datamodel-connector"
 version = "0.1.0"
 dependencies = [
  "diagnostics",
- "dml",
  "enumflags2",
  "parser-database",
- "serde",
  "serde_json",
  "url",
 ]
@@ -2341,7 +2339,6 @@ name = "mongodb-datamodel-connector"
 version = "0.1.0"
 dependencies = [
  "datamodel-connector",
- "dml",
  "enumflags2",
  "native-types",
  "once_cell",
@@ -4143,7 +4140,6 @@ name = "sql-datamodel-connector"
 version = "0.1.0"
 dependencies = [
  "datamodel-connector",
- "dml",
  "enumflags2",
  "native-types",
  "once_cell",

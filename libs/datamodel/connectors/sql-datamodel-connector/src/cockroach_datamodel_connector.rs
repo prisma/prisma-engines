@@ -2,11 +2,13 @@ use datamodel_connector::{
     connector_error::ConnectorError,
     helper::{arg_vec_from_opt, args_vec_from_opt, parse_one_opt_u32, parse_two_opt_u32},
     parser_database, Connector, ConnectorCapability, ConstraintScope, Diagnostics, NativeTypeConstructor,
-    ReferentialAction, ReferentialIntegrity, ScalarType,
-    NativeTypeInstance,
+    NativeTypeInstance, ReferentialAction, ReferentialIntegrity, ScalarType,
 };
 use enumflags2::BitFlags;
-use native_types::{CockroachType::{self, *}, NativeType};
+use native_types::{
+    CockroachType::{self, *},
+    NativeType,
+};
 
 const SMALL_INT_TYPE_NAME: &str = "SmallInt";
 const INTEGER_TYPE_NAME: &str = "Integer";
@@ -187,7 +189,8 @@ impl Connector for CockroachDatamodelConnector {
         _scalar_type: &ScalarType,
         errors: &mut Vec<ConnectorError>,
     ) {
-        let native_type: CockroachType = native_type_instance.deserialize_native_type();
+        let native_type: CockroachType =
+            serde_json::from_value(native_type_instance.serialized_native_type.clone()).unwrap();
         let error = self.native_instance_error(native_type_instance);
 
         match native_type {
