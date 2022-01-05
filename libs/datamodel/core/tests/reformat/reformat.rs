@@ -1214,3 +1214,65 @@ fn reformatting_with_empty_indexes() {
     let result = Reformatter::new(schema).reformat_to_string();
     expected.assert_eq(&result);
 }
+
+#[test]
+fn test_composite_types_in_models() {
+    let input = indoc! {r#"
+        datasource db {
+          provider = "mongodb"
+          url      = "mongodb://prisma:prisma@127.0.0.1:27017/test?authSource=admin"
+        }
+
+        generator js {
+          previewFeatures = ["mongodb"]
+          provider        = "prisma-client-js"
+        }
+
+        model A {
+          id String @id @default(dbgenerated()) @map("_id") @db.ObjectId
+          b  B
+          c  C[]
+        }
+
+        type B {
+          b_1 String
+          b_2 Int
+        }
+
+        type C {
+          b_1 String
+          b_2 Int
+        }
+    "#};
+
+    let expected = expect![[r#"
+        datasource db {
+          provider = "mongodb"
+          url      = "mongodb://prisma:prisma@127.0.0.1:27017/test?authSource=admin"
+        }
+
+        generator js {
+          previewFeatures = ["mongodb"]
+          provider        = "prisma-client-js"
+        }
+
+        model A {
+          id String @id @default(dbgenerated()) @map("_id") @db.ObjectId
+          b  B
+          c  C[]
+        }
+
+        type B {
+          b_1 String
+          b_2 Int
+        }
+
+        type C {
+          b_1 String
+          b_2 Int
+        }
+    "#]];
+
+    let result = Reformatter::new(input).reformat_to_string();
+    expected.assert_eq(&result);
+}
