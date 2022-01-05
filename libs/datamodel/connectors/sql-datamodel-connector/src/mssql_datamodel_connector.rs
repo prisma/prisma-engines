@@ -3,12 +3,11 @@ use datamodel_connector::{
     helper::{arg_vec_from_opt, args_vec_from_opt, parse_one_opt_u32, parse_two_opt_u32},
     parser_database::{self, ScalarType},
     walker_ext_traits::*,
-    Connector, ConnectorCapability, ConstraintScope, Diagnostics, NativeTypeConstructor, ReferentialAction,
-    ReferentialIntegrity,
+    Connector, ConnectorCapability, ConstraintScope, Diagnostics, NativeTypeConstructor, NativeTypeInstance,
+    ReferentialAction, ReferentialIntegrity,
 };
-use dml::native_type_instance::NativeTypeInstance;
 use enumflags2::BitFlags;
-use native_types::{MsSqlType, MsSqlTypeParameter};
+use native_types::{MsSqlType, MsSqlTypeParameter, NativeType};
 use once_cell::sync::Lazy;
 use std::borrow::Cow;
 
@@ -228,7 +227,7 @@ impl Connector for MsSqlDatamodelConnector {
         _scalar_type: &ScalarType,
         errors: &mut Vec<ConnectorError>,
     ) {
-        let r#type: MsSqlType = native_type.deserialize_native_type();
+        let r#type: MsSqlType = serde_json::from_value(native_type.serialized_native_type.clone()).unwrap();
         let error = self.native_instance_error(native_type);
 
         match r#type {
@@ -273,7 +272,7 @@ impl Connector for MsSqlDatamodelConnector {
         for index in model.indexes() {
             for field in index.fields() {
                 if let Some(native_type) = field.native_type_instance(self) {
-                    let r#type: MsSqlType = native_type.deserialize_native_type();
+                    let r#type: MsSqlType = serde_json::from_value(native_type.serialized_native_type.clone()).unwrap();
                     let error = self.native_instance_error(&native_type);
 
                     if heap_allocated_types().contains(&r#type) {
@@ -291,7 +290,7 @@ impl Connector for MsSqlDatamodelConnector {
         if let Some(pk) = model.primary_key() {
             for id_field in pk.fields() {
                 if let Some(native_type) = id_field.native_type_instance(self) {
-                    let r#type: MsSqlType = native_type.deserialize_native_type();
+                    let r#type: MsSqlType = serde_json::from_value(native_type.serialized_native_type.clone()).unwrap();
 
                     if heap_allocated_types().contains(&r#type) {
                         push_error(
@@ -355,7 +354,7 @@ impl Connector for MsSqlDatamodelConnector {
             _ => return Err(ConnectorError::new_native_type_parser_error(name)),
         };
 
-        Ok(NativeTypeInstance::new(name, cloned_args, &native_type))
+        Ok(NativeTypeInstance::new(name, cloned_args, native_type.to_json()))
     }
 
     fn introspect_native_type(&self, native_type: serde_json::Value) -> Result<NativeTypeInstance, ConnectorError> {
@@ -396,7 +395,7 @@ impl Connector for MsSqlDatamodelConnector {
             Ok(NativeTypeInstance::new(
                 constructor.name,
                 stringified_args,
-                &native_type,
+                native_type.to_json(),
             ))
         } else {
             Err(self.native_str_error(constructor_name).native_type_name_unknown())

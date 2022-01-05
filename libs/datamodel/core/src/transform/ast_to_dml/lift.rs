@@ -355,7 +355,7 @@ impl<'a> LiftAstToDml<'a> {
             field.is_updated_at = scalar_field.is_updated_at();
             field.database_name = scalar_field.mapped_name().map(String::from);
             field.default_value = scalar_field.default_value().map(|d| dml::DefaultValue {
-                kind: d.dml_default_kind(),
+                kind: dml_default_kind(d),
                 db_name: Some(d.constraint_name(self.connector).into())
                     .filter(|_| self.connector.supports_named_default_values()),
             });
@@ -426,7 +426,7 @@ impl<'a> LiftAstToDml<'a> {
                 dml::FieldType::Scalar(
                     parser_database_scalar_type_to_dml_scalar_type(*scalar_type),
                     None,
-                    native_type,
+                    native_type.map(datamodel_connector_native_type_to_dml_native_type),
                 )
             }
         }
@@ -468,4 +468,67 @@ fn parser_database_referential_action_to_dml_referential_action(
 
 fn parser_database_scalar_type_to_dml_scalar_type(st: parser_database::ScalarType) -> dml::ScalarType {
     st.as_str().parse().unwrap()
+}
+
+fn datamodel_connector_native_type_to_dml_native_type(
+    instance: datamodel_connector::NativeTypeInstance,
+) -> dml::NativeTypeInstance {
+    dml::NativeTypeInstance {
+        name: instance.name,
+        args: instance.args,
+        serialized_native_type: instance.serialized_native_type,
+    }
+}
+
+fn dml_default_kind(default_value: DefaultValueWalker<'_, '_>) -> dml::DefaultKind {
+    use crate::dml::{DefaultKind, PrismaValue, ValueGenerator};
+    use parser_database::ScalarType;
+
+    // This has all been validated in parser-database, so unwrapping is always safe.
+    match default_value.value() {
+        ast::Expression::Function(funcname, args, _) if funcname == "dbgenerated" => {
+            DefaultKind::Expression(ValueGenerator::new_dbgenerated(
+                args.arguments
+                    .get(0)
+                    .and_then(|arg| arg.value.as_string_value())
+                    .map(|(val, _)| val.to_owned())
+                    .unwrap_or_else(String::new),
+            ))
+        }
+        ast::Expression::Function(funcname, _args, _) if funcname == "autoincrement" => {
+            DefaultKind::Expression(ValueGenerator::new_autoincrement())
+        }
+        ast::Expression::Function(funcname, _args, _) if funcname == "uuid" => {
+            DefaultKind::Expression(ValueGenerator::new_uuid())
+        }
+        ast::Expression::Function(funcname, _args, _) if funcname == "cuid" => {
+            DefaultKind::Expression(ValueGenerator::new_cuid())
+        }
+        ast::Expression::Function(funcname, _args, _) if funcname == "now" => {
+            DefaultKind::Expression(ValueGenerator::new_now())
+        }
+        ast::Expression::NumericValue(num, _) => match default_value.field().scalar_type() {
+            Some(ScalarType::Int) => DefaultKind::Single(PrismaValue::Int(num.parse().unwrap())),
+            Some(ScalarType::BigInt) => DefaultKind::Single(PrismaValue::BigInt(num.parse().unwrap())),
+            Some(ScalarType::Float) => DefaultKind::Single(PrismaValue::Float(num.parse().unwrap())),
+            Some(ScalarType::Decimal) => DefaultKind::Single(PrismaValue::Float(num.parse().unwrap())),
+            other => unreachable!("{:?}", other),
+        },
+        ast::Expression::ConstantValue(v, _) => match default_value.field().scalar_type() {
+            Some(ScalarType::Boolean) => DefaultKind::Single(PrismaValue::Boolean(v.parse().unwrap())),
+            None => DefaultKind::Single(PrismaValue::Enum(v.to_owned())),
+            other => unreachable!("{:?}", other),
+        },
+        ast::Expression::StringValue(v, _) => match default_value.field().scalar_type() {
+            Some(ScalarType::DateTime) => DefaultKind::Single(PrismaValue::DateTime(v.parse().unwrap())),
+            Some(ScalarType::String) => DefaultKind::Single(PrismaValue::String(v.parse().unwrap())),
+            Some(ScalarType::Json) => DefaultKind::Single(PrismaValue::Json(v.parse().unwrap())),
+            Some(ScalarType::Decimal) => DefaultKind::Single(PrismaValue::Float(v.parse().unwrap())),
+            Some(ScalarType::Bytes) => {
+                DefaultKind::Single(PrismaValue::Bytes(::dml::prisma_value::decode_bytes(v).unwrap()))
+            }
+            other => unreachable!("{:?}", other),
+        },
+        other => unreachable!("{:?}", other),
+    }
 }

@@ -1,8 +1,5 @@
 use crate::Connector;
 use diagnostics::{DatamodelError, Span};
-use dml::model::{IndexDefinition, Model};
-use dml::relation_info::RelationInfo;
-use dml::{model::PrimaryKeyDefinition, traits::WithDatabaseName};
 
 pub struct ConstraintNames;
 
@@ -34,11 +31,7 @@ impl ConstraintNames {
     /// seq for sequences
     ///
 
-    pub fn primary_key_name_matches(pk: &PrimaryKeyDefinition, model: &Model, connector: &dyn Connector) -> bool {
-        pk.db_name.as_ref().unwrap() == &ConstraintNames::primary_key_name(model.final_database_name(), connector)
-    }
-
-    pub(crate) fn primary_key_name(table_name: &str, connector: &dyn Connector) -> String {
+    pub fn primary_key_name(table_name: &str, connector: &dyn Connector) -> String {
         let suffix = "_pkey";
         let limit = connector.max_identifier_length();
 
@@ -51,28 +44,12 @@ impl ConstraintNames {
         format!("{}{}", trimmed, suffix)
     }
 
-    pub fn index_name_matches(idx: &IndexDefinition, model: &Model, connector: &dyn Connector) -> bool {
-        let column_names: Vec<&str> = idx
-            .fields
-            .iter()
-            .map(|field| model.find_scalar_field(&field.name).unwrap().final_database_name())
-            .collect();
-
-        let expected = if idx.is_unique() {
-            Self::unique_index_name(model.final_database_name(), &column_names, connector)
-        } else {
-            Self::non_unique_index_name(model.final_database_name(), &column_names, connector)
-        };
-
-        idx.db_name.as_deref().unwrap() == expected
-    }
-
-    pub(crate) fn unique_index_name(table_name: &str, column_names: &[&str], connector: &dyn Connector) -> String {
+    pub fn unique_index_name(table_name: &str, column_names: &[&str], connector: &dyn Connector) -> String {
         const UNIQUE_SUFFIX: &str = "_key";
         Self::index_name_impl(table_name, column_names, UNIQUE_SUFFIX, connector)
     }
 
-    pub(crate) fn non_unique_index_name(table_name: &str, column_names: &[&str], connector: &dyn Connector) -> String {
+    pub fn non_unique_index_name(table_name: &str, column_names: &[&str], connector: &dyn Connector) -> String {
         const INDEX_SUFFIX: &str = "_idx";
         Self::index_name_impl(table_name, column_names, INDEX_SUFFIX, connector)
     }
@@ -116,32 +93,7 @@ impl ConstraintNames {
         format!("{}_df", trimmed)
     }
 
-    pub fn foreign_key_name_matches(ri: &RelationInfo, model: &Model, connector: &dyn Connector) -> bool {
-        let column_names: Vec<&str> = ri
-            .fields
-            .iter()
-            .map(|field_name| {
-                // We cannot unwrap here, due to us re-introspecting relations
-                // and if we're not using foreign keys, we might copy a relation
-                // that is not valid anymore. We still want to write that to the
-                // file and let user fix it, but if we unwrap here, we will
-                // panic.
-                model
-                    .find_scalar_field(field_name)
-                    .map(|field| field.final_database_name())
-                    .unwrap_or(field_name)
-            })
-            .collect();
-
-        ri.fk_name.as_ref().unwrap()
-            == &ConstraintNames::foreign_key_constraint_name(model.final_database_name(), &column_names, connector)
-    }
-
-    pub(crate) fn foreign_key_constraint_name(
-        table_name: &str,
-        column_names: &[&str],
-        connector: &dyn Connector,
-    ) -> String {
+    pub fn foreign_key_constraint_name(table_name: &str, column_names: &[&str], connector: &dyn Connector) -> String {
         let fk_suffix = "_fkey";
         let limit = connector.max_identifier_length();
 

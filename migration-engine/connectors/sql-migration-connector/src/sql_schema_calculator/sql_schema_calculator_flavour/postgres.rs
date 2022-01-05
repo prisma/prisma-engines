@@ -15,7 +15,7 @@ impl SqlSchemaCalculatorFlavour for PostgresFlavour {
     }
 
     fn default_native_type_for_scalar_type(&self, scalar_type: &ScalarType) -> serde_json::Value {
-        sql_datamodel_connector::SqlDatamodelConnectors::POSTGRES.default_native_type_for_scalar_type(scalar_type)
+        sql_datamodel_connector::POSTGRES.default_native_type_for_scalar_type(scalar_type)
     }
 
     fn enum_column_type(&self, field: &ScalarFieldWalker<'_>, db_name: &str) -> sql::ColumnType {

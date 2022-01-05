@@ -2,14 +2,13 @@ mod mongodb_types;
 
 use datamodel_connector::{
     connector_error::{ConnectorError, ErrorKind},
-    parser_database::walkers::*,
-    walker_ext_traits::*,
-    Connector, ConnectorCapability, NativeTypeConstructor, ReferentialAction, ReferentialIntegrity, ScalarType,
+    parser_database::{ast::Expression, walkers::*},
+    Connector, ConnectorCapability, NativeTypeConstructor, NativeTypeInstance, ReferentialAction, ReferentialIntegrity,
+    ScalarType,
 };
-use dml::{default_value::DefaultKind, native_type_instance::NativeTypeInstance};
 use enumflags2::BitFlags;
 use mongodb_types::*;
-use native_types::MongoDbType;
+use native_types::{MongoDbType, NativeType};
 use std::result::Result as StdResult;
 
 const CAPABILITIES: &[ConnectorCapability] = &[
@@ -105,7 +104,7 @@ impl Connector for MongoDbDatamodelConnector {
             }
 
             if field.raw_native_type().is_none()
-                && matches!(field.default_value().map(|v| v.dml_default_kind()), Some(DefaultKind::Expression(expr)) if expr.is_dbgenerated())
+                && matches!(field.default_value().map(|v| v.value()), Some(Expression::Function(fn_name,_,_)) if fn_name == "dbgenerated")
             {
                 push_error(ConnectorError::from_kind(ErrorKind::FieldValidationError {
                     field: field.name().to_owned(),
@@ -139,20 +138,13 @@ impl Connector for MongoDbDatamodelConnector {
         &native_type == default_native_type
     }
 
-    fn parse_native_type(
-        &self,
-        name: &str,
-        args: Vec<String>,
-    ) -> Result<dml::native_type_instance::NativeTypeInstance> {
+    fn parse_native_type(&self, name: &str, args: Vec<String>) -> Result<NativeTypeInstance> {
         let mongo_type = mongo_type_from_input(name, &args)?;
 
-        Ok(NativeTypeInstance::new(name, args, &mongo_type))
+        Ok(NativeTypeInstance::new(name, args, mongo_type.to_json()))
     }
 
-    fn introspect_native_type(
-        &self,
-        _native_type: serde_json::Value,
-    ) -> Result<dml::native_type_instance::NativeTypeInstance> {
+    fn introspect_native_type(&self, _native_type: serde_json::Value) -> Result<NativeTypeInstance> {
         // Out of scope for MVP
         todo!()
     }

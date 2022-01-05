@@ -444,7 +444,10 @@ impl<'a> ColumnAssertion<'a> {
     }
 
     pub fn assert_native_type(self, expected: &str, connector: &dyn Connector) -> Self {
-        let found = connector.render_native_type(self.column.tpe.native_type.clone().unwrap());
+        let found = connector
+            .introspect_native_type(self.column.tpe.native_type.clone().unwrap())
+            .unwrap()
+            .to_string();
         assert!(
             found == expected,
             "Assertion failed. Expected the column native type for `{}` to be `{:?}`, found `{:?}`",

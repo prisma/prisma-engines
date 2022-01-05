@@ -1,5 +1,3 @@
-use sql_datamodel_connector::SqlDatamodelConnectors;
-
 use super::*;
 use crate::datamodel_rendering::SqlDatamodelRenderer;
 
@@ -58,5 +56,5 @@ impl CockroachDbConnectorTag {
 }
 
 fn cockroachdb_capabilities() -> Vec<ConnectorCapability> {
-    SqlDatamodelConnectors::COCKROACH.capabilities().to_owned()
+    sql_datamodel_connector::COCKROACH.capabilities().to_owned()
 }

@@ -2,7 +2,6 @@ use super::datasource_provider::DatasourceProvider;
 use crate::common::provider_names::*;
 use datamodel_connector::Connector;
 use mongodb_datamodel_connector::MongoDbDatamodelConnector;
-use sql_datamodel_connector::SqlDatamodelConnectors;
 
 pub struct SqliteDatasourceProvider;
 
@@ -16,7 +15,7 @@ impl DatasourceProvider for SqliteDatasourceProvider {
     }
 
     fn connector(&self) -> &'static dyn Connector {
-        SqlDatamodelConnectors::SQLITE
+        sql_datamodel_connector::SQLITE
     }
 }
 
@@ -32,7 +31,7 @@ impl DatasourceProvider for CockroachDbDatasourceProvider {
     }
 
     fn connector(&self) -> &'static dyn Connector {
-        SqlDatamodelConnectors::COCKROACH
+        sql_datamodel_connector::COCKROACH
     }
 }
 
@@ -48,7 +47,7 @@ impl DatasourceProvider for PostgresDatasourceProvider {
     }
 
     fn connector(&self) -> &'static dyn Connector {
-        SqlDatamodelConnectors::POSTGRES
+        sql_datamodel_connector::POSTGRES
     }
 }
 
@@ -64,7 +63,7 @@ impl DatasourceProvider for MySqlDatasourceProvider {
     }
 
     fn connector(&self) -> &'static dyn Connector {
-        SqlDatamodelConnectors::MYSQL
+        sql_datamodel_connector::MYSQL
     }
 }
 
@@ -80,7 +79,7 @@ impl DatasourceProvider for MsSqlDatasourceProvider {
     }
 
     fn connector(&self) -> &'static dyn Connector {
-        SqlDatamodelConnectors::MSSQL
+        sql_datamodel_connector::MSSQL
     }
 }
 

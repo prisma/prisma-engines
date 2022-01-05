@@ -1,6 +1,6 @@
 use super::DestructiveChangeCheckerFlavour;
 use crate::{
-    flavour::MssqlFlavour,
+    flavour::{MssqlFlavour, SqlFlavour},
     pair::Pair,
     sql_destructive_change_checker::{
         destructive_check_plan::DestructiveCheckPlan, unexecutable_step_check::UnexecutableStepCheck,
@@ -9,7 +9,6 @@ use crate::{
     sql_migration::{AlterColumn, ColumnTypeChange},
     sql_schema_differ::ColumnChanges,
 };
-use sql_datamodel_connector::SqlDatamodelConnectors;
 use sql_schema_describer::walkers::ColumnWalker;
 
 #[async_trait::async_trait]
@@ -46,16 +45,8 @@ impl DestructiveChangeCheckerFlavour for MssqlFlavour {
         match type_change {
             Some(ColumnTypeChange::SafeCast) | None => (),
             Some(ColumnTypeChange::RiskyCast) => {
-                let datamodel_connector = SqlDatamodelConnectors::MSSQL;
-                let previous_type = match &columns.previous().column_type().native_type {
-                    Some(tpe) => datamodel_connector.render_native_type(tpe.clone()),
-                    _ => format!("{:?}", columns.previous().column_type_family()),
-                };
-
-                let next_type = match &columns.next().column_type().native_type {
-                    Some(tpe) => datamodel_connector.render_native_type(tpe.clone()),
-                    _ => format!("{:?}", columns.next().column_type_family()),
-                };
+                let previous_type = super::display_column_type(columns.previous, self.datamodel_connector());
+                let next_type = super::display_column_type(columns.next, self.datamodel_connector());
 
                 plan.push_warning(
                     SqlMigrationWarningCheck::RiskyCast {

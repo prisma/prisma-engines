@@ -141,6 +141,10 @@ impl SqlFlavour for MysqlFlavour {
         Ok(connection.raw_cmd(&query).await?)
     }
 
+    fn datamodel_connector(&self) -> &'static dyn datamodel::datamodel_connector::Connector {
+        sql_datamodel_connector::MYSQL
+    }
+
     async fn run_query_script(&self, sql: &str, connection: &Connection) -> ConnectorResult<()> {
         let convert_error = |error: my::Error| match self.convert_server_error(&error) {
             Some(e) => ConnectorError::from(e),

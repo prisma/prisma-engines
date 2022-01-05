@@ -119,6 +119,10 @@ impl SqlFlavour for PostgresFlavour {
         Ok(())
     }
 
+    fn datamodel_connector(&self) -> &'static dyn datamodel::datamodel_connector::Connector {
+        sql_datamodel_connector::POSTGRES
+    }
+
     async fn run_query_script(&self, sql: &str, connection: &Connection) -> ConnectorResult<()> {
         Ok(connection.raw_cmd(sql).await?)
     }

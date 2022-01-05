@@ -291,7 +291,7 @@ fn column_for_scalar_field(field: &ScalarFieldWalker<'_>, flavour: &dyn SqlFlavo
         }
         TypeWalker::Base(scalar_type) => (
             scalar_type,
-            flavour.default_native_type_for_scalar_type(&datamodel_connector::convert_from_scalar_type(scalar_type)),
+            flavour.default_native_type_for_scalar_type(&convert_from_scalar_type(scalar_type)),
         ),
         TypeWalker::NativeType(scalar_type, instance) => (scalar_type, instance.serialized_native_type.clone()),
         TypeWalker::Unsupported(description) => {
@@ -373,4 +373,21 @@ fn column_arity(arity: FieldArity) -> sql::ColumnArity {
 
 fn db_generated(default: &DefaultValue) -> Option<sql::DefaultValue> {
     default.db_generated_description().map(sql::DefaultValue::db_generated)
+}
+
+/// (temporary) bridge between dml::ScalarType and parser_database::ScalarType. Avoid
+/// relying on this if you can.
+fn convert_from_scalar_type(st: datamodel::dml::ScalarType) -> datamodel_connector::ScalarType {
+    use datamodel_connector::ScalarType;
+    match st {
+        datamodel::dml::ScalarType::Int => ScalarType::Int,
+        datamodel::dml::ScalarType::BigInt => ScalarType::BigInt,
+        datamodel::dml::ScalarType::Float => ScalarType::Float,
+        datamodel::dml::ScalarType::Boolean => ScalarType::Boolean,
+        datamodel::dml::ScalarType::String => ScalarType::String,
+        datamodel::dml::ScalarType::DateTime => ScalarType::DateTime,
+        datamodel::dml::ScalarType::Json => ScalarType::Json,
+        datamodel::dml::ScalarType::Bytes => ScalarType::Bytes,
+        datamodel::dml::ScalarType::Decimal => ScalarType::Decimal,
+    }
 }

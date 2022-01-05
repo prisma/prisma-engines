@@ -68,6 +68,9 @@ pub(crate) trait SqlFlavour:
     /// Initialize the `_prisma_migrations` table.
     async fn create_migrations_table(&self, connection: &Connection) -> ConnectorResult<()>;
 
+    /// The datamodel connector corresponding to the flavour
+    fn datamodel_connector(&self) -> &'static dyn datamodel::datamodel_connector::Connector;
+
     /// Drop the database for the provided URL on the server.
     async fn drop_database(&self, database_url: &str) -> ConnectorResult<()>;
 

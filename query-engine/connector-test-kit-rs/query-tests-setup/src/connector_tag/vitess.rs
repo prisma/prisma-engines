@@ -1,6 +1,5 @@
 use super::*;
 use crate::{SqlDatamodelRenderer, TestResult};
-use sql_datamodel_connector::SqlDatamodelConnectors;
 use std::{fmt::Display, str::FromStr};
 
 #[derive(Debug, Default, Clone)]
@@ -118,5 +117,5 @@ impl Display for VitessVersion {
 }
 
 fn vitess_capabilities() -> Vec<ConnectorCapability> {
-    SqlDatamodelConnectors::MYSQL.capabilities().to_owned()
+    sql_datamodel_connector::MYSQL.capabilities().to_owned()
 }

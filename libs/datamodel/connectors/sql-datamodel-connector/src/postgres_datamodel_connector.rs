@@ -3,12 +3,14 @@ use datamodel_connector::{
     helper::{arg_vec_from_opt, args_vec_from_opt, parse_one_opt_u32, parse_two_opt_u32},
     parser_database::walkers::ModelWalker,
     walker_ext_traits::*,
-    Connector, ConnectorCapability, ConstraintScope, Diagnostics, NativeTypeConstructor, ReferentialAction,
-    ReferentialIntegrity, ScalarType,
+    Connector, ConnectorCapability, ConstraintScope, Diagnostics, NativeTypeConstructor, NativeTypeInstance,
+    ReferentialAction, ReferentialIntegrity, ScalarType,
 };
-use dml::native_type_instance::NativeTypeInstance;
 use enumflags2::BitFlags;
-use native_types::PostgresType::{self, *};
+use native_types::{
+    NativeType,
+    PostgresType::{self, *},
+};
 
 const SMALL_INT_TYPE_NAME: &str = "SmallInt";
 const INTEGER_TYPE_NAME: &str = "Integer";
@@ -203,7 +205,8 @@ impl Connector for PostgresDatamodelConnector {
         _scalar_type: &ScalarType,
         errors: &mut Vec<ConnectorError>,
     ) {
-        let native_type: PostgresType = native_type_instance.deserialize_native_type();
+        let native_type: PostgresType =
+            serde_json::from_value(native_type_instance.serialized_native_type.clone()).unwrap();
         let error = self.native_instance_error(native_type_instance);
 
         match native_type {
@@ -234,7 +237,8 @@ impl Connector for PostgresDatamodelConnector {
         for index in model.indexes() {
             for field in index.fields() {
                 if let Some(native_type) = field.native_type_instance(self) {
-                    let r#type: PostgresType = native_type.deserialize_native_type();
+                    let r#type: PostgresType =
+                        serde_json::from_value(native_type.serialized_native_type.clone()).unwrap();
                     let error = self.native_instance_error(&native_type);
 
                     if r#type == PostgresType::Xml {
@@ -292,7 +296,7 @@ impl Connector for PostgresDatamodelConnector {
             _ => return Err(ConnectorError::new_native_type_parser_error(name)),
         };
 
-        Ok(NativeTypeInstance::new(name, cloned_args, &native_type))
+        Ok(NativeTypeInstance::new(name, cloned_args, native_type.to_json()))
     }
 
     fn introspect_native_type(&self, native_type: serde_json::Value) -> Result<NativeTypeInstance, ConnectorError> {
@@ -327,7 +331,7 @@ impl Connector for PostgresDatamodelConnector {
         };
 
         if let Some(constructor) = self.find_native_type_constructor(constructor_name) {
-            Ok(NativeTypeInstance::new(constructor.name, args, &native_type))
+            Ok(NativeTypeInstance::new(constructor.name, args, native_type.to_json()))
         } else {
             Err(self.native_str_error(constructor_name).native_type_name_unknown())
         }

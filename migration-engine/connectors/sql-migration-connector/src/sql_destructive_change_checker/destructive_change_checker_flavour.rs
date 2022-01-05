@@ -34,6 +34,17 @@ pub(crate) trait DestructiveChangeCheckerFlavour {
     async fn count_values_in_column(&self, table_and_column: (&str, &str), conn: &Connection) -> ConnectorResult<i64>;
 }
 
+/// Display a column type for warnings/errors.
+fn display_column_type(
+    column: sql_schema_describer::walkers::ColumnWalker<'_>,
+    connector: &dyn datamodel_connector::Connector,
+) -> String {
+    match &column.column_type().native_type {
+        Some(tpe) => connector.introspect_native_type(tpe.clone()).unwrap().to_string(),
+        _ => format!("{:?}", column.column_type_family()),
+    }
+}
+
 fn extract_table_rows_count(table_name: &str, result_set: quaint::prelude::ResultSet) -> ConnectorResult<i64> {
     result_set
         .first()
