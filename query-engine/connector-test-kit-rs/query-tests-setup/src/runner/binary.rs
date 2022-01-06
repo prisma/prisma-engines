@@ -72,7 +72,7 @@ impl RunnerInterface for BinaryRunner {
 
         if let Some(batch) = json_resp.get("batchResult") {
             let results = batch.as_array().unwrap();
-            let responses: Vec<GQLResponse> = results.iter().map(|result| json_to_gql_response(result)).collect();
+            let responses: Vec<GQLResponse> = results.iter().map(json_to_gql_response).collect();
             batch_response.insert_responses(responses);
         }
 
@@ -181,9 +181,8 @@ fn json_to_gql_response(json_resp: &serde_json::Value) -> GQLResponse {
     let mut gql_response = match json_resp.get("data") {
         Some(data_val) => {
             let obj = data_val.as_object().unwrap();
-            let keys: Vec<_> = obj.keys().collect();
 
-            let mut gql_response = GQLResponse::with_capacity(keys.len());
+            let mut gql_response = GQLResponse::with_capacity(obj.keys().count());
 
             obj.iter().for_each(|(k, v)| {
                 gql_response.insert_data(k.to_string(), query_core::Item::Json(v.clone()));

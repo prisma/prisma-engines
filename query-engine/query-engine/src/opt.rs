@@ -139,7 +139,7 @@ impl PrismaOpt {
         let datamodel_str = self.datamodel_str()?;
 
         let datasource_url_overrides: Vec<(String, String)> = if let Some(ref json) = self.overwrite_datasources {
-            let datasource_url_overrides: Vec<SourceOverride> = serde_json::from_str(&json)?;
+            let datasource_url_overrides: Vec<SourceOverride> = serde_json::from_str(json)?;
             datasource_url_overrides.into_iter().map(|x| (x.name, x.url)).collect()
         } else {
             vec![]
