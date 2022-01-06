@@ -124,8 +124,8 @@ pub(crate) struct ScalarField<'ast> {
 #[derive(Debug)]
 pub(crate) struct RelationField<'ast> {
     pub(crate) referenced_model: ast::ModelId,
-    pub(crate) on_delete: Option<crate::ReferentialAction>,
-    pub(crate) on_update: Option<crate::ReferentialAction>,
+    pub(crate) on_delete: Option<(crate::ReferentialAction, ast::Span)>,
+    pub(crate) on_update: Option<(crate::ReferentialAction, ast::Span)>,
     /// The fields _explicitly present_ in the AST.
     pub(crate) fields: Option<Vec<ast::FieldId>>,
     /// The `references` fields _explicitly present_ in the AST.

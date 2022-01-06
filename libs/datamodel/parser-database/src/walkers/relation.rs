@@ -363,7 +363,11 @@ impl<'ast, 'db> CompleteInlineRelationWalker<'ast, 'db> {
     pub fn on_update(self) -> ReferentialAction {
         use ReferentialAction::*;
 
-        self.referencing_field().attributes().on_update.unwrap_or(Cascade)
+        self.referencing_field()
+            .attributes()
+            .on_update
+            .map(|(action, _)| action)
+            .unwrap_or(Cascade)
     }
 
     /// Prisma allows setting the relation field as optional, even if one of the

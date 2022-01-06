@@ -684,7 +684,7 @@ fn visit_relation<'ast>(
     if let Some(on_delete) = args.optional_arg("onDelete") {
         match on_delete.as_referential_action() {
             Ok(action) => {
-                relation_field.on_delete = Some(action);
+                relation_field.on_delete = Some((action, on_delete.span()));
             }
             Err(err) => ctx.push_error(err),
         }
@@ -693,7 +693,7 @@ fn visit_relation<'ast>(
     if let Some(on_update) = args.optional_arg("onUpdate") {
         match on_update.as_referential_action() {
             Ok(action) => {
-                relation_field.on_update = Some(action);
+                relation_field.on_update = Some((action, on_update.span()));
             }
             Err(err) => ctx.push_error(err),
         }

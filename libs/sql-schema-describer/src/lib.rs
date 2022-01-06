@@ -269,6 +269,12 @@ pub enum SQLSortOrder {
     Desc,
 }
 
+impl Default for SQLSortOrder {
+    fn default() -> Self {
+        Self::Asc
+    }
+}
+
 impl AsRef<str> for SQLSortOrder {
     fn as_ref(&self) -> &str {
         match self {

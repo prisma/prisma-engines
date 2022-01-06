@@ -37,3 +37,22 @@ pub(crate) fn validate_singular_id(relation: ImplicitManyToManyRelationWalker<'_
         }
     }
 }
+
+pub(crate) fn validate_no_referential_actions(
+    relation: ImplicitManyToManyRelationWalker<'_, '_>,
+    ctx: &mut Context<'_>,
+) {
+    let referential_action_spans = [relation.field_a(), relation.field_b()].into_iter().flat_map(|field| {
+        field
+            .explicit_on_delete_span()
+            .into_iter()
+            .chain(field.explicit_on_update_span().into_iter())
+    });
+
+    for span in referential_action_spans {
+        ctx.push_error(DatamodelError::new_validation_error(
+            "Referential actions on many-to-many relations are not supported".to_owned(),
+            span,
+        ));
+    }
+}
