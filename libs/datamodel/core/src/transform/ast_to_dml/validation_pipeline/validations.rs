@@ -148,6 +148,7 @@ pub(super) fn validate(ctx: &mut Context<'_>, relation_transformation_enabled: b
             }
             RefinedRelationWalker::ImplicitManyToMany(relation) => {
                 relations::many_to_many::validate_singular_id(relation, ctx);
+                relations::many_to_many::validate_no_referential_actions(relation, ctx);
             }
         }
     }
