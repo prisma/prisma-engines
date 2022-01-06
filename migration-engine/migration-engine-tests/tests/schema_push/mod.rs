@@ -393,3 +393,24 @@ fn implicit_relations_indices_are_not_renamed_unnecessarily(api: TestApi) {
         .send_sync()
         .assert_migration_directories_count(1);
 }
+
+//Mysql
+#[test_connector(tags(Mysql), preview_features("extendedIndexes"))]
+fn creating_index_on_long_varchar_without_length_fails(api: TestApi) {
+    let plain_dm = r#"
+     model User {
+        id         String @db.VarChar(2000)
+
+        @@index([id])
+        @@unique([id])
+        @@id([id])
+     }
+     "#;
+
+    let err = api.schema_push_w_datasource(plain_dm).send_unwrap_err();
+
+    assert_eq!(
+        &err.to_string(),
+        "Specified key was too long; max key length is 3072 bytes\n"
+    );
+}
