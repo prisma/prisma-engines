@@ -61,12 +61,22 @@ impl<'ast, 'db> RelationFieldWalker<'ast, 'db> {
 
     /// The onDelete argument on the relation.
     pub fn explicit_on_delete(self) -> Option<ReferentialAction> {
-        self.attributes().on_delete
+        self.attributes().on_delete.map(|(action, _span)| action)
+    }
+
+    /// The onDelete argument on the relation.
+    pub fn explicit_on_delete_span(self) -> Option<ast::Span> {
+        self.attributes().on_delete.map(|(_action, span)| span)
     }
 
     /// The onUpdate argument on the relation.
     pub fn explicit_on_update(self) -> Option<ReferentialAction> {
-        self.attributes().on_update
+        self.attributes().on_update.map(|(action, _span)| action)
+    }
+
+    /// The onUpdate argument on the relation.
+    pub fn explicit_on_update_span(self) -> Option<ast::Span> {
+        self.attributes().on_update.map(|(_action, span)| span)
     }
 
     /// The relation name explicitly written in the schema source.
