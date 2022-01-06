@@ -55,22 +55,38 @@ pub(crate) fn completion(schema: &str, params: CompletionParams) -> CompletionLi
 /// the line.
 fn position_to_offset(position: &Position, document: &str) -> Option<usize> {
     let mut offset = 0;
+    let mut line_offset = position.line;
+    let mut character_offset = position.character;
+    let mut chars = document.chars();
 
-    for (line_idx, line) in document.lines().enumerate() {
-        if position.line == line_idx as u32 {
-            // We're on the right line.
-            return if position.character < line.len() as u32 {
-                Some(offset + position.character as usize)
-            } else {
-                None
-            };
+    while line_offset > 0 {
+        loop {
+            match chars.next() {
+                Some('\n') => {
+                    offset += 1;
+                    break;
+                }
+                Some(_) => {
+                    offset += 1;
+                }
+                None => return None,
+            }
         }
 
-        // Next line, but first add the current line to the offset.
-        offset += line.len() + 1; // don't forget the newline char!
+        line_offset -= 1;
     }
 
-    None
+    while character_offset > 0 {
+        match chars.next() {
+            Some('\n') | None => return None,
+            Some(_) => {
+                offset += 1;
+                character_offset -= 1;
+            }
+        }
+    }
+
+    Some(offset)
 }
 
 // Completion is implemented for:
@@ -112,4 +128,15 @@ fn push_ast_completions(
         }
         _ => (),
     }
+}
+
+// On Windows, a newline is actually two characters.
+#[test]
+fn position_to_offset_with_crlf() {
+    let schema = "\r\nmodel Test {\r\n    id Int @id\r\n}";
+    // Let's put the cursor on the "i" in "id Int".
+    let expected_offset = schema.chars().position(|c| c == 'i').unwrap();
+    let found_offset = position_to_offset(&Position { line: 2, character: 4 }, schema).unwrap();
+
+    assert_eq!(found_offset, expected_offset);
 }
