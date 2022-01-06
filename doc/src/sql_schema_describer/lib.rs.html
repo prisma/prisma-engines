@@ -736,6 +736,12 @@
 <span id="736">736</span>
 <span id="737">737</span>
 <span id="738">738</span>
+<span id="739">739</span>
+<span id="740">740</span>
+<span id="741">741</span>
+<span id="742">742</span>
+<span id="743">743</span>
+<span id="744">744</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Database description. This crate is used heavily in the introspection and migration engines.</span>
 <span class="attribute">#![<span class="ident">allow</span>(<span class="ident">clippy::trivial_regex</span>)]</span> <span class="comment">// this is allowed, because we want to do CoW replaces and these regexes will grow.</span>
 <span class="attribute">#![<span class="ident">allow</span>(<span class="ident">clippy::match_bool</span>)]</span> <span class="comment">// we respectfully disagree that it makes the code less readable.</span>
@@ -1005,6 +1011,12 @@
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">SQLSortOrder</span> {
     <span class="ident">Asc</span>,
     <span class="ident">Desc</span>,
+}
+
+<span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">SQLSortOrder</span> {
+    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
+        <span class="ident"><span class="self">Self</span>::Asc</span>
+    }
 }
 
 <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">SQLSortOrder</span> {
