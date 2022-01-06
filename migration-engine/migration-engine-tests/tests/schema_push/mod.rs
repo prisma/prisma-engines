@@ -1,3 +1,4 @@
+use indoc::indoc;
 use migration_engine_tests::test_api::*;
 use sql_schema_describer::ColumnTypeFamily;
 
@@ -392,4 +393,30 @@ fn implicit_relations_indices_are_not_renamed_unnecessarily(api: TestApi) {
     api.create_migration("no_op", &dm, &dir)
         .send_sync()
         .assert_migration_directories_count(1);
+}
+
+#[test_connector(tags(Mysql), preview_features("extendedIndexes"))]
+fn mysql_should_diff_column_ordering_correctly_issue_10983(api: TestApi) {
+    // https://github.com/prisma/prisma/issues/10983
+
+    let dm = indoc! {r#"
+        model a {
+          id Int       @id @default(autoincrement())
+          b  DateTime? @db.DateTime(6)
+
+          @@index([b], map: "IDX_b")
+        }
+    "#};
+
+    let ddl = r#"
+        CREATE TABLE `a` (
+          `id` int(11) NOT NULL AUTO_INCREMENT,
+          `b` datetime(6) DEFAULT NULL,
+          PRIMARY KEY (`id`),
+          KEY `IDX_b` (`b`)
+        )
+    "#;
+
+    api.raw_cmd(ddl);
+    api.schema_push_w_datasource(dm).send().assert_green().assert_no_steps();
 }
