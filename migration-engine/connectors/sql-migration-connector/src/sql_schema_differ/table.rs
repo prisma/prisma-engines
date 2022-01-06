@@ -168,7 +168,7 @@ fn indexes_match(first: &IndexWalker<'_>, second: &IndexWalker<'_>) -> bool {
         && left_cols.zip(right_cols).all(|(a, b)| {
             let names_match = a.as_column().name() == b.as_column().name();
             let lengths_match = a.length() == b.length();
-            let orders_match = a.sort_order() == b.sort_order();
+            let orders_match = a.sort_order().unwrap_or_default() == b.sort_order().unwrap_or_default();
 
             names_match && lengths_match && orders_match
         })
