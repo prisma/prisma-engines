@@ -1584,7 +1584,7 @@
     <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">on_delete</span>) <span class="op">=</span> <span class="ident">args</span>.<span class="ident">optional_arg</span>(<span class="string">&quot;onDelete&quot;</span>) {
         <span class="kw">match</span> <span class="ident">on_delete</span>.<span class="ident">as_referential_action</span>() {
             <span class="prelude-val">Ok</span>(<span class="ident">action</span>) =&gt; {
-                <span class="ident">relation_field</span>.<span class="ident">on_delete</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">action</span>);
+                <span class="ident">relation_field</span>.<span class="ident">on_delete</span> <span class="op">=</span> <span class="prelude-val">Some</span>((<span class="ident">action</span>, <span class="ident">on_delete</span>.<span class="ident">span</span>()));
             }
             <span class="prelude-val">Err</span>(<span class="ident">err</span>) =&gt; <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">err</span>),
         }
@@ -1593,7 +1593,7 @@
     <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">on_update</span>) <span class="op">=</span> <span class="ident">args</span>.<span class="ident">optional_arg</span>(<span class="string">&quot;onUpdate&quot;</span>) {
         <span class="kw">match</span> <span class="ident">on_update</span>.<span class="ident">as_referential_action</span>() {
             <span class="prelude-val">Ok</span>(<span class="ident">action</span>) =&gt; {
-                <span class="ident">relation_field</span>.<span class="ident">on_update</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">action</span>);
+                <span class="ident">relation_field</span>.<span class="ident">on_update</span> <span class="op">=</span> <span class="prelude-val">Some</span>((<span class="ident">action</span>, <span class="ident">on_update</span>.<span class="ident">span</span>()));
             }
             <span class="prelude-val">Err</span>(<span class="ident">err</span>) =&gt; <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">err</span>),
         }

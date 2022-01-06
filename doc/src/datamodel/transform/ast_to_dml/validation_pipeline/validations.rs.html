@@ -152,6 +152,7 @@
 <span id="152">152</span>
 <span id="153">153</span>
 <span id="154">154</span>
+<span id="155">155</span>
 </pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">autoincrement</span>;
 <span class="kw">mod</span> <span class="ident">composite_types</span>;
 <span class="kw">mod</span> <span class="ident">constraint_namespace</span>;
@@ -302,6 +303,7 @@
             }
             <span class="ident">RefinedRelationWalker::ImplicitManyToMany</span>(<span class="ident">relation</span>) =&gt; {
                 <span class="ident">relations::many_to_many::validate_singular_id</span>(<span class="ident">relation</span>, <span class="ident">ctx</span>);
+                <span class="ident">relations::many_to_many::validate_no_referential_actions</span>(<span class="ident">relation</span>, <span class="ident">ctx</span>);
             }
         }
     }

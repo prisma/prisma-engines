@@ -390,6 +390,10 @@
 <span id="390">390</span>
 <span id="391">391</span>
 <span id="392">392</span>
+<span id="393">393</span>
+<span id="394">394</span>
+<span id="395">395</span>
+<span id="396">396</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">ast</span>, <span class="ident">relations</span>::<span class="kw-2">*</span>, <span class="ident">walkers</span>::<span class="kw-2">*</span>, <span class="ident">ParserDatabase</span>, <span class="ident">ScalarFieldType</span>};
 
 <span class="doccomment">/// A relation that has the minimal amount of information for us to create one. Useful for</span>
@@ -755,7 +759,11 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">on_update</span>(<span class="self">self</span>) -&gt; <span class="ident">ReferentialAction</span> {
         <span class="kw">use</span> <span class="ident">ReferentialAction</span>::<span class="kw-2">*</span>;
 
-        <span class="self">self</span>.<span class="ident">referencing_field</span>().<span class="ident">attributes</span>().<span class="ident">on_update</span>.<span class="ident">unwrap_or</span>(<span class="ident">Cascade</span>)
+        <span class="self">self</span>.<span class="ident">referencing_field</span>()
+            .<span class="ident">attributes</span>()
+            .<span class="ident">on_update</span>
+            .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">action</span>, <span class="kw">_</span>)<span class="op">|</span> <span class="ident">action</span>)
+            .<span class="ident">unwrap_or</span>(<span class="ident">Cascade</span>)
     }
 
     <span class="doccomment">/// Prisma allows setting the relation field as optional, even if one of the</span>
