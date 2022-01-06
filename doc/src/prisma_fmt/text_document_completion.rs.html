@@ -113,6 +113,33 @@
 <span id="113">113</span>
 <span id="114">114</span>
 <span id="115">115</span>
+<span id="116">116</span>
+<span id="117">117</span>
+<span id="118">118</span>
+<span id="119">119</span>
+<span id="120">120</span>
+<span id="121">121</span>
+<span id="122">122</span>
+<span id="123">123</span>
+<span id="124">124</span>
+<span id="125">125</span>
+<span id="126">126</span>
+<span id="127">127</span>
+<span id="128">128</span>
+<span id="129">129</span>
+<span id="130">130</span>
+<span id="131">131</span>
+<span id="132">132</span>
+<span id="133">133</span>
+<span id="134">134</span>
+<span id="135">135</span>
+<span id="136">136</span>
+<span id="137">137</span>
+<span id="138">138</span>
+<span id="139">139</span>
+<span id="140">140</span>
+<span id="141">141</span>
+<span id="142">142</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">datamodel</span>::{
     <span class="ident">datamodel_connector</span>::{<span class="ident">Connector</span>, <span class="ident">ReferentialIntegrity</span>},
     <span class="ident">parse_configuration</span>, <span class="ident">parse_schema_ast</span>,
@@ -170,22 +197,38 @@
 <span class="doccomment">/// the line.</span>
 <span class="kw">fn</span> <span class="ident">position_to_offset</span>(<span class="ident">position</span>: <span class="kw-2">&amp;</span><span class="ident">Position</span>, <span class="ident">document</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">offset</span> <span class="op">=</span> <span class="number">0</span>;
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">line_offset</span> <span class="op">=</span> <span class="ident">position</span>.<span class="ident">line</span>;
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">character_offset</span> <span class="op">=</span> <span class="ident">position</span>.<span class="ident">character</span>;
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">chars</span> <span class="op">=</span> <span class="ident">document</span>.<span class="ident">chars</span>();
 
-    <span class="kw">for</span> (<span class="ident">line_idx</span>, <span class="ident">line</span>) <span class="kw">in</span> <span class="ident">document</span>.<span class="ident">lines</span>().<span class="ident">enumerate</span>() {
-        <span class="kw">if</span> <span class="ident">position</span>.<span class="ident">line</span> <span class="op">==</span> <span class="ident">line_idx</span> <span class="kw">as</span> <span class="ident">u32</span> {
-            <span class="comment">// We&#39;re on the right line.</span>
-            <span class="kw">return</span> <span class="kw">if</span> <span class="ident">position</span>.<span class="ident">character</span> <span class="op">&lt;</span> <span class="ident">line</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u32</span> {
-                <span class="prelude-val">Some</span>(<span class="ident">offset</span> <span class="op">+</span> <span class="ident">position</span>.<span class="ident">character</span> <span class="kw">as</span> <span class="ident">usize</span>)
-            } <span class="kw">else</span> {
-                <span class="prelude-val">None</span>
-            };
+    <span class="kw">while</span> <span class="ident">line_offset</span> <span class="op">&gt;</span> <span class="number">0</span> {
+        <span class="kw">loop</span> {
+            <span class="kw">match</span> <span class="ident">chars</span>.<span class="ident">next</span>() {
+                <span class="prelude-val">Some</span>(<span class="string">&#39;\n&#39;</span>) =&gt; {
+                    <span class="ident">offset</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
+                    <span class="kw">break</span>;
+                }
+                <span class="prelude-val">Some</span>(<span class="kw">_</span>) =&gt; {
+                    <span class="ident">offset</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
+                }
+                <span class="prelude-val">None</span> =&gt; <span class="kw">return</span> <span class="prelude-val">None</span>,
+            }
         }
 
-        <span class="comment">// Next line, but first add the current line to the offset.</span>
-        <span class="ident">offset</span> <span class="op">+</span><span class="op">=</span> <span class="ident">line</span>.<span class="ident">len</span>() <span class="op">+</span> <span class="number">1</span>; <span class="comment">// don&#39;t forget the newline char!</span>
+        <span class="ident">line_offset</span> <span class="op">-</span><span class="op">=</span> <span class="number">1</span>;
     }
 
-    <span class="prelude-val">None</span>
+    <span class="kw">while</span> <span class="ident">character_offset</span> <span class="op">&gt;</span> <span class="number">0</span> {
+        <span class="kw">match</span> <span class="ident">chars</span>.<span class="ident">next</span>() {
+            <span class="prelude-val">Some</span>(<span class="string">&#39;\n&#39;</span>) <span class="op">|</span> <span class="prelude-val">None</span> =&gt; <span class="kw">return</span> <span class="prelude-val">None</span>,
+            <span class="prelude-val">Some</span>(<span class="kw">_</span>) =&gt; {
+                <span class="ident">offset</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
+                <span class="ident">character_offset</span> <span class="op">-</span><span class="op">=</span> <span class="number">1</span>;
+            }
+        }
+    }
+
+    <span class="prelude-val">Some</span>(<span class="ident">offset</span>)
 }
 
 <span class="comment">// Completion is implemented for:</span>
@@ -227,6 +270,17 @@
         }
         <span class="kw">_</span> =&gt; (),
     }
+}
+
+<span class="comment">// On Windows, a newline is actually two characters.</span>
+<span class="attribute">#[<span class="ident">test</span>]</span>
+<span class="kw">fn</span> <span class="ident">position_to_offset_with_crlf</span>() {
+    <span class="kw">let</span> <span class="ident">schema</span> <span class="op">=</span> <span class="string">&quot;\r\nmodel Test {\r\n    id Int @id\r\n}&quot;</span>;
+    <span class="comment">// Let&#39;s put the cursor on the &quot;i&quot; in &quot;id Int&quot;.</span>
+    <span class="kw">let</span> <span class="ident">expected_offset</span> <span class="op">=</span> <span class="ident">schema</span>.<span class="ident">chars</span>().<span class="ident">position</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span> <span class="op">==</span> <span class="string">&#39;i&#39;</span>).<span class="ident">unwrap</span>();
+    <span class="kw">let</span> <span class="ident">found_offset</span> <span class="op">=</span> <span class="ident">position_to_offset</span>(<span class="kw-2">&amp;</span><span class="ident">Position</span> { <span class="ident">line</span>: <span class="number">2</span>, <span class="ident">character</span>: <span class="number">4</span> }, <span class="ident">schema</span>).<span class="ident">unwrap</span>();
+
+    <span class="macro">assert_eq!</span>(<span class="ident">found_offset</span>, <span class="ident">expected_offset</span>);
 }
 </code></pre></div>
 </section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="prisma_fmt" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>
