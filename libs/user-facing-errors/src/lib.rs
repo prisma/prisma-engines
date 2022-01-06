@@ -7,11 +7,13 @@ pub mod migration_engine;
 pub mod quaint;
 pub mod query_engine;
 
+use std::borrow::Cow;
+
 pub use panic_hook::set_panic_hook;
 
 mod panic_hook;
 
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 
 pub trait UserFacingError: serde::Serialize {
     const ERROR_CODE: &'static str;
@@ -19,11 +21,11 @@ pub trait UserFacingError: serde::Serialize {
     fn message(&self) -> String;
 }
 
-#[derive(Serialize, Clone, PartialEq, Debug)]
+#[derive(Serialize, Deserialize, Clone, PartialEq, Debug)]
 pub struct KnownError {
     pub message: String,
     pub meta: serde_json::Value,
-    pub error_code: &'static str,
+    pub error_code: Cow<'static, str>,
 }
 
 impl KnownError {
@@ -31,25 +33,25 @@ impl KnownError {
         KnownError {
             message: inner.message(),
             meta: serde_json::to_value(&inner).expect("Failed to render user facing error metadata to JSON"),
-            error_code: T::ERROR_CODE,
+            error_code: Cow::from(T::ERROR_CODE),
         }
     }
 }
 
-#[derive(Serialize, PartialEq, Debug, Clone)]
+#[derive(Serialize, Deserialize, PartialEq, Debug, Clone)]
 pub struct UnknownError {
     pub message: String,
     pub backtrace: Option<String>,
 }
 
-#[derive(Serialize, PartialEq, Debug, Clone)]
+#[derive(Serialize, Deserialize, PartialEq, Debug, Clone)]
 pub struct Error {
     is_panic: bool,
     #[serde(flatten)]
     inner: ErrorType,
 }
 
-#[derive(Serialize, PartialEq, Debug, Clone)]
+#[derive(Serialize, Deserialize, PartialEq, Debug, Clone)]
 #[serde(untagged)]
 enum ErrorType {
     Known(KnownError),

@@ -26,3 +26,12 @@ pub enum PrismaResponse {
     Single(GQLResponse),
     Multi(GQLBatchResponse),
 }
+
+impl PrismaResponse {
+    pub fn errors(&self) -> Vec<&GQLError> {
+        match self {
+            PrismaResponse::Single(ref s) => s.errors().collect(),
+            PrismaResponse::Multi(ref m) => m.errors().collect(),
+        }
+    }
+}

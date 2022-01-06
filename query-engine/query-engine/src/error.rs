@@ -72,7 +72,7 @@ impl From<PrismaError> for user_facing_errors::Error {
 }
 
 impl PrismaError {
-    pub(crate) fn render_as_json(self) -> Result<(), anyhow::Error> {
+    pub fn render_as_json(self) -> Result<(), anyhow::Error> {
         use std::io::Write as _;
 
         let error = user_facing_errors::Error::from(self);

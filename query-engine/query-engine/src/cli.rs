@@ -39,7 +39,7 @@ pub enum CliCommand {
 
 impl CliCommand {
     /// Create a CLI command from a `PrismaOpt` instance.
-    pub(crate) fn from_opt(opts: &PrismaOpt) -> crate::PrismaResult<Option<CliCommand>> {
+    pub fn from_opt(opts: &PrismaOpt) -> crate::PrismaResult<Option<CliCommand>> {
         let subcommand = opts.subcommand.as_ref();
         let subcommand = match subcommand {
             Some(cmd) => cmd,

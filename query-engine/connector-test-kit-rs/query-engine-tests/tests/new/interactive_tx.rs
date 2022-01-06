@@ -1,15 +1,15 @@
 use query_engine_tests::test_suite;
+use std::borrow::Cow;
 
 /// Note that if cache expiration tests fail, make sure `CLOSED_TX_CLEANUP` is set correctly (low value like 2) from the .envrc.
 #[test_suite(schema(generic))]
 mod interactive_tx {
-    use query_core::TransactionError;
     use query_engine_tests::*;
     use tokio::time;
 
     #[connector_test]
     async fn basic_commit_workflow(mut runner: Runner) -> TestResult<()> {
-        let tx_id = runner.executor().start_tx(5000, 5000).await?;
+        let tx_id = runner.start_tx(5000, 5000).await?;
         runner.set_active_tx(tx_id.clone());
 
         insta::assert_snapshot!(
@@ -22,7 +22,8 @@ mod interactive_tx {
           @r###"{"data":{"updateOneTestModel":{"field":"updated"}}}"###
         );
 
-        runner.executor().commit_tx(tx_id).await?;
+        let res = runner.commit_tx(tx_id).await?;
+        assert!(res.is_ok());
         runner.clear_active_tx();
 
         insta::assert_snapshot!(
@@ -35,7 +36,7 @@ mod interactive_tx {
 
     #[connector_test]
     async fn basic_rollback_workflow(mut runner: Runner) -> TestResult<()> {
-        let tx_id = runner.executor().start_tx(5000, 5000).await?;
+        let tx_id = runner.start_tx(5000, 5000).await?;
         runner.set_active_tx(tx_id.clone());
 
         insta::assert_snapshot!(
@@ -48,7 +49,8 @@ mod interactive_tx {
           @r###"{"data":{"updateOneTestModel":{"field":"updated"}}}"###
         );
 
-        runner.executor().rollback_tx(tx_id).await?;
+        let res = runner.rollback_tx(tx_id).await?;
+        assert!(res.is_ok());
         runner.clear_active_tx();
 
         insta::assert_snapshot!(
@@ -62,7 +64,7 @@ mod interactive_tx {
     #[connector_test]
     async fn tx_expiration_cycle(mut runner: Runner) -> TestResult<()> {
         // Tx expires after one second.
-        let tx_id = runner.executor().start_tx(5000, 1000).await?;
+        let tx_id = runner.start_tx(5000, 1000).await?;
         runner.set_active_tx(tx_id.clone());
 
         insta::assert_snapshot!(
@@ -80,28 +82,22 @@ mod interactive_tx {
         );
 
         // Status of the tx must be `Expired`
-        let res = runner.executor().commit_tx(tx_id.clone()).await;
+        let res = runner.commit_tx(tx_id.clone()).await?;
 
-        if let Err(query_core::CoreError::TransactionError(txe)) = res {
-            assert_eq!(
-                txe,
-                TransactionError::Closed {
-                    reason: "Transaction is no longer valid. Last state: 'Expired'".to_string()
-                }
-            );
-        } else {
-            panic!("Expected error, got success.");
-        }
+        let error = res.err().unwrap();
+        let known_err = error.as_known().unwrap();
+
+        assert_eq!(known_err.error_code, Cow::Borrowed("P2028"));
+        assert!(known_err.message.contains("Transaction is no longer valid. Last state"));
 
         // Wait for cache eviction, no tx should be found.
         time::sleep(time::Duration::from_secs(2)).await;
-        let res = runner.executor().commit_tx(tx_id).await;
+        let res = runner.commit_tx(tx_id).await?;
+        let error = res.err().unwrap();
+        let known_err = error.as_known().unwrap();
 
-        if let Err(query_core::CoreError::TransactionError(txe)) = res {
-            assert_eq!(txe, TransactionError::NotFound);
-        } else {
-            panic!("Expected error, got success.");
-        }
+        assert_eq!(known_err.error_code, Cow::Borrowed("P2028"));
+        assert!(known_err.message.contains("Transaction not found."));
 
         Ok(())
     }
@@ -109,7 +105,7 @@ mod interactive_tx {
     #[connector_test]
     async fn no_auto_rollback(mut runner: Runner) -> TestResult<()> {
         // Tx expires after five second.
-        let tx_id = runner.executor().start_tx(5000, 5000).await?;
+        let tx_id = runner.start_tx(5000, 5000).await?;
         runner.set_active_tx(tx_id.clone());
 
         // Row is created
@@ -126,7 +122,7 @@ mod interactive_tx {
         );
 
         // Commit TX, first written row must still be present.
-        let res = runner.executor().commit_tx(tx_id.clone()).await;
+        let res = runner.commit_tx(tx_id.clone()).await?;
         assert!(res.is_ok());
 
         Ok(())
@@ -136,7 +132,7 @@ mod interactive_tx {
     #[connector_test(only(Postgres))]
     async fn raw_queries(mut runner: Runner) -> TestResult<()> {
         // Tx expires after five second.
-        let tx_id = runner.executor().start_tx(5000, 5000).await?;
+        let tx_id = runner.start_tx(5000, 5000).await?;
         runner.set_active_tx(tx_id.clone());
 
         insta::assert_snapshot!(
@@ -149,7 +145,8 @@ mod interactive_tx {
           @r###"{"data":{"queryRaw":[{"id":1,"field":"Test"}]}}"###
         );
 
-        runner.executor().commit_tx(tx_id.clone()).await?;
+        let res = runner.commit_tx(tx_id.clone()).await?;
+        assert!(res.is_ok());
         runner.clear_active_tx();
 
         // Data still there after commit.
@@ -164,7 +161,7 @@ mod interactive_tx {
     #[connector_test]
     async fn batch_queries_success(mut runner: Runner) -> TestResult<()> {
         // Tx expires after five second.
-        let tx_id = runner.executor().start_tx(5000, 5000).await?;
+        let tx_id = runner.start_tx(5000, 5000).await?;
         runner.set_active_tx(tx_id.clone());
 
         let queries = vec![
@@ -175,7 +172,8 @@ mod interactive_tx {
 
         // Tx flag is not set, but it executes on an ITX.
         runner.batch(queries, false).await?;
-        runner.executor().commit_tx(tx_id.clone()).await?;
+        let res = runner.commit_tx(tx_id.clone()).await?;
+        assert!(res.is_ok());
         runner.clear_active_tx();
 
         insta::assert_snapshot!(
@@ -189,7 +187,7 @@ mod interactive_tx {
     #[connector_test]
     async fn batch_queries_rollback(mut runner: Runner) -> TestResult<()> {
         // Tx expires after five second.
-        let tx_id = runner.executor().start_tx(5000, 5000).await?;
+        let tx_id = runner.start_tx(5000, 5000).await?;
         runner.set_active_tx(tx_id.clone());
 
         let queries = vec![
@@ -200,7 +198,8 @@ mod interactive_tx {
 
         // Tx flag is not set, but it executes on an ITX.
         runner.batch(queries, false).await?;
-        runner.executor().rollback_tx(tx_id.clone()).await?;
+        let res = runner.rollback_tx(tx_id.clone()).await?;
+        assert!(res.is_ok());
         runner.clear_active_tx();
 
         insta::assert_snapshot!(
@@ -214,7 +213,7 @@ mod interactive_tx {
     #[connector_test]
     async fn batch_queries_failure(mut runner: Runner) -> TestResult<()> {
         // Tx expires after five second.
-        let tx_id = runner.executor().start_tx(5000, 5000).await?;
+        let tx_id = runner.start_tx(5000, 5000).await?;
         runner.set_active_tx(tx_id.clone());
 
         // One dup key, will cause failure of the batch.
@@ -229,7 +228,8 @@ mod interactive_tx {
         let batch_results = runner.batch(queries, false).await?;
         batch_results.assert_failure(2002, None);
 
-        runner.executor().commit_tx(tx_id.clone()).await?;
+        let res = runner.commit_tx(tx_id.clone()).await?;
+        assert!(res.is_ok());
         runner.clear_active_tx();
 
         match_connector_result!(
@@ -247,7 +247,7 @@ mod interactive_tx {
     #[connector_test]
     async fn tx_expiration_failure_cycle(mut runner: Runner) -> TestResult<()> {
         // Tx expires after one seconds.
-        let tx_id = runner.executor().start_tx(5000, 1000).await?;
+        let tx_id = runner.start_tx(5000, 1000).await?;
         runner.set_active_tx(tx_id.clone());
 
         // Row is created
@@ -268,18 +268,12 @@ mod interactive_tx {
 
         // Expect the state of the tx to be expired.
         // Status of the tx must be `Expired`
-        let res = runner.executor().commit_tx(tx_id.clone()).await;
+        let res = runner.commit_tx(tx_id.clone()).await?;
+        let error = res.err().unwrap();
+        let known_err = error.as_known().unwrap();
 
-        if let Err(query_core::CoreError::TransactionError(txe)) = res {
-            assert_eq!(
-                txe,
-                TransactionError::Closed {
-                    reason: "Transaction is no longer valid. Last state: 'Expired'".to_string()
-                }
-            );
-        } else {
-            panic!("Expected error, got success.");
-        }
+        assert_eq!(known_err.error_code, Cow::Borrowed("P2028"));
+        assert!(known_err.message.contains("Transaction is no longer valid"));
 
         Ok(())
     }
@@ -288,10 +282,10 @@ mod interactive_tx {
     #[connector_test(exclude(Sqlite))]
     async fn multiple_tx(mut runner: Runner) -> TestResult<()> {
         // First transaction.
-        let tx_id_a = runner.executor().start_tx(2000, 2000).await?;
+        let tx_id_a = runner.start_tx(2000, 2000).await?;
 
         // Second transaction.
-        let tx_id_b = runner.executor().start_tx(2000, 2000).await?;
+        let tx_id_b = runner.start_tx(2000, 2000).await?;
 
         // Execute on first transaction.
         runner.set_active_tx(tx_id_a.clone());
@@ -308,7 +302,8 @@ mod interactive_tx {
         );
 
         // Commit second transaction.
-        runner.executor().commit_tx(tx_id_b.clone()).await?;
+        let res = runner.commit_tx(tx_id_b.clone()).await?;
+        assert!(res.is_ok());
 
         // Back to first transaction, do a final read and commit.
         runner.set_active_tx(tx_id_a.clone());
@@ -322,7 +317,9 @@ mod interactive_tx {
             ]
         );
 
-        runner.executor().commit_tx(tx_id_a.clone()).await?;
+        let res = runner.commit_tx(tx_id_a.clone()).await?;
+
+        assert!(res.is_ok());
 
         Ok(())
     }

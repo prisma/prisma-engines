@@ -20,7 +20,7 @@ tokio = "1.0"
 tracing = "0.1"
 tracing-futures = "0.2"
 uuid = "0.8"
-opentelemetry = { version = "0.16", features = ["async-std"] }
+opentelemetry = { version = "0.16", features = ["tokio"] }
 tracing-opentelemetry = "0.16"
 
 [dependencies.quaint]

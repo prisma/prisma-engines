@@ -10,6 +10,8 @@ use query_core::{QueryExecutor, TxId};
 use crate::{ConnectorTag, ConnectorVersion, QueryResult, TestError, TestResult};
 use colored::*;
 
+pub type TxResult = Result<(), user_facing_errors::Error>;
+
 #[async_trait::async_trait]
 pub trait RunnerInterface: Sized {
     /// Initializes the runner.
@@ -20,6 +22,15 @@ pub trait RunnerInterface: Sized {
 
     /// Queries the engine with a batch.
     async fn batch(&self, queries: Vec<String>, transaction: bool) -> TestResult<QueryResult>;
+
+    /// start a transaction for a batch run
+    async fn start_tx(&self, max_acquisition_millis: u64, valid_for_millis: u64) -> TestResult<TxId>;
+
+    /// commit transaction
+    async fn commit_tx(&self, tx_id: TxId) -> TestResult<TxResult>;
+
+    /// rollback transaction
+    async fn rollback_tx(&self, tx_id: TxId) -> TestResult<TxResult>;
 
     /// The connector tag used to load this runner.
     fn connector(&self) -> &ConnectorTag;
@@ -50,7 +61,7 @@ impl Runner {
         match ident {
             "direct" => Self::direct(datamodel, connector_tag).await,
             "node-api" => Ok(Self::NodeApi(NodeApiRunner {})),
-            "binary" => Ok(Self::Binary(BinaryRunner {})),
+            "binary" => Self::binary(datamodel, connector_tag).await,
             unknown => Err(TestError::parse_error(format!("Unknown test runner '{}'", unknown))),
         }
     }
@@ -65,7 +76,7 @@ impl Runner {
         let response = match self {
             Runner::Direct(r) => r.query(gql_query).await,
             Runner::NodeApi(_) => todo!(),
-            Runner::Binary(_) => todo!(),
+            Runner::Binary(r) => r.query(gql_query).await,
         }?;
 
         if response.failed() {
@@ -77,11 +88,35 @@ impl Runner {
         Ok(response)
     }
 
+    pub async fn start_tx(&self, max_acquisition_millis: u64, valid_for_millis: u64) -> TestResult<TxId> {
+        match self {
+            Runner::Direct(r) => r.start_tx(max_acquisition_millis, valid_for_millis).await,
+            Runner::NodeApi(_) => todo!(),
+            Runner::Binary(r) => r.start_tx(max_acquisition_millis, valid_for_millis).await,
+        }
+    }
+
+    pub async fn commit_tx(&self, tx_id: TxId) -> TestResult<TxResult> {
+        match self {
+            Runner::Direct(r) => r.commit_tx(tx_id).await,
+            Runner::NodeApi(_) => todo!(),
+            Runner::Binary(r) => r.commit_tx(tx_id).await,
+        }
+    }
+
+    pub async fn rollback_tx(&self, tx_id: TxId) -> TestResult<TxResult> {
+        match self {
+            Runner::Direct(r) => r.rollback_tx(tx_id).await,
+            Runner::NodeApi(_) => todo!(),
+            Runner::Binary(r) => r.rollback_tx(tx_id).await,
+        }
+    }
+
     pub async fn batch(&self, queries: Vec<String>, transaction: bool) -> TestResult<QueryResult> {
         match self {
             Runner::Direct(r) => r.batch(queries, transaction).await,
             Runner::NodeApi(_) => todo!(),
-            Runner::Binary(_) => todo!(),
+            Runner::Binary(r) => r.batch(queries, transaction).await,
         }
     }
 
@@ -91,11 +126,17 @@ impl Runner {
         Ok(Self::Direct(runner))
     }
 
+    async fn binary(datamodel: String, connector_tag: ConnectorTag) -> TestResult<Self> {
+        let runner = BinaryRunner::load(datamodel, connector_tag).await?;
+
+        Ok(Self::Binary(runner))
+    }
+
     pub fn connector(&self) -> &ConnectorTag {
         match self {
             Runner::Direct(r) => r.connector(),
             Runner::NodeApi(_) => todo!(),
-            Runner::Binary(_) => todo!(),
+            Runner::Binary(r) => r.connector(),
         }
     }
 
@@ -103,15 +144,7 @@ impl Runner {
         match self {
             Runner::Direct(r) => ConnectorVersion::from(r.connector()),
             Runner::NodeApi(_) => todo!(),
-            Runner::Binary(_) => todo!(),
-        }
-    }
-
-    pub fn executor(&self) -> &dyn QueryExecutor {
-        match self {
-            Runner::Direct(r) => r.executor(),
-            Runner::NodeApi(_) => todo!(),
-            Runner::Binary(_) => todo!(),
+            Runner::Binary(r) => ConnectorVersion::from(r.connector()),
         }
     }
 
@@ -119,7 +152,7 @@ impl Runner {
         match self {
             Runner::Direct(r) => r.set_active_tx(tx_id),
             Runner::NodeApi(_) => todo!(),
-            Runner::Binary(_) => todo!(),
+            Runner::Binary(r) => r.set_active_tx(tx_id),
         }
     }
 
@@ -127,7 +160,7 @@ impl Runner {
         match self {
             Runner::Direct(r) => r.clear_active_tx(),
             Runner::NodeApi(_) => todo!(),
-            Runner::Binary(_) => todo!(),
+            Runner::Binary(r) => r.clear_active_tx(),
         }
     }
 }
