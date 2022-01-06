@@ -1,3 +1,5 @@
+use datamodel::Datamodel;
+
 use crate::common::*;
 
 #[test]
@@ -381,4 +383,119 @@ fn env_in_preview_features_must_be_rejected() {
 
     expect_1.assert_eq(&datamodel::parse_schema(schema_1).map(drop).unwrap_err());
     expect_2.assert_eq(&datamodel::parse_schema(schema_2).map(drop).unwrap_err());
+}
+
+#[test]
+fn empty_preview_features_array_should_work() {
+    let schema = r#"
+        datasource db {
+            provider = "postgresql"
+            url = env("DBURL")
+        }
+
+        generator js {
+            provider = "prisma-client-js"
+            previewFeatures = []
+        }
+    "#;
+
+    let (config, _) = datamodel::parse_schema(schema).unwrap();
+
+    assert!(config.preview_features().is_empty());
+}
+
+#[test]
+fn empty_preview_features_array_with_empty_space_should_work() {
+    let schema = r#"
+        datasource db {
+            provider = "postgresql"
+            url = env("DBURL")
+        }
+
+        generator js {
+            provider = "prisma-client-js"
+            previewFeatures = [ ]
+        }
+    "#;
+
+    let (config, _) = datamodel::parse_schema(schema).unwrap();
+
+    assert!(config.preview_features().is_empty());
+}
+
+#[test]
+fn empty_preview_features_are_kept_when_rendering() {
+    let schema = indoc! {r#"
+       generator js1 {
+         provider = "a_cat"
+         previewFeatures = []
+       }
+    "#};
+
+    let config = parse_configuration(schema);
+    let rendered = datamodel::render_datamodel_and_config_to_string(&Datamodel::default(), &config);
+
+    let expected = expect![[r#"
+       generator js1 {
+         provider        = "a_cat"
+         previewFeatures = []
+       }
+    "#]];
+
+    expected.assert_eq(&rendered);
+}
+
+#[test]
+fn not_defining_preview_features_should_not_add_them_as_empty_when_rendering() {
+    let schema = indoc! {r#"
+       generator js1 {
+         provider = "a_cat"
+       }
+    "#};
+
+    let config = parse_configuration(schema);
+    let rendered = datamodel::render_datamodel_and_config_to_string(&Datamodel::default(), &config);
+
+    let expected = expect![[r#"
+       generator js1 {
+         provider = "a_cat"
+       }
+    "#]];
+
+    expected.assert_eq(&rendered);
+}
+
+#[test]
+fn engine_type_must_be_a_string() {
+    let with_string = indoc! {r#"
+        generator client {
+          provider = "prisma-client-js"
+          engineType = "binary"
+        }
+    "#};
+
+    assert!(datamodel::parse_schema(with_string).is_ok());
+
+    let with_array = indoc! {r#"
+        generator client {
+          provider = "prisma-client-js"
+          engineType = ["binary"]
+        }
+    "#};
+
+    let expect = expect![[r#"
+        [1;91merror[0m: [1mExpected a String value, but received array value `["binary"]`.[0m
+          [1;94m-->[0m  [4mschema.prisma:3[0m
+        [1;94m   | [0m
+        [1;94m 2 | [0m  provider = "prisma-client-js"
+        [1;94m 3 | [0m  engineType = [1;91m["binary"][0m
+        [1;94m   | [0m
+    "#]];
+
+    let error = datamodel::parse_configuration(with_array)
+        .map(drop)
+        .map_err(|diag| diag.to_pretty_string("schema.prisma", with_array))
+        .unwrap_err();
+
+    expect.assert_eq(&error);
 }

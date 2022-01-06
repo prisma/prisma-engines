@@ -3,7 +3,7 @@ use query_engine_tests::*;
 #[test_suite(schema(schema))]
 mod order_by_dependent_pag {
     use indoc::indoc;
-    use query_engine_tests::run_query;
+    use query_engine_tests::{connector_test, match_connector_result, run_query};
 
     fn schema() -> String {
         let schema = indoc! {
@@ -97,9 +97,8 @@ mod order_by_dependent_pag {
               }
             }"#,
             // Depends on how null values are handled.
-            [MongoDb] => r#"{"data":{"findManyModelA":[{"id":1,"b":{"id":1}},{"id":2,"b":{"id":2}}]}}"#,
-            [Postgres] =>  r#"{"data":{"findManyModelA":[{"id":1,"b":{"id":1}},{"id":2,"b":{"id":2}},{"id":3,"b":null}]}}"#,
-            [MySql, Sqlite] => r#"{"data":{"findManyModelA":[{"id":3,"b":null},{"id":1,"b":{"id":1}},{"id":2,"b":{"id":2}}]}}"#
+            MongoDb(_) | Sqlite | MySql(_) | CockroachDb => vec![r#"{"data":{"findManyModelA":[{"id":1,"b":{"id":1}},{"id":2,"b":{"id":2}}]}}"#],
+            _ => vec![r#"{"data":{"findManyModelA":[{"id":1,"b":{"id":1}},{"id":2,"b":{"id":2}},{"id":3,"b":null}]}}"#]
         );
 
         Ok(())
@@ -167,10 +166,8 @@ mod order_by_dependent_pag {
               }
             }"#,
             // Depends on how null values are handled.
-            [MongoDb] => r#"{"data":{"findManyModelA":[{"id":1,"b":{"c":{"id":1}}}]}}"#,
-            [Postgres] => r#"{"data":{"findManyModelA":[{"id":1,"b":{"c":{"id":1}}},{"id":2,"b":{"c":null}},{"id":3,"b":null}]}}"#,
-            [Sqlite, MySql] => r#"{"data":{"findManyModelA":[{"id":2,"b":{"c":null}},{"id":3,"b":null},{"id":1,"b":{"c":{"id":1}}}]}}"#,
-            [MySql] => r#"{"data":{"findManyModelA":[{"id":3,"b":null},{"id":2,"b":{"c":null}},{"id":1,"b":{"c":{"id":1}}}]}}"#
+            MongoDb(_) | Sqlite | MySql(_) | CockroachDb => vec![r#"{"data":{"findManyModelA":[{"id":1,"b":{"c":{"id":1}}}]}}"#],
+            _ => vec![r#"{"data":{"findManyModelA":[{"id":1,"b":{"c":{"id":1}}},{"id":2,"b":{"c":null}},{"id":3,"b":null}]}}"#]
         );
 
         Ok(())
@@ -229,7 +226,6 @@ mod order_by_dependent_pag {
     }
 
     // "[Circular with differing records] Ordering by related record field ascending" should "work"
-    // TODO: Does not work on MySQL & SQLite. Figure out why?
     // TODO(julius): should enable for SQL Server when partial indices are in the PSL
     #[connector_test(exclude(SqlServer))]
     async fn circular_diff_related_record_asc(runner: Runner) -> TestResult<()> {
@@ -250,15 +246,12 @@ mod order_by_dependent_pag {
                   }
                 }
               }
-            }"#, // Depends on how null values are handled.
-            [MongoDb] => r#"{"data":{"findManyModelA":[{"id":1,"b":{"c":{"a":{"id":3}}}},{"id":2,"b":{"c":{"a":{"id":4}}}}]}}"#,
-            [Postgres] =>  r#"{"data":{"findManyModelA":[{"id":1,"b":{"c":{"a":{"id":3}}}},{"id":2,"b":{"c":{"a":{"id":4}}}},{"id":3,"b":null},{"id":4,"b":null}]}}"#,
-                // CockroachDB can order ModelA.id in any order if ModelB.a_id is NULL.
-            [Postgres] =>  r#"{"data":{"findManyModelA":[{"id":1,"b":{"c":{"a":{"id":3}}}},{"id":2,"b":{"c":{"a":{"id":4}}}},{"id":4,"b":null},{"id":3,"b":null}]}}"#,
-            // Mariadb
-            [Sqlite, MySql] =>  r#"{"data":{"findManyModelA":[{"id":3,"b":null},{"id":4,"b":null},{"id":1,"b":{"c":{"a":{"id":3}}}},{"id":2,"b":{"c":{"a":{"id":4}}}}]}}"#,
-            [MySql] =>  r#"{"data":{"findManyModelA":[{"id":4,"b":null},{"id":3,"b":null},{"id":1,"b":{"c":{"a":{"id":3}}}},{"id":2,"b":{"c":{"a":{"id":4}}}}]}}"#
+            }"#,
+            // Depends on how null values are handled.
+            MongoDb(_) | MySql(_) | Sqlite | CockroachDb => vec![r#"{"data":{"findManyModelA":[{"id":1,"b":{"c":{"a":{"id":3}}}},{"id":2,"b":{"c":{"a":{"id":4}}}}]}}"#],
+            _ => vec![r#"{"data":{"findManyModelA":[{"id":1,"b":{"c":{"a":{"id":3}}}},{"id":2,"b":{"c":{"a":{"id":4}}}},{"id":3,"b":null},{"id":4,"b":null}]}}"#]
         );
+
         Ok(())
     }
 
@@ -284,10 +277,14 @@ mod order_by_dependent_pag {
                 }
               }
             }"#,
+            Postgres(_) => vec![r#"{"data":{"findManyModelA":[{"id":2,"b":{"c":{"a":{"id":4}}}},{"id":1,"b":{"c":{"a":{"id":3}}}}]}}"#],
             // Depends on how null values are handled.
-            [MongoDb, Sqlite, MySql] => r#"{"data":{"findManyModelA":[{"id":2,"b":{"c":{"a":{"id":4}}}},{"id":1,"b":{"c":{"a":{"id":3}}}},{"id":3,"b":null},{"id":4,"b":null}]}}"#,
-            [Postgres] => r#"{"data":{"findManyModelA":[{"id":3,"b":null},{"id":4,"b":null},{"id":2,"b":{"c":{"a":{"id":4}}}},{"id":1,"b":{"c":{"a":{"id":3}}}}]}}"#
+            _ => vec![
+              r#"{"data":{"findManyModelA":[{"id":2,"b":{"c":{"a":{"id":4}}}},{"id":1,"b":{"c":{"a":{"id":3}}}},{"id":3,"b":null},{"id":4,"b":null}]}}"#,
+              r#"{"data":{"findManyModelA":[{"id":2,"b":{"c":{"a":{"id":4}}}},{"id":1,"b":{"c":{"a":{"id":3}}}},{"id":4,"b":null},{"id":3,"b":null}]}}"#,
+            ]
         );
+
         Ok(())
     }
 

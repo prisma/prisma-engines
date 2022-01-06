@@ -38,7 +38,7 @@ pub fn delete_record(
     graph.create_edge(
         &read_node,
         &delete_node,
-        QueryGraphDependency::ParentProjection(
+        QueryGraphDependency::ProjectedDataDependency(
             model.primary_identifier(),
             Box::new(|delete_node, parent_ids| {
                 if !parent_ids.is_empty() {

@@ -608,7 +608,7 @@ fn dev_diagnostic_shadow_database_creation_error_is_special_cased_mysql(api: Tes
 
     let err = api
         .block_on(async {
-            let migration_api = migration_api(&datamodel).await.unwrap();
+            let migration_api = migration_api(&datamodel).unwrap();
             migration_api
                 .dev_diagnostic(&DevDiagnosticInput {
                     migrations_directory_path: directory.path().as_os_str().to_string_lossy().into_owned(),
@@ -657,7 +657,7 @@ fn dev_diagnostic_shadow_database_creation_error_is_special_cased_postgres(api: 
 
     let err = api
         .block_on(async {
-            let migration_api = migration_api(&datamodel).await.unwrap();
+            let migration_api = migration_api(&datamodel).unwrap();
             migration_api
                 .dev_diagnostic(&DevDiagnosticInput {
                     migrations_directory_path: directory.path().as_os_str().to_string_lossy().into_owned(),

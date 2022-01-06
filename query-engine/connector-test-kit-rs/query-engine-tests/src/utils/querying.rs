@@ -8,17 +8,17 @@ macro_rules! assert_query {
 
 #[macro_export]
 macro_rules! match_connector_result {
-    ($runner:expr, $q:expr, $([$($connector_opt:ident),*] => $result:expr),*) => {
-        use query_tests_setup::ConnectorTag::*;
-        let connector = $runner.connector();
-        let mut results: Vec<&str> = vec![];
-        $(
+    ($runner:expr, $q:expr, $( $($matcher:pat)|+ $( if $pred:expr )? => $result:expr ),*) => {
+        use query_tests_setup::*;
+        use query_tests_setup::ConnectorVersion::*;
+
+        let connector = $runner.connector_version();
+
+        let mut results = match connector {
             $(
-                if matches!(connector, $connector_opt(_)) {
-                    results.push($result);
-                }
-            )*
-        )*
+                $( $matcher )|+ $( if $pred )? => $result
+            ),*
+        };
 
         let query_result = $runner.query($q).await?.to_string();
 

@@ -15,7 +15,7 @@ pub enum TestError {
     QueryCoreError(#[from] query_core::CoreError),
 
     #[error("Migration core error: {0}")]
-    MigrationCoreError(#[from] migration_core::CoreError),
+    MigrationCoreError(#[from] qe_setup::ConnectorError),
 
     #[error("Error processing schema template: {0}")]
     TemplatingError(#[from] TemplatingError),

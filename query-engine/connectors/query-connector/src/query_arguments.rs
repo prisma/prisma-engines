@@ -22,12 +22,12 @@ pub struct SkipAndLimit {
 #[derive(Debug, Clone)]
 pub struct QueryArguments {
     pub model: ModelRef,
-    pub cursor: Option<RecordProjection>,
+    pub cursor: Option<SelectionResult>,
     pub take: Option<i64>,
     pub skip: Option<i64>,
     pub filter: Option<Filter>,
     pub order_by: Vec<OrderBy>,
-    pub distinct: Option<ModelProjection>,
+    pub distinct: Option<FieldSelection>,
     pub ignore_skip: bool,
     pub ignore_take: bool,
 }
@@ -137,6 +137,14 @@ impl QueryArguments {
         let relations_contain_1to1_unique = on_relation
             .iter()
             .any(|o| o.field.unique() && o.path.iter().all(|r| r.relation().is_one_to_one()));
+
+        let has_optional_relation = on_relation
+            .iter()
+            .any(|o| o.path.iter().any(|r| r.arity == dml::FieldArity::Optional));
+
+        if has_optional_relation {
+            return false;
+        }
 
         source_contains_unique || order_by_contains_unique_index || relations_contain_1to1_unique
     }

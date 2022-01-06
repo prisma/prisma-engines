@@ -54,7 +54,7 @@ fn connecting_to_a_postgres_database_with_missing_schema_creates_it(api: TestApi
             url
         );
 
-        let me = api.block_on(migration_api(&datamodel)).unwrap();
+        let me = migration_api(&datamodel).unwrap();
         api.block_on(me.ensure_connection_validity()).unwrap();
     }
 

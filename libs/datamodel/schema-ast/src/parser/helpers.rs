@@ -3,6 +3,7 @@ use crate::ast::{Identifier, Span};
 
 pub type Token<'a> = pest::iterators::Pair<'a, Rule>;
 
+#[track_caller]
 pub fn parsing_catch_all(token: &Token<'_>, kind: &str) {
     match token.as_rule() {
         Rule::comment | Rule::comment_and_new_line | Rule::comment_block | Rule::doc_comment_and_new_line => {}
@@ -24,7 +25,7 @@ impl ToIdentifier for pest::iterators::Pair<'_, Rule> {
     fn to_id(&self) -> Identifier {
         Identifier {
             name: String::from(self.as_str()),
-            span: Span::from_pest(self.as_span()),
+            span: Span::from(self.as_span()),
         }
     }
 }

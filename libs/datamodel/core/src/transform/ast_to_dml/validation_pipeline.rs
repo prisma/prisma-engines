@@ -1,68 +1,63 @@
+mod context;
 mod validations;
 
-use super::{db::ParserDatabase, lift::LiftAstToDml, validate::Validator};
-use crate::{
-    ast, common::preview_features::PreviewFeature, configuration, diagnostics::Diagnostics, ValidatedDatamodel,
-};
+use crate::{ast, common::preview_features::PreviewFeature, configuration, diagnostics::Diagnostics};
+use datamodel_connector::{Connector, EmptyDatamodelConnector, ReferentialIntegrity};
 use enumflags2::BitFlags;
+use parser_database::ParserDatabase;
 
-/// Is responsible for loading and validating the Datamodel defined in an AST.
-/// Wrapper for all lift and validation steps
-pub(crate) struct ValidationPipeline<'a> {
-    source: Option<&'a configuration::Datasource>,
-    validator: Validator<'a>,
-    preview_features: BitFlags<PreviewFeature>,
+pub(crate) struct ValidateOutput<'ast> {
+    pub(crate) db: ParserDatabase<'ast>,
+    pub(crate) diagnostics: Diagnostics,
+    pub(crate) referential_integrity: ReferentialIntegrity,
+    pub(crate) connector: &'static dyn Connector,
 }
 
-impl<'a, 'b> ValidationPipeline<'a> {
-    pub(crate) fn new(
-        sources: &'a [configuration::Datasource],
-        preview_features: BitFlags<PreviewFeature>,
-    ) -> ValidationPipeline<'a> {
-        let source = sources.first();
+/// Analyze and validate a schema AST.
+///
+/// This will attempt to
+///
+/// * Resolve all attributes
+/// * Resolve and check default values
+/// * Resolve and check all field types
+/// * ...
+/// * Validate the schema
+pub(crate) fn validate<'ast>(
+    ast_schema: &'ast ast::SchemaAst,
+    sources: &[configuration::Datasource],
+    preview_features: BitFlags<PreviewFeature>,
+    diagnostics: Diagnostics,
+    relation_transformation_enabled: bool,
+) -> ValidateOutput<'ast> {
+    let source = sources.first();
+    let connector = source.map(|s| s.active_connector).unwrap_or(&EmptyDatamodelConnector);
+    let referential_integrity = source.map(|s| s.referential_integrity()).unwrap_or_default();
 
-        ValidationPipeline {
-            source,
-            validator: Validator::new(source),
-            preview_features,
-        }
+    // Make sense of the AST.
+    let (db, diagnostics) = ParserDatabase::new(ast_schema, diagnostics);
+
+    let mut output = ValidateOutput {
+        db,
+        diagnostics,
+        referential_integrity,
+        connector,
+    };
+
+    // Early return so that the validator does not have to deal with invalid schemas
+    if !output.diagnostics.errors().is_empty() {
+        return output;
     }
 
-    /// Validates an AST semantically and promotes it to a datamodel/schema.
-    ///
-    /// This method will attempt to
-    /// * Resolve all attributes
-    /// * Recursively evaluate all functions
-    /// * Resolve and check default values
-    /// * Resolve and check all field types
-    /// * etc.
-    pub(crate) fn validate(
-        &self,
-        ast_schema: &ast::SchemaAst,
-        relation_transformation_enabled: bool,
-    ) -> Result<ValidatedDatamodel, Diagnostics> {
-        let diagnostics = Diagnostics::new();
+    let mut context = context::Context {
+        db: &output.db,
+        datasource: source,
+        preview_features,
+        connector,
+        referential_integrity,
+        diagnostics: &mut output.diagnostics,
+    };
 
-        // Make sense of the AST.
-        let (db, mut diagnostics) = ParserDatabase::new(ast_schema, self.source, diagnostics, self.preview_features);
+    validations::validate(&mut context, relation_transformation_enabled);
 
-        // Early return so that the validator does not have to deal with invalid schemas
-        diagnostics.to_result()?;
-
-        validations::validate(&db, &mut diagnostics, relation_transformation_enabled);
-        diagnostics.to_result()?;
-
-        let schema = LiftAstToDml::new(&db).lift();
-
-        // From now on we do not operate on the internal ast anymore, but DML.
-        // Please try to avoid all new validations after this, if you can.
-
-        self.validator.validate(db.ast(), &schema, &mut diagnostics);
-        diagnostics.to_result()?;
-
-        Ok(ValidatedDatamodel {
-            subject: schema,
-            warnings: diagnostics.warnings().to_owned(),
-        })
-    }
+    output
 }

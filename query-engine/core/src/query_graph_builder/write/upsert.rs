@@ -5,7 +5,7 @@ use crate::{
     query_graph::{Flow, Node, QueryGraph, QueryGraphDependency},
     ArgumentListLookup, ConnectorContext, ParsedField, ParsedInputMap,
 };
-use connector::IdFilter;
+use connector::IntoFilter;
 use prisma_models::ModelRef;
 use std::{convert::TryInto, sync::Arc};
 
@@ -15,42 +15,42 @@ use std::{convert::TryInto, sync::Arc};
 ///                         ┌─────────────────┐           ┌ ─ ─ ─ ─ ─ ─
 ///                         │   Read Parent   │─ ─ ─ ─ ─ ▶    Result   │
 ///                         └─────────────────┘           └ ─ ─ ─ ─ ─ ─
-///                                  │                                  
-///                                  │                                  
-///                                  │                                  
-///                                  │                                  
-///                                  ▼                                  
-///                         ┌─────────────────┐                         
-///           ┌───Then──────│   If (exists)   │──Else─────┐             
-///           │             └─────────────────┘           │             
-///           │                                           │             
-/// ┌ ─ ─ ─ ─ ▼ ─ ─ ─ ─ ┐                                 │             
-///  ┌─────────────────┐                                  │             
-/// ││    Join Node    ││                                 │             
-///  └─────────────────┘                                  ▼             
-/// │         │         │                        ┌─────────────────┐    
-///           │                                  │  Create Parent  │    
-/// │         ▼         │                        └─────────────────┘    
-///  ┌─────────────────┐                                  │             
-/// ││ Insert onUpdate ││                                 │             
-///  │emulation subtree│                                  │             
-/// ││for all relations││                                 │             
-///  │ pointing to the │                                  ▼             
-/// ││  Parent model   ││                        ┌─────────────────┐    
-///  └─────────────────┘                         │   Read Parent   │    
-/// └ ─ ─ ─ ─ ┬ ─ ─ ─ ─ ┘                        └─────────────────┘    
-///           │                                                         
-///           │                                                         
-///           ▼                                                         
-///  ┌─────────────────┐                                                
-///  │  Update Parent  │                                                
-///  └─────────────────┘                                                
-///           │                                                         
-///           ▼                                                         
-///  ┌─────────────────┐                                                
-///  │   Read Parent   │                                                
+///                                  │
+///                                  │
+///                                  │
+///                                  │
+///                                  ▼
+///                         ┌─────────────────┐
+///           ┌───Then──────│   If (exists)   │──Else─────┐
+///           │             └─────────────────┘           │
+///           │                                           │
+/// ┌ ─ ─ ─ ─ ▼ ─ ─ ─ ─ ┐                                 │
+///  ┌─────────────────┐                                  │
+/// ││    Join Node    ││                                 │
+///  └─────────────────┘                                  ▼
+/// │         │         │                        ┌─────────────────┐
+///           │                                  │  Create Parent  │
+/// │         ▼         │                        └─────────────────┘
+///  ┌─────────────────┐                                  │
+/// ││ Insert onUpdate ││                                 │
+///  │emulation subtree│                                  │
+/// ││for all relations││                                 │
+///  │ pointing to the │                                  ▼
+/// ││  Parent model   ││                        ┌─────────────────┐
+///  └─────────────────┘                         │   Read Parent   │
+/// └ ─ ─ ─ ─ ┬ ─ ─ ─ ─ ┘                        └─────────────────┘
+///           │
+///           │
+///           ▼
+///  ┌─────────────────┐
+///  │  Update Parent  │
 ///  └─────────────────┘
-/// ```                                             
+///           │
+///           ▼
+///  ┌─────────────────┐
+///  │   Read Parent   │
+///  └─────────────────┘
+/// ```
 #[tracing::instrument(skip(graph, model, field))]
 pub fn upsert_record(
     graph: &mut QueryGraph,
@@ -98,7 +98,7 @@ pub fn upsert_record(
     graph.create_edge(
         &read_parent_records_node,
         &if_node,
-        QueryGraphDependency::ParentProjection(
+        QueryGraphDependency::ProjectedDataDependency(
             model_id.clone(),
             Box::new(|if_node, parent_ids| {
                 if let Node::Flow(Flow::If(_)) = if_node {
@@ -134,7 +134,7 @@ pub fn upsert_record(
     graph.create_edge(
         &update_node,
         &read_node_update,
-        QueryGraphDependency::ParentProjection(
+        QueryGraphDependency::ProjectedDataDependency(
             model_id.clone(),
             Box::new(move |mut read_node_update, mut parent_ids| {
                 let parent_id = match parent_ids.pop() {
@@ -156,7 +156,7 @@ pub fn upsert_record(
     graph.create_edge(
         &create_node,
         &read_node_create,
-        QueryGraphDependency::ParentProjection(
+        QueryGraphDependency::ProjectedDataDependency(
             model_id,
             Box::new(move |mut read_node_create, mut parent_ids| {
                 let parent_id = match parent_ids.pop() {

@@ -445,3 +445,59 @@ fn duplicate_implicit_names_should_error() {
 
     expectation.assert_eq(&error)
 }
+
+#[test]
+fn duplicate_custom_names_on_same_model_should_error() {
+    let dml = with_header(
+        indoc! {r#"
+        model A {
+            id  Int
+            id2 Int
+            
+            @@unique([id, id2], name: "foo", map: "bar")
+            @@unique([id, id2], name: "foo")
+        }
+        
+        model B {
+            id  Int
+            id2 Int
+            
+            @@unique([id, id2], name: "foo", map: "bar2")
+            @@id([id, id2], name: "foo")
+        }
+    "#},
+        Provider::Postgres,
+        &[],
+    );
+
+    let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
+
+    let expectation = expect![[r#"
+        [1;91merror[0m: [1mError parsing attribute "@@unique": The given custom name `foo` has to be unique on the model. Please provide a different name for the `name` argument.[0m
+          [1;94m-->[0m  [4mschema.prisma:15[0m
+        [1;94m   | [0m
+        [1;94m14 | [0m    
+        [1;94m15 | [0m    @@unique([id, id2], [1;91mname: "foo"[0m, map: "bar")
+        [1;94m   | [0m
+        [1;91merror[0m: [1mError parsing attribute "@@unique": The given custom name `foo` has to be unique on the model. Please provide a different name for the `name` argument.[0m
+          [1;94m-->[0m  [4mschema.prisma:16[0m
+        [1;94m   | [0m
+        [1;94m15 | [0m    @@unique([id, id2], name: "foo", map: "bar")
+        [1;94m16 | [0m    @@unique([id, id2], [1;91mname: "foo"[0m)
+        [1;94m   | [0m
+        [1;91merror[0m: [1mError parsing attribute "@@id": The given custom name `foo` has to be unique on the model. Please provide a different name for the `name` argument.[0m
+          [1;94m-->[0m  [4mschema.prisma:24[0m
+        [1;94m   | [0m
+        [1;94m23 | [0m    @@unique([id, id2], name: "foo", map: "bar2")
+        [1;94m24 | [0m    @@id([id, id2], [1;91mname: "foo"[0m)
+        [1;94m   | [0m
+        [1;91merror[0m: [1mError parsing attribute "@@unique": The given custom name `foo` has to be unique on the model. Please provide a different name for the `name` argument.[0m
+          [1;94m-->[0m  [4mschema.prisma:23[0m
+        [1;94m   | [0m
+        [1;94m22 | [0m    
+        [1;94m23 | [0m    @@unique([id, id2], [1;91mname: "foo"[0m, map: "bar2")
+        [1;94m   | [0m
+    "#]];
+
+    expectation.assert_eq(&error)
+}

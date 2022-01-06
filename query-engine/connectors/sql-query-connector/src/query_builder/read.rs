@@ -252,7 +252,10 @@ fn extract_columns(model: &ModelRef, selections: &[AggregationSelection]) -> Vec
             AggregationSelection::Field(field) => vec![field.clone()],
             AggregationSelection::Count { all: _, fields } => {
                 if fields.is_empty() {
-                    model.primary_identifier().scalar_fields().collect()
+                    model
+                        .primary_identifier()
+                        .as_scalar_fields()
+                        .expect("Primary identifier has non-scalar fields.")
                 } else {
                     fields.clone()
                 }

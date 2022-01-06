@@ -1,0 +1,87 @@
+model Order {
+    id Int @id @default(autoincrement())
+    items OrderItem[]
+    total Int
+}
+
+model OrderItem {
+    id Int @id @default(autoincrement())
+    productName String
+    productPrice Int
+    quantity Int
+    orderId Int
+    order Order @relation()
+}
+
+model OrderItemTwo {
+    id Int @id @default(autoincrement())
+    productName String
+    productPrice Int
+    quantity Int
+    orderId Int
+    order Order @relation(references: [])
+}
+
+model OrderItemThree {
+    id Int @id @default(autoincrement())
+    productName String
+    productPrice Int
+    quantity Int
+    orderId Int
+    order Order @relation(references: [id], )
+}
+
+model OrderItemFour {
+    id Int @id @default(autoincrement())
+    productName String
+    productPrice Int
+    quantity Int
+    orderId Int
+    order Order @relation(fields: [orderId], )
+}
+
+model OrderItemFive {
+    id Int @id @default(autoincrement())
+    productName String
+    productPrice Int
+    quantity Int
+    orderId Int
+    order Order @relation(fields: [])
+}
+
+model OrderItemSix {
+    id           Int    @id @default(autoincrement())
+    productName  String
+    productPrice Int
+    quantity     Int
+    orderId      Int
+    order Order @relation(fields: [orderId], references: [id], )
+}
+
+model OrderItemSeven {
+    id Int @id @default(autoincrement())
+    productName String
+    productPrice Int
+    quantity Int
+    orderId Int
+    order Order @relation(onDelete: )
+}
+
+model OrderItemEight {
+    id Int @id @default(autoincrement())
+    productName String
+    productPrice Int
+    quantity Int
+    orderId Int
+    order Order @relation(onUpdate: <|>)
+}
+
+model OrderItemNine {
+    id Int @id @default(autoincrement())
+    productName String
+    productPrice Int
+    quantity Int
+    orderId Int
+    order Order @relation(fields: [orderId], references: [id], onDelete: )
+}
+

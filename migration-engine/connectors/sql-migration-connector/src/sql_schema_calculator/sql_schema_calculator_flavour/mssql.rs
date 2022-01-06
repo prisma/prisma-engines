@@ -1,8 +1,8 @@
 use super::SqlSchemaCalculatorFlavour;
 use crate::flavour::MssqlFlavour;
 use datamodel::{
+    datamodel_connector::ScalarType,
     walkers::{ModelWalker, RelationFieldWalker},
-    ScalarType,
 };
 use sql_schema_describer::{self as sql, ForeignKeyAction};
 

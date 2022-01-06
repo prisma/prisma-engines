@@ -1,0 +1,14 @@
+datasource db {
+    provider = "postgresql"
+    url = env("DATABASE_URL")
+}
+
+model TestB {
+    id String @id
+    name Int
+}
+
+model Test {
+    id Int @id
+    name String @default(<|>)
+}

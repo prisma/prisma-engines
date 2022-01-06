@@ -14,7 +14,7 @@ use mongodb::{
     options::InsertManyOptions,
     ClientSession, Collection, Database, SessionCursor,
 };
-use prisma_models::{ModelRef, PrismaValue, RecordProjection};
+use prisma_models::{ModelRef, PrismaValue, SelectionResult};
 use std::convert::{TryFrom, TryInto};
 
 /// Create a single record to the database resulting in a
@@ -24,11 +24,14 @@ pub async fn create_record<'conn>(
     session: &mut ClientSession,
     model: &ModelRef,
     mut args: WriteArgs,
-) -> crate::Result<RecordProjection> {
+) -> crate::Result<SelectionResult> {
     let coll = database.collection::<Document>(model.db_name());
 
     // Mongo only allows a singular ID.
-    let mut id_fields = model.primary_identifier().scalar_fields().collect::<Vec<_>>();
+    let mut id_fields = ModelProjection::from(model.primary_identifier())
+        .scalar_fields()
+        .collect::<Vec<_>>();
+
     assert!(id_fields.len() == 1);
 
     let id_field = id_fields.pop().unwrap();
@@ -60,7 +63,7 @@ pub async fn create_record<'conn>(
     let insert_result = coll.insert_one_with_session(doc, None, session).await?;
     let id_value = value_from_bson(insert_result.inserted_id, &id_meta)?;
 
-    Ok(RecordProjection::from((id_field, id_value)))
+    Ok(SelectionResult::from((id_field, id_value)))
 }
 
 pub async fn create_records<'conn>(
@@ -119,7 +122,7 @@ pub async fn update_records<'conn>(
     model: &ModelRef,
     record_filter: RecordFilter,
     args: WriteArgs,
-) -> crate::Result<Vec<RecordProjection>> {
+) -> crate::Result<Vec<SelectionResult>> {
     let coll = database.collection::<Document>(model.db_name());
 
     // We need to load ids of documents to be updated first because Mongo doesn't
@@ -128,9 +131,12 @@ pub async fn update_records<'conn>(
     //
     // Mongo can only have singular IDs (always `_id`), hence the unwraps. Since IDs are immutable, we also don't
     // need to merge back id changes into the result set as with SQL.
-    let id_field = model.primary_identifier().scalar_fields().next().unwrap();
-    let id_meta = output_meta::from_field(&id_field);
+    let id_field = ModelProjection::from(model.primary_identifier())
+        .scalar_fields()
+        .next()
+        .unwrap();
 
+    let id_meta = output_meta::from_field(&id_field);
     let ids: Vec<Bson> = if let Some(selectors) = record_filter.selectors {
         selectors
             .into_iter()
@@ -163,7 +169,19 @@ pub async fn update_records<'conn>(
                     let vals = vals
                         .into_iter()
                         .map(|val| (field, val).into_bson())
-                        .collect::<crate::Result<Vec<_>>>()?;
+                        .collect::<crate::Result<Vec<_>>>()?
+                        .into_iter()
+                        .map(|bson| {
+                            // Strip the list from the BSON values. [Todo] This is unfortunately necessary right now due to how the
+                            // conversion is set up with native types, we should clean that up at some point (move from traits to fns?).
+                            if let Bson::Array(mut inner) = bson {
+                                inner.pop().unwrap()
+                            } else {
+                                bson
+                            }
+                        })
+                        .collect();
+
                     let bson_array = Bson::Array(vals);
 
                     doc! {
@@ -176,15 +194,20 @@ pub async fn update_records<'conn>(
                     }
                 }
                 val => {
-                    let bson_val = (field, val).into_bson()?;
+                    let bson_val = match (field, val).into_bson()? {
+                        bson @ Bson::Array(_) => bson,
+                        bson => Bson::Array(vec![bson]),
+                    };
 
                     doc! {
-                        "$set": { field_name: {
-                            "$ifNull": [
-                                { "$concatArrays": [dollar_field_name, [bson_val.clone()]] },
-                                [bson_val]
-                            ]
-                        } }
+                        "$set": {
+                            field_name: {
+                                "$ifNull": [
+                                    { "$concatArrays": [dollar_field_name, bson_val.clone()] },
+                                    bson_val
+                                ]
+                            }
+                        }
                     }
                 }
             },
@@ -218,7 +241,7 @@ pub async fn update_records<'conn>(
     let ids = ids
         .into_iter()
         .map(|bson_id| {
-            Ok(RecordProjection::from((
+            Ok(SelectionResult::from((
                 id_field.clone(),
                 value_from_bson(bson_id, &id_meta)?,
             )))
@@ -235,22 +258,26 @@ pub async fn delete_records<'conn>(
     record_filter: RecordFilter,
 ) -> crate::Result<usize> {
     let coll = database.collection::<Document>(model.db_name());
-    let id_field = model.primary_identifier().scalar_fields().next().unwrap();
+    let id_field = ModelProjection::from(model.primary_identifier())
+        .scalar_fields()
+        .next()
+        .unwrap();
 
-    let filter = if let Some(selectors) = record_filter.selectors {
-        let ids = selectors
+    let ids = if let Some(selectors) = record_filter.selectors {
+        selectors
             .into_iter()
             .map(|p| (&id_field, p.values().next().unwrap()).into_bson())
-            .collect::<crate::Result<Vec<_>>>()?;
-
-        doc! { id_field.db_name(): { "$in": ids } }
+            .collect::<crate::Result<Vec<_>>>()?
     } else {
         let filter = convert_filter(record_filter.filter, false, false)?;
-        let ids = find_ids(coll.clone(), session, model, filter).await?;
-
-        doc! { id_field.db_name(): { "$in": ids } }
+        find_ids(coll.clone(), session, model, filter).await?
     };
 
+    if ids.is_empty() {
+        return Ok(0);
+    }
+
+    let filter = doc! { id_field.db_name(): { "$in": ids } };
     let delete_result = coll.delete_many_with_session(filter, None, session).await?;
 
     Ok(delete_result.deleted_count as usize)
@@ -275,7 +302,7 @@ async fn find_ids(
         builder.query = Some(filter);
     };
 
-    let builder = builder.with_model_projection(id_field)?;
+    let builder = builder.with_model_projection(id_field.into())?;
     let query = builder.build()?;
     let docs = query.execute(collection, session).await?;
     let ids = docs.into_iter().map(|mut doc| doc.remove("_id").unwrap()).collect();
@@ -289,8 +316,8 @@ pub async fn m2m_connect<'conn>(
     database: &Database,
     session: &mut ClientSession,
     field: &RelationFieldRef,
-    parent_id: &RecordProjection,
-    child_ids: &[RecordProjection],
+    parent_id: &SelectionResult,
+    child_ids: &[SelectionResult],
 ) -> crate::Result<()> {
     let parent_model = field.model();
     let child_model = field.related_model();
@@ -299,7 +326,11 @@ pub async fn m2m_connect<'conn>(
     let child_coll = database.collection::<Document>(child_model.db_name());
 
     let parent_id = parent_id.values().next().unwrap();
-    let parent_id_field = parent_model.primary_identifier().scalar_fields().next().unwrap();
+    let parent_id_field = ModelProjection::from(parent_model.primary_identifier())
+        .scalar_fields()
+        .next()
+        .unwrap();
+
     let parent_ids_scalar_field_name = field.relation_info.fields.get(0).unwrap();
     let parent_id = (&parent_id_field, parent_id).into_bson()?;
 
@@ -307,8 +338,8 @@ pub async fn m2m_connect<'conn>(
     let child_ids = child_ids
         .iter()
         .map(|child_id| {
-            let (field, value) = child_id.pairs.get(0).unwrap();
-            (field, value.clone()).into_bson()
+            let (selection, value) = child_id.pairs.get(0).unwrap();
+            (selection, value.clone()).into_bson()
         })
         .collect::<crate::Result<Vec<_>>>()?;
 
@@ -335,8 +366,8 @@ pub async fn m2m_disconnect<'conn>(
     database: &Database,
     session: &mut ClientSession,
     field: &RelationFieldRef,
-    parent_id: &RecordProjection,
-    child_ids: &[RecordProjection],
+    parent_id: &SelectionResult,
+    child_ids: &[SelectionResult],
 ) -> crate::Result<()> {
     let parent_model = field.model();
     let child_model = field.related_model();
@@ -345,7 +376,11 @@ pub async fn m2m_disconnect<'conn>(
     let child_coll = database.collection::<Document>(child_model.db_name());
 
     let parent_id = parent_id.values().next().unwrap();
-    let parent_id_field = parent_model.primary_identifier().scalar_fields().next().unwrap();
+    let parent_id_field = ModelProjection::from(parent_model.primary_identifier())
+        .scalar_fields()
+        .next()
+        .unwrap();
+
     let parent_ids_scalar_field_name = field.relation_info.fields.get(0).unwrap();
     let parent_id = (&parent_id_field, parent_id).into_bson()?;
 

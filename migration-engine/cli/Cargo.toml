@@ -2,9 +2,7 @@
 name = "migration-engine-cli"
 version = "0.1.0"
 authors = ["Tom Houlé <tom@tomhoule.com>"]
-edition = "2018"
-
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+edition = "2021"
 
 [dependencies]
 migration-connector = { path = "../connectors/migration-connector" }
@@ -17,8 +15,8 @@ json-rpc-stdio = { path = "../../libs/json-rpc-stdio" }
 structopt = "0.3.8"
 tokio = { version = "1.0", default-features = false, features = ["macros"] }
 tracing = "0.1"
-tracing-error = "0.1.2"
-tracing-subscriber = "0.2"
+tracing-error = "0.2"
+tracing-subscriber = { version = "0.3", features = [ "fmt", "json", "time", "env-filter" ] }
 
 [dev-dependencies]
 tempfile = "3.1.0"

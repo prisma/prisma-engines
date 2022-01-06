@@ -112,10 +112,10 @@ impl<'a> super::SqlSchemaDescriberBackend for SqlSchemaDescriber<'a> {
 }
 
 // Examples (postgres): 1, 1::INT, '1'::INT, -1::INT, '-1'::INT
-// Examples (cockroach): 1:::INT, '1':::INT, (-1):::INT, ('-1'):::INT
+// Examples (CockroachDb)): 1:::INT, '1':::INT, (-1):::INT, ('-1'):::INT
 static PG_RE_NUM: Lazy<Regex> = Lazy::new(|| Regex::new(r"^\(?'?(-?\d+)'?\)?(:{2,3}.*)?$").expect("compile regex"));
 // Examples (postgres): 5.3, 5.3::FLOAT, -5.3, '-5.3'::FLOAT
-// Examples (cockroach): 5.3:::FLOAT8, (-5.3):::FLOAT8
+// Examples (CockroachDb)): 5.3:::FLOAT8, (-5.3):::FLOAT8
 static PG_RE_FLOAT: Lazy<Regex> = Lazy::new(|| Regex::new(r"^\(?'?([^:')]+)'?\)?(:{2,3}.*)?$").expect("compile regex"));
 
 impl Parser for SqlSchemaDescriber<'_> {
@@ -799,9 +799,13 @@ impl<'a> SqlSchemaDescriber<'a> {
                         ColumnTypeFamily::DateTime => {
                             match default_string.to_lowercase().as_str() {
                                 "now()"
+                                | "now():::timestamp"
+                                | "now():::timestamptz"
+                                | "now():::date"
                                 | "current_timestamp"
                                 | "current_timestamp():::timestamp"
-                                | "current_timestamp():::timestamptz" => DefaultValue::now(),
+                                | "current_timestamp():::timestamptz"
+                                | "current_timestamp():::date" => DefaultValue::now(),
                                 _ => DefaultValue::db_generated(default_string), //todo parse values
                             }
                         }

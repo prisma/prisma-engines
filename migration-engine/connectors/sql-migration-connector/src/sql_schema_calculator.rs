@@ -21,7 +21,7 @@ pub(crate) fn calculate_sql_schema(
     // Two types of tables: model tables and implicit M2M relation tables (a.k.a. join tables.).
     schema.tables.extend(calculate_model_tables(datamodel, flavour));
 
-    let mut relation_tables: Vec<_> = calculate_relation_tables(datamodel, flavour, &schema).collect();
+    let mut relation_tables: Vec<_> = calculate_relation_tables(configuration, datamodel, flavour, &schema).collect();
     schema.tables.append(&mut relation_tables);
 
     let referential_integrity = configuration.referential_integrity().unwrap_or_default();
@@ -144,6 +144,7 @@ fn push_inline_relations(model: ModelWalker<'_>, table: &mut sql::Table, flavour
 }
 
 fn calculate_relation_tables<'a>(
+    configuration: &'a Configuration,
     datamodel: &'a Datamodel,
     flavour: &'a dyn SqlFlavour,
     schema: &'a sql::SqlSchema,
@@ -178,7 +179,13 @@ fn calculate_relation_tables<'a>(
 
             let indexes = vec![
                 sql::Index {
-                    name: format!("{}_AB_unique", &table_name),
+                    name: format!(
+                        "{}_AB_unique",
+                        table_name
+                            .chars()
+                            .take(configuration.max_identifier_length() - 10)
+                            .collect::<String>()
+                    ),
                     columns: vec![
                         sql::IndexColumn::new(m2m.model_a_column()),
                         sql::IndexColumn::new(m2m.model_b_column()),
@@ -187,7 +194,13 @@ fn calculate_relation_tables<'a>(
                     algorithm: None,
                 },
                 sql::Index {
-                    name: format!("{}_B_index", &table_name),
+                    name: format!(
+                        "{}_B_index",
+                        table_name
+                            .chars()
+                            .take(configuration.max_identifier_length() - 8)
+                            .collect::<String>()
+                    ),
                     columns: vec![sql::IndexColumn::new(m2m.model_b_column())],
                     tpe: sql::IndexType::Normal,
                     algorithm: None,
@@ -210,7 +223,10 @@ fn calculate_relation_tables<'a>(
             ];
 
             sql::Table {
-                name: table_name,
+                name: table_name
+                    .chars()
+                    .take(configuration.max_identifier_length())
+                    .collect::<String>(),
                 columns,
                 indices: indexes,
                 primary_key: None,
@@ -273,10 +289,13 @@ fn column_for_scalar_field(field: &ScalarFieldWalker<'_>, flavour: &dyn SqlFlavo
                 auto_increment: false,
             }
         }
-        TypeWalker::Base(scalar_type) => (scalar_type, flavour.default_native_type_for_scalar_type(&scalar_type)),
+        TypeWalker::Base(scalar_type) => (
+            scalar_type,
+            flavour.default_native_type_for_scalar_type(&datamodel_connector::convert_from_scalar_type(scalar_type)),
+        ),
         TypeWalker::NativeType(scalar_type, instance) => (scalar_type, instance.serialized_native_type.clone()),
         TypeWalker::Unsupported(description) => {
-            let default = field.default_value().and_then(|v| db_generated(v)).map(|mut default| {
+            let default = field.default_value().and_then(db_generated).map(|mut default| {
                 if let Some(name) = field.default_value().and_then(|v| v.db_name()) {
                     default.set_constraint_name(name);
                 }

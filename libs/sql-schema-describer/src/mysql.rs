@@ -796,7 +796,7 @@ impl<'a> SqlSchemaDescriber<'a> {
     fn extract_enum_values(full_data_type: &&str) -> Vec<String> {
         let len = &full_data_type.len() - 1;
         let vals = &full_data_type[5..len];
-        vals.split(',').map(|v| unquote_string(v)).collect()
+        vals.split(',').map(unquote_string).collect()
     }
 
     // See https://dev.mysql.com/doc/refman/8.0/en/string-literals.html

@@ -1,12 +1,18 @@
 use crate::{
-    ast,
-    diagnostics::{DatamodelError, Diagnostics},
-    transform::ast_to_dml::db::walkers::{ModelWalker, RelationFieldWalker, RelationName},
+    ast::{self, WithName},
+    diagnostics::DatamodelError,
+    transform::ast_to_dml::{
+        db::{
+            walkers::{ModelWalker, RelationFieldWalker, RelationName},
+            ReferentialAction,
+        },
+        validation_pipeline::context::Context,
+    },
 };
 use itertools::Itertools;
 use std::fmt;
 
-use super::names::Names;
+use super::{database_name::validate_db_name, names::Names};
 
 struct Fields<'ast, 'db> {
     fields: &'ast [ast::FieldId],
@@ -113,11 +119,11 @@ pub(super) fn ambiguity(field: RelationFieldWalker<'_, '_>, names: &Names<'_>) -
 }
 
 /// Validates if the related model for the relation is ignored.
-pub(super) fn ignored_related_model(field: RelationFieldWalker<'_, '_>, diagnostics: &mut Diagnostics) {
+pub(super) fn ignored_related_model(field: RelationFieldWalker<'_, '_>, ctx: &mut Context<'_>) {
     let related_model = field.related_model();
     let model = field.model();
 
-    if !related_model.attributes().is_ignored || field.attributes().is_ignored || model.attributes().is_ignored {
+    if !related_model.is_ignored() || field.is_ignored() || model.is_ignored() {
         return;
     }
 
@@ -126,7 +132,7 @@ pub(super) fn ignored_related_model(field: RelationFieldWalker<'_, '_>, diagnost
         field.name(), model.name(), related_model.name()
     );
 
-    diagnostics.push_error(DatamodelError::new_attribute_validation_error(
+    ctx.push_error(DatamodelError::new_attribute_validation_error(
         &message,
         "ignore",
         field.ast_field().span,
@@ -134,45 +140,81 @@ pub(super) fn ignored_related_model(field: RelationFieldWalker<'_, '_>, diagnost
 }
 
 /// Does the connector support the given referential actions.
-pub(super) fn referential_actions(
-    field: RelationFieldWalker<'_, '_>,
-    db: &super::ParserDatabase<'_>,
-    diagnostics: &mut Diagnostics,
-) {
-    let referential_integrity = db.active_referential_integrity();
-    let connector = db.active_connector();
-    let msg = |action| {
+pub(super) fn referential_actions(field: RelationFieldWalker<'_, '_>, ctx: &mut Context<'_>) {
+    let connector = ctx.connector;
+    let referential_integrity = ctx.referential_integrity;
+    let msg = |action: ReferentialAction| {
         let allowed_values = connector
             .referential_actions(&referential_integrity)
             .iter()
-            .map(|f| format!("`{}`", f))
+            .map(|f| format!("`{}`", f.as_str()))
             .join(", ");
 
         format!(
             "Invalid referential action: `{}`. Allowed values: ({})",
-            action, allowed_values,
+            action.as_str(),
+            allowed_values,
         )
     };
 
-    if let Some(on_delete) = field.attributes().on_delete {
-        if !connector.supports_referential_action(&referential_integrity, on_delete) {
+    if let Some(on_delete) = field.explicit_on_delete() {
+        if !ctx
+            .connector
+            .supports_referential_action(&ctx.referential_integrity, on_delete)
+        {
             let span = field
                 .ast_field()
                 .span_for_argument("relation", "onDelete")
                 .unwrap_or_else(|| field.ast_field().span);
 
-            diagnostics.push_error(DatamodelError::new_validation_error(msg(on_delete), span));
+            ctx.push_error(DatamodelError::new_validation_error(msg(on_delete), span));
         }
     }
 
-    if let Some(on_update) = field.attributes().on_update {
-        if !connector.supports_referential_action(&referential_integrity, on_update) {
+    if let Some(on_update) = field.explicit_on_update() {
+        if !ctx
+            .connector
+            .supports_referential_action(&ctx.referential_integrity, on_update)
+        {
             let span = field
                 .ast_field()
                 .span_for_argument("relation", "onUpdate")
                 .unwrap_or_else(|| field.ast_field().span);
 
-            diagnostics.push_error(DatamodelError::new_validation_error(msg(on_update), span));
+            ctx.push_error(DatamodelError::new_validation_error(msg(on_update), span));
         }
+    }
+}
+
+pub(super) fn map(field: RelationFieldWalker<'_, '_>, ctx: &mut Context<'_>) {
+    if field.foreign_key_name().is_none() {
+        return;
+    }
+
+    if !ctx.connector.supports_named_foreign_keys() {
+        ctx.push_error(DatamodelError::new_attribute_validation_error(
+            "Your provider does not support named foreign keys.",
+            "relation",
+            field
+                .ast_field()
+                .span_for_attribute("relation")
+                .unwrap_or_else(ast::Span::empty),
+        ));
+        return;
+    }
+
+    if let Some(relation_attr) = field
+        .ast_field()
+        .attributes
+        .iter()
+        .find(|attr| attr.name() == "relation")
+    {
+        validate_db_name(
+            field.model().name(),
+            relation_attr,
+            field.foreign_key_name(),
+            ctx,
+            false,
+        );
     }
 }

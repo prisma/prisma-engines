@@ -252,7 +252,7 @@ fn nice_error_in_case_of_bool_type_in_env_var() {
     let error = datamodel::parse_schema(source).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
-        [1;91merror[0m: [1mExpected a String value, but received boolean value `true`.[0m
+        [1;91merror[0m: [1mExpected a String value, but received literal value `true`.[0m
           [1;94m-->[0m  [4mschema.prisma:3[0m
         [1;94m   | [0m
         [1;94m 2 | [0m  provider = "postgresql"

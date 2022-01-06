@@ -12,12 +12,26 @@ pub use lower::LowerDmlToAst;
 
 use crate::{ast, configuration::StringFromEnvVar};
 
-fn lower_string_from_env_var(arg_name: &str, string_from_env: &StringFromEnvVar) -> ast::Argument {
+fn lower_string_from_env_var(arg_name: &str, string_from_env: &StringFromEnvVar) -> ast::ConfigBlockProperty {
     match string_from_env.as_env_var() {
         Some(ref env_var) => {
-            let values = vec![ast::Expression::StringValue(env_var.to_string(), ast::Span::empty())];
-            ast::Argument::new_function(arg_name, "env", values)
+            let values = ast::ArgumentsList {
+                arguments: vec![ast::Argument::new_unnamed(ast::Expression::StringValue(
+                    env_var.to_string(),
+                    ast::Span::empty(),
+                ))],
+                ..Default::default()
+            };
+            ast::ConfigBlockProperty {
+                name: ast::Identifier::new(arg_name),
+                value: ast::Expression::Function("env".to_owned(), values, ast::Span::empty()),
+                span: ast::Span::empty(),
+            }
         }
-        None => ast::Argument::new_string(arg_name, string_from_env.as_literal().unwrap().to_string()),
+        None => ast::ConfigBlockProperty {
+            name: ast::Identifier::new(arg_name),
+            value: ast::Expression::StringValue(string_from_env.as_literal().unwrap().to_string(), ast::Span::empty()),
+            span: ast::Span::empty(),
+        },
     }
 }

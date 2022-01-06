@@ -12,30 +12,30 @@ use std::{convert::TryInto, sync::Arc};
 /// Handles nested update (single record) cases.
 ///
 /// ```text
-///       ┌ ─ ─ ─ ─ ─ ─                 
-/// ┌─────    Parent   │─ ─ ─ ─ ─ ┐     
-/// │     └ ─ ─ ─ ─ ─ ─                 
-/// │            │                │     
-/// │            ▼                ▼     
+///       ┌ ─ ─ ─ ─ ─ ─
+/// ┌─────    Parent   │─ ─ ─ ─ ─ ┐
+/// │     └ ─ ─ ─ ─ ─ ─
+/// │            │                │
+/// │            ▼                ▼
 /// │     ┌────────────┐    ┌ ─ ─ ─ ─ ─
 /// │     │   Check    │       Result  │
 /// │     └────────────┘    └ ─ ─ ─ ─ ─
-/// │            │                      
-/// │  ┌ ─ ─ ─ ─ ▼ ─ ─ ─ ─ ┐            
-/// │   ┌─────────────────┐             
-/// │  ││ Insert onUpdate ││            
-/// │   │emulation subtree│             
-/// │  ││for all relations││            
-/// │   │ pointing to the │             
-/// │  ││   Child model   ││            
-/// │   └─────────────────┘             
-/// │  └ ─ ─ ─ ─ ┬ ─ ─ ─ ─ ┘            
-/// │         ┌──┘                      
-/// │         │                         
-/// │         ▼                         
-/// │  ┌────────────┐                   
-/// └─▶│   Update   │                   
-///    └────────────┘                   
+/// │            │
+/// │  ┌ ─ ─ ─ ─ ▼ ─ ─ ─ ─ ┐
+/// │   ┌─────────────────┐
+/// │  ││ Insert onUpdate ││
+/// │   │emulation subtree│
+/// │  ││for all relations││
+/// │   │ pointing to the │
+/// │  ││   Child model   ││
+/// │   └─────────────────┘
+/// │  └ ─ ─ ─ ─ ┬ ─ ─ ─ ─ ┘
+/// │         ┌──┘
+/// │         │
+/// │         ▼
+/// │  ┌────────────┐
+/// └─▶│   Update   │
+///    └────────────┘
 /// ```
 #[tracing::instrument(skip(graph, parent, parent_relation_field, value, child_model))]
 pub fn nested_update(
@@ -78,7 +78,7 @@ pub fn nested_update(
         graph.create_edge(
             &find_child_records_node,
             &update_node,
-            QueryGraphDependency::ParentProjection(
+            QueryGraphDependency::ProjectedDataDependency(
                 child_model_identifier.clone(),
                 Box::new(move |mut update_node, mut child_ids| {
                     let child_id = match child_ids.pop() {
@@ -137,7 +137,7 @@ pub fn nested_update_many(
         graph.create_edge(
             &find_child_records_node,
             &update_many_node,
-            QueryGraphDependency::ParentProjection(
+            QueryGraphDependency::ProjectedDataDependency(
                 child_model_identifier.clone(),
                 Box::new(move |mut update_many_node, child_ids| {
                     if let Node::Query(Query::Write(WriteQuery::UpdateManyRecords(ref mut ur))) = update_many_node {

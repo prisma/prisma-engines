@@ -5,8 +5,8 @@ use std::fmt;
 /// Represents a default specified on a field.
 #[derive(Clone, PartialEq)]
 pub struct DefaultValue {
-    kind: DefaultKind,
-    db_name: Option<String>,
+    pub kind: DefaultKind,
+    pub db_name: Option<String>,
 }
 
 /// Represents a default specified on a field.
@@ -159,7 +159,7 @@ impl ValueGenerator {
     }
 
     pub fn new_dbgenerated(description: String) -> Self {
-        if description.trim_matches(char::from(0)).is_empty() {
+        if description.trim_matches('\0').is_empty() {
             ValueGenerator::new("dbgenerated".to_owned(), Vec::new()).unwrap()
         } else {
             ValueGenerator::new("dbgenerated".to_owned(), vec![PrismaValue::String(description)]).unwrap()

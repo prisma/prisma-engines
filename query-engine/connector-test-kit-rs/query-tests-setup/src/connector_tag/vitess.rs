@@ -78,6 +78,11 @@ impl VitessConnectorTag {
             },
         ]
     }
+
+    /// Get a reference to the vitess connector tag's version.
+    pub fn version(&self) -> Option<VitessVersion> {
+        self.version
+    }
 }
 
 impl PartialEq for VitessConnectorTag {

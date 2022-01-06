@@ -1,5 +1,5 @@
 use crate::{error::ApiError, logger::ChannelLogger};
-use datamodel::{diagnostics::ValidatedConfiguration, Datamodel};
+use datamodel::{Datamodel, ValidatedConfiguration};
 use napi::threadsafe_function::ThreadsafeFunction;
 use opentelemetry::global;
 use prisma_models::InternalDataModelBuilder;
@@ -35,7 +35,6 @@ pub enum Inner {
 /// Holding the information to reconnect the engine if needed.
 #[derive(Debug, Clone)]
 struct EngineDatamodel {
-    datasource_overrides: Vec<(String, String)>,
     ast: Datamodel,
     raw: String,
 }
@@ -148,11 +147,7 @@ impl QueryEngine {
             .map_err(|errors| ApiError::conversion(errors, &datamodel))?
             .subject;
 
-        let datamodel = EngineDatamodel {
-            ast,
-            raw: datamodel,
-            datasource_overrides: overrides,
-        };
+        let datamodel = EngineDatamodel { ast, raw: datamodel };
 
         let logger = if telemetry.enabled {
             ChannelLogger::new_with_telemetry(log_callback, telemetry.endpoint)

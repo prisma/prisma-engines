@@ -1,6 +1,6 @@
 use super::SqlSchemaCalculatorFlavour;
 use crate::flavour::PostgresFlavour;
-use datamodel::{walkers::ScalarFieldWalker, Datamodel, ScalarType, WithDatabaseName};
+use datamodel::{datamodel_connector::ScalarType, walkers::ScalarFieldWalker, Datamodel, WithDatabaseName};
 use sql_schema_describer::{self as sql};
 
 impl SqlSchemaCalculatorFlavour for PostgresFlavour {

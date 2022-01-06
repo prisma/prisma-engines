@@ -116,7 +116,9 @@ fn relation_input_fields_for_checked_create(
 
                 let all_required_scalar_fields_have_defaults = rf
                     .linking_fields()
-                    .scalar_fields()
+                    .as_scalar_fields()
+                    .expect("Expected linking fields to be scalar.")
+                    .into_iter()
                     .all(|scalar_field| scalar_field.default_value.is_some());
 
                 let input_field = input_field(rf.name.clone(), InputType::object(input_object), None);
@@ -166,7 +168,10 @@ fn unchecked_create_input_type(
     let linking_fields = if let Some(parent_field) = parent_field {
         let child_field = parent_field.related_field();
         if child_field.is_inlined_on_enclosing_model() {
-            child_field.linking_fields().scalar_fields().collect()
+            child_field
+                .linking_fields()
+                .as_scalar_fields()
+                .expect("Expected linking fields to be scalar.")
         } else {
             vec![]
         }
@@ -248,7 +253,9 @@ fn relation_input_fields_for_unchecked_create(
 
                 let all_required_scalar_fields_have_defaults = rf
                     .linking_fields()
-                    .scalar_fields()
+                    .as_scalar_fields()
+                    .expect("Expected linking fields to be scalar.")
+                    .into_iter()
                     .all(|scalar_field| scalar_field.default_value.is_some());
 
                 let input_field = input_field(rf.name.clone(), InputType::object(input_object), None);

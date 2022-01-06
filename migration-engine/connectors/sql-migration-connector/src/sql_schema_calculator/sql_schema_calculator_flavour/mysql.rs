@@ -1,8 +1,9 @@
 use super::SqlSchemaCalculatorFlavour;
 use crate::flavour::MysqlFlavour;
 use datamodel::{
+    datamodel_connector::ScalarType,
     walkers::{walk_scalar_fields, ScalarFieldWalker},
-    Datamodel, ScalarType,
+    Datamodel,
 };
 use sql_schema_describer as sql;
 

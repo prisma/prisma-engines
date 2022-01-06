@@ -298,3 +298,10 @@ pub struct InteractiveTransactionError {
 pub struct QueryParameterLimitExceeded {
     pub message: String,
 }
+
+#[derive(Debug, UserFacingError, Serialize)]
+#[user_facing(
+    code = "P2030",
+    message = "Cannot find a fulltext index to use for the search, try adding a @@fulltext([Fields...]) to your schema"
+)]
+pub struct MissingFullTextSearchIndex {}

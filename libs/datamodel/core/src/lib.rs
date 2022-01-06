@@ -75,7 +75,6 @@
 
 pub mod ast;
 pub mod common;
-pub mod diagnostics;
 pub mod dml;
 pub mod json;
 pub mod walkers;
@@ -85,16 +84,24 @@ mod transform;
 
 pub use crate::dml::*;
 pub use configuration::{Configuration, Datasource, Generator, StringFromEnvVar};
-pub use transform::ast_to_dml::reserved_model_names;
+pub use datamodel_connector;
+pub use diagnostics;
+pub use parser_database;
+pub use parser_database::is_reserved_type_name;
+pub use schema_ast;
 
-use crate::diagnostics::{Validated, ValidatedConfiguration, ValidatedDatamodel};
 use crate::{ast::SchemaAst, common::preview_features::PreviewFeature};
-use diagnostics::Diagnostics;
+use ast::reformat::MissingField;
+use diagnostics::{Diagnostics, Validated};
 use enumflags2::BitFlags;
 use transform::{
-    ast_to_dml::{DatasourceLoader, GeneratorLoader, ValidationPipeline},
+    ast_to_dml::{validate, DatasourceLoader, GeneratorLoader},
     dml_to_ast::{self, GeneratorSerializer, LowerDmlToAst},
 };
+
+pub type ValidatedDatamodel = Validated<Datamodel>;
+pub type ValidatedConfiguration = Validated<Configuration>;
+pub type ValidatedMissingFields = Validated<Vec<MissingField>>;
 
 /// Parse and validate the whole schema
 pub fn parse_schema(schema_str: &str) -> Result<(Configuration, Datamodel), String> {
@@ -134,7 +141,7 @@ fn parse_datamodel_internal(
     transform: bool,
 ) -> Result<Validated<(Configuration, Datamodel)>, diagnostics::Diagnostics> {
     let mut diagnostics = diagnostics::Diagnostics::new();
-    let ast = ast::parse_schema(datamodel_string)?;
+    let ast = ast::parse_schema(datamodel_string, &mut diagnostics);
 
     let generators = GeneratorLoader::load_generators_from_ast(&ast, &mut diagnostics);
     let preview_features = preview_features(&generators);
@@ -142,37 +149,42 @@ fn parse_datamodel_internal(
 
     diagnostics.to_result()?;
 
-    let validator = ValidationPipeline::new(&datasources, preview_features);
+    let out = validate(&ast, &datasources, preview_features, diagnostics, transform);
 
-    match validator.validate(&ast, transform) {
-        Ok(mut src) => {
-            src.warnings.append(diagnostics.warnings_mut());
-            Ok(Validated {
-                subject: (
-                    Configuration {
-                        generators,
-                        datasources,
-                    },
-                    src.subject,
-                ),
-                warnings: src.warnings,
-            })
-        }
-        Err(mut err) => {
-            diagnostics.append(&mut err);
-            Err(diagnostics)
-        }
+    if !out.diagnostics.errors().is_empty() {
+        return Err(out.diagnostics);
     }
+
+    let datamodel = transform::ast_to_dml::LiftAstToDml::new(&out.db, out.connector, out.referential_integrity).lift();
+
+    Ok(Validated {
+        subject: (
+            Configuration {
+                generators,
+                datasources,
+            },
+            datamodel,
+        ),
+        warnings: out.diagnostics.warnings().to_vec(),
+    })
 }
 
 pub fn parse_schema_ast(datamodel_string: &str) -> Result<SchemaAst, diagnostics::Diagnostics> {
-    Ok(ast::parse_schema(datamodel_string)?)
+    let mut diagnostics = Diagnostics::default();
+    let schema = ast::parse_schema(datamodel_string, &mut diagnostics);
+
+    diagnostics.to_result()?;
+
+    Ok(schema)
 }
 
 /// Loads all configuration blocks from a datamodel using the built-in source definitions.
 pub fn parse_configuration(schema: &str) -> Result<ValidatedConfiguration, diagnostics::Diagnostics> {
-    let ast = ast::parse_schema(schema)?;
     let mut diagnostics = Diagnostics::default();
+    let ast = ast::parse_schema(schema, &mut diagnostics);
+
+    diagnostics.to_result()?;
+
     let generators = GeneratorLoader::load_generators_from_ast(&ast, &mut diagnostics);
     let preview_features = preview_features(&generators);
     let datasources = load_sources(&ast, preview_features, &mut diagnostics);
@@ -277,8 +289,5 @@ fn render_schema_ast_to(stream: &mut dyn std::fmt::Write, schema: &ast::SchemaAs
 }
 
 fn preview_features(generators: &[Generator]) -> BitFlags<PreviewFeature> {
-    generators
-        .iter()
-        .flat_map(|gen| gen.preview_features.iter().cloned())
-        .collect()
+    generators.iter().map(|gen| gen.preview_features()).collect()
 }

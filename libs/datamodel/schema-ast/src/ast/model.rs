@@ -21,7 +21,7 @@ impl std::ops::Index<FieldId> for Model {
 }
 
 /// A model declaration.
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone)]
 pub struct Model {
     /// The name of the model.
     pub name: Identifier,
@@ -51,10 +51,6 @@ impl Model {
 
     pub fn find_field_bang(&self, name: &str) -> &Field {
         self.find_field(name).unwrap()
-    }
-
-    pub fn name(&self) -> &str {
-        &self.name.name
     }
 }
 

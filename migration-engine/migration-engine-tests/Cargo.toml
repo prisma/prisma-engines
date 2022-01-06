@@ -2,9 +2,7 @@
 name = "migration-engine-tests"
 version = "0.1.0"
 authors = ["Tom Houlé <tom@tomhoule.com>"]
-edition = "2018"
-
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+edition = "2021"
 
 [features]
 default = ["sql"]
@@ -32,8 +30,8 @@ serde = "1"
 serde_json = { version = "1.0", features = ["float_roundtrip"] }
 tempfile = "3.1.0"
 tokio = { version = "1.0" }
-tracing = "0.1.12"
-tracing-futures = "0.2.1"
+tracing = "0.1"
+tracing-futures = "0.2"
 url = "2.1.1"
 connection-string = "0.1.13"
 expect-test = "1.1.0"

@@ -6,7 +6,7 @@ fn reordering_and_altering_models_at_the_same_time_works(api: TestApi) {
         model A {
             id Int @id
             name Int @unique
-            c C @relation(name: "atoc", fields: [name], references: [name], onDelete: Restrict)
+            c C @relation(name: "atoc", fields: [name], references: [name], onDelete: Restrict, onUpdate: Restrict)
             cs C[] @relation(name: "ctoa")
         }
 
@@ -39,7 +39,7 @@ fn reordering_and_altering_models_at_the_same_time_works(api: TestApi) {
         model A {
             id Int @id
             name Int @unique
-            c C @relation(name: "atoc2", fields: [name], references: [name], onDelete: Restrict)
+            c C @relation(name: "atoc2", fields: [name], references: [name], onDelete: Restrict, onUpdate: Restrict)
             cs C[] @relation(name: "ctoa2")
         }
 

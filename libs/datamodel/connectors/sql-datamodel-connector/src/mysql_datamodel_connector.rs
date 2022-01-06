@@ -1,12 +1,12 @@
 use datamodel_connector::{
     connector_error::ConnectorError,
     helper::{args_vec_from_opt, parse_one_opt_u32, parse_one_u32, parse_two_opt_u32},
-    Connector, ConnectorCapability, ConstraintScope, ReferentialIntegrity,
+    parser_database::walkers::ModelWalker,
+    walker_ext_traits::*,
+    Connector, ConnectorCapability, ConstraintScope, Diagnostics, NativeTypeConstructor, ReferentialAction,
+    ReferentialIntegrity, ScalarType,
 };
-use dml::{
-    field::FieldType, model::Model, native_type_constructor::NativeTypeConstructor,
-    native_type_instance::NativeTypeInstance, relation_info::ReferentialAction, scalars::ScalarType,
-};
+use dml::native_type_instance::NativeTypeInstance;
 use enumflags2::BitFlags;
 use native_types::MySqlType::{self, *};
 
@@ -92,6 +92,7 @@ const NATIVE_TYPE_CONSTRUCTORS: &[NativeTypeConstructor] = &[
 const CAPABILITIES: &[ConnectorCapability] = &[
     ConnectorCapability::RelationsOverNonUniqueCriteria,
     ConnectorCapability::Enums,
+    ConnectorCapability::EnumArrayPush,
     ConnectorCapability::Json,
     ConnectorCapability::AutoIncrementAllowedOnNonId,
     ConnectorCapability::RelationFieldsInArbitraryOrder,
@@ -100,6 +101,7 @@ const CAPABILITIES: &[ConnectorCapability] = &[
     ConnectorCapability::CreateSkipDuplicates,
     ConnectorCapability::UpdateableId,
     ConnectorCapability::JsonFilteringJsonPath,
+    ConnectorCapability::JsonFilteringAlphanumeric,
     ConnectorCapability::CreateManyWriteableAutoIncId,
     ConnectorCapability::AutoIncrement,
     ConnectorCapability::CompoundIds,
@@ -109,6 +111,7 @@ const CAPABILITIES: &[ConnectorCapability] = &[
     ConnectorCapability::AdvancedJsonNullability,
     ConnectorCapability::IndexColumnLengthPrefixing,
     ConnectorCapability::FullTextIndex,
+    ConnectorCapability::FullTextSearchWithIndex,
     ConnectorCapability::MultipleFullTextAttributesPerModel,
 ];
 
@@ -137,7 +140,7 @@ impl Connector for MySqlDatamodelConnector {
         CAPABILITIES
     }
 
-    fn constraint_name_length(&self) -> usize {
+    fn max_identifier_length(&self) -> usize {
         64
     }
 
@@ -244,42 +247,41 @@ impl Connector for MySqlDatamodelConnector {
             VarChar(length) if length > 65535 => {
                 errors.push(error.new_argument_m_out_of_range_error("M can range from 0 to 65,535."))
             }
-            Bit(n) if n > 1 && scalar_type.is_boolean() => {
+            Bit(n) if n > 1 && matches!(scalar_type, ScalarType::Boolean) => {
                 errors.push(error.new_argument_m_out_of_range_error("only Bit(1) can be used as Boolean."))
             }
             _ => (),
         }
     }
 
-    fn validate_model(&self, model: &Model, errors: &mut Vec<ConnectorError>) {
-        for index_definition in model.indices.iter() {
-            let fields = index_definition
-                .fields
-                .iter()
-                .map(|f| model.find_field(&f.name).unwrap())
-                .zip(index_definition.fields.iter());
+    fn validate_model(&self, model: ModelWalker<'_, '_>, errors: &mut Diagnostics) {
+        let mut push_error = |err: ConnectorError| {
+            errors.push_error(datamodel_connector::DatamodelError::ConnectorError {
+                message: err.to_string(),
+                span: model.ast_model().span,
+            });
+        };
 
-            for (f, definition) in fields {
-                if let FieldType::Scalar(_, _, Some(native_type)) = f.field_type() {
-                    let native_type_name = native_type.name.as_str();
-
-                    if NATIVE_TYPES_THAT_CAN_NOT_BE_USED_IN_KEY_SPECIFICATION.contains(&native_type_name) {
+        for index in model.indexes() {
+            for field in index.scalar_field_attributes() {
+                if let Some(native_type) = field.as_scalar_field().native_type_instance(self) {
+                    if NATIVE_TYPES_THAT_CAN_NOT_BE_USED_IN_KEY_SPECIFICATION.contains(&native_type.name.as_str()) {
                         // Length defined, so we allow the index.
-                        if definition.length.is_some() {
+                        if field.length().is_some() {
                             continue;
                         }
 
-                        if index_definition.is_fulltext() {
+                        if index.is_fulltext() {
                             continue;
                         }
 
-                        if index_definition.is_unique() {
-                            errors.push(
+                        if index.is_unique() {
+                            push_error(
                                 self.native_instance_error(&native_type)
                                     .new_incompatible_native_type_with_unique(),
                             )
                         } else {
-                            errors.push(
+                            push_error(
                                 self.native_instance_error(&native_type)
                                     .new_incompatible_native_type_with_index(),
                             )
@@ -291,21 +293,19 @@ impl Connector for MySqlDatamodelConnector {
             }
         }
 
-        if let Some(pk) = &model.primary_key {
-            for id_field in pk.fields.iter() {
-                let field = model.find_field(&id_field.name).unwrap();
-
-                if let FieldType::Scalar(_, _, Some(native_type)) = field.field_type() {
-                    let native_type_name = native_type.name.as_str();
-
-                    if NATIVE_TYPES_THAT_CAN_NOT_BE_USED_IN_KEY_SPECIFICATION.contains(&native_type_name) {
+        if let Some(pk) = model.primary_key() {
+            for id_field in pk.scalar_field_attributes() {
+                if let Some(native_type_instance) = id_field.as_scalar_field().native_type_instance(self) {
+                    if NATIVE_TYPES_THAT_CAN_NOT_BE_USED_IN_KEY_SPECIFICATION
+                        .contains(&native_type_instance.name.as_str())
+                    {
                         // Length defined, so we allow the index.
-                        if id_field.length.is_some() {
+                        if id_field.length().is_some() {
                             continue;
                         }
 
-                        errors.push(
-                            self.native_instance_error(&native_type)
+                        push_error(
+                            self.native_instance_error(&native_type_instance)
                                 .new_incompatible_native_type_with_id(),
                         );
 

@@ -3,9 +3,10 @@ use super::{
     parse_attribute::parse_attribute,
     parse_comments::*,
     parse_field::parse_field,
-    Diagnostics, ParserError, Rule,
+    Rule,
 };
 use crate::ast::*;
+use diagnostics::{DatamodelError, Diagnostics};
 
 pub(crate) fn parse_model(token: &Token<'_>, diagnostics: &mut Diagnostics) -> Model {
     let mut name: Option<Identifier> = None;
@@ -20,12 +21,12 @@ pub(crate) fn parse_model(token: &Token<'_>, diagnostics: &mut Diagnostics) -> M
             Rule::block_level_attribute => attributes.push(parse_attribute(&current)),
             Rule::field_declaration => match parse_field(&name.as_ref().unwrap().name, &current) {
                 Ok(field) => fields.push(field),
-                Err(err) => diagnostics.push(err),
+                Err(err) => diagnostics.push_error(err),
             },
             Rule::comment_block => comment = parse_comment_block(&current),
-            Rule::BLOCK_LEVEL_CATCH_ALL => diagnostics.push(ParserError::new_validation_error(
+            Rule::BLOCK_LEVEL_CATCH_ALL => diagnostics.push_error(DatamodelError::new_validation_error(
                 "This line is not a valid field or attribute definition.".to_owned(),
-                current.as_span(),
+                current.as_span().into(),
             )),
             _ => parsing_catch_all(&current, "model"),
         }
@@ -37,7 +38,7 @@ pub(crate) fn parse_model(token: &Token<'_>, diagnostics: &mut Diagnostics) -> M
             fields,
             attributes,
             documentation: comment,
-            span: Span::from_pest(token.as_span()),
+            span: Span::from(token.as_span()),
             commented_out: false,
         },
         _ => panic!(

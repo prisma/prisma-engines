@@ -44,7 +44,7 @@ pub trait ConnectionLike: ReadOperations + WriteOperations + Send + Sync {}
 #[derive(Debug, Clone)]
 pub struct RecordFilter {
     pub filter: Filter,
-    pub selectors: Option<Vec<RecordProjection>>,
+    pub selectors: Option<Vec<SelectionResult>>,
 }
 
 impl RecordFilter {
@@ -65,8 +65,8 @@ impl From<Filter> for RecordFilter {
     }
 }
 
-impl From<Vec<RecordProjection>> for RecordFilter {
-    fn from(selectors: Vec<RecordProjection>) -> Self {
+impl From<Vec<SelectionResult>> for RecordFilter {
+    fn from(selectors: Vec<SelectionResult>) -> Self {
         Self {
             filter: Filter::empty(),
             selectors: Some(selectors),
@@ -74,8 +74,8 @@ impl From<Vec<RecordProjection>> for RecordFilter {
     }
 }
 
-impl From<RecordProjection> for RecordFilter {
-    fn from(selector: RecordProjection) -> Self {
+impl From<SelectionResult> for RecordFilter {
+    fn from(selector: SelectionResult) -> Self {
         Self {
             filter: Filter::empty(),
             selectors: Some(vec![selector]),
@@ -215,12 +215,12 @@ pub trait ReadOperations {
     /// - The `ModelRef` represents the datamodel and its relations.
     /// - The `Filter` defines what item we want back and is guaranteed to be
     ///   defined to filter at most one item by the core.
-    /// - The `SelectedFields` defines the values to be returned.
+    /// - The `FieldSelection` defines the values to be returned.
     async fn get_single_record(
         &mut self,
         model: &ModelRef,
         filter: &Filter,
-        selected_fields: &ModelProjection,
+        selected_fields: &FieldSelection,
         aggregation_selections: &[RelAggregationSelection],
     ) -> crate::Result<Option<SingleRecord>>;
 
@@ -228,13 +228,13 @@ pub trait ReadOperations {
     ///
     /// - The `ModelRef` represents the datamodel and its relations.
     /// - The `QueryArguments` defines various constraints (see docs for detailed explanation).
-    /// - The `SelectedFields` defines the fields (e.g. columns or document fields)
+    /// - The `FieldSelection` defines the fields (e.g. columns or document fields)
     ///   to be returned as a projection of fields of the model it queries.
     async fn get_many_records(
         &mut self,
         model: &ModelRef,
         query_arguments: QueryArguments,
-        selected_fields: &ModelProjection,
+        selected_fields: &FieldSelection,
         aggregation_selections: &[RelAggregationSelection],
     ) -> crate::Result<ManyRecords>;
 
@@ -248,8 +248,8 @@ pub trait ReadOperations {
     async fn get_related_m2m_record_ids(
         &mut self,
         from_field: &RelationFieldRef,
-        from_record_ids: &[RecordProjection],
-    ) -> crate::Result<Vec<(RecordProjection, RecordProjection)>>;
+        from_record_ids: &[SelectionResult],
+    ) -> crate::Result<Vec<(SelectionResult, SelectionResult)>>;
 
     /// Aggregates records for a specific model based on the given selections.
     /// Whether or not the aggregations can be executed in a single query or
@@ -269,7 +269,7 @@ pub trait ReadOperations {
 #[async_trait]
 pub trait WriteOperations {
     /// Insert a single record to the database.
-    async fn create_record(&mut self, model: &ModelRef, args: WriteArgs) -> crate::Result<RecordProjection>;
+    async fn create_record(&mut self, model: &ModelRef, args: WriteArgs) -> crate::Result<SelectionResult>;
 
     /// Inserts many records at once into the database.
     async fn create_records(
@@ -286,7 +286,7 @@ pub trait WriteOperations {
         model: &ModelRef,
         record_filter: RecordFilter,
         args: WriteArgs,
-    ) -> crate::Result<Vec<RecordProjection>>;
+    ) -> crate::Result<Vec<SelectionResult>>;
 
     /// Delete records in the `Model` with the given `Filter`.
     async fn delete_records(&mut self, model: &ModelRef, record_filter: RecordFilter) -> crate::Result<usize>;
@@ -297,16 +297,16 @@ pub trait WriteOperations {
     async fn m2m_connect(
         &mut self,
         field: &RelationFieldRef,
-        parent_id: &RecordProjection,
-        child_ids: &[RecordProjection],
+        parent_id: &SelectionResult,
+        child_ids: &[SelectionResult],
     ) -> crate::Result<()>;
 
     /// Disconnect the children from the parent (m2m relation only).
     async fn m2m_disconnect(
         &mut self,
         field: &RelationFieldRef,
-        parent_id: &RecordProjection,
-        child_ids: &[RecordProjection],
+        parent_id: &SelectionResult,
+        child_ids: &[SelectionResult],
     ) -> crate::Result<()>;
 
     /// Execute the raw query in the database as-is. The `parameters` are

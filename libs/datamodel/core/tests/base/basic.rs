@@ -1,5 +1,6 @@
 use crate::common::*;
 use datamodel::ScalarType;
+use diagnostics::{DatamodelWarning, Span};
 
 #[test]
 fn parse_basic_model() {
@@ -210,4 +211,23 @@ fn invalid_line_must_not_break() {
     "#]];
 
     expectation.assert_eq(&error);
+}
+
+#[test]
+fn type_aliases_must_warn() {
+    let dml = indoc! {r#"
+      type MyString = String @default("B")
+
+      model A {
+        id  Int      @id
+        val MyString
+      }
+    "#};
+
+    let parsed = datamodel::parse_datamodel(dml).unwrap();
+    let expected = DatamodelWarning::DeprecatedTypeAlias {
+        span: Span { start: 0, end: 36 },
+    };
+
+    assert_eq!(Some(expected).as_ref(), parsed.warnings.first());
 }

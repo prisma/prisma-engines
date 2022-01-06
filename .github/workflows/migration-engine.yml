@@ -2,7 +2,7 @@ name: Introspection Engine + Migration Engine + sql_schema_describer
 on:
   push:
     branches:
-      - master
+      - main
   pull_request:
 jobs:
   test-mongodb-introspection-and-migration-connector:
@@ -27,13 +27,13 @@ jobs:
           toolchain: stable
           default: true
 
-      - uses: actions/cache@v2
-        with:
-          path: |
-            ~/.cargo/registry
-            ~/.cargo/git
-            target
-          key: me-ie-ubuntu-latest-mongodb-cargo-${{ hashFiles('**/Cargo.lock') }}
+      # - uses: actions/cache@v2
+      #   with:
+      #     path: |
+      #       ~/.cargo/registry
+      #       ~/.cargo/git
+      #       target
+      #     key: me-ie-ubuntu-latest-mongodb-cargo-${{ hashFiles('**/Cargo.lock') }}
 
       - run: cargo test -p mongodb-introspection-connector
         env:
@@ -44,7 +44,6 @@ jobs:
         env:
           CLICOLOR_FORCE: 1
           TEST_DATABASE_URL: ${{ matrix.database.url }}
-
 
   test-linux:
     name: "Test ${{ matrix.database.name }} on Linux"
@@ -80,7 +79,7 @@ jobs:
           - name: postgres14
             url: "postgresql://postgres:prisma@localhost:5437"
           - name: cockroach
-            url: "postgresql://root@localhost:5436"
+            url: "postgresql://root@localhost:26257"
             is_cockroach: true
           - name: sqlite
             url: sqlite
@@ -107,13 +106,13 @@ jobs:
           toolchain: stable
           default: true
 
-      - uses: actions/cache@v2
-        with:
-          path: |
-            ~/.cargo/registry
-            ~/.cargo/git
-            target
-          key: me-ie-${{ runner.os }}-${{ matrix.database.name }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+      # - uses: actions/cache@v2
+      #   with:
+      #     path: |
+      #       ~/.cargo/registry
+      #       ~/.cargo/git
+      #       target
+      #     key: me-ie-${{ runner.os }}-${{ matrix.database.name }}-cargo-${{ hashFiles('**/Cargo.lock') }}
 
       - run: cargo test -p introspection-engine-tests
         if: ${{ !matrix.database.single_threaded }}
@@ -212,13 +211,13 @@ jobs:
         with:
           toolchain: ${{matrix.rust}}
 
-      - uses: actions/cache@v2
-        with:
-          path: |
-            ~/.cargo/registry
-            ~/.cargo/git
-            target
-          key: ${{ runner.os }}-cargo-${{ matrix.rust }}-${{ hashFiles('**/Cargo.lock') }}
+      # - uses: actions/cache@v2
+      #   with:
+      #     path: |
+      #       ~/.cargo/registry
+      #       ~/.cargo/git
+      #       target
+      #     key: ${{ runner.os }}-cargo-${{ matrix.rust }}-${{ hashFiles('**/Cargo.lock') }}
 
       - uses: MinoruSekine/setup-scoop@main
 

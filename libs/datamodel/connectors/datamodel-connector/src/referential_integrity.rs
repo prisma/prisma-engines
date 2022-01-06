@@ -1,7 +1,6 @@
-use std::fmt;
-
-use dml::relation_info::ReferentialAction;
+use crate::ReferentialAction;
 use enumflags2::{bitflags, BitFlags};
+use std::fmt;
 
 /// Defines the part of the stack where referential actions are handled.
 #[bitflags]

@@ -1,8 +1,7 @@
 use super::{Datamodel, Enum, EnumValue, Field, Function, Model, UniqueIndex};
-use crate::json::dmmf::PrimaryKey;
-use crate::{dml, FieldType, Ignorable, ScalarType};
+use crate::{dml, json::dmmf::PrimaryKey, FieldType, Ignorable, ScalarType};
+use ::dml::{prisma_value, PrismaValue};
 use bigdecimal::ToPrimitive;
-use prisma_value::PrismaValue;
 
 pub fn render_to_dmmf(schema: &dml::Datamodel) -> String {
     let dmmf = schema_to_dmmf(schema);
@@ -154,17 +153,23 @@ fn prisma_value_to_serde(value: &PrismaValue) -> serde_json::Value {
         PrismaValue::Uuid(val) => serde_json::Value::String(val.to_string()),
         PrismaValue::Json(val) => serde_json::Value::String(val.to_string()),
         PrismaValue::Xml(val) => serde_json::Value::String(val.to_string()),
-        PrismaValue::List(value_vec) => {
-            serde_json::Value::Array(value_vec.iter().map(|pv| prisma_value_to_serde(pv)).collect())
-        }
+        PrismaValue::List(value_vec) => serde_json::Value::Array(value_vec.iter().map(prisma_value_to_serde).collect()),
         PrismaValue::Bytes(b) => serde_json::Value::String(prisma_value::encode_bytes(b)),
+        PrismaValue::Object(pairs) => {
+            let mut map = serde_json::Map::with_capacity(pairs.len());
+            pairs.iter().for_each(|(key, value)| {
+                map.insert(key.clone(), prisma_value_to_serde(value));
+            });
+
+            serde_json::Value::Object(map)
+        }
     }
 }
 
 fn function_to_serde(name: &str, args: &[PrismaValue]) -> serde_json::Value {
     let func = Function {
         name: String::from(name),
-        args: args.iter().map(|arg| prisma_value_to_serde(arg)).collect(),
+        args: args.iter().map(prisma_value_to_serde).collect(),
     };
 
     serde_json::to_value(&func).expect("Failed to render function JSON")

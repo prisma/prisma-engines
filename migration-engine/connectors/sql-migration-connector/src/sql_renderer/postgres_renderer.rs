@@ -26,7 +26,7 @@ impl PostgresFlavour {
         let nullability_str = render_nullability(column);
         let default_str = column
             .default()
-            .map(|default| render_default(default))
+            .map(render_default)
             .filter(|default| !default.is_empty())
             .map(|default| format!(" DEFAULT {}", default))
             .unwrap_or_else(String::new);
@@ -678,13 +678,20 @@ enum PostgresAlterColumn {
 
 fn render_default(default: &DefaultValue) -> Cow<'_, str> {
     match default.kind() {
-        DefaultKind::DbGenerated(val) => val.as_str().into(),
+        DefaultKind::DbGenerated(val) => Cow::Borrowed(val.as_str()),
         DefaultKind::Value(PrismaValue::String(val)) | DefaultKind::Value(PrismaValue::Enum(val)) => {
             format!("E'{}'", escape_string_literal(val)).into()
         }
         DefaultKind::Value(PrismaValue::Bytes(b)) => Quoted::postgres_string(format_hex(b)).to_string().into(),
         DefaultKind::Now => "CURRENT_TIMESTAMP".into(),
         DefaultKind::Value(PrismaValue::DateTime(val)) => Quoted::postgres_string(val).to_string().into(),
+        DefaultKind::Value(PrismaValue::Json(json_value)) => {
+            let mut out = String::with_capacity(json_value.len() + 2);
+            out.push('\'');
+            out.push_str(&escape_string_literal(json_value));
+            out.push('\'');
+            Cow::Owned(out)
+        }
         DefaultKind::Value(val) => val.to_string().into(),
         DefaultKind::Sequence(_) => Default::default(),
     }

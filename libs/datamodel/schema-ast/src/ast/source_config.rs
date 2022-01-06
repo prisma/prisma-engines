@@ -1,12 +1,12 @@
-use super::{Argument, Comment, Identifier, Span, WithDocumentation, WithIdentifier, WithSpan};
+use super::{Comment, ConfigBlockProperty, Identifier, Span, WithDocumentation, WithIdentifier, WithSpan};
 
 /// A source block declaration.
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone)]
 pub struct SourceConfig {
     /// Name of this source.
     pub name: Identifier,
     /// Top-level configuration properties for this source.
-    pub properties: Vec<Argument>,
+    pub properties: Vec<ConfigBlockProperty>,
     /// The comments for this source block.
     pub documentation: Option<Comment>,
     /// The location of this source block in the text representation.

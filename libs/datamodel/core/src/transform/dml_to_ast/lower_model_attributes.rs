@@ -19,12 +19,15 @@ impl<'a> LowerDmlToAst<'a> {
         if let Some(pk) = &model.primary_key {
             if !pk.defined_on_field {
                 let mut args = if self.preview_features.contains(PreviewFeature::ExtendedIndexes) {
-                    vec![ast::Argument::new_array("", LowerDmlToAst::pk_field_array(&pk.fields))]
+                    vec![ast::Argument::new_unnamed(ast::Expression::Array(
+                        LowerDmlToAst::pk_field_array(&pk.fields),
+                        ast::Span::empty(),
+                    ))]
                 } else {
-                    vec![ast::Argument::new_array(
-                        "",
+                    vec![ast::Argument::new_unnamed(ast::Expression::Array(
                         LowerDmlToAst::field_array(&pk.fields.clone().into_iter().map(|f| f.name).collect::<Vec<_>>()),
-                    )]
+                        ast::Span::empty(),
+                    ))]
                 };
 
                 if pk.name.is_some() {
@@ -109,15 +112,15 @@ impl<'a> LowerDmlToAst<'a> {
 
     fn fields_argument(&self, index_def: &IndexDefinition, always_render_sort_order: bool) -> Vec<Argument> {
         if self.preview_features.contains(PreviewFeature::ExtendedIndexes) {
-            vec![ast::Argument::new_array(
-                "",
+            vec![ast::Argument::new_unnamed(ast::Expression::Array(
                 LowerDmlToAst::index_field_array(&index_def.fields, always_render_sort_order),
-            )]
+                ast::Span::empty(),
+            ))]
         } else {
-            vec![ast::Argument::new_array(
-                "",
+            vec![ast::Argument::new_unnamed(ast::Expression::Array(
                 LowerDmlToAst::field_array(&index_def.fields.clone().into_iter().map(|f| f.name).collect::<Vec<_>>()),
-            )]
+                ast::Span::empty(),
+            ))]
         }
     }
 

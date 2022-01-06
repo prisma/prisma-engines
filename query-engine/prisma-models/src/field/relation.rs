@@ -35,7 +35,7 @@ impl RelationField {
         matches!(self.arity, FieldArity::Required)
     }
 
-    /// Returns the `ModelProjection` used for this relation fields model.
+    /// Returns the `FieldSelection` used for this relation fields model.
     ///
     /// ## What is the model projection of a relation field?
     /// The set of fields required by the relation (**on the model of the relation field**) to be able to link the related records.
@@ -43,7 +43,7 @@ impl RelationField {
     /// In case of a many-to-many relation field, we can make the assumption that the primary identifier of the enclosing model
     /// is the set of linking fields, as this is how Prisma many-to-many works and we only support implicit join tables (i.e. m:n)
     /// in the Prisma style.
-    pub fn linking_fields(&self) -> ModelProjection {
+    pub fn linking_fields(&self) -> FieldSelection {
         if self.relation().is_many_to_many() {
             self.model().primary_identifier()
         } else if self.relation_info.references.is_empty() {
@@ -68,9 +68,9 @@ impl RelationField {
                 })
                 .collect();
 
-            ModelProjection::new(referenced_fields)
+            FieldSelection::from(referenced_fields)
         } else {
-            ModelProjection::new(vec![Arc::new(self.clone()).into()])
+            FieldSelection::from(self)
         }
     }
 
@@ -182,7 +182,10 @@ impl RelationField {
     // Todo This is provisionary.
     pub fn left_scalars(&self) -> Vec<ScalarFieldRef> {
         if self.relation().is_many_to_many() {
-            self.model().primary_identifier().scalar_fields().collect()
+            self.model()
+                .primary_identifier()
+                .as_scalar_fields()
+                .expect("Left scalars contain non-scalar selections.")
         } else if self.is_inlined_on_enclosing_model() {
             self.scalar_fields()
         } else {
@@ -198,7 +201,10 @@ impl RelationField {
             let related_model = self.related_model();
 
             if related_field.relation_info.fields.is_empty() {
-                related_model.primary_identifier().scalar_fields().collect()
+                related_model
+                    .primary_identifier()
+                    .as_scalar_fields()
+                    .expect("Right scalars contain non-scalar selections.")
             } else {
                 related_field
                     .relation_info

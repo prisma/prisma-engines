@@ -4,8 +4,8 @@ pub mod write;
 pub use read::*;
 pub use write::*;
 
-use crate::model_extensions::RecordProjectionExt;
-use prisma_models::RecordProjection;
+use crate::model_extensions::SelectionResultExt;
+use prisma_models::SelectionResult;
 use quaint::ast::{Column, Comparable, ConditionTree, Query, Row, Values};
 
 const PARAMETER_LIMIT: usize = 2000;
@@ -13,7 +13,7 @@ const PARAMETER_LIMIT: usize = 2000;
 #[tracing::instrument(skip(columns, records, f))]
 pub(super) fn chunked_conditions<F, Q>(
     columns: &[Column<'static>],
-    records: &[&RecordProjection],
+    records: &[&SelectionResult],
     f: F,
 ) -> Vec<Query<'static>>
 where
@@ -29,15 +29,15 @@ where
         .collect()
 }
 
-#[tracing::instrument(skip(columns, records))]
+#[tracing::instrument(skip(columns, results))]
 pub(super) fn conditions<'a>(
     columns: &'a [Column<'static>],
-    records: impl IntoIterator<Item = &'a RecordProjection>,
+    results: impl IntoIterator<Item = &'a SelectionResult>,
 ) -> ConditionTree<'static> {
     let mut values = Values::empty();
 
-    for proj in records.into_iter() {
-        let vals: Vec<_> = proj.db_values();
+    for result in results.into_iter() {
+        let vals: Vec<_> = result.db_values();
         values.push(vals)
     }
 

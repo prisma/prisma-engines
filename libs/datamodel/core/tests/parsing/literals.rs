@@ -1,8 +1,7 @@
-use std::path::Path;
-
 use crate::common::parse;
 use indoc::indoc;
 use pretty_assertions::assert_eq;
+use std::path::Path;
 
 fn from_env(key: &str) -> Option<String> {
     std::env::var(key).ok()

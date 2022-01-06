@@ -13,9 +13,9 @@ pub(crate) struct SqlError {
     /// The constructed ConnectorError for bubbling up.
     connector_error: ConnectorError,
     /// A byte offset in the query text.
-    src_position: Option<u32>,
+    _src_position: Option<u32>,
     /// 0-based index of the statement in the original query.
-    src_statement: Option<u32>,
+    _src_statement: Option<u32>,
 }
 
 impl SqlError {

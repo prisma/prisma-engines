@@ -1,12 +1,11 @@
+use crate::{
+    diagnostics::DatamodelError,
+    transform::ast_to_dml::{db::walkers::ImplicitManyToManyRelationWalker, validation_pipeline::context::Context},
+};
 use itertools::Itertools;
 
-use crate::{
-    diagnostics::{DatamodelError, Diagnostics},
-    transform::ast_to_dml::db::walkers::ImplicitManyToManyRelationWalker,
-};
-
 /// Our weird many-to-many requirement.
-pub(crate) fn validate_singular_id(relation: ImplicitManyToManyRelationWalker<'_, '_>, diagnostics: &mut Diagnostics) {
+pub(crate) fn validate_singular_id(relation: ImplicitManyToManyRelationWalker<'_, '_>, ctx: &mut Context<'_>) {
     for relation_field in [relation.field_a(), relation.field_b()].iter() {
         if !relation_field.related_model().has_single_id_field() {
             let message = format!(
@@ -16,7 +15,7 @@ pub(crate) fn validate_singular_id(relation: ImplicitManyToManyRelationWalker<'_
                 &relation_field.related_model().name(),
             );
 
-            diagnostics.push_error(DatamodelError::new_field_validation_error(
+            ctx.push_error(DatamodelError::new_field_validation_error(
                 &message,
                 relation_field.model().name(),
                 relation_field.name(),
@@ -27,7 +26,7 @@ pub(crate) fn validate_singular_id(relation: ImplicitManyToManyRelationWalker<'_
         }
 
         if !relation_field.references_singular_id_field() {
-            diagnostics.push_error(DatamodelError::new_validation_error(
+            ctx.push_error(DatamodelError::new_validation_error(
             format!(
                 "Many to many relations must always reference the id field of the related model. Change the argument `references` to use the id field of the related model `{}`. But it is referencing the following fields that are not the id: {}",
                 &relation_field.related_model().name(),

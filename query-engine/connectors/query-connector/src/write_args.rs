@@ -1,7 +1,7 @@
 use crate::error::{ConnectorError, ErrorKind};
 use chrono::Utc;
 use indexmap::{map::Keys, IndexMap};
-use prisma_models::{ModelProjection, ModelRef, PrismaValue, RecordProjection, ScalarFieldRef};
+use prisma_models::{ModelProjection, ModelRef, PrismaValue, ScalarFieldRef, SelectionResult};
 use std::{borrow::Borrow, convert::TryInto, ops::Deref};
 
 /// WriteArgs represent data to be written to an underlying data source.
@@ -168,7 +168,7 @@ impl WriteArgs {
         }
     }
 
-    pub fn as_record_projection(&self, model_projection: ModelProjection) -> Option<RecordProjection> {
+    pub fn as_record_projection(&self, model_projection: ModelProjection) -> Option<SelectionResult> {
         let pairs: Vec<_> = model_projection
             .scalar_fields()
             .map(|field| {
@@ -211,7 +211,7 @@ pub fn pick_args(projection: &ModelProjection, args: &WriteArgs) -> WriteArgs {
 }
 
 /// Merges the incoming write argument values into the given, already loaded, ids. Overwrites existing values.
-pub fn merge_write_args(loaded_ids: Vec<RecordProjection>, incoming_args: WriteArgs) -> Vec<RecordProjection> {
+pub fn merge_write_args(loaded_ids: Vec<SelectionResult>, incoming_args: WriteArgs) -> Vec<SelectionResult> {
     if loaded_ids.is_empty() || incoming_args.is_empty() {
         return loaded_ids;
     }
@@ -223,7 +223,7 @@ pub fn merge_write_args(loaded_ids: Vec<RecordProjection>, incoming_args: WriteA
         .pairs
         .iter()
         .enumerate()
-        .filter_map(|(i, (field, _))| incoming_args.get_field_value(field.db_name()).map(|val| (i, val)))
+        .filter_map(|(i, (selection, _))| incoming_args.get_field_value(selection.db_name()).map(|val| (i, val)))
         .collect();
 
     loaded_ids

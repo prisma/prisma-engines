@@ -5,7 +5,7 @@ use crate::{
     query_graph::{Node, NodeRef, QueryGraph, QueryGraphDependency},
     ArgumentListLookup, ConnectorContext, ParsedField, ParsedInputList, ParsedInputMap,
 };
-use connector::IdFilter;
+use connector::IntoFilter;
 use prisma_models::ModelRef;
 use std::{convert::TryInto, sync::Arc};
 use write_args_parser::*;
@@ -35,7 +35,7 @@ pub fn create_record(
     graph.create_edge(
         &create_node,
         &read_node,
-        QueryGraphDependency::ParentProjection(
+        QueryGraphDependency::ProjectedDataDependency(
             model.primary_identifier(),
             Box::new(move |mut read_node, mut parent_ids| {
                 let parent_id = match parent_ids.pop() {

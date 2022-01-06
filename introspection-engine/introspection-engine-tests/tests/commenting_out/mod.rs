@@ -47,7 +47,7 @@ async fn a_table_without_uniques_should_ignore(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(tags(Postgres), exclude(Cockroach))]
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
 async fn relations_between_ignored_models_should_not_have_field_level_ignores(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
@@ -114,7 +114,7 @@ async fn a_table_without_required_uniques(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(exclude(Cockroach))] // there is no such thing on cockroach, you will get the rowid column
+#[test_connector(exclude(CockroachDb))] // there is no such thing on cockroach, you will get the rowid column
 async fn a_table_without_fully_required_compound_unique(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
@@ -149,7 +149,7 @@ async fn a_table_without_fully_required_compound_unique(api: &TestApi) -> TestRe
     Ok(())
 }
 
-#[test_connector(tags(Postgres), exclude(Cockroach))]
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
 async fn unsupported_type_keeps_its_usages(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
@@ -197,7 +197,7 @@ async fn unsupported_type_keeps_its_usages(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(tags(Cockroach))]
+#[test_connector(tags(CockroachDb))]
 async fn unsupported_type_keeps_its_usages_cockroach(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
@@ -245,7 +245,7 @@ async fn unsupported_type_keeps_its_usages_cockroach(api: &TestApi) -> TestResul
     Ok(())
 }
 
-#[test_connector(tags(Postgres), exclude(Cockroach))]
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
 async fn a_table_with_only_an_unsupported_id(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
@@ -295,7 +295,7 @@ async fn a_table_with_only_an_unsupported_id(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(tags(Postgres), exclude(Cockroach))]
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
 async fn a_table_with_unsupported_types_in_a_relation(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
@@ -356,7 +356,7 @@ async fn remapping_field_names_to_empty(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(tags(Postgres), exclude(Cockroach))]
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
 async fn dbgenerated_in_unsupported(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {

@@ -1,13 +1,11 @@
 [package]
 authors = ["Marcus Böhm <boehm@prisma.io>"]
-edition = "2018"
+edition = "2021"
 name = "sql-introspection-connector"
 version = "0.1.0"
 
 [features]
 vendored-openssl = ["quaint/vendored-openssl"]
-
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
 anyhow = "1.0.26"
@@ -25,8 +23,8 @@ serde = { version = "1", features = ["derive"] }
 serde_json = { version = "1.0", features = ["float_roundtrip"] }
 sql-schema-describer = { path = "../../../libs/sql-schema-describer" }
 thiserror = "1.0.9"
-tracing = "0.1.10"
-tracing-futures = "0.2.0"
+tracing = "0.1"
+tracing-futures = "0.2"
 user-facing-errors = { path = "../../../libs/user-facing-errors", features = ["sql"] }
 enumflags2 = "0.7.1"
 

@@ -14,7 +14,7 @@ pub struct Model {
     pub(crate) manifestation: Option<String>,
     pub(crate) fields: OnceCell<Fields>,
     pub(crate) indexes: OnceCell<Vec<Index>>,
-    pub(crate) primary_identifier: OnceCell<ModelProjection>,
+    pub(crate) primary_identifier: OnceCell<FieldSelection>,
     pub(crate) dml_model: datamodel::Model,
 
     pub internal_data_model: InternalDataModelWeakRef,
@@ -30,10 +30,10 @@ impl Model {
     /// The identifier is nothing but an internal convention to have an anchor point for querying, or in other words,
     /// the identifier is not to be mistaken for a stable, external identifier, but has to be understood as
     /// implementation detail that is used to reason over a fixed set of fields.
-    pub fn primary_identifier(&self) -> ModelProjection {
+    pub fn primary_identifier(&self) -> FieldSelection {
         self.primary_identifier.get_or_init(||{
             let dml_fields = self.dml_model.first_unique_criterion();
-            let fields: Vec<_> = dml_fields
+            let fields: Vec<Field> = dml_fields
                 .iter()
                 .map(|dml_field| {
                     let field = self.fields().find_from_all(&dml_field.name).unwrap_or_else(|_| panic!("Error finding primary identifier: The parser field {} does not exist in the query engine datamodel.", &dml_field.name));
@@ -41,7 +41,7 @@ impl Model {
                 })
                 .collect();
 
-            ModelProjection::new(fields)
+            FieldSelection::from(fields)
         }).clone()
     }
 

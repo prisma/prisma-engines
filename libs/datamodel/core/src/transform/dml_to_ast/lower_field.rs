@@ -1,14 +1,12 @@
-use crate::common::constraint_names::ConstraintNames;
-use crate::common::preview_features::PreviewFeature;
-use crate::common::RelationNames;
-use crate::transform::dml_to_ast::LowerDmlToAst;
 use crate::{
     ast::{self, Attribute, Span},
-    dml, Datasource, Field, Ignorable, SortOrder,
+    common::{constraint_names::ConstraintNames, preview_features::PreviewFeature, RelationNames},
+    dml,
+    transform::dml_to_ast::LowerDmlToAst,
+    Datasource, Field, Ignorable, SortOrder,
 };
-use ::dml::traits::WithName;
+use ::dml::{prisma_value, traits::WithName, PrismaValue};
 use datamodel_connector::{Connector, EmptyDatamodelConnector};
-use prisma_value::PrismaValue;
 
 impl<'a> LowerDmlToAst<'a> {
     /// Internal: Lowers a field's arity.
@@ -56,10 +54,10 @@ impl<'a> LowerDmlToAst<'a> {
         attributes: &mut Vec<Attribute>,
         datasource: &Datasource,
     ) {
-        if datasource
-            .active_connector
-            .native_type_is_default_for_scalar_type(native_type.serialized_native_type.clone(), scalar_type)
-        {
+        if datasource.active_connector.native_type_is_default_for_scalar_type(
+            native_type.serialized_native_type.clone(),
+            &dml_scalar_type_to_parser_database_scalar_type(*scalar_type),
+        ) {
             return;
         }
 
@@ -136,10 +134,9 @@ impl<'a> LowerDmlToAst<'a> {
 
         // @default
         if let Some(default_value) = field.default_value() {
-            let mut args = vec![ast::Argument::new(
-                "",
-                LowerDmlToAst::<'a>::lower_default_value(default_value.clone()),
-            )];
+            let mut args = vec![ast::Argument::new_unnamed(LowerDmlToAst::<'a>::lower_default_value(
+                default_value.clone(),
+            ))];
 
             let connector = self
                 .datasource
@@ -179,7 +176,10 @@ impl<'a> LowerDmlToAst<'a> {
                 == RelationNames::name_for_unambiguous_relation(&relation_info.to, &parent_model.name);
 
             if !relation_info.name.is_empty() && (!has_default_name || parent_model.name == related_model.name) {
-                args.push(ast::Argument::new_string("", relation_info.name.to_string()));
+                args.push(ast::Argument::new_unnamed(ast::Expression::StringValue(
+                    relation_info.name.to_string(),
+                    ast::Span::empty(),
+                )));
             }
 
             let mut relation_fields = relation_info.references.clone();
@@ -253,8 +253,20 @@ impl<'a> LowerDmlToAst<'a> {
         match dv.kind() {
             dml::DefaultKind::Single(v) => LowerDmlToAst::<'a>::lower_prisma_value(v),
             dml::DefaultKind::Expression(e) => {
-                let exprs = e.args().iter().map(LowerDmlToAst::<'a>::lower_prisma_value).collect();
-                ast::Expression::Function(e.name().to_string(), exprs, ast::Span::empty())
+                let arguments = e
+                    .args()
+                    .iter()
+                    .map(LowerDmlToAst::<'a>::lower_prisma_value)
+                    .map(ast::Argument::new_unnamed)
+                    .collect();
+                ast::Expression::Function(
+                    e.name().to_string(),
+                    ast::ArgumentsList {
+                        arguments,
+                        ..Default::default()
+                    },
+                    ast::Span::empty(),
+                )
             }
         }
     }
@@ -265,8 +277,8 @@ impl<'a> LowerDmlToAst<'a> {
 
     pub fn lower_prisma_value(pv: &PrismaValue) -> ast::Expression {
         match pv {
-            PrismaValue::Boolean(true) => ast::Expression::BooleanValue(String::from("true"), ast::Span::empty()),
-            PrismaValue::Boolean(false) => ast::Expression::BooleanValue(String::from("false"), ast::Span::empty()),
+            PrismaValue::Boolean(true) => ast::Expression::ConstantValue(String::from("true"), ast::Span::empty()),
+            PrismaValue::Boolean(false) => ast::Expression::ConstantValue(String::from("false"), ast::Span::empty()),
             PrismaValue::String(value) => Self::lower_string(value),
             PrismaValue::Enum(value) => ast::Expression::ConstantValue(value.clone(), ast::Span::empty()),
             PrismaValue::DateTime(value) => Self::lower_string(value),
@@ -277,13 +289,26 @@ impl<'a> LowerDmlToAst<'a> {
             PrismaValue::Uuid(val) => Self::lower_string(val),
             PrismaValue::Json(val) => Self::lower_string(val),
             PrismaValue::List(vec) => ast::Expression::Array(
-                vec.iter()
-                    .map(|pv| LowerDmlToAst::<'a>::lower_prisma_value(pv))
-                    .collect(),
+                vec.iter().map(LowerDmlToAst::<'a>::lower_prisma_value).collect(),
                 ast::Span::empty(),
             ),
             PrismaValue::Xml(val) => ast::Expression::StringValue(val.to_string(), ast::Span::empty()),
             PrismaValue::Bytes(b) => ast::Expression::StringValue(prisma_value::encode_bytes(b), ast::Span::empty()),
+            PrismaValue::Object(_) => unreachable!(), // There's no concept of object values in the PSL right now.
         }
+    }
+}
+
+fn dml_scalar_type_to_parser_database_scalar_type(st: dml::ScalarType) -> parser_database::ScalarType {
+    match st {
+        dml::ScalarType::Int => parser_database::ScalarType::Int,
+        dml::ScalarType::BigInt => parser_database::ScalarType::BigInt,
+        dml::ScalarType::Float => parser_database::ScalarType::Float,
+        dml::ScalarType::Boolean => parser_database::ScalarType::Boolean,
+        dml::ScalarType::String => parser_database::ScalarType::String,
+        dml::ScalarType::DateTime => parser_database::ScalarType::DateTime,
+        dml::ScalarType::Json => parser_database::ScalarType::Json,
+        dml::ScalarType::Bytes => parser_database::ScalarType::Bytes,
+        dml::ScalarType::Decimal => parser_database::ScalarType::Decimal,
     }
 }

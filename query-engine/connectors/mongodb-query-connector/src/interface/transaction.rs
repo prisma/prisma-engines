@@ -5,6 +5,7 @@ use crate::{
 };
 use connector_interface::{ConnectionLike, ReadOperations, RelAggregationSelection, Transaction, WriteOperations};
 use mongodb::options::{Acknowledgment, ReadConcern, TransactionOptions, WriteConcern};
+use prisma_models::SelectionResult;
 
 pub struct MongoDbTransaction<'conn> {
     connection: &'conn mut MongoDbConnection,
@@ -64,7 +65,7 @@ impl<'conn> WriteOperations for MongoDbTransaction<'conn> {
         &mut self,
         model: &ModelRef,
         args: connector_interface::WriteArgs,
-    ) -> connector_interface::Result<RecordProjection> {
+    ) -> connector_interface::Result<SelectionResult> {
         catch(async move {
             write::create_record(&self.connection.database, &mut self.connection.session, model, args).await
         })
@@ -95,7 +96,7 @@ impl<'conn> WriteOperations for MongoDbTransaction<'conn> {
         model: &ModelRef,
         record_filter: connector_interface::RecordFilter,
         args: connector_interface::WriteArgs,
-    ) -> connector_interface::Result<Vec<RecordProjection>> {
+    ) -> connector_interface::Result<Vec<SelectionResult>> {
         catch(async move {
             write::update_records(
                 &self.connection.database,
@@ -129,8 +130,8 @@ impl<'conn> WriteOperations for MongoDbTransaction<'conn> {
     async fn m2m_connect(
         &mut self,
         field: &RelationFieldRef,
-        parent_id: &RecordProjection,
-        child_ids: &[RecordProjection],
+        parent_id: &SelectionResult,
+        child_ids: &[SelectionResult],
     ) -> connector_interface::Result<()> {
         catch(async move {
             write::m2m_connect(
@@ -148,8 +149,8 @@ impl<'conn> WriteOperations for MongoDbTransaction<'conn> {
     async fn m2m_disconnect(
         &mut self,
         field: &RelationFieldRef,
-        parent_id: &RecordProjection,
-        child_ids: &[RecordProjection],
+        parent_id: &SelectionResult,
+        child_ids: &[SelectionResult],
     ) -> connector_interface::Result<()> {
         catch(async move {
             write::m2m_disconnect(
@@ -187,7 +188,7 @@ impl<'conn> ReadOperations for MongoDbTransaction<'conn> {
         &mut self,
         model: &ModelRef,
         filter: &connector_interface::Filter,
-        selected_fields: &ModelProjection,
+        selected_fields: &FieldSelection,
         aggr_selections: &[RelAggregationSelection],
     ) -> connector_interface::Result<Option<SingleRecord>> {
         catch(async move {
@@ -196,7 +197,7 @@ impl<'conn> ReadOperations for MongoDbTransaction<'conn> {
                 &mut self.connection.session,
                 model,
                 filter,
-                selected_fields,
+                &selected_fields.into(),
                 aggr_selections,
             )
             .await
@@ -208,7 +209,7 @@ impl<'conn> ReadOperations for MongoDbTransaction<'conn> {
         &mut self,
         model: &ModelRef,
         query_arguments: connector_interface::QueryArguments,
-        selected_fields: &ModelProjection,
+        selected_fields: &FieldSelection,
         aggregation_selections: &[RelAggregationSelection],
     ) -> connector_interface::Result<ManyRecords> {
         catch(async move {
@@ -217,7 +218,7 @@ impl<'conn> ReadOperations for MongoDbTransaction<'conn> {
                 &mut self.connection.session,
                 model,
                 query_arguments,
-                selected_fields,
+                &selected_fields.into(),
                 aggregation_selections,
             )
             .await
@@ -228,8 +229,8 @@ impl<'conn> ReadOperations for MongoDbTransaction<'conn> {
     async fn get_related_m2m_record_ids(
         &mut self,
         from_field: &RelationFieldRef,
-        from_record_ids: &[RecordProjection],
-    ) -> connector_interface::Result<Vec<(RecordProjection, RecordProjection)>> {
+        from_record_ids: &[SelectionResult],
+    ) -> connector_interface::Result<Vec<(SelectionResult, SelectionResult)>> {
         catch(async move {
             read::get_related_m2m_record_ids(
                 &self.connection.database,

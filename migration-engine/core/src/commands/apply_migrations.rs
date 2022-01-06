@@ -4,7 +4,7 @@ use migration_connector::{
     ConnectorError, MigrationRecord, PersistenceNotInitializedError,
 };
 use serde::{Deserialize, Serialize};
-use std::path::Path;
+use std::{path::Path, time::Instant};
 use user_facing_errors::migration_engine::FoundFailedMigrations;
 
 /// The input to the `ApplyMigrations` command.
@@ -30,6 +30,7 @@ pub(crate) async fn apply_migrations<C>(
 where
     C: migration_connector::MigrationConnector,
 {
+    let start = Instant::now();
     let applier = connector.database_migration_step_applier();
     let migration_persistence = connector.migration_persistence();
 
@@ -59,7 +60,11 @@ where
         })
         .collect();
 
+    let analysis_duration_ms = Instant::now().duration_since(start).as_millis() as u64;
+    tracing::info!(analysis_duration_ms, "Analysis run in {}ms", analysis_duration_ms,);
+
     let mut applied_migration_names: Vec<String> = Vec::with_capacity(unapplied_migrations.len());
+    let apply_migrations_start = Instant::now();
 
     for unapplied_migration in unapplied_migrations {
         let span = tracing::info_span!(
@@ -67,6 +72,7 @@ where
             migration_name = unapplied_migration.migration_name(),
         );
         let _span = span.enter();
+        let migration_apply_start = Instant::now();
 
         let script = unapplied_migration
             .read_migration_script()
@@ -91,6 +97,12 @@ where
                 migration_persistence.record_successful_step(&migration_id).await?;
                 migration_persistence.record_migration_finished(&migration_id).await?;
                 applied_migration_names.push(unapplied_migration.migration_name().to_owned());
+                let migration_duration_ms = Instant::now().duration_since(migration_apply_start).as_millis() as u64;
+                tracing::info!(
+                    migration_duration_ms = migration_duration_ms,
+                    "Migration executed in {}ms",
+                    migration_duration_ms
+                );
             }
             Err(err) => {
                 tracing::debug!("Failed to apply the script.");
@@ -103,6 +115,13 @@ where
             }
         }
     }
+
+    let apply_migrations_ms = Instant::now().duration_since(apply_migrations_start).as_millis() as u64;
+    tracing::info!(
+        apply_migrations_duration_ms = apply_migrations_ms,
+        "All the migrations executed in {}ms",
+        apply_migrations_ms
+    );
 
     Ok(ApplyMigrationsOutput {
         applied_migration_names,

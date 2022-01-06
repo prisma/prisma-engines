@@ -1,4 +1,5 @@
 pub mod arithmetic;
+
 mod error;
 #[cfg(feature = "sql-ext")]
 mod sql_ext;
@@ -25,6 +26,9 @@ pub enum PrismaValue {
     List(PrismaListValue),
     Json(String),
     Xml(String),
+
+    /// A collections of key-value pairs constituting an object.
+    Object(Vec<(String, PrismaValue)>),
 
     #[serde(serialize_with = "serialize_null")]
     Null,
@@ -248,6 +252,15 @@ impl fmt::Display for PrismaValue {
                 as_string.fmt(f)
             }
             PrismaValue::Bytes(b) => encode_bytes(b).fmt(f),
+            PrismaValue::Object(pairs) => {
+                let joined = pairs
+                    .iter()
+                    .map(|(key, value)| format!(r#""{}": {}"#, key, value))
+                    .collect::<Vec<_>>()
+                    .join(", ");
+
+                write!(f, "{{ {} }}", joined)
+            }
         }
     }
 }

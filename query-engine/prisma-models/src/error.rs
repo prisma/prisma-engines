@@ -6,14 +6,22 @@ pub enum DomainError {
     #[error("Model `{}` not found", name)]
     ModelNotFound { name: String },
 
-    #[error("Field `{}` on model `{}` not found", name, model)]
-    FieldNotFound { name: String, model: String },
+    #[error("Field `{}` on {} `{}` not found", name, container_type, container_name)]
+    FieldNotFound {
+        name: String,
+        container_type: &'static str,
+        container_name: String,
+    },
 
     #[error("Relation `{}` not found", name)]
     RelationNotFound { name: String },
 
-    #[error("ScalarField `{}` on model `{}` not found", name, model)]
-    ScalarFieldNotFound { name: String, model: String },
+    #[error("ScalarField `{}` on {} `{}` not found", name, container_type, container_name)]
+    ScalarFieldNotFound {
+        name: String,
+        container_name: String,
+        container_type: &'static str,
+    },
 
     #[error("RelationField `{}` on model `{}` not found", name, model)]
     RelationFieldNotFound { name: String, model: String },

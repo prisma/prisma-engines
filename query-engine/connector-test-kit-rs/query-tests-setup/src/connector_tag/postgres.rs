@@ -48,18 +48,13 @@ impl ConnectorTagInterface for PostgresConnectorTag {
                 "postgresql://postgres:prisma@test-db-pgbouncer:6432/db?schema={}&pgbouncer=true",
                 database
             ),
-            // Use the same database and schema name for CockroachDB - unfortunately CockroachDB
-            // can't handle 1 schema per test in a database well at this point in time.
-            Some(PostgresVersion::Cockroach) if is_ci => {
-                format!("postgresql://root@test-db-cockroach:5436/{0}?schema={0}", database)
-            }
+
             Some(PostgresVersion::V9) => format!("postgresql://postgres:prisma@127.0.0.1:5431/db?schema={}", database),
             Some(PostgresVersion::V10) => format!("postgresql://postgres:prisma@127.0.0.1:5432/db?schema={}", database),
             Some(PostgresVersion::V11) => format!("postgresql://postgres:prisma@127.0.0.1:5433/db?schema={}", database),
             Some(PostgresVersion::V12) => format!("postgresql://postgres:prisma@127.0.0.1:5434/db?schema={}", database),
             Some(PostgresVersion::V13) => format!("postgresql://postgres:prisma@127.0.0.1:5435/db?schema={}", database),
             Some(PostgresVersion::V14) => format!("postgresql://postgres:prisma@127.0.0.1:5437/db?schema={}", database),
-            Some(PostgresVersion::Cockroach) => format!("postgresql://root@127.0.0.1:5436/{0}?schema={0}", database),
             Some(PostgresVersion::PgBouncer) => format!(
                 "postgresql://postgres:prisma@127.0.0.1:6432/db?schema={}&pgbouncer=true",
                 database
@@ -81,6 +76,10 @@ impl ConnectorTagInterface for PostgresConnectorTag {
     fn is_versioned(&self) -> bool {
         true
     }
+
+    fn requires_teardown(&self) -> bool {
+        false
+    }
 }
 
 #[derive(Debug, Clone, Copy, PartialEq)]
@@ -92,7 +91,6 @@ pub enum PostgresVersion {
     V13,
     V14,
     PgBouncer,
-    Cockroach,
 }
 
 impl PostgresConnectorTag {
@@ -137,14 +135,15 @@ impl PostgresConnectorTag {
                 capabilities: capabilities.clone(),
             },
             Self {
-                version: Some(PostgresVersion::Cockroach),
-                capabilities: capabilities.clone(),
-            },
-            Self {
                 version: Some(PostgresVersion::PgBouncer),
                 capabilities,
             },
         ]
+    }
+
+    /// Get a reference to the postgres connector tag's version.
+    pub fn version(&self) -> Option<PostgresVersion> {
+        self.version
     }
 }
 
@@ -169,7 +168,6 @@ impl TryFrom<&str> for PostgresVersion {
             "13" => Self::V13,
             "14" => Self::V14,
             "pgbouncer" => Self::PgBouncer,
-            "cockroach" => Self::Cockroach,
             _ => return Err(TestError::parse_error(format!("Unknown Postgres version `{}`", s))),
         };
 
@@ -187,7 +185,6 @@ impl ToString for PostgresVersion {
             PostgresVersion::V13 => "13",
             PostgresVersion::V14 => "14",
             PostgresVersion::PgBouncer => "pgbouncer",
-            PostgresVersion::Cockroach => "cockroach",
         }
         .to_owned()
     }

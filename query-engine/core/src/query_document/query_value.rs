@@ -74,6 +74,7 @@ impl From<PrismaValue> for QueryValue {
             PrismaValue::Xml(s) => Self::String(s),
             PrismaValue::Bytes(b) => Self::String(prisma_value::encode_bytes(&b)),
             PrismaValue::BigInt(i) => Self::Int(i),
+            PrismaValue::Object(pairs) => Self::Object(pairs.into_iter().map(|(k, v)| (k, v.into())).collect()),
         }
     }
 }

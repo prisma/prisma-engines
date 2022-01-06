@@ -235,7 +235,7 @@ fn convert_scalar_list_filter(
 impl AliasedCondition for RelationFilter {
     /// Conversion from a `RelationFilter` to a query condition tree. Aliased when in a nested `SELECT`.
     fn aliased_cond(self, alias: Option<Alias>) -> ConditionTree<'static> {
-        let ids = self.field.model().primary_identifier().as_columns();
+        let ids = ModelProjection::from(self.field.model().primary_identifier()).as_columns();
         let columns: Vec<Column<'static>> = match alias {
             Some(alias) => ids.map(|c| c.table(alias.to_string(None))).collect(),
             None => ids.collect(),
@@ -275,10 +275,7 @@ impl AliasedSelect for RelationFilter {
             .collect();
 
         let related_table = self.field.related_model().as_table();
-        let related_join_columns: Vec<_> = self
-            .field
-            .related_field()
-            .linking_fields()
+        let related_join_columns: Vec<_> = ModelProjection::from(self.field.related_field().linking_fields())
             .as_columns()
             .map(|col| col.table(alias.to_string(Some(AliasMode::Join))))
             .collect();
@@ -356,9 +353,7 @@ impl AliasedCondition for OneRelationIsNullFilter {
                 .columns(columns)
                 .and_where(columns_not_null);
 
-            let id_columns: Vec<Column<'static>> = self
-                .field
-                .linking_fields()
+            let id_columns: Vec<Column<'static>> = ModelProjection::from(self.field.linking_fields())
                 .as_columns()
                 .map(|c| c.opt_table(alias.clone()))
                 .collect();

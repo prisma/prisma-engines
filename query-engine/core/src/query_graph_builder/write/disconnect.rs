@@ -58,7 +58,7 @@ pub fn disconnect_records_node(
     graph.create_edge(
         parent_node,
         &disconnect_node,
-        QueryGraphDependency::ParentProjection(
+        QueryGraphDependency::ProjectedDataDependency(
             parent_model_id,
             Box::new(move |mut disconnect_node, mut parent_ids| {
                 let parent_id = match parent_ids.pop() {
@@ -82,7 +82,7 @@ pub fn disconnect_records_node(
     graph.create_edge(
         &child_node,
         &disconnect_node,
-        QueryGraphDependency::ParentProjection(
+        QueryGraphDependency::ProjectedDataDependency(
             child_model_id,
             Box::new(move |mut disconnect_node, child_ids| {
                 if let Node::Query(Query::Write(WriteQuery::DisconnectRecords(ref mut c))) = disconnect_node {

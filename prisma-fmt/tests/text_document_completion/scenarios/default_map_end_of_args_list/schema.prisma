@@ -1,0 +1,10 @@
+datasource db {
+  provider = "sqlserver"
+  url      = env("DATABASE_URL")
+}
+
+model Test {
+  id      Int   @id
+  dogId   Int   @default(1, <|>)
+}
+

@@ -65,7 +65,7 @@ mod postgres {
     }
 
     // "Postgres native decimal types" should "work"
-    #[connector_test(schema(schema_decimal), only(Postgres), exclude(Cockroach))]
+    #[connector_test(schema(schema_decimal), only(Postgres), exclude(CockroachDb))]
     async fn native_decimal_types(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
           run_query!(&runner, r#"mutation {
@@ -104,7 +104,7 @@ mod postgres {
     }
 
     // Cockroach does not support money.
-    #[connector_test(schema(schema_decimal_cockroach), only(Cockroach))]
+    #[connector_test(schema(schema_decimal_cockroach), only(CockroachDb))]
     async fn native_decimal_types_cockroach(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
           run_query!(&runner, r#"mutation {
@@ -191,7 +191,7 @@ mod postgres {
     }
 
     // "Other Postgres native types" should "work"
-    #[connector_test(schema(schema_other_types), only(Postgres), exclude(Cockroach))]
+    #[connector_test(schema(schema_other_types), only(Postgres), exclude(CockroachDb))]
     async fn native_other_types(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
           run_query!(&runner, r#"mutation {
@@ -232,7 +232,7 @@ mod postgres {
     }
 
     // Cockroach does not support XML.
-    #[connector_test(schema(schema_other_types_cockroach), only(Cockroach))]
+    #[connector_test(schema(schema_other_types_cockroach), only(CockroachDb))]
     async fn native_other_types_cockroach(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
           run_query!(&runner, r#"mutation {

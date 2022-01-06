@@ -135,12 +135,11 @@ fn must_error_for_empty_provider_arrays() {
     let error = super::parse_config(dml).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
-        [1;91merror[0m: [1mError validating: This line is not a valid definition within a datasource.[0m
+        [1;91merror[0m: [1mError validating datasource `myds`: The provider argument in a datasource must be a string literal[0m
           [1;94m-->[0m  [4mschema.prisma:2[0m
         [1;94m   | [0m
         [1;94m 1 | [0mdatasource myds {
-        [1;94m 2 | [0m  [1;91mprovider = [][0m
-        [1;94m 3 | [0m  url = "postgres://"
+        [1;94m 2 | [0m  provider = [1;91m[][0m
         [1;94m   | [0m
     "#]];
 
@@ -525,7 +524,8 @@ fn fail_when_preview_features_are_declared() {
           [1;94m-->[0m  [4mschema.prisma:4[0m
         [1;94m   | [0m
         [1;94m 3 | [0m  url = "mysql://"
-        [1;94m 4 | [0m  previewFeatures = [1;91m["foo"][0m
+        [1;94m 4 | [0m  [1;91mpreviewFeatures = ["foo"][0m
+        [1;94m 5 | [0m}
         [1;94m   | [0m
     "#]];
 
@@ -584,7 +584,8 @@ fn referential_integrity_without_preview_feature_errors() {
           [1;94m-->[0m  [4mschema.prisma:3[0m
         [1;94m   | [0m
         [1;94m 2 | [0m  provider = "sqlserver"
-        [1;94m 3 | [0m  referentialIntegrity = [1;91m"prisma"[0m
+        [1;94m 3 | [0m  [1;91mreferentialIntegrity = "prisma"[0m
+        [1;94m 4 | [0m  url = "mysql://root:prisma@localhost:3306/mydb"
         [1;94m   | [0m
     "#]];
 

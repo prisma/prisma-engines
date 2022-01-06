@@ -75,7 +75,7 @@ impl TestApi {
         match self.sql_family() {
             SqlFamily::Postgres => Box::new(sql_schema_describer::postgres::SqlSchemaDescriber::new(
                 connection,
-                if self.tags.contains(Tags::Cockroach) {
+                if self.tags.contains(Tags::CockroachDb) {
                     Circumstances::Cockroach.into()
                 } else {
                     Default::default()
@@ -121,7 +121,7 @@ impl TestApi {
     }
 
     pub(crate) fn is_cockroach(&self) -> bool {
-        self.tags.contains(Tags::Cockroach)
+        self.tags.contains(Tags::CockroachDb)
     }
 
     pub(crate) fn schema_name(&self) -> &str {

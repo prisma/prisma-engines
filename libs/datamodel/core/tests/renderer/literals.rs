@@ -1,7 +1,7 @@
 use datamodel::DefaultValue;
+use dml::prisma_value::PrismaValue;
 use indoc::indoc;
 use pretty_assertions::assert_eq;
-use prisma_value::PrismaValue;
 
 #[test]
 fn strings_with_quotes_render_as_escaped_literals() {

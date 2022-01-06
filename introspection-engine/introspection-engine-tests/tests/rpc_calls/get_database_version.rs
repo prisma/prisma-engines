@@ -44,7 +44,7 @@ async fn database_version_for_mysql_8_should_work(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(tags(Postgres), exclude(Cockroach))]
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
 async fn database_version_for_postgres_should_work(api: &TestApi) -> TestResult {
     setup_empty(&api.barrel(), api.schema_name()).await?;
     let result = api.get_database_version().await?;
@@ -53,7 +53,7 @@ async fn database_version_for_postgres_should_work(api: &TestApi) -> TestResult 
     Ok(())
 }
 
-#[test_connector(tags(Cockroach))]
+#[test_connector(tags(CockroachDb))]
 async fn database_version_for_cockroach_should_work(api: &TestApi) -> TestResult {
     setup_empty(&api.barrel(), api.schema_name()).await?;
     let result = api.get_database_version().await?;

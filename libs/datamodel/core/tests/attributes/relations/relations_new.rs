@@ -977,3 +977,37 @@ fn must_allow_relations_with_default_native_types_with_annotation_on_one_side() 
         );
     }
 }
+
+#[test]
+fn a_one_on_one_relation_with_fields_on_the_wrong_side_should_not_pass() {
+    let schema = r#"
+datasource db {
+  provider = "postgresql"
+  url      = env("TEST_DATABASE_URL")
+}
+
+model Boom {
+  id         Int      @id
+  occurrence DateTime
+  bam        Bam
+}
+
+model Bam {
+  id        Int      @id
+  boomId    Int?
+  boom      Boom? @relation(fields: [boomId], references: [id])
+}
+    "#;
+
+    let expect = expect![[r#"
+        [1;91merror[0m: [1mError parsing attribute "@relation": The relation field `Bam.boom` defines the `fields` and/or `references` argument. You must set them on the required side of the relation (`Boom.bam`) in order for the constraints to be enforced. Alternatively, you can change this field to be required and the opposite optional, or make both sides of the relation optional.[0m
+          [1;94m-->[0m  [4mschema.prisma:16[0m
+        [1;94m   | [0m
+        [1;94m15 | [0m  boomId    Int?
+        [1;94m16 | [0m  [1;91mboom      Boom? @relation(fields: [boomId], references: [id])[0m
+        [1;94m17 | [0m}
+        [1;94m   | [0m
+    "#]];
+
+    expect.assert_eq(&datamodel::parse_schema(schema).map(drop).unwrap_err());
+}

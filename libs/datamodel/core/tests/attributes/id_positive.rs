@@ -1,7 +1,7 @@
 use crate::common::*;
 use crate::{with_header, Provider};
 use datamodel::dml::*;
-use prisma_value::PrismaValue;
+use dml::prisma_value::PrismaValue;
 
 #[test]
 fn int_id_without_default_should_have_strategy_none() {

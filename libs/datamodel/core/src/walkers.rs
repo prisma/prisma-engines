@@ -140,11 +140,7 @@ impl<'a> ModelWalker<'a> {
             .indices
             .iter()
             .filter(|index| index.is_unique())
-            .map(move |index| IndexWalker {
-                model: *self,
-                index,
-                datamodel: self.datamodel,
-            })
+            .map(move |index| IndexWalker { model: *self, index })
     }
 }
 
@@ -171,7 +167,6 @@ impl<'a> ScalarFieldWalker<'a> {
     pub fn field_type(&self) -> TypeWalker<'a> {
         match &self.get().field_type {
             FieldType::Enum(name) => TypeWalker::Enum(EnumWalker {
-                datamodel: self.datamodel,
                 r#enum: self.datamodel.find_enum(name).unwrap(),
             }),
             FieldType::CompositeType(_) => TypeWalker::Base(ScalarType::Json), // only used by the ME, will be gone soon
@@ -357,7 +352,6 @@ impl<'a> RelationFieldWalker<'a> {
 #[derive(Debug, Clone, Copy)]
 pub struct EnumWalker<'a> {
     pub r#enum: &'a Enum,
-    datamodel: &'a Datamodel,
 }
 
 impl<'a> EnumWalker<'a> {
@@ -374,7 +368,6 @@ impl<'a> EnumWalker<'a> {
 pub struct IndexWalker<'a> {
     index: &'a IndexDefinition,
     model: ModelWalker<'a>,
-    datamodel: &'a Datamodel,
 }
 
 impl<'a> IndexWalker<'a> {

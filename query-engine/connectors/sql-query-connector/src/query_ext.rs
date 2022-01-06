@@ -5,6 +5,7 @@ use crate::{
 use async_trait::async_trait;
 use connector_interface::{filter::Filter, RecordFilter};
 use futures::future::FutureExt;
+use opentelemetry::trace::TraceFlags;
 use prisma_models::*;
 use quaint::{
     ast::*,
@@ -17,8 +18,9 @@ use serde_json::{Map, Value};
 use std::panic::AssertUnwindSafe;
 
 use crate::sql_trace::trace_parent_to_string;
+
 use opentelemetry::trace::TraceContextExt;
-use tracing::Span;
+use tracing::{span, Span};
 use tracing_opentelemetry::OpenTelemetrySpanExt;
 
 impl<'t> QueryExt for connector::Transaction<'t> {}
@@ -31,14 +33,15 @@ pub trait QueryExt: Queryable + Send + Sync {
     /// Filter and map the resulting types with the given identifiers.
     #[tracing::instrument(skip(self, q, idents))]
     async fn filter(&self, q: Query<'_>, idents: &[ColumnMetadata<'_>]) -> crate::Result<Vec<SqlRow>> {
-        let span = tracing::span!(tracing::Level::INFO, "filter read query");
+        let span = span!(tracing::Level::INFO, "filter read query");
 
-        let span_ctx = span.context();
-        let otel_ctx = span_ctx.span().span_context();
+        let otel_ctx = span.context();
+        let span_ref = otel_ctx.span();
+        let span_ctx = span_ref.span_context();
 
         let q = match q {
-            Query::Select(x) if otel_ctx.trace_flags() == 1 => {
-                Query::Select(Box::from(x.comment(trace_parent_to_string(otel_ctx))))
+            Query::Select(x) if span_ctx.trace_flags() == TraceFlags::SAMPLED => {
+                Query::Select(Box::from(x.comment(trace_parent_to_string(span_ctx))))
             }
             _ => q,
         };
@@ -115,7 +118,7 @@ pub trait QueryExt: Queryable + Send + Sync {
         &self,
         model: &ModelRef,
         record_filter: RecordFilter,
-    ) -> crate::Result<Vec<RecordProjection>> {
+    ) -> crate::Result<Vec<SelectionResult>> {
         if let Some(selectors) = record_filter.selectors {
             Ok(selectors)
         } else {
@@ -125,8 +128,8 @@ pub trait QueryExt: Queryable + Send + Sync {
 
     /// Read the all columns as a (primary) identifier.
     #[tracing::instrument(skip(self, model, filter))]
-    async fn filter_ids(&self, model: &ModelRef, filter: Filter) -> crate::Result<Vec<RecordProjection>> {
-        let model_id = model.primary_identifier();
+    async fn filter_ids(&self, model: &ModelRef, filter: Filter) -> crate::Result<Vec<SelectionResult>> {
+        let model_id: ModelProjection = model.primary_identifier().into();
         let id_cols: Vec<Column<'static>> = model_id.as_columns().collect();
 
         let select = Select::from_table(model.as_table())
@@ -138,7 +141,7 @@ pub trait QueryExt: Queryable + Send + Sync {
     }
 
     #[tracing::instrument(skip(self, select, model_id))]
-    async fn select_ids(&self, select: Select<'_>, model_id: ModelProjection) -> crate::Result<Vec<RecordProjection>> {
+    async fn select_ids(&self, select: Select<'_>, model_id: ModelProjection) -> crate::Result<Vec<SelectionResult>> {
         let idents: Vec<_> = model_id
             .fields()
             .flat_map(|f| match f {
@@ -157,7 +160,7 @@ pub trait QueryExt: Queryable + Send + Sync {
 
         for row in rows.drain(0..) {
             let tuples: Vec<_> = model_id.scalar_fields().zip(row.values.into_iter()).collect();
-            let record_id: RecordProjection = RecordProjection::new(tuples);
+            let record_id: SelectionResult = SelectionResult::new(tuples);
 
             result.push(record_id);
         }

@@ -1,5 +1,4 @@
-use crate::{connector_error::ConnectorError, Connector, ConnectorCapability};
-use dml::relation_info::ReferentialAction;
+use crate::{connector_error::ConnectorError, Connector, ConnectorCapability, ReferentialAction, ScalarType};
 use enumflags2::BitFlags;
 
 /// A [Connector](/trait.Connector.html) implementor meant to
@@ -23,26 +22,26 @@ impl Connector for EmptyDatamodelConnector {
         ]
     }
 
-    fn constraint_name_length(&self) -> usize {
+    fn max_identifier_length(&self) -> usize {
         usize::MAX
     }
 
-    fn available_native_type_constructors(&self) -> &'static [dml::native_type_constructor::NativeTypeConstructor] {
+    fn available_native_type_constructors(&self) -> &'static [crate::native_type_constructor::NativeTypeConstructor] {
         &[]
     }
 
-    fn scalar_type_for_native_type(&self, _native_type: serde_json::Value) -> dml::scalars::ScalarType {
-        dml::scalars::ScalarType::String
+    fn scalar_type_for_native_type(&self, _native_type: serde_json::Value) -> ScalarType {
+        ScalarType::String
     }
 
-    fn default_native_type_for_scalar_type(&self, _scalar_type: &dml::scalars::ScalarType) -> serde_json::Value {
+    fn default_native_type_for_scalar_type(&self, _scalar_type: &ScalarType) -> serde_json::Value {
         serde_json::Value::Null
     }
 
     fn native_type_is_default_for_scalar_type(
         &self,
         _native_type: serde_json::Value,
-        _scalar_type: &dml::scalars::ScalarType,
+        _scalar_type: &ScalarType,
     ) -> bool {
         false
     }

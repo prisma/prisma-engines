@@ -8,7 +8,7 @@ use query_engine_tests::*;
 //   operators applied. For a good confidence, we choose `equals`, `in`, `not equals`, `endsWith` (where applicable).
 #[test_suite(schema(schemas::common_text_and_numeric_types_optional))]
 mod aggregation_group_by_having {
-    use query_engine_tests::{assert_error, run_query, Runner};
+    use query_engine_tests::{assert_error, match_connector_result, run_query, Runner};
 
     // This is just basic confirmation that scalar filters are applied correctly.
     // The assumption is that we don't need to test all normal scalar filters as they share the exact same code path
@@ -54,9 +54,13 @@ mod aggregation_group_by_having {
                 _sum { int }
               }
             }"#,
-            [SqlServer, Postgres, MySql, Sqlite, MongoDb] => r#"{"data":{"groupByTestModel":[{"string":"group1","int":5,"_count":{"_all":1},"_sum":{"int":5}},{"string":"group2","int":5,"_count":{"_all":1},"_sum":{"int":5}}]}}"#,
-            [MongoDb] =>   r#"{"data":{"groupByTestModel":[{"string":"group2","int":5,"_count":{"_all":1},"_sum":{"int":5}},{"string":"group1","int":5,"_count":{"_all":1},"_sum":{"int":5}}]}}"#
+            MongoDb(_) => vec![
+              r#"{"data":{"groupByTestModel":[{"string":"group2","int":5,"_count":{"_all":1},"_sum":{"int":5}},{"string":"group1","int":5,"_count":{"_all":1},"_sum":{"int":5}}]}}"#,
+              r#"{"data":{"groupByTestModel":[{"string":"group1","int":5,"_count":{"_all":1},"_sum":{"int":5}},{"string":"group2","int":5,"_count":{"_all":1},"_sum":{"int":5}}]}}"#
+            ],
+            _ => vec![r#"{"data":{"groupByTestModel":[{"string":"group1","int":5,"_count":{"_all":1},"_sum":{"int":5}},{"string":"group2","int":5,"_count":{"_all":1},"_sum":{"int":5}}]}}"#]
         );
+
         Ok(())
     }
 
@@ -251,7 +255,7 @@ mod aggregation_group_by_having {
             @r###"{"data":{"groupByTestModel":[{"string":"group1","_sum":{"float":16.0,"int":16,"decimal":"16"}}]}}"###
         );
 
-        let res = run_query!(
+        match_connector_result!(
             runner,
             r#"query { groupByTestModel(by: [string], orderBy: { string: asc }, having: {
               float: { _sum: { not: { equals: 16 }}}
@@ -265,24 +269,12 @@ mod aggregation_group_by_having {
                 decimal
               }
             }
-          }"#
+          }"#,
+          // On MongoDB, having sum returns 0 where there are inexistant element
+          // Contrary to SQL which returns NULL and therefore excludes group3
+          MongoDb(_) => vec![r#"{"data":{"groupByTestModel":[{"string":"group2","_sum":{"float":5.0,"int":5,"decimal":"5"}},{"string":"group3","_sum":{"float":0.0,"int":0,"decimal":"0"}}]}}"#],
+          _ => vec![r#"{"data":{"groupByTestModel":[{"string":"group2","_sum":{"float":5.0,"int":5,"decimal":"5"}}]}}"#]
         );
-        // On MongoDB, having sum returns 0 where there are inexistant element
-        // Contrary to SQL which returns NULL and therefore excludes group3
-        match runner.connector() {
-            query_engine_tests::ConnectorTag::MongoDb(_) => {
-                assert_eq!(
-                    res,
-                    r#"{"data":{"groupByTestModel":[{"string":"group2","_sum":{"float":5.0,"int":5,"decimal":"5"}},{"string":"group3","_sum":{"float":0.0,"int":0,"decimal":"0"}}]}}"#
-                )
-            }
-            _ => {
-                assert_eq!(
-                    res,
-                    r#"{"data":{"groupByTestModel":[{"string":"group2","_sum":{"float":5.0,"int":5,"decimal":"5"}}]}}"#
-                );
-            }
-        }
 
         // Group 1 and 2 returned
         insta::assert_snapshot!(
@@ -350,7 +342,7 @@ mod aggregation_group_by_having {
             @r###"{"data":{"groupByTestModel":[{"string":"group1","_min":{"float":0.0,"int":0,"decimal":"0"}},{"string":"group2","_min":{"float":0.0,"int":0,"decimal":"0"}}]}}"###
         );
 
-        let res = run_query!(
+        match_connector_result!(
             runner,
             r#"query { groupByTestModel(by: [string], orderBy: { string: asc }, having: {
               float: { _min: { not: { equals: 0 }}}
@@ -364,22 +356,12 @@ mod aggregation_group_by_having {
                 decimal
               }
             }
-          }"#
+          }"#,
+          // Since MongoDB doesn't have the concept of `NULL` `not equals 10` includes `null` records
+          // The result _is_ empty on SQL though
+          MongoDb(_) => vec![r#"{"data":{"groupByTestModel":[{"string":"group3","_min":{"float":null,"int":null,"decimal":null}}]}}"#],
+          _ => vec![r#"{"data":{"groupByTestModel":[]}}"#]
         );
-
-        // Since MongoDB doesn't have the concept of `NULL` `not equals 10` includes `null` records
-        // The result _is_ empty on SQL though
-        match runner.connector() {
-            query_engine_tests::ConnectorTag::MongoDb(_) => {
-                assert_eq!(
-                    res,
-                    r#"{"data":{"groupByTestModel":[{"string":"group3","_min":{"float":null,"int":null,"decimal":null}}]}}"#
-                );
-            }
-            _ => {
-                assert_eq!(res, r#"{"data":{"groupByTestModel":[]}}"#);
-            }
-        }
 
         // Group 1 and 2 returned
         insta::assert_snapshot!(
@@ -447,7 +429,7 @@ mod aggregation_group_by_having {
             @r###"{"data":{"groupByTestModel":[{"string":"group1","_max":{"float":10.0,"int":10,"decimal":"10"}},{"string":"group2","_max":{"float":10.0,"int":10,"decimal":"10"}}]}}"###
         );
 
-        let res = run_query!(
+        match_connector_result!(
             runner,
             r#"query { groupByTestModel(by: [string], orderBy: { string: asc }, having: {
               float: { _max: { not: { equals: 10 }}}
@@ -461,21 +443,12 @@ mod aggregation_group_by_having {
                 decimal
               }
             }
-          }"#
+          }"#,
+          // Since MongoDB doesn't have the concept of `NULL` `not equals 10` includes `null` records
+          // The result _is_ empty on SQL though
+          MongoDb(_) => vec![r#"{"data":{"groupByTestModel":[{"string":"group3","_max":{"float":null,"int":null,"decimal":null}}]}}"#],
+          _ => vec![r#"{"data":{"groupByTestModel":[]}}"#]
         );
-        // Since MongoDB doesn't have the concept of `NULL` `not equals 10` includes `null` records
-        // The result _is_ empty on SQL though
-        match runner.connector() {
-            query_engine_tests::ConnectorTag::MongoDb(_) => {
-                assert_eq!(
-                    res,
-                    r#"{"data":{"groupByTestModel":[{"string":"group3","_max":{"float":null,"int":null,"decimal":null}}]}}"#
-                );
-            }
-            _ => {
-                assert_eq!(res, r#"{"data":{"groupByTestModel":[]}}"#);
-            }
-        }
 
         // Group 1 and 2 returned
         insta::assert_snapshot!(

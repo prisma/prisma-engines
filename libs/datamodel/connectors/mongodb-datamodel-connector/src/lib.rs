@@ -2,12 +2,11 @@ mod mongodb_types;
 
 use datamodel_connector::{
     connector_error::{ConnectorError, ErrorKind},
-    Connector, ConnectorCapability, ReferentialIntegrity,
+    parser_database::walkers::*,
+    walker_ext_traits::*,
+    Connector, ConnectorCapability, NativeTypeConstructor, ReferentialAction, ReferentialIntegrity, ScalarType,
 };
-use dml::{
-    default_value::DefaultKind, field::FieldType, native_type_instance::NativeTypeInstance,
-    relation_info::ReferentialAction, scalars::ScalarType, traits::WithDatabaseName,
-};
+use dml::{default_value::DefaultKind, native_type_instance::NativeTypeInstance};
 use enumflags2::BitFlags;
 use mongodb_types::*;
 use native_types::MongoDbType;
@@ -17,9 +16,11 @@ const CAPABILITIES: &[ConnectorCapability] = &[
     ConnectorCapability::RelationsOverNonUniqueCriteria,
     ConnectorCapability::Json,
     ConnectorCapability::Enums,
+    ConnectorCapability::EnumArrayPush,
     ConnectorCapability::RelationFieldsInArbitraryOrder,
     ConnectorCapability::CreateMany,
     ConnectorCapability::ScalarLists,
+    ConnectorCapability::JsonLists,
     ConnectorCapability::InsensitiveFilters,
     ConnectorCapability::CompositeTypes,
     ConnectorCapability::FullTextIndex,
@@ -40,7 +41,7 @@ impl Connector for MongoDbDatamodelConnector {
         CAPABILITIES
     }
 
-    fn constraint_name_length(&self) -> usize {
+    fn max_identifier_length(&self) -> usize {
         127
     }
 
@@ -48,92 +49,90 @@ impl Connector for MongoDbDatamodelConnector {
         referential_integrity.allowed_referential_actions(BitFlags::empty())
     }
 
-    fn validate_field_default(
-        &self,
-        field_name: &str,
-        _scalar_type: &ScalarType,
-        native_type: Option<&NativeTypeInstance>,
-        default: Option<&dml::default_value::DefaultValue>,
-        errors: &mut Vec<ConnectorError>,
-    ) {
-        if native_type.is_some() {
-            return;
+    fn validate_model(&self, model: ModelWalker<'_, '_>, errors: &mut datamodel_connector::Diagnostics) {
+        for field in model.scalar_fields() {
+            if field.raw_native_type().is_none()
+                && field
+                    .default_value()
+                    .map(|val| val.is_dbgenerated())
+                    .unwrap_or_default()
+            {
+                errors.push_error(datamodel_connector::DatamodelError::ConnectorError {
+                    message: ConnectorError::from_kind(ErrorKind::FieldValidationError {
+                        field: field.name().to_owned(),
+                        message: "MongoDB `@default(dbgenerated())` fields must have a native type annotation."
+                            .to_owned(),
+                    })
+                    .to_string(),
+                    span: field.ast_field().span,
+                })
+            }
         }
 
-        if !matches!(default.map(|d| d.kind()), Some(dml::default_value::DefaultKind::Expression(expr)) if expr.is_dbgenerated())
-        {
-            return;
-        }
+        let mut push_error = |err: ConnectorError| {
+            errors.push_error(datamodel_connector::DatamodelError::ConnectorError {
+                message: err.to_string(),
+                span: model.ast_model().span,
+            });
+        };
 
-        errors.push(ConnectorError::from_kind(ErrorKind::FieldValidationError {
-            field: field_name.to_owned(),
-            message: "MongoDB `@default(dbgenerated())` fields must have a native type annotation.".to_owned(),
-        }))
-    }
-
-    fn validate_model(&self, model: &dml::model::Model, errors: &mut Vec<ConnectorError>) {
-        if let Some(pk) = &model.primary_key {
+        if let Some(pk) = model.primary_key() {
             // no compound ids
-            if pk.fields.len() > 1 {
-                errors.push(ConnectorError::from_kind(ErrorKind::InvalidModelError {
+            if pk.fields().len() > 1 {
+                push_error(ConnectorError::from_kind(ErrorKind::InvalidModelError {
                     message: "MongoDB models require exactly one identity field annotated with @id".to_owned(),
                 }));
             }
 
             // singular id
-            let field_name = pk.fields.first().unwrap();
-            let field = model.find_scalar_field(field_name.name.as_str()).unwrap();
+            let field = pk.fields().next().unwrap();
 
             // The _id name check is superfluous because it's not a valid schema field at the moment.
-            if field.name != "_id" {
-                match field.database_name() {
+            if field.name() != "_id" {
+                match field.mapped_name() {
                     Some("_id") => (),
-                    Some(mapped_name) => errors.push(ConnectorError::from_kind(ErrorKind::FieldValidationError {
-                        field: field.name.to_owned(),
+                    Some(mapped_name) => push_error(ConnectorError::from_kind(ErrorKind::FieldValidationError {
+                        field: field.name().to_owned(),
                         message: format!(
                             "MongoDB model IDs must have a @map(\"_id\") annotation, found @map(\"{}\").",
                             mapped_name
                         ),
                     })),
-                    None => errors.push(ConnectorError::from_kind(ErrorKind::FieldValidationError {
-                        field: field.name.to_owned(),
+                    None => push_error(ConnectorError::from_kind(ErrorKind::FieldValidationError {
+                        field: field.name().to_owned(),
                         message: "MongoDB model IDs must have a @map(\"_id\") annotations.".to_owned(),
                     })),
                 };
             }
 
-            if !matches!(field.field_type, FieldType::Scalar(_, _, Some(_)))
-                && matches!(field.default_value.as_ref().map(|v| v.kind()), Some(DefaultKind::Expression(expr)) if expr.is_dbgenerated())
+            if field.raw_native_type().is_none()
+                && matches!(field.default_value().map(|v| v.dml_default_kind()), Some(DefaultKind::Expression(expr)) if expr.is_dbgenerated())
             {
-                errors.push(ConnectorError::from_kind(ErrorKind::FieldValidationError {
-                    field: field.name.to_owned(),
+                push_error(ConnectorError::from_kind(ErrorKind::FieldValidationError {
+                    field: field.name().to_owned(),
                     message: format!(
                         "MongoDB `@default(dbgenerated())` IDs must have an `ObjectID` native type annotation. `{}` is an ID field, so you probably want `ObjectId` as your native type.",
-                        field.name
+                        field.name()
                     ),
                 }));
             }
         } else {
-            errors.push(ConnectorError::from_kind(ErrorKind::InvalidModelError {
+            push_error(ConnectorError::from_kind(ErrorKind::InvalidModelError {
                 message: "MongoDB models require exactly one identity field annotated with @id".to_owned(),
             }))
         }
     }
 
-    fn available_native_type_constructors(&self) -> &'static [dml::native_type_constructor::NativeTypeConstructor] {
+    fn available_native_type_constructors(&self) -> &'static [NativeTypeConstructor] {
         NATIVE_TYPE_CONSTRUCTORS
     }
 
-    fn default_native_type_for_scalar_type(&self, scalar_type: &dml::scalars::ScalarType) -> serde_json::Value {
+    fn default_native_type_for_scalar_type(&self, scalar_type: &ScalarType) -> serde_json::Value {
         let native_type = default_for(scalar_type);
         serde_json::to_value(native_type).expect("MongoDB native type to JSON failed")
     }
 
-    fn native_type_is_default_for_scalar_type(
-        &self,
-        native_type: serde_json::Value,
-        scalar_type: &dml::scalars::ScalarType,
-    ) -> bool {
+    fn native_type_is_default_for_scalar_type(&self, native_type: serde_json::Value, scalar_type: &ScalarType) -> bool {
         let default_native_type = default_for(scalar_type);
         let native_type: MongoDbType =
             serde_json::from_value(native_type).expect("MongoDB native type from JSON failed");
@@ -159,7 +158,7 @@ impl Connector for MongoDbDatamodelConnector {
         todo!()
     }
 
-    fn scalar_type_for_native_type(&self, _native_type: serde_json::Value) -> dml::scalars::ScalarType {
+    fn scalar_type_for_native_type(&self, _native_type: serde_json::Value) -> ScalarType {
         // Out of scope for MVP
         todo!()
     }

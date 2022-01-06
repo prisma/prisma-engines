@@ -5,7 +5,7 @@ use introspection_engine_tests::test_api::*;
 use quaint::prelude::Queryable;
 use test_macros::test_connector;
 
-#[test_connector(tags(Postgres), exclude(Cockroach))]
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
 // Cockroach can return either order for multiple foreign keys. This is hard to deterministically
 // test, so disable for now. See: https://github.com/cockroachdb/cockroach/issues/71098.
 async fn multiple_foreign_key_constraints_are_taken_always_in_the_same_order(api: &TestApi) -> TestResult {

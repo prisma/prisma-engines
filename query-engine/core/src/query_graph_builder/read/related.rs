@@ -31,6 +31,6 @@ pub fn find_related(
         nested,
         selection_order,
         aggregation_selections: aggr_selections,
-        parent_projections: None,
+        parent_results: None,
     }))
 }

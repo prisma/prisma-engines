@@ -42,7 +42,6 @@ pub enum MongoError {
     QueryRawError(String),
 }
 
-// Error translation is WIP.
 impl MongoError {
     pub fn into_connector_error(self) -> ConnectorError {
         match self {

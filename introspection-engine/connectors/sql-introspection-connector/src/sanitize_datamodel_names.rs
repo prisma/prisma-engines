@@ -1,7 +1,7 @@
 use crate::SqlFamilyTrait;
 use datamodel::{
-    reserved_model_names::is_reserved_type_name, Datamodel, DefaultKind, DefaultValue, Field, FieldType, IndexField,
-    Model, PrimaryKeyField, ValueGenerator, WithDatabaseName, WithName,
+    is_reserved_type_name, Datamodel, DefaultKind, DefaultValue, Field, FieldType, IndexField, Model, PrimaryKeyField,
+    ValueGenerator, WithDatabaseName, WithName,
 };
 use introspection_connector::IntrospectionContext;
 use once_cell::sync::Lazy;

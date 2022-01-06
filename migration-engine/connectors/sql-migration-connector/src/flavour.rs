@@ -79,9 +79,6 @@ pub(crate) trait SqlFlavour:
     /// schema we connect to exists.
     async fn ensure_connection_validity(&self, connection: &Connection) -> ConnectorResult<()>;
 
-    /// Perform the initialization required by connector-test-kit tests.
-    async fn qe_setup(&self, database_url: &str) -> ConnectorResult<()>;
-
     /// Drop the database and recreate it empty.
     async fn reset(&self, connection: &Connection) -> ConnectorResult<()>;
 

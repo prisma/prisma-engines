@@ -168,24 +168,33 @@ fn full_scalar_filter_type(
             .collect(),
 
         TypeIdentifier::Json => {
+            let mut filters: Vec<InputField> =
+                json_equality_filters(ctx, mapped_scalar_type.clone(), nullable).collect();
+
             if ctx.has_feature(&PreviewFeature::FilterJson)
-                && (ctx.capabilities.contains(ConnectorCapability::JsonFilteringJsonPath)
-                    || ctx.capabilities.contains(ConnectorCapability::JsonFilteringArrayPath))
+                && ctx.capabilities.supports_any(&[
+                    ConnectorCapability::JsonFilteringJsonPath,
+                    ConnectorCapability::JsonFilteringArrayPath,
+                ])
             {
-                json_equality_filters(ctx, mapped_scalar_type.clone(), nullable)
-                    .chain(alphanumeric_filters(mapped_scalar_type.clone()))
-                    .chain(json_filters(ctx))
-                    .collect()
-            } else {
-                json_equality_filters(ctx, mapped_scalar_type.clone(), nullable).collect()
+                filters.extend(json_filters(ctx));
+
+                if ctx
+                    .capabilities
+                    .contains(ConnectorCapability::JsonFilteringAlphanumeric)
+                {
+                    filters.extend(alphanumeric_filters(mapped_scalar_type.clone()))
+                }
             }
+
+            filters
         }
 
-        TypeIdentifier::Boolean | TypeIdentifier::Xml | TypeIdentifier::Bytes => {
+        TypeIdentifier::Boolean | TypeIdentifier::Xml => {
             equality_filters(mapped_scalar_type.clone(), nullable).collect()
         }
 
-        TypeIdentifier::Enum(_) => equality_filters(mapped_scalar_type.clone(), nullable)
+        TypeIdentifier::Bytes | TypeIdentifier::Enum(_) => equality_filters(mapped_scalar_type.clone(), nullable)
             .chain(inclusion_filters(mapped_scalar_type.clone(), nullable))
             .collect(),
 
@@ -317,9 +326,7 @@ fn string_filters(ctx: &mut BuilderContext, mapped_type: InputType) -> impl Iter
         input_field(filters::ENDS_WITH, mapped_type.clone(), None).optional(),
     ];
 
-    if ctx.has_feature(&PreviewFeature::FullTextSearch)
-        && ctx.has_capability(ConnectorCapability::FullTextSearchWithoutIndex)
-    {
+    if ctx.can_full_text_search() {
         string_filters.push(input_field(filters::SEARCH, mapped_type, None).optional());
     }
 
