@@ -590,9 +590,9 @@
 
                     <span class="kw">if</span> <span class="ident">r#type</span> <span class="op">==</span> <span class="ident">PostgresType::Xml</span> {
                         <span class="kw">if</span> <span class="ident">index</span>.<span class="ident">is_unique</span>() {
-                            <span class="ident">push_error</span>(<span class="ident">error</span>.<span class="ident">new_incompatible_native_type_with_unique</span>())
+                            <span class="ident">push_error</span>(<span class="ident">error</span>.<span class="ident">new_incompatible_native_type_with_unique</span>(<span class="string">&quot;&quot;</span>))
                         } <span class="kw">else</span> {
-                            <span class="ident">push_error</span>(<span class="ident">error</span>.<span class="ident">new_incompatible_native_type_with_index</span>())
+                            <span class="ident">push_error</span>(<span class="ident">error</span>.<span class="ident">new_incompatible_native_type_with_index</span>(<span class="string">&quot;&quot;</span>))
                         };
 
                         <span class="kw">break</span>;
