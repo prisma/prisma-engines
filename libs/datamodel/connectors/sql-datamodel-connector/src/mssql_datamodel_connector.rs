@@ -277,9 +277,9 @@ impl Connector for MsSqlDatamodelConnector {
 
                     if heap_allocated_types().contains(&r#type) {
                         if index.is_unique() {
-                            push_error(error.new_incompatible_native_type_with_unique())
+                            push_error(error.new_incompatible_native_type_with_unique(""))
                         } else {
-                            push_error(error.new_incompatible_native_type_with_index())
+                            push_error(error.new_incompatible_native_type_with_index(""))
                         };
                         break;
                     }
@@ -295,7 +295,7 @@ impl Connector for MsSqlDatamodelConnector {
                     if heap_allocated_types().contains(&r#type) {
                         push_error(
                             self.native_instance_error(&native_type)
-                                .new_incompatible_native_type_with_id(),
+                                .new_incompatible_native_type_with_id(""),
                         );
                         break;
                     }

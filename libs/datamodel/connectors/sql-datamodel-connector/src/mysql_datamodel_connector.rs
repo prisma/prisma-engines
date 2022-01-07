@@ -281,12 +281,12 @@ impl Connector for MySqlDatamodelConnector {
                         if index.is_unique() {
                             push_error(
                                 self.native_instance_error(&native_type)
-                                    .new_incompatible_native_type_with_unique(),
+                                    .new_incompatible_native_type_with_unique(" If you are using the `extendedIndexes` preview feature you can add a `length` argument to allow this."),
                             )
                         } else {
                             push_error(
                                 self.native_instance_error(&native_type)
-                                    .new_incompatible_native_type_with_index(),
+                                    .new_incompatible_native_type_with_index(" If you are using the `extendedIndexes` preview feature you can add a `length` argument to allow this."),
                             )
                         };
 
@@ -309,7 +309,7 @@ impl Connector for MySqlDatamodelConnector {
 
                         push_error(
                             self.native_instance_error(&native_type_instance)
-                                .new_incompatible_native_type_with_id(),
+                                .new_incompatible_native_type_with_id(" If you are using the `extendedIndexes` preview feature you can add a `length` argument to allow this."),
                         );
 
                         break;

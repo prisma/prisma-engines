@@ -157,7 +157,7 @@ fn index_does_not_accept_missing_length_with_extended_indexes() {
     let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
-        [1;91merror[0m: [1mNative type Text cannot be unique in MySQL.[0m
+        [1;91merror[0m: [1mNative type Text cannot be unique in MySQL. If you are using the `extendedIndexes` preview feature you can add a `length` argument to allow this.[0m
           [1;94m-->[0m  [4mschema.prisma:12[0m
         [1;94m   | [0m
         [1;94m11 | [0m
@@ -168,7 +168,7 @@ fn index_does_not_accept_missing_length_with_extended_indexes() {
         [1;94m16 | [0m         @@index([firstName])
         [1;94m17 | [0m     }
         [1;94m   | [0m
-        [1;91merror[0m: [1mYou cannot define an index on fields with Native type Text of MySQL.[0m
+        [1;91merror[0m: [1mYou cannot define an index on fields with Native type Text of MySQL. If you are using the `extendedIndexes` preview feature you can add a `length` argument to allow this.[0m
           [1;94m-->[0m  [4mschema.prisma:12[0m
         [1;94m   | [0m
         [1;94m11 | [0m
