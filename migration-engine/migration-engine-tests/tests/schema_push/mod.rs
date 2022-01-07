@@ -413,8 +413,8 @@ fn creating_index_on_long_varchar_without_length_fails(api: TestApi) {
         &err.to_string(),
         "Specified key was too long; max key length is 3072 bytes\n"
     );
-}  
-  
+}
+
 #[test_connector(tags(Mysql), preview_features("extendedIndexes"))]
 fn mysql_should_diff_column_ordering_correctly_issue_10983(api: TestApi) {
     // https://github.com/prisma/prisma/issues/10983
