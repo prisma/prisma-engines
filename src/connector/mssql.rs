@@ -186,6 +186,23 @@ impl MssqlUrl {
         self.query_params.user()
     }
 
+    /// The password to use when connecting to the database.
+    pub fn password(&self) -> Option<&str> {
+        self.query_params.password()
+    }
+
+    /// The TLS mode to use when connecting to the database.
+    pub fn encrypt(&self) -> EncryptMode {
+        self.query_params.encrypt()
+    }
+
+    /// If true, we allow invalid certificates (self-signed, or otherwise
+    /// dangerous) when connecting. Should be true only for development and
+    /// testing.
+    pub fn trust_server_certificate(&self) -> bool {
+        self.query_params.trust_server_certificate()
+    }
+
     /// Database port.
     pub fn port(&self) -> u16 {
         self.query_params.port()
@@ -220,6 +237,18 @@ impl MssqlQueryParams {
         self.user.as_deref()
     }
 
+    fn password(&self) -> Option<&str> {
+        self.password.as_deref()
+    }
+
+    fn encrypt(&self) -> EncryptMode {
+        self.encrypt
+    }
+
+    fn trust_server_certificate(&self) -> bool {
+        self.trust_server_certificate
+    }
+
     fn database(&self) -> &str {
         &self.database
     }
@@ -233,7 +262,7 @@ impl MssqlQueryParams {
     }
 
     fn connect_timeout(&self) -> Option<Duration> {
-        self.socket_timeout
+        self.connect_timeout
     }
 
     fn connection_limit(&self) -> Option<usize> {
