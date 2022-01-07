@@ -118,7 +118,7 @@ impl<'a> SchemaPushAssertion<'a> {
     pub fn assert_no_steps(self) -> Self {
         assert!(
             self.result.executed_steps == 0,
-            "Assertion failed. Executed steps should be zero, but found {:#?}",
+            "Assertion failed. Executed steps should be zero, but found {}",
             self.result.executed_steps,
         );
         self

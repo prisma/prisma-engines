@@ -7,12 +7,7 @@ use colored::Colorize;
 use introspection_connector::CompositeTypeDepth;
 use migration_connector::{DestructiveChangeDiagnostics, DiffTarget};
 use migration_core::commands::{ApplyMigrationsInput, CreateMigrationInput, SchemaPushInput};
-use std::{
-    fmt,
-    fs::File,
-    io::{self, Read},
-    str::FromStr,
-};
+use std::{fmt, fs::File, io::Read, str::FromStr};
 use structopt::*;
 
 #[derive(Debug, StructOpt)]
@@ -199,15 +194,14 @@ async fn main() -> anyhow::Result<()> {
             println!("{}", introspected);
         }
         Command::ValidateDatamodel(cmd) => {
-            use std::io::{self, Read as _};
+            use std::io::Read as _;
 
             let mut file = std::fs::File::open(&cmd.schema_path).expect("error opening datamodel file");
 
             let mut datamodel = String::new();
             file.read_to_string(&mut datamodel).unwrap();
 
-            datamodel::parse_schema(&datamodel)
-                .map_err(|diagnostics| io::Error::new(io::ErrorKind::InvalidInput, diagnostics))?;
+            datamodel::parse_datamodel(&datamodel).unwrap();
         }
         Command::ResetDatabase(cmd) => {
             let schema = read_datamodel_from_file(&cmd.schema_path).context("Error reading the schema from file")?;
@@ -385,15 +379,12 @@ async fn migrate_diff(cmd: &MigrateDiff) -> anyhow::Result<()> {
     let datamodel = read_datamodel_from_file(&cmd.schema_path).context("Error reading the schema from file")?;
     let api = migration_core::migration_api(&datamodel)?;
 
-    let (configuration, datamodel) = datamodel::parse_schema(&datamodel)
-        .map_err(|diagnostics| io::Error::new(io::ErrorKind::InvalidInput, diagnostics))?;
+    let ast = datamodel::parse_schema_ast(&datamodel).unwrap();
+    let parsed_schema = datamodel::parse_schema_parserdb(&datamodel, &ast).unwrap();
 
     let migration = api
         .connector()
-        .diff(
-            DiffTarget::Database,
-            DiffTarget::Datamodel((&configuration, &datamodel)),
-        )
+        .diff(DiffTarget::Database, DiffTarget::Datamodel(&parsed_schema))
         .await?;
 
     match cmd.output_type {

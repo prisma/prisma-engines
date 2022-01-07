@@ -122,3 +122,21 @@ impl ScalarFieldWalkerExt for ScalarFieldWalker<'_, '_> {
             .and_then(|(_, name, args, _)| connector.parse_native_type(name, args.to_owned()).ok())
     }
 }
+
+pub trait RelationFieldWalkerExt {
+    fn default_on_delete_action(self, integrity: ReferentialIntegrity, connector: &dyn Connector) -> ReferentialAction;
+}
+
+impl RelationFieldWalkerExt for RelationFieldWalker<'_, '_> {
+    fn default_on_delete_action(self, integrity: ReferentialIntegrity, connector: &dyn Connector) -> ReferentialAction {
+        match self.referential_arity() {
+            ast::FieldArity::Required
+                if connector.supports_referential_action(&integrity, ReferentialAction::Restrict) =>
+            {
+                ReferentialAction::Restrict
+            }
+            ast::FieldArity::Required => ReferentialAction::NoAction,
+            _ => ReferentialAction::SetNull,
+        }
+    }
+}

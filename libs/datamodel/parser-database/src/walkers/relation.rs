@@ -20,7 +20,7 @@ impl<'ast, 'db> RelationWalker<'ast, 'db> {
     }
 
     /// The relation attributes parsed from the AST.
-    pub(crate) fn get(self) -> &'db Relation<'ast> {
+    fn get(self) -> &'db Relation<'ast> {
         &self.db.relations[self.id]
     }
 }
@@ -38,6 +38,14 @@ impl<'ast, 'db> RefinedRelationWalker<'ast, 'db> {
     pub fn as_inline(&self) -> Option<InlineRelationWalker<'ast, 'db>> {
         match self {
             RefinedRelationWalker::Inline(inline) => Some(*inline),
+            _ => None,
+        }
+    }
+
+    /// Try interpreting this relation as an implicit many-to-many relation.
+    pub fn as_many_to_many(&self) -> Option<ImplicitManyToManyRelationWalker<'ast, 'db>> {
+        match self {
+            RefinedRelationWalker::ImplicitManyToMany(m2m) => Some(*m2m),
             _ => None,
         }
     }
@@ -258,6 +266,11 @@ impl<'ast, 'db> ImplicitManyToManyRelationWalker<'ast, 'db> {
             RelationAttributes::ImplicitManyToMany { field_a: _, field_b } => self.model_b().relation_field(field_b),
             _ => unreachable!(),
         }
+    }
+
+    /// The name of the relation.
+    pub fn relation_name(self) -> RelationName<'ast> {
+        self.field_a().relation_name()
     }
 }
 

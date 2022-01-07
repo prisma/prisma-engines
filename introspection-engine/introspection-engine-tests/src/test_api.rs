@@ -317,7 +317,8 @@ impl TestApi {
 
 #[track_caller]
 fn parse_datamodel(dm: &str) -> Datamodel {
-    datamodel::parse_datamodel_or_pretty_error(dm, "schema.prisma")
+    datamodel::parse_datamodel(dm)
+        .map_err(|diagnostics| diagnostics.to_pretty_string("schema.prisma", dm))
         .unwrap()
         .subject
 }

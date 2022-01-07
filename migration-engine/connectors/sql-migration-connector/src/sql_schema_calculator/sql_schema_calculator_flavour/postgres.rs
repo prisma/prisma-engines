@@ -1,15 +1,16 @@
 use super::SqlSchemaCalculatorFlavour;
 use crate::flavour::PostgresFlavour;
-use datamodel::{datamodel_connector::ScalarType, walkers::ScalarFieldWalker, Datamodel, WithDatabaseName};
-use sql_schema_describer::{self as sql};
+use datamodel::{datamodel_connector::ScalarType, parser_database::walkers::*, ValidatedSchema};
+use sql_schema_describer as sql;
 
 impl SqlSchemaCalculatorFlavour for PostgresFlavour {
-    fn calculate_enums(&self, datamodel: &Datamodel) -> Vec<sql::Enum> {
+    fn calculate_enums(&self, datamodel: &ValidatedSchema<'_>) -> Vec<sql::Enum> {
         datamodel
-            .enums()
+            .db
+            .walk_enums()
             .map(|r#enum| sql::Enum {
-                name: r#enum.final_database_name().to_owned(),
-                values: r#enum.database_values(),
+                name: r#enum.database_name().to_owned(),
+                values: r#enum.values().map(|val| val.database_name().to_owned()).collect(),
             })
             .collect()
     }
@@ -18,8 +19,8 @@ impl SqlSchemaCalculatorFlavour for PostgresFlavour {
         sql_datamodel_connector::POSTGRES.default_native_type_for_scalar_type(scalar_type)
     }
 
-    fn enum_column_type(&self, field: &ScalarFieldWalker<'_>, db_name: &str) -> sql::ColumnType {
-        let arity = super::super::column_arity(field.arity());
+    fn enum_column_type(&self, field: ScalarFieldWalker<'_, '_>, db_name: &str) -> sql::ColumnType {
+        let arity = super::super::column_arity(field.ast_field().arity);
 
         sql::ColumnType::pure(sql::ColumnTypeFamily::Enum(db_name.to_owned()), arity)
     }

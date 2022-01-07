@@ -119,17 +119,6 @@ impl DefaultValue {
         Self { kind, db_name: None }
     }
 
-    pub fn db_generated_description(&self) -> Option<String> {
-        match &self.kind {
-            DefaultKind::Expression(ValueGenerator {
-                name,
-                args,
-                generator: ValueGeneratorFn::DbGenerated,
-            }) if name == "dbgenerated" => args.first().map(|x| x.to_string()),
-            _ => None,
-        }
-    }
-
     pub fn set_db_name(&mut self, name: impl ToString) {
         self.db_name = Some(name.to_string());
     }

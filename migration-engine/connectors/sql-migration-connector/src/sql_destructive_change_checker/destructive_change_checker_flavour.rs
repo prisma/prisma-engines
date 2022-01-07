@@ -37,7 +37,7 @@ pub(crate) trait DestructiveChangeCheckerFlavour {
 /// Display a column type for warnings/errors.
 fn display_column_type(
     column: sql_schema_describer::walkers::ColumnWalker<'_>,
-    connector: &dyn datamodel_connector::Connector,
+    connector: &dyn datamodel::datamodel_connector::Connector,
 ) -> String {
     match &column.column_type().native_type {
         Some(tpe) => connector.introspect_native_type(tpe.clone()).unwrap().to_string(),

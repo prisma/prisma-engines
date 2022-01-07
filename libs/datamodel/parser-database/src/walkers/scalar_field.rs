@@ -1,7 +1,7 @@
 use crate::{
     ast,
     types::{DefaultAttribute, FieldWithArgs, ScalarField, ScalarType, SortOrder},
-    walkers::ModelWalker,
+    walkers::{EnumWalker, ModelWalker, Walker},
     ParserDatabase, ScalarFieldType,
 };
 use diagnostics::Span;
@@ -76,6 +76,17 @@ impl<'ast, 'db> ScalarFieldWalker<'ast, 'db> {
         self.scalar_field
     }
 
+    /// Is this field's type an enum? If yes, walk the enum.
+    pub fn field_type_as_enum(self) -> Option<EnumWalker<'ast, 'db>> {
+        match self.scalar_field_type() {
+            ScalarFieldType::Enum(enum_id) => Some(Walker {
+                db: self.db,
+                id: enum_id,
+            }),
+            _ => None,
+        }
+    }
+
     /// The name in the `@map(<name>)` attribute.
     pub fn mapped_name(self) -> Option<&'ast str> {
         self.attributes().mapped_name
@@ -113,6 +124,14 @@ impl<'ast, 'db> ScalarFieldWalker<'ast, 'db> {
             db: self.db,
             default: d,
         })
+    }
+
+    /// The type of the field, with type aliases resolved.
+    pub fn resolved_scalar_field_type(self) -> ScalarFieldType {
+        match self.attributes().r#type {
+            ScalarFieldType::Alias(id) => *self.db.alias_scalar_field_type(&id),
+            other => other,
+        }
     }
 
     /// The type of the field.
@@ -159,9 +178,29 @@ impl<'ast, 'db> DefaultValueWalker<'ast, 'db> {
         self.default.value
     }
 
+    /// Is this an `@default(autoincrement())`?
+    pub fn is_autoincrement(self) -> bool {
+        matches!(self.default.value, ast::Expression::Function(name, _, _) if name == "autoincrement")
+    }
+
+    /// Is this an `@default(cuid())`?
+    pub fn is_cuid(self) -> bool {
+        matches!(self.default.value, ast::Expression::Function(name, _, _) if name == "cuid")
+    }
+
     /// Is this an `@default(dbgenerated())`?
     pub fn is_dbgenerated(self) -> bool {
         matches!(self.default.value, ast::Expression::Function(name, _, _) if name == "dbgenerated")
+    }
+
+    /// Is this an `@default(now())`?
+    pub fn is_now(self) -> bool {
+        matches!(self.default.value, ast::Expression::Function(name, _, _) if name == "now")
+    }
+
+    /// Is this an `@default(uuid())`?
+    pub fn is_uuid(self) -> bool {
+        matches!(self.default.value, ast::Expression::Function(name, _, _) if name == "uuid")
     }
 
     /// The mapped name of the default value. Not applicable to all connectors. See crate docs for

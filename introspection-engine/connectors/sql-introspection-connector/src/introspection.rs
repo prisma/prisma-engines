@@ -8,8 +8,8 @@ use crate::version_checker::VersionChecker;
 use crate::SqlError;
 use crate::{Dedup, SqlFamilyTrait};
 use datamodel::{
-    common::preview_features::PreviewFeature, dml, walkers::find_model_by_db_name, Datamodel, Field, Model,
-    PrimaryKeyDefinition, PrimaryKeyField, RelationField, SortOrder,
+    common::preview_features::PreviewFeature, dml, Datamodel, Field, Model, PrimaryKeyDefinition, PrimaryKeyField,
+    RelationField, SortOrder,
 };
 use introspection_connector::IntrospectionContext;
 use sql_schema_describer::{SQLSortOrder, SqlSchema, Table};
@@ -155,13 +155,13 @@ fn calculate_fields_for_prisma_join_table(
         let is_self_relation = fk_a.referenced_table == fk_b.referenced_table;
 
         for (fk, opposite_fk) in &[(fk_a, fk_b), (fk_b, fk_a)] {
-            let referenced_model = find_model_by_db_name(data_model, &fk.referenced_table)
+            let referenced_model = dml::find_model_by_db_name(data_model, &fk.referenced_table)
                 .expect("Could not find model referenced in relation table.");
 
             let relation_name = join_table.name[1..].to_string();
             let field = calculate_many_to_many_field(opposite_fk, relation_name, is_self_relation);
 
-            fields_to_be_added.push((referenced_model.name().to_owned(), field));
+            fields_to_be_added.push((referenced_model.name.clone(), field));
         }
     }
 }

@@ -17,12 +17,13 @@ pub(crate) async fn mongo_setup(schema: &str, url: &str) -> ConnectorResult<()> 
         .await
         .unwrap();
 
-    let (_config, schema) = datamodel::parse_schema(schema).unwrap();
+    let ast = datamodel::parse_schema_ast(schema).unwrap();
+    let parsed_schema = datamodel::parse_schema_parserdb(schema, &ast).unwrap();
 
-    for model in schema.models {
+    for model in parsed_schema.db.walk_models() {
         client
             .database(&db_name)
-            .create_collection(model.database_name.as_deref().unwrap_or(&model.name), None)
+            .create_collection(model.final_database_name(), None)
             .await
             .unwrap();
     }
