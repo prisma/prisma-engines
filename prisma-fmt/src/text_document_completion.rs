@@ -39,14 +39,14 @@ pub(crate) fn completion(schema: &str, params: CompletionParams) -> CompletionLi
             )
         });
 
-    let mut items = Vec::new();
+    let mut list = CompletionList {
+        is_incomplete: false,
+        items: Vec::new(),
+    };
 
-    push_ast_completions(&mut items, connector, referential_integrity, &schema_ast, position);
+    push_ast_completions(&mut list, connector, referential_integrity, &schema_ast, position);
 
-    CompletionList {
-        is_incomplete: items.is_empty(),
-        items,
-    }
+    list
 }
 
 /// The LSP position is expressed as a (line, col) tuple, but our pest-based parser works with byte
@@ -93,7 +93,7 @@ fn position_to_offset(position: &Position, document: &str) -> Option<usize> {
 // - referential actions (onDelete and onUpdate arguments)
 // - default arguments on scalar fields (based on connector capabilities for the `map: ...` argument).
 fn push_ast_completions(
-    items: &mut Vec<CompletionItem>,
+    completion_list: &mut CompletionList,
     connector: &'static dyn Connector,
     referential_integrity: ReferentialIntegrity,
     ast: &ast::SchemaAst,
@@ -105,7 +105,7 @@ fn push_ast_completions(
             ast::ModelPosition::Field(_, ast::FieldPosition::Attribute("default", _, None)),
         ) => {
             if connector.has_capability(datamodel::datamodel_connector::ConnectorCapability::NamedDefaultValues) {
-                items.push(CompletionItem {
+                completion_list.items.push(CompletionItem {
                     label: "map: ".to_owned(),
                     kind: Some(CompletionItemKind::PROPERTY),
                     ..Default::default()
@@ -117,11 +117,11 @@ fn push_ast_completions(
             ast::ModelPosition::Field(_, ast::FieldPosition::Attribute("relation", _, Some(attr_name))),
         ) if attr_name == "onDelete" || attr_name == "onUpdate" => {
             for referential_action in connector.referential_actions(&referential_integrity).iter() {
-                items.push(CompletionItem {
+                completion_list.items.push(CompletionItem {
                     label: referential_action.as_str().to_owned(),
                     kind: Some(CompletionItemKind::ENUM),
-                    detail: None, // what is the difference between detail and documentation?
-                    documentation: Some(Documentation::String(referential_action.documentation().to_owned())),
+                    // what is the difference between detail and documentation?
+                    detail: Some(referential_action.documentation().to_owned()),
                     ..Default::default()
                 });
             }
