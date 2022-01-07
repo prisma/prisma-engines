@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["ContextBuilder",""],["PrismaContext","Prisma request context containing all immutable state of the process. There is usually only one context initialized per process."]]});
