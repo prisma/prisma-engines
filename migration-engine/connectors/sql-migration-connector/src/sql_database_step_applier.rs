@@ -104,7 +104,7 @@ impl DatabaseMigrationStepApplier for SqlMigrationConnector {
     #[tracing::instrument(skip(self, script))]
     async fn apply_script(&self, migration_name: &str, script: &str) -> ConnectorResult<()> {
         self.host
-            .print(&format!("Applying migration `{}`", migration_name))
+            .print(&format!("Applying migration `{}`\n", migration_name))
             .await?;
         self.flavour.scan_migration_script(script);
         let conn = self.conn().await?;

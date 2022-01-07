@@ -3,6 +3,7 @@
 mod commands;
 mod logger;
 
+use migration_connector::ConnectorError;
 use migration_core::rpc_api;
 use std::sync::Arc;
 use structopt::StructOpt;
@@ -67,13 +68,19 @@ fn set_panic_hook() {
     }));
 }
 
-struct JsonRpcHost;
+struct JsonRpcHost {
+    client: json_rpc_stdio::Client,
+}
 
 #[async_trait::async_trait]
 impl migration_connector::ConnectorHost for JsonRpcHost {
     async fn print(&self, text: &str) -> migration_connector::ConnectorResult<()> {
-        tracing::info!(migrate_action = "log", "{}", text);
-        Ok(())
+        let notification = serde_json::json!({ "content": text });
+
+        self.client
+            .notify("print".to_owned(), notification)
+            .await
+            .map_err(|err| ConnectorError::from_source(err, "JSON-RPC error"))
     }
 }
 
@@ -84,14 +91,15 @@ async fn start_engine(datamodel_location: Option<&str>) {
 
     let datamodel = datamodel_location.map(|location| {
         let mut file = std::fs::File::open(location).expect("error opening datamodel file");
-
         let mut datamodel = String::new();
         file.read_to_string(&mut datamodel).unwrap();
         datamodel
     });
 
-    let api = rpc_api(datamodel, Arc::new(JsonRpcHost));
+    let (client, adapter) = json_rpc_stdio::new_client();
+    let host = JsonRpcHost { client };
 
+    let api = rpc_api(datamodel, Arc::new(host));
     // Block the thread and handle IO in async until EOF.
-    json_rpc_stdio::run(&api).await.unwrap();
+    json_rpc_stdio::run_with_client(&api, adapter).await.unwrap();
 }
