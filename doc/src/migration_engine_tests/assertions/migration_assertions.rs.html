@@ -40,7 +40,7 @@
 <span id="40">40</span>
 <span id="41">41</span>
 <span id="42">42</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">migration_connector::MigrationRecord</span>;
+</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">migration_core::migration_connector::MigrationRecord</span>;
 
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">MigrationsAssertions</span>: <span class="ident">Sized</span> {
     <span class="kw">fn</span> <span class="ident">assert_applied_steps_count</span>(<span class="self">self</span>, <span class="ident">count</span>: <span class="ident">u32</span>) -&gt; <span class="self">Self</span>;
