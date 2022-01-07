@@ -407,12 +407,7 @@ fn creating_index_on_long_varchar_without_length_fails(api: TestApi) {
      }
      "#;
 
-    let err = api.schema_push_w_datasource(plain_dm).send_unwrap_err();
-
-    assert_eq!(
-        &err.to_string(),
-        "Specified key was too long; max key length is 3072 bytes\n"
-    );
+    api.schema_push_w_datasource(plain_dm).send_unwrap_err();
 }
 
 #[test_connector(tags(Mysql), preview_features("extendedIndexes"))]
