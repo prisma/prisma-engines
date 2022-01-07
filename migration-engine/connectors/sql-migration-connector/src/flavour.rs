@@ -7,23 +7,23 @@ mod mysql;
 mod postgres;
 mod sqlite;
 
-use enumflags2::BitFlags;
 pub(crate) use mssql::MssqlFlavour;
 pub(crate) use mysql::MysqlFlavour;
 pub(crate) use postgres::PostgresFlavour;
 pub(crate) use sqlite::SqliteFlavour;
-use user_facing_errors::migration_engine::ApplyMigrationError;
 
 use crate::{
     connection_wrapper::Connection, sql_destructive_change_checker::DestructiveChangeCheckerFlavour,
     sql_renderer::SqlRenderer, sql_schema_calculator::SqlSchemaCalculatorFlavour,
     sql_schema_differ::SqlSchemaDifferFlavour, SqlMigrationConnector,
 };
-use datamodel::{common::preview_features::PreviewFeature, Datamodel};
+use datamodel::{common::preview_features::PreviewFeature, ValidatedSchema};
+use enumflags2::BitFlags;
 use migration_connector::{migrations_directory::MigrationDirectory, ConnectorError, ConnectorResult};
 use quaint::prelude::{ConnectionInfo, Table};
 use sql_schema_describer::SqlSchema;
 use std::fmt::Debug;
+use user_facing_errors::migration_engine::ApplyMigrationError;
 
 pub(crate) fn from_connection_info(
     connection_info: &ConnectionInfo,
@@ -57,7 +57,7 @@ pub(crate) trait SqlFlavour:
 
     fn check_database_version_compatibility(
         &self,
-        _datamodel: &Datamodel,
+        _datamodel: &ValidatedSchema<'_>,
     ) -> Option<user_facing_errors::common::DatabaseVersionIncompatibility> {
         None
     }

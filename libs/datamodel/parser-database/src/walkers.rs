@@ -51,6 +51,11 @@ impl<'ast> ParserDatabase<'ast> {
         }
     }
 
+    /// Find an enum by ID.
+    pub fn walk_enum(&self, enum_id: ast::EnumId) -> EnumWalker<'ast, '_> {
+        Walker { db: self, id: enum_id }
+    }
+
     /// Walk all the models in the schema.
     pub fn walk_models(&self) -> impl Iterator<Item = ModelWalker<'ast, '_>> + '_ {
         self.ast()

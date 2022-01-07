@@ -1,25 +1,26 @@
-use datamodel::Datamodel;
+use datamodel::{
+    datamodel_connector::walker_ext_traits::*,
+    parser_database::{IndexType, SortOrder},
+    ValidatedSchema,
+};
 use mongodb_schema_describer::{IndexField, IndexFieldProperty, MongoSchema};
 
 /// Datamodel -> MongoSchema
-pub(crate) fn calculate(datamodel: &Datamodel) -> MongoSchema {
+pub(crate) fn calculate(datamodel: &ValidatedSchema<'_>) -> MongoSchema {
     let mut schema = MongoSchema::default();
+    let connector = mongodb_datamodel_connector::MongoDbDatamodelConnector;
 
-    for model in datamodel.models() {
-        let collection_id = schema.push_collection(model.database_name.as_ref().unwrap_or(&model.name).clone());
+    for model in datamodel.db.walk_models() {
+        let collection_id = schema.push_collection(model.final_database_name().to_owned());
 
-        for index in &model.indices {
-            let name = index.db_name.clone().expect("unnamed index");
+        for index in model.indexes() {
+            let name = index.final_database_name(&connector);
             let fields = index
-                .fields
-                .iter()
-                .map(|field| {
-                    let sf = model.find_scalar_field(&field.name).unwrap();
-                    (sf.db_name(), field.sort_order)
-                })
+                .scalar_field_attributes()
+                .map(|field| (field.as_scalar_field().database_name(), field.sort_order()))
                 .map(|(name, sort_order)| {
                     let property = match sort_order {
-                        Some(datamodel::SortOrder::Desc) => IndexFieldProperty::Descending,
+                        Some(SortOrder::Desc) => IndexFieldProperty::Descending,
                         None if index.is_fulltext() => IndexFieldProperty::Text,
                         _ => IndexFieldProperty::Ascending,
                     };
@@ -31,13 +32,13 @@ pub(crate) fn calculate(datamodel: &Datamodel) -> MongoSchema {
                 })
                 .collect();
 
-            let r#type = match index.tpe {
-                datamodel::IndexType::Unique => mongodb_schema_describer::IndexType::Unique,
-                datamodel::IndexType::Normal => mongodb_schema_describer::IndexType::Normal,
-                datamodel::IndexType::Fulltext => mongodb_schema_describer::IndexType::Fulltext,
+            let r#type = match index.index_type() {
+                IndexType::Unique => mongodb_schema_describer::IndexType::Unique,
+                IndexType::Normal => mongodb_schema_describer::IndexType::Normal,
+                IndexType::Fulltext => mongodb_schema_describer::IndexType::Fulltext,
             };
 
-            schema.push_index(collection_id, name, r#type, fields);
+            schema.push_index(collection_id, name.into_owned(), r#type, fields);
         }
     }
 

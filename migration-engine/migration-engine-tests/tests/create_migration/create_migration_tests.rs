@@ -347,7 +347,7 @@ fn create_enum_step_only_rendered_when_needed(api: TestApi) {
                             "id" INTEGER NOT NULL,
                             "mood" "Mood" NOT NULL,
 
-                            PRIMARY KEY ("id")
+                            CONSTRAINT "Cat_pkey" PRIMARY KEY ("id")
                         );
                     "#
                 }

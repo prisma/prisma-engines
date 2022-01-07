@@ -1,7 +1,10 @@
 use crate::{
     constraint_names::ConstraintNames, Connector, NativeTypeInstance, ReferentialAction, ReferentialIntegrity,
 };
-use parser_database::{ast, walkers::*};
+use parser_database::{
+    ast::{self, FieldArity},
+    walkers::*,
+};
 use std::borrow::Cow;
 
 pub trait IndexWalkerExt<'ast> {
@@ -120,5 +123,21 @@ impl ScalarFieldWalkerExt for ScalarFieldWalker<'_, '_> {
     fn native_type_instance(&self, connector: &dyn Connector) -> Option<NativeTypeInstance> {
         self.raw_native_type()
             .and_then(|(_, name, args, _)| connector.parse_native_type(name, args.to_owned()).ok())
+    }
+}
+
+pub trait RelationFieldWalkerExt {
+    fn default_on_delete_action(self, integrity: ReferentialIntegrity, connector: &dyn Connector) -> ReferentialAction;
+}
+
+impl RelationFieldWalkerExt for RelationFieldWalker<'_, '_> {
+    fn default_on_delete_action(self, integrity: ReferentialIntegrity, connector: &dyn Connector) -> ReferentialAction {
+        match self.referential_arity() {
+            FieldArity::Required if connector.supports_referential_action(&integrity, ReferentialAction::Restrict) => {
+                ReferentialAction::Restrict
+            }
+            FieldArity::Required => ReferentialAction::NoAction,
+            _ => ReferentialAction::SetNull,
+        }
     }
 }

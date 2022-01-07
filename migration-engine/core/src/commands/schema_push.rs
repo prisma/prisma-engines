@@ -9,7 +9,8 @@ pub(crate) async fn schema_push(
     input: &SchemaPushInput,
     connector: &dyn MigrationConnector,
 ) -> CoreResult<SchemaPushOutput> {
-    let (configuration, datamodel) = parse_schema(&input.schema)?;
+    let ast = crate::parse_ast(&input.schema)?;
+    let datamodel = parse_schema(&input.schema, &ast)?;
     let applier = connector.database_migration_step_applier();
     let checker = connector.destructive_change_checker();
 
@@ -18,10 +19,7 @@ pub(crate) async fn schema_push(
     };
 
     let database_migration = connector
-        .diff(
-            DiffTarget::Database,
-            DiffTarget::Datamodel((&configuration, &datamodel)),
-        )
+        .diff(DiffTarget::Database, DiffTarget::Datamodel(&datamodel))
         .await?;
 
     let checks = checker.check(&database_migration).await?;

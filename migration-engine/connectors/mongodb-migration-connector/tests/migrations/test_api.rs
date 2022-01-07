@@ -162,18 +162,16 @@ pub(crate) fn test_scenario(scenario_name: &str) {
 
     // let state: State = serde_json::from_str(state).unwrap();
     RT.block_on(async move {
-        let parsed_schema = datamodel::parse_schema(&schema).unwrap();
-        let (db_name, connector) = new_connector(parsed_schema.0.preview_features());
+        let ast = datamodel::parse_schema_ast(&schema).unwrap();
+        let parsed_schema = datamodel::parse_schema_parserdb(&schema, &ast).unwrap();
+        let (db_name, connector) = new_connector(parsed_schema.configuration.preview_features());
         let client = client().await;
         let db = client.database(&db_name);
         db.drop(None).await.unwrap();
         apply_state(&db, state).await;
 
         let migration = connector
-            .diff(
-                DiffTarget::Database,
-                DiffTarget::Datamodel((&parsed_schema.0, &parsed_schema.1)),
-            )
+            .diff(DiffTarget::Database, DiffTarget::Datamodel(&parsed_schema))
             .await
             .unwrap();
 
@@ -214,10 +212,7 @@ Snapshot comparison failed. Run the test again with UPDATE_EXPECT=1 in the envir
 
         // Check that the migration is idempotent.
         let migration = connector
-            .diff(
-                DiffTarget::Database,
-                DiffTarget::Datamodel((&parsed_schema.0, &parsed_schema.1)),
-            )
+            .diff(DiffTarget::Database, DiffTarget::Datamodel(&parsed_schema))
             .await
             .unwrap();
 

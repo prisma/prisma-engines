@@ -396,13 +396,13 @@ impl<'a> SqlSchemaDescriber<'a> {
         if default_generated {
             Self::dbgenerated_expression(default_string)
         } else {
-            DefaultValue::db_generated(default_string)
+            DefaultValue::db_generated(default_string.to_owned())
         }
     }
 
     fn dbgenerated_expression(default_string: &str) -> DefaultValue {
         if matches!(default_string.chars().next(), Some('(')) {
-            DefaultValue::db_generated(default_string)
+            DefaultValue::db_generated(default_string.to_owned())
         } else {
             let mut introspected_default = String::with_capacity(default_string.len());
             introspected_default.push('(');

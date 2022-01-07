@@ -44,12 +44,13 @@ pub async fn create_migration(
 
     // Infer the migration.
     let previous_migrations = list_migrations(Path::new(&input.migrations_directory_path))?;
-    let target_schema = parse_schema(&input.prisma_schema)?;
+    let target_ast = crate::parse_ast(&input.prisma_schema)?;
+    let target_schema = parse_schema(&input.prisma_schema, &target_ast)?;
 
     let migration = connector
         .diff(
             DiffTarget::Migrations(&previous_migrations),
-            DiffTarget::Datamodel((&target_schema.0, &target_schema.1)),
+            DiffTarget::Datamodel(&target_schema),
         )
         .await?;
 

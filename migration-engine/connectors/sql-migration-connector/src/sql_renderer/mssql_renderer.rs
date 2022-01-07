@@ -9,9 +9,9 @@ use crate::{
     pair::Pair,
     sql_migration::{AlterEnum, AlterTable, RedefineTable},
 };
+use datamodel::PrismaValue;
 use indoc::{formatdoc, indoc};
 use native_types::{MsSqlType, MsSqlTypeParameter};
-use prisma_value::PrismaValue;
 use sql_schema_describer::{
     walkers::{
         ColumnWalker, EnumWalker, ForeignKeyWalker, IndexWalker, TableWalker, UserDefinedTypeWalker, ViewWalker,
