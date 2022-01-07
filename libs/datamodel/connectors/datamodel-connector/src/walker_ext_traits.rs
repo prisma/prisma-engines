@@ -94,17 +94,16 @@ impl<'ast> InlineRelationWalkerExt<'ast> for InlineRelationWalker<'ast, '_> {
     fn constraint_name(self, connector: &dyn Connector) -> Cow<'ast, str> {
         self.foreign_key_name().map(Cow::Borrowed).unwrap_or_else(|| {
             let model_database_name = self.referencing_model().final_database_name();
-            match self.referencing_fields() {
-                ReferencingFields::Concrete(fields) => {
-                    let field_names: Vec<&str> = fields.map(|f| f.database_name()).collect();
-                    ConstraintNames::foreign_key_constraint_name(model_database_name, &field_names, connector).into()
-                }
+            let field_names: Vec<&str> = match self.referencing_fields() {
+                ReferencingFields::Concrete(fields) => fields.map(|f| f.database_name()).collect(),
                 ReferencingFields::Inferred(fields) => {
-                    let field_names: Vec<&str> = fields.iter().map(|f| f.name.as_str()).collect();
-                    ConstraintNames::foreign_key_constraint_name(model_database_name, &field_names, connector).into()
+                    let field_names: Vec<_> = fields.iter().map(|f| f.name.as_str()).collect();
+                    return ConstraintNames::foreign_key_constraint_name(model_database_name, &field_names, connector)
+                        .into();
                 }
-                ReferencingFields::NA => unreachable!(),
-            }
+                ReferencingFields::NA => Vec::new(),
+            };
+            ConstraintNames::foreign_key_constraint_name(model_database_name, &field_names, connector).into()
         })
     }
 }
