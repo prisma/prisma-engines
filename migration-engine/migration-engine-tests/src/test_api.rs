@@ -1,12 +1,12 @@
 pub use crate::assertions::{MigrationsAssertions, ResultSetExt, SchemaAssertion};
-use datamodel::common::preview_features::PreviewFeature;
 pub use expect_test::expect;
 pub use test_macros::test_connector;
 pub use test_setup::{BitFlags, Capabilities, Tags};
 
 use crate::{commands::*, multi_engine_test_api::TestApi as RootTestApi};
-use migration_connector::{
-    ConnectorResult, DatabaseMigrationStepApplier, DiffTarget, MigrationConnector, MigrationPersistence,
+use datamodel::common::preview_features::PreviewFeature;
+use migration_core::migration_connector::{
+    ConnectorResult, DatabaseMigrationStepApplier, DiffTarget, EmptyHost, MigrationConnector, MigrationPersistence,
 };
 use quaint::{
     prelude::{ConnectionInfo, ResultSet},
@@ -23,9 +23,7 @@ use test_setup::{DatasourceBlock, TestApiArgs};
 
 /// For error testing.
 pub async fn rpc_api(schema: &str) -> ConnectorResult<()> {
-    migration_core::rpc_api(schema, Box::new(migration_connector::EmptyHost))
-        .await
-        .map(drop)
+    migration_core::rpc_api(schema, Box::new(EmptyHost)).await.map(drop)
 }
 
 pub struct TestApi {

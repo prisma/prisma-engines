@@ -21,6 +21,7 @@ scenarios! {
     no_default_map_on_postgres
     referential_actions_end_of_args_list
     referential_actions_in_progress
+    referential_actions_in_progress_2
     referential_actions_middle_of_args_list
     referential_actions_mssql
     referential_actions_with_trailing_comma

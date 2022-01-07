@@ -1,4 +1,4 @@
-use migration_connector::DiffTarget;
+use migration_core::migration_connector::DiffTarget;
 use migration_engine_tests::test_api::*;
 
 #[test_connector(tags(Mssql))]
