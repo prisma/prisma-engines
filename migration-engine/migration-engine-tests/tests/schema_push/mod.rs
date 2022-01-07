@@ -396,6 +396,21 @@ fn implicit_relations_indices_are_not_renamed_unnecessarily(api: TestApi) {
 }
 
 #[test_connector(tags(Mysql), preview_features("extendedIndexes"))]
+fn creating_index_on_long_varchar_without_length_fails(api: TestApi) {
+    let plain_dm = r#"
+     model User {
+        id         String @db.VarChar(2000)
+
+        @@index([id])
+        @@unique([id])
+        @@id([id])
+     }
+     "#;
+
+    api.schema_push_w_datasource(plain_dm).send_unwrap_err();
+}
+
+#[test_connector(tags(Mysql), preview_features("extendedIndexes"))]
 fn mysql_should_diff_column_ordering_correctly_issue_10983(api: TestApi) {
     // https://github.com/prisma/prisma/issues/10983
 

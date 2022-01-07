@@ -128,6 +128,37 @@ async fn a_table_with_length_prefixed_index(api: &TestApi) -> TestResult {
 }
 
 #[test_connector(tags(Mysql8), preview_features("extendedIndexes"))]
+async fn a_table_with_non_length_prefixed_index(api: &TestApi) -> TestResult {
+    let setup = indoc! {r#"
+        CREATE TABLE `A` (
+            `id` INT  PRIMARY KEY,
+            `a`  VARCHAR(190) NOT NULL,
+            `b`  VARCHAR(192) NOT NULL
+        );
+        
+        CREATE INDEX A_a_idx ON `A` (a);
+        CREATE INDEX A_b_idx ON `A` (b(191));
+    "#};
+
+    api.raw_cmd(setup).await;
+
+    let expected = expect![[r#"
+        model A {
+          id Int    @id
+          a  String @db.VarChar(190)
+          b  String @db.VarChar(192)
+
+          @@index([a])
+          @@index([b(length: 191)])
+        }
+    "#]];
+
+    expected.assert_eq(&api.introspect_dml().await?);
+
+    Ok(())
+}
+
+#[test_connector(tags(Mysql8), preview_features("extendedIndexes"))]
 async fn a_table_with_descending_index(api: &TestApi) -> TestResult {
     let setup = indoc! {r#"
         CREATE TABLE `A` (

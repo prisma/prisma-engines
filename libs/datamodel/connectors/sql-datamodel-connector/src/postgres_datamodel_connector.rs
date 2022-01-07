@@ -243,9 +243,9 @@ impl Connector for PostgresDatamodelConnector {
 
                     if r#type == PostgresType::Xml {
                         if index.is_unique() {
-                            push_error(error.new_incompatible_native_type_with_unique())
+                            push_error(error.new_incompatible_native_type_with_unique(""))
                         } else {
-                            push_error(error.new_incompatible_native_type_with_index())
+                            push_error(error.new_incompatible_native_type_with_index(""))
                         };
 
                         break;
