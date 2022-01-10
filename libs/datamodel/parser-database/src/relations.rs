@@ -17,6 +17,14 @@ pub(super) fn infer_relations(ctx: &mut Context<'_>) {
     ctx.db.relations = relations;
 }
 
+#[derive(Debug, Copy, Clone, PartialEq, PartialOrd, Ord, Eq)]
+pub struct RelationId(u32);
+
+impl RelationId {
+    const MAX: RelationId = RelationId(u32::MAX);
+    const MIN: RelationId = RelationId(u32::MIN);
+}
+
 /// Storage for the relations in a schema.
 ///
 /// A relation is always between two models. One model is assigned the role
@@ -36,7 +44,7 @@ pub(super) fn infer_relations(ctx: &mut Context<'_>) {
 #[derive(Debug, Default)]
 pub(crate) struct Relations<'ast> {
     /// Storage. Private. Do not use directly.
-    pub(super) relations_storage: Vec<Relation<'ast>>,
+    relations_storage: Vec<Relation<'ast>>,
 
     // Indexes for efficient querying.
     //
@@ -54,28 +62,48 @@ pub(crate) struct Relations<'ast> {
     /// (model_a, model_b, relation_idx)
     ///
     /// This can be interpreted as the relations _from_ a model.
-    forward: BTreeSet<(ast::ModelId, ast::ModelId, usize)>,
+    forward: BTreeSet<(ast::ModelId, ast::ModelId, RelationId)>,
     /// (model_b, model_a, relation_idx)
     ///
     /// This can be interpreted as the relations _to_ a model.
-    back: BTreeSet<(ast::ModelId, ast::ModelId, usize)>,
+    back: BTreeSet<(ast::ModelId, ast::ModelId, RelationId)>,
+}
+
+impl<'ast> std::ops::Index<RelationId> for Relations<'ast> {
+    type Output = Relation<'ast>;
+
+    fn index(&self, index: RelationId) -> &Self::Output {
+        &self.relations_storage[index.0 as usize]
+    }
 }
 
 impl<'ast> Relations<'ast> {
+    /// Iterate over all relations in the schema.
+    pub(crate) fn iter(&self) -> impl Iterator<Item = RelationId> {
+        (0..self.relations_storage.len()).map(|idx| RelationId(idx as u32))
+    }
+
     /// Iterator over all the relations in a schema.
     ///
     /// (model_a_id, model_b_id, relation)
     pub(crate) fn iter_relations(&self) -> impl Iterator<Item = (ast::ModelId, ast::ModelId, &Relation<'ast>)> + '_ {
-        self.forward.iter().map(move |(model_a_id, model_b_id, relation_idx)| {
-            (*model_a_id, *model_b_id, &self.relations_storage[*relation_idx])
-        })
+        self.forward
+            .iter()
+            .map(move |(model_a_id, model_b_id, relation_idx)| (*model_a_id, *model_b_id, &self[*relation_idx]))
     }
 
     /// Iterator over relation id
-    pub(crate) fn from_model(&self, model_a_id: ast::ModelId) -> impl Iterator<Item = usize> + '_ {
+    pub(crate) fn from_model(&self, model_a_id: ast::ModelId) -> impl Iterator<Item = RelationId> + '_ {
         self.forward
-            .range((model_a_id, ast::ModelId::ZERO, 0)..(model_a_id, ast::ModelId::MAX, usize::MAX))
-            .map(move |(_, _, relation_idx)| *relation_idx)
+            .range((model_a_id, ast::ModelId::ZERO, RelationId::MIN)..(model_a_id, ast::ModelId::MAX, RelationId::MAX))
+            .map(move |(_, _, relation_id)| *relation_id)
+    }
+
+    /// Iterator over relation id
+    pub(crate) fn to_model(&self, model_a_id: ast::ModelId) -> impl Iterator<Item = RelationId> + '_ {
+        self.back
+            .range((model_a_id, ast::ModelId::ZERO, RelationId::MIN)..(model_a_id, ast::ModelId::MAX, RelationId::MAX))
+            .map(move |(_, _, relation_id)| *relation_id)
     }
 }
 
@@ -102,6 +130,21 @@ pub(super) enum RelationAttributes {
     OneToMany(OneToManyRelationFields),
 }
 
+impl RelationAttributes {
+    fn fields(&self) -> (Option<ast::FieldId>, Option<ast::FieldId>) {
+        match self {
+            RelationAttributes::ImplicitManyToMany { field_a, field_b }
+            | RelationAttributes::OneToOne(OneToOneRelationFields::Both(field_a, field_b))
+            | RelationAttributes::OneToMany(OneToManyRelationFields::Both(field_a, field_b)) => {
+                (Some(*field_a), Some(*field_b))
+            }
+            RelationAttributes::OneToMany(OneToManyRelationFields::Forward(field_a))
+            | RelationAttributes::OneToOne(OneToOneRelationFields::Forward(field_a)) => (Some(*field_a), None),
+            RelationAttributes::OneToMany(OneToManyRelationFields::Back(field_b)) => (None, Some(*field_b)),
+        }
+    }
+}
+
 #[derive(PartialOrd, Ord, PartialEq, Eq, Debug)]
 pub(crate) struct Relation<'ast> {
     /// The `name` argument in `@relation`.
@@ -112,6 +155,14 @@ pub(crate) struct Relation<'ast> {
 }
 
 impl<'ast> Relation<'ast> {
+    pub(crate) fn has_field(&self, model_id: ast::ModelId, field_id: ast::FieldId) -> bool {
+        match self.attributes.fields() {
+            (Some(field_a), _) if self.model_a == model_id && field_a == field_id => true,
+            (_, Some(field_b)) if self.model_b == model_id && field_b == field_id => true,
+            _ => false,
+        }
+    }
+
     pub(crate) fn is_many_to_many(&self) -> bool {
         matches!(self.attributes, RelationAttributes::ImplicitManyToMany { .. })
     }
@@ -292,21 +343,17 @@ pub(super) fn ingest_relation<'ast, 'db>(
         },
     };
 
-    let relation_idx = relations.relations_storage.len();
+    let relation_id = RelationId(relations.relations_storage.len() as u32);
 
     relations.relations_storage.push(relation);
 
-    relations.forward.insert((
-        evidence.model_id,
-        evidence.relation_field.referenced_model,
-        relation_idx,
-    ));
+    relations
+        .forward
+        .insert((evidence.model_id, evidence.relation_field.referenced_model, relation_id));
 
-    relations.back.insert((
-        evidence.relation_field.referenced_model,
-        evidence.model_id,
-        relation_idx,
-    ));
+    relations
+        .back
+        .insert((evidence.relation_field.referenced_model, evidence.model_id, relation_id));
 }
 
 /// Describes what happens when related nodes are deleted.

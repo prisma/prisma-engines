@@ -250,7 +250,18 @@ impl<'ast, 'db> ModelWalker<'ast, 'db> {
             .relations
             .from_model(self.model_id)
             .map(move |relation_id| RelationWalker {
-                relation_id,
+                id: relation_id,
+                db: self.db,
+            })
+    }
+
+    /// All relations that reference this model.
+    pub fn relations_to(self) -> impl Iterator<Item = RelationWalker<'ast, 'db>> + 'db {
+        self.db
+            .relations
+            .to_model(self.model_id)
+            .map(move |relation_id| RelationWalker {
+                id: relation_id,
                 db: self.db,
             })
     }

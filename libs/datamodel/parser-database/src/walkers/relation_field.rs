@@ -1,7 +1,7 @@
 use crate::{
     ast::{self, FieldArity},
     types::RelationField,
-    walkers::{ModelWalker, ScalarFieldWalker},
+    walkers::{ModelWalker, RelationWalker, ScalarFieldWalker},
     ParserDatabase, ReferentialAction,
 };
 use std::{
@@ -130,6 +130,13 @@ impl<'ast, 'db> RelationFieldWalker<'ast, 'db> {
                 .iter()
                 .map(move |field_id| self.related_model().scalar_field(*field_id))
         })
+    }
+
+    /// The relation this field is part of.
+    pub fn relation(self) -> RelationWalker<'ast, 'db> {
+        let model = self.model();
+        let mut relations = model.relations_from().chain(model.relations_to());
+        relations.find(|r| r.has_field(self.model_id, self.field_id)).unwrap()
     }
 
     /// The name of the relation. Either uses the `name` (or default) argument,
