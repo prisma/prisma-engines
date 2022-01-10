@@ -250,7 +250,7 @@ impl<'ast, 'db> ModelWalker<'ast, 'db> {
             .relations
             .from_model(self.model_id)
             .map(move |relation_id| RelationWalker {
-                relation_id,
+                id: relation_id,
                 db: self.db,
             })
     }

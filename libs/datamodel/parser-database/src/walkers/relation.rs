@@ -2,32 +2,22 @@ use crate::{ast, relations::*, walkers::*, ParserDatabase, ScalarFieldType};
 
 /// A relation that has the minimal amount of information for us to create one. Useful for
 /// validation purposes. Holds all possible relation types.
-#[derive(Copy, Clone)]
-pub struct RelationWalker<'ast, 'db> {
-    pub(super) relation_id: usize,
-    pub(super) db: &'db ParserDatabase<'ast>,
-}
+pub type RelationWalker<'ast, 'db> = Walker<'ast, 'db, RelationId>;
 
 impl<'ast, 'db> RelationWalker<'ast, 'db> {
     /// Converts the walker to either an implicit many to many, or a inline relation walker
     /// gathering 1:1 and 1:n relations.
     pub fn refine(self) -> RefinedRelationWalker<'ast, 'db> {
         if self.get().is_many_to_many() {
-            RefinedRelationWalker::ImplicitManyToMany(ImplicitManyToManyRelationWalker {
-                db: self.db,
-                relation_id: self.relation_id,
-            })
+            RefinedRelationWalker::ImplicitManyToMany(ImplicitManyToManyRelationWalker(self))
         } else {
-            RefinedRelationWalker::Inline(InlineRelationWalker {
-                relation_id: self.relation_id,
-                db: self.db,
-            })
+            RefinedRelationWalker::Inline(InlineRelationWalker(self))
         }
     }
 
     /// The relation attributes parsed from the AST.
     pub(crate) fn get(self) -> &'db Relation<'ast> {
-        &self.db.relations.relations_storage[self.relation_id]
+        &self.db.relations[self.id]
     }
 }
 
@@ -71,15 +61,12 @@ pub enum ReferencingFields<'ast, 'db> {
 /// An explicitly defined 1:1 or 1:n relation. The walker has the referencing side defined, but
 /// might miss the back relation in the AST.
 #[derive(Copy, Clone)]
-pub struct InlineRelationWalker<'ast, 'db> {
-    relation_id: usize,
-    db: &'db ParserDatabase<'ast>,
-}
+pub struct InlineRelationWalker<'ast, 'db>(RelationWalker<'ast, 'db>);
 
 impl<'ast, 'db> InlineRelationWalker<'ast, 'db> {
     /// Get the relation attributes defined in the AST.
     fn get(self) -> &'db Relation<'ast> {
-        &self.db.relations.relations_storage[self.relation_id]
+        &self.0.db.relations[self.0.id]
     }
 
     /// The relation is 1:1, having at most one record on both sides of the relation.
@@ -89,12 +76,12 @@ impl<'ast, 'db> InlineRelationWalker<'ast, 'db> {
 
     /// The model which holds the relation arguments.
     pub fn referencing_model(self) -> ModelWalker<'ast, 'db> {
-        self.db.walk_model(self.get().model_a)
+        self.0.db.walk_model(self.get().model_a)
     }
 
     /// The model referenced and which hold the back-relation field.
     pub fn referenced_model(self) -> ModelWalker<'ast, 'db> {
-        self.db.walk_model(self.get().model_b)
+        self.0.db.walk_model(self.get().model_b)
     }
 
     /// If the relation is defined from both sides, convert to an explicit relation
@@ -105,7 +92,7 @@ impl<'ast, 'db> InlineRelationWalker<'ast, 'db> {
                 let walker = CompleteInlineRelationWalker {
                     side_a: (self.referencing_model().model_id, field_a.field_id),
                     side_b: (self.referenced_model().model_id, field_b.field_id),
-                    db: self.db,
+                    db: self.0.db,
                 };
 
                 Some(walker)
@@ -235,25 +222,22 @@ impl<'ast, 'db> InlineRelationWalker<'ast, 'db> {
 /// Describes an implicit m:n relation between two models. Neither side defines fields, attributes
 /// or referential actions, which are all inferred by Prisma.
 #[derive(Copy, Clone)]
-pub struct ImplicitManyToManyRelationWalker<'ast, 'db> {
-    relation_id: usize,
-    db: &'db ParserDatabase<'ast>,
-}
+pub struct ImplicitManyToManyRelationWalker<'ast, 'db>(RelationWalker<'ast, 'db>);
 
 impl<'ast, 'db> ImplicitManyToManyRelationWalker<'ast, 'db> {
     /// Gets the relation attributes from the AST.
     fn get(&self) -> &'db Relation<'ast> {
-        &self.db.relations.relations_storage[self.relation_id]
+        &self.0.db.relations[self.0.id]
     }
 
     /// The model which comes first in the alphabetical order.
     pub fn model_a(self) -> ModelWalker<'ast, 'db> {
-        self.db.walk_model(self.get().model_a)
+        self.0.db.walk_model(self.get().model_a)
     }
 
     /// The model which comes after model a in the alphabetical order.
     pub fn model_b(self) -> ModelWalker<'ast, 'db> {
-        self.db.walk_model(self.get().model_b)
+        self.0.db.walk_model(self.get().model_b)
     }
 
     /// The field that defines the relation in model a.
