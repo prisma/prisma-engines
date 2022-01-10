@@ -22,6 +22,7 @@ pub(crate) struct ValidateOutput<'ast> {
 /// * Resolve and check all field types
 /// * ...
 /// * Validate the schema
+#[tracing::instrument]
 pub(crate) fn validate<'ast>(
     ast_schema: &'ast ast::SchemaAst,
     sources: &[configuration::Datasource],

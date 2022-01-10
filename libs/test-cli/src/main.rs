@@ -14,6 +14,7 @@ use std::{
     str::FromStr,
 };
 use structopt::*;
+use tracing_subscriber::{prelude::__tracing_subscriber_SubscriberExt, Registry};
 
 #[derive(Debug, StructOpt)]
 #[structopt(version = env!("GIT_HASH"))]
@@ -160,7 +161,17 @@ impl From<ApplyMigrations> for ApplyMigrationsInput {
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
-    init_logger();
+    let tracer = opentelemetry_jaeger::new_pipeline()
+        .with_collector_endpoint("http://localhost:14268/api/traces")
+        .with_service_name("test-cli")
+        .install_batch(opentelemetry::runtime::Tokio)?;
+
+    // Create a tracing layer with the configured tracer
+    let telemetry = tracing_opentelemetry::layer().with_tracer(tracer);
+
+    // Use the tracing subscriber `Registry`, or any other subscriber
+    // that impls `LookupSpan`
+    let subscriber = Registry::default().with(telemetry);
 
     match Command::from_args() {
         Command::DiagnoseMigrationHistory(cmd) => cmd.execute().await?,
@@ -206,8 +217,15 @@ async fn main() -> anyhow::Result<()> {
             let mut datamodel = String::new();
             file.read_to_string(&mut datamodel).unwrap();
 
-            datamodel::parse_schema(&datamodel)
-                .map_err(|diagnostics| io::Error::new(io::ErrorKind::InvalidInput, diagnostics))?;
+            // Trace executed code
+            tracing::subscriber::with_default(subscriber, || {
+                // Spans will be sent to the configured OpenTelemetry exporter
+                let root = tracing::span!(tracing::Level::TRACE, "validate_datamodel", work_units = 2);
+                let _enter = root.enter();
+
+                datamodel::parse_schema(&datamodel)
+                    .map_err(|diagnostics| io::Error::new(io::ErrorKind::InvalidInput, diagnostics))
+            });
         }
         Command::ResetDatabase(cmd) => {
             let schema = read_datamodel_from_file(&cmd.schema_path).context("Error reading the schema from file")?;
@@ -238,6 +256,8 @@ async fn main() -> anyhow::Result<()> {
             api.apply_migrations(&cmd.into()).await?;
         }
     }
+
+    opentelemetry::global::shutdown_tracer_provider(); // export remaining spans
 
     Ok(())
 }
@@ -415,22 +435,4 @@ async fn migrate_diff(cmd: &MigrateDiff) -> anyhow::Result<()> {
     }
 
     Ok(())
-}
-
-fn init_logger() {
-    use tracing_error::ErrorLayer;
-    use tracing_subscriber::prelude::*;
-
-    use tracing_subscriber::{EnvFilter, FmtSubscriber};
-
-    let subscriber = FmtSubscriber::builder()
-        .with_env_filter(EnvFilter::from_default_env())
-        .with_ansi(false)
-        .with_writer(std::io::stderr)
-        .finish()
-        .with(ErrorLayer::default());
-
-    tracing::subscriber::set_global_default(subscriber)
-        .map_err(|err| eprintln!("Error initializing the global logger: {}", err))
-        .ok();
 }

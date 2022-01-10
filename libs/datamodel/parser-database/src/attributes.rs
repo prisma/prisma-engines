@@ -14,6 +14,7 @@ use crate::{
 };
 use diagnostics::Span;
 
+#[tracing::instrument(skip(ctx))]
 pub(super) fn resolve_attributes(ctx: &mut Context<'_>) {
     for top in ctx.db.ast.iter_tops() {
         match top {

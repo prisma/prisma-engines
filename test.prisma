@@ -1,0 +1,711 @@
+generator js {
+  provider        = "prisma-client-js"
+  previewFeatures = ["mongoDb"]
+}
+
+datasource db {
+  provider = "sqlserver"
+  url      = "sqlserver://localhost:1433;database=master;user=SA;password=<YourStrong@Passw0rd>;trustServerCertificate=true;socket_timeout=60;isolationLevel=READ UNCOMMITTED;schema=dbo"
+}
+
+model ActionItem {
+  Id                                                      Int                        @id(map: "PK__ActionIt__3214EC07DB7F6A96") @default(autoincrement())
+  ScorecardId                                             Int
+  RegionId                                                Int
+  ResponsibleUserId                                       Int
+  Category                                                String?                    @db.NVarChar(255)
+  Description                                             String?                    @db.NVarChar(Max)
+  DateCreated                                             DateTime                   @db.DateTime
+  LastUpdated                                             DateTime?                  @db.DateTime
+  Deadline                                                DateTime?                  @db.Date
+  StatusColorId                                           Int?                       @default(0, map: "DF__ActionIte__Statu__5FD33367")
+  CategoryId                                              Int?
+  CurrentStatus                                           String?                    @db.NVarChar(Max)
+  AdministrativeUserId                                    Int?
+  Partner                                                 String?                    @db.NVarChar(1024)
+  IsCommunity                                             Boolean                    @default(false, map: "DF__ActionIte__IsCom__60C757A0")
+  IsStatusYellowReminderSent                              Boolean?
+  IsStatusRedReminderSent                                 Boolean?
+  LastDeadlineReminderTime                                DateTime?                  @db.DateTime
+  ResponsibleUserDhisId                                   String?                    @db.NVarChar(50)
+  AdministrativeUserDhisId                                String?                    @db.NVarChar(50)
+  Version                                                 Int                        @default(1, map: "DF__ActionIte__Versi__61BB7BD9")
+  ParentDeliverableId                                     Int?
+  IsDeliverable                                           Boolean                    @default(false, map: "DF__ActionIte__IsDel__63A3C44B")
+  IsSMSNotification                                       Boolean                    @default(false, map: "DF__ActionIte__IsSMS__6497E884")
+  StartDate                                               DateTime?                  @db.DateTime
+  Custom1                                                 String?                    @db.NVarChar(50)
+  Custom2                                                 String?                    @db.NVarChar(50)
+  IsSharedActionItem                                      Boolean                    @default(false, map: "DF__ActionIte__IsSha__658C0CBD")
+  DhisUser_ActionItem_AdministrativeUserDhisIdToDhisUser  DhisUser?                  @relation("ActionItem_AdministrativeUserDhisIdToDhisUser", fields: [AdministrativeUserDhisId], references: [Id], onDelete: NoAction, onUpdate: NoAction, map: "FK_ActionItem_AdministrativeDhisUser")
+  User_ActionItem_AdministrativeUserIdToUser              User?                      @relation("ActionItem_AdministrativeUserIdToUser", fields: [AdministrativeUserId], references: [Id], onDelete: NoAction, onUpdate: NoAction, map: "FK_ActionItem_User1")
+  ActionItemCategory                                      ActionItemCategory?        @relation(fields: [CategoryId], references: [Id], onDelete: NoAction, onUpdate: NoAction, map: "FK_ActionItem_ActionItemCategory")
+  Deliverable_ActionItem_ParentDeliverableIdToDeliverable Deliverable?               @relation("ActionItem_ParentDeliverableIdToDeliverable", fields: [ParentDeliverableId], references: [Id], onDelete: NoAction, onUpdate: NoAction, map: "FK_ActionItem_Deliverable")
+  Region                                                  Region                     @relation(fields: [RegionId], references: [Id], onUpdate: NoAction, map: "FK_ActionItem_Region")
+  DhisUser_ActionItem_ResponsibleUserDhisIdToDhisUser     DhisUser?                  @relation("ActionItem_ResponsibleUserDhisIdToDhisUser", fields: [ResponsibleUserDhisId], references: [Id], onDelete: NoAction, onUpdate: NoAction, map: "FK_ActionItem_ResponsibleDhisUser")
+  User_ActionItem_ResponsibleUserIdToUser                 User?                      @relation("ActionItem_ResponsibleUserIdToUser", fields: [ResponsibleUserId], references: [Id], onDelete: NoAction, onUpdate: NoAction, map: "FK_ActionItem_User")
+  Scorecard                                               Scorecard                  @relation(fields: [ScorecardId], references: [Id], onUpdate: NoAction, map: "FK_ActionItem_Scorecard")
+  ActionItem_KpiDefinition                                ActionItem_KpiDefinition[]
+  ActionItemComment                                       ActionItemComment[]
+  Deliverable_ActionItemToDeliverable_Id                  Deliverable?               @relation("ActionItemToDeliverable_Id")
+  Notification                                            Notification[]
+  Subscription                                            Subscription[]
+}
+
+model ActionItem_KpiDefinition {
+  ActionItemId    Int
+  KpiDefinitionId Int
+  ActionItem      ActionItem    @relation(fields: [ActionItemId], references: [Id], onUpdate: NoAction, map: "FK_ActionItem_KpiDefinition_ActionItem")
+  KpiDefinition   KpiDefinition @relation(fields: [KpiDefinitionId], references: [Id], onUpdate: NoAction, map: "FK_ActionItem_KpiDefinition_KpiDefinition")
+
+  @@id([ActionItemId, KpiDefinitionId], map: "PK__ActionIt__2333C858B755DA80")
+}
+
+model ActionItemCategory {
+  Id          Int          @id(map: "PK__ActionIt__3214EC076EC2A401") @default(autoincrement())
+  ScorecardId Int
+  Name        String       @db.NVarChar(250)
+  Scorecard   Scorecard    @relation(fields: [ScorecardId], references: [Id], onUpdate: NoAction, map: "FK_ActionItemCategory_Scorecard")
+  ActionItem  ActionItem[]
+}
+
+model ActionItemComment {
+  Id           Int        @id(map: "PK__ActionIt__3214EC075B7C2555") @default(autoincrement())
+  UserId       Int
+  ActionItemId Int
+  TimeStamp    DateTime   @db.DateTime
+  Comment      String     @db.NVarChar(Max)
+  Version      Int        @default(1, map: "DF__ActionIte__Versi__668030F6")
+  ActionItem   ActionItem @relation(fields: [ActionItemId], references: [Id], onDelete: Cascade, onUpdate: NoAction, map: "FK_ActionItemComment_ActionItem")
+  User         User       @relation(fields: [UserId], references: [Id], onUpdate: NoAction, map: "FK_ActionItemComment_User")
+}
+
+model AspNetRoles {
+  Id              String            @id(map: "PK_dbo.AspNetRoles") @db.NVarChar(128)
+  Name            String            @db.NVarChar(256)
+  AspNetUserRoles AspNetUserRoles[]
+}
+
+model AspNetUserClaims {
+  Id          Int         @id(map: "PK_dbo.AspNetUserClaims") @default(autoincrement())
+  UserId      String      @db.NVarChar(128)
+  ClaimType   String?     @db.NVarChar(Max)
+  ClaimValue  String?     @db.NVarChar(Max)
+  AspNetUsers AspNetUsers @relation(fields: [UserId], references: [Id], onDelete: Cascade, onUpdate: NoAction, map: "FK_dbo.AspNetUserClaims_dbo.AspNetUsers_UserId")
+}
+
+model AspNetUserLogins {
+  LoginProvider String      @db.NVarChar(128)
+  ProviderKey   String      @db.NVarChar(128)
+  UserId        String      @db.NVarChar(128)
+  AspNetUsers   AspNetUsers @relation(fields: [UserId], references: [Id], onDelete: Cascade, onUpdate: NoAction, map: "FK_dbo.AspNetUserLogins_dbo.AspNetUsers_UserId")
+
+  @@id([LoginProvider, ProviderKey, UserId], map: "PK_dbo.AspNetUserLogins")
+}
+
+model AspNetUserRoles {
+  UserId      String      @db.NVarChar(128)
+  RoleId      String      @db.NVarChar(128)
+  AspNetRoles AspNetRoles @relation(fields: [RoleId], references: [Id], onDelete: Cascade, onUpdate: NoAction, map: "FK_dbo.AspNetUserRoles_dbo.AspNetRoles_RoleId")
+  AspNetUsers AspNetUsers @relation(fields: [UserId], references: [Id], onDelete: Cascade, onUpdate: NoAction, map: "FK_dbo.AspNetUserRoles_dbo.AspNetUsers_UserId")
+
+  @@id([UserId, RoleId], map: "PK_dbo.AspNetUserRoles")
+}
+
+model AspNetUsers {
+  Id                   String             @id(map: "PK_dbo.AspNetUsers") @db.NVarChar(128)
+  Email                String?            @db.NVarChar(256)
+  EmailConfirmed       Boolean
+  PasswordHash         String?            @db.NVarChar(Max)
+  SecurityStamp        String?            @db.NVarChar(Max)
+  PhoneNumber          String?            @db.NVarChar(Max)
+  PhoneNumberConfirmed Boolean
+  TwoFactorEnabled     Boolean
+  LockoutEndDateUtc    DateTime?          @db.DateTime
+  LockoutEnabled       Boolean
+  AccessFailedCount    Int
+  UserName             String             @db.NVarChar(256)
+  AspNetUserClaims     AspNetUserClaims[]
+  AspNetUserLogins     AspNetUserLogins[]
+  AspNetUserRoles      AspNetUserRoles[]
+  User                 User[]
+}
+
+model CellValue {
+  PeriodId        Int
+  ColumnId        String         @db.NVarChar(50)
+  KpiDefinitionId Int?
+  RegionId        Int
+  Value           Decimal?       @db.Decimal(18, 4)
+  IsNA            Boolean?       @default(false, map: "DF__CellValue__IsNA__6774552F")
+  Label           String?        @db.NVarChar(Max)
+  KpiDefinition   KpiDefinition? @relation(fields: [KpiDefinitionId], references: [Id], onDelete: NoAction, onUpdate: NoAction, map: "FK_CellValue_KpiDefinition")
+  Period          Period         @relation(fields: [PeriodId], references: [Id], onUpdate: NoAction, map: "FK_CellValue_Period")
+  Region          Region         @relation(fields: [RegionId], references: [Id], onUpdate: NoAction, map: "FK_CellValue_Region")
+
+  @@id([PeriodId, ColumnId, RegionId], map: "PK__CellValu__A62777726A3EDFB2")
+  @@index([KpiDefinitionId], map: "idx_CellValue_KpiDefinition")
+  @@index([KpiDefinitionId, RegionId, PeriodId], map: "idx_CellValue_KpiRegionPeriod")
+}
+
+model Deliverable {
+  Id                                                     Int          @id(map: "PK__Delivera__3214EC07B8FCDF05")
+  ObjectiveId                                            Int
+  ActionItem_ActionItemToDeliverable_Id                  ActionItem   @relation("ActionItemToDeliverable_Id", fields: [Id], references: [Id], onUpdate: NoAction, map: "FK_Deliverable_ActionItem")
+  Objective                                              Objective    @relation(fields: [ObjectiveId], references: [Id], onUpdate: NoAction, map: "FK_Deliverable_Objective")
+  ActionItem_ActionItem_ParentDeliverableIdToDeliverable ActionItem[] @relation("ActionItem_ParentDeliverableIdToDeliverable")
+}
+
+model DhisAuth {
+  Id              Int       @id(map: "PK__DhisAuth__3214EC0776ACF41F") @default(autoincrement())
+  CreatedByUserId Int
+  RegionId        Int
+  ServerName      String    @db.NVarChar(Max)
+  ServerUrl       String    @db.NVarChar(Max)
+  OauthSecret     String    @db.NVarChar(Max)
+  Access_token    String?   @db.NVarChar(Max)
+  Refresh_token   String?   @db.NVarChar(Max)
+  Valid_till      DateTime? @db.DateTime
+  ApiKey          String?   @db.NVarChar(Max)
+  User            User      @relation(fields: [CreatedByUserId], references: [Id], onUpdate: NoAction, map: "FK_DhisAuth_User")
+  Region          Region    @relation(fields: [RegionId], references: [Id], onUpdate: NoAction, map: "FK_DhisAuth_Region")
+}
+
+model DhisCellValue {
+  PeriodId            Int
+  DhisKpiDefinitionId String            @db.NVarChar(255)
+  DhisRegionId        String            @db.NVarChar(11)
+  Value               Decimal?          @db.Decimal(18, 4)
+  DhisPeriodId        String            @db.NVarChar(11)
+  DhisKpiDefinition   DhisKpiDefinition @relation(fields: [DhisKpiDefinitionId], references: [Id], onUpdate: NoAction, map: "FK_DhisCellValue_DhisKpiDefinition")
+  DhisRegion          DhisRegion        @relation(fields: [DhisRegionId], references: [Id], onUpdate: NoAction, map: "FK_DhisCellValue_DhisRegion")
+  Period              Period            @relation(fields: [PeriodId], references: [Id], onUpdate: NoAction, map: "FK_DhisCellValue_Period")
+
+  @@id([DhisRegionId, DhisPeriodId, DhisKpiDefinitionId], map: "PK__DhisCell__0DD9851820FFB8D7")
+  @@index([DhisKpiDefinitionId], map: "IX_DhisCellValue_DhisKpiDefinition")
+  @@index([DhisKpiDefinitionId, DhisRegionId, DhisPeriodId], map: "IX_DhisCellValue_DhisKpiDhisRegionDhisPeriod")
+  @@index([DhisKpiDefinitionId, DhisRegionId, PeriodId], map: "IX_DhisCellValue_DhisKpiDhisRegionPeriod")
+}
+
+model DhisKpiDefinition {
+  Id                String          @id(map: "PK__DhisKpiD__3214EC07A4E45B9F") @db.NVarChar(255)
+  Name              String?         @db.NVarChar(230)
+  ShortName         String?         @db.NVarChar(50)
+  Description       String?         @db.NVarChar(Max)
+  Numerator         String?         @db.NVarChar(Max)
+  Denominator       String?         @db.NVarChar(Max)
+  IndicatorTypeId   String?         @db.NVarChar(11)
+  IndicatorTypeName String?         @db.NVarChar(230)
+  NumberFormatId    Int?
+  RegionId          Int?
+  DhisSyncConfigId  String?         @db.UniqueIdentifier
+  DhisSyncConfig    DhisSyncConfig? @relation(fields: [DhisSyncConfigId], references: [Id], onDelete: NoAction, onUpdate: NoAction, map: "FK_DhisKpiDefinition_DhisSyncConfig")
+  Region            Region?         @relation(fields: [RegionId], references: [Id], onDelete: NoAction, onUpdate: NoAction, map: "FK_DhisKpiDefinition_Region")
+  DhisCellValue     DhisCellValue[]
+  KpiDefinition     KpiDefinition[]
+}
+
+model DhisRegion {
+  Id               String          @id(map: "PK__DhisRegi__3214EC070FEFFA11") @db.NVarChar(11)
+  ParentId         String?         @db.NVarChar(11)
+  Name             String?         @db.NVarChar(230)
+  Order            Int
+  FeatureType      Int?
+  Coordinates      String?         @db.NVarChar(Max)
+  Level            Int?
+  DhisRegion       DhisRegion?     @relation("DhisRegionToDhisRegion_ParentId", fields: [ParentId], references: [Id], onDelete: NoAction, onUpdate: NoAction, map: "FK_DhisRegion_DhisRegion")
+  DhisCellValue    DhisCellValue[]
+  other_DhisRegion DhisRegion[]    @relation("DhisRegionToDhisRegion_ParentId")
+  Region           Region[]
+
+  @@unique([ParentId, Order], map: "IX_DhisRegionOrder")
+  @@index([ParentId], map: "IX_DhisRegion_ParentId")
+}
+
+model DhisSyncConfig {
+  Id                    String              @id(map: "PK__DhisSync__3214EC070427ACFD") @default(dbgenerated("newid()"), map: "DF__DhisSyncConf__Id__68687968") @db.UniqueIdentifier
+  CreatedByUserId       Int
+  RegionId              Int
+  DhisAuthorizationCode String?             @db.NVarChar(255)
+  DhisUserId            String?             @db.NVarChar(255)
+  DhisUserName          String?             @db.NVarChar(255)
+  DhisUserEmail         String?             @db.NVarChar(255)
+  DhisRegionName        String?             @db.NVarChar(255)
+  DhisRegionId          String?             @db.NVarChar(255)
+  DhisSystemId          String?             @db.NVarChar(255)
+  User                  User                @relation(fields: [CreatedByUserId], references: [Id], onUpdate: NoAction, map: "FK_DhisSyncConfig_User")
+  Region                Region              @relation(fields: [RegionId], references: [Id], onUpdate: NoAction, map: "FK_DhisSyncConfig_Region")
+  DhisKpiDefinition     DhisKpiDefinition[]
+}
+
+model DhisUser {
+  Id                                                       String       @id(map: "PK__DhisUser__3214EC076998C19E") @db.NVarChar(50)
+  DisplayName                                              String       @db.NVarChar(50)
+  Email                                                    String?      @db.NVarChar(50)
+  DhisRegionId                                             String?      @db.NVarChar(50)
+  IsDeactivated                                            Boolean
+  UserId                                                   Int?
+  RegionId                                                 Int?
+  Region                                                   Region?      @relation(fields: [RegionId], references: [Id], onDelete: NoAction, onUpdate: NoAction, map: "FK_DhisUser_Region")
+  User_DhisUser_UserIdToUser                               User?        @relation("DhisUser_UserIdToUser", fields: [UserId], references: [Id], onDelete: NoAction, onUpdate: NoAction, map: "FK_DhisUser_User")
+  ActionItem_ActionItem_AdministrativeUserDhisIdToDhisUser ActionItem[] @relation("ActionItem_AdministrativeUserDhisIdToDhisUser")
+  ActionItem_ActionItem_ResponsibleUserDhisIdToDhisUser    ActionItem[] @relation("ActionItem_ResponsibleUserDhisIdToDhisUser")
+  User_DhisUserToUser_DhisUserId                           User[]       @relation("DhisUserToUser_DhisUserId")
+}
+
+model KpiDefinition {
+  Id                              Int                               @id(map: "PK__KpiDefin__3214EC07A4FA5549")
+  ParentId                        Int?
+  IsStatic                        Boolean?                          @default(false, map: "DF__KpiDefini__IsSta__695C9DA1")
+  Name                            String?                           @db.NVarChar(255)
+  ShortName                       String?                           @db.NVarChar(50)
+  Description                     String?                           @db.NText
+  IsHighValuePreferable           Boolean?
+  IsLimitedRatio                  Boolean?
+  IsBinary                        Boolean?
+  CalculationType                 Int?
+  ThresholdColorRY                Float?
+  ThresholdColorYG                Float?
+  ArrowComparisonType             Int?
+  ThresholdArrowUp                Float?
+  ThresholdArrowDown              Float?
+  OwnerId                         Int?
+  NumberFormatId                  Int?
+  Source                          String?                           @db.NVarChar(1024)
+  Unit                            String?                           @db.NVarChar(50)
+  IsGlobal                        Boolean?                          @default(false, map: "DF__KpiDefini__IsGlo__6A50C1DA")
+  UseLatestAvailableData          Boolean?                          @default(false, map: "DF__KpiDefini__UseLa__6B44E613")
+  TargetFallbackDirection         Int?                              @default(0, map: "DF__KpiDefini__Targe__6C390A4C")
+  ReportingFrequencyId            Int?                              @default(3, map: "DF__KpiDefini__Repor__6D2D2E85")
+  ReportingFrequencyMonthOffset   Int?                              @default(0, map: "DF__KpiDefini__Repor__6E2152BE")
+  RegionalType                    Int?                              @default(0, map: "DF__KpiDefini__Regio__6F1576F7")
+  Numerator                       String?                           @db.NVarChar(1024)
+  Denominator                     String?                           @db.NVarChar(1024)
+  DhisKpiDefinitionId             String?                           @db.NVarChar(255)
+  DhisKpiDefinition               DhisKpiDefinition?                @relation(fields: [DhisKpiDefinitionId], references: [Id], onDelete: NoAction, onUpdate: NoAction, map: "FK_KpiDefintion_DhisKpiDefinition")
+  KpiDefinition                   KpiDefinition?                    @relation("KpiDefinitionToKpiDefinition_ParentId", fields: [ParentId], references: [Id], onDelete: NoAction, onUpdate: NoAction, map: "FK_KpiDefintion_KpiDefinition")
+  ReportingFrequency              ReportingFrequency?               @relation(fields: [ReportingFrequencyId], references: [Id], onDelete: NoAction, onUpdate: NoAction, map: "FK_KpiDefinition_ReportingFrequency")
+  ActionItem_KpiDefinition        ActionItem_KpiDefinition[]
+  CellValue                       CellValue[]
+  other_KpiDefinition             KpiDefinition[]                   @relation("KpiDefinitionToKpiDefinition_ParentId")
+  KpiValue                        KpiValue[]
+  ScorecardCategory_KpiDefinition ScorecardCategory_KpiDefinition[]
+  WaveItem                        WaveItem[]
+}
+
+model KpiValue {
+  Id                                   Int           @id(map: "PK__KpiValue__3214EC0732FE36C4") @default(autoincrement())
+  PeriodId                             Int
+  KpiDefinitionId                      Int
+  RegionId                             Int
+  Type                                 Int
+  Value                                Float?
+  CreatedByUserId                      Int?
+  ApprovedByUserId                     Int?
+  IsApproved                           Boolean?
+  IsNA                                 Boolean?      @default(false, map: "DF__KpiValue__IsNA__70099B30")
+  User_KpiValue_ApprovedByUserIdToUser User?         @relation("KpiValue_ApprovedByUserIdToUser", fields: [ApprovedByUserId], references: [Id], onDelete: NoAction, onUpdate: NoAction, map: "FK_KpiValue_User_2")
+  User_KpiValue_CreatedByUserIdToUser  User?         @relation("KpiValue_CreatedByUserIdToUser", fields: [CreatedByUserId], references: [Id], onDelete: NoAction, onUpdate: NoAction, map: "FK_KpiValue_User_1")
+  KpiDefinition                        KpiDefinition @relation(fields: [KpiDefinitionId], references: [Id], onUpdate: NoAction, map: "FK_KpiValue_KpiDefinition")
+  Period                               Period        @relation(fields: [PeriodId], references: [Id], onUpdate: NoAction, map: "FK_KpiValue_Period")
+  Region                               Region        @relation(fields: [RegionId], references: [Id], onUpdate: NoAction, map: "FK_KpiValue_Region")
+
+  @@unique([PeriodId, KpiDefinitionId, RegionId, Type], map: "AK_KpiValue")
+  @@index([KpiDefinitionId], map: "idx_DCh_943_942_KpiValue")
+  @@index([KpiDefinitionId, RegionId, PeriodId], map: "idx_KpiValue_KpiRegionPeriod")
+}
+
+model Log {
+  Id          Int       @id(map: "PK__Log__3214EC0770ED04FD") @default(autoincrement())
+  UserId      Int?
+  ObjectId    String?   @db.NVarChar(255)
+  Type        String?   @db.NVarChar(255)
+  Action      String?   @db.NVarChar(255)
+  OldObject   String?   @db.NVarChar(Max)
+  NewObject   String?   @db.NVarChar(Max)
+  StatusCode  Int?
+  Result      String?   @db.NVarChar(Max)
+  FileContent String?   @db.NVarChar(Max)
+  MimeCode    String?   @db.NVarChar(255)
+  Timestamp   DateTime? @db.DateTime
+}
+
+model Mail {
+  Id        Int      @id(map: "PK__Mail__3214EC070C143C23")
+  Timestamp DateTime @db.DateTime
+  Option    String   @db.NVarChar(Max)
+}
+
+model Migration {
+  oldId Int
+  newId Int
+  Type  String @db.NVarChar(20)
+
+  @@id([Type, newId], map: "PK__Migratio__E8B653BE70DB33B9")
+}
+
+model Notification {
+  Id                               Int         @id(map: "PK_ScorecardNotification") @default(autoincrement())
+  UserId                           Int
+  ScorecardId                      Int?
+  RegionId                         Int?
+  PeriodId                         Int?
+  TriggerType                      Int
+  OccuranceDate                    DateTime    @db.DateTime
+  EmailDate                        DateTime?   @db.DateTime
+  Subject                          String      @db.NVarChar(255)
+  Body                             String      @db.NVarChar(Max)
+  ActionItemId                     Int?
+  IsNew                            Boolean     @default(true, map: "DF_Notification_IsNew")
+  HideFromView                     Boolean?
+  AuthorId                         Int
+  OnlineMessage                    String?     @db.NVarChar(Max)
+  ActionItemReminderDays           Int?
+  ActionItem                       ActionItem? @relation(fields: [ActionItemId], references: [Id], onDelete: Cascade, map: "FK_Notification_ActionItem")
+  User_Notification_AuthorIdToUser User        @relation("Notification_AuthorIdToUser", fields: [AuthorId], references: [Id], onUpdate: NoAction, map: "FK_ScorecardNotification_Author")
+  Period                           Period?     @relation(fields: [PeriodId], references: [Id], onDelete: NoAction, onUpdate: NoAction, map: "FK_ScorecardNotification_Period")
+  Region                           Region?     @relation(fields: [RegionId], references: [Id], onDelete: NoAction, onUpdate: NoAction, map: "FK_ScorecardNotification_Region")
+  Scorecard                        Scorecard?  @relation(fields: [ScorecardId], references: [Id], onDelete: Cascade, map: "FK_ScorecardNotification_Scorecard")
+  User_Notification_UserIdToUser   User        @relation("Notification_UserIdToUser", fields: [UserId], references: [Id], onDelete: Cascade, map: "FK_ScorecardNotification_User")
+}
+
+model NotificationSetting {
+  UserId           Int
+  TriggerType      Int
+  NotificationType Int  @default(2, map: "DF_NotificationSetting_NotificationType") @db.SmallInt
+  User             User @relation(fields: [UserId], references: [Id], onDelete: Cascade, map: "FK_NotificationSetting_User")
+
+  @@id([UserId, TriggerType], map: "PK_NotificationSetting")
+}
+
+model Objective {
+  Id          Int           @id(map: "PK__Objectiv__3214EC07E0CCCF53") @default(autoincrement())
+  WorkplanId  Int
+  Name        String        @db.NVarChar(Max)
+  Workplan    Workplan      @relation(fields: [WorkplanId], references: [Id], onUpdate: NoAction, map: "FK_Objective_Workplan")
+  Deliverable Deliverable[]
+}
+
+model PdfFile {
+  Id          Int       @id(map: "PK__PdfFile__3214EC0787B3C8D7") @default(autoincrement())
+  ScorecardId Int
+  PeriodId    Int
+  UserId      Int
+  TimeStamp   DateTime  @db.DateTime
+  File        Bytes
+  RegionId    Int?
+  Period      Period    @relation(fields: [PeriodId], references: [Id], map: "FK_PdfFile_Period")
+  Region      Region?   @relation(fields: [RegionId], references: [Id], map: "FK_PdfFile_Region")
+  Scorecard   Scorecard @relation(fields: [ScorecardId], references: [Id], map: "FK_PdfFile_Scorecard")
+  User        User      @relation(fields: [UserId], references: [Id], map: "FK_PdfFile_User")
+}
+
+model PdfToken {
+  Id        String   @id(map: "PK_PdfToken") @db.NVarChar(128)
+  UserId    Int
+  ViewModel String?  @db.NVarChar(Max)
+  Timestamp DateTime @db.DateTime
+  User      User     @relation(fields: [UserId], references: [Id], map: "FK_PdfToken_User")
+}
+
+model Period {
+  Id                Int                 @id(map: "PK__Period__3214EC0701CABB2D")
+  Date              DateTime            @db.Date
+  CellValue         CellValue[]
+  DhisCellValue     DhisCellValue[]
+  KpiValue          KpiValue[]
+  Notification      Notification[]
+  PdfFile           PdfFile[]
+  ScorecardDocument ScorecardDocument[]
+  User              User[]
+}
+
+model Region {
+  Id                                Int                 @id(map: "PK__Region__3214EC072FAA8BF4")
+  Name                              String?             @db.NVarChar(255)
+  ShortName                         String?             @db.NVarChar(50)
+  ParentId                          Int?
+  Category1                         String?             @db.NVarChar(255)
+  Category2                         String?             @db.NVarChar(255)
+  Category3                         String?             @db.NVarChar(255)
+  Order                             Int
+  PreferedLanguageId                Int?
+  FlagImage                         Bytes?
+  ShapeImage                        Bytes?
+  FlagMimeType                      String?             @db.NVarChar(50)
+  ShapeMimeType                     String?             @db.NVarChar(50)
+  VectorMap                         Bytes?
+  Category1ChildrenName             String?             @db.NVarChar(255)
+  Category2ChildrenName             String?             @db.NVarChar(255)
+  Category3ChildrenName             String?             @db.NVarChar(255)
+  SublevelName                      String?             @db.NVarChar(255)
+  CanBeExpanded                     Boolean?
+  Version                           Int?
+  DhisRegionId                      String?             @db.NVarChar(11)
+  IsCountry                         Boolean             @default(false, map: "DF__Region__IsCountr__72E607DB")
+  DhisRegion                        DhisRegion?         @relation(fields: [DhisRegionId], references: [Id], map: "FK_Region_DhisRegion")
+  Region                            Region?             @relation("RegionToRegion_ParentId", fields: [ParentId], references: [Id], map: "FK_Region_Region")
+  ActionItem                        ActionItem[]
+  CellValue                         CellValue[]
+  DhisAuth                          DhisAuth[]
+  DhisKpiDefinition                 DhisKpiDefinition[]
+  DhisSyncConfig                    DhisSyncConfig[]
+  DhisUser                          DhisUser[]
+  KpiValue                          KpiValue[]
+  Notification                      Notification[]
+  PdfFile                           PdfFile[]
+  other_Region                      Region[]            @relation("RegionToRegion_ParentId")
+  Scorecard                         Scorecard[]
+  ScorecardDocument                 ScorecardDocument[]
+  Subscription                      Subscription[]
+  User_RegionToUser_CurrentRegionId User[]              @relation("RegionToUser_CurrentRegionId")
+  User_RegionToUser_RegionId        User[]              @relation("RegionToUser_RegionId")
+  User_RegionToUser_ViewAsRegionId  User[]              @relation("RegionToUser_ViewAsRegionId")
+  Workplan                          Workplan[]
+
+  @@unique([ParentId, Order], map: "IX_RegionOrder")
+  @@index([ParentId], map: "idx_DCh_9200_9199_Region")
+}
+
+model ReportingFrequency {
+  Id             Int             @id(map: "PK__Reportin__3214EC0764FFCB80")
+  Name           String          @db.NVarChar(50)
+  NumberOfMonths Int
+  IsSystemFormat Boolean
+  FormatString   String          @db.NVarChar(50)
+  KpiDefinition  KpiDefinition[]
+  Scorecard      Scorecard[]
+}
+
+model Scorecard {
+  Id                                      Int                  @id(map: "PK__Scorecar__3214EC077BDF0ABC")
+  Name                                    String               @db.NVarChar(255)
+  ShortName                               String               @db.NVarChar(50)
+  Description                             String?              @db.NVarChar(Max)
+  OwnerId                                 Int?
+  RegionId                                Int
+  ReportingFrequencyId                    Int                  @default(1, map: "DF__Scorecard__Repor__32E0915F")
+  LogoImage                               Bytes?
+  LogoMimeType                            String?              @db.NVarChar(50)
+  RegionalLevelsCovered                   Int?                 @default(1, map: "DF__Scorecard__Regio__4F9CCB9E")
+  PdfFormat                               Int?
+  PdfScalingFactor                        Float?
+  IsInMigration                           Boolean?
+  Version                                 Int                  @default(1, map: "DF__Scorecard__Versi__75C27486")
+  User_Scorecard_OwnerIdToUser            User?                @relation("Scorecard_OwnerIdToUser", fields: [OwnerId], references: [Id], map: "FK_Scorecard_User")
+  Region                                  Region               @relation(fields: [RegionId], references: [Id], map: "FK_Scorecard_Region")
+  ReportingFrequency                      ReportingFrequency   @relation(fields: [ReportingFrequencyId], references: [Id], map: "FK_Scorecard_ReportingFrequency")
+  ActionItem                              ActionItem[]
+  ActionItemCategory                      ActionItemCategory[]
+  Notification                            Notification[]
+  PdfFile                                 PdfFile[]
+  ScorecardCategory                       ScorecardCategory[]
+  ScorecardDocument                       ScorecardDocument[]
+  Subscription                            Subscription[]
+  User_ScorecardToUser_CurrentScorecardId User[]               @relation("ScorecardToUser_CurrentScorecardId")
+  WaveContainer                           WaveContainer[]
+  Workplan                                Workplan[]
+}
+
+model ScorecardCategory {
+  Id                              Int                               @id(map: "PK__Scorecar__3214EC07450F79D1")
+  ScorecardId                     Int
+  IsActive                        Boolean                           @default(true, map: "DF__Scorecard__IsAct__76B698BF")
+  IsPriority                      Boolean
+  Name                            String                            @db.NVarChar(255)
+  ShortName                       String                            @db.NVarChar(50)
+  Description                     String?                           @db.NVarChar(Max)
+  Order                           Int
+  IsInMigration                   Boolean?
+  Scorecard                       Scorecard                         @relation(fields: [ScorecardId], references: [Id], map: "FK_ScorecardCategory_Scorecard")
+  ScorecardCategory_KpiDefinition ScorecardCategory_KpiDefinition[]
+  WaveContainer                   WaveContainer[]
+  WaveItem                        WaveItem[]
+
+  @@unique([ScorecardId, Order], map: "IX_ScorecardCategoryOrder")
+}
+
+model ScorecardCategory_KpiDefinition {
+  ScorecardCategoryId                   Int
+  KpiDefinitionId                       Int
+  Order                                 Int
+  ShowTogetherWithKpiDefinitionId       Int?
+  IsActive                              Boolean                           @default(true, map: "DF__Scorecard__IsAct__77AABCF8")
+  StartWaveId                           Int?
+  EndWaveId                             Int?
+  KpiDefinition                         KpiDefinition                     @relation(fields: [KpiDefinitionId], references: [Id], map: "FK_ScorecardCategory_KpiDefinition_KpiDefinition")
+  ScorecardCategory                     ScorecardCategory                 @relation(fields: [ScorecardCategoryId], references: [Id], map: "FK_ScorecardCategory_KpiDefinition_ScorecardCategory")
+  ScorecardCategory_KpiDefinition       ScorecardCategory_KpiDefinition?  @relation("ScorecardCategory_KpiDefinitionToScorecardCategory_KpiDefinition_ScorecardCategoryId_ShowTogetherWithKpiDefinitionId", fields: [ScorecardCategoryId, ShowTogetherWithKpiDefinitionId], references: [ScorecardCategoryId, KpiDefinitionId], map: "FK_ScorecardCategory_KpiDefinition_ScorecardCategory_KpiDefinition")
+  other_ScorecardCategory_KpiDefinition ScorecardCategory_KpiDefinition[] @relation("ScorecardCategory_KpiDefinitionToScorecardCategory_KpiDefinition_ScorecardCategoryId_ShowTogetherWithKpiDefinitionId")
+
+  @@id([ScorecardCategoryId, KpiDefinitionId], map: "PK_ScorecardCategory_KpiDefinition")
+  @@unique([ScorecardCategoryId, Order], map: "IX_KpiDefinitionOder")
+}
+
+model ScorecardDocument {
+  Id                   String            @id(map: "PK__ScorecardDocument") @db.NVarChar(50)
+  ScorecardId          Int
+  RegionId             Int
+  PeriodId             Int
+  Name                 String?           @db.NVarChar(255)
+  ReportingFrequencyId Int?
+  DefinitionJson       String            @db.NVarChar(Max)
+  EditMode             Boolean           @default(false, map: "DF__Scorecard__EditM__789EE131")
+  IsPublishedToHub     Boolean           @default(false, map: "DF__Scorecard__IsPub__7993056A")
+  HubPublicationStatus Int               @default(0, map: "DF__Scorecard__HubPu__7A8729A3")
+  HubId                Int?
+  HubErrorCount        Int?
+  DeletedHubId         Int?
+  Version              Int?              @default(0, map: "DF__Scorecard__Versi__7B7B4DDC")
+  Period               Period            @relation(fields: [PeriodId], references: [Id], map: "FK_ScorecardDocument_Period")
+  Region               Region            @relation(fields: [RegionId], references: [Id], map: "FK_ScorecardDocument_Region")
+  Scorecard            Scorecard         @relation(fields: [ScorecardId], references: [Id], map: "FK_ScorecardDocument_Scorecard")
+  ScorecardSummary     ScorecardSummary?
+
+  @@unique([ScorecardId, RegionId, PeriodId], map: "IX_ScorecardDocument_ScorecardRegionPeriod")
+  @@index([RegionId], map: "IX_ScorecardDocument_Region")
+}
+
+model ScorecardSummary {
+  Id                String            @id(map: "PK__ScorecardSummary") @db.NVarChar(50)
+  SummaryMarkDown   String            @db.NVarChar(Max)
+  Version           Int
+  IsPublished       Boolean
+  ScorecardDocument ScorecardDocument @relation(fields: [Id], references: [Id], map: "FK_ScorecardSummary_ScorecardDocument")
+}
+
+model Subscription {
+  Id            Int         @id(map: "PK__Subscription") @default(autoincrement())
+  UserId        Int
+  TriggerType   Int
+  ActionItemId  Int?
+  ScorecardId   Int?
+  RegionId      Int?
+  ColumnId      String?     @db.NVarChar(255)
+  Threshold     Decimal?    @db.Decimal(18, 4)
+  ThresholdType Int?
+  ActionItem    ActionItem? @relation(fields: [ActionItemId], references: [Id], map: "FK_Subscription_ActionItem")
+  Region        Region?     @relation(fields: [RegionId], references: [Id], map: "FK_Subscription_Region")
+  Scorecard     Scorecard?  @relation(fields: [ScorecardId], references: [Id], map: "FK_Subscription_Scorecard")
+  User          User        @relation(fields: [UserId], references: [Id], map: "FK_Subscription_User")
+}
+
+model User {
+  Id                                               Int                   @id(map: "PK__User__3214EC07B667AA18") @default(autoincrement())
+  AspNetId                                         String?               @db.NVarChar(128)
+  Login                                            String                @unique(map: "IX_User_UniqueLogin") @db.NVarChar(50)
+  Password                                         String                @db.NVarChar(50)
+  EmailAddress                                     String?               @unique(map: "IX_User_UniqueEmail") @db.NVarChar(255)
+  Organization                                     String?               @db.NVarChar(255)
+  PasswordResetToken                               String?               @db.NVarChar(255)
+  PasswordResetTokenValidityDate                   DateTime?             @db.DateTime
+  CreatedDate                                      DateTime              @default(dbgenerated("getutcdate()"), map: "DF__User__CreatedDat__7C6F7215") @db.DateTime
+  LastPasswordFailureDate                          DateTime?             @db.DateTime
+  PasswordChangedDate                              DateTime?             @db.DateTime
+  PasswordFailures                                 Int                   @default(0, map: "DF__User__PasswordFa__7D63964E")
+  IsLocked                                         Boolean               @default(false, map: "DF__User__IsLocked__7E57BA87")
+  ActivationToken                                  String?               @db.NVarChar(255)
+  PreferedLanguageId                               Int?
+  RegionId                                         Int
+  RoleId                                           Int
+  DisplayName                                      String?               @db.NVarChar(255)
+  IsDeactivated                                    Boolean               @default(false, map: "DF__User__IsDeactiva__7F4BDEC0")
+  LastLoginDate                                    DateTime?             @db.DateTime
+  ViewAsRegionId                                   Int?
+  CurrentScorecardId                               Int?
+  CurrentRegionId                                  Int?
+  CurrentPeriodId                                  Int?
+  IsAdvancedAdmin                                  Boolean?              @default(false, map: "DF__User__IsAdvanced__004002F9")
+  HideExpandCollapseWarning                        Boolean?
+  HideCloneRegionalScorecardWarning                Boolean?
+  LastState                                        String?               @db.NVarChar(1024)
+  LastStateParams                                  String?               @db.NVarChar(4000)
+  HasSeenV4Message                                 Boolean               @default(false, map: "DF__User__HasSeenV4M__01342732")
+  DhisUserId                                       String?               @db.NVarChar(50)
+  IsDhisFakeUser                                   Boolean?              @default(false, map: "DF__User__IsDhisFake__02284B6B")
+  PhoneNumber                                      String?               @db.NVarChar(50)
+  Version                                          Int                   @default(1, map: "DF__User__Version__031C6FA4")
+  AspNetUsers                                      AspNetUsers?          @relation(fields: [AspNetId], references: [Id], map: "FK_User_AspNetUsers")
+  Period                                           Period?               @relation(fields: [CurrentPeriodId], references: [Id], map: "FK_User_Period")
+  Region_RegionToUser_CurrentRegionId              Region?               @relation("RegionToUser_CurrentRegionId", fields: [CurrentRegionId], references: [Id], map: "FK_User_Region1")
+  Scorecard_ScorecardToUser_CurrentScorecardId     Scorecard?            @relation("ScorecardToUser_CurrentScorecardId", fields: [CurrentScorecardId], references: [Id], map: "FK_User_Scorecard")
+  DhisUser_DhisUserToUser_DhisUserId               DhisUser?             @relation("DhisUserToUser_DhisUserId", fields: [DhisUserId], references: [Id], map: "FK_User_DhisUser")
+  Region_RegionToUser_RegionId                     Region                @relation("RegionToUser_RegionId", fields: [RegionId], references: [Id], map: "FK_User_Region")
+  Region_RegionToUser_ViewAsRegionId               Region?               @relation("RegionToUser_ViewAsRegionId", fields: [ViewAsRegionId], references: [Id], map: "FK_User_Region_ViewAsRegion")
+  ActionItem_ActionItem_AdministrativeUserIdToUser ActionItem[]          @relation("ActionItem_AdministrativeUserIdToUser")
+  ActionItem_ActionItem_ResponsibleUserIdToUser    ActionItem[]          @relation("ActionItem_ResponsibleUserIdToUser")
+  ActionItemComment                                ActionItemComment[]
+  DhisAuth                                         DhisAuth[]
+  DhisSyncConfig                                   DhisSyncConfig[]
+  DhisUser_DhisUser_UserIdToUser                   DhisUser[]            @relation("DhisUser_UserIdToUser")
+  KpiValue_KpiValue_ApprovedByUserIdToUser         KpiValue[]            @relation("KpiValue_ApprovedByUserIdToUser")
+  KpiValue_KpiValue_CreatedByUserIdToUser          KpiValue[]            @relation("KpiValue_CreatedByUserIdToUser")
+  Notification_Notification_AuthorIdToUser         Notification[]        @relation("Notification_AuthorIdToUser")
+  Notification_Notification_UserIdToUser           Notification[]        @relation("Notification_UserIdToUser")
+  NotificationSetting                              NotificationSetting[]
+  PdfFile                                          PdfFile[]
+  PdfToken                                         PdfToken[]
+  Scorecard_Scorecard_OwnerIdToUser                Scorecard[]           @relation("Scorecard_OwnerIdToUser")
+  Subscription                                     Subscription[]
+}
+
+model Wave {
+  Id              Int           @id(map: "PK__Wave__3214EC070CB618E7") @default(autoincrement())
+  WaveContainerId Int
+  Name            String?       @db.NVarChar(50)
+  Order           Int
+  WaveContainer   WaveContainer @relation(fields: [WaveContainerId], references: [Id], map: "FK_Wave_WaveContainer")
+  WaveItem        WaveItem[]
+
+  @@unique([WaveContainerId, Order], map: "IX_WaveOder")
+}
+
+model WaveContainer {
+  Id                  Int                @id(map: "PK__WaveCont__3214EC07FFDA3A78") @default(autoincrement())
+  ScorecardId         Int
+  Name                String?            @db.NVarChar(50)
+  Order               Int
+  ScorecardCategoryId Int?
+  ScorecardCategory   ScorecardCategory? @relation(fields: [ScorecardCategoryId], references: [Id], map: "FK_WaveContainer_ScorecardCategory")
+  Scorecard           Scorecard          @relation(fields: [ScorecardId], references: [Id], map: "FK_WaveContainer_Scorecard")
+  Wave                Wave[]
+
+  @@unique([ScorecardId, Order], map: "IX_WaveContainerOrder")
+}
+
+model WaveItem {
+  WaveId              Int
+  ScorecardCategoryId Int?
+  KpiDefinitionId     Int?
+  Id                  Int                @id(map: "PK_Wave_ScorecardCategory_KpiDefinition_1") @default(autoincrement())
+  Description         String?            @db.NVarChar(Max)
+  Order               Int?
+  Title               String?            @db.NVarChar(1024)
+  KpiDefinition       KpiDefinition?     @relation(fields: [KpiDefinitionId], references: [Id], map: "FK_Wave_ScorecardCategory_KpiDefinition_KpiDefinition")
+  ScorecardCategory   ScorecardCategory? @relation(fields: [ScorecardCategoryId], references: [Id], map: "FK_Wave_ScorecardCategory_KpiDefinition_ScorecardCategory")
+  Wave                Wave               @relation(fields: [WaveId], references: [Id], map: "FK_Wave_ScorecardCategory_KpiDefinition_Wave")
+
+  @@unique([WaveId, Order], map: "IX_WaveItemOdrer")
+}
+
+model Workplan {
+  Id                    Int         @id(map: "PK__Workplan__3214EC077568285C") @default(autoincrement())
+  Name                  String      @db.NVarChar(Max)
+  ScorecardRootId       Int
+  IsArchived            Boolean     @default(false, map: "DF__Workplan__IsArch__041093DD")
+  ObjectiveLabel        String      @db.NVarChar(50)
+  DeliverableLabel      String      @db.NVarChar(50)
+  IsSharedActionItems   Boolean     @default(true, map: "DF__Workplan__IsShar__0504B816")
+  Version               Int         @default(1, map: "DF__Workplan__Versio__05F8DC4F")
+  ActionItemLabel       String?     @db.NVarChar(50)
+  CustomColumn1Label    String?     @db.NVarChar(50)
+  CustomColumn2Label    String?     @db.NVarChar(50)
+  ShowCustomColumn1     Boolean     @default(false, map: "DF__Workplan__ShowCu__06ED0088")
+  ShowCustomColumn2     Boolean     @default(false, map: "DF__Workplan__ShowCu__07E124C1")
+  StatusLabel           String?     @db.NChar(50)
+  RegionId              Int
+  ShareWithChildRegions Boolean
+  Region                Region      @relation(fields: [RegionId], references: [Id], map: "FK_Workplan_Region")
+  Scorecard             Scorecard   @relation(fields: [ScorecardRootId], references: [Id], map: "FK_Workplan_Scorecard")
+  Objective             Objective[]
+}

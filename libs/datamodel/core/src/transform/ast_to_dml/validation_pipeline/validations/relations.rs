@@ -33,6 +33,7 @@ const STATE_ERROR: &str = "Failed lookup of model, field or optional property du
 
 /// Depending on the database, a constraint name might need to be unique in a certain namespace.
 /// Validates per database that we do not use a name that is already in use.
+#[tracing::instrument(skip(names, relation, ctx))]
 pub(super) fn has_a_unique_constraint_name(
     names: &super::Names<'_>,
     relation: InlineRelationWalker<'_, '_>,
@@ -69,6 +70,7 @@ pub(super) fn has_a_unique_constraint_name(
 }
 
 /// Required relational fields should point to required scalar fields.
+#[tracing::instrument(skip(relation, ctx))]
 pub(super) fn field_arity(relation: InlineRelationWalker<'_, '_>, ctx: &mut Context<'_>) {
     let forward_relation_field = if let Some(f) = relation.forward_relation_field() {
         f
@@ -107,6 +109,7 @@ pub(super) fn field_arity(relation: InlineRelationWalker<'_, '_>, ctx: &mut Cont
 }
 
 /// The `fields` and `references` arguments should hold the same number of fields.
+#[tracing::instrument(skip(relation, ctx))]
 pub(super) fn same_length_in_referencing_and_referenced(relation: InlineRelationWalker<'_, '_>, ctx: &mut Context<'_>) {
     let relation_field = if let Some(forward) = relation.forward_relation_field() {
         forward
@@ -126,6 +129,7 @@ pub(super) fn same_length_in_referencing_and_referenced(relation: InlineRelation
 }
 
 /// Some connectors expect us to refer only unique fields from the foreign key.
+#[tracing::instrument(skip(relation, ctx))]
 pub(super) fn references_unique_fields(relation: InlineRelationWalker<'_, '_>, ctx: &mut Context<'_>) {
     let relation_field = if let Some(rf) = relation.forward_relation_field() {
         rf
@@ -165,6 +169,7 @@ pub(super) fn references_unique_fields(relation: InlineRelationWalker<'_, '_>, c
 }
 
 /// Some connectors want the fields and references in the same order.
+#[tracing::instrument(skip(relation, ctx))]
 pub(super) fn referencing_fields_in_correct_order(relation: InlineRelationWalker<'_, '_>, ctx: &mut Context<'_>) {
     let relation_field = if let Some(rf) = relation.forward_relation_field() {
         rf
@@ -227,6 +232,7 @@ pub(super) fn referencing_fields_in_correct_order(relation: InlineRelationWalker
 /// We count them from forward-relations, e.g. from the side that defines the
 /// foreign key. Many to many relations we skip. The user must set one of the
 /// relation links to NoAction for both referential actions.
+#[tracing::instrument(skip(relation, ctx))]
 pub(super) fn cycles<'ast, 'db>(relation: CompleteInlineRelationWalker<'ast, 'db>, ctx: &mut Context<'_>) {
     if !ctx
         .connector
@@ -308,6 +314,7 @@ pub(super) fn cycles<'ast, 'db>(relation: CompleteInlineRelationWalker<'ast, 'db
 ///
 /// The user must set one of these relations to use NoAction for onUpdate and
 /// onDelete.
+#[tracing::instrument(skip(relation, ctx))]
 pub(super) fn multiple_cascading_paths(relation: CompleteInlineRelationWalker<'_, '_>, ctx: &mut Context<'_>) {
     if !ctx
         .connector
@@ -498,6 +505,7 @@ fn cascade_error_with_default_values(
 }
 
 /// The types of the referencing and referenced scalar fields in a relation must be compatible.
+#[tracing::instrument(skip(relation, ctx))]
 pub(super) fn referencing_scalar_field_types(relation: InlineRelationWalker<'_, '_>, ctx: &mut Context<'_>) {
     // see https://github.com/prisma/prisma/issues/10105
     if ctx

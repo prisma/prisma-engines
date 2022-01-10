@@ -13,6 +13,7 @@ use std::borrow::Cow;
 
 /// A model must have either a primary key, or a unique criteria
 /// with no optional, commented-out or unsupported fields.
+#[tracing::instrument(skip(model, ctx))]
 pub(super) fn has_a_strict_unique_criteria(model: ModelWalker<'_, '_>, ctx: &mut Context<'_>) {
     if model.is_ignored() {
         return;
@@ -57,6 +58,7 @@ pub(super) fn has_a_strict_unique_criteria(model: ModelWalker<'_, '_>, ctx: &mut
 
 /// A primary key name can be unique in different namespaces, depending on a database. Validates
 /// model's primary key against the database requirements.
+#[tracing::instrument(skip(model, names, ctx))]
 pub(super) fn has_a_unique_primary_key_name(
     model: ModelWalker<'_, '_>,
     names: &super::Names<'_>,
@@ -99,6 +101,7 @@ pub(super) fn has_a_unique_primary_key_name(
 
 /// The custom name argument makes its way into the generated client API. Therefore the name argument
 /// needs to be unique per model. It can be found on the primary key or unique indexes.
+#[tracing::instrument(skip(model, names, ctx))]
 pub(super) fn has_a_unique_custom_primary_key_name_per_model(
     model: ModelWalker<'_, '_>,
     names: &super::Names<'_>,
@@ -130,6 +133,7 @@ pub(super) fn has_a_unique_custom_primary_key_name_per_model(
 }
 
 /// uses sort or length on id without preview flag
+#[tracing::instrument(skip(model, ctx))]
 pub(crate) fn uses_sort_or_length_on_primary_without_preview_flag(model: ModelWalker<'_, '_>, ctx: &mut Context<'_>) {
     if ctx.preview_features.contains(PreviewFeature::ExtendedIndexes) {
         return;
@@ -149,6 +153,7 @@ pub(crate) fn uses_sort_or_length_on_primary_without_preview_flag(model: ModelWa
 }
 
 /// The database must support the primary key length prefix for it to be allowed in the data model.
+#[tracing::instrument(skip(model, ctx))]
 pub(crate) fn primary_key_length_prefix_supported(model: ModelWalker<'_, '_>, ctx: &mut Context<'_>) {
     if !ctx.preview_features.contains(PreviewFeature::ExtendedIndexes) {
         return;
@@ -172,6 +177,7 @@ pub(crate) fn primary_key_length_prefix_supported(model: ModelWalker<'_, '_>, ct
 }
 
 /// Not every database is allowing sort definition in the primary key.
+#[tracing::instrument(skip(model, ctx))]
 pub(crate) fn primary_key_sort_order_supported(model: ModelWalker<'_, '_>, ctx: &mut Context<'_>) {
     if !ctx.preview_features.contains(PreviewFeature::ExtendedIndexes) {
         return;
@@ -194,6 +200,7 @@ pub(crate) fn primary_key_sort_order_supported(model: ModelWalker<'_, '_>, ctx: 
     }
 }
 
+#[tracing::instrument(skip(model, ctx))]
 pub(crate) fn only_one_fulltext_attribute_allowed(model: ModelWalker<'_, '_>, ctx: &mut Context<'_>) {
     if !ctx.preview_features.contains(PreviewFeature::FullTextIndex) {
         return;
@@ -228,6 +235,7 @@ pub(crate) fn only_one_fulltext_attribute_allowed(model: ModelWalker<'_, '_>, ct
 }
 
 /// Does the connector support named and compound primary keys at all?
+#[tracing::instrument(skip(model, ctx))]
 pub(crate) fn primary_key_connector_specific(model: ModelWalker<'_, '_>, ctx: &mut Context<'_>) {
     let primary_key = if let Some(pk) = model.primary_key() {
         pk
@@ -252,10 +260,12 @@ pub(crate) fn primary_key_connector_specific(model: ModelWalker<'_, '_>, ctx: &m
     }
 }
 
+#[tracing::instrument(skip(model, ctx))]
 pub(super) fn connector_specific(model: ModelWalker<'_, '_>, ctx: &mut Context<'_>) {
     ctx.connector.validate_model(model, ctx.diagnostics)
 }
 
+#[tracing::instrument(skip(model, ctx))]
 pub(super) fn id_has_fields(model: ModelWalker<'_, '_>, ctx: &mut Context<'_>) {
     let id = if let Some(id) = model.primary_key() { id } else { return };
 

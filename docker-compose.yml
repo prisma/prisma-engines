@@ -315,7 +315,10 @@ services:
     image: jaegertracing/all-in-one:latest
     restart: always
     ports:
+      - "6831:6831"
+      - "6832:6832"
       - "16686:16686" # the trace viewer (http)
+      - "14268:14268"
     networks:
       - telemetry
 

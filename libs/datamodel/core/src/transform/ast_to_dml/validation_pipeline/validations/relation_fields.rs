@@ -55,6 +55,7 @@ impl<'ast, 'db> fmt::Display for Fields<'ast, 'db> {
     }
 }
 
+#[tracing::instrument(skip(field, names))]
 pub(super) fn ambiguity(field: RelationFieldWalker<'_, '_>, names: &Names<'_>) -> Result<(), DatamodelError> {
     let model = field.model();
     let related_model = field.related_model();
@@ -119,6 +120,7 @@ pub(super) fn ambiguity(field: RelationFieldWalker<'_, '_>, names: &Names<'_>) -
 }
 
 /// Validates if the related model for the relation is ignored.
+#[tracing::instrument(skip(field, ctx))]
 pub(super) fn ignored_related_model(field: RelationFieldWalker<'_, '_>, ctx: &mut Context<'_>) {
     let related_model = field.related_model();
     let model = field.model();
@@ -140,6 +142,7 @@ pub(super) fn ignored_related_model(field: RelationFieldWalker<'_, '_>, ctx: &mu
 }
 
 /// Does the connector support the given referential actions.
+#[tracing::instrument(skip(field, ctx))]
 pub(super) fn referential_actions(field: RelationFieldWalker<'_, '_>, ctx: &mut Context<'_>) {
     let connector = ctx.connector;
     let referential_integrity = ctx.referential_integrity;
@@ -186,6 +189,7 @@ pub(super) fn referential_actions(field: RelationFieldWalker<'_, '_>, ctx: &mut 
     }
 }
 
+#[tracing::instrument(skip(field, ctx))]
 pub(super) fn map(field: RelationFieldWalker<'_, '_>, ctx: &mut Context<'_>) {
     if field.foreign_key_name().is_none() {
         return;

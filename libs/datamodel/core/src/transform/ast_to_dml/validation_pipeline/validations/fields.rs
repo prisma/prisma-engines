@@ -21,6 +21,7 @@ use datamodel_connector::{
 };
 use std::str::FromStr;
 
+#[tracing::instrument(skip(field, names, ctx))]
 pub(super) fn validate_client_name(field: FieldWalker<'_, '_>, names: &Names<'_>, ctx: &mut Context<'_>) {
     let model = field.model();
 
@@ -59,6 +60,7 @@ pub(super) fn validate_client_name(field: FieldWalker<'_, '_>, names: &Names<'_>
 
 /// Some databases use constraints for default values, with a name that can be unique in a certain
 /// namespace. Validates the field default constraint against name clases.
+#[tracing::instrument(skip(field, names, ctx))]
 pub(super) fn has_a_unique_default_constraint_name(
     field: ScalarFieldWalker<'_, '_>,
     names: &Names<'_>,
@@ -91,6 +93,7 @@ pub(super) fn has_a_unique_default_constraint_name(
 }
 
 /// The length prefix can be used with strings and byte columns.
+#[tracing::instrument(skip(attr, attribute, ctx))]
 pub(crate) fn validate_length_used_with_correct_types(
     attr: ScalarFieldAttributeWalker<'_, '_>,
     attribute: (&str, ast::Span),
@@ -122,6 +125,7 @@ pub(crate) fn validate_length_used_with_correct_types(
     ));
 }
 
+#[tracing::instrument(skip(field, ctx))]
 pub(super) fn validate_native_type_arguments(field: ScalarFieldWalker<'_, '_>, ctx: &mut Context<'_>) {
     let connector_name = ctx
         .datasource
@@ -228,6 +232,7 @@ pub(super) fn validate_native_type_arguments(field: ScalarFieldWalker<'_, '_>, c
     };
 }
 
+#[tracing::instrument(skip(field, ctx))]
 pub(super) fn validate_default(field: ScalarFieldWalker<'_, '_>, ctx: &mut Context<'_>) {
     use chrono::{DateTime, FixedOffset};
 
@@ -325,6 +330,7 @@ pub(super) fn validate_default(field: ScalarFieldWalker<'_, '_>, ctx: &mut Conte
     }
 }
 
+#[tracing::instrument(skip(field, ctx))]
 pub(super) fn validate_scalar_field_connector_specific(field: ScalarFieldWalker<'_, '_>, ctx: &mut Context<'_>) {
     if matches!(
         field.scalar_field_type(),
@@ -366,6 +372,7 @@ pub(super) fn validate_scalar_field_connector_specific(field: ScalarFieldWalker<
     }
 }
 
+#[tracing::instrument(skip(field, ctx))]
 pub(super) fn validate_unsupported_field_type(field: ScalarFieldWalker<'_, '_>, ctx: &mut Context<'_>) {
     use once_cell::sync::Lazy;
     use regex::Regex;

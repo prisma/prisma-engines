@@ -26,6 +26,7 @@ pub(super) struct Names<'ast> {
 }
 
 impl<'ast> Names<'ast> {
+    #[tracing::instrument(skip(db, connector))]
     pub(super) fn new(db: &ParserDatabase<'ast>, connector: &dyn Connector) -> Self {
         let mut relation_names: HashMap<RelationIdentifier<'ast>, Vec<FieldId>> = HashMap::new();
         let mut index_names: HashMap<ModelId, HashSet<&'ast str>> = HashMap::new();

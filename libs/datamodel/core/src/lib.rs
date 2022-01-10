@@ -104,6 +104,7 @@ pub type ValidatedConfiguration = Validated<Configuration>;
 pub type ValidatedMissingFields = Validated<Vec<MissingField>>;
 
 /// Parse and validate the whole schema
+#[tracing::instrument]
 pub fn parse_schema(schema_str: &str) -> Result<(Configuration, Datamodel), String> {
     parse_datamodel_internal(schema_str, false)
         .map_err(|err| err.to_pretty_string("schema.prisma", schema_str))
@@ -200,6 +201,7 @@ pub fn parse_configuration(schema: &str) -> Result<ValidatedConfiguration, diagn
     })
 }
 
+#[tracing::instrument]
 fn load_sources(
     schema_ast: &SchemaAst,
     preview_features: BitFlags<PreviewFeature>,

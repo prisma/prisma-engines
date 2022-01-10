@@ -12,6 +12,7 @@ use diagnostics::{DatamodelError, DatamodelWarning, Diagnostics};
 use pest::Parser;
 
 /// Parses a Prisma V2 datamodel document into an internal AST representation.
+#[tracing::instrument]
 pub fn parse_schema(datamodel_string: &str, diagnostics: &mut Diagnostics) -> SchemaAst {
     let datamodel_result = PrismaDatamodelParser::parse(Rule::schema, datamodel_string);
 

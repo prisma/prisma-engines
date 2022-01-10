@@ -8,3 +8,4 @@ diagnostics = { path = "../diagnostics" }
 
 pest = "2.1.3"
 pest_derive = "2.1.0"
+tracing = "0.1"

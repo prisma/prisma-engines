@@ -9,6 +9,7 @@ use crate::{
 
 /// A relation must be defined from both sides, one defining the fields, references and possible
 /// referential actions, the other side just as a list.
+#[tracing::instrument(skip(relation, ctx))]
 pub(crate) fn both_sides_are_defined(relation: InlineRelationWalker<'_, '_>, ctx: &mut Context<'_>) {
     let mut error_fn = |relation_field: RelationFieldWalker<'_, '_>| {
         let message = format!(
@@ -34,6 +35,7 @@ pub(crate) fn both_sides_are_defined(relation: InlineRelationWalker<'_, '_>, ctx
 }
 
 /// The singular side must define `fields` and `references` attributes.
+#[tracing::instrument(skip(relation, ctx))]
 pub(crate) fn fields_and_references_are_defined(relation: InlineRelationWalker<'_, '_>, ctx: &mut Context<'_>) {
     let (forward, back) = match (relation.forward_relation_field(), relation.back_relation_field()) {
         (Some(forward), Some(back)) => (forward, back),
@@ -90,6 +92,7 @@ pub(crate) fn fields_and_references_are_defined(relation: InlineRelationWalker<'
 }
 
 /// The referential actions, if defined, must be on the singular side only.
+#[tracing::instrument(skip(relation, ctx))]
 pub(crate) fn referential_actions(relation: InlineRelationWalker<'_, '_>, ctx: &mut Context<'_>) {
     let (forward, back) = match (relation.forward_relation_field(), relation.back_relation_field()) {
         (Some(forward), Some(back)) => (forward, back),

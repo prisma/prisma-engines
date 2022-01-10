@@ -30,6 +30,7 @@ impl<'a> LiftAstToDml<'a> {
         }
     }
 
+    #[tracing::instrument(skip(self))]
     pub(crate) fn lift(&self) -> dml::Datamodel {
         let mut schema = dml::Datamodel::new();
 

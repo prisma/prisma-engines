@@ -6,6 +6,7 @@ use std::{
     rc::Rc,
 };
 
+#[tracing::instrument(skip(ctx))]
 pub(super) fn resolve_types(ctx: &mut Context<'_>) {
     for (top_id, top) in ctx.db.ast.iter_tops() {
         match (top_id, top) {

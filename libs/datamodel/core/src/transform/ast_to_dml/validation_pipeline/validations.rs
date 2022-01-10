@@ -14,6 +14,7 @@ use crate::{ast, transform::ast_to_dml::db::walkers::RefinedRelationWalker};
 use diagnostics::DatamodelError;
 use names::Names;
 
+#[tracing::instrument(skip(ctx))]
 pub(super) fn validate(ctx: &mut Context<'_>, relation_transformation_enabled: bool) {
     let db = ctx.db;
     let connector = ctx.connector;

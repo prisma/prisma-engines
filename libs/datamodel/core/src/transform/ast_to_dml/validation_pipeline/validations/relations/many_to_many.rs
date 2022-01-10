@@ -5,6 +5,7 @@ use crate::{
 use itertools::Itertools;
 
 /// Our weird many-to-many requirement.
+#[tracing::instrument(skip(relation, ctx))]
 pub(crate) fn validate_singular_id(relation: ImplicitManyToManyRelationWalker<'_, '_>, ctx: &mut Context<'_>) {
     for relation_field in [relation.field_a(), relation.field_b()].iter() {
         if !relation_field.related_model().has_single_id_field() {
@@ -38,6 +39,7 @@ pub(crate) fn validate_singular_id(relation: ImplicitManyToManyRelationWalker<'_
     }
 }
 
+#[tracing::instrument(skip(relation, ctx))]
 pub(crate) fn validate_no_referential_actions(
     relation: ImplicitManyToManyRelationWalker<'_, '_>,
     ctx: &mut Context<'_>,

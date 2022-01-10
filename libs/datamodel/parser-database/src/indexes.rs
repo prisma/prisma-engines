@@ -6,6 +6,7 @@ use crate::{
 /// Prisma forces a 1:1 relation to be unique from the defining side. If the
 /// field is not a primary key or already defined in a unique index, we add an
 /// implicit unique index to that field here.
+#[tracing::instrument(skip(ctx))]
 pub(super) fn infer_implicit_indexes(ctx: &mut Context<'_>) {
     let mut indexes = Vec::new();
 

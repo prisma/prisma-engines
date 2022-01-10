@@ -26,6 +26,7 @@ const FIRST_CLASS_PROPERTIES: &[&str] = &[
 pub(crate) struct GeneratorLoader;
 
 impl GeneratorLoader {
+    #[tracing::instrument]
     pub fn load_generators_from_ast(ast_schema: &ast::SchemaAst, diagnostics: &mut Diagnostics) -> Vec<Generator> {
         let mut generators: Vec<Generator> = Vec::new();
 

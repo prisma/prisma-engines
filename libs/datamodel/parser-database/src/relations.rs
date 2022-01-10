@@ -6,6 +6,7 @@ use enumflags2::bitflags;
 use std::collections::BTreeSet;
 
 /// Detect relation types and construct relation objects to the database.
+#[tracing::instrument(skip(ctx))]
 pub(super) fn infer_relations(ctx: &mut Context<'_>) {
     let mut relations = Relations::default();
 

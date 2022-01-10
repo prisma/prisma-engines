@@ -31,6 +31,7 @@ pub(super) struct Names<'ast> {
 /// - Datasources
 /// - Model fields for each model
 /// - Enum variants for each enum
+#[tracing::instrument(skip(ctx))]
 pub(super) fn resolve_names(ctx: &mut Context<'_>) {
     let mut tmp_names: HashSet<&str> = HashSet::new(); // throwaway container for duplicate checking
     let mut names = Names::default();

@@ -1,6 +1,7 @@
 use crate::transform::ast_to_dml::{db::walkers::CompositeTypeWalker, validation_pipeline::context::Context};
 use diagnostics::DatamodelError;
 
+#[tracing::instrument(skip(composite_type, ctx))]
 pub(crate) fn composite_types_support(composite_type: CompositeTypeWalker<'_, '_>, ctx: &mut Context<'_>) {
     if ctx.connector.supports_composite_types() {
         return;
