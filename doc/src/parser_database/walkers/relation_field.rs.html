@@ -280,10 +280,17 @@
 <span id="280">280</span>
 <span id="281">281</span>
 <span id="282">282</span>
+<span id="283">283</span>
+<span id="284">284</span>
+<span id="285">285</span>
+<span id="286">286</span>
+<span id="287">287</span>
+<span id="288">288</span>
+<span id="289">289</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">ast</span>::{<span class="self">self</span>, <span class="ident">FieldArity</span>},
     <span class="ident">types::RelationField</span>,
-    <span class="ident">walkers</span>::{<span class="ident">ModelWalker</span>, <span class="ident">ScalarFieldWalker</span>},
+    <span class="ident">walkers</span>::{<span class="ident">ModelWalker</span>, <span class="ident">RelationWalker</span>, <span class="ident">ScalarFieldWalker</span>},
     <span class="ident">ParserDatabase</span>, <span class="ident">ReferentialAction</span>,
 };
 <span class="kw">use</span> <span class="ident">std</span>::{
@@ -412,6 +419,13 @@
                 .<span class="ident">iter</span>()
                 .<span class="ident">map</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">field_id</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">related_model</span>().<span class="ident">scalar_field</span>(<span class="kw-2">*</span><span class="ident">field_id</span>))
         })
+    }
+
+    <span class="doccomment">/// The relation this field is part of.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">relation</span>(<span class="self">self</span>) -&gt; <span class="ident">RelationWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">model</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">model</span>();
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">relations</span> <span class="op">=</span> <span class="ident">model</span>.<span class="ident">relations_from</span>().<span class="ident">chain</span>(<span class="ident">model</span>.<span class="ident">relations_to</span>());
+        <span class="ident">relations</span>.<span class="ident">find</span>(<span class="op">|</span><span class="ident">r</span><span class="op">|</span> <span class="ident">r</span>.<span class="ident">has_field</span>(<span class="self">self</span>.<span class="ident">model_id</span>, <span class="self">self</span>.<span class="ident">field_id</span>)).<span class="ident">unwrap</span>()
     }
 
     <span class="doccomment">/// The name of the relation. Either uses the `name` (or default) argument,</span>

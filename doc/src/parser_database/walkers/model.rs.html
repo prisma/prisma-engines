@@ -269,6 +269,17 @@
 <span id="269">269</span>
 <span id="270">270</span>
 <span id="271">271</span>
+<span id="272">272</span>
+<span id="273">273</span>
+<span id="274">274</span>
+<span id="275">275</span>
+<span id="276">276</span>
+<span id="277">277</span>
+<span id="278">278</span>
+<span id="279">279</span>
+<span id="280">280</span>
+<span id="281">281</span>
+<span id="282">282</span>
 </pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">primary_key</span>;
 <span class="kw">mod</span> <span class="ident">unique_criteria</span>;
 
@@ -521,7 +532,18 @@
             .<span class="ident">relations</span>
             .<span class="ident">from_model</span>(<span class="self">self</span>.<span class="ident">model_id</span>)
             .<span class="ident">map</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">relation_id</span><span class="op">|</span> <span class="ident">RelationWalker</span> {
-                <span class="ident">relation_id</span>,
+                <span class="ident">id</span>: <span class="ident">relation_id</span>,
+                <span class="ident">db</span>: <span class="self">self</span>.<span class="ident">db</span>,
+            })
+    }
+
+    <span class="doccomment">/// All relations that reference this model.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">relations_to</span>(<span class="self">self</span>) -&gt; <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">RelationWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;db</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;db</span> {
+        <span class="self">self</span>.<span class="ident">db</span>
+            .<span class="ident">relations</span>
+            .<span class="ident">to_model</span>(<span class="self">self</span>.<span class="ident">model_id</span>)
+            .<span class="ident">map</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">relation_id</span><span class="op">|</span> <span class="ident">RelationWalker</span> {
+                <span class="ident">id</span>: <span class="ident">relation_id</span>,
                 <span class="ident">db</span>: <span class="self">self</span>.<span class="ident">db</span>,
             })
     }
