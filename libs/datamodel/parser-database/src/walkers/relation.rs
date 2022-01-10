@@ -15,6 +15,10 @@ impl<'ast, 'db> RelationWalker<'ast, 'db> {
         }
     }
 
+    pub(crate) fn has_field(self, model_id: ast::ModelId, field_id: ast::FieldId) -> bool {
+        self.get().has_field(model_id, field_id)
+    }
+
     /// The relation attributes parsed from the AST.
     pub(crate) fn get(self) -> &'db Relation<'ast> {
         &self.db.relations[self.id]

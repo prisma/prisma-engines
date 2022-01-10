@@ -255,6 +255,17 @@ impl<'ast, 'db> ModelWalker<'ast, 'db> {
             })
     }
 
+    /// All relations that reference this model.
+    pub fn relations_to(self) -> impl Iterator<Item = RelationWalker<'ast, 'db>> + 'db {
+        self.db
+            .relations
+            .to_model(self.model_id)
+            .map(move |relation_id| RelationWalker {
+                id: relation_id,
+                db: self.db,
+            })
+    }
+
     /// 1:n and 1:1 relations that start from this model.
     pub fn inline_relations_from(self) -> impl Iterator<Item = InlineRelationWalker<'ast, 'db>> + 'db {
         self.relations_from().filter_map(|relation| match relation.refine() {
