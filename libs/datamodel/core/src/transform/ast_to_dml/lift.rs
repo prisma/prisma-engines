@@ -297,8 +297,6 @@ impl<'a> LiftAstToDml<'a> {
         model.indices = walker
             .indexes()
             .map(|idx| {
-                assert!(idx.fields().len() != 0);
-
                 let fields = idx
                     .scalar_field_attributes()
                     .map(|field| IndexField {
