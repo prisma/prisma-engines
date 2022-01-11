@@ -72,3 +72,5 @@ jobs:
         env:
           CLICOLOR_FORCE: 1
           SIMPLE_TEST_MODE: 1
+          QUERY_BATCH_SIZE: 10
+          CLOSED_TX_CLEANUP: 2
