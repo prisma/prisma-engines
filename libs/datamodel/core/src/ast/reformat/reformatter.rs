@@ -742,8 +742,11 @@ impl<'a> Reformatter<'a> {
                     }
                     Self::reformat_expression(&mut builder, &current);
                 }
-                Rule::doc_comment | Rule::doc_comment_and_new_line => {
-                    panic!("Comments inside attribute argument list not supported yet.")
+                Rule::empty_argument => {
+                    if !builder.line_empty() {
+                        builder.write(", ");
+                    }
+                    Self::reformat_attribute_arg(&mut builder, &current);
                 }
                 _ => Self::reformat_generic_token(target, &current),
             };

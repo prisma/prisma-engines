@@ -1276,3 +1276,47 @@ fn test_composite_types_in_models() {
     let result = Reformatter::new(input).reformat_to_string();
     expected.assert_eq(&result);
 }
+
+#[test]
+fn empty_arguments_reformat_properly() {
+    let schema = r#"
+        /// Post including an author and content.
+        model Post {
+          id        Int     @id @default(autoincrement())
+          content   String? @default(map: "")
+          published Boolean @default(false)
+          author    User?   @relation(fields: [authorId], references: [id], onDelete: )
+          authorId  Int?
+        }
+
+        // Documentation for this model.
+        model User {
+          id    Int     @id @default(autoincrement())
+          email String  @unique
+          name  String?
+          posts Post[]
+        }
+    "#;
+
+    let expected = expect![[r#"
+        /// Post including an author and content.
+        model Post {
+          id        Int     @id @default(autoincrement())
+          content   String? @default(map: "")
+          published Boolean @default(false)
+          author    User?   @relation(fields: [authorId], references: [id], onDelete: )
+          authorId  Int?
+        }
+
+        // Documentation for this model.
+        model User {
+          id    Int     @id @default(autoincrement())
+          email String  @unique
+          name  String?
+          posts Post[]
+        }
+    "#]];
+
+    let result = Reformatter::new(schema).reformat_to_string();
+    expected.assert_eq(&result);
+}
