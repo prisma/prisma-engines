@@ -9,6 +9,7 @@ use connector_interface::{
 };
 use mongodb::{ClientSession, Database};
 use prisma_models::{prelude::*, SelectionResult};
+use std::collections::HashMap;
 
 pub struct MongoDbConnection {
     /// The session to use for operations.
@@ -97,20 +98,17 @@ impl WriteOperations for MongoDbConnection {
         .await
     }
 
-    async fn execute_raw(
-        &mut self,
-        query: String,
-        parameters: Vec<prisma_value::PrismaValue>,
-    ) -> connector_interface::Result<usize> {
-        catch(async move { write::execute_raw(&self.database, &mut self.session, query, parameters).await }).await
+    async fn execute_raw(&mut self, inputs: HashMap<String, PrismaValue>) -> connector_interface::Result<usize> {
+        catch(async move { write::execute_raw(&self.database, &mut self.session, inputs).await }).await
     }
 
     async fn query_raw(
         &mut self,
-        query: String,
-        parameters: Vec<prisma_value::PrismaValue>,
+        model: Option<&ModelRef>,
+        inputs: HashMap<String, PrismaValue>,
+        query_type: Option<String>,
     ) -> connector_interface::Result<serde_json::Value> {
-        catch(async move { write::query_raw(&self.database, &mut self.session, query, parameters).await }).await
+        catch(async move { write::query_raw(&self.database, &mut self.session, model, inputs, query_type).await }).await
     }
 }
 

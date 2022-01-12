@@ -106,7 +106,7 @@ const CAPABILITIES: &[ConnectorCapability] = &[
     ConnectorCapability::AutoIncrement,
     ConnectorCapability::CompoundIds,
     ConnectorCapability::AnyId,
-    ConnectorCapability::QueryRaw,
+    ConnectorCapability::SqlQueryRaw,
     ConnectorCapability::NamedForeignKeys,
     ConnectorCapability::AdvancedJsonNullability,
     ConnectorCapability::IndexColumnLengthPrefixing,

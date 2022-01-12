@@ -1,44 +1,12 @@
+use crate::{error::MongoError, vacuum_cursor, BsonTransform};
+use datamodel::PrismaValue;
+use itertools::Itertools;
 use mongodb::{
     bson::{from_bson, Bson, Document},
     options::*,
 };
-use std::convert::TryFrom;
-
-use crate::{error::MongoError, BsonTransform};
-
-impl TryFrom<Document> for MongoCommand {
-    type Error = MongoError;
-
-    fn try_from(doc: Document) -> Result<Self, Self::Error> {
-        if doc.contains_key("find") {
-            return MongoCommand::try_into_find(doc);
-        }
-
-        if doc.contains_key("aggregate") {
-            return MongoCommand::try_into_aggregate(doc);
-        }
-
-        if doc.contains_key("findAndModify") {
-            return MongoCommand::try_into_find_and_modify(doc);
-        }
-
-        if doc.contains_key("count") {
-            return MongoCommand::try_into_count(doc);
-        }
-
-        if doc.contains_key("distinct") {
-            return MongoCommand::try_into_distinct(doc);
-        }
-
-        if doc.contains_key("insert") {
-            return MongoCommand::try_into_insert_many(doc);
-        }
-
-        // If there is no top-level driver API for a command or the driver doesn't allow expressing everything that can be done via the raw command
-        // just try executing it as-is with `run_command`
-        Ok(MongoCommand::new_raw(doc))
-    }
-}
+use prisma_models::ModelRef;
+use std::collections::HashMap;
 
 #[allow(clippy::large_enum_variant)]
 pub enum MongoCommand {
@@ -51,240 +19,154 @@ pub enum MongoCommand {
     },
 }
 
+#[allow(clippy::large_enum_variant)]
 pub enum MongoOperation {
-    Find(Option<Document>, FindOptions),
-    FindAndUpdate(Document, UpdateModifications, FindOneAndUpdateOptions),
-    FindAndReplace(Document, Document, FindOneAndReplaceOptions),
-    FindAndDelete(Document, FindOneAndDeleteOptions),
-    Aggregate(Vec<Document>, AggregateOptions),
-    Count(Option<Document>, CountOptions),
-    Distinct(String, Option<Document>, DistinctOptions),
-    InsertMany(Vec<Document>, InsertManyOptions),
+    Find(Option<Document>, Option<FindOptions>),
+    Aggregate(Vec<Document>, Option<AggregateOptions>),
 }
 
 impl MongoCommand {
-    fn new(collection: impl Into<String>, operation: MongoOperation) -> MongoCommand {
-        Self::Handled {
-            collection: collection.into(),
-            operation,
+    pub fn from_raw_query(
+        model: Option<&ModelRef>,
+        inputs: HashMap<String, PrismaValue>,
+        query_type: Option<String>,
+    ) -> crate::Result<MongoCommand> {
+        match (query_type.as_deref(), model) {
+            (Some("find"), Some(m)) => Self::find(m, inputs),
+            (Some("aggregate"), Some(m)) => Self::aggregate(m, inputs),
+            (Some("runCommand"), _) => Self::raw(inputs),
+            // This is more of an internal guard in case new raw queries are added. It shouldn't happen
+            (_, _) => Err(MongoError::UnhandledError("Unexpected MongoDB raw query".to_string())),
         }
     }
 
-    fn new_raw(cmd: Document) -> MongoCommand {
-        Self::Raw { cmd }
+    fn find(model: &ModelRef, inputs: HashMap<String, PrismaValue>) -> crate::Result<MongoCommand> {
+        let query = inputs.get_document("query")?;
+        let options = inputs
+            .get_document("options")?
+            .map(Bson::Document)
+            .map(from_bson::<FindOptions>)
+            .transpose()?;
+
+        Ok(Self::Handled {
+            collection: model.name.clone(),
+            operation: MongoOperation::Find(query, options),
+        })
     }
 
-    fn try_into_find(doc: Document) -> crate::Result<MongoCommand> {
-        let options: FindOptions = from_bson(Bson::Document(doc.clone()))?;
-        let collection = doc.get_required_str("find")?;
-        let filter = doc.get_document_("filter")?;
+    fn aggregate(model: &ModelRef, inputs: HashMap<String, PrismaValue>) -> crate::Result<MongoCommand> {
+        let pipeline = inputs.get_array_document("pipeline")?.unwrap_or_default();
+        let options = inputs
+            .get_document("options")?
+            .map(Bson::Document)
+            .map(from_bson::<AggregateOptions>)
+            .transpose()?;
 
-        Ok(Self::new(collection, MongoOperation::Find(filter, options)))
+        Ok(MongoCommand::Handled {
+            collection: model.name.clone(),
+            operation: MongoOperation::Aggregate(pipeline, options),
+        })
     }
 
-    fn try_into_aggregate(doc: Document) -> crate::Result<MongoCommand> {
-        let options: AggregateOptions = from_bson(Bson::Document(doc.clone()))?;
-        let collection = doc.get_required_str("aggregate")?;
-        let pipeline = doc.get_required_array_document("pipeline")?;
+    fn raw(inputs: HashMap<String, PrismaValue>) -> crate::Result<MongoCommand> {
+        let cmd = inputs.get_required_document("command")?;
 
-        Ok(MongoCommand::new(
-            collection,
-            MongoOperation::Aggregate(pipeline, options),
-        ))
-    }
-
-    fn try_into_find_and_modify(doc: Document) -> crate::Result<MongoCommand> {
-        let collection = doc.get_required_str("findAndModify")?;
-        let query = doc.get_document_("query")?.unwrap_or_default();
-        // Mongo driver options name this field "return_document".
-        let new = doc.get_bool("new").unwrap_or(false);
-        // Mongo driver options name this field "projection".
-        let projection = doc.get_document_("fields")?;
-
-        let operation: crate::Result<MongoOperation> = match FindAndModifyType::try_from(&doc)? {
-            FindAndModifyType::Update(modifications) => {
-                let mut options: FindOneAndUpdateOptions = from_bson(Bson::Document(doc))?;
-
-                if new {
-                    options.return_document = Some(ReturnDocument::After);
-                }
-
-                options.projection = projection;
-
-                Ok(MongoOperation::FindAndUpdate(query, modifications, options))
-            }
-            FindAndModifyType::Replace(replacement) => {
-                let mut options: FindOneAndReplaceOptions = from_bson(Bson::Document(doc))?;
-
-                if new {
-                    options.return_document = Some(ReturnDocument::After);
-                }
-
-                options.projection = projection;
-
-                Ok(MongoOperation::FindAndReplace(query, replacement, options))
-            }
-            FindAndModifyType::Delete => {
-                let mut options: FindOneAndDeleteOptions = from_bson(Bson::Document(doc))?;
-
-                options.projection = projection;
-
-                Ok(MongoOperation::FindAndDelete(query, options))
-            }
-        };
-        let operation = operation?;
-
-        Ok(MongoCommand::new(collection, operation))
-    }
-
-    fn try_into_count(doc: Document) -> crate::Result<MongoCommand> {
-        let options: CountOptions = from_bson(Bson::Document(doc.clone()))?;
-        let collection = doc.get_required_str("count")?;
-        let query = doc.get_document_("query")?;
-
-        Ok(MongoCommand::new(collection, MongoOperation::Count(query, options)))
-    }
-
-    fn try_into_distinct(doc: Document) -> crate::Result<MongoCommand> {
-        let options: DistinctOptions = from_bson(Bson::Document(doc.clone()))?;
-        let collection = doc.get_required_str("distinct")?;
-        let key = doc.get_required_str("key")?;
-        let query = doc.get_document_("query")?;
-
-        Ok(MongoCommand::new(
-            collection,
-            MongoOperation::Distinct(key, query, options),
-        ))
-    }
-
-    fn try_into_insert_many(doc: Document) -> crate::Result<MongoCommand> {
-        let options: InsertManyOptions = from_bson(Bson::Document(doc.clone()))?;
-        let collection = doc.get_required_str("insert")?;
-        let documents = doc.get_required_array_document("documents")?;
-
-        Ok(MongoCommand::new(
-            collection,
-            MongoOperation::InsertMany(documents, options),
-        ))
+        Ok(MongoCommand::Raw { cmd })
     }
 }
 
-enum FindAndModifyType {
-    Update(UpdateModifications),
-    Replace(Document),
-    Delete,
+trait QueryRawParsingExtension {
+    fn get_document(&self, key: &str) -> crate::Result<Option<Document>>;
+    fn get_required_document(&self, key: &str) -> crate::Result<Document>;
+    fn get_array_document(&self, key: &str) -> crate::Result<Option<Vec<Document>>>;
 }
 
-impl TryFrom<&Document> for FindAndModifyType {
-    type Error = MongoError;
+impl QueryRawParsingExtension for HashMap<String, PrismaValue> {
+    fn get_document(&self, key: &str) -> crate::Result<Option<Document>> {
+        self.get(key).map(|pv| pv.try_as_bson_document(key)).transpose()
+    }
 
-    fn try_from(doc: &Document) -> Result<Self, Self::Error> {
-        if doc.contains_key("remove") {
-            return Ok(Self::Delete);
-        };
+    fn get_required_document(&self, key: &str) -> crate::Result<Document> {
+        self.get_document(key)?
+            .ok_or_else(|| MongoError::MissingRequiredArgumentError {
+                argument: key.to_string(),
+            })
+    }
 
-        match doc.get("update") {
-            Some(&Bson::Array(ref stages)) => {
-                let pipeline = stages
-                    .iter()
-                    .map(|stage| stage.clone().into_document())
-                    .collect::<crate::Result<Vec<_>>>()?;
+    fn get_array_document(&self, key: &str) -> crate::Result<Option<Vec<Document>>> {
+        self.get(key)
+            .map(|pv| {
+                let stages: Vec<_> = pv
+                    .try_as_bson_array(key)?
+                    .into_iter()
+                    .map(|stage| {
+                        stage.into_document().map_err(|_| {
+                            MongoError::argument_type_mismatch(key, format!("{:?}", pv), "Json::Array<Json::Object>")
+                        })
+                    })
+                    .try_collect()?;
 
-                Ok(Self::Update(UpdateModifications::Pipeline(pipeline)))
-            }
-            Some(&Bson::Document(ref update_doc)) => {
-                if update_doc.keys().any(|k| k.starts_with('$')) {
-                    Ok(Self::Update(UpdateModifications::Document(update_doc.clone())))
-                } else {
-                    Ok(Self::Replace(update_doc.clone()))
-                }
-            }
-            Some(bson) => Err(MongoError::QueryRawError(format!(
-                "Expected 'update' key to be of type document or array of document, found: {}",
-                bson
-            ))),
-            None => Err(MongoError::QueryRawError(
-                "Either an 'update' or 'remove' key must be specified".to_string(),
+                Ok(stages)
+            })
+            .transpose()
+    }
+}
+
+trait QueryRawConversionExtension {
+    fn try_as_bson(&self, arg_name: &str) -> crate::Result<Bson>;
+    fn try_as_bson_document(&self, arg_name: &str) -> crate::Result<Document>;
+    fn try_as_bson_array(&self, arg_name: &str) -> crate::Result<Vec<Bson>>;
+}
+
+impl QueryRawConversionExtension for &PrismaValue {
+    fn try_as_bson(&self, arg_name: &str) -> crate::Result<Bson> {
+        let json_str = match self {
+            PrismaValue::Json(json) => Ok(json),
+            x => Err(MongoError::argument_type_mismatch(arg_name, format!("{:?}", x), "Json")),
+        }?;
+        let json: serde_json::Value = serde_json::from_str(json_str.as_str())?;
+        let bson = Bson::try_from(json)?;
+
+        Ok(bson)
+    }
+
+    fn try_as_bson_document(&self, arg_name: &str) -> crate::Result<Document> {
+        let bson = self.try_as_bson(arg_name)?;
+
+        match bson {
+            Bson::Document(doc) => Ok(doc),
+            bson => Err(MongoError::argument_type_mismatch(
+                arg_name,
+                format!("{:?}", bson),
+                "Json::Object",
+            )),
+        }
+    }
+
+    fn try_as_bson_array(&self, arg_name: &str) -> crate::Result<Vec<Bson>> {
+        let bson = self.try_as_bson(arg_name)?;
+
+        match bson {
+            Bson::Array(doc) => Ok(doc),
+            bson => Err(MongoError::argument_type_mismatch(
+                arg_name,
+                format!("{:?}", bson),
+                "Json::Array",
             )),
         }
     }
 }
 
-pub(crate) trait QueryRawDocumentExtension {
-    fn get_document_(&self, key: &str) -> crate::Result<Option<Document>>;
-    fn get_required_document(&self, key: &str) -> crate::Result<Document>;
-    fn get_required_str(&self, key: &str) -> crate::Result<String>;
-    fn get_required_array_document(&self, key: &str) -> crate::Result<Vec<Document>>;
-    /// Removes unnecessary properties from raw response
-    /// See https://docs.mongodb.com/v5.0/reference/method/db.runCommand
-    fn cleanup_raw_result(&mut self);
-}
+pub async fn cursor_to_json(
+    cursor: mongodb::SessionCursor<Document>,
+    session: &mut mongodb::ClientSession,
+) -> crate::Result<serde_json::Value> {
+    let bson_result = vacuum_cursor(cursor, session)
+        .await?
+        .into_iter()
+        .map(Bson::Document)
+        .collect_vec();
+    let json_result: serde_json::Value = Bson::Array(bson_result).into();
 
-impl QueryRawDocumentExtension for Document {
-    fn get_document_(&self, key: &str) -> crate::Result<Option<Document>> {
-        match self.get(key) {
-            Some(&Bson::Document(ref d)) => Ok(Some(d.clone())),
-            None => Ok(None),
-            Some(bson) => Err(MongoError::QueryRawError(format!(
-                "Expected key '{}' to be of type document, but found {}",
-                key, bson
-            ))),
-        }
-    }
-
-    fn get_required_document(&self, key: &str) -> crate::Result<Document> {
-        match self.get(key) {
-            Some(&Bson::Document(ref d)) => Ok(d.clone()),
-            None => Err(MongoError::QueryRawError(format!(
-                "Could not find required key '{}'",
-                key
-            ))),
-            Some(bson) => Err(MongoError::QueryRawError(format!(
-                "Expected key '{}' to be of type document, but found {}",
-                key, bson
-            ))),
-        }
-    }
-
-    fn get_required_str(&self, key: &str) -> crate::Result<String> {
-        match self.get(key) {
-            Some(&Bson::String(ref s)) => Ok(s.to_owned()),
-            None => Err(MongoError::QueryRawError(format!(
-                "Could not find required key '{}'",
-                key
-            ))),
-            Some(bson) => Err(MongoError::QueryRawError(format!(
-                "Expected key '{}' to be of type string, but found {}",
-                key, bson
-            ))),
-        }
-    }
-
-    fn get_required_array_document(&self, key: &str) -> crate::Result<Vec<Document>> {
-        let bson_array = match self.get(key) {
-            Some(&Bson::Array(ref array)) => Ok(array),
-            None => Err(MongoError::QueryRawError(format!(
-                "Could not find required key '{}'",
-                key
-            ))),
-            Some(bson) => Err(MongoError::QueryRawError(format!(
-                "Expected key '{}' to be of type array, but found {}",
-                key, bson
-            ))),
-        }?;
-
-        let docs = bson_array
-            .iter()
-            .map(|bson_elem| bson_elem.clone().into_document())
-            .collect::<crate::Result<Vec<_>>>()?;
-
-        Ok(docs)
-    }
-
-    fn cleanup_raw_result(&mut self) {
-        self.remove("operationTime");
-        self.remove("$clusterTime");
-        self.remove("opTime");
-        self.remove("electionId");
-    }
+    Ok(json_result)
 }

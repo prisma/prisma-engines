@@ -13,7 +13,7 @@ const CAPABILITIES: &[ConnectorCapability] = &[
     ConnectorCapability::AnyId,
     ConnectorCapability::AutoIncrement,
     ConnectorCapability::CompoundIds,
-    ConnectorCapability::QueryRaw,
+    ConnectorCapability::SqlQueryRaw,
     ConnectorCapability::RelationFieldsInArbitraryOrder,
     ConnectorCapability::UpdateableId,
 ];

@@ -103,7 +103,7 @@ impl QueryGraphBuilder {
             (QueryTag::DeleteOne, Some(m)) => QueryGraph::root(|g| write::delete_record(g, connector_ctx, m, parsed_field)),
             (QueryTag::DeleteMany, Some(m)) => QueryGraph::root(|g| write::delete_many_records(g, connector_ctx, m, parsed_field)),
             (QueryTag::ExecuteRaw, _) => QueryGraph::root(|g| write::execute_raw(g, parsed_field)),
-            (QueryTag::QueryRaw, _) => QueryGraph::root(|g| write::query_raw(g, parsed_field)),
+            (QueryTag::QueryRaw { query_type }, m) => QueryGraph::root(|g| write::query_raw(g, m, query_type, parsed_field)),
             _ => unreachable!("Query builder dispatching failed."),
         }?;
 

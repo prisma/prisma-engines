@@ -21,6 +21,7 @@ pub mod args {
     // raw specific args
     pub const QUERY: &str = "query";
     pub const PARAMETERS: &str = "parameters";
+    pub const COMMAND: &str = "command";
 
     pub const DISTINCT: &str = "distinct";
 

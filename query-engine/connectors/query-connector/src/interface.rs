@@ -3,6 +3,7 @@ use async_trait::async_trait;
 use dml::FieldArity;
 use prisma_models::*;
 use prisma_value::PrismaValue;
+use std::collections::HashMap;
 
 #[async_trait]
 pub trait Connector {
@@ -313,11 +314,16 @@ pub trait WriteOperations {
     /// parameterized values for databases that support prepared statements.
     ///
     /// Returns the number of rows affected.
-    async fn execute_raw(&mut self, query: String, parameters: Vec<PrismaValue>) -> crate::Result<usize>;
+    async fn execute_raw(&mut self, inputs: HashMap<String, PrismaValue>) -> crate::Result<usize>;
 
     /// Execute the raw query in the database as-is. The `parameters` are
     /// parameterized values for databases that support prepared statements.
     ///
     /// Returns resulting rows as JSON.
-    async fn query_raw(&mut self, query: String, parameters: Vec<PrismaValue>) -> crate::Result<serde_json::Value>;
+    async fn query_raw(
+        &mut self,
+        model: Option<&ModelRef>,
+        inputs: HashMap<String, PrismaValue>,
+        query_type: Option<String>,
+    ) -> crate::Result<serde_json::Value>;
 }

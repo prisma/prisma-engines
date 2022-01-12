@@ -132,7 +132,7 @@ impl RenderContext {
                 };
             } else {
                 match info.tag {
-                    QueryTag::ExecuteRaw | QueryTag::QueryRaw => {
+                    QueryTag::ExecuteRaw | QueryTag::QueryRaw { query_type: _ } => {
                         self.mappings.other_operations.write.push(info.tag.to_string())
                     }
                     _ => unreachable!("Invalid operations mapping."),

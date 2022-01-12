@@ -38,11 +38,26 @@ pub enum MongoError {
     #[error("{0}")]
     BsonDeserializationError(#[from] bson::de::Error),
 
-    #[error("Query raw error: {0}.")]
-    QueryRawError(String),
+    #[error("Missing required argument: '{}'.", argument)]
+    MissingRequiredArgumentError { argument: String },
+
+    #[error("Argument type mismatch for '{}'. Have: {:?}, want: {}.", argument, have, want)]
+    ArgumentTypeMismatchError {
+        argument: String,
+        have: String,
+        want: String,
+    },
 }
 
 impl MongoError {
+    pub fn argument_type_mismatch(argument: &str, have: String, want: &str) -> Self {
+        Self::ArgumentTypeMismatchError {
+            argument: argument.to_string(),
+            have,
+            want: want.to_string(),
+        }
+    }
+
     pub fn into_connector_error(self) -> ConnectorError {
         match self {
             MongoError::Unsupported(feature) => ConnectorError::from_kind(ErrorKind::UnsupportedFeature(feature)),
@@ -52,7 +67,15 @@ impl MongoError {
             MongoError::BsonDeserializationError(err) => {
                 ConnectorError::from_kind(ErrorKind::ConversionError(err.into()))
             }
-            MongoError::QueryRawError(message) => ConnectorError::from_kind(ErrorKind::RawApiError(message)),
+            MongoError::MissingRequiredArgumentError { argument } => ConnectorError::from_kind(ErrorKind::RawApiError(
+                format!("Missing required argument: '{}'.", argument),
+            )),
+            MongoError::ArgumentTypeMismatchError { argument, have, want } => {
+                ConnectorError::from_kind(ErrorKind::RawApiError(format!(
+                    "Argument type mismatch for '{}'. Have: {}, want: {}.",
+                    argument, have, want
+                )))
+            }
 
             err @ MongoError::ConversionError { .. } => {
                 ConnectorError::from_kind(ErrorKind::ConversionError(err.into()))
