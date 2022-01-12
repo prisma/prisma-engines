@@ -1,8 +1,7 @@
 use std::fmt;
 
 use super::*;
-use crate::{constants::args, query_document::*, query_graph::*, schema::*, IrSerializer};
-use prisma_value::PrismaValue;
+use crate::{query_document::*, query_graph::*, schema::*, IrSerializer};
 
 pub struct QueryGraphBuilder {
     pub query_schema: QuerySchemaRef,
@@ -11,35 +10,6 @@ pub struct QueryGraphBuilder {
 impl fmt::Debug for QueryGraphBuilder {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.debug_struct("QueryGraphBuilder").finish()
-    }
-}
-
-#[derive(Default)]
-struct RawArgs {
-    query: String,
-    parameters: Vec<PrismaValue>,
-}
-
-impl RawArgs {
-    fn add_arg(&mut self, arg: Option<ParsedArgument>) {
-        if let Some(arg) = arg {
-            if arg.name == args::QUERY {
-                self.query = arg.into_value().unwrap().into_string().unwrap();
-            } else {
-                self.parameters = arg.into_value().unwrap().into_list().unwrap();
-            }
-        }
-    }
-}
-
-impl From<Vec<ParsedArgument>> for RawArgs {
-    fn from(mut args: Vec<ParsedArgument>) -> Self {
-        let mut ra = Self::default();
-
-        ra.add_arg(args.pop());
-        ra.add_arg(args.pop());
-
-        ra
     }
 }
 

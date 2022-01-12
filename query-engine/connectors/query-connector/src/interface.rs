@@ -310,14 +310,14 @@ pub trait WriteOperations {
         child_ids: &[SelectionResult],
     ) -> crate::Result<()>;
 
-    /// Execute the raw query in the database as-is. The `parameters` are
-    /// parameterized values for databases that support prepared statements.
+    /// Execute the raw query in the database as-is.
+    /// The parsing of the query arguments is deferred to the connectors.
     ///
     /// Returns the number of rows affected.
     async fn execute_raw(&mut self, inputs: HashMap<String, PrismaValue>) -> crate::Result<usize>;
 
-    /// Execute the raw query in the database as-is. The `parameters` are
-    /// parameterized values for databases that support prepared statements.
+    /// Execute the raw query in the database as-is.
+    /// The parsing of the query arguments is deferred to the connectors.
     ///
     /// Returns resulting rows as JSON.
     async fn query_raw(

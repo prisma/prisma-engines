@@ -184,8 +184,11 @@ pub struct DisconnectRecords {
 
 #[derive(Debug, Clone)]
 pub struct RawQuery {
+    /// Model associated with the raw query, if one is necessary
     pub model: Option<ModelRef>,
+    /// Map of query arguments and their values
     pub inputs: HashMap<String, PrismaValue>,
+    /// Hint as to what kind of query is being executed
     pub query_type: Option<String>,
 }
 

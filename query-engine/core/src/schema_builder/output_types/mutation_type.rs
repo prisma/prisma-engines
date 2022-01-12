@@ -106,9 +106,9 @@ fn create_execute_raw_field() -> OutputField {
     field(
         "executeRaw",
         vec![
-            input_field(QUERY, InputType::string(), None),
+            input_field("query", InputType::string(), None),
             input_field(
-                PARAMETERS,
+                "parameters",
                 InputType::json_list(),
                 Some(dml::DefaultValue::new_single(PrismaValue::String("[]".into()))),
             )
@@ -126,9 +126,9 @@ fn create_query_raw_field() -> OutputField {
     field(
         "queryRaw",
         vec![
-            input_field(QUERY, InputType::string(), None),
+            input_field("query", InputType::string(), None),
             input_field(
-                PARAMETERS,
+                "parameters",
                 InputType::json_list(),
                 Some(dml::DefaultValue::new_single(PrismaValue::String("[]".into()))),
             )
@@ -145,7 +145,7 @@ fn create_query_raw_field() -> OutputField {
 fn create_mongodb_run_command_raw() -> OutputField {
     field(
         "runCommandRaw",
-        vec![input_field(COMMAND, InputType::json(), None)],
+        vec![input_field("command", InputType::json(), None)],
         OutputType::json(),
         Some(QueryInfo {
             tag: QueryTag::QueryRaw {
