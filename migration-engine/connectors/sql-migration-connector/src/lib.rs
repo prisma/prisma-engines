@@ -16,7 +16,7 @@ mod sql_schema_calculator;
 mod sql_schema_differ;
 
 use connection_wrapper::{connect, Connection};
-use datamodel::{common::preview_features::PreviewFeature, walkers::walk_models, Configuration, Datamodel};
+use datamodel::{common::preview_features::PreviewFeature, ValidatedSchema};
 use enumflags2::BitFlags;
 use flavour::SqlFlavour;
 use migration_connector::{migrations_directory::MigrationDirectory, *};
@@ -148,12 +148,13 @@ impl SqlMigrationConnector {
     }
 
     /// For tests.
-    pub fn migration_from_schemas(
-        from: (&Configuration, &Datamodel),
-        to: (&Configuration, &Datamodel),
-    ) -> SqlMigration {
-        let connection_info =
-            ConnectionInfo::from_url(&from.0.datasources[0].load_url(|key| env::var(key).ok()).unwrap()).unwrap();
+    pub fn migration_from_schemas(from: &ValidatedSchema<'_>, to: &ValidatedSchema<'_>) -> SqlMigration {
+        let connection_info = ConnectionInfo::from_url(
+            &from.configuration.datasources[0]
+                .load_url(|key| env::var(key).ok())
+                .unwrap(),
+        )
+        .unwrap();
 
         let flavour = flavour::from_connection_info(&connection_info, BitFlags::empty());
         let from_sql = sql_schema_calculator::calculate_sql_schema(from, flavour.as_ref());
@@ -203,7 +204,7 @@ impl SqlMigrationConnector {
     async fn sql_schema_from_diff_target(&self, target: &DiffTarget<'_>) -> ConnectorResult<SqlSchema> {
         match target {
             DiffTarget::Datamodel(schema) => Ok(sql_schema_calculator::calculate_sql_schema(
-                (schema.0, schema.1),
+                schema,
                 self.flavour.as_ref(),
             )),
             DiffTarget::Migrations(migrations) => {
@@ -258,7 +259,7 @@ impl MigrationConnector for SqlMigrationConnector {
             sql_schema_differ::calculate_steps(Pair::new(&previous_schema, &next_schema), self.flavour.as_ref());
 
         let added_columns_with_virtual_defaults: Vec<(TableId, ColumnId)> =
-            if let Some((_, next_datamodel)) = to.as_datamodel() {
+            if let Some(next_datamodel) = to.as_datamodel() {
                 walk_added_columns(&steps)
                     .map(|(table_index, column_index)| {
                         let table = next_schema.table_walker_at(table_index);
@@ -267,9 +268,11 @@ impl MigrationConnector for SqlMigrationConnector {
                         (table, column)
                     })
                     .filter(|(table, column)| {
-                        walk_models(next_datamodel)
-                            .find(|model| model.database_name() == table.name())
-                            .and_then(|model| model.find_scalar_field(column.name()))
+                        next_datamodel
+                            .db
+                            .walk_models()
+                            .find(|model| model.final_database_name() == table.name())
+                            .and_then(|model| model.scalar_fields().find(|sf| sf.name() == column.name()))
                             .filter(|field| {
                                 field
                                     .default_value()
@@ -321,7 +324,7 @@ impl MigrationConnector for SqlMigrationConnector {
     /// the specific database version being used.
     fn check_database_version_compatibility(
         &self,
-        datamodel: &Datamodel,
+        datamodel: &ValidatedSchema<'_>,
     ) -> Option<user_facing_errors::common::DatabaseVersionIncompatibility> {
         self.flavour.check_database_version_compatibility(datamodel)
     }

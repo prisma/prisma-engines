@@ -648,8 +648,8 @@ pub enum DefaultKind {
 }
 
 impl DefaultValue {
-    pub fn db_generated(val: impl ToString) -> Self {
-        Self::new(DefaultKind::DbGenerated(val.to_string()))
+    pub fn db_generated(val: impl Into<String>) -> Self {
+        Self::new(DefaultKind::DbGenerated(val.into()))
     }
 
     pub fn now() -> Self {
@@ -708,6 +708,11 @@ impl DefaultValue {
 
     pub fn is_db_generated(&self) -> bool {
         matches!(self.kind, DefaultKind::DbGenerated(_))
+    }
+
+    pub fn with_constraint_name(mut self, constraint_name: Option<String>) -> Self {
+        self.constraint_name = constraint_name;
+        self
     }
 }
 

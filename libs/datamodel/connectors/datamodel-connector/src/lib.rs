@@ -1,8 +1,14 @@
 #![deny(rust_2018_idioms, unsafe_code)]
 
+//! The interface implemented by connectors for Prisma schema validation and interpretation.
+
+/// Connector capabilities
 pub mod capabilities;
+/// Constraint name defaults.
 pub mod constraint_names;
+/// Helpers for implementors of `Connector`.
 pub mod helper;
+/// Extensions for parser database walkers with context from the connector.
 pub mod walker_ext_traits;
 
 mod empty_connector;
@@ -24,6 +30,7 @@ use crate::connector_error::{ConnectorError, ConnectorErrorFactory, ErrorKind};
 use enumflags2::BitFlags;
 use std::{borrow::Cow, collections::BTreeMap};
 
+/// The datamodel connector API.
 pub trait Connector: Send + Sync {
     /// The name of the connector. Can be used in error messages.
     fn name(&self) -> &str;
@@ -33,6 +40,7 @@ pub trait Connector: Send + Sync {
     /// The static list of capabilities for the connector.
     fn capabilities(&self) -> &'static [ConnectorCapability];
 
+    /// Does the connector have this capability?
     fn has_capability(&self, capability: ConnectorCapability) -> bool {
         self.capabilities().contains(&capability)
     }
@@ -56,6 +64,7 @@ pub trait Connector: Send + Sync {
         ReferentialIntegrity::ForeignKeys
     }
 
+    /// The referential actions supported by the connector.
     fn referential_actions(&self, referential_integrity: &ReferentialIntegrity) -> BitFlags<ReferentialAction>;
 
     fn supports_composite_types(&self) -> bool {

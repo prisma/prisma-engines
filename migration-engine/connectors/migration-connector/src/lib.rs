@@ -19,6 +19,7 @@ pub use diff::DiffTarget;
 pub use error::{ConnectorError, ConnectorResult};
 pub use migration_persistence::{MigrationPersistence, MigrationRecord, PersistenceNotInitializedError, Timestamp};
 
+use datamodel::ValidatedSchema;
 use migrations_directory::MigrationDirectory;
 
 /// A boxed migration, opaque to the migration engine core. The connectors are
@@ -96,7 +97,7 @@ pub trait MigrationConnector: Send + Sync + 'static {
     /// the specific database version being used.
     fn check_database_version_compatibility(
         &self,
-        _datamodel: &datamodel::dml::Datamodel,
+        _datamodel: &ValidatedSchema<'_>,
     ) -> Option<user_facing_errors::common::DatabaseVersionIncompatibility> {
         None
     }

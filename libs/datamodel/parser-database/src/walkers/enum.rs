@@ -16,6 +16,11 @@ impl<'ast, 'db> EnumWalker<'ast, 'db> {
         &self.db.ast()[self.id]
     }
 
+    /// The database name of the enum.
+    pub fn database_name(self) -> &'ast str {
+        self.mapped_name().unwrap_or_else(|| self.name())
+    }
+
     /// The mapped name of the enum:
     ///
     /// ```ignore
@@ -60,6 +65,11 @@ impl<'ast, 'db> EnumValueWalker<'ast, 'db> {
     /// The name of the value.
     pub fn name(self) -> &'ast str {
         &self.r#enum().ast_enum().values[self.id.1].name.name
+    }
+
+    /// The database name of the enum.
+    pub fn database_name(self) -> &'ast str {
+        self.mapped_name().unwrap_or_else(|| self.name())
     }
 
     /// The mapped name of the value:

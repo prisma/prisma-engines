@@ -51,12 +51,13 @@ pub(crate) async fn evaluate_data_loss(
     error_on_changed_provider(&input.migrations_directory_path, connector.connector_type())?;
 
     let migrations_from_directory = list_migrations(input.migrations_directory_path.as_ref())?;
-    let target_schema = parse_schema(&input.prisma_schema)?;
+    let target_ast = crate::parse_ast(&input.prisma_schema)?;
+    let target_schema = parse_schema(&input.prisma_schema, &target_ast)?;
 
     let migration = connector
         .diff(
             DiffTarget::Migrations(&migrations_from_directory),
-            DiffTarget::Datamodel((&target_schema.0, &target_schema.1)),
+            DiffTarget::Datamodel(&target_schema),
         )
         .await?;
 

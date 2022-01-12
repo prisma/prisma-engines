@@ -6,7 +6,7 @@ use datamodel_connector::{Connector, EmptyDatamodelConnector, ReferentialIntegri
 use enumflags2::BitFlags;
 use parser_database::ParserDatabase;
 
-pub(crate) struct ValidateOutput<'ast> {
+pub struct ValidateOutput<'ast> {
     pub(crate) db: ParserDatabase<'ast>,
     pub(crate) diagnostics: Diagnostics,
     pub(crate) referential_integrity: ReferentialIntegrity,

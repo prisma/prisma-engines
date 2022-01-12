@@ -77,12 +77,12 @@ pub mod ast;
 pub mod common;
 pub mod dml;
 pub mod json;
-pub mod walkers;
 
 mod configuration;
 mod transform;
 
 pub use crate::dml::*;
+pub use ::dml::prisma_value;
 pub use configuration::{Configuration, Datasource, Generator, StringFromEnvVar};
 pub use datamodel_connector;
 pub use diagnostics;
@@ -108,6 +108,46 @@ pub fn parse_schema(schema_str: &str) -> Result<(Configuration, Datamodel), Stri
         .map(|v| v.subject)
 }
 
+pub struct ValidatedSchema<'a> {
+    pub configuration: Configuration,
+    pub db: parser_database::ParserDatabase<'a>,
+    referential_integrity: datamodel_connector::ReferentialIntegrity,
+}
+
+impl<'a> ValidatedSchema<'a> {
+    pub fn referential_integrity(&self) -> datamodel_connector::ReferentialIntegrity {
+        self.referential_integrity
+    }
+}
+
+/// Parse and validate the whole schema. This function's signature is obviously less than optimal,
+/// let's work towards something simpler.
+pub fn parse_schema_parserdb<'ast>(src: &str, ast: &'ast ast::SchemaAst) -> Result<ValidatedSchema<'ast>, String> {
+    let mut diagnostics = Diagnostics::new();
+    let generators = GeneratorLoader::load_generators_from_ast(ast, &mut diagnostics);
+    let preview_features = preview_features(&generators);
+    let datasources = load_sources(ast, preview_features, &mut diagnostics);
+
+    diagnostics
+        .to_result()
+        .map_err(|err| err.to_pretty_string("schema.prisma", src))?;
+
+    let out = validate(ast, &datasources, preview_features, diagnostics);
+
+    out.diagnostics
+        .to_result()
+        .map_err(|err| err.to_pretty_string("schema.prisma", src))?;
+
+    Ok(ValidatedSchema {
+        configuration: Configuration {
+            generators,
+            datasources,
+        },
+        db: out.db,
+        referential_integrity: out.referential_integrity,
+    })
+}
+
 /// Parses and validates a datamodel string, using core attributes only.
 pub fn parse_datamodel(datamodel_string: &str) -> Result<ValidatedDatamodel, diagnostics::Diagnostics> {
     parse_datamodel_internal(datamodel_string).map(|validated| Validated {
@@ -128,17 +168,6 @@ fn parse_datamodel_for_formatter(ast: &SchemaAst) -> Result<(Datamodel, Vec<Data
 
     let datamodel = transform::ast_to_dml::LiftAstToDml::new(&db, connector, referential_integrity).lift();
     Ok((datamodel, datasources))
-}
-
-/// Parses and validates a datamodel string, using core attributes only.
-/// In case of an error, a pretty, colorful string is returned.
-pub fn parse_datamodel_or_pretty_error(datamodel_string: &str, file_name: &str) -> Result<ValidatedDatamodel, String> {
-    parse_datamodel_internal(datamodel_string)
-        .map_err(|err| err.to_pretty_string(file_name, datamodel_string))
-        .map(|validated| Validated {
-            subject: validated.subject.1,
-            warnings: validated.warnings,
-        })
 }
 
 fn parse_datamodel_internal(

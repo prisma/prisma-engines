@@ -25,10 +25,15 @@ use enumflags2::BitFlags;
 use std::env;
 use user_facing_errors::{common::InvalidConnectionString, KnownError};
 
-use datamodel::{Configuration, Datamodel};
+use datamodel::{schema_ast::ast::SchemaAst, ValidatedSchema};
 
-fn parse_schema(schema: &str) -> CoreResult<(Configuration, Datamodel)> {
-    datamodel::parse_schema(schema).map_err(CoreError::new_schema_parser_error)
+fn parse_ast(schema: &str) -> CoreResult<SchemaAst> {
+    datamodel::parse_schema_ast(schema)
+        .map_err(|err| CoreError::new_schema_parser_error(err.to_pretty_string("schema.prisma", schema)))
+}
+
+fn parse_schema<'ast>(schema: &str, ast: &'ast SchemaAst) -> CoreResult<ValidatedSchema<'ast>> {
+    datamodel::parse_schema_parserdb(schema, ast).map_err(CoreError::new_schema_parser_error)
 }
 
 #[cfg(feature = "mongodb")]

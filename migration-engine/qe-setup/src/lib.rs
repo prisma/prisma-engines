@@ -55,9 +55,10 @@ pub async fn setup(prisma_schema: &str) -> ConnectorResult<()> {
             mysql_reset(&url).await?;
             let api = migration_core::migration_api(prisma_schema)?;
             let api = api.connector();
-            let (config, schema) = datamodel::parse_schema(prisma_schema).unwrap();
+            let ast = datamodel::parse_schema_ast(prisma_schema).unwrap();
+            let schema = datamodel::parse_schema_parserdb(prisma_schema, &ast).unwrap();
             let migration = api
-                .diff(DiffTarget::Empty, DiffTarget::Datamodel((&config, &schema)))
+                .diff(DiffTarget::Empty, DiffTarget::Datamodel(&schema))
                 .await
                 .unwrap();
             api.database_migration_step_applier()
@@ -74,9 +75,10 @@ pub async fn setup(prisma_schema: &str) -> ConnectorResult<()> {
 
             // 2. create the database schema for given Prisma schema
             {
-                let (config, schema) = datamodel::parse_schema(prisma_schema).unwrap();
+                let ast = datamodel::parse_schema_ast(prisma_schema).unwrap();
+                let schema = datamodel::parse_schema_parserdb(prisma_schema, &ast).unwrap();
                 let migration = api
-                    .diff(DiffTarget::Empty, DiffTarget::Datamodel((&config, &schema)))
+                    .diff(DiffTarget::Empty, DiffTarget::Datamodel(&schema))
                     .await
                     .unwrap();
                 api.database_migration_step_applier()

@@ -8,9 +8,9 @@ use crate::{
     sql_migration::{AlterColumn, AlterEnum, AlterTable, RedefineTable, TableChange},
     sql_schema_differ::{ColumnChange, ColumnChanges},
 };
+use datamodel::PrismaValue;
 use native_types::PostgresType;
 use once_cell::sync::Lazy;
-use prisma_value::PrismaValue;
 use regex::Regex;
 use sql_ddl::{postgres as ddl, IndexColumn, SortOrder};
 use sql_schema_describer::{
