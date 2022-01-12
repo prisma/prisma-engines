@@ -277,7 +277,7 @@ impl<'a> LiftAstToDml<'a> {
 
         model.primary_key = walker.primary_key().map(|pk| dml::PrimaryKeyDefinition {
             name: pk.name().map(String::from),
-            db_name: pk.final_database_name(self.connector).map(|c| c.into_owned()),
+            db_name: pk.constraint_name(self.connector).map(|c| c.into_owned()),
             fields: pk
                 .scalar_field_attributes()
                 .map(|field|
@@ -319,7 +319,7 @@ impl<'a> LiftAstToDml<'a> {
 
                 dml::IndexDefinition {
                     name: idx.name().map(String::from),
-                    db_name: Some(idx.final_database_name(self.connector).into_owned()),
+                    db_name: Some(idx.constraint_name(self.connector).into_owned()),
                     fields,
                     tpe,
                     algorithm,

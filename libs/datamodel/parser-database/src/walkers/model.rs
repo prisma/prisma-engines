@@ -90,7 +90,7 @@ impl<'ast, 'db> ModelWalker<'ast, 'db> {
 
     /// The name of the database table the model points to.
     #[allow(clippy::unnecessary_lazy_evaluations)] // respectfully disagree
-    pub fn final_database_name(self) -> &'ast str {
+    pub fn database_name(self) -> &'ast str {
         self.model_attributes
             .mapped_name
             .unwrap_or_else(|| &self.db.ast[self.model_id].name.name)
@@ -98,7 +98,7 @@ impl<'ast, 'db> ModelWalker<'ast, 'db> {
 
     /// Get the database names of the constrained scalar fields.
     #[allow(clippy::unnecessary_lazy_evaluations)] // respectfully disagree
-    pub fn get_field_db_names<'a>(&'a self, fields: &'a [ast::FieldId]) -> impl Iterator<Item = &'ast str> + 'a {
+    pub fn get_field_database_names<'a>(&'a self, fields: &'a [ast::FieldId]) -> impl Iterator<Item = &'ast str> + 'a {
         fields.iter().map(move |&field_id| {
             self.db.types.scalar_fields[&(self.model_id, field_id)]
                 .mapped_name

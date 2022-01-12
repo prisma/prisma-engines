@@ -187,7 +187,7 @@ pub(super) fn referential_actions(field: RelationFieldWalker<'_, '_>, ctx: &mut 
 }
 
 pub(super) fn map(field: RelationFieldWalker<'_, '_>, ctx: &mut Context<'_>) {
-    if field.foreign_key_name().is_none() {
+    if field.mapped_name().is_none() {
         return;
     }
 
@@ -209,12 +209,6 @@ pub(super) fn map(field: RelationFieldWalker<'_, '_>, ctx: &mut Context<'_>) {
         .iter()
         .find(|attr| attr.name() == "relation")
     {
-        validate_db_name(
-            field.model().name(),
-            relation_attr,
-            field.foreign_key_name(),
-            ctx,
-            false,
-        );
+        validate_db_name(field.model().name(), relation_attr, field.mapped_name(), ctx, false);
     }
 }

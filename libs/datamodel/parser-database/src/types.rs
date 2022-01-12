@@ -133,8 +133,8 @@ pub(crate) struct RelationField<'ast> {
     /// The name _explicitly present_ in the AST.
     pub(crate) name: Option<&'ast str>,
     pub(crate) is_ignored: bool,
-    /// The fk_name _explicitly present_ in the AST through the map argument.
-    pub(crate) fk_name: Option<&'ast str>,
+    /// The foreign key name _explicitly present_ in the AST through the `@map` attribute.
+    pub(crate) mapped_name: Option<&'ast str>,
     pub(crate) relation_attribute: Option<&'ast ast::Attribute>,
 }
 
@@ -148,7 +148,7 @@ impl RelationField<'_> {
             references: None,
             name: None,
             is_ignored: false,
-            fk_name: None,
+            mapped_name: None,
             relation_attribute: None,
         }
     }
@@ -219,7 +219,7 @@ pub(crate) struct IndexAttribute<'ast> {
     pub(crate) fields: Vec<FieldWithArgs>,
     pub(crate) source_field: Option<ast::FieldId>,
     pub(crate) name: Option<&'ast str>,
-    pub(crate) db_name: Option<&'ast str>,
+    pub(crate) mapped_name: Option<&'ast str>,
     pub(crate) algorithm: Option<IndexAlgorithm>,
 }
 
@@ -239,7 +239,7 @@ pub(crate) struct IdAttribute<'ast> {
     pub(super) source_field: Option<ast::FieldId>,
     pub(super) source_attribute: &'ast ast::Attribute,
     pub(super) name: Option<&'ast str>,
-    pub(super) db_name: Option<&'ast str>,
+    pub(super) mapped_name: Option<&'ast str>,
 }
 
 #[derive(Debug, Clone, Copy)]

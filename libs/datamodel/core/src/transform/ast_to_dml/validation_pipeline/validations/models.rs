@@ -64,7 +64,7 @@ pub(super) fn has_a_unique_primary_key_name(
 ) {
     let (pk, name): (PrimaryKeyWalker<'_, '_>, Cow<'_, str>) = match model
         .primary_key()
-        .and_then(|pk| pk.final_database_name(ctx.connector).map(|name| (pk, name)))
+        .and_then(|pk| pk.constraint_name(ctx.connector).map(|name| (pk, name)))
     {
         Some((pk, name)) => (pk, name),
         None => return,

@@ -22,7 +22,7 @@ impl<'ast, 'db> IndexWalker<'ast, 'db> {
     ///                      ^^^^^^^^^
     /// ```
     pub fn mapped_name(self) -> Option<&'ast str> {
-        self.index_attribute.db_name
+        self.index_attribute.mapped_name
     }
 
     /// The attribute name: `"unique"` for `@@unique`, `"fulltext"` for `@@fultext` and `"index"`

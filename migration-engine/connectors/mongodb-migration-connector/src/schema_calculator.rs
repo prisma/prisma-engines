@@ -11,10 +11,10 @@ pub(crate) fn calculate(datamodel: &ValidatedSchema<'_>) -> MongoSchema {
     let connector = mongodb_datamodel_connector::MongoDbDatamodelConnector;
 
     for model in datamodel.db.walk_models() {
-        let collection_id = schema.push_collection(model.final_database_name().to_owned());
+        let collection_id = schema.push_collection(model.database_name().to_owned());
 
         for index in model.indexes() {
-            let name = index.final_database_name(&connector);
+            let name = index.constraint_name(&connector);
             let fields = index
                 .scalar_field_attributes()
                 .map(|field| (field.as_scalar_field().database_name(), field.sort_order()))
