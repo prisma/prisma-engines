@@ -742,6 +742,11 @@
 <span id="742">742</span>
 <span id="743">743</span>
 <span id="744">744</span>
+<span id="745">745</span>
+<span id="746">746</span>
+<span id="747">747</span>
+<span id="748">748</span>
+<span id="749">749</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Database description. This crate is used heavily in the introspection and migration engines.</span>
 <span class="attribute">#![<span class="ident">allow</span>(<span class="ident">clippy::trivial_regex</span>)]</span> <span class="comment">// this is allowed, because we want to do CoW replaces and these regexes will grow.</span>
 <span class="attribute">#![<span class="ident">allow</span>(<span class="ident">clippy::match_bool</span>)]</span> <span class="comment">// we respectfully disagree that it makes the code less readable.</span>
@@ -1392,8 +1397,8 @@
 }
 
 <span class="kw">impl</span> <span class="ident">DefaultValue</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">db_generated</span>(<span class="ident">val</span>: <span class="kw">impl</span> <span class="ident">ToString</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::new</span>(<span class="ident">DefaultKind::DbGenerated</span>(<span class="ident">val</span>.<span class="ident">to_string</span>()))
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">db_generated</span>(<span class="ident">val</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
+        <span class="ident"><span class="self">Self</span>::new</span>(<span class="ident">DefaultKind::DbGenerated</span>(<span class="ident">val</span>.<span class="ident">into</span>()))
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">now</span>() -&gt; <span class="self">Self</span> {
@@ -1452,6 +1457,11 @@
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_db_generated</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="macro">matches!</span>(<span class="self">self</span>.<span class="ident">kind</span>, <span class="ident">DefaultKind::DbGenerated</span>(<span class="kw">_</span>))
+    }
+
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_constraint_name</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">constraint_name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
+        <span class="self">self</span>.<span class="ident">constraint_name</span> <span class="op">=</span> <span class="ident">constraint_name</span>;
+        <span class="self">self</span>
     }
 }
 

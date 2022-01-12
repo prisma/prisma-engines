@@ -706,9 +706,9 @@
     <span class="ident">sql_migration</span>::{<span class="ident">AlterColumn</span>, <span class="ident">AlterEnum</span>, <span class="ident">AlterTable</span>, <span class="ident">RedefineTable</span>, <span class="ident">TableChange</span>},
     <span class="ident">sql_schema_differ</span>::{<span class="ident">ColumnChange</span>, <span class="ident">ColumnChanges</span>},
 };
+<span class="kw">use</span> <span class="ident">datamodel::PrismaValue</span>;
 <span class="kw">use</span> <span class="ident">native_types::PostgresType</span>;
 <span class="kw">use</span> <span class="ident">once_cell::sync::Lazy</span>;
-<span class="kw">use</span> <span class="ident">prisma_value::PrismaValue</span>;
 <span class="kw">use</span> <span class="ident">regex::Regex</span>;
 <span class="kw">use</span> <span class="ident">sql_ddl</span>::{<span class="ident">postgres</span> <span class="kw">as</span> <span class="ident">ddl</span>, <span class="ident">IndexColumn</span>, <span class="ident">SortOrder</span>};
 <span class="kw">use</span> <span class="ident">sql_schema_describer</span>::{

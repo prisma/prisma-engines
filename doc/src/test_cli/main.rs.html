@@ -425,15 +425,6 @@
 <span id="425">425</span>
 <span id="426">426</span>
 <span id="427">427</span>
-<span id="428">428</span>
-<span id="429">429</span>
-<span id="430">430</span>
-<span id="431">431</span>
-<span id="432">432</span>
-<span id="433">433</span>
-<span id="434">434</span>
-<span id="435">435</span>
-<span id="436">436</span>
 </pre><pre class="rust"><code><span class="attribute">#![<span class="ident">allow</span>(<span class="ident">clippy::print_literal</span>)]</span> <span class="comment">// it is just wrong in this case</span>
 
 <span class="kw">mod</span> <span class="ident">diagnose_migration_history</span>;
@@ -443,12 +434,7 @@
 <span class="kw">use</span> <span class="ident">introspection_connector::CompositeTypeDepth</span>;
 <span class="kw">use</span> <span class="ident">migration_connector</span>::{<span class="ident">DestructiveChangeDiagnostics</span>, <span class="ident">DiffTarget</span>};
 <span class="kw">use</span> <span class="ident">migration_core::commands</span>::{<span class="ident">ApplyMigrationsInput</span>, <span class="ident">CreateMigrationInput</span>, <span class="ident">SchemaPushInput</span>};
-<span class="kw">use</span> <span class="ident">std</span>::{
-    <span class="ident">fmt</span>,
-    <span class="ident">fs::File</span>,
-    <span class="ident">io</span>::{<span class="self">self</span>, <span class="ident">Read</span>},
-    <span class="ident">str::FromStr</span>,
-};
+<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">fmt</span>, <span class="ident">fs::File</span>, <span class="ident">io::Read</span>, <span class="ident">str::FromStr</span>};
 <span class="kw">use</span> <span class="ident">structopt</span>::<span class="kw-2">*</span>;
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">StructOpt</span>)]</span>
@@ -635,15 +621,14 @@
             <span class="macro">println!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">introspected</span>);
         }
         <span class="ident">Command::ValidateDatamodel</span>(<span class="ident">cmd</span>) =&gt; {
-            <span class="kw">use</span> <span class="ident">std::io</span>::{<span class="self">self</span>, <span class="ident">Read</span> <span class="kw">as</span> <span class="kw">_</span>};
+            <span class="kw">use</span> <span class="ident">std::io::Read</span> <span class="kw">as</span> <span class="kw">_</span>;
 
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">file</span> <span class="op">=</span> <span class="ident">std::fs::File::open</span>(<span class="kw-2">&amp;</span><span class="ident">cmd</span>.<span class="ident">schema_path</span>).<span class="ident">expect</span>(<span class="string">&quot;error opening datamodel file&quot;</span>);
 
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">datamodel</span> <span class="op">=</span> <span class="ident">String::new</span>();
             <span class="ident">file</span>.<span class="ident">read_to_string</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">datamodel</span>).<span class="ident">unwrap</span>();
 
-            <span class="ident">datamodel::parse_schema</span>(<span class="kw-2">&amp;</span><span class="ident">datamodel</span>)
-                .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">diagnostics</span><span class="op">|</span> <span class="ident">io::Error::new</span>(<span class="ident">io::ErrorKind::InvalidInput</span>, <span class="ident">diagnostics</span>))<span class="question-mark">?</span>;
+            <span class="ident">datamodel::parse_datamodel</span>(<span class="kw-2">&amp;</span><span class="ident">datamodel</span>).<span class="ident">unwrap</span>();
         }
         <span class="ident">Command::ResetDatabase</span>(<span class="ident">cmd</span>) =&gt; {
             <span class="kw">let</span> <span class="ident">schema</span> <span class="op">=</span> <span class="ident">read_datamodel_from_file</span>(<span class="kw-2">&amp;</span><span class="ident">cmd</span>.<span class="ident">schema_path</span>).<span class="ident">context</span>(<span class="string">&quot;Error reading the schema from file&quot;</span>)<span class="question-mark">?</span>;
@@ -821,15 +806,12 @@
     <span class="kw">let</span> <span class="ident">datamodel</span> <span class="op">=</span> <span class="ident">read_datamodel_from_file</span>(<span class="kw-2">&amp;</span><span class="ident">cmd</span>.<span class="ident">schema_path</span>).<span class="ident">context</span>(<span class="string">&quot;Error reading the schema from file&quot;</span>)<span class="question-mark">?</span>;
     <span class="kw">let</span> <span class="ident">api</span> <span class="op">=</span> <span class="ident">migration_core::migration_api</span>(<span class="kw-2">&amp;</span><span class="ident">datamodel</span>)<span class="question-mark">?</span>;
 
-    <span class="kw">let</span> (<span class="ident">configuration</span>, <span class="ident">datamodel</span>) <span class="op">=</span> <span class="ident">datamodel::parse_schema</span>(<span class="kw-2">&amp;</span><span class="ident">datamodel</span>)
-        .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">diagnostics</span><span class="op">|</span> <span class="ident">io::Error::new</span>(<span class="ident">io::ErrorKind::InvalidInput</span>, <span class="ident">diagnostics</span>))<span class="question-mark">?</span>;
+    <span class="kw">let</span> <span class="ident">ast</span> <span class="op">=</span> <span class="ident">datamodel::parse_schema_ast</span>(<span class="kw-2">&amp;</span><span class="ident">datamodel</span>).<span class="ident">unwrap</span>();
+    <span class="kw">let</span> <span class="ident">parsed_schema</span> <span class="op">=</span> <span class="ident">datamodel::parse_schema_parserdb</span>(<span class="kw-2">&amp;</span><span class="ident">datamodel</span>, <span class="kw-2">&amp;</span><span class="ident">ast</span>).<span class="ident">unwrap</span>();
 
     <span class="kw">let</span> <span class="ident">migration</span> <span class="op">=</span> <span class="ident">api</span>
         .<span class="ident">connector</span>()
-        .<span class="ident">diff</span>(
-            <span class="ident">DiffTarget::Database</span>,
-            <span class="ident">DiffTarget::Datamodel</span>((<span class="kw-2">&amp;</span><span class="ident">configuration</span>, <span class="kw-2">&amp;</span><span class="ident">datamodel</span>)),
-        )
+        .<span class="ident">diff</span>(<span class="ident">DiffTarget::Database</span>, <span class="ident">DiffTarget::Datamodel</span>(<span class="kw-2">&amp;</span><span class="ident">parsed_schema</span>))
         .<span class="kw">await</span><span class="question-mark">?</span>;
 
     <span class="kw">match</span> <span class="ident">cmd</span>.<span class="ident">output_type</span> {

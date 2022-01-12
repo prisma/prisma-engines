@@ -283,7 +283,7 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">assert_no_steps</span>(<span class="self">self</span>) -&gt; <span class="self">Self</span> {
         <span class="macro">assert!</span>(
             <span class="self">self</span>.<span class="ident">result</span>.<span class="ident">executed_steps</span> <span class="op">==</span> <span class="number">0</span>,
-            <span class="string">&quot;Assertion failed. Executed steps should be zero, but found {:#?}&quot;</span>,
+            <span class="string">&quot;Assertion failed. Executed steps should be zero, but found {}&quot;</span>,
             <span class="self">self</span>.<span class="ident">result</span>.<span class="ident">executed_steps</span>,
         );
         <span class="self">self</span>

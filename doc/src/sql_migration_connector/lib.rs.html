@@ -378,6 +378,9 @@
 <span id="378">378</span>
 <span id="379">379</span>
 <span id="380">380</span>
+<span id="381">381</span>
+<span id="382">382</span>
+<span id="383">383</span>
 </pre><pre class="rust"><code><span class="doccomment">//! The SQL migration connector.</span>
 
 <span class="attribute">#![<span class="ident">deny</span>(<span class="ident">rust_2018_idioms</span>, <span class="ident">unsafe_code</span>, <span class="ident">missing_docs</span>)]</span>
@@ -396,7 +399,7 @@
 <span class="kw">mod</span> <span class="ident">sql_schema_differ</span>;
 
 <span class="kw">use</span> <span class="ident">connection_wrapper</span>::{<span class="ident">connect</span>, <span class="ident">Connection</span>};
-<span class="kw">use</span> <span class="ident">datamodel</span>::{<span class="ident">common::preview_features::PreviewFeature</span>, <span class="ident">walkers::walk_models</span>, <span class="ident">Configuration</span>, <span class="ident">Datamodel</span>};
+<span class="kw">use</span> <span class="ident">datamodel</span>::{<span class="ident">common::preview_features::PreviewFeature</span>, <span class="ident">ValidatedSchema</span>};
 <span class="kw">use</span> <span class="ident">enumflags2::BitFlags</span>;
 <span class="kw">use</span> <span class="ident">flavour::SqlFlavour</span>;
 <span class="kw">use</span> <span class="ident">migration_connector</span>::{<span class="ident">migrations_directory::MigrationDirectory</span>, <span class="kw-2">*</span>};
@@ -528,12 +531,13 @@
     }
 
     <span class="doccomment">/// For tests.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">migration_from_schemas</span>(
-        <span class="ident">from</span>: (<span class="kw-2">&amp;</span><span class="ident">Configuration</span>, <span class="kw-2">&amp;</span><span class="ident">Datamodel</span>),
-        <span class="ident">to</span>: (<span class="kw-2">&amp;</span><span class="ident">Configuration</span>, <span class="kw-2">&amp;</span><span class="ident">Datamodel</span>),
-    ) -&gt; <span class="ident">SqlMigration</span> {
-        <span class="kw">let</span> <span class="ident">connection_info</span> <span class="op">=</span>
-            <span class="ident">ConnectionInfo::from_url</span>(<span class="kw-2">&amp;</span><span class="ident">from</span>.<span class="number">0</span>.<span class="ident">datasources</span>[<span class="number">0</span>].<span class="ident">load_url</span>(<span class="op">|</span><span class="ident">key</span><span class="op">|</span> <span class="ident">env::var</span>(<span class="ident">key</span>).<span class="ident">ok</span>()).<span class="ident">unwrap</span>()).<span class="ident">unwrap</span>();
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">migration_from_schemas</span>(<span class="ident">from</span>: <span class="kw-2">&amp;</span><span class="ident">ValidatedSchema</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">to</span>: <span class="kw-2">&amp;</span><span class="ident">ValidatedSchema</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">SqlMigration</span> {
+        <span class="kw">let</span> <span class="ident">connection_info</span> <span class="op">=</span> <span class="ident">ConnectionInfo::from_url</span>(
+            <span class="kw-2">&amp;</span><span class="ident">from</span>.<span class="ident">configuration</span>.<span class="ident">datasources</span>[<span class="number">0</span>]
+                .<span class="ident">load_url</span>(<span class="op">|</span><span class="ident">key</span><span class="op">|</span> <span class="ident">env::var</span>(<span class="ident">key</span>).<span class="ident">ok</span>())
+                .<span class="ident">unwrap</span>(),
+        )
+        .<span class="ident">unwrap</span>();
 
         <span class="kw">let</span> <span class="ident">flavour</span> <span class="op">=</span> <span class="ident">flavour::from_connection_info</span>(<span class="kw-2">&amp;</span><span class="ident">connection_info</span>, <span class="ident">BitFlags::empty</span>());
         <span class="kw">let</span> <span class="ident">from_sql</span> <span class="op">=</span> <span class="ident">sql_schema_calculator::calculate_sql_schema</span>(<span class="ident">from</span>, <span class="ident">flavour</span>.<span class="ident">as_ref</span>());
@@ -583,7 +587,7 @@
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">sql_schema_from_diff_target</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">target</span>: <span class="kw-2">&amp;</span><span class="ident">DiffTarget</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">ConnectorResult</span><span class="op">&lt;</span><span class="ident">SqlSchema</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="ident">target</span> {
             <span class="ident">DiffTarget::Datamodel</span>(<span class="ident">schema</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">sql_schema_calculator::calculate_sql_schema</span>(
-                (<span class="ident">schema</span>.<span class="number">0</span>, <span class="ident">schema</span>.<span class="number">1</span>),
+                <span class="ident">schema</span>,
                 <span class="self">self</span>.<span class="ident">flavour</span>.<span class="ident">as_ref</span>(),
             )),
             <span class="ident">DiffTarget::Migrations</span>(<span class="ident">migrations</span>) =&gt; {
@@ -638,7 +642,7 @@
             <span class="ident">sql_schema_differ::calculate_steps</span>(<span class="ident">Pair::new</span>(<span class="kw-2">&amp;</span><span class="ident">previous_schema</span>, <span class="kw-2">&amp;</span><span class="ident">next_schema</span>), <span class="self">self</span>.<span class="ident">flavour</span>.<span class="ident">as_ref</span>());
 
         <span class="kw">let</span> <span class="ident">added_columns_with_virtual_defaults</span>: <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">TableId</span>, <span class="ident">ColumnId</span>)<span class="op">&gt;</span> <span class="op">=</span>
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>((<span class="kw">_</span>, <span class="ident">next_datamodel</span>)) <span class="op">=</span> <span class="ident">to</span>.<span class="ident">as_datamodel</span>() {
+            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">next_datamodel</span>) <span class="op">=</span> <span class="ident">to</span>.<span class="ident">as_datamodel</span>() {
                 <span class="ident">walk_added_columns</span>(<span class="kw-2">&amp;</span><span class="ident">steps</span>)
                     .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">table_index</span>, <span class="ident">column_index</span>)<span class="op">|</span> {
                         <span class="kw">let</span> <span class="ident">table</span> <span class="op">=</span> <span class="ident">next_schema</span>.<span class="ident">table_walker_at</span>(<span class="ident">table_index</span>);
@@ -647,9 +651,11 @@
                         (<span class="ident">table</span>, <span class="ident">column</span>)
                     })
                     .<span class="ident">filter</span>(<span class="op">|</span>(<span class="ident">table</span>, <span class="ident">column</span>)<span class="op">|</span> {
-                        <span class="ident">walk_models</span>(<span class="ident">next_datamodel</span>)
-                            .<span class="ident">find</span>(<span class="op">|</span><span class="ident">model</span><span class="op">|</span> <span class="ident">model</span>.<span class="ident">database_name</span>() <span class="op">==</span> <span class="ident">table</span>.<span class="ident">name</span>())
-                            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">model</span><span class="op">|</span> <span class="ident">model</span>.<span class="ident">find_scalar_field</span>(<span class="ident">column</span>.<span class="ident">name</span>()))
+                        <span class="ident">next_datamodel</span>
+                            .<span class="ident">db</span>
+                            .<span class="ident">walk_models</span>()
+                            .<span class="ident">find</span>(<span class="op">|</span><span class="ident">model</span><span class="op">|</span> <span class="ident">model</span>.<span class="ident">final_database_name</span>() <span class="op">==</span> <span class="ident">table</span>.<span class="ident">name</span>())
+                            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">model</span><span class="op">|</span> <span class="ident">model</span>.<span class="ident">scalar_fields</span>().<span class="ident">find</span>(<span class="op">|</span><span class="ident">sf</span><span class="op">|</span> <span class="ident">sf</span>.<span class="ident">name</span>() <span class="op">==</span> <span class="ident">column</span>.<span class="ident">name</span>()))
                             .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">field</span><span class="op">|</span> {
                                 <span class="ident">field</span>
                                     .<span class="ident">default_value</span>()
@@ -701,7 +707,7 @@
     <span class="doccomment">/// the specific database version being used.</span>
     <span class="kw">fn</span> <span class="ident">check_database_version_compatibility</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">datamodel</span>: <span class="kw-2">&amp;</span><span class="ident">Datamodel</span>,
+        <span class="ident">datamodel</span>: <span class="kw-2">&amp;</span><span class="ident">ValidatedSchema</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
     ) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">user_facing_errors::common::DatabaseVersionIncompatibility</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">flavour</span>.<span class="ident">check_database_version_compatibility</span>(<span class="ident">datamodel</span>)
     }

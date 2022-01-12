@@ -247,10 +247,49 @@
 <span id="247">247</span>
 <span id="248">248</span>
 <span id="249">249</span>
+<span id="250">250</span>
+<span id="251">251</span>
+<span id="252">252</span>
+<span id="253">253</span>
+<span id="254">254</span>
+<span id="255">255</span>
+<span id="256">256</span>
+<span id="257">257</span>
+<span id="258">258</span>
+<span id="259">259</span>
+<span id="260">260</span>
+<span id="261">261</span>
+<span id="262">262</span>
+<span id="263">263</span>
+<span id="264">264</span>
+<span id="265">265</span>
+<span id="266">266</span>
+<span id="267">267</span>
+<span id="268">268</span>
+<span id="269">269</span>
+<span id="270">270</span>
+<span id="271">271</span>
+<span id="272">272</span>
+<span id="273">273</span>
+<span id="274">274</span>
+<span id="275">275</span>
+<span id="276">276</span>
+<span id="277">277</span>
+<span id="278">278</span>
+<span id="279">279</span>
+<span id="280">280</span>
+<span id="281">281</span>
+<span id="282">282</span>
+<span id="283">283</span>
+<span id="284">284</span>
+<span id="285">285</span>
+<span id="286">286</span>
+<span id="287">287</span>
+<span id="288">288</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">ast</span>,
     <span class="ident">types</span>::{<span class="ident">DefaultAttribute</span>, <span class="ident">FieldWithArgs</span>, <span class="ident">ScalarField</span>, <span class="ident">ScalarType</span>, <span class="ident">SortOrder</span>},
-    <span class="ident">walkers::ModelWalker</span>,
+    <span class="ident">walkers</span>::{<span class="ident">EnumWalker</span>, <span class="ident">ModelWalker</span>, <span class="ident">Walker</span>},
     <span class="ident">ParserDatabase</span>, <span class="ident">ScalarFieldType</span>,
 };
 <span class="kw">use</span> <span class="ident">diagnostics::Span</span>;
@@ -325,6 +364,17 @@
         <span class="self">self</span>.<span class="ident">scalar_field</span>
     }
 
+    <span class="doccomment">/// Is this field&#39;s type an enum? If yes, walk the enum.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">field_type_as_enum</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">EnumWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;db</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">scalar_field_type</span>() {
+            <span class="ident">ScalarFieldType::Enum</span>(<span class="ident">enum_id</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">Walker</span> {
+                <span class="ident">db</span>: <span class="self">self</span>.<span class="ident">db</span>,
+                <span class="ident">id</span>: <span class="ident">enum_id</span>,
+            }),
+            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+        }
+    }
+
     <span class="doccomment">/// The name in the `@map(&lt;name&gt;)` attribute.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">mapped_name</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;ast</span> <span class="ident">str</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">attributes</span>().<span class="ident">mapped_name</span>
@@ -362,6 +412,14 @@
             <span class="ident">db</span>: <span class="self">self</span>.<span class="ident">db</span>,
             <span class="ident">default</span>: <span class="ident">d</span>,
         })
+    }
+
+    <span class="doccomment">/// The type of the field, with type aliases resolved.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">resolved_scalar_field_type</span>(<span class="self">self</span>) -&gt; <span class="ident">ScalarFieldType</span> {
+        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">attributes</span>().<span class="ident">r#type</span> {
+            <span class="ident">ScalarFieldType::Alias</span>(<span class="ident">id</span>) =&gt; <span class="kw-2">*</span><span class="self">self</span>.<span class="ident">db</span>.<span class="ident">alias_scalar_field_type</span>(<span class="kw-2">&amp;</span><span class="ident">id</span>),
+            <span class="ident">other</span> =&gt; <span class="ident">other</span>,
+        }
     }
 
     <span class="doccomment">/// The type of the field.</span>
@@ -408,9 +466,29 @@
         <span class="self">self</span>.<span class="ident">default</span>.<span class="ident">value</span>
     }
 
+    <span class="doccomment">/// Is this an `@default(autoincrement())`?</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_autoincrement</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+        <span class="macro">matches!</span>(<span class="self">self</span>.<span class="ident">default</span>.<span class="ident">value</span>, <span class="ident">ast::Expression::Function</span>(<span class="ident">name</span>, <span class="kw">_</span>, <span class="kw">_</span>) <span class="kw">if</span> <span class="ident">name</span> <span class="op">==</span> <span class="string">&quot;autoincrement&quot;</span>)
+    }
+
+    <span class="doccomment">/// Is this an `@default(cuid())`?</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_cuid</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+        <span class="macro">matches!</span>(<span class="self">self</span>.<span class="ident">default</span>.<span class="ident">value</span>, <span class="ident">ast::Expression::Function</span>(<span class="ident">name</span>, <span class="kw">_</span>, <span class="kw">_</span>) <span class="kw">if</span> <span class="ident">name</span> <span class="op">==</span> <span class="string">&quot;cuid&quot;</span>)
+    }
+
     <span class="doccomment">/// Is this an `@default(dbgenerated())`?</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_dbgenerated</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="macro">matches!</span>(<span class="self">self</span>.<span class="ident">default</span>.<span class="ident">value</span>, <span class="ident">ast::Expression::Function</span>(<span class="ident">name</span>, <span class="kw">_</span>, <span class="kw">_</span>) <span class="kw">if</span> <span class="ident">name</span> <span class="op">==</span> <span class="string">&quot;dbgenerated&quot;</span>)
+    }
+
+    <span class="doccomment">/// Is this an `@default(now())`?</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_now</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+        <span class="macro">matches!</span>(<span class="self">self</span>.<span class="ident">default</span>.<span class="ident">value</span>, <span class="ident">ast::Expression::Function</span>(<span class="ident">name</span>, <span class="kw">_</span>, <span class="kw">_</span>) <span class="kw">if</span> <span class="ident">name</span> <span class="op">==</span> <span class="string">&quot;now&quot;</span>)
+    }
+
+    <span class="doccomment">/// Is this an `@default(uuid())`?</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_uuid</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+        <span class="macro">matches!</span>(<span class="self">self</span>.<span class="ident">default</span>.<span class="ident">value</span>, <span class="ident">ast::Expression::Function</span>(<span class="ident">name</span>, <span class="kw">_</span>, <span class="kw">_</span>) <span class="kw">if</span> <span class="ident">name</span> <span class="op">==</span> <span class="string">&quot;uuid&quot;</span>)
     }
 
     <span class="doccomment">/// The mapped name of the default value. Not applicable to all connectors. See crate docs for</span>
