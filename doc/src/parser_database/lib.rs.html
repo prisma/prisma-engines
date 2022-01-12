@@ -139,6 +139,9 @@
 <span id="139">139</span>
 <span id="140">140</span>
 <span id="141">141</span>
+<span id="142">142</span>
+<span id="143">143</span>
+<span id="144">144</span>
 </pre><pre class="rust"><code><span class="attribute">#![<span class="ident">deny</span>(<span class="ident">unsafe_code</span>, <span class="ident">rust_2018_idioms</span>, <span class="ident">missing_docs</span>)]</span>
 
 <span class="doccomment">//! See the docs on [ParserDatabase](./struct.ParserDatabase.html).</span>
@@ -153,15 +156,18 @@
 <span class="doccomment">//!</span>
 <span class="doccomment">//! Names:</span>
 <span class="doccomment">//!</span>
+<span class="doccomment">//! - _name_: the item name in the schema for datasources, generators, models, model fields,</span>
+<span class="doccomment">//!   composite types, composite type fields, enums and enum variants. The `name:` argument for</span>
+<span class="doccomment">//!   unique constraints, primary keys and relations.</span>
 <span class="doccomment">//! - _mapped name_: the name inside an `@map()` or `@@map()` attribute of a model, field, enum or</span>
 <span class="doccomment">//!   enum value. This is used to determine what the name of the Prisma schema item is in the</span>
 <span class="doccomment">//!   database.</span>
 <span class="doccomment">//! - _database name_: the name in the database, once both the name of the item and the mapped</span>
 <span class="doccomment">//!   name have been taken into account. The logic is always the same: if a mapped name is defined,</span>
 <span class="doccomment">//!   then the database name is the mapped name, otherwise it is the name of the item.</span>
-<span class="doccomment">//! - _foreign key name_: the name inside the `map: ...` argument inside an `@relation()`</span>
-<span class="doccomment">//!   attribute. This is taken as the database name of the constraint backing the relation, on the</span>
-<span class="doccomment">//!   connectors where that makes sense.</span>
+<span class="doccomment">//! - _constraint name_: indexes, primary keys and defaults can have a constraint name. It can be</span>
+<span class="doccomment">//!   defined with a `map:` argument or be a default, generated name if the `map:` argument is not</span>
+<span class="doccomment">//!   provided. These usually require a datamodel connector to be defined.</span>
 
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">walkers</span>;
 

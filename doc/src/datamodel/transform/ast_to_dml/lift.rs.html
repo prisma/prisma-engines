@@ -810,7 +810,7 @@
 
         <span class="ident">model</span>.<span class="ident">primary_key</span> <span class="op">=</span> <span class="ident">walker</span>.<span class="ident">primary_key</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">pk</span><span class="op">|</span> <span class="ident">dml::PrimaryKeyDefinition</span> {
             <span class="ident">name</span>: <span class="ident">pk</span>.<span class="ident">name</span>().<span class="ident">map</span>(<span class="ident">String::from</span>),
-            <span class="ident">db_name</span>: <span class="ident">pk</span>.<span class="ident">final_database_name</span>(<span class="self">self</span>.<span class="ident">connector</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">into_owned</span>()),
+            <span class="ident">db_name</span>: <span class="ident">pk</span>.<span class="ident">constraint_name</span>(<span class="self">self</span>.<span class="ident">connector</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">into_owned</span>()),
             <span class="ident">fields</span>: <span class="ident">pk</span>
                 .<span class="ident">scalar_field_attributes</span>()
                 .<span class="ident">map</span>(<span class="op">|</span><span class="ident">field</span><span class="op">|</span>
@@ -852,7 +852,7 @@
 
                 <span class="ident">dml::IndexDefinition</span> {
                     <span class="ident">name</span>: <span class="ident">idx</span>.<span class="ident">name</span>().<span class="ident">map</span>(<span class="ident">String::from</span>),
-                    <span class="ident">db_name</span>: <span class="prelude-val">Some</span>(<span class="ident">idx</span>.<span class="ident">final_database_name</span>(<span class="self">self</span>.<span class="ident">connector</span>).<span class="ident">into_owned</span>()),
+                    <span class="ident">db_name</span>: <span class="prelude-val">Some</span>(<span class="ident">idx</span>.<span class="ident">constraint_name</span>(<span class="self">self</span>.<span class="ident">connector</span>).<span class="ident">into_owned</span>()),
                     <span class="ident">fields</span>,
                     <span class="ident">tpe</span>,
                     <span class="ident">algorithm</span>,

@@ -44,10 +44,6 @@
 <span id="44">44</span>
 <span id="45">45</span>
 <span id="46">46</span>
-<span id="47">47</span>
-<span id="48">48</span>
-<span id="49">49</span>
-<span id="50">50</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">super</span>::SqlSchemaCalculatorFlavour</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::flavour::MysqlFlavour</span>;
 <span class="kw">use</span> <span class="ident">datamodel</span>::{<span class="ident">datamodel_connector::ScalarType</span>, <span class="ident">parser_database::walkers</span>::<span class="kw-2">*</span>, <span class="ident">ValidatedSchema</span>};
@@ -69,7 +65,7 @@
             <span class="kw">let</span> <span class="ident">sql_enum</span> <span class="op">=</span> <span class="ident">sql::Enum</span> {
                 <span class="ident">name</span>: <span class="macro">format!</span>(
                     <span class="string">&quot;{model_name}_{field_name}&quot;</span>,
-                    <span class="ident">model_name</span> <span class="op">=</span> <span class="ident">field</span>.<span class="ident">model</span>().<span class="ident">final_database_name</span>(),
+                    <span class="ident">model_name</span> <span class="op">=</span> <span class="ident">field</span>.<span class="ident">model</span>().<span class="ident">database_name</span>(),
                     <span class="ident">field_name</span> <span class="op">=</span> <span class="ident">field</span>.<span class="ident">database_name</span>()
                 ),
                 <span class="ident">values</span>: <span class="ident">enum_tpe</span>.<span class="ident">values</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">v</span>.<span class="ident">database_name</span>().<span class="ident">to_owned</span>()).<span class="ident">collect</span>(),
@@ -89,11 +85,7 @@
         <span class="kw">let</span> <span class="ident">arity</span> <span class="op">=</span> <span class="ident"><span class="kw">super</span>::<span class="kw">super</span>::column_arity</span>(<span class="ident">field</span>.<span class="ident">ast_field</span>().<span class="ident">arity</span>);
 
         <span class="ident">sql::ColumnType::pure</span>(
-            <span class="ident">sql::ColumnTypeFamily::Enum</span>(<span class="macro">format!</span>(
-                <span class="string">&quot;{}_{}&quot;</span>,
-                <span class="ident">field</span>.<span class="ident">model</span>().<span class="ident">final_database_name</span>(),
-                <span class="ident">field</span>.<span class="ident">database_name</span>()
-            )),
+            <span class="ident">sql::ColumnTypeFamily::Enum</span>(<span class="macro">format!</span>(<span class="string">&quot;{}_{}&quot;</span>, <span class="ident">field</span>.<span class="ident">model</span>().<span class="ident">database_name</span>(), <span class="ident">field</span>.<span class="ident">database_name</span>())),
             <span class="ident">arity</span>,
         )
     }

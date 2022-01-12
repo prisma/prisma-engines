@@ -654,7 +654,7 @@
                         <span class="ident">next_datamodel</span>
                             .<span class="ident">db</span>
                             .<span class="ident">walk_models</span>()
-                            .<span class="ident">find</span>(<span class="op">|</span><span class="ident">model</span><span class="op">|</span> <span class="ident">model</span>.<span class="ident">final_database_name</span>() <span class="op">==</span> <span class="ident">table</span>.<span class="ident">name</span>())
+                            .<span class="ident">find</span>(<span class="op">|</span><span class="ident">model</span><span class="op">|</span> <span class="ident">model</span>.<span class="ident">database_name</span>() <span class="op">==</span> <span class="ident">table</span>.<span class="ident">name</span>())
                             .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">model</span><span class="op">|</span> <span class="ident">model</span>.<span class="ident">scalar_fields</span>().<span class="ident">find</span>(<span class="op">|</span><span class="ident">sf</span><span class="op">|</span> <span class="ident">sf</span>.<span class="ident">name</span>() <span class="op">==</span> <span class="ident">column</span>.<span class="ident">name</span>()))
                             .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">field</span><span class="op">|</span> {
                                 <span class="ident">field</span>

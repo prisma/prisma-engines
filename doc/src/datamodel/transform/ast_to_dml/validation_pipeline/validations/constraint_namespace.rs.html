@@ -330,7 +330,7 @@
         <span class="kw">for</span> <span class="ident">index</span> <span class="kw">in</span> <span class="ident">db</span>.<span class="ident">walk_models</span>().<span class="ident">flat_map</span>(<span class="op">|</span><span class="ident">m</span><span class="op">|</span> <span class="ident">m</span>.<span class="ident">indexes</span>()) {
             <span class="kw">let</span> <span class="ident">counter</span> <span class="op">=</span> <span class="self">self</span>
                 .<span class="ident">global</span>
-                .<span class="ident">entry</span>((<span class="ident">scope</span>, <span class="ident">index</span>.<span class="ident">final_database_name</span>(<span class="ident">connector</span>)))
+                .<span class="ident">entry</span>((<span class="ident">scope</span>, <span class="ident">index</span>.<span class="ident">constraint_name</span>(<span class="ident">connector</span>)))
                 .<span class="ident">or_default</span>();
             <span class="kw-2">*</span><span class="ident">counter</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
         }
@@ -361,7 +361,7 @@
         <span class="ident">scope</span>: <span class="ident">ConstraintScope</span>,
     ) {
         <span class="kw">for</span> <span class="ident">model</span> <span class="kw">in</span> <span class="ident">db</span>.<span class="ident">walk_models</span>() {
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">name</span>) <span class="op">=</span> <span class="ident">model</span>.<span class="ident">primary_key</span>().<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">k</span><span class="op">|</span> <span class="ident">k</span>.<span class="ident">final_database_name</span>(<span class="ident">connector</span>)) {
+            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">name</span>) <span class="op">=</span> <span class="ident">model</span>.<span class="ident">primary_key</span>().<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">k</span><span class="op">|</span> <span class="ident">k</span>.<span class="ident">constraint_name</span>(<span class="ident">connector</span>)) {
                 <span class="kw">let</span> <span class="ident">counter</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">global</span>.<span class="ident">entry</span>((<span class="ident">scope</span>, <span class="ident">name</span>)).<span class="ident">or_default</span>();
                 <span class="kw-2">*</span><span class="ident">counter</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
             }
@@ -399,7 +399,7 @@
             <span class="kw">for</span> <span class="ident">index</span> <span class="kw">in</span> <span class="ident">model</span>.<span class="ident">indexes</span>() {
                 <span class="kw">let</span> <span class="ident">counter</span> <span class="op">=</span> <span class="self">self</span>
                     .<span class="ident">local</span>
-                    .<span class="ident">entry</span>((<span class="ident">model</span>.<span class="ident">model_id</span>(), <span class="ident">scope</span>, <span class="ident">index</span>.<span class="ident">final_database_name</span>(<span class="ident">connector</span>)))
+                    .<span class="ident">entry</span>((<span class="ident">model</span>.<span class="ident">model_id</span>(), <span class="ident">scope</span>, <span class="ident">index</span>.<span class="ident">constraint_name</span>(<span class="ident">connector</span>)))
                     .<span class="ident">or_default</span>();
 
                 <span class="kw-2">*</span><span class="ident">counter</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
@@ -415,7 +415,7 @@
         <span class="ident">scope</span>: <span class="ident">ConstraintScope</span>,
     ) {
         <span class="kw">for</span> <span class="ident">model</span> <span class="kw">in</span> <span class="ident">db</span>.<span class="ident">walk_models</span>() {
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">name</span>) <span class="op">=</span> <span class="ident">model</span>.<span class="ident">primary_key</span>().<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">pk</span><span class="op">|</span> <span class="ident">pk</span>.<span class="ident">final_database_name</span>(<span class="ident">connector</span>)) {
+            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">name</span>) <span class="op">=</span> <span class="ident">model</span>.<span class="ident">primary_key</span>().<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">pk</span><span class="op">|</span> <span class="ident">pk</span>.<span class="ident">constraint_name</span>(<span class="ident">connector</span>)) {
                 <span class="kw">let</span> <span class="ident">counter</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">local</span>.<span class="ident">entry</span>((<span class="ident">model</span>.<span class="ident">model_id</span>(), <span class="ident">scope</span>, <span class="ident">name</span>)).<span class="ident">or_default</span>();
                 <span class="kw-2">*</span><span class="ident">counter</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
             }

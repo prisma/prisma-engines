@@ -601,8 +601,8 @@
     }
 
     <span class="doccomment">/// The contents of the `map: ...` argument of the `@relation` attribute.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">foreign_key_name</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;ast</span> <span class="ident">str</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">forward_relation_field</span>().<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">field</span><span class="op">|</span> <span class="ident">field</span>.<span class="ident">foreign_key_name</span>())
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">mapped_name</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;ast</span> <span class="ident">str</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">forward_relation_field</span>().<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">field</span><span class="op">|</span> <span class="ident">field</span>.<span class="ident">mapped_name</span>())
     }
 
     <span class="doccomment">/// The back relation field, or virtual relation field (on model B, the referenced model).</span>
