@@ -372,3 +372,39 @@ these issues in Migrate.
       merge conflict in the schema, which should prompt questions (team members
       disagreeing on the datamodel)
 
+### I want to customize a many-to-many relation table (e.g. to add a primary key)
+
+Unfortunately the schema of these tables is a very deep assumption in all of
+migrate, introspection and the query engine, so it's not possible. The long
+term solution is that we want to replace the current system with more explicit
+many-to-many relations where the join table can be specified.
+
+Currently, the only solution would be to stop using implicit many-to-many
+relations (list relation fields on both sides) and use an explicit join table with two
+inline relations:
+
+```prisma
+model Cat {
+  id Int @id
+  boxes CatBoxes[]
+}
+
+model CatBoxes {
+  id Int @id @default(autoincrement())
+  catId Int
+  boxId Int
+
+  cat Cat @relation(fields: [catId], references: [id])
+  box Box @relation(field: [boxId], references: [id])
+}
+
+model Box {
+  id Int @id
+  cats CatBoxes[]
+}
+```
+
+Note that the Client API for this schema will not be as ergonomic as a proper
+many-to-many relations API. There are issues about this problem,
+https://github.com/prisma/prisma/issues/6135 for example. Please participate in
+these discussions to help push design work forward.
