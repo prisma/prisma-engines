@@ -217,7 +217,7 @@ fn visit_field_unique<'ast>(
     args: &mut Arguments<'ast>,
     ctx: &mut Context<'ast>,
 ) {
-    let db_name = match args.optional_arg("map").map(|name| name.as_str()) {
+    let mapped_name = match args.optional_arg("map").map(|name| name.as_str()) {
         Some(Ok("")) => {
             ctx.push_error(args.new_attribute_validation_error("The `map` argument cannot be an empty string."));
             None
@@ -266,7 +266,7 @@ fn visit_field_unique<'ast>(
                 length,
             }],
             source_field: Some(field_id),
-            db_name,
+            mapped_name,
             ..Default::default()
         },
     ))
@@ -383,7 +383,7 @@ fn model_fulltext<'ast>(
     };
 
     common_index_validations(args, &mut index_attribute, model_id, ctx);
-    let db_name = match args.optional_arg("map").map(|name| name.as_str()) {
+    let mapped_name = match args.optional_arg("map").map(|name| name.as_str()) {
         Some(Ok("")) => {
             ctx.push_error(args.new_attribute_validation_error("The `map` argument cannot be an empty string."));
             None
@@ -396,7 +396,7 @@ fn model_fulltext<'ast>(
         None => None,
     };
 
-    index_attribute.db_name = db_name;
+    index_attribute.mapped_name = mapped_name;
 
     data.ast_indexes.push((args.attribute(), index_attribute));
 }
@@ -416,7 +416,7 @@ fn model_index<'ast>(
     common_index_validations(args, &mut index_attribute, model_id, ctx);
     let name = get_name_argument(args, ctx);
 
-    let db_name = match args.optional_arg("map").map(|name| name.as_str()) {
+    let mapped_name = match args.optional_arg("map").map(|name| name.as_str()) {
         Some(Ok("")) => {
             ctx.push_error(args.new_attribute_validation_error("The `map` argument cannot be an empty string."));
             None
@@ -441,7 +441,7 @@ fn model_index<'ast>(
     // accordingly. If the datamodel gets freshly rendered it will then be
     // rendered correctly as `map`. We will however error if both `map` and
     // `name` are being used.
-    index_attribute.db_name = match (name, db_name) {
+    index_attribute.mapped_name = match (name, mapped_name) {
         (Some(_), Some(_)) => {
             let error = args.new_attribute_validation_error("The `@@index` attribute accepts the `name` argument as an alias for the `map` argument for legacy reasons. It does not accept both though. Please use the `map` argument to specify the database name of the index.");
             ctx.push_error(error);
@@ -489,7 +489,7 @@ fn model_unique<'ast>(
     let ast_model = &ctx.db.ast()[model_id];
     let name = get_name_argument(args, ctx);
 
-    let db_name = {
+    let mapped_name = {
         // We do not want to break existing datamodels for client purposes that
         // use the old `@@unique([field], name: "ClientANDdbname")` Since we
         // still parse the name argument and pass it to the client they will
@@ -500,7 +500,7 @@ fn model_unique<'ast>(
         // We are fine with that since this is not automatically breaking but
         // rather prompts a migration upon the first run on migrate. The client
         // is unaffected by this.
-        let db_name = match args.optional_arg("map").map(|name| name.as_str()) {
+        let mapped_name = match args.optional_arg("map").map(|name| name.as_str()) {
             Some(Ok("")) => {
                 ctx.push_error(args.new_attribute_validation_error("The `map` argument cannot be an empty string."));
                 None
@@ -517,11 +517,11 @@ fn model_unique<'ast>(
             validate_client_name(args.span(), &ast_model.name.name, name, "@@unique", ctx);
         }
 
-        db_name
+        mapped_name
     };
 
     index_attribute.name = name;
-    index_attribute.db_name = db_name;
+    index_attribute.mapped_name = mapped_name;
 
     data.ast_indexes.push((args.attribute(), index_attribute));
 }
@@ -700,7 +700,7 @@ fn visit_relation<'ast>(
     }
 
     let fk_name = {
-        let db_name = match args.optional_arg("map").map(|name| name.as_str()) {
+        let mapped_name = match args.optional_arg("map").map(|name| name.as_str()) {
             Some(Ok("")) => {
                 ctx.push_error(args.new_attribute_validation_error("The `map` argument cannot be an empty string."));
                 None
@@ -713,10 +713,10 @@ fn visit_relation<'ast>(
             None => None,
         };
 
-        db_name
+        mapped_name
     };
 
-    relation_field.fk_name = fk_name;
+    relation_field.mapped_name = fk_name;
 }
 
 enum FieldResolutionError<'ast> {

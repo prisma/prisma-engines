@@ -19,7 +19,7 @@ impl SqlSchemaCalculatorFlavour for MysqlFlavour {
             let sql_enum = sql::Enum {
                 name: format!(
                     "{model_name}_{field_name}",
-                    model_name = field.model().final_database_name(),
+                    model_name = field.model().database_name(),
                     field_name = field.database_name()
                 ),
                 values: enum_tpe.values().map(|v| v.database_name().to_owned()).collect(),
@@ -39,11 +39,7 @@ impl SqlSchemaCalculatorFlavour for MysqlFlavour {
         let arity = super::super::column_arity(field.ast_field().arity);
 
         sql::ColumnType::pure(
-            sql::ColumnTypeFamily::Enum(format!(
-                "{}_{}",
-                field.model().final_database_name(),
-                field.database_name()
-            )),
+            sql::ColumnTypeFamily::Enum(format!("{}_{}", field.model().database_name(), field.database_name())),
             arity,
         )
     }

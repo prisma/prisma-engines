@@ -54,7 +54,7 @@ fn push_model_tables(ctx: &mut Context<'_>) {
                 .collect(),
             sequence: None,
             constraint_name: pk
-                .final_database_name(ctx.flavour.datamodel_connector())
+                .constraint_name(ctx.flavour.datamodel_connector())
                 .map(|c| c.into_owned()),
         });
 
@@ -85,9 +85,7 @@ fn push_model_tables(ctx: &mut Context<'_>) {
                 });
 
                 sql::Index {
-                    name: index
-                        .final_database_name(ctx.flavour.datamodel_connector())
-                        .into_owned(),
+                    name: index.constraint_name(ctx.flavour.datamodel_connector()).into_owned(),
                     // The model index definition uses the model field names, but the SQL Index wants the column names.
                     columns,
                     tpe: index_type,
@@ -97,7 +95,7 @@ fn push_model_tables(ctx: &mut Context<'_>) {
             .collect();
 
         let mut table = sql::Table {
-            name: model.final_database_name().to_owned(),
+            name: model.database_name().to_owned(),
             columns,
             indices,
             primary_key,
@@ -134,7 +132,7 @@ fn push_inline_relations(model: ModelWalker<'_, '_>, table: &mut sql::Table, ctx
         table.foreign_keys.push(sql::ForeignKey {
             constraint_name: Some(relation.constraint_name(ctx.flavour.datamodel_connector()).into_owned()),
             columns: fk_columns,
-            referenced_table: relation.referenced_model().final_database_name().to_owned(),
+            referenced_table: relation.referenced_model().database_name().to_owned(),
             referenced_columns: relation_field
                 .referenced_fields()
                 .expect("Expected references to be defined on relation field")
@@ -172,7 +170,7 @@ fn push_relation_tables(ctx: &mut Context<'_>) {
                 sql::ForeignKey {
                     constraint_name: None,
                     columns: vec![model_a_column.into()],
-                    referenced_table: model_a.final_database_name().into(),
+                    referenced_table: model_a.database_name().into(),
                     referenced_columns: vec![model_a_id.database_name().into()],
                     on_update_action: flavour.m2m_foreign_key_action(model_a, model_b),
                     on_delete_action: flavour.m2m_foreign_key_action(model_a, model_b),
@@ -180,7 +178,7 @@ fn push_relation_tables(ctx: &mut Context<'_>) {
                 sql::ForeignKey {
                     constraint_name: None,
                     columns: vec![model_b_column.into()],
-                    referenced_table: model_b.final_database_name().into(),
+                    referenced_table: model_b.database_name().into(),
                     referenced_columns: vec![model_b_id.database_name().into()],
                     on_update_action: flavour.m2m_foreign_key_action(model_a, model_b),
                     on_delete_action: flavour.m2m_foreign_key_action(model_a, model_b),

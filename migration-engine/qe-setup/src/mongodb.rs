@@ -23,7 +23,7 @@ pub(crate) async fn mongo_setup(schema: &str, url: &str) -> ConnectorResult<()> 
     for model in parsed_schema.db.walk_models() {
         client
             .database(&db_name)
-            .create_collection(model.final_database_name(), None)
+            .create_collection(model.database_name(), None)
             .await
             .unwrap();
     }

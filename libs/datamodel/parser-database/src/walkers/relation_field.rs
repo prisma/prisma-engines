@@ -41,8 +41,8 @@ impl<'ast, 'db> RelationFieldWalker<'ast, 'db> {
     }
 
     /// The foreign key name of the relation (`@relation(map: ...)`).
-    pub fn foreign_key_name(self) -> Option<&'ast str> {
-        self.attributes().fk_name
+    pub fn mapped_name(self) -> Option<&'ast str> {
+        self.attributes().mapped_name
     }
 
     /// The field name.

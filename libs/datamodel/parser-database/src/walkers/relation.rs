@@ -204,8 +204,8 @@ impl<'ast, 'db> InlineRelationWalker<'ast, 'db> {
     }
 
     /// The contents of the `map: ...` argument of the `@relation` attribute.
-    pub fn foreign_key_name(self) -> Option<&'ast str> {
-        self.forward_relation_field().and_then(|field| field.foreign_key_name())
+    pub fn mapped_name(self) -> Option<&'ast str> {
+        self.forward_relation_field().and_then(|field| field.mapped_name())
     }
 
     /// The back relation field, or virtual relation field (on model B, the referenced model).

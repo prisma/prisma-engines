@@ -271,7 +271,7 @@ impl MigrationConnector for SqlMigrationConnector {
                         next_datamodel
                             .db
                             .walk_models()
-                            .find(|model| model.final_database_name() == table.name())
+                            .find(|model| model.database_name() == table.name())
                             .and_then(|model| model.scalar_fields().find(|sf| sf.name() == column.name()))
                             .filter(|field| {
                                 field

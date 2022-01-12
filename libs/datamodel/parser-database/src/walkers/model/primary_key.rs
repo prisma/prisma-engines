@@ -26,7 +26,7 @@ impl<'ast, 'db> PrimaryKeyWalker<'ast, 'db> {
     ///                   ^^^^^^^^^
     /// ```
     pub fn mapped_name(self) -> Option<&'ast str> {
-        self.attribute.db_name
+        self.attribute.mapped_name
     }
 
     /// Is this an `@id` on a specific field, rather than on the model?
