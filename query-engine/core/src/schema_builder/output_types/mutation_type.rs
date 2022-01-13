@@ -147,7 +147,7 @@ fn create_mongodb_run_command_raw() -> OutputField {
         OutputType::json(),
         Some(QueryInfo {
             tag: QueryTag::QueryRaw {
-                query_type: Some("runCommand".to_string()),
+                query_type: Some("runCommandRaw".to_string()),
             },
             model: None,
         }),

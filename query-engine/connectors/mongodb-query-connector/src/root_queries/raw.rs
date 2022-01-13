@@ -32,9 +32,9 @@ impl MongoCommand {
         query_type: Option<String>,
     ) -> crate::Result<MongoCommand> {
         match (query_type.as_deref(), model) {
-            (Some("find"), Some(m)) => Self::find(m, inputs),
-            (Some("aggregate"), Some(m)) => Self::aggregate(m, inputs),
-            (Some("runCommand"), _) => Self::raw(inputs),
+            (Some("findRaw"), Some(m)) => Self::find(m, inputs),
+            (Some("aggregateRaw"), Some(m)) => Self::aggregate(m, inputs),
+            (Some("runCommandRaw"), _) => Self::raw(inputs),
             // This is more of an internal guard in case new raw queries are added. It shouldn't happen
             (_, _) => Err(MongoError::UnhandledError("Unexpected MongoDB raw query".to_string())),
         }
