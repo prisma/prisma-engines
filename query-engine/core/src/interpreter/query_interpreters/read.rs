@@ -10,10 +10,11 @@ pub fn execute<'conn>(
     tx: &'conn mut dyn ConnectionLike,
     query: ReadQuery,
     parent_result: Option<&'conn ManyRecords>,
+    trace_id: Option<String>,
 ) -> BoxFuture<'conn, InterpretationResult<QueryResult>> {
     let fut = async move {
         match query {
-            ReadQuery::RecordQuery(q) => read_one(tx, q).await,
+            ReadQuery::RecordQuery(q) => read_one(tx, q, trace_id).await,
             ReadQuery::ManyRecordsQuery(q) => read_many(tx, q).await,
             ReadQuery::RelatedRecordsQuery(q) => read_related(tx, q, parent_result).await,
             ReadQuery::AggregateRecordsQuery(q) => aggregate(tx, q).await,
@@ -24,7 +25,8 @@ pub fn execute<'conn>(
 }
 
 /// Queries a single record.
-fn read_one(tx: &mut dyn ConnectionLike, query: RecordQuery) -> BoxFuture<'_, InterpretationResult<QueryResult>> {
+#[tracing::instrument(skip(tx, query, trace_id))]
+fn read_one(tx: &mut dyn ConnectionLike, query: RecordQuery, trace_id: Option<String>) -> BoxFuture<'_, InterpretationResult<QueryResult>> {
     let fut = async move {
         let model = query.model;
         let filter = query.filter.expect("Expected filter to be set for ReadOne query.");
@@ -72,6 +74,7 @@ fn read_one(tx: &mut dyn ConnectionLike, query: RecordQuery) -> BoxFuture<'_, In
 ///    We need to select IDs / uniques alongside the distincts, which doesn't work in SQL, as all records
 ///    are distinct by definition if a unique is in the selection set.
 /// -> Unstable cursors can't reliably be fetched by the underlying datasource, so we need to process part of it in-memory.
+#[tracing::instrument(skip(tx, query))]
 fn read_many(
     tx: &mut dyn ConnectionLike,
     mut query: ManyRecordsQuery,
@@ -195,7 +198,7 @@ fn process_nested<'conn>(
             let mut nested_results = Vec::with_capacity(nested.len());
 
             for query in nested {
-                let result = execute(tx, query, parent_result).await?;
+                let result = execute(tx, query, parent_result, None).await?;
                 nested_results.push(result);
             }
 

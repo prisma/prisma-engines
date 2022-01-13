@@ -269,9 +269,10 @@ impl QueryEngine {
                         let span = tracing::span!(Level::TRACE, "query");
 
                         span.set_parent(cx);
+                        let trace_id = trace.get("traceparent").map(String::from);
 
                         let handler = GraphQlHandler::new(engine.executor(), engine.query_schema());
-                        Ok(handler.handle(query, tx_id.map(TxId::from)).await)
+                        Ok(handler.handle(query, tx_id.map(TxId::from), trace_id).await)
                     })
                     .await
             }

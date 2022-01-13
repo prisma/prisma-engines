@@ -32,17 +32,20 @@ impl QueryExt for PooledConnection {}
 pub trait QueryExt: Queryable + Send + Sync {
     /// Filter and map the resulting types with the given identifiers.
     #[tracing::instrument(skip(self, q, idents))]
-    async fn filter(&self, q: Query<'_>, idents: &[ColumnMetadata<'_>]) -> crate::Result<Vec<SqlRow>> {
+    async fn filter(&self, q: Query<'_>, idents: &[ColumnMetadata<'_>], trace_id: Option<String>) -> crate::Result<Vec<SqlRow>> {
         let span = span!(tracing::Level::INFO, "filter read query");
 
         let otel_ctx = span.context();
         let span_ref = otel_ctx.span();
         let span_ctx = span_ref.span_context();
 
-        let q = match q {
-            Query::Select(x) if span_ctx.trace_flags() == TraceFlags::SAMPLED => {
+        let q = match (q, trace_id) {
+            (Query::Select(x), _) if span_ctx.trace_flags() == TraceFlags::SAMPLED => {
                 Query::Select(Box::from(x.comment(trace_parent_to_string(span_ctx))))
-            }
+            },
+            (Query::Select(x), Some(traceparent)) => {
+                Query::Select(Box::from(x.comment(format!("traceparent={}", traceparent))))
+            },
             _ => q,
         };
 

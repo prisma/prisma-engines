@@ -27,6 +27,7 @@ pub trait QueryExecutor: TransactionManager {
         tx_id: Option<TxId>,
         operation: Operation,
         query_schema: QuerySchemaRef,
+        trace_id: Option<String>,
     ) -> crate::Result<ResponseData>;
 
     /// Executes a collection of operations as either a fanout of individual operations (non-transactional), or in series (transactional).
@@ -41,6 +42,7 @@ pub trait QueryExecutor: TransactionManager {
         operations: Vec<Operation>,
         transactional: bool,
         query_schema: QuerySchemaRef,
+        trace_id: Option<String>,
     ) -> crate::Result<Vec<crate::Result<ResponseData>>>;
 
     fn primary_connector(&self) -> &(dyn Connector + Send + Sync);
