@@ -61,7 +61,7 @@ impl MongoError {
     pub fn into_connector_error(self) -> ConnectorError {
         match self {
             MongoError::Unsupported(feature) => ConnectorError::from_kind(ErrorKind::UnsupportedFeature(feature)),
-            MongoError::UnhandledError(reason) => ConnectorError::from_kind(ErrorKind::UnsupportedFeature(reason)),
+            MongoError::UnhandledError(reason) => ConnectorError::from_kind(ErrorKind::RawApiError(reason)),
             MongoError::UuidError(err) => ConnectorError::from_kind(ErrorKind::ConversionError(err.into())),
             MongoError::JsonError(err) => ConnectorError::from_kind(ErrorKind::ConversionError(err.into())),
             MongoError::BsonDeserializationError(err) => {
