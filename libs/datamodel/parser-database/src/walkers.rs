@@ -51,6 +51,11 @@ impl<'ast> ParserDatabase<'ast> {
         }
     }
 
+    /// Find an enum by ID.
+    pub fn walk_enum(&self, enum_id: ast::EnumId) -> EnumWalker<'ast, '_> {
+        Walker { db: self, id: enum_id }
+    }
+
     /// Walk all the models in the schema.
     pub fn walk_models(&self) -> impl Iterator<Item = ModelWalker<'ast, '_>> + '_ {
         self.ast()
@@ -75,7 +80,10 @@ impl<'ast> ParserDatabase<'ast> {
     /// Walk all the relations in the schema. A relation may be defined by one or two fields; in
     /// both cases, it is still a single relation.
     pub fn walk_relations(&self) -> impl Iterator<Item = RelationWalker<'ast, '_>> + '_ {
-        (0..self.relations.relations_storage.len()).map(move |relation_id| RelationWalker { db: self, relation_id })
+        self.relations.iter().map(move |relation_id| Walker {
+            db: self,
+            id: relation_id,
+        })
     }
 
     /// Iterate all complete relations that are not many to many and are

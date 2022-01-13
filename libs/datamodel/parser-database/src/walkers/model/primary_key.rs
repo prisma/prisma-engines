@@ -26,7 +26,7 @@ impl<'ast, 'db> PrimaryKeyWalker<'ast, 'db> {
     ///                   ^^^^^^^^^
     /// ```
     pub fn mapped_name(self) -> Option<&'ast str> {
-        self.attribute.db_name
+        self.attribute.mapped_name
     }
 
     /// Is this an `@id` on a specific field, rather than on the model?
@@ -84,10 +84,7 @@ impl<'ast, 'db> PrimaryKeyWalker<'ast, 'db> {
     }
 
     /// Do the constrained fields match exactly these?
-    pub(crate) fn contains_exactly_fields(
-        self,
-        fields: impl ExactSizeIterator<Item = ScalarFieldWalker<'ast, 'db>>,
-    ) -> bool {
+    pub fn contains_exactly_fields(self, fields: impl ExactSizeIterator<Item = ScalarFieldWalker<'ast, 'db>>) -> bool {
         self.attribute.fields.len() == fields.len() && self.fields().zip(fields).all(|(a, b)| a == b)
     }
 }

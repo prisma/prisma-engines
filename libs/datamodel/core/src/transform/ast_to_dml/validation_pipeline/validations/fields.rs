@@ -403,7 +403,7 @@ pub(super) fn validate_unsupported_field_type(field: ScalarFieldWalker<'_, '_>, 
 
             let msg = format!(
                         "The type `Unsupported(\"{}\")` you specified in the type definition for the field `{}` is supported as a native type by Prisma. Please use the native type notation `{} @{}.{}` for full support.",
-                        unsupported_lit, field.name(), prisma_type.as_str(), &source.name, native_type.render()
+                        unsupported_lit, field.name(), prisma_type.as_str(), &source.name, native_type
                     );
 
             ctx.push_error(DatamodelError::new_validation_error(msg, field.ast_field().span));

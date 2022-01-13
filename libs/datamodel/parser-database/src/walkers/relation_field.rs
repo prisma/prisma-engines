@@ -1,7 +1,7 @@
 use crate::{
     ast::{self, FieldArity},
     types::RelationField,
-    walkers::{ModelWalker, ScalarFieldWalker},
+    walkers::{ModelWalker, RelationWalker, ScalarFieldWalker},
     ParserDatabase, ReferentialAction,
 };
 use std::{
@@ -41,8 +41,8 @@ impl<'ast, 'db> RelationFieldWalker<'ast, 'db> {
     }
 
     /// The foreign key name of the relation (`@relation(map: ...)`).
-    pub fn foreign_key_name(self) -> Option<&'ast str> {
-        self.attributes().fk_name
+    pub fn mapped_name(self) -> Option<&'ast str> {
+        self.attributes().mapped_name
     }
 
     /// The field name.
@@ -61,12 +61,22 @@ impl<'ast, 'db> RelationFieldWalker<'ast, 'db> {
 
     /// The onDelete argument on the relation.
     pub fn explicit_on_delete(self) -> Option<ReferentialAction> {
-        self.attributes().on_delete
+        self.attributes().on_delete.map(|(action, _span)| action)
+    }
+
+    /// The onDelete argument on the relation.
+    pub fn explicit_on_delete_span(self) -> Option<ast::Span> {
+        self.attributes().on_delete.map(|(_action, span)| span)
     }
 
     /// The onUpdate argument on the relation.
     pub fn explicit_on_update(self) -> Option<ReferentialAction> {
-        self.attributes().on_update
+        self.attributes().on_update.map(|(action, _span)| action)
+    }
+
+    /// The onUpdate argument on the relation.
+    pub fn explicit_on_update_span(self) -> Option<ast::Span> {
+        self.attributes().on_update.map(|(_action, span)| span)
     }
 
     /// The relation name explicitly written in the schema source.
@@ -120,6 +130,13 @@ impl<'ast, 'db> RelationFieldWalker<'ast, 'db> {
                 .iter()
                 .map(move |field_id| self.related_model().scalar_field(*field_id))
         })
+    }
+
+    /// The relation this field is part of.
+    pub fn relation(self) -> RelationWalker<'ast, 'db> {
+        let model = self.model();
+        let mut relations = model.relations_from().chain(model.relations_to());
+        relations.find(|r| r.has_field(self.model_id, self.field_id)).unwrap()
     }
 
     /// The name of the relation. Either uses the `name` (or default) argument,

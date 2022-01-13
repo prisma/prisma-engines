@@ -4,7 +4,7 @@ use crate::{
     error::SystemDatabase,
     SqlMigrationConnector,
 };
-use datamodel::{common::preview_features::PreviewFeature, walkers::walk_scalar_fields, Datamodel};
+use datamodel::{common::preview_features::PreviewFeature, parser_database::ScalarType, ValidatedSchema};
 use enumflags2::BitFlags;
 use indoc::indoc;
 use migration_connector::{migrations_directory::MigrationDirectory, ConnectorError, ConnectorResult};
@@ -141,6 +141,10 @@ impl SqlFlavour for MysqlFlavour {
         Ok(connection.raw_cmd(&query).await?)
     }
 
+    fn datamodel_connector(&self) -> &'static dyn datamodel::datamodel_connector::Connector {
+        sql_datamodel_connector::MYSQL
+    }
+
     async fn run_query_script(&self, sql: &str, connection: &Connection) -> ConnectorResult<()> {
         let convert_error = |error: my::Error| match self.convert_server_error(&error) {
             Some(e) => ConnectorError::from(e),
@@ -227,7 +231,7 @@ impl SqlFlavour for MysqlFlavour {
 
     fn check_database_version_compatibility(
         &self,
-        datamodel: &Datamodel,
+        datamodel: &ValidatedSchema<'_>,
     ) -> Option<user_facing_errors::common::DatabaseVersionIncompatibility> {
         if self.is_mysql_5_6() {
             let mut errors = Vec::new();
@@ -456,16 +460,24 @@ pub(crate) enum Circumstances {
     IsVitess,
 }
 
-fn check_datamodel_for_mysql_5_6(datamodel: &Datamodel, errors: &mut Vec<String>) {
-    walk_scalar_fields(datamodel).for_each(|field| {
-        if field.field_type().is_json() {
-            errors.push(format!(
-                "The `Json` data type used in {}.{} is not supported on MySQL 5.6.",
-                field.model().name(),
-                field.name()
-            ))
-        }
-    });
+fn check_datamodel_for_mysql_5_6(datamodel: &ValidatedSchema<'_>, errors: &mut Vec<String>) {
+    datamodel
+        .db
+        .walk_models()
+        .flat_map(|model| model.scalar_fields())
+        .for_each(|field| {
+            if field
+                .scalar_type()
+                .map(|t| matches!(t, ScalarType::Json))
+                .unwrap_or(false)
+            {
+                errors.push(format!(
+                    "The `Json` data type used in {}.{} is not supported on MySQL 5.6.",
+                    field.model().name(),
+                    field.name()
+                ))
+            }
+        });
 }
 
 #[cfg(test)]

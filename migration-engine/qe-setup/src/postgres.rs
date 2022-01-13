@@ -33,10 +33,11 @@ pub(crate) async fn postgres_setup(url: String, prisma_schema: &str) -> Connecto
         let prisma_schema2 = prisma_schema.replace("provider = \"cockroachdb\"", "provider = \"postgres\"");
         let api = migration_core::migration_api(&prisma_schema2)?;
         // 2. create the database schema for given Prisma schema
-        let (config, schema) = datamodel::parse_schema(prisma_schema).unwrap();
+        let ast = datamodel::parse_schema_ast(prisma_schema).unwrap();
+        let schema = datamodel::parse_schema_parserdb(prisma_schema, &ast).unwrap();
         let migration = api
             .connector()
-            .diff(DiffTarget::Empty, DiffTarget::Datamodel((&config, &schema)))
+            .diff(DiffTarget::Empty, DiffTarget::Datamodel(&schema))
             .await
             .unwrap();
         api.connector()

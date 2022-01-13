@@ -6,7 +6,7 @@ use datamodel_connector::{Connector, EmptyDatamodelConnector, ReferentialIntegri
 use enumflags2::BitFlags;
 use parser_database::ParserDatabase;
 
-pub(crate) struct ValidateOutput<'ast> {
+pub struct ValidateOutput<'ast> {
     pub(crate) db: ParserDatabase<'ast>,
     pub(crate) diagnostics: Diagnostics,
     pub(crate) referential_integrity: ReferentialIntegrity,
@@ -27,7 +27,6 @@ pub(crate) fn validate<'ast>(
     sources: &[configuration::Datasource],
     preview_features: BitFlags<PreviewFeature>,
     diagnostics: Diagnostics,
-    relation_transformation_enabled: bool,
 ) -> ValidateOutput<'ast> {
     let source = sources.first();
     let connector = source.map(|s| s.active_connector).unwrap_or(&EmptyDatamodelConnector);
@@ -57,7 +56,7 @@ pub(crate) fn validate<'ast>(
         diagnostics: &mut output.diagnostics,
     };
 
-    validations::validate(&mut context, relation_transformation_enabled);
+    validations::validate(&mut context);
 
     output
 }

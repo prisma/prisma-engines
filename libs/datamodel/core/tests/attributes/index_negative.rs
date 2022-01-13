@@ -140,6 +140,51 @@ fn index_does_not_accept_sort_or_length_without_extended_indexes() {
 }
 
 #[test]
+fn index_does_not_accept_missing_length_with_extended_indexes() {
+    let dml = with_header(
+        r#"
+     model User {
+         id         Int    @id
+         firstName  String @unique @test.Text
+         
+         @@index([firstName])
+     }
+     "#,
+        Provider::Mysql,
+        &["extendedIndexes"],
+    );
+
+    let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
+
+    let expectation = expect![[r#"
+        [1;91merror[0m: [1mNative type Text cannot be unique in MySQL. If you are using the `extendedIndexes` preview feature you can add a `length` argument to allow this.[0m
+          [1;94m-->[0m  [4mschema.prisma:12[0m
+        [1;94m   | [0m
+        [1;94m11 | [0m
+        [1;94m12 | [0m     [1;91mmodel User {[0m
+        [1;94m13 | [0m         id         Int    @id
+        [1;94m14 | [0m         firstName  String @unique @test.Text
+        [1;94m15 | [0m         
+        [1;94m16 | [0m         @@index([firstName])
+        [1;94m17 | [0m     }
+        [1;94m   | [0m
+        [1;91merror[0m: [1mYou cannot define an index on fields with Native type Text of MySQL. If you are using the `extendedIndexes` preview feature you can add a `length` argument to allow this.[0m
+          [1;94m-->[0m  [4mschema.prisma:12[0m
+        [1;94m   | [0m
+        [1;94m11 | [0m
+        [1;94m12 | [0m     [1;91mmodel User {[0m
+        [1;94m13 | [0m         id         Int    @id
+        [1;94m14 | [0m         firstName  String @unique @test.Text
+        [1;94m15 | [0m         
+        [1;94m16 | [0m         @@index([firstName])
+        [1;94m17 | [0m     }
+        [1;94m   | [0m
+    "#]];
+
+    expectation.assert_eq(&error)
+}
+
+#[test]
 fn postgres_disallows_unique_length_prefix() {
     let dml = indoc! {r#"
         model A {

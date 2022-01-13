@@ -18,7 +18,7 @@ pub(super) fn has_a_unique_constraint_name(
     names: &super::Names<'_>,
     ctx: &mut Context<'_>,
 ) {
-    let name = index.final_database_name(ctx.connector);
+    let name = index.constraint_name(ctx.connector);
     let model = index.model();
 
     for violation in names

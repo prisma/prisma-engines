@@ -48,7 +48,7 @@ impl MongoDbMigrationConnector {
 
     async fn mongodb_schema_from_diff_target(&self, target: DiffTarget<'_>) -> ConnectorResult<MongoSchema> {
         match target {
-            DiffTarget::Datamodel((_config, schema)) => Ok(schema_calculator::calculate(schema)),
+            DiffTarget::Datamodel(schema) => Ok(schema_calculator::calculate(schema)),
             DiffTarget::Database => self.client().await?.describe().await,
             DiffTarget::Migrations(_) => Err(unsupported_command_error()),
             DiffTarget::Empty => Ok(MongoSchema::default()),
@@ -117,6 +117,8 @@ impl MigrationConnector for MongoDbMigrationConnector {
     async fn acquire_lock(&self) -> ConnectorResult<()> {
         Ok(())
     }
+
+    fn set_host(&mut self, _host: Box<dyn migration_connector::ConnectorHost>) {}
 
     async fn validate_migrations(
         &self,

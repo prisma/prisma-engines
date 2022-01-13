@@ -1,21 +1,23 @@
-use crate::{constraint_names::ConstraintNames, Connector, ReferentialAction, ReferentialIntegrity};
-use parser_database::{ast, walkers::*, ScalarType};
+use crate::{
+    constraint_names::ConstraintNames, Connector, NativeTypeInstance, ReferentialAction, ReferentialIntegrity,
+};
+use parser_database::{ast, walkers::*};
 use std::borrow::Cow;
 
 pub trait IndexWalkerExt<'ast> {
-    fn final_database_name(self, connector: &dyn Connector) -> Cow<'ast, str>;
+    fn constraint_name(self, connector: &dyn Connector) -> Cow<'ast, str>;
 }
 
 impl<'ast> IndexWalkerExt<'ast> for IndexWalker<'ast, '_> {
-    fn final_database_name(self, connector: &dyn Connector) -> Cow<'ast, str> {
+    fn constraint_name(self, connector: &dyn Connector) -> Cow<'ast, str> {
         if let Some(mapped_name) = self.mapped_name() {
             return Cow::from(mapped_name);
         }
 
         let model = self.model();
-        let model_db_name = model.final_database_name();
+        let model_db_name = model.database_name();
         let field_db_names: Vec<&str> = model
-            .get_field_db_names(&self.fields().map(|f| f.field_id()).collect::<Vec<_>>())
+            .get_field_database_names(&self.fields().map(|f| f.field_id()).collect::<Vec<_>>())
             .collect();
 
         if self.is_unique() {
@@ -28,69 +30,13 @@ impl<'ast> IndexWalkerExt<'ast> for IndexWalker<'ast, '_> {
 
 pub trait DefaultValueExt<'ast> {
     fn constraint_name(self, connector: &dyn Connector) -> Cow<'ast, str>;
-    fn dml_default_kind(self) -> dml::default_value::DefaultKind;
 }
 
 impl<'ast> DefaultValueExt<'ast> for DefaultValueWalker<'ast, '_> {
-    fn dml_default_kind(self) -> dml::default_value::DefaultKind {
-        use dml::{
-            default_value::{DefaultKind, ValueGenerator},
-            prisma_value::PrismaValue,
-        };
-
-        // This has all been validated in parser-database, so unwrapping is always safe.
-        match self.value() {
-            ast::Expression::Function(funcname, args, _) if funcname == "dbgenerated" => {
-                DefaultKind::Expression(ValueGenerator::new_dbgenerated(
-                    args.arguments
-                        .get(0)
-                        .and_then(|arg| arg.value.as_string_value())
-                        .map(|(val, _)| val.to_owned())
-                        .unwrap_or_else(String::new),
-                ))
-            }
-            ast::Expression::Function(funcname, _args, _) if funcname == "autoincrement" => {
-                DefaultKind::Expression(ValueGenerator::new_autoincrement())
-            }
-            ast::Expression::Function(funcname, _args, _) if funcname == "uuid" => {
-                DefaultKind::Expression(ValueGenerator::new_uuid())
-            }
-            ast::Expression::Function(funcname, _args, _) if funcname == "cuid" => {
-                DefaultKind::Expression(ValueGenerator::new_cuid())
-            }
-            ast::Expression::Function(funcname, _args, _) if funcname == "now" => {
-                DefaultKind::Expression(ValueGenerator::new_now())
-            }
-            ast::Expression::NumericValue(num, _) => match self.field().scalar_type() {
-                Some(ScalarType::Int) => DefaultKind::Single(PrismaValue::Int(num.parse().unwrap())),
-                Some(ScalarType::BigInt) => DefaultKind::Single(PrismaValue::BigInt(num.parse().unwrap())),
-                Some(ScalarType::Float) => DefaultKind::Single(PrismaValue::Float(num.parse().unwrap())),
-                Some(ScalarType::Decimal) => DefaultKind::Single(PrismaValue::Float(num.parse().unwrap())),
-                other => unreachable!("{:?}", other),
-            },
-            ast::Expression::ConstantValue(v, _) => match self.field().scalar_type() {
-                Some(ScalarType::Boolean) => DefaultKind::Single(PrismaValue::Boolean(v.parse().unwrap())),
-                None => DefaultKind::Single(PrismaValue::Enum(v.to_owned())),
-                other => unreachable!("{:?}", other),
-            },
-            ast::Expression::StringValue(v, _) => match self.field().scalar_type() {
-                Some(ScalarType::DateTime) => DefaultKind::Single(PrismaValue::DateTime(v.parse().unwrap())),
-                Some(ScalarType::String) => DefaultKind::Single(PrismaValue::String(v.parse().unwrap())),
-                Some(ScalarType::Json) => DefaultKind::Single(PrismaValue::Json(v.parse().unwrap())),
-                Some(ScalarType::Decimal) => DefaultKind::Single(PrismaValue::Float(v.parse().unwrap())),
-                Some(ScalarType::Bytes) => {
-                    DefaultKind::Single(PrismaValue::Bytes(dml::prisma_value::decode_bytes(v).unwrap()))
-                }
-                other => unreachable!("{:?}", other),
-            },
-            other => unreachable!("{:?}", other),
-        }
-    }
-
     fn constraint_name(self, connector: &dyn Connector) -> Cow<'ast, str> {
         self.mapped_name().map(Cow::from).unwrap_or_else(|| {
             let name = ConstraintNames::default_name(
-                self.field().model().final_database_name(),
+                self.field().model().database_name(),
                 self.field().database_name(),
                 connector,
             );
@@ -101,19 +47,21 @@ impl<'ast> DefaultValueExt<'ast> for DefaultValueWalker<'ast, '_> {
 }
 
 pub trait PrimaryKeyWalkerExt<'ast> {
-    fn final_database_name(self, connector: &dyn Connector) -> Option<Cow<'ast, str>>;
+    /// This will be None if and only if the connector does not support named primary keys. It can
+    /// be a generated name or one explicitly set in the schema.
+    fn constraint_name(self, connector: &dyn Connector) -> Option<Cow<'ast, str>>;
 }
 
 impl<'ast> PrimaryKeyWalkerExt<'ast> for PrimaryKeyWalker<'ast, '_> {
-    fn final_database_name(self, connector: &dyn Connector) -> Option<Cow<'ast, str>> {
+    fn constraint_name(self, connector: &dyn Connector) -> Option<Cow<'ast, str>> {
         if !connector.supports_named_primary_keys() {
             return None;
         }
 
         Some(
-            self.mapped_name().map(Cow::Borrowed).unwrap_or_else(|| {
-                ConstraintNames::primary_key_name(self.model().final_database_name(), connector).into()
-            }),
+            self.mapped_name()
+                .map(Cow::Borrowed)
+                .unwrap_or_else(|| ConstraintNames::primary_key_name(self.model().database_name(), connector).into()),
         )
     }
 }
@@ -146,19 +94,18 @@ pub trait InlineRelationWalkerExt<'ast> {
 
 impl<'ast> InlineRelationWalkerExt<'ast> for InlineRelationWalker<'ast, '_> {
     fn constraint_name(self, connector: &dyn Connector) -> Cow<'ast, str> {
-        self.foreign_key_name().map(Cow::Borrowed).unwrap_or_else(|| {
-            let model_database_name = self.referencing_model().final_database_name();
-            match self.referencing_fields() {
-                ReferencingFields::Concrete(fields) => {
-                    let field_names: Vec<&str> = fields.map(|f| f.database_name()).collect();
-                    ConstraintNames::foreign_key_constraint_name(model_database_name, &field_names, connector).into()
-                }
+        self.mapped_name().map(Cow::Borrowed).unwrap_or_else(|| {
+            let model_database_name = self.referencing_model().database_name();
+            let field_names: Vec<&str> = match self.referencing_fields() {
+                ReferencingFields::Concrete(fields) => fields.map(|f| f.database_name()).collect(),
                 ReferencingFields::Inferred(fields) => {
-                    let field_names: Vec<&str> = fields.iter().map(|f| f.name.as_str()).collect();
-                    ConstraintNames::foreign_key_constraint_name(model_database_name, &field_names, connector).into()
+                    let field_names: Vec<_> = fields.iter().map(|f| f.name.as_str()).collect();
+                    return ConstraintNames::foreign_key_constraint_name(model_database_name, &field_names, connector)
+                        .into();
                 }
-                ReferencingFields::NA => unreachable!(),
-            }
+                ReferencingFields::NA => Vec::new(),
+            };
+            ConstraintNames::foreign_key_constraint_name(model_database_name, &field_names, connector).into()
         })
     }
 }
@@ -168,12 +115,30 @@ pub trait ScalarFieldWalkerExt {
     ///
     /// - There is no native type attribute on the field.
     /// - The native type attribute is not valid for the connector.
-    fn native_type_instance(&self, connector: &dyn Connector) -> Option<dml::native_type_instance::NativeTypeInstance>;
+    fn native_type_instance(&self, connector: &dyn Connector) -> Option<NativeTypeInstance>;
 }
 
 impl ScalarFieldWalkerExt for ScalarFieldWalker<'_, '_> {
-    fn native_type_instance(&self, connector: &dyn Connector) -> Option<dml::native_type_instance::NativeTypeInstance> {
+    fn native_type_instance(&self, connector: &dyn Connector) -> Option<NativeTypeInstance> {
         self.raw_native_type()
             .and_then(|(_, name, args, _)| connector.parse_native_type(name, args.to_owned()).ok())
+    }
+}
+
+pub trait RelationFieldWalkerExt {
+    fn default_on_delete_action(self, integrity: ReferentialIntegrity, connector: &dyn Connector) -> ReferentialAction;
+}
+
+impl RelationFieldWalkerExt for RelationFieldWalker<'_, '_> {
+    fn default_on_delete_action(self, integrity: ReferentialIntegrity, connector: &dyn Connector) -> ReferentialAction {
+        match self.referential_arity() {
+            ast::FieldArity::Required
+                if connector.supports_referential_action(&integrity, ReferentialAction::Restrict) =>
+            {
+                ReferentialAction::Restrict
+            }
+            ast::FieldArity::Required => ReferentialAction::NoAction,
+            _ => ReferentialAction::SetNull,
+        }
     }
 }

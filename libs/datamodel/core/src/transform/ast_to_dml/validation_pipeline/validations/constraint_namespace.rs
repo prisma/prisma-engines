@@ -67,7 +67,7 @@ impl<'ast> ConstraintNamespace<'ast> {
         for index in db.walk_models().flat_map(|m| m.indexes()) {
             let counter = self
                 .global
-                .entry((scope, index.final_database_name(connector)))
+                .entry((scope, index.constraint_name(connector)))
                 .or_default();
             *counter += 1;
         }
@@ -98,7 +98,7 @@ impl<'ast> ConstraintNamespace<'ast> {
         scope: ConstraintScope,
     ) {
         for model in db.walk_models() {
-            if let Some(name) = model.primary_key().and_then(|k| k.final_database_name(connector)) {
+            if let Some(name) = model.primary_key().and_then(|k| k.constraint_name(connector)) {
                 let counter = self.global.entry((scope, name)).or_default();
                 *counter += 1;
             }
@@ -136,7 +136,7 @@ impl<'ast> ConstraintNamespace<'ast> {
             for index in model.indexes() {
                 let counter = self
                     .local
-                    .entry((model.model_id(), scope, index.final_database_name(connector)))
+                    .entry((model.model_id(), scope, index.constraint_name(connector)))
                     .or_default();
 
                 *counter += 1;
@@ -152,7 +152,7 @@ impl<'ast> ConstraintNamespace<'ast> {
         scope: ConstraintScope,
     ) {
         for model in db.walk_models() {
-            if let Some(name) = model.primary_key().and_then(|pk| pk.final_database_name(connector)) {
+            if let Some(name) = model.primary_key().and_then(|pk| pk.constraint_name(connector)) {
                 let counter = self.local.entry((model.model_id(), scope, name)).or_default();
                 *counter += 1;
             }

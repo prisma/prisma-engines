@@ -12,15 +12,18 @@
 //!
 //! Names:
 //!
+//! - _name_: the item name in the schema for datasources, generators, models, model fields,
+//!   composite types, composite type fields, enums and enum variants. The `name:` argument for
+//!   unique constraints, primary keys and relations.
 //! - _mapped name_: the name inside an `@map()` or `@@map()` attribute of a model, field, enum or
 //!   enum value. This is used to determine what the name of the Prisma schema item is in the
 //!   database.
 //! - _database name_: the name in the database, once both the name of the item and the mapped
 //!   name have been taken into account. The logic is always the same: if a mapped name is defined,
 //!   then the database name is the mapped name, otherwise it is the name of the item.
-//! - _foreign key name_: the name inside the `map: ...` argument inside an `@relation()`
-//!   attribute. This is taken as the database name of the constraint backing the relation, on the
-//!   connectors where that makes sense.
+//! - _constraint name_: indexes, primary keys and defaults can have a constraint name. It can be
+//!   defined with a `map:` argument or be a default, generated name if the `map:` argument is not
+//!   provided. These usually require a datamodel connector to be defined.
 
 pub mod walkers;
 

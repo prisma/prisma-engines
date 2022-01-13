@@ -19,6 +19,7 @@ pub use diff::DiffTarget;
 pub use error::{ConnectorError, ConnectorResult};
 pub use migration_persistence::{MigrationPersistence, MigrationRecord, PersistenceNotInitializedError, Timestamp};
 
+use datamodel::ValidatedSchema;
 use migrations_directory::MigrationDirectory;
 
 /// A boxed migration, opaque to the migration engine core. The connectors are
@@ -38,10 +39,32 @@ impl Migration {
     }
 }
 
+/// An abstract host for a migration connector. It exposes IO that is not directly performed by the
+/// connectors.
+#[async_trait::async_trait]
+pub trait ConnectorHost: Sync + Send + 'static {
+    /// Print to the console.
+    async fn print(&self, text: &str) -> ConnectorResult<()>;
+}
+
+/// A no-op ConnectorHost.
+#[derive(Debug, Clone)]
+pub struct EmptyHost;
+
+#[async_trait::async_trait]
+impl ConnectorHost for EmptyHost {
+    async fn print(&self, _text: &str) -> ConnectorResult<()> {
+        Ok(())
+    }
+}
+
 /// The top-level trait for connectors. This is the abstraction the migration engine core relies on to
 /// interface with different database backends.
 #[async_trait::async_trait]
 pub trait MigrationConnector: Send + Sync + 'static {
+    /// Accept a new ConnectorHost.
+    fn set_host(&mut self, host: Box<dyn ConnectorHost>);
+
     /// If possible on the target connector, acquire an advisory lock, so multiple instances of migrate do not run concurrently.
     async fn acquire_lock(&self) -> ConnectorResult<()>;
 
@@ -74,7 +97,7 @@ pub trait MigrationConnector: Send + Sync + 'static {
     /// the specific database version being used.
     fn check_database_version_compatibility(
         &self,
-        _datamodel: &datamodel::dml::Datamodel,
+        _datamodel: &ValidatedSchema<'_>,
     ) -> Option<user_facing_errors::common::DatabaseVersionIncompatibility> {
         None
     }

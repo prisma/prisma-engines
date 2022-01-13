@@ -66,7 +66,7 @@ pub(super) fn infer_implicit_indexes(ctx: &mut Context<'_>) {
                     })
                     .collect(),
                 source_field,
-                db_name: None,
+                mapped_name: None,
                 ..Default::default()
             },
         ));

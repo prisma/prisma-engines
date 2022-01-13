@@ -1,4 +1,4 @@
-use migration_connector::MigrationRecord;
+use migration_core::migration_connector::MigrationRecord;
 
 pub trait MigrationsAssertions: Sized {
     fn assert_applied_steps_count(self, count: u32) -> Self;

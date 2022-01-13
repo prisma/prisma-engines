@@ -36,24 +36,27 @@ impl ConnectorErrorFactory {
         })
     }
 
-    pub fn new_incompatible_native_type_with_index(self) -> ConnectorError {
+    pub fn new_incompatible_native_type_with_index(self, message: &str) -> ConnectorError {
         ConnectorError::from_kind(ErrorKind::IncompatibleNativeTypeWithIndexAttribute {
             native_type: self.native_type,
             connector_name: self.connector,
+            message: String::from(message),
         })
     }
 
-    pub fn new_incompatible_native_type_with_unique(self) -> ConnectorError {
+    pub fn new_incompatible_native_type_with_unique(self, message: &str) -> ConnectorError {
         ConnectorError::from_kind(ErrorKind::IncompatibleNativeTypeWithUniqueAttribute {
             native_type: self.native_type,
             connector_name: self.connector,
+            message: String::from(message),
         })
     }
 
-    pub fn new_incompatible_native_type_with_id(self) -> ConnectorError {
+    pub fn new_incompatible_native_type_with_id(self, message: &str) -> ConnectorError {
         ConnectorError::from_kind(ErrorKind::IncompatibleNativeTypeWithIdAttribute {
             native_type: self.native_type,
             connector_name: self.connector,
+            message: String::from(message),
         })
     }
 
@@ -182,30 +185,35 @@ pub enum ErrorKind {
         given_count: usize,
     },
 
-    #[error("Native type {} cannot be unique in {}.", native_type, connector_name)]
+    #[error("Native type {} cannot be unique in {}.{}", native_type, connector_name, message)]
     IncompatibleNativeTypeWithUniqueAttribute {
         native_type: String,
         connector_name: String,
+        message: String,
     },
 
     #[error(
-        "Native type {} of {} cannot be used on a field that is `@id` or `@@id`.",
+        "Native type {} of {} cannot be used on a field that is `@id` or `@@id`.{}",
         native_type,
-        connector_name
+        connector_name,
+        message
     )]
     IncompatibleNativeTypeWithIdAttribute {
         native_type: String,
         connector_name: String,
+        message: String,
     },
 
     #[error(
-        "You cannot define an index on fields with Native type {} of {}.",
+        "You cannot define an index on fields with Native type {} of {}.{}",
         native_type,
-        connector_name
+        connector_name,
+        message
     )]
     IncompatibleNativeTypeWithIndexAttribute {
         native_type: String,
         connector_name: String,
+        message: String,
     },
 
     #[error(

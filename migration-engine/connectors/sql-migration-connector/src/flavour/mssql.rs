@@ -126,6 +126,10 @@ impl SqlFlavour for MssqlFlavour {
         super::generic_apply_migration_script(migration_name, script, conn).await
     }
 
+    fn datamodel_connector(&self) -> &'static dyn datamodel::datamodel_connector::Connector {
+        sql_datamodel_connector::MSSQL
+    }
+
     fn migrations_table(&self) -> Table<'_> {
         (self.schema_name(), self.migrations_table_name()).into()
     }

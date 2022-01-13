@@ -133,7 +133,6 @@ mod lists {
         list_query(&runner, "decimal", "isEmpty", "true", vec![2]).await?;
         list_query(&runner, "dt", "isEmpty", "true", vec![2]).await?;
         list_query(&runner, "bool", "isEmpty", "true", vec![2]).await?;
-        list_query(&runner, "bytes", "isEmpty", "true", vec![2]).await?;
 
         list_query(&runner, "string", "isEmpty", "false", vec![1]).await?;
         list_query(&runner, "int", "isEmpty", "false", vec![1]).await?;
@@ -142,9 +141,18 @@ mod lists {
         list_query(&runner, "decimal", "isEmpty", "false", vec![1]).await?;
         list_query(&runner, "dt", "isEmpty", "false", vec![1]).await?;
         list_query(&runner, "bool", "isEmpty", "false", vec![1]).await?;
-        list_query(&runner, "bytes", "isEmpty", "false", vec![1]).await?;
 
         list_query(&runner, "string", "hasSome", "[]", vec![]).await?;
+
+        Ok(())
+    }
+
+    // Cockroachdb does not like the bytes empty array check in v21 but this will be fixed in 22.
+    #[connector_test(exclude(CockroachDB))]
+    async fn is_empty_bytes(runner: Runner) -> TestResult<()> {
+        test_data(&runner).await?;
+        list_query(&runner, "bytes", "isEmpty", "true", vec![2]).await?;
+        list_query(&runner, "bytes", "isEmpty", "false", vec![1]).await?;
 
         Ok(())
     }
@@ -343,7 +351,8 @@ mod enum_lists {
         schema.to_owned()
     }
 
-    #[connector_test]
+    // This will be fixed in v22
+    #[connector_test(exclude(CockroachDB))]
     async fn equality(runner: Runner) -> TestResult<()> {
         test_data(&runner).await?;
         list_query(&runner, "enum", "equals", r#"[A, B, B, A]"#, vec![1]).await?;
@@ -375,7 +384,8 @@ mod enum_lists {
         Ok(())
     }
 
-    #[connector_test]
+    // This will be fixed in v22
+    #[connector_test(exclude(CockroachDB))]
     async fn is_empty(runner: Runner) -> TestResult<()> {
         test_data(&runner).await?;
 

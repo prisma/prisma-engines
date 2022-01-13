@@ -39,14 +39,14 @@ pub(crate) fn completion(schema: &str, params: CompletionParams) -> CompletionLi
             )
         });
 
-    let mut items = Vec::new();
+    let mut list = CompletionList {
+        is_incomplete: false,
+        items: Vec::new(),
+    };
 
-    push_ast_completions(&mut items, connector, referential_integrity, &schema_ast, position);
+    push_ast_completions(&mut list, connector, referential_integrity, &schema_ast, position);
 
-    CompletionList {
-        is_incomplete: items.is_empty(),
-        items,
-    }
+    list
 }
 
 /// The LSP position is expressed as a (line, col) tuple, but our pest-based parser works with byte
@@ -55,29 +55,45 @@ pub(crate) fn completion(schema: &str, params: CompletionParams) -> CompletionLi
 /// the line.
 fn position_to_offset(position: &Position, document: &str) -> Option<usize> {
     let mut offset = 0;
+    let mut line_offset = position.line;
+    let mut character_offset = position.character;
+    let mut chars = document.chars();
 
-    for (line_idx, line) in document.lines().enumerate() {
-        if position.line == line_idx as u32 {
-            // We're on the right line.
-            return if position.character < line.len() as u32 {
-                Some(offset + position.character as usize)
-            } else {
-                None
-            };
+    while line_offset > 0 {
+        loop {
+            match chars.next() {
+                Some('\n') => {
+                    offset += 1;
+                    break;
+                }
+                Some(_) => {
+                    offset += 1;
+                }
+                None => return None,
+            }
         }
 
-        // Next line, but first add the current line to the offset.
-        offset += line.len() + 1; // don't forget the newline char!
+        line_offset -= 1;
     }
 
-    None
+    while character_offset > 0 {
+        match chars.next() {
+            Some('\n') | None => return None,
+            Some(_) => {
+                offset += 1;
+                character_offset -= 1;
+            }
+        }
+    }
+
+    Some(offset)
 }
 
 // Completion is implemented for:
 // - referential actions (onDelete and onUpdate arguments)
 // - default arguments on scalar fields (based on connector capabilities for the `map: ...` argument).
 fn push_ast_completions(
-    items: &mut Vec<CompletionItem>,
+    completion_list: &mut CompletionList,
     connector: &'static dyn Connector,
     referential_integrity: ReferentialIntegrity,
     ast: &ast::SchemaAst,
@@ -89,7 +105,7 @@ fn push_ast_completions(
             ast::ModelPosition::Field(_, ast::FieldPosition::Attribute("default", _, None)),
         ) => {
             if connector.has_capability(datamodel::datamodel_connector::ConnectorCapability::NamedDefaultValues) {
-                items.push(CompletionItem {
+                completion_list.items.push(CompletionItem {
                     label: "map: ".to_owned(),
                     kind: Some(CompletionItemKind::PROPERTY),
                     ..Default::default()
@@ -101,15 +117,26 @@ fn push_ast_completions(
             ast::ModelPosition::Field(_, ast::FieldPosition::Attribute("relation", _, Some(attr_name))),
         ) if attr_name == "onDelete" || attr_name == "onUpdate" => {
             for referential_action in connector.referential_actions(&referential_integrity).iter() {
-                items.push(CompletionItem {
+                completion_list.items.push(CompletionItem {
                     label: referential_action.as_str().to_owned(),
-                    kind: Some(CompletionItemKind::CONSTANT),
-                    detail: None, // what is the difference between detail and documentation?
-                    documentation: Some(Documentation::String(referential_action.documentation().to_owned())),
+                    kind: Some(CompletionItemKind::ENUM),
+                    // what is the difference between detail and documentation?
+                    detail: Some(referential_action.documentation().to_owned()),
                     ..Default::default()
                 });
             }
         }
         _ => (),
     }
+}
+
+// On Windows, a newline is actually two characters.
+#[test]
+fn position_to_offset_with_crlf() {
+    let schema = "\r\nmodel Test {\r\n    id Int @id\r\n}";
+    // Let's put the cursor on the "i" in "id Int".
+    let expected_offset = schema.chars().position(|c| c == 'i').unwrap();
+    let found_offset = position_to_offset(&Position { line: 2, character: 4 }, schema).unwrap();
+
+    assert_eq!(found_offset, expected_offset);
 }

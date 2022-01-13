@@ -74,21 +74,21 @@ pub(super) fn model<'ast>(
         ))
     }
 
-    let (name, db_name) = {
-        let db_name = primary_key_constraint_name(args, ctx);
+    let (name, mapped_name) = {
+        let mapped_name = primary_key_mapped_name(args, ctx);
         let name = super::get_name_argument(args, ctx);
 
         if let Some(name) = name {
             super::validate_client_name(args.span(), &ast_model.name.name, name, "@@id", ctx);
         }
 
-        (name, db_name)
+        (name, mapped_name)
     };
 
     model_data.primary_key = Some(IdAttribute {
         name,
         source_attribute: args.attribute(),
-        db_name,
+        mapped_name,
         fields: resolved_fields,
         source_field: None,
     });
@@ -107,7 +107,7 @@ pub(super) fn field<'ast>(
             ast_model.span,
         )),
         None => {
-            let db_name = primary_key_constraint_name(args, ctx);
+            let mapped_name = primary_key_mapped_name(args, ctx);
 
             let length = match args.optional_arg("length").map(|length| length.as_int()) {
                 Some(Ok(length)) => Some(length as u32),
@@ -137,7 +137,7 @@ pub(super) fn field<'ast>(
 
             model_attributes.primary_key = Some(IdAttribute {
                 name: None,
-                db_name,
+                mapped_name,
                 source_attribute: args.attribute(),
                 fields: vec![FieldWithArgs {
                     field_id,
@@ -180,8 +180,8 @@ pub(super) fn validate_id_field_arities(
     }
 }
 
-fn primary_key_constraint_name<'ast>(args: &mut Arguments<'ast>, ctx: &mut Context<'ast>) -> Option<&'ast str> {
-    let db_name = match args.optional_arg("map").map(|name| name.as_str()) {
+fn primary_key_mapped_name<'ast>(args: &mut Arguments<'ast>, ctx: &mut Context<'ast>) -> Option<&'ast str> {
+    let mapped_name = match args.optional_arg("map").map(|name| name.as_str()) {
         Some(Ok("")) => {
             ctx.push_error(args.new_attribute_validation_error("The `map` argument cannot be an empty string."));
             None
@@ -194,5 +194,5 @@ fn primary_key_constraint_name<'ast>(args: &mut Arguments<'ast>, ctx: &mut Conte
         None => None,
     };
 
-    db_name
+    mapped_name
 }

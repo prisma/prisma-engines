@@ -312,27 +312,26 @@ fn creating_a_migration_with_a_non_existent_migrations_directory_should_work(api
 
 #[test_connector(tags(Mysql, Postgres))]
 fn create_enum_step_only_rendered_when_needed(api: TestApi) {
-    let dm = r#"
-        datasource test {
-          provider = "mysql"
-          url = "mysql://root:prisma@127.0.0.1:3306/SelfRelationFilterBugSpec?connection_limit=1"
-        }
+    let dm = format!(
+        r#"
+        {}
 
-
-        model Cat {
+        model Cat {{
             id      Int @id
             mood    Mood
-        }
+        }}
 
-        enum Mood{
+        enum Mood {{
             HUNGRY
             SLEEPY
-        }
-    "#;
+        }}
+    "#,
+        api.datasource_block()
+    );
 
     let dir = api.create_migrations_directory();
 
-    api.create_migration("create-cats", dm, &dir)
+    api.create_migration("create-cats", &dm, &dir)
         .send_sync()
         .assert_migration_directories_count(1)
         .assert_migration("create-cats", |migration| {
@@ -347,7 +346,7 @@ fn create_enum_step_only_rendered_when_needed(api: TestApi) {
                             "id" INTEGER NOT NULL,
                             "mood" "Mood" NOT NULL,
 
-                            PRIMARY KEY ("id")
+                            CONSTRAINT "Cat_pkey" PRIMARY KEY ("id")
                         );
                     "#
                 }

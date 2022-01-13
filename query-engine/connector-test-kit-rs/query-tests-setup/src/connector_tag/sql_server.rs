@@ -1,5 +1,3 @@
-use sql_datamodel_connector::SqlDatamodelConnectors;
-
 use crate::{datamodel_rendering::SqlDatamodelRenderer, TestError, TestResult};
 
 use super::*;
@@ -120,5 +118,5 @@ impl ToString for SqlServerVersion {
 }
 
 fn sql_server_capabilities() -> Vec<ConnectorCapability> {
-    SqlDatamodelConnectors::MSSQL.capabilities().to_owned()
+    sql_datamodel_connector::MSSQL.capabilities().to_owned()
 }
