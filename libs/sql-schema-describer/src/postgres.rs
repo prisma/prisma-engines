@@ -966,7 +966,7 @@ fn unsuffix_default_literal<'a, T: AsRef<str>>(literal: &'a str, expected_suffix
 
     if !expected_suffixes
         .iter()
-        .any(|expected| expected.as_ref() == suffix.to_lowercase())
+        .any(|expected| expected.as_ref().to_lowercase() == suffix.to_lowercase())
     {
         return None;
     }
