@@ -1,7 +1,7 @@
 use crate::error::{ConnectorError, ErrorKind};
 use chrono::Utc;
 use indexmap::{map::Keys, IndexMap};
-use prisma_models::{ModelProjection, ModelRef, PrismaValue, ScalarFieldRef, SelectionResult};
+use prisma_models::{CompositeFieldRef, ModelProjection, ModelRef, PrismaValue, ScalarFieldRef, SelectionResult};
 use std::{borrow::Borrow, convert::TryInto, ops::Deref};
 
 /// WriteArgs represent data to be written to an underlying data source.
@@ -36,12 +36,21 @@ impl From<&ScalarFieldRef> for DatasourceFieldName {
     }
 }
 
+impl From<&CompositeFieldRef> for DatasourceFieldName {
+    fn from(cf: &CompositeFieldRef) -> Self {
+        DatasourceFieldName(cf.db_name().to_owned())
+    }
+}
+
 /// A WriteExpression allows to express more complex operations on how the data is written,
 /// like field or inter-field arithmetic.
 #[derive(Debug, PartialEq, Clone)]
 pub enum WriteExpression {
-    /// Reference to another field on the same model.
+    /// Reference to another field on the same model (unused at the moment).
     Field(DatasourceFieldName),
+
+    ///
+    CompositeWrite(CompositeWrite),
 
     /// Write plain value to field.
     Value(PrismaValue),
@@ -57,6 +66,12 @@ pub enum WriteExpression {
 
     /// Divide field by value.
     Divide(PrismaValue),
+}
+
+#[derive(Debug, PartialEq, Clone)]
+pub struct CompositeWrite {
+    field_name: DatasourceFieldName,
+    writes: Vec<WriteExpression>,
 }
 
 impl From<PrismaValue> for WriteExpression {
@@ -247,5 +262,6 @@ pub fn apply_expression(val: PrismaValue, expr: WriteExpression) -> PrismaValue 
         WriteExpression::Substract(rhs) => val - rhs,
         WriteExpression::Multiply(rhs) => val * rhs,
         WriteExpression::Divide(rhs) => val / rhs,
+        WriteExpression::CompositeWrite(_) => unimplemented!(),
     }
 }

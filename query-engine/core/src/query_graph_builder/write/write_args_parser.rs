@@ -76,13 +76,49 @@ impl WriteArgsParser {
                         _ => args.nested.push((Arc::clone(rf), v.try_into()?)),
                     },
 
-                    Field::Composite(_) => todo!(), // [Composites] todo
+                    Field::Composite(cf) => {
+                        let expr: WriteExpression = match v {
+                            // Null-set operation.
+                            ParsedInputValue::Single(PrismaValue::Null) => WriteExpression::Value(PrismaValue::Null),
+
+                            // Set list shorthand operation (can only be objects).
+                            ParsedInputValue::List(_) => {
+                                let list: PrismaValue = v.try_into()?;
+                                WriteExpression::Value(list)
+                            }
+
+                            // One of:
+                            // - Single object set shorthand.
+                            // - Operation envelope with further actions nested.
+                            ParsedInputValue::Map(map) => {
+                                if is_composite_envelope(&map) {
+                                    parse_composite_envelope(map)
+                                } else {
+                                    WriteExpression::Value(ParsedInputValue::Map(map).try_into()?)
+                                }
+                            }
+
+                            _ => unreachable!(),
+                        };
+
+                        args.args.insert(cf, expr)
+                    }
                 };
 
                 Ok(args)
             },
         )
     }
+}
+
+fn is_composite_envelope(map: &ParsedInputMap) -> bool {
+    let (key, _) = map.iter().next().unwrap();
+
+    map.len() == 1 && key == operations::SET
+}
+
+fn parse_composite_envelope(map: ParsedInputMap) -> WriteExpression {
+    todo!()
 }
 
 fn extract_scalar_list_ops(map: ParsedInputMap) -> QueryGraphBuilderResult<WriteExpression> {
@@ -94,3 +130,24 @@ fn extract_scalar_list_ops(map: ParsedInputMap) -> QueryGraphBuilderResult<Write
         _ => unreachable!("Invalid scalar list operation"),
     }
 }
+
+// // Top level is a create operation, so we can strip all envelopes, they aren't needed.
+// fn strip_composite_create_envelopes(input: ParsedInputMap) -> ParsedInputValue {
+//     if input.len() == 1 {
+//         let (key, value) = input.into_iter().next().unwrap();
+
+//         match key.as_str() {
+//             operations::SET => strip_composite_create_envelopes(value),
+//             _ => unreachable!("Invalid composite operation."),
+//         }
+//     } else {
+//         input
+//             .into_iter()
+//             .map(|(key, value)| match value {
+//                 ParsedInputValue::Map(map) => (key, strip_composite_create_envelopes(map)),
+//                 value => (key, value),
+//             })
+//             .collect()
+//             .into()
+//     }
+// }

@@ -22,6 +22,12 @@ impl TryInto<PrismaValue> for ParsedInputValue {
                 .collect::<QueryParserResult<Vec<PrismaValue>>>()
                 .map(PrismaValue::List),
 
+            ParsedInputValue::Map(map) => Ok(PrismaValue::Object(
+                map.into_iter()
+                    .map(|(k, v)| Ok((k, v.try_into()?)))
+                    .collect::<QueryParserResult<Vec<_>>>()?,
+            )),
+
             v => Err(QueryParserError {
                 path: QueryPath::default(),
                 error_kind: QueryParserErrorKind::AssertionError(format!(

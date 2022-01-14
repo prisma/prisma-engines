@@ -1,4 +1,4 @@
-use super::fields::mapper::*;
+use super::fields::data_input_mapper::*;
 use super::*;
 use datamodel_connector::ConnectorCapability;
 
