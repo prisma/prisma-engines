@@ -80,4 +80,6 @@ mod to_one {
     // set empty
 
     // defaults
+
+    // same map + field name (one with `bar @map("foo")` then a `foo` field)
 }

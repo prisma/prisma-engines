@@ -6,18 +6,18 @@ pub fn to_one_composites() -> String {
         r#"model TestModel {
             #id(id, Int, @id)
             field String?
-            a     A
+            a     A       @map("top_a")
             b     B?
         }
 
         type A {
-            a_1 String
+            a_1 String @map("a1")
             a_2 Int?
         }
 
         type B {
             b_field String
-            c C
+            c       C      @map("nested_c")
         }
 
         type C {
