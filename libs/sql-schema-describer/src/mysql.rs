@@ -12,6 +12,15 @@ use std::{
 };
 use tracing::trace;
 
+/// Matches a default value in the schema, wrapped single quotes.
+///
+/// Example:
+///
+/// ```ignore
+/// 'this is a test'
+/// ```
+static DEFAULT_QUOTES: Lazy<Regex> = Lazy::new(|| Regex::new(r"'([\S\s]*)'").unwrap());
+
 fn is_mariadb(version: &str) -> bool {
     version.contains("MariaDB")
 }
@@ -357,7 +366,7 @@ impl<'a> SqlSchemaDescriber<'a> {
                             //todo check other now() definitions
                             ColumnTypeFamily::DateTime => match Self::default_is_current_timestamp(&default_string) {
                                 true => DefaultValue::now(),
-                                _ => Self::db_generated(&default_string, default_expression),
+                                _ => Self::db_generated_date_time(&default_string, default_generated),
                             },
                             ColumnTypeFamily::Binary => Self::db_generated(&default_string, default_expression),
                             ColumnTypeFamily::Json => Self::db_generated(&default_string, default_expression),
@@ -390,6 +399,16 @@ impl<'a> SqlSchemaDescriber<'a> {
         }
 
         Ok(map)
+    }
+
+    fn db_generated_date_time(default_string: &str, default_generated: bool) -> DefaultValue {
+        if default_generated {
+            Self::dbgenerated_expression(default_string)
+        } else if DEFAULT_QUOTES.is_match(default_string) {
+            DefaultValue::db_generated(default_string.to_owned())
+        } else {
+            DefaultValue::db_generated(format!("'{}'", default_string))
+        }
     }
 
     fn db_generated(default_string: &str, default_generated: bool) -> DefaultValue {
