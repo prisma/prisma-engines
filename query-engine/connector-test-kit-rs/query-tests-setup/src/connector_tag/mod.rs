@@ -132,7 +132,7 @@ impl fmt::Display for ConnectorVersion {
             },
             Self::Sqlite => "SQLite".to_string(),
             Self::Vitess(v) => match v {
-                Some(v) => format!("Vitess ({})", v.to_string()),
+                Some(v) => format!("Vitess ({})", v),
                 None => "Vitess (unknown)".to_string(),
             },
             Self::CockroachDb => "CockroachDB".to_string(),
