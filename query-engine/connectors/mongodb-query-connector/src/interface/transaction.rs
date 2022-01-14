@@ -65,6 +65,7 @@ impl<'conn> WriteOperations for MongoDbTransaction<'conn> {
         &mut self,
         model: &ModelRef,
         args: connector_interface::WriteArgs,
+        _trace_id: Option<String>,
     ) -> connector_interface::Result<SelectionResult> {
         catch(async move {
             write::create_record(&self.connection.database, &mut self.connection.session, model, args).await
@@ -77,6 +78,7 @@ impl<'conn> WriteOperations for MongoDbTransaction<'conn> {
         model: &ModelRef,
         args: Vec<connector_interface::WriteArgs>,
         skip_duplicates: bool,
+        _trace_id: Option<String>,
     ) -> connector_interface::Result<usize> {
         catch(async move {
             write::create_records(
@@ -96,6 +98,7 @@ impl<'conn> WriteOperations for MongoDbTransaction<'conn> {
         model: &ModelRef,
         record_filter: connector_interface::RecordFilter,
         args: connector_interface::WriteArgs,
+        _trace_id: Option<String>,
     ) -> connector_interface::Result<Vec<SelectionResult>> {
         catch(async move {
             write::update_records(
@@ -114,6 +117,7 @@ impl<'conn> WriteOperations for MongoDbTransaction<'conn> {
         &mut self,
         model: &ModelRef,
         record_filter: connector_interface::RecordFilter,
+        _trace_id: Option<String>,
     ) -> connector_interface::Result<usize> {
         catch(async move {
             write::delete_records(
@@ -151,6 +155,7 @@ impl<'conn> WriteOperations for MongoDbTransaction<'conn> {
         field: &RelationFieldRef,
         parent_id: &SelectionResult,
         child_ids: &[SelectionResult],
+        _trace_id: Option<String>,
     ) -> connector_interface::Result<()> {
         catch(async move {
             write::m2m_disconnect(
@@ -190,6 +195,7 @@ impl<'conn> ReadOperations for MongoDbTransaction<'conn> {
         filter: &connector_interface::Filter,
         selected_fields: &FieldSelection,
         aggr_selections: &[RelAggregationSelection],
+        _trace_id: Option<String>,
     ) -> connector_interface::Result<Option<SingleRecord>> {
         catch(async move {
             read::get_single_record(
@@ -211,6 +217,7 @@ impl<'conn> ReadOperations for MongoDbTransaction<'conn> {
         query_arguments: connector_interface::QueryArguments,
         selected_fields: &FieldSelection,
         aggregation_selections: &[RelAggregationSelection],
+        _trace_id: Option<String>,
     ) -> connector_interface::Result<ManyRecords> {
         catch(async move {
             read::get_many_records(
@@ -230,6 +237,7 @@ impl<'conn> ReadOperations for MongoDbTransaction<'conn> {
         &mut self,
         from_field: &RelationFieldRef,
         from_record_ids: &[SelectionResult],
+        _trace_id: Option<String>,
     ) -> connector_interface::Result<Vec<(SelectionResult, SelectionResult)>> {
         catch(async move {
             read::get_related_m2m_record_ids(
@@ -250,6 +258,7 @@ impl<'conn> ReadOperations for MongoDbTransaction<'conn> {
         selections: Vec<connector_interface::AggregationSelection>,
         group_by: Vec<ScalarFieldRef>,
         having: Option<connector_interface::Filter>,
+        _trace_id: Option<String>,
     ) -> connector_interface::Result<Vec<connector_interface::AggregationRow>> {
         catch(async move {
             aggregate::aggregate(

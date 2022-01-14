@@ -11,8 +11,13 @@ use user_facing_errors::query_engine::DatabaseConstraint;
 /// Create a single record to the database defined in `conn`, resulting into a
 /// `RecordProjection` as an identifier pointing to the just-created record.
 #[tracing::instrument(skip(conn, model, args))]
-pub async fn create_record(conn: &dyn QueryExt, model: &ModelRef, args: WriteArgs) -> crate::Result<SelectionResult> {
-    let (insert, returned_id) = write::create_record(model, args);
+pub async fn create_record(
+    conn: &dyn QueryExt,
+    model: &ModelRef,
+    args: WriteArgs,
+    trace_id: Option<String>,
+) -> crate::Result<SelectionResult> {
+    let (insert, returned_id) = write::create_record(model, args, trace_id);
 
     let result_set = match conn.insert(insert).await {
         Ok(id) => id,
@@ -81,6 +86,7 @@ pub async fn create_records(
     model: &ModelRef,
     args: Vec<WriteArgs>,
     skip_duplicates: bool,
+    trace_id: Option<String>,
 ) -> crate::Result<usize> {
     if args.is_empty() {
         return Ok(0);
@@ -105,9 +111,9 @@ pub async fn create_records(
 
     if affected_fields.is_empty() {
         // If no fields are to be inserted (everything is DEFAULT) we need to fall back to inserting default rows `args.len()` times.
-        create_many_empty(conn, model, args.len(), skip_duplicates).await
+        create_many_empty(conn, model, args.len(), skip_duplicates, trace_id).await
     } else {
-        create_many_nonempty(conn, sql_info, model, args, skip_duplicates, affected_fields).await
+        create_many_nonempty(conn, sql_info, model, args, skip_duplicates, affected_fields, trace_id).await
     }
 }
 
@@ -120,6 +126,7 @@ async fn create_many_nonempty(
     args: Vec<WriteArgs>,
     skip_duplicates: bool,
     affected_fields: HashSet<ScalarFieldRef>,
+    trace_id: Option<String>,
 ) -> crate::Result<usize> {
     let batches = if let Some(max_params) = sql_info.max_bind_values {
         // We need to split inserts if they are above a parameter threshold, as well as split based on number of rows.
@@ -193,7 +200,7 @@ async fn create_many_nonempty(
 
     let mut count = 0;
     for batch in partitioned_batches {
-        let stmt = write::create_records_nonempty(model, batch, skip_duplicates, &affected_fields);
+        let stmt = write::create_records_nonempty(model, batch, skip_duplicates, &affected_fields, trace_id.clone());
         count += conn.execute(stmt.into()).await?;
     }
 
@@ -206,8 +213,9 @@ async fn create_many_empty(
     model: &ModelRef,
     num_records: usize,
     skip_duplicates: bool,
+    trace_id: Option<String>,
 ) -> crate::Result<usize> {
-    let stmt = write::create_records_empty(model, skip_duplicates);
+    let stmt = write::create_records_empty(model, skip_duplicates, trace_id);
     let mut count = 0;
 
     for _ in 0..num_records {
@@ -226,8 +234,9 @@ pub async fn update_records(
     model: &ModelRef,
     record_filter: RecordFilter,
     args: WriteArgs,
+    trace_id: Option<String>,
 ) -> crate::Result<Vec<SelectionResult>> {
-    let ids = conn.filter_selectors(model, record_filter).await?;
+    let ids = conn.filter_selectors(model, record_filter, trace_id.clone()).await?;
     let id_args = pick_args(&model.primary_identifier().into(), &args);
 
     if ids.is_empty() {
@@ -236,7 +245,7 @@ pub async fn update_records(
 
     let updates = {
         let ids: Vec<&SelectionResult> = ids.iter().map(|id| &*id).collect();
-        write::update_many(model, ids.as_slice(), args)?
+        write::update_many(model, ids.as_slice(), args, trace_id)?
     };
 
     for update in updates {
@@ -252,8 +261,9 @@ pub async fn delete_records(
     conn: &dyn QueryExt,
     model: &ModelRef,
     record_filter: RecordFilter,
+    trace_id: Option<String>,
 ) -> crate::Result<usize> {
-    let ids = conn.filter_selectors(model, record_filter).await?;
+    let ids = conn.filter_selectors(model, record_filter, trace_id.clone()).await?;
     let ids: Vec<&SelectionResult> = ids.iter().map(|id| &*id).collect();
     let count = ids.len();
 
@@ -261,7 +271,7 @@ pub async fn delete_records(
         return Ok(count);
     }
 
-    for delete in write::delete_many(model, ids.as_slice()) {
+    for delete in write::delete_many(model, ids.as_slice(), trace_id) {
         conn.query(delete).await?;
     }
 
@@ -291,8 +301,9 @@ pub async fn m2m_disconnect(
     field: &RelationFieldRef,
     parent_id: &SelectionResult,
     child_ids: &[SelectionResult],
+    trace_id: Option<String>,
 ) -> crate::Result<()> {
-    let query = write::delete_relation_table_records(field, parent_id, child_ids);
+    let query = write::delete_relation_table_records(field, parent_id, child_ids, trace_id);
     conn.delete(query).await?;
 
     Ok(())

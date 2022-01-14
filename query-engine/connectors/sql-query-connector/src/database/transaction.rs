@@ -66,9 +66,18 @@ impl<'tx> ReadOperations for SqlConnectorTransaction<'tx> {
         filter: &Filter,
         selected_fields: &FieldSelection,
         aggr_selections: &[RelAggregationSelection],
+        trace_id: Option<String>,
     ) -> connector::Result<Option<SingleRecord>> {
         catch(self.connection_info.clone(), async move {
-            read::get_single_record(&self.inner, model, filter, &selected_fields.into(), aggr_selections).await
+            read::get_single_record(
+                &self.inner,
+                model,
+                filter,
+                &selected_fields.into(),
+                aggr_selections,
+                trace_id,
+            )
+            .await
         })
         .await
     }
@@ -79,6 +88,7 @@ impl<'tx> ReadOperations for SqlConnectorTransaction<'tx> {
         query_arguments: QueryArguments,
         selected_fields: &FieldSelection,
         aggr_selections: &[RelAggregationSelection],
+        trace_id: Option<String>,
     ) -> connector::Result<ManyRecords> {
         catch(self.connection_info.clone(), async move {
             read::get_many_records(
@@ -88,6 +98,7 @@ impl<'tx> ReadOperations for SqlConnectorTransaction<'tx> {
                 &selected_fields.into(),
                 aggr_selections,
                 SqlInfo::from(&self.connection_info),
+                trace_id,
             )
             .await
         })
@@ -98,9 +109,10 @@ impl<'tx> ReadOperations for SqlConnectorTransaction<'tx> {
         &mut self,
         from_field: &RelationFieldRef,
         from_record_ids: &[SelectionResult],
+        trace_id: Option<String>,
     ) -> connector::Result<Vec<(SelectionResult, SelectionResult)>> {
         catch(self.connection_info.clone(), async move {
-            read::get_related_m2m_record_ids(&self.inner, from_field, from_record_ids).await
+            read::get_related_m2m_record_ids(&self.inner, from_field, from_record_ids, trace_id).await
         })
         .await
     }
@@ -112,9 +124,19 @@ impl<'tx> ReadOperations for SqlConnectorTransaction<'tx> {
         selections: Vec<AggregationSelection>,
         group_by: Vec<ScalarFieldRef>,
         having: Option<Filter>,
+        trace_id: Option<String>,
     ) -> connector::Result<Vec<AggregationRow>> {
         catch(self.connection_info.clone(), async move {
-            read::aggregate(&self.inner, model, query_arguments, selections, group_by, having).await
+            read::aggregate(
+                &self.inner,
+                model,
+                query_arguments,
+                selections,
+                group_by,
+                having,
+                trace_id,
+            )
+            .await
         })
         .await
     }
@@ -122,9 +144,14 @@ impl<'tx> ReadOperations for SqlConnectorTransaction<'tx> {
 
 #[async_trait]
 impl<'tx> WriteOperations for SqlConnectorTransaction<'tx> {
-    async fn create_record(&mut self, model: &ModelRef, args: WriteArgs) -> connector::Result<SelectionResult> {
+    async fn create_record(
+        &mut self,
+        model: &ModelRef,
+        args: WriteArgs,
+        trace_id: Option<String>,
+    ) -> connector::Result<SelectionResult> {
         catch(self.connection_info.clone(), async move {
-            write::create_record(&self.inner, model, args).await
+            write::create_record(&self.inner, model, args, trace_id).await
         })
         .await
     }
@@ -134,6 +161,7 @@ impl<'tx> WriteOperations for SqlConnectorTransaction<'tx> {
         model: &ModelRef,
         args: Vec<WriteArgs>,
         skip_duplicates: bool,
+        trace_id: Option<String>,
     ) -> connector::Result<usize> {
         catch(self.connection_info.clone(), async move {
             write::create_records(
@@ -142,6 +170,7 @@ impl<'tx> WriteOperations for SqlConnectorTransaction<'tx> {
                 model,
                 args,
                 skip_duplicates,
+                trace_id,
             )
             .await
         })
@@ -153,16 +182,22 @@ impl<'tx> WriteOperations for SqlConnectorTransaction<'tx> {
         model: &ModelRef,
         record_filter: RecordFilter,
         args: WriteArgs,
+        trace_id: Option<String>,
     ) -> connector::Result<Vec<SelectionResult>> {
         catch(self.connection_info.clone(), async move {
-            write::update_records(&self.inner, model, record_filter, args).await
+            write::update_records(&self.inner, model, record_filter, args, trace_id).await
         })
         .await
     }
 
-    async fn delete_records(&mut self, model: &ModelRef, record_filter: RecordFilter) -> connector::Result<usize> {
+    async fn delete_records(
+        &mut self,
+        model: &ModelRef,
+        record_filter: RecordFilter,
+        trace_id: Option<String>,
+    ) -> connector::Result<usize> {
         catch(self.connection_info.clone(), async move {
-            write::delete_records(&self.inner, model, record_filter).await
+            write::delete_records(&self.inner, model, record_filter, trace_id).await
         })
         .await
     }
@@ -184,9 +219,10 @@ impl<'tx> WriteOperations for SqlConnectorTransaction<'tx> {
         field: &RelationFieldRef,
         parent_id: &SelectionResult,
         child_ids: &[SelectionResult],
+        trace_id: Option<String>,
     ) -> connector::Result<()> {
         catch(self.connection_info.clone(), async move {
-            write::m2m_disconnect(&self.inner, field, parent_id, child_ids).await
+            write::m2m_disconnect(&self.inner, field, parent_id, child_ids, trace_id).await
         })
         .await
     }

@@ -18,8 +18,15 @@ pub async fn get_single_record(
     filter: &Filter,
     selected_fields: &ModelProjection,
     aggr_selections: &[RelAggregationSelection],
+    trace_id: Option<String>,
 ) -> crate::Result<Option<SingleRecord>> {
-    let query = read::get_records(model, selected_fields.as_columns(), aggr_selections, filter);
+    let query = read::get_records(
+        model,
+        selected_fields.as_columns(),
+        aggr_selections,
+        filter,
+        trace_id.clone(),
+    );
 
     let mut field_names: Vec<_> = selected_fields.db_names().collect();
     let mut aggr_field_names: Vec<_> = aggr_selections.iter().map(|aggr_sel| aggr_sel.db_alias()).collect();
@@ -36,7 +43,7 @@ pub async fn get_single_record(
 
     let meta = column_metadata::create(field_names.as_slice(), idents.as_slice());
 
-    let record = (match conn.find(query, meta.as_slice()).await {
+    let record = (match conn.find(query, meta.as_slice(), trace_id).await {
         Ok(result) => Ok(Some(result)),
         Err(_e @ SqlError::RecordNotFoundForWhere(_)) => Ok(None),
         Err(_e @ SqlError::RecordDoesNotExist) => Ok(None),
@@ -56,6 +63,7 @@ pub async fn get_many_records(
     selected_fields: &ModelProjection,
     aggr_selections: &[RelAggregationSelection],
     sql_info: SqlInfo,
+    trace_id: Option<String>,
 ) -> crate::Result<ManyRecords> {
     let reversed = query_arguments.needs_reversed_order();
 
@@ -106,9 +114,15 @@ pub async fn get_many_records(
             let mut futures = FuturesUnordered::new();
 
             for args in batches.into_iter() {
-                let query = read::get_records(model, selected_fields.as_columns(), aggr_selections, args);
+                let query = read::get_records(
+                    model,
+                    selected_fields.as_columns(),
+                    aggr_selections,
+                    args,
+                    trace_id.clone(),
+                );
 
-                futures.push(conn.filter(query.into(), meta.as_slice()));
+                futures.push(conn.filter(query.into(), meta.as_slice(), trace_id.clone()));
             }
 
             while let Some(result) = futures.next().await {
@@ -122,9 +136,15 @@ pub async fn get_many_records(
             }
         }
         _ => {
-            let query = read::get_records(model, selected_fields.as_columns(), aggr_selections, query_arguments);
+            let query = read::get_records(
+                model,
+                selected_fields.as_columns(),
+                aggr_selections,
+                query_arguments,
+                trace_id.clone(),
+            );
 
-            for item in conn.filter(query.into(), meta.as_slice()).await?.into_iter() {
+            for item in conn.filter(query.into(), meta.as_slice(), trace_id).await?.into_iter() {
                 records.push(Record::from(item))
             }
         }
@@ -142,6 +162,7 @@ pub async fn get_related_m2m_record_ids(
     conn: &dyn QueryExt,
     from_field: &RelationFieldRef,
     from_record_ids: &[SelectionResult],
+    trace_id: Option<String>,
 ) -> crate::Result<Vec<(SelectionResult, SelectionResult)>> {
     let mut idents = vec![];
     idents.extend(ModelProjection::from(from_field.model().primary_identifier()).type_identifiers_with_arities());
@@ -178,7 +199,7 @@ pub async fn get_related_m2m_record_ids(
 
     // first parent id, then child id
     Ok(conn
-        .filter(select.into(), meta.as_slice())
+        .filter(select.into(), meta.as_slice(), trace_id)
         .await?
         .into_iter()
         .map(|row| {
@@ -214,11 +235,12 @@ pub async fn aggregate(
     selections: Vec<AggregationSelection>,
     group_by: Vec<ScalarFieldRef>,
     having: Option<Filter>,
+    trace_id: Option<String>,
 ) -> crate::Result<Vec<AggregationRow>> {
     if !group_by.is_empty() {
-        group_by_aggregate(conn, model, query_arguments, selections, group_by, having).await
+        group_by_aggregate(conn, model, query_arguments, selections, group_by, having, trace_id).await
     } else {
-        plain_aggregate(conn, model, query_arguments, selections)
+        plain_aggregate(conn, model, query_arguments, selections, trace_id)
             .await
             .map(|v| vec![v])
     }
@@ -230,8 +252,9 @@ async fn plain_aggregate(
     model: &ModelRef,
     query_arguments: QueryArguments,
     selections: Vec<AggregationSelection>,
+    trace_id: Option<String>,
 ) -> crate::Result<Vec<AggregationResult>> {
-    let query = read::aggregate(model, &selections, query_arguments);
+    let query = read::aggregate(model, &selections, query_arguments, trace_id.clone());
 
     let idents: Vec<_> = selections
         .iter()
@@ -241,7 +264,7 @@ async fn plain_aggregate(
 
     let meta = column_metadata::create_anonymous(&idents);
 
-    let mut rows = conn.filter(query.into(), meta.as_slice()).await?;
+    let mut rows = conn.filter(query.into(), meta.as_slice(), trace_id).await?;
     let row = rows
         .pop()
         .expect("Expected exactly one return row for aggregation query.");
@@ -257,8 +280,9 @@ async fn group_by_aggregate(
     selections: Vec<AggregationSelection>,
     group_by: Vec<ScalarFieldRef>,
     having: Option<Filter>,
+    trace_id: Option<String>,
 ) -> crate::Result<Vec<AggregationRow>> {
-    let query = read::group_by_aggregate(model, query_arguments, &selections, group_by, having);
+    let query = read::group_by_aggregate(model, query_arguments, &selections, group_by, having, trace_id.clone());
 
     let idents: Vec<_> = selections
         .iter()
@@ -267,7 +291,7 @@ async fn group_by_aggregate(
         .collect();
 
     let meta = column_metadata::create_anonymous(&idents);
-    let rows = conn.filter(query.into(), meta.as_slice()).await?;
+    let rows = conn.filter(query.into(), meta.as_slice(), trace_id).await?;
 
     Ok(rows
         .into_iter()

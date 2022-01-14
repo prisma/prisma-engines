@@ -122,7 +122,7 @@ async fn graphql_handler(mut req: Request<State>) -> tide::Result {
         let cx = req.state().cx.clone();
 
         let handler = GraphQlHandler::new(&*cx.executor, cx.query_schema());
-        let result = handler.handle(body, tx_id).await;
+        let result = handler.handle(body, tx_id, None).await;
 
         let mut res = Response::new(StatusCode::Ok);
         res.set_body(Body::from_json(&result)?);

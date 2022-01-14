@@ -311,25 +311,13 @@ services:
     networks:
       - databases
 
-  jaeger:
-    image: jaegertracing/all-in-one:latest
-    restart: always
+  otel:
+    image: jaegertracing/opentelemetry-all-in-one:latest
     ports:
-      - "16686:16686" # the trace viewer (http)
-    networks:
-      - telemetry
-
-  otel-agent:
-    image: otel/opentelemetry-collector-dev:latest
-    command: [ "--config=/etc/otel-agent-config.yaml" ]
-    restart: always
-    volumes:
-      - ./otel-agent-config.yaml:/etc/otel-agent-config.yaml
-    ports:
-      - 13133:13133 # health check port
-      - 16686:16686 # UI viewer
-      - 4317:55680 # Otel endpoint
+      - 13133:13133
+      - 16686:16686
+      - 4317:55680
 
 networks:
   databases: null
-  telemetry: null
+
