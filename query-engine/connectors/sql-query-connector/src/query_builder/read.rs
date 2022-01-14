@@ -41,7 +41,12 @@ impl SelectDefinition for &Filter {
 }
 
 impl SelectDefinition for Select<'static> {
-    fn into_select(self, _: &ModelRef, _: &[RelAggregationSelection], _trace_id: Option<String>) -> (Select<'static>, Vec<Expression<'static>>) {
+    fn into_select(
+        self,
+        _: &ModelRef,
+        _: &[RelAggregationSelection],
+        _trace_id: Option<String>,
+    ) -> (Select<'static>, Vec<Expression<'static>>) {
         (self, vec![])
     }
 }
@@ -155,13 +160,20 @@ where
 /// Important note: Do not use the AsColumn trait here as we need to construct column references that are relative,
 /// not absolute - e.g. `SELECT "field" FROM (...)` NOT `SELECT "full"."path"."to"."field" FROM (...)`.
 #[tracing::instrument(skip(model, selections, args))]
-pub fn aggregate(model: &ModelRef, selections: &[AggregationSelection], args: QueryArguments, trace_id: Option<String>) -> Select<'static> {
+pub fn aggregate(
+    model: &ModelRef,
+    selections: &[AggregationSelection],
+    args: QueryArguments,
+    trace_id: Option<String>,
+) -> Select<'static> {
     let columns = extract_columns(model, &selections);
     let sub_query = get_records(model, columns.into_iter(), &[], args, trace_id.clone());
     let sub_table = Table::from(sub_query).alias("sub");
 
     selections.iter().fold(
-        Select::from_table(sub_table).append_trace(&Span::current()).add_trace_id(trace_id),
+        Select::from_table(sub_table)
+            .append_trace(&Span::current())
+            .add_trace_id(trace_id),
         |select, next_op| match next_op {
             AggregationSelection::Field(field) => select.column(Column::from(field.db_name().to_owned())),
 
@@ -239,11 +251,10 @@ pub fn group_by_aggregate(
             .fold(select, |select, next_field| select.value(max(next_field.as_column()))),
     });
 
-    let grouped = group_by
-        .into_iter()
-        .fold(select_query.append_trace(&Span::current()).add_trace_id(trace_id), |query, field| {
-            query.group_by(field.as_column())
-        });
+    let grouped = group_by.into_iter().fold(
+        select_query.append_trace(&Span::current()).add_trace_id(trace_id),
+        |query, field| query.group_by(field.as_column()),
+    );
 
     match having {
         Some(filter) => grouped.having(filter.aliased_cond(None)),

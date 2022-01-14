@@ -10,7 +10,11 @@ use tracing::Span;
 /// `INSERT` a new record to the database. Resulting an `INSERT` ast and an
 /// optional `RecordProjection` if available from the arguments or model.
 #[tracing::instrument(skip(model, args))]
-pub fn create_record(model: &ModelRef, mut args: WriteArgs, trace_id: Option<String>) -> (Insert<'static>, Option<SelectionResult>) {
+pub fn create_record(
+    model: &ModelRef,
+    mut args: WriteArgs,
+    trace_id: Option<String>,
+) -> (Insert<'static>, Option<SelectionResult>) {
     let return_id = args.as_record_projection(model.primary_identifier().into());
 
     let fields: Vec<_> = model
@@ -95,7 +99,7 @@ pub fn create_records_nonempty(
 
 /// `INSERT` empty records statement.
 #[tracing::instrument(skip(model, skip_duplicates))]
-pub fn create_records_empty(model: &ModelRef, skip_duplicates: bool, trace_id: Option<String>,) -> Insert<'static> {
+pub fn create_records_empty(model: &ModelRef, skip_duplicates: bool, trace_id: Option<String>) -> Insert<'static> {
     let insert: Insert<'static> = Insert::single_into(model.as_table()).into();
     let insert = insert.append_trace(&Span::current()).add_trace_id(trace_id);
 
@@ -107,7 +111,12 @@ pub fn create_records_empty(model: &ModelRef, skip_duplicates: bool, trace_id: O
 }
 
 #[tracing::instrument(skip(model, ids, args))]
-pub fn update_many(model: &ModelRef, ids: &[&SelectionResult], args: WriteArgs, trace_id: Option<String>) -> crate::Result<Vec<Query<'static>>> {
+pub fn update_many(
+    model: &ModelRef,
+    ids: &[&SelectionResult],
+    args: WriteArgs,
+    trace_id: Option<String>,
+) -> crate::Result<Vec<Query<'static>>> {
     if args.args.is_empty() || ids.is_empty() {
         return Ok(Vec::new());
     }

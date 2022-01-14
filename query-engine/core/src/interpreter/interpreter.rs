@@ -207,7 +207,9 @@ impl<'conn> QueryInterpreter<'conn> {
                     for binding in bindings {
                         self.log_line(level + 1, || format!("bind {} ", &binding.name));
 
-                        let result = self.interpret(binding.expr, env.clone(), level + 2, trace_id.clone()).await?;
+                        let result = self
+                            .interpret(binding.expr, env.clone(), level + 2, trace_id.clone())
+                            .await?;
                         inner_env.insert(binding.name, result);
                     }
 
@@ -233,7 +235,9 @@ impl<'conn> QueryInterpreter<'conn> {
 
                     Query::Write(write) => {
                         self.log_line(level, || format!("WRITE {}", write));
-                        Ok(write::execute(self.conn, write, trace_id).await.map(ExpressionResult::Query)?)
+                        Ok(write::execute(self.conn, write, trace_id)
+                            .await
+                            .map(ExpressionResult::Query)?)
                     }
                 }
             }),
@@ -263,9 +267,11 @@ impl<'conn> QueryInterpreter<'conn> {
                 self.log_line(level, || "IF");
 
                 if func() {
-                    self.interpret(Expression::Sequence { seq: then }, env, level + 1, trace_id).await
+                    self.interpret(Expression::Sequence { seq: then }, env, level + 1, trace_id)
+                        .await
                 } else {
-                    self.interpret(Expression::Sequence { seq: elze }, env, level + 1, trace_id).await
+                    self.interpret(Expression::Sequence { seq: elze }, env, level + 1, trace_id)
+                        .await
                 }
             }),
 

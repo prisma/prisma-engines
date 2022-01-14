@@ -64,7 +64,15 @@ where
     ) -> connector::Result<Option<SingleRecord>> {
         // [Composites] todo: FieldSelection -> ModelProjection conversion
         catch(self.connection_info.clone(), async move {
-            read::get_single_record(&self.inner, model, filter, &selected_fields.into(), aggr_selections, trace_id).await
+            read::get_single_record(
+                &self.inner,
+                model,
+                filter,
+                &selected_fields.into(),
+                aggr_selections,
+                trace_id,
+            )
+            .await
         })
         .await
     }
@@ -85,7 +93,7 @@ where
                 &selected_fields.into(),
                 aggr_selections,
                 SqlInfo::from(&self.connection_info),
-                trace_id
+                trace_id,
             )
             .await
         })
@@ -114,7 +122,16 @@ where
         trace_id: Option<String>,
     ) -> connector::Result<Vec<AggregationRow>> {
         catch(self.connection_info.clone(), async move {
-            read::aggregate(&self.inner, model, query_arguments, selections, group_by, having, trace_id).await
+            read::aggregate(
+                &self.inner,
+                model,
+                query_arguments,
+                selections,
+                group_by,
+                having,
+                trace_id,
+            )
+            .await
         })
         .await
     }
@@ -125,7 +142,12 @@ impl<C> WriteOperations for SqlConnection<C>
 where
     C: QueryExt + Send + Sync + 'static,
 {
-    async fn create_record(&mut self, model: &ModelRef, args: WriteArgs, trace_id: Option<String>) -> connector::Result<SelectionResult> {
+    async fn create_record(
+        &mut self,
+        model: &ModelRef,
+        args: WriteArgs,
+        trace_id: Option<String>,
+    ) -> connector::Result<SelectionResult> {
         catch(self.connection_info.clone(), async move {
             write::create_record(&self.inner, model, args, trace_id).await
         })
@@ -146,7 +168,7 @@ where
                 model,
                 args,
                 skip_duplicates,
-                trace_id
+                trace_id,
             )
             .await
         })
@@ -166,7 +188,12 @@ where
         .await
     }
 
-    async fn delete_records(&mut self, model: &ModelRef, record_filter: RecordFilter, trace_id: Option<String>) -> connector::Result<usize> {
+    async fn delete_records(
+        &mut self,
+        model: &ModelRef,
+        record_filter: RecordFilter,
+        trace_id: Option<String>,
+    ) -> connector::Result<usize> {
         catch(self.connection_info.clone(), async move {
             write::delete_records(&self.inner, model, record_filter, trace_id).await
         })

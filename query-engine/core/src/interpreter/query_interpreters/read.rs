@@ -26,12 +26,22 @@ pub fn execute<'conn>(
 
 /// Queries a single record.
 #[tracing::instrument(skip(tx, query, trace_id))]
-fn read_one(tx: &mut dyn ConnectionLike, query: RecordQuery, trace_id: Option<String>) -> BoxFuture<'_, InterpretationResult<QueryResult>> {
+fn read_one(
+    tx: &mut dyn ConnectionLike,
+    query: RecordQuery,
+    trace_id: Option<String>,
+) -> BoxFuture<'_, InterpretationResult<QueryResult>> {
     let fut = async move {
         let model = query.model;
         let filter = query.filter.expect("Expected filter to be set for ReadOne query.");
         let scalars = tx
-            .get_single_record(&model, &filter, &query.selected_fields, &query.aggregation_selections, trace_id)
+            .get_single_record(
+                &model,
+                &filter,
+                &query.selected_fields,
+                &query.aggregation_selections,
+                trace_id,
+            )
             .await?;
 
         match scalars {
@@ -74,7 +84,6 @@ fn read_one(tx: &mut dyn ConnectionLike, query: RecordQuery, trace_id: Option<St
 ///    We need to select IDs / uniques alongside the distincts, which doesn't work in SQL, as all records
 ///    are distinct by definition if a unique is in the selection set.
 /// -> Unstable cursors can't reliably be fetched by the underlying datasource, so we need to process part of it in-memory.
-#[tracing::instrument(skip(tx, query))]
 fn read_many(
     tx: &mut dyn ConnectionLike,
     mut query: ManyRecordsQuery,
@@ -176,11 +185,22 @@ fn read_related<'conn>(
     fut.boxed()
 }
 
-async fn aggregate(tx: &mut dyn ConnectionLike, query: AggregateRecordsQuery, trace_id: Option<String>) -> InterpretationResult<QueryResult> {
+async fn aggregate(
+    tx: &mut dyn ConnectionLike,
+    query: AggregateRecordsQuery,
+    trace_id: Option<String>,
+) -> InterpretationResult<QueryResult> {
     let selection_order = query.selection_order;
 
     let results = tx
-        .aggregate_records(&query.model, query.args, query.selectors, query.group_by, query.having, trace_id)
+        .aggregate_records(
+            &query.model,
+            query.args,
+            query.selectors,
+            query.group_by,
+            query.having,
+            trace_id,
+        )
         .await?;
 
     Ok(QueryResult::RecordAggregations(RecordAggregations {

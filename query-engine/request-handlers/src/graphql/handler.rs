@@ -30,7 +30,9 @@ impl<'a> GraphQlHandler<'a> {
         match body.into_doc() {
             Ok(QueryDocument::Single(query)) => self.handle_single(query, tx_id, trace_id).await,
             Ok(QueryDocument::Multi(batch)) => match batch.compact() {
-                BatchDocument::Multi(batch, transactional) => self.handle_batch(batch, transactional, tx_id, trace_id).await,
+                BatchDocument::Multi(batch, transactional) => {
+                    self.handle_batch(batch, transactional, tx_id, trace_id).await
+                }
                 BatchDocument::Compact(compacted) => self.handle_compacted(compacted, tx_id, trace_id).await,
             },
             Err(err) => PrismaResponse::Single(err.into()),
@@ -40,7 +42,10 @@ impl<'a> GraphQlHandler<'a> {
     async fn handle_single(&self, query: Operation, tx_id: Option<TxId>, trace_id: Option<String>) -> PrismaResponse {
         use user_facing_errors::Error;
 
-        let gql_response = match AssertUnwindSafe(self.handle_graphql(query, tx_id, trace_id)).catch_unwind().await {
+        let gql_response = match AssertUnwindSafe(self.handle_graphql(query, tx_id, trace_id))
+            .catch_unwind()
+            .await
+        {
             Ok(Ok(response)) => response.into(),
             Ok(Err(err)) => err.into(),
             Err(err) => {
@@ -53,13 +58,22 @@ impl<'a> GraphQlHandler<'a> {
         PrismaResponse::Single(gql_response)
     }
 
-    async fn handle_batch(&self, queries: Vec<Operation>, transactional: bool, tx_id: Option<TxId>, trace_id: Option<String>) -> PrismaResponse {
+    async fn handle_batch(
+        &self,
+        queries: Vec<Operation>,
+        transactional: bool,
+        tx_id: Option<TxId>,
+        trace_id: Option<String>,
+    ) -> PrismaResponse {
         use user_facing_errors::Error;
 
-        match AssertUnwindSafe(
-            self.executor
-                .execute_all(tx_id, queries, transactional, self.query_schema.clone(), trace_id),
-        )
+        match AssertUnwindSafe(self.executor.execute_all(
+            tx_id,
+            queries,
+            transactional,
+            self.query_schema.clone(),
+            trace_id,
+        ))
         .catch_unwind()
         .await
         {
@@ -86,7 +100,12 @@ impl<'a> GraphQlHandler<'a> {
     }
 
     #[tracing::instrument(skip(self, document))]
-    async fn handle_compacted(&self, document: CompactedDocument, tx_id: Option<TxId>, trace_id: Option<String>) -> PrismaResponse {
+    async fn handle_compacted(
+        &self,
+        document: CompactedDocument,
+        tx_id: Option<TxId>,
+        trace_id: Option<String>,
+    ) -> PrismaResponse {
         use user_facing_errors::Error;
 
         let plural_name = document.plural_name();
@@ -153,7 +172,14 @@ impl<'a> GraphQlHandler<'a> {
         }
     }
 
-    async fn handle_graphql(&self, query_doc: Operation, tx_id: Option<TxId>, trace_id: Option<String>) -> query_core::Result<ResponseData> {
-        self.executor.execute(tx_id, query_doc, self.query_schema.clone(), trace_id).await
+    async fn handle_graphql(
+        &self,
+        query_doc: Operation,
+        tx_id: Option<TxId>,
+        trace_id: Option<String>,
+    ) -> query_core::Result<ResponseData> {
+        self.executor
+            .execute(tx_id, query_doc, self.query_schema.clone(), trace_id)
+            .await
     }
 }

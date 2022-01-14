@@ -33,7 +33,9 @@ pub async fn m2m(
         return Ok((ManyRecords::empty(&query.selected_fields), None));
     }
 
-    let ids = tx.get_related_m2m_record_ids(&query.parent_field, &parent_ids, trace_id.clone()).await?;
+    let ids = tx
+        .get_related_m2m_record_ids(&query.parent_field, &parent_ids, trace_id.clone())
+        .await?;
     if ids.is_empty() {
         return Ok((ManyRecords::empty(&query.selected_fields), None));
     }
@@ -205,8 +207,14 @@ pub async fn one2m(
             Some(existing_filter) => Some(Filter::and(vec![existing_filter, filter])),
             None => Some(filter),
         };
-        tx.get_many_records(&parent_field.related_model(), args, selected_fields, &aggr_selections, trace_id)
-            .await?
+        tx.get_many_records(
+            &parent_field.related_model(),
+            args,
+            selected_fields,
+            &aggr_selections,
+            trace_id,
+        )
+        .await?
     };
 
     // Inlining is done on the parent, this means that we need to write the primary parent ID

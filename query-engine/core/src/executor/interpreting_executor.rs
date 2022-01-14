@@ -70,7 +70,9 @@ where
         trace_id: Option<String>,
     ) -> crate::Result<ResponseData> {
         let interpreter = QueryInterpreter::new(conn);
-        let result = QueryPipeline::new(graph, interpreter, serializer).execute(trace_id).await;
+        let result = QueryPipeline::new(graph, interpreter, serializer)
+            .execute(trace_id)
+            .await;
 
         result
     }
@@ -209,7 +211,7 @@ where
                             graph,
                             serializer,
                             self.force_transactions,
-                            trace_id.clone()
+                            trace_id.clone(),
                         )));
                     }
 

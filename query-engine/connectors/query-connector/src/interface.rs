@@ -273,7 +273,12 @@ pub trait ReadOperations {
 #[async_trait]
 pub trait WriteOperations {
     /// Insert a single record to the database.
-    async fn create_record(&mut self, model: &ModelRef, args: WriteArgs, trace_id: Option<String>) -> crate::Result<SelectionResult>;
+    async fn create_record(
+        &mut self,
+        model: &ModelRef,
+        args: WriteArgs,
+        trace_id: Option<String>,
+    ) -> crate::Result<SelectionResult>;
 
     /// Inserts many records at once into the database.
     async fn create_records(
@@ -295,7 +300,12 @@ pub trait WriteOperations {
     ) -> crate::Result<Vec<SelectionResult>>;
 
     /// Delete records in the `Model` with the given `Filter`.
-    async fn delete_records(&mut self, model: &ModelRef, record_filter: RecordFilter, trace_id: Option<String>,) -> crate::Result<usize>;
+    async fn delete_records(
+        &mut self,
+        model: &ModelRef,
+        record_filter: RecordFilter,
+        trace_id: Option<String>,
+    ) -> crate::Result<usize>;
 
     // We plan to remove the methods below in the future. We want emulate them with the ones above. Those should suffice.
 

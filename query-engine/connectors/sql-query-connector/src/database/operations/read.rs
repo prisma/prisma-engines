@@ -20,7 +20,13 @@ pub async fn get_single_record(
     aggr_selections: &[RelAggregationSelection],
     trace_id: Option<String>,
 ) -> crate::Result<Option<SingleRecord>> {
-    let query = read::get_records(model, selected_fields.as_columns(), aggr_selections, filter, trace_id.clone());
+    let query = read::get_records(
+        model,
+        selected_fields.as_columns(),
+        aggr_selections,
+        filter,
+        trace_id.clone(),
+    );
 
     let mut field_names: Vec<_> = selected_fields.db_names().collect();
     let mut aggr_field_names: Vec<_> = aggr_selections.iter().map(|aggr_sel| aggr_sel.db_alias()).collect();
@@ -108,7 +114,13 @@ pub async fn get_many_records(
             let mut futures = FuturesUnordered::new();
 
             for args in batches.into_iter() {
-                let query = read::get_records(model, selected_fields.as_columns(), aggr_selections, args, trace_id.clone());
+                let query = read::get_records(
+                    model,
+                    selected_fields.as_columns(),
+                    aggr_selections,
+                    args,
+                    trace_id.clone(),
+                );
 
                 futures.push(conn.filter(query.into(), meta.as_slice(), trace_id.clone()));
             }
@@ -124,7 +136,13 @@ pub async fn get_many_records(
             }
         }
         _ => {
-            let query = read::get_records(model, selected_fields.as_columns (), aggr_selections, query_arguments, trace_id.clone());
+            let query = read::get_records(
+                model,
+                selected_fields.as_columns(),
+                aggr_selections,
+                query_arguments,
+                trace_id.clone(),
+            );
 
             for item in conn.filter(query.into(), meta.as_slice(), trace_id).await?.into_iter() {
                 records.push(Record::from(item))

@@ -11,7 +11,12 @@ use user_facing_errors::query_engine::DatabaseConstraint;
 /// Create a single record to the database defined in `conn`, resulting into a
 /// `RecordProjection` as an identifier pointing to the just-created record.
 #[tracing::instrument(skip(conn, model, args))]
-pub async fn create_record(conn: &dyn QueryExt, model: &ModelRef, args: WriteArgs, trace_id: Option<String>) -> crate::Result<SelectionResult> {
+pub async fn create_record(
+    conn: &dyn QueryExt,
+    model: &ModelRef,
+    args: WriteArgs,
+    trace_id: Option<String>,
+) -> crate::Result<SelectionResult> {
     let (insert, returned_id) = write::create_record(model, args, trace_id);
 
     let result_set = match conn.insert(insert).await {
