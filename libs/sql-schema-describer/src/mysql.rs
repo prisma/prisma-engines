@@ -366,7 +366,7 @@ impl<'a> SqlSchemaDescriber<'a> {
                             //todo check other now() definitions
                             ColumnTypeFamily::DateTime => match Self::default_is_current_timestamp(&default_string) {
                                 true => DefaultValue::now(),
-                                _ => Self::db_generated_date_time(&default_string, default_generated),
+                                _ => Self::db_generated_date_time(&default_string, default_expression),
                             },
                             ColumnTypeFamily::Binary => Self::db_generated(&default_string, default_expression),
                             ColumnTypeFamily::Json => Self::db_generated(&default_string, default_expression),
