@@ -469,8 +469,15 @@ fn serialize_composite(cf: &CompositeFieldRef, out_field: &OutputFieldRef, value
             let composite_type = &cf.typ;
 
             for (field_name, value) in pairs {
-                let inner_field = composite_type.find_field(&field_name).unwrap();
-                let inner_out_field = object_type.find_field(&field_name).unwrap();
+                // The field on the composite type.
+                // This will cause clashes if one field has an @map("name") and the other field is named "field" directly.
+                let inner_field = composite_type
+                    .find_field(&field_name)
+                    .or(composite_type.find_field_by_db_name(&field_name))
+                    .unwrap();
+
+                // The field on the output object type. Used for the actual serialization process.
+                let inner_out_field = object_type.find_field(inner_field.name()).unwrap();
 
                 match inner_field {
                     Field::Composite(cf) => {
