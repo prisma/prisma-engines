@@ -1,4 +1,4 @@
-use crate::{parent_container::ParentContainer, CompositeTypeRef, ScalarFieldRef};
+use crate::{parent_container::ParentContainer, CompositeTypeRef};
 use datamodel::FieldArity;
 use std::{
     fmt::Debug,
@@ -29,29 +29,6 @@ impl CompositeField {
 
     pub fn db_name(&self) -> &str {
         self.db_name.as_deref().unwrap_or_else(|| self.name.as_str())
-    }
-
-    pub fn scalar_fields(&self) -> Vec<ScalarFieldRef> {
-        // let fields = self.fields.get_or_init(|| {
-        //     let model = self.model();
-        //     let fields = model.fields();
-
-        //     self.relation_info
-        //         .fields
-        //         .iter()
-        //         .map(|f| {
-        //             Arc::downgrade(&fields.find_from_scalar(f).unwrap_or_else(|_| {
-        //                 panic!(
-        //                     "Expected '{}' to be a scalar field on model '{}', found none.",
-        //                     f, model.name
-        //                 )
-        //             }))
-        //         })
-        //         .collect()
-        // });
-
-        // fields.iter().map(|f| f.upgrade().unwrap()).collect()
-        todo!()
     }
 
     pub fn container(&self) -> &ParentContainer {
