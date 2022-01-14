@@ -63,6 +63,7 @@ impl WriteOperations for MongoDbConnection {
         model: &ModelRef,
         record_filter: connector_interface::RecordFilter,
         args: WriteArgs,
+        _trace_id: Option<String>,
     ) -> connector_interface::Result<Vec<SelectionResult>> {
         catch(async move { write::update_records(&self.database, &mut self.session, model, record_filter, args).await })
             .await
@@ -72,6 +73,7 @@ impl WriteOperations for MongoDbConnection {
         &mut self,
         model: &ModelRef,
         record_filter: connector_interface::RecordFilter,
+        _trace_id: Option<String>,
     ) -> connector_interface::Result<usize> {
         catch(async move { write::delete_records(&self.database, &mut self.session, model, record_filter).await }).await
     }
@@ -123,6 +125,7 @@ impl ReadOperations for MongoDbConnection {
         filter: &connector_interface::Filter,
         selected_fields: &FieldSelection,
         aggr_selections: &[RelAggregationSelection],
+        _trace_id: Option<String>,
     ) -> connector_interface::Result<Option<SingleRecord>> {
         catch(async move {
             read::get_single_record(
@@ -144,6 +147,7 @@ impl ReadOperations for MongoDbConnection {
         query_arguments: connector_interface::QueryArguments,
         selected_fields: &FieldSelection,
         aggregation_selections: &[RelAggregationSelection],
+        _trace_id: Option<String>,
     ) -> connector_interface::Result<ManyRecords> {
         catch(async move {
             read::get_many_records(
@@ -163,6 +167,7 @@ impl ReadOperations for MongoDbConnection {
         &mut self,
         from_field: &RelationFieldRef,
         from_record_ids: &[SelectionResult],
+        _trace_id: Option<String>,
     ) -> connector_interface::Result<Vec<(SelectionResult, SelectionResult)>> {
         catch(async move {
             read::get_related_m2m_record_ids(&self.database, &mut self.session, from_field, from_record_ids).await
@@ -177,6 +182,7 @@ impl ReadOperations for MongoDbConnection {
         selections: Vec<connector_interface::AggregationSelection>,
         group_by: Vec<ScalarFieldRef>,
         having: Option<connector_interface::Filter>,
+        _trace_id: Option<String>,
     ) -> connector_interface::Result<Vec<connector_interface::AggregationRow>> {
         catch(async move {
             aggregate::aggregate(

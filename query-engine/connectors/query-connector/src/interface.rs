@@ -222,6 +222,7 @@ pub trait ReadOperations {
         filter: &Filter,
         selected_fields: &FieldSelection,
         aggregation_selections: &[RelAggregationSelection],
+        trace_id: Option<String>,
     ) -> crate::Result<Option<SingleRecord>>;
 
     /// Gets multiple records from the database.
@@ -236,6 +237,7 @@ pub trait ReadOperations {
         query_arguments: QueryArguments,
         selected_fields: &FieldSelection,
         aggregation_selections: &[RelAggregationSelection],
+        trace_id: Option<String>,
     ) -> crate::Result<ManyRecords>;
 
     /// Retrieves pairs of IDs that belong together from a intermediate join
@@ -249,6 +251,7 @@ pub trait ReadOperations {
         &mut self,
         from_field: &RelationFieldRef,
         from_record_ids: &[SelectionResult],
+        trace_id: Option<String>,
     ) -> crate::Result<Vec<(SelectionResult, SelectionResult)>>;
 
     /// Aggregates records for a specific model based on the given selections.
@@ -263,6 +266,7 @@ pub trait ReadOperations {
         selections: Vec<AggregationSelection>,
         group_by: Vec<ScalarFieldRef>,
         having: Option<Filter>,
+        trace_id: Option<String>,
     ) -> crate::Result<Vec<AggregationRow>>;
 }
 
@@ -286,10 +290,11 @@ pub trait WriteOperations {
         model: &ModelRef,
         record_filter: RecordFilter,
         args: WriteArgs,
+        trace_id: Option<String>,
     ) -> crate::Result<Vec<SelectionResult>>;
 
     /// Delete records in the `Model` with the given `Filter`.
-    async fn delete_records(&mut self, model: &ModelRef, record_filter: RecordFilter) -> crate::Result<usize>;
+    async fn delete_records(&mut self, model: &ModelRef, record_filter: RecordFilter, trace_id: Option<String>,) -> crate::Result<usize>;
 
     // We plan to remove the methods below in the future. We want emulate them with the ones above. Those should suffice.
 

@@ -233,7 +233,7 @@ impl<'conn> QueryInterpreter<'conn> {
 
                     Query::Write(write) => {
                         self.log_line(level, || format!("WRITE {}", write));
-                        Ok(write::execute(self.conn, write).await.map(ExpressionResult::Query)?)
+                        Ok(write::execute(self.conn, write, trace_id).await.map(ExpressionResult::Query)?)
                     }
                 }
             }),

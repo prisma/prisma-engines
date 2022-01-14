@@ -15,9 +15,9 @@ pub fn execute<'conn>(
     let fut = async move {
         match query {
             ReadQuery::RecordQuery(q) => read_one(tx, q, trace_id).await,
-            ReadQuery::ManyRecordsQuery(q) => read_many(tx, q).await,
-            ReadQuery::RelatedRecordsQuery(q) => read_related(tx, q, parent_result).await,
-            ReadQuery::AggregateRecordsQuery(q) => aggregate(tx, q).await,
+            ReadQuery::ManyRecordsQuery(q) => read_many(tx, q, trace_id).await,
+            ReadQuery::RelatedRecordsQuery(q) => read_related(tx, q, parent_result, trace_id).await,
+            ReadQuery::AggregateRecordsQuery(q) => aggregate(tx, q, trace_id).await,
         }
     };
 
@@ -31,7 +31,7 @@ fn read_one(tx: &mut dyn ConnectionLike, query: RecordQuery, trace_id: Option<St
         let model = query.model;
         let filter = query.filter.expect("Expected filter to be set for ReadOne query.");
         let scalars = tx
-            .get_single_record(&model, &filter, &query.selected_fields, &query.aggregation_selections)
+            .get_single_record(&model, &filter, &query.selected_fields, &query.aggregation_selections, trace_id)
             .await?;
 
         match scalars {
@@ -78,6 +78,7 @@ fn read_one(tx: &mut dyn ConnectionLike, query: RecordQuery, trace_id: Option<St
 fn read_many(
     tx: &mut dyn ConnectionLike,
     mut query: ManyRecordsQuery,
+    trace_id: Option<String>,
 ) -> BoxFuture<'_, InterpretationResult<QueryResult>> {
     let fut = async move {
         let (scalars, aggregation_rows) = if query.args.requires_inmemory_processing() {
@@ -88,6 +89,7 @@ fn read_many(
                     query.args.clone(),
                     &query.selected_fields,
                     &query.aggregation_selections,
+                    trace_id,
                 )
                 .await?;
             let scalars = processor.apply(scalars);
@@ -102,6 +104,7 @@ fn read_many(
                     query.args.clone(),
                     &query.selected_fields,
                     &query.aggregation_selections,
+                    trace_id,
                 )
                 .await?;
             let (scalars, aggregation_rows) =
@@ -131,6 +134,7 @@ fn read_related<'conn>(
     tx: &'conn mut dyn ConnectionLike,
     mut query: RelatedRecordsQuery,
     parent_result: Option<&'conn ManyRecords>,
+    trace_id: Option<String>,
 ) -> BoxFuture<'conn, InterpretationResult<QueryResult>> {
     let fut = async move {
         let relation = query.parent_field.relation();
@@ -138,7 +142,7 @@ fn read_related<'conn>(
         let processor = InMemoryRecordProcessor::new_from_query_args(&mut query.args);
 
         let (scalars, aggregation_rows) = if is_m2m {
-            nested_read::m2m(tx, &query, parent_result, processor).await?
+            nested_read::m2m(tx, &query, parent_result, processor, trace_id).await?
         } else {
             nested_read::one2m(
                 tx,
@@ -149,6 +153,7 @@ fn read_related<'conn>(
                 &query.selected_fields,
                 query.aggregation_selections,
                 processor,
+                trace_id,
             )
             .await?
         };
@@ -171,11 +176,11 @@ fn read_related<'conn>(
     fut.boxed()
 }
 
-async fn aggregate(tx: &mut dyn ConnectionLike, query: AggregateRecordsQuery) -> InterpretationResult<QueryResult> {
+async fn aggregate(tx: &mut dyn ConnectionLike, query: AggregateRecordsQuery, trace_id: Option<String>) -> InterpretationResult<QueryResult> {
     let selection_order = query.selection_order;
 
     let results = tx
-        .aggregate_records(&query.model, query.args, query.selectors, query.group_by, query.having)
+        .aggregate_records(&query.model, query.args, query.selectors, query.group_by, query.having, trace_id)
         .await?;
 
     Ok(QueryResult::RecordAggregations(RecordAggregations {

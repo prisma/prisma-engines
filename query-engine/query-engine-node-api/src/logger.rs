@@ -54,6 +54,7 @@ impl ChannelLogger {
 
     /// Creates a new instance of a logger with the `trace` minimum level.
     /// Enables tracing events to OTLP endpoint.
+    #[allow(dead_code)] // This is not ready for prime time yet!
     pub fn new_with_telemetry(callback: ThreadsafeFunction<String>, endpoint: Option<String>) -> Self {
         let javascript_cb = EventChannel::new(callback, EnvFilter::new("trace"), true);
 

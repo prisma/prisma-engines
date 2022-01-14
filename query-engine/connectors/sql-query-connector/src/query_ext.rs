@@ -39,14 +39,17 @@ pub trait QueryExt: Queryable + Send + Sync {
         let span_ref = otel_ctx.span();
         let span_ctx = span_ref.span_context();
 
+        // TODO: Fix the copy problem here
         let q = match (q, trace_id) {
             (Query::Select(x), _) if span_ctx.trace_flags() == TraceFlags::SAMPLED => {
                 Query::Select(Box::from(x.comment(trace_parent_to_string(span_ctx))))
             },
+            // This is part of the required changes to pass a traceid
             (Query::Select(x), Some(traceparent)) => {
+                //dbg!(traceparent.clone());
                 Query::Select(Box::from(x.comment(format!("traceparent={}", traceparent))))
             },
-            _ => q,
+            (q, _) => q,
         };
 
         let result_set = self.query(q).instrument(span).await?;
@@ -106,8 +109,8 @@ pub trait QueryExt: Queryable + Send + Sync {
 
     /// Select one row from the database.
     #[tracing::instrument(skip(self, q, meta))]
-    async fn find(&self, q: Select<'_>, meta: &[ColumnMetadata<'_>]) -> crate::Result<SqlRow> {
-        self.filter(q.limit(1).into(), meta)
+    async fn find(&self, q: Select<'_>, meta: &[ColumnMetadata<'_>], trace_id: Option<String>) -> crate::Result<SqlRow> {
+        self.filter(q.limit(1).into(), meta, trace_id)
             .await?
             .into_iter()
             .next()
@@ -121,17 +124,18 @@ pub trait QueryExt: Queryable + Send + Sync {
         &self,
         model: &ModelRef,
         record_filter: RecordFilter,
+        trace_id: Option<String>,
     ) -> crate::Result<Vec<SelectionResult>> {
         if let Some(selectors) = record_filter.selectors {
             Ok(selectors)
         } else {
-            self.filter_ids(model, record_filter.filter).await
+            self.filter_ids(model, record_filter.filter, trace_id).await
         }
     }
 
     /// Read the all columns as a (primary) identifier.
     #[tracing::instrument(skip(self, model, filter))]
-    async fn filter_ids(&self, model: &ModelRef, filter: Filter) -> crate::Result<Vec<SelectionResult>> {
+    async fn filter_ids(&self, model: &ModelRef, filter: Filter, trace_id: Option<String>) -> crate::Result<Vec<SelectionResult>> {
         let model_id: ModelProjection = model.primary_identifier().into();
         let id_cols: Vec<Column<'static>> = model_id.as_columns().collect();
 
@@ -140,11 +144,11 @@ pub trait QueryExt: Queryable + Send + Sync {
             .append_trace(&Span::current())
             .so_that(filter.aliased_cond(None));
 
-        self.select_ids(select, model_id).await
+        self.select_ids(select, model_id, trace_id).await
     }
 
     #[tracing::instrument(skip(self, select, model_id))]
-    async fn select_ids(&self, select: Select<'_>, model_id: ModelProjection) -> crate::Result<Vec<SelectionResult>> {
+    async fn select_ids(&self, select: Select<'_>, model_id: ModelProjection, trace_id: Option<String>) -> crate::Result<Vec<SelectionResult>> {
         let idents: Vec<_> = model_id
             .fields()
             .flat_map(|f| match f {
@@ -158,7 +162,7 @@ pub trait QueryExt: Queryable + Send + Sync {
         let meta = column_metadata::create(field_names.as_slice(), &idents);
 
         // TODO: Add tracing
-        let mut rows = self.filter(select.into(), &meta).await?;
+        let mut rows = self.filter(select.into(), &meta, trace_id).await?;
         let mut result = Vec::new();
 
         for row in rows.drain(0..) {

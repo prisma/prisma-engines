@@ -226,8 +226,9 @@ pub async fn update_records(
     model: &ModelRef,
     record_filter: RecordFilter,
     args: WriteArgs,
+    trace_id: Option<String>,
 ) -> crate::Result<Vec<SelectionResult>> {
-    let ids = conn.filter_selectors(model, record_filter).await?;
+    let ids = conn.filter_selectors(model, record_filter, trace_id).await?;
     let id_args = pick_args(&model.primary_identifier().into(), &args);
 
     if ids.is_empty() {
@@ -252,8 +253,9 @@ pub async fn delete_records(
     conn: &dyn QueryExt,
     model: &ModelRef,
     record_filter: RecordFilter,
+    trace_id: Option<String>,
 ) -> crate::Result<usize> {
-    let ids = conn.filter_selectors(model, record_filter).await?;
+    let ids = conn.filter_selectors(model, record_filter, trace_id).await?;
     let ids: Vec<&SelectionResult> = ids.iter().map(|id| &*id).collect();
     let count = ids.len();
 
