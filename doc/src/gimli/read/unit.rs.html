@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;gimli-0.24.0&#x2F;src&#x2F;read&#x2F;unit.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>unit.rs - source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../gimli/index.html'><div class='logo-container rust-logo'><img src='../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">   1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;gimli-0.24.0&#x2F;src&#x2F;read&#x2F;unit.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>unit.rs - source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><script defer src="../../../main.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script>
+    <noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../gimli/index.html'><div class='logo-container rust-logo'><img src='../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">   1</span>
 <span id="2">   2</span>
 <span id="3">   3</span>
 <span id="4">   4</span>
@@ -6213,7 +6214,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">///</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">header_from_offset</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">offset</span>: <span class="ident">DebugInfoOffset</span><span class="op">&lt;</span><span class="ident">R::Offset</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">UnitHeader</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">input</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">debug_info_section</span>.<span class="ident">clone</span>();
+        <span class="kw">let</span> <span class="ident">input</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">debug_info_section</span>.<span class="ident">clone</span>();
         <span class="ident">input</span>.<span class="ident">skip</span>(<span class="ident">offset</span>.<span class="number">0</span>)<span class="question-mark">?</span>;
         <span class="ident">parse_unit_header</span>(<span class="ident">input</span>, <span class="ident">offset</span>.<span class="ident">into</span>())
     }
@@ -6271,12 +6272,12 @@
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">Reader</span><span class="op">&gt;</span> <span class="ident">DebugInfoUnitHeadersIter</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span> {
     <span class="doccomment">/// Advance the iterator to the next unit header.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">UnitHeader</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">UnitHeader</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">input</span>.<span class="ident">is_empty</span>() {
             <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>)
         } <span class="kw">else</span> {
             <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">input</span>.<span class="ident">len</span>();
-            <span class="kw">match</span> <span class="ident">parse_unit_header</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">input</span>, <span class="self">self</span>.<span class="ident">offset</span>.<span class="ident">into</span>()) {
+            <span class="kw">match</span> <span class="ident">parse_unit_header</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">input</span>, <span class="self">self</span>.<span class="ident">offset</span>.<span class="ident">into</span>()) {
                 <span class="prelude-val">Ok</span>(<span class="ident">header</span>) =&gt; {
                     <span class="self">self</span>.<span class="ident">offset</span>.<span class="number">0</span> <span class="op">+</span><span class="op">=</span> <span class="ident">len</span> <span class="op">-</span> <span class="self">self</span>.<span class="ident">input</span>.<span class="ident">len</span>();
                     <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">header</span>))
@@ -6295,20 +6296,20 @@
     <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident">UnitHeader</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>;
     <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">Error</span>;
 
-    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident">::core::result::Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">::core::result::Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
         <span class="ident">DebugInfoUnitHeadersIter::next</span>(<span class="self">self</span>)
     }
 }
 
 <span class="doccomment">/// Parse the unit type from the unit header.</span>
-<span class="kw">fn</span> <span class="ident">parse_unit_type</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">Reader</span><span class="op">&gt;</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">R</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">constants::DwUt</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">parse_unit_type</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">Reader</span><span class="op">&gt;</span>(<span class="ident">input</span>: <span class="kw-2">&amp;mut</span> <span class="ident">R</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">constants::DwUt</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">val</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">read_u8</span>()<span class="question-mark">?</span>;
     <span class="prelude-val">Ok</span>(<span class="ident">constants::DwUt</span>(<span class="ident">val</span>))
 }
 
 <span class="doccomment">/// Parse the `debug_abbrev_offset` in the compilation unit header.</span>
 <span class="kw">fn</span> <span class="ident">parse_debug_abbrev_offset</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">Reader</span><span class="op">&gt;</span>(
-    <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">R</span>,
+    <span class="ident">input</span>: <span class="kw-2">&amp;mut</span> <span class="ident">R</span>,
     <span class="ident">format</span>: <span class="ident">Format</span>,
 ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">DebugAbbrevOffset</span><span class="op">&lt;</span><span class="ident">R::Offset</span><span class="op">&gt;</span><span class="op">&gt;</span> {
     <span class="ident">input</span>.<span class="ident">read_offset</span>(<span class="ident">format</span>).<span class="ident">map</span>(<span class="ident">DebugAbbrevOffset</span>)
@@ -6316,7 +6317,7 @@
 
 <span class="doccomment">/// Parse the `debug_info_offset` in the arange header.</span>
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">parse_debug_info_offset</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">Reader</span><span class="op">&gt;</span>(
-    <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">R</span>,
+    <span class="ident">input</span>: <span class="kw-2">&amp;mut</span> <span class="ident">R</span>,
     <span class="ident">format</span>: <span class="ident">Format</span>,
 ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">DebugInfoOffset</span><span class="op">&lt;</span><span class="ident">R::Offset</span><span class="op">&gt;</span><span class="op">&gt;</span> {
     <span class="ident">input</span>.<span class="ident">read_offset</span>(<span class="ident">format</span>).<span class="ident">map</span>(<span class="ident">DebugInfoOffset</span>)
@@ -6569,7 +6570,7 @@
         <span class="ident">offset</span>: <span class="ident">UnitOffset</span><span class="op">&lt;</span><span class="ident">Offset</span><span class="op">&gt;</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">DebuggingInformationEntry</span><span class="op">&lt;</span><span class="lifetime">&#39;abbrev</span>, <span class="lifetime">&#39;me</span>, <span class="ident">R</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">input</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">range_from</span>(<span class="ident">offset</span>..)<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">entry</span> <span class="op">=</span> <span class="ident">DebuggingInformationEntry::parse</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">input</span>, <span class="self">self</span>, <span class="ident">abbreviations</span>)<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">entry</span> <span class="op">=</span> <span class="ident">DebuggingInformationEntry::parse</span>(<span class="kw-2">&amp;mut</span> <span class="ident">input</span>, <span class="self">self</span>, <span class="ident">abbreviations</span>)<span class="question-mark">?</span>;
         <span class="ident">entry</span>.<span class="ident">ok_or</span>(<span class="ident">Error::NoEntryAtGivenOffset</span>)
     }
 
@@ -6644,7 +6645,7 @@
 
 <span class="doccomment">/// Parse a unit header.</span>
 <span class="kw">fn</span> <span class="ident">parse_unit_header</span><span class="op">&lt;</span><span class="ident">R</span>, <span class="ident">Offset</span><span class="op">&gt;</span>(
-    <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">R</span>,
+    <span class="ident">input</span>: <span class="kw-2">&amp;mut</span> <span class="ident">R</span>,
     <span class="ident">unit_offset</span>: <span class="ident">UnitSectionOffset</span><span class="op">&lt;</span><span class="ident">Offset</span><span class="op">&gt;</span>,
 ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">UnitHeader</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span><span class="op">&gt;</span>
 <span class="kw">where</span>
@@ -6661,7 +6662,7 @@
     <span class="comment">// DWARF 1 was very different, and is obsolete, so isn&#39;t supported by this</span>
     <span class="comment">// reader.</span>
     <span class="kw">if</span> <span class="number">2</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">version</span> <span class="op">&amp;&amp;</span> <span class="ident">version</span> <span class="op">&lt;</span><span class="op">=</span> <span class="number">4</span> {
-        <span class="ident">abbrev_offset</span> <span class="op">=</span> <span class="ident">parse_debug_abbrev_offset</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">rest</span>, <span class="ident">format</span>)<span class="question-mark">?</span>;
+        <span class="ident">abbrev_offset</span> <span class="op">=</span> <span class="ident">parse_debug_abbrev_offset</span>(<span class="kw-2">&amp;mut</span> <span class="ident">rest</span>, <span class="ident">format</span>)<span class="question-mark">?</span>;
         <span class="ident">address_size</span> <span class="op">=</span> <span class="ident">rest</span>.<span class="ident">read_u8</span>()<span class="question-mark">?</span>;
         <span class="comment">// Before DWARF5, all units in the .debug_info section are compilation</span>
         <span class="comment">// units, and all units in the .debug_types section are type units.</span>
@@ -6670,9 +6671,9 @@
             <span class="ident">UnitSectionOffset::DebugTypesOffset</span>(<span class="kw">_</span>) =&gt; <span class="ident">constants::DW_UT_type</span>,
         };
     } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">version</span> <span class="op">==</span> <span class="number">5</span> {
-        <span class="ident">unit_type</span> <span class="op">=</span> <span class="ident">parse_unit_type</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">rest</span>)<span class="question-mark">?</span>;
+        <span class="ident">unit_type</span> <span class="op">=</span> <span class="ident">parse_unit_type</span>(<span class="kw-2">&amp;mut</span> <span class="ident">rest</span>)<span class="question-mark">?</span>;
         <span class="ident">address_size</span> <span class="op">=</span> <span class="ident">rest</span>.<span class="ident">read_u8</span>()<span class="question-mark">?</span>;
-        <span class="ident">abbrev_offset</span> <span class="op">=</span> <span class="ident">parse_debug_abbrev_offset</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">rest</span>, <span class="ident">format</span>)<span class="question-mark">?</span>;
+        <span class="ident">abbrev_offset</span> <span class="op">=</span> <span class="ident">parse_debug_abbrev_offset</span>(<span class="kw-2">&amp;mut</span> <span class="ident">rest</span>, <span class="ident">format</span>)<span class="question-mark">?</span>;
     } <span class="kw">else</span> {
         <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::UnknownVersion</span>(<span class="ident">u64::from</span>(<span class="ident">version</span>)));
     }
@@ -6686,8 +6687,8 @@
     <span class="kw">let</span> <span class="ident">unit_type</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">unit_type</span> {
         <span class="ident">constants::DW_UT_compile</span> =&gt; <span class="ident">UnitType::Compilation</span>,
         <span class="ident">constants::DW_UT_type</span> =&gt; {
-            <span class="kw">let</span> <span class="ident">type_signature</span> <span class="op">=</span> <span class="ident">parse_type_signature</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">rest</span>)<span class="question-mark">?</span>;
-            <span class="kw">let</span> <span class="ident">type_offset</span> <span class="op">=</span> <span class="ident">parse_type_offset</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">rest</span>, <span class="ident">format</span>)<span class="question-mark">?</span>;
+            <span class="kw">let</span> <span class="ident">type_signature</span> <span class="op">=</span> <span class="ident">parse_type_signature</span>(<span class="kw-2">&amp;mut</span> <span class="ident">rest</span>)<span class="question-mark">?</span>;
+            <span class="kw">let</span> <span class="ident">type_offset</span> <span class="op">=</span> <span class="ident">parse_type_offset</span>(<span class="kw-2">&amp;mut</span> <span class="ident">rest</span>, <span class="ident">format</span>)<span class="question-mark">?</span>;
             <span class="ident">UnitType::Type</span> {
                 <span class="ident">type_signature</span>,
                 <span class="ident">type_offset</span>,
@@ -6695,16 +6696,16 @@
         }
         <span class="ident">constants::DW_UT_partial</span> =&gt; <span class="ident">UnitType::Partial</span>,
         <span class="ident">constants::DW_UT_skeleton</span> =&gt; {
-            <span class="kw">let</span> <span class="ident">dwo_id</span> <span class="op">=</span> <span class="ident">parse_dwo_id</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">rest</span>)<span class="question-mark">?</span>;
+            <span class="kw">let</span> <span class="ident">dwo_id</span> <span class="op">=</span> <span class="ident">parse_dwo_id</span>(<span class="kw-2">&amp;mut</span> <span class="ident">rest</span>)<span class="question-mark">?</span>;
             <span class="ident">UnitType::Skeleton</span>(<span class="ident">dwo_id</span>)
         }
         <span class="ident">constants::DW_UT_split_compile</span> =&gt; {
-            <span class="kw">let</span> <span class="ident">dwo_id</span> <span class="op">=</span> <span class="ident">parse_dwo_id</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">rest</span>)<span class="question-mark">?</span>;
+            <span class="kw">let</span> <span class="ident">dwo_id</span> <span class="op">=</span> <span class="ident">parse_dwo_id</span>(<span class="kw-2">&amp;mut</span> <span class="ident">rest</span>)<span class="question-mark">?</span>;
             <span class="ident">UnitType::SplitCompilation</span>(<span class="ident">dwo_id</span>)
         }
         <span class="ident">constants::DW_UT_split_type</span> =&gt; {
-            <span class="kw">let</span> <span class="ident">type_signature</span> <span class="op">=</span> <span class="ident">parse_type_signature</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">rest</span>)<span class="question-mark">?</span>;
-            <span class="kw">let</span> <span class="ident">type_offset</span> <span class="op">=</span> <span class="ident">parse_type_offset</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">rest</span>, <span class="ident">format</span>)<span class="question-mark">?</span>;
+            <span class="kw">let</span> <span class="ident">type_signature</span> <span class="op">=</span> <span class="ident">parse_type_signature</span>(<span class="kw-2">&amp;mut</span> <span class="ident">rest</span>)<span class="question-mark">?</span>;
+            <span class="kw">let</span> <span class="ident">type_offset</span> <span class="op">=</span> <span class="ident">parse_type_offset</span>(<span class="kw-2">&amp;mut</span> <span class="ident">rest</span>, <span class="ident">format</span>)<span class="question-mark">?</span>;
             <span class="ident">UnitType::SplitType</span> {
                 <span class="ident">type_signature</span>,
                 <span class="ident">type_offset</span>,
@@ -6724,7 +6725,7 @@
 }
 
 <span class="doccomment">/// Parse a dwo_id from a header</span>
-<span class="kw">fn</span> <span class="ident">parse_dwo_id</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">Reader</span><span class="op">&gt;</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">R</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">DwoId</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">parse_dwo_id</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">Reader</span><span class="op">&gt;</span>(<span class="ident">input</span>: <span class="kw-2">&amp;mut</span> <span class="ident">R</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">DwoId</span><span class="op">&gt;</span> {
     <span class="prelude-val">Ok</span>(<span class="ident">DwoId</span>(<span class="ident">input</span>.<span class="ident">read_u64</span>()<span class="question-mark">?</span>))
 }
 
@@ -6992,7 +6993,7 @@
     <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::inline_always</span>)]</span>
     <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
     <span class="kw">fn</span> <span class="ident">parse</span>(
-        <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">R</span>,
+        <span class="ident">input</span>: <span class="kw-2">&amp;mut</span> <span class="ident">R</span>,
         <span class="ident">unit</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;unit</span> <span class="ident">UnitHeader</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>,
         <span class="ident">abbreviations</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;abbrev</span> <span class="ident">Abbreviations</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span><span class="op">&gt;</span> {
@@ -8015,22 +8016,22 @@
     }
 }
 
-<span class="kw">fn</span> <span class="ident">length_u8_value</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">Reader</span><span class="op">&gt;</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">R</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">length_u8_value</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">Reader</span><span class="op">&gt;</span>(<span class="ident">input</span>: <span class="kw-2">&amp;mut</span> <span class="ident">R</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">read_u8</span>().<span class="ident">map</span>(<span class="ident">R::Offset::from_u8</span>)<span class="question-mark">?</span>;
     <span class="ident">input</span>.<span class="ident">split</span>(<span class="ident">len</span>)
 }
 
-<span class="kw">fn</span> <span class="ident">length_u16_value</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">Reader</span><span class="op">&gt;</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">R</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">length_u16_value</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">Reader</span><span class="op">&gt;</span>(<span class="ident">input</span>: <span class="kw-2">&amp;mut</span> <span class="ident">R</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">read_u16</span>().<span class="ident">map</span>(<span class="ident">R::Offset::from_u16</span>)<span class="question-mark">?</span>;
     <span class="ident">input</span>.<span class="ident">split</span>(<span class="ident">len</span>)
 }
 
-<span class="kw">fn</span> <span class="ident">length_u32_value</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">Reader</span><span class="op">&gt;</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">R</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">length_u32_value</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">Reader</span><span class="op">&gt;</span>(<span class="ident">input</span>: <span class="kw-2">&amp;mut</span> <span class="ident">R</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">read_u32</span>().<span class="ident">map</span>(<span class="ident">R::Offset::from_u32</span>)<span class="question-mark">?</span>;
     <span class="ident">input</span>.<span class="ident">split</span>(<span class="ident">len</span>)
 }
 
-<span class="kw">fn</span> <span class="ident">length_uleb128_value</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">Reader</span><span class="op">&gt;</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">R</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">length_uleb128_value</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">Reader</span><span class="op">&gt;</span>(<span class="ident">input</span>: <span class="kw-2">&amp;mut</span> <span class="ident">R</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">read_uleb128</span>().<span class="ident">and_then</span>(<span class="ident">R::Offset::from_u64</span>)<span class="question-mark">?</span>;
     <span class="ident">input</span>.<span class="ident">split</span>(<span class="ident">len</span>)
 }
@@ -8058,7 +8059,7 @@
 }
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">parse_attribute</span><span class="op">&lt;</span><span class="lifetime">&#39;unit</span>, <span class="ident">R</span>: <span class="ident">Reader</span><span class="op">&gt;</span>(
-    <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">R</span>,
+    <span class="ident">input</span>: <span class="kw-2">&amp;mut</span> <span class="ident">R</span>,
     <span class="ident">encoding</span>: <span class="ident">Encoding</span>,
     <span class="ident">spec</span>: <span class="ident">AttributeSpecification</span>,
 ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Attribute</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span><span class="op">&gt;</span> {
@@ -8305,7 +8306,7 @@
     <span class="doccomment">/// is returned, and all subsequent calls return `None`.</span>
     <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::inline_always</span>)]</span>
     <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Attribute</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Attribute</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">attributes</span>.<span class="ident">is_empty</span>() {
             <span class="comment">// Now that we have parsed all of the attributes, we know where</span>
             <span class="comment">// either (1) this entry&#39;s children start, if the abbreviation says</span>
@@ -8324,7 +8325,7 @@
 
         <span class="kw">let</span> <span class="ident">spec</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">attributes</span>[<span class="number">0</span>];
         <span class="kw">let</span> <span class="ident">rest_spec</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">attributes</span>[<span class="number">1</span>..];
-        <span class="kw">match</span> <span class="ident">parse_attribute</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">input</span>, <span class="self">self</span>.<span class="ident">entry</span>.<span class="ident">unit</span>.<span class="ident">encoding</span>(), <span class="ident">spec</span>) {
+        <span class="kw">match</span> <span class="ident">parse_attribute</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">input</span>, <span class="self">self</span>.<span class="ident">entry</span>.<span class="ident">unit</span>.<span class="ident">encoding</span>(), <span class="ident">spec</span>) {
             <span class="prelude-val">Ok</span>(<span class="ident">attr</span>) =&gt; {
                 <span class="self">self</span>.<span class="ident">attributes</span> <span class="op">=</span> <span class="ident">rest_spec</span>;
                 <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">attr</span>))
@@ -8344,7 +8345,7 @@
     <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident">Attribute</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>;
     <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">Error</span>;
 
-    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident">::core::result::Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">::core::result::Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
         <span class="ident">AttrsIter::next</span>(<span class="self">self</span>)
     }
 }
@@ -8442,7 +8443,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Returns `Ok(None)` for null entries.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">read_abbreviation</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;abbrev</span> <span class="ident">Abbreviation</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">read_abbreviation</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;abbrev</span> <span class="ident">Abbreviation</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">code</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">input</span>.<span class="ident">read_uleb128</span>()<span class="question-mark">?</span>;
         <span class="kw">if</span> <span class="ident">code</span> <span class="op">==</span> <span class="number">0</span> {
             <span class="self">self</span>.<span class="ident">depth</span> <span class="op">-</span><span class="op">=</span> <span class="number">1</span>;
@@ -8460,8 +8461,8 @@
 
     <span class="doccomment">/// Read an attribute.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">read_attribute</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">spec</span>: <span class="ident">AttributeSpecification</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Attribute</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="ident">parse_attribute</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">input</span>, <span class="self">self</span>.<span class="ident">unit</span>.<span class="ident">encoding</span>(), <span class="ident">spec</span>)
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">read_attribute</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">spec</span>: <span class="ident">AttributeSpecification</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Attribute</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+        <span class="ident">parse_attribute</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">input</span>, <span class="self">self</span>.<span class="ident">unit</span>.<span class="ident">encoding</span>(), <span class="ident">spec</span>)
     }
 }
 
@@ -8504,7 +8505,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Returns `Some` if there is a next entry, even if this entry is null.</span>
     <span class="doccomment">/// If there is no next entry, then `None` is returned.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">next_entry</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">next_entry</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">current</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">cached_current</span> {
             <span class="self">self</span>.<span class="ident">input</span> <span class="op">=</span> <span class="ident">current</span>.<span class="ident">after_attrs</span>()<span class="question-mark">?</span>;
         }
@@ -8515,7 +8516,7 @@
             <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>);
         }
 
-        <span class="kw">match</span> <span class="ident">DebuggingInformationEntry::parse</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">input</span>, <span class="self">self</span>.<span class="ident">unit</span>, <span class="self">self</span>.<span class="ident">abbreviations</span>) {
+        <span class="kw">match</span> <span class="ident">DebuggingInformationEntry::parse</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">input</span>, <span class="self">self</span>.<span class="ident">unit</span>, <span class="self">self</span>.<span class="ident">abbreviations</span>) {
             <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">entry</span>)) =&gt; {
                 <span class="self">self</span>.<span class="ident">delta_depth</span> <span class="op">=</span> <span class="ident">entry</span>.<span class="ident">has_children</span>() <span class="kw">as</span> <span class="ident">isize</span>;
                 <span class="self">self</span>.<span class="ident">cached_current</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">entry</span>);
@@ -8654,7 +8655,7 @@
     <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::type_complexity</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">next_dfs</span>(
-        <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
+        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">isize</span>, <span class="kw-2">&amp;</span><span class="ident">DebuggingInformationEntry</span><span class="op">&lt;</span><span class="lifetime">&#39;abbrev</span>, <span class="lifetime">&#39;unit</span>, <span class="ident">R</span><span class="op">&gt;</span>)<span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">delta_depth</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">delta_depth</span>;
         <span class="kw">loop</span> {
@@ -8779,7 +8780,7 @@
     <span class="doccomment">/// }</span>
     <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">next_sibling</span>(
-        <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
+        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">DebuggingInformationEntry</span><span class="op">&lt;</span><span class="lifetime">&#39;abbrev</span>, <span class="lifetime">&#39;unit</span>, <span class="ident">R</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">current</span>().<span class="ident">is_none</span>() {
             <span class="comment">// We&#39;re already at the null for the end of the sibling list.</span>
@@ -8893,7 +8894,7 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">root</span><span class="op">&lt;</span><span class="lifetime">&#39;me</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;me</span> <span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">EntriesTreeNode</span><span class="op">&lt;</span><span class="lifetime">&#39;abbrev</span>, <span class="lifetime">&#39;unit</span>, <span class="lifetime">&#39;me</span>, <span class="ident">R</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">input</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">root</span>.<span class="ident">clone</span>();
         <span class="self">self</span>.<span class="ident">entry</span> <span class="op">=</span>
-            <span class="ident">DebuggingInformationEntry::parse</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">input</span>, <span class="self">self</span>.<span class="ident">unit</span>, <span class="self">self</span>.<span class="ident">abbreviations</span>)<span class="question-mark">?</span>;
+            <span class="ident">DebuggingInformationEntry::parse</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">input</span>, <span class="self">self</span>.<span class="ident">unit</span>, <span class="self">self</span>.<span class="ident">abbreviations</span>)<span class="question-mark">?</span>;
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">entry</span>.<span class="ident">is_none</span>() {
             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::UnexpectedNull</span>);
         }
@@ -8906,7 +8907,7 @@
     <span class="doccomment">/// Requires `depth &lt;= self.depth + 1`.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Returns `true` if successful.</span>
-    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">depth</span>: <span class="ident">isize</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">depth</span>: <span class="ident">isize</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">depth</span> <span class="op">&lt;</span> <span class="ident">depth</span> {
             <span class="macro">debug_assert_eq!</span>(<span class="self">self</span>.<span class="ident">depth</span> <span class="op">+</span> <span class="number">1</span>, <span class="ident">depth</span>);
 
@@ -8927,7 +8928,7 @@
             }
 
             <span class="kw">return</span> <span class="kw">match</span> <span class="ident">DebuggingInformationEntry::parse</span>(
-                <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">input</span>,
+                <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">input</span>,
                 <span class="self">self</span>.<span class="ident">unit</span>,
                 <span class="self">self</span>.<span class="ident">abbreviations</span>,
             ) {
@@ -8974,7 +8975,7 @@
                 <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="bool-val">false</span>);
             }
 
-            <span class="kw">match</span> <span class="ident">DebuggingInformationEntry::parse</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">input</span>, <span class="self">self</span>.<span class="ident">unit</span>, <span class="self">self</span>.<span class="ident">abbreviations</span>) {
+            <span class="kw">match</span> <span class="ident">DebuggingInformationEntry::parse</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">input</span>, <span class="self">self</span>.<span class="ident">unit</span>, <span class="self">self</span>.<span class="ident">abbreviations</span>) {
                 <span class="prelude-val">Ok</span>(<span class="ident">entry</span>) =&gt; {
                     <span class="self">self</span>.<span class="ident">entry</span> <span class="op">=</span> <span class="ident">entry</span>;
                     <span class="kw">if</span> <span class="self">self</span>.<span class="ident">depth</span> <span class="op">==</span> <span class="ident">depth</span> {
@@ -9066,12 +9067,12 @@
 
 <span class="doccomment">/// Parse a type unit header&#39;s unique type signature. Callers should handle</span>
 <span class="doccomment">/// unique-ness checking.</span>
-<span class="kw">fn</span> <span class="ident">parse_type_signature</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">Reader</span><span class="op">&gt;</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">R</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">DebugTypeSignature</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">parse_type_signature</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">Reader</span><span class="op">&gt;</span>(<span class="ident">input</span>: <span class="kw-2">&amp;mut</span> <span class="ident">R</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">DebugTypeSignature</span><span class="op">&gt;</span> {
     <span class="ident">input</span>.<span class="ident">read_u64</span>().<span class="ident">map</span>(<span class="ident">DebugTypeSignature</span>)
 }
 
 <span class="doccomment">/// Parse a type unit header&#39;s type offset.</span>
-<span class="kw">fn</span> <span class="ident">parse_type_offset</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">Reader</span><span class="op">&gt;</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">R</span>, <span class="ident">format</span>: <span class="ident">Format</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">UnitOffset</span><span class="op">&lt;</span><span class="ident">R::Offset</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">parse_type_offset</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">Reader</span><span class="op">&gt;</span>(<span class="ident">input</span>: <span class="kw-2">&amp;mut</span> <span class="ident">R</span>, <span class="ident">format</span>: <span class="ident">Format</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">UnitOffset</span><span class="op">&lt;</span><span class="ident">R::Offset</span><span class="op">&gt;</span><span class="op">&gt;</span> {
     <span class="ident">input</span>.<span class="ident">read_offset</span>(<span class="ident">format</span>).<span class="ident">map</span>(<span class="ident">UnitOffset</span>)
 }
 
@@ -9186,12 +9187,12 @@
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">Reader</span><span class="op">&gt;</span> <span class="ident">DebugTypesUnitHeadersIter</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span> {
     <span class="doccomment">/// Advance the iterator to the next type unit header.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">UnitHeader</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">UnitHeader</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">input</span>.<span class="ident">is_empty</span>() {
             <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>)
         } <span class="kw">else</span> {
             <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">input</span>.<span class="ident">len</span>();
-            <span class="kw">match</span> <span class="ident">parse_unit_header</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">input</span>, <span class="self">self</span>.<span class="ident">offset</span>.<span class="ident">into</span>()) {
+            <span class="kw">match</span> <span class="ident">parse_unit_header</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">input</span>, <span class="self">self</span>.<span class="ident">offset</span>.<span class="ident">into</span>()) {
                 <span class="prelude-val">Ok</span>(<span class="ident">header</span>) =&gt; {
                     <span class="self">self</span>.<span class="ident">offset</span>.<span class="number">0</span> <span class="op">+</span><span class="op">=</span> <span class="ident">len</span> <span class="op">-</span> <span class="self">self</span>.<span class="ident">input</span>.<span class="ident">len</span>();
                     <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">header</span>))
@@ -9210,7 +9211,7 @@
     <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident">UnitHeader</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>;
     <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">Error</span>;
 
-    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident">::core::result::Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">::core::result::Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
         <span class="ident">DebugTypesUnitHeadersIter::next</span>(<span class="self">self</span>)
     }
 }
@@ -9236,7 +9237,7 @@
     <span class="comment">// Mixin methods for `Section` to help define binary test data.</span>
 
     <span class="kw">trait</span> <span class="ident">UnitSectionMethods</span> {
-        <span class="kw">fn</span> <span class="ident">unit</span><span class="op">&lt;</span><span class="lifetime">&#39;input</span>, <span class="ident">E</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">unit</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">UnitHeader</span><span class="op">&lt;</span><span class="ident">EndianSlice</span><span class="op">&lt;</span><span class="lifetime">&#39;input</span>, <span class="ident">E</span><span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span>
+        <span class="kw">fn</span> <span class="ident">unit</span><span class="op">&lt;</span><span class="lifetime">&#39;input</span>, <span class="ident">E</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">unit</span>: <span class="kw-2">&amp;mut</span> <span class="ident">UnitHeader</span><span class="op">&lt;</span><span class="ident">EndianSlice</span><span class="op">&lt;</span><span class="lifetime">&#39;input</span>, <span class="ident">E</span><span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span>
         <span class="kw">where</span>
             <span class="ident">E</span>: <span class="ident">Endianity</span>;
         <span class="kw">fn</span> <span class="ident">die</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">code</span>: <span class="ident">u64</span>, <span class="ident">attr</span>: <span class="ident">F</span>) -&gt; <span class="self">Self</span>
@@ -9249,7 +9250,7 @@
     }
 
     <span class="kw">impl</span> <span class="ident">UnitSectionMethods</span> <span class="kw">for</span> <span class="ident">Section</span> {
-        <span class="kw">fn</span> <span class="ident">unit</span><span class="op">&lt;</span><span class="lifetime">&#39;input</span>, <span class="ident">E</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">unit</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">UnitHeader</span><span class="op">&lt;</span><span class="ident">EndianSlice</span><span class="op">&lt;</span><span class="lifetime">&#39;input</span>, <span class="ident">E</span><span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span>
+        <span class="kw">fn</span> <span class="ident">unit</span><span class="op">&lt;</span><span class="lifetime">&#39;input</span>, <span class="ident">E</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">unit</span>: <span class="kw-2">&amp;mut</span> <span class="ident">UnitHeader</span><span class="op">&lt;</span><span class="ident">EndianSlice</span><span class="op">&lt;</span><span class="lifetime">&#39;input</span>, <span class="ident">E</span><span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span>
         <span class="kw">where</span>
             <span class="ident">E</span>: <span class="ident">Endianity</span>,
         {
@@ -9357,7 +9358,7 @@
     <span class="kw">fn</span> <span class="ident">test_parse_debug_abbrev_offset_32</span>() {
         <span class="kw">let</span> <span class="ident">section</span> <span class="op">=</span> <span class="ident">Section::with_endian</span>(<span class="ident">Endian::Little</span>).<span class="ident">L32</span>(<span class="number">0x0403_0201</span>);
         <span class="kw">let</span> <span class="ident">buf</span> <span class="op">=</span> <span class="ident">section</span>.<span class="ident">get_contents</span>().<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">buf</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">EndianSlice::new</span>(<span class="kw-2">&amp;</span><span class="ident">buf</span>, <span class="ident">LittleEndian</span>);
+        <span class="kw">let</span> <span class="ident">buf</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="ident">EndianSlice::new</span>(<span class="kw-2">&amp;</span><span class="ident">buf</span>, <span class="ident">LittleEndian</span>);
 
         <span class="kw">match</span> <span class="ident">parse_debug_abbrev_offset</span>(<span class="ident">buf</span>, <span class="ident">Format::Dwarf32</span>) {
             <span class="prelude-val">Ok</span>(<span class="ident">val</span>) =&gt; <span class="macro">assert_eq!</span>(<span class="ident">val</span>, <span class="ident">DebugAbbrevOffset</span>(<span class="number">0x0403_0201</span>)),
@@ -9368,7 +9369,7 @@
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">test_parse_debug_abbrev_offset_32_incomplete</span>() {
         <span class="kw">let</span> <span class="ident">buf</span> <span class="op">=</span> [<span class="number">0x01</span>, <span class="number">0x02</span>];
-        <span class="kw">let</span> <span class="ident">buf</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">EndianSlice::new</span>(<span class="kw-2">&amp;</span><span class="ident">buf</span>, <span class="ident">LittleEndian</span>);
+        <span class="kw">let</span> <span class="ident">buf</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="ident">EndianSlice::new</span>(<span class="kw-2">&amp;</span><span class="ident">buf</span>, <span class="ident">LittleEndian</span>);
 
         <span class="kw">match</span> <span class="ident">parse_debug_abbrev_offset</span>(<span class="ident">buf</span>, <span class="ident">Format::Dwarf32</span>) {
             <span class="prelude-val">Err</span>(<span class="ident">Error::UnexpectedEof</span>(<span class="kw">_</span>)) =&gt; <span class="macro">assert!</span>(<span class="bool-val">true</span>),
@@ -9381,7 +9382,7 @@
     <span class="kw">fn</span> <span class="ident">test_parse_debug_abbrev_offset_64</span>() {
         <span class="kw">let</span> <span class="ident">section</span> <span class="op">=</span> <span class="ident">Section::with_endian</span>(<span class="ident">Endian::Little</span>).<span class="ident">L64</span>(<span class="number">0x0807_0605_0403_0201</span>);
         <span class="kw">let</span> <span class="ident">buf</span> <span class="op">=</span> <span class="ident">section</span>.<span class="ident">get_contents</span>().<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">buf</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">EndianSlice::new</span>(<span class="kw-2">&amp;</span><span class="ident">buf</span>, <span class="ident">LittleEndian</span>);
+        <span class="kw">let</span> <span class="ident">buf</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="ident">EndianSlice::new</span>(<span class="kw-2">&amp;</span><span class="ident">buf</span>, <span class="ident">LittleEndian</span>);
 
         <span class="kw">match</span> <span class="ident">parse_debug_abbrev_offset</span>(<span class="ident">buf</span>, <span class="ident">Format::Dwarf64</span>) {
             <span class="prelude-val">Ok</span>(<span class="ident">val</span>) =&gt; <span class="macro">assert_eq!</span>(<span class="ident">val</span>, <span class="ident">DebugAbbrevOffset</span>(<span class="number">0x0807_0605_0403_0201</span>)),
@@ -9392,7 +9393,7 @@
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">test_parse_debug_abbrev_offset_64_incomplete</span>() {
         <span class="kw">let</span> <span class="ident">buf</span> <span class="op">=</span> [<span class="number">0x01</span>, <span class="number">0x02</span>];
-        <span class="kw">let</span> <span class="ident">buf</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">EndianSlice::new</span>(<span class="kw-2">&amp;</span><span class="ident">buf</span>, <span class="ident">LittleEndian</span>);
+        <span class="kw">let</span> <span class="ident">buf</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="ident">EndianSlice::new</span>(<span class="kw-2">&amp;</span><span class="ident">buf</span>, <span class="ident">LittleEndian</span>);
 
         <span class="kw">match</span> <span class="ident">parse_debug_abbrev_offset</span>(<span class="ident">buf</span>, <span class="ident">Format::Dwarf64</span>) {
             <span class="prelude-val">Err</span>(<span class="ident">Error::UnexpectedEof</span>(<span class="kw">_</span>)) =&gt; <span class="macro">assert!</span>(<span class="bool-val">true</span>),
@@ -9404,7 +9405,7 @@
     <span class="kw">fn</span> <span class="ident">test_parse_debug_info_offset_32</span>() {
         <span class="kw">let</span> <span class="ident">section</span> <span class="op">=</span> <span class="ident">Section::with_endian</span>(<span class="ident">Endian::Little</span>).<span class="ident">L32</span>(<span class="number">0x0403_0201</span>);
         <span class="kw">let</span> <span class="ident">buf</span> <span class="op">=</span> <span class="ident">section</span>.<span class="ident">get_contents</span>().<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">buf</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">EndianSlice::new</span>(<span class="kw-2">&amp;</span><span class="ident">buf</span>, <span class="ident">LittleEndian</span>);
+        <span class="kw">let</span> <span class="ident">buf</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="ident">EndianSlice::new</span>(<span class="kw-2">&amp;</span><span class="ident">buf</span>, <span class="ident">LittleEndian</span>);
 
         <span class="kw">match</span> <span class="ident">parse_debug_info_offset</span>(<span class="ident">buf</span>, <span class="ident">Format::Dwarf32</span>) {
             <span class="prelude-val">Ok</span>(<span class="ident">val</span>) =&gt; <span class="macro">assert_eq!</span>(<span class="ident">val</span>, <span class="ident">DebugInfoOffset</span>(<span class="number">0x0403_0201</span>)),
@@ -9415,7 +9416,7 @@
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">test_parse_debug_info_offset_32_incomplete</span>() {
         <span class="kw">let</span> <span class="ident">buf</span> <span class="op">=</span> [<span class="number">0x01</span>, <span class="number">0x02</span>];
-        <span class="kw">let</span> <span class="ident">buf</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">EndianSlice::new</span>(<span class="kw-2">&amp;</span><span class="ident">buf</span>, <span class="ident">LittleEndian</span>);
+        <span class="kw">let</span> <span class="ident">buf</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="ident">EndianSlice::new</span>(<span class="kw-2">&amp;</span><span class="ident">buf</span>, <span class="ident">LittleEndian</span>);
 
         <span class="kw">match</span> <span class="ident">parse_debug_info_offset</span>(<span class="ident">buf</span>, <span class="ident">Format::Dwarf32</span>) {
             <span class="prelude-val">Err</span>(<span class="ident">Error::UnexpectedEof</span>(<span class="kw">_</span>)) =&gt; <span class="macro">assert!</span>(<span class="bool-val">true</span>),
@@ -9428,7 +9429,7 @@
     <span class="kw">fn</span> <span class="ident">test_parse_debug_info_offset_64</span>() {
         <span class="kw">let</span> <span class="ident">section</span> <span class="op">=</span> <span class="ident">Section::with_endian</span>(<span class="ident">Endian::Little</span>).<span class="ident">L64</span>(<span class="number">0x0807_0605_0403_0201</span>);
         <span class="kw">let</span> <span class="ident">buf</span> <span class="op">=</span> <span class="ident">section</span>.<span class="ident">get_contents</span>().<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">buf</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">EndianSlice::new</span>(<span class="kw-2">&amp;</span><span class="ident">buf</span>, <span class="ident">LittleEndian</span>);
+        <span class="kw">let</span> <span class="ident">buf</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="ident">EndianSlice::new</span>(<span class="kw-2">&amp;</span><span class="ident">buf</span>, <span class="ident">LittleEndian</span>);
 
         <span class="kw">match</span> <span class="ident">parse_debug_info_offset</span>(<span class="ident">buf</span>, <span class="ident">Format::Dwarf64</span>) {
             <span class="prelude-val">Ok</span>(<span class="ident">val</span>) =&gt; <span class="macro">assert_eq!</span>(<span class="ident">val</span>, <span class="ident">DebugInfoOffset</span>(<span class="number">0x0807_0605_0403_0201</span>)),
@@ -9439,7 +9440,7 @@
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">test_parse_debug_info_offset_64_incomplete</span>() {
         <span class="kw">let</span> <span class="ident">buf</span> <span class="op">=</span> [<span class="number">0x01</span>, <span class="number">0x02</span>];
-        <span class="kw">let</span> <span class="ident">buf</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">EndianSlice::new</span>(<span class="kw-2">&amp;</span><span class="ident">buf</span>, <span class="ident">LittleEndian</span>);
+        <span class="kw">let</span> <span class="ident">buf</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="ident">EndianSlice::new</span>(<span class="kw-2">&amp;</span><span class="ident">buf</span>, <span class="ident">LittleEndian</span>);
 
         <span class="kw">match</span> <span class="ident">parse_debug_info_offset</span>(<span class="ident">buf</span>, <span class="ident">Format::Dwarf64</span>) {
             <span class="prelude-val">Err</span>(<span class="ident">Error::UnexpectedEof</span>(<span class="kw">_</span>)) =&gt; <span class="macro">assert!</span>(<span class="bool-val">true</span>),
@@ -9476,8 +9477,8 @@
             <span class="ident">entries_buf</span>: <span class="ident">EndianSlice::new</span>(<span class="ident">expected_rest</span>, <span class="ident">LittleEndian</span>),
         };
         <span class="kw">let</span> <span class="ident">section</span> <span class="op">=</span> <span class="ident">Section::with_endian</span>(<span class="ident">Endian::Little</span>)
-            .<span class="ident">unit</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">unit64</span>)
-            .<span class="ident">unit</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">unit32</span>);
+            .<span class="ident">unit</span>(<span class="kw-2">&amp;mut</span> <span class="ident">unit64</span>)
+            .<span class="ident">unit</span>(<span class="kw-2">&amp;mut</span> <span class="ident">unit32</span>);
         <span class="kw">let</span> <span class="ident">buf</span> <span class="op">=</span> <span class="ident">section</span>.<span class="ident">get_contents</span>().<span class="ident">unwrap</span>();
 
         <span class="kw">let</span> <span class="ident">debug_info</span> <span class="op">=</span> <span class="ident">DebugInfo::new</span>(<span class="kw-2">&amp;</span><span class="ident">buf</span>, <span class="ident">LittleEndian</span>);
@@ -9491,7 +9492,7 @@
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">test_unit_version_unknown_version</span>() {
         <span class="kw">let</span> <span class="ident">buf</span> <span class="op">=</span> [<span class="number">0x02</span>, <span class="number">0x00</span>, <span class="number">0x00</span>, <span class="number">0x00</span>, <span class="number">0xab</span>, <span class="number">0xcd</span>];
-        <span class="kw">let</span> <span class="ident">rest</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">EndianSlice::new</span>(<span class="kw-2">&amp;</span><span class="ident">buf</span>, <span class="ident">LittleEndian</span>);
+        <span class="kw">let</span> <span class="ident">rest</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="ident">EndianSlice::new</span>(<span class="kw-2">&amp;</span><span class="ident">buf</span>, <span class="ident">LittleEndian</span>);
 
         <span class="kw">match</span> <span class="ident">parse_unit_header</span>(<span class="ident">rest</span>, <span class="ident">DebugInfoOffset</span>(<span class="number">0</span>).<span class="ident">into</span>()) {
             <span class="prelude-val">Err</span>(<span class="ident">Error::UnknownVersion</span>(<span class="number">0xcdab</span>)) =&gt; <span class="macro">assert!</span>(<span class="bool-val">true</span>),
@@ -9499,7 +9500,7 @@
         };
 
         <span class="kw">let</span> <span class="ident">buf</span> <span class="op">=</span> [<span class="number">0x02</span>, <span class="number">0x00</span>, <span class="number">0x00</span>, <span class="number">0x00</span>, <span class="number">0x1</span>, <span class="number">0x0</span>];
-        <span class="kw">let</span> <span class="ident">rest</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">EndianSlice::new</span>(<span class="kw-2">&amp;</span><span class="ident">buf</span>, <span class="ident">LittleEndian</span>);
+        <span class="kw">let</span> <span class="ident">rest</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="ident">EndianSlice::new</span>(<span class="kw-2">&amp;</span><span class="ident">buf</span>, <span class="ident">LittleEndian</span>);
 
         <span class="kw">match</span> <span class="ident">parse_unit_header</span>(<span class="ident">rest</span>, <span class="ident">DebugInfoOffset</span>(<span class="number">0</span>).<span class="ident">into</span>()) {
             <span class="prelude-val">Err</span>(<span class="ident">Error::UnknownVersion</span>(<span class="number">1</span>)) =&gt; <span class="macro">assert!</span>(<span class="bool-val">true</span>),
@@ -9510,7 +9511,7 @@
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">test_unit_version_incomplete</span>() {
         <span class="kw">let</span> <span class="ident">buf</span> <span class="op">=</span> [<span class="number">0x01</span>, <span class="number">0x00</span>, <span class="number">0x00</span>, <span class="number">0x00</span>, <span class="number">0x04</span>];
-        <span class="kw">let</span> <span class="ident">rest</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">EndianSlice::new</span>(<span class="kw-2">&amp;</span><span class="ident">buf</span>, <span class="ident">LittleEndian</span>);
+        <span class="kw">let</span> <span class="ident">rest</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="ident">EndianSlice::new</span>(<span class="kw-2">&amp;</span><span class="ident">buf</span>, <span class="ident">LittleEndian</span>);
 
         <span class="kw">match</span> <span class="ident">parse_unit_header</span>(<span class="ident">rest</span>, <span class="ident">DebugInfoOffset</span>(<span class="number">0</span>).<span class="ident">into</span>()) {
             <span class="prelude-val">Err</span>(<span class="ident">Error::UnexpectedEof</span>(<span class="kw">_</span>)) =&gt; <span class="macro">assert!</span>(<span class="bool-val">true</span>),
@@ -9535,10 +9536,10 @@
             <span class="ident">entries_buf</span>: <span class="ident">EndianSlice::new</span>(<span class="ident">expected_rest</span>, <span class="ident">LittleEndian</span>),
         };
         <span class="kw">let</span> <span class="ident">section</span> <span class="op">=</span> <span class="ident">Section::with_endian</span>(<span class="ident">Endian::Little</span>)
-            .<span class="ident">unit</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">expected_unit</span>)
+            .<span class="ident">unit</span>(<span class="kw-2">&amp;mut</span> <span class="ident">expected_unit</span>)
             .<span class="ident">append_bytes</span>(<span class="ident">expected_rest</span>);
         <span class="kw">let</span> <span class="ident">buf</span> <span class="op">=</span> <span class="ident">section</span>.<span class="ident">get_contents</span>().<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">rest</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">EndianSlice::new</span>(<span class="kw-2">&amp;</span><span class="ident">buf</span>, <span class="ident">LittleEndian</span>);
+        <span class="kw">let</span> <span class="ident">rest</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="ident">EndianSlice::new</span>(<span class="kw-2">&amp;</span><span class="ident">buf</span>, <span class="ident">LittleEndian</span>);
 
         <span class="macro">assert_eq!</span>(
             <span class="ident">parse_unit_header</span>(<span class="ident">rest</span>, <span class="ident">DebugInfoOffset</span>(<span class="number">0</span>).<span class="ident">into</span>()),
@@ -9565,10 +9566,10 @@
             <span class="ident">entries_buf</span>: <span class="ident">EndianSlice::new</span>(<span class="ident">expected_rest</span>, <span class="ident">LittleEndian</span>),
         };
         <span class="kw">let</span> <span class="ident">section</span> <span class="op">=</span> <span class="ident">Section::with_endian</span>(<span class="ident">Endian::Little</span>)
-            .<span class="ident">unit</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">expected_unit</span>)
+            .<span class="ident">unit</span>(<span class="kw-2">&amp;mut</span> <span class="ident">expected_unit</span>)
             .<span class="ident">append_bytes</span>(<span class="ident">expected_rest</span>);
         <span class="kw">let</span> <span class="ident">buf</span> <span class="op">=</span> <span class="ident">section</span>.<span class="ident">get_contents</span>().<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">rest</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">EndianSlice::new</span>(<span class="kw-2">&amp;</span><span class="ident">buf</span>, <span class="ident">LittleEndian</span>);
+        <span class="kw">let</span> <span class="ident">rest</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="ident">EndianSlice::new</span>(<span class="kw-2">&amp;</span><span class="ident">buf</span>, <span class="ident">LittleEndian</span>);
 
         <span class="macro">assert_eq!</span>(
             <span class="ident">parse_unit_header</span>(<span class="ident">rest</span>, <span class="ident">DebugInfoOffset</span>(<span class="number">0</span>).<span class="ident">into</span>()),
@@ -9594,10 +9595,10 @@
             <span class="ident">entries_buf</span>: <span class="ident">EndianSlice::new</span>(<span class="ident">expected_rest</span>, <span class="ident">LittleEndian</span>),
         };
         <span class="kw">let</span> <span class="ident">section</span> <span class="op">=</span> <span class="ident">Section::with_endian</span>(<span class="ident">Endian::Little</span>)
-            .<span class="ident">unit</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">expected_unit</span>)
+            .<span class="ident">unit</span>(<span class="kw-2">&amp;mut</span> <span class="ident">expected_unit</span>)
             .<span class="ident">append_bytes</span>(<span class="ident">expected_rest</span>);
         <span class="kw">let</span> <span class="ident">buf</span> <span class="op">=</span> <span class="ident">section</span>.<span class="ident">get_contents</span>().<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">rest</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">EndianSlice::new</span>(<span class="kw-2">&amp;</span><span class="ident">buf</span>, <span class="ident">LittleEndian</span>);
+        <span class="kw">let</span> <span class="ident">rest</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="ident">EndianSlice::new</span>(<span class="kw-2">&amp;</span><span class="ident">buf</span>, <span class="ident">LittleEndian</span>);
 
         <span class="macro">assert_eq!</span>(
             <span class="ident">parse_unit_header</span>(<span class="ident">rest</span>, <span class="ident">DebugInfoOffset</span>(<span class="number">0</span>).<span class="ident">into</span>()),
@@ -9624,10 +9625,10 @@
             <span class="ident">entries_buf</span>: <span class="ident">EndianSlice::new</span>(<span class="ident">expected_rest</span>, <span class="ident">LittleEndian</span>),
         };
         <span class="kw">let</span> <span class="ident">section</span> <span class="op">=</span> <span class="ident">Section::with_endian</span>(<span class="ident">Endian::Little</span>)
-            .<span class="ident">unit</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">expected_unit</span>)
+            .<span class="ident">unit</span>(<span class="kw-2">&amp;mut</span> <span class="ident">expected_unit</span>)
             .<span class="ident">append_bytes</span>(<span class="ident">expected_rest</span>);
         <span class="kw">let</span> <span class="ident">buf</span> <span class="op">=</span> <span class="ident">section</span>.<span class="ident">get_contents</span>().<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">rest</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">EndianSlice::new</span>(<span class="kw-2">&amp;</span><span class="ident">buf</span>, <span class="ident">LittleEndian</span>);
+        <span class="kw">let</span> <span class="ident">rest</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="ident">EndianSlice::new</span>(<span class="kw-2">&amp;</span><span class="ident">buf</span>, <span class="ident">LittleEndian</span>);
 
         <span class="macro">assert_eq!</span>(
             <span class="ident">parse_unit_header</span>(<span class="ident">rest</span>, <span class="ident">DebugInfoOffset</span>(<span class="number">0</span>).<span class="ident">into</span>()),
@@ -9653,10 +9654,10 @@
             <span class="ident">entries_buf</span>: <span class="ident">EndianSlice::new</span>(<span class="ident">expected_rest</span>, <span class="ident">LittleEndian</span>),
         };
         <span class="kw">let</span> <span class="ident">section</span> <span class="op">=</span> <span class="ident">Section::with_endian</span>(<span class="ident">Endian::Little</span>)
-            .<span class="ident">unit</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">expected_unit</span>)
+            .<span class="ident">unit</span>(<span class="kw-2">&amp;mut</span> <span class="ident">expected_unit</span>)
             .<span class="ident">append_bytes</span>(<span class="ident">expected_rest</span>);
         <span class="kw">let</span> <span class="ident">buf</span> <span class="op">=</span> <span class="ident">section</span>.<span class="ident">get_contents</span>().<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">rest</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">EndianSlice::new</span>(<span class="kw-2">&amp;</span><span class="ident">buf</span>, <span class="ident">LittleEndian</span>);
+        <span class="kw">let</span> <span class="ident">rest</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="ident">EndianSlice::new</span>(<span class="kw-2">&amp;</span><span class="ident">buf</span>, <span class="ident">LittleEndian</span>);
 
         <span class="macro">assert_eq!</span>(
             <span class="ident">parse_unit_header</span>(<span class="ident">rest</span>, <span class="ident">DebugInfoOffset</span>(<span class="number">0</span>).<span class="ident">into</span>()),
@@ -9683,10 +9684,10 @@
             <span class="ident">entries_buf</span>: <span class="ident">EndianSlice::new</span>(<span class="ident">expected_rest</span>, <span class="ident">LittleEndian</span>),
         };
         <span class="kw">let</span> <span class="ident">section</span> <span class="op">=</span> <span class="ident">Section::with_endian</span>(<span class="ident">Endian::Little</span>)
-            .<span class="ident">unit</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">expected_unit</span>)
+            .<span class="ident">unit</span>(<span class="kw-2">&amp;mut</span> <span class="ident">expected_unit</span>)
             .<span class="ident">append_bytes</span>(<span class="ident">expected_rest</span>);
         <span class="kw">let</span> <span class="ident">buf</span> <span class="op">=</span> <span class="ident">section</span>.<span class="ident">get_contents</span>().<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">rest</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">EndianSlice::new</span>(<span class="kw-2">&amp;</span><span class="ident">buf</span>, <span class="ident">LittleEndian</span>);
+        <span class="kw">let</span> <span class="ident">rest</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="ident">EndianSlice::new</span>(<span class="kw-2">&amp;</span><span class="ident">buf</span>, <span class="ident">LittleEndian</span>);
 
         <span class="macro">assert_eq!</span>(
             <span class="ident">parse_unit_header</span>(<span class="ident">rest</span>, <span class="ident">DebugInfoOffset</span>(<span class="number">0</span>).<span class="ident">into</span>()),
@@ -9712,10 +9713,10 @@
             <span class="ident">entries_buf</span>: <span class="ident">EndianSlice::new</span>(<span class="ident">expected_rest</span>, <span class="ident">LittleEndian</span>),
         };
         <span class="kw">let</span> <span class="ident">section</span> <span class="op">=</span> <span class="ident">Section::with_endian</span>(<span class="ident">Endian::Little</span>)
-            .<span class="ident">unit</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">expected_unit</span>)
+            .<span class="ident">unit</span>(<span class="kw-2">&amp;mut</span> <span class="ident">expected_unit</span>)
             .<span class="ident">append_bytes</span>(<span class="ident">expected_rest</span>);
         <span class="kw">let</span> <span class="ident">buf</span> <span class="op">=</span> <span class="ident">section</span>.<span class="ident">get_contents</span>().<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">rest</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">EndianSlice::new</span>(<span class="kw-2">&amp;</span><span class="ident">buf</span>, <span class="ident">LittleEndian</span>);
+        <span class="kw">let</span> <span class="ident">rest</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="ident">EndianSlice::new</span>(<span class="kw-2">&amp;</span><span class="ident">buf</span>, <span class="ident">LittleEndian</span>);
 
         <span class="macro">assert_eq!</span>(
             <span class="ident">parse_unit_header</span>(<span class="ident">rest</span>, <span class="ident">DebugInfoOffset</span>(<span class="number">0</span>).<span class="ident">into</span>()),
@@ -9742,10 +9743,10 @@
             <span class="ident">entries_buf</span>: <span class="ident">EndianSlice::new</span>(<span class="ident">expected_rest</span>, <span class="ident">LittleEndian</span>),
         };
         <span class="kw">let</span> <span class="ident">section</span> <span class="op">=</span> <span class="ident">Section::with_endian</span>(<span class="ident">Endian::Little</span>)
-            .<span class="ident">unit</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">expected_unit</span>)
+            .<span class="ident">unit</span>(<span class="kw-2">&amp;mut</span> <span class="ident">expected_unit</span>)
             .<span class="ident">append_bytes</span>(<span class="ident">expected_rest</span>);
         <span class="kw">let</span> <span class="ident">buf</span> <span class="op">=</span> <span class="ident">section</span>.<span class="ident">get_contents</span>().<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">rest</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">EndianSlice::new</span>(<span class="kw-2">&amp;</span><span class="ident">buf</span>, <span class="ident">LittleEndian</span>);
+        <span class="kw">let</span> <span class="ident">rest</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="ident">EndianSlice::new</span>(<span class="kw-2">&amp;</span><span class="ident">buf</span>, <span class="ident">LittleEndian</span>);
 
         <span class="macro">assert_eq!</span>(
             <span class="ident">parse_unit_header</span>(<span class="ident">rest</span>, <span class="ident">DebugInfoOffset</span>(<span class="number">0</span>).<span class="ident">into</span>()),
@@ -9771,10 +9772,10 @@
             <span class="ident">entries_buf</span>: <span class="ident">EndianSlice::new</span>(<span class="ident">expected_rest</span>, <span class="ident">LittleEndian</span>),
         };
         <span class="kw">let</span> <span class="ident">section</span> <span class="op">=</span> <span class="ident">Section::with_endian</span>(<span class="ident">Endian::Little</span>)
-            .<span class="ident">unit</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">expected_unit</span>)
+            .<span class="ident">unit</span>(<span class="kw-2">&amp;mut</span> <span class="ident">expected_unit</span>)
             .<span class="ident">append_bytes</span>(<span class="ident">expected_rest</span>);
         <span class="kw">let</span> <span class="ident">buf</span> <span class="op">=</span> <span class="ident">section</span>.<span class="ident">get_contents</span>().<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">rest</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">EndianSlice::new</span>(<span class="kw-2">&amp;</span><span class="ident">buf</span>, <span class="ident">LittleEndian</span>);
+        <span class="kw">let</span> <span class="ident">rest</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="ident">EndianSlice::new</span>(<span class="kw-2">&amp;</span><span class="ident">buf</span>, <span class="ident">LittleEndian</span>);
 
         <span class="macro">assert_eq!</span>(
             <span class="ident">parse_unit_header</span>(<span class="ident">rest</span>, <span class="ident">DebugInfoOffset</span>(<span class="number">0</span>).<span class="ident">into</span>()),
@@ -9801,10 +9802,10 @@
             <span class="ident">entries_buf</span>: <span class="ident">EndianSlice::new</span>(<span class="ident">expected_rest</span>, <span class="ident">LittleEndian</span>),
         };
         <span class="kw">let</span> <span class="ident">section</span> <span class="op">=</span> <span class="ident">Section::with_endian</span>(<span class="ident">Endian::Little</span>)
-            .<span class="ident">unit</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">expected_unit</span>)
+            .<span class="ident">unit</span>(<span class="kw-2">&amp;mut</span> <span class="ident">expected_unit</span>)
             .<span class="ident">append_bytes</span>(<span class="ident">expected_rest</span>);
         <span class="kw">let</span> <span class="ident">buf</span> <span class="op">=</span> <span class="ident">section</span>.<span class="ident">get_contents</span>().<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">rest</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">EndianSlice::new</span>(<span class="kw-2">&amp;</span><span class="ident">buf</span>, <span class="ident">LittleEndian</span>);
+        <span class="kw">let</span> <span class="ident">rest</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="ident">EndianSlice::new</span>(<span class="kw-2">&amp;</span><span class="ident">buf</span>, <span class="ident">LittleEndian</span>);
 
         <span class="macro">assert_eq!</span>(
             <span class="ident">parse_unit_header</span>(<span class="ident">rest</span>, <span class="ident">DebugInfoOffset</span>(<span class="number">0</span>).<span class="ident">into</span>()),
@@ -9816,7 +9817,7 @@
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">test_parse_type_offset_32_ok</span>() {
         <span class="kw">let</span> <span class="ident">buf</span> <span class="op">=</span> [<span class="number">0x12</span>, <span class="number">0x34</span>, <span class="number">0x56</span>, <span class="number">0x78</span>, <span class="number">0x00</span>];
-        <span class="kw">let</span> <span class="ident">rest</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">EndianSlice::new</span>(<span class="kw-2">&amp;</span><span class="ident">buf</span>, <span class="ident">LittleEndian</span>);
+        <span class="kw">let</span> <span class="ident">rest</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="ident">EndianSlice::new</span>(<span class="kw-2">&amp;</span><span class="ident">buf</span>, <span class="ident">LittleEndian</span>);
 
         <span class="kw">match</span> <span class="ident">parse_type_offset</span>(<span class="ident">rest</span>, <span class="ident">Format::Dwarf32</span>) {
             <span class="prelude-val">Ok</span>(<span class="ident">offset</span>) =&gt; {
@@ -9831,7 +9832,7 @@
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">target_pointer_width</span> <span class="op">=</span> <span class="string">&quot;64&quot;</span>)]</span>
     <span class="kw">fn</span> <span class="ident">test_parse_type_offset_64_ok</span>() {
         <span class="kw">let</span> <span class="ident">buf</span> <span class="op">=</span> [<span class="number">0x12</span>, <span class="number">0x34</span>, <span class="number">0x56</span>, <span class="number">0x78</span>, <span class="number">0x9a</span>, <span class="number">0xbc</span>, <span class="number">0xde</span>, <span class="number">0xff</span>, <span class="number">0x00</span>];
-        <span class="kw">let</span> <span class="ident">rest</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">EndianSlice::new</span>(<span class="kw-2">&amp;</span><span class="ident">buf</span>, <span class="ident">LittleEndian</span>);
+        <span class="kw">let</span> <span class="ident">rest</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="ident">EndianSlice::new</span>(<span class="kw-2">&amp;</span><span class="ident">buf</span>, <span class="ident">LittleEndian</span>);
 
         <span class="kw">match</span> <span class="ident">parse_type_offset</span>(<span class="ident">rest</span>, <span class="ident">Format::Dwarf64</span>) {
             <span class="prelude-val">Ok</span>(<span class="ident">offset</span>) =&gt; {
@@ -9846,7 +9847,7 @@
     <span class="kw">fn</span> <span class="ident">test_parse_type_offset_incomplete</span>() {
         <span class="comment">// Need at least 4 bytes.</span>
         <span class="kw">let</span> <span class="ident">buf</span> <span class="op">=</span> [<span class="number">0xff</span>, <span class="number">0xff</span>, <span class="number">0xff</span>];
-        <span class="kw">let</span> <span class="ident">rest</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">EndianSlice::new</span>(<span class="kw-2">&amp;</span><span class="ident">buf</span>, <span class="ident">LittleEndian</span>);
+        <span class="kw">let</span> <span class="ident">rest</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="ident">EndianSlice::new</span>(<span class="kw-2">&amp;</span><span class="ident">buf</span>, <span class="ident">LittleEndian</span>);
 
         <span class="kw">match</span> <span class="ident">parse_type_offset</span>(<span class="ident">rest</span>, <span class="ident">Format::Dwarf32</span>) {
             <span class="prelude-val">Err</span>(<span class="ident">Error::UnexpectedEof</span>(<span class="kw">_</span>)) =&gt; <span class="macro">assert!</span>(<span class="bool-val">true</span>),
@@ -9874,10 +9875,10 @@
             <span class="ident">entries_buf</span>: <span class="ident">EndianSlice::new</span>(<span class="ident">expected_rest</span>, <span class="ident">LittleEndian</span>),
         };
         <span class="kw">let</span> <span class="ident">section</span> <span class="op">=</span> <span class="ident">Section::with_endian</span>(<span class="ident">Endian::Little</span>)
-            .<span class="ident">unit</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">expected_unit</span>)
+            .<span class="ident">unit</span>(<span class="kw-2">&amp;mut</span> <span class="ident">expected_unit</span>)
             .<span class="ident">append_bytes</span>(<span class="ident">expected_rest</span>);
         <span class="kw">let</span> <span class="ident">buf</span> <span class="op">=</span> <span class="ident">section</span>.<span class="ident">get_contents</span>().<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">rest</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">EndianSlice::new</span>(<span class="kw-2">&amp;</span><span class="ident">buf</span>, <span class="ident">LittleEndian</span>);
+        <span class="kw">let</span> <span class="ident">rest</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="ident">EndianSlice::new</span>(<span class="kw-2">&amp;</span><span class="ident">buf</span>, <span class="ident">LittleEndian</span>);
 
         <span class="macro">assert_eq!</span>(
             <span class="ident">parse_unit_header</span>(<span class="ident">rest</span>, <span class="ident">DebugTypesOffset</span>(<span class="number">0</span>).<span class="ident">into</span>()),
@@ -9907,10 +9908,10 @@
             <span class="ident">entries_buf</span>: <span class="ident">EndianSlice::new</span>(<span class="ident">expected_rest</span>, <span class="ident">LittleEndian</span>),
         };
         <span class="kw">let</span> <span class="ident">section</span> <span class="op">=</span> <span class="ident">Section::with_endian</span>(<span class="ident">Endian::Little</span>)
-            .<span class="ident">unit</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">expected_unit</span>)
+            .<span class="ident">unit</span>(<span class="kw-2">&amp;mut</span> <span class="ident">expected_unit</span>)
             .<span class="ident">append_bytes</span>(<span class="ident">expected_rest</span>);
         <span class="kw">let</span> <span class="ident">buf</span> <span class="op">=</span> <span class="ident">section</span>.<span class="ident">get_contents</span>().<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">rest</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">EndianSlice::new</span>(<span class="kw-2">&amp;</span><span class="ident">buf</span>, <span class="ident">LittleEndian</span>);
+        <span class="kw">let</span> <span class="ident">rest</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="ident">EndianSlice::new</span>(<span class="kw-2">&amp;</span><span class="ident">buf</span>, <span class="ident">LittleEndian</span>);
 
         <span class="macro">assert_eq!</span>(
             <span class="ident">parse_unit_header</span>(<span class="ident">rest</span>, <span class="ident">DebugTypesOffset</span>(<span class="number">0</span>).<span class="ident">into</span>()),
@@ -9939,10 +9940,10 @@
             <span class="ident">entries_buf</span>: <span class="ident">EndianSlice::new</span>(<span class="ident">expected_rest</span>, <span class="ident">LittleEndian</span>),
         };
         <span class="kw">let</span> <span class="ident">section</span> <span class="op">=</span> <span class="ident">Section::with_endian</span>(<span class="ident">Endian::Little</span>)
-            .<span class="ident">unit</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">expected_unit</span>)
+            .<span class="ident">unit</span>(<span class="kw-2">&amp;mut</span> <span class="ident">expected_unit</span>)
             .<span class="ident">append_bytes</span>(<span class="ident">expected_rest</span>);
         <span class="kw">let</span> <span class="ident">buf</span> <span class="op">=</span> <span class="ident">section</span>.<span class="ident">get_contents</span>().<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">rest</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">EndianSlice::new</span>(<span class="kw-2">&amp;</span><span class="ident">buf</span>, <span class="ident">LittleEndian</span>);
+        <span class="kw">let</span> <span class="ident">rest</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="ident">EndianSlice::new</span>(<span class="kw-2">&amp;</span><span class="ident">buf</span>, <span class="ident">LittleEndian</span>);
 
         <span class="macro">assert_eq!</span>(
             <span class="ident">parse_unit_header</span>(<span class="ident">rest</span>, <span class="ident">DebugInfoOffset</span>(<span class="number">0</span>).<span class="ident">into</span>()),
@@ -9972,10 +9973,10 @@
             <span class="ident">entries_buf</span>: <span class="ident">EndianSlice::new</span>(<span class="ident">expected_rest</span>, <span class="ident">LittleEndian</span>),
         };
         <span class="kw">let</span> <span class="ident">section</span> <span class="op">=</span> <span class="ident">Section::with_endian</span>(<span class="ident">Endian::Little</span>)
-            .<span class="ident">unit</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">expected_unit</span>)
+            .<span class="ident">unit</span>(<span class="kw-2">&amp;mut</span> <span class="ident">expected_unit</span>)
             .<span class="ident">append_bytes</span>(<span class="ident">expected_rest</span>);
         <span class="kw">let</span> <span class="ident">buf</span> <span class="op">=</span> <span class="ident">section</span>.<span class="ident">get_contents</span>().<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">rest</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">EndianSlice::new</span>(<span class="kw-2">&amp;</span><span class="ident">buf</span>, <span class="ident">LittleEndian</span>);
+        <span class="kw">let</span> <span class="ident">rest</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="ident">EndianSlice::new</span>(<span class="kw-2">&amp;</span><span class="ident">buf</span>, <span class="ident">LittleEndian</span>);
 
         <span class="macro">assert_eq!</span>(
             <span class="ident">parse_unit_header</span>(<span class="ident">rest</span>, <span class="ident">DebugInfoOffset</span>(<span class="number">0</span>).<span class="ident">into</span>()),
@@ -10004,10 +10005,10 @@
             <span class="ident">entries_buf</span>: <span class="ident">EndianSlice::new</span>(<span class="ident">expected_rest</span>, <span class="ident">LittleEndian</span>),
         };
         <span class="kw">let</span> <span class="ident">section</span> <span class="op">=</span> <span class="ident">Section::with_endian</span>(<span class="ident">Endian::Little</span>)
-            .<span class="ident">unit</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">expected_unit</span>)
+            .<span class="ident">unit</span>(<span class="kw-2">&amp;mut</span> <span class="ident">expected_unit</span>)
             .<span class="ident">append_bytes</span>(<span class="ident">expected_rest</span>);
         <span class="kw">let</span> <span class="ident">buf</span> <span class="op">=</span> <span class="ident">section</span>.<span class="ident">get_contents</span>().<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">rest</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">EndianSlice::new</span>(<span class="kw-2">&amp;</span><span class="ident">buf</span>, <span class="ident">LittleEndian</span>);
+        <span class="kw">let</span> <span class="ident">rest</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="ident">EndianSlice::new</span>(<span class="kw-2">&amp;</span><span class="ident">buf</span>, <span class="ident">LittleEndian</span>);
 
         <span class="macro">assert_eq!</span>(
             <span class="ident">parse_unit_header</span>(<span class="ident">rest</span>, <span class="ident">DebugInfoOffset</span>(<span class="number">0</span>).<span class="ident">into</span>()),
@@ -10037,10 +10038,10 @@
             <span class="ident">entries_buf</span>: <span class="ident">EndianSlice::new</span>(<span class="ident">expected_rest</span>, <span class="ident">LittleEndian</span>),
         };
         <span class="kw">let</span> <span class="ident">section</span> <span class="op">=</span> <span class="ident">Section::with_endian</span>(<span class="ident">Endian::Little</span>)
-            .<span class="ident">unit</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">expected_unit</span>)
+            .<span class="ident">unit</span>(<span class="kw-2">&amp;mut</span> <span class="ident">expected_unit</span>)
             .<span class="ident">append_bytes</span>(<span class="ident">expected_rest</span>);
         <span class="kw">let</span> <span class="ident">buf</span> <span class="op">=</span> <span class="ident">section</span>.<span class="ident">get_contents</span>().<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">rest</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">EndianSlice::new</span>(<span class="kw-2">&amp;</span><span class="ident">buf</span>, <span class="ident">LittleEndian</span>);
+        <span class="kw">let</span> <span class="ident">rest</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="ident">EndianSlice::new</span>(<span class="kw-2">&amp;</span><span class="ident">buf</span>, <span class="ident">LittleEndian</span>);
 
         <span class="macro">assert_eq!</span>(
             <span class="ident">parse_unit_header</span>(<span class="ident">rest</span>, <span class="ident">DebugInfoOffset</span>(<span class="number">0</span>).<span class="ident">into</span>()),
@@ -10210,7 +10211,7 @@
             <span class="ident">unit</span>.<span class="ident">encoding</span>.<span class="ident">version</span> <span class="op">=</span> <span class="ident">version</span>;
             <span class="kw">let</span> <span class="ident">spec</span> <span class="op">=</span> <span class="ident">AttributeSpecification::new</span>(<span class="ident">name</span>, <span class="ident">form</span>, <span class="prelude-val">None</span>);
             <span class="kw">let</span> <span class="ident">attribute</span> <span class="op">=</span>
-                <span class="ident">parse_attribute</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">input</span>, <span class="ident">unit</span>.<span class="ident">encoding</span>(), <span class="ident">spec</span>).<span class="ident">expect</span>(<span class="string">&quot;Should parse attribute&quot;</span>);
+                <span class="ident">parse_attribute</span>(<span class="kw-2">&amp;mut</span> <span class="ident">input</span>, <span class="ident">unit</span>.<span class="ident">encoding</span>(), <span class="ident">spec</span>).<span class="ident">expect</span>(<span class="string">&quot;Should parse attribute&quot;</span>);
             <span class="macro">assert_eq!</span>(<span class="ident">attribute</span>.<span class="ident">raw_value</span>(), <span class="ident">expect_raw</span>);
             <span class="macro">assert_eq!</span>(<span class="ident">attribute</span>.<span class="ident">value</span>(), <span class="ident">expect_value</span>);
         }
@@ -10307,7 +10308,7 @@
             <span class="ident">value</span>,
         };
 
-        <span class="kw">let</span> <span class="ident">rest</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">EndianSlice::new</span>(<span class="ident">buf</span>, <span class="ident">Endian::default</span>());
+        <span class="kw">let</span> <span class="ident">rest</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="ident">EndianSlice::new</span>(<span class="ident">buf</span>, <span class="ident">Endian::default</span>());
         <span class="kw">match</span> <span class="ident">parse_attribute</span>(<span class="ident">rest</span>, <span class="ident">unit</span>.<span class="ident">encoding</span>(), <span class="ident">spec</span>) {
             <span class="prelude-val">Ok</span>(<span class="ident">attr</span>) =&gt; {
                 <span class="macro">assert_eq!</span>(<span class="ident">attr</span>, <span class="ident">expect</span>);
@@ -10418,8 +10419,8 @@
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> [<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>];
 
         <span class="kw">let</span> <span class="ident">bytes_written</span> <span class="op">=</span> {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">writable</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">buf</span>[..];
-            <span class="ident">leb128::write::unsigned</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">writable</span>, <span class="number">4097</span>).<span class="ident">expect</span>(<span class="string">&quot;should write ok&quot;</span>)
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">writable</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="ident">buf</span>[..];
+            <span class="ident">leb128::write::unsigned</span>(<span class="kw-2">&amp;mut</span> <span class="ident">writable</span>, <span class="number">4097</span>).<span class="ident">expect</span>(<span class="string">&quot;should write ok&quot;</span>)
         };
 
         <span class="kw">let</span> <span class="ident">unit</span> <span class="op">=</span> <span class="ident">test_parse_attribute_unit_default</span>();
@@ -10433,8 +10434,8 @@
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> [<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>];
 
         <span class="kw">let</span> <span class="ident">bytes_written</span> <span class="op">=</span> {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">writable</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">buf</span>[..];
-            <span class="ident">leb128::write::signed</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">writable</span>, <span class="op">-</span><span class="number">4097</span>).<span class="ident">expect</span>(<span class="string">&quot;should write ok&quot;</span>)
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">writable</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="ident">buf</span>[..];
+            <span class="ident">leb128::write::signed</span>(<span class="kw-2">&amp;mut</span> <span class="ident">writable</span>, <span class="op">-</span><span class="number">4097</span>).<span class="ident">expect</span>(<span class="string">&quot;should write ok&quot;</span>)
         };
 
         <span class="kw">let</span> <span class="ident">unit</span> <span class="op">=</span> <span class="ident">test_parse_attribute_unit_default</span>();
@@ -10561,8 +10562,8 @@
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> [<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>];
 
         <span class="kw">let</span> <span class="ident">bytes_written</span> <span class="op">=</span> {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">writable</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">buf</span>[..];
-            <span class="ident">leb128::write::unsigned</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">writable</span>, <span class="number">4097</span>).<span class="ident">expect</span>(<span class="string">&quot;should write ok&quot;</span>)
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">writable</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="ident">buf</span>[..];
+            <span class="ident">leb128::write::unsigned</span>(<span class="kw-2">&amp;mut</span> <span class="ident">writable</span>, <span class="number">4097</span>).<span class="ident">expect</span>(<span class="string">&quot;should write ok&quot;</span>)
         };
 
         <span class="kw">let</span> <span class="ident">unit</span> <span class="op">=</span> <span class="ident">test_parse_attribute_unit_default</span>();
@@ -10710,8 +10711,8 @@
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> [<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>];
 
         <span class="kw">let</span> <span class="ident">bytes_written</span> <span class="op">=</span> {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">writable</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">buf</span>[..];
-            <span class="ident">leb128::write::unsigned</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">writable</span>, <span class="number">4097</span>).<span class="ident">expect</span>(<span class="string">&quot;should write ok&quot;</span>)
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">writable</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="ident">buf</span>[..];
+            <span class="ident">leb128::write::unsigned</span>(<span class="kw-2">&amp;mut</span> <span class="ident">writable</span>, <span class="number">4097</span>).<span class="ident">expect</span>(<span class="string">&quot;should write ok&quot;</span>)
         };
 
         <span class="kw">let</span> <span class="ident">unit</span> <span class="op">=</span> <span class="ident">test_parse_attribute_unit_default</span>();
@@ -10761,8 +10762,8 @@
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> [<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>];
 
         <span class="kw">let</span> <span class="ident">bytes_written</span> <span class="op">=</span> {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">writable</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">buf</span>[..];
-            <span class="ident">leb128::write::unsigned</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">writable</span>, <span class="number">4097</span>).<span class="ident">expect</span>(<span class="string">&quot;should write ok&quot;</span>)
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">writable</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="ident">buf</span>[..];
+            <span class="ident">leb128::write::unsigned</span>(<span class="kw-2">&amp;mut</span> <span class="ident">writable</span>, <span class="number">4097</span>).<span class="ident">expect</span>(<span class="string">&quot;should write ok&quot;</span>)
         };
 
         <span class="kw">let</span> <span class="ident">unit</span> <span class="op">=</span> <span class="ident">test_parse_attribute_unit_default</span>();
@@ -10812,8 +10813,8 @@
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> [<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>];
 
         <span class="kw">let</span> <span class="ident">bytes_written</span> <span class="op">=</span> {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">writable</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">buf</span>[..];
-            <span class="ident">leb128::write::unsigned</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">writable</span>, <span class="number">4097</span>).<span class="ident">expect</span>(<span class="string">&quot;should write ok&quot;</span>)
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">writable</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="ident">buf</span>[..];
+            <span class="ident">leb128::write::unsigned</span>(<span class="kw-2">&amp;mut</span> <span class="ident">writable</span>, <span class="number">4097</span>).<span class="ident">expect</span>(<span class="string">&quot;should write ok&quot;</span>)
         };
 
         <span class="kw">let</span> <span class="ident">unit</span> <span class="op">=</span> <span class="ident">test_parse_attribute_unit_default</span>();
@@ -10827,8 +10828,8 @@
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> [<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>];
 
         <span class="kw">let</span> <span class="ident">bytes_written</span> <span class="op">=</span> {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">writable</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">buf</span>[..];
-            <span class="ident">leb128::write::unsigned</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">writable</span>, <span class="number">4097</span>).<span class="ident">expect</span>(<span class="string">&quot;should write ok&quot;</span>)
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">writable</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="ident">buf</span>[..];
+            <span class="ident">leb128::write::unsigned</span>(<span class="kw-2">&amp;mut</span> <span class="ident">writable</span>, <span class="number">4097</span>).<span class="ident">expect</span>(<span class="string">&quot;should write ok&quot;</span>)
         };
 
         <span class="kw">let</span> <span class="ident">unit</span> <span class="op">=</span> <span class="ident">test_parse_attribute_unit_default</span>();
@@ -10842,10 +10843,10 @@
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> [<span class="number">0</span>; <span class="number">100</span>];
 
         <span class="kw">let</span> <span class="ident">bytes_written</span> <span class="op">=</span> {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">writable</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">buf</span>[..];
-            <span class="ident">leb128::write::unsigned</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">writable</span>, <span class="ident">constants::DW_FORM_udata</span>.<span class="number">0</span>.<span class="ident">into</span>())
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">writable</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="ident">buf</span>[..];
+            <span class="ident">leb128::write::unsigned</span>(<span class="kw-2">&amp;mut</span> <span class="ident">writable</span>, <span class="ident">constants::DW_FORM_udata</span>.<span class="number">0</span>.<span class="ident">into</span>())
                 .<span class="ident">expect</span>(<span class="string">&quot;should write udata&quot;</span>)
-                <span class="op">+</span> <span class="ident">leb128::write::unsigned</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">writable</span>, <span class="number">9_999_999</span>).<span class="ident">expect</span>(<span class="string">&quot;should write value&quot;</span>)
+                <span class="op">+</span> <span class="ident">leb128::write::unsigned</span>(<span class="kw-2">&amp;mut</span> <span class="ident">writable</span>, <span class="number">9_999_999</span>).<span class="ident">expect</span>(<span class="string">&quot;should write value&quot;</span>)
         };
 
         <span class="kw">let</span> <span class="ident">unit</span> <span class="op">=</span> <span class="ident">test_parse_attribute_unit_default</span>();
@@ -10862,11 +10863,11 @@
             <span class="ident">address_size</span>: <span class="number">4</span>,
         };
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> [<span class="number">0</span>; <span class="number">100</span>];
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">writable</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">buf</span>[..];
-        <span class="ident">leb128::write::unsigned</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">writable</span>, <span class="ident">constants::DW_FORM_implicit_const</span>.<span class="number">0</span>.<span class="ident">into</span>())
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">writable</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="ident">buf</span>[..];
+        <span class="ident">leb128::write::unsigned</span>(<span class="kw-2">&amp;mut</span> <span class="ident">writable</span>, <span class="ident">constants::DW_FORM_implicit_const</span>.<span class="number">0</span>.<span class="ident">into</span>())
             .<span class="ident">expect</span>(<span class="string">&quot;should write implicit_const&quot;</span>);
 
-        <span class="kw">let</span> <span class="ident">input</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">EndianSlice::new</span>(<span class="kw-2">&amp;</span><span class="ident">buf</span>, <span class="ident">LittleEndian</span>);
+        <span class="kw">let</span> <span class="ident">input</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="ident">EndianSlice::new</span>(<span class="kw-2">&amp;</span><span class="ident">buf</span>, <span class="ident">LittleEndian</span>);
         <span class="kw">let</span> <span class="ident">spec</span> <span class="op">=</span>
             <span class="ident">AttributeSpecification::new</span>(<span class="ident">constants::DW_AT_low_pc</span>, <span class="ident">constants::DW_FORM_indirect</span>, <span class="prelude-val">None</span>);
         <span class="macro">assert_eq!</span>(
@@ -11087,7 +11088,7 @@
         <span class="ident">assert_entry_name</span>(<span class="ident">entry</span>, <span class="ident">name</span>);
     }
 
-    <span class="kw">fn</span> <span class="ident">assert_next_entry</span><span class="op">&lt;</span><span class="ident">Endian</span><span class="op">&gt;</span>(<span class="ident">cursor</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">EntriesCursor</span><span class="op">&lt;</span><span class="ident">EndianSlice</span><span class="op">&lt;</span><span class="ident">Endian</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>)
+    <span class="kw">fn</span> <span class="ident">assert_next_entry</span><span class="op">&lt;</span><span class="ident">Endian</span><span class="op">&gt;</span>(<span class="ident">cursor</span>: <span class="kw-2">&amp;mut</span> <span class="ident">EntriesCursor</span><span class="op">&lt;</span><span class="ident">EndianSlice</span><span class="op">&lt;</span><span class="ident">Endian</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>)
     <span class="kw">where</span>
         <span class="ident">Endian</span>: <span class="ident">Endianity</span>,
     {
@@ -11098,7 +11099,7 @@
         <span class="ident">assert_current_name</span>(<span class="ident">cursor</span>, <span class="ident">name</span>);
     }
 
-    <span class="kw">fn</span> <span class="ident">assert_next_entry_null</span><span class="op">&lt;</span><span class="ident">Endian</span><span class="op">&gt;</span>(<span class="ident">cursor</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">EntriesCursor</span><span class="op">&lt;</span><span class="ident">EndianSlice</span><span class="op">&lt;</span><span class="ident">Endian</span><span class="op">&gt;</span><span class="op">&gt;</span>)
+    <span class="kw">fn</span> <span class="ident">assert_next_entry_null</span><span class="op">&lt;</span><span class="ident">Endian</span><span class="op">&gt;</span>(<span class="ident">cursor</span>: <span class="kw-2">&amp;mut</span> <span class="ident">EntriesCursor</span><span class="op">&lt;</span><span class="ident">EndianSlice</span><span class="op">&lt;</span><span class="ident">Endian</span><span class="op">&gt;</span><span class="op">&gt;</span>)
     <span class="kw">where</span>
         <span class="ident">Endian</span>: <span class="ident">Endianity</span>,
     {
@@ -11110,7 +11111,7 @@
     }
 
     <span class="kw">fn</span> <span class="ident">assert_next_dfs</span><span class="op">&lt;</span><span class="ident">Endian</span><span class="op">&gt;</span>(
-        <span class="ident">cursor</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">EntriesCursor</span><span class="op">&lt;</span><span class="ident">EndianSlice</span><span class="op">&lt;</span><span class="ident">Endian</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+        <span class="ident">cursor</span>: <span class="kw-2">&amp;mut</span> <span class="ident">EntriesCursor</span><span class="op">&lt;</span><span class="ident">EndianSlice</span><span class="op">&lt;</span><span class="ident">Endian</span><span class="op">&gt;</span><span class="op">&gt;</span>,
         <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
         <span class="ident">depth</span>: <span class="ident">isize</span>,
     ) <span class="kw">where</span>
@@ -11127,7 +11128,7 @@
         <span class="ident">assert_current_name</span>(<span class="ident">cursor</span>, <span class="ident">name</span>);
     }
 
-    <span class="kw">fn</span> <span class="ident">assert_next_sibling</span><span class="op">&lt;</span><span class="ident">Endian</span><span class="op">&gt;</span>(<span class="ident">cursor</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">EntriesCursor</span><span class="op">&lt;</span><span class="ident">EndianSlice</span><span class="op">&lt;</span><span class="ident">Endian</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>)
+    <span class="kw">fn</span> <span class="ident">assert_next_sibling</span><span class="op">&lt;</span><span class="ident">Endian</span><span class="op">&gt;</span>(<span class="ident">cursor</span>: <span class="kw-2">&amp;mut</span> <span class="ident">EntriesCursor</span><span class="op">&lt;</span><span class="ident">EndianSlice</span><span class="op">&lt;</span><span class="ident">Endian</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>)
     <span class="kw">where</span>
         <span class="ident">Endian</span>: <span class="ident">Endianity</span>,
     {
@@ -11208,7 +11209,7 @@
             <span class="ident">unit_offset</span>: <span class="ident">DebugInfoOffset</span>(<span class="number">0</span>).<span class="ident">into</span>(),
             <span class="ident">entries_buf</span>: <span class="ident">EndianSlice::new</span>(<span class="kw-2">&amp;</span><span class="ident">entries_buf</span>, <span class="ident">LittleEndian</span>),
         };
-        <span class="kw">let</span> <span class="ident">section</span> <span class="op">=</span> <span class="ident">Section::with_endian</span>(<span class="ident">Endian::Little</span>).<span class="ident">unit</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">unit</span>);
+        <span class="kw">let</span> <span class="ident">section</span> <span class="op">=</span> <span class="ident">Section::with_endian</span>(<span class="ident">Endian::Little</span>).<span class="ident">unit</span>(<span class="kw-2">&amp;mut</span> <span class="ident">unit</span>);
         <span class="ident">section</span>.<span class="ident">get_contents</span>().<span class="ident">unwrap</span>()
     }
 
@@ -11234,7 +11235,7 @@
             <span class="ident">unit_offset</span>: <span class="ident">DebugInfoOffset</span>(<span class="number">0</span>).<span class="ident">into</span>(),
             <span class="ident">entries_buf</span>: <span class="ident">EndianSlice::new</span>(<span class="kw-2">&amp;</span><span class="ident">entries_buf</span>, <span class="ident">LittleEndian</span>),
         };
-        <span class="kw">let</span> <span class="ident">section</span> <span class="op">=</span> <span class="ident">Section::with_endian</span>(<span class="ident">Endian::Little</span>).<span class="ident">unit</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">unit</span>);
+        <span class="kw">let</span> <span class="ident">section</span> <span class="op">=</span> <span class="ident">Section::with_endian</span>(<span class="ident">Endian::Little</span>).<span class="ident">unit</span>(<span class="kw-2">&amp;mut</span> <span class="ident">unit</span>);
         <span class="kw">let</span> <span class="ident">info_buf</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">section</span>.<span class="ident">get_contents</span>().<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">debug_info</span> <span class="op">=</span> <span class="ident">DebugInfo::new</span>(<span class="ident">info_buf</span>, <span class="ident">LittleEndian</span>);
 
@@ -11253,8 +11254,8 @@
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cursor</span> <span class="op">=</span> <span class="ident">unit</span>.<span class="ident">entries</span>(<span class="kw-2">&amp;</span><span class="ident">abbrevs</span>);
 
-        <span class="ident">assert_next_entry</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">cursor</span>, <span class="string">&quot;001&quot;</span>);
-        <span class="ident">assert_next_entry</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">cursor</span>, <span class="string">&quot;002&quot;</span>);
+        <span class="ident">assert_next_entry</span>(<span class="kw-2">&amp;mut</span> <span class="ident">cursor</span>, <span class="string">&quot;001&quot;</span>);
+        <span class="ident">assert_next_entry</span>(<span class="kw-2">&amp;mut</span> <span class="ident">cursor</span>, <span class="string">&quot;002&quot;</span>);
 
         {
             <span class="comment">// Entry code is present, but none of the attributes.</span>
@@ -11290,26 +11291,26 @@
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cursor</span> <span class="op">=</span> <span class="ident">unit</span>.<span class="ident">entries</span>(<span class="kw-2">&amp;</span><span class="ident">abbrevs</span>);
 
-        <span class="ident">assert_next_entry</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">cursor</span>, <span class="string">&quot;001&quot;</span>);
-        <span class="ident">assert_next_entry</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">cursor</span>, <span class="string">&quot;002&quot;</span>);
-        <span class="ident">assert_next_entry</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">cursor</span>, <span class="string">&quot;003&quot;</span>);
-        <span class="ident">assert_next_entry_null</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">cursor</span>);
-        <span class="ident">assert_next_entry_null</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">cursor</span>);
-        <span class="ident">assert_next_entry</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">cursor</span>, <span class="string">&quot;004&quot;</span>);
-        <span class="ident">assert_next_entry</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">cursor</span>, <span class="string">&quot;005&quot;</span>);
-        <span class="ident">assert_next_entry_null</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">cursor</span>);
-        <span class="ident">assert_next_entry</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">cursor</span>, <span class="string">&quot;006&quot;</span>);
-        <span class="ident">assert_next_entry_null</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">cursor</span>);
-        <span class="ident">assert_next_entry_null</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">cursor</span>);
-        <span class="ident">assert_next_entry</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">cursor</span>, <span class="string">&quot;007&quot;</span>);
-        <span class="ident">assert_next_entry</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">cursor</span>, <span class="string">&quot;008&quot;</span>);
-        <span class="ident">assert_next_entry</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">cursor</span>, <span class="string">&quot;009&quot;</span>);
-        <span class="ident">assert_next_entry_null</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">cursor</span>);
-        <span class="ident">assert_next_entry_null</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">cursor</span>);
-        <span class="ident">assert_next_entry_null</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">cursor</span>);
-        <span class="ident">assert_next_entry</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">cursor</span>, <span class="string">&quot;010&quot;</span>);
-        <span class="ident">assert_next_entry_null</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">cursor</span>);
-        <span class="ident">assert_next_entry_null</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">cursor</span>);
+        <span class="ident">assert_next_entry</span>(<span class="kw-2">&amp;mut</span> <span class="ident">cursor</span>, <span class="string">&quot;001&quot;</span>);
+        <span class="ident">assert_next_entry</span>(<span class="kw-2">&amp;mut</span> <span class="ident">cursor</span>, <span class="string">&quot;002&quot;</span>);
+        <span class="ident">assert_next_entry</span>(<span class="kw-2">&amp;mut</span> <span class="ident">cursor</span>, <span class="string">&quot;003&quot;</span>);
+        <span class="ident">assert_next_entry_null</span>(<span class="kw-2">&amp;mut</span> <span class="ident">cursor</span>);
+        <span class="ident">assert_next_entry_null</span>(<span class="kw-2">&amp;mut</span> <span class="ident">cursor</span>);
+        <span class="ident">assert_next_entry</span>(<span class="kw-2">&amp;mut</span> <span class="ident">cursor</span>, <span class="string">&quot;004&quot;</span>);
+        <span class="ident">assert_next_entry</span>(<span class="kw-2">&amp;mut</span> <span class="ident">cursor</span>, <span class="string">&quot;005&quot;</span>);
+        <span class="ident">assert_next_entry_null</span>(<span class="kw-2">&amp;mut</span> <span class="ident">cursor</span>);
+        <span class="ident">assert_next_entry</span>(<span class="kw-2">&amp;mut</span> <span class="ident">cursor</span>, <span class="string">&quot;006&quot;</span>);
+        <span class="ident">assert_next_entry_null</span>(<span class="kw-2">&amp;mut</span> <span class="ident">cursor</span>);
+        <span class="ident">assert_next_entry_null</span>(<span class="kw-2">&amp;mut</span> <span class="ident">cursor</span>);
+        <span class="ident">assert_next_entry</span>(<span class="kw-2">&amp;mut</span> <span class="ident">cursor</span>, <span class="string">&quot;007&quot;</span>);
+        <span class="ident">assert_next_entry</span>(<span class="kw-2">&amp;mut</span> <span class="ident">cursor</span>, <span class="string">&quot;008&quot;</span>);
+        <span class="ident">assert_next_entry</span>(<span class="kw-2">&amp;mut</span> <span class="ident">cursor</span>, <span class="string">&quot;009&quot;</span>);
+        <span class="ident">assert_next_entry_null</span>(<span class="kw-2">&amp;mut</span> <span class="ident">cursor</span>);
+        <span class="ident">assert_next_entry_null</span>(<span class="kw-2">&amp;mut</span> <span class="ident">cursor</span>);
+        <span class="ident">assert_next_entry_null</span>(<span class="kw-2">&amp;mut</span> <span class="ident">cursor</span>);
+        <span class="ident">assert_next_entry</span>(<span class="kw-2">&amp;mut</span> <span class="ident">cursor</span>, <span class="string">&quot;010&quot;</span>);
+        <span class="ident">assert_next_entry_null</span>(<span class="kw-2">&amp;mut</span> <span class="ident">cursor</span>);
+        <span class="ident">assert_next_entry_null</span>(<span class="kw-2">&amp;mut</span> <span class="ident">cursor</span>);
 
         <span class="macro">assert!</span>(<span class="ident">cursor</span>
             .<span class="ident">next_entry</span>()
@@ -11338,16 +11339,16 @@
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cursor</span> <span class="op">=</span> <span class="ident">unit</span>.<span class="ident">entries</span>(<span class="kw-2">&amp;</span><span class="ident">abbrevs</span>);
 
-        <span class="ident">assert_next_dfs</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">cursor</span>, <span class="string">&quot;001&quot;</span>, <span class="number">0</span>);
-        <span class="ident">assert_next_dfs</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">cursor</span>, <span class="string">&quot;002&quot;</span>, <span class="number">1</span>);
-        <span class="ident">assert_next_dfs</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">cursor</span>, <span class="string">&quot;003&quot;</span>, <span class="number">1</span>);
-        <span class="ident">assert_next_dfs</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">cursor</span>, <span class="string">&quot;004&quot;</span>, <span class="op">-</span><span class="number">1</span>);
-        <span class="ident">assert_next_dfs</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">cursor</span>, <span class="string">&quot;005&quot;</span>, <span class="number">1</span>);
-        <span class="ident">assert_next_dfs</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">cursor</span>, <span class="string">&quot;006&quot;</span>, <span class="number">0</span>);
-        <span class="ident">assert_next_dfs</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">cursor</span>, <span class="string">&quot;007&quot;</span>, <span class="op">-</span><span class="number">1</span>);
-        <span class="ident">assert_next_dfs</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">cursor</span>, <span class="string">&quot;008&quot;</span>, <span class="number">1</span>);
-        <span class="ident">assert_next_dfs</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">cursor</span>, <span class="string">&quot;009&quot;</span>, <span class="number">1</span>);
-        <span class="ident">assert_next_dfs</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">cursor</span>, <span class="string">&quot;010&quot;</span>, <span class="op">-</span><span class="number">2</span>);
+        <span class="ident">assert_next_dfs</span>(<span class="kw-2">&amp;mut</span> <span class="ident">cursor</span>, <span class="string">&quot;001&quot;</span>, <span class="number">0</span>);
+        <span class="ident">assert_next_dfs</span>(<span class="kw-2">&amp;mut</span> <span class="ident">cursor</span>, <span class="string">&quot;002&quot;</span>, <span class="number">1</span>);
+        <span class="ident">assert_next_dfs</span>(<span class="kw-2">&amp;mut</span> <span class="ident">cursor</span>, <span class="string">&quot;003&quot;</span>, <span class="number">1</span>);
+        <span class="ident">assert_next_dfs</span>(<span class="kw-2">&amp;mut</span> <span class="ident">cursor</span>, <span class="string">&quot;004&quot;</span>, <span class="op">-</span><span class="number">1</span>);
+        <span class="ident">assert_next_dfs</span>(<span class="kw-2">&amp;mut</span> <span class="ident">cursor</span>, <span class="string">&quot;005&quot;</span>, <span class="number">1</span>);
+        <span class="ident">assert_next_dfs</span>(<span class="kw-2">&amp;mut</span> <span class="ident">cursor</span>, <span class="string">&quot;006&quot;</span>, <span class="number">0</span>);
+        <span class="ident">assert_next_dfs</span>(<span class="kw-2">&amp;mut</span> <span class="ident">cursor</span>, <span class="string">&quot;007&quot;</span>, <span class="op">-</span><span class="number">1</span>);
+        <span class="ident">assert_next_dfs</span>(<span class="kw-2">&amp;mut</span> <span class="ident">cursor</span>, <span class="string">&quot;008&quot;</span>, <span class="number">1</span>);
+        <span class="ident">assert_next_dfs</span>(<span class="kw-2">&amp;mut</span> <span class="ident">cursor</span>, <span class="string">&quot;009&quot;</span>, <span class="number">1</span>);
+        <span class="ident">assert_next_dfs</span>(<span class="kw-2">&amp;mut</span> <span class="ident">cursor</span>, <span class="string">&quot;010&quot;</span>, <span class="op">-</span><span class="number">2</span>);
 
         <span class="macro">assert!</span>(<span class="ident">cursor</span>.<span class="ident">next_dfs</span>().<span class="ident">expect</span>(<span class="string">&quot;Should parse next dfs&quot;</span>).<span class="ident">is_none</span>());
         <span class="macro">assert!</span>(<span class="ident">cursor</span>.<span class="ident">current</span>().<span class="ident">is_none</span>());
@@ -11373,17 +11374,17 @@
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cursor</span> <span class="op">=</span> <span class="ident">unit</span>.<span class="ident">entries</span>(<span class="kw-2">&amp;</span><span class="ident">abbrevs</span>);
 
-        <span class="ident">assert_next_dfs</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">cursor</span>, <span class="string">&quot;001&quot;</span>, <span class="number">0</span>);
+        <span class="ident">assert_next_dfs</span>(<span class="kw-2">&amp;mut</span> <span class="ident">cursor</span>, <span class="string">&quot;001&quot;</span>, <span class="number">0</span>);
 
         <span class="comment">// Down to the first child of the root entry.</span>
 
-        <span class="ident">assert_next_dfs</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">cursor</span>, <span class="string">&quot;002&quot;</span>, <span class="number">1</span>);
+        <span class="ident">assert_next_dfs</span>(<span class="kw-2">&amp;mut</span> <span class="ident">cursor</span>, <span class="string">&quot;002&quot;</span>, <span class="number">1</span>);
 
         <span class="comment">// Now iterate all children of the root via `next_sibling`.</span>
 
-        <span class="ident">assert_next_sibling</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">cursor</span>, <span class="string">&quot;004&quot;</span>);
-        <span class="ident">assert_next_sibling</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">cursor</span>, <span class="string">&quot;007&quot;</span>);
-        <span class="ident">assert_next_sibling</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">cursor</span>, <span class="string">&quot;010&quot;</span>);
+        <span class="ident">assert_next_sibling</span>(<span class="kw-2">&amp;mut</span> <span class="ident">cursor</span>, <span class="string">&quot;004&quot;</span>);
+        <span class="ident">assert_next_sibling</span>(<span class="kw-2">&amp;mut</span> <span class="ident">cursor</span>, <span class="string">&quot;007&quot;</span>);
+        <span class="ident">assert_next_sibling</span>(<span class="kw-2">&amp;mut</span> <span class="ident">cursor</span>, <span class="string">&quot;010&quot;</span>);
 
         <span class="comment">// There should be no more siblings.</span>
 
@@ -11414,17 +11415,17 @@
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cursor</span> <span class="op">=</span> <span class="ident">unit</span>.<span class="ident">entries</span>(<span class="kw-2">&amp;</span><span class="ident">abbrevs</span>);
 
-        <span class="ident">assert_next_dfs</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">cursor</span>, <span class="string">&quot;001&quot;</span>, <span class="number">0</span>);
+        <span class="ident">assert_next_dfs</span>(<span class="kw-2">&amp;mut</span> <span class="ident">cursor</span>, <span class="string">&quot;001&quot;</span>, <span class="number">0</span>);
 
         <span class="comment">// Down to the first child of the root entry.</span>
 
-        <span class="ident">assert_next_dfs</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">cursor</span>, <span class="string">&quot;002&quot;</span>, <span class="number">1</span>);
+        <span class="ident">assert_next_dfs</span>(<span class="kw-2">&amp;mut</span> <span class="ident">cursor</span>, <span class="string">&quot;002&quot;</span>, <span class="number">1</span>);
 
         <span class="comment">// Get the next sibling, then iterate its children</span>
 
-        <span class="ident">assert_next_sibling</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">cursor</span>, <span class="string">&quot;004&quot;</span>);
-        <span class="ident">assert_next_dfs</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">cursor</span>, <span class="string">&quot;005&quot;</span>, <span class="number">1</span>);
-        <span class="ident">assert_next_sibling</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">cursor</span>, <span class="string">&quot;006&quot;</span>);
+        <span class="ident">assert_next_sibling</span>(<span class="kw-2">&amp;mut</span> <span class="ident">cursor</span>, <span class="string">&quot;004&quot;</span>);
+        <span class="ident">assert_next_dfs</span>(<span class="kw-2">&amp;mut</span> <span class="ident">cursor</span>, <span class="string">&quot;005&quot;</span>, <span class="number">1</span>);
+        <span class="ident">assert_next_sibling</span>(<span class="kw-2">&amp;mut</span> <span class="ident">cursor</span>, <span class="string">&quot;006&quot;</span>);
         <span class="macro">assert!</span>(<span class="ident">cursor</span>
             .<span class="ident">next_sibling</span>()
             .<span class="ident">expect</span>(<span class="string">&quot;Should parse next sibling&quot;</span>)
@@ -11444,8 +11445,8 @@
 
         <span class="comment">// And we should be able to continue with the children of the root entry.</span>
 
-        <span class="ident">assert_next_dfs</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">cursor</span>, <span class="string">&quot;007&quot;</span>, <span class="op">-</span><span class="number">1</span>);
-        <span class="ident">assert_next_sibling</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">cursor</span>, <span class="string">&quot;010&quot;</span>);
+        <span class="ident">assert_next_dfs</span>(<span class="kw-2">&amp;mut</span> <span class="ident">cursor</span>, <span class="string">&quot;007&quot;</span>, <span class="op">-</span><span class="number">1</span>);
+        <span class="ident">assert_next_sibling</span>(<span class="kw-2">&amp;mut</span> <span class="ident">cursor</span>, <span class="string">&quot;010&quot;</span>);
 
         <span class="comment">// There should be no more siblings.</span>
 
@@ -11521,7 +11522,7 @@
         <span class="ident">section</span>.<span class="ident">get_contents</span>().<span class="ident">unwrap</span>()
     }
 
-    <span class="kw">fn</span> <span class="ident">test_cursor_next_sibling_with_ptr</span>(<span class="ident">cursor</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">EntriesCursor</span><span class="op">&lt;</span><span class="ident">EndianSlice</span><span class="op">&lt;</span><span class="ident">LittleEndian</span><span class="op">&gt;</span><span class="op">&gt;</span>) {
+    <span class="kw">fn</span> <span class="ident">test_cursor_next_sibling_with_ptr</span>(<span class="ident">cursor</span>: <span class="kw-2">&amp;mut</span> <span class="ident">EntriesCursor</span><span class="op">&lt;</span><span class="ident">EndianSlice</span><span class="op">&lt;</span><span class="ident">LittleEndian</span><span class="op">&gt;</span><span class="op">&gt;</span>) {
         <span class="ident">assert_next_dfs</span>(<span class="ident">cursor</span>, <span class="string">&quot;001&quot;</span>, <span class="number">0</span>);
 
         <span class="comment">// Down to the first child of the root.</span>
@@ -11563,7 +11564,7 @@
         <span class="kw">let</span> <span class="ident">header_size</span> <span class="op">=</span> <span class="ident">unit</span>.<span class="ident">size_of_header</span>();
         <span class="kw">let</span> <span class="ident">entries_buf</span> <span class="op">=</span> <span class="ident">entries_cursor_sibling_entries_buf</span>(<span class="ident">header_size</span>);
         <span class="ident">unit</span>.<span class="ident">entries_buf</span> <span class="op">=</span> <span class="ident">EndianSlice::new</span>(<span class="kw-2">&amp;</span><span class="ident">entries_buf</span>, <span class="ident">LittleEndian</span>);
-        <span class="kw">let</span> <span class="ident">section</span> <span class="op">=</span> <span class="ident">Section::with_endian</span>(<span class="ident">Endian::Little</span>).<span class="ident">unit</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">unit</span>);
+        <span class="kw">let</span> <span class="ident">section</span> <span class="op">=</span> <span class="ident">Section::with_endian</span>(<span class="ident">Endian::Little</span>).<span class="ident">unit</span>(<span class="kw-2">&amp;mut</span> <span class="ident">unit</span>);
         <span class="kw">let</span> <span class="ident">info_buf</span> <span class="op">=</span> <span class="ident">section</span>.<span class="ident">get_contents</span>().<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">debug_info</span> <span class="op">=</span> <span class="ident">DebugInfo::new</span>(<span class="kw-2">&amp;</span><span class="ident">info_buf</span>, <span class="ident">LittleEndian</span>);
 
@@ -11581,7 +11582,7 @@
             .<span class="ident">expect</span>(<span class="string">&quot;Should parse abbreviations&quot;</span>);
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cursor</span> <span class="op">=</span> <span class="ident">unit</span>.<span class="ident">entries</span>(<span class="kw-2">&amp;</span><span class="ident">abbrevs</span>);
-        <span class="ident">test_cursor_next_sibling_with_ptr</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">cursor</span>);
+        <span class="ident">test_cursor_next_sibling_with_ptr</span>(<span class="kw-2">&amp;mut</span> <span class="ident">cursor</span>);
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
@@ -11605,7 +11606,7 @@
         <span class="kw">let</span> <span class="ident">header_size</span> <span class="op">=</span> <span class="ident">unit</span>.<span class="ident">size_of_header</span>();
         <span class="kw">let</span> <span class="ident">entries_buf</span> <span class="op">=</span> <span class="ident">entries_cursor_sibling_entries_buf</span>(<span class="ident">header_size</span>);
         <span class="ident">unit</span>.<span class="ident">entries_buf</span> <span class="op">=</span> <span class="ident">EndianSlice::new</span>(<span class="kw-2">&amp;</span><span class="ident">entries_buf</span>, <span class="ident">LittleEndian</span>);
-        <span class="kw">let</span> <span class="ident">section</span> <span class="op">=</span> <span class="ident">Section::with_endian</span>(<span class="ident">Endian::Little</span>).<span class="ident">unit</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">unit</span>);
+        <span class="kw">let</span> <span class="ident">section</span> <span class="op">=</span> <span class="ident">Section::with_endian</span>(<span class="ident">Endian::Little</span>).<span class="ident">unit</span>(<span class="kw-2">&amp;mut</span> <span class="ident">unit</span>);
         <span class="kw">let</span> <span class="ident">info_buf</span> <span class="op">=</span> <span class="ident">section</span>.<span class="ident">get_contents</span>().<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">debug_types</span> <span class="op">=</span> <span class="ident">DebugTypes::new</span>(<span class="kw-2">&amp;</span><span class="ident">info_buf</span>, <span class="ident">LittleEndian</span>);
 
@@ -11623,7 +11624,7 @@
             .<span class="ident">expect</span>(<span class="string">&quot;Should parse abbreviations&quot;</span>);
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cursor</span> <span class="op">=</span> <span class="ident">unit</span>.<span class="ident">entries</span>(<span class="kw-2">&amp;</span><span class="ident">abbrevs</span>);
-        <span class="ident">test_cursor_next_sibling_with_ptr</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">cursor</span>);
+        <span class="ident">test_cursor_next_sibling_with_ptr</span>(<span class="kw-2">&amp;mut</span> <span class="ident">cursor</span>);
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
@@ -11647,7 +11648,7 @@
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cursor</span> <span class="op">=</span> <span class="ident">unit</span>
             .<span class="ident">entries_at_offset</span>(<span class="kw-2">&amp;</span><span class="ident">abbrevs</span>, <span class="ident">UnitOffset</span>(<span class="ident">unit</span>.<span class="ident">header_size</span>()))
             .<span class="ident">unwrap</span>();
-        <span class="ident">assert_next_entry</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">cursor</span>, <span class="string">&quot;001&quot;</span>);
+        <span class="ident">assert_next_entry</span>(<span class="kw-2">&amp;mut</span> <span class="ident">cursor</span>, <span class="string">&quot;001&quot;</span>);
 
         <span class="kw">let</span> <span class="ident">cursor</span> <span class="op">=</span> <span class="ident">unit</span>.<span class="ident">entries_at_offset</span>(<span class="kw-2">&amp;</span><span class="ident">abbrevs</span>, <span class="ident">UnitOffset</span>(<span class="number">0</span>));
         <span class="kw">match</span> <span class="ident">cursor</span> {
@@ -11757,7 +11758,7 @@
         <span class="kw">let</span> (<span class="ident">entries_buf</span>, <span class="ident">entry2</span>) <span class="op">=</span> <span class="ident">entries_tree_tests_debug_info_buf</span>(<span class="ident">header_size</span>);
         <span class="ident">unit</span>.<span class="ident">entries_buf</span> <span class="op">=</span> <span class="ident">EndianSlice::new</span>(<span class="kw-2">&amp;</span><span class="ident">entries_buf</span>, <span class="ident">LittleEndian</span>);
         <span class="kw">let</span> <span class="ident">info_buf</span> <span class="op">=</span> <span class="ident">Section::with_endian</span>(<span class="ident">Endian::Little</span>)
-            .<span class="ident">unit</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">unit</span>)
+            .<span class="ident">unit</span>(<span class="kw-2">&amp;mut</span> <span class="ident">unit</span>)
             .<span class="ident">get_contents</span>()
             .<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">debug_info</span> <span class="op">=</span> <span class="ident">DebugInfo::new</span>(<span class="kw-2">&amp;</span><span class="ident">info_buf</span>, <span class="ident">LittleEndian</span>);
@@ -11837,7 +11838,7 @@
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">test_entries_raw</span>() {
         <span class="kw">fn</span> <span class="ident">assert_abbrev</span><span class="op">&lt;</span><span class="lifetime">&#39;input</span>, <span class="lifetime">&#39;abbrev</span>, <span class="lifetime">&#39;unit</span>, <span class="ident">Endian</span><span class="op">&gt;</span>(
-            <span class="ident">entries</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">EntriesRaw</span><span class="op">&lt;</span><span class="lifetime">&#39;abbrev</span>, <span class="lifetime">&#39;unit</span>, <span class="ident">EndianSlice</span><span class="op">&lt;</span><span class="lifetime">&#39;input</span>, <span class="ident">Endian</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+            <span class="ident">entries</span>: <span class="kw-2">&amp;mut</span> <span class="ident">EntriesRaw</span><span class="op">&lt;</span><span class="lifetime">&#39;abbrev</span>, <span class="lifetime">&#39;unit</span>, <span class="ident">EndianSlice</span><span class="op">&lt;</span><span class="lifetime">&#39;input</span>, <span class="ident">Endian</span><span class="op">&gt;</span><span class="op">&gt;</span>,
             <span class="ident">tag</span>: <span class="ident">DwTag</span>,
         ) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;abbrev</span> <span class="ident">Abbreviation</span>
         <span class="kw">where</span>
@@ -11852,7 +11853,7 @@
         }
 
         <span class="kw">fn</span> <span class="ident">assert_null</span><span class="op">&lt;</span><span class="lifetime">&#39;input</span>, <span class="lifetime">&#39;abbrev</span>, <span class="lifetime">&#39;unit</span>, <span class="ident">Endian</span><span class="op">&gt;</span>(
-            <span class="ident">entries</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">EntriesRaw</span><span class="op">&lt;</span><span class="lifetime">&#39;abbrev</span>, <span class="lifetime">&#39;unit</span>, <span class="ident">EndianSlice</span><span class="op">&lt;</span><span class="lifetime">&#39;input</span>, <span class="ident">Endian</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+            <span class="ident">entries</span>: <span class="kw-2">&amp;mut</span> <span class="ident">EntriesRaw</span><span class="op">&lt;</span><span class="lifetime">&#39;abbrev</span>, <span class="lifetime">&#39;unit</span>, <span class="ident">EndianSlice</span><span class="op">&lt;</span><span class="lifetime">&#39;input</span>, <span class="ident">Endian</span><span class="op">&gt;</span><span class="op">&gt;</span>,
         ) <span class="kw">where</span>
             <span class="ident">Endian</span>: <span class="ident">Endianity</span>,
         {
@@ -11865,7 +11866,7 @@
         }
 
         <span class="kw">fn</span> <span class="ident">assert_attr</span><span class="op">&lt;</span><span class="lifetime">&#39;input</span>, <span class="lifetime">&#39;abbrev</span>, <span class="lifetime">&#39;unit</span>, <span class="ident">Endian</span><span class="op">&gt;</span>(
-            <span class="ident">entries</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">EntriesRaw</span><span class="op">&lt;</span><span class="lifetime">&#39;abbrev</span>, <span class="lifetime">&#39;unit</span>, <span class="ident">EndianSlice</span><span class="op">&lt;</span><span class="lifetime">&#39;input</span>, <span class="ident">Endian</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+            <span class="ident">entries</span>: <span class="kw-2">&amp;mut</span> <span class="ident">EntriesRaw</span><span class="op">&lt;</span><span class="lifetime">&#39;abbrev</span>, <span class="lifetime">&#39;unit</span>, <span class="ident">EndianSlice</span><span class="op">&lt;</span><span class="lifetime">&#39;input</span>, <span class="ident">Endian</span><span class="op">&gt;</span><span class="op">&gt;</span>,
             <span class="ident">spec</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">AttributeSpecification</span><span class="op">&gt;</span>,
             <span class="ident">name</span>: <span class="ident">DwAt</span>,
             <span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
@@ -11919,7 +11920,7 @@
             <span class="ident">unit_offset</span>: <span class="ident">DebugInfoOffset</span>(<span class="number">0</span>).<span class="ident">into</span>(),
             <span class="ident">entries_buf</span>: <span class="ident">EndianSlice::new</span>(<span class="kw-2">&amp;</span><span class="ident">entries_buf</span>, <span class="ident">LittleEndian</span>),
         };
-        <span class="kw">let</span> <span class="ident">section</span> <span class="op">=</span> <span class="ident">Section::with_endian</span>(<span class="ident">Endian::Little</span>).<span class="ident">unit</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">unit</span>);
+        <span class="kw">let</span> <span class="ident">section</span> <span class="op">=</span> <span class="ident">Section::with_endian</span>(<span class="ident">Endian::Little</span>).<span class="ident">unit</span>(<span class="kw-2">&amp;mut</span> <span class="ident">unit</span>);
         <span class="kw">let</span> <span class="ident">info_buf</span> <span class="op">=</span> <span class="ident">section</span>.<span class="ident">get_contents</span>().<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">debug_info</span> <span class="op">=</span> <span class="ident">DebugInfo::new</span>(<span class="kw-2">&amp;</span><span class="ident">info_buf</span>, <span class="ident">LittleEndian</span>);
 
@@ -11938,36 +11939,36 @@
             .<span class="ident">expect</span>(<span class="string">&quot;Should have entries&quot;</span>);
 
         <span class="macro">assert_eq!</span>(<span class="ident">entries</span>.<span class="ident">next_depth</span>(), <span class="number">0</span>);
-        <span class="kw">let</span> <span class="ident">abbrev</span> <span class="op">=</span> <span class="ident">assert_abbrev</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">entries</span>, <span class="ident">DW_TAG_subprogram</span>);
+        <span class="kw">let</span> <span class="ident">abbrev</span> <span class="op">=</span> <span class="ident">assert_abbrev</span>(<span class="kw-2">&amp;mut</span> <span class="ident">entries</span>, <span class="ident">DW_TAG_subprogram</span>);
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">attrs</span> <span class="op">=</span> <span class="ident">abbrev</span>.<span class="ident">attributes</span>().<span class="ident">iter</span>().<span class="ident">copied</span>();
-        <span class="ident">assert_attr</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">entries</span>, <span class="ident">attrs</span>.<span class="ident">next</span>(), <span class="ident">DW_AT_name</span>, <span class="string">&quot;f1&quot;</span>);
-        <span class="ident">assert_attr</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">entries</span>, <span class="ident">attrs</span>.<span class="ident">next</span>(), <span class="ident">DW_AT_linkage_name</span>, <span class="string">&quot;l1&quot;</span>);
+        <span class="ident">assert_attr</span>(<span class="kw-2">&amp;mut</span> <span class="ident">entries</span>, <span class="ident">attrs</span>.<span class="ident">next</span>(), <span class="ident">DW_AT_name</span>, <span class="string">&quot;f1&quot;</span>);
+        <span class="ident">assert_attr</span>(<span class="kw-2">&amp;mut</span> <span class="ident">entries</span>, <span class="ident">attrs</span>.<span class="ident">next</span>(), <span class="ident">DW_AT_linkage_name</span>, <span class="string">&quot;l1&quot;</span>);
         <span class="macro">assert!</span>(<span class="ident">attrs</span>.<span class="ident">next</span>().<span class="ident">is_none</span>());
 
         <span class="macro">assert_eq!</span>(<span class="ident">entries</span>.<span class="ident">next_depth</span>(), <span class="number">1</span>);
-        <span class="kw">let</span> <span class="ident">abbrev</span> <span class="op">=</span> <span class="ident">assert_abbrev</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">entries</span>, <span class="ident">DW_TAG_variable</span>);
+        <span class="kw">let</span> <span class="ident">abbrev</span> <span class="op">=</span> <span class="ident">assert_abbrev</span>(<span class="kw-2">&amp;mut</span> <span class="ident">entries</span>, <span class="ident">DW_TAG_variable</span>);
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">attrs</span> <span class="op">=</span> <span class="ident">abbrev</span>.<span class="ident">attributes</span>().<span class="ident">iter</span>().<span class="ident">copied</span>();
-        <span class="ident">assert_attr</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">entries</span>, <span class="ident">attrs</span>.<span class="ident">next</span>(), <span class="ident">DW_AT_name</span>, <span class="string">&quot;v1&quot;</span>);
+        <span class="ident">assert_attr</span>(<span class="kw-2">&amp;mut</span> <span class="ident">entries</span>, <span class="ident">attrs</span>.<span class="ident">next</span>(), <span class="ident">DW_AT_name</span>, <span class="string">&quot;v1&quot;</span>);
         <span class="macro">assert!</span>(<span class="ident">attrs</span>.<span class="ident">next</span>().<span class="ident">is_none</span>());
 
         <span class="macro">assert_eq!</span>(<span class="ident">entries</span>.<span class="ident">next_depth</span>(), <span class="number">1</span>);
-        <span class="kw">let</span> <span class="ident">abbrev</span> <span class="op">=</span> <span class="ident">assert_abbrev</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">entries</span>, <span class="ident">DW_TAG_variable</span>);
+        <span class="kw">let</span> <span class="ident">abbrev</span> <span class="op">=</span> <span class="ident">assert_abbrev</span>(<span class="kw-2">&amp;mut</span> <span class="ident">entries</span>, <span class="ident">DW_TAG_variable</span>);
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">attrs</span> <span class="op">=</span> <span class="ident">abbrev</span>.<span class="ident">attributes</span>().<span class="ident">iter</span>().<span class="ident">copied</span>();
-        <span class="ident">assert_attr</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">entries</span>, <span class="ident">attrs</span>.<span class="ident">next</span>(), <span class="ident">DW_AT_name</span>, <span class="string">&quot;v2&quot;</span>);
+        <span class="ident">assert_attr</span>(<span class="kw-2">&amp;mut</span> <span class="ident">entries</span>, <span class="ident">attrs</span>.<span class="ident">next</span>(), <span class="ident">DW_AT_name</span>, <span class="string">&quot;v2&quot;</span>);
         <span class="macro">assert!</span>(<span class="ident">attrs</span>.<span class="ident">next</span>().<span class="ident">is_none</span>());
 
         <span class="macro">assert_eq!</span>(<span class="ident">entries</span>.<span class="ident">next_depth</span>(), <span class="number">1</span>);
-        <span class="kw">let</span> <span class="ident">abbrev</span> <span class="op">=</span> <span class="ident">assert_abbrev</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">entries</span>, <span class="ident">DW_TAG_subprogram</span>);
+        <span class="kw">let</span> <span class="ident">abbrev</span> <span class="op">=</span> <span class="ident">assert_abbrev</span>(<span class="kw-2">&amp;mut</span> <span class="ident">entries</span>, <span class="ident">DW_TAG_subprogram</span>);
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">attrs</span> <span class="op">=</span> <span class="ident">abbrev</span>.<span class="ident">attributes</span>().<span class="ident">iter</span>().<span class="ident">copied</span>();
-        <span class="ident">assert_attr</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">entries</span>, <span class="ident">attrs</span>.<span class="ident">next</span>(), <span class="ident">DW_AT_name</span>, <span class="string">&quot;f2&quot;</span>);
-        <span class="ident">assert_attr</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">entries</span>, <span class="ident">attrs</span>.<span class="ident">next</span>(), <span class="ident">DW_AT_linkage_name</span>, <span class="string">&quot;l2&quot;</span>);
+        <span class="ident">assert_attr</span>(<span class="kw-2">&amp;mut</span> <span class="ident">entries</span>, <span class="ident">attrs</span>.<span class="ident">next</span>(), <span class="ident">DW_AT_name</span>, <span class="string">&quot;f2&quot;</span>);
+        <span class="ident">assert_attr</span>(<span class="kw-2">&amp;mut</span> <span class="ident">entries</span>, <span class="ident">attrs</span>.<span class="ident">next</span>(), <span class="ident">DW_AT_linkage_name</span>, <span class="string">&quot;l2&quot;</span>);
         <span class="macro">assert!</span>(<span class="ident">attrs</span>.<span class="ident">next</span>().<span class="ident">is_none</span>());
 
         <span class="macro">assert_eq!</span>(<span class="ident">entries</span>.<span class="ident">next_depth</span>(), <span class="number">2</span>);
-        <span class="ident">assert_null</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">entries</span>);
+        <span class="ident">assert_null</span>(<span class="kw-2">&amp;mut</span> <span class="ident">entries</span>);
 
         <span class="macro">assert_eq!</span>(<span class="ident">entries</span>.<span class="ident">next_depth</span>(), <span class="number">1</span>);
-        <span class="ident">assert_null</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">entries</span>);
+        <span class="ident">assert_null</span>(<span class="kw-2">&amp;mut</span> <span class="ident">entries</span>);
 
         <span class="macro">assert_eq!</span>(<span class="ident">entries</span>.<span class="ident">next_depth</span>(), <span class="number">0</span>);
         <span class="macro">assert!</span>(<span class="ident">entries</span>.<span class="ident">is_empty</span>());
@@ -11992,7 +11993,7 @@
         };
         <span class="ident">Section::with_endian</span>(<span class="ident">Endian::Little</span>)
             .<span class="ident">append_bytes</span>(<span class="ident">padding</span>)
-            .<span class="ident">unit</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">unit</span>);
+            .<span class="ident">unit</span>(<span class="kw-2">&amp;mut</span> <span class="ident">unit</span>);
         <span class="kw">let</span> <span class="ident">offset</span> <span class="op">=</span> <span class="ident">padding</span>.<span class="ident">len</span>();
         <span class="kw">let</span> <span class="ident">header_length</span> <span class="op">=</span> <span class="ident">unit</span>.<span class="ident">size_of_header</span>();
         <span class="kw">let</span> <span class="ident">length</span> <span class="op">=</span> <span class="ident">unit</span>.<span class="ident">length_including_self</span>();
@@ -12044,7 +12045,7 @@
         };
         <span class="ident">Section::with_endian</span>(<span class="ident">Endian::Little</span>)
             .<span class="ident">append_bytes</span>(<span class="ident">padding</span>)
-            .<span class="ident">unit</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">unit</span>);
+            .<span class="ident">unit</span>(<span class="kw-2">&amp;mut</span> <span class="ident">unit</span>);
         <span class="kw">let</span> <span class="ident">offset</span> <span class="op">=</span> <span class="ident">padding</span>.<span class="ident">len</span>();
         <span class="kw">let</span> <span class="ident">header_length</span> <span class="op">=</span> <span class="ident">unit</span>.<span class="ident">size_of_header</span>();
         <span class="kw">let</span> <span class="ident">length</span> <span class="op">=</span> <span class="ident">unit</span>.<span class="ident">length_including_self</span>();
@@ -12148,5 +12149,4 @@
 }
 </code></pre></div>
 </section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="gimli" data-search-index-js="../../../search-index.js" data-search-js="../../../search.js"></div>
-    <script src="../../../main.js"></script><script src="../../../source-script.js"></script><script src="../../../source-files.js"></script>
 </body></html>

@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;tide-0.15.1&#x2F;src&#x2F;response.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>response.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="shortcut icon" href="https:&#x2F;&#x2F;yoshuawuyts.com&#x2F;assets&#x2F;http-rs&#x2F;favicon.ico"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../tide/index.html'><div class='logo-container rust-logo'><img src='https:&#x2F;&#x2F;yoshuawuyts.com&#x2F;assets&#x2F;http-rs&#x2F;logo-rounded.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;tide-0.15.1&#x2F;src&#x2F;response.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>response.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><script defer src="../../main.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script>
+    <noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="shortcut icon" href="https:&#x2F;&#x2F;yoshuawuyts.com&#x2F;assets&#x2F;http-rs&#x2F;favicon.ico"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../tide/index.html'><div class='logo-container rust-logo'><img src='https:&#x2F;&#x2F;yoshuawuyts.com&#x2F;assets&#x2F;http-rs&#x2F;logo-rounded.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -568,7 +569,7 @@
     <span class="doccomment">/// # use tide::Response;</span>
     <span class="doccomment">/// Response::new(200).set_status(210); // this is not an established status code and will panic</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_status</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">status</span>: <span class="ident">S</span>)
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_status</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">status</span>: <span class="ident">S</span>)
     <span class="kw">where</span>
         <span class="ident">S</span>: <span class="ident">TryInto</span><span class="op">&lt;</span><span class="ident">StatusCode</span><span class="op">&gt;</span>,
         <span class="ident">S::Error</span>: <span class="ident">Debug</span>,
@@ -600,22 +601,22 @@
 
     <span class="doccomment">/// Get an HTTP header mutably.</span>
     <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">header_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">HeaderName</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">HeaderValues</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">header_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">HeaderName</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="ident">HeaderValues</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">res</span>.<span class="ident">header_mut</span>(<span class="ident">name</span>)
     }
 
     <span class="doccomment">/// Remove a header.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">remove_header</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">HeaderName</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">HeaderValues</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">remove_header</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">HeaderName</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">HeaderValues</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">res</span>.<span class="ident">remove_header</span>(<span class="ident">name</span>)
     }
 
     <span class="doccomment">/// Insert an HTTP header.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">insert_header</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">key</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">HeaderName</span><span class="op">&gt;</span>, <span class="ident">value</span>: <span class="kw">impl</span> <span class="ident">ToHeaderValues</span>) {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">insert_header</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">key</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">HeaderName</span><span class="op">&gt;</span>, <span class="ident">value</span>: <span class="kw">impl</span> <span class="ident">ToHeaderValues</span>) {
         <span class="self">self</span>.<span class="ident">res</span>.<span class="ident">insert_header</span>(<span class="ident">key</span>, <span class="ident">value</span>);
     }
 
     <span class="doccomment">/// Append an HTTP header.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">append_header</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">key</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">HeaderName</span><span class="op">&gt;</span>, <span class="ident">value</span>: <span class="kw">impl</span> <span class="ident">ToHeaderValues</span>) {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">append_header</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">key</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">HeaderName</span><span class="op">&gt;</span>, <span class="ident">value</span>: <span class="kw">impl</span> <span class="ident">ToHeaderValues</span>) {
         <span class="self">self</span>.<span class="ident">res</span>.<span class="ident">append_header</span>(<span class="ident">key</span>, <span class="ident">value</span>);
     }
 
@@ -628,7 +629,7 @@
     <span class="doccomment">/// An iterator visiting all header pairs in arbitrary order, with mutable references to the</span>
     <span class="doccomment">/// values.</span>
     <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">iter_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident">headers::IterMut</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">iter_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">headers::IterMut</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">res</span>.<span class="ident">iter_mut</span>()
     }
 
@@ -659,12 +660,12 @@
     <span class="doccomment">/// This sets the response `Content-Type` header.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [Read more on MDN](https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types)</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_content_type</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">mime</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Mime</span><span class="op">&gt;</span>) {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_content_type</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">mime</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Mime</span><span class="op">&gt;</span>) {
         <span class="self">self</span>.<span class="ident">res</span>.<span class="ident">set_content_type</span>(<span class="ident">mime</span>.<span class="ident">into</span>());
     }
 
     <span class="doccomment">/// Set the body reader.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_body</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">body</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Body</span><span class="op">&gt;</span>) {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_body</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">body</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Body</span><span class="op">&gt;</span>) {
         <span class="self">self</span>.<span class="ident">res</span>.<span class="ident">set_body</span>(<span class="ident">body</span>);
     }
 
@@ -674,7 +675,7 @@
     <span class="doccomment">/// but will return an empty `Body`.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Useful for adjusting the whole body, such as in middleware.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">take_body</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident">Body</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">take_body</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">Body</span> {
         <span class="self">self</span>.<span class="ident">res</span>.<span class="ident">take_body</span>()
     }
 
@@ -702,12 +703,12 @@
     <span class="doccomment">/// #</span>
     <span class="doccomment">/// # Ok(()) }) }</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">swap_body</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">body</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Body</span>) {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">swap_body</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">body</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Body</span>) {
         <span class="self">self</span>.<span class="ident">res</span>.<span class="ident">swap_body</span>(<span class="ident">body</span>)
     }
 
     <span class="doccomment">/// Insert cookie in the cookie jar.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">insert_cookie</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">cookie</span>: <span class="ident">Cookie</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span>) {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">insert_cookie</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">cookie</span>: <span class="ident">Cookie</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span>) {
         <span class="self">self</span>.<span class="ident">cookie_events</span>.<span class="ident">push</span>(<span class="ident">CookieEvent::Added</span>(<span class="ident">cookie</span>));
     }
 
@@ -731,7 +732,7 @@
     <span class="doccomment">/// [`Request::cookie`](crate::Request::cookie).</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [section 5.3 step 11 of RFC 6265]: https://tools.ietf.org/html/rfc6265#section-5.3</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">remove_cookie</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">cookie</span>: <span class="ident">Cookie</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span>) {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">remove_cookie</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">cookie</span>: <span class="ident">Cookie</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span>) {
         <span class="self">self</span>.<span class="ident">cookie_events</span>.<span class="ident">push</span>(<span class="ident">CookieEvent::Removed</span>(<span class="ident">cookie</span>));
     }
 
@@ -771,7 +772,7 @@
     }
 
     <span class="doccomment">/// Takes the error from the response if one exists, replacing it with `None`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">take_error</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Error</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">take_error</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">error</span>.<span class="ident">take</span>()
     }
 
@@ -779,7 +780,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// This is particularly useful for middleware which would like to notify further</span>
     <span class="doccomment">/// middleware that an error has occured without overwriting the existing response.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_error</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">error</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Error</span><span class="op">&gt;</span>) {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_error</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">error</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Error</span><span class="op">&gt;</span>) {
         <span class="self">self</span>.<span class="ident">error</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">error</span>.<span class="ident">into</span>());
     }
 
@@ -790,7 +791,7 @@
     }
 
     <span class="doccomment">/// Set a response scoped extension value.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">insert_ext</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">val</span>: <span class="ident">T</span>) {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">insert_ext</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">val</span>: <span class="ident">T</span>) {
         <span class="self">self</span>.<span class="ident">res</span>.<span class="ident">ext_mut</span>().<span class="ident">insert</span>(<span class="ident">val</span>);
     }
 
@@ -816,8 +817,8 @@
 }
 
 <span class="kw">impl</span> <span class="ident">AsMut</span><span class="op">&lt;</span><span class="ident">http::Response</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Response</span> {
-    <span class="kw">fn</span> <span class="ident">as_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">http::Response</span> {
-        <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">res</span>
+    <span class="kw">fn</span> <span class="ident">as_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">http::Response</span> {
+        <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">res</span>
     }
 }
 
@@ -828,7 +829,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">AsMut</span><span class="op">&lt;</span><span class="ident">http::Headers</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Response</span> {
-    <span class="kw">fn</span> <span class="ident">as_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">http::Headers</span> {
+    <span class="kw">fn</span> <span class="ident">as_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">http::Headers</span> {
         <span class="self">self</span>.<span class="ident">res</span>.<span class="ident">as_mut</span>()
     }
 }
@@ -954,5 +955,4 @@
 }
 </code></pre></div>
 </section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="tide" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>
-    <script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script>
 </body></html>

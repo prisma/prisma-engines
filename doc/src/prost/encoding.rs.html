@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;prost-0.8.0&#x2F;src&#x2F;encoding.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>encoding.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../prost/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">   1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;prost-0.8.0&#x2F;src&#x2F;encoding.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>encoding.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><script defer src="../../main.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script>
+    <noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../prost/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">   1</span>
 <span id="2">   2</span>
 <span id="3">   3</span>
 <span id="4">   4</span>
@@ -1793,7 +1794,7 @@
 <span class="doccomment">/// Encodes an integer value into LEB128 variable length format, and writes it to the buffer.</span>
 <span class="doccomment">/// The buffer must have enough remaining space (maximum 10 bytes).</span>
 <span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">encode_varint</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="ident">value</span>: <span class="ident">u64</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">B</span>)
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">encode_varint</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="ident">value</span>: <span class="ident">u64</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">B</span>)
 <span class="kw">where</span>
     <span class="ident">B</span>: <span class="ident">BufMut</span>,
 {
@@ -1831,7 +1832,7 @@
 }
 
 <span class="doccomment">/// Decodes a LEB128-encoded variable length integer from the buffer.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">decode_varint</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>(<span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">B</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">u64</span>, <span class="ident">DecodeError</span><span class="op">&gt;</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">decode_varint</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>(<span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">B</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">u64</span>, <span class="ident">DecodeError</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">B</span>: <span class="ident">Buf</span>,
 {
@@ -1944,7 +1945,7 @@
 <span class="doccomment">/// Decodes a LEB128-encoded variable length integer from the buffer, advancing the buffer as</span>
 <span class="doccomment">/// necessary.</span>
 <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">never</span>)]</span>
-<span class="kw">fn</span> <span class="ident">decode_varint_slow</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>(<span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">B</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">u64</span>, <span class="ident">DecodeError</span><span class="op">&gt;</span>
+<span class="kw">fn</span> <span class="ident">decode_varint_slow</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>(<span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">B</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">u64</span>, <span class="ident">DecodeError</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">B</span>: <span class="ident">Buf</span>,
 {
@@ -2081,7 +2082,7 @@
 <span class="doccomment">/// Encodes a Protobuf field key, which consists of a wire type designator and</span>
 <span class="doccomment">/// the field tag.</span>
 <span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">encode_key</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>(<span class="ident">tag</span>: <span class="ident">u32</span>, <span class="ident">wire_type</span>: <span class="ident">WireType</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">B</span>)
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">encode_key</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>(<span class="ident">tag</span>: <span class="ident">u32</span>, <span class="ident">wire_type</span>: <span class="ident">WireType</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">B</span>)
 <span class="kw">where</span>
     <span class="ident">B</span>: <span class="ident">BufMut</span>,
 {
@@ -2093,7 +2094,7 @@
 <span class="doccomment">/// Decodes a Protobuf field key, which consists of a wire type designator and</span>
 <span class="doccomment">/// the field tag.</span>
 <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">decode_key</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>(<span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">B</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">u32</span>, <span class="ident">WireType</span>), <span class="ident">DecodeError</span><span class="op">&gt;</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">decode_key</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>(<span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">B</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">u32</span>, <span class="ident">WireType</span>), <span class="ident">DecodeError</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">B</span>: <span class="ident">Buf</span>,
 {
@@ -2134,13 +2135,13 @@
 <span class="doccomment">/// Helper function which abstracts reading a length delimiter prefix followed</span>
 <span class="doccomment">/// by decoding values until the length of bytes is exhausted.</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">merge_loop</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">M</span>, <span class="ident">B</span><span class="op">&gt;</span>(
-    <span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">T</span>,
-    <span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">B</span>,
+    <span class="ident">value</span>: <span class="kw-2">&amp;mut</span> <span class="ident">T</span>,
+    <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">B</span>,
     <span class="ident">ctx</span>: <span class="ident">DecodeContext</span>,
     <span class="kw-2">mut</span> <span class="ident">merge</span>: <span class="ident">M</span>,
 ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">DecodeError</span><span class="op">&gt;</span>
 <span class="kw">where</span>
-    <span class="ident">M</span>: <span class="ident">FnMut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">T</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">B</span>, <span class="ident">DecodeContext</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">DecodeError</span><span class="op">&gt;</span>,
+    <span class="ident">M</span>: <span class="ident">FnMut</span>(<span class="kw-2">&amp;mut</span> <span class="ident">T</span>, <span class="kw-2">&amp;mut</span> <span class="ident">B</span>, <span class="ident">DecodeContext</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">DecodeError</span><span class="op">&gt;</span>,
     <span class="ident">B</span>: <span class="ident">Buf</span>,
 {
     <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">decode_varint</span>(<span class="ident">buf</span>)<span class="question-mark">?</span>;
@@ -2163,7 +2164,7 @@
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">skip_field</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>(
     <span class="ident">wire_type</span>: <span class="ident">WireType</span>,
     <span class="ident">tag</span>: <span class="ident">u32</span>,
-    <span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">B</span>,
+    <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">B</span>,
     <span class="ident">ctx</span>: <span class="ident">DecodeContext</span>,
 ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">DecodeError</span><span class="op">&gt;</span>
 <span class="kw">where</span>
@@ -2201,7 +2202,7 @@
 <span class="doccomment">/// Helper macro which emits an `encode_repeated` function for the type.</span>
 <span class="macro">macro_rules!</span> <span class="ident">encode_repeated</span> {
     (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">ty</span>:<span class="ident">ty</span>) =&gt; {
-        <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">encode_repeated</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>(<span class="ident">tag</span>: <span class="ident">u32</span>, <span class="ident">values</span>: <span class="kw-2">&amp;</span>[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">ty</span>], <span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">B</span>)
+        <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">encode_repeated</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>(<span class="ident">tag</span>: <span class="ident">u32</span>, <span class="ident">values</span>: <span class="kw-2">&amp;</span>[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">ty</span>], <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">B</span>)
         <span class="kw">where</span>
             <span class="ident">B</span>: <span class="ident">BufMut</span>,
         {
@@ -2220,8 +2221,8 @@
      <span class="macro-nonterminal">$</span><span class="macro-nonterminal">merge_repeated</span>:<span class="ident">ident</span>) =&gt; {
         <span class="kw">pub</span> <span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">merge_repeated</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>(
             <span class="ident">wire_type</span>: <span class="ident">WireType</span>,
-            <span class="ident">values</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">ty</span><span class="op">&gt;</span>,
-            <span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">B</span>,
+            <span class="ident">values</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">ty</span><span class="op">&gt;</span>,
+            <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">B</span>,
             <span class="ident">ctx</span>: <span class="ident">DecodeContext</span>,
         ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">DecodeError</span><span class="op">&gt;</span>
         <span class="kw">where</span>
@@ -2231,7 +2232,7 @@
                 <span class="comment">// Packed.</span>
                 <span class="ident">merge_loop</span>(<span class="ident">values</span>, <span class="ident">buf</span>, <span class="ident">ctx</span>, <span class="op">|</span><span class="ident">values</span>, <span class="ident">buf</span>, <span class="ident">ctx</span><span class="op">|</span> {
                     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">value</span> <span class="op">=</span> <span class="ident">Default::default</span>();
-                    <span class="macro-nonterminal">$</span><span class="macro-nonterminal">merge</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">wire_type</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">value</span>, <span class="ident">buf</span>, <span class="ident">ctx</span>)<span class="question-mark">?</span>;
+                    <span class="macro-nonterminal">$</span><span class="macro-nonterminal">merge</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">wire_type</span>, <span class="kw-2">&amp;mut</span> <span class="ident">value</span>, <span class="ident">buf</span>, <span class="ident">ctx</span>)<span class="question-mark">?</span>;
                     <span class="ident">values</span>.<span class="ident">push</span>(<span class="ident">value</span>);
                     <span class="prelude-val">Ok</span>(())
                 })
@@ -2239,7 +2240,7 @@
                 <span class="comment">// Unpacked.</span>
                 <span class="ident">check_wire_type</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">wire_type</span>, <span class="ident">wire_type</span>)<span class="question-mark">?</span>;
                 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">value</span> <span class="op">=</span> <span class="ident">Default::default</span>();
-                <span class="macro-nonterminal">$</span><span class="macro-nonterminal">merge</span>(<span class="ident">wire_type</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">value</span>, <span class="ident">buf</span>, <span class="ident">ctx</span>)<span class="question-mark">?</span>;
+                <span class="macro-nonterminal">$</span><span class="macro-nonterminal">merge</span>(<span class="ident">wire_type</span>, <span class="kw-2">&amp;mut</span> <span class="ident">value</span>, <span class="ident">buf</span>, <span class="ident">ctx</span>)<span class="question-mark">?</span>;
                 <span class="ident">values</span>.<span class="ident">push</span>(<span class="ident">value</span>);
                 <span class="prelude-val">Ok</span>(())
             }
@@ -2266,12 +2267,12 @@
          <span class="kw">pub</span> <span class="kw">mod</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">proto_ty</span> {
             <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::encoding</span>::<span class="kw-2">*</span>;
 
-            <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">encode</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>(<span class="ident">tag</span>: <span class="ident">u32</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">to_uint64_value</span>: <span class="kw-2">&amp;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">ty</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">B</span>) <span class="kw">where</span> <span class="ident">B</span>: <span class="ident">BufMut</span> {
+            <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">encode</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>(<span class="ident">tag</span>: <span class="ident">u32</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">to_uint64_value</span>: <span class="kw-2">&amp;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">ty</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">B</span>) <span class="kw">where</span> <span class="ident">B</span>: <span class="ident">BufMut</span> {
                 <span class="ident">encode_key</span>(<span class="ident">tag</span>, <span class="ident">WireType::Varint</span>, <span class="ident">buf</span>);
                 <span class="ident">encode_varint</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">to_uint64</span>, <span class="ident">buf</span>);
             }
 
-            <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">merge</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>(<span class="ident">wire_type</span>: <span class="ident">WireType</span>, <span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ty</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">B</span>, <span class="ident">_ctx</span>: <span class="ident">DecodeContext</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">DecodeError</span><span class="op">&gt;</span> <span class="kw">where</span> <span class="ident">B</span>: <span class="ident">Buf</span> {
+            <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">merge</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>(<span class="ident">wire_type</span>: <span class="ident">WireType</span>, <span class="ident">value</span>: <span class="kw-2">&amp;mut</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ty</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">B</span>, <span class="ident">_ctx</span>: <span class="ident">DecodeContext</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">DecodeError</span><span class="op">&gt;</span> <span class="kw">where</span> <span class="ident">B</span>: <span class="ident">Buf</span> {
                 <span class="ident">check_wire_type</span>(<span class="ident">WireType::Varint</span>, <span class="ident">wire_type</span>)<span class="question-mark">?</span>;
                 <span class="kw">let</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">from_uint64_value</span> <span class="op">=</span> <span class="ident">decode_varint</span>(<span class="ident">buf</span>)<span class="question-mark">?</span>;
                 <span class="kw-2">*</span><span class="ident">value</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">from_uint64</span>;
@@ -2280,7 +2281,7 @@
 
             <span class="macro">encode_repeated!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">ty</span>);
 
-            <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">encode_packed</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>(<span class="ident">tag</span>: <span class="ident">u32</span>, <span class="ident">values</span>: <span class="kw-2">&amp;</span>[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">ty</span>], <span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">B</span>) <span class="kw">where</span> <span class="ident">B</span>: <span class="ident">BufMut</span> {
+            <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">encode_packed</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>(<span class="ident">tag</span>: <span class="ident">u32</span>, <span class="ident">values</span>: <span class="kw-2">&amp;</span>[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">ty</span>], <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">B</span>) <span class="kw">where</span> <span class="ident">B</span>: <span class="ident">BufMut</span> {
                 <span class="kw">if</span> <span class="ident">values</span>.<span class="ident">is_empty</span>() { <span class="kw">return</span>; }
 
                 <span class="ident">encode_key</span>(<span class="ident">tag</span>, <span class="ident">WireType::LengthDelimited</span>, <span class="ident">buf</span>);
@@ -2389,7 +2390,7 @@
         <span class="kw">pub</span> <span class="kw">mod</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">proto_ty</span> {
             <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::encoding</span>::<span class="kw-2">*</span>;
 
-            <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">encode</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>(<span class="ident">tag</span>: <span class="ident">u32</span>, <span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">ty</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">B</span>)
+            <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">encode</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>(<span class="ident">tag</span>: <span class="ident">u32</span>, <span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">ty</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">B</span>)
             <span class="kw">where</span>
                 <span class="ident">B</span>: <span class="ident">BufMut</span>,
             {
@@ -2399,8 +2400,8 @@
 
             <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">merge</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>(
                 <span class="ident">wire_type</span>: <span class="ident">WireType</span>,
-                <span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ty</span>,
-                <span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">B</span>,
+                <span class="ident">value</span>: <span class="kw-2">&amp;mut</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ty</span>,
+                <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">B</span>,
                 <span class="ident">_ctx</span>: <span class="ident">DecodeContext</span>,
             ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">DecodeError</span><span class="op">&gt;</span>
             <span class="kw">where</span>
@@ -2416,7 +2417,7 @@
 
             <span class="macro">encode_repeated!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">ty</span>);
 
-            <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">encode_packed</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>(<span class="ident">tag</span>: <span class="ident">u32</span>, <span class="ident">values</span>: <span class="kw-2">&amp;</span>[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">ty</span>], <span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">B</span>)
+            <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">encode_packed</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>(<span class="ident">tag</span>: <span class="ident">u32</span>, <span class="ident">values</span>: <span class="kw-2">&amp;</span>[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">ty</span>], <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">B</span>)
             <span class="kw">where</span>
                 <span class="ident">B</span>: <span class="ident">BufMut</span>,
             {
@@ -2541,8 +2542,8 @@
 
         <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">merge_repeated</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>(
             <span class="ident">wire_type</span>: <span class="ident">WireType</span>,
-            <span class="ident">values</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">ty</span><span class="op">&gt;</span>,
-            <span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">B</span>,
+            <span class="ident">values</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">ty</span><span class="op">&gt;</span>,
+            <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">B</span>,
             <span class="ident">ctx</span>: <span class="ident">DecodeContext</span>,
         ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">DecodeError</span><span class="op">&gt;</span>
         <span class="kw">where</span>
@@ -2550,7 +2551,7 @@
         {
             <span class="ident">check_wire_type</span>(<span class="ident">WireType::LengthDelimited</span>, <span class="ident">wire_type</span>)<span class="question-mark">?</span>;
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">value</span> <span class="op">=</span> <span class="ident">Default::default</span>();
-            <span class="ident">merge</span>(<span class="ident">wire_type</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">value</span>, <span class="ident">buf</span>, <span class="ident">ctx</span>)<span class="question-mark">?</span>;
+            <span class="ident">merge</span>(<span class="ident">wire_type</span>, <span class="kw-2">&amp;mut</span> <span class="ident">value</span>, <span class="ident">buf</span>, <span class="ident">ctx</span>)<span class="question-mark">?</span>;
             <span class="ident">values</span>.<span class="ident">push</span>(<span class="ident">value</span>);
             <span class="prelude-val">Ok</span>(())
         }
@@ -2574,7 +2575,7 @@
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">string</span> {
     <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">encode</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>(<span class="ident">tag</span>: <span class="ident">u32</span>, <span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="ident">String</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">B</span>)
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">encode</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>(<span class="ident">tag</span>: <span class="ident">u32</span>, <span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="ident">String</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">B</span>)
     <span class="kw">where</span>
         <span class="ident">B</span>: <span class="ident">BufMut</span>,
     {
@@ -2584,8 +2585,8 @@
     }
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">merge</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>(
         <span class="ident">wire_type</span>: <span class="ident">WireType</span>,
-        <span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">String</span>,
-        <span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">B</span>,
+        <span class="ident">value</span>: <span class="kw-2">&amp;mut</span> <span class="ident">String</span>,
+        <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">B</span>,
         <span class="ident">ctx</span>: <span class="ident">DecodeContext</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">DecodeError</span><span class="op">&gt;</span>
     <span class="kw">where</span>
@@ -2608,7 +2609,7 @@
             <span class="kw">struct</span> <span class="ident">DropGuard</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>);
             <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Drop</span> <span class="kw">for</span> <span class="ident">DropGuard</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
                 <span class="attribute">#[<span class="ident">inline</span>]</span>
-                <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
+                <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
                     <span class="self">self</span>.<span class="number">0</span>.<span class="ident">clear</span>();
                 }
             }
@@ -2662,12 +2663,12 @@
         <span class="kw">fn</span> <span class="ident">len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span>;
 
         <span class="doccomment">/// Replace contents of this buffer with the contents of another buffer.</span>
-        <span class="kw">fn</span> <span class="ident">replace_with</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">buf</span>: <span class="ident">B</span>)
+        <span class="kw">fn</span> <span class="ident">replace_with</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">buf</span>: <span class="ident">B</span>)
         <span class="kw">where</span>
             <span class="ident">B</span>: <span class="ident">Buf</span>;
 
         <span class="doccomment">/// Appends this buffer to the (contents of) other buffer.</span>
-        <span class="kw">fn</span> <span class="ident">append_to</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">B</span>)
+        <span class="kw">fn</span> <span class="ident">append_to</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">B</span>)
         <span class="kw">where</span>
             <span class="ident">B</span>: <span class="ident">BufMut</span>;
 
@@ -2684,14 +2685,14 @@
         <span class="ident">Buf::remaining</span>(<span class="self">self</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">replace_with</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">buf</span>: <span class="ident">B</span>)
+    <span class="kw">fn</span> <span class="ident">replace_with</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">buf</span>: <span class="ident">B</span>)
     <span class="kw">where</span>
         <span class="ident">B</span>: <span class="ident">Buf</span>,
     {
         <span class="kw-2">*</span><span class="self">self</span> <span class="op">=</span> <span class="ident">buf</span>.<span class="ident">copy_to_bytes</span>(<span class="ident">buf</span>.<span class="ident">remaining</span>());
     }
 
-    <span class="kw">fn</span> <span class="ident">append_to</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">B</span>)
+    <span class="kw">fn</span> <span class="ident">append_to</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">B</span>)
     <span class="kw">where</span>
         <span class="ident">B</span>: <span class="ident">BufMut</span>,
     {
@@ -2706,7 +2707,7 @@
         <span class="ident">Vec::len</span>(<span class="self">self</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">replace_with</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">buf</span>: <span class="ident">B</span>)
+    <span class="kw">fn</span> <span class="ident">replace_with</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">buf</span>: <span class="ident">B</span>)
     <span class="kw">where</span>
         <span class="ident">B</span>: <span class="ident">Buf</span>,
     {
@@ -2715,7 +2716,7 @@
         <span class="self">self</span>.<span class="ident">put</span>(<span class="ident">buf</span>);
     }
 
-    <span class="kw">fn</span> <span class="ident">append_to</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">B</span>)
+    <span class="kw">fn</span> <span class="ident">append_to</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">B</span>)
     <span class="kw">where</span>
         <span class="ident">B</span>: <span class="ident">BufMut</span>,
     {
@@ -2726,7 +2727,7 @@
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">bytes</span> {
     <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">encode</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">B</span><span class="op">&gt;</span>(<span class="ident">tag</span>: <span class="ident">u32</span>, <span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="ident">A</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">B</span>)
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">encode</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">B</span><span class="op">&gt;</span>(<span class="ident">tag</span>: <span class="ident">u32</span>, <span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="ident">A</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">B</span>)
     <span class="kw">where</span>
         <span class="ident">A</span>: <span class="ident">BytesAdapter</span>,
         <span class="ident">B</span>: <span class="ident">BufMut</span>,
@@ -2738,8 +2739,8 @@
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">merge</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">B</span><span class="op">&gt;</span>(
         <span class="ident">wire_type</span>: <span class="ident">WireType</span>,
-        <span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">A</span>,
-        <span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">B</span>,
+        <span class="ident">value</span>: <span class="kw-2">&amp;mut</span> <span class="ident">A</span>,
+        <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">B</span>,
         <span class="ident">_ctx</span>: <span class="ident">DecodeContext</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">DecodeError</span><span class="op">&gt;</span>
     <span class="kw">where</span>
@@ -2809,7 +2810,7 @@
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">message</span> {
     <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">encode</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">B</span><span class="op">&gt;</span>(<span class="ident">tag</span>: <span class="ident">u32</span>, <span class="ident">msg</span>: <span class="kw-2">&amp;</span><span class="ident">M</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">B</span>)
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">encode</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">B</span><span class="op">&gt;</span>(<span class="ident">tag</span>: <span class="ident">u32</span>, <span class="ident">msg</span>: <span class="kw-2">&amp;</span><span class="ident">M</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">B</span>)
     <span class="kw">where</span>
         <span class="ident">M</span>: <span class="ident">Message</span>,
         <span class="ident">B</span>: <span class="ident">BufMut</span>,
@@ -2821,8 +2822,8 @@
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">merge</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">B</span><span class="op">&gt;</span>(
         <span class="ident">wire_type</span>: <span class="ident">WireType</span>,
-        <span class="ident">msg</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">M</span>,
-        <span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">B</span>,
+        <span class="ident">msg</span>: <span class="kw-2">&amp;mut</span> <span class="ident">M</span>,
+        <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">B</span>,
         <span class="ident">ctx</span>: <span class="ident">DecodeContext</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">DecodeError</span><span class="op">&gt;</span>
     <span class="kw">where</span>
@@ -2835,14 +2836,14 @@
             <span class="ident">msg</span>,
             <span class="ident">buf</span>,
             <span class="ident">ctx</span>.<span class="ident">enter_recursion</span>(),
-            <span class="op">|</span><span class="ident">msg</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">M</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">B</span>, <span class="ident">ctx</span><span class="op">|</span> {
+            <span class="op">|</span><span class="ident">msg</span>: <span class="kw-2">&amp;mut</span> <span class="ident">M</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">B</span>, <span class="ident">ctx</span><span class="op">|</span> {
                 <span class="kw">let</span> (<span class="ident">tag</span>, <span class="ident">wire_type</span>) <span class="op">=</span> <span class="ident">decode_key</span>(<span class="ident">buf</span>)<span class="question-mark">?</span>;
                 <span class="ident">msg</span>.<span class="ident">merge_field</span>(<span class="ident">tag</span>, <span class="ident">wire_type</span>, <span class="ident">buf</span>, <span class="ident">ctx</span>)
             },
         )
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">encode_repeated</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">B</span><span class="op">&gt;</span>(<span class="ident">tag</span>: <span class="ident">u32</span>, <span class="ident">messages</span>: <span class="kw-2">&amp;</span>[<span class="ident">M</span>], <span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">B</span>)
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">encode_repeated</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">B</span><span class="op">&gt;</span>(<span class="ident">tag</span>: <span class="ident">u32</span>, <span class="ident">messages</span>: <span class="kw-2">&amp;</span>[<span class="ident">M</span>], <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">B</span>)
     <span class="kw">where</span>
         <span class="ident">M</span>: <span class="ident">Message</span>,
         <span class="ident">B</span>: <span class="ident">BufMut</span>,
@@ -2854,8 +2855,8 @@
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">merge_repeated</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">B</span><span class="op">&gt;</span>(
         <span class="ident">wire_type</span>: <span class="ident">WireType</span>,
-        <span class="ident">messages</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>,
-        <span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">B</span>,
+        <span class="ident">messages</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>,
+        <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">B</span>,
         <span class="ident">ctx</span>: <span class="ident">DecodeContext</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">DecodeError</span><span class="op">&gt;</span>
     <span class="kw">where</span>
@@ -2864,7 +2865,7 @@
     {
         <span class="ident">check_wire_type</span>(<span class="ident">WireType::LengthDelimited</span>, <span class="ident">wire_type</span>)<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">msg</span> <span class="op">=</span> <span class="ident">M::default</span>();
-        <span class="ident">merge</span>(<span class="ident">WireType::LengthDelimited</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">msg</span>, <span class="ident">buf</span>, <span class="ident">ctx</span>)<span class="question-mark">?</span>;
+        <span class="ident">merge</span>(<span class="ident">WireType::LengthDelimited</span>, <span class="kw-2">&amp;mut</span> <span class="ident">msg</span>, <span class="ident">buf</span>, <span class="ident">ctx</span>)<span class="question-mark">?</span>;
         <span class="ident">messages</span>.<span class="ident">push</span>(<span class="ident">msg</span>);
         <span class="prelude-val">Ok</span>(())
     }
@@ -2895,7 +2896,7 @@
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">group</span> {
     <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">encode</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">B</span><span class="op">&gt;</span>(<span class="ident">tag</span>: <span class="ident">u32</span>, <span class="ident">msg</span>: <span class="kw-2">&amp;</span><span class="ident">M</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">B</span>)
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">encode</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">B</span><span class="op">&gt;</span>(<span class="ident">tag</span>: <span class="ident">u32</span>, <span class="ident">msg</span>: <span class="kw-2">&amp;</span><span class="ident">M</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">B</span>)
     <span class="kw">where</span>
         <span class="ident">M</span>: <span class="ident">Message</span>,
         <span class="ident">B</span>: <span class="ident">BufMut</span>,
@@ -2908,8 +2909,8 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">merge</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">B</span><span class="op">&gt;</span>(
         <span class="ident">tag</span>: <span class="ident">u32</span>,
         <span class="ident">wire_type</span>: <span class="ident">WireType</span>,
-        <span class="ident">msg</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">M</span>,
-        <span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">B</span>,
+        <span class="ident">msg</span>: <span class="kw-2">&amp;mut</span> <span class="ident">M</span>,
+        <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">B</span>,
         <span class="ident">ctx</span>: <span class="ident">DecodeContext</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">DecodeError</span><span class="op">&gt;</span>
     <span class="kw">where</span>
@@ -2932,7 +2933,7 @@
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">encode_repeated</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">B</span><span class="op">&gt;</span>(<span class="ident">tag</span>: <span class="ident">u32</span>, <span class="ident">messages</span>: <span class="kw-2">&amp;</span>[<span class="ident">M</span>], <span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">B</span>)
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">encode_repeated</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">B</span><span class="op">&gt;</span>(<span class="ident">tag</span>: <span class="ident">u32</span>, <span class="ident">messages</span>: <span class="kw-2">&amp;</span>[<span class="ident">M</span>], <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">B</span>)
     <span class="kw">where</span>
         <span class="ident">M</span>: <span class="ident">Message</span>,
         <span class="ident">B</span>: <span class="ident">BufMut</span>,
@@ -2945,8 +2946,8 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">merge_repeated</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">B</span><span class="op">&gt;</span>(
         <span class="ident">tag</span>: <span class="ident">u32</span>,
         <span class="ident">wire_type</span>: <span class="ident">WireType</span>,
-        <span class="ident">messages</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>,
-        <span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">B</span>,
+        <span class="ident">messages</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>,
+        <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">B</span>,
         <span class="ident">ctx</span>: <span class="ident">DecodeContext</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">DecodeError</span><span class="op">&gt;</span>
     <span class="kw">where</span>
@@ -2955,7 +2956,7 @@
     {
         <span class="ident">check_wire_type</span>(<span class="ident">WireType::StartGroup</span>, <span class="ident">wire_type</span>)<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">msg</span> <span class="op">=</span> <span class="ident">M::default</span>();
-        <span class="ident">merge</span>(<span class="ident">tag</span>, <span class="ident">WireType::StartGroup</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">msg</span>, <span class="ident">buf</span>, <span class="ident">ctx</span>)<span class="question-mark">?</span>;
+        <span class="ident">merge</span>(<span class="ident">tag</span>, <span class="ident">WireType::StartGroup</span>, <span class="kw-2">&amp;mut</span> <span class="ident">msg</span>, <span class="ident">buf</span>, <span class="ident">ctx</span>)<span class="question-mark">?</span>;
         <span class="ident">messages</span>.<span class="ident">push</span>(<span class="ident">msg</span>);
         <span class="prelude-val">Ok</span>(())
     }
@@ -2992,14 +2993,14 @@
             <span class="ident">val_encoded_len</span>: <span class="ident">VL</span>,
             <span class="ident">tag</span>: <span class="ident">u32</span>,
             <span class="ident">values</span>: <span class="kw-2">&amp;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">map_ty</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span>,
-            <span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">B</span>,
+            <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">B</span>,
         ) <span class="kw">where</span>
             <span class="ident">K</span>: <span class="ident">Default</span> <span class="op">+</span> <span class="ident">Eq</span> <span class="op">+</span> <span class="ident">Hash</span> <span class="op">+</span> <span class="ident">Ord</span>,
             <span class="ident">V</span>: <span class="ident">Default</span> <span class="op">+</span> <span class="ident">PartialEq</span>,
             <span class="ident">B</span>: <span class="ident">BufMut</span>,
-            <span class="ident">KE</span>: <span class="ident">Fn</span>(<span class="ident">u32</span>, <span class="kw-2">&amp;</span><span class="ident">K</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">B</span>),
+            <span class="ident">KE</span>: <span class="ident">Fn</span>(<span class="ident">u32</span>, <span class="kw-2">&amp;</span><span class="ident">K</span>, <span class="kw-2">&amp;mut</span> <span class="ident">B</span>),
             <span class="ident">KL</span>: <span class="ident">Fn</span>(<span class="ident">u32</span>, <span class="kw-2">&amp;</span><span class="ident">K</span>) -&gt; <span class="ident">usize</span>,
-            <span class="ident">VE</span>: <span class="ident">Fn</span>(<span class="ident">u32</span>, <span class="kw-2">&amp;</span><span class="ident">V</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">B</span>),
+            <span class="ident">VE</span>: <span class="ident">Fn</span>(<span class="ident">u32</span>, <span class="kw-2">&amp;</span><span class="ident">V</span>, <span class="kw-2">&amp;mut</span> <span class="ident">B</span>),
             <span class="ident">VL</span>: <span class="ident">Fn</span>(<span class="ident">u32</span>, <span class="kw-2">&amp;</span><span class="ident">V</span>) -&gt; <span class="ident">usize</span>,
         {
             <span class="ident">encode_with_default</span>(
@@ -3018,16 +3019,16 @@
         <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">merge</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span>, <span class="ident">B</span>, <span class="ident">KM</span>, <span class="ident">VM</span><span class="op">&gt;</span>(
             <span class="ident">key_merge</span>: <span class="ident">KM</span>,
             <span class="ident">val_merge</span>: <span class="ident">VM</span>,
-            <span class="ident">values</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">map_ty</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span>,
-            <span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">B</span>,
+            <span class="ident">values</span>: <span class="kw-2">&amp;mut</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">map_ty</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span>,
+            <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">B</span>,
             <span class="ident">ctx</span>: <span class="ident">DecodeContext</span>,
         ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">DecodeError</span><span class="op">&gt;</span>
         <span class="kw">where</span>
             <span class="ident">K</span>: <span class="ident">Default</span> <span class="op">+</span> <span class="ident">Eq</span> <span class="op">+</span> <span class="ident">Hash</span> <span class="op">+</span> <span class="ident">Ord</span>,
             <span class="ident">V</span>: <span class="ident">Default</span>,
             <span class="ident">B</span>: <span class="ident">Buf</span>,
-            <span class="ident">KM</span>: <span class="ident">Fn</span>(<span class="ident">WireType</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">K</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">B</span>, <span class="ident">DecodeContext</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">DecodeError</span><span class="op">&gt;</span>,
-            <span class="ident">VM</span>: <span class="ident">Fn</span>(<span class="ident">WireType</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">V</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">B</span>, <span class="ident">DecodeContext</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">DecodeError</span><span class="op">&gt;</span>,
+            <span class="ident">KM</span>: <span class="ident">Fn</span>(<span class="ident">WireType</span>, <span class="kw-2">&amp;mut</span> <span class="ident">K</span>, <span class="kw-2">&amp;mut</span> <span class="ident">B</span>, <span class="ident">DecodeContext</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">DecodeError</span><span class="op">&gt;</span>,
+            <span class="ident">VM</span>: <span class="ident">Fn</span>(<span class="ident">WireType</span>, <span class="kw-2">&amp;mut</span> <span class="ident">V</span>, <span class="kw-2">&amp;mut</span> <span class="ident">B</span>, <span class="ident">DecodeContext</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">DecodeError</span><span class="op">&gt;</span>,
         {
             <span class="ident">merge_with_default</span>(<span class="ident">key_merge</span>, <span class="ident">val_merge</span>, <span class="ident">V::default</span>(), <span class="ident">values</span>, <span class="ident">buf</span>, <span class="ident">ctx</span>)
         }
@@ -3060,14 +3061,14 @@
             <span class="ident">val_default</span>: <span class="kw-2">&amp;</span><span class="ident">V</span>,
             <span class="ident">tag</span>: <span class="ident">u32</span>,
             <span class="ident">values</span>: <span class="kw-2">&amp;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">map_ty</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span>,
-            <span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">B</span>,
+            <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">B</span>,
         ) <span class="kw">where</span>
             <span class="ident">K</span>: <span class="ident">Default</span> <span class="op">+</span> <span class="ident">Eq</span> <span class="op">+</span> <span class="ident">Hash</span> <span class="op">+</span> <span class="ident">Ord</span>,
             <span class="ident">V</span>: <span class="ident">PartialEq</span>,
             <span class="ident">B</span>: <span class="ident">BufMut</span>,
-            <span class="ident">KE</span>: <span class="ident">Fn</span>(<span class="ident">u32</span>, <span class="kw-2">&amp;</span><span class="ident">K</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">B</span>),
+            <span class="ident">KE</span>: <span class="ident">Fn</span>(<span class="ident">u32</span>, <span class="kw-2">&amp;</span><span class="ident">K</span>, <span class="kw-2">&amp;mut</span> <span class="ident">B</span>),
             <span class="ident">KL</span>: <span class="ident">Fn</span>(<span class="ident">u32</span>, <span class="kw-2">&amp;</span><span class="ident">K</span>) -&gt; <span class="ident">usize</span>,
-            <span class="ident">VE</span>: <span class="ident">Fn</span>(<span class="ident">u32</span>, <span class="kw-2">&amp;</span><span class="ident">V</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">B</span>),
+            <span class="ident">VE</span>: <span class="ident">Fn</span>(<span class="ident">u32</span>, <span class="kw-2">&amp;</span><span class="ident">V</span>, <span class="kw-2">&amp;mut</span> <span class="ident">B</span>),
             <span class="ident">VL</span>: <span class="ident">Fn</span>(<span class="ident">u32</span>, <span class="kw-2">&amp;</span><span class="ident">V</span>) -&gt; <span class="ident">usize</span>,
         {
             <span class="kw">for</span> (<span class="ident">key</span>, <span class="ident">val</span>) <span class="kw">in</span> <span class="ident">values</span>.<span class="ident">iter</span>() {
@@ -3096,24 +3097,24 @@
             <span class="ident">key_merge</span>: <span class="ident">KM</span>,
             <span class="ident">val_merge</span>: <span class="ident">VM</span>,
             <span class="ident">val_default</span>: <span class="ident">V</span>,
-            <span class="ident">values</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">map_ty</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span>,
-            <span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">B</span>,
+            <span class="ident">values</span>: <span class="kw-2">&amp;mut</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">map_ty</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span>,
+            <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">B</span>,
             <span class="ident">ctx</span>: <span class="ident">DecodeContext</span>,
         ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">DecodeError</span><span class="op">&gt;</span>
         <span class="kw">where</span>
             <span class="ident">K</span>: <span class="ident">Default</span> <span class="op">+</span> <span class="ident">Eq</span> <span class="op">+</span> <span class="ident">Hash</span> <span class="op">+</span> <span class="ident">Ord</span>,
             <span class="ident">B</span>: <span class="ident">Buf</span>,
-            <span class="ident">KM</span>: <span class="ident">Fn</span>(<span class="ident">WireType</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">K</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">B</span>, <span class="ident">DecodeContext</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">DecodeError</span><span class="op">&gt;</span>,
-            <span class="ident">VM</span>: <span class="ident">Fn</span>(<span class="ident">WireType</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">V</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">B</span>, <span class="ident">DecodeContext</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">DecodeError</span><span class="op">&gt;</span>,
+            <span class="ident">KM</span>: <span class="ident">Fn</span>(<span class="ident">WireType</span>, <span class="kw-2">&amp;mut</span> <span class="ident">K</span>, <span class="kw-2">&amp;mut</span> <span class="ident">B</span>, <span class="ident">DecodeContext</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">DecodeError</span><span class="op">&gt;</span>,
+            <span class="ident">VM</span>: <span class="ident">Fn</span>(<span class="ident">WireType</span>, <span class="kw-2">&amp;mut</span> <span class="ident">V</span>, <span class="kw-2">&amp;mut</span> <span class="ident">B</span>, <span class="ident">DecodeContext</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">DecodeError</span><span class="op">&gt;</span>,
         {
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">key</span> <span class="op">=</span> <span class="ident">Default::default</span>();
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">val</span> <span class="op">=</span> <span class="ident">val_default</span>;
             <span class="ident">ctx</span>.<span class="ident">limit_reached</span>()<span class="question-mark">?</span>;
             <span class="ident">merge_loop</span>(
-                <span class="kw-2">&amp;</span><span class="kw-2">mut</span> (<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">key</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">val</span>),
+                <span class="kw-2">&amp;mut</span> (<span class="kw-2">&amp;mut</span> <span class="ident">key</span>, <span class="kw-2">&amp;mut</span> <span class="ident">val</span>),
                 <span class="ident">buf</span>,
                 <span class="ident">ctx</span>.<span class="ident">enter_recursion</span>(),
-                <span class="op">|</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> (<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">key</span>, <span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">val</span>), <span class="ident">buf</span>, <span class="ident">ctx</span><span class="op">|</span> {
+                <span class="op">|</span><span class="kw-2">&amp;mut</span> (<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">key</span>, <span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">val</span>), <span class="ident">buf</span>, <span class="ident">ctx</span><span class="op">|</span> {
                     <span class="kw">let</span> (<span class="ident">tag</span>, <span class="ident">wire_type</span>) <span class="op">=</span> <span class="ident">decode_key</span>(<span class="ident">buf</span>)<span class="question-mark">?</span>;
                     <span class="kw">match</span> <span class="ident">tag</span> {
                         <span class="number">1</span> =&gt; <span class="ident">key_merge</span>(<span class="ident">wire_type</span>, <span class="ident">key</span>, <span class="ident">buf</span>, <span class="ident">ctx</span>),
@@ -3190,8 +3191,8 @@
         <span class="ident">value</span>: <span class="ident">T</span>,
         <span class="ident">tag</span>: <span class="ident">u32</span>,
         <span class="ident">wire_type</span>: <span class="ident">WireType</span>,
-        <span class="ident">encode</span>: <span class="kw">fn</span>(<span class="ident">u32</span>, <span class="kw-2">&amp;</span><span class="ident">B</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BytesMut</span>),
-        <span class="ident">merge</span>: <span class="kw">fn</span>(<span class="ident">WireType</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">T</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Bytes</span>, <span class="ident">DecodeContext</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">DecodeError</span><span class="op">&gt;</span>,
+        <span class="ident">encode</span>: <span class="kw">fn</span>(<span class="ident">u32</span>, <span class="kw-2">&amp;</span><span class="ident">B</span>, <span class="kw-2">&amp;mut</span> <span class="ident">BytesMut</span>),
+        <span class="ident">merge</span>: <span class="kw">fn</span>(<span class="ident">WireType</span>, <span class="kw-2">&amp;mut</span> <span class="ident">T</span>, <span class="kw-2">&amp;mut</span> <span class="ident">Bytes</span>, <span class="ident">DecodeContext</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">DecodeError</span><span class="op">&gt;</span>,
         <span class="ident">encoded_len</span>: <span class="kw">fn</span>(<span class="ident">u32</span>, <span class="kw-2">&amp;</span><span class="ident">B</span>) -&gt; <span class="ident">usize</span>,
     ) -&gt; <span class="ident">TestCaseResult</span>
     <span class="kw">where</span>
@@ -3203,7 +3204,7 @@
         <span class="kw">let</span> <span class="ident">expected_len</span> <span class="op">=</span> <span class="ident">encoded_len</span>(<span class="ident">tag</span>, <span class="ident">value</span>.<span class="ident">borrow</span>());
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> <span class="ident">BytesMut::with_capacity</span>(<span class="ident">expected_len</span>);
-        <span class="ident">encode</span>(<span class="ident">tag</span>, <span class="ident">value</span>.<span class="ident">borrow</span>(), <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">buf</span>);
+        <span class="ident">encode</span>(<span class="ident">tag</span>, <span class="ident">value</span>.<span class="ident">borrow</span>(), <span class="kw-2">&amp;mut</span> <span class="ident">buf</span>);
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> <span class="ident">buf</span>.<span class="ident">freeze</span>();
 
@@ -3221,7 +3222,7 @@
         }
 
         <span class="kw">let</span> (<span class="ident">decoded_tag</span>, <span class="ident">decoded_wire_type</span>) <span class="op">=</span>
-            <span class="ident">decode_key</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">buf</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">error</span><span class="op">|</span> <span class="ident">TestCaseError::fail</span>(<span class="ident">error</span>.<span class="ident">to_string</span>()))<span class="question-mark">?</span>;
+            <span class="ident">decode_key</span>(<span class="kw-2">&amp;mut</span> <span class="ident">buf</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">error</span><span class="op">|</span> <span class="ident">TestCaseError::fail</span>(<span class="ident">error</span>.<span class="ident">to_string</span>()))<span class="question-mark">?</span>;
         <span class="macro">prop_assert_eq!</span>(
             <span class="ident">tag</span>,
             <span class="ident">decoded_tag</span>,
@@ -3255,8 +3256,8 @@
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">roundtrip_value</span> <span class="op">=</span> <span class="ident">T::default</span>();
         <span class="ident">merge</span>(
             <span class="ident">wire_type</span>,
-            <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">roundtrip_value</span>,
-            <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">buf</span>,
+            <span class="kw-2">&amp;mut</span> <span class="ident">roundtrip_value</span>,
+            <span class="kw-2">&amp;mut</span> <span class="ident">buf</span>,
             <span class="ident">DecodeContext::default</span>(),
         )
         .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">error</span><span class="op">|</span> <span class="ident">TestCaseError::fail</span>(<span class="ident">error</span>.<span class="ident">to_string</span>()))<span class="question-mark">?</span>;
@@ -3283,8 +3284,8 @@
     <span class="kw">where</span>
         <span class="ident">T</span>: <span class="ident">Debug</span> <span class="op">+</span> <span class="ident">Default</span> <span class="op">+</span> <span class="ident">PartialEq</span> <span class="op">+</span> <span class="ident">Borrow</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>,
         <span class="ident">B</span>: <span class="question-mark">?</span><span class="ident">Sized</span>,
-        <span class="ident">E</span>: <span class="ident">FnOnce</span>(<span class="ident">u32</span>, <span class="kw-2">&amp;</span><span class="ident">B</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BytesMut</span>),
-        <span class="ident">M</span>: <span class="ident">FnMut</span>(<span class="ident">WireType</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">T</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Bytes</span>, <span class="ident">DecodeContext</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">DecodeError</span><span class="op">&gt;</span>,
+        <span class="ident">E</span>: <span class="ident">FnOnce</span>(<span class="ident">u32</span>, <span class="kw-2">&amp;</span><span class="ident">B</span>, <span class="kw-2">&amp;mut</span> <span class="ident">BytesMut</span>),
+        <span class="ident">M</span>: <span class="ident">FnMut</span>(<span class="ident">WireType</span>, <span class="kw-2">&amp;mut</span> <span class="ident">T</span>, <span class="kw-2">&amp;mut</span> <span class="ident">Bytes</span>, <span class="ident">DecodeContext</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">DecodeError</span><span class="op">&gt;</span>,
         <span class="ident">L</span>: <span class="ident">FnOnce</span>(<span class="ident">u32</span>, <span class="kw-2">&amp;</span><span class="ident">B</span>) -&gt; <span class="ident">usize</span>,
     {
         <span class="macro">prop_assume!</span>(<span class="ident">MIN_TAG</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">tag</span> <span class="op">&amp;&amp;</span> <span class="ident">tag</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">MAX_TAG</span>);
@@ -3292,7 +3293,7 @@
         <span class="kw">let</span> <span class="ident">expected_len</span> <span class="op">=</span> <span class="ident">encoded_len</span>(<span class="ident">tag</span>, <span class="ident">value</span>.<span class="ident">borrow</span>());
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> <span class="ident">BytesMut::with_capacity</span>(<span class="ident">expected_len</span>);
-        <span class="ident">encode</span>(<span class="ident">tag</span>, <span class="ident">value</span>.<span class="ident">borrow</span>(), <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">buf</span>);
+        <span class="ident">encode</span>(<span class="ident">tag</span>, <span class="ident">value</span>.<span class="ident">borrow</span>(), <span class="kw-2">&amp;mut</span> <span class="ident">buf</span>);
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> <span class="ident">buf</span>.<span class="ident">freeze</span>();
 
@@ -3307,7 +3308,7 @@
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">roundtrip_value</span> <span class="op">=</span> <span class="ident">Default::default</span>();
         <span class="kw">while</span> <span class="ident">buf</span>.<span class="ident">has_remaining</span>() {
             <span class="kw">let</span> (<span class="ident">decoded_tag</span>, <span class="ident">decoded_wire_type</span>) <span class="op">=</span>
-                <span class="ident">decode_key</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">buf</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">error</span><span class="op">|</span> <span class="ident">TestCaseError::fail</span>(<span class="ident">error</span>.<span class="ident">to_string</span>()))<span class="question-mark">?</span>;
+                <span class="ident">decode_key</span>(<span class="kw-2">&amp;mut</span> <span class="ident">buf</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">error</span><span class="op">|</span> <span class="ident">TestCaseError::fail</span>(<span class="ident">error</span>.<span class="ident">to_string</span>()))<span class="question-mark">?</span>;
 
             <span class="macro">prop_assert_eq!</span>(
                 <span class="ident">tag</span>,
@@ -3327,8 +3328,8 @@
 
             <span class="ident">merge</span>(
                 <span class="ident">wire_type</span>,
-                <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">roundtrip_value</span>,
-                <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">buf</span>,
+                <span class="kw-2">&amp;mut</span> <span class="ident">roundtrip_value</span>,
+                <span class="kw-2">&amp;mut</span> <span class="ident">buf</span>,
                 <span class="ident">DecodeContext::default</span>(),
             )
             .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">error</span><span class="op">|</span> <span class="ident">TestCaseError::fail</span>(<span class="ident">error</span>.<span class="ident">to_string</span>()))<span class="question-mark">?</span>;
@@ -3346,8 +3347,8 @@
 
         <span class="kw">let</span> <span class="ident">r</span> <span class="op">=</span> <span class="ident">string::merge</span>(
             <span class="ident">WireType::LengthDelimited</span>,
-            <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">s</span>,
-            <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw-2">&amp;</span><span class="ident">buf</span>[..],
+            <span class="kw-2">&amp;mut</span> <span class="ident">s</span>,
+            <span class="kw-2">&amp;mut</span> <span class="kw-2">&amp;</span><span class="ident">buf</span>[..],
             <span class="ident">DecodeContext::default</span>(),
         );
         <span class="ident">r</span>.<span class="ident">expect_err</span>(<span class="string">&quot;must be an error&quot;</span>);
@@ -3362,20 +3363,20 @@
 
             <span class="comment">// Small buffer.</span>
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> <span class="ident">Vec::with_capacity</span>(<span class="number">1</span>);
-            <span class="ident">encode_varint</span>(<span class="ident">value</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">buf</span>);
+            <span class="ident">encode_varint</span>(<span class="ident">value</span>, <span class="kw-2">&amp;mut</span> <span class="ident">buf</span>);
             <span class="macro">assert_eq!</span>(<span class="ident">buf</span>, <span class="ident">encoded</span>);
 
             <span class="comment">// Large buffer.</span>
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> <span class="ident">Vec::with_capacity</span>(<span class="number">100</span>);
-            <span class="ident">encode_varint</span>(<span class="ident">value</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">buf</span>);
+            <span class="ident">encode_varint</span>(<span class="ident">value</span>, <span class="kw-2">&amp;mut</span> <span class="ident">buf</span>);
             <span class="macro">assert_eq!</span>(<span class="ident">buf</span>, <span class="ident">encoded</span>);
 
             <span class="macro">assert_eq!</span>(<span class="ident">encoded_len_varint</span>(<span class="ident">value</span>), <span class="ident">encoded</span>.<span class="ident">len</span>());
 
-            <span class="kw">let</span> <span class="ident">roundtrip_value</span> <span class="op">=</span> <span class="ident">decode_varint</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">encoded</span>.<span class="ident">clone</span>()).<span class="ident">expect</span>(<span class="string">&quot;decoding failed&quot;</span>);
+            <span class="kw">let</span> <span class="ident">roundtrip_value</span> <span class="op">=</span> <span class="ident">decode_varint</span>(<span class="kw-2">&amp;mut</span> <span class="ident">encoded</span>.<span class="ident">clone</span>()).<span class="ident">expect</span>(<span class="string">&quot;decoding failed&quot;</span>);
             <span class="macro">assert_eq!</span>(<span class="ident">value</span>, <span class="ident">roundtrip_value</span>);
 
-            <span class="kw">let</span> <span class="ident">roundtrip_value</span> <span class="op">=</span> <span class="ident">decode_varint_slow</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">encoded</span>).<span class="ident">expect</span>(<span class="string">&quot;slow decoding failed&quot;</span>);
+            <span class="kw">let</span> <span class="ident">roundtrip_value</span> <span class="op">=</span> <span class="ident">decode_varint_slow</span>(<span class="kw-2">&amp;mut</span> <span class="ident">encoded</span>).<span class="ident">expect</span>(<span class="string">&quot;slow decoding failed&quot;</span>);
             <span class="macro">assert_eq!</span>(<span class="ident">value</span>, <span class="ident">roundtrip_value</span>);
         }
 
@@ -3540,5 +3541,4 @@
 }
 </code></pre></div>
 </section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="prost" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>
-    <script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script>
 </body></html>

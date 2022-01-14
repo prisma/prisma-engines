@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;hyper-0.14.16&#x2F;src&#x2F;client&#x2F;pool.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>pool.rs - source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../hyper/index.html'><div class='logo-container rust-logo'><img src='../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">   1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;hyper-0.14.16&#x2F;src&#x2F;client&#x2F;pool.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>pool.rs - source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><script defer src="../../../main.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script>
+    <noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../hyper/index.html'><div class='logo-container rust-logo'><img src='../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">   1</span>
 <span id="2">   2</span>
 <span id="3">   3</span>
 <span id="4">   4</span>
@@ -1362,7 +1363,7 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Poolable</span><span class="op">&gt;</span> <span class="ident">PoolInner</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">put</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">key</span>: <span class="ident">Key</span>, <span class="ident">value</span>: <span class="ident">T</span>, <span class="ident">__pool_ref</span>: <span class="kw-2">&amp;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Mutex</span><span class="op">&lt;</span><span class="ident">PoolInner</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>) {
+    <span class="kw">fn</span> <span class="ident">put</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">key</span>: <span class="ident">Key</span>, <span class="ident">value</span>: <span class="ident">T</span>, <span class="ident">__pool_ref</span>: <span class="kw-2">&amp;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Mutex</span><span class="op">&lt;</span><span class="ident">PoolInner</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>) {
         <span class="kw">if</span> <span class="ident">value</span>.<span class="ident">can_share</span>() <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">idle</span>.<span class="ident">contains_key</span>(<span class="kw-2">&amp;</span><span class="ident">key</span>) {
             <span class="macro">trace!</span>(<span class="string">&quot;put; existing idle HTTP/2 connection for {:?}&quot;</span>, <span class="ident">key</span>);
             <span class="kw">return</span>;
@@ -1432,7 +1433,7 @@
 
     <span class="doccomment">/// A `Connecting` task is complete. Not necessarily successfully,</span>
     <span class="doccomment">/// but the lock is going away, so clean up.</span>
-    <span class="kw">fn</span> <span class="ident">connected</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">Key</span>) {
+    <span class="kw">fn</span> <span class="ident">connected</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">Key</span>) {
         <span class="kw">let</span> <span class="ident">existed</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">connecting</span>.<span class="ident">remove</span>(<span class="ident">key</span>);
         <span class="macro">debug_assert!</span>(<span class="ident">existed</span>, <span class="string">&quot;Connecting dropped, key not in pool.connecting&quot;</span>);
         <span class="comment">// cancel any waiters. if there are any, it&#39;s because</span>
@@ -1442,7 +1443,7 @@
     }
 
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;runtime&quot;</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">spawn_idle_interval</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">pool_ref</span>: <span class="kw-2">&amp;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Mutex</span><span class="op">&lt;</span><span class="ident">PoolInner</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>) {
+    <span class="kw">fn</span> <span class="ident">spawn_idle_interval</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">pool_ref</span>: <span class="kw-2">&amp;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Mutex</span><span class="op">&lt;</span><span class="ident">PoolInner</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>) {
         <span class="kw">let</span> (<span class="ident">dur</span>, <span class="ident">rx</span>) <span class="op">=</span> {
             <span class="kw">if</span> <span class="self">self</span>.<span class="ident">idle_interval_ref</span>.<span class="ident">is_some</span>() {
                 <span class="kw">return</span>;
@@ -1472,7 +1473,7 @@
     <span class="doccomment">/// and possibly inserted into the pool that it is waiting for an idle</span>
     <span class="doccomment">/// connection. If a user ever dropped that future, we need to clean out</span>
     <span class="doccomment">/// those parked senders.</span>
-    <span class="kw">fn</span> <span class="ident">clean_waiters</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">Key</span>) {
+    <span class="kw">fn</span> <span class="ident">clean_waiters</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">Key</span>) {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">remove_waiters</span> <span class="op">=</span> <span class="bool-val">false</span>;
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">waiters</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">waiters</span>.<span class="ident">get_mut</span>(<span class="ident">key</span>) {
             <span class="ident">waiters</span>.<span class="ident">retain</span>(<span class="op">|</span><span class="ident">tx</span><span class="op">|</span> <span class="op">!</span><span class="ident">tx</span>.<span class="ident">is_canceled</span>());
@@ -1487,7 +1488,7 @@
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;runtime&quot;</span>)]</span>
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Poolable</span><span class="op">&gt;</span> <span class="ident">PoolInner</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
     <span class="doccomment">/// This should *only* be called by the IdleTask</span>
-    <span class="kw">fn</span> <span class="ident">clear_expired</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
+    <span class="kw">fn</span> <span class="ident">clear_expired</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
         <span class="kw">let</span> <span class="ident">dur</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">timeout</span>.<span class="ident">expect</span>(<span class="string">&quot;interval assumes timeout&quot;</span>);
 
         <span class="kw">let</span> <span class="ident">now</span> <span class="op">=</span> <span class="ident">Instant::now</span>();
@@ -1544,7 +1545,7 @@
         <span class="self">self</span>.<span class="ident">value</span>.<span class="ident">as_ref</span>().<span class="ident">expect</span>(<span class="string">&quot;not dropped&quot;</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">as_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">T</span> {
+    <span class="kw">fn</span> <span class="ident">as_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">T</span> {
         <span class="self">self</span>.<span class="ident">value</span>.<span class="ident">as_mut</span>().<span class="ident">expect</span>(<span class="string">&quot;not dropped&quot;</span>)
     }
 }
@@ -1557,13 +1558,13 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Poolable</span><span class="op">&gt;</span> <span class="ident">DerefMut</span> <span class="kw">for</span> <span class="ident">Pooled</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">deref_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">T</span> {
+    <span class="kw">fn</span> <span class="ident">deref_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">T</span> {
         <span class="self">self</span>.<span class="ident">as_mut</span>()
     }
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Poolable</span><span class="op">&gt;</span> <span class="ident">Drop</span> <span class="kw">for</span> <span class="ident">Pooled</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
+    <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">value</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">value</span>.<span class="ident">take</span>() {
             <span class="kw">if</span> <span class="op">!</span><span class="ident">value</span>.<span class="ident">is_open</span>() {
                 <span class="comment">// If we *already* know the connection is done here,</span>
@@ -1585,7 +1586,7 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Poolable</span><span class="op">&gt;</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">Pooled</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;Pooled&quot;</span>).<span class="ident">field</span>(<span class="string">&quot;key&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">key</span>).<span class="ident">finish</span>()
     }
 }
@@ -1609,18 +1610,18 @@
 <span class="kw">impl</span> <span class="ident">StdError</span> <span class="kw">for</span> <span class="ident">CheckoutIsClosedError</span> {}
 
 <span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">CheckoutIsClosedError</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;checked out connection was closed&quot;</span>)
     }
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Poolable</span><span class="op">&gt;</span> <span class="ident">Checkout</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
     <span class="kw">fn</span> <span class="ident">poll_waiter</span>(
-        <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
-        <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">task::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
+        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
+        <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">task::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
     ) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">Pooled</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">mut</span> <span class="ident">rx</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">waiter</span>.<span class="ident">take</span>() {
-            <span class="kw">match</span> <span class="ident">Pin::new</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">rx</span>).<span class="ident">poll</span>(<span class="ident">cx</span>) {
+            <span class="kw">match</span> <span class="ident">Pin::new</span>(<span class="kw-2">&amp;mut</span> <span class="ident">rx</span>).<span class="ident">poll</span>(<span class="ident">cx</span>) {
                 <span class="ident">Poll::Ready</span>(<span class="prelude-val">Ok</span>(<span class="ident">value</span>)) =&gt; {
                     <span class="kw">if</span> <span class="ident">value</span>.<span class="ident">is_open</span>() {
                         <span class="ident">Poll::Ready</span>(<span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">pool</span>.<span class="ident">reuse</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">key</span>, <span class="ident">value</span>))))
@@ -1643,7 +1644,7 @@
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">checkout</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">task::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Pooled</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">checkout</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">task::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Pooled</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">entry</span> <span class="op">=</span> {
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">inner</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">pool</span>.<span class="ident">inner</span>.<span class="ident">as_ref</span>()<span class="question-mark">?</span>.<span class="ident">lock</span>().<span class="ident">unwrap</span>();
             <span class="kw">let</span> <span class="ident">expiration</span> <span class="op">=</span> <span class="ident">Expiration::new</span>(<span class="ident">inner</span>.<span class="ident">timeout</span>);
@@ -1682,7 +1683,7 @@
                     .<span class="ident">push_back</span>(<span class="ident">tx</span>);
 
                 <span class="comment">// register the waker with this oneshot</span>
-                <span class="macro">assert!</span>(<span class="ident">Pin::new</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">rx</span>).<span class="ident">poll</span>(<span class="ident">cx</span>).<span class="ident">is_pending</span>());
+                <span class="macro">assert!</span>(<span class="ident">Pin::new</span>(<span class="kw-2">&amp;mut</span> <span class="ident">rx</span>).<span class="ident">poll</span>(<span class="ident">cx</span>).<span class="ident">is_pending</span>());
                 <span class="self">self</span>.<span class="ident">waiter</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">rx</span>);
             }
 
@@ -1696,7 +1697,7 @@
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Poolable</span><span class="op">&gt;</span> <span class="ident">Future</span> <span class="kw">for</span> <span class="ident">Checkout</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
     <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">Pooled</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>;
 
-    <span class="kw">fn</span> <span class="ident">poll</span>(<span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">task::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">poll</span>(<span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">task::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">pooled</span>) <span class="op">=</span> <span class="macro">ready!</span>(<span class="self">self</span>.<span class="ident">poll_waiter</span>(<span class="ident">cx</span>)<span class="question-mark">?</span>) {
             <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">Ok</span>(<span class="ident">pooled</span>));
         }
@@ -1714,7 +1715,7 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Drop</span> <span class="kw">for</span> <span class="ident">Checkout</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
+    <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">waiter</span>.<span class="ident">take</span>().<span class="ident">is_some</span>() {
             <span class="macro">trace!</span>(<span class="string">&quot;checkout dropped for {:?}&quot;</span>, <span class="self">self</span>.<span class="ident">key</span>);
             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(<span class="kw-2">mut</span> <span class="ident">inner</span>)) <span class="op">=</span> <span class="self">self</span>.<span class="ident">pool</span>.<span class="ident">inner</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">i</span><span class="op">|</span> <span class="ident">i</span>.<span class="ident">lock</span>()) {
@@ -1743,7 +1744,7 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Poolable</span><span class="op">&gt;</span> <span class="ident">Drop</span> <span class="kw">for</span> <span class="ident">Connecting</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
+    <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">pool</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">pool</span>.<span class="ident">upgrade</span>() {
             <span class="comment">// No need to panic on drop, that could abort!</span>
             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="kw-2">mut</span> <span class="ident">inner</span>) <span class="op">=</span> <span class="ident">pool</span>.<span class="ident">lock</span>() {
@@ -1786,7 +1787,7 @@
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Poolable</span> <span class="op">+</span> <span class="lifetime">&#39;static</span><span class="op">&gt;</span> <span class="ident">Future</span> <span class="kw">for</span> <span class="ident">IdleTask</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
     <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> ();
 
-    <span class="kw">fn</span> <span class="ident">poll</span>(<span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">task::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">poll</span>(<span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">task::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">this</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">project</span>();
         <span class="kw">loop</span> {
             <span class="kw">match</span> <span class="ident">this</span>.<span class="ident">pool_drop_notifier</span>.<span class="ident">as_mut</span>().<span class="ident">poll</span>(<span class="ident">cx</span>) {
@@ -1902,8 +1903,8 @@
     {
         <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span>()<span class="op">&gt;</span>;
 
-        <span class="kw">fn</span> <span class="ident">poll</span>(<span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">task::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span><span class="op">&gt;</span> {
-            <span class="kw">match</span> <span class="ident">Pin::new</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="number">0</span>).<span class="ident">poll</span>(<span class="ident">cx</span>) {
+        <span class="kw">fn</span> <span class="ident">poll</span>(<span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">task::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span><span class="op">&gt;</span> {
+            <span class="kw">match</span> <span class="ident">Pin::new</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="number">0</span>).<span class="ident">poll</span>(<span class="ident">cx</span>) {
                 <span class="ident">Poll::Ready</span>(<span class="prelude-val">Ok</span>(<span class="kw">_</span>)) =&gt; <span class="ident">Poll::Ready</span>(<span class="prelude-val">Some</span>(())),
                 <span class="ident">Poll::Ready</span>(<span class="prelude-val">Err</span>(<span class="kw">_</span>)) =&gt; <span class="ident">Poll::Ready</span>(<span class="prelude-val">Some</span>(())),
                 <span class="ident">Poll::Pending</span> =&gt; <span class="ident">Poll::Ready</span>(<span class="prelude-val">None</span>),
@@ -1920,7 +1921,7 @@
         <span class="ident">drop</span>(<span class="ident">pooled</span>);
         <span class="ident">tokio::time::sleep</span>(<span class="ident">pool</span>.<span class="ident">locked</span>().<span class="ident">timeout</span>.<span class="ident">unwrap</span>()).<span class="kw">await</span>;
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">checkout</span> <span class="op">=</span> <span class="ident">pool</span>.<span class="ident">checkout</span>(<span class="ident">key</span>);
-        <span class="kw">let</span> <span class="ident">poll_once</span> <span class="op">=</span> <span class="ident">PollOnce</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">checkout</span>);
+        <span class="kw">let</span> <span class="ident">poll_once</span> <span class="op">=</span> <span class="ident">PollOnce</span>(<span class="kw-2">&amp;mut</span> <span class="ident">checkout</span>);
         <span class="kw">let</span> <span class="ident">is_not_ready</span> <span class="op">=</span> <span class="ident">poll_once</span>.<span class="kw">await</span>.<span class="ident">is_none</span>();
         <span class="macro">assert!</span>(<span class="ident">is_not_ready</span>);
     }
@@ -1942,7 +1943,7 @@
         <span class="ident">tokio::time::sleep</span>(<span class="ident">pool</span>.<span class="ident">locked</span>().<span class="ident">timeout</span>.<span class="ident">unwrap</span>()).<span class="kw">await</span>;
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">checkout</span> <span class="op">=</span> <span class="ident">pool</span>.<span class="ident">checkout</span>(<span class="ident">key</span>.<span class="ident">clone</span>());
-        <span class="kw">let</span> <span class="ident">poll_once</span> <span class="op">=</span> <span class="ident">PollOnce</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">checkout</span>);
+        <span class="kw">let</span> <span class="ident">poll_once</span> <span class="op">=</span> <span class="ident">PollOnce</span>(<span class="kw-2">&amp;mut</span> <span class="ident">checkout</span>);
         <span class="comment">// checkout.await should clean out the expired</span>
         <span class="ident">poll_once</span>.<span class="kw">await</span>;
         <span class="macro">assert!</span>(<span class="ident">pool</span>.<span class="ident">locked</span>().<span class="ident">idle</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">key</span>).<span class="ident">is_none</span>());
@@ -2027,8 +2028,8 @@
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">checkout1</span> <span class="op">=</span> <span class="ident">pool</span>.<span class="ident">checkout</span>(<span class="ident">key</span>.<span class="ident">clone</span>());
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">checkout2</span> <span class="op">=</span> <span class="ident">pool</span>.<span class="ident">checkout</span>(<span class="ident">key</span>.<span class="ident">clone</span>());
 
-        <span class="kw">let</span> <span class="ident">poll_once1</span> <span class="op">=</span> <span class="ident">PollOnce</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">checkout1</span>);
-        <span class="kw">let</span> <span class="ident">poll_once2</span> <span class="op">=</span> <span class="ident">PollOnce</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">checkout2</span>);
+        <span class="kw">let</span> <span class="ident">poll_once1</span> <span class="op">=</span> <span class="ident">PollOnce</span>(<span class="kw-2">&amp;mut</span> <span class="ident">checkout1</span>);
+        <span class="kw">let</span> <span class="ident">poll_once2</span> <span class="op">=</span> <span class="ident">PollOnce</span>(<span class="kw-2">&amp;mut</span> <span class="ident">checkout2</span>);
 
         <span class="comment">// first poll needed to get into Pool&#39;s parked</span>
         <span class="ident">poll_once1</span>.<span class="kw">await</span>;
@@ -2082,5 +2083,4 @@
 }
 </code></pre></div>
 </section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="hyper" data-search-index-js="../../../search-index.js" data-search-js="../../../search.js"></div>
-    <script src="../../../main.js"></script><script src="../../../source-script.js"></script><script src="../../../source-files.js"></script>
 </body></html>

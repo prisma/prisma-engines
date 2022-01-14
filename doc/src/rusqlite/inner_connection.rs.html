@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;rusqlite-0.25.3&#x2F;src&#x2F;inner_connection.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>inner_connection.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../rusqlite/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;rusqlite-0.25.3&#x2F;src&#x2F;inner_connection.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>inner_connection.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><script defer src="../../main.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script>
+    <noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../rusqlite/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -457,20 +458,20 @@
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::version::version_number</span>;
 
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">InnerConnection</span> {
-    <span class="kw">pub</span> <span class="ident">db</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">ffi::sqlite3</span>,
+    <span class="kw">pub</span> <span class="ident">db</span>: <span class="kw-2">*mut</span> <span class="ident">ffi::sqlite3</span>,
     <span class="comment">// It&#39;s unsafe to call `sqlite3_close` while another thread is performing</span>
     <span class="comment">// a `sqlite3_interrupt`, and vice versa, so we take this mutex during</span>
     <span class="comment">// those functions. This protects a copy of the `db` pointer (which is</span>
     <span class="comment">// cleared on closing), however the main copy, `db`, is unprotected.</span>
     <span class="comment">// Otherwise, a long running query would prevent calling interrupt, as</span>
     <span class="comment">// interrupt would only acquire the lock after the query&#39;s completion.</span>
-    <span class="ident">interrupt_lock</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Mutex</span><span class="op">&lt;</span><span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">ffi::sqlite3</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="ident">interrupt_lock</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Mutex</span><span class="op">&lt;</span><span class="kw-2">*mut</span> <span class="ident">ffi::sqlite3</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;hooks&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">free_commit_hook</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw">unsafe</span> <span class="kw">fn</span>(<span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">::std::os::raw::c_void</span>)<span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">free_commit_hook</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw">unsafe</span> <span class="kw">fn</span>(<span class="kw-2">*mut</span> <span class="ident">::std::os::raw::c_void</span>)<span class="op">&gt;</span>,
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;hooks&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">free_rollback_hook</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw">unsafe</span> <span class="kw">fn</span>(<span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">::std::os::raw::c_void</span>)<span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">free_rollback_hook</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw">unsafe</span> <span class="kw">fn</span>(<span class="kw-2">*mut</span> <span class="ident">::std::os::raw::c_void</span>)<span class="op">&gt;</span>,
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;hooks&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">free_update_hook</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw">unsafe</span> <span class="kw">fn</span>(<span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">::std::os::raw::c_void</span>)<span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">free_update_hook</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw">unsafe</span> <span class="kw">fn</span>(<span class="kw-2">*mut</span> <span class="ident">::std::os::raw::c_void</span>)<span class="op">&gt;</span>,
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;hooks&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="ident">progress_handler</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">FnMut</span>() -&gt; <span class="ident">bool</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="ident">owned</span>: <span class="ident">bool</span>,
@@ -479,7 +480,7 @@
 <span class="kw">impl</span> <span class="ident">InnerConnection</span> {
     <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::mutex_atomic</span>)]</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">db</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">ffi::sqlite3</span>, <span class="ident">owned</span>: <span class="ident">bool</span>) -&gt; <span class="ident">InnerConnection</span> {
+    <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">db</span>: <span class="kw-2">*mut</span> <span class="ident">ffi::sqlite3</span>, <span class="ident">owned</span>: <span class="ident">bool</span>) -&gt; <span class="ident">InnerConnection</span> {
         <span class="ident">InnerConnection</span> {
             <span class="ident">db</span>,
             <span class="ident">interrupt_lock</span>: <span class="ident">Arc::new</span>(<span class="ident">Mutex::new</span>(<span class="ident">db</span>)),
@@ -525,8 +526,8 @@
         };
 
         <span class="kw">unsafe</span> {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">db</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">ffi::sqlite3</span> <span class="op">=</span> <span class="ident">ptr::null_mut</span>();
-            <span class="kw">let</span> <span class="ident">r</span> <span class="op">=</span> <span class="ident">ffi::sqlite3_open_v2</span>(<span class="ident">c_path</span>.<span class="ident">as_ptr</span>(), <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">db</span>, <span class="ident">flags</span>.<span class="ident">bits</span>(), <span class="ident">z_vfs</span>);
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">db</span>: <span class="kw-2">*mut</span> <span class="ident">ffi::sqlite3</span> <span class="op">=</span> <span class="ident">ptr::null_mut</span>();
+            <span class="kw">let</span> <span class="ident">r</span> <span class="op">=</span> <span class="ident">ffi::sqlite3_open_v2</span>(<span class="ident">c_path</span>.<span class="ident">as_ptr</span>(), <span class="kw-2">&amp;mut</span> <span class="ident">db</span>, <span class="ident">flags</span>.<span class="ident">bits</span>(), <span class="ident">z_vfs</span>);
             <span class="kw">if</span> <span class="ident">r</span> <span class="op">!</span><span class="op">=</span> <span class="ident">ffi::SQLITE_OK</span> {
                 <span class="kw">let</span> <span class="ident">e</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">db</span>.<span class="ident">is_null</span>() {
                     <span class="ident">error_from_sqlite_code</span>(<span class="ident">r</span>, <span class="prelude-val">Some</span>(<span class="ident">c_path</span>.<span class="ident">to_string_lossy</span>().<span class="ident">to_string</span>()))
@@ -567,17 +568,17 @@
     }
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">db</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">ffi::sqlite3</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">db</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">*mut</span> <span class="ident">ffi::sqlite3</span> {
         <span class="self">self</span>.<span class="ident">db</span>
     }
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">decode_result</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">code</span>: <span class="ident">c_int</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">decode_result</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">code</span>: <span class="ident">c_int</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">unsafe</span> { <span class="ident">InnerConnection::decode_result_raw</span>(<span class="self">self</span>.<span class="ident">db</span>(), <span class="ident">code</span>) }
     }
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">decode_result_raw</span>(<span class="ident">db</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">ffi::sqlite3</span>, <span class="ident">code</span>: <span class="ident">c_int</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">decode_result_raw</span>(<span class="ident">db</span>: <span class="kw-2">*mut</span> <span class="ident">ffi::sqlite3</span>, <span class="ident">code</span>: <span class="ident">c_int</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="ident">code</span> <span class="op">==</span> <span class="ident">ffi::SQLITE_OK</span> {
             <span class="prelude-val">Ok</span>(())
         } <span class="kw">else</span> {
@@ -586,7 +587,7 @@
     }
 
     <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::mutex_atomic</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">close</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">close</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">db</span>.<span class="ident">is_null</span>() {
             <span class="kw">return</span> <span class="prelude-val">Ok</span>(());
         }
@@ -622,7 +623,7 @@
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;load_extension&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">enable_load_extension</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">onoff</span>: <span class="ident">c_int</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">enable_load_extension</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">onoff</span>: <span class="ident">c_int</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">r</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">ffi::sqlite3_enable_load_extension</span>(<span class="self">self</span>.<span class="ident">db</span>, <span class="ident">onoff</span>) };
         <span class="self">self</span>.<span class="ident">decode_result</span>(<span class="ident">r</span>)
     }
@@ -631,23 +632,23 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">load_extension</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">dylib_path</span>: <span class="kw-2">&amp;</span><span class="ident">Path</span>, <span class="ident">entry_point</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">dylib_str</span> <span class="op">=</span> <span class="ident"><span class="kw">super</span>::path_to_cstring</span>(<span class="ident">dylib_path</span>)<span class="question-mark">?</span>;
         <span class="kw">unsafe</span> {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">errmsg</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">c_char</span> <span class="op">=</span> <span class="ident">ptr::null_mut</span>();
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">errmsg</span>: <span class="kw-2">*mut</span> <span class="ident">c_char</span> <span class="op">=</span> <span class="ident">ptr::null_mut</span>();
             <span class="kw">let</span> <span class="ident">r</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">entry_point</span>) <span class="op">=</span> <span class="ident">entry_point</span> {
                 <span class="kw">let</span> <span class="ident">c_entry</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::str_to_cstring</span>(<span class="ident">entry_point</span>)<span class="question-mark">?</span>;
                 <span class="ident">ffi::sqlite3_load_extension</span>(
                     <span class="self">self</span>.<span class="ident">db</span>,
                     <span class="ident">dylib_str</span>.<span class="ident">as_ptr</span>(),
                     <span class="ident">c_entry</span>.<span class="ident">as_ptr</span>(),
-                    <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">errmsg</span>,
+                    <span class="kw-2">&amp;mut</span> <span class="ident">errmsg</span>,
                 )
             } <span class="kw">else</span> {
-                <span class="ident">ffi::sqlite3_load_extension</span>(<span class="self">self</span>.<span class="ident">db</span>, <span class="ident">dylib_str</span>.<span class="ident">as_ptr</span>(), <span class="ident">ptr::null</span>(), <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">errmsg</span>)
+                <span class="ident">ffi::sqlite3_load_extension</span>(<span class="self">self</span>.<span class="ident">db</span>, <span class="ident">dylib_str</span>.<span class="ident">as_ptr</span>(), <span class="ident">ptr::null</span>(), <span class="kw-2">&amp;mut</span> <span class="ident">errmsg</span>)
             };
             <span class="kw">if</span> <span class="ident">r</span> <span class="op">==</span> <span class="ident">ffi::SQLITE_OK</span> {
                 <span class="prelude-val">Ok</span>(())
             } <span class="kw">else</span> {
                 <span class="kw">let</span> <span class="ident">message</span> <span class="op">=</span> <span class="ident"><span class="kw">super</span>::errmsg_to_string</span>(<span class="ident">errmsg</span>);
-                <span class="ident">ffi::sqlite3_free</span>(<span class="ident">errmsg</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">::std::os::raw::c_void</span>);
+                <span class="ident">ffi::sqlite3_free</span>(<span class="ident">errmsg</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="ident">::std::os::raw::c_void</span>);
                 <span class="prelude-val">Err</span>(<span class="ident">error_from_sqlite_code</span>(<span class="ident">r</span>, <span class="prelude-val">Some</span>(<span class="ident">message</span>)))
             }
         }
@@ -658,7 +659,7 @@
         <span class="kw">unsafe</span> { <span class="ident">ffi::sqlite3_last_insert_rowid</span>(<span class="self">self</span>.<span class="ident">db</span>()) }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">prepare</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">conn</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Connection</span>, <span class="ident">sql</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Statement</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">prepare</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">conn</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Connection</span>, <span class="ident">sql</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Statement</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">c_stmt</span> <span class="op">=</span> <span class="ident">ptr::null_mut</span>();
         <span class="kw">let</span> (<span class="ident">c_sql</span>, <span class="ident">len</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="ident">str_for_sqlite</span>(<span class="ident">sql</span>.<span class="ident">as_bytes</span>())<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">c_tail</span> <span class="op">=</span> <span class="ident">ptr::null</span>();
@@ -670,8 +671,8 @@
                         <span class="self">self</span>.<span class="ident">db</span>(),
                         <span class="ident">c_sql</span>,
                         <span class="ident">len</span>,
-                        <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">c_stmt</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">ffi::sqlite3_stmt</span>,
-                        <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">c_tail</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">c_char</span>,
+                        <span class="kw-2">&amp;mut</span> <span class="ident">c_stmt</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw-2">*mut</span> <span class="ident">ffi::sqlite3_stmt</span>,
+                        <span class="kw-2">&amp;mut</span> <span class="ident">c_tail</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw-2">*const</span> <span class="ident">c_char</span>,
                     );
                     <span class="kw">if</span> <span class="op">!</span><span class="ident">unlock_notify::is_locked</span>(<span class="self">self</span>.<span class="ident">db</span>, <span class="ident">rc</span>) {
                         <span class="kw">break</span>;
@@ -687,8 +688,8 @@
                     <span class="self">self</span>.<span class="ident">db</span>(),
                     <span class="ident">c_sql</span>,
                     <span class="ident">len</span>,
-                    <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">c_stmt</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">ffi::sqlite3_stmt</span>,
-                    <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">c_tail</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">c_char</span>,
+                    <span class="kw-2">&amp;mut</span> <span class="ident">c_stmt</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw-2">*mut</span> <span class="ident">ffi::sqlite3_stmt</span>,
+                    <span class="kw-2">&amp;mut</span> <span class="ident">c_tail</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw-2">*const</span> <span class="ident">c_char</span>,
                 )
             }
         };
@@ -696,8 +697,8 @@
         <span class="self">self</span>.<span class="ident">decode_result</span>(<span class="ident">r</span>)<span class="question-mark">?</span>;
         <span class="comment">// If the input text contains no SQL (if the input is an empty string or a</span>
         <span class="comment">// comment) then *ppStmt is set to NULL.</span>
-        <span class="kw">let</span> <span class="ident">c_stmt</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">ffi::sqlite3_stmt</span> <span class="op">=</span> <span class="ident">c_stmt</span>;
-        <span class="kw">let</span> <span class="ident">c_tail</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">c_char</span> <span class="op">=</span> <span class="ident">c_tail</span>;
+        <span class="kw">let</span> <span class="ident">c_stmt</span>: <span class="kw-2">*mut</span> <span class="ident">ffi::sqlite3_stmt</span> <span class="op">=</span> <span class="ident">c_stmt</span>;
+        <span class="kw">let</span> <span class="ident">c_tail</span>: <span class="kw-2">*const</span> <span class="ident">c_char</span> <span class="op">=</span> <span class="ident">c_tail</span>;
         <span class="kw">let</span> <span class="ident">tail</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">c_tail</span>.<span class="ident">is_null</span>() {
             <span class="number">0</span>
         } <span class="kw">else</span> {
@@ -714,7 +715,7 @@
     }
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">changes</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident">usize</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">changes</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">usize</span> {
         <span class="kw">unsafe</span> { <span class="ident">ffi::sqlite3_changes</span>(<span class="self">self</span>.<span class="ident">db</span>()) <span class="kw">as</span> <span class="ident">usize</span> }
     }
 
@@ -740,13 +741,13 @@
 
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;hooks&quot;</span>))]</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">remove_hooks</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {}
+    <span class="kw">fn</span> <span class="ident">remove_hooks</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {}
 }
 
 <span class="kw">impl</span> <span class="ident">Drop</span> <span class="kw">for</span> <span class="ident">InnerConnection</span> {
     <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unused_must_use</span>)]</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
+    <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
         <span class="kw">use</span> <span class="ident">std::thread::panicking</span>;
 
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">close</span>() {
@@ -880,5 +881,4 @@ rusqlite was built against SQLite {} but the runtime SQLite version is {}. To fi
 }
 </code></pre></div>
 </section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="rusqlite" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>
-    <script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script>
 </body></html>

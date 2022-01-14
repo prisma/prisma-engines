@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;trust-dns-proto-0.20.3&#x2F;src&#x2F;xfer&#x2F;dns_multiplexer.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>dns_multiplexer.rs - source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../trust_dns_proto/index.html'><div class='logo-container rust-logo'><img src='../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;trust-dns-proto-0.20.3&#x2F;src&#x2F;xfer&#x2F;dns_multiplexer.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>dns_multiplexer.rs - source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><script defer src="../../../main.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script>
+    <noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../trust_dns_proto/index.html'><div class='logo-container rust-logo'><img src='../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -532,7 +533,7 @@
     }
 
     <span class="doccomment">/// polls the timeout and converts the error</span>
-    <span class="kw">fn</span> <span class="ident">poll_timeout</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">poll_timeout</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">timeout</span>.<span class="ident">poll_unpin</span>(<span class="ident">cx</span>)
     }
 
@@ -542,7 +543,7 @@
     }
 
     <span class="doccomment">/// Adds the response to the request such that it can be later sent to the client</span>
-    <span class="kw">fn</span> <span class="ident">add_response</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">message</span>: <span class="ident">Message</span>) {
+    <span class="kw">fn</span> <span class="ident">add_response</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">message</span>: <span class="ident">Message</span>) {
         <span class="self">self</span>.<span class="ident">responses</span>.<span class="ident">push</span>(<span class="ident">message</span>);
     }
 
@@ -648,9 +649,9 @@
 
     <span class="doccomment">/// loop over active_requests and remove cancelled requests</span>
     <span class="doccomment">///  this should free up space if we already had 4096 active requests</span>
-    <span class="kw">fn</span> <span class="ident">drop_cancelled</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
+    <span class="kw">fn</span> <span class="ident">drop_cancelled</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">canceled</span> <span class="op">=</span> <span class="ident">HashMap</span>::<span class="op">&lt;</span><span class="ident">u16</span>, <span class="ident">ProtoError</span><span class="op">&gt;</span><span class="ident">::new</span>();
-        <span class="kw">for</span> (<span class="kw-2">&amp;</span><span class="ident">id</span>, <span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">active_req</span>) <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">active_requests</span> {
+        <span class="kw">for</span> (<span class="kw-2">&amp;</span><span class="ident">id</span>, <span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">active_req</span>) <span class="kw">in</span> <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">active_requests</span> {
             <span class="kw">if</span> <span class="ident">active_req</span>.<span class="ident">is_canceled</span>() {
                 <span class="ident">canceled</span>.<span class="ident">insert</span>(<span class="ident">id</span>, <span class="ident">ProtoError::from</span>(<span class="string">&quot;requestor canceled&quot;</span>));
             }
@@ -684,7 +685,7 @@
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">rand</span> <span class="op">=</span> <span class="ident">rand::thread_rng</span>();
 
         <span class="kw">for</span> <span class="kw">_</span> <span class="kw">in</span> <span class="number">0</span>..<span class="number">100</span> {
-            <span class="kw">let</span> <span class="ident">id</span>: <span class="ident">u16</span> <span class="op">=</span> <span class="ident">Standard</span>.<span class="ident">sample</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">rand</span>); <span class="comment">// the range is [0 ... u16::max]</span>
+            <span class="kw">let</span> <span class="ident">id</span>: <span class="ident">u16</span> <span class="op">=</span> <span class="ident">Standard</span>.<span class="ident">sample</span>(<span class="kw-2">&amp;mut</span> <span class="ident">rand</span>); <span class="comment">// the range is [0 ... u16::max]</span>
 
             <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">active_requests</span>.<span class="ident">contains_key</span>(<span class="kw-2">&amp;</span><span class="ident">id</span>) {
                 <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">id</span>);
@@ -697,7 +698,7 @@
     }
 
     <span class="doccomment">/// Closes all outstanding completes with a closed stream error</span>
-    <span class="kw">fn</span> <span class="ident">stream_closed_close_all</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">error</span>: <span class="ident">ProtoError</span>) {
+    <span class="kw">fn</span> <span class="ident">stream_closed_close_all</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">error</span>: <span class="ident">ProtoError</span>) {
         <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">active_requests</span>.<span class="ident">is_empty</span>() {
             <span class="macro">warn!</span>(<span class="string">&quot;stream {} error: {}&quot;</span>, <span class="self">self</span>.<span class="ident">stream</span>, <span class="ident">error</span>);
         } <span class="kw">else</span> {
@@ -738,7 +739,7 @@
 {
     <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">DnsMultiplexer</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">MF</span>, <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">DnsStreamHandle</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">ProtoError</span><span class="op">&gt;</span>;
 
-    <span class="kw">fn</span> <span class="ident">poll</span>(<span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">poll</span>(<span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">stream</span>: <span class="ident">S</span> <span class="op">=</span> <span class="macro">ready!</span>(<span class="self">self</span>.<span class="ident">stream</span>.<span class="ident">poll_unpin</span>(<span class="ident">cx</span>))<span class="question-mark">?</span>;
 
         <span class="ident">Poll::Ready</span>(<span class="prelude-val">Ok</span>(<span class="ident">DnsMultiplexer</span> {
@@ -760,7 +761,7 @@
     <span class="ident">S</span>: <span class="ident">DnsClientStream</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
     <span class="ident">MF</span>: <span class="ident">MessageFinalizer</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
 {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">formatter</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">fmt::Error</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">formatter</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">fmt::Error</span><span class="op">&gt;</span> {
         <span class="macro">write!</span>(<span class="ident">formatter</span>, <span class="string">&quot;{}&quot;</span>, <span class="self">self</span>.<span class="ident">stream</span>)
     }
 }
@@ -770,7 +771,7 @@
     <span class="ident">S</span>: <span class="ident">DnsClientStream</span> <span class="op">+</span> <span class="ident">Unpin</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
     <span class="ident">MF</span>: <span class="ident">MessageFinalizer</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
 {
-    <span class="kw">fn</span> <span class="ident">send_message</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">request</span>: <span class="ident">DnsRequest</span>) -&gt; <span class="ident">DnsResponseFuture</span> {
+    <span class="kw">fn</span> <span class="ident">send_message</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">request</span>: <span class="ident">DnsRequest</span>) -&gt; <span class="ident">DnsResponseFuture</span> {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_shutdown</span> {
             <span class="macro">panic!</span>(<span class="string">&quot;can not send messages after stream is shutdown&quot;</span>)
         }
@@ -842,7 +843,7 @@
         <span class="ident">receiver</span>.<span class="ident">into</span>()
     }
 
-    <span class="kw">fn</span> <span class="ident">shutdown</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
+    <span class="kw">fn</span> <span class="ident">shutdown</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
         <span class="self">self</span>.<span class="ident">is_shutdown</span> <span class="op">=</span> <span class="bool-val">true</span>;
     }
 
@@ -858,7 +859,7 @@
 {
     <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">ProtoError</span><span class="op">&gt;</span>;
 
-    <span class="kw">fn</span> <span class="ident">poll_next</span>(<span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">poll_next</span>(<span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="comment">// Always drop the cancelled queries first</span>
         <span class="self">self</span>.<span class="ident">drop_cancelled</span>(<span class="ident">cx</span>);
 
@@ -930,5 +931,4 @@
 }
 </code></pre></div>
 </section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="trust_dns_proto" data-search-index-js="../../../search-index.js" data-search-js="../../../search.js"></div>
-    <script src="../../../main.js"></script><script src="../../../source-script.js"></script><script src="../../../source-files.js"></script>
 </body></html>

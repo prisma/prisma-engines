@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;git&#x2F;checkouts&#x2F;rust-postgres-dc0fca9be721a90f&#x2F;8a61d46&#x2F;postgres-protocol&#x2F;src&#x2F;types&#x2F;mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../postgres_protocol/index.html'><div class='logo-container rust-logo'><img src='../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">   1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;git&#x2F;checkouts&#x2F;rust-postgres-dc0fca9be721a90f&#x2F;8a61d46&#x2F;postgres-protocol&#x2F;src&#x2F;types&#x2F;mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><script defer src="../../../main.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script>
+    <noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../postgres_protocol/index.html'><div class='logo-container rust-logo'><img src='../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">   1</span>
 <span id="2">   2</span>
 <span id="3">   3</span>
 <span id="4">   4</span>
@@ -1085,7 +1086,7 @@
 
 <span class="doccomment">/// Serializes a `BOOL` value.</span>
 <span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">bool_to_sql</span>(<span class="ident">v</span>: <span class="ident">bool</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BytesMut</span>) {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">bool_to_sql</span>(<span class="ident">v</span>: <span class="ident">bool</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BytesMut</span>) {
     <span class="ident">buf</span>.<span class="ident">put_u8</span>(<span class="ident">v</span> <span class="kw">as</span> <span class="ident">u8</span>);
 }
 
@@ -1101,7 +1102,7 @@
 
 <span class="doccomment">/// Serializes a `BYTEA` value.</span>
 <span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">bytea_to_sql</span>(<span class="ident">v</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BytesMut</span>) {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">bytea_to_sql</span>(<span class="ident">v</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BytesMut</span>) {
     <span class="ident">buf</span>.<span class="ident">put_slice</span>(<span class="ident">v</span>);
 }
 
@@ -1113,7 +1114,7 @@
 
 <span class="doccomment">/// Serializes a `TEXT`, `VARCHAR`, `CHAR(n)`, `NAME`, or `CITEXT` value.</span>
 <span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">text_to_sql</span>(<span class="ident">v</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BytesMut</span>) {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">text_to_sql</span>(<span class="ident">v</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BytesMut</span>) {
     <span class="ident">buf</span>.<span class="ident">put_slice</span>(<span class="ident">v</span>.<span class="ident">as_bytes</span>());
 }
 
@@ -1125,7 +1126,7 @@
 
 <span class="doccomment">/// Serializes a `&quot;char&quot;` value.</span>
 <span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">char_to_sql</span>(<span class="ident">v</span>: <span class="ident">i8</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BytesMut</span>) {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">char_to_sql</span>(<span class="ident">v</span>: <span class="ident">i8</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BytesMut</span>) {
     <span class="ident">buf</span>.<span class="ident">put_i8</span>(<span class="ident">v</span>);
 }
 
@@ -1141,7 +1142,7 @@
 
 <span class="doccomment">/// Serializes an `INT2` value.</span>
 <span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">int2_to_sql</span>(<span class="ident">v</span>: <span class="ident">i16</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BytesMut</span>) {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">int2_to_sql</span>(<span class="ident">v</span>: <span class="ident">i16</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BytesMut</span>) {
     <span class="ident">buf</span>.<span class="ident">put_i16</span>(<span class="ident">v</span>);
 }
 
@@ -1157,7 +1158,7 @@
 
 <span class="doccomment">/// Serializes an `INT4` value.</span>
 <span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">int4_to_sql</span>(<span class="ident">v</span>: <span class="ident">i32</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BytesMut</span>) {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">int4_to_sql</span>(<span class="ident">v</span>: <span class="ident">i32</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BytesMut</span>) {
     <span class="ident">buf</span>.<span class="ident">put_i32</span>(<span class="ident">v</span>);
 }
 
@@ -1173,7 +1174,7 @@
 
 <span class="doccomment">/// Serializes an `OID` value.</span>
 <span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">oid_to_sql</span>(<span class="ident">v</span>: <span class="ident">Oid</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BytesMut</span>) {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">oid_to_sql</span>(<span class="ident">v</span>: <span class="ident">Oid</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BytesMut</span>) {
     <span class="ident">buf</span>.<span class="ident">put_u32</span>(<span class="ident">v</span>);
 }
 
@@ -1189,7 +1190,7 @@
 
 <span class="doccomment">/// Serializes an `INT8` value.</span>
 <span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">int8_to_sql</span>(<span class="ident">v</span>: <span class="ident">i64</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BytesMut</span>) {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">int8_to_sql</span>(<span class="ident">v</span>: <span class="ident">i64</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BytesMut</span>) {
     <span class="ident">buf</span>.<span class="ident">put_i64</span>(<span class="ident">v</span>);
 }
 
@@ -1205,7 +1206,7 @@
 
 <span class="doccomment">/// Serializes a `PG_LSN` value.</span>
 <span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">lsn_to_sql</span>(<span class="ident">v</span>: <span class="ident">Lsn</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BytesMut</span>) {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">lsn_to_sql</span>(<span class="ident">v</span>: <span class="ident">Lsn</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BytesMut</span>) {
     <span class="ident">buf</span>.<span class="ident">put_u64</span>(<span class="ident">v</span>);
 }
 
@@ -1221,7 +1222,7 @@
 
 <span class="doccomment">/// Serializes a `FLOAT4` value.</span>
 <span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">float4_to_sql</span>(<span class="ident">v</span>: <span class="ident">f32</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BytesMut</span>) {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">float4_to_sql</span>(<span class="ident">v</span>: <span class="ident">f32</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BytesMut</span>) {
     <span class="ident">buf</span>.<span class="ident">put_f32</span>(<span class="ident">v</span>);
 }
 
@@ -1237,7 +1238,7 @@
 
 <span class="doccomment">/// Serializes a `FLOAT8` value.</span>
 <span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">float8_to_sql</span>(<span class="ident">v</span>: <span class="ident">f64</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BytesMut</span>) {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">float8_to_sql</span>(<span class="ident">v</span>: <span class="ident">f64</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BytesMut</span>) {
     <span class="ident">buf</span>.<span class="ident">put_f64</span>(<span class="ident">v</span>);
 }
 
@@ -1255,7 +1256,7 @@
 <span class="attribute">#[<span class="ident">inline</span>]</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">hstore_to_sql</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">I</span><span class="op">&gt;</span>(
     <span class="ident">values</span>: <span class="ident">I</span>,
-    <span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BytesMut</span>,
+    <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BytesMut</span>,
 ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">StdBox</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Error</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">I</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> (<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span><span class="op">&gt;</span>)<span class="op">&gt;</span>,
@@ -1278,12 +1279,12 @@
     }
 
     <span class="kw">let</span> <span class="ident">count</span> <span class="op">=</span> <span class="ident">i32::from_usize</span>(<span class="ident">count</span>)<span class="question-mark">?</span>;
-    <span class="ident">BigEndian::write_i32</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">buf</span>[<span class="ident">base</span>..], <span class="ident">count</span>);
+    <span class="ident">BigEndian::write_i32</span>(<span class="kw-2">&amp;mut</span> <span class="ident">buf</span>[<span class="ident">base</span>..], <span class="ident">count</span>);
 
     <span class="prelude-val">Ok</span>(())
 }
 
-<span class="kw">fn</span> <span class="ident">write_pascal_string</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BytesMut</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">StdBox</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Error</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">write_pascal_string</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BytesMut</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">StdBox</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Error</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">size</span> <span class="op">=</span> <span class="ident">i32::from_usize</span>(<span class="ident">s</span>.<span class="ident">len</span>())<span class="question-mark">?</span>;
     <span class="ident">buf</span>.<span class="ident">put_i32</span>(<span class="ident">size</span>);
     <span class="ident">buf</span>.<span class="ident">put_slice</span>(<span class="ident">s</span>.<span class="ident">as_bytes</span>());
@@ -1319,7 +1320,7 @@
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::type_complexity</span>)]</span>
     <span class="kw">fn</span> <span class="ident">next</span>(
-        <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
+        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span><span class="op">&gt;</span>)<span class="op">&gt;</span>, <span class="ident">StdBox</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Error</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">remaining</span> <span class="op">==</span> <span class="number">0</span> {
             <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">buf</span>.<span class="ident">is_empty</span>() {
@@ -1363,7 +1364,7 @@
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">varbit_to_sql</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(
     <span class="ident">len</span>: <span class="ident">usize</span>,
     <span class="ident">v</span>: <span class="ident">I</span>,
-    <span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BytesMut</span>,
+    <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BytesMut</span>,
 ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">StdBox</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Error</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">I</span>: <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">u8</span><span class="op">&gt;</span>,
@@ -1426,7 +1427,7 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// The value should represent the number of microseconds since midnight, January 1st, 2000.</span>
 <span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">timestamp_to_sql</span>(<span class="ident">v</span>: <span class="ident">i64</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BytesMut</span>) {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">timestamp_to_sql</span>(<span class="ident">v</span>: <span class="ident">i64</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BytesMut</span>) {
     <span class="ident">buf</span>.<span class="ident">put_i64</span>(<span class="ident">v</span>);
 }
 
@@ -1446,7 +1447,7 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// The value should represent the number of days since January 1st, 2000.</span>
 <span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">date_to_sql</span>(<span class="ident">v</span>: <span class="ident">i32</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BytesMut</span>) {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">date_to_sql</span>(<span class="ident">v</span>: <span class="ident">i32</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BytesMut</span>) {
     <span class="ident">buf</span>.<span class="ident">put_i32</span>(<span class="ident">v</span>);
 }
 
@@ -1466,7 +1467,7 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// The value should represent the number of microseconds since midnight.</span>
 <span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">time_to_sql</span>(<span class="ident">v</span>: <span class="ident">i64</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BytesMut</span>) {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">time_to_sql</span>(<span class="ident">v</span>: <span class="ident">i64</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BytesMut</span>) {
     <span class="ident">buf</span>.<span class="ident">put_i64</span>(<span class="ident">v</span>);
 }
 
@@ -1484,7 +1485,7 @@
 
 <span class="doccomment">/// Serializes a `MACADDR` value.</span>
 <span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">macaddr_to_sql</span>(<span class="ident">v</span>: [<span class="ident">u8</span>; <span class="number">6</span>], <span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BytesMut</span>) {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">macaddr_to_sql</span>(<span class="ident">v</span>: [<span class="ident">u8</span>; <span class="number">6</span>], <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BytesMut</span>) {
     <span class="ident">buf</span>.<span class="ident">put_slice</span>(<span class="kw-2">&amp;</span><span class="ident">v</span>);
 }
 
@@ -1501,7 +1502,7 @@
 
 <span class="doccomment">/// Serializes a `UUID` value.</span>
 <span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">uuid_to_sql</span>(<span class="ident">v</span>: [<span class="ident">u8</span>; <span class="number">16</span>], <span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BytesMut</span>) {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">uuid_to_sql</span>(<span class="ident">v</span>: [<span class="ident">u8</span>; <span class="number">16</span>], <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BytesMut</span>) {
     <span class="ident">buf</span>.<span class="ident">put_slice</span>(<span class="kw-2">&amp;</span><span class="ident">v</span>);
 }
 
@@ -1523,12 +1524,12 @@
     <span class="ident">element_type</span>: <span class="ident">Oid</span>,
     <span class="ident">elements</span>: <span class="ident">J</span>,
     <span class="kw-2">mut</span> <span class="ident">serializer</span>: <span class="ident">F</span>,
-    <span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BytesMut</span>,
+    <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BytesMut</span>,
 ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">StdBox</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Error</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">I</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">ArrayDimension</span><span class="op">&gt;</span>,
     <span class="ident">J</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">T</span><span class="op">&gt;</span>,
-    <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="ident">T</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BytesMut</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">IsNull</span>, <span class="ident">StdBox</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Error</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="ident">T</span>, <span class="kw-2">&amp;mut</span> <span class="ident">BytesMut</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">IsNull</span>, <span class="ident">StdBox</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Error</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span><span class="op">&gt;</span>,
 {
     <span class="kw">let</span> <span class="ident">dimensions_idx</span> <span class="op">=</span> <span class="ident">buf</span>.<span class="ident">len</span>();
     <span class="ident">buf</span>.<span class="ident">put_i32</span>(<span class="number">0</span>);
@@ -1544,7 +1545,7 @@
     }
 
     <span class="kw">let</span> <span class="ident">num_dimensions</span> <span class="op">=</span> <span class="ident">i32::from_usize</span>(<span class="ident">num_dimensions</span>)<span class="question-mark">?</span>;
-    <span class="ident">BigEndian::write_i32</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">buf</span>[<span class="ident">dimensions_idx</span>..], <span class="ident">num_dimensions</span>);
+    <span class="ident">BigEndian::write_i32</span>(<span class="kw-2">&amp;mut</span> <span class="ident">buf</span>[<span class="ident">dimensions_idx</span>..], <span class="ident">num_dimensions</span>);
 
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">has_nulls</span> <span class="op">=</span> <span class="bool-val">false</span>;
     <span class="kw">for</span> <span class="ident">element</span> <span class="kw">in</span> <span class="ident">elements</span> {
@@ -1560,7 +1561,7 @@
         )<span class="question-mark">?</span>;
     }
 
-    <span class="ident">BigEndian::write_i32</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">buf</span>[<span class="ident">flags_idx</span>..], <span class="ident">has_nulls</span> <span class="kw">as</span> <span class="ident">i32</span>);
+    <span class="ident">BigEndian::write_i32</span>(<span class="kw-2">&amp;mut</span> <span class="ident">buf</span>[<span class="ident">flags_idx</span>..], <span class="ident">has_nulls</span> <span class="kw">as</span> <span class="ident">i32</span>);
 
     <span class="prelude-val">Ok</span>(())
 }
@@ -1648,7 +1649,7 @@
     <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">StdBox</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Error</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span>;
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ArrayDimension</span><span class="op">&gt;</span>, <span class="ident">StdBox</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Error</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ArrayDimension</span><span class="op">&gt;</span>, <span class="ident">StdBox</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Error</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">is_empty</span>() {
             <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>);
         }
@@ -1687,7 +1688,7 @@
     <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">StdBox</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Error</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span>;
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>]<span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">StdBox</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Error</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>]<span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">StdBox</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Error</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">remaining</span> <span class="op">==</span> <span class="number">0</span> {
             <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">buf</span>.<span class="ident">is_empty</span>() {
                 <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="string">&quot;invalid message length: arrayvalue not drained&quot;</span>.<span class="ident">into</span>());
@@ -1720,7 +1721,7 @@
 
 <span class="doccomment">/// Serializes an empty range.</span>
 <span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">empty_range_to_sql</span>(<span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BytesMut</span>) {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">empty_range_to_sql</span>(<span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BytesMut</span>) {
     <span class="ident">buf</span>.<span class="ident">put_u8</span>(<span class="ident">RANGE_EMPTY</span>);
 }
 
@@ -1728,11 +1729,11 @@
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">range_to_sql</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">G</span><span class="op">&gt;</span>(
     <span class="ident">lower</span>: <span class="ident">F</span>,
     <span class="ident">upper</span>: <span class="ident">G</span>,
-    <span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BytesMut</span>,
+    <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BytesMut</span>,
 ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">StdBox</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Error</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span><span class="op">&gt;</span>
 <span class="kw">where</span>
-    <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BytesMut</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">RangeBound</span><span class="op">&lt;</span><span class="ident">IsNull</span><span class="op">&gt;</span>, <span class="ident">StdBox</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Error</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">G</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BytesMut</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">RangeBound</span><span class="op">&lt;</span><span class="ident">IsNull</span><span class="op">&gt;</span>, <span class="ident">StdBox</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Error</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;mut</span> <span class="ident">BytesMut</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">RangeBound</span><span class="op">&lt;</span><span class="ident">IsNull</span><span class="op">&gt;</span>, <span class="ident">StdBox</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Error</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="ident">G</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;mut</span> <span class="ident">BytesMut</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">RangeBound</span><span class="op">&lt;</span><span class="ident">IsNull</span><span class="op">&gt;</span>, <span class="ident">StdBox</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Error</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span><span class="op">&gt;</span>,
 {
     <span class="kw">let</span> <span class="ident">tag_idx</span> <span class="op">=</span> <span class="ident">buf</span>.<span class="ident">len</span>();
     <span class="ident">buf</span>.<span class="ident">put_u8</span>(<span class="number">0</span>);
@@ -1757,10 +1758,10 @@
 
 <span class="kw">fn</span> <span class="ident">write_bound</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(
     <span class="ident">bound</span>: <span class="ident">F</span>,
-    <span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BytesMut</span>,
+    <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BytesMut</span>,
 ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">RangeBound</span><span class="op">&lt;</span>()<span class="op">&gt;</span>, <span class="ident">StdBox</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Error</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span><span class="op">&gt;</span>
 <span class="kw">where</span>
-    <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BytesMut</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">RangeBound</span><span class="op">&lt;</span><span class="ident">IsNull</span><span class="op">&gt;</span>, <span class="ident">StdBox</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Error</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;mut</span> <span class="ident">BytesMut</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">RangeBound</span><span class="op">&lt;</span><span class="ident">IsNull</span><span class="op">&gt;</span>, <span class="ident">StdBox</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Error</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span><span class="op">&gt;</span>,
 {
     <span class="kw">let</span> <span class="ident">base</span> <span class="op">=</span> <span class="ident">buf</span>.<span class="ident">len</span>();
     <span class="ident">buf</span>.<span class="ident">put_i32</span>(<span class="number">0</span>);
@@ -1777,7 +1778,7 @@
                 <span class="ident">IsNull::No</span> =&gt; <span class="ident">i32::from_usize</span>(<span class="ident">buf</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="ident">base</span> <span class="op">-</span> <span class="number">4</span>)<span class="question-mark">?</span>,
                 <span class="ident">IsNull::Yes</span> =&gt; <span class="op">-</span><span class="number">1</span>,
             };
-            <span class="ident">BigEndian::write_i32</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">buf</span>[<span class="ident">base</span>..], <span class="ident">len</span>);
+            <span class="ident">BigEndian::write_i32</span>(<span class="kw-2">&amp;mut</span> <span class="ident">buf</span>[<span class="ident">base</span>..], <span class="ident">len</span>);
         }
         <span class="prelude-val">None</span> =&gt; <span class="ident">buf</span>.<span class="ident">truncate</span>(<span class="ident">base</span>),
     }
@@ -1807,8 +1808,8 @@
         <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">Range::Empty</span>);
     }
 
-    <span class="kw">let</span> <span class="ident">lower</span> <span class="op">=</span> <span class="ident">read_bound</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">buf</span>, <span class="ident">tag</span>, <span class="ident">RANGE_LOWER_UNBOUNDED</span>, <span class="ident">RANGE_LOWER_INCLUSIVE</span>)<span class="question-mark">?</span>;
-    <span class="kw">let</span> <span class="ident">upper</span> <span class="op">=</span> <span class="ident">read_bound</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">buf</span>, <span class="ident">tag</span>, <span class="ident">RANGE_UPPER_UNBOUNDED</span>, <span class="ident">RANGE_UPPER_INCLUSIVE</span>)<span class="question-mark">?</span>;
+    <span class="kw">let</span> <span class="ident">lower</span> <span class="op">=</span> <span class="ident">read_bound</span>(<span class="kw-2">&amp;mut</span> <span class="ident">buf</span>, <span class="ident">tag</span>, <span class="ident">RANGE_LOWER_UNBOUNDED</span>, <span class="ident">RANGE_LOWER_INCLUSIVE</span>)<span class="question-mark">?</span>;
+    <span class="kw">let</span> <span class="ident">upper</span> <span class="op">=</span> <span class="ident">read_bound</span>(<span class="kw-2">&amp;mut</span> <span class="ident">buf</span>, <span class="ident">tag</span>, <span class="ident">RANGE_UPPER_UNBOUNDED</span>, <span class="ident">RANGE_UPPER_INCLUSIVE</span>)<span class="question-mark">?</span>;
 
     <span class="kw">if</span> <span class="op">!</span><span class="ident">buf</span>.<span class="ident">is_empty</span>() {
         <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="string">&quot;invalid message size&quot;</span>.<span class="ident">into</span>());
@@ -1819,7 +1820,7 @@
 
 <span class="attribute">#[<span class="ident">inline</span>]</span>
 <span class="kw">fn</span> <span class="ident">read_bound</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
-    <span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>],
+    <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>],
     <span class="ident">tag</span>: <span class="ident">u8</span>,
     <span class="ident">unbounded</span>: <span class="ident">u8</span>,
     <span class="ident">inclusive</span>: <span class="ident">u8</span>,
@@ -1858,7 +1859,7 @@
 
 <span class="doccomment">/// Serializes a point value.</span>
 <span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">point_to_sql</span>(<span class="ident">x</span>: <span class="ident">f64</span>, <span class="ident">y</span>: <span class="ident">f64</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BytesMut</span>) {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">point_to_sql</span>(<span class="ident">x</span>: <span class="ident">f64</span>, <span class="ident">y</span>: <span class="ident">f64</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BytesMut</span>) {
     <span class="ident">buf</span>.<span class="ident">put_f64</span>(<span class="ident">x</span>);
     <span class="ident">buf</span>.<span class="ident">put_f64</span>(<span class="ident">y</span>);
 }
@@ -1897,7 +1898,7 @@
 
 <span class="doccomment">/// Serializes a box value.</span>
 <span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">box_to_sql</span>(<span class="ident">x1</span>: <span class="ident">f64</span>, <span class="ident">y1</span>: <span class="ident">f64</span>, <span class="ident">x2</span>: <span class="ident">f64</span>, <span class="ident">y2</span>: <span class="ident">f64</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BytesMut</span>) {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">box_to_sql</span>(<span class="ident">x1</span>: <span class="ident">f64</span>, <span class="ident">y1</span>: <span class="ident">f64</span>, <span class="ident">x2</span>: <span class="ident">f64</span>, <span class="ident">y2</span>: <span class="ident">f64</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BytesMut</span>) {
     <span class="ident">buf</span>.<span class="ident">put_f64</span>(<span class="ident">x1</span>);
     <span class="ident">buf</span>.<span class="ident">put_f64</span>(<span class="ident">y1</span>);
     <span class="ident">buf</span>.<span class="ident">put_f64</span>(<span class="ident">x2</span>);
@@ -1946,7 +1947,7 @@
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">path_to_sql</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(
     <span class="ident">closed</span>: <span class="ident">bool</span>,
     <span class="ident">points</span>: <span class="ident">I</span>,
-    <span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BytesMut</span>,
+    <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BytesMut</span>,
 ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">StdBox</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Error</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">I</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> (<span class="ident">f64</span>, <span class="ident">f64</span>)<span class="op">&gt;</span>,
@@ -1963,7 +1964,7 @@
     }
 
     <span class="kw">let</span> <span class="ident">num_points</span> <span class="op">=</span> <span class="ident">i32::from_usize</span>(<span class="ident">num_points</span>)<span class="question-mark">?</span>;
-    <span class="ident">BigEndian::write_i32</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">buf</span>[<span class="ident">points_idx</span>..], <span class="ident">num_points</span>);
+    <span class="ident">BigEndian::write_i32</span>(<span class="kw-2">&amp;mut</span> <span class="ident">buf</span>[<span class="ident">points_idx</span>..], <span class="ident">num_points</span>);
 
     <span class="prelude-val">Ok</span>(())
 }
@@ -2016,7 +2017,7 @@
     <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">StdBox</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Error</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span>;
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Point</span><span class="op">&gt;</span>, <span class="ident">StdBox</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Error</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Point</span><span class="op">&gt;</span>, <span class="ident">StdBox</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Error</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">remaining</span> <span class="op">==</span> <span class="number">0</span> {
             <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">buf</span>.<span class="ident">is_empty</span>() {
                 <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="string">&quot;invalid message length: path points not drained&quot;</span>.<span class="ident">into</span>());
@@ -2040,7 +2041,7 @@
 
 <span class="doccomment">/// Serializes a Postgres inet.</span>
 <span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">inet_to_sql</span>(<span class="ident">addr</span>: <span class="ident">IpAddr</span>, <span class="ident">netmask</span>: <span class="ident">u8</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BytesMut</span>) {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">inet_to_sql</span>(<span class="ident">addr</span>: <span class="ident">IpAddr</span>, <span class="ident">netmask</span>: <span class="ident">u8</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BytesMut</span>) {
     <span class="kw">let</span> <span class="ident">family</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">addr</span> {
         <span class="ident">IpAddr::V4</span>(<span class="kw">_</span>) =&gt; <span class="ident">PGSQL_AF_INET</span>,
         <span class="ident">IpAddr::V6</span>(<span class="kw">_</span>) =&gt; <span class="ident">PGSQL_AF_INET6</span>,
@@ -2077,7 +2078,7 @@
                 <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="string">&quot;invalid IPv4 address length&quot;</span>.<span class="ident">into</span>());
             }
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">addr</span> <span class="op">=</span> [<span class="number">0</span>; <span class="number">4</span>];
-            <span class="ident">buf</span>.<span class="ident">read_exact</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">addr</span>)<span class="question-mark">?</span>;
+            <span class="ident">buf</span>.<span class="ident">read_exact</span>(<span class="kw-2">&amp;mut</span> <span class="ident">addr</span>)<span class="question-mark">?</span>;
             <span class="ident">IpAddr::V4</span>(<span class="ident">Ipv4Addr::from</span>(<span class="ident">addr</span>))
         }
         <span class="ident">PGSQL_AF_INET6</span> =&gt; {
@@ -2088,7 +2089,7 @@
                 <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="string">&quot;invalid IPv6 address length&quot;</span>.<span class="ident">into</span>());
             }
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">addr</span> <span class="op">=</span> [<span class="number">0</span>; <span class="number">16</span>];
-            <span class="ident">buf</span>.<span class="ident">read_exact</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">addr</span>)<span class="question-mark">?</span>;
+            <span class="ident">buf</span>.<span class="ident">read_exact</span>(<span class="kw-2">&amp;mut</span> <span class="ident">addr</span>)<span class="question-mark">?</span>;
             <span class="ident">IpAddr::V6</span>(<span class="ident">Ipv6Addr::from</span>(<span class="ident">addr</span>))
         }
         <span class="kw">_</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="string">&quot;invalid IP family&quot;</span>.<span class="ident">into</span>()),
@@ -2122,5 +2123,4 @@
 }
 </code></pre></div>
 </section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="postgres_protocol" data-search-index-js="../../../search-index.js" data-search-js="../../../search.js"></div>
-    <script src="../../../main.js"></script><script src="../../../source-script.js"></script><script src="../../../source-files.js"></script>
 </body></html>

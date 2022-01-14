@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;ring-0.16.20&#x2F;src&#x2F;arithmetic&#x2F;bigint.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>bigint.rs - source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../ring/index.html'><div class='logo-container rust-logo'><img src='../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">   1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;ring-0.16.20&#x2F;src&#x2F;arithmetic&#x2F;bigint.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>bigint.rs - source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><script defer src="../../../main.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script>
+    <noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../ring/index.html'><div class='logo-container rust-logo'><img src='../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">   1</span>
 <span id="2">   2</span>
 <span id="3">   3</span>
 <span id="4">   4</span>
@@ -1701,8 +1702,8 @@
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span> <span class="ident">DerefMut</span> <span class="kw">for</span> <span class="ident">BoxedLimbs</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span> {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">deref_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident"><span class="self">Self</span>::Target</span> {
-        <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">limbs</span>
+    <span class="kw">fn</span> <span class="ident">deref_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident"><span class="self">Self</span>::Target</span> {
+        <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">limbs</span>
     }
 }
 
@@ -1731,7 +1732,7 @@
             <span class="ident">num_limbs</span>,
             <span class="ident">m</span>: <span class="ident">PhantomData</span>,
         });
-        <span class="ident">limb::parse_big_endian_and_pad_consttime</span>(<span class="ident">input</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">r</span>)
+        <span class="ident">limb::parse_big_endian_and_pad_consttime</span>(<span class="ident">input</span>, <span class="kw-2">&amp;mut</span> <span class="ident">r</span>)
             .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">error::Unspecified</span><span class="op">|</span> <span class="ident">error::KeyRejected::unexpected_error</span>())<span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>(<span class="ident">r</span>)
     }
@@ -1749,7 +1750,7 @@
         <span class="ident">m</span>: <span class="kw-2">&amp;</span><span class="ident">Modulus</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">error::Unspecified</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">r</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::zero</span>(<span class="ident">m</span>.<span class="ident">width</span>());
-        <span class="ident">limb::parse_big_endian_and_pad_consttime</span>(<span class="ident">input</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">r</span>)<span class="question-mark">?</span>;
+        <span class="ident">limb::parse_big_endian_and_pad_consttime</span>(<span class="ident">input</span>, <span class="kw-2">&amp;mut</span> <span class="ident">r</span>)<span class="question-mark">?</span>;
         <span class="kw">if</span> <span class="ident">limb::limbs_less_than_limbs_consttime</span>(<span class="kw-2">&amp;</span><span class="ident">r</span>, <span class="kw-2">&amp;</span><span class="ident">m</span>.<span class="ident">limbs</span>) <span class="op">!</span><span class="op">=</span> <span class="ident">LimbMask::True</span> {
             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">error::Unspecified</span>);
         }
@@ -1849,7 +1850,7 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">M</span>: <span class="ident">PublicModulus</span><span class="op">&gt;</span> <span class="ident">core::fmt::Debug</span> <span class="kw">for</span> <span class="ident">Modulus</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">::core::fmt::Formatter</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">::core::fmt::Error</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;mut</span> <span class="ident">::core::fmt::Formatter</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">::core::fmt::Error</span><span class="op">&gt;</span> {
         <span class="ident">fmt</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;Modulus&quot;</span>)
             <span class="comment">// TODO: Print modulus value.</span>
             .<span class="ident">finish</span>()
@@ -2039,7 +2040,7 @@
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">one</span> <span class="op">=</span> [<span class="number">0</span>; <span class="ident">MODULUS_MAX_LIMBS</span>];
         <span class="ident">one</span>[<span class="number">0</span>] <span class="op">=</span> <span class="number">1</span>;
         <span class="kw">let</span> <span class="ident">one</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">one</span>[..<span class="ident">num_limbs</span>]; <span class="comment">// assert!(num_limbs &lt;= MODULUS_MAX_LIMBS);</span>
-        <span class="ident">limbs_mont_mul</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">limbs</span>, <span class="kw-2">&amp;</span><span class="ident">one</span>, <span class="kw-2">&amp;</span><span class="ident">m</span>.<span class="ident">limbs</span>, <span class="kw-2">&amp;</span><span class="ident">m</span>.<span class="ident">n0</span>);
+        <span class="ident">limbs_mont_mul</span>(<span class="kw-2">&amp;mut</span> <span class="ident">limbs</span>, <span class="kw-2">&amp;</span><span class="ident">one</span>, <span class="kw-2">&amp;</span><span class="ident">m</span>.<span class="ident">limbs</span>, <span class="kw-2">&amp;</span><span class="ident">m</span>.<span class="ident">n0</span>);
         <span class="ident">Elem</span> {
             <span class="ident">limbs</span>,
             <span class="ident">encoding</span>: <span class="ident">PhantomData</span>,
@@ -2066,7 +2067,7 @@
     }
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">fill_be_bytes</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">out</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">u8</span>]) {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">fill_be_bytes</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">out</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">u8</span>]) {
         <span class="comment">// See Falko Strenzke, &quot;Manger&#39;s Attack revisited&quot;, ICICS 2010.</span>
         <span class="ident">limb::big_endian_from_limbs</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">limbs</span>, <span class="ident">out</span>)
     }
@@ -2101,16 +2102,16 @@
 <span class="kw">where</span>
     (<span class="ident">AF</span>, <span class="ident">BF</span>): <span class="ident">ProductEncoding</span>,
 {
-    <span class="ident">limbs_mont_mul</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">b</span>.<span class="ident">limbs</span>, <span class="kw-2">&amp;</span><span class="ident">a</span>.<span class="ident">limbs</span>, <span class="kw-2">&amp;</span><span class="ident">m</span>.<span class="ident">limbs</span>, <span class="kw-2">&amp;</span><span class="ident">m</span>.<span class="ident">n0</span>);
+    <span class="ident">limbs_mont_mul</span>(<span class="kw-2">&amp;mut</span> <span class="ident">b</span>.<span class="ident">limbs</span>, <span class="kw-2">&amp;</span><span class="ident">a</span>.<span class="ident">limbs</span>, <span class="kw-2">&amp;</span><span class="ident">m</span>.<span class="ident">limbs</span>, <span class="kw-2">&amp;</span><span class="ident">m</span>.<span class="ident">n0</span>);
     <span class="ident">Elem</span> {
         <span class="ident">limbs</span>: <span class="ident">b</span>.<span class="ident">limbs</span>,
         <span class="ident">encoding</span>: <span class="ident">PhantomData</span>,
     }
 }
 
-<span class="kw">fn</span> <span class="ident">elem_mul_by_2</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">AF</span><span class="op">&gt;</span>(<span class="ident">a</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Elem</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">AF</span><span class="op">&gt;</span>, <span class="ident">m</span>: <span class="kw-2">&amp;</span><span class="ident">PartialModulus</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>) {
+<span class="kw">fn</span> <span class="ident">elem_mul_by_2</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">AF</span><span class="op">&gt;</span>(<span class="ident">a</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Elem</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">AF</span><span class="op">&gt;</span>, <span class="ident">m</span>: <span class="kw-2">&amp;</span><span class="ident">PartialModulus</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>) {
     <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> {
-        <span class="kw">fn</span> <span class="ident">LIMBS_shl_mod</span>(<span class="ident">r</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">Limb</span>, <span class="ident">a</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">Limb</span>, <span class="ident">m</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">Limb</span>, <span class="ident">num_limbs</span>: <span class="ident">c::size_t</span>);
+        <span class="kw">fn</span> <span class="ident">LIMBS_shl_mod</span>(<span class="ident">r</span>: <span class="kw-2">*mut</span> <span class="ident">Limb</span>, <span class="ident">a</span>: <span class="kw-2">*const</span> <span class="ident">Limb</span>, <span class="ident">m</span>: <span class="kw-2">*const</span> <span class="ident">Limb</span>, <span class="ident">num_limbs</span>: <span class="ident">c::size_t</span>);
     }
     <span class="kw">unsafe</span> {
         <span class="ident">LIMBS_shl_mod</span>(
@@ -2128,7 +2129,7 @@
 ) -&gt; <span class="ident">Elem</span><span class="op">&lt;</span><span class="ident">Smaller</span>, <span class="ident">Unencoded</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">r</span> <span class="op">=</span> <span class="ident">a</span>.<span class="ident">limbs</span>.<span class="ident">clone</span>();
     <span class="macro">assert!</span>(<span class="ident">r</span>.<span class="ident">len</span>() <span class="op">&lt;</span><span class="op">=</span> <span class="ident">m</span>.<span class="ident">limbs</span>.<span class="ident">len</span>());
-    <span class="ident">limb::limbs_reduce_once_constant_time</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">r</span>, <span class="kw-2">&amp;</span><span class="ident">m</span>.<span class="ident">limbs</span>);
+    <span class="ident">limb::limbs_reduce_once_constant_time</span>(<span class="kw-2">&amp;mut</span> <span class="ident">r</span>, <span class="kw-2">&amp;</span><span class="ident">m</span>.<span class="ident">limbs</span>);
     <span class="ident">Elem</span> {
         <span class="ident">limbs</span>: <span class="ident">BoxedLimbs</span> {
             <span class="ident">limbs</span>: <span class="ident">r</span>.<span class="ident">limbs</span>,
@@ -2144,11 +2145,11 @@
     <span class="ident">m</span>: <span class="kw-2">&amp;</span><span class="ident">Modulus</span><span class="op">&lt;</span><span class="ident">Smaller</span><span class="op">&gt;</span>,
 ) -&gt; <span class="ident">Elem</span><span class="op">&lt;</span><span class="ident">Smaller</span>, <span class="ident">RInverse</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">tmp</span> <span class="op">=</span> [<span class="number">0</span>; <span class="ident">MODULUS_MAX_LIMBS</span>];
-    <span class="kw">let</span> <span class="ident">tmp</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">tmp</span>[..<span class="ident">a</span>.<span class="ident">limbs</span>.<span class="ident">len</span>()];
+    <span class="kw">let</span> <span class="ident">tmp</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="ident">tmp</span>[..<span class="ident">a</span>.<span class="ident">limbs</span>.<span class="ident">len</span>()];
     <span class="ident">tmp</span>.<span class="ident">copy_from_slice</span>(<span class="kw-2">&amp;</span><span class="ident">a</span>.<span class="ident">limbs</span>);
 
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">r</span> <span class="op">=</span> <span class="ident">m</span>.<span class="ident">zero</span>();
-    <span class="ident">limbs_from_mont_in_place</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">r</span>.<span class="ident">limbs</span>, <span class="ident">tmp</span>, <span class="kw-2">&amp;</span><span class="ident">m</span>.<span class="ident">limbs</span>, <span class="kw-2">&amp;</span><span class="ident">m</span>.<span class="ident">n0</span>);
+    <span class="ident">limbs_from_mont_in_place</span>(<span class="kw-2">&amp;mut</span> <span class="ident">r</span>.<span class="ident">limbs</span>, <span class="ident">tmp</span>, <span class="kw-2">&amp;</span><span class="ident">m</span>.<span class="ident">limbs</span>, <span class="kw-2">&amp;</span><span class="ident">m</span>.<span class="ident">n0</span>);
     <span class="ident">r</span>
 }
 
@@ -2159,7 +2160,7 @@
 <span class="kw">where</span>
     (<span class="ident">E</span>, <span class="ident">E</span>): <span class="ident">ProductEncoding</span>,
 {
-    <span class="ident">limbs_mont_square</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">a</span>.<span class="ident">limbs</span>, <span class="kw-2">&amp;</span><span class="ident">m</span>.<span class="ident">limbs</span>, <span class="kw-2">&amp;</span><span class="ident">m</span>.<span class="ident">n0</span>);
+    <span class="ident">limbs_mont_square</span>(<span class="kw-2">&amp;mut</span> <span class="ident">a</span>.<span class="ident">limbs</span>, <span class="kw-2">&amp;</span><span class="ident">m</span>.<span class="ident">limbs</span>, <span class="kw-2">&amp;</span><span class="ident">m</span>.<span class="ident">n0</span>);
     <span class="ident">Elem</span> {
         <span class="ident">limbs</span>: <span class="ident">a</span>.<span class="ident">limbs</span>,
         <span class="ident">encoding</span>: <span class="ident">PhantomData</span>,
@@ -2180,10 +2181,10 @@
     <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> {
         <span class="comment">// `r` and `a` may alias.</span>
         <span class="kw">fn</span> <span class="ident">LIMBS_add_mod</span>(
-            <span class="ident">r</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">Limb</span>,
-            <span class="ident">a</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">Limb</span>,
-            <span class="ident">b</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">Limb</span>,
-            <span class="ident">m</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">Limb</span>,
+            <span class="ident">r</span>: <span class="kw-2">*mut</span> <span class="ident">Limb</span>,
+            <span class="ident">a</span>: <span class="kw-2">*const</span> <span class="ident">Limb</span>,
+            <span class="ident">b</span>: <span class="kw-2">*const</span> <span class="ident">Limb</span>,
+            <span class="ident">m</span>: <span class="kw-2">*const</span> <span class="ident">Limb</span>,
             <span class="ident">num_limbs</span>: <span class="ident">c::size_t</span>,
         );
     }
@@ -2204,10 +2205,10 @@
     <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> {
         <span class="comment">// `r` and `a` may alias.</span>
         <span class="kw">fn</span> <span class="ident">LIMBS_sub_mod</span>(
-            <span class="ident">r</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">Limb</span>,
-            <span class="ident">a</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">Limb</span>,
-            <span class="ident">b</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">Limb</span>,
-            <span class="ident">m</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">Limb</span>,
+            <span class="ident">r</span>: <span class="kw-2">*mut</span> <span class="ident">Limb</span>,
+            <span class="ident">a</span>: <span class="kw-2">*const</span> <span class="ident">Limb</span>,
+            <span class="ident">b</span>: <span class="kw-2">*const</span> <span class="ident">Limb</span>,
+            <span class="ident">m</span>: <span class="kw-2">*const</span> <span class="ident">Limb</span>,
             <span class="ident">num_limbs</span>: <span class="ident">c::size_t</span>,
         );
     }
@@ -2262,7 +2263,7 @@
         <span class="kw">let</span> <span class="ident">shifts</span> <span class="op">=</span> <span class="ident">r</span> <span class="op">-</span> <span class="ident">bit</span> <span class="op">+</span> <span class="ident">lg_base</span>;
         <span class="kw">let</span> <span class="ident">exponent</span> <span class="op">=</span> (<span class="ident">r</span> <span class="op">/</span> <span class="ident">lg_base</span>) <span class="kw">as</span> <span class="ident">u64</span>;
         <span class="kw">for</span> <span class="kw">_</span> <span class="kw">in</span> <span class="number">0</span>..<span class="ident">shifts</span> {
-            <span class="ident">elem_mul_by_2</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">base</span>, <span class="ident">m</span>)
+            <span class="ident">elem_mul_by_2</span>(<span class="kw-2">&amp;mut</span> <span class="ident">base</span>, <span class="ident">m</span>)
         }
         <span class="kw">let</span> <span class="ident">RR</span> <span class="op">=</span> <span class="ident">elem_exp_vartime_</span>(<span class="ident">base</span>, <span class="ident">exponent</span>, <span class="ident">m</span>);
 
@@ -2449,11 +2450,11 @@
 
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">table</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="number">0</span>; <span class="ident">TABLE_ENTRIES</span> <span class="op">*</span> <span class="ident">num_limbs</span>];
 
-    <span class="kw">fn</span> <span class="ident">gather</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>(<span class="ident">table</span>: <span class="kw-2">&amp;</span>[<span class="ident">Limb</span>], <span class="ident">i</span>: <span class="ident">Window</span>, <span class="ident">r</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Elem</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">R</span><span class="op">&gt;</span>) {
+    <span class="kw">fn</span> <span class="ident">gather</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>(<span class="ident">table</span>: <span class="kw-2">&amp;</span>[<span class="ident">Limb</span>], <span class="ident">i</span>: <span class="ident">Window</span>, <span class="ident">r</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Elem</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">R</span><span class="op">&gt;</span>) {
         <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> {
             <span class="kw">fn</span> <span class="ident">LIMBS_select_512_32</span>(
-                <span class="ident">r</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">Limb</span>,
-                <span class="ident">table</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">Limb</span>,
+                <span class="ident">r</span>: <span class="kw-2">*mut</span> <span class="ident">Limb</span>,
+                <span class="ident">table</span>: <span class="kw-2">*const</span> <span class="ident">Limb</span>,
                 <span class="ident">num_limbs</span>: <span class="ident">c::size_t</span>,
                 <span class="ident">i</span>: <span class="ident">Window</span>,
             ) -&gt; <span class="ident">bssl::Result</span>;
@@ -2474,7 +2475,7 @@
         <span class="kw">for</span> <span class="kw">_</span> <span class="kw">in</span> <span class="number">0</span>..<span class="ident">WINDOW_BITS</span> {
             <span class="ident">acc</span> <span class="op">=</span> <span class="ident">elem_squared</span>(<span class="ident">acc</span>, <span class="kw-2">&amp;</span><span class="ident">m</span>.<span class="ident">as_partial</span>());
         }
-        <span class="ident">gather</span>(<span class="ident">table</span>, <span class="ident">i</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">tmp</span>);
+        <span class="ident">gather</span>(<span class="ident">table</span>, <span class="ident">i</span>, <span class="kw-2">&amp;mut</span> <span class="ident">tmp</span>);
         <span class="kw">let</span> <span class="ident">acc</span> <span class="op">=</span> <span class="ident">elem_mul</span>(<span class="kw-2">&amp;</span><span class="ident">tmp</span>, <span class="ident">acc</span>, <span class="ident">m</span>);
         (<span class="ident">acc</span>, <span class="ident">tmp</span>)
     }
@@ -2485,12 +2486,12 @@
     <span class="kw">fn</span> <span class="ident">entry</span>(<span class="ident">table</span>: <span class="kw-2">&amp;</span>[<span class="ident">Limb</span>], <span class="ident">i</span>: <span class="ident">usize</span>, <span class="ident">num_limbs</span>: <span class="ident">usize</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">Limb</span>] {
         <span class="kw-2">&amp;</span><span class="ident">table</span>[(<span class="ident">i</span> <span class="op">*</span> <span class="ident">num_limbs</span>)..][..<span class="ident">num_limbs</span>]
     }
-    <span class="kw">fn</span> <span class="ident">entry_mut</span>(<span class="ident">table</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">Limb</span>], <span class="ident">i</span>: <span class="ident">usize</span>, <span class="ident">num_limbs</span>: <span class="ident">usize</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">Limb</span>] {
-        <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">table</span>[(<span class="ident">i</span> <span class="op">*</span> <span class="ident">num_limbs</span>)..][..<span class="ident">num_limbs</span>]
+    <span class="kw">fn</span> <span class="ident">entry_mut</span>(<span class="ident">table</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">Limb</span>], <span class="ident">i</span>: <span class="ident">usize</span>, <span class="ident">num_limbs</span>: <span class="ident">usize</span>) -&gt; <span class="kw-2">&amp;mut</span> [<span class="ident">Limb</span>] {
+        <span class="kw-2">&amp;mut</span> <span class="ident">table</span>[(<span class="ident">i</span> <span class="op">*</span> <span class="ident">num_limbs</span>)..][..<span class="ident">num_limbs</span>]
     }
     <span class="kw">let</span> <span class="ident">num_limbs</span> <span class="op">=</span> <span class="ident">m</span>.<span class="ident">limbs</span>.<span class="ident">len</span>();
-    <span class="ident">entry_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">table</span>, <span class="number">0</span>, <span class="ident">num_limbs</span>).<span class="ident">copy_from_slice</span>(<span class="kw-2">&amp;</span><span class="ident">tmp</span>.<span class="ident">limbs</span>);
-    <span class="ident">entry_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">table</span>, <span class="number">1</span>, <span class="ident">num_limbs</span>).<span class="ident">copy_from_slice</span>(<span class="kw-2">&amp;</span><span class="ident">base</span>.<span class="ident">limbs</span>);
+    <span class="ident">entry_mut</span>(<span class="kw-2">&amp;mut</span> <span class="ident">table</span>, <span class="number">0</span>, <span class="ident">num_limbs</span>).<span class="ident">copy_from_slice</span>(<span class="kw-2">&amp;</span><span class="ident">tmp</span>.<span class="ident">limbs</span>);
+    <span class="ident">entry_mut</span>(<span class="kw-2">&amp;mut</span> <span class="ident">table</span>, <span class="number">1</span>, <span class="ident">num_limbs</span>).<span class="ident">copy_from_slice</span>(<span class="kw-2">&amp;</span><span class="ident">base</span>.<span class="ident">limbs</span>);
     <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="number">2</span>..<span class="ident">TABLE_ENTRIES</span> {
         <span class="kw">let</span> (<span class="ident">src1</span>, <span class="ident">src2</span>) <span class="op">=</span> <span class="kw">if</span> <span class="ident">i</span> <span class="op">%</span> <span class="number">2</span> <span class="op">==</span> <span class="number">0</span> {
             (<span class="ident">i</span> <span class="op">/</span> <span class="number">2</span>, <span class="ident">i</span> <span class="op">/</span> <span class="number">2</span>)
@@ -2511,7 +2512,7 @@
                 <span class="ident">limbs</span>: <span class="ident">base</span>.<span class="ident">limbs</span>,
                 <span class="ident">encoding</span>: <span class="ident">PhantomData</span>,
             };
-            <span class="ident">gather</span>(<span class="kw-2">&amp;</span><span class="ident">table</span>, <span class="ident">initial_window</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">r</span>);
+            <span class="ident">gather</span>(<span class="kw-2">&amp;</span><span class="ident">table</span>, <span class="ident">initial_window</span>, <span class="kw-2">&amp;mut</span> <span class="ident">r</span>);
             (<span class="ident">r</span>, <span class="ident">tmp</span>)
         },
         <span class="op">|</span>(<span class="ident">acc</span>, <span class="ident">tmp</span>), <span class="ident">window</span><span class="op">|</span> <span class="ident">power</span>(<span class="kw-2">&amp;</span><span class="ident">table</span>, <span class="ident">window</span>, <span class="ident">acc</span>, <span class="ident">tmp</span>, <span class="ident">m</span>),
@@ -2557,7 +2558,7 @@
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">table</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="number">0</span>; ((<span class="ident">TABLE_ENTRIES</span> <span class="op">+</span> <span class="number">3</span>) <span class="op">*</span> <span class="ident">num_limbs</span>) <span class="op">+</span> <span class="ident">ALIGNMENT</span>];
     <span class="kw">let</span> (<span class="ident">table</span>, <span class="ident">state</span>) <span class="op">=</span> {
         <span class="kw">let</span> <span class="ident">misalignment</span> <span class="op">=</span> (<span class="ident">table</span>.<span class="ident">as_ptr</span>() <span class="kw">as</span> <span class="ident">usize</span>) <span class="op">%</span> <span class="ident">ALIGNMENT</span>;
-        <span class="kw">let</span> <span class="ident">table</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">table</span>[((<span class="ident">ALIGNMENT</span> <span class="op">-</span> <span class="ident">misalignment</span>) <span class="op">/</span> <span class="ident">LIMB_BYTES</span>)..];
+        <span class="kw">let</span> <span class="ident">table</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="ident">table</span>[((<span class="ident">ALIGNMENT</span> <span class="op">-</span> <span class="ident">misalignment</span>) <span class="op">/</span> <span class="ident">LIMB_BYTES</span>)..];
         <span class="macro">assert_eq!</span>((<span class="ident">table</span>.<span class="ident">as_ptr</span>() <span class="kw">as</span> <span class="ident">usize</span>) <span class="op">%</span> <span class="ident">ALIGNMENT</span>, <span class="number">0</span>);
         <span class="ident">table</span>.<span class="ident">split_at_mut</span>(<span class="ident">TABLE_ENTRIES</span> <span class="op">*</span> <span class="ident">num_limbs</span>)
     };
@@ -2565,8 +2566,8 @@
     <span class="kw">fn</span> <span class="ident">entry</span>(<span class="ident">table</span>: <span class="kw-2">&amp;</span>[<span class="ident">Limb</span>], <span class="ident">i</span>: <span class="ident">usize</span>, <span class="ident">num_limbs</span>: <span class="ident">usize</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">Limb</span>] {
         <span class="kw-2">&amp;</span><span class="ident">table</span>[(<span class="ident">i</span> <span class="op">*</span> <span class="ident">num_limbs</span>)..][..<span class="ident">num_limbs</span>]
     }
-    <span class="kw">fn</span> <span class="ident">entry_mut</span>(<span class="ident">table</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">Limb</span>], <span class="ident">i</span>: <span class="ident">usize</span>, <span class="ident">num_limbs</span>: <span class="ident">usize</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">Limb</span>] {
-        <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">table</span>[(<span class="ident">i</span> <span class="op">*</span> <span class="ident">num_limbs</span>)..][..<span class="ident">num_limbs</span>]
+    <span class="kw">fn</span> <span class="ident">entry_mut</span>(<span class="ident">table</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">Limb</span>], <span class="ident">i</span>: <span class="ident">usize</span>, <span class="ident">num_limbs</span>: <span class="ident">usize</span>) -&gt; <span class="kw-2">&amp;mut</span> [<span class="ident">Limb</span>] {
+        <span class="kw-2">&amp;mut</span> <span class="ident">table</span>[(<span class="ident">i</span> <span class="op">*</span> <span class="ident">num_limbs</span>)..][..<span class="ident">num_limbs</span>]
     }
 
     <span class="kw">const</span> <span class="ident">ACC</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">0</span>; <span class="comment">// `tmp` in OpenSSL</span>
@@ -2576,9 +2577,9 @@
     <span class="ident">entry_mut</span>(<span class="ident">state</span>, <span class="ident">BASE</span>, <span class="ident">num_limbs</span>).<span class="ident">copy_from_slice</span>(<span class="kw-2">&amp;</span><span class="ident">base</span>.<span class="ident">limbs</span>);
     <span class="ident">entry_mut</span>(<span class="ident">state</span>, <span class="ident">M</span>, <span class="ident">num_limbs</span>).<span class="ident">copy_from_slice</span>(<span class="kw-2">&amp;</span><span class="ident">m</span>.<span class="ident">limbs</span>);
 
-    <span class="kw">fn</span> <span class="ident">scatter</span>(<span class="ident">table</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">Limb</span>], <span class="ident">state</span>: <span class="kw-2">&amp;</span>[<span class="ident">Limb</span>], <span class="ident">i</span>: <span class="ident">Window</span>, <span class="ident">num_limbs</span>: <span class="ident">usize</span>) {
+    <span class="kw">fn</span> <span class="ident">scatter</span>(<span class="ident">table</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">Limb</span>], <span class="ident">state</span>: <span class="kw-2">&amp;</span>[<span class="ident">Limb</span>], <span class="ident">i</span>: <span class="ident">Window</span>, <span class="ident">num_limbs</span>: <span class="ident">usize</span>) {
         <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> {
-            <span class="kw">fn</span> <span class="ident">GFp_bn_scatter5</span>(<span class="ident">a</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">Limb</span>, <span class="ident">a_len</span>: <span class="ident">c::size_t</span>, <span class="ident">table</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">Limb</span>, <span class="ident">i</span>: <span class="ident">Window</span>);
+            <span class="kw">fn</span> <span class="ident">GFp_bn_scatter5</span>(<span class="ident">a</span>: <span class="kw-2">*const</span> <span class="ident">Limb</span>, <span class="ident">a_len</span>: <span class="ident">c::size_t</span>, <span class="ident">table</span>: <span class="kw-2">*mut</span> <span class="ident">Limb</span>, <span class="ident">i</span>: <span class="ident">Window</span>);
         }
         <span class="kw">unsafe</span> {
             <span class="ident">GFp_bn_scatter5</span>(
@@ -2590,9 +2591,9 @@
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">gather</span>(<span class="ident">table</span>: <span class="kw-2">&amp;</span>[<span class="ident">Limb</span>], <span class="ident">state</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">Limb</span>], <span class="ident">i</span>: <span class="ident">Window</span>, <span class="ident">num_limbs</span>: <span class="ident">usize</span>) {
+    <span class="kw">fn</span> <span class="ident">gather</span>(<span class="ident">table</span>: <span class="kw-2">&amp;</span>[<span class="ident">Limb</span>], <span class="ident">state</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">Limb</span>], <span class="ident">i</span>: <span class="ident">Window</span>, <span class="ident">num_limbs</span>: <span class="ident">usize</span>) {
         <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> {
-            <span class="kw">fn</span> <span class="ident">GFp_bn_gather5</span>(<span class="ident">r</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">Limb</span>, <span class="ident">a_len</span>: <span class="ident">c::size_t</span>, <span class="ident">table</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">Limb</span>, <span class="ident">i</span>: <span class="ident">Window</span>);
+            <span class="kw">fn</span> <span class="ident">GFp_bn_gather5</span>(<span class="ident">r</span>: <span class="kw-2">*mut</span> <span class="ident">Limb</span>, <span class="ident">a_len</span>: <span class="ident">c::size_t</span>, <span class="ident">table</span>: <span class="kw-2">*const</span> <span class="ident">Limb</span>, <span class="ident">i</span>: <span class="ident">Window</span>);
         }
         <span class="kw">unsafe</span> {
             <span class="ident">GFp_bn_gather5</span>(
@@ -2604,7 +2605,7 @@
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">gather_square</span>(<span class="ident">table</span>: <span class="kw-2">&amp;</span>[<span class="ident">Limb</span>], <span class="ident">state</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">Limb</span>], <span class="ident">n0</span>: <span class="kw-2">&amp;</span><span class="ident">N0</span>, <span class="ident">i</span>: <span class="ident">Window</span>, <span class="ident">num_limbs</span>: <span class="ident">usize</span>) {
+    <span class="kw">fn</span> <span class="ident">gather_square</span>(<span class="ident">table</span>: <span class="kw-2">&amp;</span>[<span class="ident">Limb</span>], <span class="ident">state</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">Limb</span>], <span class="ident">n0</span>: <span class="kw-2">&amp;</span><span class="ident">N0</span>, <span class="ident">i</span>: <span class="ident">Window</span>, <span class="ident">num_limbs</span>: <span class="ident">usize</span>) {
         <span class="ident">gather</span>(<span class="ident">table</span>, <span class="ident">state</span>, <span class="ident">i</span>, <span class="ident">num_limbs</span>);
         <span class="macro">assert_eq!</span>(<span class="ident">ACC</span>, <span class="number">0</span>);
         <span class="kw">let</span> (<span class="ident">acc</span>, <span class="ident">rest</span>) <span class="op">=</span> <span class="ident">state</span>.<span class="ident">split_at_mut</span>(<span class="ident">num_limbs</span>);
@@ -2612,13 +2613,13 @@
         <span class="ident">limbs_mont_square</span>(<span class="ident">acc</span>, <span class="ident">m</span>, <span class="ident">n0</span>);
     }
 
-    <span class="kw">fn</span> <span class="ident">gather_mul_base</span>(<span class="ident">table</span>: <span class="kw-2">&amp;</span>[<span class="ident">Limb</span>], <span class="ident">state</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">Limb</span>], <span class="ident">n0</span>: <span class="kw-2">&amp;</span><span class="ident">N0</span>, <span class="ident">i</span>: <span class="ident">Window</span>, <span class="ident">num_limbs</span>: <span class="ident">usize</span>) {
+    <span class="kw">fn</span> <span class="ident">gather_mul_base</span>(<span class="ident">table</span>: <span class="kw-2">&amp;</span>[<span class="ident">Limb</span>], <span class="ident">state</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">Limb</span>], <span class="ident">n0</span>: <span class="kw-2">&amp;</span><span class="ident">N0</span>, <span class="ident">i</span>: <span class="ident">Window</span>, <span class="ident">num_limbs</span>: <span class="ident">usize</span>) {
         <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> {
             <span class="kw">fn</span> <span class="ident">GFp_bn_mul_mont_gather5</span>(
-                <span class="ident">rp</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">Limb</span>,
-                <span class="ident">ap</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">Limb</span>,
-                <span class="ident">table</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">Limb</span>,
-                <span class="ident">np</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">Limb</span>,
+                <span class="ident">rp</span>: <span class="kw-2">*mut</span> <span class="ident">Limb</span>,
+                <span class="ident">ap</span>: <span class="kw-2">*const</span> <span class="ident">Limb</span>,
+                <span class="ident">table</span>: <span class="kw-2">*const</span> <span class="ident">Limb</span>,
+                <span class="ident">np</span>: <span class="kw-2">*const</span> <span class="ident">Limb</span>,
                 <span class="ident">n0</span>: <span class="kw-2">&amp;</span><span class="ident">N0</span>,
                 <span class="ident">num</span>: <span class="ident">c::size_t</span>,
                 <span class="ident">power</span>: <span class="ident">Window</span>,
@@ -2637,13 +2638,13 @@
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">power</span>(<span class="ident">table</span>: <span class="kw-2">&amp;</span>[<span class="ident">Limb</span>], <span class="ident">state</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">Limb</span>], <span class="ident">n0</span>: <span class="kw-2">&amp;</span><span class="ident">N0</span>, <span class="ident">i</span>: <span class="ident">Window</span>, <span class="ident">num_limbs</span>: <span class="ident">usize</span>) {
+    <span class="kw">fn</span> <span class="ident">power</span>(<span class="ident">table</span>: <span class="kw-2">&amp;</span>[<span class="ident">Limb</span>], <span class="ident">state</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">Limb</span>], <span class="ident">n0</span>: <span class="kw-2">&amp;</span><span class="ident">N0</span>, <span class="ident">i</span>: <span class="ident">Window</span>, <span class="ident">num_limbs</span>: <span class="ident">usize</span>) {
         <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> {
             <span class="kw">fn</span> <span class="ident">GFp_bn_power5</span>(
-                <span class="ident">r</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">Limb</span>,
-                <span class="ident">a</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">Limb</span>,
-                <span class="ident">table</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">Limb</span>,
-                <span class="ident">n</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">Limb</span>,
+                <span class="ident">r</span>: <span class="kw-2">*mut</span> <span class="ident">Limb</span>,
+                <span class="ident">a</span>: <span class="kw-2">*const</span> <span class="ident">Limb</span>,
+                <span class="ident">table</span>: <span class="kw-2">*const</span> <span class="ident">Limb</span>,
+                <span class="ident">n</span>: <span class="kw-2">*const</span> <span class="ident">Limb</span>,
                 <span class="ident">n0</span>: <span class="kw-2">&amp;</span><span class="ident">N0</span>,
                 <span class="ident">num</span>: <span class="ident">c::size_t</span>,
                 <span class="ident">i</span>: <span class="ident">Window</span>,
@@ -2698,10 +2699,10 @@
 
     <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> {
         <span class="kw">fn</span> <span class="ident">GFp_bn_from_montgomery</span>(
-            <span class="ident">r</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">Limb</span>,
-            <span class="ident">a</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">Limb</span>,
-            <span class="ident">not_used</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">Limb</span>,
-            <span class="ident">n</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">Limb</span>,
+            <span class="ident">r</span>: <span class="kw-2">*mut</span> <span class="ident">Limb</span>,
+            <span class="ident">a</span>: <span class="kw-2">*const</span> <span class="ident">Limb</span>,
+            <span class="ident">not_used</span>: <span class="kw-2">*const</span> <span class="ident">Limb</span>,
+            <span class="ident">n</span>: <span class="kw-2">*const</span> <span class="ident">Limb</span>,
             <span class="ident">n0</span>: <span class="kw-2">&amp;</span><span class="ident">N0</span>,
             <span class="ident">num</span>: <span class="ident">c::size_t</span>,
         ) -&gt; <span class="ident">bssl::Result</span>;
@@ -2760,7 +2761,7 @@
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="self">Self</span>, <span class="ident">bits::BitLength</span>), <span class="ident">error::Unspecified</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">limbs</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="number">0</span>; (<span class="ident">input</span>.<span class="ident">len</span>() <span class="op">+</span> <span class="ident">LIMB_BYTES</span> <span class="op">-</span> <span class="number">1</span>) <span class="op">/</span> <span class="ident">LIMB_BYTES</span>];
         <span class="comment">// Rejects empty inputs.</span>
-        <span class="ident">limb::parse_big_endian_and_pad_consttime</span>(<span class="ident">input</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">limbs</span>)<span class="question-mark">?</span>;
+        <span class="ident">limb::parse_big_endian_and_pad_consttime</span>(<span class="ident">input</span>, <span class="kw-2">&amp;mut</span> <span class="ident">limbs</span>)<span class="question-mark">?</span>;
         <span class="kw">while</span> <span class="ident">limbs</span>.<span class="ident">last</span>() <span class="op">==</span> <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="number">0</span>) {
             <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">limbs</span>.<span class="ident">pop</span>();
         }
@@ -2831,7 +2832,7 @@
 }
 
 <span class="doccomment">/// r *= a</span>
-<span class="kw">fn</span> <span class="ident">limbs_mont_mul</span>(<span class="ident">r</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">Limb</span>], <span class="ident">a</span>: <span class="kw-2">&amp;</span>[<span class="ident">Limb</span>], <span class="ident">m</span>: <span class="kw-2">&amp;</span>[<span class="ident">Limb</span>], <span class="ident">n0</span>: <span class="kw-2">&amp;</span><span class="ident">N0</span>) {
+<span class="kw">fn</span> <span class="ident">limbs_mont_mul</span>(<span class="ident">r</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">Limb</span>], <span class="ident">a</span>: <span class="kw-2">&amp;</span>[<span class="ident">Limb</span>], <span class="ident">m</span>: <span class="kw-2">&amp;</span>[<span class="ident">Limb</span>], <span class="ident">n0</span>: <span class="kw-2">&amp;</span><span class="ident">N0</span>) {
     <span class="macro">debug_assert_eq!</span>(<span class="ident">r</span>.<span class="ident">len</span>(), <span class="ident">m</span>.<span class="ident">len</span>());
     <span class="macro">debug_assert_eq!</span>(<span class="ident">a</span>.<span class="ident">len</span>(), <span class="ident">m</span>.<span class="ident">len</span>());
 
@@ -2860,20 +2861,20 @@
     )))]</span>
     {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">tmp</span> <span class="op">=</span> [<span class="number">0</span>; <span class="number">2</span> <span class="op">*</span> <span class="ident">MODULUS_MAX_LIMBS</span>];
-        <span class="kw">let</span> <span class="ident">tmp</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">tmp</span>[..(<span class="number">2</span> <span class="op">*</span> <span class="ident">a</span>.<span class="ident">len</span>())];
+        <span class="kw">let</span> <span class="ident">tmp</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="ident">tmp</span>[..(<span class="number">2</span> <span class="op">*</span> <span class="ident">a</span>.<span class="ident">len</span>())];
         <span class="ident">limbs_mul</span>(<span class="ident">tmp</span>, <span class="ident">r</span>, <span class="ident">a</span>);
         <span class="ident">limbs_from_mont_in_place</span>(<span class="ident">r</span>, <span class="ident">tmp</span>, <span class="ident">m</span>, <span class="ident">n0</span>);
     }
 }
 
-<span class="kw">fn</span> <span class="ident">limbs_from_mont_in_place</span>(<span class="ident">r</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">Limb</span>], <span class="ident">tmp</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">Limb</span>], <span class="ident">m</span>: <span class="kw-2">&amp;</span>[<span class="ident">Limb</span>], <span class="ident">n0</span>: <span class="kw-2">&amp;</span><span class="ident">N0</span>) {
+<span class="kw">fn</span> <span class="ident">limbs_from_mont_in_place</span>(<span class="ident">r</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">Limb</span>], <span class="ident">tmp</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">Limb</span>], <span class="ident">m</span>: <span class="kw-2">&amp;</span>[<span class="ident">Limb</span>], <span class="ident">n0</span>: <span class="kw-2">&amp;</span><span class="ident">N0</span>) {
     <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> {
         <span class="kw">fn</span> <span class="ident">GFp_bn_from_montgomery_in_place</span>(
-            <span class="ident">r</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">Limb</span>,
+            <span class="ident">r</span>: <span class="kw-2">*mut</span> <span class="ident">Limb</span>,
             <span class="ident">num_r</span>: <span class="ident">c::size_t</span>,
-            <span class="ident">a</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">Limb</span>,
+            <span class="ident">a</span>: <span class="kw-2">*mut</span> <span class="ident">Limb</span>,
             <span class="ident">num_a</span>: <span class="ident">c::size_t</span>,
-            <span class="ident">n</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">Limb</span>,
+            <span class="ident">n</span>: <span class="kw-2">*const</span> <span class="ident">Limb</span>,
             <span class="ident">num_n</span>: <span class="ident">c::size_t</span>,
             <span class="ident">n0</span>: <span class="kw-2">&amp;</span><span class="ident">N0</span>,
         ) -&gt; <span class="ident">bssl::Result</span>;
@@ -2898,16 +2899,16 @@
     <span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;x86_64&quot;</span>,
     <span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;x86&quot;</span>
 )))]</span>
-<span class="kw">fn</span> <span class="ident">limbs_mul</span>(<span class="ident">r</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">Limb</span>], <span class="ident">a</span>: <span class="kw-2">&amp;</span>[<span class="ident">Limb</span>], <span class="ident">b</span>: <span class="kw-2">&amp;</span>[<span class="ident">Limb</span>]) {
+<span class="kw">fn</span> <span class="ident">limbs_mul</span>(<span class="ident">r</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">Limb</span>], <span class="ident">a</span>: <span class="kw-2">&amp;</span>[<span class="ident">Limb</span>], <span class="ident">b</span>: <span class="kw-2">&amp;</span>[<span class="ident">Limb</span>]) {
     <span class="macro">debug_assert_eq!</span>(<span class="ident">r</span>.<span class="ident">len</span>(), <span class="number">2</span> <span class="op">*</span> <span class="ident">a</span>.<span class="ident">len</span>());
     <span class="macro">debug_assert_eq!</span>(<span class="ident">a</span>.<span class="ident">len</span>(), <span class="ident">b</span>.<span class="ident">len</span>());
     <span class="kw">let</span> <span class="ident">ab_len</span> <span class="op">=</span> <span class="ident">a</span>.<span class="ident">len</span>();
 
-    <span class="ident"><span class="kw">crate</span>::polyfill::slice::fill</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">r</span>[..<span class="ident">ab_len</span>], <span class="number">0</span>);
+    <span class="ident"><span class="kw">crate</span>::polyfill::slice::fill</span>(<span class="kw-2">&amp;mut</span> <span class="ident">r</span>[..<span class="ident">ab_len</span>], <span class="number">0</span>);
     <span class="kw">for</span> (<span class="ident">i</span>, <span class="kw-2">&amp;</span><span class="ident">b_limb</span>) <span class="kw">in</span> <span class="ident">b</span>.<span class="ident">iter</span>().<span class="ident">enumerate</span>() {
         <span class="ident">r</span>[<span class="ident">ab_len</span> <span class="op">+</span> <span class="ident">i</span>] <span class="op">=</span> <span class="kw">unsafe</span> {
             <span class="ident">GFp_limbs_mul_add_limb</span>(
-                (<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">r</span>[<span class="ident">i</span>..][..<span class="ident">ab_len</span>]).<span class="ident">as_mut_ptr</span>(),
+                (<span class="kw-2">&amp;mut</span> <span class="ident">r</span>[<span class="ident">i</span>..][..<span class="ident">ab_len</span>]).<span class="ident">as_mut_ptr</span>(),
                 <span class="ident">a</span>.<span class="ident">as_ptr</span>(),
                 <span class="ident">b_limb</span>,
                 <span class="ident">ab_len</span>,
@@ -2918,7 +2919,7 @@
 
 <span class="doccomment">/// r = a * b</span>
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;x86_64&quot;</span>))]</span>
-<span class="kw">fn</span> <span class="ident">limbs_mont_product</span>(<span class="ident">r</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">Limb</span>], <span class="ident">a</span>: <span class="kw-2">&amp;</span>[<span class="ident">Limb</span>], <span class="ident">b</span>: <span class="kw-2">&amp;</span>[<span class="ident">Limb</span>], <span class="ident">m</span>: <span class="kw-2">&amp;</span>[<span class="ident">Limb</span>], <span class="ident">n0</span>: <span class="kw-2">&amp;</span><span class="ident">N0</span>) {
+<span class="kw">fn</span> <span class="ident">limbs_mont_product</span>(<span class="ident">r</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">Limb</span>], <span class="ident">a</span>: <span class="kw-2">&amp;</span>[<span class="ident">Limb</span>], <span class="ident">b</span>: <span class="kw-2">&amp;</span>[<span class="ident">Limb</span>], <span class="ident">m</span>: <span class="kw-2">&amp;</span>[<span class="ident">Limb</span>], <span class="ident">n0</span>: <span class="kw-2">&amp;</span><span class="ident">N0</span>) {
     <span class="macro">debug_assert_eq!</span>(<span class="ident">r</span>.<span class="ident">len</span>(), <span class="ident">m</span>.<span class="ident">len</span>());
     <span class="macro">debug_assert_eq!</span>(<span class="ident">a</span>.<span class="ident">len</span>(), <span class="ident">m</span>.<span class="ident">len</span>());
     <span class="macro">debug_assert_eq!</span>(<span class="ident">b</span>.<span class="ident">len</span>(), <span class="ident">m</span>.<span class="ident">len</span>());
@@ -2948,14 +2949,14 @@
     )))]</span>
     {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">tmp</span> <span class="op">=</span> [<span class="number">0</span>; <span class="number">2</span> <span class="op">*</span> <span class="ident">MODULUS_MAX_LIMBS</span>];
-        <span class="kw">let</span> <span class="ident">tmp</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">tmp</span>[..(<span class="number">2</span> <span class="op">*</span> <span class="ident">a</span>.<span class="ident">len</span>())];
+        <span class="kw">let</span> <span class="ident">tmp</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="ident">tmp</span>[..(<span class="number">2</span> <span class="op">*</span> <span class="ident">a</span>.<span class="ident">len</span>())];
         <span class="ident">limbs_mul</span>(<span class="ident">tmp</span>, <span class="ident">a</span>, <span class="ident">b</span>);
         <span class="ident">limbs_from_mont_in_place</span>(<span class="ident">r</span>, <span class="ident">tmp</span>, <span class="ident">m</span>, <span class="ident">n0</span>)
     }
 }
 
 <span class="doccomment">/// r = r**2</span>
-<span class="kw">fn</span> <span class="ident">limbs_mont_square</span>(<span class="ident">r</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">Limb</span>], <span class="ident">m</span>: <span class="kw-2">&amp;</span>[<span class="ident">Limb</span>], <span class="ident">n0</span>: <span class="kw-2">&amp;</span><span class="ident">N0</span>) {
+<span class="kw">fn</span> <span class="ident">limbs_mont_square</span>(<span class="ident">r</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">Limb</span>], <span class="ident">m</span>: <span class="kw-2">&amp;</span>[<span class="ident">Limb</span>], <span class="ident">n0</span>: <span class="kw-2">&amp;</span><span class="ident">N0</span>) {
     <span class="macro">debug_assert_eq!</span>(<span class="ident">r</span>.<span class="ident">len</span>(), <span class="ident">m</span>.<span class="ident">len</span>());
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(
         <span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;aarch64&quot;</span>,
@@ -2982,7 +2983,7 @@
     )))]</span>
     {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">tmp</span> <span class="op">=</span> [<span class="number">0</span>; <span class="number">2</span> <span class="op">*</span> <span class="ident">MODULUS_MAX_LIMBS</span>];
-        <span class="kw">let</span> <span class="ident">tmp</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">tmp</span>[..(<span class="number">2</span> <span class="op">*</span> <span class="ident">r</span>.<span class="ident">len</span>())];
+        <span class="kw">let</span> <span class="ident">tmp</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="ident">tmp</span>[..(<span class="number">2</span> <span class="op">*</span> <span class="ident">r</span>.<span class="ident">len</span>())];
         <span class="ident">limbs_mul</span>(<span class="ident">tmp</span>, <span class="ident">r</span>, <span class="ident">r</span>);
         <span class="ident">limbs_from_mont_in_place</span>(<span class="ident">r</span>, <span class="ident">tmp</span>, <span class="ident">m</span>, <span class="ident">n0</span>)
     }
@@ -2997,10 +2998,10 @@
     ))]</span>
     <span class="comment">// `r` and/or &#39;a&#39; and/or &#39;b&#39; may alias.</span>
     <span class="kw">fn</span> <span class="ident">GFp_bn_mul_mont</span>(
-        <span class="ident">r</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">Limb</span>,
-        <span class="ident">a</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">Limb</span>,
-        <span class="ident">b</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">Limb</span>,
-        <span class="ident">n</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">Limb</span>,
+        <span class="ident">r</span>: <span class="kw-2">*mut</span> <span class="ident">Limb</span>,
+        <span class="ident">a</span>: <span class="kw-2">*const</span> <span class="ident">Limb</span>,
+        <span class="ident">b</span>: <span class="kw-2">*const</span> <span class="ident">Limb</span>,
+        <span class="ident">n</span>: <span class="kw-2">*const</span> <span class="ident">Limb</span>,
         <span class="ident">n0</span>: <span class="kw-2">&amp;</span><span class="ident">N0</span>,
         <span class="ident">num_limbs</span>: <span class="ident">c::size_t</span>,
     );
@@ -3016,7 +3017,7 @@
         ))
     ))]</span>
     <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">fn</span> <span class="ident">GFp_limbs_mul_add_limb</span>(<span class="ident">r</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">Limb</span>, <span class="ident">a</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">Limb</span>, <span class="ident">b</span>: <span class="ident">Limb</span>, <span class="ident">num_limbs</span>: <span class="ident">c::size_t</span>) -&gt; <span class="ident">Limb</span>;
+    <span class="kw">fn</span> <span class="ident">GFp_limbs_mul_add_limb</span>(<span class="ident">r</span>: <span class="kw-2">*mut</span> <span class="ident">Limb</span>, <span class="ident">a</span>: <span class="kw-2">*const</span> <span class="ident">Limb</span>, <span class="ident">b</span>: <span class="ident">Limb</span>, <span class="ident">num_limbs</span>: <span class="ident">c::size_t</span>) -&gt; <span class="ident">Limb</span>;
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
@@ -3171,7 +3172,7 @@
     }
 
     <span class="kw">fn</span> <span class="ident">consume_elem</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>(
-        <span class="ident">test_case</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">test::TestCase</span>,
+        <span class="ident">test_case</span>: <span class="kw-2">&amp;mut</span> <span class="ident">test::TestCase</span>,
         <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
         <span class="ident">m</span>: <span class="kw-2">&amp;</span><span class="ident">Modulus</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>,
     ) -&gt; <span class="ident">Elem</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">Unencoded</span><span class="op">&gt;</span> {
@@ -3180,7 +3181,7 @@
     }
 
     <span class="kw">fn</span> <span class="ident">consume_elem_unchecked</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>(
-        <span class="ident">test_case</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">test::TestCase</span>,
+        <span class="ident">test_case</span>: <span class="kw-2">&amp;mut</span> <span class="ident">test::TestCase</span>,
         <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
         <span class="ident">num_limbs</span>: <span class="ident">usize</span>,
     ) -&gt; <span class="ident">Elem</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">Unencoded</span><span class="op">&gt;</span> {
@@ -3196,14 +3197,14 @@
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">consume_modulus</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>(<span class="ident">test_case</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">test::TestCase</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">Modulus</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">consume_modulus</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>(<span class="ident">test_case</span>: <span class="kw-2">&amp;mut</span> <span class="ident">test::TestCase</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">Modulus</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="ident">test_case</span>.<span class="ident">consume_bytes</span>(<span class="ident">name</span>);
         <span class="kw">let</span> (<span class="ident">value</span>, <span class="kw">_</span>) <span class="op">=</span>
             <span class="ident">Modulus::from_be_bytes_with_bit_length</span>(<span class="ident">untrusted::Input::from</span>(<span class="kw-2">&amp;</span><span class="ident">value</span>)).<span class="ident">unwrap</span>();
         <span class="ident">value</span>
     }
 
-    <span class="kw">fn</span> <span class="ident">consume_nonnegative</span>(<span class="ident">test_case</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">test::TestCase</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">Nonnegative</span> {
+    <span class="kw">fn</span> <span class="ident">consume_nonnegative</span>(<span class="ident">test_case</span>: <span class="kw-2">&amp;mut</span> <span class="ident">test::TestCase</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">Nonnegative</span> {
         <span class="kw">let</span> <span class="ident">bytes</span> <span class="op">=</span> <span class="ident">test_case</span>.<span class="ident">consume_bytes</span>(<span class="ident">name</span>);
         <span class="kw">let</span> (<span class="ident">r</span>, <span class="ident">_r_bits</span>) <span class="op">=</span>
             <span class="ident">Nonnegative::from_be_bytes_with_bit_length</span>(<span class="ident">untrusted::Input::from</span>(<span class="kw-2">&amp;</span><span class="ident">bytes</span>)).<span class="ident">unwrap</span>();
@@ -3254,5 +3255,4 @@
 }
 </code></pre></div>
 </section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="ring" data-search-index-js="../../../search-index.js" data-search-js="../../../search.js"></div>
-    <script src="../../../main.js"></script><script src="../../../source-script.js"></script><script src="../../../source-files.js"></script>
 </body></html>

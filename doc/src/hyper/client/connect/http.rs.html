@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;hyper-0.14.16&#x2F;src&#x2F;client&#x2F;connect&#x2F;http.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>http.rs - source</title><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../../../storage.js"></script><script src="../../../../crates.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../../hyper/index.html'><div class='logo-container rust-logo'><img src='../../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">   1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;hyper-0.14.16&#x2F;src&#x2F;client&#x2F;connect&#x2F;http.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>http.rs - source</title><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../../../storage.js"></script><script src="../../../../crates.js"></script><script defer src="../../../../main.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script>
+    <noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../../hyper/index.html'><div class='logo-container rust-logo'><img src='../../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">   1</span>
 <span id="2">   2</span>
 <span id="3">   3</span>
 <span id="4">   4</span>
@@ -1130,7 +1131,7 @@ impl HttpConnector&lt;TokioThreadpoolGaiResolver&gt; {
     <span class="doccomment">///</span>
     <span class="doccomment">/// Enabled by default.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">enforce_http</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">is_enforced</span>: <span class="ident">bool</span>) {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">enforce_http</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">is_enforced</span>: <span class="ident">bool</span>) {
         <span class="self">self</span>.<span class="ident">config_mut</span>().<span class="ident">enforce_http</span> <span class="op">=</span> <span class="ident">is_enforced</span>;
     }
 
@@ -1140,7 +1141,7 @@ impl HttpConnector&lt;TokioThreadpoolGaiResolver&gt; {
     <span class="doccomment">///</span>
     <span class="doccomment">/// Default is `None`.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_keepalive</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">dur</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>) {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_keepalive</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">dur</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>) {
         <span class="self">self</span>.<span class="ident">config_mut</span>().<span class="ident">keep_alive_timeout</span> <span class="op">=</span> <span class="ident">dur</span>;
     }
 
@@ -1148,19 +1149,19 @@ impl HttpConnector&lt;TokioThreadpoolGaiResolver&gt; {
     <span class="doccomment">///</span>
     <span class="doccomment">/// Default is `false`.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_nodelay</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">nodelay</span>: <span class="ident">bool</span>) {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_nodelay</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">nodelay</span>: <span class="ident">bool</span>) {
         <span class="self">self</span>.<span class="ident">config_mut</span>().<span class="ident">nodelay</span> <span class="op">=</span> <span class="ident">nodelay</span>;
     }
 
     <span class="doccomment">/// Sets the value of the SO_SNDBUF option on the socket.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_send_buffer_size</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">size</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>) {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_send_buffer_size</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">size</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>) {
         <span class="self">self</span>.<span class="ident">config_mut</span>().<span class="ident">send_buffer_size</span> <span class="op">=</span> <span class="ident">size</span>;
     }
 
     <span class="doccomment">/// Sets the value of the SO_RCVBUF option on the socket.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_recv_buffer_size</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">size</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>) {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_recv_buffer_size</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">size</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>) {
         <span class="self">self</span>.<span class="ident">config_mut</span>().<span class="ident">recv_buffer_size</span> <span class="op">=</span> <span class="ident">size</span>;
     }
 
@@ -1170,7 +1171,7 @@ impl HttpConnector&lt;TokioThreadpoolGaiResolver&gt; {
     <span class="doccomment">///</span>
     <span class="doccomment">/// Default is `None`.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_local_address</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">addr</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">IpAddr</span><span class="op">&gt;</span>) {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_local_address</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">addr</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">IpAddr</span><span class="op">&gt;</span>) {
         <span class="kw">let</span> (<span class="ident">v4</span>, <span class="ident">v6</span>) <span class="op">=</span> <span class="kw">match</span> <span class="ident">addr</span> {
             <span class="prelude-val">Some</span>(<span class="ident">IpAddr::V4</span>(<span class="ident">a</span>)) =&gt; (<span class="prelude-val">Some</span>(<span class="ident">a</span>), <span class="prelude-val">None</span>),
             <span class="prelude-val">Some</span>(<span class="ident">IpAddr::V6</span>(<span class="ident">a</span>)) =&gt; (<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="ident">a</span>)),
@@ -1186,7 +1187,7 @@ impl HttpConnector&lt;TokioThreadpoolGaiResolver&gt; {
     <span class="doccomment">/// Set that all sockets are bound to the configured IPv4 or IPv6 address (depending on host&#39;s</span>
     <span class="doccomment">/// preferences) before connection.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_local_addresses</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">addr_ipv4</span>: <span class="ident">Ipv4Addr</span>, <span class="ident">addr_ipv6</span>: <span class="ident">Ipv6Addr</span>) {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_local_addresses</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">addr_ipv4</span>: <span class="ident">Ipv4Addr</span>, <span class="ident">addr_ipv6</span>: <span class="ident">Ipv6Addr</span>) {
         <span class="kw">let</span> <span class="ident">cfg</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">config_mut</span>();
 
         <span class="ident">cfg</span>.<span class="ident">local_address_ipv4</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">addr_ipv4</span>);
@@ -1200,7 +1201,7 @@ impl HttpConnector&lt;TokioThreadpoolGaiResolver&gt; {
     <span class="doccomment">///</span>
     <span class="doccomment">/// Default is `None`.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_connect_timeout</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">dur</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>) {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_connect_timeout</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">dur</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>) {
         <span class="self">self</span>.<span class="ident">config_mut</span>().<span class="ident">connect_timeout</span> <span class="op">=</span> <span class="ident">dur</span>;
     }
 
@@ -1217,7 +1218,7 @@ impl HttpConnector&lt;TokioThreadpoolGaiResolver&gt; {
     <span class="doccomment">///</span>
     <span class="doccomment">/// [RFC 6555]: https://tools.ietf.org/html/rfc6555</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_happy_eyeballs_timeout</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">dur</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>) {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_happy_eyeballs_timeout</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">dur</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>) {
         <span class="self">self</span>.<span class="ident">config_mut</span>().<span class="ident">happy_eyeballs_timeout</span> <span class="op">=</span> <span class="ident">dur</span>;
     }
 
@@ -1225,18 +1226,18 @@ impl HttpConnector&lt;TokioThreadpoolGaiResolver&gt; {
     <span class="doccomment">///</span>
     <span class="doccomment">/// Default is `false`.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_reuse_address</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">reuse_address</span>: <span class="ident">bool</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_reuse_address</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">reuse_address</span>: <span class="ident">bool</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">config_mut</span>().<span class="ident">reuse_address</span> <span class="op">=</span> <span class="ident">reuse_address</span>;
         <span class="self">self</span>
     }
 
     <span class="comment">// private</span>
 
-    <span class="kw">fn</span> <span class="ident">config_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Config</span> {
+    <span class="kw">fn</span> <span class="ident">config_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">Config</span> {
         <span class="comment">// If the are HttpConnector clones, this will clone the inner</span>
         <span class="comment">// config. So mutating the config won&#39;t ever affect previous</span>
         <span class="comment">// clones.</span>
-        <span class="ident">Arc::make_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">config</span>)
+        <span class="ident">Arc::make_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">config</span>)
     }
 }
 
@@ -1246,7 +1247,7 @@ impl HttpConnector&lt;TokioThreadpoolGaiResolver&gt; {
 
 <span class="comment">// R: Debug required for now to allow adding it to debug output later...</span>
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">fmt::Debug</span><span class="op">&gt;</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">HttpConnector</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;HttpConnector&quot;</span>).<span class="ident">finish</span>()
     }
 }
@@ -1260,12 +1261,12 @@ impl HttpConnector&lt;TokioThreadpoolGaiResolver&gt; {
     <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">ConnectError</span>;
     <span class="kw">type</span> <span class="ident">Future</span> <span class="op">=</span> <span class="ident">HttpConnecting</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>;
 
-    <span class="kw">fn</span> <span class="ident">poll_ready</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">task::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">poll_ready</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">task::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="macro">ready!</span>(<span class="self">self</span>.<span class="ident">resolver</span>.<span class="ident">poll_ready</span>(<span class="ident">cx</span>)).<span class="ident">map_err</span>(<span class="ident">ConnectError::dns</span>)<span class="question-mark">?</span>;
         <span class="ident">Poll::Ready</span>(<span class="prelude-val">Ok</span>(()))
     }
 
-    <span class="kw">fn</span> <span class="ident">call</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">dst</span>: <span class="ident">Uri</span>) -&gt; <span class="ident"><span class="self">Self</span>::Future</span> {
+    <span class="kw">fn</span> <span class="ident">call</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">dst</span>: <span class="ident">Uri</span>) -&gt; <span class="ident"><span class="self">Self</span>::Future</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">self_</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">clone</span>();
         <span class="ident">HttpConnecting</span> {
             <span class="ident">fut</span>: <span class="ident">Box::pin</span>(<span class="kw">async</span> <span class="kw">move</span> { <span class="ident">self_</span>.<span class="ident">call_async</span>(<span class="ident">dst</span>).<span class="kw">await</span> }),
@@ -1323,7 +1324,7 @@ impl HttpConnector&lt;TokioThreadpoolGaiResolver&gt; {
 <span class="kw">where</span>
     <span class="ident">R</span>: <span class="ident">Resolve</span>,
 {
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">call_async</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">dst</span>: <span class="ident">Uri</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">TcpStream</span>, <span class="ident">ConnectError</span><span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">call_async</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">dst</span>: <span class="ident">Uri</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">TcpStream</span>, <span class="ident">ConnectError</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">config</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">config</span>;
 
         <span class="kw">let</span> (<span class="ident">host</span>, <span class="ident">port</span>) <span class="op">=</span> <span class="ident">get_host_port</span>(<span class="ident">config</span>, <span class="kw-2">&amp;</span><span class="ident">dst</span>)<span class="question-mark">?</span>;
@@ -1334,7 +1335,7 @@ impl HttpConnector&lt;TokioThreadpoolGaiResolver&gt; {
         <span class="kw">let</span> <span class="ident">addrs</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">addrs</span>) <span class="op">=</span> <span class="ident">dns::SocketAddrs::try_parse</span>(<span class="ident">host</span>, <span class="ident">port</span>) {
             <span class="ident">addrs</span>
         } <span class="kw">else</span> {
-            <span class="kw">let</span> <span class="ident">addrs</span> <span class="op">=</span> <span class="ident">resolve</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">resolver</span>, <span class="ident">dns::Name::new</span>(<span class="ident">host</span>.<span class="ident">into</span>()))
+            <span class="kw">let</span> <span class="ident">addrs</span> <span class="op">=</span> <span class="ident">resolve</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">resolver</span>, <span class="ident">dns::Name::new</span>(<span class="ident">host</span>.<span class="ident">into</span>()))
                 .<span class="kw">await</span>
                 .<span class="ident">map_err</span>(<span class="ident">ConnectError::dns</span>)<span class="question-mark">?</span>;
             <span class="kw">let</span> <span class="ident">addrs</span> <span class="op">=</span> <span class="ident">addrs</span>
@@ -1397,7 +1398,7 @@ impl HttpConnector&lt;TokioThreadpoolGaiResolver&gt; {
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">Resolve</span><span class="op">&gt;</span> <span class="ident">Future</span> <span class="kw">for</span> <span class="ident">HttpConnecting</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span> {
     <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">ConnectResult</span>;
 
-    <span class="kw">fn</span> <span class="ident">poll</span>(<span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">task::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">poll</span>(<span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">task::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">project</span>().<span class="ident">fut</span>.<span class="ident">poll</span>(<span class="ident">cx</span>)
     }
 }
@@ -1437,7 +1438,7 @@ impl HttpConnector&lt;TokioThreadpoolGaiResolver&gt; {
 }
 
 <span class="kw">impl</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">ConnectError</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">cause</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">cause</span> {
             <span class="ident">f</span>.<span class="ident">debug_tuple</span>(<span class="string">&quot;ConnectError&quot;</span>)
                 .<span class="ident">field</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">msg</span>)
@@ -1450,7 +1451,7 @@ impl HttpConnector&lt;TokioThreadpoolGaiResolver&gt; {
 }
 
 <span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">ConnectError</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">msg</span>)<span class="question-mark">?</span>;
 
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">cause</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">cause</span> {
@@ -1526,9 +1527,9 @@ impl HttpConnector&lt;TokioThreadpoolGaiResolver&gt; {
 }
 
 <span class="kw">impl</span> <span class="ident">ConnectingTcpRemote</span> {
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">connect</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">config</span>: <span class="kw-2">&amp;</span><span class="ident">Config</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">TcpStream</span>, <span class="ident">ConnectError</span><span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">connect</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">config</span>: <span class="kw-2">&amp;</span><span class="ident">Config</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">TcpStream</span>, <span class="ident">ConnectError</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">err</span> <span class="op">=</span> <span class="prelude-val">None</span>;
-        <span class="kw">for</span> <span class="ident">addr</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">addrs</span> {
+        <span class="kw">for</span> <span class="ident">addr</span> <span class="kw">in</span> <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">addrs</span> {
             <span class="macro">debug!</span>(<span class="string">&quot;connecting to {}&quot;</span>, <span class="ident">addr</span>);
             <span class="kw">match</span> <span class="ident">connect</span>(<span class="kw-2">&amp;</span><span class="ident">addr</span>, <span class="ident">config</span>, <span class="self">self</span>.<span class="ident">connect_timeout</span>)<span class="question-mark">?</span>.<span class="kw">await</span> {
                 <span class="prelude-val">Ok</span>(<span class="ident">tcp</span>) =&gt; {
@@ -2002,5 +2003,4 @@ impl HttpConnector&lt;TokioThreadpoolGaiResolver&gt; {
 }
 </code></pre></div>
 </section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="hyper" data-search-index-js="../../../../search-index.js" data-search-js="../../../../search.js"></div>
-    <script src="../../../../main.js"></script><script src="../../../../source-script.js"></script><script src="../../../../source-files.js"></script>
 </body></html>

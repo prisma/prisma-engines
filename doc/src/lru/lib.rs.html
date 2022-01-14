@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;lru-0.6.6&#x2F;src&#x2F;lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../lru/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">   1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;lru-0.6.6&#x2F;src&#x2F;lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><script defer src="../../main.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script>
+    <noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../lru/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">   1</span>
 <span id="2">   2</span>
 <span id="3">   3</span>
 <span id="4">   4</span>
@@ -1716,11 +1717,11 @@
 <span class="comment">// Struct used to hold a reference to a key</span>
 <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">KeyRef</span><span class="op">&lt;</span><span class="ident">K</span><span class="op">&gt;</span> {
-    <span class="ident">k</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">K</span>,
+    <span class="ident">k</span>: <span class="kw-2">*const</span> <span class="ident">K</span>,
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">K</span>: <span class="ident">Hash</span><span class="op">&gt;</span> <span class="ident">Hash</span> <span class="kw">for</span> <span class="ident">KeyRef</span><span class="op">&lt;</span><span class="ident">K</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">hash</span><span class="op">&lt;</span><span class="ident">H</span>: <span class="ident">Hasher</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">state</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">H</span>) {
+    <span class="kw">fn</span> <span class="ident">hash</span><span class="op">&lt;</span><span class="ident">H</span>: <span class="ident">Hasher</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">state</span>: <span class="kw-2">&amp;mut</span> <span class="ident">H</span>) {
         <span class="kw">unsafe</span> { (<span class="kw-2">*</span><span class="self">self</span>.<span class="ident">k</span>).<span class="ident">hash</span>(<span class="ident">state</span>) }
     }
 }
@@ -1763,8 +1764,8 @@
 <span class="kw">struct</span> <span class="ident">LruEntry</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span> {
     <span class="ident">key</span>: <span class="ident">mem::MaybeUninit</span><span class="op">&lt;</span><span class="ident">K</span><span class="op">&gt;</span>,
     <span class="ident">val</span>: <span class="ident">mem::MaybeUninit</span><span class="op">&lt;</span><span class="ident">V</span><span class="op">&gt;</span>,
-    <span class="ident">prev</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">LruEntry</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span>,
-    <span class="ident">next</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">LruEntry</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span>,
+    <span class="ident">prev</span>: <span class="kw-2">*mut</span> <span class="ident">LruEntry</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span>,
+    <span class="ident">next</span>: <span class="kw-2">*mut</span> <span class="ident">LruEntry</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span>,
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span> <span class="ident">LruEntry</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span> {
@@ -1798,8 +1799,8 @@
     <span class="ident">cap</span>: <span class="ident">usize</span>,
 
     <span class="comment">// head and tail are sigil nodes to faciliate inserting entries</span>
-    <span class="ident">head</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">LruEntry</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span>,
-    <span class="ident">tail</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">LruEntry</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span>,
+    <span class="ident">head</span>: <span class="kw-2">*mut</span> <span class="ident">LruEntry</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span>,
+    <span class="ident">tail</span>: <span class="kw-2">*mut</span> <span class="ident">LruEntry</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span>,
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">K</span>: <span class="ident">Hash</span> <span class="op">+</span> <span class="ident">Eq</span>, <span class="ident">V</span><span class="op">&gt;</span> <span class="ident">LruCache</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span> {
@@ -1894,9 +1895,9 @@
     <span class="doccomment">/// assert_eq!(cache.get(&amp;1), Some(&amp;&quot;a&quot;));</span>
     <span class="doccomment">/// assert_eq!(cache.get(&amp;2), Some(&amp;&quot;beta&quot;));</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">put</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">k</span>: <span class="ident">K</span>, <span class="kw-2">mut</span> <span class="ident">v</span>: <span class="ident">V</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">V</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">put</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">k</span>: <span class="ident">K</span>, <span class="kw-2">mut</span> <span class="ident">v</span>: <span class="ident">V</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">V</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">node_ptr</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">map</span>.<span class="ident">get_mut</span>(<span class="kw-2">&amp;</span><span class="ident">KeyRef</span> { <span class="ident">k</span>: <span class="kw-2">&amp;</span><span class="ident">k</span> }).<span class="ident">map</span>(<span class="op">|</span><span class="ident">node</span><span class="op">|</span> {
-            <span class="kw">let</span> <span class="ident">node_ptr</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">LruEntry</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">node</span>;
+            <span class="kw">let</span> <span class="ident">node_ptr</span>: <span class="kw-2">*mut</span> <span class="ident">LruEntry</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">node</span>;
             <span class="ident">node_ptr</span>
         });
 
@@ -1904,7 +1905,7 @@
             <span class="prelude-val">Some</span>(<span class="ident">node_ptr</span>) =&gt; {
                 <span class="comment">// if the key is already in the cache just update its value and move it to the</span>
                 <span class="comment">// front of the list</span>
-                <span class="kw">unsafe</span> { <span class="ident">mem::swap</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">v</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> (<span class="kw-2">*</span>(<span class="kw-2">*</span><span class="ident">node_ptr</span>).<span class="ident">val</span>.<span class="ident">as_mut_ptr</span>()) <span class="kw">as</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">V</span>) }
+                <span class="kw">unsafe</span> { <span class="ident">mem::swap</span>(<span class="kw-2">&amp;mut</span> <span class="ident">v</span>, <span class="kw-2">&amp;mut</span> (<span class="kw-2">*</span>(<span class="kw-2">*</span><span class="ident">node_ptr</span>).<span class="ident">val</span>.<span class="ident">as_mut_ptr</span>()) <span class="kw">as</span> <span class="kw-2">&amp;mut</span> <span class="ident">V</span>) }
                 <span class="self">self</span>.<span class="ident">detach</span>(<span class="ident">node_ptr</span>);
                 <span class="self">self</span>.<span class="ident">attach</span>(<span class="ident">node_ptr</span>);
                 <span class="prelude-val">Some</span>(<span class="ident">v</span>)
@@ -1931,7 +1932,7 @@
                     <span class="ident">old_node</span>.<span class="ident">key</span> <span class="op">=</span> <span class="ident">mem::MaybeUninit::new</span>(<span class="ident">k</span>);
                     <span class="ident">old_node</span>.<span class="ident">val</span> <span class="op">=</span> <span class="ident">mem::MaybeUninit::new</span>(<span class="ident">v</span>);
 
-                    <span class="kw">let</span> <span class="ident">node_ptr</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">LruEntry</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw-2">*</span><span class="ident">old_node</span>;
+                    <span class="kw">let</span> <span class="ident">node_ptr</span>: <span class="kw-2">*mut</span> <span class="ident">LruEntry</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="ident">old_node</span>;
                     <span class="self">self</span>.<span class="ident">detach</span>(<span class="ident">node_ptr</span>);
 
                     <span class="ident">old_node</span>
@@ -1940,7 +1941,7 @@
                     <span class="ident">Box::new</span>(<span class="ident">LruEntry::new</span>(<span class="ident">k</span>, <span class="ident">v</span>))
                 };
 
-                <span class="kw">let</span> <span class="ident">node_ptr</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">LruEntry</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw-2">*</span><span class="ident">node</span>;
+                <span class="kw">let</span> <span class="ident">node_ptr</span>: <span class="kw-2">*mut</span> <span class="ident">LruEntry</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="ident">node</span>;
                 <span class="self">self</span>.<span class="ident">attach</span>(<span class="ident">node_ptr</span>);
 
                 <span class="kw">let</span> <span class="ident">keyref</span> <span class="op">=</span> <span class="kw">unsafe</span> { (<span class="kw-2">*</span><span class="ident">node_ptr</span>).<span class="ident">key</span>.<span class="ident">as_ptr</span>() };
@@ -1974,7 +1975,7 @@
         <span class="ident">Q</span>: <span class="ident">Hash</span> <span class="op">+</span> <span class="ident">Eq</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span>,
     {
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">node</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">map</span>.<span class="ident">get_mut</span>(<span class="ident">k</span>) {
-            <span class="kw">let</span> <span class="ident">node_ptr</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">LruEntry</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">node</span>;
+            <span class="kw">let</span> <span class="ident">node_ptr</span>: <span class="kw-2">*mut</span> <span class="ident">LruEntry</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">node</span>;
 
             <span class="self">self</span>.<span class="ident">detach</span>(<span class="ident">node_ptr</span>);
             <span class="self">self</span>.<span class="ident">attach</span>(<span class="ident">node_ptr</span>);
@@ -2009,12 +2010,12 @@
         <span class="ident">Q</span>: <span class="ident">Hash</span> <span class="op">+</span> <span class="ident">Eq</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span>,
     {
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">node</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">map</span>.<span class="ident">get_mut</span>(<span class="ident">k</span>) {
-            <span class="kw">let</span> <span class="ident">node_ptr</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">LruEntry</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">node</span>;
+            <span class="kw">let</span> <span class="ident">node_ptr</span>: <span class="kw-2">*mut</span> <span class="ident">LruEntry</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">node</span>;
 
             <span class="self">self</span>.<span class="ident">detach</span>(<span class="ident">node_ptr</span>);
             <span class="self">self</span>.<span class="ident">attach</span>(<span class="ident">node_ptr</span>);
 
-            <span class="prelude-val">Some</span>(<span class="kw">unsafe</span> { <span class="kw-2">&amp;</span><span class="kw-2">mut</span> (<span class="kw-2">*</span>(<span class="kw-2">*</span><span class="ident">node_ptr</span>).<span class="ident">val</span>.<span class="ident">as_mut_ptr</span>()) <span class="kw">as</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">V</span> })
+            <span class="prelude-val">Some</span>(<span class="kw">unsafe</span> { <span class="kw-2">&amp;mut</span> (<span class="kw-2">*</span>(<span class="kw-2">*</span><span class="ident">node_ptr</span>).<span class="ident">val</span>.<span class="ident">as_mut_ptr</span>()) <span class="kw">as</span> <span class="kw-2">&amp;mut</span> <span class="ident">V</span> })
         } <span class="kw">else</span> {
             <span class="prelude-val">None</span>
         }
@@ -2069,7 +2070,7 @@
     {
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">map</span>.<span class="ident">get_mut</span>(<span class="ident">k</span>) {
             <span class="prelude-val">None</span> =&gt; <span class="prelude-val">None</span>,
-            <span class="prelude-val">Some</span>(<span class="ident">node</span>) =&gt; <span class="prelude-val">Some</span>(<span class="kw">unsafe</span> { <span class="kw-2">&amp;</span><span class="kw-2">mut</span> (<span class="kw-2">*</span>(<span class="kw-2">*</span><span class="ident">node</span>).<span class="ident">val</span>.<span class="ident">as_mut_ptr</span>()) <span class="kw">as</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">V</span> }),
+            <span class="prelude-val">Some</span>(<span class="ident">node</span>) =&gt; <span class="prelude-val">Some</span>(<span class="kw">unsafe</span> { <span class="kw-2">&amp;mut</span> (<span class="kw-2">*</span>(<span class="kw-2">*</span><span class="ident">node</span>).<span class="ident">val</span>.<span class="ident">as_mut_ptr</span>()) <span class="kw">as</span> <span class="kw-2">&amp;mut</span> <span class="ident">V</span> }),
         }
     }
 
@@ -2144,7 +2145,7 @@
     <span class="doccomment">/// assert_eq!(cache.pop(&amp;2), None);</span>
     <span class="doccomment">/// assert_eq!(cache.len(), 0);</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">pop</span><span class="op">&lt;</span><span class="ident">Q</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">k</span>: <span class="kw-2">&amp;</span><span class="ident">Q</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">V</span><span class="op">&gt;</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">pop</span><span class="op">&lt;</span><span class="ident">Q</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">k</span>: <span class="kw-2">&amp;</span><span class="ident">Q</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">V</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">KeyRef</span><span class="op">&lt;</span><span class="ident">K</span><span class="op">&gt;</span>: <span class="ident">Borrow</span><span class="op">&lt;</span><span class="ident">Q</span><span class="op">&gt;</span>,
         <span class="ident">Q</span>: <span class="ident">Hash</span> <span class="op">+</span> <span class="ident">Eq</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span>,
@@ -2155,7 +2156,7 @@
                 <span class="kw">unsafe</span> {
                     <span class="ident">ptr::drop_in_place</span>(<span class="ident">old_node</span>.<span class="ident">key</span>.<span class="ident">as_mut_ptr</span>());
                 }
-                <span class="kw">let</span> <span class="ident">node_ptr</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">LruEntry</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw-2">*</span><span class="ident">old_node</span>;
+                <span class="kw">let</span> <span class="ident">node_ptr</span>: <span class="kw-2">*mut</span> <span class="ident">LruEntry</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="ident">old_node</span>;
                 <span class="self">self</span>.<span class="ident">detach</span>(<span class="ident">node_ptr</span>);
                 <span class="kw">unsafe</span> { <span class="prelude-val">Some</span>(<span class="ident">old_node</span>.<span class="ident">val</span>.<span class="ident">assume_init</span>()) }
             }
@@ -2181,7 +2182,7 @@
     <span class="doccomment">/// assert_eq!(cache.pop_lru(), None);</span>
     <span class="doccomment">/// assert_eq!(cache.len(), 0);</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">pop_lru</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">K</span>, <span class="ident">V</span>)<span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">pop_lru</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">K</span>, <span class="ident">V</span>)<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">node</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">remove_last</span>()<span class="question-mark">?</span>;
         <span class="comment">// N.B.: Can&#39;t destructure directly because of https://github.com/rust-lang/rust/issues/28536</span>
         <span class="kw">let</span> <span class="ident">node</span> <span class="op">=</span> <span class="kw-2">*</span><span class="ident">node</span>;
@@ -2261,7 +2262,7 @@
     <span class="doccomment">/// assert_eq!(cache.get(&amp;3), Some(&amp;&quot;c&quot;));</span>
     <span class="doccomment">/// assert_eq!(cache.get(&amp;4), Some(&amp;&quot;d&quot;));</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">resize</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">cap</span>: <span class="ident">usize</span>) {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">resize</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">cap</span>: <span class="ident">usize</span>) {
         <span class="comment">// return early if capacity doesn&#39;t change</span>
         <span class="kw">if</span> <span class="ident">cap</span> <span class="op">==</span> <span class="self">self</span>.<span class="ident">cap</span> {
             <span class="kw">return</span>;
@@ -2293,7 +2294,7 @@
     <span class="doccomment">/// cache.clear();</span>
     <span class="doccomment">/// assert_eq!(cache.len(), 0);</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">clear</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">clear</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
         <span class="kw">while</span> <span class="self">self</span>.<span class="ident">pop_lru</span>().<span class="ident">is_some</span>() {}
     }
 
@@ -2358,7 +2359,7 @@
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">remove_last</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">LruEntry</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">remove_last</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">LruEntry</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">prev</span>;
         <span class="kw">unsafe</span> { <span class="ident">prev</span> <span class="op">=</span> (<span class="kw-2">*</span><span class="self">self</span>.<span class="ident">tail</span>).<span class="ident">prev</span> }
         <span class="kw">if</span> <span class="ident">prev</span> <span class="op">!</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">head</span> {
@@ -2366,7 +2367,7 @@
                 <span class="ident">k</span>: <span class="kw">unsafe</span> { <span class="kw-2">&amp;</span>(<span class="kw-2">*</span>(<span class="kw-2">*</span>(<span class="kw-2">*</span><span class="self">self</span>.<span class="ident">tail</span>).<span class="ident">prev</span>).<span class="ident">key</span>.<span class="ident">as_ptr</span>()) },
             };
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">old_node</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">map</span>.<span class="ident">remove</span>(<span class="kw-2">&amp;</span><span class="ident">old_key</span>).<span class="ident">unwrap</span>();
-            <span class="kw">let</span> <span class="ident">node_ptr</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">LruEntry</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw-2">*</span><span class="ident">old_node</span>;
+            <span class="kw">let</span> <span class="ident">node_ptr</span>: <span class="kw-2">*mut</span> <span class="ident">LruEntry</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="ident">old_node</span>;
             <span class="self">self</span>.<span class="ident">detach</span>(<span class="ident">node_ptr</span>);
             <span class="prelude-val">Some</span>(<span class="ident">old_node</span>)
         } <span class="kw">else</span> {
@@ -2374,14 +2375,14 @@
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">detach</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">node</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">LruEntry</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span>) {
+    <span class="kw">fn</span> <span class="ident">detach</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">node</span>: <span class="kw-2">*mut</span> <span class="ident">LruEntry</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span>) {
         <span class="kw">unsafe</span> {
             (<span class="kw-2">*</span>(<span class="kw-2">*</span><span class="ident">node</span>).<span class="ident">prev</span>).<span class="ident">next</span> <span class="op">=</span> (<span class="kw-2">*</span><span class="ident">node</span>).<span class="ident">next</span>;
             (<span class="kw-2">*</span>(<span class="kw-2">*</span><span class="ident">node</span>).<span class="ident">next</span>).<span class="ident">prev</span> <span class="op">=</span> (<span class="kw-2">*</span><span class="ident">node</span>).<span class="ident">prev</span>;
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">attach</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">node</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">LruEntry</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span>) {
+    <span class="kw">fn</span> <span class="ident">attach</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">node</span>: <span class="kw-2">*mut</span> <span class="ident">LruEntry</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span>) {
         <span class="kw">unsafe</span> {
             (<span class="kw-2">*</span><span class="ident">node</span>).<span class="ident">next</span> <span class="op">=</span> (<span class="kw-2">*</span><span class="self">self</span>.<span class="ident">head</span>).<span class="ident">next</span>;
             (<span class="kw-2">*</span><span class="ident">node</span>).<span class="ident">prev</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">head</span>;
@@ -2392,7 +2393,7 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span>, <span class="ident">S</span><span class="op">&gt;</span> <span class="ident">Drop</span> <span class="kw">for</span> <span class="ident">LruCache</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span>, <span class="ident">S</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
+    <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
         <span class="self">self</span>.<span class="ident">map</span>.<span class="ident">values_mut</span>().<span class="ident">for_each</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="kw">unsafe</span> {
             <span class="ident">ptr::drop_in_place</span>(<span class="ident">e</span>.<span class="ident">key</span>.<span class="ident">as_mut_ptr</span>());
             <span class="ident">ptr::drop_in_place</span>(<span class="ident">e</span>.<span class="ident">val</span>.<span class="ident">as_mut_ptr</span>());
@@ -2431,7 +2432,7 @@
 <span class="kw">unsafe</span> <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">K</span>: <span class="ident">Sync</span>, <span class="ident">V</span>: <span class="ident">Sync</span>, <span class="ident">S</span>: <span class="ident">Sync</span><span class="op">&gt;</span> <span class="ident">Sync</span> <span class="kw">for</span> <span class="ident">LruCache</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span>, <span class="ident">S</span><span class="op">&gt;</span> {}
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">K</span>: <span class="ident">Hash</span> <span class="op">+</span> <span class="ident">Eq</span>, <span class="ident">V</span><span class="op">&gt;</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">LruCache</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;LruCache&quot;</span>)
             .<span class="ident">field</span>(<span class="string">&quot;len&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">len</span>())
             .<span class="ident">field</span>(<span class="string">&quot;cap&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">cap</span>())
@@ -2449,8 +2450,8 @@
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Iter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">K</span>: <span class="lifetime">&#39;a</span>, <span class="ident">V</span>: <span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
     <span class="ident">len</span>: <span class="ident">usize</span>,
 
-    <span class="ident">ptr</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">LruEntry</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span>,
-    <span class="ident">end</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">LruEntry</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span>,
+    <span class="ident">ptr</span>: <span class="kw-2">*const</span> <span class="ident">LruEntry</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span>,
+    <span class="ident">end</span>: <span class="kw-2">*const</span> <span class="ident">LruEntry</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span>,
 
     <span class="ident">phantom</span>: <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">K</span><span class="op">&gt;</span>,
 }
@@ -2458,7 +2459,7 @@
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span> <span class="ident">Iterator</span> <span class="kw">for</span> <span class="ident">Iter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span> {
     <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> (<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">K</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">V</span>);
 
-    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">K</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">V</span>)<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">K</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">V</span>)<span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">len</span> <span class="op">==</span> <span class="number">0</span> {
             <span class="kw">return</span> <span class="prelude-val">None</span>;
         }
@@ -2482,7 +2483,7 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span> <span class="ident">DoubleEndedIterator</span> <span class="kw">for</span> <span class="ident">Iter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">next_back</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">K</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">V</span>)<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">next_back</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">K</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">V</span>)<span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">len</span> <span class="op">==</span> <span class="number">0</span> {
             <span class="kw">return</span> <span class="prelude-val">None</span>;
         }
@@ -2526,8 +2527,8 @@
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">IterMut</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">K</span>: <span class="lifetime">&#39;a</span>, <span class="ident">V</span>: <span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
     <span class="ident">len</span>: <span class="ident">usize</span>,
 
-    <span class="ident">ptr</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">LruEntry</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span>,
-    <span class="ident">end</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">LruEntry</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span>,
+    <span class="ident">ptr</span>: <span class="kw-2">*mut</span> <span class="ident">LruEntry</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span>,
+    <span class="ident">end</span>: <span class="kw-2">*mut</span> <span class="ident">LruEntry</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span>,
 
     <span class="ident">phantom</span>: <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">K</span><span class="op">&gt;</span>,
 }
@@ -2535,13 +2536,13 @@
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span> <span class="ident">Iterator</span> <span class="kw">for</span> <span class="ident">IterMut</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span> {
     <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> (<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">K</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">V</span>);
 
-    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">K</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">V</span>)<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">K</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">V</span>)<span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">len</span> <span class="op">==</span> <span class="number">0</span> {
             <span class="kw">return</span> <span class="prelude-val">None</span>;
         }
 
-        <span class="kw">let</span> <span class="ident">key</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="kw-2">&amp;</span><span class="kw-2">mut</span> (<span class="kw-2">*</span>(<span class="kw-2">*</span><span class="self">self</span>.<span class="ident">ptr</span>).<span class="ident">key</span>.<span class="ident">as_mut_ptr</span>()) <span class="kw">as</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">K</span> };
-        <span class="kw">let</span> <span class="ident">val</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="kw-2">&amp;</span><span class="kw-2">mut</span> (<span class="kw-2">*</span>(<span class="kw-2">*</span><span class="self">self</span>.<span class="ident">ptr</span>).<span class="ident">val</span>.<span class="ident">as_mut_ptr</span>()) <span class="kw">as</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">V</span> };
+        <span class="kw">let</span> <span class="ident">key</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="kw-2">&amp;mut</span> (<span class="kw-2">*</span>(<span class="kw-2">*</span><span class="self">self</span>.<span class="ident">ptr</span>).<span class="ident">key</span>.<span class="ident">as_mut_ptr</span>()) <span class="kw">as</span> <span class="kw-2">&amp;mut</span> <span class="ident">K</span> };
+        <span class="kw">let</span> <span class="ident">val</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="kw-2">&amp;mut</span> (<span class="kw-2">*</span>(<span class="kw-2">*</span><span class="self">self</span>.<span class="ident">ptr</span>).<span class="ident">val</span>.<span class="ident">as_mut_ptr</span>()) <span class="kw">as</span> <span class="kw-2">&amp;mut</span> <span class="ident">V</span> };
 
         <span class="self">self</span>.<span class="ident">len</span> <span class="op">-</span><span class="op">=</span> <span class="number">1</span>;
         <span class="self">self</span>.<span class="ident">ptr</span> <span class="op">=</span> <span class="kw">unsafe</span> { (<span class="kw-2">*</span><span class="self">self</span>.<span class="ident">ptr</span>).<span class="ident">next</span> };
@@ -2559,13 +2560,13 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span> <span class="ident">DoubleEndedIterator</span> <span class="kw">for</span> <span class="ident">IterMut</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">next_back</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">K</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">V</span>)<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">next_back</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">K</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">V</span>)<span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">len</span> <span class="op">==</span> <span class="number">0</span> {
             <span class="kw">return</span> <span class="prelude-val">None</span>;
         }
 
-        <span class="kw">let</span> <span class="ident">key</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="kw-2">&amp;</span><span class="kw-2">mut</span> (<span class="kw-2">*</span>(<span class="kw-2">*</span><span class="self">self</span>.<span class="ident">end</span>).<span class="ident">key</span>.<span class="ident">as_mut_ptr</span>()) <span class="kw">as</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">K</span> };
-        <span class="kw">let</span> <span class="ident">val</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="kw-2">&amp;</span><span class="kw-2">mut</span> (<span class="kw-2">*</span>(<span class="kw-2">*</span><span class="self">self</span>.<span class="ident">end</span>).<span class="ident">val</span>.<span class="ident">as_mut_ptr</span>()) <span class="kw">as</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">V</span> };
+        <span class="kw">let</span> <span class="ident">key</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="kw-2">&amp;mut</span> (<span class="kw-2">*</span>(<span class="kw-2">*</span><span class="self">self</span>.<span class="ident">end</span>).<span class="ident">key</span>.<span class="ident">as_mut_ptr</span>()) <span class="kw">as</span> <span class="kw-2">&amp;mut</span> <span class="ident">K</span> };
+        <span class="kw">let</span> <span class="ident">val</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="kw-2">&amp;mut</span> (<span class="kw-2">*</span>(<span class="kw-2">*</span><span class="self">self</span>.<span class="ident">end</span>).<span class="ident">val</span>.<span class="ident">as_mut_ptr</span>()) <span class="kw">as</span> <span class="kw-2">&amp;mut</span> <span class="ident">V</span> };
 
         <span class="self">self</span>.<span class="ident">len</span> <span class="op">-</span><span class="op">=</span> <span class="number">1</span>;
         <span class="self">self</span>.<span class="ident">end</span> <span class="op">=</span> <span class="kw">unsafe</span> { (<span class="kw-2">*</span><span class="self">self</span>.<span class="ident">end</span>).<span class="ident">prev</span> };
@@ -2594,7 +2595,7 @@
         <span class="macro">assert_eq!</span>(<span class="ident">opt</span>.<span class="ident">unwrap</span>(), <span class="kw-2">&amp;</span><span class="ident">v</span>);
     }
 
-    <span class="kw">fn</span> <span class="ident">assert_opt_eq_mut</span><span class="op">&lt;</span><span class="ident">V</span>: <span class="ident">PartialEq</span> <span class="op">+</span> <span class="ident">Debug</span><span class="op">&gt;</span>(<span class="ident">opt</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">V</span><span class="op">&gt;</span>, <span class="ident">v</span>: <span class="ident">V</span>) {
+    <span class="kw">fn</span> <span class="ident">assert_opt_eq_mut</span><span class="op">&lt;</span><span class="ident">V</span>: <span class="ident">PartialEq</span> <span class="op">+</span> <span class="ident">Debug</span><span class="op">&gt;</span>(<span class="ident">opt</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="ident">V</span><span class="op">&gt;</span>, <span class="ident">v</span>: <span class="ident">V</span>) {
         <span class="macro">assert!</span>(<span class="ident">opt</span>.<span class="ident">is_some</span>());
         <span class="macro">assert_eq!</span>(<span class="ident">opt</span>.<span class="ident">unwrap</span>(), <span class="kw-2">&amp;</span><span class="ident">v</span>);
     }
@@ -2610,7 +2611,7 @@
     }
 
     <span class="kw">fn</span> <span class="ident">assert_opt_eq_mut_tuple</span><span class="op">&lt;</span><span class="ident">K</span>: <span class="ident">PartialEq</span> <span class="op">+</span> <span class="ident">Debug</span>, <span class="ident">V</span>: <span class="ident">PartialEq</span> <span class="op">+</span> <span class="ident">Debug</span><span class="op">&gt;</span>(
-        <span class="ident">opt</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="ident">K</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">V</span>)<span class="op">&gt;</span>,
+        <span class="ident">opt</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="ident">K</span>, <span class="kw-2">&amp;mut</span> <span class="ident">V</span>)<span class="op">&gt;</span>,
         <span class="ident">kv</span>: (<span class="ident">K</span>, <span class="ident">V</span>),
     ) {
         <span class="macro">assert!</span>(<span class="ident">opt</span>.<span class="ident">is_some</span>());
@@ -3058,7 +3059,7 @@
         <span class="ident">assert_opt_eq_tuple</span>(<span class="ident">iter</span>.<span class="ident">next</span>(), (<span class="string">&quot;c&quot;</span>, <span class="number">3</span>));
 
         {
-            <span class="kw">let</span> <span class="ident">iter_ref</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">iter</span>;
+            <span class="kw">let</span> <span class="ident">iter_ref</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="ident">iter</span>;
             <span class="ident">pool</span>.<span class="ident">scoped</span>(<span class="op">|</span><span class="ident">scoped</span><span class="op">|</span> {
                 <span class="ident">scoped</span>.<span class="ident">execute</span>(<span class="kw">move</span> <span class="op">|</span><span class="op">|</span> {
                     <span class="macro">assert_eq!</span>(<span class="ident">iter_ref</span>.<span class="ident">len</span>(), <span class="number">2</span>);
@@ -3155,7 +3156,7 @@
         <span class="kw">struct</span> <span class="ident">DropCounter</span>;
 
         <span class="kw">impl</span> <span class="ident">Drop</span> <span class="kw">for</span> <span class="ident">DropCounter</span> {
-            <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
+            <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
                 <span class="ident">DROP_COUNT</span>.<span class="ident">fetch_add</span>(<span class="number">1</span>, <span class="ident">Ordering::SeqCst</span>);
             }
         }
@@ -3177,7 +3178,7 @@
         <span class="kw">struct</span> <span class="ident">DropCounter</span>;
 
         <span class="kw">impl</span> <span class="ident">Drop</span> <span class="kw">for</span> <span class="ident">DropCounter</span> {
-            <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
+            <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
                 <span class="ident">DROP_COUNT</span>.<span class="ident">fetch_add</span>(<span class="number">1</span>, <span class="ident">Ordering::SeqCst</span>);
             }
         }
@@ -3200,7 +3201,7 @@
         <span class="kw">struct</span> <span class="ident">DropCounter</span>;
 
         <span class="kw">impl</span> <span class="ident">Drop</span> <span class="kw">for</span> <span class="ident">DropCounter</span> {
-            <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
+            <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
                 <span class="ident">DROP_COUNT</span>.<span class="ident">fetch_add</span>(<span class="number">1</span>, <span class="ident">Ordering::SeqCst</span>);
             }
         }
@@ -3230,7 +3231,7 @@
         }
 
         <span class="kw">impl</span> <span class="ident">Drop</span> <span class="kw">for</span> <span class="ident">KeyDropCounter</span> {
-            <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
+            <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
                 <span class="ident">DROP_COUNT</span>.<span class="ident">fetch_add</span>(<span class="number">1</span>, <span class="ident">Ordering::SeqCst</span>);
             }
         }
@@ -3256,5 +3257,4 @@
 }
 </code></pre></div>
 </section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="lru" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>
-    <script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script>
 </body></html>

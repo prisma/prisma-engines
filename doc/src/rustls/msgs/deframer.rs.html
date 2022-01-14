@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;rustls-0.19.1&#x2F;src&#x2F;msgs&#x2F;deframer.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>deframer.rs - source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../rustls/index.html'><div class='logo-container rust-logo'><img src='../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;rustls-0.19.1&#x2F;src&#x2F;msgs&#x2F;deframer.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>deframer.rs - source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><script defer src="../../../main.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script>
+    <noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../rustls/index.html'><div class='logo-container rust-logo'><img src='../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -397,13 +398,13 @@
     <span class="doccomment">/// Read some bytes from `rd`, and add them to our internal</span>
     <span class="doccomment">/// buffer.  If this means our internal buffer contains</span>
     <span class="doccomment">/// full messages, decode them all.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">read</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">rd</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw">dyn</span> <span class="ident">io::Read</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">read</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">rd</span>: <span class="kw-2">&amp;mut</span> <span class="kw">dyn</span> <span class="ident">io::Read</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
         <span class="comment">// Try to do the largest reads possible.  Note that if</span>
         <span class="comment">// we get a message with a length field out of range here,</span>
         <span class="comment">// we do a zero length read.  That looks like an EOF to</span>
         <span class="comment">// the next layer up, which is fine.</span>
         <span class="macro">debug_assert!</span>(<span class="self">self</span>.<span class="ident">used</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">Message::MAX_WIRE_SIZE</span>);
-        <span class="kw">let</span> <span class="ident">new_bytes</span> <span class="op">=</span> <span class="ident">rd</span>.<span class="ident">read</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">buf</span>[<span class="self">self</span>.<span class="ident">used</span>..])<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">new_bytes</span> <span class="op">=</span> <span class="ident">rd</span>.<span class="ident">read</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">buf</span>[<span class="self">self</span>.<span class="ident">used</span>..])<span class="question-mark">?</span>;
 
         <span class="self">self</span>.<span class="ident">used</span> <span class="op">+</span><span class="op">=</span> <span class="ident">new_bytes</span>;
 
@@ -431,11 +432,11 @@
     <span class="doccomment">/// Does our `buf` contain a full message?  It does if it is big enough to</span>
     <span class="doccomment">/// contain a header, and that header has a length which falls within `buf`.</span>
     <span class="doccomment">/// If so, deframe it and place the message onto the frames output queue.</span>
-    <span class="kw">fn</span> <span class="ident">try_deframe_one</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident">BufferContents</span> {
+    <span class="kw">fn</span> <span class="ident">try_deframe_one</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">BufferContents</span> {
         <span class="comment">// Try to decode a message off the front of buf.</span>
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">rd</span> <span class="op">=</span> <span class="ident">codec::Reader::init</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">buf</span>[..<span class="self">self</span>.<span class="ident">used</span>]);
 
-        <span class="kw">match</span> <span class="ident">Message::read_with_detailed_error</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">rd</span>) {
+        <span class="kw">match</span> <span class="ident">Message::read_with_detailed_error</span>(<span class="kw-2">&amp;mut</span> <span class="ident">rd</span>) {
             <span class="prelude-val">Ok</span>(<span class="ident">m</span>) =&gt; {
                 <span class="kw">let</span> <span class="ident">used</span> <span class="op">=</span> <span class="ident">rd</span>.<span class="ident">used</span>();
                 <span class="self">self</span>.<span class="ident">frames</span>.<span class="ident">push_back</span>(<span class="ident">m</span>);
@@ -449,7 +450,7 @@
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">buf_consume</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">taken</span>: <span class="ident">usize</span>) {
+    <span class="kw">fn</span> <span class="ident">buf_consume</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">taken</span>: <span class="ident">usize</span>) {
         <span class="kw">if</span> <span class="ident">taken</span> <span class="op">&lt;</span> <span class="self">self</span>.<span class="ident">used</span> {
             <span class="comment">/* Before:
              * +----------+----------+----------+
@@ -497,7 +498,7 @@
     }
 
     <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">io::Read</span> <span class="kw">for</span> <span class="ident">ByteRead</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-        <span class="kw">fn</span> <span class="ident">read</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">u8</span>]) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
+        <span class="kw">fn</span> <span class="ident">read</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">u8</span>]) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">len</span> <span class="op">=</span> <span class="number">0</span>;
 
             <span class="kw">while</span> <span class="ident">len</span> <span class="op">&lt;</span> <span class="ident">buf</span>.<span class="ident">len</span>() <span class="op">&amp;&amp;</span> <span class="ident">len</span> <span class="op">&lt;</span> <span class="self">self</span>.<span class="ident">buf</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="self">self</span>.<span class="ident">offs</span> {
@@ -511,13 +512,13 @@
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">input_bytes</span>(<span class="ident">d</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">MessageDeframer</span>, <span class="ident">bytes</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">input_bytes</span>(<span class="ident">d</span>: <span class="kw-2">&amp;mut</span> <span class="ident">MessageDeframer</span>, <span class="ident">bytes</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">rd</span> <span class="op">=</span> <span class="ident">ByteRead::new</span>(<span class="ident">bytes</span>);
-        <span class="ident">d</span>.<span class="ident">read</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">rd</span>)
+        <span class="ident">d</span>.<span class="ident">read</span>(<span class="kw-2">&amp;mut</span> <span class="ident">rd</span>)
     }
 
     <span class="kw">fn</span> <span class="ident">input_bytes_concat</span>(
-        <span class="ident">d</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">MessageDeframer</span>,
+        <span class="ident">d</span>: <span class="kw-2">&amp;mut</span> <span class="ident">MessageDeframer</span>,
         <span class="ident">bytes1</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
         <span class="ident">bytes2</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
     ) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
@@ -525,7 +526,7 @@
         <span class="ident">bytes</span>[..<span class="ident">bytes1</span>.<span class="ident">len</span>()].<span class="ident">clone_from_slice</span>(<span class="ident">bytes1</span>);
         <span class="ident">bytes</span>[<span class="ident">bytes1</span>.<span class="ident">len</span>()..].<span class="ident">clone_from_slice</span>(<span class="ident">bytes2</span>);
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">rd</span> <span class="op">=</span> <span class="ident">ByteRead::new</span>(<span class="kw-2">&amp;</span><span class="ident">bytes</span>);
-        <span class="ident">d</span>.<span class="ident">read</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">rd</span>)
+        <span class="ident">d</span>.<span class="ident">read</span>(<span class="kw-2">&amp;mut</span> <span class="ident">rd</span>)
     }
 
     <span class="kw">struct</span> <span class="ident">ErrorRead</span> {
@@ -539,7 +540,7 @@
     }
 
     <span class="kw">impl</span> <span class="ident">io::Read</span> <span class="kw">for</span> <span class="ident">ErrorRead</span> {
-        <span class="kw">fn</span> <span class="ident">read</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">u8</span>]) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
+        <span class="kw">fn</span> <span class="ident">read</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">u8</span>]) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
             <span class="kw">for</span> (<span class="ident">i</span>, <span class="ident">b</span>) <span class="kw">in</span> <span class="ident">buf</span>.<span class="ident">iter_mut</span>().<span class="ident">enumerate</span>() {
                 <span class="kw-2">*</span><span class="ident">b</span> <span class="op">=</span> <span class="ident">i</span> <span class="kw">as</span> <span class="ident">u8</span>;
             }
@@ -549,14 +550,14 @@
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">input_error</span>(<span class="ident">d</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">MessageDeframer</span>) {
+    <span class="kw">fn</span> <span class="ident">input_error</span>(<span class="ident">d</span>: <span class="kw-2">&amp;mut</span> <span class="ident">MessageDeframer</span>) {
         <span class="kw">let</span> <span class="ident">error</span> <span class="op">=</span> <span class="ident">io::Error::from</span>(<span class="ident">io::ErrorKind::TimedOut</span>);
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">rd</span> <span class="op">=</span> <span class="ident">ErrorRead::new</span>(<span class="ident">error</span>);
-        <span class="ident">d</span>.<span class="ident">read</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">rd</span>)
+        <span class="ident">d</span>.<span class="ident">read</span>(<span class="kw-2">&amp;mut</span> <span class="ident">rd</span>)
             .<span class="ident">expect_err</span>(<span class="string">&quot;error not propagated&quot;</span>);
     }
 
-    <span class="kw">fn</span> <span class="ident">input_whole_incremental</span>(<span class="ident">d</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">MessageDeframer</span>, <span class="ident">bytes</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) {
+    <span class="kw">fn</span> <span class="ident">input_whole_incremental</span>(<span class="ident">d</span>: <span class="kw-2">&amp;mut</span> <span class="ident">MessageDeframer</span>, <span class="ident">bytes</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) {
         <span class="kw">let</span> <span class="ident">frames_before</span> <span class="op">=</span> <span class="ident">d</span>.<span class="ident">frames</span>.<span class="ident">len</span>();
 
         <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="number">0</span>..<span class="ident">bytes</span>.<span class="ident">len</span>() {
@@ -579,13 +580,13 @@
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">pop_first</span>(<span class="ident">d</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">MessageDeframer</span>) {
+    <span class="kw">fn</span> <span class="ident">pop_first</span>(<span class="ident">d</span>: <span class="kw-2">&amp;mut</span> <span class="ident">MessageDeframer</span>) {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">m</span> <span class="op">=</span> <span class="ident">d</span>.<span class="ident">frames</span>.<span class="ident">pop_front</span>().<span class="ident">unwrap</span>();
         <span class="ident">m</span>.<span class="ident">decode_payload</span>();
         <span class="macro">assert_eq!</span>(<span class="ident">m</span>.<span class="ident">typ</span>, <span class="ident">msgs::enums::ContentType::Handshake</span>);
     }
 
-    <span class="kw">fn</span> <span class="ident">pop_second</span>(<span class="ident">d</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">MessageDeframer</span>) {
+    <span class="kw">fn</span> <span class="ident">pop_second</span>(<span class="ident">d</span>: <span class="kw-2">&amp;mut</span> <span class="ident">MessageDeframer</span>) {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">m</span> <span class="op">=</span> <span class="ident">d</span>.<span class="ident">frames</span>.<span class="ident">pop_front</span>().<span class="ident">unwrap</span>();
         <span class="ident">m</span>.<span class="ident">decode_payload</span>();
         <span class="macro">assert_eq!</span>(<span class="ident">m</span>.<span class="ident">typ</span>, <span class="ident">msgs::enums::ContentType::Alert</span>);
@@ -595,10 +596,10 @@
     <span class="kw">fn</span> <span class="ident">check_incremental</span>() {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">d</span> <span class="op">=</span> <span class="ident">MessageDeframer::new</span>();
         <span class="macro">assert_eq!</span>(<span class="ident">d</span>.<span class="ident">has_pending</span>(), <span class="bool-val">false</span>);
-        <span class="ident">input_whole_incremental</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">d</span>, <span class="ident">FIRST_MESSAGE</span>);
+        <span class="ident">input_whole_incremental</span>(<span class="kw-2">&amp;mut</span> <span class="ident">d</span>, <span class="ident">FIRST_MESSAGE</span>);
         <span class="macro">assert_eq!</span>(<span class="ident">d</span>.<span class="ident">has_pending</span>(), <span class="bool-val">true</span>);
         <span class="macro">assert_eq!</span>(<span class="number">1</span>, <span class="ident">d</span>.<span class="ident">frames</span>.<span class="ident">len</span>());
-        <span class="ident">pop_first</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">d</span>);
+        <span class="ident">pop_first</span>(<span class="kw-2">&amp;mut</span> <span class="ident">d</span>);
         <span class="macro">assert_eq!</span>(<span class="ident">d</span>.<span class="ident">has_pending</span>(), <span class="bool-val">false</span>);
     }
 
@@ -606,14 +607,14 @@
     <span class="kw">fn</span> <span class="ident">check_incremental_2</span>() {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">d</span> <span class="op">=</span> <span class="ident">MessageDeframer::new</span>();
         <span class="macro">assert_eq!</span>(<span class="ident">d</span>.<span class="ident">has_pending</span>(), <span class="bool-val">false</span>);
-        <span class="ident">input_whole_incremental</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">d</span>, <span class="ident">FIRST_MESSAGE</span>);
+        <span class="ident">input_whole_incremental</span>(<span class="kw-2">&amp;mut</span> <span class="ident">d</span>, <span class="ident">FIRST_MESSAGE</span>);
         <span class="macro">assert_eq!</span>(<span class="ident">d</span>.<span class="ident">has_pending</span>(), <span class="bool-val">true</span>);
-        <span class="ident">input_whole_incremental</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">d</span>, <span class="ident">SECOND_MESSAGE</span>);
+        <span class="ident">input_whole_incremental</span>(<span class="kw-2">&amp;mut</span> <span class="ident">d</span>, <span class="ident">SECOND_MESSAGE</span>);
         <span class="macro">assert_eq!</span>(<span class="ident">d</span>.<span class="ident">has_pending</span>(), <span class="bool-val">true</span>);
         <span class="macro">assert_eq!</span>(<span class="number">2</span>, <span class="ident">d</span>.<span class="ident">frames</span>.<span class="ident">len</span>());
-        <span class="ident">pop_first</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">d</span>);
+        <span class="ident">pop_first</span>(<span class="kw-2">&amp;mut</span> <span class="ident">d</span>);
         <span class="macro">assert_eq!</span>(<span class="ident">d</span>.<span class="ident">has_pending</span>(), <span class="bool-val">true</span>);
-        <span class="ident">pop_second</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">d</span>);
+        <span class="ident">pop_second</span>(<span class="kw-2">&amp;mut</span> <span class="ident">d</span>);
         <span class="macro">assert_eq!</span>(<span class="ident">d</span>.<span class="ident">has_pending</span>(), <span class="bool-val">false</span>);
     }
 
@@ -621,10 +622,10 @@
     <span class="kw">fn</span> <span class="ident">check_whole</span>() {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">d</span> <span class="op">=</span> <span class="ident">MessageDeframer::new</span>();
         <span class="macro">assert_eq!</span>(<span class="ident">d</span>.<span class="ident">has_pending</span>(), <span class="bool-val">false</span>);
-        <span class="ident">assert_len</span>(<span class="ident">FIRST_MESSAGE</span>.<span class="ident">len</span>(), <span class="ident">input_bytes</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">d</span>, <span class="ident">FIRST_MESSAGE</span>));
+        <span class="ident">assert_len</span>(<span class="ident">FIRST_MESSAGE</span>.<span class="ident">len</span>(), <span class="ident">input_bytes</span>(<span class="kw-2">&amp;mut</span> <span class="ident">d</span>, <span class="ident">FIRST_MESSAGE</span>));
         <span class="macro">assert_eq!</span>(<span class="ident">d</span>.<span class="ident">has_pending</span>(), <span class="bool-val">true</span>);
         <span class="macro">assert_eq!</span>(<span class="ident">d</span>.<span class="ident">frames</span>.<span class="ident">len</span>(), <span class="number">1</span>);
-        <span class="ident">pop_first</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">d</span>);
+        <span class="ident">pop_first</span>(<span class="kw-2">&amp;mut</span> <span class="ident">d</span>);
         <span class="macro">assert_eq!</span>(<span class="ident">d</span>.<span class="ident">has_pending</span>(), <span class="bool-val">false</span>);
     }
 
@@ -632,11 +633,11 @@
     <span class="kw">fn</span> <span class="ident">check_whole_2</span>() {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">d</span> <span class="op">=</span> <span class="ident">MessageDeframer::new</span>();
         <span class="macro">assert_eq!</span>(<span class="ident">d</span>.<span class="ident">has_pending</span>(), <span class="bool-val">false</span>);
-        <span class="ident">assert_len</span>(<span class="ident">FIRST_MESSAGE</span>.<span class="ident">len</span>(), <span class="ident">input_bytes</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">d</span>, <span class="ident">FIRST_MESSAGE</span>));
-        <span class="ident">assert_len</span>(<span class="ident">SECOND_MESSAGE</span>.<span class="ident">len</span>(), <span class="ident">input_bytes</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">d</span>, <span class="ident">SECOND_MESSAGE</span>));
+        <span class="ident">assert_len</span>(<span class="ident">FIRST_MESSAGE</span>.<span class="ident">len</span>(), <span class="ident">input_bytes</span>(<span class="kw-2">&amp;mut</span> <span class="ident">d</span>, <span class="ident">FIRST_MESSAGE</span>));
+        <span class="ident">assert_len</span>(<span class="ident">SECOND_MESSAGE</span>.<span class="ident">len</span>(), <span class="ident">input_bytes</span>(<span class="kw-2">&amp;mut</span> <span class="ident">d</span>, <span class="ident">SECOND_MESSAGE</span>));
         <span class="macro">assert_eq!</span>(<span class="ident">d</span>.<span class="ident">frames</span>.<span class="ident">len</span>(), <span class="number">2</span>);
-        <span class="ident">pop_first</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">d</span>);
-        <span class="ident">pop_second</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">d</span>);
+        <span class="ident">pop_first</span>(<span class="kw-2">&amp;mut</span> <span class="ident">d</span>);
+        <span class="ident">pop_second</span>(<span class="kw-2">&amp;mut</span> <span class="ident">d</span>);
         <span class="macro">assert_eq!</span>(<span class="ident">d</span>.<span class="ident">has_pending</span>(), <span class="bool-val">false</span>);
     }
 
@@ -646,11 +647,11 @@
         <span class="macro">assert_eq!</span>(<span class="ident">d</span>.<span class="ident">has_pending</span>(), <span class="bool-val">false</span>);
         <span class="ident">assert_len</span>(
             <span class="ident">FIRST_MESSAGE</span>.<span class="ident">len</span>() <span class="op">+</span> <span class="ident">SECOND_MESSAGE</span>.<span class="ident">len</span>(),
-            <span class="ident">input_bytes_concat</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">d</span>, <span class="ident">FIRST_MESSAGE</span>, <span class="ident">SECOND_MESSAGE</span>),
+            <span class="ident">input_bytes_concat</span>(<span class="kw-2">&amp;mut</span> <span class="ident">d</span>, <span class="ident">FIRST_MESSAGE</span>, <span class="ident">SECOND_MESSAGE</span>),
         );
         <span class="macro">assert_eq!</span>(<span class="ident">d</span>.<span class="ident">frames</span>.<span class="ident">len</span>(), <span class="number">2</span>);
-        <span class="ident">pop_first</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">d</span>);
-        <span class="ident">pop_second</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">d</span>);
+        <span class="ident">pop_first</span>(<span class="kw-2">&amp;mut</span> <span class="ident">d</span>);
+        <span class="ident">pop_second</span>(<span class="kw-2">&amp;mut</span> <span class="ident">d</span>);
         <span class="macro">assert_eq!</span>(<span class="ident">d</span>.<span class="ident">has_pending</span>(), <span class="bool-val">false</span>);
     }
 
@@ -660,29 +661,28 @@
         <span class="macro">assert_eq!</span>(<span class="ident">d</span>.<span class="ident">has_pending</span>(), <span class="bool-val">false</span>);
         <span class="ident">assert_len</span>(
             <span class="ident">FIRST_MESSAGE</span>.<span class="ident">len</span>() <span class="op">+</span> <span class="ident">SECOND_MESSAGE</span>.<span class="ident">len</span>(),
-            <span class="ident">input_bytes_concat</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">d</span>, <span class="ident">SECOND_MESSAGE</span>, <span class="ident">FIRST_MESSAGE</span>),
+            <span class="ident">input_bytes_concat</span>(<span class="kw-2">&amp;mut</span> <span class="ident">d</span>, <span class="ident">SECOND_MESSAGE</span>, <span class="ident">FIRST_MESSAGE</span>),
         );
         <span class="macro">assert_eq!</span>(<span class="ident">d</span>.<span class="ident">frames</span>.<span class="ident">len</span>(), <span class="number">2</span>);
-        <span class="ident">pop_second</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">d</span>);
-        <span class="ident">pop_first</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">d</span>);
+        <span class="ident">pop_second</span>(<span class="kw-2">&amp;mut</span> <span class="ident">d</span>);
+        <span class="ident">pop_first</span>(<span class="kw-2">&amp;mut</span> <span class="ident">d</span>);
         <span class="macro">assert_eq!</span>(<span class="ident">d</span>.<span class="ident">has_pending</span>(), <span class="bool-val">false</span>);
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">test_incremental_with_nonfatal_read_error</span>() {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">d</span> <span class="op">=</span> <span class="ident">MessageDeframer::new</span>();
-        <span class="ident">assert_len</span>(<span class="number">3</span>, <span class="ident">input_bytes</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">d</span>, <span class="kw-2">&amp;</span><span class="ident">FIRST_MESSAGE</span>[..<span class="number">3</span>]));
-        <span class="ident">input_error</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">d</span>);
+        <span class="ident">assert_len</span>(<span class="number">3</span>, <span class="ident">input_bytes</span>(<span class="kw-2">&amp;mut</span> <span class="ident">d</span>, <span class="kw-2">&amp;</span><span class="ident">FIRST_MESSAGE</span>[..<span class="number">3</span>]));
+        <span class="ident">input_error</span>(<span class="kw-2">&amp;mut</span> <span class="ident">d</span>);
         <span class="ident">assert_len</span>(
             <span class="ident">FIRST_MESSAGE</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="number">3</span>,
-            <span class="ident">input_bytes</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">d</span>, <span class="kw-2">&amp;</span><span class="ident">FIRST_MESSAGE</span>[<span class="number">3</span>..]),
+            <span class="ident">input_bytes</span>(<span class="kw-2">&amp;mut</span> <span class="ident">d</span>, <span class="kw-2">&amp;</span><span class="ident">FIRST_MESSAGE</span>[<span class="number">3</span>..]),
         );
         <span class="macro">assert_eq!</span>(<span class="ident">d</span>.<span class="ident">frames</span>.<span class="ident">len</span>(), <span class="number">1</span>);
-        <span class="ident">pop_first</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">d</span>);
+        <span class="ident">pop_first</span>(<span class="kw-2">&amp;mut</span> <span class="ident">d</span>);
         <span class="macro">assert_eq!</span>(<span class="ident">d</span>.<span class="ident">has_pending</span>(), <span class="bool-val">false</span>);
     }
 }
 </code></pre></div>
 </section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="rustls" data-search-index-js="../../../search-index.js" data-search-js="../../../search.js"></div>
-    <script src="../../../main.js"></script><script src="../../../source-script.js"></script><script src="../../../source-files.js"></script>
 </body></html>

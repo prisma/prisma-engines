@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;rustls-0.19.1&#x2F;src&#x2F;server&#x2F;tls13.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>tls13.rs - source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../rustls/index.html'><div class='logo-container rust-logo'><img src='../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">   1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;rustls-0.19.1&#x2F;src&#x2F;server&#x2F;tls13.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>tls13.rs - source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><script defer src="../../../main.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script>
+    <noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../rustls/index.html'><div class='logo-container rust-logo'><img src='../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">   1</span>
 <span id="2">   2</span>
 <span id="3">   3</span>
 <span id="4">   4</span>
@@ -1256,7 +1257,7 @@
 <span class="kw">impl</span> <span class="ident">CompleteClientHelloHandling</span> {
     <span class="kw">fn</span> <span class="ident">check_binder</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">sess</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ServerSessionImpl</span>,
+        <span class="ident">sess</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ServerSessionImpl</span>,
         <span class="ident">client_hello</span>: <span class="kw-2">&amp;</span><span class="ident">Message</span>,
         <span class="ident">psk</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
         <span class="ident">binder</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
@@ -1313,8 +1314,8 @@
     }
 
     <span class="kw">fn</span> <span class="ident">emit_server_hello</span>(
-        <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
-        <span class="ident">sess</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ServerSessionImpl</span>,
+        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
+        <span class="ident">sess</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ServerSessionImpl</span>,
         <span class="ident">session_id</span>: <span class="kw-2">&amp;</span><span class="ident">SessionID</span>,
         <span class="ident">share</span>: <span class="kw-2">&amp;</span><span class="ident">KeyShareEntry</span>,
         <span class="ident">chosen_psk_idx</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>,
@@ -1428,7 +1429,7 @@
         <span class="prelude-val">Ok</span>(<span class="ident">key_schedule</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">emit_fake_ccs</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">sess</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ServerSessionImpl</span>) {
+    <span class="kw">fn</span> <span class="ident">emit_fake_ccs</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">sess</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ServerSessionImpl</span>) {
         <span class="kw">if</span> <span class="ident">sess</span>.<span class="ident">common</span>.<span class="ident">is_quic</span>() {
             <span class="kw">return</span>;
         }
@@ -1440,7 +1441,7 @@
         <span class="ident">sess</span>.<span class="ident">common</span>.<span class="ident">send_msg</span>(<span class="ident">m</span>, <span class="bool-val">false</span>);
     }
 
-    <span class="kw">fn</span> <span class="ident">emit_hello_retry_request</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">sess</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ServerSessionImpl</span>, <span class="ident">group</span>: <span class="ident">NamedGroup</span>) {
+    <span class="kw">fn</span> <span class="ident">emit_hello_retry_request</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">sess</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ServerSessionImpl</span>, <span class="ident">group</span>: <span class="ident">NamedGroup</span>) {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">req</span> <span class="op">=</span> <span class="ident">HelloRetryRequest</span> {
             <span class="ident">legacy_version</span>: <span class="ident">ProtocolVersion::TLSv1_2</span>,
             <span class="ident">session_id</span>: <span class="ident">SessionID::empty</span>(),
@@ -1475,9 +1476,9 @@
     }
 
     <span class="kw">fn</span> <span class="ident">emit_encrypted_extensions</span>(
-        <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
-        <span class="ident">sess</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ServerSessionImpl</span>,
-        <span class="ident">server_key</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">sign::CertifiedKey</span>,
+        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
+        <span class="ident">sess</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ServerSessionImpl</span>,
+        <span class="ident">server_key</span>: <span class="kw-2">&amp;mut</span> <span class="ident">sign::CertifiedKey</span>,
         <span class="ident">hello</span>: <span class="kw-2">&amp;</span><span class="ident">ClientHelloPayload</span>,
         <span class="ident">resumedata</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">persist::ServerSessionValue</span><span class="op">&gt;</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">TLSError</span><span class="op">&gt;</span> {
@@ -1505,8 +1506,8 @@
     }
 
     <span class="kw">fn</span> <span class="ident">emit_certificate_req_tls13</span>(
-        <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
-        <span class="ident">sess</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ServerSessionImpl</span>,
+        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
+        <span class="ident">sess</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ServerSessionImpl</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">bool</span>, <span class="ident">TLSError</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="op">!</span><span class="ident">sess</span>.<span class="ident">config</span>.<span class="ident">verifier</span>.<span class="ident">offer_client_auth</span>() {
             <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="bool-val">false</span>);
@@ -1558,9 +1559,9 @@
     }
 
     <span class="kw">fn</span> <span class="ident">emit_certificate_tls13</span>(
-        <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
-        <span class="ident">sess</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ServerSessionImpl</span>,
-        <span class="ident">server_key</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">sign::CertifiedKey</span>,
+        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
+        <span class="ident">sess</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ServerSessionImpl</span>,
+        <span class="ident">server_key</span>: <span class="kw-2">&amp;mut</span> <span class="ident">sign::CertifiedKey</span>,
     ) {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cert_entries</span> <span class="op">=</span> <span class="macro">vec!</span>[];
         <span class="kw">for</span> <span class="ident">cert</span> <span class="kw">in</span> <span class="ident">server_key</span>.<span class="ident">take_cert</span>() {
@@ -1612,9 +1613,9 @@
     }
 
     <span class="kw">fn</span> <span class="ident">emit_certificate_verify_tls13</span>(
-        <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
-        <span class="ident">sess</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ServerSessionImpl</span>,
-        <span class="ident">server_key</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">sign::CertifiedKey</span>,
+        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
+        <span class="ident">sess</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ServerSessionImpl</span>,
+        <span class="ident">server_key</span>: <span class="kw-2">&amp;mut</span> <span class="ident">sign::CertifiedKey</span>,
         <span class="ident">schemes</span>: <span class="kw-2">&amp;</span>[<span class="ident">SignatureScheme</span>],
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">TLSError</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">message</span> <span class="op">=</span> <span class="ident">verify::construct_tls13_server_verify_message</span>(
@@ -1652,8 +1653,8 @@
     }
 
     <span class="kw">fn</span> <span class="ident">emit_finished_tls13</span>(
-        <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
-        <span class="ident">sess</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ServerSessionImpl</span>,
+        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
+        <span class="ident">sess</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ServerSessionImpl</span>,
         <span class="ident">key_schedule</span>: <span class="ident">KeyScheduleHandshake</span>,
     ) -&gt; <span class="ident">KeyScheduleTrafficWithClientFinishedPending</span> {
         <span class="kw">let</span> <span class="ident">handshake_hash</span> <span class="op">=</span> <span class="self">self</span>
@@ -1719,8 +1720,8 @@
     }
 
     <span class="kw">fn</span> <span class="ident">attempt_tls13_ticket_decryption</span>(
-        <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
-        <span class="ident">sess</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ServerSessionImpl</span>,
+        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
+        <span class="ident">sess</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ServerSessionImpl</span>,
         <span class="ident">ticket</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
     ) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">persist::ServerSessionValue</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="ident">sess</span>.<span class="ident">config</span>.<span class="ident">ticketer</span>.<span class="ident">enabled</span>() {
@@ -1738,7 +1739,7 @@
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">handle_client_hello</span>(
         <span class="kw-2">mut</span> <span class="self">self</span>,
-        <span class="ident">sess</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ServerSessionImpl</span>,
+        <span class="ident">sess</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ServerSessionImpl</span>,
         <span class="kw-2">mut</span> <span class="ident">server_key</span>: <span class="ident">sign::CertifiedKey</span>,
         <span class="ident">chm</span>: <span class="kw-2">&amp;</span><span class="ident">Message</span>,
     ) -&gt; <span class="ident">hs::NextStateOrError</span> {
@@ -1886,12 +1887,12 @@
         <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">done_retry</span> {
             <span class="self">self</span>.<span class="ident">emit_fake_ccs</span>(<span class="ident">sess</span>);
         }
-        <span class="self">self</span>.<span class="ident">emit_encrypted_extensions</span>(<span class="ident">sess</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">server_key</span>, <span class="ident">client_hello</span>, <span class="ident">resumedata</span>.<span class="ident">as_ref</span>())<span class="question-mark">?</span>;
+        <span class="self">self</span>.<span class="ident">emit_encrypted_extensions</span>(<span class="ident">sess</span>, <span class="kw-2">&amp;mut</span> <span class="ident">server_key</span>, <span class="ident">client_hello</span>, <span class="ident">resumedata</span>.<span class="ident">as_ref</span>())<span class="question-mark">?</span>;
 
         <span class="kw">let</span> <span class="ident">doing_client_auth</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">full_handshake</span> {
             <span class="kw">let</span> <span class="ident">client_auth</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">emit_certificate_req_tls13</span>(<span class="ident">sess</span>)<span class="question-mark">?</span>;
-            <span class="self">self</span>.<span class="ident">emit_certificate_tls13</span>(<span class="ident">sess</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">server_key</span>);
-            <span class="self">self</span>.<span class="ident">emit_certificate_verify_tls13</span>(<span class="ident">sess</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">server_key</span>, <span class="kw-2">&amp;</span><span class="ident">sigschemes_ext</span>)<span class="question-mark">?</span>;
+            <span class="self">self</span>.<span class="ident">emit_certificate_tls13</span>(<span class="ident">sess</span>, <span class="kw-2">&amp;mut</span> <span class="ident">server_key</span>);
+            <span class="self">self</span>.<span class="ident">emit_certificate_verify_tls13</span>(<span class="ident">sess</span>, <span class="kw-2">&amp;mut</span> <span class="ident">server_key</span>, <span class="kw-2">&amp;</span><span class="ident">sigschemes_ext</span>)<span class="question-mark">?</span>;
             <span class="ident">client_auth</span>
         } <span class="kw">else</span> {
             <span class="bool-val">false</span>
@@ -1936,7 +1937,7 @@
 <span class="kw">impl</span> <span class="ident">hs::State</span> <span class="kw">for</span> <span class="ident">ExpectCertificate</span> {
     <span class="kw">fn</span> <span class="ident">handle</span>(
         <span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>,
-        <span class="ident">sess</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ServerSessionImpl</span>,
+        <span class="ident">sess</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ServerSessionImpl</span>,
         <span class="ident">m</span>: <span class="ident">Message</span>,
     ) -&gt; <span class="ident">hs::NextStateOrError</span> {
         <span class="kw">let</span> <span class="ident">certp</span> <span class="op">=</span> <span class="macro">require_handshake_msg!</span>(
@@ -2016,7 +2017,7 @@
 <span class="kw">impl</span> <span class="ident">hs::State</span> <span class="kw">for</span> <span class="ident">ExpectCertificateVerify</span> {
     <span class="kw">fn</span> <span class="ident">handle</span>(
         <span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>,
-        <span class="ident">sess</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ServerSessionImpl</span>,
+        <span class="ident">sess</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ServerSessionImpl</span>,
         <span class="ident">m</span>: <span class="ident">Message</span>,
     ) -&gt; <span class="ident">hs::NextStateOrError</span> {
         <span class="kw">let</span> <span class="ident">rc</span> <span class="op">=</span> {
@@ -2058,7 +2059,7 @@
 
 <span class="comment">// --- Process client&#39;s Finished ---</span>
 <span class="kw">fn</span> <span class="ident">get_server_session_value</span>(
-    <span class="ident">handshake</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">HandshakeDetails</span>,
+    <span class="ident">handshake</span>: <span class="kw-2">&amp;mut</span> <span class="ident">HandshakeDetails</span>,
     <span class="ident">key_schedule</span>: <span class="kw-2">&amp;</span><span class="ident">KeyScheduleTraffic</span>,
     <span class="ident">sess</span>: <span class="kw-2">&amp;</span><span class="ident">ServerSessionImpl</span>,
     <span class="ident">nonce</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
@@ -2100,8 +2101,8 @@
     }
 
     <span class="kw">fn</span> <span class="ident">emit_stateless_ticket</span>(
-        <span class="ident">handshake</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">HandshakeDetails</span>,
-        <span class="ident">sess</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ServerSessionImpl</span>,
+        <span class="ident">handshake</span>: <span class="kw-2">&amp;mut</span> <span class="ident">HandshakeDetails</span>,
+        <span class="ident">sess</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ServerSessionImpl</span>,
         <span class="ident">key_schedule</span>: <span class="kw-2">&amp;</span><span class="ident">KeyScheduleTraffic</span>,
     ) {
         <span class="kw">let</span> <span class="ident">nonce</span> <span class="op">=</span> <span class="ident">rand::random_vec</span>(<span class="number">32</span>);
@@ -2143,8 +2144,8 @@
     }
 
     <span class="kw">fn</span> <span class="ident">emit_stateful_ticket</span>(
-        <span class="ident">handshake</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">HandshakeDetails</span>,
-        <span class="ident">sess</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ServerSessionImpl</span>,
+        <span class="ident">handshake</span>: <span class="kw-2">&amp;mut</span> <span class="ident">HandshakeDetails</span>,
+        <span class="ident">sess</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ServerSessionImpl</span>,
         <span class="ident">key_schedule</span>: <span class="kw-2">&amp;</span><span class="ident">KeyScheduleTraffic</span>,
     ) {
         <span class="kw">let</span> <span class="ident">nonce</span> <span class="op">=</span> <span class="ident">rand::random_vec</span>(<span class="number">32</span>);
@@ -2192,7 +2193,7 @@
 <span class="kw">impl</span> <span class="ident">hs::State</span> <span class="kw">for</span> <span class="ident">ExpectFinished</span> {
     <span class="kw">fn</span> <span class="ident">handle</span>(
         <span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>,
-        <span class="ident">sess</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ServerSessionImpl</span>,
+        <span class="ident">sess</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ServerSessionImpl</span>,
         <span class="ident">m</span>: <span class="ident">Message</span>,
     ) -&gt; <span class="ident">hs::NextStateOrError</span> {
         <span class="kw">let</span> <span class="ident">finished</span> <span class="op">=</span>
@@ -2241,9 +2242,9 @@
 
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">send_ticket</span> {
             <span class="kw">if</span> <span class="ident">sess</span>.<span class="ident">config</span>.<span class="ident">ticketer</span>.<span class="ident">enabled</span>() {
-                <span class="ident"><span class="self">Self</span>::emit_stateless_ticket</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">handshake</span>, <span class="ident">sess</span>, <span class="kw-2">&amp;</span><span class="ident">key_schedule_traffic</span>);
+                <span class="ident"><span class="self">Self</span>::emit_stateless_ticket</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">handshake</span>, <span class="ident">sess</span>, <span class="kw-2">&amp;</span><span class="ident">key_schedule_traffic</span>);
             } <span class="kw">else</span> {
-                <span class="ident"><span class="self">Self</span>::emit_stateful_ticket</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">handshake</span>, <span class="ident">sess</span>, <span class="kw-2">&amp;</span><span class="ident">key_schedule_traffic</span>);
+                <span class="ident"><span class="self">Self</span>::emit_stateful_ticket</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">handshake</span>, <span class="ident">sess</span>, <span class="kw-2">&amp;</span><span class="ident">key_schedule_traffic</span>);
             }
         }
 
@@ -2271,15 +2272,15 @@
 }
 
 <span class="kw">impl</span> <span class="ident">ExpectTraffic</span> {
-    <span class="kw">fn</span> <span class="ident">handle_traffic</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">sess</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ServerSessionImpl</span>, <span class="kw-2">mut</span> <span class="ident">m</span>: <span class="ident">Message</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">TLSError</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">handle_traffic</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">sess</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ServerSessionImpl</span>, <span class="kw-2">mut</span> <span class="ident">m</span>: <span class="ident">Message</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">TLSError</span><span class="op">&gt;</span> {
         <span class="ident">sess</span>.<span class="ident">common</span>
             .<span class="ident">take_received_plaintext</span>(<span class="ident">m</span>.<span class="ident">take_opaque_payload</span>().<span class="ident">unwrap</span>());
         <span class="prelude-val">Ok</span>(())
     }
 
     <span class="kw">fn</span> <span class="ident">handle_key_update</span>(
-        <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
-        <span class="ident">sess</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ServerSessionImpl</span>,
+        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
+        <span class="ident">sess</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ServerSessionImpl</span>,
         <span class="ident">kur</span>: <span class="kw-2">&amp;</span><span class="ident">KeyUpdateRequest</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">TLSError</span><span class="op">&gt;</span> {
         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;quic&quot;</span>)]</span>
@@ -2323,7 +2324,7 @@
 <span class="kw">impl</span> <span class="ident">hs::State</span> <span class="kw">for</span> <span class="ident">ExpectTraffic</span> {
     <span class="kw">fn</span> <span class="ident">handle</span>(
         <span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>,
-        <span class="ident">sess</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ServerSessionImpl</span>,
+        <span class="ident">sess</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ServerSessionImpl</span>,
         <span class="ident">m</span>: <span class="ident">Message</span>,
     ) -&gt; <span class="ident">hs::NextStateOrError</span> {
         <span class="kw">if</span> <span class="ident">m</span>.<span class="ident">is_content_type</span>(<span class="ident">ContentType::ApplicationData</span>) {
@@ -2345,7 +2346,7 @@
 
     <span class="kw">fn</span> <span class="ident">export_keying_material</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">output</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">u8</span>],
+        <span class="ident">output</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">u8</span>],
         <span class="ident">label</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
         <span class="ident">context</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">TLSError</span><span class="op">&gt;</span> {
@@ -2353,7 +2354,7 @@
             .<span class="ident">export_keying_material</span>(<span class="ident">output</span>, <span class="ident">label</span>, <span class="ident">context</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">perhaps_write_key_update</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">sess</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ServerSessionImpl</span>) {
+    <span class="kw">fn</span> <span class="ident">perhaps_write_key_update</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">sess</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ServerSessionImpl</span>) {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">want_write_key_update</span> {
             <span class="self">self</span>.<span class="ident">want_write_key_update</span> <span class="op">=</span> <span class="bool-val">false</span>;
             <span class="ident">sess</span>.<span class="ident">common</span>
@@ -2378,7 +2379,7 @@
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;quic&quot;</span>)]</span>
 <span class="kw">impl</span> <span class="ident">hs::State</span> <span class="kw">for</span> <span class="ident">ExpectQUICTraffic</span> {
-    <span class="kw">fn</span> <span class="ident">handle</span>(<span class="self">self</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>, <span class="kw">_</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ServerSessionImpl</span>, <span class="ident">m</span>: <span class="ident">Message</span>) -&gt; <span class="ident">hs::NextStateOrError</span> {
+    <span class="kw">fn</span> <span class="ident">handle</span>(<span class="self">self</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>, <span class="kw">_</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ServerSessionImpl</span>, <span class="ident">m</span>: <span class="ident">Message</span>) -&gt; <span class="ident">hs::NextStateOrError</span> {
         <span class="comment">// reject all messages</span>
         <span class="ident">check_message</span>(<span class="kw-2">&amp;</span><span class="ident">m</span>, <span class="kw-2">&amp;</span>[], <span class="kw-2">&amp;</span>[])<span class="question-mark">?</span>;
         <span class="macro">unreachable!</span>();
@@ -2386,7 +2387,7 @@
 
     <span class="kw">fn</span> <span class="ident">export_keying_material</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">output</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">u8</span>],
+        <span class="ident">output</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">u8</span>],
         <span class="ident">label</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
         <span class="ident">context</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">TLSError</span><span class="op">&gt;</span> {
@@ -2396,5 +2397,4 @@
 }
 </code></pre></div>
 </section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="rustls" data-search-index-js="../../../search-index.js" data-search-js="../../../search.js"></div>
-    <script src="../../../main.js"></script><script src="../../../source-script.js"></script><script src="../../../source-files.js"></script>
 </body></html>

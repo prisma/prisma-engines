@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;rustls-0.19.1&#x2F;src&#x2F;session.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>session.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../rustls/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;rustls-0.19.1&#x2F;src&#x2F;session.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>session.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><script defer src="../../main.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script>
+    <noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../rustls/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -888,7 +889,7 @@
     <span class="doccomment">/// This function returns `Ok(0)` when the underlying `rd` does</span>
     <span class="doccomment">/// so.  This typically happens when a socket is cleanly closed,</span>
     <span class="doccomment">/// or a file is at EOF.</span>
-    <span class="kw">fn</span> <span class="ident">read_tls</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">rd</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw">dyn</span> <span class="ident">Read</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">usize</span>, <span class="ident">io::Error</span><span class="op">&gt;</span>;
+    <span class="kw">fn</span> <span class="ident">read_tls</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">rd</span>: <span class="kw-2">&amp;mut</span> <span class="kw">dyn</span> <span class="ident">Read</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">usize</span>, <span class="ident">io::Error</span><span class="op">&gt;</span>;
 
     <span class="doccomment">/// Writes TLS messages to `wr`.</span>
     <span class="doccomment">///</span>
@@ -901,7 +902,7 @@
     <span class="doccomment">/// to check if output buffer is not empty.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`wants_write`]: #tymethod.wants_write</span>
-    <span class="kw">fn</span> <span class="ident">write_tls</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">wr</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw">dyn</span> <span class="ident">Write</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">usize</span>, <span class="ident">io::Error</span><span class="op">&gt;</span>;
+    <span class="kw">fn</span> <span class="ident">write_tls</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">wr</span>: <span class="kw-2">&amp;mut</span> <span class="kw">dyn</span> <span class="ident">Write</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">usize</span>, <span class="ident">io::Error</span><span class="op">&gt;</span>;
 
     <span class="doccomment">/// Processes any new packets read by a previous call to `read_tls`.</span>
     <span class="doccomment">/// Errors from this function relate to TLS protocol errors, and</span>
@@ -910,7 +911,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Success from this function can mean new plaintext is available:</span>
     <span class="doccomment">/// obtain it using `read`.</span>
-    <span class="kw">fn</span> <span class="ident">process_new_packets</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">TLSError</span><span class="op">&gt;</span>;
+    <span class="kw">fn</span> <span class="ident">process_new_packets</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">TLSError</span><span class="op">&gt;</span>;
 
     <span class="doccomment">/// Returns true if the caller should call `read_tls` as soon</span>
     <span class="doccomment">/// as possible.</span>
@@ -931,12 +932,12 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// By default, there is no limit.  The limit can be set</span>
     <span class="doccomment">/// at any time, even if the current buffer use is higher.</span>
-    <span class="kw">fn</span> <span class="ident">set_buffer_limit</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">limit</span>: <span class="ident">usize</span>);
+    <span class="kw">fn</span> <span class="ident">set_buffer_limit</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">limit</span>: <span class="ident">usize</span>);
 
     <span class="doccomment">/// Queues a close_notify fatal alert to be sent in the next</span>
     <span class="doccomment">/// `write_tls` call.  This informs the peer that the</span>
     <span class="doccomment">/// connection is being closed.</span>
-    <span class="kw">fn</span> <span class="ident">send_close_notify</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>);
+    <span class="kw">fn</span> <span class="ident">send_close_notify</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>);
 
     <span class="doccomment">/// Retrieves the certificate chain used by the peer to authenticate.</span>
     <span class="doccomment">///</span>
@@ -980,7 +981,7 @@
     <span class="doccomment">/// check with `is_handshaking()` first.</span>
     <span class="kw">fn</span> <span class="ident">export_keying_material</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">output</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">u8</span>],
+        <span class="ident">output</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">u8</span>],
         <span class="ident">label</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
         <span class="ident">context</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">TLSError</span><span class="op">&gt;</span>;
@@ -1012,7 +1013,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Errors from TLS record handling (ie, from `process_new_packets()`)</span>
     <span class="doccomment">/// are wrapped in an `io::ErrorKind::InvalidData`-kind error.</span>
-    <span class="kw">fn</span> <span class="ident">complete_io</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">io</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">T</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">usize</span>, <span class="ident">usize</span>), <span class="ident">io::Error</span><span class="op">&gt;</span>
+    <span class="kw">fn</span> <span class="ident">complete_io</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">io</span>: <span class="kw-2">&amp;mut</span> <span class="ident">T</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">usize</span>, <span class="ident">usize</span>), <span class="ident">io::Error</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="self">Self</span>: <span class="ident">Sized</span>,
         <span class="ident">T</span>: <span class="ident">Read</span> <span class="op">+</span> <span class="ident">Write</span>,
@@ -1084,7 +1085,7 @@
             <span class="ident">server</span>: [<span class="number">0u8</span>; <span class="number">32</span>],
         };
 
-        <span class="ident">rand::fill_random</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ret</span>.<span class="ident">server</span>);
+        <span class="ident">rand::fill_random</span>(<span class="kw-2">&amp;mut</span> <span class="ident">ret</span>.<span class="ident">server</span>);
         <span class="ident">ret</span>
     }
 
@@ -1095,11 +1096,11 @@
             <span class="ident">server</span>: [<span class="number">0u8</span>; <span class="number">32</span>],
         };
 
-        <span class="ident">rand::fill_random</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ret</span>.<span class="ident">client</span>);
+        <span class="ident">rand::fill_random</span>(<span class="kw-2">&amp;mut</span> <span class="ident">ret</span>.<span class="ident">client</span>);
         <span class="ident">ret</span>
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_tls12_downgrade_marker</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_tls12_downgrade_marker</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
         <span class="macro">assert!</span>(<span class="op">!</span><span class="self">self</span>.<span class="ident">we_are_client</span>);
         <span class="self">self</span>.<span class="ident">server</span>[<span class="number">24</span>..]
             .<span class="ident">as_mut</span>()
@@ -1107,7 +1108,7 @@
             .<span class="ident">unwrap</span>();
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">has_tls12_downgrade_marker</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">has_tls12_downgrade_marker</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="macro">assert!</span>(<span class="self">self</span>.<span class="ident">we_are_client</span>);
         <span class="comment">// both the server random and TLS12_DOWNGRADE_SENTINEL are</span>
         <span class="comment">// public values and don&#39;t require constant time comparison</span>
@@ -1149,7 +1150,7 @@
 
         <span class="kw">let</span> <span class="ident">randoms</span> <span class="op">=</span> <span class="ident">join_randoms</span>(<span class="kw-2">&amp;</span><span class="ident">ret</span>.<span class="ident">randoms</span>.<span class="ident">client</span>, <span class="kw-2">&amp;</span><span class="ident">ret</span>.<span class="ident">randoms</span>.<span class="ident">server</span>);
         <span class="ident">prf::prf</span>(
-            <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ret</span>.<span class="ident">master_secret</span>,
+            <span class="kw-2">&amp;mut</span> <span class="ident">ret</span>.<span class="ident">master_secret</span>,
             <span class="ident">ret</span>.<span class="ident">hash</span>,
             <span class="ident">pms</span>,
             <span class="string">b&quot;master secret&quot;</span>,
@@ -1171,7 +1172,7 @@
         };
 
         <span class="ident">prf::prf</span>(
-            <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ret</span>.<span class="ident">master_secret</span>,
+            <span class="kw-2">&amp;mut</span> <span class="ident">ret</span>.<span class="ident">master_secret</span>,
             <span class="ident">ret</span>.<span class="ident">hash</span>,
             <span class="ident">pms</span>,
             <span class="string">b&quot;extended master secret&quot;</span>,
@@ -1205,7 +1206,7 @@
         <span class="comment">// Don&#39;t design security protocols on drugs, kids.</span>
         <span class="kw">let</span> <span class="ident">randoms</span> <span class="op">=</span> <span class="ident">join_randoms</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">randoms</span>.<span class="ident">server</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">randoms</span>.<span class="ident">client</span>);
         <span class="ident">prf::prf</span>(
-            <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">out</span>,
+            <span class="kw-2">&amp;mut</span> <span class="ident">out</span>,
             <span class="self">self</span>.<span class="ident">hash</span>,
             <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">master_secret</span>,
             <span class="string">b&quot;key expansion&quot;</span>,
@@ -1226,7 +1227,7 @@
         <span class="ident">out</span>.<span class="ident">resize</span>(<span class="number">12</span>, <span class="number">0u8</span>);
 
         <span class="ident">prf::prf</span>(
-            <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">out</span>,
+            <span class="kw-2">&amp;mut</span> <span class="ident">out</span>,
             <span class="self">self</span>.<span class="ident">hash</span>,
             <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">master_secret</span>,
             <span class="ident">label</span>,
@@ -1243,13 +1244,13 @@
         <span class="self">self</span>.<span class="ident">make_verify_data</span>(<span class="ident">handshake_hash</span>, <span class="string">b&quot;server finished&quot;</span>)
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">export_keying_material</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">output</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">u8</span>], <span class="ident">label</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">context</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span>) {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">export_keying_material</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">output</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">u8</span>], <span class="ident">label</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">context</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span>) {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">randoms</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
         <span class="ident">randoms</span>.<span class="ident">extend_from_slice</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">randoms</span>.<span class="ident">client</span>);
         <span class="ident">randoms</span>.<span class="ident">extend_from_slice</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">randoms</span>.<span class="ident">server</span>);
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">context</span>) <span class="op">=</span> <span class="ident">context</span> {
             <span class="macro">assert!</span>(<span class="ident">context</span>.<span class="ident">len</span>() <span class="op">&lt;</span><span class="op">=</span> <span class="number">0xffff</span>);
-            (<span class="ident">context</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u16</span>).<span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">randoms</span>);
+            (<span class="ident">context</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u16</span>).<span class="ident">encode</span>(<span class="kw-2">&amp;mut</span> <span class="ident">randoms</span>);
             <span class="ident">randoms</span>.<span class="ident">extend_from_slice</span>(<span class="ident">context</span>);
         }
 
@@ -1335,7 +1336,7 @@
         <span class="self">self</span>.<span class="ident">suite</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>()
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_suite</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">suite</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">SupportedCipherSuite</span>) -&gt; <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_suite</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">suite</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">SupportedCipherSuite</span>) -&gt; <span class="ident">bool</span> {
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">suite</span> {
             <span class="prelude-val">None</span> =&gt; {
                 <span class="self">self</span>.<span class="ident">suite</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">suite</span>);
@@ -1349,7 +1350,7 @@
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">filter_tls13_ccs</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">msg</span>: <span class="kw-2">&amp;</span><span class="ident">Message</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">MiddleboxCCS</span>, <span class="ident">TLSError</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">filter_tls13_ccs</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">msg</span>: <span class="kw-2">&amp;</span><span class="ident">Message</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">MiddleboxCCS</span>, <span class="ident">TLSError</span><span class="op">&gt;</span> {
         <span class="comment">// pass message to handshake state machine if any of these are true:</span>
         <span class="comment">// - TLS1.2 (where it&#39;s part of the state machine),</span>
         <span class="comment">// - prior to determining the version (it&#39;s illegal as a first message)</span>
@@ -1369,7 +1370,7 @@
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">decrypt_incoming</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">encr</span>: <span class="ident">Message</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Message</span>, <span class="ident">TLSError</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">decrypt_incoming</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">encr</span>: <span class="ident">Message</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Message</span>, <span class="ident">TLSError</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="self">self</span>
             .<span class="ident">record_layer</span>
             .<span class="ident">wants_close_before_decrypt</span>()
@@ -1388,12 +1389,12 @@
         <span class="op">!</span><span class="self">self</span>.<span class="ident">received_plaintext</span>.<span class="ident">is_empty</span>()
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_buffer_limit</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">limit</span>: <span class="ident">usize</span>) {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_buffer_limit</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">limit</span>: <span class="ident">usize</span>) {
         <span class="self">self</span>.<span class="ident">sendable_plaintext</span>.<span class="ident">set_limit</span>(<span class="ident">limit</span>);
         <span class="self">self</span>.<span class="ident">sendable_tls</span>.<span class="ident">set_limit</span>(<span class="ident">limit</span>);
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">process_alert</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">msg</span>: <span class="ident">Message</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">TLSError</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">process_alert</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">msg</span>: <span class="ident">Message</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">TLSError</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="kw">let</span> <span class="ident">MessagePayload::Alert</span>(<span class="kw-2">ref</span> <span class="ident">alert</span>) <span class="op">=</span> <span class="ident">msg</span>.<span class="ident">payload</span> {
             <span class="comment">// Reject unknown AlertLevels.</span>
             <span class="kw">if</span> <span class="kw">let</span> <span class="ident">AlertLevel::Unknown</span>(<span class="kw">_</span>) <span class="op">=</span> <span class="ident">alert</span>.<span class="ident">level</span> {
@@ -1427,10 +1428,10 @@
 
     <span class="doccomment">/// Fragment `m`, encrypt the fragments, and then queue</span>
     <span class="doccomment">/// the encrypted fragments for sending.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">send_msg_encrypt</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">m</span>: <span class="ident">Message</span>) {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">send_msg_encrypt</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">m</span>: <span class="ident">Message</span>) {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">plain_messages</span> <span class="op">=</span> <span class="ident">VecDeque::new</span>();
         <span class="self">self</span>.<span class="ident">message_fragmenter</span>
-            .<span class="ident">fragment</span>(<span class="ident">m</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">plain_messages</span>);
+            .<span class="ident">fragment</span>(<span class="ident">m</span>, <span class="kw-2">&amp;mut</span> <span class="ident">plain_messages</span>);
 
         <span class="kw">for</span> <span class="ident">m</span> <span class="kw">in</span> <span class="ident">plain_messages</span> {
             <span class="self">self</span>.<span class="ident">send_single_fragment</span>(<span class="ident">m</span>.<span class="ident">to_borrowed</span>());
@@ -1438,7 +1439,7 @@
     }
 
     <span class="doccomment">/// Like send_msg_encrypt, but operate on an appdata directly.</span>
-    <span class="kw">fn</span> <span class="ident">send_appdata_encrypt</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">payload</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">limit</span>: <span class="ident">Limit</span>) -&gt; <span class="ident">usize</span> {
+    <span class="kw">fn</span> <span class="ident">send_appdata_encrypt</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">payload</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">limit</span>: <span class="ident">Limit</span>) -&gt; <span class="ident">usize</span> {
         <span class="comment">// Here, the limit on sendable_tls applies to encrypted data,</span>
         <span class="comment">// but we&#39;re respecting it for plaintext data -- so we&#39;ll</span>
         <span class="comment">// be out by whatever the cipher+record overhead is.  That&#39;s a</span>
@@ -1455,7 +1456,7 @@
             <span class="ident">ContentType::ApplicationData</span>,
             <span class="ident">ProtocolVersion::TLSv1_2</span>,
             <span class="kw-2">&amp;</span><span class="ident">payload</span>[..<span class="ident">len</span>],
-            <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">plain_messages</span>,
+            <span class="kw-2">&amp;mut</span> <span class="ident">plain_messages</span>,
         );
 
         <span class="kw">for</span> <span class="ident">m</span> <span class="kw">in</span> <span class="ident">plain_messages</span> {
@@ -1465,7 +1466,7 @@
         <span class="ident">len</span>
     }
 
-    <span class="kw">fn</span> <span class="ident">send_single_fragment</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">m</span>: <span class="ident">BorrowMessage</span>) {
+    <span class="kw">fn</span> <span class="ident">send_single_fragment</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">m</span>: <span class="ident">BorrowMessage</span>) {
         <span class="comment">// Close connection once we start to run out of</span>
         <span class="comment">// sequence space.</span>
         <span class="kw">if</span> <span class="self">self</span>
@@ -1495,11 +1496,11 @@
     <span class="doccomment">/// Read TLS content from `rd`.  This method does internal</span>
     <span class="doccomment">/// buffering, so `rd` can supply TLS messages in arbitrary-</span>
     <span class="doccomment">/// sized chunks (like a socket or pipe might).</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">read_tls</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">rd</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw">dyn</span> <span class="ident">Read</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">read_tls</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">rd</span>: <span class="kw-2">&amp;mut</span> <span class="kw">dyn</span> <span class="ident">Read</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">message_deframer</span>.<span class="ident">read</span>(<span class="ident">rd</span>)
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">write_tls</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">wr</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw">dyn</span> <span class="ident">Write</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">write_tls</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">wr</span>: <span class="kw-2">&amp;mut</span> <span class="kw">dyn</span> <span class="ident">Write</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">sendable_tls</span>.<span class="ident">write_to</span>(<span class="ident">wr</span>)
     }
 
@@ -1508,11 +1509,11 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// If internal buffers are too small, this function will not accept</span>
     <span class="doccomment">/// all the data.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">send_some_plaintext</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">data</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="ident">usize</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">send_some_plaintext</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">data</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="ident">usize</span> {
         <span class="self">self</span>.<span class="ident">send_plain</span>(<span class="ident">data</span>, <span class="ident">Limit::Yes</span>)
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">send_early_plaintext</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">data</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="ident">usize</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">send_early_plaintext</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">data</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="ident">usize</span> {
         <span class="macro">debug_assert!</span>(<span class="self">self</span>.<span class="ident">early_traffic</span>);
         <span class="macro">debug_assert!</span>(<span class="self">self</span>.<span class="ident">record_layer</span>.<span class="ident">is_encrypting</span>());
 
@@ -1529,7 +1530,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Returns the number of bytes written from `data`: this might</span>
     <span class="doccomment">/// be less than `data.len()` if buffer limits were exceeded.</span>
-    <span class="kw">fn</span> <span class="ident">send_plain</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">data</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">limit</span>: <span class="ident">Limit</span>) -&gt; <span class="ident">usize</span> {
+    <span class="kw">fn</span> <span class="ident">send_plain</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">data</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">limit</span>: <span class="ident">Limit</span>) -&gt; <span class="ident">usize</span> {
         <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">traffic</span> {
             <span class="comment">// If we haven&#39;t completed handshaking, buffer</span>
             <span class="comment">// plaintext to send once we do.</span>
@@ -1554,14 +1555,14 @@
         <span class="self">self</span>.<span class="ident">send_appdata_encrypt</span>(<span class="ident">data</span>, <span class="ident">limit</span>)
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">start_traffic</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">start_traffic</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
         <span class="self">self</span>.<span class="ident">traffic</span> <span class="op">=</span> <span class="bool-val">true</span>;
         <span class="self">self</span>.<span class="ident">flush_plaintext</span>();
     }
 
     <span class="doccomment">/// Send any buffered plaintext.  Plaintext is buffered if</span>
     <span class="doccomment">/// written during handshake.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">flush_plaintext</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">flush_plaintext</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
         <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">traffic</span> {
             <span class="kw">return</span>;
         }
@@ -1573,13 +1574,13 @@
     }
 
     <span class="comment">// Put m into sendable_tls for writing.</span>
-    <span class="kw">fn</span> <span class="ident">queue_tls_message</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">m</span>: <span class="ident">Message</span>) {
+    <span class="kw">fn</span> <span class="ident">queue_tls_message</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">m</span>: <span class="ident">Message</span>) {
         <span class="self">self</span>.<span class="ident">sendable_tls</span>
             .<span class="ident">append</span>(<span class="ident">m</span>.<span class="ident">get_encoding</span>());
     }
 
     <span class="doccomment">/// Send a raw TLS message, fragmenting it if needed.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">send_msg</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">m</span>: <span class="ident">Message</span>, <span class="ident">must_encrypt</span>: <span class="ident">bool</span>) {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">send_msg</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">m</span>: <span class="ident">Message</span>, <span class="ident">must_encrypt</span>: <span class="ident">bool</span>) {
         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;quic&quot;</span>)]</span>
         {
             <span class="kw">if</span> <span class="kw">let</span> <span class="ident">Protocol::Quic</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">protocol</span> {
@@ -1595,7 +1596,7 @@
                         <span class="string">&quot;QUIC uses TLS for the cryptographic handshake only&quot;</span>
                     );
                     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">bytes</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
-                    <span class="ident">m</span>.<span class="ident">payload</span>.<span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">bytes</span>);
+                    <span class="ident">m</span>.<span class="ident">payload</span>.<span class="ident">encode</span>(<span class="kw-2">&amp;mut</span> <span class="ident">bytes</span>);
                     <span class="self">self</span>.<span class="ident">quic</span>
                         .<span class="ident">hs_queue</span>
                         .<span class="ident">push_back</span>((<span class="ident">must_encrypt</span>, <span class="ident">bytes</span>));
@@ -1606,7 +1607,7 @@
         <span class="kw">if</span> <span class="op">!</span><span class="ident">must_encrypt</span> {
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">to_send</span> <span class="op">=</span> <span class="ident">VecDeque::new</span>();
             <span class="self">self</span>.<span class="ident">message_fragmenter</span>
-                .<span class="ident">fragment</span>(<span class="ident">m</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">to_send</span>);
+                .<span class="ident">fragment</span>(<span class="ident">m</span>, <span class="kw-2">&amp;mut</span> <span class="ident">to_send</span>);
             <span class="kw">for</span> <span class="ident">mm</span> <span class="kw">in</span> <span class="ident">to_send</span> {
                 <span class="self">self</span>.<span class="ident">queue_tls_message</span>(<span class="ident">mm</span>);
             }
@@ -1615,11 +1616,11 @@
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">take_received_plaintext</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">bytes</span>: <span class="ident">Payload</span>) {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">take_received_plaintext</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">bytes</span>: <span class="ident">Payload</span>) {
         <span class="self">self</span>.<span class="ident">received_plaintext</span>.<span class="ident">append</span>(<span class="ident">bytes</span>.<span class="number">0</span>);
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">read</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">u8</span>]) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">read</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">u8</span>]) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">received_plaintext</span>.<span class="ident">read</span>(<span class="ident">buf</span>)<span class="question-mark">?</span>;
 
         <span class="kw">if</span> <span class="ident">len</span> <span class="op">==</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">connection_at_eof</span>() <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">received_plaintext</span>.<span class="ident">is_empty</span>() {
@@ -1632,7 +1633,7 @@
         <span class="prelude-val">Ok</span>(<span class="ident">len</span>)
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">start_encryption_tls12</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">secrets</span>: <span class="kw-2">&amp;</span><span class="ident">SessionSecrets</span>) {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">start_encryption_tls12</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">secrets</span>: <span class="kw-2">&amp;</span><span class="ident">SessionSecrets</span>) {
         <span class="kw">let</span> (<span class="ident">dec</span>, <span class="ident">enc</span>) <span class="op">=</span> <span class="ident">cipher::new_tls12</span>(<span class="self">self</span>.<span class="ident">get_suite_assert</span>(), <span class="ident">secrets</span>);
         <span class="self">self</span>.<span class="ident">record_layer</span>
             .<span class="ident">prepare_message_encrypter</span>(<span class="ident">enc</span>);
@@ -1640,12 +1641,12 @@
             .<span class="ident">prepare_message_decrypter</span>(<span class="ident">dec</span>);
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">send_warning_alert</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">desc</span>: <span class="ident">AlertDescription</span>) {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">send_warning_alert</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">desc</span>: <span class="ident">AlertDescription</span>) {
         <span class="macro">warn!</span>(<span class="string">&quot;Sending warning alert {:?}&quot;</span>, <span class="ident">desc</span>);
         <span class="self">self</span>.<span class="ident">send_warning_alert_no_log</span>(<span class="ident">desc</span>);
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">send_fatal_alert</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">desc</span>: <span class="ident">AlertDescription</span>) {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">send_fatal_alert</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">desc</span>: <span class="ident">AlertDescription</span>) {
         <span class="macro">warn!</span>(<span class="string">&quot;Sending fatal alert {:?}&quot;</span>, <span class="ident">desc</span>);
         <span class="macro">debug_assert!</span>(<span class="op">!</span><span class="self">self</span>.<span class="ident">sent_fatal_alert</span>);
         <span class="kw">let</span> <span class="ident">m</span> <span class="op">=</span> <span class="ident">Message::build_alert</span>(<span class="ident">AlertLevel::Fatal</span>, <span class="ident">desc</span>);
@@ -1653,12 +1654,12 @@
         <span class="self">self</span>.<span class="ident">sent_fatal_alert</span> <span class="op">=</span> <span class="bool-val">true</span>;
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">send_close_notify</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">send_close_notify</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
         <span class="macro">debug!</span>(<span class="string">&quot;Sending warning alert {:?}&quot;</span>, <span class="ident">AlertDescription::CloseNotify</span>);
         <span class="self">self</span>.<span class="ident">send_warning_alert_no_log</span>(<span class="ident">AlertDescription::CloseNotify</span>);
     }
 
-    <span class="kw">fn</span> <span class="ident">send_warning_alert_no_log</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">desc</span>: <span class="ident">AlertDescription</span>) {
+    <span class="kw">fn</span> <span class="ident">send_warning_alert_no_log</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">desc</span>: <span class="ident">AlertDescription</span>) {
         <span class="kw">let</span> <span class="ident">m</span> <span class="op">=</span> <span class="ident">Message::build_alert</span>(<span class="ident">AlertLevel::Warning</span>, <span class="ident">desc</span>);
         <span class="self">self</span>.<span class="ident">send_msg</span>(<span class="ident">m</span>, <span class="self">self</span>.<span class="ident">record_layer</span>.<span class="ident">is_encrypting</span>());
     }
@@ -1702,5 +1703,4 @@
 }
 </code></pre></div>
 </section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="rustls" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>
-    <script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script>
 </body></html>

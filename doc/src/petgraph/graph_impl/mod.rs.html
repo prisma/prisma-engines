@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;petgraph-0.4.13&#x2F;src&#x2F;graph_impl&#x2F;mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../petgraph/index.html'><div class='logo-container rust-logo'><img src='../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">   1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;petgraph-0.4.13&#x2F;src&#x2F;graph_impl&#x2F;mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><script defer src="../../../main.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script>
+    <noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../petgraph/index.html'><div class='logo-container rust-logo'><img src='../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">   1</span>
 <span id="2">   2</span>
 <span id="3">   3</span>
 <span id="4">   4</span>
@@ -2153,7 +2154,7 @@
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">Ix</span>: <span class="ident">fmt::Debug</span><span class="op">&gt;</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">NodeIndex</span><span class="op">&lt;</span><span class="ident">Ix</span><span class="op">&gt;</span>
 {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;NodeIndex({:?})&quot;</span>, <span class="self">self</span>.<span class="number">0</span>)
     }
 }
@@ -2195,7 +2196,7 @@
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">Ix</span>: <span class="ident">fmt::Debug</span><span class="op">&gt;</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">EdgeIndex</span><span class="op">&lt;</span><span class="ident">Ix</span><span class="op">&gt;</span>
 {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;EdgeIndex({:?})&quot;</span>, <span class="self">self</span>.<span class="number">0</span>)
     }
 }
@@ -2388,7 +2389,7 @@ impl&lt;Ix: IndexType&gt; fmt::Debug for EdgeIndex&lt;Ix&gt;
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">clone_from</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">rhs</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) {
+    <span class="kw">fn</span> <span class="ident">clone_from</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">rhs</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) {
         <span class="self">self</span>.<span class="ident">nodes</span>.<span class="ident">clone_from</span>(<span class="kw-2">&amp;</span><span class="ident">rhs</span>.<span class="ident">nodes</span>);
         <span class="self">self</span>.<span class="ident">edges</span>.<span class="ident">clone_from</span>(<span class="kw-2">&amp;</span><span class="ident">rhs</span>.<span class="ident">edges</span>);
         <span class="self">self</span>.<span class="ident">ty</span> <span class="op">=</span> <span class="ident">rhs</span>.<span class="ident">ty</span>;
@@ -2401,7 +2402,7 @@ impl&lt;Ix: IndexType&gt; fmt::Debug for EdgeIndex&lt;Ix&gt;
           <span class="ident">Ty</span>: <span class="ident">EdgeType</span>,
           <span class="ident">Ix</span>: <span class="ident">IndexType</span>,
 {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="kw">let</span> <span class="ident">etype</span> <span class="op">=</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_directed</span>() { <span class="string">&quot;Directed&quot;</span> } <span class="kw">else</span> { <span class="string">&quot;Undirected&quot;</span> };
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">fmt_struct</span> <span class="op">=</span> <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;Graph&quot;</span>);
         <span class="ident">fmt_struct</span>.<span class="ident">field</span>(<span class="string">&quot;Ty&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">etype</span>);
@@ -2438,16 +2439,16 @@ impl&lt;Ix: IndexType&gt; fmt::Debug for EdgeIndex&lt;Ix&gt;
 <span class="kw">use</span> <span class="ident">std::cmp::max</span>;
 
 <span class="doccomment">/// Get mutable references at index `a` and `b`.</span>
-<span class="kw">fn</span> <span class="ident">index_twice</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">slc</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">T</span>], <span class="ident">a</span>: <span class="ident">usize</span>, <span class="ident">b</span>: <span class="ident">usize</span>) -&gt; <span class="ident">Pair</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">T</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">index_twice</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">slc</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">T</span>], <span class="ident">a</span>: <span class="ident">usize</span>, <span class="ident">b</span>: <span class="ident">usize</span>) -&gt; <span class="ident">Pair</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="ident">T</span><span class="op">&gt;</span> {
     <span class="kw">if</span> <span class="ident">max</span>(<span class="ident">a</span>, <span class="ident">b</span>) <span class="op">&gt;</span><span class="op">=</span> <span class="ident">slc</span>.<span class="ident">len</span>() {
         <span class="ident">Pair::None</span>
     } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">a</span> <span class="op">==</span> <span class="ident">b</span> {
-        <span class="ident">Pair::One</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">slc</span>[<span class="ident">max</span>(<span class="ident">a</span>, <span class="ident">b</span>)])
+        <span class="ident">Pair::One</span>(<span class="kw-2">&amp;mut</span> <span class="ident">slc</span>[<span class="ident">max</span>(<span class="ident">a</span>, <span class="ident">b</span>)])
     } <span class="kw">else</span> {
         <span class="comment">// safe because a, b are in bounds and distinct</span>
         <span class="kw">unsafe</span> {
-            <span class="kw">let</span> <span class="ident">ar</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw-2">*</span>(<span class="ident">slc</span>.<span class="ident">get_unchecked_mut</span>(<span class="ident">a</span>) <span class="kw">as</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="kw">_</span>);
-            <span class="kw">let</span> <span class="ident">br</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw-2">*</span>(<span class="ident">slc</span>.<span class="ident">get_unchecked_mut</span>(<span class="ident">b</span>) <span class="kw">as</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="kw">_</span>);
+            <span class="kw">let</span> <span class="ident">ar</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="kw-2">*</span>(<span class="ident">slc</span>.<span class="ident">get_unchecked_mut</span>(<span class="ident">a</span>) <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw">_</span>);
+            <span class="kw">let</span> <span class="ident">br</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="kw-2">*</span>(<span class="ident">slc</span>.<span class="ident">get_unchecked_mut</span>(<span class="ident">b</span>) <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw">_</span>);
             <span class="ident">Pair::Both</span>(<span class="ident">ar</span>, <span class="ident">br</span>)
         }
     }
@@ -2521,7 +2522,7 @@ impl&lt;Ix: IndexType&gt; fmt::Debug for EdgeIndex&lt;Ix&gt;
     <span class="doccomment">///</span>
     <span class="doccomment">/// **Panics** if the Graph is at the maximum number of nodes for its index</span>
     <span class="doccomment">/// type (N/A if usize).</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_node</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">weight</span>: <span class="ident">N</span>) -&gt; <span class="ident">NodeIndex</span><span class="op">&lt;</span><span class="ident">Ix</span><span class="op">&gt;</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_node</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">weight</span>: <span class="ident">N</span>) -&gt; <span class="ident">NodeIndex</span><span class="op">&lt;</span><span class="ident">Ix</span><span class="op">&gt;</span>
     {
         <span class="kw">let</span> <span class="ident">node</span> <span class="op">=</span> <span class="ident">Node</span>{<span class="ident">weight</span>: <span class="ident">weight</span>, <span class="ident">next</span>: [<span class="ident">EdgeIndex::end</span>(), <span class="ident">EdgeIndex::end</span>()]};
         <span class="kw">let</span> <span class="ident">node_idx</span> <span class="op">=</span> <span class="ident">NodeIndex::new</span>(<span class="self">self</span>.<span class="ident">nodes</span>.<span class="ident">len</span>());
@@ -2542,9 +2543,9 @@ impl&lt;Ix: IndexType&gt; fmt::Debug for EdgeIndex&lt;Ix&gt;
     <span class="doccomment">/// Access the weight for node `a`, mutably.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Also available with indexing syntax: `&amp;mut graph[a]`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">node_weight_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">a</span>: <span class="ident">NodeIndex</span><span class="op">&lt;</span><span class="ident">Ix</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">N</span><span class="op">&gt;</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">node_weight_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">a</span>: <span class="ident">NodeIndex</span><span class="op">&lt;</span><span class="ident">Ix</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="ident">N</span><span class="op">&gt;</span>
     {
-        <span class="self">self</span>.<span class="ident">nodes</span>.<span class="ident">get_mut</span>(<span class="ident">a</span>.<span class="ident">index</span>()).<span class="ident">map</span>(<span class="op">|</span><span class="ident">n</span><span class="op">|</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">n</span>.<span class="ident">weight</span>)
+        <span class="self">self</span>.<span class="ident">nodes</span>.<span class="ident">get_mut</span>(<span class="ident">a</span>.<span class="ident">index</span>()).<span class="ident">map</span>(<span class="op">|</span><span class="ident">n</span><span class="op">|</span> <span class="kw-2">&amp;mut</span> <span class="ident">n</span>.<span class="ident">weight</span>)
     }
 
     <span class="doccomment">/// Add an edge from `a` to `b` to the graph, with its associated</span>
@@ -2560,7 +2561,7 @@ impl&lt;Ix: IndexType&gt; fmt::Debug for EdgeIndex&lt;Ix&gt;
     <span class="doccomment">///</span>
     <span class="doccomment">/// **Note:** `Graph` allows adding parallel (“duplicate”) edges. If you want</span>
     <span class="doccomment">/// to avoid this, use [`.update_edge(a, b, weight)`](#method.update_edge) instead.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_edge</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">a</span>: <span class="ident">NodeIndex</span><span class="op">&lt;</span><span class="ident">Ix</span><span class="op">&gt;</span>, <span class="ident">b</span>: <span class="ident">NodeIndex</span><span class="op">&lt;</span><span class="ident">Ix</span><span class="op">&gt;</span>, <span class="ident">weight</span>: <span class="ident">E</span>) -&gt; <span class="ident">EdgeIndex</span><span class="op">&lt;</span><span class="ident">Ix</span><span class="op">&gt;</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_edge</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">a</span>: <span class="ident">NodeIndex</span><span class="op">&lt;</span><span class="ident">Ix</span><span class="op">&gt;</span>, <span class="ident">b</span>: <span class="ident">NodeIndex</span><span class="op">&lt;</span><span class="ident">Ix</span><span class="op">&gt;</span>, <span class="ident">weight</span>: <span class="ident">E</span>) -&gt; <span class="ident">EdgeIndex</span><span class="op">&lt;</span><span class="ident">Ix</span><span class="op">&gt;</span>
     {
         <span class="kw">let</span> <span class="ident">edge_idx</span> <span class="op">=</span> <span class="ident">EdgeIndex::new</span>(<span class="self">self</span>.<span class="ident">edges</span>.<span class="ident">len</span>());
         <span class="macro">assert!</span>(<span class="op">&lt;</span><span class="ident">Ix</span> <span class="kw">as</span> <span class="ident">IndexType</span><span class="op">&gt;</span><span class="ident">::max</span>().<span class="ident">index</span>() <span class="op">==</span> <span class="op">!</span><span class="number">0</span> <span class="op">|</span><span class="op">|</span> <span class="ident">EdgeIndex::end</span>() <span class="op">!</span><span class="op">=</span> <span class="ident">edge_idx</span>);
@@ -2569,7 +2570,7 @@ impl&lt;Ix: IndexType&gt; fmt::Debug for EdgeIndex&lt;Ix&gt;
             <span class="ident">node</span>: [<span class="ident">a</span>, <span class="ident">b</span>],
             <span class="ident">next</span>: [<span class="ident">EdgeIndex::end</span>(); <span class="number">2</span>],
         };
-        <span class="kw">match</span> <span class="ident">index_twice</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">nodes</span>, <span class="ident">a</span>.<span class="ident">index</span>(), <span class="ident">b</span>.<span class="ident">index</span>()) {
+        <span class="kw">match</span> <span class="ident">index_twice</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">nodes</span>, <span class="ident">a</span>.<span class="ident">index</span>(), <span class="ident">b</span>.<span class="ident">index</span>()) {
             <span class="ident">Pair::None</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Graph::add_edge: node indices out of bounds&quot;</span>),
             <span class="ident">Pair::One</span>(<span class="ident">an</span>) =&gt; {
                 <span class="ident">edge</span>.<span class="ident">next</span> <span class="op">=</span> <span class="ident">an</span>.<span class="ident">next</span>;
@@ -2596,7 +2597,7 @@ impl&lt;Ix: IndexType&gt; fmt::Debug for EdgeIndex&lt;Ix&gt;
     <span class="doccomment">/// connected to `a` (and `b`, if the graph edges are undirected).</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// **Panics** if any of the nodes don&#39;t exist.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">update_edge</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">a</span>: <span class="ident">NodeIndex</span><span class="op">&lt;</span><span class="ident">Ix</span><span class="op">&gt;</span>, <span class="ident">b</span>: <span class="ident">NodeIndex</span><span class="op">&lt;</span><span class="ident">Ix</span><span class="op">&gt;</span>, <span class="ident">weight</span>: <span class="ident">E</span>) -&gt; <span class="ident">EdgeIndex</span><span class="op">&lt;</span><span class="ident">Ix</span><span class="op">&gt;</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">update_edge</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">a</span>: <span class="ident">NodeIndex</span><span class="op">&lt;</span><span class="ident">Ix</span><span class="op">&gt;</span>, <span class="ident">b</span>: <span class="ident">NodeIndex</span><span class="op">&lt;</span><span class="ident">Ix</span><span class="op">&gt;</span>, <span class="ident">weight</span>: <span class="ident">E</span>) -&gt; <span class="ident">EdgeIndex</span><span class="op">&lt;</span><span class="ident">Ix</span><span class="op">&gt;</span>
     {
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">ix</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">find_edge</span>(<span class="ident">a</span>, <span class="ident">b</span>) {
             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">ed</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">edge_weight_mut</span>(<span class="ident">ix</span>) {
@@ -2618,9 +2619,9 @@ impl&lt;Ix: IndexType&gt; fmt::Debug for EdgeIndex&lt;Ix&gt;
     <span class="doccomment">/// Access the weight for edge `e`, mutably.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Also available with indexing syntax: `&amp;mut graph[e]`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">edge_weight_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">e</span>: <span class="ident">EdgeIndex</span><span class="op">&lt;</span><span class="ident">Ix</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">E</span><span class="op">&gt;</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">edge_weight_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">e</span>: <span class="ident">EdgeIndex</span><span class="op">&lt;</span><span class="ident">Ix</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="ident">E</span><span class="op">&gt;</span>
     {
-        <span class="self">self</span>.<span class="ident">edges</span>.<span class="ident">get_mut</span>(<span class="ident">e</span>.<span class="ident">index</span>()).<span class="ident">map</span>(<span class="op">|</span><span class="ident">ed</span><span class="op">|</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ed</span>.<span class="ident">weight</span>)
+        <span class="self">self</span>.<span class="ident">edges</span>.<span class="ident">get_mut</span>(<span class="ident">e</span>.<span class="ident">index</span>()).<span class="ident">map</span>(<span class="op">|</span><span class="ident">ed</span><span class="op">|</span> <span class="kw-2">&amp;mut</span> <span class="ident">ed</span>.<span class="ident">weight</span>)
     }
 
     <span class="doccomment">/// Access the source and target nodes for `e`.</span>
@@ -2642,7 +2643,7 @@ impl&lt;Ix: IndexType&gt; fmt::Debug for EdgeIndex&lt;Ix&gt;
     <span class="doccomment">/// edges, including *n* calls to `.remove_edge()` where *n* is the number</span>
     <span class="doccomment">/// of edges with an endpoint in `a`, and including the edges with an</span>
     <span class="doccomment">/// endpoint in the displaced node.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">remove_node</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">a</span>: <span class="ident">NodeIndex</span><span class="op">&lt;</span><span class="ident">Ix</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">N</span><span class="op">&gt;</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">remove_node</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">a</span>: <span class="ident">NodeIndex</span><span class="op">&lt;</span><span class="ident">Ix</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">N</span><span class="op">&gt;</span>
     {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">nodes</span>.<span class="ident">get</span>(<span class="ident">a</span>.<span class="ident">index</span>()).<span class="ident">is_none</span>() {
             <span class="kw">return</span> <span class="prelude-val">None</span>
@@ -2681,7 +2682,7 @@ impl&lt;Ix: IndexType&gt; fmt::Debug for EdgeIndex&lt;Ix&gt;
         <span class="comment">// Adjust the starts of the out edges, and ends of the in edges.</span>
         <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="ident">d</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">DIRECTIONS</span> {
             <span class="kw">let</span> <span class="ident">k</span> <span class="op">=</span> <span class="ident">d</span>.<span class="ident">index</span>();
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">edges</span> <span class="op">=</span> <span class="ident">edges_walker_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">edges</span>, <span class="ident">swap_edges</span>[<span class="ident">k</span>], <span class="ident">d</span>);
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">edges</span> <span class="op">=</span> <span class="ident">edges_walker_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">edges</span>, <span class="ident">swap_edges</span>[<span class="ident">k</span>], <span class="ident">d</span>);
             <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">curedge</span>) <span class="op">=</span> <span class="ident">edges</span>.<span class="ident">next_edge</span>() {
                 <span class="macro">debug_assert!</span>(<span class="ident">curedge</span>.<span class="ident">node</span>[<span class="ident">k</span>] <span class="op">==</span> <span class="ident">old_index</span>);
                 <span class="ident">curedge</span>.<span class="ident">node</span>[<span class="ident">k</span>] <span class="op">=</span> <span class="ident">new_index</span>;
@@ -2692,7 +2693,7 @@ impl&lt;Ix: IndexType&gt; fmt::Debug for EdgeIndex&lt;Ix&gt;
 
     <span class="doccomment">/// For edge `e` with endpoints `edge_node`, replace links to it,</span>
     <span class="doccomment">/// with links to `edge_next`.</span>
-    <span class="kw">fn</span> <span class="ident">change_edge_links</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">edge_node</span>: [<span class="ident">NodeIndex</span><span class="op">&lt;</span><span class="ident">Ix</span><span class="op">&gt;</span>; <span class="number">2</span>], <span class="ident">e</span>: <span class="ident">EdgeIndex</span><span class="op">&lt;</span><span class="ident">Ix</span><span class="op">&gt;</span>,
+    <span class="kw">fn</span> <span class="ident">change_edge_links</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">edge_node</span>: [<span class="ident">NodeIndex</span><span class="op">&lt;</span><span class="ident">Ix</span><span class="op">&gt;</span>; <span class="number">2</span>], <span class="ident">e</span>: <span class="ident">EdgeIndex</span><span class="op">&lt;</span><span class="ident">Ix</span><span class="op">&gt;</span>,
                          <span class="ident">edge_next</span>: [<span class="ident">EdgeIndex</span><span class="op">&lt;</span><span class="ident">Ix</span><span class="op">&gt;</span>; <span class="number">2</span>])
     {
         <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="ident">d</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">DIRECTIONS</span> {
@@ -2710,7 +2711,7 @@ impl&lt;Ix: IndexType&gt; fmt::Debug for EdgeIndex&lt;Ix&gt;
                 <span class="comment">//println!(&quot;Updating first edge 0 for node {}, set to {}&quot;, edge_node[0], edge_next[0]);</span>
                 <span class="ident">node</span>.<span class="ident">next</span>[<span class="ident">k</span>] <span class="op">=</span> <span class="ident">edge_next</span>[<span class="ident">k</span>];
             } <span class="kw">else</span> {
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">edges</span> <span class="op">=</span> <span class="ident">edges_walker_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">edges</span>, <span class="ident">fst</span>, <span class="ident">d</span>);
+                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">edges</span> <span class="op">=</span> <span class="ident">edges_walker_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">edges</span>, <span class="ident">fst</span>, <span class="ident">d</span>);
                 <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">curedge</span>) <span class="op">=</span> <span class="ident">edges</span>.<span class="ident">next_edge</span>() {
                     <span class="kw">if</span> <span class="ident">curedge</span>.<span class="ident">next</span>[<span class="ident">k</span>] <span class="op">==</span> <span class="ident">e</span> {
                         <span class="ident">curedge</span>.<span class="ident">next</span>[<span class="ident">k</span>] <span class="op">=</span> <span class="ident">edge_next</span>[<span class="ident">k</span>];
@@ -2728,7 +2729,7 @@ impl&lt;Ix: IndexType&gt; fmt::Debug for EdgeIndex&lt;Ix&gt;
     <span class="doccomment">///</span>
     <span class="doccomment">/// Computes in **O(e&#39;)** time, where **e&#39;** is the size of four particular edge lists, for</span>
     <span class="doccomment">/// the vertices of `e` and the vertices of another affected edge.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">remove_edge</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">e</span>: <span class="ident">EdgeIndex</span><span class="op">&lt;</span><span class="ident">Ix</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">remove_edge</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">e</span>: <span class="ident">EdgeIndex</span><span class="op">&lt;</span><span class="ident">Ix</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>
     {
         <span class="comment">// every edge is part of two lists,</span>
         <span class="comment">// outgoing and incoming edges.</span>
@@ -2743,7 +2744,7 @@ impl&lt;Ix: IndexType&gt; fmt::Debug for EdgeIndex&lt;Ix&gt;
         <span class="self">self</span>.<span class="ident">remove_edge_adjust_indices</span>(<span class="ident">e</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">remove_edge_adjust_indices</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">e</span>: <span class="ident">EdgeIndex</span><span class="op">&lt;</span><span class="ident">Ix</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>
+    <span class="kw">fn</span> <span class="ident">remove_edge_adjust_indices</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">e</span>: <span class="ident">EdgeIndex</span><span class="op">&lt;</span><span class="ident">Ix</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>
     {
         <span class="comment">// swap_remove the edge -- only the removed edge</span>
         <span class="comment">// and the edge swapped into place are affected and need updating</span>
@@ -2978,7 +2979,7 @@ impl&lt;Ix: IndexType&gt; fmt::Debug for EdgeIndex&lt;Ix&gt;
     <span class="doccomment">///</span>
     <span class="doccomment">/// The order in which weights are yielded matches the order of their</span>
     <span class="doccomment">/// node indices.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">node_weights_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident">NodeWeightsMut</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">Ix</span><span class="op">&gt;</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">node_weights_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">NodeWeightsMut</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">Ix</span><span class="op">&gt;</span>
     {
         <span class="ident">NodeWeightsMut</span> { <span class="ident">nodes</span>: <span class="self">self</span>.<span class="ident">nodes</span>.<span class="ident">iter_mut</span>() }
     }
@@ -3001,7 +3002,7 @@ impl&lt;Ix: IndexType&gt; fmt::Debug for EdgeIndex&lt;Ix&gt;
     <span class="doccomment">///</span>
     <span class="doccomment">/// The order in which weights are yielded matches the order of their</span>
     <span class="doccomment">/// edge indices.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">edge_weights_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident">EdgeWeightsMut</span><span class="op">&lt;</span><span class="ident">E</span>, <span class="ident">Ix</span><span class="op">&gt;</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">edge_weights_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">EdgeWeightsMut</span><span class="op">&lt;</span><span class="ident">E</span>, <span class="ident">Ix</span><span class="op">&gt;</span>
     {
         <span class="ident">EdgeWeightsMut</span> { <span class="ident">edges</span>: <span class="self">self</span>.<span class="ident">edges</span>.<span class="ident">iter_mut</span>() }
     }
@@ -3087,9 +3088,9 @@ impl&lt;Ix: IndexType&gt; fmt::Debug for EdgeIndex&lt;Ix&gt;
     <span class="doccomment">/// assert_eq!(gr[b], 4.);</span>
     <span class="doccomment">/// assert_eq!(gr[c], 2.);</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">index_twice_mut</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">U</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">i</span>: <span class="ident">T</span>, <span class="ident">j</span>: <span class="ident">U</span>)
-        -&gt; (<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">Index</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::Output</span>,
-            <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">Index</span><span class="op">&lt;</span><span class="ident">U</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::Output</span>)
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">index_twice_mut</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">U</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">i</span>: <span class="ident">T</span>, <span class="ident">j</span>: <span class="ident">U</span>)
+        -&gt; (<span class="kw-2">&amp;mut</span> <span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">Index</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::Output</span>,
+            <span class="kw-2">&amp;mut</span> <span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">Index</span><span class="op">&lt;</span><span class="ident">U</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::Output</span>)
         <span class="kw">where</span> <span class="self">Self</span>: <span class="ident">IndexMut</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">IndexMut</span><span class="op">&lt;</span><span class="ident">U</span><span class="op">&gt;</span>,
               <span class="ident">T</span>: <span class="ident">GraphIndex</span>,
               <span class="ident">U</span>: <span class="ident">GraphIndex</span>,
@@ -3099,36 +3100,36 @@ impl&lt;Ix: IndexType&gt; fmt::Debug for EdgeIndex&lt;Ix&gt;
 
         <span class="comment">// Allow two mutable indexes here -- they are nonoverlapping</span>
         <span class="kw">unsafe</span> {
-            <span class="kw">let</span> <span class="ident">self_mut</span> <span class="op">=</span> <span class="self">self</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="kw">_</span>;
-            (<span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">IndexMut</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::index_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw-2">*</span><span class="ident">self_mut</span>, <span class="ident">i</span>),
-             <span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">IndexMut</span><span class="op">&lt;</span><span class="ident">U</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::index_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw-2">*</span><span class="ident">self_mut</span>, <span class="ident">j</span>))
+            <span class="kw">let</span> <span class="ident">self_mut</span> <span class="op">=</span> <span class="self">self</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw">_</span>;
+            (<span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">IndexMut</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::index_mut</span>(<span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="ident">self_mut</span>, <span class="ident">i</span>),
+             <span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">IndexMut</span><span class="op">&lt;</span><span class="ident">U</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::index_mut</span>(<span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="ident">self_mut</span>, <span class="ident">j</span>))
         }
     }
 
     <span class="doccomment">/// Reverse the direction of all edges</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">reverse</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">reverse</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
         <span class="comment">// swap edge endpoints,</span>
         <span class="comment">// edge incoming / outgoing lists,</span>
         <span class="comment">// node incoming / outgoing lists</span>
-        <span class="kw">for</span> <span class="ident">edge</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">edges</span> {
+        <span class="kw">for</span> <span class="ident">edge</span> <span class="kw">in</span> <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">edges</span> {
             <span class="ident">edge</span>.<span class="ident">node</span>.<span class="ident">swap</span>(<span class="number">0</span>, <span class="number">1</span>);
             <span class="ident">edge</span>.<span class="ident">next</span>.<span class="ident">swap</span>(<span class="number">0</span>, <span class="number">1</span>);
         }
-        <span class="kw">for</span> <span class="ident">node</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">nodes</span> {
+        <span class="kw">for</span> <span class="ident">node</span> <span class="kw">in</span> <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">nodes</span> {
             <span class="ident">node</span>.<span class="ident">next</span>.<span class="ident">swap</span>(<span class="number">0</span>, <span class="number">1</span>);
         }
     }
 
     <span class="doccomment">/// Remove all nodes and edges</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">clear</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">clear</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
         <span class="self">self</span>.<span class="ident">nodes</span>.<span class="ident">clear</span>();
         <span class="self">self</span>.<span class="ident">edges</span>.<span class="ident">clear</span>();
     }
 
     <span class="doccomment">/// Remove all edges</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">clear_edges</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">clear_edges</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
         <span class="self">self</span>.<span class="ident">edges</span>.<span class="ident">clear</span>();
-        <span class="kw">for</span> <span class="ident">node</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">nodes</span> {
+        <span class="kw">for</span> <span class="ident">node</span> <span class="kw">in</span> <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">nodes</span> {
             <span class="ident">node</span>.<span class="ident">next</span> <span class="op">=</span> [<span class="ident">EdgeIndex::end</span>(), <span class="ident">EdgeIndex::end</span>()];
         }
     }
@@ -3142,7 +3143,7 @@ impl&lt;Ix: IndexType&gt; fmt::Debug for EdgeIndex&lt;Ix&gt;
     <span class="doccomment">/// the graph. Graph may reserve more space to avoid frequent reallocations.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// **Panics** if the new capacity overflows `usize`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">reserve_nodes</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">additional</span>: <span class="ident">usize</span>) {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">reserve_nodes</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">additional</span>: <span class="ident">usize</span>) {
         <span class="self">self</span>.<span class="ident">nodes</span>.<span class="ident">reserve</span>(<span class="ident">additional</span>);
     }
 
@@ -3150,7 +3151,7 @@ impl&lt;Ix: IndexType&gt; fmt::Debug for EdgeIndex&lt;Ix&gt;
     <span class="doccomment">/// the graph. Graph may reserve more space to avoid frequent reallocations.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// **Panics** if the new capacity overflows `usize`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">reserve_edges</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">additional</span>: <span class="ident">usize</span>) {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">reserve_edges</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">additional</span>: <span class="ident">usize</span>) {
         <span class="self">self</span>.<span class="ident">edges</span>.<span class="ident">reserve</span>(<span class="ident">additional</span>);
     }
 
@@ -3161,7 +3162,7 @@ impl&lt;Ix: IndexType&gt; fmt::Debug for EdgeIndex&lt;Ix&gt;
     <span class="doccomment">/// Prefer `reserve_nodes` if future insertions are expected.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// **Panics** if the new capacity overflows `usize`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">reserve_exact_nodes</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">additional</span>: <span class="ident">usize</span>) {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">reserve_exact_nodes</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">additional</span>: <span class="ident">usize</span>) {
         <span class="self">self</span>.<span class="ident">nodes</span>.<span class="ident">reserve_exact</span>(<span class="ident">additional</span>);
     }
 
@@ -3172,22 +3173,22 @@ impl&lt;Ix: IndexType&gt; fmt::Debug for EdgeIndex&lt;Ix&gt;
     <span class="doccomment">/// Prefer `reserve_edges` if future insertions are expected.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// **Panics** if the new capacity overflows `usize`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">reserve_exact_edges</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">additional</span>: <span class="ident">usize</span>) {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">reserve_exact_edges</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">additional</span>: <span class="ident">usize</span>) {
         <span class="self">self</span>.<span class="ident">edges</span>.<span class="ident">reserve_exact</span>(<span class="ident">additional</span>);
     }
 
     <span class="doccomment">/// Shrinks the capacity of the underlying nodes collection as much as possible.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">shrink_to_fit_nodes</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">shrink_to_fit_nodes</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
         <span class="self">self</span>.<span class="ident">nodes</span>.<span class="ident">shrink_to_fit</span>();
     }
 
     <span class="doccomment">/// Shrinks the capacity of the underlying edges collection as much as possible.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">shrink_to_fit_edges</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">shrink_to_fit_edges</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
         <span class="self">self</span>.<span class="ident">edges</span>.<span class="ident">shrink_to_fit</span>();
     }
 
     <span class="doccomment">/// Shrinks the capacity of the graph as much as possible.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">shrink_to_fit</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">shrink_to_fit</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
         <span class="self">self</span>.<span class="ident">nodes</span>.<span class="ident">shrink_to_fit</span>();
         <span class="self">self</span>.<span class="ident">edges</span>.<span class="ident">shrink_to_fit</span>();
     }
@@ -3199,7 +3200,7 @@ impl&lt;Ix: IndexType&gt; fmt::Debug for EdgeIndex&lt;Ix&gt;
     <span class="doccomment">/// the graph can be walked and associated data modified.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// The order nodes are visited is not specified.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">retain_nodes</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">visit</span>: <span class="ident">F</span>)
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">retain_nodes</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">visit</span>: <span class="ident">F</span>)
         <span class="kw">where</span> <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="ident">Frozen</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">NodeIndex</span><span class="op">&lt;</span><span class="ident">Ix</span><span class="op">&gt;</span>) -&gt; <span class="ident">bool</span>
     {
         <span class="kw">for</span> <span class="ident">index</span> <span class="kw">in</span> <span class="self">self</span>.<span class="ident">node_indices</span>().<span class="ident">rev</span>() {
@@ -3218,7 +3219,7 @@ impl&lt;Ix: IndexType&gt; fmt::Debug for EdgeIndex&lt;Ix&gt;
     <span class="doccomment">/// the graph can be walked and associated data modified.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// The order edges are visited is not specified.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">retain_edges</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">visit</span>: <span class="ident">F</span>)
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">retain_edges</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">visit</span>: <span class="ident">F</span>)
         <span class="kw">where</span> <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="ident">Frozen</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">EdgeIndex</span><span class="op">&lt;</span><span class="ident">Ix</span><span class="op">&gt;</span>) -&gt; <span class="ident">bool</span>
     {
         <span class="kw">for</span> <span class="ident">index</span> <span class="kw">in</span> <span class="self">self</span>.<span class="ident">edge_indices</span>().<span class="ident">rev</span>() {
@@ -3266,7 +3267,7 @@ impl&lt;Ix: IndexType&gt; fmt::Debug for EdgeIndex&lt;Ix&gt;
     <span class="doccomment">/// or they are filled with default values.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Nodes are inserted automatically to match the edges.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">extend_with_edges</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">iterable</span>: <span class="ident">I</span>)
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">extend_with_edges</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">iterable</span>: <span class="ident">I</span>)
         <span class="kw">where</span> <span class="ident">I</span>: <span class="ident">IntoIterator</span>,
               <span class="ident">I::Item</span>: <span class="ident">IntoWeightedEdge</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>,
               <span class="op">&lt;</span><span class="ident">I::Item</span> <span class="kw">as</span> <span class="ident">IntoWeightedEdge</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::NodeId</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">NodeIndex</span><span class="op">&lt;</span><span class="ident">Ix</span><span class="op">&gt;</span><span class="op">&gt;</span>,
@@ -3368,12 +3369,12 @@ impl&lt;Ix: IndexType&gt; fmt::Debug for EdgeIndex&lt;Ix&gt;
     <span class="comment">//</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde-1&quot;</span>)]</span>
     <span class="doccomment">/// Fix up node and edge links after deserialization</span>
-    <span class="kw">fn</span> <span class="ident">link_edges</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">NodeIndex</span><span class="op">&lt;</span><span class="ident">Ix</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">for</span> (<span class="ident">edge_index</span>, <span class="ident">edge</span>) <span class="kw">in</span> <span class="ident">enumerate</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">edges</span>) {
+    <span class="kw">fn</span> <span class="ident">link_edges</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">NodeIndex</span><span class="op">&lt;</span><span class="ident">Ix</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+        <span class="kw">for</span> (<span class="ident">edge_index</span>, <span class="ident">edge</span>) <span class="kw">in</span> <span class="ident">enumerate</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">edges</span>) {
             <span class="kw">let</span> <span class="ident">a</span> <span class="op">=</span> <span class="ident">edge</span>.<span class="ident">source</span>();
             <span class="kw">let</span> <span class="ident">b</span> <span class="op">=</span> <span class="ident">edge</span>.<span class="ident">target</span>();
             <span class="kw">let</span> <span class="ident">edge_idx</span> <span class="op">=</span> <span class="ident">EdgeIndex::new</span>(<span class="ident">edge_index</span>);
-            <span class="kw">match</span> <span class="ident">index_twice</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">nodes</span>, <span class="ident">a</span>.<span class="ident">index</span>(), <span class="ident">b</span>.<span class="ident">index</span>()) {
+            <span class="kw">match</span> <span class="ident">index_twice</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">nodes</span>, <span class="ident">a</span>.<span class="ident">index</span>(), <span class="ident">b</span>.<span class="ident">index</span>()) {
                 <span class="ident">Pair::None</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="kw">if</span> <span class="ident">a</span> <span class="op">&gt;</span> <span class="ident">b</span> { <span class="ident">a</span> } <span class="kw">else</span> { <span class="ident">b</span> }),
                 <span class="ident">Pair::One</span>(<span class="ident">an</span>) =&gt; {
                     <span class="ident">edge</span>.<span class="ident">next</span> <span class="op">=</span> <span class="ident">an</span>.<span class="ident">next</span>;
@@ -3404,7 +3405,7 @@ impl&lt;Ix: IndexType&gt; fmt::Debug for EdgeIndex&lt;Ix&gt;
     <span class="ident">Ix</span>: <span class="ident">IndexType</span>,
 {
     <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident">NodeIndex</span><span class="op">&lt;</span><span class="ident">Ix</span><span class="op">&gt;</span>;
-    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">NodeIndex</span><span class="op">&lt;</span><span class="ident">Ix</span><span class="op">&gt;</span><span class="op">&gt;</span>
+    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">NodeIndex</span><span class="op">&lt;</span><span class="ident">Ix</span><span class="op">&gt;</span><span class="op">&gt;</span>
     {
         <span class="kw">let</span> <span class="ident">k</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">dir</span>.<span class="ident">index</span>();
         <span class="kw">loop</span> {
@@ -3447,7 +3448,7 @@ impl&lt;Ix: IndexType&gt; fmt::Debug for EdgeIndex&lt;Ix&gt;
 {
     <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident">NodeIndex</span><span class="op">&lt;</span><span class="ident">Ix</span><span class="op">&gt;</span>;
 
-    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">NodeIndex</span><span class="op">&lt;</span><span class="ident">Ix</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">NodeIndex</span><span class="op">&lt;</span><span class="ident">Ix</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="comment">// First any outgoing edges</span>
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">edges</span>.<span class="ident">get</span>(<span class="self">self</span>.<span class="ident">next</span>[<span class="number">0</span>].<span class="ident">index</span>()) {
             <span class="prelude-val">None</span> =&gt; {}
@@ -3503,7 +3504,7 @@ impl&lt;Ix: IndexType&gt; fmt::Debug for EdgeIndex&lt;Ix&gt;
     <span class="ident">dir</span>: <span class="ident">Direction</span>,
 }
 
-<span class="kw">fn</span> <span class="ident">edges_walker_mut</span><span class="op">&lt;</span><span class="ident">E</span>, <span class="ident">Ix</span><span class="op">&gt;</span>(<span class="ident">edges</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">Edge</span><span class="op">&lt;</span><span class="ident">E</span>, <span class="ident">Ix</span><span class="op">&gt;</span>], <span class="ident">next</span>: <span class="ident">EdgeIndex</span><span class="op">&lt;</span><span class="ident">Ix</span><span class="op">&gt;</span>, <span class="ident">dir</span>: <span class="ident">Direction</span>)
+<span class="kw">fn</span> <span class="ident">edges_walker_mut</span><span class="op">&lt;</span><span class="ident">E</span>, <span class="ident">Ix</span><span class="op">&gt;</span>(<span class="ident">edges</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">Edge</span><span class="op">&lt;</span><span class="ident">E</span>, <span class="ident">Ix</span><span class="op">&gt;</span>], <span class="ident">next</span>: <span class="ident">EdgeIndex</span><span class="op">&lt;</span><span class="ident">Ix</span><span class="op">&gt;</span>, <span class="ident">dir</span>: <span class="ident">Direction</span>)
     -&gt; <span class="ident">EdgesWalkerMut</span><span class="op">&lt;</span><span class="ident">E</span>, <span class="ident">Ix</span><span class="op">&gt;</span>
     <span class="kw">where</span> <span class="ident">Ix</span>: <span class="ident">IndexType</span>,
 {
@@ -3517,11 +3518,11 @@ impl&lt;Ix: IndexType&gt; fmt::Debug for EdgeIndex&lt;Ix&gt;
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">E</span>, <span class="ident">Ix</span><span class="op">&gt;</span> <span class="ident">EdgesWalkerMut</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">E</span>, <span class="ident">Ix</span><span class="op">&gt;</span> <span class="kw">where</span>
     <span class="ident">Ix</span>: <span class="ident">IndexType</span>,
 {
-    <span class="kw">fn</span> <span class="ident">next_edge</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Edge</span><span class="op">&lt;</span><span class="ident">E</span>, <span class="ident">Ix</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">next_edge</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="ident">Edge</span><span class="op">&lt;</span><span class="ident">E</span>, <span class="ident">Ix</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">next</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">t</span><span class="op">|</span> <span class="ident">t</span>.<span class="number">1</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">EdgeIndex</span><span class="op">&lt;</span><span class="ident">Ix</span><span class="op">&gt;</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Edge</span><span class="op">&lt;</span><span class="ident">E</span>, <span class="ident">Ix</span><span class="op">&gt;</span>)<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">EdgeIndex</span><span class="op">&lt;</span><span class="ident">Ix</span><span class="op">&gt;</span>, <span class="kw-2">&amp;mut</span> <span class="ident">Edge</span><span class="op">&lt;</span><span class="ident">E</span>, <span class="ident">Ix</span><span class="op">&gt;</span>)<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">this_index</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">next</span>;
         <span class="kw">let</span> <span class="ident">k</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">dir</span>.<span class="ident">index</span>();
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">edges</span>.<span class="ident">get_mut</span>(<span class="self">self</span>.<span class="ident">next</span>.<span class="ident">index</span>()) {
@@ -3582,7 +3583,7 @@ impl&lt;Ix: IndexType&gt; fmt::Debug for EdgeIndex&lt;Ix&gt;
 {
     <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident">EdgeReference</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">E</span>, <span class="ident">Ix</span><span class="op">&gt;</span>;
 
-    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
         <span class="comment">// First the outgoing or incoming edges (directionality)</span>
         <span class="kw">let</span> <span class="ident">k</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">direction</span>.<span class="ident">unwrap_or</span>(<span class="ident">Outgoing</span>).<span class="ident">index</span>();
         <span class="kw">let</span> <span class="ident">i</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">next</span>[<span class="number">0</span>].<span class="ident">index</span>();
@@ -3653,8 +3654,8 @@ impl&lt;Ix: IndexType&gt; fmt::Debug for EdgeIndex&lt;Ix&gt;
 {
     <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">N</span>;
 
-    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">N</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">nodes</span>.<span class="ident">next</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">node</span><span class="op">|</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">node</span>.<span class="ident">weight</span>)
+    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">N</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">nodes</span>.<span class="ident">next</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">node</span><span class="op">|</span> <span class="kw-2">&amp;mut</span> <span class="ident">node</span>.<span class="ident">weight</span>)
     }
 
     <span class="kw">fn</span> <span class="ident">size_hint</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (<span class="ident">usize</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>) {
@@ -3672,8 +3673,8 @@ impl&lt;Ix: IndexType&gt; fmt::Debug for EdgeIndex&lt;Ix&gt;
 {
     <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">E</span>;
 
-    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">E</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">edges</span>.<span class="ident">next</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">edge</span><span class="op">|</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">edge</span>.<span class="ident">weight</span>)
+    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">E</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">edges</span>.<span class="ident">next</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">edge</span><span class="op">|</span> <span class="kw-2">&amp;mut</span> <span class="ident">edge</span>.<span class="ident">weight</span>)
     }
 
     <span class="kw">fn</span> <span class="ident">size_hint</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (<span class="ident">usize</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>) {
@@ -3701,8 +3702,8 @@ impl&lt;Ix: IndexType&gt; fmt::Debug for EdgeIndex&lt;Ix&gt;
     <span class="ident">Ty</span>: <span class="ident">EdgeType</span>,
     <span class="ident">Ix</span>: <span class="ident">IndexType</span>,
 {
-    <span class="kw">fn</span> <span class="ident">index_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">index</span>: <span class="ident">NodeIndex</span><span class="op">&lt;</span><span class="ident">Ix</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">N</span> {
-        <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">nodes</span>[<span class="ident">index</span>.<span class="ident">index</span>()].<span class="ident">weight</span>
+    <span class="kw">fn</span> <span class="ident">index_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">index</span>: <span class="ident">NodeIndex</span><span class="op">&lt;</span><span class="ident">Ix</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">N</span> {
+        <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">nodes</span>[<span class="ident">index</span>.<span class="ident">index</span>()].<span class="ident">weight</span>
     }
 
 }
@@ -3727,8 +3728,8 @@ impl&lt;Ix: IndexType&gt; fmt::Debug for EdgeIndex&lt;Ix&gt;
     <span class="ident">Ty</span>: <span class="ident">EdgeType</span>,
     <span class="ident">Ix</span>: <span class="ident">IndexType</span>,
 {
-    <span class="kw">fn</span> <span class="ident">index_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">index</span>: <span class="ident">EdgeIndex</span><span class="op">&lt;</span><span class="ident">Ix</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">E</span> {
-        <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">edges</span>[<span class="ident">index</span>.<span class="ident">index</span>()].<span class="ident">weight</span>
+    <span class="kw">fn</span> <span class="ident">index_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">index</span>: <span class="ident">EdgeIndex</span><span class="op">&lt;</span><span class="ident">Ix</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">E</span> {
+        <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">edges</span>[<span class="ident">index</span>.<span class="ident">index</span>()].<span class="ident">weight</span>
     }
 }
 
@@ -3820,7 +3821,7 @@ impl&lt;Ix: IndexType&gt; fmt::Debug for EdgeIndex&lt;Ix&gt;
     <span class="doccomment">/// where the `WalkNeighbors` value was created.</span>
     <span class="doccomment">/// For an `Outgoing` walk, the target nodes,</span>
     <span class="doccomment">/// for an `Incoming` walk, the source nodes of the edge.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">next</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span>: <span class="ident">EdgeType</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">g</span>: <span class="kw-2">&amp;</span><span class="ident">Graph</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span>, <span class="ident">Ix</span><span class="op">&gt;</span>)
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">next</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span>: <span class="ident">EdgeType</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">g</span>: <span class="kw-2">&amp;</span><span class="ident">Graph</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span>, <span class="ident">Ix</span><span class="op">&gt;</span>)
         -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">EdgeIndex</span><span class="op">&lt;</span><span class="ident">Ix</span><span class="op">&gt;</span>, <span class="ident">NodeIndex</span><span class="op">&lt;</span><span class="ident">Ix</span><span class="op">&gt;</span>)<span class="op">&gt;</span> {
         <span class="comment">// First any outgoing edges</span>
         <span class="kw">match</span> <span class="ident">g</span>.<span class="ident">edges</span>.<span class="ident">get</span>(<span class="self">self</span>.<span class="ident">next</span>[<span class="number">0</span>].<span class="ident">index</span>()) {
@@ -3845,13 +3846,13 @@ impl&lt;Ix: IndexType&gt; fmt::Debug for EdgeIndex&lt;Ix&gt;
         <span class="prelude-val">None</span>
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">next_node</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span>: <span class="ident">EdgeType</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">g</span>: <span class="kw-2">&amp;</span><span class="ident">Graph</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span>, <span class="ident">Ix</span><span class="op">&gt;</span>)
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">next_node</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span>: <span class="ident">EdgeType</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">g</span>: <span class="kw-2">&amp;</span><span class="ident">Graph</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span>, <span class="ident">Ix</span><span class="op">&gt;</span>)
         -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">NodeIndex</span><span class="op">&lt;</span><span class="ident">Ix</span><span class="op">&gt;</span><span class="op">&gt;</span>
     {
         <span class="self">self</span>.<span class="ident">next</span>(<span class="ident">g</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">t</span><span class="op">|</span> <span class="ident">t</span>.<span class="number">1</span>)
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">next_edge</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span>: <span class="ident">EdgeType</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">g</span>: <span class="kw-2">&amp;</span><span class="ident">Graph</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span>, <span class="ident">Ix</span><span class="op">&gt;</span>)
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">next_edge</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span>: <span class="ident">EdgeType</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">g</span>: <span class="kw-2">&amp;</span><span class="ident">Graph</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">E</span>, <span class="ident">Ty</span>, <span class="ident">Ix</span><span class="op">&gt;</span>)
         -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">EdgeIndex</span><span class="op">&lt;</span><span class="ident">Ix</span><span class="op">&gt;</span><span class="op">&gt;</span>
     {
         <span class="self">self</span>.<span class="ident">next</span>(<span class="ident">g</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">t</span><span class="op">|</span> <span class="ident">t</span>.<span class="number">0</span>)
@@ -3868,7 +3869,7 @@ impl&lt;Ix: IndexType&gt; fmt::Debug for EdgeIndex&lt;Ix&gt;
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">Ix</span>: <span class="ident">IndexType</span><span class="op">&gt;</span> <span class="ident">Iterator</span> <span class="kw">for</span> <span class="ident">NodeIndices</span><span class="op">&lt;</span><span class="ident">Ix</span><span class="op">&gt;</span> {
     <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident">NodeIndex</span><span class="op">&lt;</span><span class="ident">Ix</span><span class="op">&gt;</span>;
 
-    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">r</span>.<span class="ident">next</span>().<span class="ident">map</span>(<span class="ident">node_index</span>)
     }
 
@@ -3878,7 +3879,7 @@ impl&lt;Ix: IndexType&gt; fmt::Debug for EdgeIndex&lt;Ix&gt;
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">Ix</span>: <span class="ident">IndexType</span><span class="op">&gt;</span> <span class="ident">DoubleEndedIterator</span> <span class="kw">for</span> <span class="ident">NodeIndices</span><span class="op">&lt;</span><span class="ident">Ix</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">next_back</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">next_back</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">r</span>.<span class="ident">next_back</span>().<span class="ident">map</span>(<span class="ident">node_index</span>)
     }
 }
@@ -3895,7 +3896,7 @@ impl&lt;Ix: IndexType&gt; fmt::Debug for EdgeIndex&lt;Ix&gt;
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">Ix</span>: <span class="ident">IndexType</span><span class="op">&gt;</span> <span class="ident">Iterator</span> <span class="kw">for</span> <span class="ident">EdgeIndices</span><span class="op">&lt;</span><span class="ident">Ix</span><span class="op">&gt;</span> {
     <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident">EdgeIndex</span><span class="op">&lt;</span><span class="ident">Ix</span><span class="op">&gt;</span>;
 
-    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">r</span>.<span class="ident">next</span>().<span class="ident">map</span>(<span class="ident">edge_index</span>)
     }
 
@@ -3905,7 +3906,7 @@ impl&lt;Ix: IndexType&gt; fmt::Debug for EdgeIndex&lt;Ix&gt;
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">Ix</span>: <span class="ident">IndexType</span><span class="op">&gt;</span> <span class="ident">DoubleEndedIterator</span> <span class="kw">for</span> <span class="ident">EdgeIndices</span><span class="op">&lt;</span><span class="ident">Ix</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">next_back</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">next_back</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">r</span>.<span class="ident">next_back</span>().<span class="ident">map</span>(<span class="ident">edge_index</span>)
     }
 }
@@ -3959,7 +3960,7 @@ impl&lt;Ix: IndexType&gt; fmt::Debug for EdgeIndex&lt;Ix&gt;
 {
     <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> (<span class="ident">NodeIndex</span><span class="op">&lt;</span><span class="ident">Ix</span><span class="op">&gt;</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">N</span>);
 
-    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">iter</span>.<span class="ident">next</span>().<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">i</span>, <span class="ident">node</span>)<span class="op">|</span> 
             (<span class="ident">node_index</span>(<span class="ident">i</span>), <span class="kw-2">&amp;</span><span class="ident">node</span>.<span class="ident">weight</span>)
         )
@@ -3973,7 +3974,7 @@ impl&lt;Ix: IndexType&gt; fmt::Debug for EdgeIndex&lt;Ix&gt;
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">N</span>, <span class="ident">Ix</span><span class="op">&gt;</span> <span class="ident">DoubleEndedIterator</span> <span class="kw">for</span> <span class="ident">NodeReferences</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">N</span>, <span class="ident">Ix</span><span class="op">&gt;</span>
     <span class="kw">where</span> <span class="ident">Ix</span>: <span class="ident">IndexType</span>
 {
-    <span class="kw">fn</span> <span class="ident">next_back</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">next_back</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">iter</span>.<span class="ident">next_back</span>().<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">i</span>, <span class="ident">node</span>)<span class="op">|</span>
             (<span class="ident">node_index</span>(<span class="ident">i</span>), <span class="kw-2">&amp;</span><span class="ident">node</span>.<span class="ident">weight</span>)
         )
@@ -4018,7 +4019,7 @@ impl&lt;Ix: IndexType&gt; fmt::Debug for EdgeIndex&lt;Ix&gt;
 {
     <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident">EdgeReference</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">E</span>, <span class="ident">Ix</span><span class="op">&gt;</span>;
 
-    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">iter</span>.<span class="ident">next</span>().<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">i</span>, <span class="ident">edge</span>)<span class="op">|</span> 
             <span class="ident">EdgeReference</span> {
                 <span class="ident">index</span>: <span class="ident">edge_index</span>(<span class="ident">i</span>),
@@ -4036,7 +4037,7 @@ impl&lt;Ix: IndexType&gt; fmt::Debug for EdgeIndex&lt;Ix&gt;
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">E</span>, <span class="ident">Ix</span><span class="op">&gt;</span> <span class="ident">DoubleEndedIterator</span> <span class="kw">for</span> <span class="ident">EdgeReferences</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">E</span>, <span class="ident">Ix</span><span class="op">&gt;</span>
     <span class="kw">where</span> <span class="ident">Ix</span>: <span class="ident">IndexType</span>
 {
-    <span class="kw">fn</span> <span class="ident">next_back</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">next_back</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">iter</span>.<span class="ident">next_back</span>().<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">i</span>, <span class="ident">edge</span>)<span class="op">|</span>
             <span class="ident">EdgeReference</span> {
                 <span class="ident">index</span>: <span class="ident">edge_index</span>(<span class="ident">i</span>),
@@ -4070,5 +4071,4 @@ impl&lt;Ix: IndexType&gt; fmt::Debug for EdgeIndex&lt;Ix&gt;
 
 </code></pre></div>
 </section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="petgraph" data-search-index-js="../../../search-index.js" data-search-js="../../../search.js"></div>
-    <script src="../../../main.js"></script><script src="../../../source-script.js"></script><script src="../../../source-files.js"></script>
 </body></html>

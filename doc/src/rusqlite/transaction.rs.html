@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;rusqlite-0.25.3&#x2F;src&#x2F;transaction.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>transaction.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../rusqlite/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;rusqlite-0.25.3&#x2F;src&#x2F;transaction.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>transaction.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><script defer src="../../main.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script>
+    <noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../rusqlite/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -814,7 +815,7 @@
     <span class="doccomment">/// so as to prevent nested transactions on the same connection. For cases</span>
     <span class="doccomment">/// where this is unacceptable, [`Transaction::new_unchecked`] is available.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">conn</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Connection</span>, <span class="ident">behavior</span>: <span class="ident">TransactionBehavior</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Transaction</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">conn</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Connection</span>, <span class="ident">behavior</span>: <span class="ident">TransactionBehavior</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Transaction</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="ident"><span class="self">Self</span>::new_unchecked</span>(<span class="ident">conn</span>, <span class="ident">behavior</span>)
     }
 
@@ -867,13 +868,13 @@
     <span class="doccomment">/// }</span>
     <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">savepoint</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Savepoint</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">savepoint</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Savepoint</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="ident">Savepoint::with_depth</span>(<span class="self">self</span>.<span class="ident">conn</span>, <span class="number">1</span>)
     }
 
     <span class="doccomment">/// Create a new savepoint with a custom savepoint name. See `savepoint()`.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">savepoint_with_name</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="ident">T</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Savepoint</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">savepoint_with_name</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="ident">T</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Savepoint</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="ident">Savepoint::with_depth_and_name</span>(<span class="self">self</span>.<span class="ident">conn</span>, <span class="number">1</span>, <span class="ident">name</span>)
     }
 
@@ -887,7 +888,7 @@
     <span class="doccomment">/// Configure the transaction to perform the specified action when it is</span>
     <span class="doccomment">/// dropped.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_drop_behavior</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">drop_behavior</span>: <span class="ident">DropBehavior</span>) {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_drop_behavior</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">drop_behavior</span>: <span class="ident">DropBehavior</span>) {
         <span class="self">self</span>.<span class="ident">drop_behavior</span> <span class="op">=</span> <span class="ident">drop_behavior</span>
     }
 
@@ -898,7 +899,7 @@
     }
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">commit_</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">commit_</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">execute_batch</span>(<span class="string">&quot;COMMIT&quot;</span>)<span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>(())
     }
@@ -910,7 +911,7 @@
     }
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">rollback_</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">rollback_</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">execute_batch</span>(<span class="string">&quot;ROLLBACK&quot;</span>)<span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>(())
     }
@@ -926,7 +927,7 @@
     }
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">finish_</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">finish_</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">is_autocommit</span>() {
             <span class="kw">return</span> <span class="prelude-val">Ok</span>(());
         }
@@ -951,7 +952,7 @@
 <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unused_must_use</span>)]</span>
 <span class="kw">impl</span> <span class="ident">Drop</span> <span class="kw">for</span> <span class="ident">Transaction</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
+    <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
         <span class="self">self</span>.<span class="ident">finish_</span>();
     }
 }
@@ -982,25 +983,25 @@
 
     <span class="doccomment">/// Begin a new savepoint. Can be nested.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">conn</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Connection</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Savepoint</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">conn</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Connection</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Savepoint</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="ident">Savepoint::with_depth</span>(<span class="ident">conn</span>, <span class="number">0</span>)
     }
 
     <span class="doccomment">/// Begin a new savepoint with a user-provided savepoint name.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_name</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">conn</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Connection</span>, <span class="ident">name</span>: <span class="ident">T</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Savepoint</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_name</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">conn</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Connection</span>, <span class="ident">name</span>: <span class="ident">T</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Savepoint</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="ident">Savepoint::with_depth_and_name</span>(<span class="ident">conn</span>, <span class="number">0</span>, <span class="ident">name</span>)
     }
 
     <span class="doccomment">/// Begin a nested savepoint.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">savepoint</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Savepoint</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">savepoint</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Savepoint</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="ident">Savepoint::with_depth</span>(<span class="self">self</span>.<span class="ident">conn</span>, <span class="self">self</span>.<span class="ident">depth</span> <span class="op">+</span> <span class="number">1</span>)
     }
 
     <span class="doccomment">/// Begin a nested savepoint with a user-provided savepoint name.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">savepoint_with_name</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="ident">T</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Savepoint</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">savepoint_with_name</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="ident">T</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Savepoint</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="ident">Savepoint::with_depth_and_name</span>(<span class="self">self</span>.<span class="ident">conn</span>, <span class="self">self</span>.<span class="ident">depth</span> <span class="op">+</span> <span class="number">1</span>, <span class="ident">name</span>)
     }
 
@@ -1014,7 +1015,7 @@
     <span class="doccomment">/// Configure the savepoint to perform the specified action when it is</span>
     <span class="doccomment">/// dropped.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_drop_behavior</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">drop_behavior</span>: <span class="ident">DropBehavior</span>) {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_drop_behavior</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">drop_behavior</span>: <span class="ident">DropBehavior</span>) {
         <span class="self">self</span>.<span class="ident">drop_behavior</span> <span class="op">=</span> <span class="ident">drop_behavior</span>
     }
 
@@ -1025,7 +1026,7 @@
     }
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">commit_</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">commit_</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">execute_batch</span>(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;RELEASE {}&quot;</span>, <span class="self">self</span>.<span class="ident">name</span>))<span class="question-mark">?</span>;
         <span class="self">self</span>.<span class="ident">committed</span> <span class="op">=</span> <span class="bool-val">true</span>;
         <span class="prelude-val">Ok</span>(())
@@ -1038,7 +1039,7 @@
     <span class="doccomment">/// Unlike `Transaction`s, savepoints remain active after they have been</span>
     <span class="doccomment">/// rolled back, and can be rolled back again or committed.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">rollback</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">rollback</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">conn</span>
             .<span class="ident">execute_batch</span>(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;ROLLBACK TO {}&quot;</span>, <span class="self">self</span>.<span class="ident">name</span>))
     }
@@ -1054,7 +1055,7 @@
     }
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">finish_</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">finish_</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">committed</span> {
             <span class="kw">return</span> <span class="prelude-val">Ok</span>(());
         }
@@ -1079,7 +1080,7 @@
 <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unused_must_use</span>)]</span>
 <span class="kw">impl</span> <span class="ident">Drop</span> <span class="kw">for</span> <span class="ident">Savepoint</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
+    <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
         <span class="self">self</span>.<span class="ident">finish_</span>();
     }
 }
@@ -1112,7 +1113,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Will return `Err` if the underlying SQLite call fails.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">transaction</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Transaction</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">transaction</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Transaction</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="ident">Transaction::new</span>(<span class="self">self</span>, <span class="ident">TransactionBehavior::Deferred</span>)
     }
 
@@ -1125,7 +1126,7 @@
     <span class="doccomment">/// Will return `Err` if the underlying SQLite call fails.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">transaction_with_behavior</span>(
-        <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
+        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
         <span class="ident">behavior</span>: <span class="ident">TransactionBehavior</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Transaction</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="ident">Transaction::new</span>(<span class="self">self</span>, <span class="ident">behavior</span>)
@@ -1193,7 +1194,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Will return `Err` if the underlying SQLite call fails.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">savepoint</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Savepoint</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">savepoint</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Savepoint</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="ident">Savepoint::new</span>(<span class="self">self</span>)
     }
 
@@ -1205,7 +1206,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Will return `Err` if the underlying SQLite call fails.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">savepoint_with_name</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="ident">T</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Savepoint</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">savepoint_with_name</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="ident">T</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Savepoint</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="ident">Savepoint::with_name</span>(<span class="self">self</span>, <span class="ident">name</span>)
     }
 }
@@ -1422,5 +1423,4 @@
 }
 </code></pre></div>
 </section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="rusqlite" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>
-    <script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script>
 </body></html>

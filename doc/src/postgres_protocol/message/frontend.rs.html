@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;git&#x2F;checkouts&#x2F;rust-postgres-dc0fca9be721a90f&#x2F;8a61d46&#x2F;postgres-protocol&#x2F;src&#x2F;message&#x2F;frontend.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>frontend.rs - source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../postgres_protocol/index.html'><div class='logo-container rust-logo'><img src='../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;git&#x2F;checkouts&#x2F;rust-postgres-dc0fca9be721a90f&#x2F;8a61d46&#x2F;postgres-protocol&#x2F;src&#x2F;message&#x2F;frontend.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>frontend.rs - source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><script defer src="../../../main.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script>
+    <noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../postgres_protocol/index.html'><div class='logo-container rust-logo'><img src='../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -308,9 +309,9 @@
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">write_nullable</span>, <span class="ident">FromUsize</span>, <span class="ident">IsNull</span>, <span class="ident">Oid</span>};
 
 <span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">fn</span> <span class="ident">write_body</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">E</span><span class="op">&gt;</span>(<span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BytesMut</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">E</span><span class="op">&gt;</span>
+<span class="kw">fn</span> <span class="ident">write_body</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">E</span><span class="op">&gt;</span>(<span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BytesMut</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">E</span><span class="op">&gt;</span>
 <span class="kw">where</span>
-    <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BytesMut</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">E</span><span class="op">&gt;</span>,
+    <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;mut</span> <span class="ident">BytesMut</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">E</span><span class="op">&gt;</span>,
     <span class="ident">E</span>: <span class="ident">From</span><span class="op">&lt;</span><span class="ident">io::Error</span><span class="op">&gt;</span>,
 {
     <span class="kw">let</span> <span class="ident">base</span> <span class="op">=</span> <span class="ident">buf</span>.<span class="ident">len</span>();
@@ -319,7 +320,7 @@
     <span class="ident">f</span>(<span class="ident">buf</span>)<span class="question-mark">?</span>;
 
     <span class="kw">let</span> <span class="ident">size</span> <span class="op">=</span> <span class="ident">i32::from_usize</span>(<span class="ident">buf</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="ident">base</span>)<span class="question-mark">?</span>;
-    <span class="ident">BigEndian::write_i32</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">buf</span>[<span class="ident">base</span>..], <span class="ident">size</span>);
+    <span class="ident">BigEndian::write_i32</span>(<span class="kw-2">&amp;mut</span> <span class="ident">buf</span>[<span class="ident">base</span>..], <span class="ident">size</span>);
     <span class="prelude-val">Ok</span>(())
 }
 
@@ -350,12 +351,12 @@
     <span class="ident">values</span>: <span class="ident">J</span>,
     <span class="kw-2">mut</span> <span class="ident">serializer</span>: <span class="ident">F</span>,
     <span class="ident">result_formats</span>: <span class="ident">K</span>,
-    <span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BytesMut</span>,
+    <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BytesMut</span>,
 ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">BindError</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">I</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">i16</span><span class="op">&gt;</span>,
     <span class="ident">J</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">T</span><span class="op">&gt;</span>,
-    <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="ident">T</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BytesMut</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">IsNull</span>, <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Error</span> <span class="op">+</span> <span class="ident">marker::Sync</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="ident">T</span>, <span class="kw-2">&amp;mut</span> <span class="ident">BytesMut</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">IsNull</span>, <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Error</span> <span class="op">+</span> <span class="ident">marker::Sync</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="ident">K</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">i16</span><span class="op">&gt;</span>,
 {
     <span class="ident">buf</span>.<span class="ident">put_u8</span>(<span class="string">b&#39;B&#39;</span>);
@@ -390,10 +391,10 @@
 }
 
 <span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">fn</span> <span class="ident">write_counted</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">T</span>, <span class="ident">F</span>, <span class="ident">E</span><span class="op">&gt;</span>(<span class="ident">items</span>: <span class="ident">I</span>, <span class="kw-2">mut</span> <span class="ident">serializer</span>: <span class="ident">F</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BytesMut</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">E</span><span class="op">&gt;</span>
+<span class="kw">fn</span> <span class="ident">write_counted</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">T</span>, <span class="ident">F</span>, <span class="ident">E</span><span class="op">&gt;</span>(<span class="ident">items</span>: <span class="ident">I</span>, <span class="kw-2">mut</span> <span class="ident">serializer</span>: <span class="ident">F</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BytesMut</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">E</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">I</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">T</span><span class="op">&gt;</span>,
-    <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="ident">T</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BytesMut</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">E</span><span class="op">&gt;</span>,
+    <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="ident">T</span>, <span class="kw-2">&amp;mut</span> <span class="ident">BytesMut</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">E</span><span class="op">&gt;</span>,
     <span class="ident">E</span>: <span class="ident">From</span><span class="op">&lt;</span><span class="ident">io::Error</span><span class="op">&gt;</span>,
 {
     <span class="kw">let</span> <span class="ident">base</span> <span class="op">=</span> <span class="ident">buf</span>.<span class="ident">len</span>();
@@ -404,13 +405,13 @@
         <span class="ident">count</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
     }
     <span class="kw">let</span> <span class="ident">count</span> <span class="op">=</span> <span class="ident">i16::from_usize</span>(<span class="ident">count</span>)<span class="question-mark">?</span>;
-    <span class="ident">BigEndian::write_i16</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">buf</span>[<span class="ident">base</span>..], <span class="ident">count</span>);
+    <span class="ident">BigEndian::write_i16</span>(<span class="kw-2">&amp;mut</span> <span class="ident">buf</span>[<span class="ident">base</span>..], <span class="ident">count</span>);
 
     <span class="prelude-val">Ok</span>(())
 }
 
 <span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">cancel_request</span>(<span class="ident">process_id</span>: <span class="ident">i32</span>, <span class="ident">secret_key</span>: <span class="ident">i32</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BytesMut</span>) {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">cancel_request</span>(<span class="ident">process_id</span>: <span class="ident">i32</span>, <span class="ident">secret_key</span>: <span class="ident">i32</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BytesMut</span>) {
     <span class="ident">write_body</span>(<span class="ident">buf</span>, <span class="op">|</span><span class="ident">buf</span><span class="op">|</span> {
         <span class="ident">buf</span>.<span class="ident">put_i32</span>(<span class="number">80_877_102</span>);
         <span class="ident">buf</span>.<span class="ident">put_i32</span>(<span class="ident">process_id</span>);
@@ -421,7 +422,7 @@
 }
 
 <span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">close</span>(<span class="ident">variant</span>: <span class="ident">u8</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BytesMut</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">close</span>(<span class="ident">variant</span>: <span class="ident">u8</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BytesMut</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
     <span class="ident">buf</span>.<span class="ident">put_u8</span>(<span class="string">b&#39;C&#39;</span>);
     <span class="ident">write_body</span>(<span class="ident">buf</span>, <span class="op">|</span><span class="ident">buf</span><span class="op">|</span> {
         <span class="ident">buf</span>.<span class="ident">put_u8</span>(<span class="ident">variant</span>);
@@ -450,7 +451,7 @@
         <span class="prelude-val">Ok</span>(<span class="ident">CopyData</span> { <span class="ident">buf</span>, <span class="ident">len</span> })
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">write</span>(<span class="self">self</span>, <span class="ident">out</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BytesMut</span>) {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">write</span>(<span class="self">self</span>, <span class="ident">out</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BytesMut</span>) {
         <span class="ident">out</span>.<span class="ident">put_u8</span>(<span class="string">b&#39;d&#39;</span>);
         <span class="ident">out</span>.<span class="ident">put_i32</span>(<span class="self">self</span>.<span class="ident">len</span>);
         <span class="ident">out</span>.<span class="ident">put</span>(<span class="self">self</span>.<span class="ident">buf</span>);
@@ -458,19 +459,19 @@
 }
 
 <span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">copy_done</span>(<span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BytesMut</span>) {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">copy_done</span>(<span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BytesMut</span>) {
     <span class="ident">buf</span>.<span class="ident">put_u8</span>(<span class="string">b&#39;c&#39;</span>);
     <span class="ident">write_body</span>(<span class="ident">buf</span>, <span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="prelude-val">Ok</span>::<span class="op">&lt;</span>(), <span class="ident">io::Error</span><span class="op">&gt;</span>(())).<span class="ident">unwrap</span>();
 }
 
 <span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">copy_fail</span>(<span class="ident">message</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BytesMut</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">copy_fail</span>(<span class="ident">message</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BytesMut</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
     <span class="ident">buf</span>.<span class="ident">put_u8</span>(<span class="string">b&#39;f&#39;</span>);
     <span class="ident">write_body</span>(<span class="ident">buf</span>, <span class="op">|</span><span class="ident">buf</span><span class="op">|</span> <span class="ident">write_cstr</span>(<span class="ident">message</span>.<span class="ident">as_bytes</span>(), <span class="ident">buf</span>))
 }
 
 <span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">describe</span>(<span class="ident">variant</span>: <span class="ident">u8</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BytesMut</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">describe</span>(<span class="ident">variant</span>: <span class="ident">u8</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BytesMut</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
     <span class="ident">buf</span>.<span class="ident">put_u8</span>(<span class="string">b&#39;D&#39;</span>);
     <span class="ident">write_body</span>(<span class="ident">buf</span>, <span class="op">|</span><span class="ident">buf</span><span class="op">|</span> {
         <span class="ident">buf</span>.<span class="ident">put_u8</span>(<span class="ident">variant</span>);
@@ -479,7 +480,7 @@
 }
 
 <span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">execute</span>(<span class="ident">portal</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">max_rows</span>: <span class="ident">i32</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BytesMut</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">execute</span>(<span class="ident">portal</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">max_rows</span>: <span class="ident">i32</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BytesMut</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
     <span class="ident">buf</span>.<span class="ident">put_u8</span>(<span class="string">b&#39;E&#39;</span>);
     <span class="ident">write_body</span>(<span class="ident">buf</span>, <span class="op">|</span><span class="ident">buf</span><span class="op">|</span> {
         <span class="ident">write_cstr</span>(<span class="ident">portal</span>.<span class="ident">as_bytes</span>(), <span class="ident">buf</span>)<span class="question-mark">?</span>;
@@ -489,7 +490,7 @@
 }
 
 <span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">query</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">param_types</span>: <span class="ident">I</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BytesMut</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">query</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">param_types</span>: <span class="ident">I</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BytesMut</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">I</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">Oid</span><span class="op">&gt;</span>,
 {
@@ -510,19 +511,19 @@
 }
 
 <span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">password_message</span>(<span class="ident">password</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BytesMut</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">password_message</span>(<span class="ident">password</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BytesMut</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
     <span class="ident">buf</span>.<span class="ident">put_u8</span>(<span class="string">b&#39;p&#39;</span>);
     <span class="ident">write_body</span>(<span class="ident">buf</span>, <span class="op">|</span><span class="ident">buf</span><span class="op">|</span> <span class="ident">write_cstr</span>(<span class="ident">password</span>, <span class="ident">buf</span>))
 }
 
 <span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">query</span>(<span class="ident">query</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BytesMut</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">query</span>(<span class="ident">query</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BytesMut</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
     <span class="ident">buf</span>.<span class="ident">put_u8</span>(<span class="string">b&#39;Q&#39;</span>);
     <span class="ident">write_body</span>(<span class="ident">buf</span>, <span class="op">|</span><span class="ident">buf</span><span class="op">|</span> <span class="ident">write_cstr</span>(<span class="ident">query</span>.<span class="ident">as_bytes</span>(), <span class="ident">buf</span>))
 }
 
 <span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">sasl_initial_response</span>(<span class="ident">mechanism</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">data</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BytesMut</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">sasl_initial_response</span>(<span class="ident">mechanism</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">data</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BytesMut</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
     <span class="ident">buf</span>.<span class="ident">put_u8</span>(<span class="string">b&#39;p&#39;</span>);
     <span class="ident">write_body</span>(<span class="ident">buf</span>, <span class="op">|</span><span class="ident">buf</span><span class="op">|</span> {
         <span class="ident">write_cstr</span>(<span class="ident">mechanism</span>.<span class="ident">as_bytes</span>(), <span class="ident">buf</span>)<span class="question-mark">?</span>;
@@ -534,7 +535,7 @@
 }
 
 <span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">sasl_response</span>(<span class="ident">data</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BytesMut</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">sasl_response</span>(<span class="ident">data</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BytesMut</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
     <span class="ident">buf</span>.<span class="ident">put_u8</span>(<span class="string">b&#39;p&#39;</span>);
     <span class="ident">write_body</span>(<span class="ident">buf</span>, <span class="op">|</span><span class="ident">buf</span><span class="op">|</span> {
         <span class="ident">buf</span>.<span class="ident">put_slice</span>(<span class="ident">data</span>);
@@ -543,7 +544,7 @@
 }
 
 <span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ssl_request</span>(<span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BytesMut</span>) {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ssl_request</span>(<span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BytesMut</span>) {
     <span class="ident">write_body</span>(<span class="ident">buf</span>, <span class="op">|</span><span class="ident">buf</span><span class="op">|</span> {
         <span class="ident">buf</span>.<span class="ident">put_i32</span>(<span class="number">80_877_103</span>);
         <span class="prelude-val">Ok</span>::<span class="op">&lt;</span><span class="kw">_</span>, <span class="ident">io::Error</span><span class="op">&gt;</span>(())
@@ -552,7 +553,7 @@
 }
 
 <span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">startup_message</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">parameters</span>: <span class="ident">I</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BytesMut</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">startup_message</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">parameters</span>: <span class="ident">I</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BytesMut</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">I</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> (<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>)<span class="op">&gt;</span>,
 {
@@ -569,19 +570,19 @@
 }
 
 <span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">sync</span>(<span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BytesMut</span>) {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">sync</span>(<span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BytesMut</span>) {
     <span class="ident">buf</span>.<span class="ident">put_u8</span>(<span class="string">b&#39;S&#39;</span>);
     <span class="ident">write_body</span>(<span class="ident">buf</span>, <span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="prelude-val">Ok</span>::<span class="op">&lt;</span>(), <span class="ident">io::Error</span><span class="op">&gt;</span>(())).<span class="ident">unwrap</span>();
 }
 
 <span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">terminate</span>(<span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BytesMut</span>) {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">terminate</span>(<span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BytesMut</span>) {
     <span class="ident">buf</span>.<span class="ident">put_u8</span>(<span class="string">b&#39;X&#39;</span>);
     <span class="ident">write_body</span>(<span class="ident">buf</span>, <span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="prelude-val">Ok</span>::<span class="op">&lt;</span>(), <span class="ident">io::Error</span><span class="op">&gt;</span>(())).<span class="ident">unwrap</span>();
 }
 
 <span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">fn</span> <span class="ident">write_cstr</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BytesMut</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">io::Error</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">write_cstr</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BytesMut</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">io::Error</span><span class="op">&gt;</span> {
     <span class="kw">if</span> <span class="ident">s</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="number">0</span>) {
         <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">io::Error::new</span>(
             <span class="ident">io::ErrorKind::InvalidInput</span>,
@@ -594,5 +595,4 @@
 }
 </code></pre></div>
 </section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="postgres_protocol" data-search-index-js="../../../search-index.js" data-search-js="../../../search.js"></div>
-    <script src="../../../main.js"></script><script src="../../../source-script.js"></script><script src="../../../source-files.js"></script>
 </body></html>

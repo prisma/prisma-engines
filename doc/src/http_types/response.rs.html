@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;http-types-2.12.0&#x2F;src&#x2F;response.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>response.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="shortcut icon" href="https:&#x2F;&#x2F;yoshuawuyts.com&#x2F;assets&#x2F;http-rs&#x2F;favicon.ico"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../http_types/index.html'><div class='logo-container rust-logo'><img src='https:&#x2F;&#x2F;yoshuawuyts.com&#x2F;assets&#x2F;http-rs&#x2F;logo-rounded.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;http-types-2.12.0&#x2F;src&#x2F;response.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>response.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><script defer src="../../main.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script>
+    <noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="shortcut icon" href="https:&#x2F;&#x2F;yoshuawuyts.com&#x2F;assets&#x2F;http-rs&#x2F;favicon.ico"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../http_types/index.html'><div class='logo-container rust-logo'><img src='https:&#x2F;&#x2F;yoshuawuyts.com&#x2F;assets&#x2F;http-rs&#x2F;logo-rounded.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -812,7 +813,7 @@
     }
 
     <span class="doccomment">/// Get a mutable reference to a header.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">header_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">HeaderName</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">HeaderValues</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">header_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">HeaderName</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="ident">HeaderValues</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">headers</span>.<span class="ident">get_mut</span>(<span class="ident">name</span>.<span class="ident">into</span>())
     }
 
@@ -822,7 +823,7 @@
     }
 
     <span class="doccomment">/// Remove a header.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">remove_header</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">HeaderName</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">HeaderValues</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">remove_header</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">HeaderName</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">HeaderValues</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">headers</span>.<span class="ident">remove</span>(<span class="ident">name</span>.<span class="ident">into</span>())
     }
 
@@ -841,7 +842,7 @@
     <span class="doccomment">/// # Ok(()) }</span>
     <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">insert_header</span>(
-        <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
+        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
         <span class="ident">name</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">HeaderName</span><span class="op">&gt;</span>,
         <span class="ident">values</span>: <span class="kw">impl</span> <span class="ident">ToHeaderValues</span>,
     ) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">HeaderValues</span><span class="op">&gt;</span> {
@@ -866,7 +867,7 @@
     <span class="doccomment">/// #</span>
     <span class="doccomment">/// # Ok(()) }</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">append_header</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">HeaderName</span><span class="op">&gt;</span>, <span class="ident">values</span>: <span class="kw">impl</span> <span class="ident">ToHeaderValues</span>) {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">append_header</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">HeaderName</span><span class="op">&gt;</span>, <span class="ident">values</span>: <span class="kw">impl</span> <span class="ident">ToHeaderValues</span>) {
         <span class="self">self</span>.<span class="ident">headers</span>.<span class="ident">append</span>(<span class="ident">name</span>, <span class="ident">values</span>)
     }
 
@@ -884,7 +885,7 @@
     <span class="doccomment">/// #</span>
     <span class="doccomment">/// # Ok(()) }</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_body</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">body</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Body</span><span class="op">&gt;</span>) {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_body</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">body</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Body</span><span class="op">&gt;</span>) {
         <span class="self">self</span>.<span class="ident">replace_body</span>(<span class="ident">body</span>);
     }
 
@@ -909,8 +910,8 @@
     <span class="doccomment">/// #</span>
     <span class="doccomment">/// # Ok(()) }) }</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">replace_body</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">body</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Body</span><span class="op">&gt;</span>) -&gt; <span class="ident">Body</span> {
-        <span class="kw">let</span> <span class="ident">body</span> <span class="op">=</span> <span class="ident">mem::replace</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">body</span>, <span class="ident">body</span>.<span class="ident">into</span>());
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">replace_body</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">body</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Body</span><span class="op">&gt;</span>) -&gt; <span class="ident">Body</span> {
+        <span class="kw">let</span> <span class="ident">body</span> <span class="op">=</span> <span class="ident">mem::replace</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">body</span>, <span class="ident">body</span>.<span class="ident">into</span>());
         <span class="self">self</span>.<span class="ident">copy_content_type_from_body</span>();
         <span class="ident">body</span>
     }
@@ -938,8 +939,8 @@
     <span class="doccomment">/// #</span>
     <span class="doccomment">/// # Ok(()) }) }</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">swap_body</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">body</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Body</span>) {
-        <span class="ident">mem::swap</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">body</span>, <span class="ident">body</span>);
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">swap_body</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">body</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Body</span>) {
+        <span class="ident">mem::swap</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">body</span>, <span class="ident">body</span>);
         <span class="self">self</span>.<span class="ident">copy_content_type_from_body</span>();
     }
 
@@ -967,7 +968,7 @@
     <span class="doccomment">/// #</span>
     <span class="doccomment">/// # Ok(()) }) }</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">take_body</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident">Body</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">take_body</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">Body</span> {
         <span class="self">self</span>.<span class="ident">replace_body</span>(<span class="ident">Body::empty</span>())
     }
 
@@ -993,7 +994,7 @@
     <span class="doccomment">/// assert_eq!(&amp;res.body_string().await.unwrap(), &quot;Hello Nori&quot;);</span>
     <span class="doccomment">/// # Ok(()) }) }</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">body_string</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">body_string</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">body</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">take_body</span>();
         <span class="ident">body</span>.<span class="ident">into_string</span>().<span class="kw">await</span>
     }
@@ -1019,7 +1020,7 @@
     <span class="doccomment">/// assert_eq!(bytes, vec![1, 2, 3]);</span>
     <span class="doccomment">/// # Ok(()) }) }</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">body_bytes</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">body_bytes</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">body</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">take_body</span>();
         <span class="ident">body</span>.<span class="ident">into_bytes</span>().<span class="kw">await</span>
     }
@@ -1053,7 +1054,7 @@
     <span class="doccomment">/// assert_eq!(&amp;cat.name, &quot;chashu&quot;);</span>
     <span class="doccomment">/// # Ok(()) }) }</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">body_json</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">DeserializeOwned</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">body_json</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">DeserializeOwned</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">body</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">take_body</span>();
         <span class="ident">body</span>.<span class="ident">into_json</span>().<span class="kw">await</span>
     }
@@ -1087,13 +1088,13 @@
     <span class="doccomment">/// assert_eq!(&amp;cat.name, &quot;chashu&quot;);</span>
     <span class="doccomment">/// # Ok(()) }) }</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">body_form</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">DeserializeOwned</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">body_form</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">DeserializeOwned</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">body</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">take_body</span>();
         <span class="ident">body</span>.<span class="ident">into_form</span>().<span class="kw">await</span>
     }
 
     <span class="doccomment">/// Set the response MIME.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_content_type</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">mime</span>: <span class="ident">Mime</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">HeaderValues</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_content_type</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">mime</span>: <span class="ident">Mime</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">HeaderValues</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">value</span>: <span class="ident">HeaderValue</span> <span class="op">=</span> <span class="ident">mime</span>.<span class="ident">into</span>();
 
         <span class="comment">// A Mime instance is guaranteed to be valid header name.</span>
@@ -1101,7 +1102,7 @@
     }
 
     <span class="doccomment">/// Copy MIME data from the body.</span>
-    <span class="kw">fn</span> <span class="ident">copy_content_type_from_body</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
+    <span class="kw">fn</span> <span class="ident">copy_content_type_from_body</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">header</span>(<span class="ident">CONTENT_TYPE</span>).<span class="ident">is_none</span>() {
             <span class="self">self</span>.<span class="ident">set_content_type</span>(<span class="self">self</span>.<span class="ident">body</span>.<span class="ident">mime</span>().<span class="ident">clone</span>());
         }
@@ -1152,14 +1153,14 @@
     <span class="doccomment">/// Sets a string representation of the peer address that this</span>
     <span class="doccomment">/// response was sent to. This might take the form of an ip/fqdn</span>
     <span class="doccomment">/// and port or a local socket address.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_peer_addr</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">peer_addr</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw">impl</span> <span class="ident">std::string::ToString</span><span class="op">&gt;</span>) {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_peer_addr</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">peer_addr</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw">impl</span> <span class="ident">std::string::ToString</span><span class="op">&gt;</span>) {
         <span class="self">self</span>.<span class="ident">peer_addr</span> <span class="op">=</span> <span class="ident">peer_addr</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">addr</span><span class="op">|</span> <span class="ident">addr</span>.<span class="ident">to_string</span>());
     }
 
     <span class="doccomment">/// Sets a string representation of the local address that this</span>
     <span class="doccomment">/// response was sent on. This might take the form of an ip/fqdn and</span>
     <span class="doccomment">/// port, or a local socket address.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_local_addr</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">local_addr</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw">impl</span> <span class="ident">std::string::ToString</span><span class="op">&gt;</span>) {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_local_addr</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">local_addr</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw">impl</span> <span class="ident">std::string::ToString</span><span class="op">&gt;</span>) {
         <span class="self">self</span>.<span class="ident">local_addr</span> <span class="op">=</span> <span class="ident">local_addr</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">addr</span><span class="op">|</span> <span class="ident">addr</span>.<span class="ident">to_string</span>());
     }
 
@@ -1188,17 +1189,17 @@
     <span class="doccomment">/// #</span>
     <span class="doccomment">/// # Ok(()) }</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_version</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">version</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Version</span><span class="op">&gt;</span>) {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_version</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">version</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Version</span><span class="op">&gt;</span>) {
         <span class="self">self</span>.<span class="ident">version</span> <span class="op">=</span> <span class="ident">version</span>;
     }
 
     <span class="doccomment">/// Set the status.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_status</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">status</span>: <span class="ident">StatusCode</span>) {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_status</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">status</span>: <span class="ident">StatusCode</span>) {
         <span class="self">self</span>.<span class="ident">status</span> <span class="op">=</span> <span class="ident">status</span>;
     }
 
     <span class="doccomment">/// Sends trailers to the a receiver.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">send_trailers</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident">trailers::Sender</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">send_trailers</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">trailers::Sender</span> {
         <span class="self">self</span>.<span class="ident">has_trailers</span> <span class="op">=</span> <span class="bool-val">true</span>;
         <span class="kw">let</span> <span class="ident">sender</span> <span class="op">=</span> <span class="self">self</span>
             .<span class="ident">trailers_sender</span>
@@ -1208,7 +1209,7 @@
     }
 
     <span class="doccomment">/// Receive trailers from a sender.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">recv_trailers</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident">trailers::Receiver</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">recv_trailers</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">trailers::Receiver</span> {
         <span class="kw">let</span> <span class="ident">receiver</span> <span class="op">=</span> <span class="self">self</span>
             .<span class="ident">trailers_receiver</span>
             .<span class="ident">take</span>()
@@ -1223,7 +1224,7 @@
 
     <span class="doccomment">/// Sends an upgrade connection to the a receiver.</span>
     <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;docs&quot;</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">unstable</span>)))]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">send_upgrade</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident">upgrade::Sender</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">send_upgrade</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">upgrade::Sender</span> {
         <span class="self">self</span>.<span class="ident">has_upgrade</span> <span class="op">=</span> <span class="bool-val">true</span>;
         <span class="kw">let</span> <span class="ident">sender</span> <span class="op">=</span> <span class="self">self</span>
             .<span class="ident">upgrade_sender</span>
@@ -1234,7 +1235,7 @@
 
     <span class="doccomment">/// Receive an upgraded connection from a sender.</span>
     <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;docs&quot;</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">unstable</span>)))]</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">recv_upgrade</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident">upgrade::Receiver</span> {
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">recv_upgrade</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">upgrade::Receiver</span> {
         <span class="self">self</span>.<span class="ident">has_upgrade</span> <span class="op">=</span> <span class="bool-val">true</span>;
         <span class="kw">let</span> <span class="ident">receiver</span> <span class="op">=</span> <span class="self">self</span>
             .<span class="ident">upgrade_receiver</span>
@@ -1256,7 +1257,7 @@
 
     <span class="doccomment">/// An iterator visiting all header pairs in arbitrary order, with mutable</span>
     <span class="doccomment">/// references to the values.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">iter_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident">headers::IterMut</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">iter_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">headers::IterMut</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">headers</span>.<span class="ident">iter_mut</span>()
     }
 
@@ -1291,8 +1292,8 @@
     <span class="doccomment">/// #</span>
     <span class="doccomment">/// # Ok(()) }</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ext_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Extensions</span> {
-        <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">ext</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ext_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">Extensions</span> {
+        <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">ext</span>
     }
 }
 
@@ -1321,23 +1322,23 @@
 <span class="kw">impl</span> <span class="ident">AsyncRead</span> <span class="kw">for</span> <span class="ident">Response</span> {
     <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">missing_doc_code_examples</span>)]</span>
     <span class="kw">fn</span> <span class="ident">poll_read</span>(
-        <span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span><span class="op">&gt;</span>,
-        <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-        <span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">u8</span>],
+        <span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>,
+        <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
+        <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">u8</span>],
     ) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="ident">Pin::new</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">body</span>).<span class="ident">poll_read</span>(<span class="ident">cx</span>, <span class="ident">buf</span>)
+        <span class="ident">Pin::new</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">body</span>).<span class="ident">poll_read</span>(<span class="ident">cx</span>, <span class="ident">buf</span>)
     }
 }
 
 <span class="kw">impl</span> <span class="ident">AsyncBufRead</span> <span class="kw">for</span> <span class="ident">Response</span> {
     <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">missing_doc_code_examples</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">poll_fill_buf</span>(<span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">io::Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;_</span> [<span class="ident">u8</span>]<span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">poll_fill_buf</span>(<span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">io::Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;_</span> [<span class="ident">u8</span>]<span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">this</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">project</span>();
         <span class="ident">this</span>.<span class="ident">body</span>.<span class="ident">poll_fill_buf</span>(<span class="ident">cx</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">consume</span>(<span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">amt</span>: <span class="ident">usize</span>) {
-        <span class="ident">Pin::new</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">body</span>).<span class="ident">consume</span>(<span class="ident">amt</span>)
+    <span class="kw">fn</span> <span class="ident">consume</span>(<span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">amt</span>: <span class="ident">usize</span>) {
+        <span class="ident">Pin::new</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">body</span>).<span class="ident">consume</span>(<span class="ident">amt</span>)
     }
 }
 
@@ -1348,8 +1349,8 @@
 }
 
 <span class="kw">impl</span> <span class="ident">AsMut</span><span class="op">&lt;</span><span class="ident">Headers</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Response</span> {
-    <span class="kw">fn</span> <span class="ident">as_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Headers</span> {
-        <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">headers</span>
+    <span class="kw">fn</span> <span class="ident">as_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">Headers</span> {
+        <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">headers</span>
     }
 }
 
@@ -1452,5 +1453,4 @@
 }
 </code></pre></div>
 </section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="http_types" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>
-    <script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script>
 </body></html>

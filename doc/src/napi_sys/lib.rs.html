@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;napi-sys-1.1.2&#x2F;src&#x2F;lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../napi_sys/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;napi-sys-1.1.2&#x2F;src&#x2F;lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><script defer src="../../main.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script>
+    <noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../napi_sys/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -929,7 +930,7 @@
 }
 
 <span class="doccomment">/// Env ptr</span>
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">napi_env</span> <span class="op">=</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">napi_env__</span>;
+<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">napi_env</span> <span class="op">=</span> <span class="kw-2">*mut</span> <span class="ident">napi_env__</span>;
 <span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">napi_value__</span> {
@@ -937,31 +938,31 @@
 }
 
 <span class="doccomment">/// JsValue ptr</span>
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">napi_value</span> <span class="op">=</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">napi_value__</span>;
+<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">napi_value</span> <span class="op">=</span> <span class="kw-2">*mut</span> <span class="ident">napi_value__</span>;
 <span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">napi_ref__</span> {
   <span class="ident">_unused</span>: [<span class="ident">u8</span>; <span class="number">0</span>],
 }
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">napi_ref</span> <span class="op">=</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">napi_ref__</span>;
+<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">napi_ref</span> <span class="op">=</span> <span class="kw-2">*mut</span> <span class="ident">napi_ref__</span>;
 <span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">napi_handle_scope__</span> {
   <span class="ident">_unused</span>: [<span class="ident">u8</span>; <span class="number">0</span>],
 }
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">napi_handle_scope</span> <span class="op">=</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">napi_handle_scope__</span>;
+<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">napi_handle_scope</span> <span class="op">=</span> <span class="kw-2">*mut</span> <span class="ident">napi_handle_scope__</span>;
 <span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">napi_escapable_handle_scope__</span> {
   <span class="ident">_unused</span>: [<span class="ident">u8</span>; <span class="number">0</span>],
 }
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">napi_escapable_handle_scope</span> <span class="op">=</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">napi_escapable_handle_scope__</span>;
+<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">napi_escapable_handle_scope</span> <span class="op">=</span> <span class="kw-2">*mut</span> <span class="ident">napi_escapable_handle_scope__</span>;
 <span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">napi_callback_info__</span> {
   <span class="ident">_unused</span>: [<span class="ident">u8</span>; <span class="number">0</span>],
 }
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">napi_callback_info</span> <span class="op">=</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">napi_callback_info__</span>;
+<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">napi_callback_info</span> <span class="op">=</span> <span class="kw-2">*mut</span> <span class="ident">napi_callback_info__</span>;
 <span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">napi_deferred__</span> {
@@ -972,7 +973,7 @@
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">uv_loop_s</span> {
   <span class="ident">_unused</span>: [<span class="ident">u8</span>; <span class="number">0</span>],
 }
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">napi_deferred</span> <span class="op">=</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">napi_deferred__</span>;
+<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">napi_deferred</span> <span class="op">=</span> <span class="kw-2">*mut</span> <span class="ident">napi_deferred__</span>;
 
 <span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">Debug</span>)]</span>
@@ -1051,26 +1052,26 @@
 <span class="kw">pub</span> <span class="kw">type</span> <span class="ident">napi_callback</span> <span class="op">=</span>
   <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw">unsafe</span> <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span>(<span class="ident">env</span>: <span class="ident">napi_env</span>, <span class="ident">info</span>: <span class="ident">napi_callback_info</span>) -&gt; <span class="ident">napi_value</span><span class="op">&gt;</span>;
 <span class="kw">pub</span> <span class="kw">type</span> <span class="ident">napi_finalize</span> <span class="op">=</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span>
-  <span class="kw">unsafe</span> <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span>(<span class="ident">env</span>: <span class="ident">napi_env</span>, <span class="ident">finalize_data</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">c_void</span>, <span class="ident">finalize_hint</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">c_void</span>),
+  <span class="kw">unsafe</span> <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span>(<span class="ident">env</span>: <span class="ident">napi_env</span>, <span class="ident">finalize_data</span>: <span class="kw-2">*mut</span> <span class="ident">c_void</span>, <span class="ident">finalize_hint</span>: <span class="kw-2">*mut</span> <span class="ident">c_void</span>),
 <span class="op">&gt;</span>;
 <span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">napi_property_descriptor</span> {
-  <span class="kw">pub</span> <span class="ident">utf8name</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">c_char</span>,
+  <span class="kw">pub</span> <span class="ident">utf8name</span>: <span class="kw-2">*const</span> <span class="ident">c_char</span>,
   <span class="kw">pub</span> <span class="ident">name</span>: <span class="ident">napi_value</span>,
   <span class="kw">pub</span> <span class="ident">method</span>: <span class="ident">napi_callback</span>,
   <span class="kw">pub</span> <span class="ident">getter</span>: <span class="ident">napi_callback</span>,
   <span class="kw">pub</span> <span class="ident">setter</span>: <span class="ident">napi_callback</span>,
   <span class="kw">pub</span> <span class="ident">value</span>: <span class="ident">napi_value</span>,
   <span class="kw">pub</span> <span class="ident">attributes</span>: <span class="ident">napi_property_attributes</span>,
-  <span class="kw">pub</span> <span class="ident">data</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">c_void</span>,
+  <span class="kw">pub</span> <span class="ident">data</span>: <span class="kw-2">*mut</span> <span class="ident">c_void</span>,
 }
 
 <span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">napi_extended_error_info</span> {
-  <span class="kw">pub</span> <span class="ident">error_message</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">c_char</span>,
-  <span class="kw">pub</span> <span class="ident">engine_reserved</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">c_void</span>,
+  <span class="kw">pub</span> <span class="ident">error_message</span>: <span class="kw-2">*const</span> <span class="ident">c_char</span>,
+  <span class="kw">pub</span> <span class="ident">engine_reserved</span>: <span class="kw-2">*mut</span> <span class="ident">c_void</span>,
   <span class="kw">pub</span> <span class="ident">engine_error_code</span>: <span class="ident">u32</span>,
   <span class="kw">pub</span> <span class="ident">error_code</span>: <span class="ident">napi_status</span>,
 }
@@ -1107,137 +1108,137 @@
   <span class="ident">_unused</span>: [<span class="ident">u8</span>; <span class="number">0</span>],
 }
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;napi8&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">napi_async_cleanup_hook_handle</span> <span class="op">=</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">napi_async_cleanup_hook_handle__</span>;
+<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">napi_async_cleanup_hook_handle</span> <span class="op">=</span> <span class="kw-2">*mut</span> <span class="ident">napi_async_cleanup_hook_handle__</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;napi8&quot;</span>)]</span>
 <span class="kw">pub</span> <span class="kw">type</span> <span class="ident">napi_async_cleanup_hook</span> <span class="op">=</span>
-  <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw">unsafe</span> <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span>(<span class="ident">handle</span>: <span class="ident">napi_async_cleanup_hook_handle</span>, <span class="ident">data</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">c_void</span>)<span class="op">&gt;</span>;
+  <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw">unsafe</span> <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span>(<span class="ident">handle</span>: <span class="ident">napi_async_cleanup_hook_handle</span>, <span class="ident">data</span>: <span class="kw-2">*mut</span> <span class="ident">c_void</span>)<span class="op">&gt;</span>;
 
 <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> {
   <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">napi_get_last_error_info</span>(
     <span class="ident">env</span>: <span class="ident">napi_env</span>,
-    <span class="ident">result</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">napi_extended_error_info</span>,
+    <span class="ident">result</span>: <span class="kw-2">*mut</span> <span class="kw-2">*const</span> <span class="ident">napi_extended_error_info</span>,
   ) -&gt; <span class="ident">napi_status</span>;
 
-  <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">napi_get_undefined</span>(<span class="ident">env</span>: <span class="ident">napi_env</span>, <span class="ident">result</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">napi_value</span>) -&gt; <span class="ident">napi_status</span>;
-  <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">napi_get_null</span>(<span class="ident">env</span>: <span class="ident">napi_env</span>, <span class="ident">result</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">napi_value</span>) -&gt; <span class="ident">napi_status</span>;
-  <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">napi_get_global</span>(<span class="ident">env</span>: <span class="ident">napi_env</span>, <span class="ident">result</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">napi_value</span>) -&gt; <span class="ident">napi_status</span>;
-  <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">napi_get_boolean</span>(<span class="ident">env</span>: <span class="ident">napi_env</span>, <span class="ident">value</span>: <span class="ident">bool</span>, <span class="ident">result</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">napi_value</span>) -&gt; <span class="ident">napi_status</span>;
-  <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">napi_create_object</span>(<span class="ident">env</span>: <span class="ident">napi_env</span>, <span class="ident">result</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">napi_value</span>) -&gt; <span class="ident">napi_status</span>;
-  <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">napi_create_array</span>(<span class="ident">env</span>: <span class="ident">napi_env</span>, <span class="ident">result</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">napi_value</span>) -&gt; <span class="ident">napi_status</span>;
+  <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">napi_get_undefined</span>(<span class="ident">env</span>: <span class="ident">napi_env</span>, <span class="ident">result</span>: <span class="kw-2">*mut</span> <span class="ident">napi_value</span>) -&gt; <span class="ident">napi_status</span>;
+  <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">napi_get_null</span>(<span class="ident">env</span>: <span class="ident">napi_env</span>, <span class="ident">result</span>: <span class="kw-2">*mut</span> <span class="ident">napi_value</span>) -&gt; <span class="ident">napi_status</span>;
+  <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">napi_get_global</span>(<span class="ident">env</span>: <span class="ident">napi_env</span>, <span class="ident">result</span>: <span class="kw-2">*mut</span> <span class="ident">napi_value</span>) -&gt; <span class="ident">napi_status</span>;
+  <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">napi_get_boolean</span>(<span class="ident">env</span>: <span class="ident">napi_env</span>, <span class="ident">value</span>: <span class="ident">bool</span>, <span class="ident">result</span>: <span class="kw-2">*mut</span> <span class="ident">napi_value</span>) -&gt; <span class="ident">napi_status</span>;
+  <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">napi_create_object</span>(<span class="ident">env</span>: <span class="ident">napi_env</span>, <span class="ident">result</span>: <span class="kw-2">*mut</span> <span class="ident">napi_value</span>) -&gt; <span class="ident">napi_status</span>;
+  <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">napi_create_array</span>(<span class="ident">env</span>: <span class="ident">napi_env</span>, <span class="ident">result</span>: <span class="kw-2">*mut</span> <span class="ident">napi_value</span>) -&gt; <span class="ident">napi_status</span>;
   <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">napi_create_array_with_length</span>(
     <span class="ident">env</span>: <span class="ident">napi_env</span>,
     <span class="ident">length</span>: <span class="ident">usize</span>,
-    <span class="ident">result</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">napi_value</span>,
+    <span class="ident">result</span>: <span class="kw-2">*mut</span> <span class="ident">napi_value</span>,
   ) -&gt; <span class="ident">napi_status</span>;
-  <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">napi_create_double</span>(<span class="ident">env</span>: <span class="ident">napi_env</span>, <span class="ident">value</span>: <span class="ident">f64</span>, <span class="ident">result</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">napi_value</span>) -&gt; <span class="ident">napi_status</span>;
-  <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">napi_create_int32</span>(<span class="ident">env</span>: <span class="ident">napi_env</span>, <span class="ident">value</span>: <span class="ident">i32</span>, <span class="ident">result</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">napi_value</span>) -&gt; <span class="ident">napi_status</span>;
-  <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">napi_create_uint32</span>(<span class="ident">env</span>: <span class="ident">napi_env</span>, <span class="ident">value</span>: <span class="ident">u32</span>, <span class="ident">result</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">napi_value</span>) -&gt; <span class="ident">napi_status</span>;
-  <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">napi_create_int64</span>(<span class="ident">env</span>: <span class="ident">napi_env</span>, <span class="ident">value</span>: <span class="ident">i64</span>, <span class="ident">result</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">napi_value</span>) -&gt; <span class="ident">napi_status</span>;
+  <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">napi_create_double</span>(<span class="ident">env</span>: <span class="ident">napi_env</span>, <span class="ident">value</span>: <span class="ident">f64</span>, <span class="ident">result</span>: <span class="kw-2">*mut</span> <span class="ident">napi_value</span>) -&gt; <span class="ident">napi_status</span>;
+  <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">napi_create_int32</span>(<span class="ident">env</span>: <span class="ident">napi_env</span>, <span class="ident">value</span>: <span class="ident">i32</span>, <span class="ident">result</span>: <span class="kw-2">*mut</span> <span class="ident">napi_value</span>) -&gt; <span class="ident">napi_status</span>;
+  <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">napi_create_uint32</span>(<span class="ident">env</span>: <span class="ident">napi_env</span>, <span class="ident">value</span>: <span class="ident">u32</span>, <span class="ident">result</span>: <span class="kw-2">*mut</span> <span class="ident">napi_value</span>) -&gt; <span class="ident">napi_status</span>;
+  <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">napi_create_int64</span>(<span class="ident">env</span>: <span class="ident">napi_env</span>, <span class="ident">value</span>: <span class="ident">i64</span>, <span class="ident">result</span>: <span class="kw-2">*mut</span> <span class="ident">napi_value</span>) -&gt; <span class="ident">napi_status</span>;
   <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">napi_create_string_latin1</span>(
     <span class="ident">env</span>: <span class="ident">napi_env</span>,
-    <span class="ident">str_</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">c_char</span>,
+    <span class="ident">str_</span>: <span class="kw-2">*const</span> <span class="ident">c_char</span>,
     <span class="ident">length</span>: <span class="ident">usize</span>,
-    <span class="ident">result</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">napi_value</span>,
+    <span class="ident">result</span>: <span class="kw-2">*mut</span> <span class="ident">napi_value</span>,
   ) -&gt; <span class="ident">napi_status</span>;
   <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">napi_create_string_utf8</span>(
     <span class="ident">env</span>: <span class="ident">napi_env</span>,
-    <span class="ident">str_</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">c_char</span>,
+    <span class="ident">str_</span>: <span class="kw-2">*const</span> <span class="ident">c_char</span>,
     <span class="ident">length</span>: <span class="ident">usize</span>,
-    <span class="ident">result</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">napi_value</span>,
+    <span class="ident">result</span>: <span class="kw-2">*mut</span> <span class="ident">napi_value</span>,
   ) -&gt; <span class="ident">napi_status</span>;
   <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">napi_create_string_utf16</span>(
     <span class="ident">env</span>: <span class="ident">napi_env</span>,
-    <span class="ident">str_</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">u16</span>,
+    <span class="ident">str_</span>: <span class="kw-2">*const</span> <span class="ident">u16</span>,
     <span class="ident">length</span>: <span class="ident">usize</span>,
-    <span class="ident">result</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">napi_value</span>,
+    <span class="ident">result</span>: <span class="kw-2">*mut</span> <span class="ident">napi_value</span>,
   ) -&gt; <span class="ident">napi_status</span>;
   <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">napi_create_symbol</span>(
     <span class="ident">env</span>: <span class="ident">napi_env</span>,
     <span class="ident">description</span>: <span class="ident">napi_value</span>,
-    <span class="ident">result</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">napi_value</span>,
+    <span class="ident">result</span>: <span class="kw-2">*mut</span> <span class="ident">napi_value</span>,
   ) -&gt; <span class="ident">napi_status</span>;
   <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">napi_create_function</span>(
     <span class="ident">env</span>: <span class="ident">napi_env</span>,
-    <span class="ident">utf8name</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">c_char</span>,
+    <span class="ident">utf8name</span>: <span class="kw-2">*const</span> <span class="ident">c_char</span>,
     <span class="ident">length</span>: <span class="ident">usize</span>,
     <span class="ident">cb</span>: <span class="ident">napi_callback</span>,
-    <span class="ident">data</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">c_void</span>,
-    <span class="ident">result</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">napi_value</span>,
+    <span class="ident">data</span>: <span class="kw-2">*mut</span> <span class="ident">c_void</span>,
+    <span class="ident">result</span>: <span class="kw-2">*mut</span> <span class="ident">napi_value</span>,
   ) -&gt; <span class="ident">napi_status</span>;
   <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">napi_create_error</span>(
     <span class="ident">env</span>: <span class="ident">napi_env</span>,
     <span class="ident">code</span>: <span class="ident">napi_value</span>,
     <span class="ident">msg</span>: <span class="ident">napi_value</span>,
-    <span class="ident">result</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">napi_value</span>,
+    <span class="ident">result</span>: <span class="kw-2">*mut</span> <span class="ident">napi_value</span>,
   ) -&gt; <span class="ident">napi_status</span>;
   <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">napi_create_type_error</span>(
     <span class="ident">env</span>: <span class="ident">napi_env</span>,
     <span class="ident">code</span>: <span class="ident">napi_value</span>,
     <span class="ident">msg</span>: <span class="ident">napi_value</span>,
-    <span class="ident">result</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">napi_value</span>,
+    <span class="ident">result</span>: <span class="kw-2">*mut</span> <span class="ident">napi_value</span>,
   ) -&gt; <span class="ident">napi_status</span>;
   <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">napi_create_range_error</span>(
     <span class="ident">env</span>: <span class="ident">napi_env</span>,
     <span class="ident">code</span>: <span class="ident">napi_value</span>,
     <span class="ident">msg</span>: <span class="ident">napi_value</span>,
-    <span class="ident">result</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">napi_value</span>,
+    <span class="ident">result</span>: <span class="kw-2">*mut</span> <span class="ident">napi_value</span>,
   ) -&gt; <span class="ident">napi_status</span>;
-  <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">napi_typeof</span>(<span class="ident">env</span>: <span class="ident">napi_env</span>, <span class="ident">value</span>: <span class="ident">napi_value</span>, <span class="ident">result</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">napi_valuetype</span>) -&gt; <span class="ident">napi_status</span>;
-  <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">napi_get_value_double</span>(<span class="ident">env</span>: <span class="ident">napi_env</span>, <span class="ident">value</span>: <span class="ident">napi_value</span>, <span class="ident">result</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">f64</span>) -&gt; <span class="ident">napi_status</span>;
-  <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">napi_get_value_int32</span>(<span class="ident">env</span>: <span class="ident">napi_env</span>, <span class="ident">value</span>: <span class="ident">napi_value</span>, <span class="ident">result</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">i32</span>) -&gt; <span class="ident">napi_status</span>;
-  <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">napi_get_value_uint32</span>(<span class="ident">env</span>: <span class="ident">napi_env</span>, <span class="ident">value</span>: <span class="ident">napi_value</span>, <span class="ident">result</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">u32</span>) -&gt; <span class="ident">napi_status</span>;
-  <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">napi_get_value_int64</span>(<span class="ident">env</span>: <span class="ident">napi_env</span>, <span class="ident">value</span>: <span class="ident">napi_value</span>, <span class="ident">result</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">i64</span>) -&gt; <span class="ident">napi_status</span>;
-  <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">napi_get_value_bool</span>(<span class="ident">env</span>: <span class="ident">napi_env</span>, <span class="ident">value</span>: <span class="ident">napi_value</span>, <span class="ident">result</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">bool</span>) -&gt; <span class="ident">napi_status</span>;
+  <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">napi_typeof</span>(<span class="ident">env</span>: <span class="ident">napi_env</span>, <span class="ident">value</span>: <span class="ident">napi_value</span>, <span class="ident">result</span>: <span class="kw-2">*mut</span> <span class="ident">napi_valuetype</span>) -&gt; <span class="ident">napi_status</span>;
+  <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">napi_get_value_double</span>(<span class="ident">env</span>: <span class="ident">napi_env</span>, <span class="ident">value</span>: <span class="ident">napi_value</span>, <span class="ident">result</span>: <span class="kw-2">*mut</span> <span class="ident">f64</span>) -&gt; <span class="ident">napi_status</span>;
+  <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">napi_get_value_int32</span>(<span class="ident">env</span>: <span class="ident">napi_env</span>, <span class="ident">value</span>: <span class="ident">napi_value</span>, <span class="ident">result</span>: <span class="kw-2">*mut</span> <span class="ident">i32</span>) -&gt; <span class="ident">napi_status</span>;
+  <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">napi_get_value_uint32</span>(<span class="ident">env</span>: <span class="ident">napi_env</span>, <span class="ident">value</span>: <span class="ident">napi_value</span>, <span class="ident">result</span>: <span class="kw-2">*mut</span> <span class="ident">u32</span>) -&gt; <span class="ident">napi_status</span>;
+  <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">napi_get_value_int64</span>(<span class="ident">env</span>: <span class="ident">napi_env</span>, <span class="ident">value</span>: <span class="ident">napi_value</span>, <span class="ident">result</span>: <span class="kw-2">*mut</span> <span class="ident">i64</span>) -&gt; <span class="ident">napi_status</span>;
+  <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">napi_get_value_bool</span>(<span class="ident">env</span>: <span class="ident">napi_env</span>, <span class="ident">value</span>: <span class="ident">napi_value</span>, <span class="ident">result</span>: <span class="kw-2">*mut</span> <span class="ident">bool</span>) -&gt; <span class="ident">napi_status</span>;
   <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">napi_get_value_string_latin1</span>(
     <span class="ident">env</span>: <span class="ident">napi_env</span>,
     <span class="ident">value</span>: <span class="ident">napi_value</span>,
-    <span class="ident">buf</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">c_char</span>,
+    <span class="ident">buf</span>: <span class="kw-2">*mut</span> <span class="ident">c_char</span>,
     <span class="ident">bufsize</span>: <span class="ident">usize</span>,
-    <span class="ident">result</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">usize</span>,
+    <span class="ident">result</span>: <span class="kw-2">*mut</span> <span class="ident">usize</span>,
   ) -&gt; <span class="ident">napi_status</span>;
   <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">napi_get_value_string_utf8</span>(
     <span class="ident">env</span>: <span class="ident">napi_env</span>,
     <span class="ident">value</span>: <span class="ident">napi_value</span>,
-    <span class="ident">buf</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">c_char</span>,
+    <span class="ident">buf</span>: <span class="kw-2">*mut</span> <span class="ident">c_char</span>,
     <span class="ident">bufsize</span>: <span class="ident">usize</span>,
-    <span class="ident">result</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">usize</span>,
+    <span class="ident">result</span>: <span class="kw-2">*mut</span> <span class="ident">usize</span>,
   ) -&gt; <span class="ident">napi_status</span>;
   <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">napi_get_value_string_utf16</span>(
     <span class="ident">env</span>: <span class="ident">napi_env</span>,
     <span class="ident">value</span>: <span class="ident">napi_value</span>,
-    <span class="ident">buf</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">u16</span>,
+    <span class="ident">buf</span>: <span class="kw-2">*mut</span> <span class="ident">u16</span>,
     <span class="ident">bufsize</span>: <span class="ident">usize</span>,
-    <span class="ident">result</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">usize</span>,
+    <span class="ident">result</span>: <span class="kw-2">*mut</span> <span class="ident">usize</span>,
   ) -&gt; <span class="ident">napi_status</span>;
   <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">napi_coerce_to_bool</span>(
     <span class="ident">env</span>: <span class="ident">napi_env</span>,
     <span class="ident">value</span>: <span class="ident">napi_value</span>,
-    <span class="ident">result</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">napi_value</span>,
+    <span class="ident">result</span>: <span class="kw-2">*mut</span> <span class="ident">napi_value</span>,
   ) -&gt; <span class="ident">napi_status</span>;
   <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">napi_coerce_to_number</span>(
     <span class="ident">env</span>: <span class="ident">napi_env</span>,
     <span class="ident">value</span>: <span class="ident">napi_value</span>,
-    <span class="ident">result</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">napi_value</span>,
+    <span class="ident">result</span>: <span class="kw-2">*mut</span> <span class="ident">napi_value</span>,
   ) -&gt; <span class="ident">napi_status</span>;
   <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">napi_coerce_to_object</span>(
     <span class="ident">env</span>: <span class="ident">napi_env</span>,
     <span class="ident">value</span>: <span class="ident">napi_value</span>,
-    <span class="ident">result</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">napi_value</span>,
+    <span class="ident">result</span>: <span class="kw-2">*mut</span> <span class="ident">napi_value</span>,
   ) -&gt; <span class="ident">napi_status</span>;
   <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">napi_coerce_to_string</span>(
     <span class="ident">env</span>: <span class="ident">napi_env</span>,
     <span class="ident">value</span>: <span class="ident">napi_value</span>,
-    <span class="ident">result</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">napi_value</span>,
+    <span class="ident">result</span>: <span class="kw-2">*mut</span> <span class="ident">napi_value</span>,
   ) -&gt; <span class="ident">napi_status</span>;
   <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">napi_get_prototype</span>(
     <span class="ident">env</span>: <span class="ident">napi_env</span>,
     <span class="ident">object</span>: <span class="ident">napi_value</span>,
-    <span class="ident">result</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">napi_value</span>,
+    <span class="ident">result</span>: <span class="kw-2">*mut</span> <span class="ident">napi_value</span>,
   ) -&gt; <span class="ident">napi_status</span>;
   <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">napi_get_property_names</span>(
     <span class="ident">env</span>: <span class="ident">napi_env</span>,
     <span class="ident">object</span>: <span class="ident">napi_value</span>,
-    <span class="ident">result</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">napi_value</span>,
+    <span class="ident">result</span>: <span class="kw-2">*mut</span> <span class="ident">napi_value</span>,
   ) -&gt; <span class="ident">napi_status</span>;
   <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">napi_set_property</span>(
     <span class="ident">env</span>: <span class="ident">napi_env</span>,
@@ -1249,43 +1250,43 @@
     <span class="ident">env</span>: <span class="ident">napi_env</span>,
     <span class="ident">object</span>: <span class="ident">napi_value</span>,
     <span class="ident">key</span>: <span class="ident">napi_value</span>,
-    <span class="ident">result</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">bool</span>,
+    <span class="ident">result</span>: <span class="kw-2">*mut</span> <span class="ident">bool</span>,
   ) -&gt; <span class="ident">napi_status</span>;
   <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">napi_get_property</span>(
     <span class="ident">env</span>: <span class="ident">napi_env</span>,
     <span class="ident">object</span>: <span class="ident">napi_value</span>,
     <span class="ident">key</span>: <span class="ident">napi_value</span>,
-    <span class="ident">result</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">napi_value</span>,
+    <span class="ident">result</span>: <span class="kw-2">*mut</span> <span class="ident">napi_value</span>,
   ) -&gt; <span class="ident">napi_status</span>;
   <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">napi_delete_property</span>(
     <span class="ident">env</span>: <span class="ident">napi_env</span>,
     <span class="ident">object</span>: <span class="ident">napi_value</span>,
     <span class="ident">key</span>: <span class="ident">napi_value</span>,
-    <span class="ident">result</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">bool</span>,
+    <span class="ident">result</span>: <span class="kw-2">*mut</span> <span class="ident">bool</span>,
   ) -&gt; <span class="ident">napi_status</span>;
   <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">napi_has_own_property</span>(
     <span class="ident">env</span>: <span class="ident">napi_env</span>,
     <span class="ident">object</span>: <span class="ident">napi_value</span>,
     <span class="ident">key</span>: <span class="ident">napi_value</span>,
-    <span class="ident">result</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">bool</span>,
+    <span class="ident">result</span>: <span class="kw-2">*mut</span> <span class="ident">bool</span>,
   ) -&gt; <span class="ident">napi_status</span>;
   <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">napi_set_named_property</span>(
     <span class="ident">env</span>: <span class="ident">napi_env</span>,
     <span class="ident">object</span>: <span class="ident">napi_value</span>,
-    <span class="ident">utf8name</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">c_char</span>,
+    <span class="ident">utf8name</span>: <span class="kw-2">*const</span> <span class="ident">c_char</span>,
     <span class="ident">value</span>: <span class="ident">napi_value</span>,
   ) -&gt; <span class="ident">napi_status</span>;
   <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">napi_has_named_property</span>(
     <span class="ident">env</span>: <span class="ident">napi_env</span>,
     <span class="ident">object</span>: <span class="ident">napi_value</span>,
-    <span class="ident">utf8name</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">c_char</span>,
-    <span class="ident">result</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">bool</span>,
+    <span class="ident">utf8name</span>: <span class="kw-2">*const</span> <span class="ident">c_char</span>,
+    <span class="ident">result</span>: <span class="kw-2">*mut</span> <span class="ident">bool</span>,
   ) -&gt; <span class="ident">napi_status</span>;
   <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">napi_get_named_property</span>(
     <span class="ident">env</span>: <span class="ident">napi_env</span>,
     <span class="ident">object</span>: <span class="ident">napi_value</span>,
-    <span class="ident">utf8name</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">c_char</span>,
-    <span class="ident">result</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">napi_value</span>,
+    <span class="ident">utf8name</span>: <span class="kw-2">*const</span> <span class="ident">c_char</span>,
+    <span class="ident">result</span>: <span class="kw-2">*mut</span> <span class="ident">napi_value</span>,
   ) -&gt; <span class="ident">napi_status</span>;
   <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">napi_set_element</span>(
     <span class="ident">env</span>: <span class="ident">napi_env</span>,
@@ -1297,124 +1298,124 @@
     <span class="ident">env</span>: <span class="ident">napi_env</span>,
     <span class="ident">object</span>: <span class="ident">napi_value</span>,
     <span class="ident">index</span>: <span class="ident">u32</span>,
-    <span class="ident">result</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">bool</span>,
+    <span class="ident">result</span>: <span class="kw-2">*mut</span> <span class="ident">bool</span>,
   ) -&gt; <span class="ident">napi_status</span>;
   <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">napi_get_element</span>(
     <span class="ident">env</span>: <span class="ident">napi_env</span>,
     <span class="ident">object</span>: <span class="ident">napi_value</span>,
     <span class="ident">index</span>: <span class="ident">u32</span>,
-    <span class="ident">result</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">napi_value</span>,
+    <span class="ident">result</span>: <span class="kw-2">*mut</span> <span class="ident">napi_value</span>,
   ) -&gt; <span class="ident">napi_status</span>;
   <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">napi_delete_element</span>(
     <span class="ident">env</span>: <span class="ident">napi_env</span>,
     <span class="ident">object</span>: <span class="ident">napi_value</span>,
     <span class="ident">index</span>: <span class="ident">u32</span>,
-    <span class="ident">result</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">bool</span>,
+    <span class="ident">result</span>: <span class="kw-2">*mut</span> <span class="ident">bool</span>,
   ) -&gt; <span class="ident">napi_status</span>;
   <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">napi_define_properties</span>(
     <span class="ident">env</span>: <span class="ident">napi_env</span>,
     <span class="ident">object</span>: <span class="ident">napi_value</span>,
     <span class="ident">property_count</span>: <span class="ident">usize</span>,
-    <span class="ident">properties</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">napi_property_descriptor</span>,
+    <span class="ident">properties</span>: <span class="kw-2">*const</span> <span class="ident">napi_property_descriptor</span>,
   ) -&gt; <span class="ident">napi_status</span>;
-  <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">napi_is_array</span>(<span class="ident">env</span>: <span class="ident">napi_env</span>, <span class="ident">value</span>: <span class="ident">napi_value</span>, <span class="ident">result</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">bool</span>) -&gt; <span class="ident">napi_status</span>;
-  <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">napi_get_array_length</span>(<span class="ident">env</span>: <span class="ident">napi_env</span>, <span class="ident">value</span>: <span class="ident">napi_value</span>, <span class="ident">result</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">u32</span>) -&gt; <span class="ident">napi_status</span>;
+  <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">napi_is_array</span>(<span class="ident">env</span>: <span class="ident">napi_env</span>, <span class="ident">value</span>: <span class="ident">napi_value</span>, <span class="ident">result</span>: <span class="kw-2">*mut</span> <span class="ident">bool</span>) -&gt; <span class="ident">napi_status</span>;
+  <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">napi_get_array_length</span>(<span class="ident">env</span>: <span class="ident">napi_env</span>, <span class="ident">value</span>: <span class="ident">napi_value</span>, <span class="ident">result</span>: <span class="kw-2">*mut</span> <span class="ident">u32</span>) -&gt; <span class="ident">napi_status</span>;
   <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">napi_strict_equals</span>(
     <span class="ident">env</span>: <span class="ident">napi_env</span>,
     <span class="ident">lhs</span>: <span class="ident">napi_value</span>,
     <span class="ident">rhs</span>: <span class="ident">napi_value</span>,
-    <span class="ident">result</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">bool</span>,
+    <span class="ident">result</span>: <span class="kw-2">*mut</span> <span class="ident">bool</span>,
   ) -&gt; <span class="ident">napi_status</span>;
   <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">napi_call_function</span>(
     <span class="ident">env</span>: <span class="ident">napi_env</span>,
     <span class="ident">recv</span>: <span class="ident">napi_value</span>,
     <span class="ident">func</span>: <span class="ident">napi_value</span>,
     <span class="ident">argc</span>: <span class="ident">usize</span>,
-    <span class="ident">argv</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">napi_value</span>,
-    <span class="ident">result</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">napi_value</span>,
+    <span class="ident">argv</span>: <span class="kw-2">*const</span> <span class="ident">napi_value</span>,
+    <span class="ident">result</span>: <span class="kw-2">*mut</span> <span class="ident">napi_value</span>,
   ) -&gt; <span class="ident">napi_status</span>;
   <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">napi_new_instance</span>(
     <span class="ident">env</span>: <span class="ident">napi_env</span>,
     <span class="ident">constructor</span>: <span class="ident">napi_value</span>,
     <span class="ident">argc</span>: <span class="ident">usize</span>,
-    <span class="ident">argv</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">napi_value</span>,
-    <span class="ident">result</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">napi_value</span>,
+    <span class="ident">argv</span>: <span class="kw-2">*const</span> <span class="ident">napi_value</span>,
+    <span class="ident">result</span>: <span class="kw-2">*mut</span> <span class="ident">napi_value</span>,
   ) -&gt; <span class="ident">napi_status</span>;
   <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">napi_instanceof</span>(
     <span class="ident">env</span>: <span class="ident">napi_env</span>,
     <span class="ident">object</span>: <span class="ident">napi_value</span>,
     <span class="ident">constructor</span>: <span class="ident">napi_value</span>,
-    <span class="ident">result</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">bool</span>,
+    <span class="ident">result</span>: <span class="kw-2">*mut</span> <span class="ident">bool</span>,
   ) -&gt; <span class="ident">napi_status</span>;
   <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">napi_get_cb_info</span>(
     <span class="ident">env</span>: <span class="ident">napi_env</span>,
     <span class="ident">cbinfo</span>: <span class="ident">napi_callback_info</span>,
-    <span class="ident">argc</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">usize</span>,
-    <span class="ident">argv</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">napi_value</span>,
-    <span class="ident">this_arg</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">napi_value</span>,
-    <span class="ident">data</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">c_void</span>,
+    <span class="ident">argc</span>: <span class="kw-2">*mut</span> <span class="ident">usize</span>,
+    <span class="ident">argv</span>: <span class="kw-2">*mut</span> <span class="ident">napi_value</span>,
+    <span class="ident">this_arg</span>: <span class="kw-2">*mut</span> <span class="ident">napi_value</span>,
+    <span class="ident">data</span>: <span class="kw-2">*mut</span> <span class="kw-2">*mut</span> <span class="ident">c_void</span>,
   ) -&gt; <span class="ident">napi_status</span>;
   <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">napi_get_new_target</span>(
     <span class="ident">env</span>: <span class="ident">napi_env</span>,
     <span class="ident">cbinfo</span>: <span class="ident">napi_callback_info</span>,
-    <span class="ident">result</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">napi_value</span>,
+    <span class="ident">result</span>: <span class="kw-2">*mut</span> <span class="ident">napi_value</span>,
   ) -&gt; <span class="ident">napi_status</span>;
   <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">napi_define_class</span>(
     <span class="ident">env</span>: <span class="ident">napi_env</span>,
-    <span class="ident">utf8name</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">c_char</span>,
+    <span class="ident">utf8name</span>: <span class="kw-2">*const</span> <span class="ident">c_char</span>,
     <span class="ident">length</span>: <span class="ident">usize</span>,
     <span class="ident">constructor</span>: <span class="ident">napi_callback</span>,
-    <span class="ident">data</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">c_void</span>,
+    <span class="ident">data</span>: <span class="kw-2">*mut</span> <span class="ident">c_void</span>,
     <span class="ident">property_count</span>: <span class="ident">usize</span>,
-    <span class="ident">properties</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">napi_property_descriptor</span>,
-    <span class="ident">result</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">napi_value</span>,
+    <span class="ident">properties</span>: <span class="kw-2">*const</span> <span class="ident">napi_property_descriptor</span>,
+    <span class="ident">result</span>: <span class="kw-2">*mut</span> <span class="ident">napi_value</span>,
   ) -&gt; <span class="ident">napi_status</span>;
   <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">napi_wrap</span>(
     <span class="ident">env</span>: <span class="ident">napi_env</span>,
     <span class="ident">js_object</span>: <span class="ident">napi_value</span>,
-    <span class="ident">native_object</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">c_void</span>,
+    <span class="ident">native_object</span>: <span class="kw-2">*mut</span> <span class="ident">c_void</span>,
     <span class="ident">finalize_cb</span>: <span class="ident">napi_finalize</span>,
-    <span class="ident">finalize_hint</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">c_void</span>,
-    <span class="ident">result</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">napi_ref</span>,
+    <span class="ident">finalize_hint</span>: <span class="kw-2">*mut</span> <span class="ident">c_void</span>,
+    <span class="ident">result</span>: <span class="kw-2">*mut</span> <span class="ident">napi_ref</span>,
   ) -&gt; <span class="ident">napi_status</span>;
-  <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">napi_unwrap</span>(<span class="ident">env</span>: <span class="ident">napi_env</span>, <span class="ident">js_object</span>: <span class="ident">napi_value</span>, <span class="ident">result</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">c_void</span>)
+  <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">napi_unwrap</span>(<span class="ident">env</span>: <span class="ident">napi_env</span>, <span class="ident">js_object</span>: <span class="ident">napi_value</span>, <span class="ident">result</span>: <span class="kw-2">*mut</span> <span class="kw-2">*mut</span> <span class="ident">c_void</span>)
     -&gt; <span class="ident">napi_status</span>;
   <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">napi_remove_wrap</span>(
     <span class="ident">env</span>: <span class="ident">napi_env</span>,
     <span class="ident">js_object</span>: <span class="ident">napi_value</span>,
-    <span class="ident">result</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">c_void</span>,
+    <span class="ident">result</span>: <span class="kw-2">*mut</span> <span class="kw-2">*mut</span> <span class="ident">c_void</span>,
   ) -&gt; <span class="ident">napi_status</span>;
   <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">napi_create_external</span>(
     <span class="ident">env</span>: <span class="ident">napi_env</span>,
-    <span class="ident">data</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">c_void</span>,
+    <span class="ident">data</span>: <span class="kw-2">*mut</span> <span class="ident">c_void</span>,
     <span class="ident">finalize_cb</span>: <span class="ident">napi_finalize</span>,
-    <span class="ident">finalize_hint</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">c_void</span>,
-    <span class="ident">result</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">napi_value</span>,
+    <span class="ident">finalize_hint</span>: <span class="kw-2">*mut</span> <span class="ident">c_void</span>,
+    <span class="ident">result</span>: <span class="kw-2">*mut</span> <span class="ident">napi_value</span>,
   ) -&gt; <span class="ident">napi_status</span>;
   <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">napi_get_value_external</span>(
     <span class="ident">env</span>: <span class="ident">napi_env</span>,
     <span class="ident">value</span>: <span class="ident">napi_value</span>,
-    <span class="ident">result</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">c_void</span>,
+    <span class="ident">result</span>: <span class="kw-2">*mut</span> <span class="kw-2">*mut</span> <span class="ident">c_void</span>,
   ) -&gt; <span class="ident">napi_status</span>;
   <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">napi_create_reference</span>(
     <span class="ident">env</span>: <span class="ident">napi_env</span>,
     <span class="ident">value</span>: <span class="ident">napi_value</span>,
     <span class="ident">initial_refcount</span>: <span class="ident">u32</span>,
-    <span class="ident">result</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">napi_ref</span>,
+    <span class="ident">result</span>: <span class="kw-2">*mut</span> <span class="ident">napi_ref</span>,
   ) -&gt; <span class="ident">napi_status</span>;
   <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">napi_delete_reference</span>(<span class="ident">env</span>: <span class="ident">napi_env</span>, <span class="ident">ref_</span>: <span class="ident">napi_ref</span>) -&gt; <span class="ident">napi_status</span>;
-  <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">napi_reference_ref</span>(<span class="ident">env</span>: <span class="ident">napi_env</span>, <span class="ident">ref_</span>: <span class="ident">napi_ref</span>, <span class="ident">result</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">u32</span>) -&gt; <span class="ident">napi_status</span>;
-  <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">napi_reference_unref</span>(<span class="ident">env</span>: <span class="ident">napi_env</span>, <span class="ident">ref_</span>: <span class="ident">napi_ref</span>, <span class="ident">result</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">u32</span>) -&gt; <span class="ident">napi_status</span>;
+  <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">napi_reference_ref</span>(<span class="ident">env</span>: <span class="ident">napi_env</span>, <span class="ident">ref_</span>: <span class="ident">napi_ref</span>, <span class="ident">result</span>: <span class="kw-2">*mut</span> <span class="ident">u32</span>) -&gt; <span class="ident">napi_status</span>;
+  <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">napi_reference_unref</span>(<span class="ident">env</span>: <span class="ident">napi_env</span>, <span class="ident">ref_</span>: <span class="ident">napi_ref</span>, <span class="ident">result</span>: <span class="kw-2">*mut</span> <span class="ident">u32</span>) -&gt; <span class="ident">napi_status</span>;
   <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">napi_get_reference_value</span>(
     <span class="ident">env</span>: <span class="ident">napi_env</span>,
     <span class="ident">ref_</span>: <span class="ident">napi_ref</span>,
-    <span class="ident">result</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">napi_value</span>,
+    <span class="ident">result</span>: <span class="kw-2">*mut</span> <span class="ident">napi_value</span>,
   ) -&gt; <span class="ident">napi_status</span>;
-  <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">napi_open_handle_scope</span>(<span class="ident">env</span>: <span class="ident">napi_env</span>, <span class="ident">result</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">napi_handle_scope</span>) -&gt; <span class="ident">napi_status</span>;
+  <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">napi_open_handle_scope</span>(<span class="ident">env</span>: <span class="ident">napi_env</span>, <span class="ident">result</span>: <span class="kw-2">*mut</span> <span class="ident">napi_handle_scope</span>) -&gt; <span class="ident">napi_status</span>;
   <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">napi_close_handle_scope</span>(<span class="ident">env</span>: <span class="ident">napi_env</span>, <span class="ident">scope</span>: <span class="ident">napi_handle_scope</span>) -&gt; <span class="ident">napi_status</span>;
   <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">napi_open_escapable_handle_scope</span>(
     <span class="ident">env</span>: <span class="ident">napi_env</span>,
-    <span class="ident">result</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">napi_escapable_handle_scope</span>,
+    <span class="ident">result</span>: <span class="kw-2">*mut</span> <span class="ident">napi_escapable_handle_scope</span>,
   ) -&gt; <span class="ident">napi_status</span>;
   <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">napi_close_escapable_handle_scope</span>(
     <span class="ident">env</span>: <span class="ident">napi_env</span>,
@@ -1424,83 +1425,83 @@
     <span class="ident">env</span>: <span class="ident">napi_env</span>,
     <span class="ident">scope</span>: <span class="ident">napi_escapable_handle_scope</span>,
     <span class="ident">escapee</span>: <span class="ident">napi_value</span>,
-    <span class="ident">result</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">napi_value</span>,
+    <span class="ident">result</span>: <span class="kw-2">*mut</span> <span class="ident">napi_value</span>,
   ) -&gt; <span class="ident">napi_status</span>;
   <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">napi_throw</span>(<span class="ident">env</span>: <span class="ident">napi_env</span>, <span class="ident">error</span>: <span class="ident">napi_value</span>) -&gt; <span class="ident">napi_status</span>;
-  <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">napi_throw_error</span>(<span class="ident">env</span>: <span class="ident">napi_env</span>, <span class="ident">code</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">c_char</span>, <span class="ident">msg</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">c_char</span>) -&gt; <span class="ident">napi_status</span>;
+  <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">napi_throw_error</span>(<span class="ident">env</span>: <span class="ident">napi_env</span>, <span class="ident">code</span>: <span class="kw-2">*const</span> <span class="ident">c_char</span>, <span class="ident">msg</span>: <span class="kw-2">*const</span> <span class="ident">c_char</span>) -&gt; <span class="ident">napi_status</span>;
   <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">napi_throw_type_error</span>(
     <span class="ident">env</span>: <span class="ident">napi_env</span>,
-    <span class="ident">code</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">c_char</span>,
-    <span class="ident">msg</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">c_char</span>,
+    <span class="ident">code</span>: <span class="kw-2">*const</span> <span class="ident">c_char</span>,
+    <span class="ident">msg</span>: <span class="kw-2">*const</span> <span class="ident">c_char</span>,
   ) -&gt; <span class="ident">napi_status</span>;
   <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">napi_throw_range_error</span>(
     <span class="ident">env</span>: <span class="ident">napi_env</span>,
-    <span class="ident">code</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">c_char</span>,
-    <span class="ident">msg</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">c_char</span>,
+    <span class="ident">code</span>: <span class="kw-2">*const</span> <span class="ident">c_char</span>,
+    <span class="ident">msg</span>: <span class="kw-2">*const</span> <span class="ident">c_char</span>,
   ) -&gt; <span class="ident">napi_status</span>;
-  <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">napi_is_error</span>(<span class="ident">env</span>: <span class="ident">napi_env</span>, <span class="ident">value</span>: <span class="ident">napi_value</span>, <span class="ident">result</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">bool</span>) -&gt; <span class="ident">napi_status</span>;
-  <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">napi_is_exception_pending</span>(<span class="ident">env</span>: <span class="ident">napi_env</span>, <span class="ident">result</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">bool</span>) -&gt; <span class="ident">napi_status</span>;
-  <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">napi_get_and_clear_last_exception</span>(<span class="ident">env</span>: <span class="ident">napi_env</span>, <span class="ident">result</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">napi_value</span>) -&gt; <span class="ident">napi_status</span>;
-  <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">napi_is_arraybuffer</span>(<span class="ident">env</span>: <span class="ident">napi_env</span>, <span class="ident">value</span>: <span class="ident">napi_value</span>, <span class="ident">result</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">bool</span>) -&gt; <span class="ident">napi_status</span>;
+  <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">napi_is_error</span>(<span class="ident">env</span>: <span class="ident">napi_env</span>, <span class="ident">value</span>: <span class="ident">napi_value</span>, <span class="ident">result</span>: <span class="kw-2">*mut</span> <span class="ident">bool</span>) -&gt; <span class="ident">napi_status</span>;
+  <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">napi_is_exception_pending</span>(<span class="ident">env</span>: <span class="ident">napi_env</span>, <span class="ident">result</span>: <span class="kw-2">*mut</span> <span class="ident">bool</span>) -&gt; <span class="ident">napi_status</span>;
+  <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">napi_get_and_clear_last_exception</span>(<span class="ident">env</span>: <span class="ident">napi_env</span>, <span class="ident">result</span>: <span class="kw-2">*mut</span> <span class="ident">napi_value</span>) -&gt; <span class="ident">napi_status</span>;
+  <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">napi_is_arraybuffer</span>(<span class="ident">env</span>: <span class="ident">napi_env</span>, <span class="ident">value</span>: <span class="ident">napi_value</span>, <span class="ident">result</span>: <span class="kw-2">*mut</span> <span class="ident">bool</span>) -&gt; <span class="ident">napi_status</span>;
   <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">napi_create_arraybuffer</span>(
     <span class="ident">env</span>: <span class="ident">napi_env</span>,
     <span class="ident">byte_length</span>: <span class="ident">usize</span>,
-    <span class="ident">data</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">c_void</span>,
-    <span class="ident">result</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">napi_value</span>,
+    <span class="ident">data</span>: <span class="kw-2">*mut</span> <span class="kw-2">*mut</span> <span class="ident">c_void</span>,
+    <span class="ident">result</span>: <span class="kw-2">*mut</span> <span class="ident">napi_value</span>,
   ) -&gt; <span class="ident">napi_status</span>;
   <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">napi_create_external_arraybuffer</span>(
     <span class="ident">env</span>: <span class="ident">napi_env</span>,
-    <span class="ident">external_data</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">c_void</span>,
+    <span class="ident">external_data</span>: <span class="kw-2">*mut</span> <span class="ident">c_void</span>,
     <span class="ident">byte_length</span>: <span class="ident">usize</span>,
     <span class="ident">finalize_cb</span>: <span class="ident">napi_finalize</span>,
-    <span class="ident">finalize_hint</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">c_void</span>,
-    <span class="ident">result</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">napi_value</span>,
+    <span class="ident">finalize_hint</span>: <span class="kw-2">*mut</span> <span class="ident">c_void</span>,
+    <span class="ident">result</span>: <span class="kw-2">*mut</span> <span class="ident">napi_value</span>,
   ) -&gt; <span class="ident">napi_status</span>;
   <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">napi_get_arraybuffer_info</span>(
     <span class="ident">env</span>: <span class="ident">napi_env</span>,
     <span class="ident">arraybuffer</span>: <span class="ident">napi_value</span>,
-    <span class="ident">data</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">c_void</span>,
-    <span class="ident">byte_length</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">usize</span>,
+    <span class="ident">data</span>: <span class="kw-2">*mut</span> <span class="kw-2">*mut</span> <span class="ident">c_void</span>,
+    <span class="ident">byte_length</span>: <span class="kw-2">*mut</span> <span class="ident">usize</span>,
   ) -&gt; <span class="ident">napi_status</span>;
-  <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">napi_is_typedarray</span>(<span class="ident">env</span>: <span class="ident">napi_env</span>, <span class="ident">value</span>: <span class="ident">napi_value</span>, <span class="ident">result</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">bool</span>) -&gt; <span class="ident">napi_status</span>;
+  <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">napi_is_typedarray</span>(<span class="ident">env</span>: <span class="ident">napi_env</span>, <span class="ident">value</span>: <span class="ident">napi_value</span>, <span class="ident">result</span>: <span class="kw-2">*mut</span> <span class="ident">bool</span>) -&gt; <span class="ident">napi_status</span>;
   <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">napi_create_typedarray</span>(
     <span class="ident">env</span>: <span class="ident">napi_env</span>,
     <span class="ident">type_</span>: <span class="ident">napi_typedarray_type</span>,
     <span class="ident">length</span>: <span class="ident">usize</span>,
     <span class="ident">arraybuffer</span>: <span class="ident">napi_value</span>,
     <span class="ident">byte_offset</span>: <span class="ident">usize</span>,
-    <span class="ident">result</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">napi_value</span>,
+    <span class="ident">result</span>: <span class="kw-2">*mut</span> <span class="ident">napi_value</span>,
   ) -&gt; <span class="ident">napi_status</span>;
   <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">napi_get_typedarray_info</span>(
     <span class="ident">env</span>: <span class="ident">napi_env</span>,
     <span class="ident">typedarray</span>: <span class="ident">napi_value</span>,
-    <span class="ident">type_</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">napi_typedarray_type</span>,
-    <span class="ident">length</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">usize</span>,
-    <span class="ident">data</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">c_void</span>,
-    <span class="ident">arraybuffer</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">napi_value</span>,
-    <span class="ident">byte_offset</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">usize</span>,
+    <span class="ident">type_</span>: <span class="kw-2">*mut</span> <span class="ident">napi_typedarray_type</span>,
+    <span class="ident">length</span>: <span class="kw-2">*mut</span> <span class="ident">usize</span>,
+    <span class="ident">data</span>: <span class="kw-2">*mut</span> <span class="kw-2">*mut</span> <span class="ident">c_void</span>,
+    <span class="ident">arraybuffer</span>: <span class="kw-2">*mut</span> <span class="ident">napi_value</span>,
+    <span class="ident">byte_offset</span>: <span class="kw-2">*mut</span> <span class="ident">usize</span>,
   ) -&gt; <span class="ident">napi_status</span>;
   <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">napi_create_dataview</span>(
     <span class="ident">env</span>: <span class="ident">napi_env</span>,
     <span class="ident">length</span>: <span class="ident">usize</span>,
     <span class="ident">arraybuffer</span>: <span class="ident">napi_value</span>,
     <span class="ident">byte_offset</span>: <span class="ident">usize</span>,
-    <span class="ident">result</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">napi_value</span>,
+    <span class="ident">result</span>: <span class="kw-2">*mut</span> <span class="ident">napi_value</span>,
   ) -&gt; <span class="ident">napi_status</span>;
-  <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">napi_is_dataview</span>(<span class="ident">env</span>: <span class="ident">napi_env</span>, <span class="ident">value</span>: <span class="ident">napi_value</span>, <span class="ident">result</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">bool</span>) -&gt; <span class="ident">napi_status</span>;
+  <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">napi_is_dataview</span>(<span class="ident">env</span>: <span class="ident">napi_env</span>, <span class="ident">value</span>: <span class="ident">napi_value</span>, <span class="ident">result</span>: <span class="kw-2">*mut</span> <span class="ident">bool</span>) -&gt; <span class="ident">napi_status</span>;
   <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">napi_get_dataview_info</span>(
     <span class="ident">env</span>: <span class="ident">napi_env</span>,
     <span class="ident">dataview</span>: <span class="ident">napi_value</span>,
-    <span class="ident">bytelength</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">usize</span>,
-    <span class="ident">data</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">c_void</span>,
-    <span class="ident">arraybuffer</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">napi_value</span>,
-    <span class="ident">byte_offset</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">usize</span>,
+    <span class="ident">bytelength</span>: <span class="kw-2">*mut</span> <span class="ident">usize</span>,
+    <span class="ident">data</span>: <span class="kw-2">*mut</span> <span class="kw-2">*mut</span> <span class="ident">c_void</span>,
+    <span class="ident">arraybuffer</span>: <span class="kw-2">*mut</span> <span class="ident">napi_value</span>,
+    <span class="ident">byte_offset</span>: <span class="kw-2">*mut</span> <span class="ident">usize</span>,
   ) -&gt; <span class="ident">napi_status</span>;
-  <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">napi_get_version</span>(<span class="ident">env</span>: <span class="ident">napi_env</span>, <span class="ident">result</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">u32</span>) -&gt; <span class="ident">napi_status</span>;
+  <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">napi_get_version</span>(<span class="ident">env</span>: <span class="ident">napi_env</span>, <span class="ident">result</span>: <span class="kw-2">*mut</span> <span class="ident">u32</span>) -&gt; <span class="ident">napi_status</span>;
   <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">napi_create_promise</span>(
     <span class="ident">env</span>: <span class="ident">napi_env</span>,
-    <span class="ident">deferred</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">napi_deferred</span>,
-    <span class="ident">promise</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">napi_value</span>,
+    <span class="ident">deferred</span>: <span class="kw-2">*mut</span> <span class="ident">napi_deferred</span>,
+    <span class="ident">promise</span>: <span class="kw-2">*mut</span> <span class="ident">napi_value</span>,
   ) -&gt; <span class="ident">napi_status</span>;
   <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">napi_resolve_deferred</span>(
     <span class="ident">env</span>: <span class="ident">napi_env</span>,
@@ -1512,26 +1513,26 @@
     <span class="ident">deferred</span>: <span class="ident">napi_deferred</span>,
     <span class="ident">rejection</span>: <span class="ident">napi_value</span>,
   ) -&gt; <span class="ident">napi_status</span>;
-  <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">napi_is_promise</span>(<span class="ident">env</span>: <span class="ident">napi_env</span>, <span class="ident">value</span>: <span class="ident">napi_value</span>, <span class="ident">is_promise</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">bool</span>) -&gt; <span class="ident">napi_status</span>;
-  <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">napi_run_script</span>(<span class="ident">env</span>: <span class="ident">napi_env</span>, <span class="ident">script</span>: <span class="ident">napi_value</span>, <span class="ident">result</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">napi_value</span>)
+  <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">napi_is_promise</span>(<span class="ident">env</span>: <span class="ident">napi_env</span>, <span class="ident">value</span>: <span class="ident">napi_value</span>, <span class="ident">is_promise</span>: <span class="kw-2">*mut</span> <span class="ident">bool</span>) -&gt; <span class="ident">napi_status</span>;
+  <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">napi_run_script</span>(<span class="ident">env</span>: <span class="ident">napi_env</span>, <span class="ident">script</span>: <span class="ident">napi_value</span>, <span class="ident">result</span>: <span class="kw-2">*mut</span> <span class="ident">napi_value</span>)
     -&gt; <span class="ident">napi_status</span>;
   <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">napi_adjust_external_memory</span>(
     <span class="ident">env</span>: <span class="ident">napi_env</span>,
     <span class="ident">change_in_bytes</span>: <span class="ident">i64</span>,
-    <span class="ident">adjusted_value</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">i64</span>,
+    <span class="ident">adjusted_value</span>: <span class="kw-2">*mut</span> <span class="ident">i64</span>,
   ) -&gt; <span class="ident">napi_status</span>;
-  <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">napi_module_register</span>(<span class="ident">mod_</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">napi_module</span>);
+  <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">napi_module_register</span>(<span class="ident">mod_</span>: <span class="kw-2">*mut</span> <span class="ident">napi_module</span>);
   <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">napi_fatal_error</span>(
-    <span class="ident">location</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">c_char</span>,
+    <span class="ident">location</span>: <span class="kw-2">*const</span> <span class="ident">c_char</span>,
     <span class="ident">location_len</span>: <span class="ident">usize</span>,
-    <span class="ident">message</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">c_char</span>,
+    <span class="ident">message</span>: <span class="kw-2">*const</span> <span class="ident">c_char</span>,
     <span class="ident">message_len</span>: <span class="ident">usize</span>,
   );
   <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">napi_async_init</span>(
     <span class="ident">env</span>: <span class="ident">napi_env</span>,
     <span class="ident">async_resource</span>: <span class="ident">napi_value</span>,
     <span class="ident">async_resource_name</span>: <span class="ident">napi_value</span>,
-    <span class="ident">result</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">napi_async_context</span>,
+    <span class="ident">result</span>: <span class="kw-2">*mut</span> <span class="ident">napi_async_context</span>,
   ) -&gt; <span class="ident">napi_status</span>;
   <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">napi_async_destroy</span>(<span class="ident">env</span>: <span class="ident">napi_env</span>, <span class="ident">async_context</span>: <span class="ident">napi_async_context</span>) -&gt; <span class="ident">napi_status</span>;
   <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">napi_make_callback</span>(
@@ -1540,36 +1541,36 @@
     <span class="ident">recv</span>: <span class="ident">napi_value</span>,
     <span class="ident">func</span>: <span class="ident">napi_value</span>,
     <span class="ident">argc</span>: <span class="ident">usize</span>,
-    <span class="ident">argv</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">napi_value</span>,
-    <span class="ident">result</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">napi_value</span>,
+    <span class="ident">argv</span>: <span class="kw-2">*const</span> <span class="ident">napi_value</span>,
+    <span class="ident">result</span>: <span class="kw-2">*mut</span> <span class="ident">napi_value</span>,
   ) -&gt; <span class="ident">napi_status</span>;
   <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">napi_create_buffer</span>(
     <span class="ident">env</span>: <span class="ident">napi_env</span>,
     <span class="ident">length</span>: <span class="ident">usize</span>,
-    <span class="ident">data</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">c_void</span>,
-    <span class="ident">result</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">napi_value</span>,
+    <span class="ident">data</span>: <span class="kw-2">*mut</span> <span class="kw-2">*mut</span> <span class="ident">c_void</span>,
+    <span class="ident">result</span>: <span class="kw-2">*mut</span> <span class="ident">napi_value</span>,
   ) -&gt; <span class="ident">napi_status</span>;
   <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">napi_create_external_buffer</span>(
     <span class="ident">env</span>: <span class="ident">napi_env</span>,
     <span class="ident">length</span>: <span class="ident">usize</span>,
-    <span class="ident">data</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">c_void</span>,
+    <span class="ident">data</span>: <span class="kw-2">*mut</span> <span class="ident">c_void</span>,
     <span class="ident">finalize_cb</span>: <span class="ident">napi_finalize</span>,
-    <span class="ident">finalize_hint</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">c_void</span>,
-    <span class="ident">result</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">napi_value</span>,
+    <span class="ident">finalize_hint</span>: <span class="kw-2">*mut</span> <span class="ident">c_void</span>,
+    <span class="ident">result</span>: <span class="kw-2">*mut</span> <span class="ident">napi_value</span>,
   ) -&gt; <span class="ident">napi_status</span>;
   <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">napi_create_buffer_copy</span>(
     <span class="ident">env</span>: <span class="ident">napi_env</span>,
     <span class="ident">length</span>: <span class="ident">usize</span>,
-    <span class="ident">data</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">c_void</span>,
-    <span class="ident">result_data</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">c_void</span>,
-    <span class="ident">result</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">napi_value</span>,
+    <span class="ident">data</span>: <span class="kw-2">*const</span> <span class="ident">c_void</span>,
+    <span class="ident">result_data</span>: <span class="kw-2">*mut</span> <span class="kw-2">*mut</span> <span class="ident">c_void</span>,
+    <span class="ident">result</span>: <span class="kw-2">*mut</span> <span class="ident">napi_value</span>,
   ) -&gt; <span class="ident">napi_status</span>;
-  <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">napi_is_buffer</span>(<span class="ident">env</span>: <span class="ident">napi_env</span>, <span class="ident">value</span>: <span class="ident">napi_value</span>, <span class="ident">result</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">bool</span>) -&gt; <span class="ident">napi_status</span>;
+  <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">napi_is_buffer</span>(<span class="ident">env</span>: <span class="ident">napi_env</span>, <span class="ident">value</span>: <span class="ident">napi_value</span>, <span class="ident">result</span>: <span class="kw-2">*mut</span> <span class="ident">bool</span>) -&gt; <span class="ident">napi_status</span>;
   <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">napi_get_buffer_info</span>(
     <span class="ident">env</span>: <span class="ident">napi_env</span>,
     <span class="ident">value</span>: <span class="ident">napi_value</span>,
-    <span class="ident">data</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">c_void</span>,
-    <span class="ident">length</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">usize</span>,
+    <span class="ident">data</span>: <span class="kw-2">*mut</span> <span class="kw-2">*mut</span> <span class="ident">c_void</span>,
+    <span class="ident">length</span>: <span class="kw-2">*mut</span> <span class="ident">usize</span>,
   ) -&gt; <span class="ident">napi_status</span>;
   <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">napi_create_async_work</span>(
     <span class="ident">env</span>: <span class="ident">napi_env</span>,
@@ -1577,21 +1578,21 @@
     <span class="ident">async_resource_name</span>: <span class="ident">napi_value</span>,
     <span class="ident">execute</span>: <span class="ident">napi_async_execute_callback</span>,
     <span class="ident">complete</span>: <span class="ident">napi_async_complete_callback</span>,
-    <span class="ident">data</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">c_void</span>,
-    <span class="ident">result</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">napi_async_work</span>,
+    <span class="ident">data</span>: <span class="kw-2">*mut</span> <span class="ident">c_void</span>,
+    <span class="ident">result</span>: <span class="kw-2">*mut</span> <span class="ident">napi_async_work</span>,
   ) -&gt; <span class="ident">napi_status</span>;
   <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">napi_delete_async_work</span>(<span class="ident">env</span>: <span class="ident">napi_env</span>, <span class="ident">work</span>: <span class="ident">napi_async_work</span>) -&gt; <span class="ident">napi_status</span>;
   <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">napi_queue_async_work</span>(<span class="ident">env</span>: <span class="ident">napi_env</span>, <span class="ident">work</span>: <span class="ident">napi_async_work</span>) -&gt; <span class="ident">napi_status</span>;
   <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">napi_cancel_async_work</span>(<span class="ident">env</span>: <span class="ident">napi_env</span>, <span class="ident">work</span>: <span class="ident">napi_async_work</span>) -&gt; <span class="ident">napi_status</span>;
   <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">napi_get_node_version</span>(
     <span class="ident">env</span>: <span class="ident">napi_env</span>,
-    <span class="ident">version</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">napi_node_version</span>,
+    <span class="ident">version</span>: <span class="kw-2">*mut</span> <span class="kw-2">*const</span> <span class="ident">napi_node_version</span>,
   ) -&gt; <span class="ident">napi_status</span>;
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;napi2&quot;</span>)]</span>
 <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> {
-  <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">napi_get_uv_event_loop</span>(<span class="ident">env</span>: <span class="ident">napi_env</span>, <span class="ident">loop_</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">uv_loop_s</span>) -&gt; <span class="ident">napi_status</span>;
+  <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">napi_get_uv_event_loop</span>(<span class="ident">env</span>: <span class="ident">napi_env</span>, <span class="ident">loop_</span>: <span class="kw-2">*mut</span> <span class="kw-2">*mut</span> <span class="ident">uv_loop_s</span>) -&gt; <span class="ident">napi_status</span>;
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;napi3&quot;</span>)]</span>
@@ -1599,19 +1600,19 @@
   <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">napi_fatal_exception</span>(<span class="ident">env</span>: <span class="ident">napi_env</span>, <span class="ident">err</span>: <span class="ident">napi_value</span>) -&gt; <span class="ident">napi_status</span>;
   <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">napi_add_env_cleanup_hook</span>(
     <span class="ident">env</span>: <span class="ident">napi_env</span>,
-    <span class="ident">fun</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw">unsafe</span> <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span>(<span class="ident">arg</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">c_void</span>)<span class="op">&gt;</span>,
-    <span class="ident">arg</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">c_void</span>,
+    <span class="ident">fun</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw">unsafe</span> <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span>(<span class="ident">arg</span>: <span class="kw-2">*mut</span> <span class="ident">c_void</span>)<span class="op">&gt;</span>,
+    <span class="ident">arg</span>: <span class="kw-2">*mut</span> <span class="ident">c_void</span>,
   ) -&gt; <span class="ident">napi_status</span>;
   <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">napi_remove_env_cleanup_hook</span>(
     <span class="ident">env</span>: <span class="ident">napi_env</span>,
-    <span class="ident">fun</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw">unsafe</span> <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span>(<span class="ident">arg</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">c_void</span>)<span class="op">&gt;</span>,
-    <span class="ident">arg</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">c_void</span>,
+    <span class="ident">fun</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw">unsafe</span> <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span>(<span class="ident">arg</span>: <span class="kw-2">*mut</span> <span class="ident">c_void</span>)<span class="op">&gt;</span>,
+    <span class="ident">arg</span>: <span class="kw-2">*mut</span> <span class="ident">c_void</span>,
   ) -&gt; <span class="ident">napi_status</span>;
   <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">napi_open_callback_scope</span>(
     <span class="ident">env</span>: <span class="ident">napi_env</span>,
     <span class="ident">resource_object</span>: <span class="ident">napi_value</span>,
     <span class="ident">context</span>: <span class="ident">napi_async_context</span>,
-    <span class="ident">result</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">napi_callback_scope</span>,
+    <span class="ident">result</span>: <span class="kw-2">*mut</span> <span class="ident">napi_callback_scope</span>,
   ) -&gt; <span class="ident">napi_status</span>;
   <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">napi_close_callback_scope</span>(<span class="ident">env</span>: <span class="ident">napi_env</span>, <span class="ident">scope</span>: <span class="ident">napi_callback_scope</span>) -&gt; <span class="ident">napi_status</span>;
 }
@@ -1625,19 +1626,19 @@
     <span class="ident">async_resource_name</span>: <span class="ident">napi_value</span>,
     <span class="ident">max_queue_size</span>: <span class="ident">usize</span>,
     <span class="ident">initial_thread_count</span>: <span class="ident">usize</span>,
-    <span class="ident">thread_finalize_data</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">c_void</span>,
+    <span class="ident">thread_finalize_data</span>: <span class="kw-2">*mut</span> <span class="ident">c_void</span>,
     <span class="ident">thread_finalize_cb</span>: <span class="ident">napi_finalize</span>,
-    <span class="ident">context</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">c_void</span>,
+    <span class="ident">context</span>: <span class="kw-2">*mut</span> <span class="ident">c_void</span>,
     <span class="ident">call_js_cb</span>: <span class="ident">napi_threadsafe_function_call_js</span>,
-    <span class="ident">result</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">napi_threadsafe_function</span>,
+    <span class="ident">result</span>: <span class="kw-2">*mut</span> <span class="ident">napi_threadsafe_function</span>,
   ) -&gt; <span class="ident">napi_status</span>;
   <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">napi_get_threadsafe_function_context</span>(
     <span class="ident">func</span>: <span class="ident">napi_threadsafe_function</span>,
-    <span class="ident">result</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">c_void</span>,
+    <span class="ident">result</span>: <span class="kw-2">*mut</span> <span class="kw-2">*mut</span> <span class="ident">c_void</span>,
   ) -&gt; <span class="ident">napi_status</span>;
   <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">napi_call_threadsafe_function</span>(
     <span class="ident">func</span>: <span class="ident">napi_threadsafe_function</span>,
-    <span class="ident">data</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">c_void</span>,
+    <span class="ident">data</span>: <span class="kw-2">*mut</span> <span class="ident">c_void</span>,
     <span class="ident">is_blocking</span>: <span class="ident">napi_threadsafe_function_call_mode</span>,
   ) -&gt; <span class="ident">napi_status</span>;
   <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">napi_acquire_threadsafe_function</span>(<span class="ident">func</span>: <span class="ident">napi_threadsafe_function</span>) -&gt; <span class="ident">napi_status</span>;
@@ -1655,16 +1656,16 @@
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;napi5&quot;</span>)]</span>
 <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> {
-  <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">napi_create_date</span>(<span class="ident">env</span>: <span class="ident">napi_env</span>, <span class="ident">time</span>: <span class="ident">f64</span>, <span class="ident">result</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">napi_value</span>) -&gt; <span class="ident">napi_status</span>;
-  <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">napi_is_date</span>(<span class="ident">env</span>: <span class="ident">napi_env</span>, <span class="ident">value</span>: <span class="ident">napi_value</span>, <span class="ident">is_date</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">bool</span>) -&gt; <span class="ident">napi_status</span>;
-  <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">napi_get_date_value</span>(<span class="ident">env</span>: <span class="ident">napi_env</span>, <span class="ident">value</span>: <span class="ident">napi_value</span>, <span class="ident">result</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">f64</span>) -&gt; <span class="ident">napi_status</span>;
+  <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">napi_create_date</span>(<span class="ident">env</span>: <span class="ident">napi_env</span>, <span class="ident">time</span>: <span class="ident">f64</span>, <span class="ident">result</span>: <span class="kw-2">*mut</span> <span class="ident">napi_value</span>) -&gt; <span class="ident">napi_status</span>;
+  <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">napi_is_date</span>(<span class="ident">env</span>: <span class="ident">napi_env</span>, <span class="ident">value</span>: <span class="ident">napi_value</span>, <span class="ident">is_date</span>: <span class="kw-2">*mut</span> <span class="ident">bool</span>) -&gt; <span class="ident">napi_status</span>;
+  <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">napi_get_date_value</span>(<span class="ident">env</span>: <span class="ident">napi_env</span>, <span class="ident">value</span>: <span class="ident">napi_value</span>, <span class="ident">result</span>: <span class="kw-2">*mut</span> <span class="ident">f64</span>) -&gt; <span class="ident">napi_status</span>;
   <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">napi_add_finalizer</span>(
     <span class="ident">env</span>: <span class="ident">napi_env</span>,
     <span class="ident">js_object</span>: <span class="ident">napi_value</span>,
-    <span class="ident">native_object</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">c_void</span>,
+    <span class="ident">native_object</span>: <span class="kw-2">*mut</span> <span class="ident">c_void</span>,
     <span class="ident">finalize_cb</span>: <span class="ident">napi_finalize</span>,
-    <span class="ident">finalize_hint</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">c_void</span>,
-    <span class="ident">result</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">napi_ref</span>,
+    <span class="ident">finalize_hint</span>: <span class="kw-2">*mut</span> <span class="ident">c_void</span>,
+    <span class="ident">result</span>: <span class="kw-2">*mut</span> <span class="ident">napi_ref</span>,
   ) -&gt; <span class="ident">napi_status</span>;
 }
 
@@ -1673,38 +1674,38 @@
   <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">napi_create_bigint_int64</span>(
     <span class="ident">env</span>: <span class="ident">napi_env</span>,
     <span class="ident">value</span>: <span class="ident">i64</span>,
-    <span class="ident">result</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">napi_value</span>,
+    <span class="ident">result</span>: <span class="kw-2">*mut</span> <span class="ident">napi_value</span>,
   ) -&gt; <span class="ident">napi_status</span>;
   <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">napi_create_bigint_uint64</span>(
     <span class="ident">env</span>: <span class="ident">napi_env</span>,
     <span class="ident">value</span>: <span class="ident">u64</span>,
-    <span class="ident">result</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">napi_value</span>,
+    <span class="ident">result</span>: <span class="kw-2">*mut</span> <span class="ident">napi_value</span>,
   ) -&gt; <span class="ident">napi_status</span>;
   <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">napi_create_bigint_words</span>(
     <span class="ident">env</span>: <span class="ident">napi_env</span>,
     <span class="ident">sign_bit</span>: <span class="ident">c_int</span>,
     <span class="ident">word_count</span>: <span class="ident">usize</span>,
-    <span class="ident">words</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">u64</span>,
-    <span class="ident">result</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">napi_value</span>,
+    <span class="ident">words</span>: <span class="kw-2">*const</span> <span class="ident">u64</span>,
+    <span class="ident">result</span>: <span class="kw-2">*mut</span> <span class="ident">napi_value</span>,
   ) -&gt; <span class="ident">napi_status</span>;
   <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">napi_get_value_bigint_int64</span>(
     <span class="ident">env</span>: <span class="ident">napi_env</span>,
     <span class="ident">value</span>: <span class="ident">napi_value</span>,
-    <span class="ident">result</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">i64</span>,
-    <span class="ident">lossless</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">bool</span>,
+    <span class="ident">result</span>: <span class="kw-2">*mut</span> <span class="ident">i64</span>,
+    <span class="ident">lossless</span>: <span class="kw-2">*mut</span> <span class="ident">bool</span>,
   ) -&gt; <span class="ident">napi_status</span>;
   <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">napi_get_value_bigint_uint64</span>(
     <span class="ident">env</span>: <span class="ident">napi_env</span>,
     <span class="ident">value</span>: <span class="ident">napi_value</span>,
-    <span class="ident">result</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">u64</span>,
-    <span class="ident">lossless</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">bool</span>,
+    <span class="ident">result</span>: <span class="kw-2">*mut</span> <span class="ident">u64</span>,
+    <span class="ident">lossless</span>: <span class="kw-2">*mut</span> <span class="ident">bool</span>,
   ) -&gt; <span class="ident">napi_status</span>;
   <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">napi_get_value_bigint_words</span>(
     <span class="ident">env</span>: <span class="ident">napi_env</span>,
     <span class="ident">value</span>: <span class="ident">napi_value</span>,
-    <span class="ident">sign_bit</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">c_int</span>,
-    <span class="ident">word_count</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">usize</span>,
-    <span class="ident">words</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">u64</span>,
+    <span class="ident">sign_bit</span>: <span class="kw-2">*mut</span> <span class="ident">c_int</span>,
+    <span class="ident">word_count</span>: <span class="kw-2">*mut</span> <span class="ident">usize</span>,
+    <span class="ident">words</span>: <span class="kw-2">*mut</span> <span class="ident">u64</span>,
   ) -&gt; <span class="ident">napi_status</span>;
   <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">napi_get_all_property_names</span>(
     <span class="ident">env</span>: <span class="ident">napi_env</span>,
@@ -1712,15 +1713,15 @@
     <span class="ident">key_mode</span>: <span class="ident">napi_key_collection_mode</span>,
     <span class="ident">key_filter</span>: <span class="ident">napi_key_filter</span>,
     <span class="ident">key_conversion</span>: <span class="ident">napi_key_conversion</span>,
-    <span class="ident">result</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">napi_value</span>,
+    <span class="ident">result</span>: <span class="kw-2">*mut</span> <span class="ident">napi_value</span>,
   ) -&gt; <span class="ident">napi_status</span>;
   <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">napi_set_instance_data</span>(
     <span class="ident">env</span>: <span class="ident">napi_env</span>,
-    <span class="ident">data</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">c_void</span>,
+    <span class="ident">data</span>: <span class="kw-2">*mut</span> <span class="ident">c_void</span>,
     <span class="ident">finalize_cb</span>: <span class="ident">napi_finalize</span>,
-    <span class="ident">finalize_hint</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">c_void</span>,
+    <span class="ident">finalize_hint</span>: <span class="kw-2">*mut</span> <span class="ident">c_void</span>,
   ) -&gt; <span class="ident">napi_status</span>;
-  <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">napi_get_instance_data</span>(<span class="ident">env</span>: <span class="ident">napi_env</span>, <span class="ident">data</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">c_void</span>) -&gt; <span class="ident">napi_status</span>;
+  <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">napi_get_instance_data</span>(<span class="ident">env</span>: <span class="ident">napi_env</span>, <span class="ident">data</span>: <span class="kw-2">*mut</span> <span class="kw-2">*mut</span> <span class="ident">c_void</span>) -&gt; <span class="ident">napi_status</span>;
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;napi7&quot;</span>)]</span>
@@ -1729,7 +1730,7 @@
   <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">napi_is_detached_arraybuffer</span>(
     <span class="ident">env</span>: <span class="ident">napi_env</span>,
     <span class="ident">value</span>: <span class="ident">napi_value</span>,
-    <span class="ident">result</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">bool</span>,
+    <span class="ident">result</span>: <span class="kw-2">*mut</span> <span class="ident">bool</span>,
   ) -&gt; <span class="ident">napi_status</span>;
 }
 
@@ -1738,8 +1739,8 @@
   <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">napi_add_async_cleanup_hook</span>(
     <span class="ident">env</span>: <span class="ident">napi_env</span>,
     <span class="ident">hook</span>: <span class="ident">napi_async_cleanup_hook</span>,
-    <span class="ident">arg</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">c_void</span>,
-    <span class="ident">remove_handle</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">napi_async_cleanup_hook_handle</span>,
+    <span class="ident">arg</span>: <span class="kw-2">*mut</span> <span class="ident">c_void</span>,
+    <span class="ident">remove_handle</span>: <span class="kw-2">*mut</span> <span class="ident">napi_async_cleanup_hook_handle</span>,
   ) -&gt; <span class="ident">napi_status</span>;
 
   <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">napi_remove_async_cleanup_hook</span>(
@@ -1756,19 +1757,19 @@
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">napi_callback_scope__</span> {
   <span class="ident">_unused</span>: [<span class="ident">u8</span>; <span class="number">0</span>],
 }
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">napi_callback_scope</span> <span class="op">=</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">napi_callback_scope__</span>;
+<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">napi_callback_scope</span> <span class="op">=</span> <span class="kw-2">*mut</span> <span class="ident">napi_callback_scope__</span>;
 <span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">napi_async_context__</span> {
   <span class="ident">_unused</span>: [<span class="ident">u8</span>; <span class="number">0</span>],
 }
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">napi_async_context</span> <span class="op">=</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">napi_async_context__</span>;
+<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">napi_async_context</span> <span class="op">=</span> <span class="kw-2">*mut</span> <span class="ident">napi_async_context__</span>;
 <span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">napi_async_work__</span> {
   <span class="ident">_unused</span>: [<span class="ident">u8</span>; <span class="number">0</span>],
 }
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">napi_async_work</span> <span class="op">=</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">napi_async_work__</span>;
+<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">napi_async_work</span> <span class="op">=</span> <span class="kw-2">*mut</span> <span class="ident">napi_async_work__</span>;
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;napi4&quot;</span>)]</span>
 <span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
@@ -1778,7 +1779,7 @@
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;napi4&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">napi_threadsafe_function</span> <span class="op">=</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">napi_threadsafe_function__</span>;
+<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">napi_threadsafe_function</span> <span class="op">=</span> <span class="kw-2">*mut</span> <span class="ident">napi_threadsafe_function__</span>;
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;napi4&quot;</span>)]</span>
 <span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
@@ -1797,17 +1798,17 @@
 }
 
 <span class="kw">pub</span> <span class="kw">type</span> <span class="ident">napi_async_execute_callback</span> <span class="op">=</span>
-  <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw">unsafe</span> <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span>(<span class="ident">env</span>: <span class="ident">napi_env</span>, <span class="ident">data</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">c_void</span>)<span class="op">&gt;</span>;
+  <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw">unsafe</span> <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span>(<span class="ident">env</span>: <span class="ident">napi_env</span>, <span class="ident">data</span>: <span class="kw-2">*mut</span> <span class="ident">c_void</span>)<span class="op">&gt;</span>;
 <span class="kw">pub</span> <span class="kw">type</span> <span class="ident">napi_async_complete_callback</span> <span class="op">=</span>
-  <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw">unsafe</span> <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span>(<span class="ident">env</span>: <span class="ident">napi_env</span>, <span class="ident">status</span>: <span class="ident">napi_status</span>, <span class="ident">data</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">c_void</span>)<span class="op">&gt;</span>;
+  <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw">unsafe</span> <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span>(<span class="ident">env</span>: <span class="ident">napi_env</span>, <span class="ident">status</span>: <span class="ident">napi_status</span>, <span class="ident">data</span>: <span class="kw-2">*mut</span> <span class="ident">c_void</span>)<span class="op">&gt;</span>;
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;napi4&quot;</span>)]</span>
 <span class="kw">pub</span> <span class="kw">type</span> <span class="ident">napi_threadsafe_function_call_js</span> <span class="op">=</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span>
   <span class="kw">unsafe</span> <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span>(
     <span class="ident">env</span>: <span class="ident">napi_env</span>,
     <span class="ident">js_callback</span>: <span class="ident">napi_value</span>,
-    <span class="ident">context</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">c_void</span>,
-    <span class="ident">data</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">c_void</span>,
+    <span class="ident">context</span>: <span class="kw-2">*mut</span> <span class="ident">c_void</span>,
+    <span class="ident">data</span>: <span class="kw-2">*mut</span> <span class="ident">c_void</span>,
   ),
 <span class="op">&gt;</span>;
 <span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
@@ -1816,7 +1817,7 @@
   <span class="kw">pub</span> <span class="ident">major</span>: <span class="ident">u32</span>,
   <span class="kw">pub</span> <span class="ident">minor</span>: <span class="ident">u32</span>,
   <span class="kw">pub</span> <span class="ident">patch</span>: <span class="ident">u32</span>,
-  <span class="kw">pub</span> <span class="ident">release</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">c_char</span>,
+  <span class="kw">pub</span> <span class="ident">release</span>: <span class="kw-2">*const</span> <span class="ident">c_char</span>,
 }
 
 <span class="kw">pub</span> <span class="kw">type</span> <span class="ident">napi_addon_register_func</span> <span class="op">=</span>
@@ -1826,13 +1827,12 @@
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">napi_module</span> {
   <span class="kw">pub</span> <span class="ident">nm_version</span>: <span class="ident">c_int</span>,
   <span class="kw">pub</span> <span class="ident">nm_flags</span>: <span class="ident">c_uint</span>,
-  <span class="kw">pub</span> <span class="ident">nm_filename</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">c_char</span>,
+  <span class="kw">pub</span> <span class="ident">nm_filename</span>: <span class="kw-2">*const</span> <span class="ident">c_char</span>,
   <span class="kw">pub</span> <span class="ident">nm_register_func</span>: <span class="ident">napi_addon_register_func</span>,
-  <span class="kw">pub</span> <span class="ident">nm_modname</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">c_char</span>,
-  <span class="kw">pub</span> <span class="ident">nm_priv</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">c_void</span>,
-  <span class="kw">pub</span> <span class="ident">reserved</span>: [<span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">c_void</span>; <span class="number">4usize</span>],
+  <span class="kw">pub</span> <span class="ident">nm_modname</span>: <span class="kw-2">*const</span> <span class="ident">c_char</span>,
+  <span class="kw">pub</span> <span class="ident">nm_priv</span>: <span class="kw-2">*mut</span> <span class="ident">c_void</span>,
+  <span class="kw">pub</span> <span class="ident">reserved</span>: [<span class="kw-2">*mut</span> <span class="ident">c_void</span>; <span class="number">4usize</span>],
 }
 </code></pre></div>
 </section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="napi_sys" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>
-    <script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script>
 </body></html>

@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;git&#x2F;checkouts&#x2F;mysql_async-998d87ac262afe55&#x2F;a38f0ac&#x2F;src&#x2F;conn&#x2F;pool&#x2F;mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../../../storage.js"></script><script src="../../../../crates.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../../mysql_async/index.html'><div class='logo-container rust-logo'><img src='../../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;git&#x2F;checkouts&#x2F;mysql_async-998d87ac262afe55&#x2F;a38f0ac&#x2F;src&#x2F;conn&#x2F;pool&#x2F;mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../../../storage.js"></script><script src="../../../../crates.js"></script><script defer src="../../../../main.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script>
+    <noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../../mysql_async/index.html'><div class='logo-container rust-logo'><img src='../../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -890,7 +891,7 @@
 <span class="kw">impl</span> <span class="ident">Exchange</span> {
     <span class="doccomment">/// This function will spawn the recycler for this pool</span>
     <span class="doccomment">/// as well as the ttl check interval if `inactive_connection_ttl` isn&#39;t `0`.</span>
-    <span class="kw">fn</span> <span class="ident">spawn_futures_if_needed</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">inner</span>: <span class="kw-2">&amp;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Inner</span><span class="op">&gt;</span>) {
+    <span class="kw">fn</span> <span class="ident">spawn_futures_if_needed</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">inner</span>: <span class="kw-2">&amp;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Inner</span><span class="op">&gt;</span>) {
         <span class="kw">use</span> <span class="ident">recycler::Recycler</span>;
         <span class="kw">use</span> <span class="ident">ttl_check_inerval::TtlCheckInterval</span>;
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>((<span class="ident">dropped</span>, <span class="ident">pool_opts</span>)) <span class="op">=</span> <span class="self">self</span>.<span class="ident">recycler</span>.<span class="ident">take</span>() {
@@ -985,7 +986,7 @@
     }
 
     <span class="doccomment">/// A way to return connection taken from a pool.</span>
-    <span class="kw">fn</span> <span class="ident">return_conn</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">conn</span>: <span class="ident">Conn</span>) {
+    <span class="kw">fn</span> <span class="ident">return_conn</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">conn</span>: <span class="ident">Conn</span>) {
         <span class="comment">// NOTE: we&#39;re not in async context here, so we can&#39;t block or return NotReady</span>
         <span class="comment">// any and all cleanup work _has_ to be done in the spawned recycler</span>
 
@@ -1041,11 +1042,11 @@
     }
 
     <span class="doccomment">/// Poll the pool for an available connection.</span>
-    <span class="kw">fn</span> <span class="ident">poll_new_conn</span>(<span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">GetConn</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">poll_new_conn</span>(<span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">GetConn</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">poll_new_conn_inner</span>(<span class="ident">cx</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">poll_new_conn_inner</span>(<span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">GetConn</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">poll_new_conn_inner</span>(<span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">GetConn</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">exchange</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">exchange</span>.<span class="ident">lock</span>().<span class="ident">unwrap</span>();
 
         <span class="comment">// NOTE: this load must happen while we hold the lock,</span>
@@ -1090,7 +1091,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Drop</span> <span class="kw">for</span> <span class="ident">Conn</span> {
-    <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
+    <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
         <span class="kw">if</span> <span class="ident">std::thread::panicking</span>() {
             <span class="kw">return</span>;
         }
@@ -1171,7 +1172,7 @@
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">should_reconnect</span>() -&gt; <span class="ident"><span class="kw">super</span>::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">master</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::Conn::new</span>(<span class="ident">get_opts</span>()).<span class="kw">await</span><span class="question-mark">?</span>;
 
-        <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">test</span>(<span class="ident">master</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident"><span class="kw">crate</span>::Conn</span>, <span class="ident">opts</span>: <span class="ident"><span class="kw">crate</span>::OptsBuilder</span>) -&gt; <span class="ident"><span class="kw">super</span>::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+        <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">test</span>(<span class="ident">master</span>: <span class="kw-2">&amp;mut</span> <span class="ident"><span class="kw">crate</span>::Conn</span>, <span class="ident">opts</span>: <span class="ident"><span class="kw">crate</span>::OptsBuilder</span>) -&gt; <span class="ident"><span class="kw">super</span>::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
             <span class="kw">const</span> <span class="ident">NUM_CONNS</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">5</span>;
             <span class="kw">let</span> <span class="ident">pool</span> <span class="op">=</span> <span class="ident">Pool::new</span>(<span class="ident">opts</span>);
 
@@ -1215,10 +1216,10 @@
         }
 
         <span class="macro">println!</span>(<span class="string">&quot;Check socket/pipe..&quot;</span>);
-        <span class="ident">test</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">master</span>, <span class="ident">get_opts</span>()).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="ident">test</span>(<span class="kw-2">&amp;mut</span> <span class="ident">master</span>, <span class="ident">get_opts</span>()).<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="macro">println!</span>(<span class="string">&quot;Check tcp..&quot;</span>);
-        <span class="ident">test</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">master</span>, <span class="ident">get_opts</span>().<span class="ident">prefer_socket</span>(<span class="bool-val">false</span>)).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="ident">test</span>(<span class="kw-2">&amp;mut</span> <span class="ident">master</span>, <span class="ident">get_opts</span>().<span class="ident">prefer_socket</span>(<span class="bool-val">false</span>)).<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="ident">master</span>.<span class="ident">disconnect</span>().<span class="kw">await</span>
     }
@@ -1602,7 +1603,7 @@
         <span class="kw">use</span> <span class="ident">std::time::Duration</span>;
 
         <span class="attribute">#[<span class="ident">bench</span>]</span>
-        <span class="kw">fn</span> <span class="ident">get_conn</span>(<span class="ident">bencher</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">test::Bencher</span>) {
+        <span class="kw">fn</span> <span class="ident">get_conn</span>(<span class="ident">bencher</span>: <span class="kw-2">&amp;mut</span> <span class="ident">test::Bencher</span>) {
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">runtime</span> <span class="op">=</span> <span class="ident">Runtime::new</span>().<span class="ident">unwrap</span>();
             <span class="kw">let</span> <span class="ident">pool</span> <span class="op">=</span> <span class="ident">Pool::new</span>(<span class="ident">get_opts</span>());
 
@@ -1617,7 +1618,7 @@
         }
 
         <span class="attribute">#[<span class="ident">bench</span>]</span>
-        <span class="kw">fn</span> <span class="ident">new_conn_on_pool_soft_boundary</span>(<span class="ident">bencher</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">test::Bencher</span>) {
+        <span class="kw">fn</span> <span class="ident">new_conn_on_pool_soft_boundary</span>(<span class="ident">bencher</span>: <span class="kw-2">&amp;mut</span> <span class="ident">test::Bencher</span>) {
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">runtime</span> <span class="op">=</span> <span class="ident">Runtime::new</span>().<span class="ident">unwrap</span>();
 
             <span class="kw">let</span> <span class="ident">pool_constraints</span> <span class="op">=</span> <span class="ident">PoolConstraints::new</span>(<span class="number">0</span>, <span class="number">1</span>).<span class="ident">unwrap</span>();
@@ -1638,5 +1639,4 @@
 }
 </code></pre></div>
 </section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="mysql_async" data-search-index-js="../../../../search-index.js" data-search-js="../../../../search.js"></div>
-    <script src="../../../../main.js"></script><script src="../../../../source-script.js"></script><script src="../../../../source-files.js"></script>
 </body></html>

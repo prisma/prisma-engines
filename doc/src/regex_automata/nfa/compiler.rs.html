@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;regex-automata-0.1.10&#x2F;src&#x2F;nfa&#x2F;compiler.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>compiler.rs - source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../regex_automata/index.html'><div class='logo-container rust-logo'><img src='../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">   1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;regex-automata-0.1.10&#x2F;src&#x2F;nfa&#x2F;compiler.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>compiler.rs - source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><script defer src="../../../main.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script>
+    <noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../regex_automata/index.html'><div class='logo-container rust-logo'><img src='../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">   1</span>
 <span id="2">   2</span>
 <span id="3">   3</span>
 <span id="4">   4</span>
@@ -1277,7 +1278,7 @@
     <span class="doccomment">/// assertions), then an error is returned.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">build</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">expr</span>: <span class="kw-2">&amp;</span><span class="ident">Hir</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">NFA</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">nfa</span> <span class="op">=</span> <span class="ident">NFA::always_match</span>();
-        <span class="self">self</span>.<span class="ident">build_with</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Compiler::new</span>(), <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">nfa</span>, <span class="ident">expr</span>)<span class="question-mark">?</span>;
+        <span class="self">self</span>.<span class="ident">build_with</span>(<span class="kw-2">&amp;mut</span> <span class="ident">Compiler::new</span>(), <span class="kw-2">&amp;mut</span> <span class="ident">nfa</span>, <span class="ident">expr</span>)<span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>(<span class="ident">nfa</span>)
     }
 
@@ -1296,8 +1297,8 @@
     <span class="doccomment">/// However, it can still be reused in subsequent calls to this method.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">build_with</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">compiler</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Compiler</span>,
-        <span class="ident">nfa</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">NFA</span>,
+        <span class="ident">compiler</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Compiler</span>,
+        <span class="ident">nfa</span>: <span class="kw-2">&amp;mut</span> <span class="ident">NFA</span>,
         <span class="ident">expr</span>: <span class="kw-2">&amp;</span><span class="ident">Hir</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="ident">compiler</span>.<span class="ident">clear</span>();
@@ -1312,7 +1313,7 @@
     <span class="doccomment">/// which enables a match to appear anywhere.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// By default this is disabled.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">anchored</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">yes</span>: <span class="ident">bool</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Builder</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">anchored</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">yes</span>: <span class="ident">bool</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">Builder</span> {
         <span class="self">self</span>.<span class="ident">config</span>.<span class="ident">anchored</span> <span class="op">=</span> <span class="ident">yes</span>;
         <span class="self">self</span>
     }
@@ -1323,7 +1324,7 @@
     <span class="doccomment">/// When disabled (the default), the builder is guaranteed to produce a</span>
     <span class="doccomment">/// regex that will only ever match valid UTF-8 (otherwise, the builder</span>
     <span class="doccomment">/// will return an error).</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">allow_invalid_utf8</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">yes</span>: <span class="ident">bool</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Builder</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">allow_invalid_utf8</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">yes</span>: <span class="ident">bool</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">Builder</span> {
         <span class="self">self</span>.<span class="ident">config</span>.<span class="ident">allow_invalid_utf8</span> <span class="op">=</span> <span class="ident">yes</span>;
         <span class="self">self</span>
     }
@@ -1337,7 +1338,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Reversing the NFA is useful for building a reverse DFA, which is most</span>
     <span class="doccomment">/// useful for finding the start of a match.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">reverse</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">yes</span>: <span class="ident">bool</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Builder</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">reverse</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">yes</span>: <span class="ident">bool</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">Builder</span> {
         <span class="self">self</span>.<span class="ident">config</span>.<span class="ident">reverse</span> <span class="op">=</span> <span class="ident">yes</span>;
         <span class="self">self</span>
     }
@@ -1353,7 +1354,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// The only reason to disable this if you want to compile an NFA and start</span>
     <span class="doccomment">/// using it as quickly as possible without needing to build a DFA.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">shrink</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">yes</span>: <span class="ident">bool</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Builder</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">shrink</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">yes</span>: <span class="ident">bool</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">Builder</span> {
         <span class="self">self</span>.<span class="ident">config</span>.<span class="ident">shrink</span> <span class="op">=</span> <span class="ident">yes</span>;
         <span class="self">self</span>
     }
@@ -1471,12 +1472,12 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// The compiler is always reconfigured by the builder before using it to</span>
     <span class="doccomment">/// build an NFA.</span>
-    <span class="kw">fn</span> <span class="ident">configure</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">config</span>: <span class="ident">Config</span>) {
+    <span class="kw">fn</span> <span class="ident">configure</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">config</span>: <span class="ident">Config</span>) {
         <span class="self">self</span>.<span class="ident">config</span> <span class="op">=</span> <span class="ident">config</span>;
     }
 
     <span class="doccomment">/// Convert the current intermediate NFA to its final compiled form.</span>
-    <span class="kw">fn</span> <span class="ident">compile</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">nfa</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">NFA</span>, <span class="ident">expr</span>: <span class="kw-2">&amp;</span><span class="ident">Hir</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">compile</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">nfa</span>: <span class="kw-2">&amp;mut</span> <span class="ident">NFA</span>, <span class="ident">expr</span>: <span class="kw-2">&amp;</span><span class="ident">Hir</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="ident">nfa</span>.<span class="ident">anchored</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">config</span>.<span class="ident">anchored</span>;
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">start</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">add_empty</span>();
@@ -1499,7 +1500,7 @@
 
     <span class="doccomment">/// Finishes the compilation process and populates the provide NFA with</span>
     <span class="doccomment">/// the final graph.</span>
-    <span class="kw">fn</span> <span class="ident">finish</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">nfa</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">NFA</span>) {
+    <span class="kw">fn</span> <span class="ident">finish</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">nfa</span>: <span class="kw-2">&amp;mut</span> <span class="ident">NFA</span>) {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">bstates</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">states</span>.<span class="ident">borrow_mut</span>();
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">remap</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">remap</span>.<span class="ident">borrow_mut</span>();
         <span class="ident">remap</span>.<span class="ident">resize</span>(<span class="ident">bstates</span>.<span class="ident">len</span>(), <span class="number">0</span>);
@@ -1574,7 +1575,7 @@
             }
             <span class="ident">remap</span>[<span class="ident">empty_id</span>] <span class="op">=</span> <span class="ident">remap</span>[<span class="ident">empty_next</span>];
         }
-        <span class="kw">for</span> <span class="ident">state</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">nfa</span>.<span class="ident">states</span> {
+        <span class="kw">for</span> <span class="ident">state</span> <span class="kw">in</span> <span class="kw-2">&amp;mut</span> <span class="ident">nfa</span>.<span class="ident">states</span> {
             <span class="ident">state</span>.<span class="ident">remap</span>(<span class="kw-2">&amp;</span><span class="ident">remap</span>);
         }
         <span class="comment">// The compiler always begins the NFA at the first state.</span>
@@ -1591,7 +1592,7 @@
             <span class="ident">HirKind::Literal</span>(<span class="ident">hir::Literal::Unicode</span>(<span class="ident">ch</span>)) =&gt; {
                 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> [<span class="number">0</span>; <span class="number">4</span>];
                 <span class="kw">let</span> <span class="ident">it</span> <span class="op">=</span> <span class="ident">ch</span>
-                    .<span class="ident">encode_utf8</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">buf</span>)
+                    .<span class="ident">encode_utf8</span>(<span class="kw-2">&amp;mut</span> <span class="ident">buf</span>)
                     .<span class="ident">as_bytes</span>()
                     .<span class="ident">iter</span>()
                     .<span class="ident">map</span>(<span class="op">|</span><span class="kw-2">&amp;</span><span class="ident">b</span><span class="op">|</span> <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">c_range</span>(<span class="ident">b</span>, <span class="ident">b</span>)));
@@ -1862,7 +1863,7 @@
                     }
                 }
                 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">utf8_state</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">utf8_state</span>.<span class="ident">borrow_mut</span>();
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">utf8c</span> <span class="op">=</span> <span class="ident">Utf8Compiler::new</span>(<span class="self">self</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw-2">*</span><span class="ident">utf8_state</span>);
+                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">utf8c</span> <span class="op">=</span> <span class="ident">Utf8Compiler::new</span>(<span class="self">self</span>, <span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="ident">utf8_state</span>);
                 <span class="ident">trie</span>.<span class="ident">iter</span>(<span class="op">|</span><span class="ident">seq</span><span class="op">|</span> {
                     <span class="ident">utf8c</span>.<span class="ident">add</span>(<span class="kw-2">&amp;</span><span class="ident">seq</span>);
                 });
@@ -1874,7 +1875,7 @@
             <span class="comment">// is almost no downside (in either memory or time) to using this</span>
             <span class="comment">// approach.</span>
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">utf8_state</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">utf8_state</span>.<span class="ident">borrow_mut</span>();
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">utf8c</span> <span class="op">=</span> <span class="ident">Utf8Compiler::new</span>(<span class="self">self</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw-2">*</span><span class="ident">utf8_state</span>);
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">utf8c</span> <span class="op">=</span> <span class="ident">Utf8Compiler::new</span>(<span class="self">self</span>, <span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="ident">utf8_state</span>);
             <span class="kw">for</span> <span class="ident">rng</span> <span class="kw">in</span> <span class="ident">cls</span>.<span class="ident">iter</span>() {
                 <span class="kw">for</span> <span class="ident">seq</span> <span class="kw">in</span> <span class="ident">Utf8Sequences::new</span>(<span class="ident">rng</span>.<span class="ident">start</span>(), <span class="ident">rng</span>.<span class="ident">end</span>()) {
                     <span class="ident">utf8c</span>.<span class="ident">add</span>(<span class="ident">seq</span>.<span class="ident">as_slice</span>());
@@ -2074,7 +2075,7 @@
         <span class="ident">Utf8State</span> { <span class="ident">compiled</span>: <span class="ident">Utf8BoundedMap::new</span>(<span class="number">5000</span>), <span class="ident">uncompiled</span>: <span class="macro">vec!</span>[] }
     }
 
-    <span class="kw">fn</span> <span class="ident">clear</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
+    <span class="kw">fn</span> <span class="ident">clear</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
         <span class="self">self</span>.<span class="ident">compiled</span>.<span class="ident">clear</span>();
         <span class="self">self</span>.<span class="ident">uncompiled</span>.<span class="ident">clear</span>();
     }
@@ -2089,14 +2090,14 @@
         <span class="ident">utf8c</span>
     }
 
-    <span class="kw">fn</span> <span class="ident">finish</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident">ThompsonRef</span> {
+    <span class="kw">fn</span> <span class="ident">finish</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">ThompsonRef</span> {
         <span class="self">self</span>.<span class="ident">compile_from</span>(<span class="number">0</span>);
         <span class="kw">let</span> <span class="ident">node</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">pop_root</span>();
         <span class="kw">let</span> <span class="ident">start</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">compile</span>(<span class="ident">node</span>);
         <span class="ident">ThompsonRef</span> { <span class="ident">start</span>, <span class="ident">end</span>: <span class="self">self</span>.<span class="ident">target</span> }
     }
 
-    <span class="kw">fn</span> <span class="ident">add</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">ranges</span>: <span class="kw-2">&amp;</span>[<span class="ident">Utf8Range</span>]) {
+    <span class="kw">fn</span> <span class="ident">add</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">ranges</span>: <span class="kw-2">&amp;</span>[<span class="ident">Utf8Range</span>]) {
         <span class="kw">let</span> <span class="ident">prefix_len</span> <span class="op">=</span> <span class="ident">ranges</span>
             .<span class="ident">iter</span>()
             .<span class="ident">zip</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">state</span>.<span class="ident">uncompiled</span>)
@@ -2111,7 +2112,7 @@
         <span class="self">self</span>.<span class="ident">add_suffix</span>(<span class="kw-2">&amp;</span><span class="ident">ranges</span>[<span class="ident">prefix_len</span>..]);
     }
 
-    <span class="kw">fn</span> <span class="ident">compile_from</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">from</span>: <span class="ident">usize</span>) {
+    <span class="kw">fn</span> <span class="ident">compile_from</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">from</span>: <span class="ident">usize</span>) {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">next</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">target</span>;
         <span class="kw">while</span> <span class="ident">from</span> <span class="op">+</span> <span class="number">1</span> <span class="op">&lt;</span> <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">uncompiled</span>.<span class="ident">len</span>() {
             <span class="kw">let</span> <span class="ident">node</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">pop_freeze</span>(<span class="ident">next</span>);
@@ -2120,7 +2121,7 @@
         <span class="self">self</span>.<span class="ident">top_last_freeze</span>(<span class="ident">next</span>);
     }
 
-    <span class="kw">fn</span> <span class="ident">compile</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">node</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Transition</span><span class="op">&gt;</span>) -&gt; <span class="ident">StateID</span> {
+    <span class="kw">fn</span> <span class="ident">compile</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">node</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Transition</span><span class="op">&gt;</span>) -&gt; <span class="ident">StateID</span> {
         <span class="kw">let</span> <span class="ident">hash</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">compiled</span>.<span class="ident">hash</span>(<span class="kw-2">&amp;</span><span class="ident">node</span>);
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">id</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">compiled</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">node</span>, <span class="ident">hash</span>) {
             <span class="kw">return</span> <span class="ident">id</span>;
@@ -2130,7 +2131,7 @@
         <span class="ident">id</span>
     }
 
-    <span class="kw">fn</span> <span class="ident">add_suffix</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">ranges</span>: <span class="kw-2">&amp;</span>[<span class="ident">Utf8Range</span>]) {
+    <span class="kw">fn</span> <span class="ident">add_suffix</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">ranges</span>: <span class="kw-2">&amp;</span>[<span class="ident">Utf8Range</span>]) {
         <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">ranges</span>.<span class="ident">is_empty</span>());
         <span class="kw">let</span> <span class="ident">last</span> <span class="op">=</span> <span class="self">self</span>
             .<span class="ident">state</span>
@@ -2151,23 +2152,23 @@
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">add_empty</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
+    <span class="kw">fn</span> <span class="ident">add_empty</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
         <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">uncompiled</span>.<span class="ident">push</span>(<span class="ident">Utf8Node</span> { <span class="ident">trans</span>: <span class="macro">vec!</span>[], <span class="ident">last</span>: <span class="prelude-val">None</span> });
     }
 
-    <span class="kw">fn</span> <span class="ident">pop_freeze</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">next</span>: <span class="ident">StateID</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Transition</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">pop_freeze</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">next</span>: <span class="ident">StateID</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Transition</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">uncompiled</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">uncompiled</span>.<span class="ident">pop</span>().<span class="ident">unwrap</span>();
         <span class="ident">uncompiled</span>.<span class="ident">set_last_transition</span>(<span class="ident">next</span>);
         <span class="ident">uncompiled</span>.<span class="ident">trans</span>
     }
 
-    <span class="kw">fn</span> <span class="ident">pop_root</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Transition</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">pop_root</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Transition</span><span class="op">&gt;</span> {
         <span class="macro">assert_eq!</span>(<span class="self">self</span>.<span class="ident">state</span>.<span class="ident">uncompiled</span>.<span class="ident">len</span>(), <span class="number">1</span>);
         <span class="macro">assert!</span>(<span class="self">self</span>.<span class="ident">state</span>.<span class="ident">uncompiled</span>[<span class="number">0</span>].<span class="ident">last</span>.<span class="ident">is_none</span>());
         <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">uncompiled</span>.<span class="ident">pop</span>().<span class="ident">expect</span>(<span class="string">&quot;non-empty nodes&quot;</span>).<span class="ident">trans</span>
     }
 
-    <span class="kw">fn</span> <span class="ident">top_last_freeze</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">next</span>: <span class="ident">StateID</span>) {
+    <span class="kw">fn</span> <span class="ident">top_last_freeze</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">next</span>: <span class="ident">StateID</span>) {
         <span class="kw">let</span> <span class="ident">last</span> <span class="op">=</span> <span class="self">self</span>
             .<span class="ident">state</span>
             .<span class="ident">uncompiled</span>
@@ -2179,7 +2180,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Utf8Node</span> {
-    <span class="kw">fn</span> <span class="ident">set_last_transition</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">next</span>: <span class="ident">StateID</span>) {
+    <span class="kw">fn</span> <span class="ident">set_last_transition</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">next</span>: <span class="ident">StateID</span>) {
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">last</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">last</span>.<span class="ident">take</span>() {
             <span class="self">self</span>.<span class="ident">trans</span>.<span class="ident">push</span>(<span class="ident">Transition</span> {
                 <span class="ident">start</span>: <span class="ident">last</span>.<span class="ident">start</span>,
@@ -2386,5 +2387,4 @@
 }
 </code></pre></div>
 </section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="regex_automata" data-search-index-js="../../../search-index.js" data-search-js="../../../search.js"></div>
-    <script src="../../../main.js"></script><script src="../../../source-script.js"></script><script src="../../../source-files.js"></script>
 </body></html>

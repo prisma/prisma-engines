@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;sval-1.0.0-alpha.5&#x2F;src&#x2F;value&#x2F;owned.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>owned.rs - source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../sval/index.html'><div class='logo-container rust-logo'><img src='../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">   1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;sval-1.0.0-alpha.5&#x2F;src&#x2F;value&#x2F;owned.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>owned.rs - source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><script defer src="../../../main.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script>
+    <noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../sval/index.html'><div class='logo-container rust-logo'><img src='../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">   1</span>
 <span id="2">   2</span>
 <span id="3">   3</span>
 <span id="4">   4</span>
@@ -1174,7 +1175,7 @@ features = [&quot;std&quot;]
 }
 
 <span class="kw">impl</span> <span class="ident">Value</span> <span class="kw">for</span> <span class="ident">OwnedValue</span> {
-    <span class="kw">fn</span> <span class="ident">stream</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">stream</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">value::Stream</span>) -&gt; <span class="ident">value::Result</span> {
+    <span class="kw">fn</span> <span class="ident">stream</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">stream</span>: <span class="kw-2">&amp;mut</span> <span class="ident">value::Stream</span>) -&gt; <span class="ident">value::Result</span> {
         <span class="kw">match</span> <span class="self">self</span>.<span class="number">0</span> {
             <span class="ident">ValueInner::Error</span>(<span class="kw-2">ref</span> <span class="ident">e</span>) =&gt; <span class="prelude-val">Err</span>(<span class="ident"><span class="kw">crate</span>::Error::custom</span>(<span class="ident">e</span>)),
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span>
@@ -1192,7 +1193,7 @@ features = [&quot;std&quot;]
 }
 
 <span class="kw">impl</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">OwnedValue</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;fmt&quot;</span>)]</span>
         {
             <span class="ident"><span class="kw">crate</span>::fmt::debug</span>(<span class="ident">f</span>, <span class="self">self</span>)
@@ -1347,7 +1348,7 @@ features = [&quot;std&quot;]
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">dst</span> <span class="op">=</span> [<span class="number">0</span>; <span class="ident">SHARED_STR_INLINE_CAPACITY</span>];
 
             <span class="kw">let</span> <span class="ident">src_ptr</span> <span class="op">=</span> <span class="ident">src</span>.<span class="ident">as_ptr</span>();
-            <span class="kw">let</span> <span class="ident">dst_ptr</span> <span class="op">=</span> (<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">dst</span>[..]).<span class="ident">as_mut_ptr</span>();
+            <span class="kw">let</span> <span class="ident">dst_ptr</span> <span class="op">=</span> (<span class="kw-2">&amp;mut</span> <span class="ident">dst</span>[..]).<span class="ident">as_mut_ptr</span>();
 
             <span class="comment">// SAFETY: The `src` is a valid, initialized `str`</span>
             <span class="comment">// The `dst` has enough capacity for `src.len()` bytes</span>
@@ -1442,13 +1443,13 @@ features = [&quot;std&quot;]
 }
 
 <span class="kw">impl</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">OwnedSource</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="ident">fmt::Display::fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">debug</span>, <span class="ident">f</span>)
     }
 }
 
 <span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">OwnedSource</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="ident">fmt::Display::fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">display</span>, <span class="ident">f</span>)
     }
 }
@@ -1483,7 +1484,7 @@ features = [&quot;std&quot;]
 }
 
 <span class="kw">impl</span> <span class="ident">Token</span> {
-    <span class="kw">fn</span> <span class="ident">stream</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">stream</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">value::Stream</span>) -&gt; <span class="ident">value::Result</span> {
+    <span class="kw">fn</span> <span class="ident">stream</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">stream</span>: <span class="kw-2">&amp;mut</span> <span class="ident">value::Stream</span>) -&gt; <span class="ident">value::Result</span> {
         <span class="kw">use</span> <span class="ident"><span class="self">self</span>::TokenKind</span>::<span class="kw-2">*</span>;
 
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">kind</span> {
@@ -1536,14 +1537,14 @@ features = [&quot;std&quot;]
     }
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">push</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">kind</span>: <span class="ident">TokenKind</span>, <span class="ident">depth</span>: <span class="ident">stack::Depth</span>) {
+    <span class="kw">fn</span> <span class="ident">push</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">kind</span>: <span class="ident">TokenKind</span>, <span class="ident">depth</span>: <span class="ident">stack::Depth</span>) {
         <span class="self">self</span>.<span class="ident">tokens</span>.<span class="ident">push</span>(<span class="ident">Token</span> { <span class="ident">depth</span>, <span class="ident">kind</span> });
     }
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde1&quot;</span>)]</span>
 <span class="kw">impl</span> <span class="ident">TokenBuf</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">clear</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">clear</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
         <span class="self">self</span>.<span class="ident">tokens</span>.<span class="ident">clear</span>();
         <span class="self">self</span>.<span class="ident">stack</span>.<span class="ident">clear</span>();
     }
@@ -1558,7 +1559,7 @@ features = [&quot;std&quot;]
 }
 
 <span class="kw">impl</span> <span class="ident">Stream</span> <span class="kw">for</span> <span class="ident">TokenBuf</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">f</span>: <span class="ident">stream::Arguments</span>) -&gt; <span class="ident">stream::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">f</span>: <span class="ident">stream::Arguments</span>) -&gt; <span class="ident">stream::Result</span> {
         <span class="kw">let</span> <span class="ident">depth</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">stack</span>.<span class="ident">primitive</span>()<span class="question-mark">?</span>.<span class="ident">depth</span>();
 
         <span class="self">self</span>.<span class="ident">push</span>(<span class="ident">TokenKind::Str</span>(<span class="ident">StringContainer::from</span>(<span class="ident">f</span>.<span class="ident">to_string</span>())), <span class="ident">depth</span>);
@@ -1566,7 +1567,7 @@ features = [&quot;std&quot;]
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">fn</span> <span class="ident">error</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">v</span>: <span class="ident">stream::Source</span>) -&gt; <span class="ident">stream::Result</span> {
+    <span class="kw">fn</span> <span class="ident">error</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">v</span>: <span class="ident">stream::Source</span>) -&gt; <span class="ident">stream::Result</span> {
         <span class="kw">let</span> <span class="ident">depth</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">stack</span>.<span class="ident">primitive</span>()<span class="question-mark">?</span>.<span class="ident">depth</span>();
 
         <span class="self">self</span>.<span class="ident">push</span>(
@@ -1577,7 +1578,7 @@ features = [&quot;std&quot;]
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">fn</span> <span class="ident">i64</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">v</span>: <span class="ident">i64</span>) -&gt; <span class="ident">stream::Result</span> {
+    <span class="kw">fn</span> <span class="ident">i64</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">v</span>: <span class="ident">i64</span>) -&gt; <span class="ident">stream::Result</span> {
         <span class="kw">let</span> <span class="ident">depth</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">stack</span>.<span class="ident">primitive</span>()<span class="question-mark">?</span>.<span class="ident">depth</span>();
 
         <span class="self">self</span>.<span class="ident">push</span>(<span class="ident">TokenKind::Signed</span>(<span class="ident">v</span>), <span class="ident">depth</span>);
@@ -1585,7 +1586,7 @@ features = [&quot;std&quot;]
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">fn</span> <span class="ident">u64</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">v</span>: <span class="ident">u64</span>) -&gt; <span class="ident">stream::Result</span> {
+    <span class="kw">fn</span> <span class="ident">u64</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">v</span>: <span class="ident">u64</span>) -&gt; <span class="ident">stream::Result</span> {
         <span class="kw">let</span> <span class="ident">depth</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">stack</span>.<span class="ident">primitive</span>()<span class="question-mark">?</span>.<span class="ident">depth</span>();
 
         <span class="self">self</span>.<span class="ident">push</span>(<span class="ident">TokenKind::Unsigned</span>(<span class="ident">v</span>), <span class="ident">depth</span>);
@@ -1593,7 +1594,7 @@ features = [&quot;std&quot;]
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">fn</span> <span class="ident">i128</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">v</span>: <span class="ident">i128</span>) -&gt; <span class="ident">stream::Result</span> {
+    <span class="kw">fn</span> <span class="ident">i128</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">v</span>: <span class="ident">i128</span>) -&gt; <span class="ident">stream::Result</span> {
         <span class="kw">let</span> <span class="ident">depth</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">stack</span>.<span class="ident">primitive</span>()<span class="question-mark">?</span>.<span class="ident">depth</span>();
 
         <span class="self">self</span>.<span class="ident">push</span>(<span class="ident">TokenKind::BigSigned</span>(<span class="ident">v</span>), <span class="ident">depth</span>);
@@ -1601,7 +1602,7 @@ features = [&quot;std&quot;]
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">fn</span> <span class="ident">u128</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">v</span>: <span class="ident">u128</span>) -&gt; <span class="ident">stream::Result</span> {
+    <span class="kw">fn</span> <span class="ident">u128</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">v</span>: <span class="ident">u128</span>) -&gt; <span class="ident">stream::Result</span> {
         <span class="kw">let</span> <span class="ident">depth</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">stack</span>.<span class="ident">primitive</span>()<span class="question-mark">?</span>.<span class="ident">depth</span>();
 
         <span class="self">self</span>.<span class="ident">push</span>(<span class="ident">TokenKind::BigUnsigned</span>(<span class="ident">v</span>), <span class="ident">depth</span>);
@@ -1609,7 +1610,7 @@ features = [&quot;std&quot;]
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">fn</span> <span class="ident">f64</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">v</span>: <span class="ident">f64</span>) -&gt; <span class="ident">stream::Result</span> {
+    <span class="kw">fn</span> <span class="ident">f64</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">v</span>: <span class="ident">f64</span>) -&gt; <span class="ident">stream::Result</span> {
         <span class="kw">let</span> <span class="ident">depth</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">stack</span>.<span class="ident">primitive</span>()<span class="question-mark">?</span>.<span class="ident">depth</span>();
 
         <span class="self">self</span>.<span class="ident">push</span>(<span class="ident">TokenKind::Float</span>(<span class="ident">v</span>), <span class="ident">depth</span>);
@@ -1617,7 +1618,7 @@ features = [&quot;std&quot;]
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">fn</span> <span class="ident">bool</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">v</span>: <span class="ident">bool</span>) -&gt; <span class="ident">stream::Result</span> {
+    <span class="kw">fn</span> <span class="ident">bool</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">v</span>: <span class="ident">bool</span>) -&gt; <span class="ident">stream::Result</span> {
         <span class="kw">let</span> <span class="ident">depth</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">stack</span>.<span class="ident">primitive</span>()<span class="question-mark">?</span>.<span class="ident">depth</span>();
 
         <span class="self">self</span>.<span class="ident">push</span>(<span class="ident">TokenKind::Bool</span>(<span class="ident">v</span>), <span class="ident">depth</span>);
@@ -1625,7 +1626,7 @@ features = [&quot;std&quot;]
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">fn</span> <span class="ident">char</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">v</span>: <span class="ident">char</span>) -&gt; <span class="ident">stream::Result</span> {
+    <span class="kw">fn</span> <span class="ident">char</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">v</span>: <span class="ident">char</span>) -&gt; <span class="ident">stream::Result</span> {
         <span class="kw">let</span> <span class="ident">depth</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">stack</span>.<span class="ident">primitive</span>()<span class="question-mark">?</span>.<span class="ident">depth</span>();
 
         <span class="self">self</span>.<span class="ident">push</span>(<span class="ident">TokenKind::Char</span>(<span class="ident">v</span>), <span class="ident">depth</span>);
@@ -1633,7 +1634,7 @@ features = [&quot;std&quot;]
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">fn</span> <span class="ident">str</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">v</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">stream::Result</span> {
+    <span class="kw">fn</span> <span class="ident">str</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">v</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">stream::Result</span> {
         <span class="kw">let</span> <span class="ident">depth</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">stack</span>.<span class="ident">primitive</span>()<span class="question-mark">?</span>.<span class="ident">depth</span>();
 
         <span class="self">self</span>.<span class="ident">push</span>(<span class="ident">TokenKind::Str</span>(<span class="ident">StringContainer::from</span>(<span class="ident">v</span>)), <span class="ident">depth</span>);
@@ -1641,7 +1642,7 @@ features = [&quot;std&quot;]
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">fn</span> <span class="ident">none</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident">stream::Result</span> {
+    <span class="kw">fn</span> <span class="ident">none</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">stream::Result</span> {
         <span class="kw">let</span> <span class="ident">depth</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">stack</span>.<span class="ident">primitive</span>()<span class="question-mark">?</span>.<span class="ident">depth</span>();
 
         <span class="self">self</span>.<span class="ident">push</span>(<span class="ident">TokenKind::None</span>, <span class="ident">depth</span>);
@@ -1649,7 +1650,7 @@ features = [&quot;std&quot;]
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">fn</span> <span class="ident">map_begin</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">len</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>) -&gt; <span class="ident">stream::Result</span> {
+    <span class="kw">fn</span> <span class="ident">map_begin</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">len</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>) -&gt; <span class="ident">stream::Result</span> {
         <span class="kw">let</span> <span class="ident">depth</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">stack</span>.<span class="ident">map_begin</span>()<span class="question-mark">?</span>.<span class="ident">depth</span>();
 
         <span class="self">self</span>.<span class="ident">push</span>(<span class="ident">TokenKind::MapBegin</span>(<span class="ident">len</span>), <span class="ident">depth</span>);
@@ -1657,7 +1658,7 @@ features = [&quot;std&quot;]
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">fn</span> <span class="ident">map_key</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident">stream::Result</span> {
+    <span class="kw">fn</span> <span class="ident">map_key</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">stream::Result</span> {
         <span class="kw">let</span> <span class="ident">depth</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">stack</span>.<span class="ident">map_key</span>()<span class="question-mark">?</span>.<span class="ident">depth</span>();
 
         <span class="self">self</span>.<span class="ident">push</span>(<span class="ident">TokenKind::MapKey</span>, <span class="ident">depth</span>);
@@ -1665,7 +1666,7 @@ features = [&quot;std&quot;]
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">fn</span> <span class="ident">map_value</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident">stream::Result</span> {
+    <span class="kw">fn</span> <span class="ident">map_value</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">stream::Result</span> {
         <span class="kw">let</span> <span class="ident">depth</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">stack</span>.<span class="ident">map_value</span>()<span class="question-mark">?</span>.<span class="ident">depth</span>();
 
         <span class="self">self</span>.<span class="ident">push</span>(<span class="ident">TokenKind::MapValue</span>, <span class="ident">depth</span>);
@@ -1673,7 +1674,7 @@ features = [&quot;std&quot;]
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">fn</span> <span class="ident">map_end</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident">stream::Result</span> {
+    <span class="kw">fn</span> <span class="ident">map_end</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">stream::Result</span> {
         <span class="kw">let</span> <span class="ident">depth</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">stack</span>.<span class="ident">map_end</span>()<span class="question-mark">?</span>.<span class="ident">depth</span>();
 
         <span class="self">self</span>.<span class="ident">push</span>(<span class="ident">TokenKind::MapEnd</span>, <span class="ident">depth</span>);
@@ -1681,7 +1682,7 @@ features = [&quot;std&quot;]
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">fn</span> <span class="ident">seq_begin</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">len</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>) -&gt; <span class="ident">stream::Result</span> {
+    <span class="kw">fn</span> <span class="ident">seq_begin</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">len</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>) -&gt; <span class="ident">stream::Result</span> {
         <span class="kw">let</span> <span class="ident">depth</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">stack</span>.<span class="ident">seq_begin</span>()<span class="question-mark">?</span>.<span class="ident">depth</span>();
 
         <span class="self">self</span>.<span class="ident">push</span>(<span class="ident">TokenKind::SeqBegin</span>(<span class="ident">len</span>), <span class="ident">depth</span>);
@@ -1689,7 +1690,7 @@ features = [&quot;std&quot;]
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">fn</span> <span class="ident">seq_elem</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident">stream::Result</span> {
+    <span class="kw">fn</span> <span class="ident">seq_elem</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">stream::Result</span> {
         <span class="kw">let</span> <span class="ident">depth</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">stack</span>.<span class="ident">seq_elem</span>()<span class="question-mark">?</span>.<span class="ident">depth</span>();
 
         <span class="self">self</span>.<span class="ident">push</span>(<span class="ident">TokenKind::SeqElem</span>, <span class="ident">depth</span>);
@@ -1697,7 +1698,7 @@ features = [&quot;std&quot;]
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">fn</span> <span class="ident">seq_end</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident">stream::Result</span> {
+    <span class="kw">fn</span> <span class="ident">seq_end</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">stream::Result</span> {
         <span class="kw">let</span> <span class="ident">depth</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">stack</span>.<span class="ident">seq_end</span>()<span class="question-mark">?</span>.<span class="ident">depth</span>();
 
         <span class="self">self</span>.<span class="ident">push</span>(<span class="ident">TokenKind::SeqEnd</span>, <span class="ident">depth</span>);
@@ -1722,7 +1723,7 @@ features = [&quot;std&quot;]
 }
 
 <span class="kw">impl</span> <span class="ident">Primitive</span> {
-    <span class="kw">fn</span> <span class="ident">stream</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">stream</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">value::Stream</span>) -&gt; <span class="ident">value::Result</span> {
+    <span class="kw">fn</span> <span class="ident">stream</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">stream</span>: <span class="kw-2">&amp;mut</span> <span class="ident">value::Stream</span>) -&gt; <span class="ident">value::Result</span> {
         <span class="kw">use</span> <span class="ident"><span class="self">self</span>::Primitive</span>::<span class="kw-2">*</span>;
 
         <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
@@ -1779,19 +1780,19 @@ features = [&quot;std&quot;]
     }
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">set</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">primitive</span>: <span class="ident">Primitive</span>) {
+    <span class="kw">fn</span> <span class="ident">set</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">primitive</span>: <span class="ident">Primitive</span>) {
         <span class="self">self</span>.<span class="ident">primitive</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">primitive</span>);
     }
 }
 
 <span class="kw">impl</span> <span class="ident">Stream</span> <span class="kw">for</span> <span class="ident">PrimitiveBuf</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">f</span>: <span class="ident">stream::Arguments</span>) -&gt; <span class="ident">stream::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">f</span>: <span class="ident">stream::Arguments</span>) -&gt; <span class="ident">stream::Result</span> {
         <span class="self">self</span>.<span class="ident">set</span>(<span class="ident">Primitive::Str</span>(<span class="ident">StringContainer::from</span>(<span class="ident">f</span>.<span class="ident">to_string</span>())));
 
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">fn</span> <span class="ident">error</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">v</span>: <span class="ident">stream::Source</span>) -&gt; <span class="ident">stream::Result</span> {
+    <span class="kw">fn</span> <span class="ident">error</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">v</span>: <span class="ident">stream::Source</span>) -&gt; <span class="ident">stream::Result</span> {
         <span class="self">self</span>.<span class="ident">set</span>(<span class="ident">Primitive::Error</span>(<span class="ident">SharedContainer::from</span>(<span class="ident">OwnedSource::from</span>(
             <span class="ident">v</span>,
         ))));
@@ -1799,85 +1800,85 @@ features = [&quot;std&quot;]
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">fn</span> <span class="ident">i64</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">v</span>: <span class="ident">i64</span>) -&gt; <span class="ident">stream::Result</span> {
+    <span class="kw">fn</span> <span class="ident">i64</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">v</span>: <span class="ident">i64</span>) -&gt; <span class="ident">stream::Result</span> {
         <span class="self">self</span>.<span class="ident">set</span>(<span class="ident">Primitive::Signed</span>(<span class="ident">v</span>));
 
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">fn</span> <span class="ident">u64</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">v</span>: <span class="ident">u64</span>) -&gt; <span class="ident">stream::Result</span> {
+    <span class="kw">fn</span> <span class="ident">u64</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">v</span>: <span class="ident">u64</span>) -&gt; <span class="ident">stream::Result</span> {
         <span class="self">self</span>.<span class="ident">set</span>(<span class="ident">Primitive::Unsigned</span>(<span class="ident">v</span>));
 
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">fn</span> <span class="ident">i128</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">v</span>: <span class="ident">i128</span>) -&gt; <span class="ident">stream::Result</span> {
+    <span class="kw">fn</span> <span class="ident">i128</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">v</span>: <span class="ident">i128</span>) -&gt; <span class="ident">stream::Result</span> {
         <span class="self">self</span>.<span class="ident">set</span>(<span class="ident">Primitive::BigSigned</span>(<span class="ident">v</span>));
 
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">fn</span> <span class="ident">u128</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">v</span>: <span class="ident">u128</span>) -&gt; <span class="ident">stream::Result</span> {
+    <span class="kw">fn</span> <span class="ident">u128</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">v</span>: <span class="ident">u128</span>) -&gt; <span class="ident">stream::Result</span> {
         <span class="self">self</span>.<span class="ident">set</span>(<span class="ident">Primitive::BigUnsigned</span>(<span class="ident">v</span>));
 
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">fn</span> <span class="ident">f64</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">v</span>: <span class="ident">f64</span>) -&gt; <span class="ident">stream::Result</span> {
+    <span class="kw">fn</span> <span class="ident">f64</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">v</span>: <span class="ident">f64</span>) -&gt; <span class="ident">stream::Result</span> {
         <span class="self">self</span>.<span class="ident">set</span>(<span class="ident">Primitive::Float</span>(<span class="ident">v</span>));
 
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">fn</span> <span class="ident">bool</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">v</span>: <span class="ident">bool</span>) -&gt; <span class="ident">stream::Result</span> {
+    <span class="kw">fn</span> <span class="ident">bool</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">v</span>: <span class="ident">bool</span>) -&gt; <span class="ident">stream::Result</span> {
         <span class="self">self</span>.<span class="ident">set</span>(<span class="ident">Primitive::Bool</span>(<span class="ident">v</span>));
 
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">fn</span> <span class="ident">char</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">v</span>: <span class="ident">char</span>) -&gt; <span class="ident">stream::Result</span> {
+    <span class="kw">fn</span> <span class="ident">char</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">v</span>: <span class="ident">char</span>) -&gt; <span class="ident">stream::Result</span> {
         <span class="self">self</span>.<span class="ident">set</span>(<span class="ident">Primitive::Char</span>(<span class="ident">v</span>));
 
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">fn</span> <span class="ident">str</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">v</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">stream::Result</span> {
+    <span class="kw">fn</span> <span class="ident">str</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">v</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">stream::Result</span> {
         <span class="self">self</span>.<span class="ident">set</span>(<span class="ident">Primitive::Str</span>(<span class="ident">StringContainer::from</span>(<span class="ident">v</span>)));
 
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">fn</span> <span class="ident">none</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident">stream::Result</span> {
+    <span class="kw">fn</span> <span class="ident">none</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">stream::Result</span> {
         <span class="self">self</span>.<span class="ident">set</span>(<span class="ident">Primitive::None</span>);
 
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">fn</span> <span class="ident">map_begin</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="kw">_</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>) -&gt; <span class="ident">stream::Result</span> {
+    <span class="kw">fn</span> <span class="ident">map_begin</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="kw">_</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>) -&gt; <span class="ident">stream::Result</span> {
         <span class="prelude-val">Err</span>(<span class="ident"><span class="kw">crate</span>::Error::unsupported</span>(<span class="string">&quot;unsupported primitive&quot;</span>))
     }
 
-    <span class="kw">fn</span> <span class="ident">map_key</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident">stream::Result</span> {
+    <span class="kw">fn</span> <span class="ident">map_key</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">stream::Result</span> {
         <span class="prelude-val">Err</span>(<span class="ident"><span class="kw">crate</span>::Error::unsupported</span>(<span class="string">&quot;unsupported primitive&quot;</span>))
     }
 
-    <span class="kw">fn</span> <span class="ident">map_value</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident">stream::Result</span> {
+    <span class="kw">fn</span> <span class="ident">map_value</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">stream::Result</span> {
         <span class="prelude-val">Err</span>(<span class="ident"><span class="kw">crate</span>::Error::unsupported</span>(<span class="string">&quot;unsupported primitive&quot;</span>))
     }
 
-    <span class="kw">fn</span> <span class="ident">map_end</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident">stream::Result</span> {
+    <span class="kw">fn</span> <span class="ident">map_end</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">stream::Result</span> {
         <span class="prelude-val">Err</span>(<span class="ident"><span class="kw">crate</span>::Error::unsupported</span>(<span class="string">&quot;unsupported primitive&quot;</span>))
     }
 
-    <span class="kw">fn</span> <span class="ident">seq_begin</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="kw">_</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>) -&gt; <span class="ident">stream::Result</span> {
+    <span class="kw">fn</span> <span class="ident">seq_begin</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="kw">_</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>) -&gt; <span class="ident">stream::Result</span> {
         <span class="prelude-val">Err</span>(<span class="ident"><span class="kw">crate</span>::Error::unsupported</span>(<span class="string">&quot;unsupported primitive&quot;</span>))
     }
 
-    <span class="kw">fn</span> <span class="ident">seq_elem</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident">stream::Result</span> {
+    <span class="kw">fn</span> <span class="ident">seq_elem</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">stream::Result</span> {
         <span class="prelude-val">Err</span>(<span class="ident"><span class="kw">crate</span>::Error::unsupported</span>(<span class="string">&quot;unsupported primitive&quot;</span>))
     }
 
-    <span class="kw">fn</span> <span class="ident">seq_end</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident">stream::Result</span> {
+    <span class="kw">fn</span> <span class="ident">seq_end</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">stream::Result</span> {
         <span class="prelude-val">Err</span>(<span class="ident"><span class="kw">crate</span>::Error::unsupported</span>(<span class="string">&quot;unsupported primitive&quot;</span>))
     }
 }
@@ -1942,7 +1943,7 @@ features = [&quot;std&quot;]
     <span class="kw">struct</span> <span class="ident">Map</span>;
 
     <span class="kw">impl</span> <span class="ident">Value</span> <span class="kw">for</span> <span class="ident">Map</span> {
-        <span class="kw">fn</span> <span class="ident">stream</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">stream</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">value::Stream</span>) -&gt; <span class="ident">value::Result</span> {
+        <span class="kw">fn</span> <span class="ident">stream</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">stream</span>: <span class="kw-2">&amp;mut</span> <span class="ident">value::Stream</span>) -&gt; <span class="ident">value::Result</span> {
             <span class="ident">stream</span>.<span class="ident">map_begin</span>(<span class="prelude-val">Some</span>(<span class="number">2</span>))<span class="question-mark">?</span>;
 
             <span class="ident">stream</span>.<span class="ident">map_key</span>(<span class="number">1</span>)<span class="question-mark">?</span>;
@@ -1958,7 +1959,7 @@ features = [&quot;std&quot;]
     <span class="kw">struct</span> <span class="ident">Seq</span>;
 
     <span class="kw">impl</span> <span class="ident">Value</span> <span class="kw">for</span> <span class="ident">Seq</span> {
-        <span class="kw">fn</span> <span class="ident">stream</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">stream</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">value::Stream</span>) -&gt; <span class="ident">value::Result</span> {
+        <span class="kw">fn</span> <span class="ident">stream</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">stream</span>: <span class="kw-2">&amp;mut</span> <span class="ident">value::Stream</span>) -&gt; <span class="ident">value::Result</span> {
             <span class="ident">stream</span>.<span class="ident">seq_begin</span>(<span class="prelude-val">Some</span>(<span class="number">2</span>))<span class="question-mark">?</span>;
 
             <span class="ident">stream</span>.<span class="ident">seq_elem</span>(<span class="number">1</span>)<span class="question-mark">?</span>;
@@ -2132,7 +2133,7 @@ features = [&quot;std&quot;]
             }
 
             <span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">TestError</span> {
-                <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
+                <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
                     <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;it broke!&quot;</span>)
                 }
             }
@@ -2150,5 +2151,4 @@ features = [&quot;std&quot;]
 }
 </code></pre></div>
 </section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="sval" data-search-index-js="../../../search-index.js" data-search-js="../../../search.js"></div>
-    <script src="../../../main.js"></script><script src="../../../source-script.js"></script><script src="../../../source-files.js"></script>
 </body></html>

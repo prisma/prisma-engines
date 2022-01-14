@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;git&#x2F;checkouts&#x2F;mysql_async-998d87ac262afe55&#x2F;a38f0ac&#x2F;src&#x2F;conn&#x2F;mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../mysql_async/index.html'><div class='logo-container rust-logo'><img src='../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">   1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;git&#x2F;checkouts&#x2F;mysql_async-998d87ac262afe55&#x2F;a38f0ac&#x2F;src&#x2F;conn&#x2F;mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><script defer src="../../../main.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script>
+    <noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../mysql_async/index.html'><div class='logo-container rust-logo'><img src='../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">   1</span>
 <span id="2">   2</span>
 <span id="3">   3</span>
 <span id="4">   4</span>
@@ -1850,7 +1851,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">ConnInner</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;Conn&quot;</span>)
             .<span class="ident">field</span>(<span class="string">&quot;connection id&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">id</span>)
             .<span class="ident">field</span>(<span class="string">&quot;server version&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">version</span>)
@@ -1892,7 +1893,7 @@
     <span class="doccomment">/// Returns mutable reference to a connection stream.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Returns `DriverError::ConnectionClosed` if there is no stream.</span>
-    <span class="kw">fn</span> <span class="ident">stream_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Stream</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">stream_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="ident">Stream</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">stream</span>
             .<span class="ident">as_mut</span>()
             .<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">DriverError::ConnectionClosed</span>.<span class="ident">into</span>())
@@ -1949,7 +1950,7 @@
             .<span class="ident">unwrap_or_default</span>()
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">stream_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Stream</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">stream_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="ident">Stream</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">stream_mut</span>()
     }
 
@@ -1958,33 +1959,33 @@
     }
 
     <span class="doccomment">/// Will update last IO time for this connection.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">touch</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">touch</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
         <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">last_io</span> <span class="op">=</span> <span class="ident">Instant::now</span>();
     }
 
     <span class="doccomment">/// Will set packet sequence id to `0`.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">reset_seq_id</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">reset_seq_id</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">stream</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">stream</span>.<span class="ident">as_mut</span>() {
             <span class="ident">stream</span>.<span class="ident">reset_seq_id</span>();
         }
     }
 
     <span class="doccomment">/// Will syncronize sequence ids between compressed and uncompressed codecs.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">sync_seq_id</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">sync_seq_id</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">stream</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">stream</span>.<span class="ident">as_mut</span>() {
             <span class="ident">stream</span>.<span class="ident">sync_seq_id</span>();
         }
     }
 
     <span class="doccomment">/// Handles OK packet.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">handle_ok</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">ok_packet</span>: <span class="ident">OkPacket</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span>) {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">handle_ok</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">ok_packet</span>: <span class="ident">OkPacket</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span>) {
         <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">status</span> <span class="op">=</span> <span class="ident">ok_packet</span>.<span class="ident">status_flags</span>();
         <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">last_err_packet</span> <span class="op">=</span> <span class="prelude-val">None</span>;
         <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">last_ok_packet</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">ok_packet</span>);
     }
 
     <span class="doccomment">/// Handles ERR packet.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">handle_err</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">err_packet</span>: <span class="ident">ErrPacket</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span>) {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">handle_err</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">err_packet</span>: <span class="ident">ErrPacket</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span>) {
         <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">status</span> <span class="op">=</span> <span class="ident">StatusFlags::empty</span>();
         <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">last_ok_packet</span> <span class="op">=</span> <span class="prelude-val">None</span>;
         <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">last_err_packet</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">err_packet</span>);
@@ -1996,7 +1997,7 @@
     }
 
     <span class="doccomment">/// Sets the given transaction status for this connection.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">set_tx_status</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">tx_status</span>: <span class="ident">TxStatus</span>) {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">set_tx_status</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">tx_status</span>: <span class="ident">TxStatus</span>) {
         <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">tx_status</span> <span class="op">=</span> <span class="ident">tx_status</span>;
     }
 
@@ -2009,10 +2010,10 @@
 
     <span class="doccomment">/// Sets the given pening result metadata for this connection. Returns the previous value.</span>
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">set_pending_result</span>(
-        <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
+        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
         <span class="ident">meta</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ResultSetMeta</span><span class="op">&gt;</span>,
     ) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ResultSetMeta</span><span class="op">&gt;</span> {
-        <span class="ident">std::mem::replace</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">pending_result</span>, <span class="ident">meta</span>)
+        <span class="ident">std::mem::replace</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">pending_result</span>, <span class="ident">meta</span>)
     }
 
     <span class="doccomment">/// Returns current status flags.</span>
@@ -2020,12 +2021,12 @@
         <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">status</span>
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">routine</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">F</span>, <span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">routine</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">F</span>, <span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">F</span>: <span class="ident">Routine</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;a</span>,
     {
         <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">disconnected</span> <span class="op">=</span> <span class="bool-val">true</span>;
-        <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">f</span>.<span class="ident">call</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw-2">*</span><span class="self">self</span>).<span class="kw">await</span>;
+        <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">f</span>.<span class="ident">call</span>(<span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="self">self</span>).<span class="kw">await</span>;
         <span class="kw">match</span> <span class="ident">result</span> {
             <span class="ident">result</span> @ <span class="prelude-val">Ok</span>(<span class="kw">_</span>) <span class="op">|</span> <span class="ident">result</span> @ <span class="prelude-val">Err</span>(<span class="ident"><span class="kw">crate</span>::Error::Server</span>(<span class="kw">_</span>)) =&gt; {
                 <span class="comment">// either OK or non-fatal error</span>
@@ -2051,7 +2052,7 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">opts</span>
     }
 
-    <span class="kw">fn</span> <span class="ident">take_stream</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident">Stream</span> {
+    <span class="kw">fn</span> <span class="ident">take_stream</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">Stream</span> {
         <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">stream</span>.<span class="ident">take</span>().<span class="ident">unwrap</span>()
     }
 
@@ -2082,7 +2083,7 @@
     }
 
     <span class="doccomment">/// Hacky way to move connection through &amp;mut. `self` becomes unusable.</span>
-    <span class="kw">fn</span> <span class="ident">take</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident">Conn</span> {
+    <span class="kw">fn</span> <span class="ident">take</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">Conn</span> {
         <span class="ident">mem::replace</span>(<span class="self">self</span>, <span class="ident">Conn::empty</span>(<span class="ident">Default::default</span>()))
     }
 
@@ -2095,7 +2096,7 @@
     <span class="doccomment">/// Set `io::Stream` options as defined in the `Opts` of the connection.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Requires that self.inner.stream is Some</span>
-    <span class="kw">fn</span> <span class="ident">setup_stream</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">setup_stream</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="macro">debug_assert!</span>(<span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">stream</span>.<span class="ident">is_some</span>());
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">stream</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">stream</span>.<span class="ident">as_mut</span>() {
             <span class="ident">stream</span>.<span class="ident">set_tcp_nodelay</span>(<span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">opts</span>.<span class="ident">tcp_nodelay</span>())<span class="question-mark">?</span>;
@@ -2103,7 +2104,7 @@
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">handle_handshake</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">handle_handshake</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">packet</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">read_packet</span>().<span class="kw">await</span><span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">handshake</span> <span class="op">=</span> <span class="ident">parse_handshake_packet</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">packet</span>)<span class="question-mark">?</span>;
         <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">nonce</span> <span class="op">=</span> {
@@ -2128,7 +2129,7 @@
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">switch_to_ssl_if_needed</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">switch_to_ssl_if_needed</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="self">self</span>
             .<span class="ident">inner</span>
             .<span class="ident">opts</span>
@@ -2147,7 +2148,7 @@
         }
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">do_handshake_response</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">do_handshake_response</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">auth_data</span> <span class="op">=</span> <span class="self">self</span>
             .<span class="ident">inner</span>
             .<span class="ident">auth_plugin</span>
@@ -2168,7 +2169,7 @@
     }
 
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">perform_auth_switch</span>(
-        <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
+        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
         <span class="ident">auth_switch_request</span>: <span class="ident">AuthSwitchRequest</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">auth_switched</span> {
@@ -2188,7 +2189,7 @@
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">continue_auth</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident">Pin</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">continue_auth</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">Pin</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="comment">// NOTE: we need to box this since it may recurse</span>
         <span class="comment">// see https://github.com/rust-lang/rust/issues/46415#issuecomment-528099782</span>
         <span class="ident">Box::pin</span>(<span class="kw">async</span> <span class="kw">move</span> {
@@ -2209,7 +2210,7 @@
         })
     }
 
-    <span class="kw">fn</span> <span class="ident">switch_to_compression</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">switch_to_compression</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="self">self</span>
             .<span class="ident">capabilities</span>()
             .<span class="ident">contains</span>(<span class="ident">CapabilityFlags::CLIENT_COMPRESS</span>)
@@ -2223,7 +2224,7 @@
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">continue_caching_sha2_password_auth</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">continue_caching_sha2_password_auth</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">packet</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">read_packet</span>().<span class="kw">await</span><span class="question-mark">?</span>;
         <span class="kw">match</span> <span class="ident">packet</span>.<span class="ident">get</span>(<span class="number">0</span>) {
             <span class="prelude-val">Some</span>(<span class="number">0x00</span>) =&gt; {
@@ -2265,7 +2266,7 @@
         }
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">continue_mysql_native_password_auth</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">continue_mysql_native_password_auth</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">packet</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">read_packet</span>().<span class="kw">await</span><span class="question-mark">?</span>;
         <span class="kw">match</span> <span class="ident">packet</span>.<span class="ident">get</span>(<span class="number">0</span>) {
             <span class="prelude-val">Some</span>(<span class="number">0x00</span>) =&gt; <span class="prelude-val">Ok</span>(()),
@@ -2278,7 +2279,7 @@
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">handle_packet</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">packet</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">handle_packet</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">packet</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">kind</span> <span class="op">=</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">get_pending_result</span>().<span class="ident">is_some</span>() {
             <span class="ident">OkPacketKind::ResultSetTerminator</span>
         } <span class="kw">else</span> {
@@ -2295,8 +2296,8 @@
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">read_packet</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">packet</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::io::ReadPacket::new</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw-2">*</span><span class="self">self</span>)
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">read_packet</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">packet</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::io::ReadPacket::new</span>(<span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="self">self</span>)
             .<span class="kw">await</span>
             .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">io_err</span><span class="op">|</span> {
                 <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">stream</span>.<span class="ident">take</span>();
@@ -2308,7 +2309,7 @@
     }
 
     <span class="doccomment">/// Returns future that reads packets from a server.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">read_packets</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">n</span>: <span class="ident">usize</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">read_packets</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">n</span>: <span class="ident">usize</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">packets</span> <span class="op">=</span> <span class="ident">Vec::with_capacity</span>(<span class="ident">n</span>);
         <span class="kw">for</span> <span class="kw">_</span> <span class="kw">in</span> <span class="number">0</span>..<span class="ident">n</span> {
             <span class="ident">packets</span>.<span class="ident">push</span>(<span class="self">self</span>.<span class="ident">read_packet</span>().<span class="kw">await</span><span class="question-mark">?</span>);
@@ -2316,11 +2317,11 @@
         <span class="prelude-val">Ok</span>(<span class="ident">packets</span>)
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">write_packet</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">data</span>: <span class="ident">T</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span>
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">write_packet</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">data</span>: <span class="ident">T</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     {
-        <span class="ident"><span class="kw">crate</span>::io::WritePacket::new</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw-2">*</span><span class="self">self</span>, <span class="ident">data</span>.<span class="ident">into</span>())
+        <span class="ident"><span class="kw">crate</span>::io::WritePacket::new</span>(<span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="self">self</span>, <span class="ident">data</span>.<span class="ident">into</span>())
             .<span class="kw">await</span>
             .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">io_err</span><span class="op">|</span> {
                 <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">stream</span>.<span class="ident">take</span>();
@@ -2330,7 +2331,7 @@
     }
 
     <span class="doccomment">/// Returns future that sends full command body to a server.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">write_command_raw</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">body</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">write_command_raw</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">body</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="macro">debug_assert!</span>(<span class="op">!</span><span class="ident">body</span>.<span class="ident">is_empty</span>());
         <span class="self">self</span>.<span class="ident">clean_dirty</span>().<span class="kw">await</span><span class="question-mark">?</span>;
         <span class="self">self</span>.<span class="ident">reset_seq_id</span>();
@@ -2338,7 +2339,7 @@
     }
 
     <span class="doccomment">/// Returns future that writes command to a server.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">write_command_data</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">cmd</span>: <span class="ident">Command</span>, <span class="ident">cmd_data</span>: <span class="ident">T</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span>
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">write_command_data</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">cmd</span>: <span class="ident">Command</span>, <span class="ident">cmd_data</span>: <span class="ident">T</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">T</span>: <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span>,
     {
@@ -2349,12 +2350,12 @@
         <span class="self">self</span>.<span class="ident">write_command_raw</span>(<span class="ident">body</span>).<span class="kw">await</span>
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">drop_packet</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">drop_packet</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">read_packet</span>().<span class="kw">await</span><span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">run_init_commands</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">run_init_commands</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">init</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">opts</span>.<span class="ident">init</span>().<span class="ident">to_vec</span>();
 
         <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">query</span>) <span class="op">=</span> <span class="ident">init</span>.<span class="ident">pop</span>() {
@@ -2410,7 +2411,7 @@
     <span class="doccomment">/// Will try to reconnect via socket using socket address in `self.inner.socket`.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Won&#39;t try to reconnect if socket connection is already enforced in [`Opts`].</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">reconnect_via_socket_if_needed</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">reconnect_via_socket_if_needed</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">socket</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">socket</span>.<span class="ident">as_ref</span>() {
             <span class="kw">let</span> <span class="ident">opts</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">opts</span>.<span class="ident">clone</span>();
             <span class="kw">if</span> <span class="ident">opts</span>.<span class="ident">socket</span>().<span class="ident">is_none</span>() {
@@ -2428,7 +2429,7 @@
     <span class="doccomment">/// Reads and stores socket address inside the connection.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Do nothing if socket address is already in [`Opts`] or if `prefer_socket` is `false`.</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">read_socket</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">read_socket</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">opts</span>.<span class="ident">prefer_socket</span>() <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">socket</span>.<span class="ident">is_none</span>() {
             <span class="kw">let</span> <span class="ident">row_opt</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">query_first</span>(<span class="string">&quot;SELECT @@socket&quot;</span>).<span class="kw">await</span><span class="question-mark">?</span>;
             <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">socket</span> <span class="op">=</span> <span class="ident">row_opt</span>.<span class="ident">unwrap_or</span>((<span class="prelude-val">None</span>,)).<span class="number">0</span>;
@@ -2437,7 +2438,7 @@
     }
 
     <span class="doccomment">/// Reads and stores `max_allowed_packet` in the connection.</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">read_max_allowed_packet</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">read_max_allowed_packet</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">row_opt</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">query_first</span>(<span class="string">&quot;SELECT @@max_allowed_packet&quot;</span>).<span class="kw">await</span><span class="question-mark">?</span>;
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">stream</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">stream</span>.<span class="ident">as_mut</span>() {
             <span class="ident">stream</span>.<span class="ident">set_max_allowed_packet</span>(<span class="ident">row_opt</span>.<span class="ident">unwrap_or</span>((<span class="ident">DEFAULT_MAX_ALLOWED_PACKET</span>,)).<span class="number">0</span>);
@@ -2446,7 +2447,7 @@
     }
 
     <span class="doccomment">/// Reads and stores `wait_timeout` in the connection.</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">read_wait_timeout</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">read_wait_timeout</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">row_opt</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">query_first</span>(<span class="string">&quot;SELECT @@wait_timeout&quot;</span>).<span class="kw">await</span><span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">wait_timeout_secs</span> <span class="op">=</span> <span class="ident">row_opt</span>.<span class="ident">unwrap_or</span>((<span class="number">28800</span>,)).<span class="number">0</span>;
         <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">wait_timeout</span> <span class="op">=</span> <span class="ident">Duration::from_secs</span>(<span class="ident">wait_timeout_secs</span>);
@@ -2472,7 +2473,7 @@
     <span class="doccomment">/// Executes `COM_RESET_CONNECTION` on `self`.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// If server version is older than 5.7.2, then it&#39;ll reconnect.</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">reset</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">reset</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">pool</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">pool</span>.<span class="ident">clone</span>();
 
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">version</span> <span class="op">&gt;</span> (<span class="number">5</span>, <span class="number">7</span>, <span class="number">2</span>) {
@@ -2490,7 +2491,7 @@
     }
 
     <span class="doccomment">/// Requires that `self.inner.tx_status != TxStatus::None`</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">rollback_transaction</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">rollback_transaction</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="macro">debug_assert_ne!</span>(<span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">tx_status</span>, <span class="ident">TxStatus::None</span>);
         <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">tx_status</span> <span class="op">=</span> <span class="ident">TxStatus::None</span>;
         <span class="self">self</span>.<span class="ident">query_drop</span>(<span class="string">&quot;ROLLBACK&quot;</span>).<span class="kw">await</span>
@@ -2505,7 +2506,7 @@
 
     <span class="doccomment">/// The purpose of this function is to cleanup a pending result set</span>
     <span class="doccomment">/// for prematurely dropeed connection or query result.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">drop_result</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">drop_result</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">pending_result</span> {
             <span class="prelude-val">Some</span>(<span class="ident">ResultSetMeta::Text</span>(<span class="kw">_</span>)) =&gt; {
                 <span class="ident">QueryResult</span>::<span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="lifetime">&#39;_</span>, <span class="ident">TextProtocol</span><span class="op">&gt;</span><span class="ident">::new</span>(<span class="self">self</span>)
@@ -3201,10 +3202,10 @@
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">conn</span> <span class="op">=</span> <span class="ident">Conn::new</span>(<span class="ident">get_opts</span>()).<span class="kw">await</span>.<span class="ident">unwrap</span>();
 
         <span class="comment">// if error is in the first result set, then query should return it immediately.</span>
-        <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">QUERY_FIRST</span>.<span class="ident">run</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">conn</span>).<span class="kw">await</span>;
+        <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">QUERY_FIRST</span>.<span class="ident">run</span>(<span class="kw-2">&amp;mut</span> <span class="ident">conn</span>).<span class="kw">await</span>;
         <span class="macro">assert!</span>(<span class="macro">matches!</span>(<span class="ident">result</span>, <span class="prelude-val">Err</span>(<span class="ident">Error::Server</span>(<span class="kw">_</span>))));
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">QUERY_MIDDLE</span>.<span class="ident">run</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">conn</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">QUERY_MIDDLE</span>.<span class="ident">run</span>(<span class="kw-2">&amp;mut</span> <span class="ident">conn</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>();
 
         <span class="comment">// first result set will contain one row</span>
         <span class="kw">let</span> <span class="ident">result_set</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">result</span>.<span class="ident">collect</span>().<span class="kw">await</span>.<span class="ident">unwrap</span>();
@@ -3278,7 +3279,7 @@
 
         <span class="comment">// LOCAL INFILE in the middle of a multi-result set should not break anything.</span>
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">conn</span> <span class="op">=</span> <span class="ident">Conn::new</span>(<span class="ident">opts</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>();
-        <span class="string">&quot;CREATE TEMPORARY TABLE tmp (a TEXT)&quot;</span>.<span class="ident">run</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">conn</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="string">&quot;CREATE TEMPORARY TABLE tmp (a TEXT)&quot;</span>.<span class="ident">run</span>(<span class="kw-2">&amp;mut</span> <span class="ident">conn</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="kw">let</span> <span class="ident">query</span> <span class="op">=</span> <span class="macro">format!</span>(
             <span class="string">r#&quot;SELECT * FROM tmp;
@@ -3289,7 +3290,7 @@
             <span class="ident">file_name</span>.<span class="ident">to_str</span>().<span class="ident">unwrap</span>(),
         );
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">query</span>.<span class="ident">run</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">conn</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">query</span>.<span class="ident">run</span>(<span class="kw-2">&amp;mut</span> <span class="ident">conn</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="kw">let</span> <span class="ident">result_set</span> <span class="op">=</span> <span class="ident">result</span>.<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>().<span class="kw">await</span><span class="question-mark">?</span>;
         <span class="macro">assert_eq!</span>(<span class="ident">result_set</span>.<span class="ident">len</span>(), <span class="number">0</span>);
@@ -3450,7 +3451,7 @@
         <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">conn::Conn</span>, <span class="ident">queryable::Queryable</span>, <span class="ident">test_misc::get_opts</span>};
 
         <span class="attribute">#[<span class="ident">bench</span>]</span>
-        <span class="kw">fn</span> <span class="ident">simple_exec</span>(<span class="ident">bencher</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">test::Bencher</span>) {
+        <span class="kw">fn</span> <span class="ident">simple_exec</span>(<span class="ident">bencher</span>: <span class="kw-2">&amp;mut</span> <span class="ident">test::Bencher</span>) {
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">runtime</span> <span class="op">=</span> <span class="ident">tokio::runtime::Runtime::new</span>().<span class="ident">unwrap</span>();
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">conn</span> <span class="op">=</span> <span class="ident">runtime</span>.<span class="ident">block_on</span>(<span class="ident">Conn::new</span>(<span class="ident">get_opts</span>())).<span class="ident">unwrap</span>();
 
@@ -3462,7 +3463,7 @@
         }
 
         <span class="attribute">#[<span class="ident">bench</span>]</span>
-        <span class="kw">fn</span> <span class="ident">select_large_string</span>(<span class="ident">bencher</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">test::Bencher</span>) {
+        <span class="kw">fn</span> <span class="ident">select_large_string</span>(<span class="ident">bencher</span>: <span class="kw-2">&amp;mut</span> <span class="ident">test::Bencher</span>) {
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">runtime</span> <span class="op">=</span> <span class="ident">tokio::runtime::Runtime::new</span>().<span class="ident">unwrap</span>();
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">conn</span> <span class="op">=</span> <span class="ident">runtime</span>.<span class="ident">block_on</span>(<span class="ident">Conn::new</span>(<span class="ident">get_opts</span>())).<span class="ident">unwrap</span>();
 
@@ -3476,7 +3477,7 @@
         }
 
         <span class="attribute">#[<span class="ident">bench</span>]</span>
-        <span class="kw">fn</span> <span class="ident">prepared_exec</span>(<span class="ident">bencher</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">test::Bencher</span>) {
+        <span class="kw">fn</span> <span class="ident">prepared_exec</span>(<span class="ident">bencher</span>: <span class="kw-2">&amp;mut</span> <span class="ident">test::Bencher</span>) {
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">runtime</span> <span class="op">=</span> <span class="ident">tokio::runtime::Runtime::new</span>().<span class="ident">unwrap</span>();
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">conn</span> <span class="op">=</span> <span class="ident">runtime</span>.<span class="ident">block_on</span>(<span class="ident">Conn::new</span>(<span class="ident">get_opts</span>())).<span class="ident">unwrap</span>();
             <span class="kw">let</span> <span class="ident">stmt</span> <span class="op">=</span> <span class="ident">runtime</span>.<span class="ident">block_on</span>(<span class="ident">conn</span>.<span class="ident">prep</span>(<span class="string">&quot;DO 1&quot;</span>)).<span class="ident">unwrap</span>();
@@ -3490,7 +3491,7 @@
         }
 
         <span class="attribute">#[<span class="ident">bench</span>]</span>
-        <span class="kw">fn</span> <span class="ident">prepare_and_exec</span>(<span class="ident">bencher</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">test::Bencher</span>) {
+        <span class="kw">fn</span> <span class="ident">prepare_and_exec</span>(<span class="ident">bencher</span>: <span class="kw-2">&amp;mut</span> <span class="ident">test::Bencher</span>) {
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">runtime</span> <span class="op">=</span> <span class="ident">tokio::runtime::Runtime::new</span>().<span class="ident">unwrap</span>();
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">conn</span> <span class="op">=</span> <span class="ident">runtime</span>.<span class="ident">block_on</span>(<span class="ident">Conn::new</span>(<span class="ident">get_opts</span>())).<span class="ident">unwrap</span>();
 
@@ -3504,5 +3505,4 @@
 }
 </code></pre></div>
 </section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="mysql_async" data-search-index-js="../../../search-index.js" data-search-js="../../../search.js"></div>
-    <script src="../../../main.js"></script><script src="../../../source-script.js"></script><script src="../../../source-files.js"></script>
 </body></html>

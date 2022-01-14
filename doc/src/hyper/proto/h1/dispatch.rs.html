@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;hyper-0.14.16&#x2F;src&#x2F;proto&#x2F;h1&#x2F;dispatch.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>dispatch.rs - source</title><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../../../storage.js"></script><script src="../../../../crates.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../../hyper/index.html'><div class='logo-container rust-logo'><img src='../../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;hyper-0.14.16&#x2F;src&#x2F;proto&#x2F;h1&#x2F;dispatch.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>dispatch.rs - source</title><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../../../storage.js"></script><script src="../../../../crates.js"></script><script defer src="../../../../main.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script>
+    <noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../../hyper/index.html'><div class='logo-container rust-logo'><img src='../../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -777,11 +778,11 @@
     <span class="kw">type</span> <span class="ident">PollError</span>;
     <span class="kw">type</span> <span class="ident">RecvItem</span>;
     <span class="kw">fn</span> <span class="ident">poll_msg</span>(
-        <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span><span class="op">&gt;</span>,
-        <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">task::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
+        <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>,
+        <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">task::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
     ) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident"><span class="self">Self</span>::PollItem</span>, <span class="ident"><span class="self">Self</span>::PollBody</span>), <span class="ident"><span class="self">Self</span>::PollError</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>;
-    <span class="kw">fn</span> <span class="ident">recv_msg</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">msg</span>: <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>(<span class="ident"><span class="self">Self</span>::RecvItem</span>, <span class="ident">Body</span>)<span class="op">&gt;</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span>;
-    <span class="kw">fn</span> <span class="ident">poll_ready</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">task::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span>(), ()<span class="op">&gt;</span><span class="op">&gt;</span>;
+    <span class="kw">fn</span> <span class="ident">recv_msg</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">msg</span>: <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>(<span class="ident"><span class="self">Self</span>::RecvItem</span>, <span class="ident">Body</span>)<span class="op">&gt;</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span>;
+    <span class="kw">fn</span> <span class="ident">poll_ready</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">task::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span>(), ()<span class="op">&gt;</span><span class="op">&gt;</span>;
     <span class="kw">fn</span> <span class="ident">should_poll</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span>;
 }
 
@@ -831,7 +832,7 @@
     }
 
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;server&quot;</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">disable_keep_alive</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">disable_keep_alive</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
         <span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">disable_keep_alive</span>();
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">is_write_closed</span>() {
             <span class="self">self</span>.<span class="ident">close</span>();
@@ -849,8 +850,8 @@
     <span class="doccomment">/// This is useful for old-style HTTP upgrades, but ignores</span>
     <span class="doccomment">/// newer-style upgrade API.</span>
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">poll_without_shutdown</span>(
-        <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
-        <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">task::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
+        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
+        <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">task::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
     ) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="self">Self</span>: <span class="ident">Unpin</span>,
@@ -863,8 +864,8 @@
     }
 
     <span class="kw">fn</span> <span class="ident">poll_catch</span>(
-        <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
-        <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">task::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
+        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
+        <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">task::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
         <span class="ident">should_shutdown</span>: <span class="ident">bool</span>,
     ) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">Dispatched</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="ident">Poll::Ready</span>(<span class="macro">ready!</span>(<span class="self">self</span>.<span class="ident">poll_inner</span>(<span class="ident">cx</span>, <span class="ident">should_shutdown</span>)).<span class="ident">or_else</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> {
@@ -878,8 +879,8 @@
     }
 
     <span class="kw">fn</span> <span class="ident">poll_inner</span>(
-        <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
-        <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">task::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
+        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
+        <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">task::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
         <span class="ident">should_shutdown</span>: <span class="ident">bool</span>,
     ) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">Dispatched</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="ident">T::update_date</span>();
@@ -900,7 +901,7 @@
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">poll_loop</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">task::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">poll_loop</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">task::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="comment">// Limit the looping on this connection, in case it is ready far too</span>
         <span class="comment">// often, so that other futures don&#39;t starve.</span>
         <span class="comment">//</span>
@@ -930,7 +931,7 @@
         <span class="ident">task::yield_now</span>(<span class="ident">cx</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">never</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">never</span> {})
     }
 
-    <span class="kw">fn</span> <span class="ident">poll_read</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">task::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">poll_read</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">task::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">loop</span> {
             <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_closing</span> {
                 <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">Ok</span>(()));
@@ -984,7 +985,7 @@
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">poll_read_head</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">task::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">poll_read_head</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">task::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="comment">// can dispatch receive, or does it still care about, an incoming message?</span>
         <span class="kw">match</span> <span class="macro">ready!</span>(<span class="self">self</span>.<span class="ident">dispatch</span>.<span class="ident">poll_ready</span>(<span class="ident">cx</span>)) {
             <span class="prelude-val">Ok</span>(()) =&gt; (),
@@ -1036,7 +1037,7 @@
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">poll_write</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">task::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">poll_write</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">task::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">loop</span> {
             <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_closing</span> {
                 <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">Ok</span>(()));
@@ -1044,14 +1045,14 @@
                 <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">can_write_head</span>()
                 <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">dispatch</span>.<span class="ident">should_poll</span>()
             {
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">msg</span>) <span class="op">=</span> <span class="macro">ready!</span>(<span class="ident">Pin::new</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">dispatch</span>).<span class="ident">poll_msg</span>(<span class="ident">cx</span>)) {
+                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">msg</span>) <span class="op">=</span> <span class="macro">ready!</span>(<span class="ident">Pin::new</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">dispatch</span>).<span class="ident">poll_msg</span>(<span class="ident">cx</span>)) {
                     <span class="kw">let</span> (<span class="ident">head</span>, <span class="kw-2">mut</span> <span class="ident">body</span>) <span class="op">=</span> <span class="ident">msg</span>.<span class="ident">map_err</span>(<span class="ident"><span class="kw">crate</span>::Error::new_user_service</span>)<span class="question-mark">?</span>;
 
                     <span class="comment">// Check if the body knows its full data immediately.</span>
                     <span class="comment">//</span>
                     <span class="comment">// If so, we can skip a bit of bookkeeping that streaming</span>
                     <span class="comment">// bodies need to do.</span>
-                    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">full</span>) <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::body::take_full_data</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">body</span>) {
+                    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">full</span>) <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::body::take_full_data</span>(<span class="kw-2">&amp;mut</span> <span class="ident">body</span>) {
                         <span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">write_full_msg</span>(<span class="ident">head</span>, <span class="ident">full</span>);
                         <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">Ok</span>(()));
                     }
@@ -1123,14 +1124,14 @@
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">poll_flush</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">task::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">poll_flush</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">task::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">poll_flush</span>(<span class="ident">cx</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">err</span><span class="op">|</span> {
             <span class="macro">debug!</span>(<span class="string">&quot;error writing: {}&quot;</span>, <span class="ident">err</span>);
             <span class="ident"><span class="kw">crate</span>::Error::new_body_write</span>(<span class="ident">err</span>)
         })
     }
 
-    <span class="kw">fn</span> <span class="ident">close</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
+    <span class="kw">fn</span> <span class="ident">close</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
         <span class="self">self</span>.<span class="ident">is_closing</span> <span class="op">=</span> <span class="bool-val">true</span>;
         <span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">close_read</span>();
         <span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">close_write</span>();
@@ -1170,7 +1171,7 @@
     <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">Dispatched</span><span class="op">&gt;</span>;
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">poll</span>(<span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">task::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">poll</span>(<span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">task::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">poll_catch</span>(<span class="ident">cx</span>, <span class="bool-val">true</span>)
     }
 }
@@ -1186,13 +1187,13 @@
         <span class="ident">OptGuard</span>(<span class="ident">pin</span>, <span class="bool-val">false</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">guard_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; (<span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">bool</span>) {
-        (<span class="self">self</span>.<span class="number">0</span>.<span class="ident">as_mut</span>().<span class="ident">as_pin_mut</span>(), <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="number">1</span>)
+    <span class="kw">fn</span> <span class="ident">guard_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; (<span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="kw-2">&amp;mut</span> <span class="ident">bool</span>) {
+        (<span class="self">self</span>.<span class="number">0</span>.<span class="ident">as_mut</span>().<span class="ident">as_pin_mut</span>(), <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="number">1</span>)
     }
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Drop</span> <span class="kw">for</span> <span class="ident">OptGuard</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
+    <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
         <span class="kw">if</span> <span class="self">self</span>.<span class="number">1</span> {
             <span class="self">self</span>.<span class="number">0</span>.<span class="ident">set</span>(<span class="prelude-val">None</span>);
         }
@@ -1233,8 +1234,8 @@
         <span class="kw">type</span> <span class="ident">RecvItem</span> <span class="op">=</span> <span class="ident">RequestHead</span>;
 
         <span class="kw">fn</span> <span class="ident">poll_msg</span>(
-            <span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span><span class="op">&gt;</span>,
-            <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">task::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
+            <span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>,
+            <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">task::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
         ) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident"><span class="self">Self</span>::PollItem</span>, <span class="ident"><span class="self">Self</span>::PollBody</span>), <span class="ident"><span class="self">Self</span>::PollError</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">this</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">as_mut</span>();
             <span class="kw">let</span> <span class="ident">ret</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">fut</span>) <span class="op">=</span> <span class="ident">this</span>.<span class="ident">in_flight</span>.<span class="ident">as_mut</span>().<span class="ident">as_pin_mut</span>() {
@@ -1256,7 +1257,7 @@
             <span class="ident">ret</span>
         }
 
-        <span class="kw">fn</span> <span class="ident">recv_msg</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">msg</span>: <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>(<span class="ident"><span class="self">Self</span>::RecvItem</span>, <span class="ident">Body</span>)<span class="op">&gt;</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+        <span class="kw">fn</span> <span class="ident">recv_msg</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">msg</span>: <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>(<span class="ident"><span class="self">Self</span>::RecvItem</span>, <span class="ident">Body</span>)<span class="op">&gt;</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
             <span class="kw">let</span> (<span class="ident">msg</span>, <span class="ident">body</span>) <span class="op">=</span> <span class="ident">msg</span><span class="question-mark">?</span>;
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">req</span> <span class="op">=</span> <span class="ident">Request::new</span>(<span class="ident">body</span>);
             <span class="kw-2">*</span><span class="ident">req</span>.<span class="ident">method_mut</span>() <span class="op">=</span> <span class="ident">msg</span>.<span class="ident">subject</span>.<span class="number">0</span>;
@@ -1269,7 +1270,7 @@
             <span class="prelude-val">Ok</span>(())
         }
 
-        <span class="kw">fn</span> <span class="ident">poll_ready</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">task::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span>(), ()<span class="op">&gt;</span><span class="op">&gt;</span> {
+        <span class="kw">fn</span> <span class="ident">poll_ready</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">task::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span>(), ()<span class="op">&gt;</span><span class="op">&gt;</span> {
             <span class="kw">if</span> <span class="self">self</span>.<span class="ident">in_flight</span>.<span class="ident">is_some</span>() {
                 <span class="ident">Poll::Pending</span>
             } <span class="kw">else</span> {
@@ -1309,8 +1310,8 @@
         <span class="kw">type</span> <span class="ident">RecvItem</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::proto::ResponseHead</span>;
 
         <span class="kw">fn</span> <span class="ident">poll_msg</span>(
-            <span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span><span class="op">&gt;</span>,
-            <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">task::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
+            <span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>,
+            <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">task::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
         ) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident"><span class="self">Self</span>::PollItem</span>, <span class="ident"><span class="self">Self</span>::PollBody</span>), <span class="ident"><span class="kw">crate</span>::common::Never</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">this</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">as_mut</span>();
             <span class="macro">debug_assert!</span>(<span class="op">!</span><span class="ident">this</span>.<span class="ident">rx_closed</span>);
@@ -1345,7 +1346,7 @@
             }
         }
 
-        <span class="kw">fn</span> <span class="ident">recv_msg</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">msg</span>: <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>(<span class="ident"><span class="self">Self</span>::RecvItem</span>, <span class="ident">Body</span>)<span class="op">&gt;</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+        <span class="kw">fn</span> <span class="ident">recv_msg</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">msg</span>: <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>(<span class="ident"><span class="self">Self</span>::RecvItem</span>, <span class="ident">Body</span>)<span class="op">&gt;</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
             <span class="kw">match</span> <span class="ident">msg</span> {
                 <span class="prelude-val">Ok</span>((<span class="ident">msg</span>, <span class="ident">body</span>)) =&gt; {
                     <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">cb</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">callback</span>.<span class="ident">take</span>() {
@@ -1381,7 +1382,7 @@
             }
         }
 
-        <span class="kw">fn</span> <span class="ident">poll_ready</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">task::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span>(), ()<span class="op">&gt;</span><span class="op">&gt;</span> {
+        <span class="kw">fn</span> <span class="ident">poll_ready</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">task::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span>(), ()<span class="op">&gt;</span><span class="op">&gt;</span> {
             <span class="kw">match</span> <span class="self">self</span>.<span class="ident">callback</span> {
                 <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">cb</span>) =&gt; <span class="kw">match</span> <span class="ident">cb</span>.<span class="ident">poll_canceled</span>(<span class="ident">cx</span>) {
                     <span class="ident">Poll::Ready</span>(()) =&gt; {
@@ -1420,7 +1421,7 @@
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">dispatcher</span> <span class="op">=</span> <span class="ident">Dispatcher::new</span>(<span class="ident">Client::new</span>(<span class="ident">rx</span>), <span class="ident">conn</span>);
 
             <span class="comment">// First poll is needed to allow tx to send...</span>
-            <span class="macro">assert!</span>(<span class="ident">Pin::new</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">dispatcher</span>).<span class="ident">poll</span>(<span class="ident">cx</span>).<span class="ident">is_pending</span>());
+            <span class="macro">assert!</span>(<span class="ident">Pin::new</span>(<span class="kw-2">&amp;mut</span> <span class="ident">dispatcher</span>).<span class="ident">poll</span>(<span class="ident">cx</span>).<span class="ident">is_pending</span>());
 
             <span class="comment">// Unblock our IO, which has a response before we&#39;ve sent request!</span>
             <span class="comment">//</span>
@@ -1430,8 +1431,8 @@
                 .<span class="ident">try_send</span>(<span class="ident"><span class="kw">crate</span>::Request::new</span>(<span class="ident"><span class="kw">crate</span>::Body::empty</span>()))
                 .<span class="ident">unwrap</span>();
 
-            <span class="macro">tokio_test::assert_ready_ok!</span>(<span class="ident">Pin::new</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">dispatcher</span>).<span class="ident">poll</span>(<span class="ident">cx</span>));
-            <span class="kw">let</span> <span class="ident">err</span> <span class="op">=</span> <span class="macro">tokio_test::assert_ready_ok!</span>(<span class="ident">Pin::new</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">res_rx</span>).<span class="ident">poll</span>(<span class="ident">cx</span>))
+            <span class="macro">tokio_test::assert_ready_ok!</span>(<span class="ident">Pin::new</span>(<span class="kw-2">&amp;mut</span> <span class="ident">dispatcher</span>).<span class="ident">poll</span>(<span class="ident">cx</span>));
+            <span class="kw">let</span> <span class="ident">err</span> <span class="op">=</span> <span class="macro">tokio_test::assert_ready_ok!</span>(<span class="ident">Pin::new</span>(<span class="kw-2">&amp;mut</span> <span class="ident">res_rx</span>).<span class="ident">poll</span>(<span class="ident">cx</span>))
                 .<span class="ident">expect_err</span>(<span class="string">&quot;callback should send error&quot;</span>);
 
             <span class="kw">match</span> (<span class="ident">err</span>.<span class="number">0</span>.<span class="ident">kind</span>(), <span class="ident">err</span>.<span class="number">1</span>) {
@@ -1500,5 +1501,4 @@
 }
 </code></pre></div>
 </section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="hyper" data-search-index-js="../../../../search-index.js" data-search-js="../../../../search.js"></div>
-    <script src="../../../../main.js"></script><script src="../../../../source-script.js"></script><script src="../../../../source-files.js"></script>
 </body></html>

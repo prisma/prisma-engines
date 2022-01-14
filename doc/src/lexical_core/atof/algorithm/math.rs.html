@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;lexical-core-0.7.6&#x2F;src&#x2F;atof&#x2F;algorithm&#x2F;math.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>math.rs - source</title><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../../../storage.js"></script><script src="../../../../crates.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../../lexical_core/index.html'><div class='logo-container rust-logo'><img src='../../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">   1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;lexical-core-0.7.6&#x2F;src&#x2F;atof&#x2F;algorithm&#x2F;math.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>math.rs - source</title><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../../../storage.js"></script><script src="../../../../crates.js"></script><script defer src="../../../../main.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script>
+    <noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../../lexical_core/index.html'><div class='logo-container rust-logo'><img src='../../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">   1</span>
 <span id="2">   2</span>
 <span id="3">   3</span>
 <span id="4">   4</span>
@@ -4451,7 +4452,7 @@
 
 <span class="macro">perftools_inline!</span>{
 <span class="doccomment">/// AddAssign two small integers and return if overflow happens.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">iadd</span>(<span class="ident">x</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Limb</span>, <span class="ident">y</span>: <span class="ident">Limb</span>)
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">iadd</span>(<span class="ident">x</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Limb</span>, <span class="ident">y</span>: <span class="ident">Limb</span>)
     -&gt; <span class="ident">bool</span>
 {
     <span class="kw">let</span> <span class="ident">t</span> <span class="op">=</span> <span class="ident">add</span>(<span class="kw-2">*</span><span class="ident">x</span>, <span class="ident">y</span>);
@@ -4471,7 +4472,7 @@
 
 <span class="macro">perftools_inline!</span>{
 <span class="doccomment">/// SubAssign two small integers and return if overflow happens.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">isub</span>(<span class="ident">x</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Limb</span>, <span class="ident">y</span>: <span class="ident">Limb</span>)
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">isub</span>(<span class="ident">x</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Limb</span>, <span class="ident">y</span>: <span class="ident">Limb</span>)
     -&gt; <span class="ident">bool</span>
 {
     <span class="kw">let</span> <span class="ident">t</span> <span class="op">=</span> <span class="ident">sub</span>(<span class="kw-2">*</span><span class="ident">x</span>, <span class="ident">y</span>);
@@ -4497,7 +4498,7 @@
 
 <span class="macro">perftools_inline!</span>{
 <span class="doccomment">/// Multiply two small integers (with carry) (and return if overflow happens).</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">imul</span>(<span class="ident">x</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Limb</span>, <span class="ident">y</span>: <span class="ident">Limb</span>, <span class="ident">carry</span>: <span class="ident">Limb</span>)
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">imul</span>(<span class="ident">x</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Limb</span>, <span class="ident">y</span>: <span class="ident">Limb</span>, <span class="ident">carry</span>: <span class="ident">Limb</span>)
     -&gt; <span class="ident">Limb</span>
 {
     <span class="kw">let</span> <span class="ident">t</span> <span class="op">=</span> <span class="ident">mul</span>(<span class="kw-2">*</span><span class="ident">x</span>, <span class="ident">y</span>, <span class="ident">carry</span>);
@@ -4522,7 +4523,7 @@
 
 <span class="macro">perftools_inline!</span>{
 <span class="doccomment">/// DivAssign two small integers and return the remainder.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">idiv</span>(<span class="ident">x</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Limb</span>, <span class="ident">y</span>: <span class="ident">Limb</span>, <span class="ident">rem</span>: <span class="ident">Limb</span>)
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">idiv</span>(<span class="ident">x</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Limb</span>, <span class="ident">y</span>: <span class="ident">Limb</span>, <span class="ident">rem</span>: <span class="ident">Limb</span>)
     -&gt; <span class="ident">Limb</span>
 {
     <span class="kw">let</span> <span class="ident">t</span> <span class="op">=</span> <span class="ident">div</span>(<span class="kw-2">*</span><span class="ident">x</span>, <span class="ident">y</span>, <span class="ident">rem</span>);
@@ -4618,7 +4619,7 @@
 <span class="doccomment">/// Returns the truncated bits.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// Assumes `n &lt; &lt;Limb as Integer&gt;::BITS`, IE, internally shifting bits.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ishr_bits</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">x</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">T</span>, <span class="ident">n</span>: <span class="ident">usize</span>)
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ishr_bits</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">x</span>: <span class="kw-2">&amp;mut</span> <span class="ident">T</span>, <span class="ident">n</span>: <span class="ident">usize</span>)
     -&gt; <span class="ident">Limb</span>
     <span class="kw">where</span> <span class="ident">T</span>: <span class="ident">CloneableVecLike</span><span class="op">&lt;</span><span class="ident">Limb</span><span class="op">&gt;</span>
 {
@@ -4648,7 +4649,7 @@
 <span class="doccomment">/// Shift-right `n` limbs inside a buffer and returns if all the truncated limbs are zero.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// Assumes `n` is not 0.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ishr_limbs</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">x</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">T</span>, <span class="ident">n</span>: <span class="ident">usize</span>)
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ishr_limbs</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">x</span>: <span class="kw-2">&amp;mut</span> <span class="ident">T</span>, <span class="ident">n</span>: <span class="ident">usize</span>)
     -&gt; <span class="ident">bool</span>
     <span class="kw">where</span> <span class="ident">T</span>: <span class="ident">CloneableVecLike</span><span class="op">&lt;</span><span class="ident">Limb</span><span class="op">&gt;</span>
 {
@@ -4666,7 +4667,7 @@
 
 <span class="macro">perftools_inline!</span>{
 <span class="doccomment">/// Shift-left buffer by n bits and return if we should round-up.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ishr</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">x</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">T</span>, <span class="ident">n</span>: <span class="ident">usize</span>)
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ishr</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">x</span>: <span class="kw-2">&amp;mut</span> <span class="ident">T</span>, <span class="ident">n</span>: <span class="ident">usize</span>)
     -&gt; <span class="ident">bool</span>
     <span class="kw">where</span> <span class="ident">T</span>: <span class="ident">CloneableVecLike</span><span class="op">&lt;</span><span class="ident">Limb</span><span class="op">&gt;</span>
 {
@@ -4715,7 +4716,7 @@
 {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">z</span> <span class="op">=</span> <span class="ident">T::default</span>();
     <span class="ident">z</span>.<span class="ident">extend_from_slice</span>(<span class="ident">x</span>);
-    <span class="kw">let</span> <span class="ident">roundup</span> <span class="op">=</span> <span class="ident">ishr</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">z</span>, <span class="ident">n</span>);
+    <span class="kw">let</span> <span class="ident">roundup</span> <span class="op">=</span> <span class="ident">ishr</span>(<span class="kw-2">&amp;mut</span> <span class="ident">z</span>, <span class="ident">n</span>);
     (<span class="ident">z</span>, <span class="ident">roundup</span>)
 }}
 
@@ -4725,7 +4726,7 @@
 <span class="doccomment">/// Shift-left bits inside a buffer.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// Assumes `n &lt; &lt;Limb as Integer&gt;::BITS`, IE, internally shifting bits.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ishl_bits</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">x</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">T</span>, <span class="ident">n</span>: <span class="ident">usize</span>)
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ishl_bits</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">x</span>: <span class="kw-2">&amp;mut</span> <span class="ident">T</span>, <span class="ident">n</span>: <span class="ident">usize</span>)
     <span class="kw">where</span> <span class="ident">T</span>: <span class="ident">CloneableVecLike</span><span class="op">&lt;</span><span class="ident">Limb</span><span class="op">&gt;</span>
 {
     <span class="comment">// Need to shift by the number of `bits % &lt;Limb as Integer&gt;::BITS)`.</span>
@@ -4767,7 +4768,7 @@
 {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">z</span> <span class="op">=</span> <span class="ident">T::default</span>();
     <span class="ident">z</span>.<span class="ident">extend_from_slice</span>(<span class="ident">x</span>);
-    <span class="ident">ishl_bits</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">z</span>, <span class="ident">n</span>);
+    <span class="ident">ishl_bits</span>(<span class="kw-2">&amp;mut</span> <span class="ident">z</span>, <span class="ident">n</span>);
     <span class="ident">z</span>
 }}
 
@@ -4775,7 +4776,7 @@
 <span class="doccomment">/// Shift-left `n` digits inside a buffer.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// Assumes `n` is not 0.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ishl_limbs</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">x</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">T</span>, <span class="ident">n</span>: <span class="ident">usize</span>)
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ishl_limbs</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">x</span>: <span class="kw-2">&amp;mut</span> <span class="ident">T</span>, <span class="ident">n</span>: <span class="ident">usize</span>)
     <span class="kw">where</span> <span class="ident">T</span>: <span class="ident">CloneableVecLike</span><span class="op">&lt;</span><span class="ident">Limb</span><span class="op">&gt;</span>
 {
     <span class="macro">debug_assert!</span>(<span class="ident">n</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span>);
@@ -4786,7 +4787,7 @@
 
 <span class="macro">perftools_inline!</span>{
 <span class="doccomment">/// Shift-left buffer by n bits.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ishl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">x</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">T</span>, <span class="ident">n</span>: <span class="ident">usize</span>)
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ishl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">x</span>: <span class="kw-2">&amp;mut</span> <span class="ident">T</span>, <span class="ident">n</span>: <span class="ident">usize</span>)
     <span class="kw">where</span> <span class="ident">T</span>: <span class="ident">CloneableVecLike</span><span class="op">&lt;</span><span class="ident">Limb</span><span class="op">&gt;</span>
 {
     <span class="kw">let</span> <span class="ident">bits</span> <span class="op">=</span> <span class="op">&lt;</span><span class="ident">Limb</span> <span class="kw">as</span> <span class="ident">Integer</span><span class="op">&gt;</span><span class="ident">::BITS</span>;
@@ -4808,7 +4809,7 @@
 {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">z</span> <span class="op">=</span> <span class="ident">T::default</span>();
     <span class="ident">z</span>.<span class="ident">extend_from_slice</span>(<span class="ident">x</span>);
-    <span class="ident">ishl</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">z</span>, <span class="ident">n</span>);
+    <span class="ident">ishl</span>(<span class="kw-2">&amp;mut</span> <span class="ident">z</span>, <span class="ident">n</span>);
     <span class="ident">z</span>
 }}
 
@@ -4816,7 +4817,7 @@
 
 <span class="macro">perftools_inline!</span>{
 <span class="doccomment">/// Normalize the container by popping any leading zeros.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">normalize</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">x</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">T</span>)
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">normalize</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">x</span>: <span class="kw-2">&amp;mut</span> <span class="ident">T</span>)
     <span class="kw">where</span> <span class="ident">T</span>: <span class="ident">CloneableVecLike</span><span class="op">&lt;</span><span class="ident">Limb</span><span class="op">&gt;</span>
 {
     <span class="comment">// Remove leading zero if we cause underflow. Since we&#39;re dividing</span>
@@ -4833,19 +4834,19 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// Allows us to choose a start-index in x to store, to allow incrementing</span>
 <span class="doccomment">/// from a non-zero start.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">iadd_impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">x</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">T</span>, <span class="ident">y</span>: <span class="ident">Limb</span>, <span class="ident">xstart</span>: <span class="ident">usize</span>)
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">iadd_impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">x</span>: <span class="kw-2">&amp;mut</span> <span class="ident">T</span>, <span class="ident">y</span>: <span class="ident">Limb</span>, <span class="ident">xstart</span>: <span class="ident">usize</span>)
     <span class="kw">where</span> <span class="ident">T</span>: <span class="ident">CloneableVecLike</span><span class="op">&lt;</span><span class="ident">Limb</span><span class="op">&gt;</span>
 {
     <span class="kw">if</span> <span class="ident">x</span>.<span class="ident">len</span>() <span class="op">&lt;</span><span class="op">=</span> <span class="ident">xstart</span> {
         <span class="ident">x</span>.<span class="ident">push</span>(<span class="ident">y</span>);
     } <span class="kw">else</span> {
         <span class="comment">// Initial add</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">carry</span> <span class="op">=</span> <span class="ident">scalar::iadd</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">x</span>[<span class="ident">xstart</span>], <span class="ident">y</span>);
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">carry</span> <span class="op">=</span> <span class="ident">scalar::iadd</span>(<span class="kw-2">&amp;mut</span> <span class="ident">x</span>[<span class="ident">xstart</span>], <span class="ident">y</span>);
 
         <span class="comment">// Increment until overflow stops occurring.</span>
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">size</span> <span class="op">=</span> <span class="ident">xstart</span> <span class="op">+</span> <span class="number">1</span>;
         <span class="kw">while</span> <span class="ident">carry</span> <span class="op">&amp;&amp;</span> <span class="ident">size</span> <span class="op">&lt;</span> <span class="ident">x</span>.<span class="ident">len</span>() {
-            <span class="ident">carry</span> <span class="op">=</span> <span class="ident">scalar::iadd</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">x</span>[<span class="ident">size</span>], <span class="number">1</span>);
+            <span class="ident">carry</span> <span class="op">=</span> <span class="ident">scalar::iadd</span>(<span class="kw-2">&amp;mut</span> <span class="ident">x</span>[<span class="ident">size</span>], <span class="number">1</span>);
             <span class="ident">size</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
         }
 
@@ -4859,7 +4860,7 @@
 
 <span class="macro">perftools_inline!</span>{
 <span class="doccomment">/// AddAssign small integer to bigint.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">iadd</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">x</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">T</span>, <span class="ident">y</span>: <span class="ident">Limb</span>)
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">iadd</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">x</span>: <span class="kw-2">&amp;mut</span> <span class="ident">T</span>, <span class="ident">y</span>: <span class="ident">Limb</span>)
     <span class="kw">where</span> <span class="ident">T</span>: <span class="ident">CloneableVecLike</span><span class="op">&lt;</span><span class="ident">Limb</span><span class="op">&gt;</span>
 {
     <span class="ident">iadd_impl</span>(<span class="ident">x</span>, <span class="ident">y</span>, <span class="number">0</span>);
@@ -4873,7 +4874,7 @@
 {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">z</span> <span class="op">=</span> <span class="ident">T::default</span>();
     <span class="ident">z</span>.<span class="ident">extend_from_slice</span>(<span class="ident">x</span>);
-    <span class="ident">iadd</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">z</span>, <span class="ident">y</span>);
+    <span class="ident">iadd</span>(<span class="kw-2">&amp;mut</span> <span class="ident">z</span>, <span class="ident">y</span>);
     <span class="ident">z</span>
 }}
 
@@ -4882,18 +4883,18 @@
 <span class="macro">perftools_inline!</span>{
 <span class="doccomment">/// SubAssign small integer to bigint.</span>
 <span class="doccomment">/// Does not do overflowing subtraction.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">isub_impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">x</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">T</span>, <span class="ident">y</span>: <span class="ident">Limb</span>, <span class="ident">xstart</span>: <span class="ident">usize</span>)
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">isub_impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">x</span>: <span class="kw-2">&amp;mut</span> <span class="ident">T</span>, <span class="ident">y</span>: <span class="ident">Limb</span>, <span class="ident">xstart</span>: <span class="ident">usize</span>)
     <span class="kw">where</span> <span class="ident">T</span>: <span class="ident">CloneableVecLike</span><span class="op">&lt;</span><span class="ident">Limb</span><span class="op">&gt;</span>
 {
     <span class="macro">debug_assert!</span>(<span class="ident">x</span>.<span class="ident">len</span>() <span class="op">&gt;</span> <span class="ident">xstart</span> <span class="op">&amp;&amp;</span> (<span class="ident">x</span>[<span class="ident">xstart</span>] <span class="op">&gt;</span><span class="op">=</span> <span class="ident">y</span> <span class="op">|</span><span class="op">|</span> <span class="ident">x</span>.<span class="ident">len</span>() <span class="op">&gt;</span> <span class="ident">xstart</span><span class="op">+</span><span class="number">1</span>));
 
     <span class="comment">// Initial subtraction</span>
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">carry</span> <span class="op">=</span> <span class="ident">scalar::isub</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">x</span>[<span class="ident">xstart</span>], <span class="ident">y</span>);
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">carry</span> <span class="op">=</span> <span class="ident">scalar::isub</span>(<span class="kw-2">&amp;mut</span> <span class="ident">x</span>[<span class="ident">xstart</span>], <span class="ident">y</span>);
 
     <span class="comment">// Increment until overflow stops occurring.</span>
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">size</span> <span class="op">=</span> <span class="ident">xstart</span> <span class="op">+</span> <span class="number">1</span>;
     <span class="kw">while</span> <span class="ident">carry</span> <span class="op">&amp;&amp;</span> <span class="ident">size</span> <span class="op">&lt;</span> <span class="ident">x</span>.<span class="ident">len</span>() {
-        <span class="ident">carry</span> <span class="op">=</span> <span class="ident">scalar::isub</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">x</span>[<span class="ident">size</span>], <span class="number">1</span>);
+        <span class="ident">carry</span> <span class="op">=</span> <span class="ident">scalar::isub</span>(<span class="kw-2">&amp;mut</span> <span class="ident">x</span>[<span class="ident">size</span>], <span class="number">1</span>);
         <span class="ident">size</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
     }
     <span class="ident">normalize</span>(<span class="ident">x</span>);
@@ -4902,7 +4903,7 @@
 <span class="macro">perftools_inline!</span>{
 <span class="doccomment">/// SubAssign small integer to bigint.</span>
 <span class="doccomment">/// Does not do overflowing subtraction.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">isub</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">x</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">T</span>, <span class="ident">y</span>: <span class="ident">Limb</span>)
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">isub</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">x</span>: <span class="kw-2">&amp;mut</span> <span class="ident">T</span>, <span class="ident">y</span>: <span class="ident">Limb</span>)
     <span class="kw">where</span> <span class="ident">T</span>: <span class="ident">CloneableVecLike</span><span class="op">&lt;</span><span class="ident">Limb</span><span class="op">&gt;</span>
 {
     <span class="ident">isub_impl</span>(<span class="ident">x</span>, <span class="ident">y</span>, <span class="number">0</span>);
@@ -4916,7 +4917,7 @@
 {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">z</span> <span class="op">=</span> <span class="ident">T::default</span>();
     <span class="ident">z</span>.<span class="ident">extend_from_slice</span>(<span class="ident">x</span>);
-    <span class="ident">isub</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">z</span>, <span class="ident">y</span>);
+    <span class="ident">isub</span>(<span class="kw-2">&amp;mut</span> <span class="ident">z</span>, <span class="ident">y</span>);
     <span class="ident">z</span>
 }}
 
@@ -4924,7 +4925,7 @@
 
 <span class="macro">perftools_inline!</span>{
 <span class="doccomment">/// MulAssign small integer to bigint.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">imul</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">x</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">T</span>, <span class="ident">y</span>: <span class="ident">Limb</span>)
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">imul</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">x</span>: <span class="kw-2">&amp;mut</span> <span class="ident">T</span>, <span class="ident">y</span>: <span class="ident">Limb</span>)
     <span class="kw">where</span> <span class="ident">T</span>: <span class="ident">CloneableVecLike</span><span class="op">&lt;</span><span class="ident">Limb</span><span class="op">&gt;</span>
 {
     <span class="comment">// Multiply iteratively over all elements, adding the carry each time.</span>
@@ -4947,7 +4948,7 @@
 {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">z</span> <span class="op">=</span> <span class="ident">T::default</span>();
     <span class="ident">z</span>.<span class="ident">extend_from_slice</span>(<span class="ident">x</span>);
-    <span class="ident">imul</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">z</span>, <span class="ident">y</span>);
+    <span class="ident">imul</span>(<span class="kw-2">&amp;mut</span> <span class="ident">z</span>, <span class="ident">y</span>);
     <span class="ident">z</span>
 }}
 
@@ -4983,7 +4984,7 @@
 <span class="doccomment">/// Even using worst-case scenarios, exponentiation by squaring is</span>
 <span class="doccomment">/// significantly slower for our workloads. Just multiply by small powers,</span>
 <span class="doccomment">/// in simple cases, and use precalculated large powers in other cases.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">imul_power</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">x</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">T</span>, <span class="ident">radix</span>: <span class="ident">u32</span>, <span class="ident">n</span>: <span class="ident">u32</span>)
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">imul_power</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">x</span>: <span class="kw-2">&amp;mut</span> <span class="ident">T</span>, <span class="ident">radix</span>: <span class="ident">u32</span>, <span class="ident">n</span>: <span class="ident">u32</span>)
     <span class="kw">where</span> <span class="ident">T</span>: <span class="ident">CloneableVecLike</span><span class="op">&lt;</span><span class="ident">Limb</span><span class="op">&gt;</span>
 {
     <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::large::KARATSUBA_CUTOFF</span>;
@@ -5047,7 +5048,7 @@
 {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">z</span> <span class="op">=</span> <span class="ident">T::default</span>();
     <span class="ident">z</span>.<span class="ident">extend_from_slice</span>(<span class="ident">x</span>);
-    <span class="ident">imul_power</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">z</span>, <span class="ident">radix</span>, <span class="ident">n</span>);
+    <span class="ident">imul_power</span>(<span class="kw-2">&amp;mut</span> <span class="ident">z</span>, <span class="ident">radix</span>, <span class="ident">n</span>);
     <span class="ident">z</span>
 }}
 
@@ -5055,7 +5056,7 @@
 
 <span class="macro">perftools_inline!</span>{
 <span class="doccomment">/// DivAssign small integer to bigint and get the remainder.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">idiv</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">x</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">T</span>, <span class="ident">y</span>: <span class="ident">Limb</span>)
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">idiv</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">x</span>: <span class="kw-2">&amp;mut</span> <span class="ident">T</span>, <span class="ident">y</span>: <span class="ident">Limb</span>)
     -&gt; <span class="ident">Limb</span>
     <span class="kw">where</span> <span class="ident">T</span>: <span class="ident">CloneableVecLike</span><span class="op">&lt;</span><span class="ident">Limb</span><span class="op">&gt;</span>
 {
@@ -5077,7 +5078,7 @@
 {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">z</span> <span class="op">=</span> <span class="ident">T::default</span>();
     <span class="ident">z</span>.<span class="ident">extend_from_slice</span>(<span class="ident">x</span>);
-    <span class="kw">let</span> <span class="ident">rem</span> <span class="op">=</span> <span class="ident">idiv</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">z</span>, <span class="ident">y</span>);
+    <span class="kw">let</span> <span class="ident">rem</span> <span class="op">=</span> <span class="ident">idiv</span>(<span class="kw-2">&amp;mut</span> <span class="ident">z</span>, <span class="ident">y</span>);
     (<span class="ident">z</span>, <span class="ident">rem</span>)
 }}
 
@@ -5089,13 +5090,13 @@
 <span class="doccomment">/// This algorithm is slow, using `mul_power` should generally be preferred,</span>
 <span class="doccomment">/// as although it&#39;s not asymptotically faster, it precalculates a lot</span>
 <span class="doccomment">/// of results.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ipow</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">x</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">T</span>, <span class="kw-2">mut</span> <span class="ident">n</span>: <span class="ident">Limb</span>)
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ipow</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">x</span>: <span class="kw-2">&amp;mut</span> <span class="ident">T</span>, <span class="kw-2">mut</span> <span class="ident">n</span>: <span class="ident">Limb</span>)
     <span class="kw">where</span> <span class="ident">T</span>: <span class="ident">CloneableVecLike</span><span class="op">&lt;</span><span class="ident">Limb</span><span class="op">&gt;</span>
 {
     <span class="comment">// Store `x` as 1, and switch `base` to `x`.</span>
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">base</span> <span class="op">=</span> <span class="ident">T::default</span>();
     <span class="ident">base</span>.<span class="ident">push</span>(<span class="number">1</span>);
-    <span class="ident">mem::swap</span>(<span class="ident">x</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">base</span>);
+    <span class="ident">mem::swap</span>(<span class="ident">x</span>, <span class="kw-2">&amp;mut</span> <span class="ident">base</span>);
 
     <span class="comment">// Do main algorithm.</span>
     <span class="kw">loop</span> {
@@ -5122,7 +5123,7 @@
 {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">z</span> <span class="op">=</span> <span class="ident">T::default</span>();
     <span class="ident">z</span>.<span class="ident">extend_from_slice</span>(<span class="ident">x</span>);
-    <span class="ident">ipow</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">z</span>, <span class="ident">n</span>);
+    <span class="ident">ipow</span>(<span class="kw-2">&amp;mut</span> <span class="ident">z</span>, <span class="ident">n</span>);
     <span class="ident">z</span>
 }}
 
@@ -5200,7 +5201,7 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// Allows us to choose a start-index in x to store, so we can avoid</span>
 <span class="doccomment">/// padding the buffer with zeros when not needed, optimized for vectors.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">iadd_impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">x</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">T</span>, <span class="ident">y</span>: <span class="kw-2">&amp;</span>[<span class="ident">Limb</span>], <span class="ident">xstart</span>: <span class="ident">usize</span>)
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">iadd_impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">x</span>: <span class="kw-2">&amp;mut</span> <span class="ident">T</span>, <span class="ident">y</span>: <span class="kw-2">&amp;</span>[<span class="ident">Limb</span>], <span class="ident">xstart</span>: <span class="ident">usize</span>)
     <span class="kw">where</span> <span class="ident">T</span>: <span class="ident">CloneableVecLike</span><span class="op">&lt;</span><span class="ident">Limb</span><span class="op">&gt;</span>
 {
     <span class="comment">// The effective x buffer is from `xstart..x.len()`, so we need to treat</span>
@@ -5212,7 +5213,7 @@
 
     <span class="comment">// Iteratively add elements from y to x.</span>
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">carry</span> <span class="op">=</span> <span class="bool-val">false</span>;
-    <span class="kw">for</span> (<span class="ident">xi</span>, <span class="ident">yi</span>) <span class="kw">in</span> (<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">x</span>[<span class="ident">xstart</span>..]).<span class="ident">iter_mut</span>().<span class="ident">zip</span>(<span class="ident">y</span>.<span class="ident">iter</span>()) {
+    <span class="kw">for</span> (<span class="ident">xi</span>, <span class="ident">yi</span>) <span class="kw">in</span> (<span class="kw-2">&amp;mut</span> <span class="ident">x</span>[<span class="ident">xstart</span>..]).<span class="ident">iter_mut</span>().<span class="ident">zip</span>(<span class="ident">y</span>.<span class="ident">iter</span>()) {
         <span class="comment">// Only one op of the two can overflow, since we added at max</span>
         <span class="comment">// Limb::max_value() + Limb::max_value(). Add the previous carry,</span>
         <span class="comment">// and store the current carry for the next.</span>
@@ -5231,7 +5232,7 @@
 
 <span class="macro">perftools_inline!</span>{
 <span class="doccomment">/// AddAssign bigint to bigint.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">iadd</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">x</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">T</span>, <span class="ident">y</span>: <span class="kw-2">&amp;</span>[<span class="ident">Limb</span>])
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">iadd</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">x</span>: <span class="kw-2">&amp;mut</span> <span class="ident">T</span>, <span class="ident">y</span>: <span class="kw-2">&amp;</span>[<span class="ident">Limb</span>])
     <span class="kw">where</span> <span class="ident">T</span>: <span class="ident">CloneableVecLike</span><span class="op">&lt;</span><span class="ident">Limb</span><span class="op">&gt;</span>
 {
     <span class="ident">iadd_impl</span>(<span class="ident">x</span>, <span class="ident">y</span>, <span class="number">0</span>)
@@ -5245,14 +5246,14 @@
 {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">z</span> <span class="op">=</span> <span class="ident">T::default</span>();
     <span class="ident">z</span>.<span class="ident">extend_from_slice</span>(<span class="ident">x</span>);
-    <span class="ident">iadd</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">z</span>, <span class="ident">y</span>);
+    <span class="ident">iadd</span>(<span class="kw-2">&amp;mut</span> <span class="ident">z</span>, <span class="ident">y</span>);
     <span class="ident">z</span>
 }}
 
 <span class="comment">// SUBTRACTION</span>
 
 <span class="doccomment">/// SubAssign bigint to bigint.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">isub</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">x</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">T</span>, <span class="ident">y</span>: <span class="kw-2">&amp;</span>[<span class="ident">Limb</span>])
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">isub</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">x</span>: <span class="kw-2">&amp;mut</span> <span class="ident">T</span>, <span class="ident">y</span>: <span class="kw-2">&amp;</span>[<span class="ident">Limb</span>])
     <span class="kw">where</span> <span class="ident">T</span>: <span class="ident">CloneableVecLike</span><span class="op">&lt;</span><span class="ident">Limb</span><span class="op">&gt;</span>
 {
     <span class="comment">// Basic underflow checks.</span>
@@ -5286,7 +5287,7 @@
 {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">z</span> <span class="op">=</span> <span class="ident">T::default</span>();
     <span class="ident">z</span>.<span class="ident">extend_from_slice</span>(<span class="ident">x</span>);
-    <span class="ident">isub</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">z</span>, <span class="ident">y</span>);
+    <span class="ident">isub</span>(<span class="kw-2">&amp;mut</span> <span class="ident">z</span>, <span class="ident">y</span>);
     <span class="ident">z</span>
 }}
 
@@ -5320,10 +5321,10 @@
     <span class="comment">// Handle the iterative cases.</span>
     <span class="kw">for</span> (<span class="ident">i</span>, <span class="kw-2">&amp;</span><span class="ident">yi</span>) <span class="kw">in</span> <span class="ident">y</span>[<span class="number">1</span>..].<span class="ident">iter</span>().<span class="ident">enumerate</span>() {
         <span class="kw">let</span> <span class="ident">zi</span>: <span class="ident">T</span> <span class="op">=</span> <span class="ident">small::mul</span>(<span class="ident">x</span>, <span class="ident">yi</span>);
-        <span class="ident">iadd_impl</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">z</span>, <span class="kw-2">&amp;</span><span class="ident">zi</span>, <span class="ident">i</span><span class="op">+</span><span class="number">1</span>);
+        <span class="ident">iadd_impl</span>(<span class="kw-2">&amp;mut</span> <span class="ident">z</span>, <span class="kw-2">&amp;</span><span class="ident">zi</span>, <span class="ident">i</span><span class="op">+</span><span class="number">1</span>);
     }
 
-    <span class="ident">small::normalize</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">z</span>);
+    <span class="ident">small::normalize</span>(<span class="kw-2">&amp;mut</span> <span class="ident">z</span>);
 
     <span class="ident">z</span>
 }
@@ -5359,8 +5360,8 @@
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">z1</span>: <span class="ident">T</span> <span class="op">=</span> <span class="ident">karatsuba_mul</span>(<span class="kw-2">&amp;</span><span class="ident">sumx</span>, <span class="kw-2">&amp;</span><span class="ident">sumy</span>);
         <span class="kw">let</span> <span class="ident">z2</span>: <span class="ident">T</span> <span class="op">=</span> <span class="ident">karatsuba_mul</span>(<span class="ident">xh</span>, <span class="ident">yh</span>);
         <span class="comment">// Properly scale z1, which is `z1 - z2 - zo`.</span>
-        <span class="ident">isub</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">z1</span>, <span class="kw-2">&amp;</span><span class="ident">z2</span>);
-        <span class="ident">isub</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">z1</span>, <span class="kw-2">&amp;</span><span class="ident">z0</span>);
+        <span class="ident">isub</span>(<span class="kw-2">&amp;mut</span> <span class="ident">z1</span>, <span class="kw-2">&amp;</span><span class="ident">z2</span>);
+        <span class="ident">isub</span>(<span class="kw-2">&amp;mut</span> <span class="ident">z1</span>, <span class="kw-2">&amp;</span><span class="ident">z0</span>);
 
         <span class="comment">// Create our result, which is equal to, in little-endian order:</span>
         <span class="comment">// [z0, z1 - z2 - z0, z2]</span>
@@ -5370,8 +5371,8 @@
         <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">z0</span>.<span class="ident">len</span>().<span class="ident">max</span>(<span class="ident">m</span> <span class="op">+</span> <span class="ident">z1</span>.<span class="ident">len</span>()).<span class="ident">max</span>(<span class="number">2</span><span class="kw-2">*</span><span class="ident">m</span> <span class="op">+</span> <span class="ident">z2</span>.<span class="ident">len</span>());
         <span class="ident">result</span>.<span class="ident">reserve_exact</span>(<span class="ident">len</span>);
         <span class="ident">result</span>.<span class="ident">extend_from_slice</span>(<span class="kw-2">&amp;</span><span class="ident">z0</span>);
-        <span class="ident">iadd_impl</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">result</span>, <span class="kw-2">&amp;</span><span class="ident">z1</span>, <span class="ident">m</span>);
-        <span class="ident">iadd_impl</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">result</span>, <span class="kw-2">&amp;</span><span class="ident">z2</span>, <span class="number">2</span><span class="kw-2">*</span><span class="ident">m</span>);
+        <span class="ident">iadd_impl</span>(<span class="kw-2">&amp;mut</span> <span class="ident">result</span>, <span class="kw-2">&amp;</span><span class="ident">z1</span>, <span class="ident">m</span>);
+        <span class="ident">iadd_impl</span>(<span class="kw-2">&amp;mut</span> <span class="ident">result</span>, <span class="kw-2">&amp;</span><span class="ident">z2</span>, <span class="number">2</span><span class="kw-2">*</span><span class="ident">m</span>);
 
         <span class="ident">result</span>
     }
@@ -5395,11 +5396,11 @@
         <span class="kw">let</span> <span class="ident">m</span> <span class="op">=</span> <span class="ident">x</span>.<span class="ident">len</span>().<span class="ident">min</span>(<span class="ident">y</span>.<span class="ident">len</span>());
         <span class="kw">let</span> (<span class="ident">yl</span>, <span class="ident">yh</span>) <span class="op">=</span> <span class="ident">karatsuba_split</span>(<span class="ident">y</span>, <span class="ident">m</span>);
         <span class="kw">let</span> <span class="ident">prod</span>: <span class="ident">T</span> <span class="op">=</span> <span class="ident">karatsuba_mul</span>(<span class="ident">x</span>, <span class="ident">yl</span>);
-        <span class="ident">iadd_impl</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">result</span>, <span class="kw-2">&amp;</span><span class="ident">prod</span>, <span class="ident">start</span>);
+        <span class="ident">iadd_impl</span>(<span class="kw-2">&amp;mut</span> <span class="ident">result</span>, <span class="kw-2">&amp;</span><span class="ident">prod</span>, <span class="ident">start</span>);
         <span class="ident">y</span> <span class="op">=</span> <span class="ident">yh</span>;
         <span class="ident">start</span> <span class="op">+</span><span class="op">=</span> <span class="ident">m</span>;
     }
-    <span class="ident">small::normalize</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">result</span>);
+    <span class="ident">small::normalize</span>(<span class="kw-2">&amp;mut</span> <span class="ident">result</span>);
 
     <span class="ident">result</span>
 }
@@ -5419,7 +5420,7 @@
 
 <span class="macro">perftools_inline!</span>{
 <span class="doccomment">/// MulAssign bigint to bigint.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">imul</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">x</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">T</span>, <span class="ident">y</span>: <span class="kw-2">&amp;</span>[<span class="ident">Limb</span>])
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">imul</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">x</span>: <span class="kw-2">&amp;mut</span> <span class="ident">T</span>, <span class="ident">y</span>: <span class="kw-2">&amp;</span>[<span class="ident">Limb</span>])
     <span class="kw">where</span> <span class="ident">T</span>: <span class="ident">CloneableVecLike</span><span class="op">&lt;</span><span class="ident">Limb</span><span class="op">&gt;</span>
 {
     <span class="kw">if</span> <span class="ident">y</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="number">1</span> {
@@ -5441,7 +5442,7 @@
 {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">z</span> <span class="op">=</span> <span class="ident">T::default</span>();
     <span class="ident">z</span>.<span class="ident">extend_from_slice</span>(<span class="ident">x</span>);
-    <span class="ident">imul</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">z</span>, <span class="ident">y</span>);
+    <span class="ident">imul</span>(<span class="kw-2">&amp;mut</span> <span class="ident">z</span>, <span class="ident">y</span>);
     <span class="ident">z</span>
 }}
 
@@ -5500,7 +5501,7 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// This is step D4 in Algorithm D in &quot;The Art of Computer Programming&quot;,</span>
 <span class="doccomment">/// and returns the remainder.</span>
-<span class="kw">fn</span> <span class="ident">multiply_and_subtract</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">x</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">T</span>, <span class="ident">y</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>, <span class="ident">qhat</span>: <span class="ident">Wide</span>, <span class="ident">j</span>: <span class="ident">usize</span>)
+<span class="kw">fn</span> <span class="ident">multiply_and_subtract</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">x</span>: <span class="kw-2">&amp;mut</span> <span class="ident">T</span>, <span class="ident">y</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>, <span class="ident">qhat</span>: <span class="ident">Wide</span>, <span class="ident">j</span>: <span class="ident">usize</span>)
     -&gt; <span class="ident">SignedWide</span>
     <span class="kw">where</span> <span class="ident">T</span>: <span class="ident">CloneableVecLike</span><span class="op">&lt;</span><span class="ident">Limb</span><span class="op">&gt;</span>
 {
@@ -5557,7 +5558,7 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// This step should be specifically debugged, due to its low likelihood,</span>
 <span class="doccomment">/// since the probability is ~2/b, where b in this case is 2^32 or 2^64.</span>
-<span class="kw">fn</span> <span class="ident">add_back</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">x</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">T</span>, <span class="ident">y</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>, <span class="kw-2">mut</span> <span class="ident">t</span>: <span class="ident">SignedWide</span>, <span class="ident">j</span>: <span class="ident">usize</span>)
+<span class="kw">fn</span> <span class="ident">add_back</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">x</span>: <span class="kw-2">&amp;mut</span> <span class="ident">T</span>, <span class="ident">y</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>, <span class="kw-2">mut</span> <span class="ident">t</span>: <span class="ident">SignedWide</span>, <span class="ident">j</span>: <span class="ident">usize</span>)
     <span class="kw">where</span> <span class="ident">T</span>: <span class="ident">CloneableVecLike</span><span class="op">&lt;</span><span class="ident">Limb</span><span class="op">&gt;</span>
 {
     <span class="kw">let</span> <span class="ident">n</span> <span class="op">=</span> <span class="ident">y</span>.<span class="ident">len</span>();
@@ -5650,24 +5651,24 @@
         <span class="comment">// Estimate the quotient</span>
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">qhat</span> <span class="op">=</span> <span class="ident">calculate_qhat</span>(<span class="kw-2">&amp;</span><span class="ident">xn</span>, <span class="kw-2">&amp;</span><span class="ident">yn</span>, <span class="ident">j</span>);
         <span class="kw">if</span> <span class="ident">qhat</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
-            <span class="kw">let</span> <span class="ident">t</span> <span class="op">=</span> <span class="ident">multiply_and_subtract</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">xn</span>, <span class="kw-2">&amp;</span><span class="ident">yn</span>, <span class="ident">qhat</span>, <span class="ident">j</span>);
+            <span class="kw">let</span> <span class="ident">t</span> <span class="op">=</span> <span class="ident">multiply_and_subtract</span>(<span class="kw-2">&amp;mut</span> <span class="ident">xn</span>, <span class="kw-2">&amp;</span><span class="ident">yn</span>, <span class="ident">qhat</span>, <span class="ident">j</span>);
             <span class="ident">qhat</span> <span class="op">=</span> <span class="ident">test_quotient</span>(<span class="ident">qhat</span>, <span class="ident">t</span>);
-            <span class="ident">add_back</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">xn</span>, <span class="kw-2">&amp;</span><span class="ident">yn</span>, <span class="ident">t</span>, <span class="ident">j</span>);
+            <span class="ident">add_back</span>(<span class="kw-2">&amp;mut</span> <span class="ident">xn</span>, <span class="kw-2">&amp;</span><span class="ident">yn</span>, <span class="ident">t</span>, <span class="ident">j</span>);
         }
         <span class="ident">q</span>[<span class="ident">j</span>] <span class="op">=</span> <span class="ident">as_limb</span>(<span class="ident">qhat</span>);
     }
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">r</span> <span class="op">=</span> <span class="ident">calculate_remainder</span>(<span class="kw-2">&amp;</span><span class="ident">xn</span>, <span class="kw-2">&amp;</span><span class="ident">yn</span>, <span class="ident">s</span>);
 
     <span class="comment">// Normalize our results</span>
-    <span class="ident">small::normalize</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">q</span>);
-    <span class="ident">small::normalize</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">r</span>);
+    <span class="ident">small::normalize</span>(<span class="kw-2">&amp;mut</span> <span class="ident">q</span>);
+    <span class="ident">small::normalize</span>(<span class="kw-2">&amp;mut</span> <span class="ident">r</span>);
 
     (<span class="ident">q</span>, <span class="ident">r</span>)
 }
 
 <span class="macro">perftools_inline!</span>{
 <span class="doccomment">/// DivAssign bigint to bigint.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">idiv</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">x</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">T</span>, <span class="ident">y</span>: <span class="kw-2">&amp;</span>[<span class="ident">Limb</span>])
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">idiv</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">x</span>: <span class="kw-2">&amp;mut</span> <span class="ident">T</span>, <span class="ident">y</span>: <span class="kw-2">&amp;</span>[<span class="ident">Limb</span>])
     -&gt; <span class="ident">T</span>
     <span class="kw">where</span> <span class="ident">T</span>: <span class="ident">CloneableVecLike</span><span class="op">&lt;</span><span class="ident">Limb</span><span class="op">&gt;</span>
 {
@@ -5678,7 +5679,7 @@
         <span class="comment">// and the remainder is x. Put before `y.len() == 1`, since</span>
         <span class="comment">// it optimizes when `x.len() == 0` nicely.</span>
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">r</span> <span class="op">=</span> <span class="ident">T::default</span>();
-        <span class="ident">mem::swap</span>(<span class="ident">x</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">r</span>);
+        <span class="ident">mem::swap</span>(<span class="ident">x</span>, <span class="kw-2">&amp;mut</span> <span class="ident">r</span>);
         <span class="ident">r</span>
     } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">y</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="number">1</span> {
         <span class="comment">// Can optimize for division by a small value.</span>
@@ -5700,7 +5701,7 @@
 {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">z</span> <span class="op">=</span> <span class="ident">T::default</span>();
     <span class="ident">z</span>.<span class="ident">extend_from_slice</span>(<span class="ident">x</span>);
-    <span class="kw">let</span> <span class="ident">rem</span> <span class="op">=</span> <span class="ident">idiv</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">z</span>, <span class="ident">y</span>);
+    <span class="kw">let</span> <span class="ident">rem</span> <span class="op">=</span> <span class="ident">idiv</span>(<span class="kw-2">&amp;mut</span> <span class="ident">z</span>, <span class="ident">y</span>);
     (<span class="ident">z</span>, <span class="ident">rem</span>)
 }}
 
@@ -5718,7 +5719,7 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// Adapted from David M. Gay&#39;s dtoa, and therefore under an MIT license:</span>
 <span class="doccomment">///     www.netlib.org/fp/dtoa.c</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">quorem</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">x</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">T</span>, <span class="ident">y</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>)
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">quorem</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">x</span>: <span class="kw-2">&amp;mut</span> <span class="ident">T</span>, <span class="ident">y</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>)
     -&gt; <span class="ident">Limb</span>
     <span class="kw">where</span> <span class="ident">T</span>: <span class="ident">CloneableVecLike</span><span class="op">&lt;</span><span class="ident">Limb</span><span class="op">&gt;</span>
 {
@@ -5778,7 +5779,7 @@
     (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span>:<span class="ident">expr</span>) =&gt; (
         <span class="macro">perftools_inline!</span>{
         <span class="doccomment">/// Multiply by a power of $base.</span>
-        <span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">n</span>: <span class="ident">u32</span>) {
+        <span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">n</span>: <span class="ident">u32</span>) {
             <span class="self">self</span>.<span class="ident">imul_power_impl</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span>, <span class="ident">n</span>)
         }}
     );
@@ -5920,7 +5921,7 @@
 
     <span class="macro">perftools_inline!</span>{
     <span class="doccomment">/// Pad the buffer with zeros to the least-significant bits.</span>
-    <span class="kw">fn</span> <span class="ident">pad_zero_digits</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">n</span>: <span class="ident">usize</span>) -&gt; <span class="ident">usize</span> {
+    <span class="kw">fn</span> <span class="ident">pad_zero_digits</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">n</span>: <span class="ident">usize</span>) -&gt; <span class="ident">usize</span> {
         <span class="ident">small::ishl_limbs</span>(<span class="self">self</span>.<span class="ident">data_mut</span>(), <span class="ident">n</span>);
         <span class="ident">n</span>
     }}
@@ -5973,7 +5974,7 @@
 
     <span class="macro">perftools_inline!</span>{
     <span class="doccomment">/// Normalize the integer, so any leading zero values are removed.</span>
-    <span class="kw">fn</span> <span class="ident">normalize</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
+    <span class="kw">fn</span> <span class="ident">normalize</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
         <span class="ident">small::normalize</span>(<span class="self">self</span>.<span class="ident">data_mut</span>());
     }}
 
@@ -5987,7 +5988,7 @@
 
     <span class="macro">perftools_inline!</span>{
     <span class="doccomment">/// Shift-left the entire buffer n bits.</span>
-    <span class="kw">fn</span> <span class="ident">ishl</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">n</span>: <span class="ident">usize</span>) {
+    <span class="kw">fn</span> <span class="ident">ishl</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">n</span>: <span class="ident">usize</span>) {
         <span class="ident">small::ishl</span>(<span class="self">self</span>.<span class="ident">data_mut</span>(), <span class="ident">n</span>);
     }}
 
@@ -6001,7 +6002,7 @@
 
     <span class="macro">perftools_inline!</span>{
     <span class="doccomment">/// Shift-right the entire buffer n bits.</span>
-    <span class="kw">fn</span> <span class="ident">ishr</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">n</span>: <span class="ident">usize</span>, <span class="kw-2">mut</span> <span class="ident">roundup</span>: <span class="ident">bool</span>) {
+    <span class="kw">fn</span> <span class="ident">ishr</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">n</span>: <span class="ident">usize</span>, <span class="kw-2">mut</span> <span class="ident">roundup</span>: <span class="ident">bool</span>) {
         <span class="ident">roundup</span> <span class="op">&amp;=</span> <span class="ident">small::ishr</span>(<span class="self">self</span>.<span class="ident">data_mut</span>(), <span class="ident">n</span>);
 
         <span class="comment">// Round-up the least significant bit.</span>
@@ -6043,7 +6044,7 @@
 
     <span class="macro">perftools_inline!</span>{
     <span class="doccomment">/// AddAssign small integer.</span>
-    <span class="kw">fn</span> <span class="ident">iadd_small</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">y</span>: <span class="ident">Limb</span>) {
+    <span class="kw">fn</span> <span class="ident">iadd_small</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">y</span>: <span class="ident">Limb</span>) {
         <span class="ident">small::iadd</span>(<span class="self">self</span>.<span class="ident">data_mut</span>(), <span class="ident">y</span>);
     }}
 
@@ -6060,14 +6061,14 @@
     <span class="macro">perftools_inline!</span>{
     <span class="doccomment">/// SubAssign small integer.</span>
     <span class="doccomment">/// Warning: Does no overflow checking, x must be &gt;= y.</span>
-    <span class="kw">fn</span> <span class="ident">isub_small</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">y</span>: <span class="ident">Limb</span>) {
+    <span class="kw">fn</span> <span class="ident">isub_small</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">y</span>: <span class="ident">Limb</span>) {
         <span class="ident">small::isub</span>(<span class="self">self</span>.<span class="ident">data_mut</span>(), <span class="ident">y</span>);
     }}
 
     <span class="macro">perftools_inline!</span>{
     <span class="doccomment">/// Sub small integer to a copy of self.</span>
     <span class="doccomment">/// Warning: Does no overflow checking, x must be &gt;= y.</span>
-    <span class="kw">fn</span> <span class="ident">sub_small</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">y</span>: <span class="ident">Limb</span>) -&gt; <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">sub_small</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">y</span>: <span class="ident">Limb</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">x</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">clone</span>();
         <span class="ident">x</span>.<span class="ident">isub_small</span>(<span class="ident">y</span>);
         <span class="ident">x</span>
@@ -6077,7 +6078,7 @@
 
     <span class="macro">perftools_inline!</span>{
     <span class="doccomment">/// MulAssign small integer.</span>
-    <span class="kw">fn</span> <span class="ident">imul_small</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">y</span>: <span class="ident">Limb</span>) {
+    <span class="kw">fn</span> <span class="ident">imul_small</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">y</span>: <span class="ident">Limb</span>) {
         <span class="ident">small::imul</span>(<span class="self">self</span>.<span class="ident">data_mut</span>(), <span class="ident">y</span>);
     }}
 
@@ -6091,12 +6092,12 @@
 
     <span class="macro">perftools_inline!</span>{
     <span class="doccomment">/// MulAssign by a power.</span>
-    <span class="kw">fn</span> <span class="ident">imul_power_impl</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">radix</span>: <span class="ident">u32</span>, <span class="ident">n</span>: <span class="ident">u32</span>) {
+    <span class="kw">fn</span> <span class="ident">imul_power_impl</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">radix</span>: <span class="ident">u32</span>, <span class="ident">n</span>: <span class="ident">u32</span>) {
         <span class="ident">small::imul_power</span>(<span class="self">self</span>.<span class="ident">data_mut</span>(), <span class="ident">radix</span>, <span class="ident">n</span>);
     }}
 
     <span class="macro">perftools_inline!</span>{
-    <span class="kw">fn</span> <span class="ident">imul_power</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">radix</span>: <span class="ident">u32</span>, <span class="ident">n</span>: <span class="ident">u32</span>) {
+    <span class="kw">fn</span> <span class="ident">imul_power</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">radix</span>: <span class="ident">u32</span>, <span class="ident">n</span>: <span class="ident">u32</span>) {
         <span class="kw">match</span> <span class="ident">radix</span> {
             <span class="number">2</span>  =&gt; <span class="self">self</span>.<span class="ident">imul_pow2</span>(<span class="ident">n</span>),
             <span class="number">3</span>  =&gt; <span class="self">self</span>.<span class="ident">imul_pow3</span>(<span class="ident">n</span>),
@@ -6139,7 +6140,7 @@
 
     <span class="macro">perftools_inline!</span>{
     <span class="doccomment">/// Multiply by a power of 2.</span>
-    <span class="kw">fn</span> <span class="ident">imul_pow2</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">n</span>: <span class="ident">u32</span>) {
+    <span class="kw">fn</span> <span class="ident">imul_pow2</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">n</span>: <span class="ident">u32</span>) {
         <span class="self">self</span>.<span class="ident">ishl</span>(<span class="ident">n</span>.<span class="ident">as_usize</span>())
     }}
 
@@ -6147,7 +6148,7 @@
 
     <span class="macro">perftools_inline!</span>{
     <span class="doccomment">/// Multiply by a power of 4.</span>
-    <span class="kw">fn</span> <span class="ident">imul_pow4</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">n</span>: <span class="ident">u32</span>) {
+    <span class="kw">fn</span> <span class="ident">imul_pow4</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">n</span>: <span class="ident">u32</span>) {
         <span class="self">self</span>.<span class="ident">imul_pow2</span>(<span class="number">2</span><span class="kw-2">*</span><span class="ident">n</span>);
     }}
 
@@ -6155,7 +6156,7 @@
 
     <span class="macro">perftools_inline!</span>{
     <span class="doccomment">/// Multiply by a power of 6.</span>
-    <span class="kw">fn</span> <span class="ident">imul_pow6</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">n</span>: <span class="ident">u32</span>) {
+    <span class="kw">fn</span> <span class="ident">imul_pow6</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">n</span>: <span class="ident">u32</span>) {
         <span class="self">self</span>.<span class="ident">imul_pow3</span>(<span class="ident">n</span>);
         <span class="self">self</span>.<span class="ident">imul_pow2</span>(<span class="ident">n</span>);
     }}
@@ -6164,20 +6165,20 @@
 
     <span class="macro">perftools_inline!</span>{
     <span class="doccomment">/// Multiply by a power of 8.</span>
-    <span class="kw">fn</span> <span class="ident">imul_pow8</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">n</span>: <span class="ident">u32</span>) {
+    <span class="kw">fn</span> <span class="ident">imul_pow8</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">n</span>: <span class="ident">u32</span>) {
         <span class="self">self</span>.<span class="ident">imul_pow2</span>(<span class="number">3</span><span class="kw-2">*</span><span class="ident">n</span>);
     }}
 
     <span class="macro">perftools_inline!</span>{
     <span class="doccomment">/// Multiply by a power of 9.</span>
-    <span class="kw">fn</span> <span class="ident">imul_pow9</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">n</span>: <span class="ident">u32</span>) {
+    <span class="kw">fn</span> <span class="ident">imul_pow9</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">n</span>: <span class="ident">u32</span>) {
         <span class="self">self</span>.<span class="ident">imul_pow3</span>(<span class="ident">n</span>);
         <span class="self">self</span>.<span class="ident">imul_pow3</span>(<span class="ident">n</span>);
     }}
 
     <span class="macro">perftools_inline!</span>{
     <span class="doccomment">/// Multiply by a power of 10.</span>
-    <span class="kw">fn</span> <span class="ident">imul_pow10</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">n</span>: <span class="ident">u32</span>) {
+    <span class="kw">fn</span> <span class="ident">imul_pow10</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">n</span>: <span class="ident">u32</span>) {
         <span class="self">self</span>.<span class="ident">imul_pow5</span>(<span class="ident">n</span>);
         <span class="self">self</span>.<span class="ident">imul_pow2</span>(<span class="ident">n</span>);
     }}
@@ -6186,7 +6187,7 @@
 
     <span class="macro">perftools_inline!</span>{
     <span class="doccomment">/// Multiply by a power of 12.</span>
-    <span class="kw">fn</span> <span class="ident">imul_pow12</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">n</span>: <span class="ident">u32</span>) {
+    <span class="kw">fn</span> <span class="ident">imul_pow12</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">n</span>: <span class="ident">u32</span>) {
         <span class="self">self</span>.<span class="ident">imul_pow3</span>(<span class="ident">n</span>);
         <span class="self">self</span>.<span class="ident">imul_pow4</span>(<span class="ident">n</span>);
     }}
@@ -6195,21 +6196,21 @@
 
     <span class="macro">perftools_inline!</span>{
     <span class="doccomment">/// Multiply by a power of 14.</span>
-    <span class="kw">fn</span> <span class="ident">imul_pow14</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">n</span>: <span class="ident">u32</span>) {
+    <span class="kw">fn</span> <span class="ident">imul_pow14</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">n</span>: <span class="ident">u32</span>) {
         <span class="self">self</span>.<span class="ident">imul_pow7</span>(<span class="ident">n</span>);
         <span class="self">self</span>.<span class="ident">imul_pow2</span>(<span class="ident">n</span>);
     }}
 
     <span class="macro">perftools_inline!</span>{
     <span class="doccomment">/// Multiply by a power of 15.</span>
-    <span class="kw">fn</span> <span class="ident">imul_pow15</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">n</span>: <span class="ident">u32</span>) {
+    <span class="kw">fn</span> <span class="ident">imul_pow15</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">n</span>: <span class="ident">u32</span>) {
         <span class="self">self</span>.<span class="ident">imul_pow3</span>(<span class="ident">n</span>);
         <span class="self">self</span>.<span class="ident">imul_pow5</span>(<span class="ident">n</span>);
     }}
 
     <span class="macro">perftools_inline!</span>{
     <span class="doccomment">/// Multiply by a power of 16.</span>
-    <span class="kw">fn</span> <span class="ident">imul_pow16</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">n</span>: <span class="ident">u32</span>) {
+    <span class="kw">fn</span> <span class="ident">imul_pow16</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">n</span>: <span class="ident">u32</span>) {
         <span class="self">self</span>.<span class="ident">imul_pow2</span>(<span class="number">4</span><span class="kw-2">*</span><span class="ident">n</span>);
     }}
 
@@ -6217,7 +6218,7 @@
 
     <span class="macro">perftools_inline!</span>{
     <span class="doccomment">/// Multiply by a power of 18.</span>
-    <span class="kw">fn</span> <span class="ident">imul_pow18</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">n</span>: <span class="ident">u32</span>) {
+    <span class="kw">fn</span> <span class="ident">imul_pow18</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">n</span>: <span class="ident">u32</span>) {
         <span class="self">self</span>.<span class="ident">imul_pow9</span>(<span class="ident">n</span>);
         <span class="self">self</span>.<span class="ident">imul_pow2</span>(<span class="ident">n</span>);
     }}
@@ -6226,21 +6227,21 @@
 
     <span class="macro">perftools_inline!</span>{
     <span class="doccomment">/// Multiply by a power of 20.</span>
-    <span class="kw">fn</span> <span class="ident">imul_pow20</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">n</span>: <span class="ident">u32</span>) {
+    <span class="kw">fn</span> <span class="ident">imul_pow20</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">n</span>: <span class="ident">u32</span>) {
         <span class="self">self</span>.<span class="ident">imul_pow5</span>(<span class="ident">n</span>);
         <span class="self">self</span>.<span class="ident">imul_pow4</span>(<span class="ident">n</span>);
     }}
 
     <span class="macro">perftools_inline!</span>{
     <span class="doccomment">/// Multiply by a power of 21.</span>
-    <span class="kw">fn</span> <span class="ident">imul_pow21</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">n</span>: <span class="ident">u32</span>) {
+    <span class="kw">fn</span> <span class="ident">imul_pow21</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">n</span>: <span class="ident">u32</span>) {
         <span class="self">self</span>.<span class="ident">imul_pow3</span>(<span class="ident">n</span>);
         <span class="self">self</span>.<span class="ident">imul_pow7</span>(<span class="ident">n</span>);
     }}
 
     <span class="macro">perftools_inline!</span>{
     <span class="doccomment">/// Multiply by a power of 22.</span>
-    <span class="kw">fn</span> <span class="ident">imul_pow22</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">n</span>: <span class="ident">u32</span>) {
+    <span class="kw">fn</span> <span class="ident">imul_pow22</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">n</span>: <span class="ident">u32</span>) {
         <span class="self">self</span>.<span class="ident">imul_pow11</span>(<span class="ident">n</span>);
         <span class="self">self</span>.<span class="ident">imul_pow2</span>(<span class="ident">n</span>);
     }}
@@ -6249,35 +6250,35 @@
 
     <span class="macro">perftools_inline!</span>{
     <span class="doccomment">/// Multiply by a power of 24.</span>
-    <span class="kw">fn</span> <span class="ident">imul_pow24</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">n</span>: <span class="ident">u32</span>) {
+    <span class="kw">fn</span> <span class="ident">imul_pow24</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">n</span>: <span class="ident">u32</span>) {
         <span class="self">self</span>.<span class="ident">imul_pow3</span>(<span class="ident">n</span>);
         <span class="self">self</span>.<span class="ident">imul_pow8</span>(<span class="ident">n</span>);
     }}
 
     <span class="macro">perftools_inline!</span>{
     <span class="doccomment">/// Multiply by a power of 25.</span>
-    <span class="kw">fn</span> <span class="ident">imul_pow25</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">n</span>: <span class="ident">u32</span>) {
+    <span class="kw">fn</span> <span class="ident">imul_pow25</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">n</span>: <span class="ident">u32</span>) {
         <span class="self">self</span>.<span class="ident">imul_pow5</span>(<span class="ident">n</span>);
         <span class="self">self</span>.<span class="ident">imul_pow5</span>(<span class="ident">n</span>);
     }}
 
     <span class="macro">perftools_inline!</span>{
     <span class="doccomment">/// Multiply by a power of 26.</span>
-    <span class="kw">fn</span> <span class="ident">imul_pow26</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">n</span>: <span class="ident">u32</span>) {
+    <span class="kw">fn</span> <span class="ident">imul_pow26</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">n</span>: <span class="ident">u32</span>) {
         <span class="self">self</span>.<span class="ident">imul_pow13</span>(<span class="ident">n</span>);
         <span class="self">self</span>.<span class="ident">imul_pow2</span>(<span class="ident">n</span>);
     }}
 
     <span class="macro">perftools_inline!</span>{
     <span class="doccomment">/// Multiply by a power of 27.</span>
-    <span class="kw">fn</span> <span class="ident">imul_pow27</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">n</span>: <span class="ident">u32</span>) {
+    <span class="kw">fn</span> <span class="ident">imul_pow27</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">n</span>: <span class="ident">u32</span>) {
         <span class="self">self</span>.<span class="ident">imul_pow9</span>(<span class="ident">n</span>);
         <span class="self">self</span>.<span class="ident">imul_pow3</span>(<span class="ident">n</span>);
     }}
 
     <span class="macro">perftools_inline!</span>{
     <span class="doccomment">/// Multiply by a power of 28.</span>
-    <span class="kw">fn</span> <span class="ident">imul_pow28</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">n</span>: <span class="ident">u32</span>) {
+    <span class="kw">fn</span> <span class="ident">imul_pow28</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">n</span>: <span class="ident">u32</span>) {
         <span class="self">self</span>.<span class="ident">imul_pow7</span>(<span class="ident">n</span>);
         <span class="self">self</span>.<span class="ident">imul_pow4</span>(<span class="ident">n</span>);
     }}
@@ -6286,7 +6287,7 @@
 
     <span class="macro">perftools_inline!</span>{
     <span class="doccomment">/// Multiply by a power of 30.</span>
-    <span class="kw">fn</span> <span class="ident">imul_pow30</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">n</span>: <span class="ident">u32</span>) {
+    <span class="kw">fn</span> <span class="ident">imul_pow30</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">n</span>: <span class="ident">u32</span>) {
         <span class="self">self</span>.<span class="ident">imul_pow15</span>(<span class="ident">n</span>);
         <span class="self">self</span>.<span class="ident">imul_pow2</span>(<span class="ident">n</span>);
     }}
@@ -6295,34 +6296,34 @@
 
     <span class="macro">perftools_inline!</span>{
     <span class="doccomment">/// Multiply by a power of 32.</span>
-    <span class="kw">fn</span> <span class="ident">imul_pow32</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">n</span>: <span class="ident">u32</span>) {
+    <span class="kw">fn</span> <span class="ident">imul_pow32</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">n</span>: <span class="ident">u32</span>) {
         <span class="self">self</span>.<span class="ident">imul_pow2</span>(<span class="number">5</span><span class="kw-2">*</span><span class="ident">n</span>);
     }}
 
     <span class="macro">perftools_inline!</span>{
     <span class="doccomment">/// Multiply by a power of 33.</span>
-    <span class="kw">fn</span> <span class="ident">imul_pow33</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">n</span>: <span class="ident">u32</span>) {
+    <span class="kw">fn</span> <span class="ident">imul_pow33</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">n</span>: <span class="ident">u32</span>) {
         <span class="self">self</span>.<span class="ident">imul_pow3</span>(<span class="ident">n</span>);
         <span class="self">self</span>.<span class="ident">imul_pow11</span>(<span class="ident">n</span>);
     }}
 
     <span class="macro">perftools_inline!</span>{
     <span class="doccomment">/// Multiply by a power of 34.</span>
-    <span class="kw">fn</span> <span class="ident">imul_pow34</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">n</span>: <span class="ident">u32</span>) {
+    <span class="kw">fn</span> <span class="ident">imul_pow34</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">n</span>: <span class="ident">u32</span>) {
         <span class="self">self</span>.<span class="ident">imul_pow17</span>(<span class="ident">n</span>);
         <span class="self">self</span>.<span class="ident">imul_pow2</span>(<span class="ident">n</span>);
     }}
 
     <span class="macro">perftools_inline!</span>{
     <span class="doccomment">/// Multiply by a power of 35.</span>
-    <span class="kw">fn</span> <span class="ident">imul_pow35</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">n</span>: <span class="ident">u32</span>) {
+    <span class="kw">fn</span> <span class="ident">imul_pow35</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">n</span>: <span class="ident">u32</span>) {
         <span class="self">self</span>.<span class="ident">imul_pow5</span>(<span class="ident">n</span>);
         <span class="self">self</span>.<span class="ident">imul_pow7</span>(<span class="ident">n</span>);
     }}
 
     <span class="macro">perftools_inline!</span>{
     <span class="doccomment">/// Multiply by a power of 36.</span>
-    <span class="kw">fn</span> <span class="ident">imul_pow36</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">n</span>: <span class="ident">u32</span>) {
+    <span class="kw">fn</span> <span class="ident">imul_pow36</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">n</span>: <span class="ident">u32</span>) {
         <span class="self">self</span>.<span class="ident">imul_pow9</span>(<span class="ident">n</span>);
         <span class="self">self</span>.<span class="ident">imul_pow4</span>(<span class="ident">n</span>);
     }}
@@ -6331,7 +6332,7 @@
 
     <span class="macro">perftools_inline!</span>{
     <span class="doccomment">/// DivAssign small integer, and return the remainder.</span>
-    <span class="kw">fn</span> <span class="ident">idiv_small</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">y</span>: <span class="ident">Limb</span>) -&gt; <span class="ident">Limb</span> {
+    <span class="kw">fn</span> <span class="ident">idiv_small</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">y</span>: <span class="ident">Limb</span>) -&gt; <span class="ident">Limb</span> {
         <span class="ident">small::idiv</span>(<span class="self">self</span>.<span class="ident">data_mut</span>(), <span class="ident">y</span>)
     }}
 
@@ -6347,7 +6348,7 @@
 
     <span class="macro">perftools_inline!</span>{
     <span class="doccomment">/// Calculate self^n</span>
-    <span class="kw">fn</span> <span class="ident">ipow</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">n</span>: <span class="ident">Limb</span>) {
+    <span class="kw">fn</span> <span class="ident">ipow</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">n</span>: <span class="ident">Limb</span>) {
         <span class="ident">small::ipow</span>(<span class="self">self</span>.<span class="ident">data_mut</span>(), <span class="ident">n</span>);
     }}
 
@@ -6366,13 +6367,13 @@
 
     <span class="macro">perftools_inline!</span>{
     <span class="doccomment">/// AddAssign large integer.</span>
-    <span class="kw">fn</span> <span class="ident">iadd_large</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">y</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) {
+    <span class="kw">fn</span> <span class="ident">iadd_large</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">y</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) {
         <span class="ident">large::iadd</span>(<span class="self">self</span>.<span class="ident">data_mut</span>(), <span class="ident">y</span>.<span class="ident">data</span>());
     }}
 
     <span class="macro">perftools_inline!</span>{
     <span class="doccomment">/// Add large integer to a copy of self.</span>
-    <span class="kw">fn</span> <span class="ident">add_large</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">y</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">add_large</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">y</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">x</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">clone</span>();
         <span class="ident">x</span>.<span class="ident">iadd_large</span>(<span class="ident">y</span>);
         <span class="ident">x</span>
@@ -6383,14 +6384,14 @@
     <span class="macro">perftools_inline!</span>{
     <span class="doccomment">/// SubAssign large integer.</span>
     <span class="doccomment">/// Warning: Does no overflow checking, x must be &gt;= y.</span>
-    <span class="kw">fn</span> <span class="ident">isub_large</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">y</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) {
+    <span class="kw">fn</span> <span class="ident">isub_large</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">y</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) {
         <span class="ident">large::isub</span>(<span class="self">self</span>.<span class="ident">data_mut</span>(), <span class="ident">y</span>.<span class="ident">data</span>());
     }}
 
     <span class="macro">perftools_inline!</span>{
     <span class="doccomment">/// Sub large integer to a copy of self.</span>
     <span class="doccomment">/// Warning: Does no overflow checking, x must be &gt;= y.</span>
-    <span class="kw">fn</span> <span class="ident">sub_large</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">y</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">sub_large</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">y</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">x</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">clone</span>();
         <span class="ident">x</span>.<span class="ident">isub_large</span>(<span class="ident">y</span>);
         <span class="ident">x</span>
@@ -6400,13 +6401,13 @@
 
     <span class="macro">perftools_inline!</span>{
     <span class="doccomment">/// MulAssign large integer.</span>
-    <span class="kw">fn</span> <span class="ident">imul_large</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">y</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) {
+    <span class="kw">fn</span> <span class="ident">imul_large</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">y</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) {
         <span class="ident">large::imul</span>(<span class="self">self</span>.<span class="ident">data_mut</span>(), <span class="ident">y</span>.<span class="ident">data</span>());
     }}
 
     <span class="macro">perftools_inline!</span>{
     <span class="doccomment">/// Mul large integer to a copy of self.</span>
-    <span class="kw">fn</span> <span class="ident">mul_large</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">y</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">mul_large</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">y</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">x</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">clone</span>();
         <span class="ident">x</span>.<span class="ident">imul_large</span>(<span class="ident">y</span>);
         <span class="ident">x</span>
@@ -6416,7 +6417,7 @@
 
     <span class="macro">perftools_inline!</span>{
     <span class="doccomment">/// DivAssign large integer and get remainder.</span>
-    <span class="kw">fn</span> <span class="ident">idiv_large</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">y</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">idiv_large</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">y</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">rem</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::default</span>();
         <span class="kw-2">*</span><span class="ident">rem</span>.<span class="ident">data_mut</span>() <span class="op">=</span> <span class="ident">large::idiv</span>(<span class="self">self</span>.<span class="ident">data_mut</span>(), <span class="ident">y</span>.<span class="ident">data</span>());
         <span class="ident">rem</span>
@@ -6424,7 +6425,7 @@
 
     <span class="macro">perftools_inline!</span>{
     <span class="doccomment">/// Div large integer to a copy of self and get quotient and remainder.</span>
-    <span class="kw">fn</span> <span class="ident">div_large</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">y</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; (<span class="self">Self</span>, <span class="self">Self</span>) {
+    <span class="kw">fn</span> <span class="ident">div_large</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">y</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; (<span class="self">Self</span>, <span class="self">Self</span>) {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">x</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">clone</span>();
         <span class="kw">let</span> <span class="ident">rem</span> <span class="op">=</span> <span class="ident">x</span>.<span class="ident">idiv_large</span>(<span class="ident">y</span>);
         (<span class="ident">x</span>, <span class="ident">rem</span>)
@@ -6439,7 +6440,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Warning: This is not a general-purpose division algorithm,</span>
     <span class="doccomment">/// it is highly specialized for peeling off singular digits.</span>
-    <span class="kw">fn</span> <span class="ident">quorem</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">y</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="ident">Limb</span> {
+    <span class="kw">fn</span> <span class="ident">quorem</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">y</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="ident">Limb</span> {
         <span class="ident">large::quorem</span>(<span class="self">self</span>.<span class="ident">data_mut</span>(), <span class="ident">y</span>.<span class="ident">data</span>())
     }}
 }
@@ -6471,7 +6472,7 @@
 
         <span class="attribute">#[<span class="ident">inline</span>]</span>
         <span class="kw">fn</span> <span class="ident">data_mut</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident"><span class="self">Self</span>::StorageType</span> {
-            <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">data</span>
+            <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">data</span>
         }
     }
 
@@ -7084,5 +7085,4 @@
 }
 </code></pre></div>
 </section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="lexical_core" data-search-index-js="../../../../search-index.js" data-search-js="../../../../search.js"></div>
-    <script src="../../../../main.js"></script><script src="../../../../source-script.js"></script><script src="../../../../source-files.js"></script>
 </body></html>

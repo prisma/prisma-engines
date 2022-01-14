@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;ring-0.16.20&#x2F;src&#x2F;test.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>test.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../ring/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;ring-0.16.20&#x2F;src&#x2F;test.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>test.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><script defer src="../../main.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script>
+    <noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../ring/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -801,7 +802,7 @@
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;alloc&quot;</span>)]</span>
 <span class="kw">impl</span> <span class="ident">TestCase</span> {
     <span class="doccomment">/// Maps the string &quot;true&quot; to true and the string &quot;false&quot; to false.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">consume_bool</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">consume_bool</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">bool</span> {
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">consume_string</span>(<span class="ident">key</span>).<span class="ident">as_ref</span>() {
             <span class="string">&quot;true&quot;</span> =&gt; <span class="bool-val">true</span>,
             <span class="string">&quot;false&quot;</span> =&gt; <span class="bool-val">false</span>,
@@ -814,7 +815,7 @@
     <span class="doccomment">/// inputs. &quot;SHA224&quot; is mapped to None because *ring* intentionally does</span>
     <span class="doccomment">/// not support SHA224, but we need to consume test vectors from NIST that</span>
     <span class="doccomment">/// have SHA224 vectors in them.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">consume_digest_alg</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">digest::Algorithm</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">consume_digest_alg</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">digest::Algorithm</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">consume_string</span>(<span class="ident">key</span>);
         <span class="kw">match</span> <span class="ident">name</span>.<span class="ident">as_ref</span>() {
             <span class="string">&quot;SHA1&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">digest::SHA1_FOR_LEGACY_USE_ONLY</span>),
@@ -830,7 +831,7 @@
     <span class="doccomment">/// Returns the value of an attribute that is encoded as a sequence of an</span>
     <span class="doccomment">/// even number of hex digits, or as a double-quoted UTF-8 string. The</span>
     <span class="doccomment">/// empty (zero-length) value is represented as &quot;&quot;.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">consume_bytes</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">consume_bytes</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">consume_string</span>(<span class="ident">key</span>);
         <span class="kw">if</span> <span class="ident">s</span>.<span class="ident">starts_with</span>(<span class="string">&#39;\&quot;&#39;</span>) {
             <span class="comment">// The value is a quoted UTF-8 string.</span>
@@ -886,7 +887,7 @@
 
     <span class="doccomment">/// Returns the value of an attribute that is an integer, in decimal</span>
     <span class="doccomment">/// notation.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">consume_usize</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">usize</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">consume_usize</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">usize</span> {
         <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">consume_string</span>(<span class="ident">key</span>);
         <span class="ident">s</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>().<span class="ident">unwrap</span>()
     }
@@ -894,7 +895,7 @@
     <span class="doccomment">/// Returns the value of an attribute that is an integer, in decimal</span>
     <span class="doccomment">/// notation, as a bit length.</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;alloc&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">consume_usize_bits</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">bits::BitLength</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">consume_usize_bits</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">bits::BitLength</span> {
         <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">consume_string</span>(<span class="ident">key</span>);
         <span class="kw">let</span> <span class="ident">bits</span> <span class="op">=</span> <span class="ident">s</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>().<span class="ident">unwrap</span>();
         <span class="ident">bits::BitLength::from_usize_bits</span>(<span class="ident">bits</span>)
@@ -902,15 +903,15 @@
 
     <span class="doccomment">/// Returns the raw value of an attribute, without any unquoting or</span>
     <span class="doccomment">/// other interpretation.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">consume_string</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">String</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">consume_string</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">String</span> {
         <span class="self">self</span>.<span class="ident">consume_optional_string</span>(<span class="ident">key</span>)
             .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="macro">panic!</span>(<span class="string">&quot;No attribute named \&quot;{}\&quot;&quot;</span>, <span class="ident">key</span>))
     }
 
     <span class="doccomment">/// Like `consume_string()` except it returns `None` if the test case</span>
     <span class="doccomment">/// doesn&#39;t have the attribute.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">consume_optional_string</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
-        <span class="kw">for</span> (<span class="ident">name</span>, <span class="ident">value</span>, <span class="ident">consumed</span>) <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">attributes</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">consume_optional_string</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
+        <span class="kw">for</span> (<span class="ident">name</span>, <span class="ident">value</span>, <span class="ident">consumed</span>) <span class="kw">in</span> <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">attributes</span> {
             <span class="kw">if</span> <span class="ident">key</span> <span class="op">==</span> <span class="ident">name</span> {
                 <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">consumed</span> {
                     <span class="macro">panic!</span>(<span class="string">&quot;Attribute {} was already consumed&quot;</span>, <span class="ident">key</span>);
@@ -953,15 +954,15 @@
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;alloc&quot;</span>)]</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">run</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="ident">test_file</span>: <span class="ident">File</span>, <span class="kw-2">mut</span> <span class="ident">f</span>: <span class="ident">F</span>)
 <span class="kw">where</span>
-    <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">TestCase</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">error::Unspecified</span><span class="op">&gt;</span>,
+    <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="kw-2">&amp;mut</span> <span class="ident">TestCase</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">error::Unspecified</span><span class="op">&gt;</span>,
 {
-    <span class="kw">let</span> <span class="ident">lines</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">test_file</span>.<span class="ident">contents</span>.<span class="ident">lines</span>();
+    <span class="kw">let</span> <span class="ident">lines</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="ident">test_file</span>.<span class="ident">contents</span>.<span class="ident">lines</span>();
 
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">current_section</span> <span class="op">=</span> <span class="ident">String::from</span>(<span class="string">&quot;&quot;</span>);
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">failed</span> <span class="op">=</span> <span class="bool-val">false</span>;
 
-    <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">mut</span> <span class="ident">test_case</span>) <span class="op">=</span> <span class="ident">parse_test_case</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">current_section</span>, <span class="ident">lines</span>) {
-        <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">f</span>(<span class="kw-2">&amp;</span><span class="ident">current_section</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">test_case</span>) {
+    <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">mut</span> <span class="ident">test_case</span>) <span class="op">=</span> <span class="ident">parse_test_case</span>(<span class="kw-2">&amp;mut</span> <span class="ident">current_section</span>, <span class="ident">lines</span>) {
+        <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">f</span>(<span class="kw-2">&amp;</span><span class="ident">current_section</span>, <span class="kw-2">&amp;mut</span> <span class="ident">test_case</span>) {
             <span class="prelude-val">Ok</span>(()) =&gt; {
                 <span class="kw">if</span> <span class="op">!</span><span class="ident">test_case</span>
                     .<span class="ident">attributes</span>
@@ -1034,8 +1035,8 @@
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;alloc&quot;</span>)]</span>
 <span class="kw">fn</span> <span class="ident">parse_test_case</span>(
-    <span class="ident">current_section</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">String</span>,
-    <span class="ident">lines</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw">dyn</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>,
+    <span class="ident">current_section</span>: <span class="kw-2">&amp;mut</span> <span class="ident">String</span>,
+    <span class="ident">lines</span>: <span class="kw-2">&amp;mut</span> <span class="kw">dyn</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>,
 ) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">TestCase</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">attributes</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
 
@@ -1122,7 +1123,7 @@
     }
 
     <span class="kw">impl</span> <span class="ident">rand::sealed::SecureRandom</span> <span class="kw">for</span> <span class="ident">FixedByteRandom</span> {
-        <span class="kw">fn</span> <span class="ident">fill_impl</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">dest</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">error::Unspecified</span><span class="op">&gt;</span> {
+        <span class="kw">fn</span> <span class="ident">fill_impl</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">dest</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">error::Unspecified</span><span class="op">&gt;</span> {
             <span class="ident">polyfill::slice::fill</span>(<span class="ident">dest</span>, <span class="self">self</span>.<span class="ident">byte</span>);
             <span class="prelude-val">Ok</span>(())
         }
@@ -1137,7 +1138,7 @@
     }
 
     <span class="kw">impl</span> <span class="ident">rand::sealed::SecureRandom</span> <span class="kw">for</span> <span class="ident">FixedSliceRandom</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
-        <span class="kw">fn</span> <span class="ident">fill_impl</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">dest</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">error::Unspecified</span><span class="op">&gt;</span> {
+        <span class="kw">fn</span> <span class="ident">fill_impl</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">dest</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">error::Unspecified</span><span class="op">&gt;</span> {
             <span class="ident">dest</span>.<span class="ident">copy_from_slice</span>(<span class="self">self</span>.<span class="ident">bytes</span>);
             <span class="prelude-val">Ok</span>(())
         }
@@ -1160,7 +1161,7 @@
     }
 
     <span class="kw">impl</span> <span class="ident">rand::sealed::SecureRandom</span> <span class="kw">for</span> <span class="ident">FixedSliceSequenceRandom</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
-        <span class="kw">fn</span> <span class="ident">fill_impl</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">dest</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">error::Unspecified</span><span class="op">&gt;</span> {
+        <span class="kw">fn</span> <span class="ident">fill_impl</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">dest</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">error::Unspecified</span><span class="op">&gt;</span> {
             <span class="kw">let</span> <span class="ident">current</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="kw-2">*</span><span class="self">self</span>.<span class="ident">current</span>.<span class="ident">get</span>() };
             <span class="kw">let</span> <span class="ident">bytes</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">bytes</span>[<span class="ident">current</span>];
             <span class="ident">dest</span>.<span class="ident">copy_from_slice</span>(<span class="ident">bytes</span>);
@@ -1172,7 +1173,7 @@
     }
 
     <span class="kw">impl</span> <span class="ident">Drop</span> <span class="kw">for</span> <span class="ident">FixedSliceSequenceRandom</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
-        <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
+        <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
             <span class="comment">// Ensure that `fill()` was called exactly the right number of</span>
             <span class="comment">// times.</span>
             <span class="macro">assert_eq!</span>(<span class="kw">unsafe</span> { <span class="kw-2">*</span><span class="self">self</span>.<span class="ident">current</span>.<span class="ident">get</span>() }, <span class="self">self</span>.<span class="ident">bytes</span>.<span class="ident">len</span>());
@@ -1280,5 +1281,4 @@
 }
 </code></pre></div>
 </section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="ring" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>
-    <script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script>
 </body></html>

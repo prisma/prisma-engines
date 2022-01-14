@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `libs&#x2F;datamodel&#x2F;parser-database&#x2F;src&#x2F;names.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>names.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../parser_database/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `libs&#x2F;datamodel&#x2F;parser-database&#x2F;src&#x2F;names.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>names.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><script defer src="../../main.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script>
+    <noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../parser_database/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -223,7 +224,7 @@
 <span class="doccomment">/// - Datasources</span>
 <span class="doccomment">/// - Model fields for each model</span>
 <span class="doccomment">/// - Enum variants for each enum</span>
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">resolve_names</span>(<span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
+<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">resolve_names</span>(<span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">tmp_names</span>: <span class="ident">HashSet</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">HashSet::new</span>(); <span class="comment">// throwaway container for duplicate checking</span>
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">names</span> <span class="op">=</span> <span class="ident">Names::default</span>();
 
@@ -234,7 +235,7 @@
             (<span class="kw">_</span>, <span class="ident">ast::Top::Enum</span>(<span class="ident">ast_enum</span>)) =&gt; {
                 <span class="ident">tmp_names</span>.<span class="ident">clear</span>();
                 <span class="ident">validate_identifier</span>(<span class="kw-2">&amp;</span><span class="ident">ast_enum</span>.<span class="ident">name</span>, <span class="string">&quot;Enum&quot;</span>, <span class="ident">ctx</span>);
-                <span class="ident">validate_enum_name</span>(<span class="ident">ast_enum</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ctx</span>.<span class="ident">diagnostics</span>);
+                <span class="ident">validate_enum_name</span>(<span class="ident">ast_enum</span>, <span class="kw-2">&amp;mut</span> <span class="ident">ctx</span>.<span class="ident">diagnostics</span>);
                 <span class="ident">validate_attribute_identifiers</span>(<span class="ident">ast_enum</span>, <span class="ident">ctx</span>);
 
                 <span class="kw">for</span> <span class="ident">value</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">ast_enum</span>.<span class="ident">values</span> {
@@ -250,11 +251,11 @@
                     }
                 }
 
-                <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">names</span>.<span class="ident">tops</span>
+                <span class="kw-2">&amp;mut</span> <span class="ident">names</span>.<span class="ident">tops</span>
             }
             (<span class="ident">ast::TopId::Model</span>(<span class="ident">model_id</span>), <span class="ident">ast::Top::Model</span>(<span class="ident">model</span>)) =&gt; {
                 <span class="ident">validate_identifier</span>(<span class="kw-2">&amp;</span><span class="ident">model</span>.<span class="ident">name</span>, <span class="string">&quot;Model&quot;</span>, <span class="ident">ctx</span>);
-                <span class="ident">validate_model_name</span>(<span class="ident">model</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ctx</span>.<span class="ident">diagnostics</span>);
+                <span class="ident">validate_model_name</span>(<span class="ident">model</span>, <span class="kw-2">&amp;mut</span> <span class="ident">ctx</span>.<span class="ident">diagnostics</span>);
                 <span class="ident">validate_attribute_identifiers</span>(<span class="ident">model</span>, <span class="ident">ctx</span>);
 
                 <span class="kw">for</span> (<span class="ident">field_id</span>, <span class="ident">field</span>) <span class="kw">in</span> <span class="ident">model</span>.<span class="ident">iter_fields</span>() {
@@ -274,7 +275,7 @@
                     }
                 }
 
-                <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">names</span>.<span class="ident">tops</span>
+                <span class="kw-2">&amp;mut</span> <span class="ident">names</span>.<span class="ident">tops</span>
             }
             (<span class="ident">ast::TopId::CompositeType</span>(<span class="ident">ctid</span>), <span class="ident">ast::Top::CompositeType</span>(<span class="ident">ct</span>)) =&gt; {
                 <span class="ident">validate_identifier</span>(<span class="kw-2">&amp;</span><span class="ident">ct</span>.<span class="ident">name</span>, <span class="string">&quot;Composite type&quot;</span>, <span class="ident">ctx</span>);
@@ -294,17 +295,17 @@
                     }
                 }
 
-                <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">names</span>.<span class="ident">tops</span>
+                <span class="kw-2">&amp;mut</span> <span class="ident">names</span>.<span class="ident">tops</span>
             }
             (<span class="kw">_</span>, <span class="ident">ast::Top::Source</span>(<span class="ident">datasource</span>)) =&gt; {
-                <span class="ident">check_for_duplicate_properties</span>(<span class="ident">top</span>, <span class="kw-2">&amp;</span><span class="ident">datasource</span>.<span class="ident">properties</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">tmp_names</span>, <span class="ident">ctx</span>);
-                <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">names</span>.<span class="ident">datasources</span>
+                <span class="ident">check_for_duplicate_properties</span>(<span class="ident">top</span>, <span class="kw-2">&amp;</span><span class="ident">datasource</span>.<span class="ident">properties</span>, <span class="kw-2">&amp;mut</span> <span class="ident">tmp_names</span>, <span class="ident">ctx</span>);
+                <span class="kw-2">&amp;mut</span> <span class="ident">names</span>.<span class="ident">datasources</span>
             }
             (<span class="kw">_</span>, <span class="ident">ast::Top::Generator</span>(<span class="ident">generator</span>)) =&gt; {
-                <span class="ident">check_for_duplicate_properties</span>(<span class="ident">top</span>, <span class="kw-2">&amp;</span><span class="ident">generator</span>.<span class="ident">properties</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">tmp_names</span>, <span class="ident">ctx</span>);
-                <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">names</span>.<span class="ident">generators</span>
+                <span class="ident">check_for_duplicate_properties</span>(<span class="ident">top</span>, <span class="kw-2">&amp;</span><span class="ident">generator</span>.<span class="ident">properties</span>, <span class="kw-2">&amp;mut</span> <span class="ident">tmp_names</span>, <span class="ident">ctx</span>);
+                <span class="kw-2">&amp;mut</span> <span class="ident">names</span>.<span class="ident">generators</span>
             }
-            (<span class="kw">_</span>, <span class="ident">ast::Top::Type</span>(<span class="kw">_</span>)) =&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">names</span>.<span class="ident">tops</span>,
+            (<span class="kw">_</span>, <span class="ident">ast::Top::Type</span>(<span class="kw">_</span>)) =&gt; <span class="kw-2">&amp;mut</span> <span class="ident">names</span>.<span class="ident">tops</span>,
             <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(),
         };
 
@@ -317,8 +318,8 @@
 <span class="kw">fn</span> <span class="ident">insert_name</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span>(
     <span class="ident">top_id</span>: <span class="ident">TopId</span>,
     <span class="ident">top</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;ast</span> <span class="ident">ast::Top</span>,
-    <span class="ident">namespace</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">HashMap</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;ast</span> <span class="ident">str</span>, <span class="ident">TopId</span><span class="op">&gt;</span>,
-    <span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
+    <span class="ident">namespace</span>: <span class="kw-2">&amp;mut</span> <span class="ident">HashMap</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;ast</span> <span class="ident">str</span>, <span class="ident">TopId</span><span class="op">&gt;</span>,
+    <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
 ) {
     <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">existing</span>) <span class="op">=</span> <span class="ident">namespace</span>.<span class="ident">insert</span>(<span class="ident">top</span>.<span class="ident">name</span>(), <span class="ident">top_id</span>) {
         <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">duplicate_top_error</span>(<span class="kw-2">&amp;</span><span class="ident">ctx</span>.<span class="ident">db</span>.<span class="ident">ast</span>[<span class="ident">existing</span>], <span class="ident">top</span>));
@@ -334,7 +335,7 @@
     )
 }
 
-<span class="kw">fn</span> <span class="ident">assert_is_not_a_reserved_scalar_type</span>(<span class="ident">ident</span>: <span class="kw-2">&amp;</span><span class="ident">ast::Identifier</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
+<span class="kw">fn</span> <span class="ident">assert_is_not_a_reserved_scalar_type</span>(<span class="ident">ident</span>: <span class="kw-2">&amp;</span><span class="ident">ast::Identifier</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
     <span class="kw">if</span> <span class="ident">ScalarType::try_from_str</span>(<span class="kw-2">&amp;</span><span class="ident">ident</span>.<span class="ident">name</span>).<span class="ident">is_some</span>() {
         <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_reserved_scalar_type_error</span>(<span class="kw-2">&amp;</span><span class="ident">ident</span>.<span class="ident">name</span>, <span class="ident">ident</span>.<span class="ident">span</span>));
     }
@@ -343,8 +344,8 @@
 <span class="kw">fn</span> <span class="ident">check_for_duplicate_properties</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
     <span class="ident">top</span>: <span class="kw-2">&amp;</span><span class="ident">ast::Top</span>,
     <span class="ident">props</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">ConfigBlockProperty</span>],
-    <span class="ident">tmp_names</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">HashSet</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span><span class="op">&gt;</span>,
-    <span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
+    <span class="ident">tmp_names</span>: <span class="kw-2">&amp;mut</span> <span class="ident">HashSet</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span><span class="op">&gt;</span>,
+    <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
 ) {
     <span class="ident">tmp_names</span>.<span class="ident">clear</span>();
     <span class="kw">for</span> <span class="ident">arg</span> <span class="kw">in</span> <span class="ident">props</span> {
@@ -358,13 +359,13 @@
     }
 }
 
-<span class="kw">fn</span> <span class="ident">validate_attribute_identifiers</span>(<span class="ident">with_attrs</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">WithAttributes</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
+<span class="kw">fn</span> <span class="ident">validate_attribute_identifiers</span>(<span class="ident">with_attrs</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">WithAttributes</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
     <span class="kw">for</span> <span class="ident">attribute</span> <span class="kw">in</span> <span class="ident">with_attrs</span>.<span class="ident">attributes</span>() {
         <span class="ident">validate_identifier</span>(<span class="kw-2">&amp;</span><span class="ident">attribute</span>.<span class="ident">name</span>, <span class="string">&quot;Attribute&quot;</span>, <span class="ident">ctx</span>);
     }
 }
 
-<span class="kw">fn</span> <span class="ident">validate_identifier</span>(<span class="ident">ident</span>: <span class="kw-2">&amp;</span><span class="ident">ast::Identifier</span>, <span class="ident">schema_item</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
+<span class="kw">fn</span> <span class="ident">validate_identifier</span>(<span class="ident">ident</span>: <span class="kw-2">&amp;</span><span class="ident">ast::Identifier</span>, <span class="ident">schema_item</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
     <span class="kw">if</span> <span class="ident">ident</span>.<span class="ident">name</span>.<span class="ident">is_empty</span>() {
         <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_validation_error</span>(
             <span class="macro">format!</span>(<span class="string">&quot;The name of a {} must not be empty.&quot;</span>, <span class="ident">schema_item</span>),
@@ -384,5 +385,4 @@
 }
 </code></pre></div>
 </section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="parser_database" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>
-    <script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script>
 </body></html>

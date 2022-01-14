@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;hyper-0.14.16&#x2F;src&#x2F;client&#x2F;client.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>client.rs - source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../hyper/index.html'><div class='logo-container rust-logo'><img src='../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">   1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;hyper-0.14.16&#x2F;src&#x2F;client&#x2F;client.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>client.rs - source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><script defer src="../../../main.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script>
+    <noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../hyper/index.html'><div class='logo-container rust-logo'><img src='../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">   1</span>
 <span id="2">   2</span>
 <span id="3">   3</span>
 <span id="4">   4</span>
@@ -1952,11 +1953,11 @@
     <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::Error</span>;
     <span class="kw">type</span> <span class="ident">Future</span> <span class="op">=</span> <span class="ident">ResponseFuture</span>;
 
-    <span class="kw">fn</span> <span class="ident">poll_ready</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="kw">_</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">task::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">poll_ready</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="kw">_</span>: <span class="kw-2">&amp;mut</span> <span class="ident">task::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="ident">Poll::Ready</span>(<span class="prelude-val">Ok</span>(()))
     }
 
-    <span class="kw">fn</span> <span class="ident">call</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">req</span>: <span class="ident">Request</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>) -&gt; <span class="ident"><span class="self">Self</span>::Future</span> {
+    <span class="kw">fn</span> <span class="ident">call</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">req</span>: <span class="ident">Request</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>) -&gt; <span class="ident"><span class="self">Self</span>::Future</span> {
         <span class="self">self</span>.<span class="ident">request</span>(<span class="ident">req</span>)
     }
 }
@@ -1972,11 +1973,11 @@
     <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::Error</span>;
     <span class="kw">type</span> <span class="ident">Future</span> <span class="op">=</span> <span class="ident">ResponseFuture</span>;
 
-    <span class="kw">fn</span> <span class="ident">poll_ready</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="kw">_</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">task::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">poll_ready</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="kw">_</span>: <span class="kw-2">&amp;mut</span> <span class="ident">task::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="ident">Poll::Ready</span>(<span class="prelude-val">Ok</span>(()))
     }
 
-    <span class="kw">fn</span> <span class="ident">call</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">req</span>: <span class="ident">Request</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>) -&gt; <span class="ident"><span class="self">Self</span>::Future</span> {
+    <span class="kw">fn</span> <span class="ident">call</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">req</span>: <span class="ident">Request</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>) -&gt; <span class="ident"><span class="self">Self</span>::Future</span> {
         <span class="self">self</span>.<span class="ident">request</span>(<span class="ident">req</span>)
     }
 }
@@ -1993,7 +1994,7 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">C</span>, <span class="ident">B</span><span class="op">&gt;</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">Client</span><span class="op">&lt;</span><span class="ident">C</span>, <span class="ident">B</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;Client&quot;</span>).<span class="ident">finish</span>()
     }
 }
@@ -2019,7 +2020,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">ResponseFuture</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="ident">f</span>.<span class="ident">pad</span>(<span class="string">&quot;Future&lt;Response&gt;&quot;</span>)
     }
 }
@@ -2027,7 +2028,7 @@
 <span class="kw">impl</span> <span class="ident">Future</span> <span class="kw">for</span> <span class="ident">ResponseFuture</span> {
     <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">Response</span><span class="op">&lt;</span><span class="ident">Body</span><span class="op">&gt;</span><span class="op">&gt;</span>;
 
-    <span class="kw">fn</span> <span class="ident">poll</span>(<span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">task::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">poll</span>(<span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">task::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">get_mut</span>().<span class="ident">as_mut</span>().<span class="ident">poll</span>(<span class="ident">cx</span>)
     }
 }
@@ -2048,7 +2049,7 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span> <span class="ident">PoolClient</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">poll_ready</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">task::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">poll_ready</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">task::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">tx</span> {
             <span class="ident">PoolTx::Http1</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">tx</span>) =&gt; <span class="ident">tx</span>.<span class="ident">poll_ready</span>(<span class="ident">cx</span>),
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http2&quot;</span>)]</span>
@@ -2087,7 +2088,7 @@
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">B</span>: <span class="ident">HttpBody</span> <span class="op">+</span> <span class="lifetime">&#39;static</span><span class="op">&gt;</span> <span class="ident">PoolClient</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span> {
     <span class="kw">fn</span> <span class="ident">send_request_retryable</span>(
-        <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
+        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
         <span class="ident">req</span>: <span class="ident">Request</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>,
     ) -&gt; <span class="kw">impl</span> <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Response</span><span class="op">&lt;</span><span class="ident">Body</span><span class="op">&gt;</span>, (<span class="ident"><span class="kw">crate</span>::Error</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Request</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span><span class="op">&gt;</span>)<span class="op">&gt;</span><span class="op">&gt;</span>
     <span class="kw">where</span>
@@ -2183,7 +2184,7 @@
     <span class="ident">Http2</span>,
 }
 
-<span class="kw">fn</span> <span class="ident">origin_form</span>(<span class="ident">uri</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Uri</span>) {
+<span class="kw">fn</span> <span class="ident">origin_form</span>(<span class="ident">uri</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Uri</span>) {
     <span class="kw">let</span> <span class="ident">path</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">uri</span>.<span class="ident">path_and_query</span>() {
         <span class="prelude-val">Some</span>(<span class="ident">path</span>) <span class="kw">if</span> <span class="ident">path</span>.<span class="ident">as_str</span>() <span class="op">!</span><span class="op">=</span> <span class="string">&quot;/&quot;</span> =&gt; {
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">parts</span> <span class="op">=</span> <span class="ident">::http::uri::Parts::default</span>();
@@ -2198,7 +2199,7 @@
     <span class="kw-2">*</span><span class="ident">uri</span> <span class="op">=</span> <span class="ident">path</span>
 }
 
-<span class="kw">fn</span> <span class="ident">absolute_form</span>(<span class="ident">uri</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Uri</span>) {
+<span class="kw">fn</span> <span class="ident">absolute_form</span>(<span class="ident">uri</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Uri</span>) {
     <span class="macro">debug_assert!</span>(<span class="ident">uri</span>.<span class="ident">scheme</span>().<span class="ident">is_some</span>(), <span class="string">&quot;absolute_form needs a scheme&quot;</span>);
     <span class="macro">debug_assert!</span>(
         <span class="ident">uri</span>.<span class="ident">authority</span>().<span class="ident">is_some</span>(),
@@ -2212,7 +2213,7 @@
     }
 }
 
-<span class="kw">fn</span> <span class="ident">authority_form</span>(<span class="ident">uri</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Uri</span>) {
+<span class="kw">fn</span> <span class="ident">authority_form</span>(<span class="ident">uri</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Uri</span>) {
     <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">path</span>) <span class="op">=</span> <span class="ident">uri</span>.<span class="ident">path_and_query</span>() {
         <span class="comment">// `https://hyper.rs` would parse with `/` path, don&#39;t</span>
         <span class="comment">// annoy people about that...</span>
@@ -2232,7 +2233,7 @@
     };
 }
 
-<span class="kw">fn</span> <span class="ident">extract_domain</span>(<span class="ident">uri</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Uri</span>, <span class="ident">is_http_connect</span>: <span class="ident">bool</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">PoolKey</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">extract_domain</span>(<span class="ident">uri</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Uri</span>, <span class="ident">is_http_connect</span>: <span class="ident">bool</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">PoolKey</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">uri_clone</span> <span class="op">=</span> <span class="ident">uri</span>.<span class="ident">clone</span>();
     <span class="kw">match</span> (<span class="ident">uri_clone</span>.<span class="ident">scheme</span>(), <span class="ident">uri_clone</span>.<span class="ident">authority</span>()) {
         (<span class="prelude-val">Some</span>(<span class="ident">scheme</span>), <span class="prelude-val">Some</span>(<span class="ident">auth</span>)) =&gt; <span class="prelude-val">Ok</span>((<span class="ident">scheme</span>.<span class="ident">clone</span>(), <span class="ident">auth</span>.<span class="ident">clone</span>())),
@@ -2265,7 +2266,7 @@
         .<span class="ident">expect</span>(<span class="string">&quot;domain is valid Uri&quot;</span>)
 }
 
-<span class="kw">fn</span> <span class="ident">set_scheme</span>(<span class="ident">uri</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Uri</span>, <span class="ident">scheme</span>: <span class="ident">Scheme</span>) {
+<span class="kw">fn</span> <span class="ident">set_scheme</span>(<span class="ident">uri</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Uri</span>, <span class="ident">scheme</span>: <span class="ident">Scheme</span>) {
     <span class="macro">debug_assert!</span>(
         <span class="ident">uri</span>.<span class="ident">scheme</span>().<span class="ident">is_none</span>(),
         <span class="string">&quot;set_scheme expects no existing scheme&quot;</span>
@@ -2340,7 +2341,7 @@
     <span class="attribute">#[<span class="ident">deprecated</span>(
         <span class="ident">note</span> <span class="op">=</span> <span class="string">&quot;name is confusing, to disable the connection pool, call pool_max_idle_per_host(0)&quot;</span>
     )]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">keep_alive</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">val</span>: <span class="ident">bool</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">keep_alive</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">val</span>: <span class="ident">bool</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="kw">if</span> <span class="op">!</span><span class="ident">val</span> {
             <span class="comment">// disable</span>
             <span class="self">self</span>.<span class="ident">pool_max_idle_per_host</span>(<span class="number">0</span>)
@@ -2355,7 +2356,7 @@
 
     <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
     <span class="attribute">#[<span class="ident">deprecated</span>(<span class="ident">note</span> <span class="op">=</span> <span class="string">&quot;renamed to `pool_idle_timeout`&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">keep_alive_timeout</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">val</span>: <span class="ident">D</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">keep_alive_timeout</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">val</span>: <span class="ident">D</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span>
     <span class="kw">where</span>
         <span class="ident">D</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     {
@@ -2367,7 +2368,7 @@
     <span class="doccomment">/// Pass `None` to disable timeout.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Default is 90 seconds.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">pool_idle_timeout</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">val</span>: <span class="ident">D</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">pool_idle_timeout</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">val</span>: <span class="ident">D</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span>
     <span class="kw">where</span>
         <span class="ident">D</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     {
@@ -2377,7 +2378,7 @@
 
     <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
     <span class="attribute">#[<span class="ident">deprecated</span>(<span class="ident">note</span> <span class="op">=</span> <span class="string">&quot;renamed to `pool_max_idle_per_host`&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">max_idle_per_host</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">max_idle</span>: <span class="ident">usize</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">max_idle_per_host</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">max_idle</span>: <span class="ident">usize</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">pool_config</span>.<span class="ident">max_idle_per_host</span> <span class="op">=</span> <span class="ident">max_idle</span>;
         <span class="self">self</span>
     }
@@ -2385,7 +2386,7 @@
     <span class="doccomment">/// Sets the maximum idle connection per host allowed in the pool.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Default is `usize::MAX` (no limit).</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">pool_max_idle_per_host</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">max_idle</span>: <span class="ident">usize</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">pool_max_idle_per_host</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">max_idle</span>: <span class="ident">usize</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">pool_config</span>.<span class="ident">max_idle_per_host</span> <span class="op">=</span> <span class="ident">max_idle</span>;
         <span class="self">self</span>
     }
@@ -2397,7 +2398,7 @@
     <span class="doccomment">/// Note that setting this option unsets the `http1_max_buf_size` option.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Default is an adaptive read buffer.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">http1_read_buf_exact_size</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">sz</span>: <span class="ident">usize</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">http1_read_buf_exact_size</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">sz</span>: <span class="ident">usize</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">conn_builder</span>.<span class="ident">http1_read_buf_exact_size</span>(<span class="prelude-val">Some</span>(<span class="ident">sz</span>));
         <span class="self">self</span>
     }
@@ -2413,7 +2414,7 @@
     <span class="doccomment">/// The minimum value allowed is 8192. This method panics if the passed `max` is less than the minimum.</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http1&quot;</span>)]</span>
     <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http1&quot;</span>)))]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">http1_max_buf_size</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">max</span>: <span class="ident">usize</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">http1_max_buf_size</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">max</span>: <span class="ident">usize</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">conn_builder</span>.<span class="ident">http1_max_buf_size</span>(<span class="ident">max</span>);
         <span class="self">self</span>
     }
@@ -2437,7 +2438,7 @@
     <span class="doccomment">/// Default is false.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [RFC 7230 Section 3.2.4.]: https://tools.ietf.org/html/rfc7230#section-3.2.4</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">http1_allow_spaces_after_header_name_in_responses</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">val</span>: <span class="ident">bool</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">http1_allow_spaces_after_header_name_in_responses</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">val</span>: <span class="ident">bool</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">conn_builder</span>
             .<span class="ident">http1_allow_spaces_after_header_name_in_responses</span>(<span class="ident">val</span>);
         <span class="self">self</span>
@@ -2455,7 +2456,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Default is `auto`. In this mode hyper will try to guess which</span>
     <span class="doccomment">/// mode to use</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">http1_writev</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">enabled</span>: <span class="ident">bool</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Builder</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">http1_writev</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">enabled</span>: <span class="ident">bool</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">Builder</span> {
         <span class="self">self</span>.<span class="ident">conn_builder</span>.<span class="ident">http1_writev</span>(<span class="ident">enabled</span>);
         <span class="self">self</span>
     }
@@ -2466,7 +2467,7 @@
     <span class="doccomment">/// Note that this setting does not affect HTTP/2.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Default is false.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">http1_title_case_headers</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">val</span>: <span class="ident">bool</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">http1_title_case_headers</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">val</span>: <span class="ident">bool</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">conn_builder</span>.<span class="ident">http1_title_case_headers</span>(<span class="ident">val</span>);
         <span class="self">self</span>
     }
@@ -2484,7 +2485,7 @@
     <span class="doccomment">/// Note that this setting does not affect HTTP/2.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Default is false.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">http1_preserve_header_case</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">val</span>: <span class="ident">bool</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">http1_preserve_header_case</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">val</span>: <span class="ident">bool</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">conn_builder</span>.<span class="ident">http1_preserve_header_case</span>(<span class="ident">val</span>);
         <span class="self">self</span>
     }
@@ -2492,7 +2493,7 @@
     <span class="doccomment">/// Set whether HTTP/0.9 responses should be tolerated.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Default is false.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">http09_responses</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">val</span>: <span class="ident">bool</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">http09_responses</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">val</span>: <span class="ident">bool</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">conn_builder</span>.<span class="ident">http09_responses</span>(<span class="ident">val</span>);
         <span class="self">self</span>
     }
@@ -2509,7 +2510,7 @@
     <span class="doccomment">/// Default is false.</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http2&quot;</span>)]</span>
     <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http2&quot;</span>)))]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">http2_only</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">val</span>: <span class="ident">bool</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">http2_only</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">val</span>: <span class="ident">bool</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">client_config</span>.<span class="ident">ver</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">val</span> { <span class="ident">Ver::Http2</span> } <span class="kw">else</span> { <span class="ident">Ver::Auto</span> };
         <span class="self">self</span>
     }
@@ -2524,7 +2525,7 @@
     <span class="doccomment">/// [spec]: https://http2.github.io/http2-spec/#SETTINGS_INITIAL_WINDOW_SIZE</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http2&quot;</span>)]</span>
     <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http2&quot;</span>)))]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">http2_initial_stream_window_size</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">sz</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">http2_initial_stream_window_size</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">sz</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">conn_builder</span>
             .<span class="ident">http2_initial_stream_window_size</span>(<span class="ident">sz</span>.<span class="ident">into</span>());
         <span class="self">self</span>
@@ -2538,9 +2539,9 @@
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http2&quot;</span>)]</span>
     <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http2&quot;</span>)))]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">http2_initial_connection_window_size</span>(
-        <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
+        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
         <span class="ident">sz</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    ) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">conn_builder</span>
             .<span class="ident">http2_initial_connection_window_size</span>(<span class="ident">sz</span>.<span class="ident">into</span>());
         <span class="self">self</span>
@@ -2553,7 +2554,7 @@
     <span class="doccomment">/// `http2_initial_connection_window_size`.</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http2&quot;</span>)]</span>
     <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http2&quot;</span>)))]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">http2_adaptive_window</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">enabled</span>: <span class="ident">bool</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">http2_adaptive_window</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">enabled</span>: <span class="ident">bool</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">conn_builder</span>.<span class="ident">http2_adaptive_window</span>(<span class="ident">enabled</span>);
         <span class="self">self</span>
     }
@@ -2565,7 +2566,7 @@
     <span class="doccomment">/// If not set, hyper will use a default.</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http2&quot;</span>)]</span>
     <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http2&quot;</span>)))]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">http2_max_frame_size</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">sz</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">http2_max_frame_size</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">sz</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">conn_builder</span>.<span class="ident">http2_max_frame_size</span>(<span class="ident">sz</span>);
         <span class="self">self</span>
     }
@@ -2584,9 +2585,9 @@
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http2&quot;</span>)]</span>
     <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http2&quot;</span>)))]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">http2_keep_alive_interval</span>(
-        <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
+        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
         <span class="ident">interval</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    ) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">conn_builder</span>.<span class="ident">http2_keep_alive_interval</span>(<span class="ident">interval</span>);
         <span class="self">self</span>
     }
@@ -2604,7 +2605,7 @@
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;runtime&quot;</span>)]</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http2&quot;</span>)]</span>
     <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http2&quot;</span>)))]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">http2_keep_alive_timeout</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">timeout</span>: <span class="ident">Duration</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">http2_keep_alive_timeout</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">timeout</span>: <span class="ident">Duration</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">conn_builder</span>.<span class="ident">http2_keep_alive_timeout</span>(<span class="ident">timeout</span>);
         <span class="self">self</span>
     }
@@ -2624,7 +2625,7 @@
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;runtime&quot;</span>)]</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http2&quot;</span>)]</span>
     <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http2&quot;</span>)))]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">http2_keep_alive_while_idle</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">enabled</span>: <span class="ident">bool</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">http2_keep_alive_while_idle</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">enabled</span>: <span class="ident">bool</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">conn_builder</span>.<span class="ident">http2_keep_alive_while_idle</span>(<span class="ident">enabled</span>);
         <span class="self">self</span>
     }
@@ -2639,7 +2640,7 @@
     <span class="doccomment">/// [`h2::client::Builder::max_concurrent_reset_streams`]: https://docs.rs/h2/client/struct.Builder.html#method.max_concurrent_reset_streams</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http2&quot;</span>)]</span>
     <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http2&quot;</span>)))]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">http2_max_concurrent_reset_streams</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">max</span>: <span class="ident">usize</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">http2_max_concurrent_reset_streams</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">max</span>: <span class="ident">usize</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">conn_builder</span>.<span class="ident">http2_max_concurrent_reset_streams</span>(<span class="ident">max</span>);
         <span class="self">self</span>
     }
@@ -2653,7 +2654,7 @@
     <span class="doccomment">/// The value must be no larger than `u32::MAX`.</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http2&quot;</span>)]</span>
     <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http2&quot;</span>)))]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">http2_max_send_buf_size</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">max</span>: <span class="ident">usize</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">http2_max_send_buf_size</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">max</span>: <span class="ident">usize</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">conn_builder</span>.<span class="ident">http2_max_send_buf_size</span>(<span class="ident">max</span>);
         <span class="self">self</span>
     }
@@ -2670,7 +2671,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Default is `true`.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">retry_canceled_requests</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">val</span>: <span class="ident">bool</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">retry_canceled_requests</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">val</span>: <span class="ident">bool</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">client_config</span>.<span class="ident">retry_canceled_requests</span> <span class="op">=</span> <span class="ident">val</span>;
         <span class="self">self</span>
     }
@@ -2682,13 +2683,13 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Default is `true`.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_host</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">val</span>: <span class="ident">bool</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_host</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">val</span>: <span class="ident">bool</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">client_config</span>.<span class="ident">set_host</span> <span class="op">=</span> <span class="ident">val</span>;
         <span class="self">self</span>
     }
 
     <span class="doccomment">/// Provide an executor to execute background `Connection` tasks.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">executor</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">exec</span>: <span class="ident">E</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">executor</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">exec</span>: <span class="ident">E</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span>
     <span class="kw">where</span>
         <span class="ident">E</span>: <span class="ident">Executor</span><span class="op">&lt;</span><span class="ident">BoxSendFuture</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
     {
@@ -2727,7 +2728,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">Builder</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;Builder&quot;</span>)
             .<span class="ident">field</span>(<span class="string">&quot;client_config&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">client_config</span>)
             .<span class="ident">field</span>(<span class="string">&quot;conn_builder&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">conn_builder</span>)
@@ -2749,29 +2750,29 @@
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">set_relative_uri_with_implicit_path</span>() {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">uri</span> <span class="op">=</span> <span class="string">&quot;http://hyper.rs&quot;</span>.<span class="ident">parse</span>().<span class="ident">unwrap</span>();
-        <span class="ident">origin_form</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">uri</span>);
+        <span class="ident">origin_form</span>(<span class="kw-2">&amp;mut</span> <span class="ident">uri</span>);
         <span class="macro">assert_eq!</span>(<span class="ident">uri</span>.<span class="ident">to_string</span>(), <span class="string">&quot;/&quot;</span>);
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">test_origin_form</span>() {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">uri</span> <span class="op">=</span> <span class="string">&quot;http://hyper.rs/guides&quot;</span>.<span class="ident">parse</span>().<span class="ident">unwrap</span>();
-        <span class="ident">origin_form</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">uri</span>);
+        <span class="ident">origin_form</span>(<span class="kw-2">&amp;mut</span> <span class="ident">uri</span>);
         <span class="macro">assert_eq!</span>(<span class="ident">uri</span>.<span class="ident">to_string</span>(), <span class="string">&quot;/guides&quot;</span>);
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">uri</span> <span class="op">=</span> <span class="string">&quot;http://hyper.rs/guides?foo=bar&quot;</span>.<span class="ident">parse</span>().<span class="ident">unwrap</span>();
-        <span class="ident">origin_form</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">uri</span>);
+        <span class="ident">origin_form</span>(<span class="kw-2">&amp;mut</span> <span class="ident">uri</span>);
         <span class="macro">assert_eq!</span>(<span class="ident">uri</span>.<span class="ident">to_string</span>(), <span class="string">&quot;/guides?foo=bar&quot;</span>);
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">test_absolute_form</span>() {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">uri</span> <span class="op">=</span> <span class="string">&quot;http://hyper.rs/guides&quot;</span>.<span class="ident">parse</span>().<span class="ident">unwrap</span>();
-        <span class="ident">absolute_form</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">uri</span>);
+        <span class="ident">absolute_form</span>(<span class="kw-2">&amp;mut</span> <span class="ident">uri</span>);
         <span class="macro">assert_eq!</span>(<span class="ident">uri</span>.<span class="ident">to_string</span>(), <span class="string">&quot;http://hyper.rs/guides&quot;</span>);
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">uri</span> <span class="op">=</span> <span class="string">&quot;https://hyper.rs/guides&quot;</span>.<span class="ident">parse</span>().<span class="ident">unwrap</span>();
-        <span class="ident">absolute_form</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">uri</span>);
+        <span class="ident">absolute_form</span>(<span class="kw-2">&amp;mut</span> <span class="ident">uri</span>);
         <span class="macro">assert_eq!</span>(<span class="ident">uri</span>.<span class="ident">to_string</span>(), <span class="string">&quot;/guides&quot;</span>);
     }
 
@@ -2780,18 +2781,18 @@
         <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">pretty_env_logger::try_init</span>();
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">uri</span> <span class="op">=</span> <span class="string">&quot;http://hyper.rs&quot;</span>.<span class="ident">parse</span>().<span class="ident">unwrap</span>();
-        <span class="ident">authority_form</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">uri</span>);
+        <span class="ident">authority_form</span>(<span class="kw-2">&amp;mut</span> <span class="ident">uri</span>);
         <span class="macro">assert_eq!</span>(<span class="ident">uri</span>.<span class="ident">to_string</span>(), <span class="string">&quot;hyper.rs&quot;</span>);
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">uri</span> <span class="op">=</span> <span class="string">&quot;hyper.rs&quot;</span>.<span class="ident">parse</span>().<span class="ident">unwrap</span>();
-        <span class="ident">authority_form</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">uri</span>);
+        <span class="ident">authority_form</span>(<span class="kw-2">&amp;mut</span> <span class="ident">uri</span>);
         <span class="macro">assert_eq!</span>(<span class="ident">uri</span>.<span class="ident">to_string</span>(), <span class="string">&quot;hyper.rs&quot;</span>);
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">test_extract_domain_connect_no_port</span>() {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">uri</span> <span class="op">=</span> <span class="string">&quot;hyper.rs&quot;</span>.<span class="ident">parse</span>().<span class="ident">unwrap</span>();
-        <span class="kw">let</span> (<span class="ident">scheme</span>, <span class="ident">host</span>) <span class="op">=</span> <span class="ident">extract_domain</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">uri</span>, <span class="bool-val">true</span>).<span class="ident">expect</span>(<span class="string">&quot;extract domain&quot;</span>);
+        <span class="kw">let</span> (<span class="ident">scheme</span>, <span class="ident">host</span>) <span class="op">=</span> <span class="ident">extract_domain</span>(<span class="kw-2">&amp;mut</span> <span class="ident">uri</span>, <span class="bool-val">true</span>).<span class="ident">expect</span>(<span class="string">&quot;extract domain&quot;</span>);
         <span class="macro">assert_eq!</span>(<span class="ident">scheme</span>, <span class="kw-2">*</span><span class="string">&quot;http&quot;</span>);
         <span class="macro">assert_eq!</span>(<span class="ident">host</span>, <span class="string">&quot;hyper.rs&quot;</span>);
     }
@@ -2842,5 +2843,4 @@
 }
 </code></pre></div>
 </section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="hyper" data-search-index-js="../../../search-index.js" data-search-js="../../../search.js"></div>
-    <script src="../../../main.js"></script><script src="../../../source-script.js"></script><script src="../../../source-files.js"></script>
 </body></html>

@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;http-types-2.12.0&#x2F;src&#x2F;conditional&#x2F;if_match.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>if_match.rs - source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="shortcut icon" href="https:&#x2F;&#x2F;yoshuawuyts.com&#x2F;assets&#x2F;http-rs&#x2F;favicon.ico"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../http_types/index.html'><div class='logo-container rust-logo'><img src='https:&#x2F;&#x2F;yoshuawuyts.com&#x2F;assets&#x2F;http-rs&#x2F;logo-rounded.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;http-types-2.12.0&#x2F;src&#x2F;conditional&#x2F;if_match.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>if_match.rs - source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><script defer src="../../../main.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script>
+    <noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="shortcut icon" href="https:&#x2F;&#x2F;yoshuawuyts.com&#x2F;assets&#x2F;http-rs&#x2F;favicon.ico"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../http_types/index.html'><div class='logo-container rust-logo'><img src='https:&#x2F;&#x2F;yoshuawuyts.com&#x2F;assets&#x2F;http-rs&#x2F;logo-rounded.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -394,7 +395,7 @@
     }
 
     <span class="doccomment">/// Push a directive into the list of entries.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">push</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">directive</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">ETag</span><span class="op">&gt;</span>) {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">push</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">directive</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">ETag</span><span class="op">&gt;</span>) {
         <span class="self">self</span>.<span class="ident">entries</span>.<span class="ident">push</span>(<span class="ident">directive</span>.<span class="ident">into</span>());
     }
 
@@ -404,7 +405,7 @@
     }
 
     <span class="doccomment">/// Set the wildcard directive.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_wildcard</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">wildcard</span>: <span class="ident">bool</span>) {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_wildcard</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">wildcard</span>: <span class="ident">bool</span>) {
         <span class="self">self</span>.<span class="ident">wildcard</span> <span class="op">=</span> <span class="ident">wildcard</span>
     }
 
@@ -416,7 +417,7 @@
     }
 
     <span class="doccomment">/// An iterator visiting all server entries.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">iter_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident">IterMut</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">iter_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">IterMut</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
         <span class="ident">IterMut</span> {
             <span class="ident">inner</span>: <span class="self">self</span>.<span class="ident">entries</span>.<span class="ident">iter_mut</span>(),
         }
@@ -464,7 +465,7 @@
 <span class="kw">impl</span> <span class="ident">Iterator</span> <span class="kw">for</span> <span class="ident">IntoIter</span> {
     <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident">ETag</span>;
 
-    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">next</span>()
     }
 
@@ -483,7 +484,7 @@
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Iterator</span> <span class="kw">for</span> <span class="ident">Iter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
     <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">ETag</span>;
 
-    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">next</span>()
     }
 
@@ -502,7 +503,7 @@
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Iterator</span> <span class="kw">for</span> <span class="ident">IterMut</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
     <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">ETag</span>;
 
-    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">next</span>()
     }
 
@@ -521,7 +522,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Debug</span> <span class="kw">for</span> <span class="ident">IfMatch</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">list</span> <span class="op">=</span> <span class="ident">f</span>.<span class="ident">debug_list</span>();
         <span class="kw">for</span> <span class="ident">directive</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">entries</span> {
             <span class="ident">list</span>.<span class="ident">entry</span>(<span class="ident">directive</span>);
@@ -542,7 +543,7 @@
         <span class="ident">entries</span>.<span class="ident">push</span>(<span class="ident">ETag::new</span>(<span class="string">&quot;0xbeefcafe&quot;</span>.<span class="ident">to_string</span>()));
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">Response::new</span>(<span class="number">200</span>);
-        <span class="ident">entries</span>.<span class="ident">apply</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">res</span>);
+        <span class="ident">entries</span>.<span class="ident">apply</span>(<span class="kw-2">&amp;mut</span> <span class="ident">res</span>);
 
         <span class="kw">let</span> <span class="ident">entries</span> <span class="op">=</span> <span class="ident">IfMatch::from_headers</span>(<span class="ident">res</span>)<span class="question-mark">?</span>.<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">entries</span> <span class="op">=</span> <span class="ident">entries</span>.<span class="ident">iter</span>();
@@ -564,7 +565,7 @@
         <span class="ident">entries</span>.<span class="ident">set_wildcard</span>(<span class="bool-val">true</span>);
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">Response::new</span>(<span class="number">200</span>);
-        <span class="ident">entries</span>.<span class="ident">apply</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">res</span>);
+        <span class="ident">entries</span>.<span class="ident">apply</span>(<span class="kw-2">&amp;mut</span> <span class="ident">res</span>);
 
         <span class="kw">let</span> <span class="ident">entries</span> <span class="op">=</span> <span class="ident">IfMatch::from_headers</span>(<span class="ident">res</span>)<span class="question-mark">?</span>.<span class="ident">unwrap</span>();
         <span class="macro">assert!</span>(<span class="ident">entries</span>.<span class="ident">wildcard</span>());
@@ -578,5 +579,4 @@
 }
 </code></pre></div>
 </section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="http_types" data-search-index-js="../../../search-index.js" data-search-js="../../../search.js"></div>
-    <script src="../../../main.js"></script><script src="../../../source-script.js"></script><script src="../../../source-files.js"></script>
 </body></html>

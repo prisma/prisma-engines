@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;rusqlite-0.25.3&#x2F;src&#x2F;statement.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>statement.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../rusqlite/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">   1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;rusqlite-0.25.3&#x2F;src&#x2F;statement.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>statement.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><script defer src="../../main.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script>
+    <noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../rusqlite/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">   1</span>
 <span id="2">   2</span>
 <span id="3">   3</span>
 <span id="4">   4</span>
@@ -1510,7 +1511,7 @@
     <span class="doccomment">/// returns rows (in which case `query` should be used instead), or the</span>
     <span class="doccomment">/// underlying SQLite call fails.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">execute</span><span class="op">&lt;</span><span class="ident">P</span>: <span class="ident">Params</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">params</span>: <span class="ident">P</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">execute</span><span class="op">&lt;</span><span class="ident">P</span>: <span class="ident">Params</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">params</span>: <span class="ident">P</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
         <span class="ident">params</span>.<span class="ident">__bind_in</span>(<span class="self">self</span>)<span class="question-mark">?</span>;
         <span class="self">self</span>.<span class="ident">execute_with_bound_parameters</span>()
     }
@@ -1535,7 +1536,7 @@
     <span class="doccomment">/// underlying SQLite call fails.</span>
     <span class="attribute">#[<span class="ident">deprecated</span> <span class="op">=</span> <span class="string">&quot;You can use `execute` with named params now.&quot;</span>]</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">execute_named</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">params</span>: <span class="kw-2">&amp;</span>[(<span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">ToSql</span>)]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">execute_named</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">params</span>: <span class="kw-2">&amp;</span>[(<span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">ToSql</span>)]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">execute</span>(<span class="ident">params</span>)
     }
 
@@ -1553,7 +1554,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Will return `Err` if no row is inserted or many rows are inserted.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">insert</span><span class="op">&lt;</span><span class="ident">P</span>: <span class="ident">Params</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">params</span>: <span class="ident">P</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">i64</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">insert</span><span class="op">&lt;</span><span class="ident">P</span>: <span class="ident">Params</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">params</span>: <span class="ident">P</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">i64</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">changes</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">execute</span>(<span class="ident">params</span>)<span class="question-mark">?</span>;
         <span class="kw">match</span> <span class="ident">changes</span> {
             <span class="number">1</span> =&gt; <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">last_insert_rowid</span>()),
@@ -1649,7 +1650,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Will return `Err` if binding parameters fails.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">query</span><span class="op">&lt;</span><span class="ident">P</span>: <span class="ident">Params</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">params</span>: <span class="ident">P</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Rows</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">query</span><span class="op">&lt;</span><span class="ident">P</span>: <span class="ident">Params</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">params</span>: <span class="ident">P</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Rows</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="ident">params</span>.<span class="ident">__bind_in</span>(<span class="self">self</span>)<span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>(<span class="ident">Rows::new</span>(<span class="self">self</span>))
     }
@@ -1669,7 +1670,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Will return `Err` if binding parameters fails.</span>
     <span class="attribute">#[<span class="ident">deprecated</span> <span class="op">=</span> <span class="string">&quot;You can use `query` with named params now.&quot;</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">query_named</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">params</span>: <span class="kw-2">&amp;</span>[(<span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">ToSql</span>)]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Rows</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">query_named</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">params</span>: <span class="kw-2">&amp;</span>[(<span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">ToSql</span>)]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Rows</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">query</span>(<span class="ident">params</span>)
     }
 
@@ -1719,7 +1720,7 @@
     <span class="doccomment">/// ## Failure</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Will return `Err` if binding parameters fails.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">query_map</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">P</span>, <span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">params</span>: <span class="ident">P</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">MappedRows</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">F</span><span class="op">&gt;</span><span class="op">&gt;</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">query_map</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">P</span>, <span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">params</span>: <span class="ident">P</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">MappedRows</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">F</span><span class="op">&gt;</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">P</span>: <span class="ident">Params</span>,
         <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="kw-2">&amp;</span><span class="ident">Row</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
@@ -1747,7 +1748,7 @@
     <span class="doccomment">/// Will return `Err` if binding parameters fails.</span>
     <span class="attribute">#[<span class="ident">deprecated</span> <span class="op">=</span> <span class="string">&quot;You can use `query_map` with named params now.&quot;</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">query_map_named</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">F</span><span class="op">&gt;</span>(
-        <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
+        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
         <span class="ident">params</span>: <span class="kw-2">&amp;</span>[(<span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">ToSql</span>)],
         <span class="ident">f</span>: <span class="ident">F</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">MappedRows</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">F</span><span class="op">&gt;</span><span class="op">&gt;</span>
@@ -1813,7 +1814,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Will return `Err` if binding parameters fails.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">query_and_then</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">E</span>, <span class="ident">P</span>, <span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">params</span>: <span class="ident">P</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">AndThenRows</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">F</span><span class="op">&gt;</span><span class="op">&gt;</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">query_and_then</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">E</span>, <span class="ident">P</span>, <span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">params</span>: <span class="ident">P</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">AndThenRows</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">F</span><span class="op">&gt;</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">P</span>: <span class="ident">Params</span>,
         <span class="ident">E</span>: <span class="ident">convert::From</span><span class="op">&lt;</span><span class="ident">Error</span><span class="op">&gt;</span>,
@@ -1840,7 +1841,7 @@
     <span class="doccomment">/// Will return `Err` if binding parameters fails.</span>
     <span class="attribute">#[<span class="ident">deprecated</span> <span class="op">=</span> <span class="string">&quot;You can use `query_and_then` with named params now.&quot;</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">query_and_then_named</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">E</span>, <span class="ident">F</span><span class="op">&gt;</span>(
-        <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
+        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
         <span class="ident">params</span>: <span class="kw-2">&amp;</span>[(<span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">ToSql</span>)],
         <span class="ident">f</span>: <span class="ident">F</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">AndThenRows</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">F</span><span class="op">&gt;</span><span class="op">&gt;</span>
@@ -1854,7 +1855,7 @@
     <span class="doccomment">/// Return `true` if a query in the SQL statement it executes returns one</span>
     <span class="doccomment">/// or more rows and `false` if the SQL returns an empty set.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">exists</span><span class="op">&lt;</span><span class="ident">P</span>: <span class="ident">Params</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">params</span>: <span class="ident">P</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">exists</span><span class="op">&lt;</span><span class="ident">P</span>: <span class="ident">Params</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">params</span>: <span class="ident">P</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">rows</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">query</span>(<span class="ident">params</span>)<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">exists</span> <span class="op">=</span> <span class="ident">rows</span>.<span class="ident">next</span>()<span class="question-mark">?</span>.<span class="ident">is_some</span>();
         <span class="prelude-val">Ok</span>(<span class="ident">exists</span>)
@@ -1875,7 +1876,7 @@
     <span class="doccomment">/// # Failure</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Will return `Err` if the underlying SQLite call fails.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">query_row</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">P</span>, <span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">params</span>: <span class="ident">P</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">query_row</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">P</span>, <span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">params</span>: <span class="ident">P</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">P</span>: <span class="ident">Params</span>,
         <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="ident">Row</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
@@ -1906,7 +1907,7 @@
     <span class="doccomment">/// Will return `Err` if `sql` cannot be converted to a C-compatible string</span>
     <span class="doccomment">/// or if the underlying SQLite call fails.</span>
     <span class="attribute">#[<span class="ident">deprecated</span> <span class="op">=</span> <span class="string">&quot;You can use `query_row` with named params now.&quot;</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">query_row_named</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">params</span>: <span class="kw-2">&amp;</span>[(<span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">ToSql</span>)], <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">query_row_named</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">params</span>: <span class="kw-2">&amp;</span>[(<span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">ToSql</span>)], <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="ident">Row</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
     {
@@ -1975,7 +1976,7 @@
     }
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">bind_parameters</span><span class="op">&lt;</span><span class="ident">P</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">params</span>: <span class="ident">P</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span>
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">bind_parameters</span><span class="op">&lt;</span><span class="ident">P</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">params</span>: <span class="ident">P</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">P</span>: <span class="ident">IntoIterator</span>,
         <span class="ident">P::Item</span>: <span class="ident">ToSql</span>,
@@ -1998,7 +1999,7 @@
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">bind_parameters_named</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span> <span class="op">+</span> <span class="ident">ToSql</span><span class="op">&gt;</span>(
-        <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
+        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
         <span class="ident">params</span>: <span class="kw-2">&amp;</span>[(<span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="kw-2">&amp;</span><span class="ident">T</span>)],
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">for</span> <span class="kw-2">&amp;</span>(<span class="ident">name</span>, <span class="ident">value</span>) <span class="kw">in</span> <span class="ident">params</span> {
@@ -2058,7 +2059,7 @@
     <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">raw_bind_parameter</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">ToSql</span><span class="op">&gt;</span>(
-        <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
+        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
         <span class="ident">one_based_col_index</span>: <span class="ident">usize</span>,
         <span class="ident">param</span>: <span class="ident">T</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
@@ -2082,7 +2083,7 @@
     <span class="doccomment">/// Will return `Err` if the executed statement returns rows (in which case</span>
     <span class="doccomment">/// `query` should be used instead), or the underlying SQLite call fails.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">raw_execute</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">raw_execute</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">execute_with_bound_parameters</span>()
     }
 
@@ -2099,7 +2100,7 @@
     <span class="doccomment">/// Note that if the SQL does not return results, [`Statement::raw_execute`]</span>
     <span class="doccomment">/// should be used instead.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">raw_query</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident">Rows</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">raw_query</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">Rows</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
         <span class="ident">Rows::new</span>(<span class="self">self</span>)
     }
 
@@ -2124,7 +2125,7 @@
                     <span class="ident">ffi::sqlite3_bind_pointer</span>(
                         <span class="ident">ptr</span>,
                         <span class="ident">col</span> <span class="kw">as</span> <span class="ident">c_int</span>,
-                        <span class="ident">Rc::into_raw</span>(<span class="ident">a</span>) <span class="kw">as</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">c_void</span>,
+                        <span class="ident">Rc::into_raw</span>(<span class="ident">a</span>) <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="ident">c_void</span>,
                         <span class="ident">ARRAY_TYPE</span>,
                         <span class="prelude-val">Some</span>(<span class="ident">free_array</span>),
                     )
@@ -2147,7 +2148,7 @@
                     <span class="ident">ffi::sqlite3_bind_blob</span>(
                         <span class="ident">ptr</span>,
                         <span class="ident">col</span> <span class="kw">as</span> <span class="ident">c_int</span>,
-                        <span class="ident">b</span>.<span class="ident">as_ptr</span>() <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">c_void</span>,
+                        <span class="ident">b</span>.<span class="ident">as_ptr</span>() <span class="kw">as</span> <span class="kw-2">*const</span> <span class="ident">c_void</span>,
                         <span class="ident">length</span>,
                         <span class="ident">ffi::SQLITE_TRANSIENT</span>(),
                     )
@@ -2157,7 +2158,7 @@
     }
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">execute_with_bound_parameters</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">execute_with_bound_parameters</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">check_update</span>()<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">r</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">stmt</span>.<span class="ident">step</span>();
         <span class="self">self</span>.<span class="ident">stmt</span>.<span class="ident">reset</span>();
@@ -2169,9 +2170,9 @@
     }
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">finalize_</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">finalize_</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">stmt</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">RawStatement::new</span>(<span class="ident">ptr::null_mut</span>(), <span class="number">0</span>) };
-        <span class="ident">mem::swap</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">stmt</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">stmt</span>);
+        <span class="ident">mem::swap</span>(<span class="kw-2">&amp;mut</span> <span class="ident">stmt</span>, <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">stmt</span>);
         <span class="self">self</span>.<span class="ident">conn</span>.<span class="ident">decode_result</span>(<span class="ident">stmt</span>.<span class="ident">finalize</span>())
     }
 
@@ -2247,13 +2248,13 @@
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">into_raw</span>(<span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident">RawStatement</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">stmt</span> <span class="op">=</span> <span class="ident">RawStatement::new</span>(<span class="ident">ptr::null_mut</span>(), <span class="number">0</span>);
-        <span class="ident">mem::swap</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">stmt</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">stmt</span>);
+        <span class="ident">mem::swap</span>(<span class="kw-2">&amp;mut</span> <span class="ident">stmt</span>, <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">stmt</span>);
         <span class="ident">stmt</span>
     }
 }
 
 <span class="kw">impl</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">Statement</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="kw">let</span> <span class="ident">sql</span> <span class="op">=</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">stmt</span>.<span class="ident">is_null</span>() {
             <span class="prelude-val">Ok</span>(<span class="string">&quot;&quot;</span>)
         } <span class="kw">else</span> {
@@ -2270,7 +2271,7 @@
 <span class="kw">impl</span> <span class="ident">Drop</span> <span class="kw">for</span> <span class="ident">Statement</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
     <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unused_must_use</span>)]</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
+    <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
         <span class="self">self</span>.<span class="ident">finalize_</span>();
     }
 }
@@ -2304,7 +2305,7 @@
                         <span class="op">!</span><span class="ident">text</span>.<span class="ident">is_null</span>(),
                         <span class="string">&quot;unexpected SQLITE_TEXT column type with NULL data&quot;</span>
                     );
-                    <span class="ident">from_raw_parts</span>(<span class="ident">text</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">u8</span>, <span class="ident">len</span> <span class="kw">as</span> <span class="ident">usize</span>)
+                    <span class="ident">from_raw_parts</span>(<span class="ident">text</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="ident">u8</span>, <span class="ident">len</span> <span class="kw">as</span> <span class="ident">usize</span>)
                 };
 
                 <span class="ident">ValueRef::Text</span>(<span class="ident">s</span>)
@@ -2326,7 +2327,7 @@
                         <span class="op">!</span><span class="ident">blob</span>.<span class="ident">is_null</span>(),
                         <span class="string">&quot;unexpected SQLITE_BLOB column type with NULL data&quot;</span>
                     );
-                    <span class="ident">ValueRef::Blob</span>(<span class="kw">unsafe</span> { <span class="ident">from_raw_parts</span>(<span class="ident">blob</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">u8</span>, <span class="ident">len</span> <span class="kw">as</span> <span class="ident">usize</span>) })
+                    <span class="ident">ValueRef::Blob</span>(<span class="kw">unsafe</span> { <span class="ident">from_raw_parts</span>(<span class="ident">blob</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="ident">u8</span>, <span class="ident">len</span> <span class="kw">as</span> <span class="ident">usize</span>) })
                 } <span class="kw">else</span> {
                     <span class="comment">// The return value from sqlite3_column_blob() for a zero-length BLOB</span>
                     <span class="comment">// is a NULL pointer.</span>
@@ -2858,5 +2859,4 @@
 }
 </code></pre></div>
 </section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="rusqlite" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>
-    <script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script>
 </body></html>

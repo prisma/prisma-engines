@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;bit-vec-0.6.3&#x2F;src&#x2F;lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../bit_vec/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">   1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;bit-vec-0.6.3&#x2F;src&#x2F;lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><script defer src="../../main.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script>
+    <noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../bit_vec/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">   1</span>
 <span id="2">   2</span>
 <span id="3">   3</span>
 <span id="4">   4</span>
@@ -2917,7 +2918,7 @@
     <span class="doccomment">/// self to be the result. This relies on the caller not to corrupt the</span>
     <span class="doccomment">/// last word.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">process</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">BitVec</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>, <span class="kw-2">mut</span> <span class="ident">op</span>: <span class="ident">F</span>) -&gt; <span class="ident">bool</span>
+    <span class="kw">fn</span> <span class="ident">process</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">BitVec</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>, <span class="kw-2">mut</span> <span class="ident">op</span>: <span class="ident">F</span>) -&gt; <span class="ident">bool</span>
     		<span class="kw">where</span> <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="ident">B</span>, <span class="ident">B</span>) -&gt; <span class="ident">B</span> {
         <span class="macro">assert_eq!</span>(<span class="self">self</span>.<span class="ident">len</span>(), <span class="ident">other</span>.<span class="ident">len</span>());
         <span class="macro">debug_assert_eq!</span>(<span class="self">self</span>.<span class="ident">storage</span>.<span class="ident">len</span>(), <span class="ident">other</span>.<span class="ident">storage</span>.<span class="ident">len</span>());
@@ -2932,7 +2933,7 @@
 
     <span class="doccomment">/// Iterator over mutable refs to  the underlying blocks of data.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">blocks_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident">MutBlocks</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">blocks_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">MutBlocks</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span> {
         <span class="comment">// (2)</span>
         <span class="self">self</span>.<span class="ident">storage</span>.<span class="ident">iter_mut</span>()
     }
@@ -2956,8 +2957,8 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Can probably cause unsafety. Only really intended for BitSet.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">storage_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span> {
-    	<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">storage</span>
+    <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">storage_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span> {
+    	<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">storage</span>
     }
 
     <span class="doccomment">/// Helper for procedures involving spare space in the last block.</span>
@@ -2975,12 +2976,12 @@
 
     <span class="doccomment">/// Helper for procedures involving spare space in the last block.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">last_block_mut_with_mask</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">B</span>, <span class="ident">B</span>)<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">last_block_mut_with_mask</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="kw-2">&amp;mut</span> <span class="ident">B</span>, <span class="ident">B</span>)<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">extra_bits</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">len</span>() <span class="op">%</span> <span class="ident">B::bits</span>();
         <span class="kw">if</span> <span class="ident">extra_bits</span> <span class="op">&gt;</span> <span class="number">0</span> {
             <span class="kw">let</span> <span class="ident">mask</span> <span class="op">=</span> (<span class="ident">B::one</span>() <span class="op">&lt;</span><span class="op">&lt;</span> <span class="ident">extra_bits</span>) <span class="op">-</span> <span class="ident">B::one</span>();
             <span class="kw">let</span> <span class="ident">storage_len</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">storage</span>.<span class="ident">len</span>();
-            <span class="prelude-val">Some</span>((<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">storage</span>[<span class="ident">storage_len</span> <span class="op">-</span> <span class="number">1</span>], <span class="ident">mask</span>))
+            <span class="prelude-val">Some</span>((<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">storage</span>[<span class="ident">storage_len</span> <span class="op">-</span> <span class="number">1</span>], <span class="ident">mask</span>))
         } <span class="kw">else</span> {
             <span class="prelude-val">None</span>
         }
@@ -2988,7 +2989,7 @@
 
     <span class="doccomment">/// An operation might screw up the unused bits in the last block of the</span>
     <span class="doccomment">/// `BitVec`. As per (3), it&#39;s assumed to be all 0s. This method fixes it up.</span>
-    <span class="kw">fn</span> <span class="ident">fix_last_block</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
+    <span class="kw">fn</span> <span class="ident">fix_last_block</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>((<span class="ident">last_block</span>, <span class="ident">used_bits</span>)) <span class="op">=</span> <span class="self">self</span>.<span class="ident">last_block_mut_with_mask</span>() {
             <span class="kw-2">*</span><span class="ident">last_block</span> <span class="op">=</span> <span class="kw-2">*</span><span class="ident">last_block</span> <span class="op">&amp;</span> <span class="ident">used_bits</span>;
         }
@@ -2996,7 +2997,7 @@
 
     <span class="doccomment">/// Operations such as change detection for xnor, nor and nand are easiest</span>
     <span class="doccomment">/// to implement when unused bits are all set to 1s.</span>
-    <span class="kw">fn</span> <span class="ident">fix_last_block_with_ones</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
+    <span class="kw">fn</span> <span class="ident">fix_last_block_with_ones</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>((<span class="ident">last_block</span>, <span class="ident">used_bits</span>)) <span class="op">=</span> <span class="self">self</span>.<span class="ident">last_block_mut_with_mask</span>() {
             <span class="kw-2">*</span><span class="ident">last_block</span> <span class="op">=</span> <span class="kw-2">*</span><span class="ident">last_block</span> <span class="op">|</span> <span class="op">!</span><span class="ident">used_bits</span>;
         }
@@ -3069,7 +3070,7 @@
     <span class="doccomment">/// assert_eq!(bv[3], true);</span>
     <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">i</span>: <span class="ident">usize</span>, <span class="ident">x</span>: <span class="ident">bool</span>) {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">i</span>: <span class="ident">usize</span>, <span class="ident">x</span>: <span class="ident">bool</span>) {
         <span class="self">self</span>.<span class="ident">ensure_invariant</span>();
         <span class="macro">assert!</span>(<span class="ident">i</span> <span class="op">&lt;</span> <span class="self">self</span>.<span class="ident">nbits</span>, <span class="string">&quot;index out of bounds: {:?} &gt;= {:?}&quot;</span>, <span class="ident">i</span>, <span class="self">self</span>.<span class="ident">nbits</span>);
         <span class="kw">let</span> <span class="ident">w</span> <span class="op">=</span> <span class="ident">i</span> <span class="op">/</span> <span class="ident">B::bits</span>();
@@ -3095,9 +3096,9 @@
     <span class="doccomment">/// assert_eq!(bv, BitVec::from_bytes(&amp;[after]));</span>
     <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_all</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_all</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
         <span class="self">self</span>.<span class="ident">ensure_invariant</span>();
-        <span class="kw">for</span> <span class="ident">w</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">storage</span> { <span class="kw-2">*</span><span class="ident">w</span> <span class="op">=</span> <span class="op">!</span><span class="ident">B::zero</span>(); }
+        <span class="kw">for</span> <span class="ident">w</span> <span class="kw">in</span> <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">storage</span> { <span class="kw-2">*</span><span class="ident">w</span> <span class="op">=</span> <span class="op">!</span><span class="ident">B::zero</span>(); }
         <span class="self">self</span>.<span class="ident">fix_last_block</span>();
     }
 
@@ -3116,9 +3117,9 @@
     <span class="doccomment">/// assert_eq!(bv, BitVec::from_bytes(&amp;[after]));</span>
     <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">negate</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">negate</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
         <span class="self">self</span>.<span class="ident">ensure_invariant</span>();
-        <span class="kw">for</span> <span class="ident">w</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">storage</span> { <span class="kw-2">*</span><span class="ident">w</span> <span class="op">=</span> <span class="op">!</span><span class="kw-2">*</span><span class="ident">w</span>; }
+        <span class="kw">for</span> <span class="ident">w</span> <span class="kw">in</span> <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">storage</span> { <span class="kw-2">*</span><span class="ident">w</span> <span class="op">=</span> <span class="op">!</span><span class="kw-2">*</span><span class="ident">w</span>; }
         <span class="self">self</span>.<span class="ident">fix_last_block</span>();
     }
 
@@ -3152,7 +3153,7 @@
         <span class="ident">note</span> <span class="op">=</span> <span class="string">&quot;Please use the &#39;or&#39; function instead&quot;</span>
     )]</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">union</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">union</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">or</span>(<span class="ident">other</span>)
     }
 
@@ -3186,7 +3187,7 @@
         <span class="ident">note</span> <span class="op">=</span> <span class="string">&quot;Please use the &#39;and&#39; function instead&quot;</span>
     )]</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">intersect</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">intersect</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">and</span>(<span class="ident">other</span>)
     }
 
@@ -3215,7 +3216,7 @@
     <span class="doccomment">/// assert_eq!(a, BitVec::from_bytes(&amp;[res]));</span>
     <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">or</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">or</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">ensure_invariant</span>();
         <span class="macro">debug_assert!</span>(<span class="ident">other</span>.<span class="ident">is_last_block_fixed</span>());
         <span class="self">self</span>.<span class="ident">process</span>(<span class="ident">other</span>, <span class="op">|</span><span class="ident">w1</span>, <span class="ident">w2</span><span class="op">|</span> (<span class="ident">w1</span> <span class="op">|</span> <span class="ident">w2</span>))
@@ -3246,7 +3247,7 @@
     <span class="doccomment">/// assert_eq!(a, BitVec::from_bytes(&amp;[res]));</span>
     <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">and</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">and</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">ensure_invariant</span>();
         <span class="macro">debug_assert!</span>(<span class="ident">other</span>.<span class="ident">is_last_block_fixed</span>());
         <span class="self">self</span>.<span class="ident">process</span>(<span class="ident">other</span>, <span class="op">|</span><span class="ident">w1</span>, <span class="ident">w2</span><span class="op">|</span> (<span class="ident">w1</span> <span class="op">&amp;</span> <span class="ident">w2</span>))
@@ -3285,7 +3286,7 @@
     <span class="doccomment">/// assert_eq!(bvb, BitVec::from_bytes(&amp;[b_a]));</span>
     <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">difference</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">difference</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">ensure_invariant</span>();
         <span class="macro">debug_assert!</span>(<span class="ident">other</span>.<span class="ident">is_last_block_fixed</span>());
         <span class="self">self</span>.<span class="ident">process</span>(<span class="ident">other</span>, <span class="op">|</span><span class="ident">w1</span>, <span class="ident">w2</span><span class="op">|</span> (<span class="ident">w1</span> <span class="op">&amp;</span> <span class="op">!</span><span class="ident">w2</span>))
@@ -3316,7 +3317,7 @@
     <span class="doccomment">/// assert_eq!(a, BitVec::from_bytes(&amp;[res]));</span>
     <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">xor</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">xor</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">ensure_invariant</span>();
         <span class="macro">debug_assert!</span>(<span class="ident">other</span>.<span class="ident">is_last_block_fixed</span>());
         <span class="self">self</span>.<span class="ident">process</span>(<span class="ident">other</span>, <span class="op">|</span><span class="ident">w1</span>, <span class="ident">w2</span><span class="op">|</span> (<span class="ident">w1</span> <span class="op">^</span> <span class="ident">w2</span>))
@@ -3347,7 +3348,7 @@
     <span class="doccomment">/// assert_eq!(a, BitVec::from_bytes(&amp;[res]));</span>
     <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">nand</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">nand</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">ensure_invariant</span>();
         <span class="macro">debug_assert!</span>(<span class="ident">other</span>.<span class="ident">is_last_block_fixed</span>());
         <span class="self">self</span>.<span class="ident">fix_last_block_with_ones</span>();
@@ -3381,7 +3382,7 @@
     <span class="doccomment">/// assert_eq!(a, BitVec::from_bytes(&amp;[res]));</span>
     <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">nor</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">nor</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">ensure_invariant</span>();
         <span class="macro">debug_assert!</span>(<span class="ident">other</span>.<span class="ident">is_last_block_fixed</span>());
         <span class="self">self</span>.<span class="ident">fix_last_block_with_ones</span>();
@@ -3415,7 +3416,7 @@
     <span class="doccomment">/// assert_eq!(a, BitVec::from_bytes(&amp;[res]));</span>
     <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">xnor</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">xnor</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">ensure_invariant</span>();
         <span class="macro">debug_assert!</span>(<span class="ident">other</span>.<span class="ident">is_last_block_fixed</span>());
         <span class="self">self</span>.<span class="ident">fix_last_block_with_ones</span>();
@@ -3483,7 +3484,7 @@
     <span class="doccomment">/// assert!(a.eq_vec(&amp;[true, false, false, false, false, false, false, false,</span>
     <span class="doccomment">///                    false, true, true, false, false, false, false, true]));</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">append</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span>) {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">append</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;mut</span> <span class="self">Self</span>) {
         <span class="self">self</span>.<span class="ident">ensure_invariant</span>();
         <span class="macro">debug_assert!</span>(<span class="ident">other</span>.<span class="ident">is_last_block_fixed</span>());
 
@@ -3495,7 +3496,7 @@
         <span class="ident">other</span>.<span class="ident">nbits</span> <span class="op">=</span> <span class="number">0</span>;
 
         <span class="kw">if</span> <span class="ident">b</span> <span class="op">==</span> <span class="number">0</span> {
-            <span class="self">self</span>.<span class="ident">storage</span>.<span class="ident">append</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">other</span>.<span class="ident">storage</span>);
+            <span class="self">self</span>.<span class="ident">storage</span>.<span class="ident">append</span>(<span class="kw-2">&amp;mut</span> <span class="ident">other</span>.<span class="ident">storage</span>);
         } <span class="kw">else</span> {
             <span class="self">self</span>.<span class="ident">storage</span>.<span class="ident">reserve</span>(<span class="ident">other</span>.<span class="ident">storage</span>.<span class="ident">len</span>());
 
@@ -3538,14 +3539,14 @@
     <span class="doccomment">/// assert!(a.eq_vec(&amp;[true, false]));</span>
     <span class="doccomment">/// assert!(b.eq_vec(&amp;[false, true]));</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">split_off</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">at</span>: <span class="ident">usize</span>) -&gt; <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">split_off</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">at</span>: <span class="ident">usize</span>) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">ensure_invariant</span>();
         <span class="macro">assert!</span>(<span class="ident">at</span> <span class="op">&lt;</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">len</span>(), <span class="string">&quot;`at` out of bounds&quot;</span>);
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">other</span> <span class="op">=</span> <span class="ident">BitVec</span>::<span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span><span class="ident">::default</span>();
 
         <span class="kw">if</span> <span class="ident">at</span> <span class="op">==</span> <span class="number">0</span> {
-            <span class="ident">mem::swap</span>(<span class="self">self</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">other</span>);
+            <span class="ident">mem::swap</span>(<span class="self">self</span>, <span class="kw-2">&amp;mut</span> <span class="ident">other</span>);
             <span class="kw">return</span> <span class="ident">other</span>;
         } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">at</span> <span class="op">==</span> <span class="self">self</span>.<span class="ident">len</span>() {
             <span class="kw">return</span> <span class="ident">other</span>;
@@ -3699,7 +3700,7 @@
     <span class="doccomment">/// assert!(bv.eq_vec(&amp;[false, true]));</span>
     <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">truncate</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">len</span>: <span class="ident">usize</span>) {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">truncate</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">len</span>: <span class="ident">usize</span>) {
         <span class="self">self</span>.<span class="ident">ensure_invariant</span>();
         <span class="kw">if</span> <span class="ident">len</span> <span class="op">&lt;</span> <span class="self">self</span>.<span class="ident">len</span>() {
             <span class="self">self</span>.<span class="ident">nbits</span> <span class="op">=</span> <span class="ident">len</span>;
@@ -3727,7 +3728,7 @@
     <span class="doccomment">/// assert!(bv.capacity() &gt;= 13);</span>
     <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">reserve</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">additional</span>: <span class="ident">usize</span>) {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">reserve</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">additional</span>: <span class="ident">usize</span>) {
         <span class="kw">let</span> <span class="ident">desired_cap</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">len</span>().<span class="ident">checked_add</span>(<span class="ident">additional</span>).<span class="ident">expect</span>(<span class="string">&quot;capacity overflow&quot;</span>);
         <span class="kw">let</span> <span class="ident">storage_len</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">storage</span>.<span class="ident">len</span>();
         <span class="kw">if</span> <span class="ident">desired_cap</span> <span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">capacity</span>() {
@@ -3757,7 +3758,7 @@
     <span class="doccomment">/// assert!(bv.capacity() &gt;= 13);</span>
     <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">reserve_exact</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">additional</span>: <span class="ident">usize</span>) {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">reserve_exact</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">additional</span>: <span class="ident">usize</span>) {
         <span class="kw">let</span> <span class="ident">desired_cap</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">len</span>().<span class="ident">checked_add</span>(<span class="ident">additional</span>).<span class="ident">expect</span>(<span class="string">&quot;capacity overflow&quot;</span>);
         <span class="kw">let</span> <span class="ident">storage_len</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">storage</span>.<span class="ident">len</span>();
         <span class="kw">if</span> <span class="ident">desired_cap</span> <span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">capacity</span>() {
@@ -3798,7 +3799,7 @@
     <span class="doccomment">/// assert_eq!(bv.len(), 10);</span>
     <span class="doccomment">/// assert_eq!(bv.to_bytes(), [0b01001011, 0b11000000]);</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">grow</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">n</span>: <span class="ident">usize</span>, <span class="ident">value</span>: <span class="ident">bool</span>) {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">grow</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">n</span>: <span class="ident">usize</span>, <span class="ident">value</span>: <span class="ident">bool</span>) {
         <span class="self">self</span>.<span class="ident">ensure_invariant</span>();
 
         <span class="comment">// Note: we just bulk set all the bits in the last word in this fn in multiple places</span>
@@ -3814,7 +3815,7 @@
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">nbits</span> <span class="op">%</span> <span class="ident">B::bits</span>() <span class="op">&gt;</span> <span class="number">0</span> {
             <span class="kw">let</span> <span class="ident">mask</span> <span class="op">=</span> <span class="ident">mask_for_bits</span>::<span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>(<span class="self">self</span>.<span class="ident">nbits</span>);
             <span class="kw">if</span> <span class="ident">value</span> {
-            	<span class="kw">let</span> <span class="ident">block</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">storage</span>[<span class="ident">num_cur_blocks</span> <span class="op">-</span> <span class="number">1</span>];
+            	<span class="kw">let</span> <span class="ident">block</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">storage</span>[<span class="ident">num_cur_blocks</span> <span class="op">-</span> <span class="number">1</span>];
                 <span class="kw-2">*</span><span class="ident">block</span> <span class="op">=</span> <span class="kw-2">*</span><span class="ident">block</span> <span class="op">|</span> <span class="op">!</span><span class="ident">mask</span>;
             } <span class="kw">else</span> {
                 <span class="comment">// Extra bits are already zero by invariant.</span>
@@ -3852,7 +3853,7 @@
     <span class="doccomment">/// assert_eq!(bv.len(), 6);</span>
     <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">pop</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">pop</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">ensure_invariant</span>();
 
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_empty</span>() {
@@ -3884,7 +3885,7 @@
     <span class="doccomment">/// assert!(bv.eq_vec(&amp;[true, false]));</span>
     <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">push</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">elem</span>: <span class="ident">bool</span>) {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">push</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">elem</span>: <span class="ident">bool</span>) {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">nbits</span> <span class="op">%</span> <span class="ident">B::bits</span>() <span class="op">==</span> <span class="number">0</span> {
             <span class="self">self</span>.<span class="ident">storage</span>.<span class="ident">push</span>(<span class="ident">B::zero</span>());
         }
@@ -3901,7 +3902,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Almost certainly can cause bad stuff. Only really intended for BitSet.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">set_len</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">len</span>: <span class="ident">usize</span>) {
+    <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">set_len</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">len</span>: <span class="ident">usize</span>) {
     	<span class="self">self</span>.<span class="ident">nbits</span> <span class="op">=</span> <span class="ident">len</span>;
     }
 
@@ -3911,9 +3912,9 @@
 
     <span class="doccomment">/// Clears all bits in this vector.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">clear</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">clear</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
         <span class="self">self</span>.<span class="ident">ensure_invariant</span>();
-        <span class="kw">for</span> <span class="ident">w</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">storage</span> { <span class="kw-2">*</span><span class="ident">w</span> <span class="op">=</span> <span class="ident">B::zero</span>(); }
+        <span class="kw">for</span> <span class="ident">w</span> <span class="kw">in</span> <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">storage</span> { <span class="kw-2">*</span><span class="ident">w</span> <span class="op">=</span> <span class="ident">B::zero</span>(); }
     }
 
     <span class="doccomment">/// Shrinks the capacity of the underlying storage as much as</span>
@@ -3922,7 +3923,7 @@
     <span class="doccomment">/// It will drop down as close as possible to the length but the</span>
     <span class="doccomment">/// allocator may still inform the underlying storage that there</span>
     <span class="doccomment">/// is space for a few more elements/bits.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">shrink_to_fit</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">shrink_to_fit</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
         <span class="self">self</span>.<span class="ident">storage</span>.<span class="ident">shrink_to_fit</span>();
     }
 }
@@ -3943,7 +3944,7 @@
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">B</span>: <span class="ident">BitBlock</span><span class="op">&gt;</span> <span class="ident">Extend</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">BitVec</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span> {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">extend</span><span class="op">&lt;</span><span class="ident">I</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span><span class="op">=</span><span class="ident">bool</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">iterable</span>: <span class="ident">I</span>) {
+    <span class="kw">fn</span> <span class="ident">extend</span><span class="op">&lt;</span><span class="ident">I</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span><span class="op">=</span><span class="ident">bool</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">iterable</span>: <span class="ident">I</span>) {
         <span class="self">self</span>.<span class="ident">ensure_invariant</span>();
         <span class="kw">let</span> <span class="ident">iterator</span> <span class="op">=</span> <span class="ident">iterable</span>.<span class="ident">into_iter</span>();
         <span class="kw">let</span> (<span class="ident">min</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="ident">iterator</span>.<span class="ident">size_hint</span>();
@@ -3962,7 +3963,7 @@
     }
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">clone_from</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">source</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) {
+    <span class="kw">fn</span> <span class="ident">clone_from</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">source</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) {
         <span class="macro">debug_assert!</span>(<span class="ident">source</span>.<span class="ident">is_last_block_fixed</span>());
         <span class="self">self</span>.<span class="ident">nbits</span> <span class="op">=</span> <span class="ident">source</span>.<span class="ident">nbits</span>;
         <span class="self">self</span>.<span class="ident">storage</span>.<span class="ident">clone_from</span>(<span class="kw-2">&amp;</span><span class="ident">source</span>.<span class="ident">storage</span>);
@@ -3998,7 +3999,7 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">B</span>: <span class="ident">BitBlock</span><span class="op">&gt;</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">BitVec</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="self">self</span>.<span class="ident">ensure_invariant</span>();
         <span class="kw">for</span> <span class="ident">bit</span> <span class="kw">in</span> <span class="self">self</span> {
             <span class="macro">write!</span>(<span class="ident">fmt</span>, <span class="string">&quot;{}&quot;</span>, <span class="kw">if</span> <span class="ident">bit</span> { <span class="number">1</span> } <span class="kw">else</span> { <span class="number">0</span> })<span class="question-mark">?</span>;
@@ -4009,7 +4010,7 @@
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">B</span>: <span class="ident">BitBlock</span><span class="op">&gt;</span> <span class="ident">hash::Hash</span> <span class="kw">for</span> <span class="ident">BitVec</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span> {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">hash</span><span class="op">&lt;</span><span class="ident">H</span>: <span class="ident">hash::Hasher</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">state</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">H</span>) {
+    <span class="kw">fn</span> <span class="ident">hash</span><span class="op">&lt;</span><span class="ident">H</span>: <span class="ident">hash::Hasher</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">state</span>: <span class="kw-2">&amp;mut</span> <span class="ident">H</span>) {
         <span class="self">self</span>.<span class="ident">ensure_invariant</span>();
         <span class="self">self</span>.<span class="ident">nbits</span>.<span class="ident">hash</span>(<span class="ident">state</span>);
         <span class="kw">for</span> <span class="ident">elem</span> <span class="kw">in</span> <span class="self">self</span>.<span class="ident">blocks</span>() {
@@ -4043,7 +4044,7 @@
     <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident">bool</span>;
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> {
         <span class="comment">// NB: indexing is slow for extern crates when it has to go through &amp;TRUE or &amp;FALSE</span>
         <span class="comment">// variables.  get is more direct, and unwrap is fine since we&#39;re sure of the range.</span>
         <span class="self">self</span>.<span class="ident">range</span>.<span class="ident">next</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">i</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">bit_vec</span>.<span class="ident">get</span>(<span class="ident">i</span>).<span class="ident">unwrap</span>())
@@ -4056,7 +4057,7 @@
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">B</span>: <span class="ident">BitBlock</span><span class="op">&gt;</span> <span class="ident">DoubleEndedIterator</span> <span class="kw">for</span> <span class="ident">Iter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">B</span><span class="op">&gt;</span> {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">next_back</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">next_back</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">range</span>.<span class="ident">next_back</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">i</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">bit_vec</span>.<span class="ident">get</span>(<span class="ident">i</span>).<span class="ident">unwrap</span>())
     }
 }
@@ -4082,14 +4083,14 @@
     <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident">bool</span>;
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">range</span>.<span class="ident">next</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">i</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">bit_vec</span>.<span class="ident">get</span>(<span class="ident">i</span>).<span class="ident">unwrap</span>())
     }
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">B</span>: <span class="ident">BitBlock</span><span class="op">&gt;</span> <span class="ident">DoubleEndedIterator</span> <span class="kw">for</span> <span class="ident">IntoIter</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span> {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">next_back</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">next_back</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">range</span>.<span class="ident">next_back</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">i</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">bit_vec</span>.<span class="ident">get</span>(<span class="ident">i</span>).<span class="ident">unwrap</span>())
     }
 }
@@ -4117,7 +4118,7 @@
     <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident">B</span>;
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">iter</span>.<span class="ident">next</span>().<span class="ident">cloned</span>()
     }
 
@@ -4129,7 +4130,7 @@
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">B</span>: <span class="ident">BitBlock</span><span class="op">&gt;</span> <span class="ident">DoubleEndedIterator</span> <span class="kw">for</span> <span class="ident">Blocks</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">B</span><span class="op">&gt;</span> {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">next_back</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">next_back</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">iter</span>.<span class="ident">next_back</span>().<span class="ident">cloned</span>()
     }
 }
@@ -4842,7 +4843,7 @@
         <span class="ident">b</span>.<span class="ident">push</span>(<span class="bool-val">true</span>);
         <span class="ident">b</span>.<span class="ident">push</span>(<span class="bool-val">true</span>);
 
-        <span class="ident">a</span>.<span class="ident">append</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">b</span>);
+        <span class="ident">a</span>.<span class="ident">append</span>(<span class="kw-2">&amp;mut</span> <span class="ident">b</span>);
 
         <span class="macro">assert_eq!</span>(<span class="ident">a</span>.<span class="ident">len</span>(), <span class="number">35</span>);
         <span class="macro">assert_eq!</span>(<span class="ident">b</span>.<span class="ident">len</span>(), <span class="number">0</span>);
@@ -4861,7 +4862,7 @@
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">b</span> <span class="op">=</span> <span class="ident">BitVec::from_bytes</span>(<span class="kw-2">&amp;</span>[<span class="number">0b10100000</span>, <span class="number">0b00010010</span>, <span class="number">0b10010010</span>, <span class="number">0b00110011</span>, <span class="number">0b10010101</span>]);
 
-        <span class="ident">a</span>.<span class="ident">append</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">b</span>);
+        <span class="ident">a</span>.<span class="ident">append</span>(<span class="kw-2">&amp;mut</span> <span class="ident">b</span>);
 
         <span class="macro">assert_eq!</span>(<span class="ident">a</span>.<span class="ident">len</span>(), <span class="number">42</span>);
         <span class="macro">assert_eq!</span>(<span class="ident">b</span>.<span class="ident">len</span>(), <span class="number">0</span>);
@@ -4878,7 +4879,7 @@
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">a</span> <span class="op">=</span> <span class="ident">BitVec::new</span>();
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">b</span> <span class="op">=</span> <span class="ident">BitVec::from_bytes</span>(<span class="kw-2">&amp;</span>[<span class="number">0b10100000</span>, <span class="number">0b00010010</span>, <span class="number">0b10010010</span>, <span class="number">0b00110011</span>, <span class="number">0b10010101</span>]);
 
-        <span class="ident">a</span>.<span class="ident">append</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">b</span>);
+        <span class="ident">a</span>.<span class="ident">append</span>(<span class="kw-2">&amp;mut</span> <span class="ident">b</span>);
 
         <span class="macro">assert_eq!</span>(<span class="ident">a</span>.<span class="ident">len</span>(), <span class="number">40</span>);
         <span class="macro">assert_eq!</span>(<span class="ident">b</span>.<span class="ident">len</span>(), <span class="number">0</span>);
@@ -4894,7 +4895,7 @@
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">a</span> <span class="op">=</span> <span class="ident">BitVec::from_bytes</span>(<span class="kw-2">&amp;</span>[<span class="number">0b10100000</span>, <span class="number">0b00010010</span>, <span class="number">0b10010010</span>, <span class="number">0b00110011</span>, <span class="number">0b10010101</span>]);
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">b</span> <span class="op">=</span> <span class="ident">BitVec::new</span>();
 
-        <span class="ident">a</span>.<span class="ident">append</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">b</span>);
+        <span class="ident">a</span>.<span class="ident">append</span>(<span class="kw-2">&amp;mut</span> <span class="ident">b</span>);
 
         <span class="macro">assert_eq!</span>(<span class="ident">a</span>.<span class="ident">len</span>(), <span class="number">40</span>);
         <span class="macro">assert_eq!</span>(<span class="ident">b</span>.<span class="ident">len</span>(), <span class="number">0</span>);
@@ -5032,8 +5033,8 @@
         <span class="ident">c</span>.<span class="ident">set</span>(<span class="number">6</span>, <span class="bool-val">true</span>);
         <span class="ident">c</span>.<span class="ident">set</span>(<span class="number">7</span>, <span class="bool-val">true</span>);
 
-        <span class="ident">a</span>.<span class="ident">append</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">b</span>);
-        <span class="ident">a</span>.<span class="ident">append</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">c</span>);
+        <span class="ident">a</span>.<span class="ident">append</span>(<span class="kw-2">&amp;mut</span> <span class="ident">b</span>);
+        <span class="ident">a</span>.<span class="ident">append</span>(<span class="kw-2">&amp;mut</span> <span class="ident">c</span>);
 
         <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span>[<span class="number">01</span>, <span class="number">00</span>, <span class="number">02</span>, <span class="number">03</span>][..], <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">a</span>.<span class="ident">to_bytes</span>());
     }
@@ -5050,8 +5051,8 @@
         <span class="ident">c</span>.<span class="ident">set</span>(<span class="number">46</span>, <span class="bool-val">true</span>);
         <span class="ident">c</span>.<span class="ident">set</span>(<span class="number">47</span>, <span class="bool-val">true</span>);
 
-        <span class="ident">a</span>.<span class="ident">append</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">b</span>);
-        <span class="ident">a</span>.<span class="ident">append</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">c</span>);
+        <span class="ident">a</span>.<span class="ident">append</span>(<span class="kw-2">&amp;mut</span> <span class="ident">b</span>);
+        <span class="ident">a</span>.<span class="ident">append</span>(<span class="kw-2">&amp;mut</span> <span class="ident">c</span>);
 
         <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span>[<span class="number">0x00</span>, <span class="number">0x00</span>, <span class="number">0x00</span>, <span class="number">0x00</span>, <span class="number">0x00</span>, <span class="number">0x01</span>,
                      <span class="number">0x00</span>, <span class="number">0x00</span>, <span class="number">0x00</span>, <span class="number">0x00</span>, <span class="number">0x00</span>, <span class="number">0x02</span>,
@@ -5063,12 +5064,11 @@
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">a</span> <span class="op">=</span> <span class="ident">BitVec::from_elem</span>(<span class="number">2</span>, <span class="bool-val">true</span>);
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">b</span> <span class="op">=</span> <span class="ident">BitVec::from_elem</span>(<span class="number">32</span>, <span class="bool-val">false</span>);
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">c</span> <span class="op">=</span> <span class="ident">BitVec::from_elem</span>(<span class="number">8</span>, <span class="bool-val">true</span>);
-        <span class="ident">a</span>.<span class="ident">append</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">b</span>);
-        <span class="ident">a</span>.<span class="ident">append</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">c</span>);
+        <span class="ident">a</span>.<span class="ident">append</span>(<span class="kw-2">&amp;mut</span> <span class="ident">b</span>);
+        <span class="ident">a</span>.<span class="ident">append</span>(<span class="kw-2">&amp;mut</span> <span class="ident">c</span>);
         <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span>[<span class="number">0xc0</span>, <span class="number">0x00</span>, <span class="number">0x00</span>, <span class="number">0x00</span>, <span class="number">0x3f</span>, <span class="number">0xc0</span>][..], <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">a</span>.<span class="ident">to_bytes</span>());
     }
 }
 </code></pre></div>
 </section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="bit_vec" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>
-    <script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script>
 </body></html>

@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine&#x2F;core&#x2F;src&#x2F;query_graph&#x2F;mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../query_core/index.html'><div class='logo-container rust-logo'><img src='../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine&#x2F;core&#x2F;src&#x2F;query_graph&#x2F;mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><script defer src="../../../main.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script>
+    <noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../query_core/index.html'><div class='logo-container rust-logo'><img src='../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -1040,7 +1041,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">QueryGraph</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;QueryGraph&quot;</span>)
             .<span class="ident">field</span>(<span class="string">&quot;graph&quot;</span>, <span class="kw-2">&amp;</span><span class="string">&quot;InnerGraph&quot;</span>)
             .<span class="ident">field</span>(<span class="string">&quot;result_nodes&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">result_nodes</span>)
@@ -1065,15 +1066,15 @@
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">root</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="ident">QueryGraphBuilderResult</span><span class="op">&lt;</span><span class="ident">QueryGraph</span><span class="op">&gt;</span>
     <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">QueryGraph</span>) -&gt; <span class="ident">QueryGraphBuilderResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span>,
+        <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;mut</span> <span class="ident">QueryGraph</span>) -&gt; <span class="ident">QueryGraphBuilderResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span>,
     {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">graph</span> <span class="op">=</span> <span class="ident">QueryGraph::new</span>();
-        <span class="ident">f</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">graph</span>)<span class="question-mark">?</span>;
+        <span class="ident">f</span>(<span class="kw-2">&amp;mut</span> <span class="ident">graph</span>)<span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>(<span class="ident">graph</span>)
     }
 
     <span class="attribute">#[<span class="ident">tracing::instrument</span>(<span class="ident">skip</span>(<span class="self">self</span>))]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">finalize</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident">QueryGraphResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">finalize</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">QueryGraphResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">finalized</span> {
             <span class="self">self</span>.<span class="ident">swap_marked</span>()<span class="question-mark">?</span>;
             <span class="self">self</span>.<span class="ident">ensure_return_nodes_have_parent_dependency</span>()<span class="question-mark">?</span>;
@@ -1103,11 +1104,11 @@
     }
 
     <span class="doccomment">/// Adds a result node to the graph.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_result_node</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">node</span>: <span class="kw-2">&amp;</span><span class="ident">NodeRef</span>) {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_result_node</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">node</span>: <span class="kw-2">&amp;</span><span class="ident">NodeRef</span>) {
         <span class="self">self</span>.<span class="ident">result_nodes</span>.<span class="ident">push</span>(<span class="ident">node</span>.<span class="ident">node_ix</span>);
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">mark_visited</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">node</span>: <span class="kw-2">&amp;</span><span class="ident">NodeRef</span>) {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">mark_visited</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">node</span>: <span class="kw-2">&amp;</span><span class="ident">NodeRef</span>) {
         <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">visited</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">node</span>.<span class="ident">node_ix</span>) {
             <span class="macro">trace!</span>(<span class="string">&quot;Visited: {}&quot;</span>, <span class="ident">node</span>.<span class="ident">id</span>());
             <span class="self">self</span>.<span class="ident">visited</span>.<span class="ident">push</span>(<span class="ident">node</span>.<span class="ident">node_ix</span>);
@@ -1150,7 +1151,7 @@
 
     <span class="doccomment">/// Creates a node with content `t` and adds it to the graph.</span>
     <span class="doccomment">/// Returns a `NodeRef` to the newly added node.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">create_node</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">t</span>: <span class="ident">T</span>) -&gt; <span class="ident">NodeRef</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">create_node</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">t</span>: <span class="ident">T</span>) -&gt; <span class="ident">NodeRef</span>
     <span class="kw">where</span>
         <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Node</span><span class="op">&gt;</span>,
     {
@@ -1164,7 +1165,7 @@
     <span class="doccomment">/// Returns an `EdgeRef` to the newly added edge.</span>
     <span class="doccomment">/// Todo currently panics, change interface to result type.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">create_edge</span>(
-        <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
+        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
         <span class="ident">from</span>: <span class="kw-2">&amp;</span><span class="ident">NodeRef</span>,
         <span class="ident">to</span>: <span class="kw-2">&amp;</span><span class="ident">NodeRef</span>,
         <span class="ident">content</span>: <span class="ident">QueryGraphDependency</span>,
@@ -1176,7 +1177,7 @@
     }
 
     <span class="doccomment">/// Mark the query graph to need a transaction.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">flag_transactional</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">flag_transactional</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
         <span class="self">self</span>.<span class="ident">needs_transaction</span> <span class="op">=</span> <span class="bool-val">true</span>;
     }
 
@@ -1219,19 +1220,19 @@
 
     <span class="doccomment">/// Removes the edge from the graph but leaves the graph intact by keeping the empty</span>
     <span class="doccomment">/// edge in the graph by plucking the content of the edge, but not the edge itself.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">pluck_edge</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">edge</span>: <span class="kw-2">&amp;</span><span class="ident">EdgeRef</span>) -&gt; <span class="ident">QueryGraphDependency</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">pluck_edge</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">edge</span>: <span class="kw-2">&amp;</span><span class="ident">EdgeRef</span>) -&gt; <span class="ident">QueryGraphDependency</span> {
         <span class="self">self</span>.<span class="ident">graph</span>.<span class="ident">edge_weight_mut</span>(<span class="ident">edge</span>.<span class="ident">edge_ix</span>).<span class="ident">unwrap</span>().<span class="ident">unset</span>()
     }
 
     <span class="doccomment">/// Removes the node from the graph but leaves the graph intact by keeping the empty</span>
     <span class="doccomment">/// node in the graph by plucking the content of the node, but not the node itself.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">pluck_node</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">node</span>: <span class="kw-2">&amp;</span><span class="ident">NodeRef</span>) -&gt; <span class="ident">Node</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">pluck_node</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">node</span>: <span class="kw-2">&amp;</span><span class="ident">NodeRef</span>) -&gt; <span class="ident">Node</span> {
         <span class="self">self</span>.<span class="ident">graph</span>.<span class="ident">node_weight_mut</span>(<span class="ident">node</span>.<span class="ident">node_ix</span>).<span class="ident">unwrap</span>().<span class="ident">unset</span>()
     }
 
     <span class="doccomment">/// Completely removes the edge from the graph, returning it&#39;s content.</span>
     <span class="doccomment">/// This operation is destructive on the underlying graph and invalidates references.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">remove_edge</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">edge</span>: <span class="ident">EdgeRef</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">QueryGraphDependency</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">remove_edge</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">edge</span>: <span class="ident">EdgeRef</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">QueryGraphDependency</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">graph</span>.<span class="ident">remove_edge</span>(<span class="ident">edge</span>.<span class="ident">edge_ix</span>).<span class="ident">unwrap</span>().<span class="ident">into_inner</span>()
     }
 
@@ -1305,7 +1306,7 @@
     }
 
     <span class="doccomment">/// Marks a node pair for swapping.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">mark_nodes</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">parent_node</span>: <span class="kw-2">&amp;</span><span class="ident">NodeRef</span>, <span class="ident">child_node</span>: <span class="kw-2">&amp;</span><span class="ident">NodeRef</span>) {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">mark_nodes</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">parent_node</span>: <span class="kw-2">&amp;</span><span class="ident">NodeRef</span>, <span class="ident">child_node</span>: <span class="kw-2">&amp;</span><span class="ident">NodeRef</span>) {
         <span class="self">self</span>.<span class="ident">marked_node_pairs</span>.<span class="ident">push</span>((<span class="kw-2">*</span><span class="ident">parent_node</span>, <span class="kw-2">*</span><span class="ident">child_node</span>));
     }
 
@@ -1376,12 +1377,12 @@
     <span class="doccomment">/// ```</span>
     <span class="doccomment">/// [DTODO] put if flow exception illustration here.</span>
     <span class="attribute">#[<span class="ident">tracing::instrument</span>(<span class="ident">skip</span>(<span class="self">self</span>))]</span>
-    <span class="kw">fn</span> <span class="ident">swap_marked</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident">QueryGraphResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">swap_marked</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">QueryGraphResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">marked_node_pairs</span>.<span class="ident">is_empty</span>() {
             <span class="macro">trace!</span>(<span class="string">&quot;[Graph][Swap] Before shape: {}&quot;</span>, <span class="self">self</span>);
         }
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">marked</span> <span class="op">=</span> <span class="ident">std::mem::take</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">marked_node_pairs</span>);
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">marked</span> <span class="op">=</span> <span class="ident">std::mem::take</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">marked_node_pairs</span>);
         <span class="ident">marked</span>.<span class="ident">reverse</span>(); <span class="comment">// Todo: Marked operation order is currently breaking if done bottom-up. Investigate how to fix it.</span>
 
         <span class="kw">for</span> (<span class="ident">parent_node</span>, <span class="ident">child_node</span>) <span class="kw">in</span> <span class="ident">marked</span> {
@@ -1473,7 +1474,7 @@
     <span class="doccomment">///      └ ─ ─ ─ ─ ─ ─</span>
     <span class="doccomment">/// ```</span>
     <span class="attribute">#[<span class="ident">tracing::instrument</span>(<span class="ident">skip</span>(<span class="self">self</span>))]</span>
-    <span class="kw">fn</span> <span class="ident">normalize_if_nodes</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident">QueryGraphResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">normalize_if_nodes</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">QueryGraphResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">for</span> <span class="ident">node_ix</span> <span class="kw">in</span> <span class="self">self</span>.<span class="ident">graph</span>.<span class="ident">node_indices</span>() {
             <span class="kw">let</span> <span class="ident">node</span> <span class="op">=</span> <span class="ident">NodeRef</span> { <span class="ident">node_ix</span> };
 
@@ -1516,7 +1517,7 @@
     <span class="doccomment">/// In case the parent nodes of return nodes do not have a field selection that fullfils the new dependency,</span>
     <span class="doccomment">/// a reload node will be inserted in between the parent and the return node by the `insert_reloads` method.</span>
     <span class="attribute">#[<span class="ident">tracing::instrument</span>(<span class="ident">skip</span>(<span class="self">self</span>))]</span>
-    <span class="kw">fn</span> <span class="ident">ensure_return_nodes_have_parent_dependency</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident">QueryGraphResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">ensure_return_nodes_have_parent_dependency</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">QueryGraphResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">return_nodes</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">NodeRef</span><span class="op">&gt;</span> <span class="op">=</span> <span class="self">self</span>
             .<span class="ident">graph</span>
             .<span class="ident">node_indices</span>()
@@ -1628,7 +1629,7 @@
     <span class="doccomment">/// The `Reload` node is always a &quot;find many&quot; query.</span>
     <span class="doccomment">/// Unwraps are safe because we&#39;re operating on the unprocessed state of the graph (`Expressionista` changes that).</span>
     <span class="attribute">#[<span class="ident">tracing::instrument</span>(<span class="ident">skip</span>(<span class="self">self</span>))]</span>
-    <span class="kw">fn</span> <span class="ident">insert_reloads</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident">QueryGraphResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">insert_reloads</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">QueryGraphResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">reloads</span>: <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">NodeRef</span>, <span class="ident">ModelRef</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">FieldSelection</span><span class="op">&gt;</span>)<span class="op">&gt;</span> <span class="op">=</span> <span class="self">self</span>
             .<span class="ident">graph</span>
             .<span class="ident">node_indices</span>()
@@ -1714,5 +1715,4 @@
 }
 </code></pre></div>
 </section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="query_core" data-search-index-js="../../../search-index.js" data-search-js="../../../search.js"></div>
-    <script src="../../../main.js"></script><script src="../../../source-script.js"></script><script src="../../../source-files.js"></script>
 </body></html>

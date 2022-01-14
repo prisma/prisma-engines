@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;hyper-0.14.16&#x2F;src&#x2F;proto&#x2F;h1&#x2F;conn.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>conn.rs - source</title><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../../../storage.js"></script><script src="../../../../crates.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../../hyper/index.html'><div class='logo-container rust-logo'><img src='../../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">   1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;hyper-0.14.16&#x2F;src&#x2F;proto&#x2F;h1&#x2F;conn.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>conn.rs - source</title><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../../../storage.js"></script><script src="../../../../crates.js"></script><script defer src="../../../../main.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script>
+    <noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../../hyper/index.html'><div class='logo-container rust-logo'><img src='../../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">   1</span>
 <span id="2">   2</span>
 <span id="3">   3</span>
 <span id="4">   4</span>
@@ -1504,57 +1505,57 @@
     }
 
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;server&quot;</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">set_flush_pipeline</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">enabled</span>: <span class="ident">bool</span>) {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">set_flush_pipeline</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">enabled</span>: <span class="ident">bool</span>) {
         <span class="self">self</span>.<span class="ident">io</span>.<span class="ident">set_flush_pipeline</span>(<span class="ident">enabled</span>);
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">set_write_strategy_queue</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">set_write_strategy_queue</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
         <span class="self">self</span>.<span class="ident">io</span>.<span class="ident">set_write_strategy_queue</span>();
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">set_max_buf_size</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">max</span>: <span class="ident">usize</span>) {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">set_max_buf_size</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">max</span>: <span class="ident">usize</span>) {
         <span class="self">self</span>.<span class="ident">io</span>.<span class="ident">set_max_buf_size</span>(<span class="ident">max</span>);
     }
 
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;client&quot;</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">set_read_buf_exact_size</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">sz</span>: <span class="ident">usize</span>) {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">set_read_buf_exact_size</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">sz</span>: <span class="ident">usize</span>) {
         <span class="self">self</span>.<span class="ident">io</span>.<span class="ident">set_read_buf_exact_size</span>(<span class="ident">sz</span>);
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">set_write_strategy_flatten</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">set_write_strategy_flatten</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
         <span class="self">self</span>.<span class="ident">io</span>.<span class="ident">set_write_strategy_flatten</span>();
     }
 
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;client&quot;</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">set_h1_parser_config</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">parser_config</span>: <span class="ident">ParserConfig</span>) {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">set_h1_parser_config</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">parser_config</span>: <span class="ident">ParserConfig</span>) {
         <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">h1_parser_config</span> <span class="op">=</span> <span class="ident">parser_config</span>;
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">set_title_case_headers</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">set_title_case_headers</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
         <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">title_case_headers</span> <span class="op">=</span> <span class="bool-val">true</span>;
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">set_preserve_header_case</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">set_preserve_header_case</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
         <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">preserve_header_case</span> <span class="op">=</span> <span class="bool-val">true</span>;
     }
 
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;client&quot;</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">set_h09_responses</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">set_h09_responses</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
         <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">h09_responses</span> <span class="op">=</span> <span class="bool-val">true</span>;
     }
 
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;server&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;runtime&quot;</span>))]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">set_http1_header_read_timeout</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">val</span>: <span class="ident">Duration</span>) {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">set_http1_header_read_timeout</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">val</span>: <span class="ident">Duration</span>) {
         <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">h1_header_read_timeout</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">val</span>);
     }
 
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;server&quot;</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">set_allow_half_close</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">set_allow_half_close</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
         <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">allow_half_close</span> <span class="op">=</span> <span class="bool-val">true</span>;
     }
 
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;ffi&quot;</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">set_raw_headers</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">enabled</span>: <span class="ident">bool</span>) {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">set_raw_headers</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">enabled</span>: <span class="ident">bool</span>) {
         <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">raw_headers</span> <span class="op">=</span> <span class="ident">enabled</span>;
     }
 
@@ -1562,7 +1563,7 @@
         <span class="self">self</span>.<span class="ident">io</span>.<span class="ident">into_inner</span>()
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">pending_upgrade</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::upgrade::Pending</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">pending_upgrade</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::upgrade::Pending</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">upgrade</span>.<span class="ident">take</span>()
     }
 
@@ -1608,8 +1609,8 @@
     }
 
     <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">poll_read_head</span>(
-        <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
-        <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">task::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
+        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
+        <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">task::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
     ) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>(<span class="ident">MessageHead</span><span class="op">&lt;</span><span class="ident">T::Incoming</span><span class="op">&gt;</span>, <span class="ident">DecodedLength</span>, <span class="ident">Wants</span>)<span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="macro">debug_assert!</span>(<span class="self">self</span>.<span class="ident">can_read_head</span>());
         <span class="macro">trace!</span>(<span class="string">&quot;Conn::read_head&quot;</span>);
@@ -1617,19 +1618,19 @@
         <span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span> <span class="kw">match</span> <span class="macro">ready!</span>(<span class="self">self</span>.<span class="ident">io</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(
             <span class="ident">cx</span>,
             <span class="ident">ParseContext</span> {
-                <span class="ident">cached_headers</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">cached_headers</span>,
-                <span class="ident">req_method</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">method</span>,
+                <span class="ident">cached_headers</span>: <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">cached_headers</span>,
+                <span class="ident">req_method</span>: <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">method</span>,
                 <span class="ident">h1_parser_config</span>: <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">h1_parser_config</span>.<span class="ident">clone</span>(),
                 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;server&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;runtime&quot;</span>))]</span>
                 <span class="ident">h1_header_read_timeout</span>: <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">h1_header_read_timeout</span>,
                 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;server&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;runtime&quot;</span>))]</span>
-                <span class="ident">h1_header_read_timeout_fut</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">h1_header_read_timeout_fut</span>,
+                <span class="ident">h1_header_read_timeout_fut</span>: <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">h1_header_read_timeout_fut</span>,
                 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;server&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;runtime&quot;</span>))]</span>
-                <span class="ident">h1_header_read_timeout_running</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">h1_header_read_timeout_running</span>,
+                <span class="ident">h1_header_read_timeout_running</span>: <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">h1_header_read_timeout_running</span>,
                 <span class="ident">preserve_header_case</span>: <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">preserve_header_case</span>,
                 <span class="ident">h09_responses</span>: <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">h09_responses</span>,
                 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;ffi&quot;</span>)]</span>
-                <span class="ident">on_informational</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">on_informational</span>,
+                <span class="ident">on_informational</span>: <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">on_informational</span>,
                 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;ffi&quot;</span>)]</span>
                 <span class="ident">raw_headers</span>: <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">raw_headers</span>,
             }
@@ -1680,7 +1681,7 @@
         <span class="ident">Poll::Ready</span>(<span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>((<span class="ident">msg</span>.<span class="ident">head</span>, <span class="ident">msg</span>.<span class="ident">decode</span>, <span class="ident">wants</span>))))
     }
 
-    <span class="kw">fn</span> <span class="ident">on_read_head_error</span><span class="op">&lt;</span><span class="ident">Z</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">e</span>: <span class="ident"><span class="kw">crate</span>::Error</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">Z</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">on_read_head_error</span><span class="op">&lt;</span><span class="ident">Z</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">e</span>: <span class="ident"><span class="kw">crate</span>::Error</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">Z</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="comment">// If we are currently waiting on a message, then an empty</span>
         <span class="comment">// message should be reported as an error. If not, it is just</span>
         <span class="comment">// the connection closing gracefully.</span>
@@ -1707,14 +1708,14 @@
     }
 
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">poll_read_body</span>(
-        <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
-        <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">task::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
+        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
+        <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">task::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
     ) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">Bytes</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="macro">debug_assert!</span>(<span class="self">self</span>.<span class="ident">can_read_body</span>());
 
         <span class="kw">let</span> (<span class="ident">reading</span>, <span class="ident">ret</span>) <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">reading</span> {
             <span class="ident">Reading::Body</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">decoder</span>) =&gt; {
-                <span class="kw">match</span> <span class="macro">ready!</span>(<span class="ident">decoder</span>.<span class="ident">decode</span>(<span class="ident">cx</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">io</span>)) {
+                <span class="kw">match</span> <span class="macro">ready!</span>(<span class="ident">decoder</span>.<span class="ident">decode</span>(<span class="ident">cx</span>, <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">io</span>)) {
                     <span class="prelude-val">Ok</span>(<span class="ident">slice</span>) =&gt; {
                         <span class="kw">let</span> (<span class="ident">reading</span>, <span class="ident">chunk</span>) <span class="op">=</span> <span class="kw">if</span> <span class="ident">decoder</span>.<span class="ident">is_eof</span>() {
                             <span class="macro">debug!</span>(<span class="string">&quot;incoming body completed&quot;</span>);
@@ -1763,15 +1764,15 @@
         <span class="ident">ret</span>
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">wants_read_again</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">wants_read_again</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="kw">let</span> <span class="ident">ret</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">notify_read</span>;
         <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">notify_read</span> <span class="op">=</span> <span class="bool-val">false</span>;
         <span class="ident">ret</span>
     }
 
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">poll_read_keep_alive</span>(
-        <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
-        <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">task::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
+        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
+        <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">task::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
     ) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="macro">debug_assert!</span>(<span class="op">!</span><span class="self">self</span>.<span class="ident">can_read_head</span>() <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">can_read_body</span>());
 
@@ -1795,7 +1796,7 @@
     <span class="comment">//</span>
     <span class="comment">// This should only be called for Clients wanting to enter the idle</span>
     <span class="comment">// state.</span>
-    <span class="kw">fn</span> <span class="ident">require_empty_read</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">task::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">require_empty_read</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">task::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="macro">debug_assert!</span>(<span class="op">!</span><span class="self">self</span>.<span class="ident">can_read_head</span>() <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">can_read_body</span>() <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">is_read_closed</span>());
         <span class="macro">debug_assert!</span>(<span class="op">!</span><span class="self">self</span>.<span class="ident">is_mid_message</span>());
         <span class="macro">debug_assert!</span>(<span class="ident">T::is_client</span>());
@@ -1828,7 +1829,7 @@
         <span class="ident">Poll::Ready</span>(<span class="prelude-val">Err</span>(<span class="ident"><span class="kw">crate</span>::Error::new_unexpected_message</span>()))
     }
 
-    <span class="kw">fn</span> <span class="ident">mid_message_detect_eof</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">task::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">mid_message_detect_eof</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">task::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="macro">debug_assert!</span>(<span class="op">!</span><span class="self">self</span>.<span class="ident">can_read_head</span>() <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">can_read_body</span>() <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">is_read_closed</span>());
         <span class="macro">debug_assert!</span>(<span class="self">self</span>.<span class="ident">is_mid_message</span>());
 
@@ -1847,7 +1848,7 @@
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">force_io_read</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">task::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">force_io_read</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">task::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="macro">debug_assert!</span>(<span class="op">!</span><span class="self">self</span>.<span class="ident">state</span>.<span class="ident">is_read_closed</span>());
 
         <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="macro">ready!</span>(<span class="self">self</span>.<span class="ident">io</span>.<span class="ident">poll_read_from_io</span>(<span class="ident">cx</span>));
@@ -1858,7 +1859,7 @@
         }))
     }
 
-    <span class="kw">fn</span> <span class="ident">maybe_notify</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">task::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
+    <span class="kw">fn</span> <span class="ident">maybe_notify</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">task::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
         <span class="comment">// its possible that we returned NotReady from poll() without having</span>
         <span class="comment">// exhausted the underlying Io. We would have done this when we</span>
         <span class="comment">// determined we couldn&#39;t keep reading until we knew how writing</span>
@@ -1905,7 +1906,7 @@
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">try_keep_alive</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">task::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
+    <span class="kw">fn</span> <span class="ident">try_keep_alive</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">task::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
         <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">try_keep_alive</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>();
         <span class="self">self</span>.<span class="ident">maybe_notify</span>(<span class="ident">cx</span>);
     }
@@ -1933,7 +1934,7 @@
         <span class="self">self</span>.<span class="ident">io</span>.<span class="ident">can_buffer</span>()
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">write_head</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">head</span>: <span class="ident">MessageHead</span><span class="op">&lt;</span><span class="ident">T::Outgoing</span><span class="op">&gt;</span>, <span class="ident">body</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">BodyLength</span><span class="op">&gt;</span>) {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">write_head</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">head</span>: <span class="ident">MessageHead</span><span class="op">&lt;</span><span class="ident">T::Outgoing</span><span class="op">&gt;</span>, <span class="ident">body</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">BodyLength</span><span class="op">&gt;</span>) {
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">encoder</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">encode_head</span>(<span class="ident">head</span>, <span class="ident">body</span>) {
             <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">writing</span> <span class="op">=</span> <span class="kw">if</span> <span class="op">!</span><span class="ident">encoder</span>.<span class="ident">is_eof</span>() {
                 <span class="ident">Writing::Body</span>(<span class="ident">encoder</span>)
@@ -1945,7 +1946,7 @@
         }
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">write_full_msg</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">head</span>: <span class="ident">MessageHead</span><span class="op">&lt;</span><span class="ident">T::Outgoing</span><span class="op">&gt;</span>, <span class="ident">body</span>: <span class="ident">B</span>) {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">write_full_msg</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">head</span>: <span class="ident">MessageHead</span><span class="op">&lt;</span><span class="ident">T::Outgoing</span><span class="op">&gt;</span>, <span class="ident">body</span>: <span class="ident">B</span>) {
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">encoder</span>) <span class="op">=</span>
             <span class="self">self</span>.<span class="ident">encode_head</span>(<span class="ident">head</span>, <span class="prelude-val">Some</span>(<span class="ident">BodyLength::Known</span>(<span class="ident">body</span>.<span class="ident">remaining</span>() <span class="kw">as</span> <span class="ident">u64</span>)))
         {
@@ -1964,7 +1965,7 @@
     }
 
     <span class="kw">fn</span> <span class="ident">encode_head</span>(
-        <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
+        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
         <span class="kw-2">mut</span> <span class="ident">head</span>: <span class="ident">MessageHead</span><span class="op">&lt;</span><span class="ident">T::Outgoing</span><span class="op">&gt;</span>,
         <span class="ident">body</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">BodyLength</span><span class="op">&gt;</span>,
     ) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Encoder</span><span class="op">&gt;</span> {
@@ -1974,16 +1975,16 @@
             <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">busy</span>();
         }
 
-        <span class="self">self</span>.<span class="ident">enforce_version</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">head</span>);
+        <span class="self">self</span>.<span class="ident">enforce_version</span>(<span class="kw-2">&amp;mut</span> <span class="ident">head</span>);
 
         <span class="kw">let</span> <span class="ident">buf</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">io</span>.<span class="ident">headers_buf</span>();
         <span class="kw">match</span> <span class="ident"><span class="kw">super</span>::role::encode_headers</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(
             <span class="ident">Encode</span> {
-                <span class="ident">head</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">head</span>,
+                <span class="ident">head</span>: <span class="kw-2">&amp;mut</span> <span class="ident">head</span>,
                 <span class="ident">body</span>,
                 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;server&quot;</span>)]</span>
                 <span class="ident">keep_alive</span>: <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">wants_keep_alive</span>(),
-                <span class="ident">req_method</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">method</span>,
+                <span class="ident">req_method</span>: <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">method</span>,
                 <span class="ident">title_case_headers</span>: <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">title_case_headers</span>,
             },
             <span class="ident">buf</span>,
@@ -2010,7 +2011,7 @@
     }
 
     <span class="comment">// Fix keep-alives when Connection: keep-alive header is not present</span>
-    <span class="kw">fn</span> <span class="ident">fix_keep_alive</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">head</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">MessageHead</span><span class="op">&lt;</span><span class="ident">T::Outgoing</span><span class="op">&gt;</span>) {
+    <span class="kw">fn</span> <span class="ident">fix_keep_alive</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">head</span>: <span class="kw-2">&amp;mut</span> <span class="ident">MessageHead</span><span class="op">&lt;</span><span class="ident">T::Outgoing</span><span class="op">&gt;</span>) {
         <span class="kw">let</span> <span class="ident">outgoing_is_keep_alive</span> <span class="op">=</span> <span class="ident">head</span>
             .<span class="ident">headers</span>
             .<span class="ident">get</span>(<span class="ident">CONNECTION</span>)
@@ -2037,7 +2038,7 @@
 
     <span class="comment">// If we know the remote speaks an older version, we try to fix up any messages</span>
     <span class="comment">// to work with our older peer.</span>
-    <span class="kw">fn</span> <span class="ident">enforce_version</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">head</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">MessageHead</span><span class="op">&lt;</span><span class="ident">T::Outgoing</span><span class="op">&gt;</span>) {
+    <span class="kw">fn</span> <span class="ident">enforce_version</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">head</span>: <span class="kw-2">&amp;mut</span> <span class="ident">MessageHead</span><span class="op">&lt;</span><span class="ident">T::Outgoing</span><span class="op">&gt;</span>) {
         <span class="kw">if</span> <span class="kw">let</span> <span class="ident">Version::HTTP_10</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">version</span> {
             <span class="comment">// Fixes response or connection when keep-alive header is not present</span>
             <span class="self">self</span>.<span class="ident">fix_keep_alive</span>(<span class="ident">head</span>);
@@ -2050,7 +2051,7 @@
         <span class="comment">// the user&#39;s headers be.</span>
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">write_body</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">chunk</span>: <span class="ident">B</span>) {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">write_body</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">chunk</span>: <span class="ident">B</span>) {
         <span class="macro">debug_assert!</span>(<span class="self">self</span>.<span class="ident">can_write_body</span>() <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">can_buffer_body</span>());
         <span class="comment">// empty chunks should be discarded at Dispatcher level</span>
         <span class="macro">debug_assert!</span>(<span class="ident">chunk</span>.<span class="ident">remaining</span>() <span class="op">!</span><span class="op">=</span> <span class="number">0</span>);
@@ -2075,7 +2076,7 @@
         <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">writing</span> <span class="op">=</span> <span class="ident">state</span>;
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">write_body_and_end</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">chunk</span>: <span class="ident">B</span>) {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">write_body_and_end</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">chunk</span>: <span class="ident">B</span>) {
         <span class="macro">debug_assert!</span>(<span class="self">self</span>.<span class="ident">can_write_body</span>() <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">can_buffer_body</span>());
         <span class="comment">// empty chunks should be discarded at Dispatcher level</span>
         <span class="macro">debug_assert!</span>(<span class="ident">chunk</span>.<span class="ident">remaining</span>() <span class="op">!</span><span class="op">=</span> <span class="number">0</span>);
@@ -2095,7 +2096,7 @@
         <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">writing</span> <span class="op">=</span> <span class="ident">state</span>;
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">end_body</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">end_body</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="macro">debug_assert!</span>(<span class="self">self</span>.<span class="ident">can_write_body</span>());
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">res</span> <span class="op">=</span> <span class="prelude-val">Ok</span>(());
@@ -2133,7 +2134,7 @@
     <span class="comment">//</span>
     <span class="comment">// - Client: there is nothing we can do</span>
     <span class="comment">// - Server: if Response hasn&#39;t been written yet, we can send a 4xx response</span>
-    <span class="kw">fn</span> <span class="ident">on_parse_error</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">err</span>: <span class="ident"><span class="kw">crate</span>::Error</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">on_parse_error</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">err</span>: <span class="ident"><span class="kw">crate</span>::Error</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="kw">let</span> <span class="ident">Writing::Init</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">writing</span> {
             <span class="kw">if</span> <span class="self">self</span>.<span class="ident">has_h2_prefix</span>() {
                 <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident"><span class="kw">crate</span>::Error::new_version_h2</span>());
@@ -2152,14 +2153,14 @@
         <span class="prelude-val">Err</span>(<span class="ident">err</span>)
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">poll_flush</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">task::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="macro">ready!</span>(<span class="ident">Pin::new</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">io</span>).<span class="ident">poll_flush</span>(<span class="ident">cx</span>))<span class="question-mark">?</span>;
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">poll_flush</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">task::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span> {
+        <span class="macro">ready!</span>(<span class="ident">Pin::new</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">io</span>).<span class="ident">poll_flush</span>(<span class="ident">cx</span>))<span class="question-mark">?</span>;
         <span class="self">self</span>.<span class="ident">try_keep_alive</span>(<span class="ident">cx</span>);
         <span class="macro">trace!</span>(<span class="string">&quot;flushed({}): {:?}&quot;</span>, <span class="ident">T::LOG</span>, <span class="self">self</span>.<span class="ident">state</span>);
         <span class="ident">Poll::Ready</span>(<span class="prelude-val">Ok</span>(()))
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">poll_shutdown</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">task::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">poll_shutdown</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">task::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="macro">ready!</span>(<span class="ident">Pin::new</span>(<span class="self">self</span>.<span class="ident">io</span>.<span class="ident">io_mut</span>()).<span class="ident">poll_shutdown</span>(<span class="ident">cx</span>)) {
             <span class="prelude-val">Ok</span>(()) =&gt; {
                 <span class="macro">trace!</span>(<span class="string">&quot;shut down IO complete&quot;</span>);
@@ -2173,7 +2174,7 @@
     }
 
     <span class="doccomment">/// If the read side can be cheaply drained, do so. Otherwise, close.</span>
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">poll_drain_or_close_read</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">task::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">poll_drain_or_close_read</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">task::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
         <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">poll_read_body</span>(<span class="ident">cx</span>);
 
         <span class="comment">// If still in Reading::Body, just give up</span>
@@ -2186,16 +2187,16 @@
         }
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">close_read</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">close_read</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
         <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">close_read</span>();
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">close_write</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">close_write</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
         <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">close_write</span>();
     }
 
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;server&quot;</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">disable_keep_alive</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">disable_keep_alive</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">is_idle</span>() {
             <span class="macro">trace!</span>(<span class="string">&quot;disable_keep_alive; closing idle connection&quot;</span>);
             <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">close</span>();
@@ -2205,7 +2206,7 @@
         }
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">take_error</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">take_error</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">err</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">error</span>.<span class="ident">take</span>() {
             <span class="prelude-val">Err</span>(<span class="ident">err</span>)
         } <span class="kw">else</span> {
@@ -2213,14 +2214,14 @@
         }
     }
 
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">on_upgrade</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident"><span class="kw">crate</span>::upgrade::OnUpgrade</span> {
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">on_upgrade</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident"><span class="kw">crate</span>::upgrade::OnUpgrade</span> {
         <span class="macro">trace!</span>(<span class="string">&quot;{}: prepare possible HTTP upgrade&quot;</span>, <span class="ident">T::LOG</span>);
         <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">prepare_upgrade</span>()
     }
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">B</span>: <span class="ident">Buf</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">Conn</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">B</span>, <span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;Conn&quot;</span>)
             .<span class="ident">field</span>(<span class="string">&quot;state&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">state</span>)
             .<span class="ident">field</span>(<span class="string">&quot;io&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">io</span>)
@@ -2292,7 +2293,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">State</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">builder</span> <span class="op">=</span> <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;State&quot;</span>);
         <span class="ident">builder</span>
             .<span class="ident">field</span>(<span class="string">&quot;reading&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">reading</span>)
@@ -2315,7 +2316,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">Writing</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
             <span class="ident">Writing::Init</span> =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Init&quot;</span>),
             <span class="ident">Writing::Body</span>(<span class="kw-2">ref</span> <span class="ident">enc</span>) =&gt; <span class="ident">f</span>.<span class="ident">debug_tuple</span>(<span class="string">&quot;Body&quot;</span>).<span class="ident">field</span>(<span class="ident">enc</span>).<span class="ident">finish</span>(),
@@ -2326,7 +2327,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">std::ops::BitAndAssign</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">KA</span> {
-    <span class="kw">fn</span> <span class="ident">bitand_assign</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">enabled</span>: <span class="ident">bool</span>) {
+    <span class="kw">fn</span> <span class="ident">bitand_assign</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">enabled</span>: <span class="ident">bool</span>) {
         <span class="kw">if</span> <span class="op">!</span><span class="ident">enabled</span> {
             <span class="macro">trace!</span>(<span class="string">&quot;remote disabling keep-alive&quot;</span>);
             <span class="kw-2">*</span><span class="self">self</span> <span class="op">=</span> <span class="ident">KA::Disabled</span>;
@@ -2348,15 +2349,15 @@
 }
 
 <span class="kw">impl</span> <span class="ident">KA</span> {
-    <span class="kw">fn</span> <span class="ident">idle</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
+    <span class="kw">fn</span> <span class="ident">idle</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
         <span class="kw-2">*</span><span class="self">self</span> <span class="op">=</span> <span class="ident">KA::Idle</span>;
     }
 
-    <span class="kw">fn</span> <span class="ident">busy</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
+    <span class="kw">fn</span> <span class="ident">busy</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
         <span class="kw-2">*</span><span class="self">self</span> <span class="op">=</span> <span class="ident">KA::Busy</span>;
     }
 
-    <span class="kw">fn</span> <span class="ident">disable</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
+    <span class="kw">fn</span> <span class="ident">disable</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
         <span class="kw-2">*</span><span class="self">self</span> <span class="op">=</span> <span class="ident">KA::Disabled</span>;
     }
 
@@ -2366,20 +2367,20 @@
 }
 
 <span class="kw">impl</span> <span class="ident">State</span> {
-    <span class="kw">fn</span> <span class="ident">close</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
+    <span class="kw">fn</span> <span class="ident">close</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
         <span class="macro">trace!</span>(<span class="string">&quot;State::close()&quot;</span>);
         <span class="self">self</span>.<span class="ident">reading</span> <span class="op">=</span> <span class="ident">Reading::Closed</span>;
         <span class="self">self</span>.<span class="ident">writing</span> <span class="op">=</span> <span class="ident">Writing::Closed</span>;
         <span class="self">self</span>.<span class="ident">keep_alive</span>.<span class="ident">disable</span>();
     }
 
-    <span class="kw">fn</span> <span class="ident">close_read</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
+    <span class="kw">fn</span> <span class="ident">close_read</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
         <span class="macro">trace!</span>(<span class="string">&quot;State::close_read()&quot;</span>);
         <span class="self">self</span>.<span class="ident">reading</span> <span class="op">=</span> <span class="ident">Reading::Closed</span>;
         <span class="self">self</span>.<span class="ident">keep_alive</span>.<span class="ident">disable</span>();
     }
 
-    <span class="kw">fn</span> <span class="ident">close_write</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
+    <span class="kw">fn</span> <span class="ident">close_write</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
         <span class="macro">trace!</span>(<span class="string">&quot;State::close_write()&quot;</span>);
         <span class="self">self</span>.<span class="ident">writing</span> <span class="op">=</span> <span class="ident">Writing::Closed</span>;
         <span class="self">self</span>.<span class="ident">keep_alive</span>.<span class="ident">disable</span>();
@@ -2393,7 +2394,7 @@
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">try_keep_alive</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Http1Transaction</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
+    <span class="kw">fn</span> <span class="ident">try_keep_alive</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Http1Transaction</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
         <span class="kw">match</span> (<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">reading</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">writing</span>) {
             (<span class="kw-2">&amp;</span><span class="ident">Reading::KeepAlive</span>, <span class="kw-2">&amp;</span><span class="ident">Writing::KeepAlive</span>) =&gt; {
                 <span class="kw">if</span> <span class="kw">let</span> <span class="ident">KA::Busy</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">keep_alive</span>.<span class="ident">status</span>() {
@@ -2414,18 +2415,18 @@
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">disable_keep_alive</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
+    <span class="kw">fn</span> <span class="ident">disable_keep_alive</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
         <span class="self">self</span>.<span class="ident">keep_alive</span>.<span class="ident">disable</span>()
     }
 
-    <span class="kw">fn</span> <span class="ident">busy</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
+    <span class="kw">fn</span> <span class="ident">busy</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
         <span class="kw">if</span> <span class="kw">let</span> <span class="ident">KA::Disabled</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">keep_alive</span>.<span class="ident">status</span>() {
             <span class="kw">return</span>;
         }
         <span class="self">self</span>.<span class="ident">keep_alive</span>.<span class="ident">busy</span>();
     }
 
-    <span class="kw">fn</span> <span class="ident">idle</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Http1Transaction</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
+    <span class="kw">fn</span> <span class="ident">idle</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Http1Transaction</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
         <span class="macro">debug_assert!</span>(<span class="op">!</span><span class="self">self</span>.<span class="ident">is_idle</span>(), <span class="string">&quot;State::idle() called while idle&quot;</span>);
 
         <span class="self">self</span>.<span class="ident">method</span> <span class="op">=</span> <span class="prelude-val">None</span>;
@@ -2469,7 +2470,7 @@
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">prepare_upgrade</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident"><span class="kw">crate</span>::upgrade::OnUpgrade</span> {
+    <span class="kw">fn</span> <span class="ident">prepare_upgrade</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident"><span class="kw">crate</span>::upgrade::OnUpgrade</span> {
         <span class="kw">let</span> (<span class="ident">tx</span>, <span class="ident">rx</span>) <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::upgrade::pending</span>();
         <span class="self">self</span>.<span class="ident">upgrade</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">tx</span>);
         <span class="ident">rx</span>
@@ -2480,7 +2481,7 @@
 <span class="kw">mod</span> <span class="ident">tests</span> {
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;nightly&quot;</span>)]</span>
     <span class="attribute">#[<span class="ident">bench</span>]</span>
-    <span class="kw">fn</span> <span class="ident">bench_read_head_short</span>(<span class="ident">b</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">::test::Bencher</span>) {
+    <span class="kw">fn</span> <span class="ident">bench_read_head_short</span>(<span class="ident">b</span>: <span class="kw-2">&amp;mut</span> <span class="ident">::test::Bencher</span>) {
         <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
         <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="string">b&quot;GET / HTTP/1.1\r\nHost: localhost:8080\r\n\r\n&quot;</span>;
         <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">s</span>.<span class="ident">len</span>();
@@ -2854,5 +2855,4 @@
 }
 </code></pre></div>
 </section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="hyper" data-search-index-js="../../../../search-index.js" data-search-js="../../../../search.js"></div>
-    <script src="../../../../main.js"></script><script src="../../../../source-script.js"></script><script src="../../../../source-files.js"></script>
 </body></html>

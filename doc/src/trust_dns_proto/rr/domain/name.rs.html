@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;trust-dns-proto-0.20.3&#x2F;src&#x2F;rr&#x2F;domain&#x2F;name.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>name.rs - source</title><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../../../storage.js"></script><script src="../../../../crates.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../../trust_dns_proto/index.html'><div class='logo-container rust-logo'><img src='../../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">   1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;trust-dns-proto-0.20.3&#x2F;src&#x2F;rr&#x2F;domain&#x2F;name.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>name.rs - source</title><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../../../storage.js"></script><script src="../../../../crates.js"></script><script defer src="../../../../main.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script>
+    <noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../../trust_dns_proto/index.html'><div class='logo-container rust-logo'><img src='../../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">   1</span>
 <span id="2">   2</span>
 <span id="3">   3</span>
 <span id="4">   4</span>
@@ -1978,7 +1979,7 @@
     <span class="doccomment">/// Specifies this name is a fully qualified domain name</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// *warning: this interface is unstable and may change in the future*</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_fqdn</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">val</span>: <span class="ident">bool</span>) {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_fqdn</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">val</span>: <span class="ident">bool</span>) {
         <span class="self">self</span>.<span class="ident">is_fqdn</span> <span class="op">=</span> <span class="ident">val</span>
     }
 
@@ -2483,7 +2484,7 @@
     <span class="doccomment">/// In canonical form, there will be no pointers written to the encoder (i.e. no compression).</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">emit_as_canonical</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">encoder</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BinEncoder</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
+        <span class="ident">encoder</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BinEncoder</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
         <span class="ident">canonical</span>: <span class="ident">bool</span>,
     ) -&gt; <span class="ident">ProtoResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">buf_len</span> <span class="op">=</span> <span class="ident">encoder</span>.<span class="ident">len</span>(); <span class="comment">// lazily assert the size is less than 255...</span>
@@ -2558,7 +2559,7 @@
     <span class="doccomment">/// * `lowercase` - if true the name will be lowercased, otherwise it will not be changed when writing</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">emit_with_lowercase</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">encoder</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BinEncoder</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
+        <span class="ident">encoder</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BinEncoder</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
         <span class="ident">lowercase</span>: <span class="ident">bool</span>,
     ) -&gt; <span class="ident">ProtoResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">is_canonical_names</span> <span class="op">=</span> <span class="ident">encoder</span>.<span class="ident">is_canonical_names</span>();
@@ -2608,7 +2609,7 @@
     <span class="doccomment">///  see `to_utf8` or the `Display` impl for methods which convert labels to utf8.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to_ascii</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">String</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">s</span> <span class="op">=</span> <span class="ident">String::with_capacity</span>(<span class="self">self</span>.<span class="ident">len</span>());
-        <span class="self">self</span>.<span class="ident">write_labels</span>::<span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">LabelEncAscii</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">s</span>)
+        <span class="self">self</span>.<span class="ident">write_labels</span>::<span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">LabelEncAscii</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="ident">s</span>)
             .<span class="ident">expect</span>(<span class="string">&quot;string conversion of name should not fail&quot;</span>);
         <span class="ident">s</span>
     }
@@ -2682,7 +2683,7 @@
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">write_labels</span><span class="op">&lt;</span><span class="ident">W</span>: <span class="ident">Write</span>, <span class="ident">E</span>: <span class="ident">LabelEnc</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">W</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">fmt::Error</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">write_labels</span><span class="op">&lt;</span><span class="ident">W</span>: <span class="ident">Write</span>, <span class="ident">E</span>: <span class="ident">LabelEnc</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">W</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">fmt::Error</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">iter</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">b</span><span class="op">|</span> <span class="ident">Label::from_raw_bytes</span>(<span class="ident">b</span>).<span class="ident">unwrap</span>());
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">label</span>) <span class="op">=</span> <span class="ident">iter</span>.<span class="ident">next</span>() {
             <span class="ident">E::write_label</span>(<span class="ident">f</span>, <span class="kw-2">&amp;</span><span class="ident">label</span>)<span class="question-mark">?</span>;
@@ -2780,7 +2781,7 @@
 <span class="kw">trait</span> <span class="ident">LabelEnc</span> {
     <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::wrong_self_convention</span>)]</span>
     <span class="kw">fn</span> <span class="ident">to_label</span>(<span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">ProtoResult</span><span class="op">&lt;</span><span class="ident">Label</span><span class="op">&gt;</span>;
-    <span class="kw">fn</span> <span class="ident">write_label</span><span class="op">&lt;</span><span class="ident">W</span>: <span class="ident">Write</span><span class="op">&gt;</span>(<span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">W</span>, <span class="ident">label</span>: <span class="kw-2">&amp;</span><span class="ident">Label</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">fmt::Error</span><span class="op">&gt;</span>;
+    <span class="kw">fn</span> <span class="ident">write_label</span><span class="op">&lt;</span><span class="ident">W</span>: <span class="ident">Write</span><span class="op">&gt;</span>(<span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">W</span>, <span class="ident">label</span>: <span class="kw-2">&amp;</span><span class="ident">Label</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">fmt::Error</span><span class="op">&gt;</span>;
 }
 
 <span class="kw">struct</span> <span class="ident">LabelEncAscii</span>;
@@ -2790,7 +2791,7 @@
         <span class="ident">Label::from_ascii</span>(<span class="ident">name</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">write_label</span><span class="op">&lt;</span><span class="ident">W</span>: <span class="ident">Write</span><span class="op">&gt;</span>(<span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">W</span>, <span class="ident">label</span>: <span class="kw-2">&amp;</span><span class="ident">Label</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">fmt::Error</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">write_label</span><span class="op">&lt;</span><span class="ident">W</span>: <span class="ident">Write</span><span class="op">&gt;</span>(<span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">W</span>, <span class="ident">label</span>: <span class="kw-2">&amp;</span><span class="ident">Label</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">fmt::Error</span><span class="op">&gt;</span> {
         <span class="ident">label</span>.<span class="ident">write_ascii</span>(<span class="ident">f</span>)
     }
 }
@@ -2802,7 +2803,7 @@
         <span class="ident">Label::from_utf8</span>(<span class="ident">name</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">write_label</span><span class="op">&lt;</span><span class="ident">W</span>: <span class="ident">Write</span><span class="op">&gt;</span>(<span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">W</span>, <span class="ident">label</span>: <span class="kw-2">&amp;</span><span class="ident">Label</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">fmt::Error</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">write_label</span><span class="op">&lt;</span><span class="ident">W</span>: <span class="ident">Write</span><span class="op">&gt;</span>(<span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">W</span>, <span class="ident">label</span>: <span class="kw-2">&amp;</span><span class="ident">Label</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">fmt::Error</span><span class="op">&gt;</span> {
         <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">label</span>)
     }
 }
@@ -2818,7 +2819,7 @@
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Iterator</span> <span class="kw">for</span> <span class="ident">LabelIter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
     <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>];
 
-    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">finished</span> {
             <span class="kw">return</span> <span class="prelude-val">None</span>;
         }
@@ -2844,7 +2845,7 @@
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">ExactSizeIterator</span> <span class="kw">for</span> <span class="ident">LabelIter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {}
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">DoubleEndedIterator</span> <span class="kw">for</span> <span class="ident">LabelIter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">next_back</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">next_back</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">finished</span> {
             <span class="kw">return</span> <span class="prelude-val">None</span>;
         }
@@ -2962,7 +2963,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Hash</span> <span class="kw">for</span> <span class="ident">Name</span> {
-    <span class="kw">fn</span> <span class="ident">hash</span><span class="op">&lt;</span><span class="ident">H</span>: <span class="ident">Hasher</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">state</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">H</span>) {
+    <span class="kw">fn</span> <span class="ident">hash</span><span class="op">&lt;</span><span class="ident">H</span>: <span class="ident">Hasher</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">state</span>: <span class="kw-2">&amp;mut</span> <span class="ident">H</span>) {
         <span class="self">self</span>.<span class="ident">is_fqdn</span>.<span class="ident">hash</span>(<span class="ident">state</span>);
 
         <span class="comment">// this needs to be CaseInsensitive like PartialEq</span>
@@ -2983,7 +2984,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">BinEncodable</span> <span class="kw">for</span> <span class="ident">Name</span> {
-    <span class="kw">fn</span> <span class="ident">emit</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">encoder</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BinEncoder</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">ProtoResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">emit</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">encoder</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BinEncoder</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">ProtoResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">is_canonical_names</span> <span class="op">=</span> <span class="ident">encoder</span>.<span class="ident">is_canonical_names</span>();
         <span class="self">self</span>.<span class="ident">emit_as_canonical</span>(<span class="ident">encoder</span>, <span class="ident">is_canonical_names</span>)
     }
@@ -2994,10 +2995,10 @@
     <span class="doccomment">///  this has a max of 255 octets, with each label being less than 63.</span>
     <span class="doccomment">///  all names will be stored lowercase internally.</span>
     <span class="doccomment">/// This will consume the portions of the `Vec` which it is reading...</span>
-    <span class="kw">fn</span> <span class="ident">read</span>(<span class="ident">decoder</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BinDecoder</span><span class="op">&lt;</span><span class="lifetime">&#39;r</span><span class="op">&gt;</span>) -&gt; <span class="ident">ProtoResult</span><span class="op">&lt;</span><span class="ident">Name</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">read</span>(<span class="ident">decoder</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BinDecoder</span><span class="op">&lt;</span><span class="lifetime">&#39;r</span><span class="op">&gt;</span>) -&gt; <span class="ident">ProtoResult</span><span class="op">&lt;</span><span class="ident">Name</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">label_data</span> <span class="op">=</span> <span class="ident">TinyVec::new</span>();
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">label_ends</span> <span class="op">=</span> <span class="ident">TinyVec::new</span>();
-        <span class="ident">read_inner</span>(<span class="ident">decoder</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">label_data</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">label_ends</span>, <span class="prelude-val">None</span>)<span class="question-mark">?</span>;
+        <span class="ident">read_inner</span>(<span class="ident">decoder</span>, <span class="kw-2">&amp;mut</span> <span class="ident">label_data</span>, <span class="kw-2">&amp;mut</span> <span class="ident">label_ends</span>, <span class="prelude-val">None</span>)<span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>(<span class="ident">Name</span> {
             <span class="ident">is_fqdn</span>: <span class="bool-val">true</span>,
             <span class="ident">label_data</span>,
@@ -3007,9 +3008,9 @@
 }
 
 <span class="kw">fn</span> <span class="ident">read_inner</span>(
-    <span class="ident">decoder</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BinDecoder</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-    <span class="ident">label_data</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">TinyVec</span><span class="op">&lt;</span>[<span class="ident">u8</span>; <span class="number">32</span>]<span class="op">&gt;</span>,
-    <span class="ident">label_ends</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">TinyVec</span><span class="op">&lt;</span>[<span class="ident">u8</span>; <span class="number">24</span>]<span class="op">&gt;</span>,
+    <span class="ident">decoder</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BinDecoder</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
+    <span class="ident">label_data</span>: <span class="kw-2">&amp;mut</span> <span class="ident">TinyVec</span><span class="op">&lt;</span>[<span class="ident">u8</span>; <span class="number">32</span>]<span class="op">&gt;</span>,
+    <span class="ident">label_ends</span>: <span class="kw-2">&amp;mut</span> <span class="ident">TinyVec</span><span class="op">&lt;</span>[<span class="ident">u8</span>; <span class="number">24</span>]<span class="op">&gt;</span>,
     <span class="ident">max_idx</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>,
 ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">DecodeError</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">state</span>: <span class="ident">LabelParseState</span> <span class="op">=</span> <span class="ident">LabelParseState::LabelLengthOrPointer</span>;
@@ -3102,7 +3103,7 @@
                     })<span class="question-mark">?</span>;
 
                 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">pointer</span> <span class="op">=</span> <span class="ident">decoder</span>.<span class="ident">clone</span>(<span class="ident">location</span>);
-                <span class="ident">read_inner</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">pointer</span>, <span class="ident">label_data</span>, <span class="ident">label_ends</span>, <span class="prelude-val">Some</span>(<span class="ident">name_start</span>))<span class="question-mark">?</span>;
+                <span class="ident">read_inner</span>(<span class="kw-2">&amp;mut</span> <span class="ident">pointer</span>, <span class="ident">label_data</span>, <span class="ident">label_ends</span>, <span class="prelude-val">Some</span>(<span class="ident">name_start</span>))<span class="question-mark">?</span>;
 
                 <span class="comment">// Pointers always finish the name, break like Root.</span>
                 <span class="kw">break</span>;
@@ -3119,7 +3120,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">Name</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="self">self</span>.<span class="ident">write_labels</span>::<span class="op">&lt;</span><span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">LabelEncUtf8</span><span class="op">&gt;</span>(<span class="ident">f</span>)
     }
 }
@@ -3298,35 +3299,35 @@
         <span class="kw">let</span> <span class="ident">fourth</span> <span class="op">=</span> <span class="ident">Name::from_str</span>(<span class="string">&quot;z.ra.rb.rc&quot;</span>).<span class="ident">unwrap</span>();
 
         {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">e</span> <span class="op">=</span> <span class="ident">BinEncoder::new</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">bytes</span>);
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">e</span> <span class="op">=</span> <span class="ident">BinEncoder::new</span>(<span class="kw-2">&amp;mut</span> <span class="ident">bytes</span>);
 
-            <span class="ident">first</span>.<span class="ident">emit</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">e</span>).<span class="ident">unwrap</span>();
+            <span class="ident">first</span>.<span class="ident">emit</span>(<span class="kw-2">&amp;mut</span> <span class="ident">e</span>).<span class="ident">unwrap</span>();
             <span class="macro">assert_eq!</span>(<span class="ident">e</span>.<span class="ident">len</span>(), <span class="number">10</span>); <span class="comment">// should be 7 u8s...</span>
 
-            <span class="ident">second</span>.<span class="ident">emit</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">e</span>).<span class="ident">unwrap</span>();
+            <span class="ident">second</span>.<span class="ident">emit</span>(<span class="kw-2">&amp;mut</span> <span class="ident">e</span>).<span class="ident">unwrap</span>();
             <span class="comment">// if this wrote the entire thing, then it would be +5... but a pointer should be +2</span>
             <span class="macro">assert_eq!</span>(<span class="ident">e</span>.<span class="ident">len</span>(), <span class="number">12</span>);
 
-            <span class="ident">third</span>.<span class="ident">emit</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">e</span>).<span class="ident">unwrap</span>();
+            <span class="ident">third</span>.<span class="ident">emit</span>(<span class="kw-2">&amp;mut</span> <span class="ident">e</span>).<span class="ident">unwrap</span>();
             <span class="macro">assert_eq!</span>(<span class="ident">e</span>.<span class="ident">len</span>(), <span class="number">14</span>);
 
-            <span class="ident">fourth</span>.<span class="ident">emit</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">e</span>).<span class="ident">unwrap</span>();
+            <span class="ident">fourth</span>.<span class="ident">emit</span>(<span class="kw-2">&amp;mut</span> <span class="ident">e</span>).<span class="ident">unwrap</span>();
             <span class="macro">assert_eq!</span>(<span class="ident">e</span>.<span class="ident">len</span>(), <span class="number">18</span>);
         }
 
         <span class="comment">// now read them back</span>
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">d</span> <span class="op">=</span> <span class="ident">BinDecoder::new</span>(<span class="kw-2">&amp;</span><span class="ident">bytes</span>);
 
-        <span class="kw">let</span> <span class="ident">r_test</span> <span class="op">=</span> <span class="ident">Name::read</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">d</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">r_test</span> <span class="op">=</span> <span class="ident">Name::read</span>(<span class="kw-2">&amp;mut</span> <span class="ident">d</span>).<span class="ident">unwrap</span>();
         <span class="macro">assert_eq!</span>(<span class="ident">first</span>, <span class="ident">r_test</span>);
 
-        <span class="kw">let</span> <span class="ident">r_test</span> <span class="op">=</span> <span class="ident">Name::read</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">d</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">r_test</span> <span class="op">=</span> <span class="ident">Name::read</span>(<span class="kw-2">&amp;mut</span> <span class="ident">d</span>).<span class="ident">unwrap</span>();
         <span class="macro">assert_eq!</span>(<span class="ident">second</span>, <span class="ident">r_test</span>);
 
-        <span class="kw">let</span> <span class="ident">r_test</span> <span class="op">=</span> <span class="ident">Name::read</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">d</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">r_test</span> <span class="op">=</span> <span class="ident">Name::read</span>(<span class="kw-2">&amp;mut</span> <span class="ident">d</span>).<span class="ident">unwrap</span>();
         <span class="macro">assert_eq!</span>(<span class="ident">third</span>, <span class="ident">r_test</span>);
 
-        <span class="kw">let</span> <span class="ident">r_test</span> <span class="op">=</span> <span class="ident">Name::read</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">d</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">r_test</span> <span class="op">=</span> <span class="ident">Name::read</span>(<span class="kw-2">&amp;mut</span> <span class="ident">d</span>).<span class="ident">unwrap</span>();
         <span class="macro">assert_eq!</span>(<span class="ident">fourth</span>, <span class="ident">r_test</span>);
     }
 
@@ -3339,30 +3340,30 @@
         <span class="kw">let</span> <span class="ident">third</span> <span class="op">=</span> <span class="ident">Name::from_str</span>(<span class="string">&quot;ra.rc&quot;</span>).<span class="ident">unwrap</span>();
 
         {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">e</span> <span class="op">=</span> <span class="ident">BinEncoder::new</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">bytes</span>);
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">e</span> <span class="op">=</span> <span class="ident">BinEncoder::new</span>(<span class="kw-2">&amp;mut</span> <span class="ident">bytes</span>);
 
-            <span class="ident">first</span>.<span class="ident">emit</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">e</span>).<span class="ident">unwrap</span>();
+            <span class="ident">first</span>.<span class="ident">emit</span>(<span class="kw-2">&amp;mut</span> <span class="ident">e</span>).<span class="ident">unwrap</span>();
             <span class="macro">assert_eq!</span>(<span class="ident">e</span>.<span class="ident">len</span>(), <span class="number">10</span>);
 
-            <span class="ident">second</span>.<span class="ident">emit</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">e</span>).<span class="ident">unwrap</span>();
+            <span class="ident">second</span>.<span class="ident">emit</span>(<span class="kw-2">&amp;mut</span> <span class="ident">e</span>).<span class="ident">unwrap</span>();
             <span class="comment">// +5 with the first +3 being the text form of &quot;ra&quot; and +2 for the pointer to &quot;rc&quot;.</span>
             <span class="macro">assert_eq!</span>(<span class="ident">e</span>.<span class="ident">len</span>(), <span class="number">15</span>);
 
             <span class="comment">// +2 with the pointer to &quot;ra.rc&quot; as previously seen.</span>
-            <span class="ident">third</span>.<span class="ident">emit</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">e</span>).<span class="ident">unwrap</span>();
+            <span class="ident">third</span>.<span class="ident">emit</span>(<span class="kw-2">&amp;mut</span> <span class="ident">e</span>).<span class="ident">unwrap</span>();
             <span class="macro">assert_eq!</span>(<span class="ident">e</span>.<span class="ident">len</span>(), <span class="number">17</span>);
         }
 
         <span class="comment">// now read them back</span>
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">d</span> <span class="op">=</span> <span class="ident">BinDecoder::new</span>(<span class="kw-2">&amp;</span><span class="ident">bytes</span>);
 
-        <span class="kw">let</span> <span class="ident">r_test</span> <span class="op">=</span> <span class="ident">Name::read</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">d</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">r_test</span> <span class="op">=</span> <span class="ident">Name::read</span>(<span class="kw-2">&amp;mut</span> <span class="ident">d</span>).<span class="ident">unwrap</span>();
         <span class="macro">assert_eq!</span>(<span class="ident">first</span>, <span class="ident">r_test</span>);
 
-        <span class="kw">let</span> <span class="ident">r_test</span> <span class="op">=</span> <span class="ident">Name::read</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">d</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">r_test</span> <span class="op">=</span> <span class="ident">Name::read</span>(<span class="kw-2">&amp;mut</span> <span class="ident">d</span>).<span class="ident">unwrap</span>();
         <span class="macro">assert_eq!</span>(<span class="ident">second</span>, <span class="ident">r_test</span>);
 
-        <span class="kw">let</span> <span class="ident">r_test</span> <span class="op">=</span> <span class="ident">Name::read</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">d</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">r_test</span> <span class="op">=</span> <span class="ident">Name::read</span>(<span class="kw-2">&amp;mut</span> <span class="ident">d</span>).<span class="ident">unwrap</span>();
         <span class="macro">assert_eq!</span>(<span class="ident">third</span>, <span class="ident">r_test</span>);
     }
 
@@ -3372,26 +3373,26 @@
         <span class="kw">let</span> <span class="ident">bytes</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="number">0xC0</span>, <span class="number">0x01</span>];
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">d</span> <span class="op">=</span> <span class="ident">BinDecoder::new</span>(<span class="kw-2">&amp;</span><span class="ident">bytes</span>);
 
-        <span class="macro">assert!</span>(<span class="ident">Name::read</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">d</span>).<span class="ident">is_err</span>());
+        <span class="macro">assert!</span>(<span class="ident">Name::read</span>(<span class="kw-2">&amp;mut</span> <span class="ident">d</span>).<span class="ident">is_err</span>());
 
         <span class="comment">// formerly a stack overflow, recursing back on itself</span>
         <span class="kw">let</span> <span class="ident">bytes</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="number">0xC0</span>, <span class="number">0x00</span>];
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">d</span> <span class="op">=</span> <span class="ident">BinDecoder::new</span>(<span class="kw-2">&amp;</span><span class="ident">bytes</span>);
 
-        <span class="macro">assert!</span>(<span class="ident">Name::read</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">d</span>).<span class="ident">is_err</span>());
+        <span class="macro">assert!</span>(<span class="ident">Name::read</span>(<span class="kw-2">&amp;mut</span> <span class="ident">d</span>).<span class="ident">is_err</span>());
 
         <span class="comment">// formerly a stack overflow, recursing back on itself</span>
         <span class="kw">let</span> <span class="ident">bytes</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="number">0x01</span>, <span class="number">0x41</span>, <span class="number">0xC0</span>, <span class="number">0x00</span>];
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">d</span> <span class="op">=</span> <span class="ident">BinDecoder::new</span>(<span class="kw-2">&amp;</span><span class="ident">bytes</span>);
 
-        <span class="macro">assert!</span>(<span class="ident">Name::read</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">d</span>).<span class="ident">is_err</span>());
+        <span class="macro">assert!</span>(<span class="ident">Name::read</span>(<span class="kw-2">&amp;mut</span> <span class="ident">d</span>).<span class="ident">is_err</span>());
 
         <span class="comment">// formerly a stack overflow, recursing by going past the end, then back to the beginning.</span>
         <span class="comment">//   this is disallowed based on the rule that all labels must be &quot;prior&quot; to the current label.</span>
         <span class="kw">let</span> <span class="ident">bytes</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="number">0xC0</span>, <span class="number">0x02</span>, <span class="number">0xC0</span>, <span class="number">0x00</span>];
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">d</span> <span class="op">=</span> <span class="ident">BinDecoder::new</span>(<span class="kw-2">&amp;</span><span class="ident">bytes</span>);
 
-        <span class="macro">assert!</span>(<span class="ident">Name::read</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">d</span>).<span class="ident">is_err</span>());
+        <span class="macro">assert!</span>(<span class="ident">Name::read</span>(<span class="kw-2">&amp;mut</span> <span class="ident">d</span>).<span class="ident">is_err</span>());
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
@@ -3411,7 +3412,7 @@
         }
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">d</span> <span class="op">=</span> <span class="ident">BinDecoder::new</span>(<span class="kw-2">&amp;</span><span class="ident">bytes</span>);
         <span class="ident">d</span>.<span class="ident">read_slice</span>(<span class="ident">n</span> <span class="kw">as</span> <span class="ident">usize</span>).<span class="ident">unwrap</span>();
-        <span class="macro">assert!</span>(<span class="ident">Name::read</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">d</span>).<span class="ident">is_err</span>());
+        <span class="macro">assert!</span>(<span class="ident">Name::read</span>(<span class="kw-2">&amp;mut</span> <span class="ident">d</span>).<span class="ident">is_err</span>());
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
@@ -3423,7 +3424,7 @@
         <span class="ident">bytes</span>.<span class="ident">push</span>(<span class="number">0</span>);
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">d</span> <span class="op">=</span> <span class="ident">BinDecoder::new</span>(<span class="kw-2">&amp;</span><span class="ident">bytes</span>);
-        <span class="macro">assert!</span>(<span class="ident">Name::read</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">d</span>).<span class="ident">is_err</span>());
+        <span class="macro">assert!</span>(<span class="ident">Name::read</span>(<span class="kw-2">&amp;mut</span> <span class="ident">d</span>).<span class="ident">is_err</span>());
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
@@ -3660,12 +3661,12 @@
 
         <span class="comment">// u16 max value is where issues start being tickled...</span>
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> <span class="ident">Vec::with_capacity</span>(<span class="ident">u16::max_value</span>() <span class="kw">as</span> <span class="ident">usize</span>);
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">encoder</span> <span class="op">=</span> <span class="ident">BinEncoder::new</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">buf</span>);
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">encoder</span> <span class="op">=</span> <span class="ident">BinEncoder::new</span>(<span class="kw-2">&amp;mut</span> <span class="ident">buf</span>);
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">result</span> <span class="op">=</span> <span class="prelude-val">Ok</span>(());
         <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="number">0</span>..<span class="number">10000</span> {
             <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">Name::from_ascii</span>(<span class="macro">format!</span>(<span class="string">&quot;name{}.example.com.&quot;</span>, <span class="ident">i</span>)).<span class="ident">unwrap</span>();
-            <span class="ident">result</span> <span class="op">=</span> <span class="ident">name</span>.<span class="ident">emit</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">encoder</span>);
+            <span class="ident">result</span> <span class="op">=</span> <span class="ident">name</span>.<span class="ident">emit</span>(<span class="kw-2">&amp;mut</span> <span class="ident">encoder</span>);
             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Err</span>(..) <span class="op">=</span> <span class="ident">result</span> {
                 <span class="kw">break</span>;
             }
@@ -3774,5 +3775,4 @@
 }
 </code></pre></div>
 </section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="trust_dns_proto" data-search-index-js="../../../../search-index.js" data-search-js="../../../../search.js"></div>
-    <script src="../../../../main.js"></script><script src="../../../../source-script.js"></script><script src="../../../../source-files.js"></script>
 </body></html>

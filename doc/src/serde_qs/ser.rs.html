@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;serde_qs-0.8.5&#x2F;src&#x2F;ser.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>ser.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../serde_qs/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;serde_qs-0.8.5&#x2F;src&#x2F;ser.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>ser.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><script defer src="../../main.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script>
+    <noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../serde_qs/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -657,10 +658,10 @@
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to_string</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">ser::Serialize</span><span class="op">&gt;</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buffer</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">first</span> <span class="op">=</span> <span class="bool-val">true</span>;
-    <span class="ident">input</span>.<span class="ident">serialize</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">QsSerializer</span> {
-        <span class="ident">writer</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">buffer</span>,
+    <span class="ident">input</span>.<span class="ident">serialize</span>(<span class="kw-2">&amp;mut</span> <span class="ident">QsSerializer</span> {
+        <span class="ident">writer</span>: <span class="kw-2">&amp;mut</span> <span class="ident">buffer</span>,
         <span class="ident">key</span>: <span class="prelude-val">None</span>,
-        <span class="ident">first</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">first</span>,
+        <span class="ident">first</span>: <span class="kw-2">&amp;mut</span> <span class="ident">first</span>,
     })<span class="question-mark">?</span>;
     <span class="ident">String::from_utf8</span>(<span class="ident">buffer</span>).<span class="ident">map_err</span>(<span class="ident">Error::from</span>)
 }
@@ -692,12 +693,12 @@
 <span class="doccomment">///     &quot;name=Alice&amp;age=24&amp;occupation=Student&quot;);</span>
 <span class="doccomment">/// # }</span>
 <span class="doccomment">/// ```</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to_writer</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">ser::Serialize</span>, <span class="ident">W</span>: <span class="ident">Write</span><span class="op">&gt;</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>, <span class="ident">writer</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">W</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to_writer</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">ser::Serialize</span>, <span class="ident">W</span>: <span class="ident">Write</span><span class="op">&gt;</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>, <span class="ident">writer</span>: <span class="kw-2">&amp;mut</span> <span class="ident">W</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">first</span> <span class="op">=</span> <span class="bool-val">true</span>;
-    <span class="ident">input</span>.<span class="ident">serialize</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">QsSerializer</span> {
+    <span class="ident">input</span>.<span class="ident">serialize</span>(<span class="kw-2">&amp;mut</span> <span class="ident">QsSerializer</span> {
         <span class="ident">writer</span>,
         <span class="ident">key</span>: <span class="prelude-val">None</span>,
-        <span class="ident">first</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">first</span>,
+        <span class="ident">first</span>: <span class="kw-2">&amp;mut</span> <span class="ident">first</span>,
     })
 }
 
@@ -721,7 +722,7 @@
         <span class="prelude-val">Some</span>(<span class="ident">first_position</span>) =&gt; {
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">replaced</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">as_bytes</span>().<span class="ident">to_owned</span>();
             <span class="ident">replaced</span>[<span class="ident">first_position</span>] <span class="op">=</span> <span class="string">b&#39;+&#39;</span>;
-            <span class="kw">for</span> <span class="ident">byte</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">replaced</span>[<span class="ident">first_position</span> <span class="op">+</span> <span class="number">1</span>..] {
+            <span class="kw">for</span> <span class="ident">byte</span> <span class="kw">in</span> <span class="kw-2">&amp;mut</span> <span class="ident">replaced</span>[<span class="ident">first_position</span> <span class="op">+</span> <span class="number">1</span>..] {
                 <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">byte</span> <span class="op">==</span> <span class="string">b&#39; &#39;</span> {
                     <span class="kw-2">*</span><span class="ident">byte</span> <span class="op">=</span> <span class="string">b&#39;+&#39;</span>;
                 }
@@ -732,7 +733,7 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">W</span>: <span class="lifetime">&#39;a</span> <span class="op">+</span> <span class="ident">Write</span><span class="op">&gt;</span> <span class="ident">QsSerializer</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">W</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">extend_key</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">newkey</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) {
+    <span class="kw">fn</span> <span class="ident">extend_key</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">newkey</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) {
         <span class="kw">let</span> <span class="ident">newkey</span> <span class="op">=</span> <span class="ident">percent_encode</span>(<span class="ident">newkey</span>.<span class="ident">as_bytes</span>(), <span class="ident">QS_ENCODE_SET</span>)
             .<span class="ident">map</span>(<span class="ident">replace_space</span>)
             .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>();
@@ -744,7 +745,7 @@
         <span class="self">self</span>.<span class="ident">key</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">Cow::Owned</span>(<span class="ident">key</span>))
     }
 
-    <span class="kw">fn</span> <span class="ident">write_value</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">value</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">write_value</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">value</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">key</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">key</span> {
             <span class="macro">write!</span>(
                 <span class="self">self</span>.<span class="ident">writer</span>,
@@ -947,14 +948,14 @@
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">W</span>: <span class="ident">Write</span><span class="op">&gt;</span> <span class="ident">ser::SerializeTuple</span> <span class="kw">for</span> <span class="ident">QsSeq</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">W</span><span class="op">&gt;</span> {
     <span class="kw">type</span> <span class="prelude-val">Ok</span> <span class="op">=</span> ();
     <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">Error</span>;
-    <span class="kw">fn</span> <span class="ident">serialize_element</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span>
+    <span class="kw">fn</span> <span class="ident">serialize_element</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">T</span>: <span class="ident">ser::Serialize</span>,
     {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">serializer</span> <span class="op">=</span> <span class="ident">QsSerializer::new_from_ref</span>(<span class="self">self</span>.<span class="number">0</span>);
         <span class="ident">serializer</span>.<span class="ident">extend_key</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">1</span>.<span class="ident">to_string</span>());
         <span class="self">self</span>.<span class="number">1</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
-        <span class="ident">value</span>.<span class="ident">serialize</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">serializer</span>)
+        <span class="ident">value</span>.<span class="ident">serialize</span>(<span class="kw-2">&amp;mut</span> <span class="ident">serializer</span>)
     }
 
     <span class="kw">fn</span> <span class="ident">end</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Ok</span><span class="op">&gt;</span> {
@@ -965,14 +966,14 @@
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">W</span>: <span class="ident">Write</span><span class="op">&gt;</span> <span class="ident">ser::SerializeSeq</span> <span class="kw">for</span> <span class="ident">QsSeq</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">W</span><span class="op">&gt;</span> {
     <span class="kw">type</span> <span class="prelude-val">Ok</span> <span class="op">=</span> ();
     <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">Error</span>;
-    <span class="kw">fn</span> <span class="ident">serialize_element</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span>
+    <span class="kw">fn</span> <span class="ident">serialize_element</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">T</span>: <span class="ident">ser::Serialize</span>,
     {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">serializer</span> <span class="op">=</span> <span class="ident">QsSerializer::new_from_ref</span>(<span class="self">self</span>.<span class="number">0</span>);
         <span class="ident">serializer</span>.<span class="ident">extend_key</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">1</span>.<span class="ident">to_string</span>());
         <span class="self">self</span>.<span class="number">1</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
-        <span class="ident">value</span>.<span class="ident">serialize</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">serializer</span>)
+        <span class="ident">value</span>.<span class="ident">serialize</span>(<span class="kw-2">&amp;mut</span> <span class="ident">serializer</span>)
     }
     <span class="kw">fn</span> <span class="ident">end</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Ok</span><span class="op">&gt;</span> {
         <span class="prelude-val">Ok</span>(())
@@ -982,13 +983,13 @@
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">W</span>: <span class="ident">Write</span><span class="op">&gt;</span> <span class="ident">ser::SerializeStruct</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">QsSerializer</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">W</span><span class="op">&gt;</span> {
     <span class="kw">type</span> <span class="prelude-val">Ok</span> <span class="op">=</span> ();
     <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">Error</span>;
-    <span class="kw">fn</span> <span class="ident">serialize_field</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span>
+    <span class="kw">fn</span> <span class="ident">serialize_field</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">T</span>: <span class="ident">ser::Serialize</span>,
     {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">serializer</span> <span class="op">=</span> <span class="ident">QsSerializer::new_from_ref</span>(<span class="self">self</span>);
         <span class="ident">serializer</span>.<span class="ident">extend_key</span>(<span class="ident">key</span>);
-        <span class="ident">value</span>.<span class="ident">serialize</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">serializer</span>)
+        <span class="ident">value</span>.<span class="ident">serialize</span>(<span class="kw-2">&amp;mut</span> <span class="ident">serializer</span>)
     }
     <span class="kw">fn</span> <span class="ident">end</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Ok</span><span class="op">&gt;</span> {
         <span class="prelude-val">Ok</span>(())
@@ -999,13 +1000,13 @@
     <span class="kw">type</span> <span class="prelude-val">Ok</span> <span class="op">=</span> ();
     <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">Error</span>;
 
-    <span class="kw">fn</span> <span class="ident">serialize_field</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span>
+    <span class="kw">fn</span> <span class="ident">serialize_field</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">T</span>: <span class="ident">ser::Serialize</span>,
     {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">serializer</span> <span class="op">=</span> <span class="ident">QsSerializer::new_from_ref</span>(<span class="self">self</span>);
         <span class="ident">serializer</span>.<span class="ident">extend_key</span>(<span class="ident">key</span>);
-        <span class="ident">value</span>.<span class="ident">serialize</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">serializer</span>)
+        <span class="ident">value</span>.<span class="ident">serialize</span>(<span class="kw-2">&amp;mut</span> <span class="ident">serializer</span>)
     }
 
     <span class="kw">fn</span> <span class="ident">end</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Ok</span><span class="op">&gt;</span> {
@@ -1017,14 +1018,14 @@
     <span class="kw">type</span> <span class="prelude-val">Ok</span> <span class="op">=</span> ();
     <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">Error</span>;
 
-    <span class="kw">fn</span> <span class="ident">serialize_field</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span>
+    <span class="kw">fn</span> <span class="ident">serialize_field</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">T</span>: <span class="ident">ser::Serialize</span>,
     {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">serializer</span> <span class="op">=</span> <span class="ident">QsSerializer::new_from_ref</span>(<span class="self">self</span>.<span class="number">0</span>);
         <span class="ident">serializer</span>.<span class="ident">extend_key</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">1</span>.<span class="ident">to_string</span>());
         <span class="self">self</span>.<span class="number">1</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
-        <span class="ident">value</span>.<span class="ident">serialize</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">serializer</span>)
+        <span class="ident">value</span>.<span class="ident">serialize</span>(<span class="kw-2">&amp;mut</span> <span class="ident">serializer</span>)
     }
 
     <span class="kw">fn</span> <span class="ident">end</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Ok</span><span class="op">&gt;</span> {
@@ -1036,14 +1037,14 @@
     <span class="kw">type</span> <span class="prelude-val">Ok</span> <span class="op">=</span> ();
     <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">Error</span>;
 
-    <span class="kw">fn</span> <span class="ident">serialize_field</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span>
+    <span class="kw">fn</span> <span class="ident">serialize_field</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">T</span>: <span class="ident">ser::Serialize</span>,
     {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">serializer</span> <span class="op">=</span> <span class="ident">QsSerializer::new_from_ref</span>(<span class="self">self</span>.<span class="number">0</span>);
         <span class="ident">serializer</span>.<span class="ident">extend_key</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">1</span>.<span class="ident">to_string</span>());
         <span class="self">self</span>.<span class="number">1</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
-        <span class="ident">value</span>.<span class="ident">serialize</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">serializer</span>)
+        <span class="ident">value</span>.<span class="ident">serialize</span>(<span class="kw-2">&amp;mut</span> <span class="ident">serializer</span>)
     }
 
     <span class="kw">fn</span> <span class="ident">end</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Ok</span><span class="op">&gt;</span> {
@@ -1055,7 +1056,7 @@
     <span class="kw">type</span> <span class="prelude-val">Ok</span> <span class="op">=</span> ();
     <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">Error</span>;
 
-    <span class="kw">fn</span> <span class="ident">serialize_key</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span>
+    <span class="kw">fn</span> <span class="ident">serialize_key</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">T</span>: <span class="ident">ser::Serialize</span>,
     {
@@ -1063,7 +1064,7 @@
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">fn</span> <span class="ident">serialize_value</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span>
+    <span class="kw">fn</span> <span class="ident">serialize_value</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">T</span>: <span class="ident">ser::Serialize</span>,
     {
@@ -1074,21 +1075,21 @@
             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::no_key</span>());
         }
         <span class="self">self</span>.<span class="number">1</span> <span class="op">=</span> <span class="prelude-val">None</span>;
-        <span class="ident">value</span>.<span class="ident">serialize</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">serializer</span>)
+        <span class="ident">value</span>.<span class="ident">serialize</span>(<span class="kw-2">&amp;mut</span> <span class="ident">serializer</span>)
     }
 
     <span class="kw">fn</span> <span class="ident">end</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Ok</span><span class="op">&gt;</span> {
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">fn</span> <span class="ident">serialize_entry</span><span class="op">&lt;</span><span class="ident">K</span>: <span class="question-mark">?</span><span class="ident">Sized</span>, <span class="ident">V</span>: <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">K</span>, <span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="ident">V</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span>
+    <span class="kw">fn</span> <span class="ident">serialize_entry</span><span class="op">&lt;</span><span class="ident">K</span>: <span class="question-mark">?</span><span class="ident">Sized</span>, <span class="ident">V</span>: <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">K</span>, <span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="ident">V</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">K</span>: <span class="ident">ser::Serialize</span>,
         <span class="ident">V</span>: <span class="ident">ser::Serialize</span>,
     {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">serializer</span> <span class="op">=</span> <span class="ident">QsSerializer::new_from_ref</span>(<span class="self">self</span>.<span class="number">0</span>);
         <span class="ident">serializer</span>.<span class="ident">extend_key</span>(<span class="kw-2">&amp;</span><span class="ident">key</span>.<span class="ident">serialize</span>(<span class="ident">StringSerializer</span>)<span class="question-mark">?</span>);
-        <span class="ident">value</span>.<span class="ident">serialize</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">serializer</span>)
+        <span class="ident">value</span>.<span class="ident">serialize</span>(<span class="kw-2">&amp;mut</span> <span class="ident">serializer</span>)
     }
 }
 
@@ -1222,5 +1223,4 @@
 }
 </code></pre></div>
 </section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="serde_qs" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>
-    <script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script>
 </body></html>

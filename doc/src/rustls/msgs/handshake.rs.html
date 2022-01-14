@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;rustls-0.19.1&#x2F;src&#x2F;msgs&#x2F;handshake.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>handshake.rs - source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../rustls/index.html'><div class='logo-container rust-logo'><img src='../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">   1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;rustls-0.19.1&#x2F;src&#x2F;msgs&#x2F;handshake.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>handshake.rs - source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><script defer src="../../../main.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script>
+    <noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../rustls/index.html'><div class='logo-container rust-logo'><img src='../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">   1</span>
 <span id="2">   2</span>
 <span id="3">   3</span>
 <span id="4">   4</span>
@@ -2328,11 +2329,11 @@
     <span class="kw">pub</span> <span class="kw">type</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span> <span class="op">=</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">itemtype</span><span class="op">&gt;</span>;
 
     <span class="kw">impl</span> <span class="ident">Codec</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span> {
-      <span class="kw">fn</span> <span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">bytes</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) {
+      <span class="kw">fn</span> <span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">bytes</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) {
         <span class="ident">codec::encode_vec_u8</span>(<span class="ident">bytes</span>, <span class="self">self</span>);
       }
 
-      <span class="kw">fn</span> <span class="ident">read</span>(<span class="ident">r</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Reader</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span><span class="op">&gt;</span> {
+      <span class="kw">fn</span> <span class="ident">read</span>(<span class="ident">r</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Reader</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span><span class="op">&gt;</span> {
         <span class="ident">codec::read_vec_u8</span>::<span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">itemtype</span><span class="op">&gt;</span>(<span class="ident">r</span>)
       }
     }
@@ -2344,11 +2345,11 @@
     <span class="kw">pub</span> <span class="kw">type</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span> <span class="op">=</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">itemtype</span><span class="op">&gt;</span>;
 
     <span class="kw">impl</span> <span class="ident">Codec</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span> {
-      <span class="kw">fn</span> <span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">bytes</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) {
+      <span class="kw">fn</span> <span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">bytes</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) {
         <span class="ident">codec::encode_vec_u16</span>(<span class="ident">bytes</span>, <span class="self">self</span>);
       }
 
-      <span class="kw">fn</span> <span class="ident">read</span>(<span class="ident">r</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Reader</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span><span class="op">&gt;</span> {
+      <span class="kw">fn</span> <span class="ident">read</span>(<span class="ident">r</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Reader</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span><span class="op">&gt;</span> {
         <span class="ident">codec::read_vec_u16</span>::<span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">itemtype</span><span class="op">&gt;</span>(<span class="ident">r</span>)
       }
     }
@@ -2369,11 +2370,11 @@
 <span class="kw">static</span> <span class="ident">ZERO_RANDOM</span>: <span class="ident">Random</span> <span class="op">=</span> <span class="ident">Random</span>([<span class="number">0u8</span>; <span class="number">32</span>]);
 
 <span class="kw">impl</span> <span class="ident">Codec</span> <span class="kw">for</span> <span class="ident">Random</span> {
-    <span class="kw">fn</span> <span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">bytes</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) {
+    <span class="kw">fn</span> <span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">bytes</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) {
         <span class="ident">bytes</span>.<span class="ident">extend_from_slice</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>);
     }
 
-    <span class="kw">fn</span> <span class="ident">read</span>(<span class="ident">r</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Reader</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Random</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">read</span>(<span class="ident">r</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Reader</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Random</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">bytes</span> <span class="op">=</span> <span class="ident">r</span>.<span class="ident">take</span>(<span class="number">32</span>)<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">opaque</span> <span class="op">=</span> [<span class="number">0</span>; <span class="number">32</span>];
         <span class="ident">opaque</span>.<span class="ident">clone_from_slice</span>(<span class="ident">bytes</span>);
@@ -2385,10 +2386,10 @@
 <span class="kw">impl</span> <span class="ident">Random</span> {
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_slice</span>(<span class="ident">bytes</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="ident">Random</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">rd</span> <span class="op">=</span> <span class="ident">Reader::init</span>(<span class="ident">bytes</span>);
-        <span class="ident">Random::read</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">rd</span>).<span class="ident">unwrap</span>()
+        <span class="ident">Random::read</span>(<span class="kw-2">&amp;mut</span> <span class="ident">rd</span>).<span class="ident">unwrap</span>()
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">write_slice</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">bytes</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">u8</span>]) {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">write_slice</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">bytes</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">u8</span>]) {
         <span class="kw">let</span> <span class="ident">buf</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">get_encoding</span>();
         <span class="ident">bytes</span>.<span class="ident">write_all</span>(<span class="kw-2">&amp;</span><span class="ident">buf</span>).<span class="ident">unwrap</span>();
     }
@@ -2401,7 +2402,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">SessionID</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">t</span> <span class="op">=</span> <span class="ident">f</span>.<span class="ident">debug_tuple</span>(<span class="string">&quot;SessionID&quot;</span>);
         <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="number">0</span>..<span class="self">self</span>.<span class="ident">len</span>() {
             <span class="ident">t</span>.<span class="ident">field</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">data</span>[<span class="ident">i</span>]);
@@ -2426,13 +2427,13 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Codec</span> <span class="kw">for</span> <span class="ident">SessionID</span> {
-    <span class="kw">fn</span> <span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">bytes</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) {
+    <span class="kw">fn</span> <span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">bytes</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) {
         <span class="macro">debug_assert!</span>(<span class="self">self</span>.<span class="ident">len</span> <span class="op">&lt;</span><span class="op">=</span> <span class="number">32</span>);
         <span class="ident">bytes</span>.<span class="ident">push</span>(<span class="self">self</span>.<span class="ident">len</span> <span class="kw">as</span> <span class="ident">u8</span>);
         <span class="ident">bytes</span>.<span class="ident">extend_from_slice</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">data</span>[..<span class="self">self</span>.<span class="ident">len</span>]);
     }
 
-    <span class="kw">fn</span> <span class="ident">read</span>(<span class="ident">r</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Reader</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">SessionID</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">read</span>(<span class="ident">r</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Reader</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">SessionID</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">u8::read</span>(<span class="ident">r</span>)<span class="question-mark">?</span> <span class="kw">as</span> <span class="ident">usize</span>;
         <span class="kw">if</span> <span class="ident">len</span> <span class="op">&gt;</span> <span class="number">32</span> {
             <span class="kw">return</span> <span class="prelude-val">None</span>;
@@ -2481,11 +2482,11 @@
 }
 
 <span class="kw">impl</span> <span class="ident">UnknownExtension</span> {
-    <span class="kw">fn</span> <span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">bytes</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) {
+    <span class="kw">fn</span> <span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">bytes</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) {
         <span class="self">self</span>.<span class="ident">payload</span>.<span class="ident">encode</span>(<span class="ident">bytes</span>);
     }
 
-    <span class="kw">fn</span> <span class="ident">read</span>(<span class="ident">typ</span>: <span class="ident">ExtensionType</span>, <span class="ident">r</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Reader</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">UnknownExtension</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">read</span>(<span class="ident">typ</span>: <span class="ident">ExtensionType</span>, <span class="ident">r</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Reader</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">UnknownExtension</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">payload</span> <span class="op">=</span> <span class="ident">Payload::read</span>(<span class="ident">r</span>)<span class="question-mark">?</span>;
         <span class="prelude-val">Some</span>(<span class="ident">UnknownExtension</span> { <span class="ident">typ</span>, <span class="ident">payload</span> })
     }
@@ -2553,7 +2554,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">ServerNamePayload</span> {
-    <span class="kw">fn</span> <span class="ident">read_hostname</span>(<span class="ident">r</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Reader</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ServerNamePayload</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">read_hostname</span>(<span class="ident">r</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Reader</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ServerNamePayload</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">u16::read</span>(<span class="ident">r</span>)<span class="question-mark">?</span> <span class="kw">as</span> <span class="ident">usize</span>;
         <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">r</span>.<span class="ident">take</span>(<span class="ident">len</span>)<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">dns_name</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">webpki::DNSNameRef::try_from_ascii</span>(<span class="ident">name</span>) {
@@ -2566,13 +2567,13 @@
         <span class="prelude-val">Some</span>(<span class="ident">ServerNamePayload::HostName</span>(<span class="ident">dns_name</span>.<span class="ident">into</span>()))
     }
 
-    <span class="kw">fn</span> <span class="ident">encode_hostname</span>(<span class="ident">name</span>: <span class="ident">webpki::DNSNameRef</span>, <span class="ident">bytes</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) {
+    <span class="kw">fn</span> <span class="ident">encode_hostname</span>(<span class="ident">name</span>: <span class="ident">webpki::DNSNameRef</span>, <span class="ident">bytes</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) {
         <span class="kw">let</span> <span class="ident">dns_name_str</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="ident">name</span>.<span class="ident">into</span>();
         (<span class="ident">dns_name_str</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u16</span>).<span class="ident">encode</span>(<span class="ident">bytes</span>);
         <span class="ident">bytes</span>.<span class="ident">extend_from_slice</span>(<span class="ident">dns_name_str</span>.<span class="ident">as_bytes</span>());
     }
 
-    <span class="kw">fn</span> <span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">bytes</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) {
+    <span class="kw">fn</span> <span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">bytes</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) {
         <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
             <span class="ident">ServerNamePayload::HostName</span>(<span class="kw-2">ref</span> <span class="ident">r</span>) =&gt; {
                 <span class="ident">ServerNamePayload::encode_hostname</span>(<span class="ident">r</span>.<span class="ident">as_ref</span>(), <span class="ident">bytes</span>)
@@ -2589,12 +2590,12 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Codec</span> <span class="kw">for</span> <span class="ident">ServerName</span> {
-    <span class="kw">fn</span> <span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">bytes</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) {
+    <span class="kw">fn</span> <span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">bytes</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) {
         <span class="self">self</span>.<span class="ident">typ</span>.<span class="ident">encode</span>(<span class="ident">bytes</span>);
         <span class="self">self</span>.<span class="ident">payload</span>.<span class="ident">encode</span>(<span class="ident">bytes</span>);
     }
 
-    <span class="kw">fn</span> <span class="ident">read</span>(<span class="ident">r</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Reader</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ServerName</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">read</span>(<span class="ident">r</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Reader</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ServerName</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">typ</span> <span class="op">=</span> <span class="ident">ServerNameType::read</span>(<span class="ident">r</span>)<span class="question-mark">?</span>;
 
         <span class="kw">let</span> <span class="ident">payload</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">typ</span> {
@@ -2693,12 +2694,12 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Codec</span> <span class="kw">for</span> <span class="ident">KeyShareEntry</span> {
-    <span class="kw">fn</span> <span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">bytes</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) {
+    <span class="kw">fn</span> <span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">bytes</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) {
         <span class="self">self</span>.<span class="ident">group</span>.<span class="ident">encode</span>(<span class="ident">bytes</span>);
         <span class="self">self</span>.<span class="ident">payload</span>.<span class="ident">encode</span>(<span class="ident">bytes</span>);
     }
 
-    <span class="kw">fn</span> <span class="ident">read</span>(<span class="ident">r</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Reader</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">KeyShareEntry</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">read</span>(<span class="ident">r</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Reader</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">KeyShareEntry</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">group</span> <span class="op">=</span> <span class="ident">NamedGroup::read</span>(<span class="ident">r</span>)<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">payload</span> <span class="op">=</span> <span class="ident">PayloadU16::read</span>(<span class="ident">r</span>)<span class="question-mark">?</span>;
 
@@ -2723,12 +2724,12 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Codec</span> <span class="kw">for</span> <span class="ident">PresharedKeyIdentity</span> {
-    <span class="kw">fn</span> <span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">bytes</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) {
+    <span class="kw">fn</span> <span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">bytes</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) {
         <span class="self">self</span>.<span class="ident">identity</span>.<span class="ident">encode</span>(<span class="ident">bytes</span>);
         <span class="self">self</span>.<span class="ident">obfuscated_ticket_age</span>.<span class="ident">encode</span>(<span class="ident">bytes</span>);
     }
 
-    <span class="kw">fn</span> <span class="ident">read</span>(<span class="ident">r</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Reader</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">PresharedKeyIdentity</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">read</span>(<span class="ident">r</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Reader</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">PresharedKeyIdentity</span><span class="op">&gt;</span> {
         <span class="prelude-val">Some</span>(<span class="ident">PresharedKeyIdentity</span> {
             <span class="ident">identity</span>: <span class="ident">PayloadU16::read</span>(<span class="ident">r</span>)<span class="question-mark">?</span>,
             <span class="ident">obfuscated_ticket_age</span>: <span class="ident">u32::read</span>(<span class="ident">r</span>)<span class="question-mark">?</span>,
@@ -2757,12 +2758,12 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Codec</span> <span class="kw">for</span> <span class="ident">PresharedKeyOffer</span> {
-    <span class="kw">fn</span> <span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">bytes</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) {
+    <span class="kw">fn</span> <span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">bytes</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) {
         <span class="self">self</span>.<span class="ident">identities</span>.<span class="ident">encode</span>(<span class="ident">bytes</span>);
         <span class="self">self</span>.<span class="ident">binders</span>.<span class="ident">encode</span>(<span class="ident">bytes</span>);
     }
 
-    <span class="kw">fn</span> <span class="ident">read</span>(<span class="ident">r</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Reader</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">PresharedKeyOffer</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">read</span>(<span class="ident">r</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Reader</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">PresharedKeyOffer</span><span class="op">&gt;</span> {
         <span class="prelude-val">Some</span>(<span class="ident">PresharedKeyOffer</span> {
             <span class="ident">identities</span>: <span class="ident">PresharedKeyIdentities::read</span>(<span class="ident">r</span>)<span class="question-mark">?</span>,
             <span class="ident">binders</span>: <span class="ident">PresharedKeyBinders::read</span>(<span class="ident">r</span>)<span class="question-mark">?</span>,
@@ -2780,13 +2781,13 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Codec</span> <span class="kw">for</span> <span class="ident">OCSPCertificateStatusRequest</span> {
-    <span class="kw">fn</span> <span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">bytes</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) {
+    <span class="kw">fn</span> <span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">bytes</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) {
         <span class="ident">CertificateStatusType::OCSP</span>.<span class="ident">encode</span>(<span class="ident">bytes</span>);
         <span class="self">self</span>.<span class="ident">responder_ids</span>.<span class="ident">encode</span>(<span class="ident">bytes</span>);
         <span class="self">self</span>.<span class="ident">extensions</span>.<span class="ident">encode</span>(<span class="ident">bytes</span>);
     }
 
-    <span class="kw">fn</span> <span class="ident">read</span>(<span class="ident">r</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Reader</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">OCSPCertificateStatusRequest</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">read</span>(<span class="ident">r</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Reader</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">OCSPCertificateStatusRequest</span><span class="op">&gt;</span> {
         <span class="prelude-val">Some</span>(<span class="ident">OCSPCertificateStatusRequest</span> {
             <span class="ident">responder_ids</span>: <span class="ident">ResponderIDs::read</span>(<span class="ident">r</span>)<span class="question-mark">?</span>,
             <span class="ident">extensions</span>: <span class="ident">PayloadU16::read</span>(<span class="ident">r</span>)<span class="question-mark">?</span>,
@@ -2801,7 +2802,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Codec</span> <span class="kw">for</span> <span class="ident">CertificateStatusRequest</span> {
-    <span class="kw">fn</span> <span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">bytes</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) {
+    <span class="kw">fn</span> <span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">bytes</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) {
         <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
             <span class="ident">CertificateStatusRequest::OCSP</span>(<span class="kw-2">ref</span> <span class="ident">r</span>) =&gt; <span class="ident">r</span>.<span class="ident">encode</span>(<span class="ident">bytes</span>),
             <span class="ident">CertificateStatusRequest::Unknown</span>((<span class="ident">typ</span>, <span class="kw-2">ref</span> <span class="ident">payload</span>)) =&gt; {
@@ -2811,7 +2812,7 @@
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">read</span>(<span class="ident">r</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Reader</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">CertificateStatusRequest</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">read</span>(<span class="ident">r</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Reader</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">CertificateStatusRequest</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">typ</span> <span class="op">=</span> <span class="ident">CertificateStatusType::read</span>(<span class="ident">r</span>)<span class="question-mark">?</span>;
 
         <span class="kw">match</span> <span class="ident">typ</span> {
@@ -2897,81 +2898,81 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Codec</span> <span class="kw">for</span> <span class="ident">ClientExtension</span> {
-    <span class="kw">fn</span> <span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">bytes</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) {
+    <span class="kw">fn</span> <span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">bytes</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) {
         <span class="self">self</span>.<span class="ident">get_type</span>().<span class="ident">encode</span>(<span class="ident">bytes</span>);
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">sub</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
         <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">ClientExtension::ECPointFormats</span>(<span class="kw-2">ref</span> <span class="ident">r</span>) =&gt; <span class="ident">r</span>.<span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">sub</span>),
-            <span class="ident">ClientExtension::NamedGroups</span>(<span class="kw-2">ref</span> <span class="ident">r</span>) =&gt; <span class="ident">r</span>.<span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">sub</span>),
-            <span class="ident">ClientExtension::SignatureAlgorithms</span>(<span class="kw-2">ref</span> <span class="ident">r</span>) =&gt; <span class="ident">r</span>.<span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">sub</span>),
-            <span class="ident">ClientExtension::ServerName</span>(<span class="kw-2">ref</span> <span class="ident">r</span>) =&gt; <span class="ident">r</span>.<span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">sub</span>),
+            <span class="ident">ClientExtension::ECPointFormats</span>(<span class="kw-2">ref</span> <span class="ident">r</span>) =&gt; <span class="ident">r</span>.<span class="ident">encode</span>(<span class="kw-2">&amp;mut</span> <span class="ident">sub</span>),
+            <span class="ident">ClientExtension::NamedGroups</span>(<span class="kw-2">ref</span> <span class="ident">r</span>) =&gt; <span class="ident">r</span>.<span class="ident">encode</span>(<span class="kw-2">&amp;mut</span> <span class="ident">sub</span>),
+            <span class="ident">ClientExtension::SignatureAlgorithms</span>(<span class="kw-2">ref</span> <span class="ident">r</span>) =&gt; <span class="ident">r</span>.<span class="ident">encode</span>(<span class="kw-2">&amp;mut</span> <span class="ident">sub</span>),
+            <span class="ident">ClientExtension::ServerName</span>(<span class="kw-2">ref</span> <span class="ident">r</span>) =&gt; <span class="ident">r</span>.<span class="ident">encode</span>(<span class="kw-2">&amp;mut</span> <span class="ident">sub</span>),
             <span class="ident">ClientExtension::SessionTicketRequest</span>
             <span class="op">|</span> <span class="ident">ClientExtension::ExtendedMasterSecretRequest</span>
             <span class="op">|</span> <span class="ident">ClientExtension::SignedCertificateTimestampRequest</span>
             <span class="op">|</span> <span class="ident">ClientExtension::EarlyData</span> =&gt; {}
-            <span class="ident">ClientExtension::SessionTicketOffer</span>(<span class="kw-2">ref</span> <span class="ident">r</span>) =&gt; <span class="ident">r</span>.<span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">sub</span>),
-            <span class="ident">ClientExtension::Protocols</span>(<span class="kw-2">ref</span> <span class="ident">r</span>) =&gt; <span class="ident">r</span>.<span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">sub</span>),
-            <span class="ident">ClientExtension::SupportedVersions</span>(<span class="kw-2">ref</span> <span class="ident">r</span>) =&gt; <span class="ident">r</span>.<span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">sub</span>),
-            <span class="ident">ClientExtension::KeyShare</span>(<span class="kw-2">ref</span> <span class="ident">r</span>) =&gt; <span class="ident">r</span>.<span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">sub</span>),
-            <span class="ident">ClientExtension::PresharedKeyModes</span>(<span class="kw-2">ref</span> <span class="ident">r</span>) =&gt; <span class="ident">r</span>.<span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">sub</span>),
-            <span class="ident">ClientExtension::PresharedKey</span>(<span class="kw-2">ref</span> <span class="ident">r</span>) =&gt; <span class="ident">r</span>.<span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">sub</span>),
-            <span class="ident">ClientExtension::Cookie</span>(<span class="kw-2">ref</span> <span class="ident">r</span>) =&gt; <span class="ident">r</span>.<span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">sub</span>),
-            <span class="ident">ClientExtension::CertificateStatusRequest</span>(<span class="kw-2">ref</span> <span class="ident">r</span>) =&gt; <span class="ident">r</span>.<span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">sub</span>),
+            <span class="ident">ClientExtension::SessionTicketOffer</span>(<span class="kw-2">ref</span> <span class="ident">r</span>) =&gt; <span class="ident">r</span>.<span class="ident">encode</span>(<span class="kw-2">&amp;mut</span> <span class="ident">sub</span>),
+            <span class="ident">ClientExtension::Protocols</span>(<span class="kw-2">ref</span> <span class="ident">r</span>) =&gt; <span class="ident">r</span>.<span class="ident">encode</span>(<span class="kw-2">&amp;mut</span> <span class="ident">sub</span>),
+            <span class="ident">ClientExtension::SupportedVersions</span>(<span class="kw-2">ref</span> <span class="ident">r</span>) =&gt; <span class="ident">r</span>.<span class="ident">encode</span>(<span class="kw-2">&amp;mut</span> <span class="ident">sub</span>),
+            <span class="ident">ClientExtension::KeyShare</span>(<span class="kw-2">ref</span> <span class="ident">r</span>) =&gt; <span class="ident">r</span>.<span class="ident">encode</span>(<span class="kw-2">&amp;mut</span> <span class="ident">sub</span>),
+            <span class="ident">ClientExtension::PresharedKeyModes</span>(<span class="kw-2">ref</span> <span class="ident">r</span>) =&gt; <span class="ident">r</span>.<span class="ident">encode</span>(<span class="kw-2">&amp;mut</span> <span class="ident">sub</span>),
+            <span class="ident">ClientExtension::PresharedKey</span>(<span class="kw-2">ref</span> <span class="ident">r</span>) =&gt; <span class="ident">r</span>.<span class="ident">encode</span>(<span class="kw-2">&amp;mut</span> <span class="ident">sub</span>),
+            <span class="ident">ClientExtension::Cookie</span>(<span class="kw-2">ref</span> <span class="ident">r</span>) =&gt; <span class="ident">r</span>.<span class="ident">encode</span>(<span class="kw-2">&amp;mut</span> <span class="ident">sub</span>),
+            <span class="ident">ClientExtension::CertificateStatusRequest</span>(<span class="kw-2">ref</span> <span class="ident">r</span>) =&gt; <span class="ident">r</span>.<span class="ident">encode</span>(<span class="kw-2">&amp;mut</span> <span class="ident">sub</span>),
             <span class="ident">ClientExtension::TransportParameters</span>(<span class="kw-2">ref</span> <span class="ident">r</span>) =&gt; <span class="ident">sub</span>.<span class="ident">extend_from_slice</span>(<span class="ident">r</span>),
-            <span class="ident">ClientExtension::Unknown</span>(<span class="kw-2">ref</span> <span class="ident">r</span>) =&gt; <span class="ident">r</span>.<span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">sub</span>),
+            <span class="ident">ClientExtension::Unknown</span>(<span class="kw-2">ref</span> <span class="ident">r</span>) =&gt; <span class="ident">r</span>.<span class="ident">encode</span>(<span class="kw-2">&amp;mut</span> <span class="ident">sub</span>),
         }
 
         (<span class="ident">sub</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u16</span>).<span class="ident">encode</span>(<span class="ident">bytes</span>);
-        <span class="ident">bytes</span>.<span class="ident">append</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">sub</span>);
+        <span class="ident">bytes</span>.<span class="ident">append</span>(<span class="kw-2">&amp;mut</span> <span class="ident">sub</span>);
     }
 
-    <span class="kw">fn</span> <span class="ident">read</span>(<span class="ident">r</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Reader</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ClientExtension</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">read</span>(<span class="ident">r</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Reader</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ClientExtension</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">typ</span> <span class="op">=</span> <span class="ident">ExtensionType::read</span>(<span class="ident">r</span>)<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">u16::read</span>(<span class="ident">r</span>)<span class="question-mark">?</span> <span class="kw">as</span> <span class="ident">usize</span>;
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">sub</span> <span class="op">=</span> <span class="ident">r</span>.<span class="ident">sub</span>(<span class="ident">len</span>)<span class="question-mark">?</span>;
 
         <span class="prelude-val">Some</span>(<span class="kw">match</span> <span class="ident">typ</span> {
             <span class="ident">ExtensionType::ECPointFormats</span> =&gt; {
-                <span class="ident">ClientExtension::ECPointFormats</span>(<span class="ident">ECPointFormatList::read</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">sub</span>)<span class="question-mark">?</span>)
+                <span class="ident">ClientExtension::ECPointFormats</span>(<span class="ident">ECPointFormatList::read</span>(<span class="kw-2">&amp;mut</span> <span class="ident">sub</span>)<span class="question-mark">?</span>)
             }
             <span class="ident">ExtensionType::EllipticCurves</span> =&gt; {
-                <span class="ident">ClientExtension::NamedGroups</span>(<span class="ident">NamedGroups::read</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">sub</span>)<span class="question-mark">?</span>)
+                <span class="ident">ClientExtension::NamedGroups</span>(<span class="ident">NamedGroups::read</span>(<span class="kw-2">&amp;mut</span> <span class="ident">sub</span>)<span class="question-mark">?</span>)
             }
             <span class="ident">ExtensionType::SignatureAlgorithms</span> =&gt; {
-                <span class="kw">let</span> <span class="ident">schemes</span> <span class="op">=</span> <span class="ident">SupportedSignatureSchemes::read</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">sub</span>)<span class="question-mark">?</span>;
+                <span class="kw">let</span> <span class="ident">schemes</span> <span class="op">=</span> <span class="ident">SupportedSignatureSchemes::read</span>(<span class="kw-2">&amp;mut</span> <span class="ident">sub</span>)<span class="question-mark">?</span>;
                 <span class="ident">ClientExtension::SignatureAlgorithms</span>(<span class="ident">schemes</span>)
             }
             <span class="ident">ExtensionType::ServerName</span> =&gt; {
-                <span class="ident">ClientExtension::ServerName</span>(<span class="ident">ServerNameRequest::read</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">sub</span>)<span class="question-mark">?</span>)
+                <span class="ident">ClientExtension::ServerName</span>(<span class="ident">ServerNameRequest::read</span>(<span class="kw-2">&amp;mut</span> <span class="ident">sub</span>)<span class="question-mark">?</span>)
             }
             <span class="ident">ExtensionType::SessionTicket</span> =&gt; {
                 <span class="kw">if</span> <span class="ident">sub</span>.<span class="ident">any_left</span>() {
-                    <span class="kw">let</span> <span class="ident">contents</span> <span class="op">=</span> <span class="ident">Payload::read</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">sub</span>).<span class="ident">unwrap</span>();
+                    <span class="kw">let</span> <span class="ident">contents</span> <span class="op">=</span> <span class="ident">Payload::read</span>(<span class="kw-2">&amp;mut</span> <span class="ident">sub</span>).<span class="ident">unwrap</span>();
                     <span class="ident">ClientExtension::SessionTicketOffer</span>(<span class="ident">contents</span>)
                 } <span class="kw">else</span> {
                     <span class="ident">ClientExtension::SessionTicketRequest</span>
                 }
             }
             <span class="ident">ExtensionType::ALProtocolNegotiation</span> =&gt; {
-                <span class="ident">ClientExtension::Protocols</span>(<span class="ident">ProtocolNameList::read</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">sub</span>)<span class="question-mark">?</span>)
+                <span class="ident">ClientExtension::Protocols</span>(<span class="ident">ProtocolNameList::read</span>(<span class="kw-2">&amp;mut</span> <span class="ident">sub</span>)<span class="question-mark">?</span>)
             }
             <span class="ident">ExtensionType::SupportedVersions</span> =&gt; {
-                <span class="ident">ClientExtension::SupportedVersions</span>(<span class="ident">ProtocolVersions::read</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">sub</span>)<span class="question-mark">?</span>)
+                <span class="ident">ClientExtension::SupportedVersions</span>(<span class="ident">ProtocolVersions::read</span>(<span class="kw-2">&amp;mut</span> <span class="ident">sub</span>)<span class="question-mark">?</span>)
             }
-            <span class="ident">ExtensionType::KeyShare</span> =&gt; <span class="ident">ClientExtension::KeyShare</span>(<span class="ident">KeyShareEntries::read</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">sub</span>)<span class="question-mark">?</span>),
+            <span class="ident">ExtensionType::KeyShare</span> =&gt; <span class="ident">ClientExtension::KeyShare</span>(<span class="ident">KeyShareEntries::read</span>(<span class="kw-2">&amp;mut</span> <span class="ident">sub</span>)<span class="question-mark">?</span>),
             <span class="ident">ExtensionType::PSKKeyExchangeModes</span> =&gt; {
-                <span class="ident">ClientExtension::PresharedKeyModes</span>(<span class="ident">PSKKeyExchangeModes::read</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">sub</span>)<span class="question-mark">?</span>)
+                <span class="ident">ClientExtension::PresharedKeyModes</span>(<span class="ident">PSKKeyExchangeModes::read</span>(<span class="kw-2">&amp;mut</span> <span class="ident">sub</span>)<span class="question-mark">?</span>)
             }
             <span class="ident">ExtensionType::PreSharedKey</span> =&gt; {
-                <span class="ident">ClientExtension::PresharedKey</span>(<span class="ident">PresharedKeyOffer::read</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">sub</span>)<span class="question-mark">?</span>)
+                <span class="ident">ClientExtension::PresharedKey</span>(<span class="ident">PresharedKeyOffer::read</span>(<span class="kw-2">&amp;mut</span> <span class="ident">sub</span>)<span class="question-mark">?</span>)
             }
-            <span class="ident">ExtensionType::Cookie</span> =&gt; <span class="ident">ClientExtension::Cookie</span>(<span class="ident">PayloadU16::read</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">sub</span>)<span class="question-mark">?</span>),
+            <span class="ident">ExtensionType::Cookie</span> =&gt; <span class="ident">ClientExtension::Cookie</span>(<span class="ident">PayloadU16::read</span>(<span class="kw-2">&amp;mut</span> <span class="ident">sub</span>)<span class="question-mark">?</span>),
             <span class="ident">ExtensionType::ExtendedMasterSecret</span> <span class="kw">if</span> <span class="op">!</span><span class="ident">sub</span>.<span class="ident">any_left</span>() =&gt; {
                 <span class="ident">ClientExtension::ExtendedMasterSecretRequest</span>
             }
             <span class="ident">ExtensionType::StatusRequest</span> =&gt; {
-                <span class="kw">let</span> <span class="ident">csr</span> <span class="op">=</span> <span class="ident">CertificateStatusRequest::read</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">sub</span>)<span class="question-mark">?</span>;
+                <span class="kw">let</span> <span class="ident">csr</span> <span class="op">=</span> <span class="ident">CertificateStatusRequest::read</span>(<span class="kw-2">&amp;mut</span> <span class="ident">sub</span>)<span class="question-mark">?</span>;
                 <span class="ident">ClientExtension::CertificateStatusRequest</span>(<span class="ident">csr</span>)
             }
             <span class="ident">ExtensionType::SCT</span> <span class="kw">if</span> <span class="op">!</span><span class="ident">sub</span>.<span class="ident">any_left</span>() =&gt; {
@@ -2981,7 +2982,7 @@
                 <span class="ident">ClientExtension::TransportParameters</span>(<span class="ident">sub</span>.<span class="ident">rest</span>().<span class="ident">to_vec</span>())
             }
             <span class="ident">ExtensionType::EarlyData</span> <span class="kw">if</span> <span class="op">!</span><span class="ident">sub</span>.<span class="ident">any_left</span>() =&gt; <span class="ident">ClientExtension::EarlyData</span>,
-            <span class="kw">_</span> =&gt; <span class="ident">ClientExtension::Unknown</span>(<span class="ident">UnknownExtension::read</span>(<span class="ident">typ</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">sub</span>)<span class="question-mark">?</span>),
+            <span class="kw">_</span> =&gt; <span class="ident">ClientExtension::Unknown</span>(<span class="ident">UnknownExtension::read</span>(<span class="ident">typ</span>, <span class="kw-2">&amp;mut</span> <span class="ident">sub</span>)<span class="question-mark">?</span>),
         })
     }
 }
@@ -3053,64 +3054,64 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Codec</span> <span class="kw">for</span> <span class="ident">ServerExtension</span> {
-    <span class="kw">fn</span> <span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">bytes</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) {
+    <span class="kw">fn</span> <span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">bytes</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) {
         <span class="self">self</span>.<span class="ident">get_type</span>().<span class="ident">encode</span>(<span class="ident">bytes</span>);
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">sub</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
         <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">ServerExtension::ECPointFormats</span>(<span class="kw-2">ref</span> <span class="ident">r</span>) =&gt; <span class="ident">r</span>.<span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">sub</span>),
+            <span class="ident">ServerExtension::ECPointFormats</span>(<span class="kw-2">ref</span> <span class="ident">r</span>) =&gt; <span class="ident">r</span>.<span class="ident">encode</span>(<span class="kw-2">&amp;mut</span> <span class="ident">sub</span>),
             <span class="ident">ServerExtension::ServerNameAck</span>
             <span class="op">|</span> <span class="ident">ServerExtension::SessionTicketAck</span>
             <span class="op">|</span> <span class="ident">ServerExtension::ExtendedMasterSecretAck</span>
             <span class="op">|</span> <span class="ident">ServerExtension::CertificateStatusAck</span>
             <span class="op">|</span> <span class="ident">ServerExtension::EarlyData</span> =&gt; {}
-            <span class="ident">ServerExtension::RenegotiationInfo</span>(<span class="kw-2">ref</span> <span class="ident">r</span>) =&gt; <span class="ident">r</span>.<span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">sub</span>),
-            <span class="ident">ServerExtension::Protocols</span>(<span class="kw-2">ref</span> <span class="ident">r</span>) =&gt; <span class="ident">r</span>.<span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">sub</span>),
-            <span class="ident">ServerExtension::KeyShare</span>(<span class="kw-2">ref</span> <span class="ident">r</span>) =&gt; <span class="ident">r</span>.<span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">sub</span>),
-            <span class="ident">ServerExtension::PresharedKey</span>(<span class="ident">r</span>) =&gt; <span class="ident">r</span>.<span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">sub</span>),
-            <span class="ident">ServerExtension::SignedCertificateTimestamp</span>(<span class="kw-2">ref</span> <span class="ident">r</span>) =&gt; <span class="ident">r</span>.<span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">sub</span>),
-            <span class="ident">ServerExtension::SupportedVersions</span>(<span class="kw-2">ref</span> <span class="ident">r</span>) =&gt; <span class="ident">r</span>.<span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">sub</span>),
+            <span class="ident">ServerExtension::RenegotiationInfo</span>(<span class="kw-2">ref</span> <span class="ident">r</span>) =&gt; <span class="ident">r</span>.<span class="ident">encode</span>(<span class="kw-2">&amp;mut</span> <span class="ident">sub</span>),
+            <span class="ident">ServerExtension::Protocols</span>(<span class="kw-2">ref</span> <span class="ident">r</span>) =&gt; <span class="ident">r</span>.<span class="ident">encode</span>(<span class="kw-2">&amp;mut</span> <span class="ident">sub</span>),
+            <span class="ident">ServerExtension::KeyShare</span>(<span class="kw-2">ref</span> <span class="ident">r</span>) =&gt; <span class="ident">r</span>.<span class="ident">encode</span>(<span class="kw-2">&amp;mut</span> <span class="ident">sub</span>),
+            <span class="ident">ServerExtension::PresharedKey</span>(<span class="ident">r</span>) =&gt; <span class="ident">r</span>.<span class="ident">encode</span>(<span class="kw-2">&amp;mut</span> <span class="ident">sub</span>),
+            <span class="ident">ServerExtension::SignedCertificateTimestamp</span>(<span class="kw-2">ref</span> <span class="ident">r</span>) =&gt; <span class="ident">r</span>.<span class="ident">encode</span>(<span class="kw-2">&amp;mut</span> <span class="ident">sub</span>),
+            <span class="ident">ServerExtension::SupportedVersions</span>(<span class="kw-2">ref</span> <span class="ident">r</span>) =&gt; <span class="ident">r</span>.<span class="ident">encode</span>(<span class="kw-2">&amp;mut</span> <span class="ident">sub</span>),
             <span class="ident">ServerExtension::TransportParameters</span>(<span class="kw-2">ref</span> <span class="ident">r</span>) =&gt; <span class="ident">sub</span>.<span class="ident">extend_from_slice</span>(<span class="ident">r</span>),
-            <span class="ident">ServerExtension::Unknown</span>(<span class="kw-2">ref</span> <span class="ident">r</span>) =&gt; <span class="ident">r</span>.<span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">sub</span>),
+            <span class="ident">ServerExtension::Unknown</span>(<span class="kw-2">ref</span> <span class="ident">r</span>) =&gt; <span class="ident">r</span>.<span class="ident">encode</span>(<span class="kw-2">&amp;mut</span> <span class="ident">sub</span>),
         }
 
         (<span class="ident">sub</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u16</span>).<span class="ident">encode</span>(<span class="ident">bytes</span>);
-        <span class="ident">bytes</span>.<span class="ident">append</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">sub</span>);
+        <span class="ident">bytes</span>.<span class="ident">append</span>(<span class="kw-2">&amp;mut</span> <span class="ident">sub</span>);
     }
 
-    <span class="kw">fn</span> <span class="ident">read</span>(<span class="ident">r</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Reader</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ServerExtension</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">read</span>(<span class="ident">r</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Reader</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ServerExtension</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">typ</span> <span class="op">=</span> <span class="ident">ExtensionType::read</span>(<span class="ident">r</span>)<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">u16::read</span>(<span class="ident">r</span>)<span class="question-mark">?</span> <span class="kw">as</span> <span class="ident">usize</span>;
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">sub</span> <span class="op">=</span> <span class="ident">r</span>.<span class="ident">sub</span>(<span class="ident">len</span>)<span class="question-mark">?</span>;
 
         <span class="prelude-val">Some</span>(<span class="kw">match</span> <span class="ident">typ</span> {
             <span class="ident">ExtensionType::ECPointFormats</span> =&gt; {
-                <span class="ident">ServerExtension::ECPointFormats</span>(<span class="ident">ECPointFormatList::read</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">sub</span>)<span class="question-mark">?</span>)
+                <span class="ident">ServerExtension::ECPointFormats</span>(<span class="ident">ECPointFormatList::read</span>(<span class="kw-2">&amp;mut</span> <span class="ident">sub</span>)<span class="question-mark">?</span>)
             }
             <span class="ident">ExtensionType::ServerName</span> =&gt; <span class="ident">ServerExtension::ServerNameAck</span>,
             <span class="ident">ExtensionType::SessionTicket</span> =&gt; <span class="ident">ServerExtension::SessionTicketAck</span>,
             <span class="ident">ExtensionType::StatusRequest</span> =&gt; <span class="ident">ServerExtension::CertificateStatusAck</span>,
             <span class="ident">ExtensionType::RenegotiationInfo</span> =&gt; {
-                <span class="ident">ServerExtension::RenegotiationInfo</span>(<span class="ident">PayloadU8::read</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">sub</span>)<span class="question-mark">?</span>)
+                <span class="ident">ServerExtension::RenegotiationInfo</span>(<span class="ident">PayloadU8::read</span>(<span class="kw-2">&amp;mut</span> <span class="ident">sub</span>)<span class="question-mark">?</span>)
             }
             <span class="ident">ExtensionType::ALProtocolNegotiation</span> =&gt; {
-                <span class="ident">ServerExtension::Protocols</span>(<span class="ident">ProtocolNameList::read</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">sub</span>)<span class="question-mark">?</span>)
+                <span class="ident">ServerExtension::Protocols</span>(<span class="ident">ProtocolNameList::read</span>(<span class="kw-2">&amp;mut</span> <span class="ident">sub</span>)<span class="question-mark">?</span>)
             }
-            <span class="ident">ExtensionType::KeyShare</span> =&gt; <span class="ident">ServerExtension::KeyShare</span>(<span class="ident">KeyShareEntry::read</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">sub</span>)<span class="question-mark">?</span>),
-            <span class="ident">ExtensionType::PreSharedKey</span> =&gt; <span class="ident">ServerExtension::PresharedKey</span>(<span class="ident">u16::read</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">sub</span>)<span class="question-mark">?</span>),
+            <span class="ident">ExtensionType::KeyShare</span> =&gt; <span class="ident">ServerExtension::KeyShare</span>(<span class="ident">KeyShareEntry::read</span>(<span class="kw-2">&amp;mut</span> <span class="ident">sub</span>)<span class="question-mark">?</span>),
+            <span class="ident">ExtensionType::PreSharedKey</span> =&gt; <span class="ident">ServerExtension::PresharedKey</span>(<span class="ident">u16::read</span>(<span class="kw-2">&amp;mut</span> <span class="ident">sub</span>)<span class="question-mark">?</span>),
             <span class="ident">ExtensionType::ExtendedMasterSecret</span> =&gt; <span class="ident">ServerExtension::ExtendedMasterSecretAck</span>,
             <span class="ident">ExtensionType::SCT</span> =&gt; {
-                <span class="kw">let</span> <span class="ident">scts</span> <span class="op">=</span> <span class="ident">SCTList::read</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">sub</span>)<span class="question-mark">?</span>;
+                <span class="kw">let</span> <span class="ident">scts</span> <span class="op">=</span> <span class="ident">SCTList::read</span>(<span class="kw-2">&amp;mut</span> <span class="ident">sub</span>)<span class="question-mark">?</span>;
                 <span class="ident">ServerExtension::SignedCertificateTimestamp</span>(<span class="ident">scts</span>)
             }
             <span class="ident">ExtensionType::SupportedVersions</span> =&gt; {
-                <span class="ident">ServerExtension::SupportedVersions</span>(<span class="ident">ProtocolVersion::read</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">sub</span>)<span class="question-mark">?</span>)
+                <span class="ident">ServerExtension::SupportedVersions</span>(<span class="ident">ProtocolVersion::read</span>(<span class="kw-2">&amp;mut</span> <span class="ident">sub</span>)<span class="question-mark">?</span>)
             }
             <span class="ident">ExtensionType::TransportParameters</span> =&gt; {
                 <span class="ident">ServerExtension::TransportParameters</span>(<span class="ident">sub</span>.<span class="ident">rest</span>().<span class="ident">to_vec</span>())
             }
             <span class="ident">ExtensionType::EarlyData</span> =&gt; <span class="ident">ServerExtension::EarlyData</span>,
-            <span class="kw">_</span> =&gt; <span class="ident">ServerExtension::Unknown</span>(<span class="ident">UnknownExtension::read</span>(<span class="ident">typ</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">sub</span>)<span class="question-mark">?</span>),
+            <span class="kw">_</span> =&gt; <span class="ident">ServerExtension::Unknown</span>(<span class="ident">UnknownExtension::read</span>(<span class="ident">typ</span>, <span class="kw-2">&amp;mut</span> <span class="ident">sub</span>)<span class="question-mark">?</span>),
         })
     }
 }
@@ -3142,7 +3143,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Codec</span> <span class="kw">for</span> <span class="ident">ClientHelloPayload</span> {
-    <span class="kw">fn</span> <span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">bytes</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) {
+    <span class="kw">fn</span> <span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">bytes</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) {
         <span class="self">self</span>.<span class="ident">client_version</span>.<span class="ident">encode</span>(<span class="ident">bytes</span>);
         <span class="self">self</span>.<span class="ident">random</span>.<span class="ident">encode</span>(<span class="ident">bytes</span>);
         <span class="self">self</span>.<span class="ident">session_id</span>.<span class="ident">encode</span>(<span class="ident">bytes</span>);
@@ -3154,7 +3155,7 @@
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">read</span>(<span class="ident">r</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Reader</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ClientHelloPayload</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">read</span>(<span class="ident">r</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Reader</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ClientHelloPayload</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ret</span> <span class="op">=</span> <span class="ident">ClientHelloPayload</span> {
             <span class="ident">client_version</span>: <span class="ident">ProtocolVersion::read</span>(<span class="ident">r</span>)<span class="question-mark">?</span>,
             <span class="ident">random</span>: <span class="ident">Random::read</span>(<span class="ident">r</span>)<span class="question-mark">?</span>,
@@ -3315,7 +3316,7 @@
     }
 
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_psk_binder</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">binder</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_psk_binder</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">binder</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) {
         <span class="kw">let</span> <span class="ident">last_extension</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">extensions</span>.<span class="ident">last_mut</span>().<span class="ident">unwrap</span>();
         <span class="kw">if</span> <span class="kw">let</span> <span class="ident">ClientExtension::PresharedKey</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">offer</span>) <span class="op">=</span> <span class="kw-2">*</span><span class="ident">last_extension</span> {
             <span class="ident">offer</span>.<span class="ident">binders</span>[<span class="number">0</span>] <span class="op">=</span> <span class="ident">PresharedKeyBinder::new</span>(<span class="ident">binder</span>);
@@ -3353,33 +3354,33 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Codec</span> <span class="kw">for</span> <span class="ident">HelloRetryExtension</span> {
-    <span class="kw">fn</span> <span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">bytes</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) {
+    <span class="kw">fn</span> <span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">bytes</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) {
         <span class="self">self</span>.<span class="ident">get_type</span>().<span class="ident">encode</span>(<span class="ident">bytes</span>);
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">sub</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
         <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">HelloRetryExtension::KeyShare</span>(<span class="kw-2">ref</span> <span class="ident">r</span>) =&gt; <span class="ident">r</span>.<span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">sub</span>),
-            <span class="ident">HelloRetryExtension::Cookie</span>(<span class="kw-2">ref</span> <span class="ident">r</span>) =&gt; <span class="ident">r</span>.<span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">sub</span>),
-            <span class="ident">HelloRetryExtension::SupportedVersions</span>(<span class="kw-2">ref</span> <span class="ident">r</span>) =&gt; <span class="ident">r</span>.<span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">sub</span>),
-            <span class="ident">HelloRetryExtension::Unknown</span>(<span class="kw-2">ref</span> <span class="ident">r</span>) =&gt; <span class="ident">r</span>.<span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">sub</span>),
+            <span class="ident">HelloRetryExtension::KeyShare</span>(<span class="kw-2">ref</span> <span class="ident">r</span>) =&gt; <span class="ident">r</span>.<span class="ident">encode</span>(<span class="kw-2">&amp;mut</span> <span class="ident">sub</span>),
+            <span class="ident">HelloRetryExtension::Cookie</span>(<span class="kw-2">ref</span> <span class="ident">r</span>) =&gt; <span class="ident">r</span>.<span class="ident">encode</span>(<span class="kw-2">&amp;mut</span> <span class="ident">sub</span>),
+            <span class="ident">HelloRetryExtension::SupportedVersions</span>(<span class="kw-2">ref</span> <span class="ident">r</span>) =&gt; <span class="ident">r</span>.<span class="ident">encode</span>(<span class="kw-2">&amp;mut</span> <span class="ident">sub</span>),
+            <span class="ident">HelloRetryExtension::Unknown</span>(<span class="kw-2">ref</span> <span class="ident">r</span>) =&gt; <span class="ident">r</span>.<span class="ident">encode</span>(<span class="kw-2">&amp;mut</span> <span class="ident">sub</span>),
         }
 
         (<span class="ident">sub</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u16</span>).<span class="ident">encode</span>(<span class="ident">bytes</span>);
-        <span class="ident">bytes</span>.<span class="ident">append</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">sub</span>);
+        <span class="ident">bytes</span>.<span class="ident">append</span>(<span class="kw-2">&amp;mut</span> <span class="ident">sub</span>);
     }
 
-    <span class="kw">fn</span> <span class="ident">read</span>(<span class="ident">r</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Reader</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">HelloRetryExtension</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">read</span>(<span class="ident">r</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Reader</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">HelloRetryExtension</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">typ</span> <span class="op">=</span> <span class="ident">ExtensionType::read</span>(<span class="ident">r</span>)<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">u16::read</span>(<span class="ident">r</span>)<span class="question-mark">?</span> <span class="kw">as</span> <span class="ident">usize</span>;
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">sub</span> <span class="op">=</span> <span class="ident">r</span>.<span class="ident">sub</span>(<span class="ident">len</span>)<span class="question-mark">?</span>;
 
         <span class="prelude-val">Some</span>(<span class="kw">match</span> <span class="ident">typ</span> {
-            <span class="ident">ExtensionType::KeyShare</span> =&gt; <span class="ident">HelloRetryExtension::KeyShare</span>(<span class="ident">NamedGroup::read</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">sub</span>)<span class="question-mark">?</span>),
-            <span class="ident">ExtensionType::Cookie</span> =&gt; <span class="ident">HelloRetryExtension::Cookie</span>(<span class="ident">PayloadU16::read</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">sub</span>)<span class="question-mark">?</span>),
+            <span class="ident">ExtensionType::KeyShare</span> =&gt; <span class="ident">HelloRetryExtension::KeyShare</span>(<span class="ident">NamedGroup::read</span>(<span class="kw-2">&amp;mut</span> <span class="ident">sub</span>)<span class="question-mark">?</span>),
+            <span class="ident">ExtensionType::Cookie</span> =&gt; <span class="ident">HelloRetryExtension::Cookie</span>(<span class="ident">PayloadU16::read</span>(<span class="kw-2">&amp;mut</span> <span class="ident">sub</span>)<span class="question-mark">?</span>),
             <span class="ident">ExtensionType::SupportedVersions</span> =&gt; {
-                <span class="ident">HelloRetryExtension::SupportedVersions</span>(<span class="ident">ProtocolVersion::read</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">sub</span>)<span class="question-mark">?</span>)
+                <span class="ident">HelloRetryExtension::SupportedVersions</span>(<span class="ident">ProtocolVersion::read</span>(<span class="kw-2">&amp;mut</span> <span class="ident">sub</span>)<span class="question-mark">?</span>)
             }
-            <span class="kw">_</span> =&gt; <span class="ident">HelloRetryExtension::Unknown</span>(<span class="ident">UnknownExtension::read</span>(<span class="ident">typ</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">sub</span>)<span class="question-mark">?</span>),
+            <span class="kw">_</span> =&gt; <span class="ident">HelloRetryExtension::Unknown</span>(<span class="ident">UnknownExtension::read</span>(<span class="ident">typ</span>, <span class="kw-2">&amp;mut</span> <span class="ident">sub</span>)<span class="question-mark">?</span>),
         })
     }
 }
@@ -3393,7 +3394,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Codec</span> <span class="kw">for</span> <span class="ident">HelloRetryRequest</span> {
-    <span class="kw">fn</span> <span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">bytes</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) {
+    <span class="kw">fn</span> <span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">bytes</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) {
         <span class="self">self</span>.<span class="ident">legacy_version</span>.<span class="ident">encode</span>(<span class="ident">bytes</span>);
         <span class="ident">HELLO_RETRY_REQUEST_RANDOM</span>.<span class="ident">encode</span>(<span class="ident">bytes</span>);
         <span class="self">self</span>.<span class="ident">session_id</span>.<span class="ident">encode</span>(<span class="ident">bytes</span>);
@@ -3402,7 +3403,7 @@
         <span class="ident">codec::encode_vec_u16</span>(<span class="ident">bytes</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">extensions</span>);
     }
 
-    <span class="kw">fn</span> <span class="ident">read</span>(<span class="ident">r</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Reader</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">HelloRetryRequest</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">read</span>(<span class="ident">r</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Reader</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">HelloRetryRequest</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">session_id</span> <span class="op">=</span> <span class="ident">SessionID::read</span>(<span class="ident">r</span>)<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">cipher_suite</span> <span class="op">=</span> <span class="ident">CipherSuite::read</span>(<span class="ident">r</span>)<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">compression</span> <span class="op">=</span> <span class="ident">Compression::read</span>(<span class="ident">r</span>)<span class="question-mark">?</span>;
@@ -3488,7 +3489,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Codec</span> <span class="kw">for</span> <span class="ident">ServerHelloPayload</span> {
-    <span class="kw">fn</span> <span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">bytes</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) {
+    <span class="kw">fn</span> <span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">bytes</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) {
         <span class="self">self</span>.<span class="ident">legacy_version</span>.<span class="ident">encode</span>(<span class="ident">bytes</span>);
         <span class="self">self</span>.<span class="ident">random</span>.<span class="ident">encode</span>(<span class="ident">bytes</span>);
 
@@ -3502,7 +3503,7 @@
     }
 
     <span class="comment">// minus version and random, which have already been read.</span>
-    <span class="kw">fn</span> <span class="ident">read</span>(<span class="ident">r</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Reader</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ServerHelloPayload</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">read</span>(<span class="ident">r</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Reader</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ServerHelloPayload</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">session_id</span> <span class="op">=</span> <span class="ident">SessionID::read</span>(<span class="ident">r</span>)<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">suite</span> <span class="op">=</span> <span class="ident">CipherSuite::read</span>(<span class="ident">r</span>)<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">compression</span> <span class="op">=</span> <span class="ident">Compression::read</span>(<span class="ident">r</span>)<span class="question-mark">?</span>;
@@ -3580,11 +3581,11 @@
 <span class="kw">pub</span> <span class="kw">type</span> <span class="ident">CertificatePayload</span> <span class="op">=</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">key::Certificate</span><span class="op">&gt;</span>;
 
 <span class="kw">impl</span> <span class="ident">Codec</span> <span class="kw">for</span> <span class="ident">CertificatePayload</span> {
-    <span class="kw">fn</span> <span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">bytes</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) {
+    <span class="kw">fn</span> <span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">bytes</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) {
         <span class="ident">codec::encode_vec_u24</span>(<span class="ident">bytes</span>, <span class="self">self</span>);
     }
 
-    <span class="kw">fn</span> <span class="ident">read</span>(<span class="ident">r</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Reader</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">CertificatePayload</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">read</span>(<span class="ident">r</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Reader</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">CertificatePayload</span><span class="op">&gt;</span> {
         <span class="comment">// 64KB of certificates is plenty, 16MB is obviously silly</span>
         <span class="ident">codec::read_vec_u24_limited</span>(<span class="ident">r</span>, <span class="number">0x10000</span>)
     }
@@ -3631,35 +3632,35 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Codec</span> <span class="kw">for</span> <span class="ident">CertificateExtension</span> {
-    <span class="kw">fn</span> <span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">bytes</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) {
+    <span class="kw">fn</span> <span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">bytes</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) {
         <span class="self">self</span>.<span class="ident">get_type</span>().<span class="ident">encode</span>(<span class="ident">bytes</span>);
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">sub</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
         <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">CertificateExtension::CertificateStatus</span>(<span class="kw-2">ref</span> <span class="ident">r</span>) =&gt; <span class="ident">r</span>.<span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">sub</span>),
-            <span class="ident">CertificateExtension::SignedCertificateTimestamp</span>(<span class="kw-2">ref</span> <span class="ident">r</span>) =&gt; <span class="ident">r</span>.<span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">sub</span>),
-            <span class="ident">CertificateExtension::Unknown</span>(<span class="kw-2">ref</span> <span class="ident">r</span>) =&gt; <span class="ident">r</span>.<span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">sub</span>),
+            <span class="ident">CertificateExtension::CertificateStatus</span>(<span class="kw-2">ref</span> <span class="ident">r</span>) =&gt; <span class="ident">r</span>.<span class="ident">encode</span>(<span class="kw-2">&amp;mut</span> <span class="ident">sub</span>),
+            <span class="ident">CertificateExtension::SignedCertificateTimestamp</span>(<span class="kw-2">ref</span> <span class="ident">r</span>) =&gt; <span class="ident">r</span>.<span class="ident">encode</span>(<span class="kw-2">&amp;mut</span> <span class="ident">sub</span>),
+            <span class="ident">CertificateExtension::Unknown</span>(<span class="kw-2">ref</span> <span class="ident">r</span>) =&gt; <span class="ident">r</span>.<span class="ident">encode</span>(<span class="kw-2">&amp;mut</span> <span class="ident">sub</span>),
         }
 
         (<span class="ident">sub</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u16</span>).<span class="ident">encode</span>(<span class="ident">bytes</span>);
-        <span class="ident">bytes</span>.<span class="ident">append</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">sub</span>);
+        <span class="ident">bytes</span>.<span class="ident">append</span>(<span class="kw-2">&amp;mut</span> <span class="ident">sub</span>);
     }
 
-    <span class="kw">fn</span> <span class="ident">read</span>(<span class="ident">r</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Reader</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">CertificateExtension</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">read</span>(<span class="ident">r</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Reader</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">CertificateExtension</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">typ</span> <span class="op">=</span> <span class="ident">ExtensionType::read</span>(<span class="ident">r</span>)<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">u16::read</span>(<span class="ident">r</span>)<span class="question-mark">?</span> <span class="kw">as</span> <span class="ident">usize</span>;
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">sub</span> <span class="op">=</span> <span class="ident">r</span>.<span class="ident">sub</span>(<span class="ident">len</span>)<span class="question-mark">?</span>;
 
         <span class="prelude-val">Some</span>(<span class="kw">match</span> <span class="ident">typ</span> {
             <span class="ident">ExtensionType::StatusRequest</span> =&gt; {
-                <span class="kw">let</span> <span class="ident">st</span> <span class="op">=</span> <span class="ident">CertificateStatus::read</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">sub</span>)<span class="question-mark">?</span>;
+                <span class="kw">let</span> <span class="ident">st</span> <span class="op">=</span> <span class="ident">CertificateStatus::read</span>(<span class="kw-2">&amp;mut</span> <span class="ident">sub</span>)<span class="question-mark">?</span>;
                 <span class="ident">CertificateExtension::CertificateStatus</span>(<span class="ident">st</span>)
             }
             <span class="ident">ExtensionType::SCT</span> =&gt; {
-                <span class="kw">let</span> <span class="ident">scts</span> <span class="op">=</span> <span class="ident">SCTList::read</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">sub</span>)<span class="question-mark">?</span>;
+                <span class="kw">let</span> <span class="ident">scts</span> <span class="op">=</span> <span class="ident">SCTList::read</span>(<span class="kw-2">&amp;mut</span> <span class="ident">sub</span>)<span class="question-mark">?</span>;
                 <span class="ident">CertificateExtension::SignedCertificateTimestamp</span>(<span class="ident">scts</span>)
             }
-            <span class="kw">_</span> =&gt; <span class="ident">CertificateExtension::Unknown</span>(<span class="ident">UnknownExtension::read</span>(<span class="ident">typ</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">sub</span>)<span class="question-mark">?</span>),
+            <span class="kw">_</span> =&gt; <span class="ident">CertificateExtension::Unknown</span>(<span class="ident">UnknownExtension::read</span>(<span class="ident">typ</span>, <span class="kw-2">&amp;mut</span> <span class="ident">sub</span>)<span class="question-mark">?</span>),
         })
     }
 }
@@ -3673,12 +3674,12 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Codec</span> <span class="kw">for</span> <span class="ident">CertificateEntry</span> {
-    <span class="kw">fn</span> <span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">bytes</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) {
+    <span class="kw">fn</span> <span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">bytes</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) {
         <span class="self">self</span>.<span class="ident">cert</span>.<span class="ident">encode</span>(<span class="ident">bytes</span>);
         <span class="self">self</span>.<span class="ident">exts</span>.<span class="ident">encode</span>(<span class="ident">bytes</span>);
     }
 
-    <span class="kw">fn</span> <span class="ident">read</span>(<span class="ident">r</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Reader</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">CertificateEntry</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">read</span>(<span class="ident">r</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Reader</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">CertificateEntry</span><span class="op">&gt;</span> {
         <span class="prelude-val">Some</span>(<span class="ident">CertificateEntry</span> {
             <span class="ident">cert</span>: <span class="ident">key::Certificate::read</span>(<span class="ident">r</span>)<span class="question-mark">?</span>,
             <span class="ident">exts</span>: <span class="ident">CertificateExtensions::read</span>(<span class="ident">r</span>)<span class="question-mark">?</span>,
@@ -3737,12 +3738,12 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Codec</span> <span class="kw">for</span> <span class="ident">CertificatePayloadTLS13</span> {
-    <span class="kw">fn</span> <span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">bytes</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) {
+    <span class="kw">fn</span> <span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">bytes</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) {
         <span class="self">self</span>.<span class="ident">context</span>.<span class="ident">encode</span>(<span class="ident">bytes</span>);
         <span class="ident">codec::encode_vec_u24</span>(<span class="ident">bytes</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">entries</span>);
     }
 
-    <span class="kw">fn</span> <span class="ident">read</span>(<span class="ident">r</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Reader</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">CertificatePayloadTLS13</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">read</span>(<span class="ident">r</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Reader</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">CertificatePayloadTLS13</span><span class="op">&gt;</span> {
         <span class="prelude-val">Some</span>(<span class="ident">CertificatePayloadTLS13</span> {
             <span class="ident">context</span>: <span class="ident">PayloadU8::read</span>(<span class="ident">r</span>)<span class="question-mark">?</span>,
             <span class="ident">entries</span>: <span class="ident">codec::read_vec_u24_limited</span>::<span class="op">&lt;</span><span class="ident">CertificateEntry</span><span class="op">&gt;</span>(<span class="ident">r</span>, <span class="number">0x10000</span>)<span class="question-mark">?</span>,
@@ -3832,12 +3833,12 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Codec</span> <span class="kw">for</span> <span class="ident">ECParameters</span> {
-    <span class="kw">fn</span> <span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">bytes</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) {
+    <span class="kw">fn</span> <span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">bytes</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) {
         <span class="self">self</span>.<span class="ident">curve_type</span>.<span class="ident">encode</span>(<span class="ident">bytes</span>);
         <span class="self">self</span>.<span class="ident">named_group</span>.<span class="ident">encode</span>(<span class="ident">bytes</span>);
     }
 
-    <span class="kw">fn</span> <span class="ident">read</span>(<span class="ident">r</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Reader</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ECParameters</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">read</span>(<span class="ident">r</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Reader</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ECParameters</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">ct</span> <span class="op">=</span> <span class="ident">ECCurveType::read</span>(<span class="ident">r</span>)<span class="question-mark">?</span>;
 
         <span class="kw">if</span> <span class="ident">ct</span> <span class="op">!</span><span class="op">=</span> <span class="ident">ECCurveType::NamedCurve</span> {
@@ -3869,12 +3870,12 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Codec</span> <span class="kw">for</span> <span class="ident">DigitallySignedStruct</span> {
-    <span class="kw">fn</span> <span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">bytes</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) {
+    <span class="kw">fn</span> <span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">bytes</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) {
         <span class="self">self</span>.<span class="ident">scheme</span>.<span class="ident">encode</span>(<span class="ident">bytes</span>);
         <span class="self">self</span>.<span class="ident">sig</span>.<span class="ident">encode</span>(<span class="ident">bytes</span>);
     }
 
-    <span class="kw">fn</span> <span class="ident">read</span>(<span class="ident">r</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Reader</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">DigitallySignedStruct</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">read</span>(<span class="ident">r</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Reader</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">DigitallySignedStruct</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">scheme</span> <span class="op">=</span> <span class="ident">SignatureScheme::read</span>(<span class="ident">r</span>)<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">sig</span> <span class="op">=</span> <span class="ident">PayloadU16::read</span>(<span class="ident">r</span>)<span class="question-mark">?</span>;
 
@@ -3888,11 +3889,11 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Codec</span> <span class="kw">for</span> <span class="ident">ClientECDHParams</span> {
-    <span class="kw">fn</span> <span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">bytes</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) {
+    <span class="kw">fn</span> <span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">bytes</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) {
         <span class="self">self</span>.<span class="ident">public</span>.<span class="ident">encode</span>(<span class="ident">bytes</span>);
     }
 
-    <span class="kw">fn</span> <span class="ident">read</span>(<span class="ident">r</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Reader</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ClientECDHParams</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">read</span>(<span class="ident">r</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Reader</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ClientECDHParams</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">pb</span> <span class="op">=</span> <span class="ident">PayloadU8::read</span>(<span class="ident">r</span>)<span class="question-mark">?</span>;
         <span class="prelude-val">Some</span>(<span class="ident">ClientECDHParams</span> { <span class="ident">public</span>: <span class="ident">pb</span> })
     }
@@ -3917,12 +3918,12 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Codec</span> <span class="kw">for</span> <span class="ident">ServerECDHParams</span> {
-    <span class="kw">fn</span> <span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">bytes</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) {
+    <span class="kw">fn</span> <span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">bytes</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) {
         <span class="self">self</span>.<span class="ident">curve_params</span>.<span class="ident">encode</span>(<span class="ident">bytes</span>);
         <span class="self">self</span>.<span class="ident">public</span>.<span class="ident">encode</span>(<span class="ident">bytes</span>);
     }
 
-    <span class="kw">fn</span> <span class="ident">read</span>(<span class="ident">r</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Reader</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ServerECDHParams</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">read</span>(<span class="ident">r</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Reader</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ServerECDHParams</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">cp</span> <span class="op">=</span> <span class="ident">ECParameters::read</span>(<span class="ident">r</span>)<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">pb</span> <span class="op">=</span> <span class="ident">PayloadU8::read</span>(<span class="ident">r</span>)<span class="question-mark">?</span>;
 
@@ -3940,12 +3941,12 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Codec</span> <span class="kw">for</span> <span class="ident">ECDHEServerKeyExchange</span> {
-    <span class="kw">fn</span> <span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">bytes</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) {
+    <span class="kw">fn</span> <span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">bytes</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) {
         <span class="self">self</span>.<span class="ident">params</span>.<span class="ident">encode</span>(<span class="ident">bytes</span>);
         <span class="self">self</span>.<span class="ident">dss</span>.<span class="ident">encode</span>(<span class="ident">bytes</span>);
     }
 
-    <span class="kw">fn</span> <span class="ident">read</span>(<span class="ident">r</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Reader</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ECDHEServerKeyExchange</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">read</span>(<span class="ident">r</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Reader</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ECDHEServerKeyExchange</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">params</span> <span class="op">=</span> <span class="ident">ServerECDHParams::read</span>(<span class="ident">r</span>)<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">dss</span> <span class="op">=</span> <span class="ident">DigitallySignedStruct::read</span>(<span class="ident">r</span>)<span class="question-mark">?</span>;
 
@@ -3960,14 +3961,14 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Codec</span> <span class="kw">for</span> <span class="ident">ServerKeyExchangePayload</span> {
-    <span class="kw">fn</span> <span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">bytes</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) {
+    <span class="kw">fn</span> <span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">bytes</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) {
         <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
             <span class="ident">ServerKeyExchangePayload::ECDHE</span>(<span class="kw-2">ref</span> <span class="ident">x</span>) =&gt; <span class="ident">x</span>.<span class="ident">encode</span>(<span class="ident">bytes</span>),
             <span class="ident">ServerKeyExchangePayload::Unknown</span>(<span class="kw-2">ref</span> <span class="ident">x</span>) =&gt; <span class="ident">x</span>.<span class="ident">encode</span>(<span class="ident">bytes</span>),
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">read</span>(<span class="ident">r</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Reader</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ServerKeyExchangePayload</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">read</span>(<span class="ident">r</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Reader</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ServerKeyExchangePayload</span><span class="op">&gt;</span> {
         <span class="comment">// read as Unknown, fully parse when we know the</span>
         <span class="comment">// KeyExchangeAlgorithm</span>
         <span class="ident">Payload::read</span>(<span class="ident">r</span>).<span class="ident">map</span>(<span class="ident">ServerKeyExchangePayload::Unknown</span>)
@@ -3981,7 +3982,7 @@
 
             <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="kw">match</span> <span class="kw-2">*</span><span class="ident">kxa</span> {
                 <span class="ident">KeyExchangeAlgorithm::ECDHE</span> =&gt; {
-                    <span class="ident">ECDHEServerKeyExchange::read</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">rd</span>).<span class="ident">map</span>(<span class="ident">ServerKeyExchangePayload::ECDHE</span>)
+                    <span class="ident">ECDHEServerKeyExchange::read</span>(<span class="kw-2">&amp;mut</span> <span class="ident">rd</span>).<span class="ident">map</span>(<span class="ident">ServerKeyExchangePayload::ECDHE</span>)
                 }
                 <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
             };
@@ -3994,7 +3995,7 @@
         <span class="prelude-val">None</span>
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">encode_params</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">bytes</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">encode_params</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">bytes</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) {
         <span class="ident">bytes</span>.<span class="ident">clear</span>();
 
         <span class="kw">if</span> <span class="kw">let</span> <span class="ident">ServerKeyExchangePayload::ECDHE</span>(<span class="kw-2">ref</span> <span class="ident">x</span>) <span class="op">=</span> <span class="kw-2">*</span><span class="self">self</span> {
@@ -4080,13 +4081,13 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Codec</span> <span class="kw">for</span> <span class="ident">CertificateRequestPayload</span> {
-    <span class="kw">fn</span> <span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">bytes</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) {
+    <span class="kw">fn</span> <span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">bytes</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) {
         <span class="self">self</span>.<span class="ident">certtypes</span>.<span class="ident">encode</span>(<span class="ident">bytes</span>);
         <span class="self">self</span>.<span class="ident">sigschemes</span>.<span class="ident">encode</span>(<span class="ident">bytes</span>);
         <span class="self">self</span>.<span class="ident">canames</span>.<span class="ident">encode</span>(<span class="ident">bytes</span>);
     }
 
-    <span class="kw">fn</span> <span class="ident">read</span>(<span class="ident">r</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Reader</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">CertificateRequestPayload</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">read</span>(<span class="ident">r</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Reader</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">CertificateRequestPayload</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">certtypes</span> <span class="op">=</span> <span class="ident">ClientCertificateTypes::read</span>(<span class="ident">r</span>)<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">sigschemes</span> <span class="op">=</span> <span class="ident">SupportedSignatureSchemes::read</span>(<span class="ident">r</span>)<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">canames</span> <span class="op">=</span> <span class="ident">DistinguishedNames::read</span>(<span class="ident">r</span>)<span class="question-mark">?</span>;
@@ -4122,38 +4123,38 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Codec</span> <span class="kw">for</span> <span class="ident">CertReqExtension</span> {
-    <span class="kw">fn</span> <span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">bytes</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) {
+    <span class="kw">fn</span> <span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">bytes</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) {
         <span class="self">self</span>.<span class="ident">get_type</span>().<span class="ident">encode</span>(<span class="ident">bytes</span>);
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">sub</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
         <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">CertReqExtension::SignatureAlgorithms</span>(<span class="kw-2">ref</span> <span class="ident">r</span>) =&gt; <span class="ident">r</span>.<span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">sub</span>),
-            <span class="ident">CertReqExtension::AuthorityNames</span>(<span class="kw-2">ref</span> <span class="ident">r</span>) =&gt; <span class="ident">r</span>.<span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">sub</span>),
-            <span class="ident">CertReqExtension::Unknown</span>(<span class="kw-2">ref</span> <span class="ident">r</span>) =&gt; <span class="ident">r</span>.<span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">sub</span>),
+            <span class="ident">CertReqExtension::SignatureAlgorithms</span>(<span class="kw-2">ref</span> <span class="ident">r</span>) =&gt; <span class="ident">r</span>.<span class="ident">encode</span>(<span class="kw-2">&amp;mut</span> <span class="ident">sub</span>),
+            <span class="ident">CertReqExtension::AuthorityNames</span>(<span class="kw-2">ref</span> <span class="ident">r</span>) =&gt; <span class="ident">r</span>.<span class="ident">encode</span>(<span class="kw-2">&amp;mut</span> <span class="ident">sub</span>),
+            <span class="ident">CertReqExtension::Unknown</span>(<span class="kw-2">ref</span> <span class="ident">r</span>) =&gt; <span class="ident">r</span>.<span class="ident">encode</span>(<span class="kw-2">&amp;mut</span> <span class="ident">sub</span>),
         }
 
         (<span class="ident">sub</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u16</span>).<span class="ident">encode</span>(<span class="ident">bytes</span>);
-        <span class="ident">bytes</span>.<span class="ident">append</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">sub</span>);
+        <span class="ident">bytes</span>.<span class="ident">append</span>(<span class="kw-2">&amp;mut</span> <span class="ident">sub</span>);
     }
 
-    <span class="kw">fn</span> <span class="ident">read</span>(<span class="ident">r</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Reader</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">CertReqExtension</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">read</span>(<span class="ident">r</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Reader</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">CertReqExtension</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">typ</span> <span class="op">=</span> <span class="ident">ExtensionType::read</span>(<span class="ident">r</span>)<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">u16::read</span>(<span class="ident">r</span>)<span class="question-mark">?</span> <span class="kw">as</span> <span class="ident">usize</span>;
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">sub</span> <span class="op">=</span> <span class="ident">r</span>.<span class="ident">sub</span>(<span class="ident">len</span>)<span class="question-mark">?</span>;
 
         <span class="prelude-val">Some</span>(<span class="kw">match</span> <span class="ident">typ</span> {
             <span class="ident">ExtensionType::SignatureAlgorithms</span> =&gt; {
-                <span class="kw">let</span> <span class="ident">schemes</span> <span class="op">=</span> <span class="ident">SupportedSignatureSchemes::read</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">sub</span>)<span class="question-mark">?</span>;
+                <span class="kw">let</span> <span class="ident">schemes</span> <span class="op">=</span> <span class="ident">SupportedSignatureSchemes::read</span>(<span class="kw-2">&amp;mut</span> <span class="ident">sub</span>)<span class="question-mark">?</span>;
                 <span class="kw">if</span> <span class="ident">schemes</span>.<span class="ident">is_empty</span>() {
                     <span class="kw">return</span> <span class="prelude-val">None</span>;
                 }
                 <span class="ident">CertReqExtension::SignatureAlgorithms</span>(<span class="ident">schemes</span>)
             }
             <span class="ident">ExtensionType::CertificateAuthorities</span> =&gt; {
-                <span class="kw">let</span> <span class="ident">cas</span> <span class="op">=</span> <span class="ident">DistinguishedNames::read</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">sub</span>)<span class="question-mark">?</span>;
+                <span class="kw">let</span> <span class="ident">cas</span> <span class="op">=</span> <span class="ident">DistinguishedNames::read</span>(<span class="kw-2">&amp;mut</span> <span class="ident">sub</span>)<span class="question-mark">?</span>;
                 <span class="ident">CertReqExtension::AuthorityNames</span>(<span class="ident">cas</span>)
             }
-            <span class="kw">_</span> =&gt; <span class="ident">CertReqExtension::Unknown</span>(<span class="ident">UnknownExtension::read</span>(<span class="ident">typ</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">sub</span>)<span class="question-mark">?</span>),
+            <span class="kw">_</span> =&gt; <span class="ident">CertReqExtension::Unknown</span>(<span class="ident">UnknownExtension::read</span>(<span class="ident">typ</span>, <span class="kw-2">&amp;mut</span> <span class="ident">sub</span>)<span class="question-mark">?</span>),
         })
     }
 }
@@ -4167,12 +4168,12 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Codec</span> <span class="kw">for</span> <span class="ident">CertificateRequestPayloadTLS13</span> {
-    <span class="kw">fn</span> <span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">bytes</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) {
+    <span class="kw">fn</span> <span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">bytes</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) {
         <span class="self">self</span>.<span class="ident">context</span>.<span class="ident">encode</span>(<span class="ident">bytes</span>);
         <span class="self">self</span>.<span class="ident">extensions</span>.<span class="ident">encode</span>(<span class="ident">bytes</span>);
     }
 
-    <span class="kw">fn</span> <span class="ident">read</span>(<span class="ident">r</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Reader</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">CertificateRequestPayloadTLS13</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">read</span>(<span class="ident">r</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Reader</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">CertificateRequestPayloadTLS13</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">context</span> <span class="op">=</span> <span class="ident">PayloadU8::read</span>(<span class="ident">r</span>)<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">extensions</span> <span class="op">=</span> <span class="ident">CertReqExtensions::read</span>(<span class="ident">r</span>)<span class="question-mark">?</span>;
 
@@ -4224,12 +4225,12 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Codec</span> <span class="kw">for</span> <span class="ident">NewSessionTicketPayload</span> {
-    <span class="kw">fn</span> <span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">bytes</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) {
+    <span class="kw">fn</span> <span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">bytes</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) {
         <span class="self">self</span>.<span class="ident">lifetime_hint</span>.<span class="ident">encode</span>(<span class="ident">bytes</span>);
         <span class="self">self</span>.<span class="ident">ticket</span>.<span class="ident">encode</span>(<span class="ident">bytes</span>);
     }
 
-    <span class="kw">fn</span> <span class="ident">read</span>(<span class="ident">r</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Reader</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">NewSessionTicketPayload</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">read</span>(<span class="ident">r</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Reader</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">NewSessionTicketPayload</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">lifetime</span> <span class="op">=</span> <span class="ident">u32::read</span>(<span class="ident">r</span>)<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">ticket</span> <span class="op">=</span> <span class="ident">PayloadU16::read</span>(<span class="ident">r</span>)<span class="question-mark">?</span>;
 
@@ -4257,27 +4258,27 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Codec</span> <span class="kw">for</span> <span class="ident">NewSessionTicketExtension</span> {
-    <span class="kw">fn</span> <span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">bytes</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) {
+    <span class="kw">fn</span> <span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">bytes</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) {
         <span class="self">self</span>.<span class="ident">get_type</span>().<span class="ident">encode</span>(<span class="ident">bytes</span>);
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">sub</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
         <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">NewSessionTicketExtension::EarlyData</span>(<span class="ident">r</span>) =&gt; <span class="ident">r</span>.<span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">sub</span>),
-            <span class="ident">NewSessionTicketExtension::Unknown</span>(<span class="kw-2">ref</span> <span class="ident">r</span>) =&gt; <span class="ident">r</span>.<span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">sub</span>),
+            <span class="ident">NewSessionTicketExtension::EarlyData</span>(<span class="ident">r</span>) =&gt; <span class="ident">r</span>.<span class="ident">encode</span>(<span class="kw-2">&amp;mut</span> <span class="ident">sub</span>),
+            <span class="ident">NewSessionTicketExtension::Unknown</span>(<span class="kw-2">ref</span> <span class="ident">r</span>) =&gt; <span class="ident">r</span>.<span class="ident">encode</span>(<span class="kw-2">&amp;mut</span> <span class="ident">sub</span>),
         }
 
         (<span class="ident">sub</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u16</span>).<span class="ident">encode</span>(<span class="ident">bytes</span>);
-        <span class="ident">bytes</span>.<span class="ident">append</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">sub</span>);
+        <span class="ident">bytes</span>.<span class="ident">append</span>(<span class="kw-2">&amp;mut</span> <span class="ident">sub</span>);
     }
 
-    <span class="kw">fn</span> <span class="ident">read</span>(<span class="ident">r</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Reader</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">NewSessionTicketExtension</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">read</span>(<span class="ident">r</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Reader</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">NewSessionTicketExtension</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">typ</span> <span class="op">=</span> <span class="ident">ExtensionType::read</span>(<span class="ident">r</span>)<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">u16::read</span>(<span class="ident">r</span>)<span class="question-mark">?</span> <span class="kw">as</span> <span class="ident">usize</span>;
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">sub</span> <span class="op">=</span> <span class="ident">r</span>.<span class="ident">sub</span>(<span class="ident">len</span>)<span class="question-mark">?</span>;
 
         <span class="prelude-val">Some</span>(<span class="kw">match</span> <span class="ident">typ</span> {
-            <span class="ident">ExtensionType::EarlyData</span> =&gt; <span class="ident">NewSessionTicketExtension::EarlyData</span>(<span class="ident">u32::read</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">sub</span>)<span class="question-mark">?</span>),
-            <span class="kw">_</span> =&gt; <span class="ident">NewSessionTicketExtension::Unknown</span>(<span class="ident">UnknownExtension::read</span>(<span class="ident">typ</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">sub</span>)<span class="question-mark">?</span>),
+            <span class="ident">ExtensionType::EarlyData</span> =&gt; <span class="ident">NewSessionTicketExtension::EarlyData</span>(<span class="ident">u32::read</span>(<span class="kw-2">&amp;mut</span> <span class="ident">sub</span>)<span class="question-mark">?</span>),
+            <span class="kw">_</span> =&gt; <span class="ident">NewSessionTicketExtension::Unknown</span>(<span class="ident">UnknownExtension::read</span>(<span class="ident">typ</span>, <span class="kw-2">&amp;mut</span> <span class="ident">sub</span>)<span class="question-mark">?</span>),
         })
     }
 }
@@ -4325,7 +4326,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Codec</span> <span class="kw">for</span> <span class="ident">NewSessionTicketPayloadTLS13</span> {
-    <span class="kw">fn</span> <span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">bytes</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) {
+    <span class="kw">fn</span> <span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">bytes</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) {
         <span class="self">self</span>.<span class="ident">lifetime</span>.<span class="ident">encode</span>(<span class="ident">bytes</span>);
         <span class="self">self</span>.<span class="ident">age_add</span>.<span class="ident">encode</span>(<span class="ident">bytes</span>);
         <span class="self">self</span>.<span class="ident">nonce</span>.<span class="ident">encode</span>(<span class="ident">bytes</span>);
@@ -4333,7 +4334,7 @@
         <span class="self">self</span>.<span class="ident">exts</span>.<span class="ident">encode</span>(<span class="ident">bytes</span>);
     }
 
-    <span class="kw">fn</span> <span class="ident">read</span>(<span class="ident">r</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Reader</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">NewSessionTicketPayloadTLS13</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">read</span>(<span class="ident">r</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Reader</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">NewSessionTicketPayloadTLS13</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">lifetime</span> <span class="op">=</span> <span class="ident">u32::read</span>(<span class="ident">r</span>)<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">age_add</span> <span class="op">=</span> <span class="ident">u32::read</span>(<span class="ident">r</span>)<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">nonce</span> <span class="op">=</span> <span class="ident">PayloadU8::read</span>(<span class="ident">r</span>)<span class="question-mark">?</span>;
@@ -4359,12 +4360,12 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Codec</span> <span class="kw">for</span> <span class="ident">CertificateStatus</span> {
-    <span class="kw">fn</span> <span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">bytes</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) {
+    <span class="kw">fn</span> <span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">bytes</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) {
         <span class="ident">CertificateStatusType::OCSP</span>.<span class="ident">encode</span>(<span class="ident">bytes</span>);
         <span class="self">self</span>.<span class="ident">ocsp_response</span>.<span class="ident">encode</span>(<span class="ident">bytes</span>);
     }
 
-    <span class="kw">fn</span> <span class="ident">read</span>(<span class="ident">r</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Reader</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">CertificateStatus</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">read</span>(<span class="ident">r</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Reader</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">CertificateStatus</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">typ</span> <span class="op">=</span> <span class="ident">CertificateStatusType::read</span>(<span class="ident">r</span>)<span class="question-mark">?</span>;
 
         <span class="kw">match</span> <span class="ident">typ</span> {
@@ -4383,9 +4384,9 @@
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">take_ocsp_response</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">take_ocsp_response</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">new</span> <span class="op">=</span> <span class="ident">PayloadU24::new</span>(<span class="ident">Vec::new</span>());
-        <span class="ident">mem::replace</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">ocsp_response</span>, <span class="ident">new</span>).<span class="number">0</span>
+        <span class="ident">mem::replace</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">ocsp_response</span>, <span class="ident">new</span>).<span class="number">0</span>
     }
 }
 
@@ -4416,7 +4417,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">HandshakePayload</span> {
-    <span class="kw">fn</span> <span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">bytes</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) {
+    <span class="kw">fn</span> <span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">bytes</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) {
         <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
             <span class="ident">HandshakePayload::HelloRequest</span>
             <span class="op">|</span> <span class="ident">HandshakePayload::ServerHelloDone</span>
@@ -4451,10 +4452,10 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Codec</span> <span class="kw">for</span> <span class="ident">HandshakeMessagePayload</span> {
-    <span class="kw">fn</span> <span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">bytes</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) {
+    <span class="kw">fn</span> <span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">bytes</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) {
         <span class="comment">// encode payload to learn length</span>
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">sub</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
-        <span class="self">self</span>.<span class="ident">payload</span>.<span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">sub</span>);
+        <span class="self">self</span>.<span class="ident">payload</span>.<span class="ident">encode</span>(<span class="kw-2">&amp;mut</span> <span class="ident">sub</span>);
 
         <span class="comment">// output type, length, and encoded payload</span>
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">typ</span> {
@@ -4463,10 +4464,10 @@
         }
         .<span class="ident">encode</span>(<span class="ident">bytes</span>);
         <span class="ident">codec::u24</span>(<span class="ident">sub</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u32</span>).<span class="ident">encode</span>(<span class="ident">bytes</span>);
-        <span class="ident">bytes</span>.<span class="ident">append</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">sub</span>);
+        <span class="ident">bytes</span>.<span class="ident">append</span>(<span class="kw-2">&amp;mut</span> <span class="ident">sub</span>);
     }
 
-    <span class="kw">fn</span> <span class="ident">read</span>(<span class="ident">r</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Reader</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">HandshakeMessagePayload</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">read</span>(<span class="ident">r</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Reader</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">HandshakeMessagePayload</span><span class="op">&gt;</span> {
         <span class="ident">HandshakeMessagePayload::read_version</span>(<span class="ident">r</span>, <span class="ident">ProtocolVersion::TLSv1_2</span>)
     }
 }
@@ -4474,11 +4475,11 @@
 <span class="kw">impl</span> <span class="ident">HandshakeMessagePayload</span> {
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">length</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
-        <span class="self">self</span>.<span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">buf</span>);
+        <span class="self">self</span>.<span class="ident">encode</span>(<span class="kw-2">&amp;mut</span> <span class="ident">buf</span>);
         <span class="ident">buf</span>.<span class="ident">len</span>()
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">read_version</span>(<span class="ident">r</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Reader</span>, <span class="ident">vers</span>: <span class="ident">ProtocolVersion</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">HandshakeMessagePayload</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">read_version</span>(<span class="ident">r</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Reader</span>, <span class="ident">vers</span>: <span class="ident">ProtocolVersion</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">HandshakeMessagePayload</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">typ</span> <span class="op">=</span> <span class="ident">HandshakeType::read</span>(<span class="ident">r</span>)<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">codec::u24::read</span>(<span class="ident">r</span>)<span class="question-mark">?</span>.<span class="number">0</span> <span class="kw">as</span> <span class="ident">usize</span>;
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">sub</span> <span class="op">=</span> <span class="ident">r</span>.<span class="ident">sub</span>(<span class="ident">len</span>)<span class="question-mark">?</span>;
@@ -4486,33 +4487,33 @@
         <span class="kw">let</span> <span class="ident">payload</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">typ</span> {
             <span class="ident">HandshakeType::HelloRequest</span> <span class="kw">if</span> <span class="ident">sub</span>.<span class="ident">left</span>() <span class="op">==</span> <span class="number">0</span> =&gt; <span class="ident">HandshakePayload::HelloRequest</span>,
             <span class="ident">HandshakeType::ClientHello</span> =&gt; {
-                <span class="ident">HandshakePayload::ClientHello</span>(<span class="ident">ClientHelloPayload::read</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">sub</span>)<span class="question-mark">?</span>)
+                <span class="ident">HandshakePayload::ClientHello</span>(<span class="ident">ClientHelloPayload::read</span>(<span class="kw-2">&amp;mut</span> <span class="ident">sub</span>)<span class="question-mark">?</span>)
             }
             <span class="ident">HandshakeType::ServerHello</span> =&gt; {
-                <span class="kw">let</span> <span class="ident">version</span> <span class="op">=</span> <span class="ident">ProtocolVersion::read</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">sub</span>)<span class="question-mark">?</span>;
-                <span class="kw">let</span> <span class="ident">random</span> <span class="op">=</span> <span class="ident">Random::read</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">sub</span>)<span class="question-mark">?</span>;
+                <span class="kw">let</span> <span class="ident">version</span> <span class="op">=</span> <span class="ident">ProtocolVersion::read</span>(<span class="kw-2">&amp;mut</span> <span class="ident">sub</span>)<span class="question-mark">?</span>;
+                <span class="kw">let</span> <span class="ident">random</span> <span class="op">=</span> <span class="ident">Random::read</span>(<span class="kw-2">&amp;mut</span> <span class="ident">sub</span>)<span class="question-mark">?</span>;
 
                 <span class="kw">if</span> <span class="ident">random</span> <span class="op">==</span> <span class="ident">HELLO_RETRY_REQUEST_RANDOM</span> {
-                    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">hrr</span> <span class="op">=</span> <span class="ident">HelloRetryRequest::read</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">sub</span>)<span class="question-mark">?</span>;
+                    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">hrr</span> <span class="op">=</span> <span class="ident">HelloRetryRequest::read</span>(<span class="kw-2">&amp;mut</span> <span class="ident">sub</span>)<span class="question-mark">?</span>;
                     <span class="ident">hrr</span>.<span class="ident">legacy_version</span> <span class="op">=</span> <span class="ident">version</span>;
                     <span class="ident">typ</span> <span class="op">=</span> <span class="ident">HandshakeType::HelloRetryRequest</span>;
                     <span class="ident">HandshakePayload::HelloRetryRequest</span>(<span class="ident">hrr</span>)
                 } <span class="kw">else</span> {
-                    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">shp</span> <span class="op">=</span> <span class="ident">ServerHelloPayload::read</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">sub</span>)<span class="question-mark">?</span>;
+                    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">shp</span> <span class="op">=</span> <span class="ident">ServerHelloPayload::read</span>(<span class="kw-2">&amp;mut</span> <span class="ident">sub</span>)<span class="question-mark">?</span>;
                     <span class="ident">shp</span>.<span class="ident">legacy_version</span> <span class="op">=</span> <span class="ident">version</span>;
                     <span class="ident">shp</span>.<span class="ident">random</span> <span class="op">=</span> <span class="ident">random</span>;
                     <span class="ident">HandshakePayload::ServerHello</span>(<span class="ident">shp</span>)
                 }
             }
             <span class="ident">HandshakeType::Certificate</span> <span class="kw">if</span> <span class="ident">vers</span> <span class="op">==</span> <span class="ident">ProtocolVersion::TLSv1_3</span> =&gt; {
-                <span class="kw">let</span> <span class="ident">p</span> <span class="op">=</span> <span class="ident">CertificatePayloadTLS13::read</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">sub</span>)<span class="question-mark">?</span>;
+                <span class="kw">let</span> <span class="ident">p</span> <span class="op">=</span> <span class="ident">CertificatePayloadTLS13::read</span>(<span class="kw-2">&amp;mut</span> <span class="ident">sub</span>)<span class="question-mark">?</span>;
                 <span class="ident">HandshakePayload::CertificateTLS13</span>(<span class="ident">p</span>)
             }
             <span class="ident">HandshakeType::Certificate</span> =&gt; {
-                <span class="ident">HandshakePayload::Certificate</span>(<span class="ident">CertificatePayload::read</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">sub</span>)<span class="question-mark">?</span>)
+                <span class="ident">HandshakePayload::Certificate</span>(<span class="ident">CertificatePayload::read</span>(<span class="kw-2">&amp;mut</span> <span class="ident">sub</span>)<span class="question-mark">?</span>)
             }
             <span class="ident">HandshakeType::ServerKeyExchange</span> =&gt; {
-                <span class="kw">let</span> <span class="ident">p</span> <span class="op">=</span> <span class="ident">ServerKeyExchangePayload::read</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">sub</span>)<span class="question-mark">?</span>;
+                <span class="kw">let</span> <span class="ident">p</span> <span class="op">=</span> <span class="ident">ServerKeyExchangePayload::read</span>(<span class="kw-2">&amp;mut</span> <span class="ident">sub</span>)<span class="question-mark">?</span>;
                 <span class="ident">HandshakePayload::ServerKeyExchange</span>(<span class="ident">p</span>)
             }
             <span class="ident">HandshakeType::ServerHelloDone</span> =&gt; {
@@ -4522,36 +4523,36 @@
                 <span class="ident">HandshakePayload::ServerHelloDone</span>
             }
             <span class="ident">HandshakeType::ClientKeyExchange</span> =&gt; {
-                <span class="ident">HandshakePayload::ClientKeyExchange</span>(<span class="ident">Payload::read</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">sub</span>).<span class="ident">unwrap</span>())
+                <span class="ident">HandshakePayload::ClientKeyExchange</span>(<span class="ident">Payload::read</span>(<span class="kw-2">&amp;mut</span> <span class="ident">sub</span>).<span class="ident">unwrap</span>())
             }
             <span class="ident">HandshakeType::CertificateRequest</span> <span class="kw">if</span> <span class="ident">vers</span> <span class="op">==</span> <span class="ident">ProtocolVersion::TLSv1_3</span> =&gt; {
-                <span class="kw">let</span> <span class="ident">p</span> <span class="op">=</span> <span class="ident">CertificateRequestPayloadTLS13::read</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">sub</span>)<span class="question-mark">?</span>;
+                <span class="kw">let</span> <span class="ident">p</span> <span class="op">=</span> <span class="ident">CertificateRequestPayloadTLS13::read</span>(<span class="kw-2">&amp;mut</span> <span class="ident">sub</span>)<span class="question-mark">?</span>;
                 <span class="ident">HandshakePayload::CertificateRequestTLS13</span>(<span class="ident">p</span>)
             }
             <span class="ident">HandshakeType::CertificateRequest</span> =&gt; {
-                <span class="kw">let</span> <span class="ident">p</span> <span class="op">=</span> <span class="ident">CertificateRequestPayload::read</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">sub</span>)<span class="question-mark">?</span>;
+                <span class="kw">let</span> <span class="ident">p</span> <span class="op">=</span> <span class="ident">CertificateRequestPayload::read</span>(<span class="kw-2">&amp;mut</span> <span class="ident">sub</span>)<span class="question-mark">?</span>;
                 <span class="ident">HandshakePayload::CertificateRequest</span>(<span class="ident">p</span>)
             }
             <span class="ident">HandshakeType::CertificateVerify</span> =&gt; {
-                <span class="ident">HandshakePayload::CertificateVerify</span>(<span class="ident">DigitallySignedStruct::read</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">sub</span>)<span class="question-mark">?</span>)
+                <span class="ident">HandshakePayload::CertificateVerify</span>(<span class="ident">DigitallySignedStruct::read</span>(<span class="kw-2">&amp;mut</span> <span class="ident">sub</span>)<span class="question-mark">?</span>)
             }
             <span class="ident">HandshakeType::NewSessionTicket</span> <span class="kw">if</span> <span class="ident">vers</span> <span class="op">==</span> <span class="ident">ProtocolVersion::TLSv1_3</span> =&gt; {
-                <span class="kw">let</span> <span class="ident">p</span> <span class="op">=</span> <span class="ident">NewSessionTicketPayloadTLS13::read</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">sub</span>)<span class="question-mark">?</span>;
+                <span class="kw">let</span> <span class="ident">p</span> <span class="op">=</span> <span class="ident">NewSessionTicketPayloadTLS13::read</span>(<span class="kw-2">&amp;mut</span> <span class="ident">sub</span>)<span class="question-mark">?</span>;
                 <span class="ident">HandshakePayload::NewSessionTicketTLS13</span>(<span class="ident">p</span>)
             }
             <span class="ident">HandshakeType::NewSessionTicket</span> =&gt; {
-                <span class="kw">let</span> <span class="ident">p</span> <span class="op">=</span> <span class="ident">NewSessionTicketPayload::read</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">sub</span>)<span class="question-mark">?</span>;
+                <span class="kw">let</span> <span class="ident">p</span> <span class="op">=</span> <span class="ident">NewSessionTicketPayload::read</span>(<span class="kw-2">&amp;mut</span> <span class="ident">sub</span>)<span class="question-mark">?</span>;
                 <span class="ident">HandshakePayload::NewSessionTicket</span>(<span class="ident">p</span>)
             }
             <span class="ident">HandshakeType::EncryptedExtensions</span> =&gt; {
-                <span class="ident">HandshakePayload::EncryptedExtensions</span>(<span class="ident">EncryptedExtensions::read</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">sub</span>)<span class="question-mark">?</span>)
+                <span class="ident">HandshakePayload::EncryptedExtensions</span>(<span class="ident">EncryptedExtensions::read</span>(<span class="kw-2">&amp;mut</span> <span class="ident">sub</span>)<span class="question-mark">?</span>)
             }
             <span class="ident">HandshakeType::KeyUpdate</span> =&gt; {
-                <span class="ident">HandshakePayload::KeyUpdate</span>(<span class="ident">KeyUpdateRequest::read</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">sub</span>)<span class="question-mark">?</span>)
+                <span class="ident">HandshakePayload::KeyUpdate</span>(<span class="ident">KeyUpdateRequest::read</span>(<span class="kw-2">&amp;mut</span> <span class="ident">sub</span>)<span class="question-mark">?</span>)
             }
-            <span class="ident">HandshakeType::Finished</span> =&gt; <span class="ident">HandshakePayload::Finished</span>(<span class="ident">Payload::read</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">sub</span>).<span class="ident">unwrap</span>()),
+            <span class="ident">HandshakeType::Finished</span> =&gt; <span class="ident">HandshakePayload::Finished</span>(<span class="ident">Payload::read</span>(<span class="kw-2">&amp;mut</span> <span class="ident">sub</span>).<span class="ident">unwrap</span>()),
             <span class="ident">HandshakeType::CertificateStatus</span> =&gt; {
-                <span class="ident">HandshakePayload::CertificateStatus</span>(<span class="ident">CertificateStatus::read</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">sub</span>)<span class="question-mark">?</span>)
+                <span class="ident">HandshakePayload::CertificateStatus</span>(<span class="ident">CertificateStatus::read</span>(<span class="kw-2">&amp;mut</span> <span class="ident">sub</span>)<span class="question-mark">?</span>)
             }
             <span class="ident">HandshakeType::MessageHash</span> =&gt; {
                 <span class="comment">// does not appear on the wire</span>
@@ -4561,7 +4562,7 @@
                 <span class="comment">// not legal on wire</span>
                 <span class="kw">return</span> <span class="prelude-val">None</span>;
             }
-            <span class="kw">_</span> =&gt; <span class="ident">HandshakePayload::Unknown</span>(<span class="ident">Payload::read</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">sub</span>).<span class="ident">unwrap</span>()),
+            <span class="kw">_</span> =&gt; <span class="ident">HandshakePayload::Unknown</span>(<span class="ident">Payload::read</span>(<span class="kw-2">&amp;mut</span> <span class="ident">sub</span>).<span class="ident">unwrap</span>()),
         };
 
         <span class="kw">if</span> <span class="ident">sub</span>.<span class="ident">any_left</span>() {
@@ -4588,7 +4589,7 @@
                 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">binders_encoding</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
                 <span class="ident">offer</span>
                     .<span class="ident">binders</span>
-                    .<span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">binders_encoding</span>);
+                    .<span class="ident">encode</span>(<span class="kw-2">&amp;mut</span> <span class="ident">binders_encoding</span>);
                 <span class="ident">binders_encoding</span>.<span class="ident">len</span>()
             }
             <span class="kw">_</span> =&gt; <span class="number">0</span>,
@@ -4608,5 +4609,4 @@
 }
 </code></pre></div>
 </section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="rustls" data-search-index-js="../../../search-index.js" data-search-js="../../../search.js"></div>
-    <script src="../../../main.js"></script><script src="../../../source-script.js"></script><script src="../../../source-files.js"></script>
 </body></html>

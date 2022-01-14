@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;git&#x2F;checkouts&#x2F;mongo-rust-driver-b939e0128fabb835&#x2F;8e55cb2&#x2F;src&#x2F;sdam&#x2F;description&#x2F;topology&#x2F;mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="stylesheet" type="text/css" href="../../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../../../../storage.js"></script><script src="../../../../../crates.js"></script><noscript><link rel="stylesheet" href="../../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../../../mongodb/index.html'><div class='logo-container rust-logo'><img src='../../../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../../../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../../../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../../../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;git&#x2F;checkouts&#x2F;mongo-rust-driver-b939e0128fabb835&#x2F;8e55cb2&#x2F;src&#x2F;sdam&#x2F;description&#x2F;topology&#x2F;mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="stylesheet" type="text/css" href="../../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../../../../storage.js"></script><script src="../../../../../crates.js"></script><script defer src="../../../../../main.js"></script><script defer src="../../../../../source-script.js"></script><script defer src="../../../../../source-files.js"></script>
+    <noscript><link rel="stylesheet" href="../../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../../../mongodb/index.html'><div class='logo-container rust-logo'><img src='../../../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../../../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../../../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../../../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -1072,7 +1073,7 @@
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">update_command_with_read_pref</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">server_type</span>: <span class="ident">ServerType</span>,
-        <span class="ident">command</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Command</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
+        <span class="ident">command</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Command</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
         <span class="ident">criteria</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">SelectionCriteria</span><span class="op">&gt;</span>,
     ) {
         <span class="kw">match</span> (<span class="self">self</span>.<span class="ident">topology_type</span>, <span class="ident">server_type</span>) {
@@ -1111,7 +1112,7 @@
 
     <span class="kw">fn</span> <span class="ident">update_command_read_pref_for_mongos</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">command</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Command</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
+        <span class="ident">command</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Command</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
         <span class="ident">criteria</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">SelectionCriteria</span><span class="op">&gt;</span>,
     ) {
         <span class="kw">let</span> <span class="ident">read_preference</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">criteria</span> {
@@ -1135,7 +1136,7 @@
     }
 
     <span class="doccomment">/// Check the cluster for a compatibility error, and record the error message if one is found.</span>
-    <span class="kw">fn</span> <span class="ident">check_compatibility</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
+    <span class="kw">fn</span> <span class="ident">check_compatibility</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
         <span class="self">self</span>.<span class="ident">compatibility_error</span> <span class="op">=</span> <span class="prelude-val">None</span>;
 
         <span class="kw">for</span> <span class="ident">server</span> <span class="kw">in</span> <span class="self">self</span>.<span class="ident">servers</span>.<span class="ident">values</span>() {
@@ -1153,7 +1154,7 @@
     }
 
     <span class="doccomment">/// Update the ServerDescription&#39;s round trip time based on the rolling average.</span>
-    <span class="kw">fn</span> <span class="ident">update_round_trip_time</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">server_description</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ServerDescription</span>) {
+    <span class="kw">fn</span> <span class="ident">update_round_trip_time</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">server_description</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ServerDescription</span>) {
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">old_rtt</span>) <span class="op">=</span> <span class="self">self</span>
             .<span class="ident">servers</span>
             .<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">server_description</span>.<span class="ident">address</span>)
@@ -1167,7 +1168,7 @@
     }
 
     <span class="doccomment">/// Updates the topology&#39;s logical session timeout value based on the server&#39;s value for it.</span>
-    <span class="kw">fn</span> <span class="ident">update_session_support_status</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">server_description</span>: <span class="kw-2">&amp;</span><span class="ident">ServerDescription</span>) {
+    <span class="kw">fn</span> <span class="ident">update_session_support_status</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">server_description</span>: <span class="kw-2">&amp;</span><span class="ident">ServerDescription</span>) {
         <span class="kw">if</span> <span class="op">!</span><span class="ident">server_description</span>.<span class="ident">server_type</span>.<span class="ident">is_data_bearing</span>() {
             <span class="kw">if</span> <span class="kw">let</span> <span class="ident">TopologyType::Single</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">topology_type</span> {
                 <span class="self">self</span>.<span class="ident">session_support_status</span> <span class="op">=</span> <span class="ident">SessionSupportStatus::Unsupported</span> {
@@ -1229,7 +1230,7 @@
 
     <span class="doccomment">/// Updates the topology&#39;s transaction support status based on its session support status and</span>
     <span class="doccomment">/// the server description&#39;s max wire version.</span>
-    <span class="kw">fn</span> <span class="ident">update_transaction_support_status</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">server_description</span>: <span class="kw-2">&amp;</span><span class="ident">ServerDescription</span>) {
+    <span class="kw">fn</span> <span class="ident">update_transaction_support_status</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">server_description</span>: <span class="kw-2">&amp;</span><span class="ident">ServerDescription</span>) {
         <span class="kw">if</span> <span class="op">!</span><span class="macro">matches!</span>(
             <span class="self">self</span>.<span class="ident">session_support_status</span>,
             <span class="ident">SessionSupportStatus::Supported</span> { .. }
@@ -1249,7 +1250,7 @@
 
     <span class="doccomment">/// Sets the topology&#39;s cluster time to the provided one if it is higher than the currently</span>
     <span class="doccomment">/// recorded one.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">advance_cluster_time</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">cluster_time</span>: <span class="kw-2">&amp;</span><span class="ident">ClusterTime</span>) {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">advance_cluster_time</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">cluster_time</span>: <span class="kw-2">&amp;</span><span class="ident">ClusterTime</span>) {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">cluster_time</span>.<span class="ident">as_ref</span>() <span class="op">&gt;</span><span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">cluster_time</span>) {
             <span class="kw">return</span>;
         }
@@ -1293,7 +1294,7 @@
     <span class="doccomment">/// Syncs the set of servers in the description to those in `hosts`. Servers in the set not</span>
     <span class="doccomment">/// already present in the cluster will be added, and servers in the cluster not present in the</span>
     <span class="doccomment">/// set will be removed.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">sync_hosts</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">hosts</span>: <span class="kw-2">&amp;</span><span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">ServerAddress</span><span class="op">&gt;</span>) {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">sync_hosts</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">hosts</span>: <span class="kw-2">&amp;</span><span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">ServerAddress</span><span class="op">&gt;</span>) {
         <span class="self">self</span>.<span class="ident">add_new_servers_from_addresses</span>(<span class="ident">hosts</span>.<span class="ident">iter</span>());
         <span class="self">self</span>.<span class="ident">servers</span>.<span class="ident">retain</span>(<span class="op">|</span><span class="ident">host</span>, <span class="kw">_</span><span class="op">|</span> <span class="ident">hosts</span>.<span class="ident">contains</span>(<span class="ident">host</span>));
     }
@@ -1309,7 +1310,7 @@
     <span class="doccomment">/// Update the topology based on the new information about the topology contained by the</span>
     <span class="doccomment">/// ServerDescription.</span>
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">update</span>(
-        <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
+        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
         <span class="kw-2">mut</span> <span class="ident">server_description</span>: <span class="ident">ServerDescription</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">String</span><span class="op">&gt;</span> {
         <span class="comment">// Ignore updates from servers not currently in the cluster.</span>
@@ -1319,7 +1320,7 @@
 
         <span class="comment">// Update the round trip time on the server description to the weighted average as described</span>
         <span class="comment">// by the spec.</span>
-        <span class="self">self</span>.<span class="ident">update_round_trip_time</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">server_description</span>);
+        <span class="self">self</span>.<span class="ident">update_round_trip_time</span>(<span class="kw-2">&amp;mut</span> <span class="ident">server_description</span>);
 
         <span class="comment">// Replace the old info about the server with the new info.</span>
         <span class="self">self</span>.<span class="ident">servers</span>.<span class="ident">insert</span>(
@@ -1365,7 +1366,7 @@
 
     <span class="doccomment">/// Update the Unknown topology description based on the server description.</span>
     <span class="kw">fn</span> <span class="ident">update_unknown_topology</span>(
-        <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
+        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
         <span class="ident">server_description</span>: <span class="ident">ServerDescription</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">String</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="ident">server_description</span>.<span class="ident">server_type</span> {
@@ -1391,7 +1392,7 @@
     }
 
     <span class="doccomment">/// Update the Sharded topology description based on the server description.</span>
-    <span class="kw">fn</span> <span class="ident">update_sharded_topology</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">server_description</span>: <span class="ident">ServerDescription</span>) {
+    <span class="kw">fn</span> <span class="ident">update_sharded_topology</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">server_description</span>: <span class="ident">ServerDescription</span>) {
         <span class="kw">match</span> <span class="ident">server_description</span>.<span class="ident">server_type</span> {
             <span class="ident">ServerType::Unknown</span> <span class="op">|</span> <span class="ident">ServerType::Mongos</span> =&gt; {}
             <span class="kw">_</span> =&gt; {
@@ -1402,7 +1403,7 @@
 
     <span class="doccomment">/// Update the ReplicaSetNoPrimary topology description based on the server description.</span>
     <span class="kw">fn</span> <span class="ident">update_replica_set_no_primary_topology</span>(
-        <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
+        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
         <span class="ident">server_description</span>: <span class="ident">ServerDescription</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">String</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="ident">server_description</span>.<span class="ident">server_type</span> {
@@ -1427,7 +1428,7 @@
 
     <span class="doccomment">/// Update the ReplicaSetWithPrimary topology description based on the server description.</span>
     <span class="kw">fn</span> <span class="ident">update_replica_set_with_primary_topology</span>(
-        <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
+        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
         <span class="ident">server_description</span>: <span class="ident">ServerDescription</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">String</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="ident">server_description</span>.<span class="ident">server_type</span> {
@@ -1451,7 +1452,7 @@
     }
 
     <span class="doccomment">/// Update the Unknown topology description based on the Standalone server description.</span>
-    <span class="kw">fn</span> <span class="ident">update_unknown_with_standalone_server</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">server_description</span>: <span class="ident">ServerDescription</span>) {
+    <span class="kw">fn</span> <span class="ident">update_unknown_with_standalone_server</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">server_description</span>: <span class="ident">ServerDescription</span>) {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">single_seed</span> {
             <span class="self">self</span>.<span class="ident">topology_type</span> <span class="op">=</span> <span class="ident">TopologyType::Single</span>;
         } <span class="kw">else</span> {
@@ -1462,7 +1463,7 @@
     <span class="doccomment">/// Update the ReplicaSetNoPrimary topology description based on the non-primary server</span>
     <span class="doccomment">/// description.</span>
     <span class="kw">fn</span> <span class="ident">update_rs_without_primary_server</span>(
-        <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
+        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
         <span class="ident">server_description</span>: <span class="ident">ServerDescription</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">String</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">set_name</span>.<span class="ident">is_none</span>() {
@@ -1485,7 +1486,7 @@
     <span class="doccomment">/// Update the ReplicaSetWithPrimary topology description based on the non-primary server</span>
     <span class="doccomment">/// description.</span>
     <span class="kw">fn</span> <span class="ident">update_rs_with_primary_from_member</span>(
-        <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
+        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
         <span class="ident">server_description</span>: <span class="ident">ServerDescription</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">String</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">set_name</span> <span class="op">!</span><span class="op">=</span> <span class="ident">server_description</span>.<span class="ident">set_name</span>()<span class="question-mark">?</span> {
@@ -1507,7 +1508,7 @@
 
     <span class="doccomment">/// Update the replica set topology description based on the RSPrimary server description.</span>
     <span class="kw">fn</span> <span class="ident">update_rs_from_primary_server</span>(
-        <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
+        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
         <span class="ident">server_description</span>: <span class="ident">ServerDescription</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">String</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">set_name</span>.<span class="ident">is_none</span>() {
@@ -1585,7 +1586,7 @@
     <span class="doccomment">/// ReplicaSetNoPrimary if none is found.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// This should only be called on a replica set topology.</span>
-    <span class="kw">fn</span> <span class="ident">record_primary_state</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
+    <span class="kw">fn</span> <span class="ident">record_primary_state</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
         <span class="self">self</span>.<span class="ident">topology_type</span> <span class="op">=</span> <span class="kw">if</span> <span class="self">self</span>
             .<span class="ident">servers</span>
             .<span class="ident">values</span>()
@@ -1599,7 +1600,7 @@
 
     <span class="doccomment">/// Create a new ServerDescription for each address and add it to the topology.</span>
     <span class="kw">fn</span> <span class="ident">add_new_servers</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
-        <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
+        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
         <span class="ident">servers</span>: <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">String</span><span class="op">&gt;</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">String</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">servers</span>: <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span>, <span class="ident">String</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">servers</span>
@@ -1612,7 +1613,7 @@
 
     <span class="doccomment">/// Create a new ServerDescription for each address and add it to the topology.</span>
     <span class="kw">fn</span> <span class="ident">add_new_servers_from_addresses</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
-        <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
+        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
         <span class="ident">servers</span>: <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">ServerAddress</span><span class="op">&gt;</span>,
     ) {
         <span class="kw">for</span> <span class="ident">server</span> <span class="kw">in</span> <span class="ident">servers</span> {
@@ -1720,5 +1721,4 @@
 }
 </code></pre></div>
 </section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../../../" data-current-crate="mongodb" data-search-index-js="../../../../../search-index.js" data-search-js="../../../../../search.js"></div>
-    <script src="../../../../../main.js"></script><script src="../../../../../source-script.js"></script><script src="../../../../../source-files.js"></script>
 </body></html>

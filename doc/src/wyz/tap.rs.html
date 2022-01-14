@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;wyz-0.2.0&#x2F;src&#x2F;tap.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>tap.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../wyz/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;wyz-0.2.0&#x2F;src&#x2F;tap.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>tap.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><script defer src="../../main.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script>
+    <noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../wyz/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -1228,10 +1229,10 @@ allows this to work.
 	<span class="doccomment">/// ```</span>
 	<span class="kw">fn</span> <span class="ident">tap_mut</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">R</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">func</span>: <span class="ident">F</span>) -&gt; <span class="self">Self</span>
 	<span class="kw">where</span>
-		<span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span>) -&gt; <span class="ident">R</span>,
+		<span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;mut</span> <span class="self">Self</span>) -&gt; <span class="ident">R</span>,
 		<span class="ident">R</span>: <span class="ident">Sized</span>,
 	{
-		<span class="ident">func</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>);
+		<span class="ident">func</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>);
 		<span class="self">self</span>
 	}
 
@@ -1240,7 +1241,7 @@ allows this to work.
 	<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">not</span>(<span class="ident">debug_assertions</span>), <span class="ident">allow</span>(<span class="ident">unused_variables</span>))]</span>
 	<span class="kw">fn</span> <span class="ident">tap_mut_dbg</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">R</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">func</span>: <span class="ident">F</span>) -&gt; <span class="self">Self</span>
 	<span class="kw">where</span>
-		<span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span>) -&gt; <span class="ident">R</span>,
+		<span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;mut</span> <span class="self">Self</span>) -&gt; <span class="ident">R</span>,
 		<span class="ident">R</span>: <span class="ident">Sized</span>,
 	{
 		<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">debug_assertions</span>)]</span>
@@ -1324,10 +1325,10 @@ assert_eq!(&amp;v, &amp;[5, 4, 3, 2, 1]);
 	<span class="kw">fn</span> <span class="ident">tap_borrow_mut</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">R</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">func</span>: <span class="ident">F</span>) -&gt; <span class="self">Self</span>
 	<span class="kw">where</span>
 		<span class="self">Self</span>: <span class="ident">BorrowMut</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
-		<span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">T</span>) -&gt; <span class="ident">R</span>,
+		<span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;mut</span> <span class="ident">T</span>) -&gt; <span class="ident">R</span>,
 		<span class="ident">R</span>: <span class="ident">Sized</span>,
 	{
-		<span class="ident">func</span>(<span class="ident">BorrowMut</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::borrow_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>));
+		<span class="ident">func</span>(<span class="ident">BorrowMut</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::borrow_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>));
 		<span class="self">self</span>
 	}
 
@@ -1338,7 +1339,7 @@ assert_eq!(&amp;v, &amp;[5, 4, 3, 2, 1]);
 	<span class="kw">fn</span> <span class="ident">tap_borrow_mut_dbg</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">R</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">func</span>: <span class="ident">F</span>) -&gt; <span class="self">Self</span>
 	<span class="kw">where</span>
 		<span class="self">Self</span>: <span class="ident">BorrowMut</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
-		<span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">T</span>) -&gt; <span class="ident">R</span>,
+		<span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;mut</span> <span class="ident">T</span>) -&gt; <span class="ident">R</span>,
 		<span class="ident">R</span>: <span class="ident">Sized</span>,
 	{
 		<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">debug_assertions</span>)]</span>
@@ -1449,9 +1450,9 @@ assert_eq!(e.b, [16, 18, 20, 22]);
 	<span class="kw">fn</span> <span class="ident">tap_ref_mut</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">R</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">func</span>: <span class="ident">F</span>) -&gt; <span class="self">Self</span>
 	<span class="kw">where</span>
 		<span class="self">Self</span>: <span class="ident">AsMut</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
-		<span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">T</span>) -&gt; <span class="ident">R</span>,
+		<span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;mut</span> <span class="ident">T</span>) -&gt; <span class="ident">R</span>,
 	{
-		<span class="ident">func</span>(<span class="ident">AsMut</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::as_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>));
+		<span class="ident">func</span>(<span class="ident">AsMut</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::as_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>));
 		<span class="self">self</span>
 	}
 
@@ -1461,7 +1462,7 @@ assert_eq!(e.b, [16, 18, 20, 22]);
 	<span class="kw">fn</span> <span class="ident">tap_ref_mut_dbg</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">R</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">func</span>: <span class="ident">F</span>) -&gt; <span class="self">Self</span>
 	<span class="kw">where</span>
 		<span class="self">Self</span>: <span class="ident">AsMut</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
-		<span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">T</span>) -&gt; <span class="ident">R</span>,
+		<span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;mut</span> <span class="ident">T</span>) -&gt; <span class="ident">R</span>,
 	{
 		<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">debug_assertions</span>)]</span>
 		<span class="kw">return</span> <span class="self">self</span>.<span class="ident">tap_ref_mut</span>(<span class="ident">func</span>);
@@ -1525,9 +1526,9 @@ assert_eq!(&amp;v, &amp;[5, 4, 3, 2, 1]);
 	<span class="kw">fn</span> <span class="ident">tap_deref_mut</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">R</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">func</span>: <span class="ident">F</span>) -&gt; <span class="self">Self</span>
 	<span class="kw">where</span>
 		<span class="self">Self</span>: <span class="ident">DerefMut</span>,
-		<span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">Deref</span><span class="op">&gt;</span><span class="ident">::Target</span>) -&gt; <span class="ident">R</span>,
+		<span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;mut</span> <span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">Deref</span><span class="op">&gt;</span><span class="ident">::Target</span>) -&gt; <span class="ident">R</span>,
 	{
-		<span class="ident">func</span>(<span class="ident">DerefMut::deref_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>));
+		<span class="ident">func</span>(<span class="ident">DerefMut::deref_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>));
 		<span class="self">self</span>
 	}
 
@@ -1537,7 +1538,7 @@ assert_eq!(&amp;v, &amp;[5, 4, 3, 2, 1]);
 	<span class="kw">fn</span> <span class="ident">tap_deref_mut_dbg</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">R</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">func</span>: <span class="ident">F</span>) -&gt; <span class="self">Self</span>
 	<span class="kw">where</span>
 		<span class="self">Self</span>: <span class="ident">DerefMut</span>,
-		<span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">Deref</span><span class="op">&gt;</span><span class="ident">::Target</span>) -&gt; <span class="ident">R</span>,
+		<span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;mut</span> <span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">Deref</span><span class="op">&gt;</span><span class="ident">::Target</span>) -&gt; <span class="ident">R</span>,
 	{
 		<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">debug_assertions</span>)]</span>
 		<span class="kw">return</span> <span class="self">self</span>.<span class="ident">tap_deref_mut</span>(<span class="ident">func</span>);
@@ -1573,12 +1574,12 @@ correct outer variant.
 	<span class="doccomment">/// Provides the interior value for modification if present.</span>
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// This is equivalent to `.map(|mut v| { func(&amp;mut v); v })`.</span>
-	<span class="kw">fn</span> <span class="ident">tap_some_mut</span><span class="op">&lt;</span><span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">T</span>) -&gt; <span class="ident">R</span>, <span class="ident">R</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">func</span>: <span class="ident">F</span>) -&gt; <span class="self">Self</span>;
+	<span class="kw">fn</span> <span class="ident">tap_some_mut</span><span class="op">&lt;</span><span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;mut</span> <span class="ident">T</span>) -&gt; <span class="ident">R</span>, <span class="ident">R</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">func</span>: <span class="ident">F</span>) -&gt; <span class="self">Self</span>;
 
 	<span class="doccomment">/// Calls `tap_some_mut` in debug builds, and does nothing in release</span>
 	<span class="doccomment">/// builds.</span>
 	<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unused_variables</span>)]</span>
-	<span class="kw">fn</span> <span class="ident">tap_some_mut_dbg</span><span class="op">&lt;</span><span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">T</span>) -&gt; <span class="ident">R</span>, <span class="ident">R</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">func</span>: <span class="ident">F</span>) -&gt; <span class="self">Self</span> {
+	<span class="kw">fn</span> <span class="ident">tap_some_mut_dbg</span><span class="op">&lt;</span><span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;mut</span> <span class="ident">T</span>) -&gt; <span class="ident">R</span>, <span class="ident">R</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">func</span>: <span class="ident">F</span>) -&gt; <span class="self">Self</span> {
 		<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">debug_assertions</span>)]</span>
 		<span class="kw">return</span> <span class="self">self</span>.<span class="ident">tap_some_mut</span>(<span class="ident">func</span>);
 		<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">debug_assertions</span>))]</span>
@@ -1608,7 +1609,7 @@ correct outer variant.
 		<span class="self">self</span>
 	}
 
-	<span class="kw">fn</span> <span class="ident">tap_some_mut</span><span class="op">&lt;</span><span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">T</span>) -&gt; <span class="ident">R</span>, <span class="ident">R</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">func</span>: <span class="ident">F</span>) -&gt; <span class="self">Self</span> {
+	<span class="kw">fn</span> <span class="ident">tap_some_mut</span><span class="op">&lt;</span><span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;mut</span> <span class="ident">T</span>) -&gt; <span class="ident">R</span>, <span class="ident">R</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">func</span>: <span class="ident">F</span>) -&gt; <span class="self">Self</span> {
 		<span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">val</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">as_mut</span>() {
 			<span class="ident">func</span>(<span class="ident">val</span>);
 		}
@@ -1648,11 +1649,11 @@ your tapper’s function produces one.
 	}
 
 	<span class="doccomment">/// Provides the inner value for modification if the `Result` is `Ok`.</span>
-	<span class="kw">fn</span> <span class="ident">tap_ok_mut</span><span class="op">&lt;</span><span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">T</span>) -&gt; <span class="ident">R</span>, <span class="ident">R</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">func</span>: <span class="ident">F</span>) -&gt; <span class="self">Self</span>;
+	<span class="kw">fn</span> <span class="ident">tap_ok_mut</span><span class="op">&lt;</span><span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;mut</span> <span class="ident">T</span>) -&gt; <span class="ident">R</span>, <span class="ident">R</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">func</span>: <span class="ident">F</span>) -&gt; <span class="self">Self</span>;
 
 	<span class="doccomment">/// Calls `tap_ok_mut` in debug builds, and does nothing in release builds.</span>
 	<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unused_variables</span>)]</span>
-	<span class="kw">fn</span> <span class="ident">tap_ok_mut_dbg</span><span class="op">&lt;</span><span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">T</span>) -&gt; <span class="ident">R</span>, <span class="ident">R</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">func</span>: <span class="ident">F</span>) -&gt; <span class="self">Self</span> {
+	<span class="kw">fn</span> <span class="ident">tap_ok_mut_dbg</span><span class="op">&lt;</span><span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;mut</span> <span class="ident">T</span>) -&gt; <span class="ident">R</span>, <span class="ident">R</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">func</span>: <span class="ident">F</span>) -&gt; <span class="self">Self</span> {
 		<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">debug_assertions</span>)]</span>
 		<span class="kw">return</span> <span class="self">self</span>.<span class="ident">tap_ok_mut</span>(<span class="ident">func</span>);
 		<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">debug_assertions</span>))]</span>
@@ -1673,11 +1674,11 @@ your tapper’s function produces one.
 
 	<span class="doccomment">/// Provides the inner error value for modification if the `Result` is</span>
 	<span class="doccomment">/// `Err`.</span>
-	<span class="kw">fn</span> <span class="ident">tap_err_mut</span><span class="op">&lt;</span><span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">E</span>) -&gt; <span class="ident">R</span>, <span class="ident">R</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">func</span>: <span class="ident">F</span>) -&gt; <span class="self">Self</span>;
+	<span class="kw">fn</span> <span class="ident">tap_err_mut</span><span class="op">&lt;</span><span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;mut</span> <span class="ident">E</span>) -&gt; <span class="ident">R</span>, <span class="ident">R</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">func</span>: <span class="ident">F</span>) -&gt; <span class="self">Self</span>;
 
 	<span class="doccomment">/// Calls `tap_err_mut` in debug builds, and does nothing in release builds.</span>
 	<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unused_variables</span>)]</span>
-	<span class="kw">fn</span> <span class="ident">tap_err_mut_dbg</span><span class="op">&lt;</span><span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">E</span>) -&gt; <span class="ident">R</span>, <span class="ident">R</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">func</span>: <span class="ident">F</span>) -&gt; <span class="self">Self</span> {
+	<span class="kw">fn</span> <span class="ident">tap_err_mut_dbg</span><span class="op">&lt;</span><span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;mut</span> <span class="ident">E</span>) -&gt; <span class="ident">R</span>, <span class="ident">R</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">func</span>: <span class="ident">F</span>) -&gt; <span class="self">Self</span> {
 		<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">debug_assertions</span>)]</span>
 		<span class="kw">return</span> <span class="self">self</span>.<span class="ident">tap_err_mut</span>(<span class="ident">func</span>);
 		<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">debug_assertions</span>))]</span>
@@ -1693,7 +1694,7 @@ your tapper’s function produces one.
 		<span class="self">self</span>
 	}
 
-	<span class="kw">fn</span> <span class="ident">tap_ok_mut</span><span class="op">&lt;</span><span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">T</span>) -&gt; <span class="ident">R</span>, <span class="ident">R</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">func</span>: <span class="ident">F</span>) -&gt; <span class="self">Self</span> {
+	<span class="kw">fn</span> <span class="ident">tap_ok_mut</span><span class="op">&lt;</span><span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;mut</span> <span class="ident">T</span>) -&gt; <span class="ident">R</span>, <span class="ident">R</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">func</span>: <span class="ident">F</span>) -&gt; <span class="self">Self</span> {
 		<span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">val</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">as_mut</span>() {
 			<span class="ident">func</span>(<span class="ident">val</span>);
 		}
@@ -1707,7 +1708,7 @@ your tapper’s function produces one.
 		<span class="self">self</span>
 	}
 
-	<span class="kw">fn</span> <span class="ident">tap_err_mut</span><span class="op">&lt;</span><span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">E</span>) -&gt; <span class="ident">R</span>, <span class="ident">R</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">func</span>: <span class="ident">F</span>) -&gt; <span class="self">Self</span> {
+	<span class="kw">fn</span> <span class="ident">tap_err_mut</span><span class="op">&lt;</span><span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;mut</span> <span class="ident">E</span>) -&gt; <span class="ident">R</span>, <span class="ident">R</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">func</span>: <span class="ident">F</span>) -&gt; <span class="self">Self</span> {
 		<span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Err</span>(<span class="ident">err</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">as_mut</span>() {
 			<span class="ident">func</span>(<span class="ident">err</span>);
 		}
@@ -1758,13 +1759,13 @@ your tapper’s function produces one.
 			}
 		}
 		<span class="kw">impl</span> <span class="ident">AsMut</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Example</span> {
-			<span class="kw">fn</span> <span class="ident">as_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">u8</span>] {
-				<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">a</span>
+			<span class="kw">fn</span> <span class="ident">as_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut</span> [<span class="ident">u8</span>] {
+				<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">a</span>
 			}
 		}
 		<span class="kw">impl</span> <span class="ident">AsMut</span><span class="op">&lt;</span>[<span class="ident">u16</span>]<span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Example</span> {
-			<span class="kw">fn</span> <span class="ident">as_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">u16</span>] {
-				<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">b</span>
+			<span class="kw">fn</span> <span class="ident">as_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut</span> [<span class="ident">u16</span>] {
+				<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">b</span>
 			}
 		}
 
@@ -1776,8 +1777,8 @@ your tapper’s function produces one.
 		}
 		.<span class="ident">tap_ref</span>(<span class="op">|</span><span class="ident">a</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]<span class="op">|</span> <span class="ident">sum_a</span> <span class="op">=</span> <span class="ident">a</span>.<span class="ident">iter</span>().<span class="ident">sum</span>())
 		.<span class="ident">tap_ref</span>(<span class="op">|</span><span class="ident">b</span>: <span class="kw-2">&amp;</span>[<span class="ident">u16</span>]<span class="op">|</span> <span class="ident">sum_b</span> <span class="op">=</span> <span class="ident">b</span>.<span class="ident">iter</span>().<span class="ident">sum</span>())
-		.<span class="ident">tap_ref_mut</span>(<span class="op">|</span><span class="ident">a</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">u8</span>]<span class="op">|</span> <span class="ident">a</span>.<span class="ident">iter_mut</span>().<span class="ident">for_each</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="kw-2">*</span><span class="ident">e</span> <span class="kw-2">*</span><span class="op">=</span> <span class="number">2</span>))
-		.<span class="ident">tap_ref_mut</span>(<span class="op">|</span><span class="ident">b</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">u16</span>]<span class="op">|</span> <span class="ident">b</span>.<span class="ident">iter_mut</span>().<span class="ident">for_each</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="kw-2">*</span><span class="ident">e</span> <span class="kw-2">*</span><span class="op">=</span> <span class="number">2</span>));
+		.<span class="ident">tap_ref_mut</span>(<span class="op">|</span><span class="ident">a</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">u8</span>]<span class="op">|</span> <span class="ident">a</span>.<span class="ident">iter_mut</span>().<span class="ident">for_each</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="kw-2">*</span><span class="ident">e</span> <span class="kw-2">*</span><span class="op">=</span> <span class="number">2</span>))
+		.<span class="ident">tap_ref_mut</span>(<span class="op">|</span><span class="ident">b</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">u16</span>]<span class="op">|</span> <span class="ident">b</span>.<span class="ident">iter_mut</span>().<span class="ident">for_each</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="kw-2">*</span><span class="ident">e</span> <span class="kw-2">*</span><span class="op">=</span> <span class="number">2</span>));
 
 		<span class="macro">assert_eq!</span>(<span class="ident">sum_a</span>, <span class="number">28</span>);
 		<span class="macro">assert_eq!</span>(<span class="ident">sum_b</span>, <span class="number">38</span>);
@@ -1817,7 +1818,7 @@ your tapper’s function produces one.
 
 		<span class="macro">assert_eq!</span>(<span class="prelude-val">Err</span>(<span class="number">5</span>).<span class="ident">tap_ok</span>(<span class="op">|</span><span class="ident">x</span>: <span class="kw-2">&amp;</span><span class="ident">i32</span><span class="op">|</span> <span class="ident">trap</span> <span class="op">+</span><span class="op">=</span> <span class="kw-2">*</span><span class="ident">x</span>).<span class="ident">unwrap_err</span>(), <span class="number">5</span>);
 		<span class="macro">assert_eq!</span>(<span class="ident">trap</span>, <span class="number">0</span>);
-		<span class="macro">assert_eq!</span>(<span class="prelude-val">Err</span>(<span class="number">5</span>).<span class="ident">tap_ok_mut</span>(<span class="op">|</span><span class="ident">x</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">i32</span><span class="op">|</span> <span class="kw-2">*</span><span class="ident">x</span> <span class="op">+</span><span class="op">=</span> <span class="number">5</span>).<span class="ident">unwrap_err</span>(), <span class="number">5</span>);
+		<span class="macro">assert_eq!</span>(<span class="prelude-val">Err</span>(<span class="number">5</span>).<span class="ident">tap_ok_mut</span>(<span class="op">|</span><span class="ident">x</span>: <span class="kw-2">&amp;mut</span> <span class="ident">i32</span><span class="op">|</span> <span class="kw-2">*</span><span class="ident">x</span> <span class="op">+</span><span class="op">=</span> <span class="number">5</span>).<span class="ident">unwrap_err</span>(), <span class="number">5</span>);
 
 		<span class="macro">assert_eq!</span>(<span class="prelude-val">Ok</span>::<span class="op">&lt;</span><span class="kw">_</span>, <span class="ident">i32</span><span class="op">&gt;</span>(<span class="number">5</span>).<span class="ident">tap_ok</span>(<span class="op">|</span><span class="ident">x</span>: <span class="kw-2">&amp;</span><span class="ident">i32</span><span class="op">|</span> <span class="ident">trap</span> <span class="op">+</span><span class="op">=</span> <span class="kw-2">*</span><span class="ident">x</span>).<span class="ident">unwrap</span>(), <span class="number">5</span>);
 		<span class="macro">assert_eq!</span>(<span class="ident">trap</span>, <span class="number">5</span>);
@@ -1826,5 +1827,4 @@ your tapper’s function produces one.
 }
 </code></pre></div>
 </section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="wyz" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>
-    <script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script>
 </body></html>

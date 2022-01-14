@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;mysql_common-0.26.0&#x2F;src&#x2F;packets.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>packets.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../mysql_common/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">   1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;mysql_common-0.26.0&#x2F;src&#x2F;packets.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>packets.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><script defer src="../../main.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script>
+    <noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../mysql_common/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">   1</span>
 <span id="2">   2</span>
 <span id="3">   3</span>
 <span id="4">   4</span>
@@ -1905,11 +1906,11 @@
         {
             <span class="comment">// Skip &quot;def&quot;</span>
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">reader</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">payload</span>[<span class="number">4</span>..];
-            <span class="ident">schema</span> <span class="op">=</span> <span class="macro">get_offset_and_len!</span>(<span class="ident">payload</span>, <span class="macro">read_lenenc_str!</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">reader</span>)<span class="question-mark">?</span>);
-            <span class="ident">table</span> <span class="op">=</span> <span class="macro">get_offset_and_len!</span>(<span class="ident">payload</span>, <span class="macro">read_lenenc_str!</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">reader</span>)<span class="question-mark">?</span>);
-            <span class="ident">org_table</span> <span class="op">=</span> <span class="macro">get_offset_and_len!</span>(<span class="ident">payload</span>, <span class="macro">read_lenenc_str!</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">reader</span>)<span class="question-mark">?</span>);
-            <span class="ident">name</span> <span class="op">=</span> <span class="macro">get_offset_and_len!</span>(<span class="ident">payload</span>, <span class="macro">read_lenenc_str!</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">reader</span>)<span class="question-mark">?</span>);
-            <span class="ident">org_name</span> <span class="op">=</span> <span class="macro">get_offset_and_len!</span>(<span class="ident">payload</span>, <span class="macro">read_lenenc_str!</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">reader</span>)<span class="question-mark">?</span>);
+            <span class="ident">schema</span> <span class="op">=</span> <span class="macro">get_offset_and_len!</span>(<span class="ident">payload</span>, <span class="macro">read_lenenc_str!</span>(<span class="kw-2">&amp;mut</span> <span class="ident">reader</span>)<span class="question-mark">?</span>);
+            <span class="ident">table</span> <span class="op">=</span> <span class="macro">get_offset_and_len!</span>(<span class="ident">payload</span>, <span class="macro">read_lenenc_str!</span>(<span class="kw-2">&amp;mut</span> <span class="ident">reader</span>)<span class="question-mark">?</span>);
+            <span class="ident">org_table</span> <span class="op">=</span> <span class="macro">get_offset_and_len!</span>(<span class="ident">payload</span>, <span class="macro">read_lenenc_str!</span>(<span class="kw-2">&amp;mut</span> <span class="ident">reader</span>)<span class="question-mark">?</span>);
+            <span class="ident">name</span> <span class="op">=</span> <span class="macro">get_offset_and_len!</span>(<span class="ident">payload</span>, <span class="macro">read_lenenc_str!</span>(<span class="kw-2">&amp;mut</span> <span class="ident">reader</span>)<span class="question-mark">?</span>);
+            <span class="ident">org_name</span> <span class="op">=</span> <span class="macro">get_offset_and_len!</span>(<span class="ident">payload</span>, <span class="macro">read_lenenc_str!</span>(<span class="kw-2">&amp;mut</span> <span class="ident">reader</span>)<span class="question-mark">?</span>);
             <span class="ident">reader</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">reader</span>[<span class="number">1</span>..];
             <span class="ident">character_set</span> <span class="op">=</span> <span class="ident">reader</span>.<span class="ident">read_u16</span>::<span class="op">&lt;</span><span class="ident">LE</span><span class="op">&gt;</span>()<span class="question-mark">?</span>;
             <span class="ident">column_length</span> <span class="op">=</span> <span class="ident">reader</span>.<span class="ident">read_u32</span>::<span class="op">&lt;</span><span class="ident">LE</span><span class="op">&gt;</span>()<span class="question-mark">?</span>;
@@ -2052,7 +2053,7 @@
         <span class="kw">let</span> <span class="ident">data_type</span> <span class="op">=</span> <span class="ident">payload</span>.<span class="ident">read_u8</span>()<span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>(<span class="ident">SessionStateInfo</span> {
             <span class="ident">data_type</span>: <span class="ident">data_type</span>.<span class="ident">into</span>(),
-            <span class="ident">data</span>: <span class="macro">read_lenenc_str!</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">payload</span>)<span class="question-mark">?</span>.<span class="ident">into</span>(),
+            <span class="ident">data</span>: <span class="macro">read_lenenc_str!</span>(<span class="kw-2">&amp;mut</span> <span class="ident">payload</span>)<span class="question-mark">?</span>.<span class="ident">into</span>(),
         })
     }
 
@@ -2072,19 +2073,19 @@
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">reader</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">data</span>.<span class="ident">as_ref</span>();
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">data_type</span> {
             <span class="ident">SessionStateType::SESSION_TRACK_SYSTEM_VARIABLES</span> =&gt; {
-                <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="macro">read_lenenc_str!</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">reader</span>)<span class="question-mark">?</span>;
-                <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="macro">read_lenenc_str!</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">reader</span>)<span class="question-mark">?</span>;
+                <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="macro">read_lenenc_str!</span>(<span class="kw-2">&amp;mut</span> <span class="ident">reader</span>)<span class="question-mark">?</span>;
+                <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="macro">read_lenenc_str!</span>(<span class="kw-2">&amp;mut</span> <span class="ident">reader</span>)<span class="question-mark">?</span>;
                 <span class="prelude-val">Ok</span>(<span class="ident">SessionStateChange::SystemVariable</span>(
                     <span class="ident">name</span>.<span class="ident">into</span>(),
                     <span class="ident">value</span>.<span class="ident">into</span>(),
                 ))
             }
             <span class="ident">SessionStateType::SESSION_TRACK_SCHEMA</span> =&gt; {
-                <span class="kw">let</span> <span class="ident">schema</span> <span class="op">=</span> <span class="macro">read_lenenc_str!</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">reader</span>)<span class="question-mark">?</span>;
+                <span class="kw">let</span> <span class="ident">schema</span> <span class="op">=</span> <span class="macro">read_lenenc_str!</span>(<span class="kw-2">&amp;mut</span> <span class="ident">reader</span>)<span class="question-mark">?</span>;
                 <span class="prelude-val">Ok</span>(<span class="ident">SessionStateChange::Schema</span>(<span class="ident">schema</span>.<span class="ident">into</span>()))
             }
             <span class="ident">SessionStateType::SESSION_TRACK_STATE_CHANGE</span> =&gt; {
-                <span class="kw">let</span> <span class="ident">is_tracked</span> <span class="op">=</span> <span class="macro">read_lenenc_str!</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">reader</span>)<span class="question-mark">?</span>;
+                <span class="kw">let</span> <span class="ident">is_tracked</span> <span class="op">=</span> <span class="macro">read_lenenc_str!</span>(<span class="kw-2">&amp;mut</span> <span class="ident">reader</span>)<span class="question-mark">?</span>;
                 <span class="prelude-val">Ok</span>(<span class="ident">SessionStateChange::IsTracked</span>(<span class="ident">is_tracked</span> <span class="op">==</span> <span class="string">b&quot;1&quot;</span>))
             }
             <span class="comment">// Layout not specified in documentation</span>
@@ -2147,10 +2148,10 @@
 
                 <span class="kw">let</span> (<span class="ident">info</span>, <span class="ident">session_state_info</span>) <span class="op">=</span>
                     <span class="kw">if</span> <span class="ident">capabilities</span>.<span class="ident">contains</span>(<span class="ident">CapabilityFlags::CLIENT_SESSION_TRACK</span>) {
-                        <span class="kw">let</span> <span class="ident">info</span> <span class="op">=</span> <span class="macro">read_lenenc_str!</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">payload</span>)<span class="question-mark">?</span>;
+                        <span class="kw">let</span> <span class="ident">info</span> <span class="op">=</span> <span class="macro">read_lenenc_str!</span>(<span class="kw-2">&amp;mut</span> <span class="ident">payload</span>)<span class="question-mark">?</span>;
                         <span class="kw">let</span> <span class="ident">session_state_info</span> <span class="op">=</span>
                             <span class="kw">if</span> <span class="ident">status_flags</span>.<span class="ident">contains</span>(<span class="ident">StatusFlags::SERVER_SESSION_STATE_CHANGED</span>) {
-                                <span class="macro">read_lenenc_str!</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">payload</span>)<span class="question-mark">?</span>
+                                <span class="macro">read_lenenc_str!</span>(<span class="kw-2">&amp;mut</span> <span class="ident">payload</span>)<span class="question-mark">?</span>
                             } <span class="kw">else</span> {
                                 <span class="kw-2">&amp;</span>[][..]
                             };
@@ -2159,7 +2160,7 @@
                         <span class="comment">// The `info` field is a `string&lt;EOF&gt;` according to the MySQL Internals</span>
                         <span class="comment">// Manual, but actually it&#39;s a `string&lt;lenenc&gt;`.</span>
                         <span class="comment">// SEE: sql/protocol_classics.cc `net_send_ok`</span>
-                        <span class="kw">let</span> <span class="ident">info</span> <span class="op">=</span> <span class="macro">read_lenenc_str!</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">payload</span>)<span class="question-mark">?</span>;
+                        <span class="kw">let</span> <span class="ident">info</span> <span class="op">=</span> <span class="macro">read_lenenc_str!</span>(<span class="kw-2">&amp;mut</span> <span class="ident">payload</span>)<span class="question-mark">?</span>;
                         (<span class="ident">info</span>, <span class="kw-2">&amp;</span>[][..])
                     } <span class="kw">else</span> {
                         (<span class="kw-2">&amp;</span>[][..], <span class="kw-2">&amp;</span>[][..])
@@ -2325,7 +2326,7 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">ProgressReport</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="macro">write!</span>(
             <span class="ident">f</span>,
             <span class="string">&quot;Stage: {} of {} &#39;{}&#39;  {:.2}% of stage done&quot;</span>,
@@ -2372,7 +2373,7 @@
             <span class="kw">let</span> <span class="ident">stage</span> <span class="op">=</span> <span class="ident">payload</span>.<span class="ident">read_u8</span>()<span class="question-mark">?</span>;
             <span class="kw">let</span> <span class="ident">max_stage</span> <span class="op">=</span> <span class="ident">payload</span>.<span class="ident">read_u8</span>()<span class="question-mark">?</span>;
             <span class="kw">let</span> <span class="ident">progress</span> <span class="op">=</span> <span class="ident">payload</span>.<span class="ident">read_uint</span>::<span class="op">&lt;</span><span class="ident">LE</span><span class="op">&gt;</span>(<span class="number">3</span>)<span class="question-mark">?</span>;
-            <span class="kw">let</span> <span class="ident">progress_info</span> <span class="op">=</span> <span class="macro">read_lenenc_str!</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">payload</span>)<span class="question-mark">?</span>;
+            <span class="kw">let</span> <span class="ident">progress_info</span> <span class="op">=</span> <span class="macro">read_lenenc_str!</span>(<span class="kw-2">&amp;mut</span> <span class="ident">payload</span>)<span class="question-mark">?</span>;
             <span class="prelude-val">Ok</span>(<span class="ident">ErrPacket::Progress</span>(<span class="ident">ProgressReport::new</span>(
                 <span class="ident">stage</span>,
                 <span class="ident">max_stage</span>,
@@ -2386,7 +2387,7 @@
                         <span class="macro">split_at_or_err!</span>(<span class="ident">payload</span>, <span class="number">6</span>, <span class="string">&quot;EOF while reading error state&quot;</span>)<span class="question-mark">?</span>;
                     <span class="prelude-val">Ok</span>(<span class="ident">ErrPacket::Error</span>(
                         <span class="ident">code</span>,
-                        <span class="kw">unsafe</span> { <span class="ident">ptr::read</span>(<span class="ident">state</span>.<span class="ident">as_ptr</span>().<span class="ident">offset</span>(<span class="number">1</span>) <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> [<span class="ident">u8</span>; <span class="number">5</span>]) },
+                        <span class="kw">unsafe</span> { <span class="ident">ptr::read</span>(<span class="ident">state</span>.<span class="ident">as_ptr</span>().<span class="ident">offset</span>(<span class="number">1</span>) <span class="kw">as</span> <span class="kw-2">*const</span> [<span class="ident">u8</span>; <span class="number">5</span>]) },
                         <span class="ident">msg</span>.<span class="ident">into</span>(),
                     ))
                 }
@@ -2470,7 +2471,7 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">ErrPacket</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
             <span class="ident">ErrPacket::Error</span>(..) =&gt; <span class="macro">write!</span>(
                 <span class="ident">f</span>,
@@ -2977,8 +2978,8 @@
 <span class="kw">impl</span> <span class="ident">SslRequest</span> {
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">capabilities</span>: <span class="ident">CapabilityFlags</span>) -&gt; <span class="ident">SslRequest</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">data</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="number">0u8</span>; <span class="number">4</span> <span class="op">+</span> <span class="number">4</span> <span class="op">+</span> <span class="number">1</span> <span class="op">+</span> <span class="number">23</span>];
-        <span class="ident">LE::write_u32</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">data</span>[<span class="number">0</span>..], <span class="ident">capabilities</span>.<span class="ident">bits</span>());
-        <span class="ident">LE::write_u32</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">data</span>[<span class="number">4</span>..], <span class="number">1024</span> <span class="op">*</span> <span class="number">1024</span>);
+        <span class="ident">LE::write_u32</span>(<span class="kw-2">&amp;mut</span> <span class="ident">data</span>[<span class="number">0</span>..], <span class="ident">capabilities</span>.<span class="ident">bits</span>());
+        <span class="ident">LE::write_u32</span>(<span class="kw-2">&amp;mut</span> <span class="ident">data</span>[<span class="number">4</span>..], <span class="number">1024</span> <span class="op">*</span> <span class="number">1024</span>);
         <span class="ident">data</span>[<span class="number">8</span>] <span class="op">=</span> <span class="ident">UTF8_GENERAL_CI</span> <span class="kw">as</span> <span class="ident">u8</span>;
         <span class="ident">SslRequest</span> { <span class="ident">data</span> }
     }
@@ -3068,7 +3069,7 @@
     }
 
     <span class="doccomment">/// Will read null-bitmap for a given number of columns from `input`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">read</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">num_columns</span>: <span class="ident">usize</span>) -&gt; <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">read</span>(<span class="ident">input</span>: <span class="kw-2">&amp;mut</span> <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">num_columns</span>: <span class="ident">usize</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">let</span> <span class="ident">bitmap_len</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::bitmap_len</span>(<span class="ident">num_columns</span>);
         <span class="macro">assert!</span>(<span class="ident">input</span>.<span class="ident">len</span>() <span class="op">&gt;</span><span class="op">=</span> <span class="ident">bitmap_len</span>);
 
@@ -3108,7 +3109,7 @@
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">SerializationSide</span>, <span class="ident">U</span>: <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span> <span class="op">+</span> <span class="ident">AsMut</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">NullBitmap</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">U</span><span class="op">&gt;</span> {
     <span class="doccomment">/// Sets flag value for given column.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">column_index</span>: <span class="ident">usize</span>, <span class="ident">is_null</span>: <span class="ident">bool</span>) {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">column_index</span>: <span class="ident">usize</span>, <span class="ident">is_null</span>: <span class="ident">bool</span>) {
         <span class="kw">let</span> (<span class="ident">byte</span>, <span class="ident">bit</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">byte_and_bit</span>(<span class="ident">column_index</span>);
         <span class="kw">if</span> <span class="ident">is_null</span> {
             <span class="self">self</span>.<span class="number">0</span>.<span class="ident">as_mut</span>()[<span class="ident">byte</span>] <span class="op">|</span><span class="op">=</span> <span class="ident">bit</span>
@@ -3140,7 +3141,7 @@
         <span class="comment">// command</span>
         <span class="ident">body</span>[<span class="number">0</span>] <span class="op">=</span> <span class="ident">Command::COM_STMT_EXECUTE</span> <span class="kw">as</span> <span class="ident">u8</span>;
         <span class="comment">// stmt-id</span>
-        <span class="ident">LE::write_u32</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">body</span>[<span class="number">1</span>..<span class="number">5</span>], <span class="ident">stmt_id</span>);
+        <span class="ident">LE::write_u32</span>(<span class="kw-2">&amp;mut</span> <span class="ident">body</span>[<span class="number">1</span>..<span class="number">5</span>], <span class="ident">stmt_id</span>);
         <span class="comment">// iteration-count</span>
         <span class="ident">body</span>[<span class="number">6</span>] <span class="op">=</span> <span class="number">1</span>;
 
@@ -3174,7 +3175,7 @@
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">add_param</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="ident">Value</span>, <span class="ident">as_long_data</span>: <span class="ident">bool</span>) -&gt; <span class="ident">u64</span> {
+    <span class="kw">fn</span> <span class="ident">add_param</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="ident">Value</span>, <span class="ident">as_long_data</span>: <span class="ident">bool</span>) -&gt; <span class="ident">u64</span> {
         <span class="kw">let</span> <span class="ident">param_index</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">params_added</span> <span class="kw">as</span> <span class="ident">usize</span>;
         <span class="self">self</span>.<span class="ident">params_added</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
 
@@ -3218,19 +3219,19 @@
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">set_type</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">param_index</span>: <span class="ident">usize</span>, <span class="ident">param_type</span>: <span class="ident">ColumnType</span>) {
+    <span class="kw">fn</span> <span class="ident">set_type</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">param_index</span>: <span class="ident">usize</span>, <span class="ident">param_type</span>: <span class="ident">ColumnType</span>) {
         <span class="kw">let</span> <span class="ident">param_meta_offset</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">param_meta_index_offset</span>(<span class="ident">param_index</span>);
         <span class="self">self</span>.<span class="ident">body</span>[<span class="ident">param_meta_offset</span>] <span class="op">=</span> <span class="ident">param_type</span> <span class="kw">as</span> <span class="ident">u8</span>;
     }
 
-    <span class="kw">fn</span> <span class="ident">set_unsigned</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">param_index</span>: <span class="ident">usize</span>) {
+    <span class="kw">fn</span> <span class="ident">set_unsigned</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">param_index</span>: <span class="ident">usize</span>) {
         <span class="kw">let</span> <span class="ident">param_meta_offset</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">param_meta_index_offset</span>(<span class="ident">param_index</span>);
         <span class="self">self</span>.<span class="ident">body</span>[<span class="ident">param_meta_offset</span> <span class="op">+</span> <span class="number">1</span>] <span class="op">=</span> <span class="number">0x80</span>;
     }
 
-    <span class="kw">fn</span> <span class="ident">set_null_flag</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">param_index</span>: <span class="ident">usize</span>) {
+    <span class="kw">fn</span> <span class="ident">set_null_flag</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">param_index</span>: <span class="ident">usize</span>) {
         <span class="kw">let</span> <span class="ident">end</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::NULL_BITMAP_OFFSET</span> <span class="op">+</span> <span class="self">self</span>.<span class="ident">bitmap_len</span>;
-        <span class="kw">let</span> <span class="ident">bitmap_bytes</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">body</span>[<span class="ident"><span class="self">Self</span>::NULL_BITMAP_OFFSET</span>..<span class="ident">end</span>];
+        <span class="kw">let</span> <span class="ident">bitmap_bytes</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">body</span>[<span class="ident"><span class="self">Self</span>::NULL_BITMAP_OFFSET</span>..<span class="ident">end</span>];
 
         <span class="ident">NullBitmap</span>::<span class="op">&lt;</span><span class="ident">ClientSide</span>, <span class="kw">_</span><span class="op">&gt;</span><span class="ident">::from_bytes</span>(<span class="ident">bitmap_bytes</span>).<span class="ident">set</span>(<span class="ident">param_index</span>, <span class="bool-val">true</span>);
     }
@@ -3284,8 +3285,8 @@
         <span class="self">Self</span> { <span class="ident">body</span> }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_id</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">stmt_id</span>: <span class="ident">u32</span>) {
-        <span class="ident">LE::write_u32</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">body</span>[<span class="number">1</span>..], <span class="ident">stmt_id</span>);
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_id</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">stmt_id</span>: <span class="ident">u32</span>) {
+        <span class="ident">LE::write_u32</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">body</span>[<span class="number">1</span>..], <span class="ident">stmt_id</span>);
     }
 }
 
@@ -3664,5 +3665,4 @@
 }
 </code></pre></div>
 </section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="mysql_common" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>
-    <script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script>
 </body></html>

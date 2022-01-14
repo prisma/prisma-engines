@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;git&#x2F;checkouts&#x2F;bson-rust-adbe8b8987a394af&#x2F;b44b202&#x2F;src&#x2F;de&#x2F;raw.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>raw.rs - source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../bson/index.html'><div class='logo-container rust-logo'><img src='../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">   1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;git&#x2F;checkouts&#x2F;bson-rust-adbe8b8987a394af&#x2F;b44b202&#x2F;src&#x2F;de&#x2F;raw.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>raw.rs - source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><script defer src="../../../main.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script>
+    <noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../bson/index.html'><div class='logo-container rust-logo'><img src='../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">   1</span>
 <span id="2">   2</span>
 <span id="3">   3</span>
 <span id="4">   4</span>
@@ -1087,10 +1088,10 @@
     <span class="doccomment">/// Ensure the entire document was visited, returning an error if not.</span>
     <span class="doccomment">/// Will read the trailing null byte if necessary (i.e. the visitor stopped after visiting</span>
     <span class="doccomment">/// exactly the number of elements in the document).</span>
-    <span class="kw">fn</span> <span class="ident">end_document</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">length_remaining</span>: <span class="ident">i32</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">end_document</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">length_remaining</span>: <span class="ident">i32</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="ident">length_remaining</span>.<span class="ident">cmp</span>(<span class="kw-2">&amp;</span><span class="number">1</span>) {
             <span class="ident">std::cmp::Ordering::Equal</span> =&gt; {
-                <span class="kw">let</span> <span class="ident">nullbyte</span> <span class="op">=</span> <span class="ident">read_u8</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">bytes</span>)<span class="question-mark">?</span>;
+                <span class="kw">let</span> <span class="ident">nullbyte</span> <span class="op">=</span> <span class="ident">read_u8</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">bytes</span>)<span class="question-mark">?</span>;
                 <span class="kw">if</span> <span class="ident">nullbyte</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
                     <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::custom</span>(<span class="macro">format!</span>(
                         <span class="string">&quot;expected null byte at end of document, got {:#x} instead&quot;</span>,
@@ -1117,24 +1118,24 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// If utf8_lossy, this will be an owned string if invalid UTF-8 is encountered in the string,</span>
     <span class="doccomment">/// otherwise it will be borrowed.</span>
-    <span class="kw">fn</span> <span class="ident">deserialize_str</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span>, <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">deserialize_str</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span>, <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">bytes</span>.<span class="ident">read_str</span>()
     }
 
-    <span class="kw">fn</span> <span class="ident">deserialize_document_key</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span>, <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">deserialize_document_key</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span>, <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">bytes</span>.<span class="ident">read_cstr</span>()
     }
 
     <span class="doccomment">/// Construct a `DocumentAccess` and pass it into the provided closure, returning the</span>
     <span class="doccomment">/// result of the closure if no other errors are encountered.</span>
-    <span class="kw">fn</span> <span class="ident">deserialize_document</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">O</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>
+    <span class="kw">fn</span> <span class="ident">deserialize_document</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">O</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="ident">DocumentAccess</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="lifetime">&#39;de</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>,
     {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">length_remaining</span> <span class="op">=</span> <span class="ident">read_i32</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">bytes</span>)<span class="question-mark">?</span> <span class="op">-</span> <span class="number">4</span>;
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">length_remaining</span> <span class="op">=</span> <span class="ident">read_i32</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">bytes</span>)<span class="question-mark">?</span> <span class="op">-</span> <span class="number">4</span>;
         <span class="kw">let</span> <span class="ident">out</span> <span class="op">=</span> <span class="ident">f</span>(<span class="ident">DocumentAccess</span> {
             <span class="ident">root_deserializer</span>: <span class="self">self</span>,
-            <span class="ident">length_remaining</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">length_remaining</span>,
+            <span class="ident">length_remaining</span>: <span class="kw-2">&amp;mut</span> <span class="ident">length_remaining</span>,
         });
 
         <span class="kw">if</span> <span class="ident">out</span>.<span class="ident">is_ok</span>() {
@@ -1145,8 +1146,8 @@
 
     <span class="doccomment">/// Deserialize the next element type and update `current_type` accordingly.</span>
     <span class="doccomment">/// Returns `None` if a null byte is read.</span>
-    <span class="kw">fn</span> <span class="ident">deserialize_next_type</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ElementType</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">tag</span> <span class="op">=</span> <span class="ident">read_u8</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">bytes</span>)<span class="question-mark">?</span>;
+    <span class="kw">fn</span> <span class="ident">deserialize_next_type</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ElementType</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">tag</span> <span class="op">=</span> <span class="ident">read_u8</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">bytes</span>)<span class="question-mark">?</span>;
         <span class="kw">if</span> <span class="ident">tag</span> <span class="op">==</span> <span class="number">0</span> {
             <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>);
         }
@@ -1159,7 +1160,7 @@
     }
 
     <span class="kw">fn</span> <span class="ident">deserialize_next</span><span class="op">&lt;</span><span class="ident">V</span><span class="op">&gt;</span>(
-        <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
+        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
         <span class="ident">visitor</span>: <span class="ident">V</span>,
         <span class="ident">binary_subtype_hint</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">BinarySubtype</span><span class="op">&gt;</span>,
     ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">V::Value</span><span class="op">&gt;</span>
@@ -1176,17 +1177,17 @@
         }
 
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">current_type</span> {
-            <span class="ident">ElementType::Int32</span> =&gt; <span class="ident">visitor</span>.<span class="ident">visit_i32</span>(<span class="ident">read_i32</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">bytes</span>)<span class="question-mark">?</span>),
-            <span class="ident">ElementType::Int64</span> =&gt; <span class="ident">visitor</span>.<span class="ident">visit_i64</span>(<span class="ident">read_i64</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">bytes</span>)<span class="question-mark">?</span>),
-            <span class="ident">ElementType::Double</span> =&gt; <span class="ident">visitor</span>.<span class="ident">visit_f64</span>(<span class="ident">read_f64</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">bytes</span>)<span class="question-mark">?</span>),
+            <span class="ident">ElementType::Int32</span> =&gt; <span class="ident">visitor</span>.<span class="ident">visit_i32</span>(<span class="ident">read_i32</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">bytes</span>)<span class="question-mark">?</span>),
+            <span class="ident">ElementType::Int64</span> =&gt; <span class="ident">visitor</span>.<span class="ident">visit_i64</span>(<span class="ident">read_i64</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">bytes</span>)<span class="question-mark">?</span>),
+            <span class="ident">ElementType::Double</span> =&gt; <span class="ident">visitor</span>.<span class="ident">visit_f64</span>(<span class="ident">read_f64</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">bytes</span>)<span class="question-mark">?</span>),
             <span class="ident">ElementType::String</span> =&gt; <span class="kw">match</span> <span class="self">self</span>.<span class="ident">deserialize_str</span>()<span class="question-mark">?</span> {
                 <span class="ident">Cow::Borrowed</span>(<span class="ident">s</span>) =&gt; <span class="ident">visitor</span>.<span class="ident">visit_borrowed_str</span>(<span class="ident">s</span>),
                 <span class="ident">Cow::Owned</span>(<span class="ident">string</span>) =&gt; <span class="ident">visitor</span>.<span class="ident">visit_string</span>(<span class="ident">string</span>),
             },
-            <span class="ident">ElementType::Boolean</span> =&gt; <span class="ident">visitor</span>.<span class="ident">visit_bool</span>(<span class="ident">read_bool</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">bytes</span>)<span class="question-mark">?</span>),
+            <span class="ident">ElementType::Boolean</span> =&gt; <span class="ident">visitor</span>.<span class="ident">visit_bool</span>(<span class="ident">read_bool</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">bytes</span>)<span class="question-mark">?</span>),
             <span class="ident">ElementType::Null</span> =&gt; <span class="ident">visitor</span>.<span class="ident">visit_unit</span>(),
             <span class="ident">ElementType::ObjectId</span> =&gt; {
-                <span class="kw">let</span> <span class="ident">oid</span> <span class="op">=</span> <span class="ident">ObjectId::from_reader</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">bytes</span>)<span class="question-mark">?</span>;
+                <span class="kw">let</span> <span class="ident">oid</span> <span class="op">=</span> <span class="ident">ObjectId::from_reader</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">bytes</span>)<span class="question-mark">?</span>;
                 <span class="ident">visitor</span>.<span class="ident">visit_map</span>(<span class="ident">ObjectIdAccess::new</span>(<span class="ident">oid</span>))
             }
             <span class="ident">ElementType::EmbeddedDocument</span> =&gt; {
@@ -1194,14 +1195,14 @@
             }
             <span class="ident">ElementType::Array</span> =&gt; <span class="self">self</span>.<span class="ident">deserialize_document</span>(<span class="op">|</span><span class="ident">access</span><span class="op">|</span> <span class="ident">visitor</span>.<span class="ident">visit_seq</span>(<span class="ident">access</span>)),
             <span class="ident">ElementType::Binary</span> =&gt; {
-                <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">read_i32</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">bytes</span>)<span class="question-mark">?</span>;
+                <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">read_i32</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">bytes</span>)<span class="question-mark">?</span>;
                 <span class="kw">if</span> <span class="op">!</span>(<span class="number">0</span>..<span class="op">=</span><span class="ident">MAX_BSON_SIZE</span>).<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">len</span>) {
                     <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::invalid_length</span>(
                         <span class="ident">len</span> <span class="kw">as</span> <span class="ident">usize</span>,
                         <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;binary length must be between 0 and {}&quot;</span>, <span class="ident">MAX_BSON_SIZE</span>).<span class="ident">as_str</span>(),
                     ));
                 }
-                <span class="kw">let</span> <span class="ident">subtype</span> <span class="op">=</span> <span class="ident">BinarySubtype::from</span>(<span class="ident">read_u8</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">bytes</span>)<span class="question-mark">?</span>);
+                <span class="kw">let</span> <span class="ident">subtype</span> <span class="op">=</span> <span class="ident">BinarySubtype::from</span>(<span class="ident">read_u8</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">bytes</span>)<span class="question-mark">?</span>);
 
                 <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">expected_subtype</span>) <span class="op">=</span> <span class="ident">binary_subtype_hint</span> {
                     <span class="kw">if</span> <span class="ident">subtype</span> <span class="op">!</span><span class="op">=</span> <span class="ident">expected_subtype</span> {
@@ -1218,13 +1219,13 @@
                     }
                     <span class="kw">_</span> =&gt; {
                         <span class="kw">let</span> <span class="ident">binary</span> <span class="op">=</span> <span class="ident">Binary::from_reader_with_len_and_payload</span>(
-                            <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">bytes</span>,
+                            <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">bytes</span>,
                             <span class="ident">len</span>,
                             <span class="ident">subtype</span>,
                         )<span class="question-mark">?</span>;
                         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">d</span> <span class="op">=</span> <span class="ident">BinaryDeserializer::new</span>(<span class="ident">binary</span>);
                         <span class="ident">visitor</span>.<span class="ident">visit_map</span>(<span class="ident">BinaryAccess</span> {
-                            <span class="ident">deserializer</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">d</span>,
+                            <span class="ident">deserializer</span>: <span class="kw-2">&amp;mut</span> <span class="ident">d</span>,
                         })
                     }
                 }
@@ -1234,51 +1235,51 @@
                 <span class="ident">visitor</span>.<span class="ident">visit_map</span>(<span class="ident">MapDeserializer::new</span>(<span class="ident">doc</span>))
             }
             <span class="ident">ElementType::DateTime</span> =&gt; {
-                <span class="kw">let</span> <span class="ident">dti</span> <span class="op">=</span> <span class="ident">read_i64</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">bytes</span>)<span class="question-mark">?</span>;
+                <span class="kw">let</span> <span class="ident">dti</span> <span class="op">=</span> <span class="ident">read_i64</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">bytes</span>)<span class="question-mark">?</span>;
                 <span class="kw">let</span> <span class="ident">dt</span> <span class="op">=</span> <span class="ident">DateTime::from_millis</span>(<span class="ident">dti</span>);
                 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">d</span> <span class="op">=</span> <span class="ident">DateTimeDeserializer::new</span>(<span class="ident">dt</span>);
                 <span class="ident">visitor</span>.<span class="ident">visit_map</span>(<span class="ident">DateTimeAccess</span> {
-                    <span class="ident">deserializer</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">d</span>,
+                    <span class="ident">deserializer</span>: <span class="kw-2">&amp;mut</span> <span class="ident">d</span>,
                 })
             }
             <span class="ident">ElementType::RegularExpression</span> =&gt; {
-                <span class="kw">let</span> <span class="ident">doc</span> <span class="op">=</span> <span class="ident">Bson::RegularExpression</span>(<span class="ident">Regex::from_reader</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">bytes</span>)<span class="question-mark">?</span>)
+                <span class="kw">let</span> <span class="ident">doc</span> <span class="op">=</span> <span class="ident">Bson::RegularExpression</span>(<span class="ident">Regex::from_reader</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">bytes</span>)<span class="question-mark">?</span>)
                     .<span class="ident">into_extended_document</span>();
                 <span class="ident">visitor</span>.<span class="ident">visit_map</span>(<span class="ident">MapDeserializer::new</span>(<span class="ident">doc</span>))
             }
             <span class="ident">ElementType::DbPointer</span> =&gt; {
-                <span class="kw">let</span> <span class="ident">doc</span> <span class="op">=</span> <span class="ident">Bson::DbPointer</span>(<span class="ident">DbPointer::from_reader</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">bytes</span>)<span class="question-mark">?</span>)
+                <span class="kw">let</span> <span class="ident">doc</span> <span class="op">=</span> <span class="ident">Bson::DbPointer</span>(<span class="ident">DbPointer::from_reader</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">bytes</span>)<span class="question-mark">?</span>)
                     .<span class="ident">into_extended_document</span>();
                 <span class="ident">visitor</span>.<span class="ident">visit_map</span>(<span class="ident">MapDeserializer::new</span>(<span class="ident">doc</span>))
             }
             <span class="ident">ElementType::JavaScriptCode</span> =&gt; {
                 <span class="kw">let</span> <span class="ident">utf8_lossy</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">bytes</span>.<span class="ident">utf8_lossy</span>;
-                <span class="kw">let</span> <span class="ident">code</span> <span class="op">=</span> <span class="ident">read_string</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">bytes</span>, <span class="ident">utf8_lossy</span>)<span class="question-mark">?</span>;
+                <span class="kw">let</span> <span class="ident">code</span> <span class="op">=</span> <span class="ident">read_string</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">bytes</span>, <span class="ident">utf8_lossy</span>)<span class="question-mark">?</span>;
                 <span class="kw">let</span> <span class="ident">doc</span> <span class="op">=</span> <span class="ident">Bson::JavaScriptCode</span>(<span class="ident">code</span>).<span class="ident">into_extended_document</span>();
                 <span class="ident">visitor</span>.<span class="ident">visit_map</span>(<span class="ident">MapDeserializer::new</span>(<span class="ident">doc</span>))
             }
             <span class="ident">ElementType::JavaScriptCodeWithScope</span> =&gt; {
                 <span class="kw">let</span> <span class="ident">utf8_lossy</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">bytes</span>.<span class="ident">utf8_lossy</span>;
                 <span class="kw">let</span> <span class="ident">code_w_scope</span> <span class="op">=</span>
-                    <span class="ident">JavaScriptCodeWithScope::from_reader</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">bytes</span>, <span class="ident">utf8_lossy</span>)<span class="question-mark">?</span>;
+                    <span class="ident">JavaScriptCodeWithScope::from_reader</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">bytes</span>, <span class="ident">utf8_lossy</span>)<span class="question-mark">?</span>;
                 <span class="kw">let</span> <span class="ident">doc</span> <span class="op">=</span> <span class="ident">Bson::JavaScriptCodeWithScope</span>(<span class="ident">code_w_scope</span>).<span class="ident">into_extended_document</span>();
                 <span class="ident">visitor</span>.<span class="ident">visit_map</span>(<span class="ident">MapDeserializer::new</span>(<span class="ident">doc</span>))
             }
             <span class="ident">ElementType::Symbol</span> =&gt; {
                 <span class="kw">let</span> <span class="ident">utf8_lossy</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">bytes</span>.<span class="ident">utf8_lossy</span>;
-                <span class="kw">let</span> <span class="ident">symbol</span> <span class="op">=</span> <span class="ident">read_string</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">bytes</span>, <span class="ident">utf8_lossy</span>)<span class="question-mark">?</span>;
+                <span class="kw">let</span> <span class="ident">symbol</span> <span class="op">=</span> <span class="ident">read_string</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">bytes</span>, <span class="ident">utf8_lossy</span>)<span class="question-mark">?</span>;
                 <span class="kw">let</span> <span class="ident">doc</span> <span class="op">=</span> <span class="ident">Bson::Symbol</span>(<span class="ident">symbol</span>).<span class="ident">into_extended_document</span>();
                 <span class="ident">visitor</span>.<span class="ident">visit_map</span>(<span class="ident">MapDeserializer::new</span>(<span class="ident">doc</span>))
             }
             <span class="ident">ElementType::Timestamp</span> =&gt; {
-                <span class="kw">let</span> <span class="ident">ts</span> <span class="op">=</span> <span class="ident">Timestamp::from_reader</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">bytes</span>)<span class="question-mark">?</span>;
+                <span class="kw">let</span> <span class="ident">ts</span> <span class="op">=</span> <span class="ident">Timestamp::from_reader</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">bytes</span>)<span class="question-mark">?</span>;
                 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">d</span> <span class="op">=</span> <span class="ident">TimestampDeserializer::new</span>(<span class="ident">ts</span>);
                 <span class="ident">visitor</span>.<span class="ident">visit_map</span>(<span class="ident">TimestampAccess</span> {
-                    <span class="ident">deserializer</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">d</span>,
+                    <span class="ident">deserializer</span>: <span class="kw-2">&amp;mut</span> <span class="ident">d</span>,
                 })
             }
             <span class="ident">ElementType::Decimal128</span> =&gt; {
-                <span class="kw">let</span> <span class="ident">d128</span> <span class="op">=</span> <span class="ident">read_f128</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">bytes</span>)<span class="question-mark">?</span>;
+                <span class="kw">let</span> <span class="ident">d128</span> <span class="op">=</span> <span class="ident">read_f128</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">bytes</span>)<span class="question-mark">?</span>;
                 <span class="ident">visitor</span>.<span class="ident">visit_map</span>(<span class="ident">Decimal128Access::new</span>(<span class="ident">d128</span>))
             }
             <span class="ident">ElementType::MaxKey</span> =&gt; {
@@ -1376,7 +1377,7 @@
     <span class="doccomment">/// Read the next element type and update the root deserializer with it.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Returns `Ok(None)` if the document has been fully read and has no more elements.</span>
-    <span class="kw">fn</span> <span class="ident">read_next_type</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ElementType</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">read_next_type</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ElementType</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">t</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">read</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">root_deserializer</span>.<span class="ident">deserialize_next_type</span>())<span class="question-mark">?</span>;
 
         <span class="kw">if</span> <span class="ident">t</span>.<span class="ident">is_none</span>() <span class="op">&amp;&amp;</span> <span class="kw-2">*</span><span class="self">self</span>.<span class="ident">length_remaining</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
@@ -1393,9 +1394,9 @@
     <span class="doccomment">/// bytes read exceeds length_remaining.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// A mutable reference to this `DocumentAccess` is passed into the closure.</span>
-    <span class="kw">fn</span> <span class="ident">read</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">O</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>
+    <span class="kw">fn</span> <span class="ident">read</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">O</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>
     <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>,
+        <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;mut</span> <span class="self">Self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>,
     {
         <span class="kw">let</span> <span class="ident">start_bytes</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">root_deserializer</span>.<span class="ident">bytes</span>.<span class="ident">bytes_read</span>();
         <span class="kw">let</span> <span class="ident">out</span> <span class="op">=</span> <span class="ident">f</span>(<span class="self">self</span>);
@@ -1409,18 +1410,18 @@
     }
 
     <span class="doccomment">/// Read the next value from the document.</span>
-    <span class="kw">fn</span> <span class="ident">read_next_value</span><span class="op">&lt;</span><span class="ident">V</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">seed</span>: <span class="ident">V</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">V::Value</span><span class="op">&gt;</span>
+    <span class="kw">fn</span> <span class="ident">read_next_value</span><span class="op">&lt;</span><span class="ident">V</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">seed</span>: <span class="ident">V</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">V::Value</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">V</span>: <span class="ident">serde::de::DeserializeSeed</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
     {
-        <span class="self">self</span>.<span class="ident">read</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">seed</span>.<span class="ident">deserialize</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw-2">*</span><span class="ident">s</span>.<span class="ident">root_deserializer</span>))
+        <span class="self">self</span>.<span class="ident">read</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">seed</span>.<span class="ident">deserialize</span>(<span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="ident">s</span>.<span class="ident">root_deserializer</span>))
     }
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;d</span>, <span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="ident">serde::de::MapAccess</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">DocumentAccess</span><span class="op">&lt;</span><span class="lifetime">&#39;d</span>, <span class="lifetime">&#39;de</span><span class="op">&gt;</span> {
     <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::de::Error</span>;
 
-    <span class="kw">fn</span> <span class="ident">next_key_seed</span><span class="op">&lt;</span><span class="ident">K</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">seed</span>: <span class="ident">K</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">K::Value</span><span class="op">&gt;</span><span class="op">&gt;</span>
+    <span class="kw">fn</span> <span class="ident">next_key_seed</span><span class="op">&lt;</span><span class="ident">K</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">seed</span>: <span class="ident">K</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">K::Value</span><span class="op">&gt;</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">K</span>: <span class="ident">serde::de::DeserializeSeed</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
     {
@@ -1430,13 +1431,13 @@
 
         <span class="self">self</span>.<span class="ident">read</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> {
             <span class="ident">seed</span>.<span class="ident">deserialize</span>(<span class="ident">DocumentKeyDeserializer</span> {
-                <span class="ident">root_deserializer</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw-2">*</span><span class="ident">s</span>.<span class="ident">root_deserializer</span>,
+                <span class="ident">root_deserializer</span>: <span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="ident">s</span>.<span class="ident">root_deserializer</span>,
             })
         })
         .<span class="ident">map</span>(<span class="prelude-val">Some</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">next_value_seed</span><span class="op">&lt;</span><span class="ident">V</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">seed</span>: <span class="ident">V</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">V::Value</span><span class="op">&gt;</span>
+    <span class="kw">fn</span> <span class="ident">next_value_seed</span><span class="op">&lt;</span><span class="ident">V</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">seed</span>: <span class="ident">V</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">V::Value</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">V</span>: <span class="ident">serde::de::DeserializeSeed</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
     {
@@ -1447,7 +1448,7 @@
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;d</span>, <span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="ident">serde::de::SeqAccess</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">DocumentAccess</span><span class="op">&lt;</span><span class="lifetime">&#39;d</span>, <span class="lifetime">&#39;de</span><span class="op">&gt;</span> {
     <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">Error</span>;
 
-    <span class="kw">fn</span> <span class="ident">next_element_seed</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">seed</span>: <span class="ident">S</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">S::Value</span><span class="op">&gt;</span><span class="op">&gt;</span>
+    <span class="kw">fn</span> <span class="ident">next_element_seed</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">seed</span>: <span class="ident">S</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">S::Value</span><span class="op">&gt;</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">S</span>: <span class="ident">serde::de::DeserializeSeed</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
     {
@@ -1473,7 +1474,7 @@
 
         <span class="kw">let</span> <span class="ident">key</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">read</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> {
             <span class="ident">seed</span>.<span class="ident">deserialize</span>(<span class="ident">DocumentKeyDeserializer</span> {
-                <span class="ident">root_deserializer</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw-2">*</span><span class="ident">s</span>.<span class="ident">root_deserializer</span>,
+                <span class="ident">root_deserializer</span>: <span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="ident">s</span>.<span class="ident">root_deserializer</span>,
             })
         })<span class="question-mark">?</span>;
 
@@ -1577,7 +1578,7 @@
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="ident">serde::de::MapAccess</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ObjectIdAccess</span> {
     <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">Error</span>;
 
-    <span class="kw">fn</span> <span class="ident">next_key_seed</span><span class="op">&lt;</span><span class="ident">K</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">seed</span>: <span class="ident">K</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">K::Value</span><span class="op">&gt;</span><span class="op">&gt;</span>
+    <span class="kw">fn</span> <span class="ident">next_key_seed</span><span class="op">&lt;</span><span class="ident">K</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">seed</span>: <span class="ident">K</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">K::Value</span><span class="op">&gt;</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">K</span>: <span class="ident">serde::de::DeserializeSeed</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
     {
@@ -1589,7 +1590,7 @@
             .<span class="ident">map</span>(<span class="prelude-val">Some</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">next_value_seed</span><span class="op">&lt;</span><span class="ident">V</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">seed</span>: <span class="ident">V</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">V::Value</span><span class="op">&gt;</span>
+    <span class="kw">fn</span> <span class="ident">next_value_seed</span><span class="op">&lt;</span><span class="ident">V</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">seed</span>: <span class="ident">V</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">V::Value</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">V</span>: <span class="ident">serde::de::DeserializeSeed</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
     {
@@ -1633,7 +1634,7 @@
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="ident">serde::de::MapAccess</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Decimal128Access</span> {
     <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">Error</span>;
 
-    <span class="kw">fn</span> <span class="ident">next_key_seed</span><span class="op">&lt;</span><span class="ident">K</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">seed</span>: <span class="ident">K</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">K::Value</span><span class="op">&gt;</span><span class="op">&gt;</span>
+    <span class="kw">fn</span> <span class="ident">next_key_seed</span><span class="op">&lt;</span><span class="ident">K</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">seed</span>: <span class="ident">K</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">K::Value</span><span class="op">&gt;</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">K</span>: <span class="ident">serde::de::DeserializeSeed</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
     {
@@ -1647,7 +1648,7 @@
         .<span class="ident">map</span>(<span class="prelude-val">Some</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">next_value_seed</span><span class="op">&lt;</span><span class="ident">V</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">seed</span>: <span class="ident">V</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">V::Value</span><span class="op">&gt;</span>
+    <span class="kw">fn</span> <span class="ident">next_value_seed</span><span class="op">&lt;</span><span class="ident">V</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">seed</span>: <span class="ident">V</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">V::Value</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">V</span>: <span class="ident">serde::de::DeserializeSeed</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
     {
@@ -1688,7 +1689,7 @@
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span>, <span class="lifetime">&#39;d</span><span class="op">&gt;</span> <span class="ident">serde::de::MapAccess</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">TimestampAccess</span><span class="op">&lt;</span><span class="lifetime">&#39;d</span><span class="op">&gt;</span> {
     <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">Error</span>;
 
-    <span class="kw">fn</span> <span class="ident">next_key_seed</span><span class="op">&lt;</span><span class="ident">K</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">seed</span>: <span class="ident">K</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">K::Value</span><span class="op">&gt;</span><span class="op">&gt;</span>
+    <span class="kw">fn</span> <span class="ident">next_key_seed</span><span class="op">&lt;</span><span class="ident">K</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">seed</span>: <span class="ident">K</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">K::Value</span><span class="op">&gt;</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">K</span>: <span class="ident">serde::de::DeserializeSeed</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
     {
@@ -1708,11 +1709,11 @@
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">next_value_seed</span><span class="op">&lt;</span><span class="ident">V</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">seed</span>: <span class="ident">V</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">V::Value</span><span class="op">&gt;</span>
+    <span class="kw">fn</span> <span class="ident">next_value_seed</span><span class="op">&lt;</span><span class="ident">V</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">seed</span>: <span class="ident">V</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">V::Value</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">V</span>: <span class="ident">serde::de::DeserializeSeed</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
     {
-        <span class="ident">seed</span>.<span class="ident">deserialize</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw-2">*</span><span class="self">self</span>.<span class="ident">deserializer</span>)
+        <span class="ident">seed</span>.<span class="ident">deserialize</span>(<span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="self">self</span>.<span class="ident">deserializer</span>)
     }
 }
 
@@ -1741,7 +1742,7 @@
             <span class="ident">TimestampDeserializationStage::TopLevel</span> =&gt; {
                 <span class="self">self</span>.<span class="ident">stage</span> <span class="op">=</span> <span class="ident">TimestampDeserializationStage::Time</span>;
                 <span class="ident">visitor</span>.<span class="ident">visit_map</span>(<span class="ident">TimestampAccess</span> {
-                    <span class="ident">deserializer</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
+                    <span class="ident">deserializer</span>: <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
                 })
             }
             <span class="ident">TimestampDeserializationStage::Time</span> =&gt; {
@@ -1778,7 +1779,7 @@
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span>, <span class="lifetime">&#39;d</span><span class="op">&gt;</span> <span class="ident">serde::de::MapAccess</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">DateTimeAccess</span><span class="op">&lt;</span><span class="lifetime">&#39;d</span><span class="op">&gt;</span> {
     <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">Error</span>;
 
-    <span class="kw">fn</span> <span class="ident">next_key_seed</span><span class="op">&lt;</span><span class="ident">K</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">seed</span>: <span class="ident">K</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">K::Value</span><span class="op">&gt;</span><span class="op">&gt;</span>
+    <span class="kw">fn</span> <span class="ident">next_key_seed</span><span class="op">&lt;</span><span class="ident">K</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">seed</span>: <span class="ident">K</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">K::Value</span><span class="op">&gt;</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">K</span>: <span class="ident">serde::de::DeserializeSeed</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
     {
@@ -1797,11 +1798,11 @@
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">next_value_seed</span><span class="op">&lt;</span><span class="ident">V</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">seed</span>: <span class="ident">V</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">V::Value</span><span class="op">&gt;</span>
+    <span class="kw">fn</span> <span class="ident">next_value_seed</span><span class="op">&lt;</span><span class="ident">V</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">seed</span>: <span class="ident">V</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">V::Value</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">V</span>: <span class="ident">serde::de::DeserializeSeed</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
     {
-        <span class="ident">seed</span>.<span class="ident">deserialize</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw-2">*</span><span class="self">self</span>.<span class="ident">deserializer</span>)
+        <span class="ident">seed</span>.<span class="ident">deserialize</span>(<span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="self">self</span>.<span class="ident">deserializer</span>)
     }
 }
 
@@ -1830,7 +1831,7 @@
             <span class="ident">DateTimeDeserializationStage::TopLevel</span> =&gt; {
                 <span class="self">self</span>.<span class="ident">stage</span> <span class="op">=</span> <span class="ident">DateTimeDeserializationStage::NumberLong</span>;
                 <span class="ident">visitor</span>.<span class="ident">visit_map</span>(<span class="ident">DateTimeAccess</span> {
-                    <span class="ident">deserializer</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
+                    <span class="ident">deserializer</span>: <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
                 })
             }
             <span class="ident">DateTimeDeserializationStage::NumberLong</span> =&gt; {
@@ -1857,7 +1858,7 @@
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span>, <span class="lifetime">&#39;d</span><span class="op">&gt;</span> <span class="ident">serde::de::MapAccess</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">BinaryAccess</span><span class="op">&lt;</span><span class="lifetime">&#39;d</span><span class="op">&gt;</span> {
     <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">Error</span>;
 
-    <span class="kw">fn</span> <span class="ident">next_key_seed</span><span class="op">&lt;</span><span class="ident">K</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">seed</span>: <span class="ident">K</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">K::Value</span><span class="op">&gt;</span><span class="op">&gt;</span>
+    <span class="kw">fn</span> <span class="ident">next_key_seed</span><span class="op">&lt;</span><span class="ident">K</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">seed</span>: <span class="ident">K</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">K::Value</span><span class="op">&gt;</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">K</span>: <span class="ident">serde::de::DeserializeSeed</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
     {
@@ -1881,11 +1882,11 @@
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">next_value_seed</span><span class="op">&lt;</span><span class="ident">V</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">seed</span>: <span class="ident">V</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">V::Value</span><span class="op">&gt;</span>
+    <span class="kw">fn</span> <span class="ident">next_value_seed</span><span class="op">&lt;</span><span class="ident">V</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">seed</span>: <span class="ident">V</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">V::Value</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">V</span>: <span class="ident">serde::de::DeserializeSeed</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
     {
-        <span class="ident">seed</span>.<span class="ident">deserialize</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw-2">*</span><span class="self">self</span>.<span class="ident">deserializer</span>)
+        <span class="ident">seed</span>.<span class="ident">deserialize</span>(<span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="self">self</span>.<span class="ident">deserializer</span>)
     }
 }
 
@@ -1914,7 +1915,7 @@
             <span class="ident">BinaryDeserializationStage::TopLevel</span> =&gt; {
                 <span class="self">self</span>.<span class="ident">stage</span> <span class="op">=</span> <span class="ident">BinaryDeserializationStage::Subtype</span>;
                 <span class="ident">visitor</span>.<span class="ident">visit_map</span>(<span class="ident">BinaryAccess</span> {
-                    <span class="ident">deserializer</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
+                    <span class="ident">deserializer</span>: <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
                 })
             }
             <span class="ident">BinaryDeserializationStage::Subtype</span> =&gt; {
@@ -1956,7 +1957,7 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Read</span> <span class="kw">for</span> <span class="ident">BsonBuf</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">read</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">u8</span>]) -&gt; <span class="ident">std::io::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">read</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">u8</span>]) -&gt; <span class="ident">std::io::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">index_check</span>()<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">bytes_read</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">bytes</span>[<span class="self">self</span>.<span class="ident">index</span>..].<span class="ident">as_ref</span>().<span class="ident">read</span>(<span class="ident">buf</span>)<span class="question-mark">?</span>;
         <span class="self">self</span>.<span class="ident">index</span> <span class="op">+</span><span class="op">=</span> <span class="ident">bytes_read</span>;
@@ -1986,7 +1987,7 @@
     }
 
     <span class="doccomment">/// Get the string starting at the provided index and ending at the buffer&#39;s current index.</span>
-    <span class="kw">fn</span> <span class="ident">str</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">start</span>: <span class="ident">usize</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">str</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">start</span>: <span class="ident">usize</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">bytes</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">bytes</span>[<span class="ident">start</span>..<span class="self">self</span>.<span class="ident">index</span>];
         <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">utf8_lossy</span> {
             <span class="ident">String::from_utf8_lossy</span>(<span class="ident">bytes</span>)
@@ -2009,7 +2010,7 @@
     <span class="doccomment">/// If utf8_lossy and invalid UTF-8 is encountered, the unicode replacement character will be</span>
     <span class="doccomment">/// inserted in place of the offending data, resulting in an owned `String`. Otherwise, the</span>
     <span class="doccomment">/// data will be borrowed as-is.</span>
-    <span class="kw">fn</span> <span class="ident">read_cstr</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">read_cstr</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">start</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">index</span>;
         <span class="kw">while</span> <span class="self">self</span>.<span class="ident">index</span> <span class="op">&lt;</span> <span class="self">self</span>.<span class="ident">bytes</span>.<span class="ident">len</span>() <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">bytes</span>[<span class="self">self</span>.<span class="ident">index</span>] <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
             <span class="self">self</span>.<span class="ident">index</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>
@@ -2025,7 +2026,7 @@
     <span class="doccomment">/// If invalid UTF-8 is encountered, the unicode replacement character will be inserted in place</span>
     <span class="doccomment">/// of the offending data, resulting in an owned `String`. Otherwise, the data will be</span>
     <span class="doccomment">/// borrowed as-is.</span>
-    <span class="kw">fn</span> <span class="ident">read_str</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">read_str</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">read_i32</span>(<span class="self">self</span>)<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">start</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">index</span>;
 
@@ -2043,7 +2044,7 @@
         <span class="self">self</span>.<span class="ident">str</span>(<span class="ident">start</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">read_slice</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">length</span>: <span class="ident">usize</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>]<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">read_slice</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">length</span>: <span class="ident">usize</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>]<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">start</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">index</span>;
         <span class="self">self</span>.<span class="ident">index</span> <span class="op">+</span><span class="op">=</span> <span class="ident">length</span>;
         <span class="self">self</span>.<span class="ident">index_check</span>()<span class="question-mark">?</span>;
@@ -2052,5 +2053,4 @@
 }
 </code></pre></div>
 </section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="bson" data-search-index-js="../../../search-index.js" data-search-js="../../../search.js"></div>
-    <script src="../../../main.js"></script><script src="../../../source-script.js"></script><script src="../../../source-files.js"></script>
 </body></html>

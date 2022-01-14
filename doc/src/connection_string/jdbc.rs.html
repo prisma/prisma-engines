@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;connection-string-0.1.13&#x2F;src&#x2F;jdbc.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>jdbc.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../connection_string/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;connection-string-0.1.13&#x2F;src&#x2F;jdbc.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>jdbc.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><script defer src="../../main.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script>
+    <noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../connection_string/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -586,13 +587,13 @@
     }
 
     <span class="doccomment">/// Mutably access the connection&#39;s key-value pairs</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">properties_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">String</span><span class="op">&gt;</span> {
-        <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">properties</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">properties_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">String</span><span class="op">&gt;</span> {
+        <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">properties</span>
     }
 }
 
 <span class="kw">impl</span> <span class="ident">Display</span> <span class="kw">for</span> <span class="ident">JdbcString</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">std::fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">std::fmt::Result</span> {
         <span class="doccomment">/// Escape all non-alphanumeric characters in a string..</span>
         <span class="kw">fn</span> <span class="ident">escape</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">String</span> {
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">output</span> <span class="op">=</span> <span class="ident">String::with_capacity</span>(<span class="ident">s</span>.<span class="ident">len</span>());
@@ -650,9 +651,9 @@
         <span class="comment">// ^^^^^^^^^^^^^^^^^</span>
         <span class="comment">// ```</span>
         <span class="kw">let</span> <span class="ident">err</span> <span class="op">=</span> <span class="string">&quot;Invalid JDBC sub-protocol&quot;</span>;
-        <span class="ident">cmp_str</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">lexer</span>, <span class="string">&quot;jdbc&quot;</span>, <span class="ident">err</span>)<span class="question-mark">?</span>;
+        <span class="ident">cmp_str</span>(<span class="kw-2">&amp;mut</span> <span class="ident">lexer</span>, <span class="string">&quot;jdbc&quot;</span>, <span class="ident">err</span>)<span class="question-mark">?</span>;
         <span class="macro">ensure!</span>(<span class="ident">lexer</span>.<span class="ident">next</span>().<span class="ident">kind</span>() <span class="op">==</span> <span class="kw-2">&amp;</span><span class="ident">TokenKind::Colon</span>, <span class="ident">err</span>);
-        <span class="kw">let</span> <span class="ident">sub_protocol</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;jdbc:{}&quot;</span>, <span class="ident">read_ident</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">lexer</span>, <span class="ident">err</span>)<span class="question-mark">?</span>);
+        <span class="kw">let</span> <span class="ident">sub_protocol</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;jdbc:{}&quot;</span>, <span class="ident">read_ident</span>(<span class="kw-2">&amp;mut</span> <span class="ident">lexer</span>, <span class="ident">err</span>)<span class="question-mark">?</span>);
 
         <span class="macro">ensure!</span>(<span class="ident">lexer</span>.<span class="ident">next</span>().<span class="ident">kind</span>() <span class="op">==</span> <span class="kw-2">&amp;</span><span class="ident">TokenKind::Colon</span>, <span class="ident">err</span>);
         <span class="macro">ensure!</span>(<span class="ident">lexer</span>.<span class="ident">next</span>().<span class="ident">kind</span>() <span class="op">==</span> <span class="kw-2">&amp;</span><span class="ident">TokenKind::FSlash</span>, <span class="ident">err</span>);
@@ -667,10 +668,10 @@
         <span class="kw">match</span> <span class="ident">lexer</span>.<span class="ident">peek</span>().<span class="ident">kind</span>() {
             <span class="ident">TokenKind::OpenBracket</span> =&gt; {
                 <span class="kw">let</span> <span class="ident">err_msg</span> <span class="op">=</span> <span class="string">&quot;Invalid server name: invalid IPv6 address&quot;</span>;
-                <span class="ident">server_name</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">parse_ipv6</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">lexer</span>, <span class="ident">err_msg</span>)<span class="question-mark">?</span>);
+                <span class="ident">server_name</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">parse_ipv6</span>(<span class="kw-2">&amp;mut</span> <span class="ident">lexer</span>, <span class="ident">err_msg</span>)<span class="question-mark">?</span>);
             }
             <span class="ident">TokenKind::Atom</span>(<span class="kw">_</span>) <span class="op">|</span> <span class="ident">TokenKind::Escaped</span>(<span class="kw">_</span>) =&gt; {
-                <span class="ident">server_name</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">read_ident</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">lexer</span>, <span class="string">&quot;Invalid server name&quot;</span>)<span class="question-mark">?</span>);
+                <span class="ident">server_name</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">read_ident</span>(<span class="kw-2">&amp;mut</span> <span class="ident">lexer</span>, <span class="string">&quot;Invalid server name&quot;</span>)<span class="question-mark">?</span>);
             }
             <span class="kw">_</span> =&gt; {}
         }
@@ -682,7 +683,7 @@
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">instance_name</span> <span class="op">=</span> <span class="prelude-val">None</span>;
         <span class="kw">if</span> <span class="macro">matches!</span>(<span class="ident">lexer</span>.<span class="ident">peek</span>().<span class="ident">kind</span>(), <span class="ident">TokenKind::BSlash</span>) {
             <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">lexer</span>.<span class="ident">next</span>();
-            <span class="ident">instance_name</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">read_ident</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">lexer</span>, <span class="string">&quot;Invalid instance name&quot;</span>)<span class="question-mark">?</span>);
+            <span class="ident">instance_name</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">read_ident</span>(<span class="kw-2">&amp;mut</span> <span class="ident">lexer</span>, <span class="string">&quot;Invalid instance name&quot;</span>)<span class="question-mark">?</span>);
         }
 
         <span class="comment">// ```</span>
@@ -693,7 +694,7 @@
         <span class="kw">if</span> <span class="macro">matches!</span>(<span class="ident">lexer</span>.<span class="ident">peek</span>().<span class="ident">kind</span>(), <span class="ident">TokenKind::Colon</span>) {
             <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">lexer</span>.<span class="ident">next</span>();
             <span class="kw">let</span> <span class="ident">err</span> <span class="op">=</span> <span class="string">&quot;Invalid port&quot;</span>;
-            <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="ident">read_ident</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">lexer</span>, <span class="ident">err</span>)<span class="question-mark">?</span>;
+            <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="ident">read_ident</span>(<span class="kw-2">&amp;mut</span> <span class="ident">lexer</span>, <span class="ident">err</span>)<span class="question-mark">?</span>;
             <span class="ident">port</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">s</span>.<span class="ident">parse</span>()<span class="question-mark">?</span>);
         }
 
@@ -713,13 +714,13 @@
             }
 
             <span class="kw">let</span> <span class="ident">err</span> <span class="op">=</span> <span class="string">&quot;Invalid property key&quot;</span>;
-            <span class="kw">let</span> <span class="ident">key</span> <span class="op">=</span> <span class="ident">read_ident</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">lexer</span>, <span class="ident">err</span>)<span class="question-mark">?</span>.<span class="ident">to_lowercase</span>();
+            <span class="kw">let</span> <span class="ident">key</span> <span class="op">=</span> <span class="ident">read_ident</span>(<span class="kw-2">&amp;mut</span> <span class="ident">lexer</span>, <span class="ident">err</span>)<span class="question-mark">?</span>.<span class="ident">to_lowercase</span>();
 
             <span class="kw">let</span> <span class="ident">err</span> <span class="op">=</span> <span class="string">&quot;Property pairs must be joined by a `=`&quot;</span>;
             <span class="macro">ensure!</span>(<span class="ident">lexer</span>.<span class="ident">next</span>().<span class="ident">kind</span>() <span class="op">==</span> <span class="kw-2">&amp;</span><span class="ident">TokenKind::Eq</span>, <span class="ident">err</span>);
 
             <span class="kw">let</span> <span class="ident">err</span> <span class="op">=</span> <span class="string">&quot;Invalid property value&quot;</span>;
-            <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="ident">read_ident</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">lexer</span>, <span class="ident">err</span>)<span class="question-mark">?</span>;
+            <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="ident">read_ident</span>(<span class="kw-2">&amp;mut</span> <span class="ident">lexer</span>, <span class="ident">err</span>)<span class="question-mark">?</span>;
 
             <span class="ident">properties</span>.<span class="ident">insert</span>(<span class="ident">key</span>, <span class="ident">value</span>);
         }
@@ -738,7 +739,7 @@
 }
 
 <span class="doccomment">/// Validate a sequence of `TokenKind::Atom` matches the content of a string.</span>
-<span class="kw">fn</span> <span class="ident">cmp_str</span>(<span class="ident">lexer</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Lexer</span>, <span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">err_msg</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">cmp_str</span>(<span class="ident">lexer</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Lexer</span>, <span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">err_msg</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
     <span class="kw">for</span> <span class="ident">char</span> <span class="kw">in</span> <span class="ident">s</span>.<span class="ident">chars</span>() {
         <span class="kw">if</span> <span class="kw">let</span> <span class="ident">Token</span> {
             <span class="ident">kind</span>: <span class="ident">TokenKind::Atom</span>(<span class="ident">tchar</span>),
@@ -754,7 +755,7 @@
 }
 
 <span class="doccomment">/// Read sequences of `TokenKind::Atom` and `TokenKind::Escaped` into a String.</span>
-<span class="kw">fn</span> <span class="ident">read_ident</span>(<span class="ident">lexer</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Lexer</span>, <span class="ident">err_msg</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">read_ident</span>(<span class="ident">lexer</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Lexer</span>, <span class="ident">err_msg</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">output</span> <span class="op">=</span> <span class="ident">String::new</span>();
     <span class="kw">loop</span> {
         <span class="kw">let</span> <span class="ident">token</span> <span class="op">=</span> <span class="ident">lexer</span>.<span class="ident">next</span>();
@@ -777,7 +778,7 @@
 <span class="doccomment">/// Example: `[2001:db8:85a3:8d3:1319:8a2e:370:7348]`</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// See also: https://en.wikipedia.org/wiki/IPv6_address#Literal_IPv6_addresses_in_network_resource_identifiers</span>
-<span class="kw">fn</span> <span class="ident">parse_ipv6</span>(<span class="ident">lexer</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Lexer</span>, <span class="ident">err_msg</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">parse_ipv6</span>(<span class="ident">lexer</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Lexer</span>, <span class="ident">err_msg</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">lexer</span>.<span class="ident">next</span>();
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">output</span> <span class="op">=</span> <span class="ident">String::from</span>(<span class="string">&#39;[&#39;</span>);
 
@@ -847,7 +848,7 @@
 
     <span class="doccomment">/// Get the next token from the queue.</span>
     <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident">Token</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">Token</span> {
         <span class="self">self</span>.<span class="ident">tokens</span>.<span class="ident">pop</span>().<span class="ident">unwrap_or</span>(<span class="ident">Token</span> {
             <span class="ident">kind</span>: <span class="ident">TokenKind::Eof</span>,
             <span class="ident">loc</span>: <span class="ident">Location::default</span>(),
@@ -855,13 +856,13 @@
     }
 
     <span class="doccomment">/// Push a token back onto the queue.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">push</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">token</span>: <span class="ident">Token</span>) {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">push</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">token</span>: <span class="ident">Token</span>) {
         <span class="self">self</span>.<span class="ident">tokens</span>.<span class="ident">push</span>(<span class="ident">token</span>);
     }
 
     <span class="doccomment">/// Peek at the next token in the queue.</span>
     <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">peek</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident">Token</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">peek</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">Token</span> {
         <span class="self">self</span>.<span class="ident">tokens</span>.<span class="ident">last</span>().<span class="ident">cloned</span>().<span class="ident">unwrap_or</span>(<span class="ident">Token</span> {
             <span class="ident">kind</span>: <span class="ident">TokenKind::Eof</span>,
             <span class="ident">loc</span>: <span class="ident">Location::default</span>(),
@@ -876,7 +877,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Location</span> {
-    <span class="kw">fn</span> <span class="ident">advance</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">text</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) {
+    <span class="kw">fn</span> <span class="ident">advance</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">text</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) {
         <span class="self">self</span>.<span class="ident">column</span> <span class="op">+</span><span class="op">=</span> <span class="ident">text</span>.<span class="ident">chars</span>().<span class="ident">count</span>();
     }
 }
@@ -1076,5 +1077,4 @@
 }
 </code></pre></div>
 </section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="connection_string" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>
-    <script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script>
 </body></html>
