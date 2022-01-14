@@ -169,6 +169,32 @@
 <span id="168">168</span>
 <span id="169">169</span>
 <span id="170">170</span>
+<span id="171">171</span>
+<span id="172">172</span>
+<span id="173">173</span>
+<span id="174">174</span>
+<span id="175">175</span>
+<span id="176">176</span>
+<span id="177">177</span>
+<span id="178">178</span>
+<span id="179">179</span>
+<span id="180">180</span>
+<span id="181">181</span>
+<span id="182">182</span>
+<span id="183">183</span>
+<span id="184">184</span>
+<span id="185">185</span>
+<span id="186">186</span>
+<span id="187">187</span>
+<span id="188">188</span>
+<span id="189">189</span>
+<span id="190">190</span>
+<span id="191">191</span>
+<span id="192">192</span>
+<span id="193">193</span>
+<span id="194">194</span>
+<span id="195">195</span>
+<span id="196">196</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">column_metadata</span>, <span class="ident">error</span>::<span class="kw-2">*</span>, <span class="ident">model_extensions</span>::<span class="kw-2">*</span>, <span class="ident">sql_trace::SqlTraceComment</span>, <span class="ident">AliasedCondition</span>, <span class="ident">ColumnMetadata</span>,
     <span class="ident">SqlRow</span>, <span class="ident">ToSqlRow</span>,
@@ -203,18 +229,27 @@
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">QueryExt</span>: <span class="ident">Queryable</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> {
     <span class="doccomment">/// Filter and map the resulting types with the given identifiers.</span>
     <span class="attribute">#[<span class="ident">tracing::instrument</span>(<span class="ident">skip</span>(<span class="self">self</span>, <span class="ident">q</span>, <span class="ident">idents</span>))]</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">filter</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">q</span>: <span class="ident">Query</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">idents</span>: <span class="kw-2">&amp;</span>[<span class="ident">ColumnMetadata</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>]) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">SqlRow</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">filter</span>(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        <span class="ident">q</span>: <span class="ident">Query</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
+        <span class="ident">idents</span>: <span class="kw-2">&amp;</span>[<span class="ident">ColumnMetadata</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>],
+        <span class="ident">trace_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+    ) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">SqlRow</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="macro">span!</span>(<span class="ident">tracing::Level::INFO</span>, <span class="string">&quot;filter read query&quot;</span>);
 
         <span class="kw">let</span> <span class="ident">otel_ctx</span> <span class="op">=</span> <span class="ident">span</span>.<span class="ident">context</span>();
         <span class="kw">let</span> <span class="ident">span_ref</span> <span class="op">=</span> <span class="ident">otel_ctx</span>.<span class="ident">span</span>();
         <span class="kw">let</span> <span class="ident">span_ctx</span> <span class="op">=</span> <span class="ident">span_ref</span>.<span class="ident">span_context</span>();
 
-        <span class="kw">let</span> <span class="ident">q</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">q</span> {
-            <span class="ident">Query::Select</span>(<span class="ident">x</span>) <span class="kw">if</span> <span class="ident">span_ctx</span>.<span class="ident">trace_flags</span>() <span class="op">==</span> <span class="ident">TraceFlags::SAMPLED</span> =&gt; {
+        <span class="kw">let</span> <span class="ident">q</span> <span class="op">=</span> <span class="kw">match</span> (<span class="ident">q</span>, <span class="ident">trace_id</span>) {
+            (<span class="ident">Query::Select</span>(<span class="ident">x</span>), <span class="kw">_</span>) <span class="kw">if</span> <span class="ident">span_ctx</span>.<span class="ident">trace_flags</span>() <span class="op">==</span> <span class="ident">TraceFlags::SAMPLED</span> =&gt; {
                 <span class="ident">Query::Select</span>(<span class="ident">Box::from</span>(<span class="ident">x</span>.<span class="ident">comment</span>(<span class="ident">trace_parent_to_string</span>(<span class="ident">span_ctx</span>))))
             }
-            <span class="kw">_</span> =&gt; <span class="ident">q</span>,
+            <span class="comment">// This is part of the required changes to pass a traceid</span>
+            (<span class="ident">Query::Select</span>(<span class="ident">x</span>), <span class="prelude-val">Some</span>(<span class="ident">traceparent</span>)) =&gt; {
+                <span class="ident">Query::Select</span>(<span class="ident">Box::from</span>(<span class="ident">x</span>.<span class="ident">comment</span>(<span class="macro">format!</span>(<span class="string">&quot;traceparent={}&quot;</span>, <span class="ident">traceparent</span>))))
+            }
+            (<span class="ident">q</span>, <span class="kw">_</span>) =&gt; <span class="ident">q</span>,
         };
 
         <span class="kw">let</span> <span class="ident">result_set</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">query</span>(<span class="ident">q</span>).<span class="ident">instrument</span>(<span class="ident">span</span>).<span class="kw">await</span><span class="question-mark">?</span>;
@@ -274,8 +309,13 @@
 
     <span class="doccomment">/// Select one row from the database.</span>
     <span class="attribute">#[<span class="ident">tracing::instrument</span>(<span class="ident">skip</span>(<span class="self">self</span>, <span class="ident">q</span>, <span class="ident">meta</span>))]</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">find</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">q</span>: <span class="ident">Select</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">meta</span>: <span class="kw-2">&amp;</span>[<span class="ident">ColumnMetadata</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>]) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">SqlRow</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">filter</span>(<span class="ident">q</span>.<span class="ident">limit</span>(<span class="number">1</span>).<span class="ident">into</span>(), <span class="ident">meta</span>)
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">find</span>(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        <span class="ident">q</span>: <span class="ident">Select</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
+        <span class="ident">meta</span>: <span class="kw-2">&amp;</span>[<span class="ident">ColumnMetadata</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>],
+        <span class="ident">trace_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+    ) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">SqlRow</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">filter</span>(<span class="ident">q</span>.<span class="ident">limit</span>(<span class="number">1</span>).<span class="ident">into</span>(), <span class="ident">meta</span>, <span class="ident">trace_id</span>)
             .<span class="kw">await</span><span class="question-mark">?</span>
             .<span class="ident">into_iter</span>()
             .<span class="ident">next</span>()
@@ -289,30 +329,42 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>,
         <span class="ident">record_filter</span>: <span class="ident">RecordFilter</span>,
+        <span class="ident">trace_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
     ) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">SelectionResult</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">selectors</span>) <span class="op">=</span> <span class="ident">record_filter</span>.<span class="ident">selectors</span> {
             <span class="prelude-val">Ok</span>(<span class="ident">selectors</span>)
         } <span class="kw">else</span> {
-            <span class="self">self</span>.<span class="ident">filter_ids</span>(<span class="ident">model</span>, <span class="ident">record_filter</span>.<span class="ident">filter</span>).<span class="kw">await</span>
+            <span class="self">self</span>.<span class="ident">filter_ids</span>(<span class="ident">model</span>, <span class="ident">record_filter</span>.<span class="ident">filter</span>, <span class="ident">trace_id</span>).<span class="kw">await</span>
         }
     }
 
     <span class="doccomment">/// Read the all columns as a (primary) identifier.</span>
     <span class="attribute">#[<span class="ident">tracing::instrument</span>(<span class="ident">skip</span>(<span class="self">self</span>, <span class="ident">model</span>, <span class="ident">filter</span>))]</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">filter_ids</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>, <span class="ident">filter</span>: <span class="ident">Filter</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">SelectionResult</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">filter_ids</span>(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>,
+        <span class="ident">filter</span>: <span class="ident">Filter</span>,
+        <span class="ident">trace_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+    ) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">SelectionResult</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">model_id</span>: <span class="ident">ModelProjection</span> <span class="op">=</span> <span class="ident">model</span>.<span class="ident">primary_identifier</span>().<span class="ident">into</span>();
         <span class="kw">let</span> <span class="ident">id_cols</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Column</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">model_id</span>.<span class="ident">as_columns</span>().<span class="ident">collect</span>();
 
         <span class="kw">let</span> <span class="ident">select</span> <span class="op">=</span> <span class="ident">Select::from_table</span>(<span class="ident">model</span>.<span class="ident">as_table</span>())
             .<span class="ident">columns</span>(<span class="ident">id_cols</span>)
             .<span class="ident">append_trace</span>(<span class="kw-2">&amp;</span><span class="ident">Span::current</span>())
+            .<span class="ident">add_trace_id</span>(<span class="ident">trace_id</span>.<span class="ident">clone</span>())
             .<span class="ident">so_that</span>(<span class="ident">filter</span>.<span class="ident">aliased_cond</span>(<span class="prelude-val">None</span>));
 
-        <span class="self">self</span>.<span class="ident">select_ids</span>(<span class="ident">select</span>, <span class="ident">model_id</span>).<span class="kw">await</span>
+        <span class="self">self</span>.<span class="ident">select_ids</span>(<span class="ident">select</span>, <span class="ident">model_id</span>, <span class="ident">trace_id</span>).<span class="kw">await</span>
     }
 
     <span class="attribute">#[<span class="ident">tracing::instrument</span>(<span class="ident">skip</span>(<span class="self">self</span>, <span class="ident">select</span>, <span class="ident">model_id</span>))]</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">select_ids</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">select</span>: <span class="ident">Select</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">model_id</span>: <span class="ident">ModelProjection</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">SelectionResult</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">select_ids</span>(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        <span class="ident">select</span>: <span class="ident">Select</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
+        <span class="ident">model_id</span>: <span class="ident">ModelProjection</span>,
+        <span class="ident">trace_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+    ) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">SelectionResult</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">idents</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">model_id</span>
             .<span class="ident">fields</span>()
             .<span class="ident">flat_map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">f</span> {
@@ -326,7 +378,7 @@
         <span class="kw">let</span> <span class="ident">meta</span> <span class="op">=</span> <span class="ident">column_metadata::create</span>(<span class="ident">field_names</span>.<span class="ident">as_slice</span>(), <span class="kw-2">&amp;</span><span class="ident">idents</span>);
 
         <span class="comment">// TODO: Add tracing</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">rows</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">filter</span>(<span class="ident">select</span>.<span class="ident">into</span>(), <span class="kw-2">&amp;</span><span class="ident">meta</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">rows</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">filter</span>(<span class="ident">select</span>.<span class="ident">into</span>(), <span class="kw-2">&amp;</span><span class="ident">meta</span>, <span class="ident">trace_id</span>).<span class="kw">await</span><span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
 
         <span class="kw">for</span> <span class="ident">row</span> <span class="kw">in</span> <span class="ident">rows</span>.<span class="ident">drain</span>(<span class="number">0</span>..) {

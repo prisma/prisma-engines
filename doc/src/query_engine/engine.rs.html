@@ -425,6 +425,10 @@
 <span id="424">424</span>
 <span id="425">425</span>
 <span id="426">426</span>
+<span id="427">427</span>
+<span id="428">428</span>
+<span id="429">429</span>
+<span id="430">430</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">error::ApiError</span>, <span class="ident">logger::ChannelLogger</span>};
 <span class="kw">use</span> <span class="ident">datamodel</span>::{<span class="ident">Datamodel</span>, <span class="ident">ValidatedConfiguration</span>};
 <span class="kw">use</span> <span class="ident">napi::threadsafe_function::ThreadsafeFunction</span>;
@@ -440,7 +444,7 @@
     <span class="ident">sync::Arc</span>,
 };
 <span class="kw">use</span> <span class="ident">tokio::sync::RwLock</span>;
-<span class="kw">use</span> <span class="ident">tracing::Level</span>;
+<span class="kw">use</span> <span class="ident">tracing</span>::{<span class="ident">warn</span>, <span class="ident">Level</span>};
 <span class="kw">use</span> <span class="ident">tracing_opentelemetry::OpenTelemetrySpanExt</span>;
 
 <span class="doccomment">/// The main engine, that can be cloned between threads when using JavaScript</span>
@@ -527,6 +531,7 @@
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Default</span>)]</span>
 <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;camelCase&quot;</span>)]</span>
+<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">dead_code</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">TelemetryOptions</span> {
     <span class="ident">enabled</span>: <span class="ident">bool</span>,
     <span class="ident">endpoint</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
@@ -576,10 +581,12 @@
 
         <span class="kw">let</span> <span class="ident">datamodel</span> <span class="op">=</span> <span class="ident">EngineDatamodel</span> { <span class="ident">ast</span>, <span class="ident">raw</span>: <span class="ident">datamodel</span> };
 
-        <span class="kw">let</span> <span class="ident">logger</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">telemetry</span>.<span class="ident">enabled</span> {
-            <span class="ident">ChannelLogger::new_with_telemetry</span>(<span class="ident">log_callback</span>, <span class="ident">telemetry</span>.<span class="ident">endpoint</span>)
-        } <span class="kw">else</span> {
-            <span class="ident">ChannelLogger::new</span>(<span class="kw-2">&amp;</span><span class="ident">log_level</span>, <span class="ident">log_queries</span>, <span class="ident">log_callback</span>)
+        <span class="comment">// OTEL is not ready (in our Node API code) to production</span>
+        <span class="comment">// it will require redoing the logging collector, ignoring it for now</span>
+        <span class="kw">let</span> <span class="ident">logger</span> <span class="op">=</span> <span class="ident">ChannelLogger::new</span>(<span class="kw-2">&amp;</span><span class="ident">log_level</span>, <span class="ident">log_queries</span>, <span class="ident">log_callback</span>);
+
+        <span class="kw">if</span> <span class="ident">telemetry</span>.<span class="ident">enabled</span> {
+            <span class="macro">warn!</span>(<span class="string">&quot;Telemetry is not ready for usage yet&quot;</span>);
         };
 
         <span class="kw">let</span> <span class="ident">builder</span> <span class="op">=</span> <span class="ident">EngineBuilder</span> {
@@ -696,9 +703,10 @@
                         <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="macro">tracing::span!</span>(<span class="ident">Level::TRACE</span>, <span class="string">&quot;query&quot;</span>);
 
                         <span class="ident">span</span>.<span class="ident">set_parent</span>(<span class="ident">cx</span>);
+                        <span class="kw">let</span> <span class="ident">trace_id</span> <span class="op">=</span> <span class="ident">trace</span>.<span class="ident">get</span>(<span class="string">&quot;traceparent&quot;</span>).<span class="ident">map</span>(<span class="ident">String::from</span>);
 
                         <span class="kw">let</span> <span class="ident">handler</span> <span class="op">=</span> <span class="ident">GraphQlHandler::new</span>(<span class="ident">engine</span>.<span class="ident">executor</span>(), <span class="ident">engine</span>.<span class="ident">query_schema</span>());
-                        <span class="prelude-val">Ok</span>(<span class="ident">handler</span>.<span class="ident">handle</span>(<span class="ident">query</span>, <span class="ident">tx_id</span>.<span class="ident">map</span>(<span class="ident">TxId::from</span>)).<span class="kw">await</span>)
+                        <span class="prelude-val">Ok</span>(<span class="ident">handler</span>.<span class="ident">handle</span>(<span class="ident">query</span>, <span class="ident">tx_id</span>.<span class="ident">map</span>(<span class="ident">TxId::from</span>), <span class="ident">trace_id</span>).<span class="kw">await</span>)
                     })
                     .<span class="kw">await</span>
             }

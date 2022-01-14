@@ -194,6 +194,15 @@
 <span id="193">193</span>
 <span id="194">194</span>
 <span id="195">195</span>
+<span id="196">196</span>
+<span id="197">197</span>
+<span id="198">198</span>
+<span id="199">199</span>
+<span id="200">200</span>
+<span id="201">201</span>
+<span id="202">202</span>
+<span id="203">203</span>
+<span id="204">204</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">super</span>::catch</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">error::MongoError</span>,
@@ -238,6 +247,7 @@
         <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
         <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>,
         <span class="ident">args</span>: <span class="ident">WriteArgs</span>,
+        <span class="ident">_trace_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
     ) -&gt; <span class="ident">connector_interface::Result</span><span class="op">&lt;</span><span class="ident">SelectionResult</span><span class="op">&gt;</span> {
         <span class="ident">catch</span>(<span class="kw">async</span> <span class="kw">move</span> { <span class="ident">write::create_record</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">database</span>, <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">session</span>, <span class="ident">model</span>, <span class="ident">args</span>).<span class="kw">await</span> }).<span class="kw">await</span>
     }
@@ -247,6 +257,7 @@
         <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>,
         <span class="ident">args</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">WriteArgs</span><span class="op">&gt;</span>,
         <span class="ident">skip_duplicates</span>: <span class="ident">bool</span>,
+        <span class="ident">_trace_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
     ) -&gt; <span class="ident">connector_interface::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
         <span class="ident">catch</span>(
             <span class="kw">async</span> <span class="kw">move</span> { <span class="ident">write::create_records</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">database</span>, <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">session</span>, <span class="ident">model</span>, <span class="ident">args</span>, <span class="ident">skip_duplicates</span>).<span class="kw">await</span> },
@@ -259,6 +270,7 @@
         <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>,
         <span class="ident">record_filter</span>: <span class="ident">connector_interface::RecordFilter</span>,
         <span class="ident">args</span>: <span class="ident">WriteArgs</span>,
+        <span class="ident">_trace_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
     ) -&gt; <span class="ident">connector_interface::Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">SelectionResult</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="ident">catch</span>(<span class="kw">async</span> <span class="kw">move</span> { <span class="ident">write::update_records</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">database</span>, <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">session</span>, <span class="ident">model</span>, <span class="ident">record_filter</span>, <span class="ident">args</span>).<span class="kw">await</span> })
             .<span class="kw">await</span>
@@ -268,6 +280,7 @@
         <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
         <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>,
         <span class="ident">record_filter</span>: <span class="ident">connector_interface::RecordFilter</span>,
+        <span class="ident">_trace_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
     ) -&gt; <span class="ident">connector_interface::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
         <span class="ident">catch</span>(<span class="kw">async</span> <span class="kw">move</span> { <span class="ident">write::delete_records</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">database</span>, <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">session</span>, <span class="ident">model</span>, <span class="ident">record_filter</span>).<span class="kw">await</span> }).<span class="kw">await</span>
     }
@@ -287,6 +300,7 @@
         <span class="ident">field</span>: <span class="kw-2">&amp;</span><span class="ident">RelationFieldRef</span>,
         <span class="ident">parent_id</span>: <span class="kw-2">&amp;</span><span class="ident">SelectionResult</span>,
         <span class="ident">child_ids</span>: <span class="kw-2">&amp;</span>[<span class="ident">SelectionResult</span>],
+        <span class="ident">_trace_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
     ) -&gt; <span class="ident">connector_interface::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="ident">catch</span>(
             <span class="kw">async</span> <span class="kw">move</span> { <span class="ident">write::m2m_disconnect</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">database</span>, <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">session</span>, <span class="ident">field</span>, <span class="ident">parent_id</span>, <span class="ident">child_ids</span>).<span class="kw">await</span> },
@@ -319,6 +333,7 @@
         <span class="ident">filter</span>: <span class="kw-2">&amp;</span><span class="ident">connector_interface::Filter</span>,
         <span class="ident">selected_fields</span>: <span class="kw-2">&amp;</span><span class="ident">FieldSelection</span>,
         <span class="ident">aggr_selections</span>: <span class="kw-2">&amp;</span>[<span class="ident">RelAggregationSelection</span>],
+        <span class="ident">_trace_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
     ) -&gt; <span class="ident">connector_interface::Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">SingleRecord</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="ident">catch</span>(<span class="kw">async</span> <span class="kw">move</span> {
             <span class="ident">read::get_single_record</span>(
@@ -340,6 +355,7 @@
         <span class="ident">query_arguments</span>: <span class="ident">connector_interface::QueryArguments</span>,
         <span class="ident">selected_fields</span>: <span class="kw-2">&amp;</span><span class="ident">FieldSelection</span>,
         <span class="ident">aggregation_selections</span>: <span class="kw-2">&amp;</span>[<span class="ident">RelAggregationSelection</span>],
+        <span class="ident">_trace_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
     ) -&gt; <span class="ident">connector_interface::Result</span><span class="op">&lt;</span><span class="ident">ManyRecords</span><span class="op">&gt;</span> {
         <span class="ident">catch</span>(<span class="kw">async</span> <span class="kw">move</span> {
             <span class="ident">read::get_many_records</span>(
@@ -359,6 +375,7 @@
         <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
         <span class="ident">from_field</span>: <span class="kw-2">&amp;</span><span class="ident">RelationFieldRef</span>,
         <span class="ident">from_record_ids</span>: <span class="kw-2">&amp;</span>[<span class="ident">SelectionResult</span>],
+        <span class="ident">_trace_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
     ) -&gt; <span class="ident">connector_interface::Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">SelectionResult</span>, <span class="ident">SelectionResult</span>)<span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="ident">catch</span>(<span class="kw">async</span> <span class="kw">move</span> {
             <span class="ident">read::get_related_m2m_record_ids</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">database</span>, <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">session</span>, <span class="ident">from_field</span>, <span class="ident">from_record_ids</span>).<span class="kw">await</span>
@@ -373,6 +390,7 @@
         <span class="ident">selections</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">connector_interface::AggregationSelection</span><span class="op">&gt;</span>,
         <span class="ident">group_by</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ScalarFieldRef</span><span class="op">&gt;</span>,
         <span class="ident">having</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">connector_interface::Filter</span><span class="op">&gt;</span>,
+        <span class="ident">_trace_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
     ) -&gt; <span class="ident">connector_interface::Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">connector_interface::AggregationRow</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="ident">catch</span>(<span class="kw">async</span> <span class="kw">move</span> {
             <span class="ident">aggregate::aggregate</span>(
