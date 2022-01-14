@@ -44,9 +44,9 @@ mod to_one {
           run_query!(runner, r#"mutation {
             createOneTestModel(
               data: {
-                id: "1"
+                id: 1
                 a: { a_1: "a1", a_2: null }
-                b: { c: {} }
+                b: { b_field: "b_field", c: { c_field: "c_field" } }
               }
             ) {
               a {
@@ -65,7 +65,7 @@ mod to_one {
             }
           }
           "#),
-          @r###""###
+          @r###"{"data":{"createOneTestModel":{"a":{"a_1":"a1","a_2":null},"b":{"b_field":"b_field","c":{"c_field":"c_field","b":null}}}}}"###
         );
 
         Ok(())

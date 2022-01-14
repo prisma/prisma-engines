@@ -135,7 +135,9 @@ impl DataInputFieldMapper for CreateDataInputFieldMapper {
             input_types.push(InputType::list(shorthand_type));
         }
 
-        input_field(cf.name.clone(), input_types, None).nullable_if(!cf.is_required())
+        input_field(cf.name.clone(), input_types, None)
+            .nullable_if(!cf.is_required())
+            .optional_if(!cf.is_required())
     }
 }
 
@@ -163,7 +165,10 @@ fn composite_create_envelope_object_type(ctx: &mut BuilderContext, cf: &Composit
         input_types.push(InputType::list(create_input));
     }
 
-    let set_field = input_field("set", input_types, None).nullable_if(!cf.is_required());
+    let set_field = input_field("set", input_types, None)
+        .nullable_if(!cf.is_required())
+        .optional_if(!cf.is_required());
+
     input_object.set_fields(vec![set_field]);
 
     Arc::downgrade(&input_object)

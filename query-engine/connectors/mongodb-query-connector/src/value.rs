@@ -415,11 +415,11 @@ fn read_composite_value(bson: Bson, meta: &CompositeOutputMeta) -> crate::Result
 
                 PrismaValue::Object(pairs)
             }
-            _ => {
-                return Err(MongoError::UnhandledError(format!(
-                    "Invalid data: Expected document but received: {:?}",
-                    bson
-                )))
+            bson => {
+                return Err(MongoError::ConversionError {
+                    from: format!("{:?}", bson),
+                    to: "Document".to_owned(),
+                })
             }
         }
     };
