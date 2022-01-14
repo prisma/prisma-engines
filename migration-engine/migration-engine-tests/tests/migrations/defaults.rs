@@ -62,6 +62,8 @@ fn datetime_dbgenerated_defaults(api: TestApi) {
             col.assert_default(Some(DefaultValue::db_generated("'16:20:00'")))
         })
     });
+
+    api.schema_push_w_datasource(dm).send().assert_green().assert_no_steps();
 }
 
 #[test_connector(tags(Mariadb, Mysql8), exclude(Vitess))]
