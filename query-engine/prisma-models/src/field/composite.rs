@@ -53,6 +53,10 @@ impl CompositeField {
         // fields.iter().map(|f| f.upgrade().unwrap()).collect()
         todo!()
     }
+
+    pub fn container(&self) -> &ParentContainer {
+        &self.container
+    }
 }
 
 impl Debug for CompositeField {

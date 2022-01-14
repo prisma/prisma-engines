@@ -31,9 +31,10 @@ pub async fn create_record<'conn>(
     //       query capability (e.g. query for field: null may need to check for exist as well?)
     let fields: Vec<_> = model
         .fields()
-        .scalar()
-        .into_iter()
+        .all
+        .iter()
         .filter(|field| args.has_arg_for(field.db_name()))
+        .map(Clone::clone)
         .collect();
 
     let mut doc = Document::new();
@@ -197,6 +198,7 @@ pub async fn update_records<'conn>(
                     }
                 }
             },
+            WriteExpression::CompositeWrite(_) => unimplemented!(),
             // We use $literal to enable the set of empty object, which is otherwise considered a syntax error
             WriteExpression::Value(rhs) => doc! {
                 "$set": { field_name: { "$literal": (field, rhs).into_bson()? } }

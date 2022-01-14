@@ -1,7 +1,6 @@
 pub(crate) mod arguments;
-pub(crate) mod composite;
+pub(crate) mod data_input_mapper;
 pub(crate) mod field_filter_types;
 pub(crate) mod input_fields;
-pub(crate) mod mapper;
 
 use super::*;

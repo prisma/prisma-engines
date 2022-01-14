@@ -5,14 +5,14 @@ use crate::{
 use bigdecimal::{BigDecimal, FromPrimitive, ToPrimitive};
 use chrono::{TimeZone, Utc};
 use itertools::Itertools;
-use mongodb::bson::{oid::ObjectId, spec::BinarySubtype, Binary, Bson, Timestamp};
+use mongodb::bson::{oid::ObjectId, spec::BinarySubtype, Binary, Bson, Document, Timestamp};
 use native_types::MongoDbType;
-use prisma_models::{PrismaValue, ScalarFieldRef, SelectedField, TypeIdentifier};
+use prisma_models::{CompositeFieldRef, Field, PrismaValue, ScalarFieldRef, SelectedField, TypeIdentifier};
 use serde_json::Value;
 use std::{convert::TryFrom, fmt::Display};
 
-/// Transforms a `PrismaValue` of a specific field into the BSON mapping as prescribed by the native types
-/// or as defined by the default `TypeIdentifier` to BSON mapping.
+/// Transforms a `PrismaValue` of a specific selected field into the BSON mapping as prescribed by
+/// the native types or as defined by the default `TypeIdentifier` to BSON mapping.
 impl IntoBson for (&SelectedField, PrismaValue) {
     fn into_bson(self) -> crate::Result<Bson> {
         let (selection, value) = self;
@@ -22,6 +22,61 @@ impl IntoBson for (&SelectedField, PrismaValue) {
             SelectedField::Composite(_) => todo!(), // [Composites] todo
         }
     }
+}
+
+impl IntoBson for (&Field, PrismaValue) {
+    fn into_bson(self) -> crate::Result<Bson> {
+        let (selection, value) = self;
+
+        match selection {
+            Field::Scalar(sf) => (sf, value).into_bson(),
+            Field::Composite(cf) => (cf, value).into_bson(),
+            Field::Relation(_) => unreachable!("Relation fields should never hit the BSON conversion logic."),
+        }
+    }
+}
+
+impl IntoBson for (&CompositeFieldRef, PrismaValue) {
+    fn into_bson(self) -> crate::Result<Bson> {
+        let (cf, value) = self;
+
+        match value {
+            PrismaValue::Null => Ok(Bson::Null),
+            PrismaValue::Object(pairs) => convert_composite_object(cf, pairs),
+
+            PrismaValue::List(values) => Ok(Bson::Array(
+                values
+                    .into_iter()
+                    .map(|val| {
+                        if let PrismaValue::Object(pairs) = val {
+                            convert_composite_object(cf, pairs)
+                        } else {
+                            unreachable!("Composite lists must be objects")
+                        }
+                    })
+                    .collect::<crate::Result<Vec<_>>>()?,
+            )),
+
+            _ => unreachable!("{}", value),
+        }
+    }
+}
+
+fn convert_composite_object(cf: &CompositeFieldRef, pairs: Vec<(String, PrismaValue)>) -> crate::Result<Bson> {
+    let mut doc = Document::new();
+
+    for (field, value) in pairs {
+        let field = cf
+            .typ
+            .find_field(&field) // Todo: This is assuming a lot by only checking the prisma names, not DB names.
+            .expect("Writing unavailable composite field.");
+
+        let converted = (field, value).into_bson()?;
+
+        doc.insert(field.db_name(), converted);
+    }
+
+    Ok(Bson::Document(doc))
 }
 
 impl IntoBson for (&ScalarFieldRef, PrismaValue) {

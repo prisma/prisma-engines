@@ -117,6 +117,72 @@ impl DataInputFieldMapper for CreateDataInputFieldMapper {
     }
 
     fn map_composite(&self, ctx: &mut BuilderContext, cf: &CompositeFieldRef) -> InputField {
-        todo!()
+        // Shorthand object (just the plain create object for the composite).
+        let shorthand_type = InputType::Object(composite_create_object_type(ctx, cf));
+
+        // Operation envelope object.
+        let envelope_type = InputType::Object(composite_create_envelope_object_type(ctx, cf));
+
+        // If the composite field in _not_ on a model, then it's nested and we're skipping the create envelope for now.
+        // (This allows us to simplify the parsing code for now.)
+        let mut input_types = if cf.container().as_model().is_some() {
+            vec![shorthand_type.clone(), envelope_type]
+        } else {
+            vec![shorthand_type.clone()]
+        };
+
+        if cf.is_list() {
+            input_types.push(InputType::list(shorthand_type));
+        }
+
+        input_field(cf.name.clone(), input_types, None).nullable_if(!cf.is_required())
     }
+}
+
+/// Build an operation envelope object type for composite creates.
+/// An operation envelope is an object that encapsulates the possible operations, like:
+/// ```text
+/// cf_field: { // this is the envelope object
+///   set: { ... create type ... }
+///   ... more ops ...
+/// }
+/// ```
+fn composite_create_envelope_object_type(ctx: &mut BuilderContext, cf: &CompositeFieldRef) -> InputObjectTypeWeakRef {
+    let name = format!("{}CreateEnvelopeInput", cf.typ.name);
+
+    let ident = Identifier::new(name, PRISMA_NAMESPACE);
+    return_cached_input!(ctx, &ident);
+
+    let input_object = Arc::new(init_input_object_type(ident.clone()));
+    ctx.cache_input_type(ident, input_object.clone());
+
+    let create_input = InputType::Object(composite_create_object_type(ctx, cf));
+    let mut input_types = vec![create_input.clone()];
+
+    if cf.is_list() {
+        input_types.push(InputType::list(create_input));
+    }
+
+    let set_field = input_field("set", input_types, None).nullable_if(!cf.is_required());
+    input_object.set_fields(vec![set_field]);
+
+    Arc::downgrade(&input_object)
+}
+
+fn composite_create_object_type(ctx: &mut BuilderContext, cf: &CompositeFieldRef) -> InputObjectTypeWeakRef {
+    // It's called "Create" input because it's used across multiple create-type operations, not only "set".
+    let name = format!("{}CreateInput", cf.typ.name);
+
+    let ident = Identifier::new(name, PRISMA_NAMESPACE);
+    return_cached_input!(ctx, &ident);
+
+    let input_object = Arc::new(init_input_object_type(ident.clone()));
+    ctx.cache_input_type(ident, input_object.clone());
+
+    let mapper = CreateDataInputFieldMapper::new_checked();
+    let fields = mapper.map_all(ctx, cf.typ.fields());
+
+    input_object.set_fields(fields);
+
+    Arc::downgrade(&input_object)
 }
