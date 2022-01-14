@@ -8,14 +8,14 @@ use prisma_value::PrismaValue;
 
 pub async fn execute(tx: &mut dyn ConnectionLike, write_query: WriteQuery, trace_id: Option<String>) -> InterpretationResult<QueryResult> {
     match write_query {
-        WriteQuery::CreateRecord(q) => create_one(tx, q).await,
-        WriteQuery::CreateManyRecords(q) => create_many(tx, q).await,
+        WriteQuery::CreateRecord(q) => create_one(tx, q, trace_id).await,
+        WriteQuery::CreateManyRecords(q) => create_many(tx, q, trace_id).await,
         WriteQuery::UpdateRecord(q) => update_one(tx, q, trace_id).await,
         WriteQuery::DeleteRecord(q) => delete_one(tx, q, trace_id).await,
         WriteQuery::UpdateManyRecords(q) => update_many(tx, q, trace_id).await,
         WriteQuery::DeleteManyRecords(q) => delete_many(tx, q, trace_id).await,
         WriteQuery::ConnectRecords(q) => connect(tx, q).await,
-        WriteQuery::DisconnectRecords(q) => disconnect(tx, q).await,
+        WriteQuery::DisconnectRecords(q) => disconnect(tx, q, trace_id).await,
         // TODO: Add trace id to raw
         WriteQuery::ExecuteRaw(rq) => execute_raw(tx, rq.query, rq.parameters).await,
         WriteQuery::QueryRaw(rq) => query_raw(tx, rq.query, rq.parameters).await,
@@ -42,14 +42,14 @@ async fn execute_raw(
     Ok(QueryResult::Json(num))
 }
 
-async fn create_one(tx: &mut dyn ConnectionLike, q: CreateRecord) -> InterpretationResult<QueryResult> {
-    let res = tx.create_record(&q.model, q.args).await?;
+async fn create_one(tx: &mut dyn ConnectionLike, q: CreateRecord, trace_id: Option<String>) -> InterpretationResult<QueryResult> {
+    let res = tx.create_record(&q.model, q.args, trace_id).await?;
 
     Ok(QueryResult::Id(Some(res)))
 }
 
-async fn create_many(tx: &mut dyn ConnectionLike, q: CreateManyRecords) -> InterpretationResult<QueryResult> {
-    let affected_records = tx.create_records(&q.model, q.args, q.skip_duplicates).await?;
+async fn create_many(tx: &mut dyn ConnectionLike, q: CreateManyRecords, trace_id: Option<String>) -> InterpretationResult<QueryResult> {
+    let affected_records = tx.create_records(&q.model, q.args, q.skip_duplicates, trace_id).await?;
 
     Ok(QueryResult::Count(affected_records))
 }
@@ -98,11 +98,12 @@ async fn connect(tx: &mut dyn ConnectionLike, q: ConnectRecords) -> Interpretati
     Ok(QueryResult::Unit)
 }
 
-async fn disconnect(tx: &mut dyn ConnectionLike, q: DisconnectRecords) -> InterpretationResult<QueryResult> {
+async fn disconnect(tx: &mut dyn ConnectionLike, q: DisconnectRecords, trace_id: Option<String>) -> InterpretationResult<QueryResult> {
     tx.m2m_disconnect(
         &q.relation_field,
         &q.parent_id.expect("Expected parent record ID to be set for disconnect"),
         &q.child_ids,
+        trace_id
     )
     .await?;
 

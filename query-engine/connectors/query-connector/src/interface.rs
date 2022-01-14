@@ -273,7 +273,7 @@ pub trait ReadOperations {
 #[async_trait]
 pub trait WriteOperations {
     /// Insert a single record to the database.
-    async fn create_record(&mut self, model: &ModelRef, args: WriteArgs) -> crate::Result<SelectionResult>;
+    async fn create_record(&mut self, model: &ModelRef, args: WriteArgs, trace_id: Option<String>) -> crate::Result<SelectionResult>;
 
     /// Inserts many records at once into the database.
     async fn create_records(
@@ -281,6 +281,7 @@ pub trait WriteOperations {
         model: &ModelRef,
         args: Vec<WriteArgs>,
         skip_duplicates: bool,
+        trace_id: Option<String>,
     ) -> crate::Result<usize>;
 
     /// Update records in the `Model` with the given `WriteArgs` filtered by the
@@ -312,6 +313,7 @@ pub trait WriteOperations {
         field: &RelationFieldRef,
         parent_id: &SelectionResult,
         child_ids: &[SelectionResult],
+        trace_id: Option<String>,
     ) -> crate::Result<()>;
 
     /// Execute the raw query in the database as-is. The `parameters` are

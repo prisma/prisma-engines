@@ -142,6 +142,7 @@ pub trait QueryExt: Queryable + Send + Sync {
         let select = Select::from_table(model.as_table())
             .columns(id_cols)
             .append_trace(&Span::current())
+            .add_trace_id(trace_id.clone())
             .so_that(filter.aliased_cond(None));
 
         self.select_ids(select, model_id, trace_id).await

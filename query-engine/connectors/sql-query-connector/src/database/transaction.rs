@@ -127,9 +127,9 @@ impl<'tx> ReadOperations for SqlConnectorTransaction<'tx> {
 
 #[async_trait]
 impl<'tx> WriteOperations for SqlConnectorTransaction<'tx> {
-    async fn create_record(&mut self, model: &ModelRef, args: WriteArgs) -> connector::Result<SelectionResult> {
+    async fn create_record(&mut self, model: &ModelRef, args: WriteArgs, trace_id: Option<String>) -> connector::Result<SelectionResult> {
         catch(self.connection_info.clone(), async move {
-            write::create_record(&self.inner, model, args).await
+            write::create_record(&self.inner, model, args, trace_id).await
         })
         .await
     }
@@ -139,6 +139,7 @@ impl<'tx> WriteOperations for SqlConnectorTransaction<'tx> {
         model: &ModelRef,
         args: Vec<WriteArgs>,
         skip_duplicates: bool,
+        trace_id: Option<String>,
     ) -> connector::Result<usize> {
         catch(self.connection_info.clone(), async move {
             write::create_records(
@@ -147,6 +148,7 @@ impl<'tx> WriteOperations for SqlConnectorTransaction<'tx> {
                 model,
                 args,
                 skip_duplicates,
+                trace_id
             )
             .await
         })
@@ -190,9 +192,10 @@ impl<'tx> WriteOperations for SqlConnectorTransaction<'tx> {
         field: &RelationFieldRef,
         parent_id: &SelectionResult,
         child_ids: &[SelectionResult],
+        trace_id: Option<String>,
     ) -> connector::Result<()> {
         catch(self.connection_info.clone(), async move {
-            write::m2m_disconnect(&self.inner, field, parent_id, child_ids).await
+            write::m2m_disconnect(&self.inner, field, parent_id, child_ids, trace_id).await
         })
         .await
     }

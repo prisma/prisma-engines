@@ -65,6 +65,7 @@ impl<'conn> WriteOperations for MongoDbTransaction<'conn> {
         &mut self,
         model: &ModelRef,
         args: connector_interface::WriteArgs,
+        _trace_id: Option<String>,
     ) -> connector_interface::Result<SelectionResult> {
         catch(async move {
             write::create_record(&self.connection.database, &mut self.connection.session, model, args).await
@@ -77,6 +78,7 @@ impl<'conn> WriteOperations for MongoDbTransaction<'conn> {
         model: &ModelRef,
         args: Vec<connector_interface::WriteArgs>,
         skip_duplicates: bool,
+        _trace_id: Option<String>,
     ) -> connector_interface::Result<usize> {
         catch(async move {
             write::create_records(
@@ -153,6 +155,7 @@ impl<'conn> WriteOperations for MongoDbTransaction<'conn> {
         field: &RelationFieldRef,
         parent_id: &SelectionResult,
         child_ids: &[SelectionResult],
+        _trace_id: Option<String>,
     ) -> connector_interface::Result<()> {
         catch(async move {
             write::m2m_disconnect(
