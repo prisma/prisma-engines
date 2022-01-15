@@ -247,7 +247,13 @@ impl QueryDocumentParser {
             (QueryValue::Int(i), ScalarType::BigInt) => Ok(PrismaValue::BigInt(i)),
 
             (QueryValue::Float(f), ScalarType::Float) => Ok(PrismaValue::Float(f)),
-            (QueryValue::Float(f), ScalarType::Int) => Ok(PrismaValue::Int(f.to_i64().unwrap())),
+            (QueryValue::Float(f), ScalarType::Int) => Ok(PrismaValue::Int(f.to_i64().ok_or(QueryParserError {
+                path: parent_path.clone(),
+                error_kind: QueryParserErrorKind::ValueParseError(format!(
+                    "'{}' is not a valid integer",
+                    f
+                )),
+            })?)),
             (QueryValue::Float(d), ScalarType::Decimal) => Ok(PrismaValue::Float(d)),
 
             (QueryValue::Boolean(b), ScalarType::Boolean) => Ok(PrismaValue::Boolean(b)),
