@@ -263,7 +263,7 @@ services:
       - databases
 
   mongo4-single:
-    image: mongo:4
+    image: mongo:5
     restart: always
     environment:
       MONGO_INITDB_ROOT_USERNAME: "prisma"
