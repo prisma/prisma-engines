@@ -225,7 +225,7 @@ impl ToSql for DecimalWrapper {
         out.reserve(8 + num_digits * 2);
 
         // Number of groups
-        out.put_u16(num_digits.try_into().unwrap());
+        out.put_u16(num_digits.try_into()?);
 
         // Weight of first group
         out.put_i16(weight);
