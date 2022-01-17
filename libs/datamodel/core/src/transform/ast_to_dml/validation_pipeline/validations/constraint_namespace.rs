@@ -162,7 +162,7 @@ impl<'ast> ConstraintNamespace<'ast> {
     /// Add all primary key and unique index custom names to separate namespaces per model.
     pub(super) fn add_local_custom_names_for_primary_keys_and_uniques(&mut self, db: &ParserDatabase<'ast>) {
         for model in db.walk_models() {
-            if let Some(name) = model.primary_key().and_then(|pk| pk.name()) {
+            if let Some(name) = model.primary_key().and_then(|pk| pk.name().as_explicit()) {
                 let counter = self
                     .local_custom_name
                     .entry((model.model_id(), Cow::from(name)))
@@ -170,7 +170,7 @@ impl<'ast> ConstraintNamespace<'ast> {
                 *counter += 1;
             }
             for index in model.indexes() {
-                if let Some(name) = index.name() {
+                if let Some(name) = index.name().as_explicit() {
                     let counter = self
                         .local_custom_name
                         .entry((model.model_id(), Cow::from(name)))

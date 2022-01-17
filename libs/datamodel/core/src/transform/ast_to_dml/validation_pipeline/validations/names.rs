@@ -1,4 +1,5 @@
 use datamodel_connector::Connector;
+use parser_database::walkers::IndexName;
 
 use super::constraint_namespace::ConstraintNamespace;
 use std::collections::{HashMap, HashSet};
@@ -12,25 +13,28 @@ type RelationIdentifier<'ast> = (ModelId, ModelId, RelationName<'ast>);
 
 #[derive(Clone, Copy)]
 pub(super) enum NameTaken {
-    Index,
-    Unique,
-    PrimaryKey,
+    ExplicitIndexName,
+    GeneratedIndexName,
+    ExplicitUniqueName,
+    GeneratedUniqueName,
+    ExplicitPrimaryKeyName,
+    GeneratedPrimaryKeyName,
 }
 
 pub(super) struct Names<'ast> {
     pub(super) relation_names: HashMap<RelationIdentifier<'ast>, Vec<FieldId>>,
-    index_names: HashMap<ModelId, HashSet<&'ast str>>,
-    unique_names: HashMap<ModelId, HashSet<&'ast str>>,
-    primary_key_names: HashMap<ModelId, &'ast str>,
+    index_names: HashMap<ModelId, HashSet<IndexName<'ast>>>,
+    unique_names: HashMap<ModelId, HashSet<IndexName<'ast>>>,
+    primary_key_names: HashMap<ModelId, IndexName<'ast>>,
     pub(super) constraint_namespace: ConstraintNamespace<'ast>,
 }
 
 impl<'ast> Names<'ast> {
     pub(super) fn new(db: &ParserDatabase<'ast>, connector: &dyn Connector) -> Self {
         let mut relation_names: HashMap<RelationIdentifier<'ast>, Vec<FieldId>> = HashMap::new();
-        let mut index_names: HashMap<ModelId, HashSet<&'ast str>> = HashMap::new();
-        let mut unique_names: HashMap<ModelId, HashSet<&'ast str>> = HashMap::new();
-        let mut primary_key_names: HashMap<ModelId, &'ast str> = HashMap::new();
+        let mut index_names: HashMap<ModelId, HashSet<IndexName<'ast>>> = HashMap::new();
+        let mut unique_names: HashMap<ModelId, HashSet<IndexName<'ast>>> = HashMap::new();
+        let mut primary_key_names: HashMap<ModelId, IndexName<'ast>> = HashMap::new();
 
         for model in db.walk_models() {
             for field in model.relation_fields() {
@@ -44,16 +48,22 @@ impl<'ast> Names<'ast> {
             }
 
             for index in model.indexes() {
-                if let Some(name) = index.name() {
-                    if index.is_unique() {
-                        unique_names.entry(index.model().model_id()).or_default().insert(name);
-                    } else {
-                        index_names.entry(index.model().model_id()).or_default().insert(name);
-                    }
+                let index_name = index.name();
+
+                if index.is_unique() {
+                    unique_names
+                        .entry(index.model().model_id())
+                        .or_default()
+                        .insert(index_name);
+                } else {
+                    index_names
+                        .entry(index.model().model_id())
+                        .or_default()
+                        .insert(index_name);
                 }
             }
 
-            if let Some(pk) = model.primary_key().and_then(|pk| pk.name()) {
+            if let Some(pk) = model.primary_key().map(|pk| pk.name()) {
                 primary_key_names.insert(model.model_id(), pk);
             }
         }
@@ -70,31 +80,37 @@ impl<'ast> Names<'ast> {
     pub(super) fn name_taken(&self, model_id: ModelId, name: &str) -> Vec<NameTaken> {
         let mut result = Vec::new();
 
-        if self
-            .index_names
-            .get(&model_id)
-            .map(|names| names.contains(name))
-            .unwrap_or(false)
-        {
-            result.push(NameTaken::Index);
+        if let Some(names) = self.index_names.get(&model_id) {
+            if names.get(&IndexName::explicit(name)).is_some() {
+                result.push(NameTaken::ExplicitIndexName);
+            }
+
+            if names.get(&IndexName::Generated(Some(name.to_string()))).is_some() {
+                result.push(NameTaken::GeneratedIndexName);
+            }
         }
 
-        if self
-            .unique_names
-            .get(&model_id)
-            .map(|names| names.contains(name))
-            .unwrap_or(false)
-        {
-            result.push(NameTaken::Unique);
+        if let Some(names) = self.unique_names.get(&model_id) {
+            if names.get(&IndexName::explicit(name)).is_some() {
+                result.push(NameTaken::ExplicitUniqueName);
+            }
+
+            if names.get(&IndexName::Generated(Some(name.to_string()))).is_some() {
+                result.push(NameTaken::GeneratedUniqueName);
+            }
         }
 
-        if self
+        if let Some(pk_name) = self
             .primary_key_names
             .get(&model_id)
-            .map(|pk| *pk == name)
-            .unwrap_or(false)
+            .and_then(|pk| if *pk == name { Some(pk) } else { None })
         {
-            result.push(NameTaken::PrimaryKey);
+            let pk_taken = match pk_name {
+                IndexName::Explicit(_) => NameTaken::ExplicitPrimaryKeyName,
+                IndexName::Generated(_) => NameTaken::GeneratedPrimaryKeyName,
+            };
+
+            result.push(pk_taken);
         }
 
         result

@@ -109,7 +109,7 @@ pub(super) fn has_a_unique_custom_primary_key_name_per_model(
         None => return,
     };
 
-    if let Some(name) = pk.name() {
+    if let Some(name) = pk.name().as_explicit() {
         if names
             .constraint_namespace
             .local_custom_name_scope_violations(model.model_id(), name.as_ref())

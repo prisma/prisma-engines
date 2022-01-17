@@ -5,6 +5,7 @@ mod constraint_names_negative;
 mod constraint_names_positive;
 mod default_negative;
 mod default_positive;
+mod field_name_clash;
 mod id_negative;
 mod id_positive;
 mod ignore_negative;

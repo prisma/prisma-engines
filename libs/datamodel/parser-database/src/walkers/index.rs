@@ -1,3 +1,4 @@
+use super::IndexName;
 use crate::{
     ast,
     types::{IndexAlgorithm, IndexAttribute},
@@ -46,8 +47,11 @@ impl<'ast, 'db> IndexWalker<'ast, 'db> {
     /// @@index([a, b], name: "theName")
     ///                      ^^^^^^^^^
     /// ```
-    pub fn name(self) -> Option<&'ast str> {
-        self.index_attribute.name
+    pub fn name(self) -> IndexName<'ast> {
+        match self.index_attribute.name {
+            Some(name) => IndexName::explicit(name),
+            None => IndexName::generated(&self.fields().collect::<Vec<_>>()),
+        }
     }
 
     /// The index algorithm, if a specific one was specified for the index.

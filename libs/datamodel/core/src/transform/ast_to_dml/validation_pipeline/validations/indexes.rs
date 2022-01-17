@@ -56,7 +56,7 @@ pub(super) fn unique_index_has_a_unique_custom_name_per_model(
 ) {
     let model = index.model();
 
-    if let Some(name) = index.name() {
+    if let Some(name) = index.name().as_explicit() {
         if names
             .constraint_namespace
             .local_custom_name_scope_violations(model.model_id(), name.as_ref())

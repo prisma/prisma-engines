@@ -276,7 +276,7 @@ impl<'a> LiftAstToDml<'a> {
         model.is_ignored = walker.is_ignored();
 
         model.primary_key = walker.primary_key().map(|pk| dml::PrimaryKeyDefinition {
-            name: pk.name().map(String::from),
+            name: pk.name().as_explicit().map(String::from),
             db_name: pk.constraint_name(self.connector).map(|c| c.into_owned()),
             fields: pk
                 .scalar_field_attributes()
@@ -318,7 +318,7 @@ impl<'a> LiftAstToDml<'a> {
                 });
 
                 dml::IndexDefinition {
-                    name: idx.name().map(String::from),
+                    name: idx.name().as_explicit().map(String::from),
                     db_name: Some(idx.constraint_name(self.connector).into_owned()),
                     fields,
                     tpe,

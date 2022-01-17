@@ -1,7 +1,7 @@
 use crate::{
     ast,
     types::IdAttribute,
-    walkers::{ModelWalker, ScalarFieldAttributeWalker, ScalarFieldWalker},
+    walkers::{IndexName, ModelWalker, ScalarFieldAttributeWalker, ScalarFieldWalker},
     ParserDatabase,
 };
 
@@ -49,8 +49,11 @@ impl<'ast, 'db> PrimaryKeyWalker<'ast, 'db> {
     /// @@id([a, b], name: "theName")
     ///                    ^^^^^^^^^
     /// ```
-    pub fn name(self) -> Option<&'ast str> {
-        self.attribute.name
+    pub fn name(self) -> IndexName<'ast> {
+        match self.attribute.name {
+            Some(s) => IndexName::explicit(s),
+            None => IndexName::generated(&self.fields().collect::<Vec<_>>()),
+        }
     }
 
     /// The scalar fields constrained by the id.
