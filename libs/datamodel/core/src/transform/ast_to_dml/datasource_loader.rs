@@ -159,7 +159,9 @@ impl DatasourceLoader {
             p if p == POSTGRES_SOURCE_NAME || p == POSTGRES_SOURCE_NAME_HEROKU => &PostgresDatasourceProvider,
             p if p == SQLITE_SOURCE_NAME => &SqliteDatasourceProvider,
             p if p == MSSQL_SOURCE_NAME => &MsSqlDatasourceProvider,
-            p if p == MONGODB_SOURCE_NAME => &MongoDbDatasourceProvider,
+            p if p == MONGODB_SOURCE_NAME && preview_features.contains(PreviewFeature::MongoDb) => {
+                &MongoDbDatasourceProvider
+            }
             p if p == COCKROACHDB_SOURCE_NAME && preview_features.contains(PreviewFeature::Cockroachdb) => {
                 &CockroachDbDatasourceProvider
             }

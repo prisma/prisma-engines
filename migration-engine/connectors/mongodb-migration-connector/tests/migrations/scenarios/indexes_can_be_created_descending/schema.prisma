@@ -1,6 +1,11 @@
+ datasource db {
+    provider = "mongodb"
+    url = env("TEST_DATABASE_URL")
+ }
+
  generator js {
-   provider        = "prisma-client-js"
-   previewFeatures = ["extendedIndexes"]
+    provider = "prisma-client-js"
+    previewFeatures = ["mongodb", "extendedIndexes"]
  }
 
  model User {

@@ -631,6 +631,50 @@ fn referential_integrity_default() {
     assert_eq!(config.referential_integrity(), Some(ReferentialIntegrity::ForeignKeys));
 }
 
+#[test]
+fn cockroach_provider_is_behind_preview_feature() {
+    let dm = r#"
+        datasource ps {
+          provider = "cockroachdb"
+          url = env("DATABASE_URL")
+        }
+    "#;
+
+    let error = super::parse_config(dm).map(drop).unwrap_err();
+
+    let expectation = expect![[r#"
+        [1;91merror[0m: [1mDatasource provider not known: "cockroachdb".[0m
+          [1;94m-->[0m  [4mschema.prisma:3[0m
+        [1;94m   | [0m
+        [1;94m 2 | [0m        datasource ps {
+        [1;94m 3 | [0m          provider = [1;91m"cockroachdb"[0m
+        [1;94m   | [0m
+    "#]];
+    expectation.assert_eq(&error);
+}
+
+#[test]
+fn mongo_provider_is_behind_preview_feature() {
+    let dm = r#"
+        datasource ps {
+          provider = "mongodb"
+          url = env("DATABASE_URL")
+        }
+    "#;
+
+    let error = super::parse_config(dm).map(drop).unwrap_err();
+
+    let expectation = expect![[r#"
+        [1;91merror[0m: [1mDatasource provider not known: "mongodb".[0m
+          [1;94m-->[0m  [4mschema.prisma:3[0m
+        [1;94m   | [0m
+        [1;94m 2 | [0m        datasource ps {
+        [1;94m 3 | [0m          provider = [1;91m"mongodb"[0m
+        [1;94m   | [0m
+    "#]];
+    expectation.assert_eq(&error);
+}
+
 fn load_env_var(key: &str) -> Option<String> {
     std::env::var(key).ok()
 }

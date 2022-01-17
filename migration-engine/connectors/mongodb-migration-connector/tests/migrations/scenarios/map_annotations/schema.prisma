@@ -1,3 +1,13 @@
+ datasource db {
+    provider = "mongodb"
+    url = env("TEST_DATABASE_URL")
+ }
+
+ generator js {
+    provider = "prisma-client-js"
+    previewFeatures = ["mongodb"]
+ }
+
  model User {
      id Int @id
      firstName String @map("fst_name")

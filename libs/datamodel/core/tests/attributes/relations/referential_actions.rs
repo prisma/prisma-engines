@@ -73,6 +73,11 @@ fn actions_on_mongo() {
                 url = "mongodb://"
             }}
 
+            generator client {{
+                provider = "prisma-client-js"
+                previewFeatures = "mongodb"
+            }}
+
             model A {{
                 id Int @id @map("_id")
                 bs B[]
@@ -176,7 +181,7 @@ fn foreign_keys_not_allowed_on_mongo() {
 
         generator client {
           provider = "prisma-client-js"
-          previewFeatures = ["referentialIntegrity"]
+          previewFeatures = ["referentialIntegrity", "mongodb"]
         }
 
         model A {
@@ -214,7 +219,7 @@ fn prisma_level_integrity_should_be_allowed_on_mongo() {
 
         generator client {
           provider = "prisma-client-js"
-          previewFeatures = ["referentialIntegrity"]
+          previewFeatures = ["referentialIntegrity", "mongodb"]
         }
 
         model A {
@@ -238,6 +243,11 @@ fn mongo_uses_prisma_referential_integrity_by_default() {
         datasource db {
           provider = "mongodb"
           url = "mongodb://"
+        }
+
+        generator client {
+          provider = "prisma-client-js"
+          previewFeatures = ["mongodb"]
         }
 
         model A {

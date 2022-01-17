@@ -5,7 +5,7 @@
 
  generator js {
    provider        = "prisma-client-js"
-   previewFeatures = ["extendedIndexes", "fullTextIndex"]
+   previewFeatures = ["extendedIndexes", "fullTextIndex", "mongodb"]
  }
 
  model User {

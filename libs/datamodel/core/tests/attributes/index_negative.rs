@@ -971,7 +971,7 @@ fn only_one_fulltext_index_allowed_per_model_in_mongo() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Mongo, &["fullTextIndex"]);
+    let schema = with_header(dml, Provider::Mongo, &["fullTextIndex", "mongodb"]);
     let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
@@ -1006,7 +1006,7 @@ fn fulltext_index_fields_must_follow_each_other_in_mongo() {
         }
     "#};
 
-    let schema = with_header(dml, Provider::Mongo, &["fullTextIndex", "extendedIndexes"]);
+    let schema = with_header(dml, Provider::Mongo, &["fullTextIndex", "extendedIndexes", "mongodb"]);
     let error = datamodel::parse_schema(&schema).map(drop).unwrap_err();
 
     let expectation = expect![[r#"

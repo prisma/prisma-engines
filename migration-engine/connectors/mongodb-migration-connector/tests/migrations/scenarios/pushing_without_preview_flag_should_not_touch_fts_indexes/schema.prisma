@@ -3,6 +3,11 @@
    url      = "mongodb://"
  }
 
+ generator js {
+   provider        = "prisma-client-js"
+   previewFeatures = ["extendedIndexes", "fullTextIndex", "mongodb"]
+ }
+
  model User {
    id        String @id @map("_id") @db.ObjectId
    age       Int

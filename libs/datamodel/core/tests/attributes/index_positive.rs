@@ -498,7 +498,7 @@ fn fulltext_index_mongodb() {
         }
     "#};
 
-    let dml = with_header(dml, Provider::Mongo, &["fullTextIndex"]);
+    let dml = with_header(dml, Provider::Mongo, &["fullTextIndex", "mongodb"]);
 
     parse(&dml).assert_has_model("A").assert_has_index(IndexDefinition {
         name: None,
@@ -522,7 +522,7 @@ fn fulltext_index_sort_mongodb() {
         }
     "#};
 
-    let dml = with_header(dml, Provider::Mongo, &["fullTextIndex", "extendedIndexes"]);
+    let dml = with_header(dml, Provider::Mongo, &["fullTextIndex", "extendedIndexes", "mongodb"]);
 
     parse(&dml).assert_has_model("A").assert_has_index(IndexDefinition {
         name: None,
