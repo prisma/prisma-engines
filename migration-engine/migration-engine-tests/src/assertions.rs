@@ -751,6 +751,12 @@ impl<'a> IndexAssertion<'a> {
         self
     }
 
+    pub fn assert_is_normal(self) -> Self {
+        assert_eq!(self.0.tpe, IndexType::Normal);
+
+        self
+    }
+
     pub fn assert_is_unique(self) -> Self {
         assert_eq!(self.0.tpe, IndexType::Unique);
 

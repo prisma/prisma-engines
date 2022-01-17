@@ -190,7 +190,11 @@ impl SqlRenderer for MysqlFlavour {
 
     fn render_create_index(&self, index: &IndexWalker<'_>) -> String {
         ddl::CreateIndex {
-            unique: index.index_type().is_unique(),
+            r#type: match index.index_type() {
+                sql_schema_describer::IndexType::Unique => ddl::IndexType::Unique,
+                sql_schema_describer::IndexType::Normal => ddl::IndexType::Normal,
+                sql_schema_describer::IndexType::Fulltext => ddl::IndexType::Fulltext,
+            },
             index_name: index.name().into(),
             on: (
                 index.table().name().into(),
