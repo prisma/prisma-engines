@@ -1035,3 +1035,72 @@ fn do_not_overwrite_fulltext_index_without_preview_feature(api: TestApi) {
 
     api.schema_push_w_datasource(dm).send().assert_no_steps();
 }
+
+#[test_connector(tags(Mysql), preview_features("fullTextIndex"))]
+fn adding_fulltext_index_to_an_existing_column(api: TestApi) {
+    let dm = indoc! {r#"
+        model A {
+          id Int    @id
+          a  String @db.Text
+          b  String @db.Text
+        }
+    "#};
+
+    api.schema_push(&api.datamodel_with_provider(dm)).send().assert_green();
+
+    api.assert_schema()
+        .assert_table("A", |table| table.assert_indexes_count(0));
+
+    let dm = indoc! {r#"
+        model A {
+          id Int    @id
+          a  String @db.Text
+          b  String @db.Text
+
+          @@fulltext([a, b])
+        }
+    "#};
+
+    api.schema_push(&api.datamodel_with_provider(dm)).send().assert_green();
+
+    api.assert_schema().assert_table("A", |table| {
+        table.assert_index_on_columns(&["a", "b"], |index| index.assert_is_fulltext())
+    });
+}
+
+#[test_connector(tags(Mysql), exclude(Mysql56), preview_features("fullTextIndex"))]
+fn changing_normal_index_to_a_fulltext_index(api: TestApi) {
+    let dm = indoc! {r#"
+        model A {
+          id Int    @id
+          a  String @db.VarChar(255)
+          b  String @db.VarChar(255)
+
+          @@index([a, b])
+        }
+    "#};
+
+    api.schema_push(&api.datamodel_with_provider(dm)).send().assert_green();
+
+    api.assert_schema().assert_table("A", |table| {
+        table.assert_indexes_count(1);
+        table.assert_index_on_columns(&["a", "b"], |index| index.assert_is_normal())
+    });
+
+    let dm = indoc! {r#"
+        model A {
+          id Int    @id
+          a  String @db.VarChar(255)
+          b  String @db.VarChar(255)
+
+          @@fulltext([a, b])
+        }
+    "#};
+
+    api.schema_push(&api.datamodel_with_provider(dm)).send().assert_green();
+
+    api.assert_schema().assert_table("A", |table| {
+        table.assert_indexes_count(1);
+        table.assert_index_on_columns(&["a", "b"], |index| index.assert_is_fulltext())
+    });
+}
