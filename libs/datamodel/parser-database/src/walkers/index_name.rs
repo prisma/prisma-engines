@@ -57,7 +57,7 @@ impl<'ast> IndexName<'ast> {
 
 /// Computes a generated index name. eg:
 /// @@unique([a, b]) -> "a_b"
-pub(crate) fn compute_generated_index_name<'ast, 'db>(fields: &[ScalarFieldWalker<'ast, 'db>]) -> String {
+pub(crate) fn compute_generated_index_name(fields: &[ScalarFieldWalker<'_, '_>]) -> String {
     let parts: Vec<_> = fields.iter().map(|sf| sf.name()).collect();
 
     parts.join("_")
