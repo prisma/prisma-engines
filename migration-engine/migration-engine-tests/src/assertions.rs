@@ -270,6 +270,7 @@ impl<'a> TableAssertion<'a> {
         }
     }
 
+    #[track_caller]
     pub fn assert_indexes_count(self, n: usize) -> Self {
         let idx_count = self.table.indices.len();
         assert!(idx_count == n, "Expected {} indexes, found {}.", n, idx_count);
@@ -747,6 +748,12 @@ impl<'a> IndexAssertion<'a> {
 
     pub fn assert_is_fulltext(self) -> Self {
         assert_eq!(self.0.tpe, IndexType::Fulltext);
+
+        self
+    }
+
+    pub fn assert_is_normal(self) -> Self {
+        assert_eq!(self.0.tpe, IndexType::Normal);
 
         self
     }
