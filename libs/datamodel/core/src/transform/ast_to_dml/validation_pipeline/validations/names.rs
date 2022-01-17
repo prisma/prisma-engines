@@ -13,12 +13,12 @@ type RelationIdentifier<'ast> = (ModelId, ModelId, RelationName<'ast>);
 
 #[derive(Clone, Copy)]
 pub(super) enum NameTaken {
-    ExplicitIndexName,
-    GeneratedIndexName,
-    ExplicitUniqueName,
-    GeneratedUniqueName,
-    ExplicitPrimaryKeyName,
-    GeneratedPrimaryKeyName,
+    ExplicitIndex,
+    GeneratedIndex,
+    ExplicitUnique,
+    GeneratedUnique,
+    ExplicitPrimaryKey,
+    GeneratedPrimaryKey,
 }
 
 pub(super) struct Names<'ast> {
@@ -82,21 +82,21 @@ impl<'ast> Names<'ast> {
 
         if let Some(names) = self.index_names.get(&model_id) {
             if names.get(&IndexName::explicit(name)).is_some() {
-                result.push(NameTaken::ExplicitIndexName);
+                result.push(NameTaken::ExplicitIndex);
             }
 
             if names.get(&IndexName::Generated(Some(name.to_string()))).is_some() {
-                result.push(NameTaken::GeneratedIndexName);
+                result.push(NameTaken::GeneratedIndex);
             }
         }
 
         if let Some(names) = self.unique_names.get(&model_id) {
             if names.get(&IndexName::explicit(name)).is_some() {
-                result.push(NameTaken::ExplicitUniqueName);
+                result.push(NameTaken::ExplicitUnique);
             }
 
             if names.get(&IndexName::Generated(Some(name.to_string()))).is_some() {
-                result.push(NameTaken::GeneratedUniqueName);
+                result.push(NameTaken::GeneratedUnique);
             }
         }
 
@@ -106,8 +106,8 @@ impl<'ast> Names<'ast> {
             .and_then(|pk| if *pk == name { Some(pk) } else { None })
         {
             let pk_taken = match pk_name {
-                IndexName::Explicit(_) => NameTaken::ExplicitPrimaryKeyName,
-                IndexName::Generated(_) => NameTaken::GeneratedPrimaryKeyName,
+                IndexName::Explicit(_) => NameTaken::ExplicitPrimaryKey,
+                IndexName::Generated(_) => NameTaken::GeneratedPrimaryKey,
             };
 
             result.push(pk_taken);

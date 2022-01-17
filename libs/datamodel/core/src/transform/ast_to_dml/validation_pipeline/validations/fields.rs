@@ -26,7 +26,7 @@ pub(super) fn validate_client_name(field: FieldWalker<'_, '_>, names: &Names<'_>
 
     for taken in names.name_taken(model.model_id(), field.name()).into_iter() {
         match taken {
-            NameTaken::ExplicitIndexName => {
+            NameTaken::ExplicitIndex => {
                 let message = format!(
                     "The custom name `{}` specified for the `@@index` attribute is already used as a name for a field. Please choose a different name.",
                     field.name()
@@ -35,7 +35,7 @@ pub(super) fn validate_client_name(field: FieldWalker<'_, '_>, names: &Names<'_>
                 let error = DatamodelError::new_model_validation_error(&message, model.name(), model.ast_model().span);
                 ctx.push_error(error);
             }
-            NameTaken::GeneratedIndexName => {
+            NameTaken::GeneratedIndex => {
                 let message = format!(
                     "The field `{}` clashes with the `@@index` attribute. Please remove the name clash by providing a custom index name: @@index([..], name: \"custom_name\")",
                     field.name()
@@ -44,7 +44,7 @@ pub(super) fn validate_client_name(field: FieldWalker<'_, '_>, names: &Names<'_>
                 let error = DatamodelError::new_model_validation_error(&message, model.name(), model.ast_model().span);
                 ctx.push_error(error);
             }
-            NameTaken::ExplicitUniqueName => {
+            NameTaken::ExplicitUnique => {
                 let message = format!(
                     "The custom name `{}` specified for the `@@unique` attribute is already used as a name for a field. Please choose a different name.",
                     field.name()
@@ -53,7 +53,7 @@ pub(super) fn validate_client_name(field: FieldWalker<'_, '_>, names: &Names<'_>
                 let error = DatamodelError::new_model_validation_error(&message, model.name(), model.ast_model().span);
                 ctx.push_error(error);
             }
-            NameTaken::GeneratedUniqueName => {
+            NameTaken::GeneratedUnique => {
                 let message = format!(
                     "The field `{}` clashes with the `@@unique` attribute. Please remove the name clash by providing a custom index name: @@unique([..], name: \"custom_name\")",
                     field.name()
@@ -62,7 +62,7 @@ pub(super) fn validate_client_name(field: FieldWalker<'_, '_>, names: &Names<'_>
                 let error = DatamodelError::new_model_validation_error(&message, model.name(), model.ast_model().span);
                 ctx.push_error(error);
             }
-            NameTaken::ExplicitPrimaryKeyName => {
+            NameTaken::ExplicitPrimaryKey => {
                 let message = format!(
                     "The custom name `{}` specified for the `@@id` attribute is already used as a name for a field. Please choose a different name.",
                     field.name()
@@ -71,7 +71,7 @@ pub(super) fn validate_client_name(field: FieldWalker<'_, '_>, names: &Names<'_>
                 let error = DatamodelError::new_model_validation_error(&message, model.name(), model.ast_model().span);
                 ctx.push_error(error);
             }
-            NameTaken::GeneratedPrimaryKeyName => {
+            NameTaken::GeneratedPrimaryKey => {
                 let message = format!(
                     "The field `{}` clashes with the `@@id` attribute. Please remove the name clash by providing a custom index name: @@id([..], name: \"custom_name\")",
                     field.name()
