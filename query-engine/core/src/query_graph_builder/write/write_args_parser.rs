@@ -114,10 +114,11 @@ impl WriteArgsParser {
 fn is_composite_envelope(map: &ParsedInputMap) -> bool {
     let (key, _) = map.iter().next().unwrap();
 
-    map.len() == 1 && key == operations::SET
+    map.len() == 1 && key == operations::SET // [Composites] Flavian Todo
 }
 
-fn parse_composite_envelope(map: ParsedInputMap) -> WriteExpression {
+fn parse_composite_envelope(envelope: ParsedInputMap) -> WriteExpression {
+    // [Composites] Flavian Todo
     todo!()
 }
 
@@ -130,24 +131,3 @@ fn extract_scalar_list_ops(map: ParsedInputMap) -> QueryGraphBuilderResult<Write
         _ => unreachable!("Invalid scalar list operation"),
     }
 }
-
-// // Top level is a create operation, so we can strip all envelopes, they aren't needed.
-// fn strip_composite_create_envelopes(input: ParsedInputMap) -> ParsedInputValue {
-//     if input.len() == 1 {
-//         let (key, value) = input.into_iter().next().unwrap();
-
-//         match key.as_str() {
-//             operations::SET => strip_composite_create_envelopes(value),
-//             _ => unreachable!("Invalid composite operation."),
-//         }
-//     } else {
-//         input
-//             .into_iter()
-//             .map(|(key, value)| match value {
-//                 ParsedInputValue::Map(map) => (key, strip_composite_create_envelopes(map)),
-//                 value => (key, value),
-//             })
-//             .collect()
-//             .into()
-//     }
-// }

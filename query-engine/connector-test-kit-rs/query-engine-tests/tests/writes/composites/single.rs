@@ -3,6 +3,7 @@ use query_engine_tests::*;
 
 #[test_suite(schema(to_one_composites))]
 mod to_one {
+    // [Composites] Flavian Todo
     /// Using explicit `set` operators, create (deeply nested) composites.
     #[connector_test]
     async fn set_create(runner: Runner) -> TestResult<()> {
@@ -12,7 +13,7 @@ mod to_one {
               data: {
                 id: "1"
                 a: { set: { a_1: "a1", a_2: null } }
-                b: { set: { c: { set: {} } } }
+                b: { set: { b_field: "b_field", c: { set: { c_field: "c_field" } } } }
               }
             ) {
               a {
