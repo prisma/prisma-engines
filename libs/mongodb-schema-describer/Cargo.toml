@@ -6,5 +6,5 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-mongodb = { git = "https://github.com/mongodb/mongo-rust-driver.git", rev = "8e55cb2" }
+mongodb = "2.1.0"
 futures = "0.3"
