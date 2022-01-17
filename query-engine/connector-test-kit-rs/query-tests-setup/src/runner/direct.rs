@@ -87,10 +87,6 @@ impl RunnerInterface for DirectRunner {
         &self.connector_tag
     }
 
-    fn executor(&self) -> &dyn QueryExecutor {
-        self.executor.as_ref()
-    }
-
     fn set_active_tx(&mut self, tx_id: query_core::TxId) {
         self.current_tx_id = Some(tx_id);
     }

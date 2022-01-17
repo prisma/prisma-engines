@@ -1,4 +1,5 @@
 #![deny(warnings, rust_2018_idioms)]
+mod panic_hook;
 
 pub mod common;
 pub mod introspection_engine;
@@ -7,13 +8,10 @@ pub mod migration_engine;
 pub mod quaint;
 pub mod query_engine;
 
+use serde::{Deserialize, Serialize};
 use std::borrow::Cow;
 
 pub use panic_hook::set_panic_hook;
-
-mod panic_hook;
-
-use serde::{Deserialize, Serialize};
 
 pub trait UserFacingError: serde::Serialize {
     const ERROR_CODE: &'static str;

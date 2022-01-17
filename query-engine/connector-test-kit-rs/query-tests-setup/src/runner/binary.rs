@@ -1,6 +1,6 @@
 use crate::{ConnectorTag, RunnerInterface, TestResult, TxResult};
 use hyper::{Body, Method, Request, Response};
-use query_core::{QueryExecutor, TxId};
+use query_core::TxId;
 use query_engine::opt::PrismaOpt;
 use query_engine::server::{routes, setup, State};
 use request_handlers::{GQLBatchResponse, GQLError, GQLResponse, GraphQlBody, MultiQuery, PrismaResponse};
@@ -30,9 +30,8 @@ impl RunnerInterface for BinaryRunner {
 
         let mut builder = Request::builder().method(Method::POST);
 
-        // Garren: basically if there is a current_tx_id we run it as a transaction
         if self.current_tx_id.is_some() {
-            let tx_id: String = self.current_tx_id.as_ref().unwrap().clone().to_string();
+            let tx_id: String = self.current_tx_id.clone().unwrap().to_string();
             builder = builder.header("X-transaction-id", tx_id);
         }
 
@@ -154,11 +153,6 @@ impl RunnerInterface for BinaryRunner {
 
     fn connector(&self) -> &crate::ConnectorTag {
         &self.connector_tag
-    }
-
-    fn executor(&self) -> &dyn QueryExecutor {
-        todo!()
-        // self.executor.as_ref()
     }
 
     fn set_active_tx(&mut self, tx_id: query_core::TxId) {

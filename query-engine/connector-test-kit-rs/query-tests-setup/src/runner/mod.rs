@@ -5,7 +5,7 @@ mod node_api;
 pub use binary::*;
 pub use direct::*;
 pub use node_api::*;
-use query_core::{QueryExecutor, TxId};
+use query_core::TxId;
 
 use crate::{ConnectorTag, ConnectorVersion, QueryResult, TestError, TestResult};
 use colored::*;
@@ -34,9 +34,6 @@ pub trait RunnerInterface: Sized {
 
     /// The connector tag used to load this runner.
     fn connector(&self) -> &ConnectorTag;
-
-    /// Exposes the underlying executor for testing.
-    fn executor(&self) -> &dyn QueryExecutor;
 
     /// Instructs this runner to use a specific ITX ID for queries.
     fn set_active_tx(&mut self, tx_id: TxId);

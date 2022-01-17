@@ -172,7 +172,7 @@ async fn graphql_handler(state: State, req: Request<Body>) -> Result<Response<Bo
         match serde_json::from_slice(full_body.as_ref()) {
             Ok(body) => {
                 let handler = GraphQlHandler::new(&*state.cx.executor, state.cx.query_schema());
-                let result = handler.handle(body, tx_id).await;
+                let result = handler.handle(body, tx_id, None).await;
 
                 let result_bytes = serde_json::to_vec(&result).unwrap();
 
