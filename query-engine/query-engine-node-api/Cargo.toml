@@ -32,7 +32,7 @@ tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 tracing-futures = "0.2"
 tracing-opentelemetry = "0.16"
 datamodel-connector = { path = "../../libs/datamodel/connectors/datamodel-connector" }
-opentelemetry = { version = "0.16", features = ["rt-async-std"] }
+opentelemetry = { version = "0.16", features = ["rt-tokio"] }
 opentelemetry-otlp = { version = "0.9", features = ["tls", "tls-roots"] }
 
 tokio = { version = "1", features = ["sync"] }

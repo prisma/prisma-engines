@@ -102,12 +102,12 @@ pub fn run_relation_link_test<F>(
         run_with_tokio(
             async move {
                 tracing::debug!("Used datamodel:\n {}", datamodel.clone().yellow());
+                setup_project(&datamodel).await.unwrap();
 
                 let runner = Runner::load(config.runner(), datamodel.clone(), connector)
                     .await
                     .unwrap();
 
-                setup_project(&datamodel).await.unwrap();
                 test_fn.call(&runner, &dm_with_params_json).await.unwrap();
 
                 if requires_teardown {

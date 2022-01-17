@@ -3,33 +3,18 @@
 #[macro_use]
 extern crate tracing;
 
-use cli::CliCommand;
-use error::PrismaError;
-use logger::Logger;
-use opt::PrismaOpt;
+use query_engine::cli::CliCommand;
+use query_engine::error::PrismaError;
+use query_engine::logger::Logger;
+use query_engine::opt::PrismaOpt;
+use query_engine::server;
+use query_engine::LogFormat;
 use std::{error::Error, process};
 use structopt::StructOpt;
 
-mod cli;
-mod context;
-mod error;
-mod logger;
-mod opt;
-mod server;
-
-#[cfg(test)]
-mod tests;
-
-#[derive(Debug, Clone, PartialEq, Copy)]
-pub enum LogFormat {
-    Text,
-    Json,
-}
-
-pub type PrismaResult<T> = Result<T, PrismaError>;
 type AnyError = Box<dyn Error + Send + Sync + 'static>;
 
-#[async_std::main]
+#[tokio::main]
 async fn main() -> Result<(), AnyError> {
     return main().await.map_err(|err| {
         info!("Encountered error during initialization:");

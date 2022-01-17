@@ -1,4 +1,4 @@
-use crate::{ConnectorTag, RunnerInterface, TestResult};
+use crate::{ConnectorTag, RunnerInterface, TestResult, TxResult};
 use prisma_models::InternalDataModelBuilder;
 use query_core::{executor, schema_builder, BuildMode, QueryExecutor, QuerySchemaRef, TxId};
 use request_handlers::{GraphQlBody, GraphQlHandler, MultiQuery};
@@ -58,12 +58,33 @@ impl RunnerInterface for DirectRunner {
         Ok(handler.handle(query, self.current_tx_id.clone(), None).await.into())
     }
 
-    fn connector(&self) -> &crate::ConnectorTag {
-        &self.connector_tag
+    async fn start_tx(&self, max_acquisition_millis: u64, valid_for_millis: u64) -> TestResult<TxId> {
+        let id = self.executor.start_tx(max_acquisition_millis, valid_for_millis).await?;
+        Ok(id)
     }
 
-    fn executor(&self) -> &dyn QueryExecutor {
-        self.executor.as_ref()
+    async fn commit_tx(&self, tx_id: TxId) -> TestResult<TxResult> {
+        let res = self.executor.commit_tx(tx_id).await;
+
+        if let Err(error) = res {
+            return Ok(Err(error.into()));
+        } else {
+            Ok(Ok(()))
+        }
+    }
+
+    async fn rollback_tx(&self, tx_id: TxId) -> TestResult<TxResult> {
+        let res = self.executor.rollback_tx(tx_id).await;
+
+        if let Err(error) = res {
+            return Ok(Err(error.into()));
+        } else {
+            Ok(Ok(()))
+        }
+    }
+
+    fn connector(&self) -> &crate::ConnectorTag {
+        &self.connector_tag
     }
 
     fn set_active_tx(&mut self, tx_id: query_core::TxId) {

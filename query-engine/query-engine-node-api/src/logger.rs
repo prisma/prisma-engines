@@ -73,7 +73,7 @@ impl ChannelLogger {
 
         builder = builder.with_exporter(exporter);
 
-        let tracer = builder.install_batch(opentelemetry::runtime::AsyncStd).unwrap();
+        let tracer = builder.install_batch(opentelemetry::runtime::Tokio).unwrap();
 
         let telemetry_layer = tracing_opentelemetry::layer().with_tracer(tracer);
         let registry = EventRegistry::new().with(telemetry_layer).with(javascript_cb);

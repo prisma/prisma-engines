@@ -71,8 +71,8 @@ impl ConnectorError {
     }
 
     /// The user-facing error code for this error.
-    pub fn error_code(&self) -> Option<&'static str> {
-        self.0.user_facing_error.as_ref().map(|err| err.error_code)
+    pub fn error_code(&self) -> Option<&str> {
+        self.0.user_facing_error.as_ref().map(|err| err.error_code.as_ref())
     }
 
     /// Build a generic unknown error from just an error message.
