@@ -305,6 +305,40 @@ fn default_current_timestamp_precision_follows_column_precision(api: TestApi) {
 }
 
 #[test_connector(tags(Mysql))]
+fn datetime_dbgenerated_defaults(api: TestApi) {
+    let migrations_directory = api.create_migrations_directory();
+
+    let dm = indoc::indoc! {r#"
+        model A {
+          id Int       @id @default(autoincrement())
+          d1 DateTime @default(dbgenerated("'2020-01-01'")) @db.Date
+          d2 DateTime @default(dbgenerated("'2038-01-19 03:14:08'")) @db.DateTime(0)
+          d3 DateTime @default(dbgenerated("'16:20:00'")) @db.Time(0)
+        }
+    "#};
+
+    let dm = api.datamodel_with_provider(dm);
+
+    let expected_migration = indoc!(
+        r#"
+        -- CreateTable
+        CREATE TABLE `A` (
+            `id` INTEGER NOT NULL AUTO_INCREMENT,
+            `d1` DATE NOT NULL DEFAULT '2020-01-01',
+            `d2` DATETIME(0) NOT NULL DEFAULT '2038-01-19 03:14:08',
+            `d3` TIME(0) NOT NULL DEFAULT '16:20:00',
+
+            PRIMARY KEY (`id`)
+        ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+        "#
+    );
+
+    api.create_migration("01init", &dm, &migrations_directory)
+        .send_sync()
+        .assert_migration("01init", |migration| migration.assert_contents(expected_migration));
+}
+
+#[test_connector(tags(Mysql))]
 fn mysql_apply_migrations_errors_gives_the_failed_sql(api: TestApi) {
     let dm = "";
     let migrations_directory = api.create_migrations_directory();
