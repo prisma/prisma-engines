@@ -193,11 +193,11 @@ impl Display for CreateIndex<'_> {
             IndexType::Fulltext => f.write_str("FULLTEXT ")?,
         }
 
-        f.write_str("INDEX ")?;
+        f.write_str("INDEX `")?;
         f.write_str(&self.index_name)?;
-        f.write_str(" ON ")?;
+        f.write_str("` ON `")?;
         f.write_str(&self.on.0)?;
-        f.write_str("(")?;
+        f.write_str("`(")?;
 
         self.on
             .1
