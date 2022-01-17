@@ -19,7 +19,7 @@ use tracing::trace;
 /// ```ignore
 /// 'this is a test'
 /// ```
-static DEFAULT_QUOTES: Lazy<Regex> = Lazy::new(|| Regex::new(r"'([\S\s]*)'").unwrap());
+static DEFAULT_QUOTES: Lazy<Regex> = Lazy::new(|| Regex::new(r"'(.*)'").unwrap());
 
 fn is_mariadb(version: &str) -> bool {
     version.contains("MariaDB")
@@ -330,24 +330,29 @@ impl<'a> SqlSchemaDescriber<'a> {
                         Some(match &tpe.family {
                             ColumnTypeFamily::Int => match Self::parse_int(&default_string) {
                                 Some(int_value) => DefaultValue::value(int_value),
-                                None => Self::db_generated(&default_string, default_expression),
+                                None if default_expression => Self::dbgenerated_expression(&default_string),
+                                None => DefaultValue::db_generated(default_string),
                             },
                             ColumnTypeFamily::BigInt => match Self::parse_big_int(&default_string) {
                                 Some(int_value) => DefaultValue::value(int_value),
-                                None => Self::db_generated(&default_string, default_expression),
+                                None if default_expression => Self::dbgenerated_expression(&default_string),
+                                None => DefaultValue::db_generated(default_string),
                             },
                             ColumnTypeFamily::Float => match Self::parse_float(&default_string) {
                                 Some(float_value) => DefaultValue::value(float_value),
-                                None => Self::db_generated(&default_string, default_expression),
+                                None if default_expression => Self::dbgenerated_expression(&default_string),
+                                None => DefaultValue::db_generated(default_string),
                             },
                             ColumnTypeFamily::Decimal => match Self::parse_float(&default_string) {
                                 Some(float_value) => DefaultValue::value(float_value),
-                                None => Self::db_generated(&default_string, default_expression),
+                                None if default_expression => Self::dbgenerated_expression(&default_string),
+                                None => DefaultValue::db_generated(default_string),
                             },
                             ColumnTypeFamily::Boolean => match Self::parse_int(&default_string) {
                                 Some(PrismaValue::Int(1)) => DefaultValue::value(true),
                                 Some(PrismaValue::Int(0)) => DefaultValue::value(false),
-                                _ => Self::db_generated(&default_string, default_expression),
+                                _ if default_expression => Self::dbgenerated_expression(&default_string),
+                                _ => DefaultValue::db_generated(default_string),
                             },
                             ColumnTypeFamily::String => {
                                 // See https://dev.mysql.com/doc/refman/8.0/en/information-schema-columns-table.html
@@ -366,11 +371,24 @@ impl<'a> SqlSchemaDescriber<'a> {
                             //todo check other now() definitions
                             ColumnTypeFamily::DateTime => match Self::default_is_current_timestamp(&default_string) {
                                 true => DefaultValue::now(),
-                                _ => Self::db_generated_date_time(&default_string, default_expression),
+                                _ if default_expression => Self::dbgenerated_expression(&default_string),
+                                _ if DEFAULT_QUOTES.is_match(&default_string) => {
+                                    DefaultValue::db_generated(default_string)
+                                }
+                                _ => DefaultValue::db_generated(format!("'{default_string}'")),
                             },
-                            ColumnTypeFamily::Binary => Self::db_generated(&default_string, default_expression),
-                            ColumnTypeFamily::Json => Self::db_generated(&default_string, default_expression),
-                            ColumnTypeFamily::Uuid => Self::db_generated(&default_string, default_expression),
+                            ColumnTypeFamily::Binary => match default_expression {
+                                true => Self::dbgenerated_expression(&default_string),
+                                false => DefaultValue::db_generated(default_string),
+                            },
+                            ColumnTypeFamily::Json => match default_expression {
+                                true => Self::dbgenerated_expression(&default_string),
+                                false => DefaultValue::db_generated(default_string),
+                            },
+                            ColumnTypeFamily::Uuid => match default_expression {
+                                true => Self::dbgenerated_expression(&default_string),
+                                false => DefaultValue::db_generated(default_string),
+                            },
                             ColumnTypeFamily::Enum(_) => {
                                 if default_generated
                                     || (maria_db && !matches!(default_string.chars().next(), Some('\'')))
@@ -382,7 +400,10 @@ impl<'a> SqlSchemaDescriber<'a> {
                                     )))
                                 }
                             }
-                            ColumnTypeFamily::Unsupported(_) => Self::db_generated(&default_string, default_generated),
+                            ColumnTypeFamily::Unsupported(_) => match default_expression {
+                                true => Self::dbgenerated_expression(&default_string),
+                                false => DefaultValue::db_generated(default_string),
+                            },
                         })
                     }
                 },
@@ -399,24 +420,6 @@ impl<'a> SqlSchemaDescriber<'a> {
         }
 
         Ok(map)
-    }
-
-    fn db_generated_date_time(default_string: &str, default_generated: bool) -> DefaultValue {
-        if default_generated {
-            Self::dbgenerated_expression(default_string)
-        } else if DEFAULT_QUOTES.is_match(default_string) {
-            DefaultValue::db_generated(default_string.to_owned())
-        } else {
-            DefaultValue::db_generated(format!("'{}'", default_string))
-        }
-    }
-
-    fn db_generated(default_string: &str, default_generated: bool) -> DefaultValue {
-        if default_generated {
-            Self::dbgenerated_expression(default_string)
-        } else {
-            DefaultValue::db_generated(default_string.to_owned())
-        }
     }
 
     fn dbgenerated_expression(default_string: &str) -> DefaultValue {
