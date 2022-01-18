@@ -1,6 +1,13 @@
 //! The external facing programmatic API to the migration engine.
 
-use crate::{commands::*, CoreResult};
+use crate::{
+    commands::*,
+    json_rpc::types::{
+        ListMigrationDirectoriesInput, ListMigrationDirectoriesOutput, MarkMigrationAppliedInput,
+        MarkMigrationAppliedOutput,
+    },
+    CoreResult,
+};
 use migration_connector::{migrations_directory, MigrationConnector};
 use std::path::Path;
 use tracing_futures::Instrument;

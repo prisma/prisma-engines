@@ -1,6 +1,4 @@
-use migration_core::{
-    commands::MarkMigrationAppliedInput, commands::MarkMigrationAppliedOutput, CoreError, CoreResult, GenericApi,
-};
+use migration_core::{json_rpc::types::*, CoreError, CoreResult, GenericApi};
 use tempfile::TempDir;
 
 #[must_use = "This struct does nothing on its own. See MarkMigrationApplied::send()"]

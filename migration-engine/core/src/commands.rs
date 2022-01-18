@@ -6,7 +6,6 @@ mod create_migration;
 mod dev_diagnostic;
 mod diagnose_migration_history;
 mod evaluate_data_loss;
-mod list_migration_directories;
 mod mark_migration_applied;
 mod mark_migration_rolled_back;
 mod schema_push;
@@ -18,8 +17,6 @@ pub use diagnose_migration_history::{
     DiagnoseMigrationHistoryInput, DiagnoseMigrationHistoryOutput, DriftDiagnostic, HistoryDiagnostic,
 };
 pub use evaluate_data_loss::*;
-pub use list_migration_directories::*;
-pub use mark_migration_applied::{MarkMigrationAppliedInput, MarkMigrationAppliedOutput};
 pub use mark_migration_rolled_back::{MarkMigrationRolledBackInput, MarkMigrationRolledBackOutput};
 pub use schema_push::{SchemaPushInput, SchemaPushOutput};
 

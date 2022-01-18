@@ -12,6 +12,9 @@ as rolled back, then create a new entry.
 requestShape = "markMigrationAppliedInput"
 responseShape = "markMigrationAppliedOutput"
 
+[recordShapes.markMigrationAppliedInput]
+description = "The names of the migrations in the migration directory. Empty if no migrations are found."
+
 [recordShapes.markMigrationAppliedInput.fields.migrationName]
 description = "The name of the migration to mark applied."
 shape = "string"
@@ -21,3 +24,4 @@ description = "The path to the root of the migrations directory."
 shape = "string"
 
 [recordShapes.markMigrationAppliedOutput]
+description = "The output of the `markMigrationApplied` command."

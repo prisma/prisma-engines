@@ -41,7 +41,9 @@ fn generate_methods_rs(src_dir: &Path, api: &Api) -> CrateResult {
         writeln!(librs, "pub mod {mod_name} {{}}", mod_name = method_name.to_snake_case())?;
     }
 
-    writeln!(librs, "\n}}\n\npub const METHOD_NAMES: &[&str] = &[")?;
+    librs.write_all(
+        b"\n}\n\n/// Exhaustive list of the names of all JSON-RPC methods.\npub const METHOD_NAMES: &[&str] = &[",
+    )?;
 
     for method_name in &method_names {
         writeln!(librs, "    \"{}\",", method_name)?;
@@ -57,7 +59,7 @@ fn generate_types_rs(src_dir: &Path, api: &Api) -> CrateResult {
     let mut typesrs = File::create(&typesrs)?;
 
     typesrs.write_all(
-        b"/// API type definitions.\n#[allow(missing_docs)] pub mod types {\nuse serde::{Serialize, Deserialize};\n\n",
+        b"/// API type definitions used by the methods.\n#[allow(missing_docs)] pub mod types {\nuse serde::{Serialize, Deserialize};\n\n",
     )?;
 
     for (type_name, record_type) in &api.record_shapes {

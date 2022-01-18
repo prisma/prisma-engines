@@ -1,7 +1,4 @@
-use migration_core::{
-    commands::{ListMigrationDirectoriesInput, ListMigrationDirectoriesOutput},
-    GenericApi,
-};
+use migration_core::{json_rpc::types::*, GenericApi};
 use tempfile::TempDir;
 
 #[must_use = "This struct does nothing on its own. See ListMigrationDirectories::send()"]
