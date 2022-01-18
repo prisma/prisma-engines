@@ -1,7 +1,4 @@
-use migration_core::{
-    commands::{EvaluateDataLossInput, EvaluateDataLossOutput},
-    CoreResult, GenericApi,
-};
+use migration_core::{json_rpc::types::*, CoreResult, GenericApi};
 use std::borrow::Cow;
 use tempfile::TempDir;
 

@@ -14,11 +14,21 @@ with the migration history.
 requestShape = "evaluateDataLossInput"
 responseShape = "evaluateDataLossOutput"
 
+[recordShapes.evaluateDataLossInput]
+description = "The input to the `evaluateDataLoss` command."
+
 [recordShapes.evaluateDataLossInput.fields.migrationsDirectoryPath]
+description = "The location of the migrations directory."
 shape = "string"
 
 [recordShapes.evaluateDataLossInput.fields.prismaSchema]
+description = "The prisma schema to migrate to."
 shape = "string"
+
+[recordShapes.evaluateDataLossOutput]
+description = """
+The output of the `evaluateDataLoss` command.
+"""
 
 [recordShapes.evaluateDataLossOutput.fields.migrationSteps]
 description = """The number migration steps that would be generated. If this is empty, we
@@ -27,7 +37,7 @@ passed.
 """
 shape = "u32"
 
-[recordShapes.evaluateDataLossOutput.fields.unexecutable]
+[recordShapes.evaluateDataLossOutput.fields.unexecutableSteps]
 description = """
 Steps that cannot be executed on the local database in the
 migration that would be generated.
@@ -48,7 +58,9 @@ shape = "migrationFeedback"
 description = "A data loss warning or an unexecutable migration error, associated with the step that triggered it."
 
 [recordShapes.migrationFeedback.fields.message]
+description = "The human-readable message."
 shape = "string"
 
 [recordShapes.migrationFeedback.fields.stepIndex]
+description = "The index of the step this pertains to."
 shape = "u32"
