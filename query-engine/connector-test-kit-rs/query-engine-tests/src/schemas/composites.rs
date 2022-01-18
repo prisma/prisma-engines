@@ -30,6 +30,31 @@ pub fn to_one_composites() -> String {
     schema.to_owned()
 }
 
+/// Full to-many composite test model.
+pub fn to_many_composites() -> String {
+    let schema = indoc! {
+        r#"model TestModel {
+            #id(id, Int, @id)
+            field String?
+            a     A[]       @map("top_a")
+        }
+
+        type A {
+            a_1 String @map("a1")
+            a_2 Int?
+            b B[]
+        }
+
+        type B {
+            b_field String
+            a       A[]      @map("nested_a")
+        }
+        "#
+    };
+
+    schema.to_owned()
+}
+
 // pub fn to_one_composites() -> String {
 //     let schema = indoc! {
 //         r#"model TestModel {
