@@ -92,7 +92,7 @@ impl WriteArgsParser {
                             // - Operation envelope with further actions nested.
                             ParsedInputValue::Map(map) => {
                                 if is_composite_envelope(&map) {
-                                    parse_composite_envelope(map)
+                                    parse_composite_envelope(map)?
                                 } else {
                                     WriteExpression::Value(ParsedInputValue::Map(map).try_into()?)
                                 }
@@ -117,9 +117,16 @@ fn is_composite_envelope(map: &ParsedInputMap) -> bool {
     map.len() == 1 && key == operations::SET // [Composites] Flavian Todo
 }
 
-fn parse_composite_envelope(envelope: ParsedInputMap) -> WriteExpression {
-    // [Composites] Flavian Todo
-    todo!()
+fn parse_composite_envelope(envelope: ParsedInputMap) -> QueryGraphBuilderResult<WriteExpression> {
+    let (op, value) = envelope.into_iter().next().unwrap();
+
+    let expr = match op.as_str() {
+        // Everything in a set operation can only be plain values, no more nested operations.
+        operations::SET => WriteExpression::Value(value.try_into()?),
+        _ => unimplemented!(),
+    };
+
+    Ok(expr)
 }
 
 fn extract_scalar_list_ops(map: ParsedInputMap) -> QueryGraphBuilderResult<WriteExpression> {

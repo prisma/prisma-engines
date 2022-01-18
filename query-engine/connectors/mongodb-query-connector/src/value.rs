@@ -42,6 +42,7 @@ impl IntoBson for (&CompositeFieldRef, PrismaValue) {
 
         match value {
             PrismaValue::Null => Ok(Bson::Null),
+            PrismaValue::Object(pairs) if cf.is_list() => Ok(Bson::Array(vec![convert_composite_object(cf, pairs)?])),
             PrismaValue::Object(pairs) => convert_composite_object(cf, pairs),
 
             PrismaValue::List(values) => Ok(Bson::Array(
