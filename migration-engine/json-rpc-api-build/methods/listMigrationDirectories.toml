@@ -13,8 +13,8 @@ description = "The location of the migrations directory."
 shape = "string"
 
 [recordShapes.listMigrationDirectoriesOutput.fields.migrations]
-isList = true
 description = """
 The names of the migrations in the migration directory. Empty if no migrations are found.
 """
+isList = true
 shape = "string"

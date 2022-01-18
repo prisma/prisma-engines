@@ -10,7 +10,6 @@ mod mark_migration_applied;
 mod mark_migration_rolled_back;
 mod schema_push;
 
-pub use apply_migrations::{ApplyMigrationsInput, ApplyMigrationsOutput};
 pub use create_migration::{CreateMigrationInput, CreateMigrationOutput};
 pub use dev_diagnostic::{DevAction, DevDiagnosticInput, DevDiagnosticOutput};
 pub use diagnose_migration_history::{

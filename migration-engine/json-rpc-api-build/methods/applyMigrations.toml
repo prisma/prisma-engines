@@ -8,8 +8,22 @@ requestShape = "applyMigrationsInput"
 responseShape = "applyMigrationsOutput"
 
 [recordShapes.applyMigrationsInput]
-fields.migrationsDirectoryPath = { shape = "string" }
+description = "The input to the `applyMigrations` command."
+
+[recordShapes.applyMigrationsInput.fields.migrationsDirectoryPath]
+shape=  "string"
+description = """
+The location of the migrations directory.
+"""
+
+[recordShapes.applyMigrationsOutput]
+description = """
+The output of the `applyMigrations` command.
+"""
 
 [recordShapes.applyMigrationsOutput.fields.appliedMigrationNames]
+description = """
+The names of the migrations that were just applied. Empty if no migration was applied.
+"""
 isList = true
 shape = "string"

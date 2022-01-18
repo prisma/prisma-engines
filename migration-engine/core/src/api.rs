@@ -3,8 +3,9 @@
 use crate::{
     commands::*,
     json_rpc::types::{
-        ListMigrationDirectoriesInput, ListMigrationDirectoriesOutput, MarkMigrationAppliedInput,
-        MarkMigrationAppliedOutput, MarkMigrationRolledBackOutput, MarkMigrationRolledBackInput,
+        ApplyMigrationsInput, ApplyMigrationsOutput, ListMigrationDirectoriesInput, ListMigrationDirectoriesOutput,
+        MarkMigrationAppliedInput, MarkMigrationAppliedOutput, MarkMigrationRolledBackInput,
+        MarkMigrationRolledBackOutput,
     },
     CoreResult,
 };
