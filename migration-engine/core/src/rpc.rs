@@ -1,34 +1,6 @@
-use crate::{CoreError, CoreResult, GenericApi};
+use crate::{json_rpc::method_names::*, CoreError, CoreResult, GenericApi};
 use jsonrpc_core::{types::error::Error as JsonRpcError, IoHandler, Params};
 use std::sync::Arc;
-
-const APPLY_MIGRATIONS: &str = "applyMigrations";
-const CREATE_MIGRATION: &str = "createMigration";
-const DEBUG_PANIC: &str = "debugPanic";
-const DEV_DIAGNOSTIC: &str = "devDiagnostic";
-const DIAGNOSE_MIGRATION_HISTORY: &str = "diagnoseMigrationHistory";
-const EVALUATE_DATA_LOSS: &str = "evaluateDataLoss";
-const GET_DATABASE_VERSION: &str = "getDatabaseVersion";
-const LIST_MIGRATION_DIRECTORIES: &str = "listMigrationDirectories";
-const MARK_MIGRATION_APPLIED: &str = "markMigrationApplied";
-const MARK_MIGRATION_ROLLED_BACK: &str = "markMigrationRolledBack";
-const RESET: &str = "reset";
-const SCHEMA_PUSH: &str = "schemaPush";
-
-const AVAILABLE_COMMANDS: &[&str] = &[
-    APPLY_MIGRATIONS,
-    CREATE_MIGRATION,
-    DEBUG_PANIC,
-    DEV_DIAGNOSTIC,
-    DIAGNOSE_MIGRATION_HISTORY,
-    EVALUATE_DATA_LOSS,
-    GET_DATABASE_VERSION,
-    LIST_MIGRATION_DIRECTORIES,
-    MARK_MIGRATION_APPLIED,
-    MARK_MIGRATION_ROLLED_BACK,
-    RESET,
-    SCHEMA_PUSH,
-];
 
 /// Initialize a JSON-RPC ready migration engine API. This entails starting
 /// a database connection.
@@ -40,7 +12,7 @@ pub async fn rpc_api(datamodel: &str, host: Box<dyn migration_connector::Connect
 
     api.ensure_connection_validity().await?;
 
-    for cmd in AVAILABLE_COMMANDS {
+    for cmd in METHOD_NAMES {
         let api = api.clone();
         io_handler.add_method(cmd, move |params: Params| {
             Box::pin(run_command(api.clone(), cmd, params))

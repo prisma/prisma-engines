@@ -3,11 +3,7 @@
 
 //! The top-level library crate for the migration engine.
 
-/// The JSON-RPC API definition.
-pub mod json_rpc {
-    include!(concat!(env!("OUT_DIR"), "/methods.rs"));
-    include!(concat!(env!("OUT_DIR"), "/types.rs"));
-}
+include!(concat!(env!("OUT_DIR"), "/methods.rs"));
 
 pub mod commands;
 
