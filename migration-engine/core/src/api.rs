@@ -4,7 +4,7 @@ use crate::{
     commands::*,
     json_rpc::types::{
         ListMigrationDirectoriesInput, ListMigrationDirectoriesOutput, MarkMigrationAppliedInput,
-        MarkMigrationAppliedOutput,
+        MarkMigrationAppliedOutput, MarkMigrationRolledBackOutput, MarkMigrationRolledBackInput,
     },
     CoreResult,
 };

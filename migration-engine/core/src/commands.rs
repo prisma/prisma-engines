@@ -17,7 +17,6 @@ pub use diagnose_migration_history::{
     DiagnoseMigrationHistoryInput, DiagnoseMigrationHistoryOutput, DriftDiagnostic, HistoryDiagnostic,
 };
 pub use evaluate_data_loss::*;
-pub use mark_migration_rolled_back::{MarkMigrationRolledBackInput, MarkMigrationRolledBackOutput};
 pub use schema_push::{SchemaPushInput, SchemaPushOutput};
 
 pub(crate) use apply_migrations::apply_migrations;
