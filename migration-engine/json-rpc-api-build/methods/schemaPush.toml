@@ -1,0 +1,21 @@
+[methods.schemaPush]
+description = "The command behind `db push`."
+requestShape = "schemaPushInput"
+responseShape = "schemaPushOutput"
+
+[recordShapes.schemaPushInput.fields.force]
+shape = "bool"
+
+[recordShapes.schemaPushInput.fields.schema]
+shape = "string"
+
+[recordShapes.schemaPushOutput.fields.executedSteps]
+shape = "u32"
+
+[recordShapes.schemaPushOutput.fields.unexecutable]
+isList = true
+shape = "string"
+
+[recordShapes.schemaPushOutput.fields.warnings]
+isList = true
+shape = "string"

@@ -1,0 +1,9 @@
+[methods.getDatabaseVersion]
+description = "Get the database version for error reporting."
+requestShape = "getDatabaseVersionInput"
+responseShape = "getDatabaseVersionOutput"
+
+[recordShapes.getDatabaseVersionInput]
+
+[recordShapes.getDatabaseVersionOutput.fields.version]
+shape = "string"
