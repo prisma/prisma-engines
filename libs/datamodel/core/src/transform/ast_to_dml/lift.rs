@@ -443,7 +443,12 @@ impl<'a> LiftAstToDml<'a> {
             db::ScalarFieldType::BuiltInScalar(scalar_type) => {
                 CompositeTypeFieldType::Scalar(parser_database_scalar_type_to_dml_scalar_type(*scalar_type), None, None)
             }
-            db::ScalarFieldType::Alias(_) | db::ScalarFieldType::Enum(_) | db::ScalarFieldType::Unsupported => {
+            db::ScalarFieldType::Enum(enum_id) => {
+                let enum_name = &self.db.ast()[*enum_id].name.name;
+
+                CompositeTypeFieldType::Enum(enum_name.to_owned())
+            }
+            db::ScalarFieldType::Alias(_) | db::ScalarFieldType::Unsupported => {
                 unreachable!()
             }
         }

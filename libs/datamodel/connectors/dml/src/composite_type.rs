@@ -34,6 +34,13 @@ impl CompositeType {
             .filter(|f| matches!(f.r#type, CompositeTypeFieldType::Scalar(_, _, _)))
     }
 
+    /// Gets an iterator over all enum fields.
+    pub fn enum_fields(&self) -> impl Iterator<Item = &CompositeTypeField> {
+        self.fields
+            .iter()
+            .filter(|f| matches!(f.r#type, CompositeTypeFieldType::Enum(_)))
+    }
+
     /// Gets an iterator over all composite type fields.
     pub fn composite_type_fields(&self) -> impl Iterator<Item = &CompositeTypeField> {
         self.fields
@@ -47,6 +54,8 @@ pub enum CompositeTypeFieldType {
     CompositeType(String),
     /// The first option is Some(x) if the scalar type is based upon a type alias.
     Scalar(ScalarType, Option<String>, Option<NativeTypeInstance>),
+    /// This is an enum field, with an enum of the given name.
+    Enum(String),
     /// This is a field with an unsupported datatype. The content is the db's description of the type, it should enable migrate to create the type.
     Unsupported(String),
 }
