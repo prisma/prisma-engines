@@ -4,7 +4,7 @@ use crate::{
     IndexField, PrimaryKeyField,
 };
 use ::dml::composite_type::{CompositeType, CompositeTypeField, CompositeTypeFieldType};
-use datamodel_connector::{walker_ext_traits::*, Connector, ReferentialIntegrity};
+use datamodel_connector::{walker_ext_traits::*, Connector, ReferentialIntegrity, ScalarType};
 use std::collections::HashMap;
 
 /// Helper for lifting a datamodel.
@@ -251,6 +251,10 @@ impl<'a> LiftAstToDml<'a> {
                 arity: self.lift_field_arity(&field.arity()),
                 database_name: field.mapped_name().map(String::from),
                 documentation: field.documentation().map(ToString::to_string),
+                default_value: field.default_value().map(|value| dml::DefaultValue {
+                    kind: dml_default_kind(value, field.r#type().as_builtin_scalar()),
+                    db_name: None,
+                }),
             };
 
             fields.push(field);
@@ -354,7 +358,7 @@ impl<'a> LiftAstToDml<'a> {
             field.is_updated_at = scalar_field.is_updated_at();
             field.database_name = scalar_field.mapped_name().map(String::from);
             field.default_value = scalar_field.default_value().map(|d| dml::DefaultValue {
-                kind: dml_default_kind(d),
+                kind: dml_default_kind(d.value(), scalar_field.scalar_type()),
                 db_name: Some(d.constraint_name(self.connector).into())
                     .filter(|_| self.connector.supports_named_default_values()),
             });
@@ -479,12 +483,11 @@ fn datamodel_connector_native_type_to_dml_native_type(
     }
 }
 
-fn dml_default_kind(default_value: DefaultValueWalker<'_, '_>) -> dml::DefaultKind {
+fn dml_default_kind(default_value: &ast::Expression, scalar_type: Option<ScalarType>) -> dml::DefaultKind {
     use crate::dml::{DefaultKind, PrismaValue, ValueGenerator};
-    use parser_database::ScalarType;
 
     // This has all been validated in parser-database, so unwrapping is always safe.
-    match default_value.value() {
+    match default_value {
         ast::Expression::Function(funcname, args, _) if funcname == "dbgenerated" => {
             DefaultKind::Expression(ValueGenerator::new_dbgenerated(
                 args.arguments
@@ -506,19 +509,19 @@ fn dml_default_kind(default_value: DefaultValueWalker<'_, '_>) -> dml::DefaultKi
         ast::Expression::Function(funcname, _args, _) if funcname == "now" => {
             DefaultKind::Expression(ValueGenerator::new_now())
         }
-        ast::Expression::NumericValue(num, _) => match default_value.field().scalar_type() {
+        ast::Expression::NumericValue(num, _) => match scalar_type {
             Some(ScalarType::Int) => DefaultKind::Single(PrismaValue::Int(num.parse().unwrap())),
             Some(ScalarType::BigInt) => DefaultKind::Single(PrismaValue::BigInt(num.parse().unwrap())),
             Some(ScalarType::Float) => DefaultKind::Single(PrismaValue::Float(num.parse().unwrap())),
             Some(ScalarType::Decimal) => DefaultKind::Single(PrismaValue::Float(num.parse().unwrap())),
             other => unreachable!("{:?}", other),
         },
-        ast::Expression::ConstantValue(v, _) => match default_value.field().scalar_type() {
+        ast::Expression::ConstantValue(v, _) => match scalar_type {
             Some(ScalarType::Boolean) => DefaultKind::Single(PrismaValue::Boolean(v.parse().unwrap())),
             None => DefaultKind::Single(PrismaValue::Enum(v.to_owned())),
             other => unreachable!("{:?}", other),
         },
-        ast::Expression::StringValue(v, _) => match default_value.field().scalar_type() {
+        ast::Expression::StringValue(v, _) => match scalar_type {
             Some(ScalarType::DateTime) => DefaultKind::Single(PrismaValue::DateTime(v.parse().unwrap())),
             Some(ScalarType::String) => DefaultKind::Single(PrismaValue::String(v.parse().unwrap())),
             Some(ScalarType::Json) => DefaultKind::Single(PrismaValue::Json(v.parse().unwrap())),

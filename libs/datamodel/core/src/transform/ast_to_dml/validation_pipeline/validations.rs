@@ -2,6 +2,7 @@ mod autoincrement;
 mod composite_types;
 mod constraint_namespace;
 mod database_name;
+mod default_value;
 mod fields;
 mod indexes;
 mod models;
@@ -22,6 +23,10 @@ pub(super) fn validate(ctx: &mut Context<'_>) {
 
     for composite_type in db.walk_composite_types() {
         composite_types::composite_types_support(composite_type, ctx);
+
+        for field in composite_type.fields() {
+            composite_types::validate_default_value(field, ctx);
+        }
     }
 
     for model in db.walk_models() {
@@ -50,7 +55,7 @@ pub(super) fn validate(ctx: &mut Context<'_>) {
             fields::validate_client_name(field.into(), &names, ctx);
             fields::has_a_unique_default_constraint_name(field, &names, ctx);
             fields::validate_native_type_arguments(field, ctx);
-            fields::validate_default(field, ctx);
+            fields::validate_default_value(field, ctx);
             fields::validate_unsupported_field_type(field, ctx)
         }
 

@@ -65,6 +65,7 @@ impl<'ast> Types<'ast> {
 pub(super) struct CompositeTypeField<'ast> {
     pub(super) r#type: ScalarFieldType,
     pub(super) mapped_name: Option<&'ast str>,
+    pub(super) default: Option<DefaultAttribute<'ast>>,
 }
 
 #[derive(Debug)]
@@ -98,7 +99,7 @@ impl ScalarFieldType {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub(crate) struct DefaultAttribute<'ast> {
     pub(crate) mapped_name: Option<&'ast str>,
     pub(crate) value: &'ast ast::Expression,
@@ -472,6 +473,7 @@ fn visit_composite_type<'ast>(ct_id: ast::CompositeTypeId, ct: &'ast ast::Compos
                 let field = CompositeTypeField {
                     r#type: scalar_type,
                     mapped_name: None,
+                    default: None,
                 };
                 ctx.db.types.composite_type_fields.insert((ct_id, field_id), field);
             }

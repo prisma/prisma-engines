@@ -112,6 +112,7 @@ fn model_field_builders(
                 db_name: cf.database_name.clone(),
                 arity: cf.arity,
                 type_name: cf.composite_type.clone(),
+                default_value: cf.default_value.clone(),
             })),
             dml::Field::RelationField(rf) => {
                 let relation = relations
@@ -173,6 +174,8 @@ fn composite_field_builders(composite: &dml::CompositeType) -> Vec<FieldBuilder>
                 db_name: field.database_name.clone(),
                 arity: field.arity,
                 type_name: type_name.clone(),
+                // No defaults on composite fields of type composite
+                default_value: None,
             })),
             CompositeTypeFieldType::Scalar(st, _alias, nt) => {
                 let type_ident = (*st).into();
@@ -190,7 +193,7 @@ fn composite_field_builders(composite: &dml::CompositeType) -> Vec<FieldBuilder>
                         internal_enum: None,  // Todo: No enums on composites?
                         arity: field.arity,
                         db_name: field.database_name.clone(),
-                        default_value: None, // Todo: No defaults?
+                        default_value: field.default_value.as_ref().cloned(),
                         native_type: nt.clone(),
                     }))
                 }
