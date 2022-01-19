@@ -5,14 +5,13 @@ mod mongodb {
     use indoc::indoc;
 
     fn full_native_types() -> String {
-        let schema = indoc! { // dec Decimal   @test.Decimal
+        let schema = indoc! {
             r#"model TestModel {
                 #id(id, String, @id, @default(cuid()))
                 int  Int      @test.Int
                 long Int      @test.Long
                 bInt BigInt   @test.Long
                 float Float   @test.Double
-
                 oid String    @test.ObjectId
                 str String    @test.String
                 bool Boolean  @test.Bool
@@ -26,7 +25,7 @@ mod mongodb {
 
     #[connector_test(schema(full_native_types))]
     async fn native_types(runner: Runner) -> TestResult<()> {
-        insta::assert_snapshot!( // Misses decimal handling `dec: 3.1234`
+        insta::assert_snapshot!(
           run_query!(&runner, r#"mutation {
             createOneTestModel(
               data: {
@@ -34,7 +33,6 @@ mod mongodb {
                 long: 32767
                 bInt: "9223372036854775807"
                 float: 3.1234
-
                 oid: "61e1425609c85b5e01817cc5"
                 str: "test"
                 bool: true
@@ -46,7 +44,6 @@ mod mongodb {
                 long
                 bInt
                 float
-
                 oid
                 str
                 bool
@@ -54,7 +51,7 @@ mod mongodb {
                 bin_oid
             }
           }"#),
-          @r###""###
+          @r###"{"data":{"createOneTestModel":{"int":2147483647,"long":32767,"bInt":"9223372036854775807","float":3.1234,"oid":"61e1425609c85b5e01817cc5","str":"test","bool":true,"bin":"dGVzdA==","bin_oid":"YeUuxAwj5igGOSD0"}}}"###
         );
 
         Ok(())
