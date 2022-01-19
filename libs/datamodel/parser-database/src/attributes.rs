@@ -41,6 +41,7 @@ fn resolve_composite_type_attributes<'ast>(
                 map::composite_type_field(ct, field, ctid, field_id, &mut ctfield, map_args, ctx);
             });
 
+            // @default
             attributes.visit_optional_single("default", ctx, |args, ctx| {
                 default::visit_composite_field_default(args, &mut ctfield, ctid, field_id, ctx);
             });

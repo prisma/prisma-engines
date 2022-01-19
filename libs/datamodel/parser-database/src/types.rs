@@ -469,6 +469,14 @@ fn detect_alias_cycles(ctx: &mut Context<'_>) {
 fn visit_composite_type<'ast>(ct_id: ast::CompositeTypeId, ct: &'ast ast::CompositeType, ctx: &mut Context<'ast>) {
     for (field_id, ast_field) in ct.iter_fields() {
         match field_type(ast_field, ctx) {
+            Ok(FieldType::Scalar(ScalarFieldType::Alias(_))) => {
+                ctx.push_error(DatamodelError::new_composite_type_validation_error(
+                    "Type aliases are not allowed on composite types. Consider using the resolved type instead."
+                        .to_string(),
+                    ct.name.name.clone(),
+                    ast_field.field_type.span(),
+                ))
+            }
             Ok(FieldType::Scalar(scalar_type)) => {
                 let field = CompositeTypeField {
                     r#type: scalar_type,

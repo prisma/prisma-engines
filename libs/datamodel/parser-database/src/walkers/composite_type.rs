@@ -123,4 +123,15 @@ impl<'ast, 'db> CompositeTypeFieldWalker<'ast, 'db> {
     pub fn default_value(self) -> Option<&'ast ast::Expression> {
         self.field.default.as_ref().map(|d| d.value)
     }
+
+    /// The mapped name of the default value. Not applicable to all connectors. See crate docs for
+    /// details on mapped names.
+    ///
+    /// ```ignore
+    /// name String @default("george", map: "name_default_to_george")
+    ///                                     ^^^^^^^^^^^^^^^^^^^^^^^^
+    /// ```
+    pub fn default_mapped_name(self) -> Option<&'ast str> {
+        self.field.default.as_ref().and_then(|d| d.mapped_name)
+    }
 }

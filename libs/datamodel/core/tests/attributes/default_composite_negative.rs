@@ -8,7 +8,7 @@ fn must_error_if_default_value_for_list() {
           url = "postgres://"
         }
 
-        type Model {
+        type Composite {
           rel String[] @default(["hello"])
         }
     "#};
@@ -19,7 +19,7 @@ fn must_error_if_default_value_for_list() {
         [1;91merror[0m: [1mError parsing attribute "@default": Cannot set a default value on list field.[0m
           [1;94m-->[0m  [4mschema.prisma:7[0m
         [1;94m   | [0m
-        [1;94m 6 | [0mtype Model {
+        [1;94m 6 | [0mtype Composite {
         [1;94m 7 | [0m  rel String[] @[1;91mdefault(["hello"])[0m
         [1;94m   | [0m
     "#]];
@@ -30,7 +30,7 @@ fn must_error_if_default_value_for_list() {
 #[test]
 fn must_error_if_default_value_type_mismatch() {
     let dml = indoc! {r#"
-        type Model {
+        type Composite {
           rel String @default(3)
         }
     "#};
@@ -41,7 +41,7 @@ fn must_error_if_default_value_type_mismatch() {
         [1;91merror[0m: [1mError parsing attribute "@default": Expected a String value, but found `3`.[0m
           [1;94m-->[0m  [4mschema.prisma:2[0m
         [1;94m   | [0m
-        [1;94m 1 | [0mtype Model {
+        [1;94m 1 | [0mtype Composite {
         [1;94m 2 | [0m  rel String @[1;91mdefault(3)[0m
         [1;94m   | [0m
     "#]];
@@ -57,7 +57,7 @@ fn datetime_defaults_must_be_valid_rfc3339() {
         url = "mongodb://"
       }
 
-        type Model {
+        type Composite {
           rel DateTime @default("Hugo")
         }
     "#};
@@ -68,7 +68,7 @@ fn datetime_defaults_must_be_valid_rfc3339() {
         [1;91merror[0m: [1mError parsing attribute "@default": Parse error: "Hugo" is not a valid rfc3339 datetime string. (input contains invalid characters)[0m
           [1;94m-->[0m  [4mschema.prisma:7[0m
         [1;94m   | [0m
-        [1;94m 6 | [0m  type Model {
+        [1;94m 6 | [0m  type Composite {
         [1;94m 7 | [0m    rel DateTime @default([1;91m"Hugo"[0m)
         [1;94m   | [0m
     "#]];
@@ -79,7 +79,7 @@ fn datetime_defaults_must_be_valid_rfc3339() {
 #[test]
 fn must_error_if_unknown_function_is_used() {
     let dml = indoc! {r#"
-        type Model {
+        type Composite {
           rel DateTime @default(unknown_function())
         }
     "#};
@@ -87,10 +87,10 @@ fn must_error_if_unknown_function_is_used() {
     let error = datamodel::parse_schema(dml).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
-        [1;91merror[0m: [1mError parsing attribute "@default": The function `unknown_function` is not a known function. You can read about the available functions here: https://pris.ly/d/attribute-functions[0m
+        [1;91merror[0m: [1mError parsing attribute "@default": The function `unknown_function` is not a known function. You can read about the available functions here: https://pris.ly/d/attribute-functions.[0m
           [1;94m-->[0m  [4mschema.prisma:2[0m
         [1;94m   | [0m
-        [1;94m 1 | [0mtype Model {
+        [1;94m 1 | [0mtype Composite {
         [1;94m 2 | [0m  rel DateTime @[1;91mdefault(unknown_function())[0m
         [1;94m   | [0m
     "#]];
@@ -101,7 +101,7 @@ fn must_error_if_unknown_function_is_used() {
 #[test]
 fn must_error_if_now_function_is_used_for_fields_that_are_not_datetime() {
     let dml = indoc! {r#"
-        type Model {
+        type Composite {
           foo String @default(now())
         }
     "#};
@@ -112,7 +112,7 @@ fn must_error_if_now_function_is_used_for_fields_that_are_not_datetime() {
         [1;91merror[0m: [1mError parsing attribute "@default": The function `now()` cannot be used on fields of type `String`.[0m
           [1;94m-->[0m  [4mschema.prisma:2[0m
         [1;94m   | [0m
-        [1;94m 1 | [0mtype Model {
+        [1;94m 1 | [0mtype Composite {
         [1;94m 2 | [0m  foo String @[1;91mdefault(now())[0m
         [1;94m   | [0m
     "#]];
@@ -123,7 +123,7 @@ fn must_error_if_now_function_is_used_for_fields_that_are_not_datetime() {
 #[test]
 fn must_error_if_autoincrement_function_is_used() {
     let dml = indoc! {r#"
-        type Model {
+        type Composite {
           foo String @default(autoincrement())
         }
     "#};
@@ -134,7 +134,7 @@ fn must_error_if_autoincrement_function_is_used() {
         [1;91merror[0m: [1mError parsing attribute "@default": The function `autoincrement()` is not a supported on composite fields.[0m
           [1;94m-->[0m  [4mschema.prisma:2[0m
         [1;94m   | [0m
-        [1;94m 1 | [0mtype Model {
+        [1;94m 1 | [0mtype Composite {
         [1;94m 2 | [0m  foo String @[1;91mdefault(autoincrement())[0m
         [1;94m   | [0m
     "#]];
@@ -145,22 +145,22 @@ fn must_error_if_autoincrement_function_is_used() {
 #[test]
 fn must_error_if_default_value_for_enum_is_not_valid() {
     let dml = indoc! {r#"
-        type Model {
-          enum A @default(B)
-        }
+      type Composite {
+        enum A @default(B)
+      }
 
-        enum A {
-          A
-        }
-    "#};
+      enum A {
+        A
+      }
+  "#};
 
     let error = datamodel::parse_schema(dml).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
-        [1;91merror[0m: [1mError parsing attribute "@default": The defined default value is not a valid value of the enum specified for the field.[0m
+        [1;91merror[0m: [1mError parsing attribute "@default": The defined default value `B` is not a valid value of the enum specified for the field.[0m
           [1;94m-->[0m  [4mschema.prisma:2[0m
         [1;94m   | [0m
-        [1;94m 1 | [0mtype Model {
+        [1;94m 1 | [0mtype Composite {
         [1;94m 2 | [0m  enum A @[1;91mdefault(B)[0m
         [1;94m   | [0m
     "#]];
@@ -176,7 +176,7 @@ fn must_error_if_scalar_default_on_unsupported() {
           url = "postgresql://"
         }
 
-        type Model {
+        type Composite {
           balance Unsupported("some random stuff") @default(12)
         }
     "#};
@@ -187,7 +187,7 @@ fn must_error_if_scalar_default_on_unsupported() {
         [1;91merror[0m: [1mError parsing attribute "@default": Composite field of type `Unsupported` cannot have default values.[0m
           [1;94m-->[0m  [4mschema.prisma:7[0m
         [1;94m   | [0m
-        [1;94m 6 | [0mtype Model {
+        [1;94m 6 | [0mtype Composite {
         [1;94m 7 | [0m  balance Unsupported("some random stuff") @[1;91mdefault(12)[0m
         [1;94m   | [0m
     "#]];
@@ -242,7 +242,7 @@ fn default_on_composite_type_field_errors() {
     let error = datamodel::parse_schema(schema).map(drop).unwrap_err();
 
     let expected = expect![[r#"
-        [1;91merror[0m: [1mError validating field `address` in composite type `Address`: Defaults on fields of type composite are not supported[0m
+        [1;91merror[0m: [1mError validating field `address` in composite type `Address`: Defaults on fields of type composite are not supported. Please remove the `@default` attribute.[0m
           [1;94m-->[0m  [4mschema.prisma:16[0m
         [1;94m   | [0m
         [1;94m15 | [0mtype User {

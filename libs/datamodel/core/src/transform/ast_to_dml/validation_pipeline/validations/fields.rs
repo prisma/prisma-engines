@@ -228,6 +228,7 @@ pub(super) fn validate_native_type_arguments(field: ScalarFieldWalker<'_, '_>, c
     };
 }
 
+/// Validates the @default attribute of a model scalar field
 pub(super) fn validate_default_value(field: ScalarFieldWalker<'_, '_>, ctx: &mut Context<'_>) {
     let model_name = field.model().name();
     let default_mapped_name = field.default_value().and_then(|d| d.mapped_name());

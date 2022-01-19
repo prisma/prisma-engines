@@ -125,40 +125,29 @@ pub(super) fn visit_composite_field_default<'ast>(
 
     // Resolve the default to a DefaultValue. We must loop in order to
     // resolve type aliases.
-    let mut r#type = field_data.r#type;
-
-    loop {
-        match r#type {
-            ScalarFieldType::CompositeType(ctid) => {
-                validate_default_value_on_composite_type(ctid, ast_field, args, ctx);
-            }
-            ScalarFieldType::Enum(enum_id) => {
-                match value.value {
-                    ast::Expression::ConstantValue(enum_value, _) => {
-                        if ctx.db.ast[enum_id].values.iter().any(|v| v.name() == enum_value) {
-                            accept()
-                        } else {
-                            validate_invalid_default_enum_value(args, ctx);
-                        }
-                    }
-                    value => validate_invalid_default_enum_expr(value, args, ctx),
-                };
-            }
-            ScalarFieldType::BuiltInScalar(scalar_type) => {
-                validate_composite_builtin_scalar_type_default(scalar_type, value.value, accept, args, ctx)
-            }
-            ScalarFieldType::Alias(alias_id) => {
-                r#type = ctx.db.types.type_aliases[&alias_id];
-                continue;
-            }
-            ScalarFieldType::Unsupported => {
-                ctx.push_error(args.new_attribute_validation_error(
-                    "Composite field of type `Unsupported` cannot have default values.",
-                ))
-            }
+    match field_data.r#type {
+        ScalarFieldType::CompositeType(ctid) => {
+            validate_default_value_on_composite_type(ctid, ast_field, args, ctx);
         }
-
-        break;
+        ScalarFieldType::Enum(enum_id) => {
+            match value.value {
+                ast::Expression::ConstantValue(enum_value, _) => {
+                    if ctx.db.ast[enum_id].values.iter().any(|v| v.name() == enum_value) {
+                        accept()
+                    } else {
+                        validate_invalid_default_enum_value(args, ctx);
+                    }
+                }
+                bad_value => validate_invalid_default_enum_expr(bad_value, args, ctx),
+            };
+        }
+        ScalarFieldType::BuiltInScalar(scalar_type) => {
+            validate_composite_builtin_scalar_type_default(scalar_type, value.value, accept, args, ctx)
+        }
+        ScalarFieldType::Unsupported => ctx.push_error(
+            args.new_attribute_validation_error("Composite field of type `Unsupported` cannot have default values."),
+        ),
+        ScalarFieldType::Alias(_) => unreachable!(),
     }
 }
 
@@ -320,7 +309,7 @@ fn validate_invalid_default_enum_expr(value: &ast::Expression, args: &mut Argume
 
 fn validate_unknown_function_default(fn_name: &str, args: &Arguments<'_>, ctx: &mut Context<'_>) {
     ctx.push_error(args.new_attribute_validation_error(&format!(
-        "The function `{fn_name}` is not a known function. You can read about the available functions here: https://pris.ly/d/attribute-functions",
+        "The function `{fn_name}` is not a known function. You can read about the available functions here: https://pris.ly/d/attribute-functions.",
     )));
 }
 
@@ -358,7 +347,7 @@ fn validate_default_value_on_composite_type(
     let ct_name = ctx.db.walk_composite_type(ctid).name();
 
     ctx.push_error(DatamodelError::new_composite_type_field_validation_error(
-        "Defaults on fields of type composite are not supported",
+        "Defaults on fields of type composite are not supported. Please remove the `@default` attribute.",
         ct_name,
         &ast_field.name.name,
         args.span(),
