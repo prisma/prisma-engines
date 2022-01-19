@@ -1,7 +1,7 @@
 use crate::error::ApiError;
 use datamodel_connector::ConnectorCapabilities;
-use napi::{bindgen_prelude::*, JsUnknown};
-use napi_derive::napi;
+use napi::{CallContext, JsString, JsUndefined, JsUnknown};
+use napi_derive::js_function;
 use prisma_models::InternalDataModelBuilder;
 use query_core::{schema_builder, BuildMode, QuerySchemaRef};
 use request_handlers::dmmf;
@@ -10,23 +10,25 @@ use std::{
     sync::Arc,
 };
 
-#[derive(serde::Serialize, Clone, Copy)]
-#[napi(object)]
-pub struct Version {
-    pub commit: &'static str,
-    pub version: &'static str,
-}
+#[js_function(0)]
+pub fn version(ctx: CallContext) -> napi::Result<JsUnknown> {
+    #[derive(serde::Serialize, Clone, Copy)]
+    struct Version {
+        commit: &'static str,
+        version: &'static str,
+    }
 
-#[napi]
-pub fn version() -> Version {
-    Version {
+    let version = Version {
         commit: env!("GIT_HASH"),
         version: env!("CARGO_PKG_VERSION"),
-    }
+    };
+
+    ctx.env.to_js_value(&version)
 }
 
-#[napi]
-pub fn dmmf(datamodel_string: String) -> napi::Result<String> {
+#[js_function(1)]
+pub fn dmmf(ctx: CallContext) -> napi::Result<JsString> {
+    let datamodel_string = ctx.get::<JsString>(0)?.into_utf8()?.into_owned()?;
     let datamodel = datamodel::parse_datamodel(&datamodel_string)
         .map_err(|errors| ApiError::conversion(errors, &datamodel_string))?;
     let config = datamodel::parse_configuration(&datamodel_string)
@@ -50,11 +52,14 @@ pub fn dmmf(datamodel_string: String) -> napi::Result<String> {
     ));
 
     let dmmf = dmmf::render_dmmf(&datamodel.subject, query_schema);
-    Ok(serde_json::to_string(&dmmf)?)
+    let dmmf_string = serde_json::to_string(&dmmf).unwrap();
+
+    ctx.env.adjust_external_memory(dmmf_string.len() as i64)?;
+    ctx.env.create_string_from_std(dmmf_string)
 }
 
-#[napi]
-pub fn get_config(js_env: Env, options: JsUnknown) -> napi::Result<JsUnknown> {
+#[js_function(1)]
+pub fn get_config(ctx: CallContext) -> napi::Result<JsUnknown> {
     #[derive(serde::Deserialize)]
     #[serde(rename_all = "camelCase")]
     struct GetConfigOptions {
@@ -67,7 +72,8 @@ pub fn get_config(js_env: Env, options: JsUnknown) -> napi::Result<JsUnknown> {
         env: HashMap<String, String>,
     }
 
-    let options: GetConfigOptions = js_env.from_js_value(options)?;
+    let options = ctx.get::<JsUnknown>(0)?;
+    let options: GetConfigOptions = ctx.env.from_js_value(options)?;
 
     let GetConfigOptions {
         datamodel,
@@ -88,11 +94,14 @@ pub fn get_config(js_env: Env, options: JsUnknown) -> napi::Result<JsUnknown> {
     }
 
     let serialized = datamodel::json::mcf::config_to_mcf_json_value(&config);
-    js_env.to_js_value(&serialized)
+    let s = serde_json::to_string(&serialized).unwrap();
+
+    ctx.env.adjust_external_memory(s.len() as i64)?;
+    ctx.env.to_js_value(&serialized)
 }
 
-#[napi]
-pub fn debug_panic() -> napi::Result<()> {
+#[js_function(0)]
+pub fn debug_panic(_: CallContext<'_>) -> napi::Result<JsUndefined> {
     let user_facing = user_facing_errors::Error::from_panic_payload(Box::new("Debug panic"));
     let message = serde_json::to_string(&user_facing).unwrap();
 
