@@ -78,7 +78,7 @@ pub async fn listen(opts: PrismaOpt) -> PrismaResult<()> {
     let ip = opts.host.parse().expect("Host was not a valid IP address.");
     let addr = SocketAddr::new(ip, opts.port);
 
-    let server = Server::bind(&addr).serve(query_engine);
+    let server = Server::bind(&addr).tcp_nodelay(true).serve(query_engine);
 
     info!("Started http server on http://{}", addr);
 
