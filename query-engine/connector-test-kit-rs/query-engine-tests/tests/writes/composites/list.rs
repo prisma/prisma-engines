@@ -5,7 +5,7 @@ use query_engine_tests::*;
 // - Make tests below pass where they don't.
 // - Implement missing tests, suggestions:
 //     - Error cases: Check that parsing correctly errors no required fields missing etc.
-#[test_suite(schema(to_many_composites))]
+#[test_suite(schema(to_many_composites), only(MongoDb))]
 mod create {
     /// Using explicit `set` operators, create (deeply nested) composite lists.
     #[connector_test]

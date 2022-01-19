@@ -1,5 +1,62 @@
 use indoc::indoc;
 
+/// All types Prisma supports on a composite.
+/// Allows for simple picking of whatever should be tested from a single model.
+pub fn all_composite_types() -> String {
+    let schema = indoc! {
+        r#"model TestModel {
+            #id(id, Int, @id)
+            allOptional AllOptional?
+            allRequired AllRequired?
+            allLists    AllLists?
+        }
+
+        enum TestEnum {
+            Foo
+            Bar
+        }
+
+        type AllRequired {
+            str   String
+            bool  Boolean
+            int   Int
+            bInt  BigInt
+            float Float
+            dt    DateTime
+            json  Json
+            bytes Bytes
+            enum  TestEnum
+        }
+
+        type AllOptional {
+            str   String?
+            bool  Boolean?
+            int   Int?
+            bInt  BigInt?
+            float Float?
+            dt    DateTime?
+            json  Json?
+            bytes Bytes?
+            enum  TestEnum?
+        }
+
+        type AllLists {
+            field String[]
+            bool  Boolean[]
+            int   Int[]
+            bInt  BigInt
+            float Float
+            dt    DateTime
+            json  Json
+            bytes Bytes
+            enum  TestEnum
+        }
+        "#
+    };
+
+    schema.to_owned()
+}
+
 /// Full to-one composite test model.
 pub fn to_one_composites() -> String {
     let schema = indoc! {
