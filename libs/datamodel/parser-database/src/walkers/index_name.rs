@@ -7,7 +7,7 @@ pub enum IndexName<'ast> {
     /// Explicit index name defined in the datamodel
     Explicit(&'ast str),
     /// Generated index name based on the fields of the index.
-    /// Only used on compound ids
+    /// A generated index name can only contain a name if it's compound
     Generated(Option<String>),
 }
 
