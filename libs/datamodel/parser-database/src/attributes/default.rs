@@ -318,11 +318,10 @@ fn validate_invalid_default_enum_expr(value: &ast::Expression, args: &mut Argume
     )))
 }
 
-fn validate_unknown_function_default(funcname: &String, args: &Arguments<'_>, ctx: &mut Context<'_>) {
+fn validate_unknown_function_default(fn_name: &str, args: &Arguments<'_>, ctx: &mut Context<'_>) {
     ctx.push_error(args.new_attribute_validation_error(&format!(
-                    "The function `{funcname}` is not a known function. You can read about the available functions here: https://pris.ly/d/attribute-functions",
-                    funcname = funcname
-                )));
+        "The function `{fn_name}` is not a known function. You can read about the available functions here: https://pris.ly/d/attribute-functions",
+    )));
 }
 
 fn validate_invalid_scalar_default(
@@ -339,14 +338,13 @@ fn validate_invalid_scalar_default(
 }
 
 fn validate_invalid_funtion_default(
-    funcname: &String,
+    fn_name: &str,
     scalar_type: ScalarType,
     args: &Arguments<'_>,
     ctx: &mut Context<'_>,
 ) {
     ctx.push_error(args.new_attribute_validation_error(&format!(
-        "The function `{funcname}()` cannot be used on fields of type `{scalar_type}`.",
-        funcname = funcname,
+        "The function `{fn_name}()` cannot be used on fields of type `{scalar_type}`.",
         scalar_type = scalar_type.as_str()
     )));
 }
