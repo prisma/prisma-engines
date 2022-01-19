@@ -1,11 +1,15 @@
 mod create;
+mod update;
 
 pub(crate) use create::*;
+pub(crate) use update::*;
 
 use super::*;
 use crate::constants::json_null;
 use prisma_models::prelude::*;
 
+// Todo: This isn't final, this is only the first draft to get structure into the
+// wild cross-dependency waste that was the create/update inputs.
 pub(crate) trait DataInputFieldMapper {
     fn map_all(&self, ctx: &mut BuilderContext, fields: &[Field]) -> Vec<InputField> {
         fields
