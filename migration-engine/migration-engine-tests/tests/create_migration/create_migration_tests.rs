@@ -936,7 +936,7 @@ fn alter_constraint_name(api: TestApi) {
            @@unique([a, b], name: "compound", map:"CustomCompoundUnique")
            @@index([a], map: "CustomIndex")
          }}
-         
+
          model B {{
            a   String
            b   String

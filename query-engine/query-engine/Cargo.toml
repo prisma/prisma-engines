@@ -13,9 +13,7 @@ vendored-openssl = ["quaint/vendored-openssl"]
 [dependencies]
 futures = "0.3"
 tokio = { version = "1.0", features = ["rt-multi-thread", "macros"] }
-
 anyhow = "1.0"
-async-std = { version = "1.6.2", features = ["attributes", "tokio1"] }
 async-trait = "0.1"
 base64 = "0.12"
 connection-string = "0.1.10"
@@ -35,15 +33,13 @@ serde_json = { version = "1.0", features = ["preserve_order", "float_roundtrip"]
 sql-connector = { path = "../connectors/sql-query-connector", optional = true, package = "sql-query-connector" }
 structopt = "0.3"
 thiserror = "1.0"
-tide = { version = "0.15.0", default-features = false, features = ["h1-server", "logger"] }
-tide-server-timing = "0.15.0"
 url = "2.1"
-
+hyper = { version = "0.14", features = ["server", "http1", "http2", "runtime"] }
 tracing = "0.1"
 tracing-opentelemetry = "0.16"
 tracing-subscriber = { version = "0.3", features = ["json", "env-filter"] }
 tracing-futures = "0.2"
-opentelemetry = { version = "0.16", features = ["async-std", "rt-async-std"] }
+opentelemetry = { version = "0.16", features = ["rt-tokio"] }
 opentelemetry-otlp = { version = "0.9", features = ["tls", "tls-roots"] }
 
 rand = "0.8"

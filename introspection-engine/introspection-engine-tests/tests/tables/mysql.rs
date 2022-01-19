@@ -282,7 +282,7 @@ async fn a_table_with_fulltext_index_without_preview_flag(api: &TestApi) -> Test
             `a`  VARCHAR(255) NOT NULL,
             `b`  TEXT         NOT NULL
         );
-        
+
         CREATE FULLTEXT INDEX A_a_b_idx ON `A` (a, b);
     "#};
 
@@ -295,6 +295,60 @@ async fn a_table_with_fulltext_index_without_preview_flag(api: &TestApi) -> Test
           b  String @db.Text
 
           @@index([a, b])
+        }
+    "#]];
+
+    expected.assert_eq(&api.introspect_dml().await?);
+
+    Ok(())
+}
+
+#[test_connector(tags(Mysql), exclude(Mariadb))]
+async fn date_time_defaults(api: &TestApi) -> TestResult {
+    let setup = indoc! {r#"
+        CREATE TABLE `A` (
+            id INT PRIMARY KEY auto_increment,
+            d1 DATE DEFAULT '2020-01-01',
+            d2 DATETIME DEFAULT '2038-01-19 03:14:08',
+            d3 TIME DEFAULT '16:20:00'
+        )
+    "#};
+
+    api.raw_cmd(setup).await;
+
+    let expected = expect![[r#"
+        model A {
+          id Int       @id @default(autoincrement())
+          d1 DateTime? @default(dbgenerated("'2020-01-01'")) @db.Date
+          d2 DateTime? @default(dbgenerated("'2038-01-19 03:14:08'")) @db.DateTime(0)
+          d3 DateTime? @default(dbgenerated("'16:20:00'")) @db.Time(0)
+        }
+    "#]];
+
+    expected.assert_eq(&api.introspect_dml().await?);
+
+    Ok(())
+}
+
+#[test_connector(tags(Mariadb))]
+async fn date_time_defaults_mariadb(api: &TestApi) -> TestResult {
+    let setup = indoc! {r#"
+        CREATE TABLE `A` (
+            id INT PRIMARY KEY auto_increment,
+            d1 DATE DEFAULT '2020-01-01',
+            d2 DATETIME DEFAULT '2038-01-19 03:14:08',
+            d3 TIME DEFAULT '16:20:00'
+        )
+    "#};
+
+    api.raw_cmd(setup).await;
+
+    let expected = expect![[r#"
+        model A {
+          id Int       @id @default(autoincrement())
+          d1 DateTime? @default(dbgenerated("('2020-01-01')")) @db.Date
+          d2 DateTime? @default(dbgenerated("('2038-01-19 03:14:08')")) @db.DateTime(0)
+          d3 DateTime? @default(dbgenerated("('16:20:00')")) @db.Time(0)
         }
     "#]];
 

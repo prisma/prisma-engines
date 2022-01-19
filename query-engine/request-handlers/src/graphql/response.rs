@@ -24,7 +24,7 @@ pub struct GQLBatchResponse {
     errors: Vec<GQLError>,
 }
 
-#[derive(Debug, serde::Serialize, PartialEq)]
+#[derive(Debug, serde::Serialize, serde::Deserialize, PartialEq)]
 pub struct GQLError {
     error: String,
     user_facing_error: user_facing_errors::Error,
@@ -32,7 +32,7 @@ pub struct GQLError {
 
 impl GQLError {
     pub fn code(&self) -> Option<&str> {
-        self.user_facing_error.as_known().map(|err| err.error_code)
+        self.user_facing_error.as_known().map(|err| err.error_code.as_ref())
     }
 
     pub fn message(&self) -> &str {

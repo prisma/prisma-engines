@@ -178,20 +178,26 @@ impl Display for Column<'_> {
 
 #[derive(Debug, Default)]
 pub struct CreateIndex<'a> {
-    pub unique: bool,
+    pub r#type: IndexType,
     pub index_name: Cow<'a, str>,
     pub on: (Cow<'a, str>, Vec<IndexColumn<'a>>),
 }
 
 impl Display for CreateIndex<'_> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(
-            f,
-            "CREATE {maybe_unique}INDEX `{index_name}` ON `{table_name}`(",
-            maybe_unique = if self.unique { "UNIQUE " } else { "" },
-            index_name = self.index_name,
-            table_name = self.on.0,
-        )?;
+        f.write_str("CREATE ")?;
+
+        match self.r#type {
+            IndexType::Normal => (),
+            IndexType::Unique => f.write_str("UNIQUE ")?,
+            IndexType::Fulltext => f.write_str("FULLTEXT ")?,
+        }
+
+        f.write_str("INDEX `")?;
+        f.write_str(&self.index_name)?;
+        f.write_str("` ON `")?;
+        f.write_str(&self.on.0)?;
+        f.write_str("`(")?;
 
         self.on
             .1
@@ -311,6 +317,12 @@ pub enum IndexType {
     Normal,
     Unique,
     Fulltext,
+}
+
+impl Default for IndexType {
+    fn default() -> Self {
+        Self::Normal
+    }
 }
 
 #[derive(Debug)]

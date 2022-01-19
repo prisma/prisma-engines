@@ -91,10 +91,11 @@ pub fn connector_test_impl(attr: TokenStream, input: TokenStream) -> TokenStream
                 query_tests_setup::run_with_tokio(async move {
                     tracing::debug!("Used datamodel:\n {}", datamodel.yellow());
 
+                    query_tests_setup::setup_project(&datamodel).await.unwrap();
+
                     let requires_teardown = connector.requires_teardown();
                     let runner = Runner::load(config.runner(), datamodel.clone(), connector).await.unwrap();
 
-                    query_tests_setup::setup_project(&datamodel).await.unwrap();
                     #runner_fn_ident(runner).await.unwrap();
 
                     if requires_teardown { query_tests_setup::teardown_project(&datamodel).await.unwrap(); }

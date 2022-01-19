@@ -24,9 +24,9 @@ fn datetime_defaults_work(api: TestApi) {
         df.set_constraint_name("Cat_birthday_df");
         df
     } else if api.is_mysql_mariadb() {
-        DefaultValue::db_generated("2018-01-27T08:00:00+00:00")
+        DefaultValue::db_generated("'2018-01-27T08:00:00+00:00'")
     } else if api.is_mysql_8() || api.is_mysql_5_6() {
-        DefaultValue::db_generated("2018-01-27 08:00:00.000")
+        DefaultValue::db_generated("'2018-01-27 08:00:00.000'")
     } else {
         DefaultValue::db_generated("'2018-01-27 08:00:00 +00:00'")
     };
@@ -34,6 +34,66 @@ fn datetime_defaults_work(api: TestApi) {
     api.assert_schema().assert_table("Cat", |table| {
         table.assert_column("birthday", |col| col.assert_default(Some(expected_default)))
     });
+}
+
+#[test_connector(tags(Mysql), exclude(Mariadb))]
+fn datetime_dbgenerated_defaults(api: TestApi) {
+    let dm = indoc::indoc! {r#"
+        model A {
+          id Int       @id @default(autoincrement())
+          d1 DateTime? @default(dbgenerated("'2020-01-01'")) @db.Date
+          d2 DateTime? @default(dbgenerated("'2038-01-19 03:14:08'")) @db.DateTime(0)
+          d3 DateTime? @default(dbgenerated("'16:20:00'")) @db.Time(0)
+        }
+    "#};
+
+    api.schema_push_w_datasource(dm).send().assert_green();
+
+    api.assert_schema().assert_table("A", |table| {
+        table.assert_column("d1", |col| {
+            col.assert_default(Some(DefaultValue::db_generated("'2020-01-01'")))
+        });
+
+        table.assert_column("d2", |col| {
+            col.assert_default(Some(DefaultValue::db_generated("'2038-01-19 03:14:08'")))
+        });
+
+        table.assert_column("d3", |col| {
+            col.assert_default(Some(DefaultValue::db_generated("'16:20:00'")))
+        })
+    });
+
+    api.schema_push_w_datasource(dm).send().assert_green().assert_no_steps();
+}
+
+#[test_connector(tags(Mariadb))]
+fn datetime_dbgenerated_defaults_mariadb(api: TestApi) {
+    let dm = indoc::indoc! {r#"
+        model A {
+          id Int       @id @default(autoincrement())
+          d1 DateTime? @default(dbgenerated("('2020-01-01')")) @db.Date
+          d2 DateTime? @default(dbgenerated("('2038-01-19 03:14:08')")) @db.DateTime(0)
+          d3 DateTime? @default(dbgenerated("('16:20:00')")) @db.Time(0)
+        }
+    "#};
+
+    api.schema_push_w_datasource(dm).send().assert_green();
+
+    api.assert_schema().assert_table("A", |table| {
+        table.assert_column("d1", |col| {
+            col.assert_default(Some(DefaultValue::db_generated("('2020-01-01')")))
+        });
+
+        table.assert_column("d2", |col| {
+            col.assert_default(Some(DefaultValue::db_generated("('2038-01-19 03:14:08')")))
+        });
+
+        table.assert_column("d3", |col| {
+            col.assert_default(Some(DefaultValue::db_generated("('16:20:00')")))
+        })
+    });
+
+    api.schema_push_w_datasource(dm).send().assert_green().assert_no_steps();
 }
 
 #[test_connector(tags(Mariadb, Mysql8), exclude(Vitess))]
