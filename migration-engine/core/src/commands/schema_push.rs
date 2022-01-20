@@ -1,6 +1,5 @@
-use crate::{parse_schema, CoreResult};
+use crate::{json_rpc::types::*, parse_schema, CoreResult};
 use migration_connector::{ConnectorError, DiffTarget, MigrationConnector};
-use serde::{Deserialize, Serialize};
 
 /// Command to bring the local database in sync with the prisma schema, without
 /// interacting with the migrations directory nor the migrations table.
@@ -53,33 +52,4 @@ pub(crate) async fn schema_push(
         warnings,
         unexecutable,
     })
-}
-
-/// Input to the `schemaPush` command.
-#[derive(Debug, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct SchemaPushInput {
-    /// The prisma schema.
-    pub schema: String,
-    /// Push the schema ignoring destructive change warnings.
-    pub force: bool,
-}
-
-/// Output of the `schemaPush` command.
-#[derive(Debug, Serialize)]
-#[serde(rename_all = "camelCase")]
-pub struct SchemaPushOutput {
-    /// How many migration steps were executed.
-    pub executed_steps: u32,
-    /// Destructive change warnings.
-    pub warnings: Vec<String>,
-    /// Steps that cannot be executed in the current state of the database.
-    pub unexecutable: Vec<String>,
-}
-
-impl SchemaPushOutput {
-    /// Returns whether the local database schema is in sync with the prisma schema.
-    pub fn had_no_changes_to_push(&self) -> bool {
-        self.warnings.is_empty() && self.unexecutable.is_empty() && self.executed_steps == 0
-    }
 }

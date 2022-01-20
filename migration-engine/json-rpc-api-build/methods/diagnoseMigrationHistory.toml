@@ -9,8 +9,18 @@ requestShape = "diagnoseMigrationHistoryInput"
 responseShape = "diagnoseMigrationHistoryOutput"
 
 [recordShapes.diagnoseMigrationHistoryInput]
+description = "The request params for the `diagnoseMigrationHistory` method."
 fields.migrationsDirectoryPath.description = "The path to the root of the migrations directory."
 fields.migrationsDirectoryPath.shape = "string"
+fields.optInToShadowDatabase.description = """
+Whether creating a shadow database is allowed.
+"""
+fields.optInToShadowDatabase.shape = "bool"
+
+[recordShapes.diagnoseMigrationHistoryOutput]
+description = """
+The result type for `diagnoseMigrationHistory` responses.
+"""
 
 [recordShapes.diagnoseMigrationHistoryOutput.fields.editedMigrationNames]
 description = """

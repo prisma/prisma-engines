@@ -6,7 +6,7 @@ use crate::{
         ApplyMigrationsInput, ApplyMigrationsOutput, CreateMigrationInput, CreateMigrationOutput, DevDiagnosticInput,
         DevDiagnosticOutput, EvaluateDataLossInput, EvaluateDataLossOutput, ListMigrationDirectoriesInput,
         ListMigrationDirectoriesOutput, MarkMigrationAppliedInput, MarkMigrationAppliedOutput,
-        MarkMigrationRolledBackInput, MarkMigrationRolledBackOutput,
+        MarkMigrationRolledBackInput, MarkMigrationRolledBackOutput, SchemaPushInput, SchemaPushOutput,
     },
     CoreResult,
 };

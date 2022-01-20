@@ -13,7 +13,6 @@ mod schema_push;
 pub use diagnose_migration_history::{
     DiagnoseMigrationHistoryInput, DiagnoseMigrationHistoryOutput, DriftDiagnostic, HistoryDiagnostic,
 };
-pub use schema_push::{SchemaPushInput, SchemaPushOutput};
 
 pub(crate) use apply_migrations::apply_migrations;
 pub(crate) use create_migration::create_migration;

@@ -357,7 +357,7 @@ async fn schema_push(cmd: &SchemaPush) -> anyhow::Result<()> {
             "✔️".bold(),
             format!("Schema pushed to database. ({} steps)", response.executed_steps).green()
         );
-    } else if response.had_no_changes_to_push() {
+    } else if response.unexecutable.len() == 0 && response.warnings.len() == 0 && response.executed_steps == 0 {
         eprintln!(
             "{}  {}",
             "✔️".bold(),

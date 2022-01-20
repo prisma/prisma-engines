@@ -1,7 +1,4 @@
-use migration_core::{
-    commands::{SchemaPushInput, SchemaPushOutput},
-    CoreError, CoreResult, GenericApi,
-};
+use migration_core::{json_rpc::types::*, CoreError, CoreResult, GenericApi};
 use std::{borrow::Cow, fmt::Debug};
 use tracing_futures::Instrument;
 
