@@ -627,13 +627,8 @@ fn named_default_constraints_cannot_clash_with_fk_names() {
 }
 
 #[test]
-fn default_on_composite_type_field_errors_on_pg() {
+fn default_on_composite_type_field_errors() {
     let schema = indoc! { r#"
-        datasource db {
-            provider = "postgres"
-            url = "postgres://"
-        }
-
         type Address {
             street String
         }
