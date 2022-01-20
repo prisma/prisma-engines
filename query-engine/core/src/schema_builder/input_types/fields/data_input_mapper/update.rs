@@ -141,12 +141,28 @@ impl DataInputFieldMapper for UpdateDataInputFieldMapper {
         input_field(rf.name.clone(), InputType::object(input_object), None).optional()
     }
 
-    fn map_composite(&self, _ctx: &mut BuilderContext, _cf: &CompositeFieldRef) -> InputField {
+    fn map_composite(&self, ctx: &mut BuilderContext, _cf: &CompositeFieldRef) -> InputField {
         // Todo: Build composite types
         // - Include scalar update operators (`set` value, `increment`, `decrement`, ...) (name clash potential? double check)
         // - `set`, `push`
         // - If `set` is used for a composite: We can simplify the input parsing by _NOT_ having any other nested operations below a set.
-        todo!()
+
+        // Dummy code to let the engine boot
+        let ident = Identifier::new("dummy".to_string(), PRISMA_NAMESPACE);
+
+        let obj = match ctx.get_input_type(&ident) {
+            Some(o) => o,
+            None => {
+                let input_object = Arc::new(input_object_type(
+                    ident.clone(),
+                    vec![input_field("foo", InputType::int(), None)],
+                ));
+                ctx.cache_input_type(ident, input_object.clone());
+                Arc::downgrade(&input_object)
+            }
+        };
+
+        input_field("foo", InputType::object(obj), None)
     }
 }
 
