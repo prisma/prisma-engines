@@ -8,7 +8,7 @@ datamodel = { path = "../../libs/datamodel/core" }
 migration-core = { path = "../core", features = ["sql"] }
 
 enumflags2 = "*"
-mongodb = { git = "https://github.com/mongodb/mongo-rust-driver.git", rev = "8e55cb2" }
+mongodb = "2.1.0"
 url = "2"
 connection-string = "*"
 

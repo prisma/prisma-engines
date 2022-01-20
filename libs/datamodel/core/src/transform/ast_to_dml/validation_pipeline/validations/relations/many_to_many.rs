@@ -51,7 +51,7 @@ pub(crate) fn validate_no_referential_actions(
 
     for span in referential_action_spans {
         ctx.push_error(DatamodelError::new_validation_error(
-            "Referential actions on many-to-many relations are not supported".to_owned(),
+            "Referential actions on implicit many-to-many relations are not supported".to_owned(),
             span,
         ));
     }
