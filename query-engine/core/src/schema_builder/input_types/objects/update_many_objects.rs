@@ -24,7 +24,7 @@ pub(crate) fn checked_update_many_input_type(ctx: &mut BuilderContext, model: &M
     let ident = Identifier::new(format!("{}UpdateManyMutationInput", model.name), PRISMA_NAMESPACE);
     return_cached_input!(ctx, &ident);
 
-    let input_object = Arc::new(input_object_type(ident.clone(), vec![]));
+    let input_object = Arc::new(init_input_object_type(ident.clone()));
     ctx.cache_input_type(ident, input_object.clone());
 
     let filtered_fields: Vec<_> = update_one_objects::filter_checked_update_fields(ctx, model, None)
@@ -58,7 +58,7 @@ pub(crate) fn unchecked_update_many_input_type(
     let ident = Identifier::new(name, PRISMA_NAMESPACE);
     return_cached_input!(ctx, &ident);
 
-    let input_object = Arc::new(input_object_type(ident.clone(), vec![]));
+    let input_object = Arc::new(init_input_object_type(ident.clone()));
     ctx.cache_input_type(ident, input_object.clone());
 
     let filtered_fields: Vec<_> = update_one_objects::filter_unchecked_update_fields(ctx, model, parent_field)

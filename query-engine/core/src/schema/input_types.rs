@@ -38,7 +38,7 @@ impl InputObjectType {
     pub fn set_fields(&self, fields: Vec<InputField>) {
         self.fields
             .set(fields.into_iter().map(Arc::new).collect())
-            .expect("InputObjectType::set_fields");
+            .expect(&format!("Fields of {:?} are already set", self.identifier));
     }
 
     /// True if fields are empty, false otherwise.
