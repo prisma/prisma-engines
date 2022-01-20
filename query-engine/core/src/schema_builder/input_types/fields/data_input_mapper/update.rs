@@ -141,7 +141,11 @@ impl DataInputFieldMapper for UpdateDataInputFieldMapper {
         input_field(rf.name.clone(), InputType::object(input_object), None).optional()
     }
 
-    fn map_composite(&self, ctx: &mut BuilderContext, cf: &CompositeFieldRef) -> InputField {
+    fn map_composite(&self, _ctx: &mut BuilderContext, _cf: &CompositeFieldRef) -> InputField {
+        // Todo: Build composite types
+        // - Include scalar update operators (`set` value, `increment`, `decrement`, ...) (name clash potential? double check)
+        // - `set`, `push`
+        // - If `set` is used for a composite: We can simplify the input parsing by _NOT_ having any other nested operations below a set.
         todo!()
     }
 }
