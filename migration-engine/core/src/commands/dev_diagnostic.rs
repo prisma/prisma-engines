@@ -121,9 +121,9 @@ mod tests {
 
     #[test]
     fn dev_action_serializes_as_expected() {
-        let reset = serde_json::to_value(DevAction::Reset {
+        let reset = serde_json::to_value(DevAction::Reset(DevActionReset {
             reason: "Because I said so".to_owned(),
-        })
+        }))
         .unwrap();
 
         assert_eq!(reset, json!({ "tag": "reset", "reason": "Because I said so" }));

@@ -31,9 +31,9 @@ shape = "devAction"
 [enumShapes.devAction]
 description = "A suggested action for the CLI `migrate dev` command."
 
-[enumShapes.devAction.variants.Reset]
+[enumShapes.devAction.variants.reset]
 description = "Reset the database."
 shape = "devActionReset"
 
-[enumShapes.devAction.variants.CreateMigration]
+[enumShapes.devAction.variants.createMigration]
 description = "Proceed to the next step"

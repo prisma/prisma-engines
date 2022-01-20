@@ -6,7 +6,7 @@ pub(crate) fn generate_rust_crate(out_dir: &Path, api: &Api) -> CrateResult {
     let librs = out_dir.join("methods.rs");
     let mut librs = std::io::BufWriter::new(File::create(&librs)?);
     let mut method_names: Vec<&str> = api.methods.keys().map(String::as_str).collect();
-    method_names.sort();
+    method_names.sort_unstable();
 
     librs.write_all(b"pub mod json_rpc {\n")?;
     librs.write_all(b"//! The JSON-RPC API definition.\n//!\n//! ## Methods\n//!\n")?;

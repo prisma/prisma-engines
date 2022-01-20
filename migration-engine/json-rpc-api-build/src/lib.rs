@@ -27,7 +27,7 @@ pub fn generate_rust_modules(out_dir: &Path) -> CrateResult {
 
     validate(&api);
 
-    rust_crate::generate_rust_crate(&out_dir, &api)?;
+    rust_crate::generate_rust_crate(out_dir, &api)?;
 
     eprintln!("ok: definitions generated");
 
@@ -94,7 +94,7 @@ fn shape_exists(shape: &str, api: &Api) -> bool {
         return true;
     }
 
-    return false;
+    false
 }
 
 fn merge(api: &mut Api, new_fragment: Api) {
