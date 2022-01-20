@@ -157,7 +157,7 @@ fn must_error_if_default_value_for_enum_is_not_valid() {
     let error = datamodel::parse_schema(dml).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
-        [1;91merror[0m: [1mError parsing attribute "@default": The defined default value `B` is not a valid value of the enum specified for the field.[0m
+        [1;91merror[0m: [1mError parsing attribute "@default": The defined default value is not a valid value of the enum specified for the field.[0m
           [1;94m-->[0m  [4mschema.prisma:2[0m
         [1;94m   | [0m
         [1;94m 1 | [0mtype Composite {
@@ -254,13 +254,8 @@ fn default_on_composite_type_field_errors() {
 }
 
 #[test]
-fn must_error_on_dbgenerated_default_on_non_native_type_on_mongodb() {
+fn must_error_on_dbgenerated_default() {
     let schema = r#"
-        datasource db {
-            provider = "mongodb"
-            url = "mongodb://"
-        }
-
         type User {
             nickname String @default(dbgenerated())
         }
@@ -270,10 +265,10 @@ fn must_error_on_dbgenerated_default_on_non_native_type_on_mongodb() {
 
     let expected = expect![[r#"
         [1;91merror[0m: [1mError parsing attribute "@default": The function `dbgenerated()` is not a supported on composite fields.[0m
-          [1;94m-->[0m  [4mschema.prisma:8[0m
+          [1;94m-->[0m  [4mschema.prisma:3[0m
         [1;94m   | [0m
-        [1;94m 7 | [0m        type User {
-        [1;94m 8 | [0m            nickname String @[1;91mdefault(dbgenerated())[0m
+        [1;94m 2 | [0m        type User {
+        [1;94m 3 | [0m            nickname String @[1;91mdefault(dbgenerated())[0m
         [1;94m   | [0m
     "#]];
 

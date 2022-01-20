@@ -1,7 +1,7 @@
 use crate::common::*;
 use bigdecimal::{BigDecimal, FromPrimitive};
 use chrono::DateTime;
-use datamodel::{DefaultValue, ScalarType, ValueGenerator};
+use datamodel::{DefaultValue, ScalarType};
 use dml::prisma_value::PrismaValue;
 
 #[test]
@@ -131,38 +131,6 @@ fn should_set_default_on_remapped_enum_type() {
         .assert_default_value(DefaultValue::new_single(PrismaValue::Enum(String::from(
             "A_VARIANT_WITH_UNDERSCORES",
         ))));
-}
-
-// TODO: Remove ignore when enums are supported
-#[test]
-#[ignore]
-fn db_generated_function_must_work_for_enum_fields() {
-    let dml = r#"
-    datasource db {
-        provider = "mongodb"
-        url = "mongodb://"
-    }
-
-    type Model {
-        id Int @id
-        role Role @default(dbgenerated("ADMIN"))
-    }
-
-    enum Role {
-        ADMIN
-        MODERATOR
-    }
-    "#;
-
-    let datamodel = parse(dml);
-    let user_model = datamodel.assert_has_composite_type("Model");
-
-    user_model
-        .assert_has_scalar_field("role")
-        .assert_enum_type("Role")
-        .assert_default_value(DefaultValue::new_expression(ValueGenerator::new_dbgenerated(
-            "ADMIN".to_string(),
-        )));
 }
 
 #[test]

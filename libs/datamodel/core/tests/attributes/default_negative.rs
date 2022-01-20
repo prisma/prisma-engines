@@ -113,7 +113,7 @@ fn must_error_if_unknown_function_is_used() {
     let error = datamodel::parse_schema(dml).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
-        [1;91merror[0m: [1mError parsing attribute "@default": The function `unknown_function` is not a known function. You can read about the available functions here: https://pris.ly/d/attribute-functions[0m
+        [1;91merror[0m: [1mError parsing attribute "@default": The function `unknown_function` is not a known function. You can read about the available functions here: https://pris.ly/d/attribute-functions.[0m
           [1;94m-->[0m  [4mschema.prisma:3[0m
         [1;94m   | [0m
         [1;94m 2 | [0m  id Int @id
@@ -624,6 +624,39 @@ fn named_default_constraints_cannot_clash_with_fk_names() {
     "#]];
 
     expectation.assert_eq(&error)
+}
+
+#[test]
+fn default_on_composite_type_field_errors_on_pg() {
+    let schema = indoc! { r#"
+        datasource db {
+            provider = "postgres"
+            url = "postgres://"
+        }
+
+        type Address {
+            street String
+        }
+
+        model User {
+            id Int @id
+            address Address? @default("{ \"street\": \"broadway\"}")
+        }
+    "#};
+
+    let error = datamodel::parse_schema(schema).map(drop).unwrap_err();
+
+    // Error could be better since PG don't support composites yet at all.
+    let expected = expect![[r#"
+        [1;91merror[0m: [1mError validating field `address` in composite type `Address`: Defaults on fields of type composite are not supported. Please remove the `@default` attribute.[0m
+          [1;94m-->[0m  [4mschema.prisma:12[0m
+        [1;94m   | [0m
+        [1;94m11 | [0m    id Int @id
+        [1;94m12 | [0m    address Address? @[1;91mdefault("{ \"street\": \"broadway\"}")[0m
+        [1;94m   | [0m
+    "#]];
+
+    expected.assert_eq(&error)
 }
 
 #[test]

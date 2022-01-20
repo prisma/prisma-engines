@@ -124,8 +124,7 @@ impl<'ast, 'db> CompositeTypeFieldWalker<'ast, 'db> {
         self.field.default.as_ref().map(|d| d.value)
     }
 
-    /// The mapped name of the default value. Not applicable to all connectors. See crate docs for
-    /// details on mapped names.
+    /// The mapped name of the default value. Always `None` in composite types at the moment.
     ///
     /// ```ignore
     /// name String @default("george", map: "name_default_to_george")
