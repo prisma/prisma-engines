@@ -14,7 +14,7 @@ pub(crate) fn generate_rust_crate(out_dir: &Path, api: &Api) -> CrateResult {
     for method_name in &method_names {
         let method = &api.methods[*method_name];
 
-        writeln!(librs, "//!\n//! ### 🤌 {method_name}\n")?;
+        writeln!(librs, "//!\n//! ### 🔌 {method_name}\n")?;
         writeln!(
             librs,
             "//! ➡️  [{request_name}](./types/struct.{request_name}.html)\n//!",
