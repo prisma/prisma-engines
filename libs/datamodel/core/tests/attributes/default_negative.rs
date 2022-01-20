@@ -644,10 +644,10 @@ fn default_on_composite_type_field_errors() {
     // Error could be better since PG don't support composites yet at all.
     let expected = expect![[r#"
         [1;91merror[0m: [1mError validating field `address` in composite type `Address`: Defaults on fields of type composite are not supported. Please remove the `@default` attribute.[0m
-          [1;94m-->[0m  [4mschema.prisma:12[0m
+          [1;94m-->[0m  [4mschema.prisma:7[0m
         [1;94m   | [0m
-        [1;94m11 | [0m    id Int @id
-        [1;94m12 | [0m    address Address? @[1;91mdefault("{ \"street\": \"broadway\"}")[0m
+        [1;94m 6 | [0m    id Int @id
+        [1;94m 7 | [0m    address Address? @[1;91mdefault("{ \"street\": \"broadway\"}")[0m
         [1;94m   | [0m
     "#]];
 
