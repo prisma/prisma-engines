@@ -1,6 +1,7 @@
 use super::{
     constraint_namespace::ConstraintName,
     database_name::validate_db_name,
+    default_value,
     names::{NameTaken, Names},
 };
 use crate::{
@@ -19,7 +20,6 @@ use datamodel_connector::{
     walker_ext_traits::*,
     ConnectorCapability,
 };
-use std::str::FromStr;
 
 pub(super) fn validate_client_name(field: FieldWalker<'_, '_>, names: &Names<'_>, ctx: &mut Context<'_>) {
     let model = field.model();
@@ -228,101 +228,29 @@ pub(super) fn validate_native_type_arguments(field: ScalarFieldWalker<'_, '_>, c
     };
 }
 
-pub(super) fn validate_default(field: ScalarFieldWalker<'_, '_>, ctx: &mut Context<'_>) {
-    use chrono::{DateTime, FixedOffset};
+/// Validates the @default attribute of a model scalar field
+pub(super) fn validate_default_value(field: ScalarFieldWalker<'_, '_>, ctx: &mut Context<'_>) {
+    let model_name = field.model().name();
+    let default_mapped_name = field.default_value().and_then(|d| d.mapped_name());
+    let default_attribute = field.default_attribute();
 
     // Named defaults.
-
-    let mapped_name = field.default_value().and_then(|default| default.mapped_name());
-
-    if mapped_name.is_some() && !ctx.connector.supports_named_default_values() {
+    if default_mapped_name.is_some() && !ctx.connector.supports_named_default_values() {
         ctx.push_error(DatamodelError::new_attribute_validation_error(
             "You defined a database name for the default value of a field on the model. This is not supported by the provider.",
             "default",
-            field.default_attribute().unwrap().span,
+            default_attribute.unwrap().span,
         ));
     }
 
-    if mapped_name.is_some() {
-        validate_db_name(
-            field.model().name(),
-            field.default_attribute().unwrap(),
-            mapped_name,
-            ctx,
-            false,
-        );
+    if default_mapped_name.is_some() {
+        validate_db_name(model_name, default_attribute.unwrap(), default_mapped_name, ctx, false);
     }
 
-    let scalar_type = if let Some(scalar_type) = field.scalar_type() {
-        scalar_type
-    } else {
-        return;
-    };
+    let default_value = field.default_value().map(|d| d.value());
+    let scalar_type = field.scalar_type();
 
-    // Scalar type specific validations.
-    match (scalar_type, field.default_value()) {
-        (ScalarType::Json, Some(attribute)) => {
-            if let Some((value, span)) = attribute.value().as_string_value() {
-                if let Err(details) = serde_json::from_str::<serde_json::Value>(value) {
-                    return ctx.push_error(DatamodelError::new_attribute_validation_error(
-                        &format!(
-                            "Parse error: \"{bad_value}\" is not a valid JSON string. ({details})",
-                            details = details,
-                            bad_value = value,
-                        ),
-                        "default",
-                        span,
-                    ));
-                }
-            }
-        }
-        (ScalarType::Bytes, Some(attribute)) => {
-            if let Some((value, span)) = attribute.value().as_string_value() {
-                if let Err(details) = dml::prisma_value::decode_bytes(value) {
-                    return ctx.push_error(DatamodelError::new_attribute_validation_error(
-                        &format!(
-                            "Parse error: \"{bad_value}\" is not a valid base64 string. ({details})",
-                            details = details,
-                            bad_value = value,
-                        ),
-                        "default",
-                        span,
-                    ));
-                }
-            }
-        }
-        (ScalarType::DateTime, Some(attribute)) => {
-            if let Some((value, span)) = attribute.value().as_string_value() {
-                if let Err(details) = DateTime::<FixedOffset>::parse_from_rfc3339(value) {
-                    return ctx.push_error(DatamodelError::new_attribute_validation_error(
-                        &format!(
-                            "Parse error: \"{bad_value}\" is not a valid rfc3339 datetime string. ({details})",
-                            details = details,
-                            bad_value = value,
-                        ),
-                        "default",
-                        span,
-                    ));
-                }
-            }
-        }
-        (ScalarType::BigInt | ScalarType::Int, Some(attribute)) => {
-            if let Some((value, span)) = attribute.value().as_numeric_value() {
-                if let Err(details) = i64::from_str(value) {
-                    return ctx.push_error(DatamodelError::new_attribute_validation_error(
-                        &format!(
-                            "Parse error: \"{bad_value}\" is not a valid integer. ({details})",
-                            details = details,
-                            bad_value = value,
-                        ),
-                        "default",
-                        span,
-                    ));
-                }
-            }
-        }
-        _ => (),
-    }
+    default_value::validate_default_value(default_value, scalar_type, ctx);
 }
 
 pub(super) fn validate_scalar_field_connector_specific(field: ScalarFieldWalker<'_, '_>, ctx: &mut Context<'_>) {

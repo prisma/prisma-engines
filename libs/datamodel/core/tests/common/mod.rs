@@ -32,6 +32,12 @@ pub(crate) trait ScalarFieldAsserts {
     fn assert_ignored(&self, state: bool) -> &Self;
 }
 
+pub(crate) trait CompositeTypeFieldAsserts {
+    fn assert_base_type(&self, t: &ScalarType) -> &Self;
+    fn assert_default_value(&self, t: dml::DefaultValue) -> &Self;
+    fn assert_enum_type(&self, en: &str) -> &Self;
+}
+
 pub(crate) trait RelationFieldAsserts {
     fn assert_relation_name(&self, t: &str) -> &Self;
     fn assert_relation_to(&self, t: &str) -> &Self;
@@ -56,6 +62,12 @@ pub(crate) trait ModelAsserts {
     fn assert_ignored(&self, state: bool) -> &Self;
 }
 
+pub(crate) trait CompositeTypeAsserts {
+    fn assert_field_count(&self, count: usize) -> &Self;
+    fn assert_has_scalar_field(&self, t: &str) -> &dml::CompositeTypeField;
+    fn assert_has_composite_type_field(&self, t: &str) -> &dml::CompositeTypeField;
+}
+
 pub(crate) trait EnumAsserts {
     fn assert_has_value(&self, t: &str) -> &dml::EnumValue;
 
@@ -68,6 +80,7 @@ pub(crate) trait EnumValueAsserts {
 
 pub(crate) trait DatamodelAsserts {
     fn assert_has_model(&self, t: &str) -> &dml::Model;
+    fn assert_has_composite_type(&self, t: &str) -> &dml::CompositeType;
     fn assert_has_enum(&self, t: &str) -> &dml::Enum;
 }
 
@@ -175,6 +188,28 @@ impl ScalarFieldAsserts for dml::ScalarField {
     }
 }
 
+impl CompositeTypeFieldAsserts for dml::CompositeTypeField {
+    fn assert_base_type(&self, t: &ScalarType) -> &Self {
+        if let Some((base_type, _, _)) = self.r#type.as_scalar() {
+            assert_eq!(base_type, t);
+        } else {
+            panic!("Scalar expected, but found {:?}", self.r#type);
+        }
+
+        self
+    }
+
+    fn assert_default_value(&self, t: dml::DefaultValue) -> &Self {
+        assert_eq!(self.default_value, Some(t));
+
+        self
+    }
+
+    fn assert_enum_type(&self, _en: &str) -> &Self {
+        todo!()
+    }
+}
+
 impl FieldAsserts for dml::RelationField {
     fn assert_arity(&self, arity: &dml::FieldArity) -> &Self {
         assert_eq!(self.arity, *arity);
@@ -243,6 +278,11 @@ impl DatamodelAsserts for dml::Datamodel {
         self.find_enum(&t.to_owned())
             .unwrap_or_else(|| panic!("Enum {} not found", t))
     }
+
+    fn assert_has_composite_type(&self, t: &str) -> &dml::CompositeType {
+        self.find_composite_type(t)
+            .unwrap_or_else(|| panic!("Composite type {} not found", t))
+    }
 }
 
 impl ModelAsserts for dml::Model {
@@ -308,6 +348,26 @@ impl ModelAsserts for dml::Model {
     fn assert_has_named_pk(&self, name: &str) -> &Self {
         assert_eq!(self.primary_key.as_ref().unwrap().db_name, Some(name.to_string()));
         self
+    }
+}
+
+impl CompositeTypeAsserts for dml::CompositeType {
+    fn assert_field_count(&self, count: usize) -> &Self {
+        assert_eq!(self.fields.len(), count);
+
+        self
+    }
+
+    fn assert_has_scalar_field(&self, t: &str) -> &dml::CompositeTypeField {
+        self.scalar_fields()
+            .find(|field| field.name == t)
+            .unwrap_or_else(|| panic!("Field {} not found", t))
+    }
+
+    fn assert_has_composite_type_field(&self, t: &str) -> &dml::CompositeTypeField {
+        self.composite_type_fields()
+            .find(|field| field.name == t)
+            .unwrap_or_else(|| panic!("Field {} not found", t))
     }
 }
 

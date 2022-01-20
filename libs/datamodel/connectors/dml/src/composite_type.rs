@@ -1,6 +1,8 @@
 //! Composite types defined with the `type` keyword.
 
-use crate::{field::FieldArity, native_type_instance::NativeTypeInstance, scalars::ScalarType};
+use crate::{
+    default_value::DefaultValue, field::FieldArity, native_type_instance::NativeTypeInstance, scalars::ScalarType,
+};
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct CompositeType {
@@ -19,6 +21,25 @@ pub struct CompositeTypeField {
 
     /// Comments associated with this field.
     pub documentation: Option<String>,
+
+    /// The default value of this field
+    pub default_value: Option<DefaultValue>,
+}
+
+impl CompositeType {
+    /// Gets an iterator over all scalar fields.
+    pub fn scalar_fields(&self) -> impl Iterator<Item = &CompositeTypeField> {
+        self.fields
+            .iter()
+            .filter(|f| matches!(f.r#type, CompositeTypeFieldType::Scalar(_, _, _)))
+    }
+
+    /// Gets an iterator over all composite type fields.
+    pub fn composite_type_fields(&self) -> impl Iterator<Item = &CompositeTypeField> {
+        self.fields
+            .iter()
+            .filter(|f| matches!(f.r#type, CompositeTypeFieldType::CompositeType(_)))
+    }
 }
 
 #[derive(Debug, PartialEq, Clone)]
@@ -28,4 +49,22 @@ pub enum CompositeTypeFieldType {
     Scalar(ScalarType, Option<String>, Option<NativeTypeInstance>),
     /// This is a field with an unsupported datatype. The content is the db's description of the type, it should enable migrate to create the type.
     Unsupported(String),
+}
+
+impl CompositeTypeFieldType {
+    pub fn as_composite_type(&self) -> Option<&String> {
+        if let Self::CompositeType(v) = self {
+            Some(v)
+        } else {
+            None
+        }
+    }
+
+    pub fn as_scalar(&self) -> Option<(&ScalarType, &Option<String>, &Option<NativeTypeInstance>)> {
+        if let Self::Scalar(typ, alias, native_type) = self {
+            Some((typ, alias, native_type))
+        } else {
+            None
+        }
+    }
 }

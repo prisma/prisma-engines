@@ -1,4 +1,8 @@
-use crate::{ast, types, ParserDatabase, ScalarFieldType};
+use crate::{
+    ast,
+    types::{self},
+    ParserDatabase, ScalarFieldType,
+};
 
 /// A composite type, introduced with the `type` keyword in the schema.
 ///
@@ -103,5 +107,30 @@ impl<'ast, 'db> CompositeTypeFieldWalker<'ast, 'db> {
     /// The type of the field, e.g. `String` in `streetName String?`.
     pub fn r#type(self) -> &'db ScalarFieldType {
         &self.field.r#type
+    }
+
+    /// The `@default()` AST attribute on the field, if any.
+    pub fn default_attribute(self) -> Option<&'ast ast::Attribute> {
+        self.field.default.as_ref().map(|d| d.default_attribute)
+    }
+
+    /// The value expression in the `@default` attribute.
+    ///
+    /// ```ignore
+    /// score Int @default(0)
+    ///                    ^
+    /// ```
+    pub fn default_value(self) -> Option<&'ast ast::Expression> {
+        self.field.default.as_ref().map(|d| d.value)
+    }
+
+    /// The mapped name of the default value. Always `None` in composite types at the moment.
+    ///
+    /// ```ignore
+    /// name String @default("george", map: "name_default_to_george")
+    ///                                     ^^^^^^^^^^^^^^^^^^^^^^^^
+    /// ```
+    pub fn default_mapped_name(self) -> Option<&'ast str> {
+        self.field.default.as_ref().and_then(|d| d.mapped_name)
     }
 }
