@@ -157,7 +157,7 @@ fn must_error_if_default_value_for_enum_is_not_a_value() {
     let error = datamodel::parse_schema(dml).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
-        [1;91merror[0m: [1mError parsing attribute "@default": The defined default value is not a valid value of the enum specified for the field.[0m
+        [1;91merror[0m: [1mError parsing attribute "@default": The defined default value `B` is not a valid value of the enum specified for the field.[0m
           [1;94m-->[0m  [4mschema.prisma:2[0m
         [1;94m   | [0m
         [1;94m 1 | [0mtype Composite {
@@ -172,7 +172,7 @@ fn must_error_if_default_value_for_enum_is_not_a_value() {
 fn must_error_if_default_value_for_enum_is_not_valid() {
     let dml = indoc! {r#"
       type Model {
-        enum A @default(B)
+        enum A @default(cuid())
       }
 
       enum A {
@@ -183,13 +183,13 @@ fn must_error_if_default_value_for_enum_is_not_valid() {
     let error = datamodel::parse_schema(dml).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
-      [1;91merror[0m: [1mError parsing attribute "@default": The defined default value is not a valid value of the enum specified for the field.[0m
-        [1;94m-->[0m  [4mschema.prisma:2[0m
-      [1;94m   | [0m
-      [1;94m 1 | [0mtype Model {
-      [1;94m 2 | [0m  enum A @[1;91mdefault(B)[0m
-      [1;94m   | [0m
-  "#]];
+        [1;91merror[0m: [1mError parsing attribute "@default": Expected an enum value, but found `cuid()`.[0m
+          [1;94m-->[0m  [4mschema.prisma:2[0m
+        [1;94m   | [0m
+        [1;94m 1 | [0mtype Model {
+        [1;94m 2 | [0m  enum A @[1;91mdefault(cuid())[0m
+        [1;94m   | [0m
+    "#]];
 
     expectation.assert_eq(&error)
 }
