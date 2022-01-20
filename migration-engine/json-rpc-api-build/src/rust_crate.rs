@@ -74,7 +74,7 @@ fn generate_types_rs(mut file: impl std::io::Write, api: &Api) -> CrateResult {
 
         writeln!(
             file,
-            "#[derive(Serialize, Deserialize)]\npub struct {} {{",
+            "#[derive(Serialize, Deserialize, Debug)]\npub struct {} {{",
             rustify_type_name(type_name)
         )?;
         for (field_name, field) in &record_type.fields {
@@ -109,7 +109,7 @@ fn generate_types_rs(mut file: impl std::io::Write, api: &Api) -> CrateResult {
         }
         writeln!(
             file,
-            "#[derive(Serialize, Deserialize)]\n#[serde(tag = \"tag\")]\npub enum {} {{",
+            "#[derive(Serialize, Deserialize, Debug)]\n#[serde(tag = \"tag\")]\npub enum {} {{",
             rustify_type_name(type_name)
         )?;
 

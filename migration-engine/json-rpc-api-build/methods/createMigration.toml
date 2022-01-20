@@ -1,14 +1,17 @@
 [methods.createMigration]
 description = """
-Create the next migration in the migrations history. If draft is false and
+Create the next migration in the migrations history. If `draft` is false and
 there are no unexecutable steps, it will also apply the newly created
 migration.
 
-**Note**: The user currently needs database creation/drop permissions in order
-for the command to work (because of the shadow database).
+**Note**: This will use the shadow database on the connectors where we need
+one.
 """
 requestShape = "createMigrationInput"
 responseShape = "createMigrationOutput"
+
+[recordShapes.createMigrationInput]
+description = "The input to the `createMigration` command."
 
 [recordShapes.createMigrationInput.fields.draft]
 description = "If true, always generate a migration, but do not apply."
@@ -23,8 +26,11 @@ description = "The filesystem path of the migrations directory to use."
 shape = "string"
 
 [recordShapes.createMigrationInput.fields.prismaSchema]
-description = "The current prisma schema to use as a target for the generated migration."
+description = "The Prisma schema to use as a target for the generated migration."
 shape = "string"
+
+[recordShapes.createMigrationOutput]
+description = "The output of the `creatMigration` command."
 
 [recordShapes.createMigrationOutput.fields.generatedMigrationName]
 description = """

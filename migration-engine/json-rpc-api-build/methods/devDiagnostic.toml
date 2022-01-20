@@ -11,15 +11,29 @@ requestShape = "devDiagnosticInput"
 responseShape = "devDiagnosticOutput"
 
 [recordShapes.devActionReset.fields.reason]
+description = "Why do we need to reset?"
 shape = "string"
 
+[recordShapes.devDiagnosticInput]
+description = "The request type for `devDiagnostic`."
+
 [recordShapes.devDiagnosticInput.fields.migrationsDirectoryPath]
+description = "The location of the migrations directory."
 shape = "string"
+
+[recordShapes.devDiagnosticOutput]
+description = "The response type for `devDiagnostic`."
 
 [recordShapes.devDiagnosticOutput.fields.action]
 description = "The suggested course of action for the CLI."
 shape = "devAction"
 
+[enumShapes.devAction]
+description = "A suggested action for the CLI `migrate dev` command."
+
 [enumShapes.devAction.variants.Reset]
+description = "Reset the database."
 shape = "devActionReset"
 
+[enumShapes.devAction.variants.CreateMigration]
+description = "Proceed to the next step"

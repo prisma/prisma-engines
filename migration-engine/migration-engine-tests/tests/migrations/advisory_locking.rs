@@ -1,7 +1,6 @@
-use std::sync::Arc;
-
-use migration_core::commands::CreateMigrationInput;
+use migration_core::json_rpc::types::*;
 use migration_engine_tests::multi_engine_test_api::*;
+use std::sync::Arc;
 use test_macros::test_connector;
 
 #[test_connector]
