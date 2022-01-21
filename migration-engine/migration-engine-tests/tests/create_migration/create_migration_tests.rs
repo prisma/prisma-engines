@@ -898,8 +898,12 @@ fn create_constraint_name_tests_w_explicit_names(api: TestApi) {
         });
 }
 
-#[cfg_attr(not(target_os = "windows"), test_connector(exclude(Vitess)))]
+#[test_connector(exclude(Vitess))]
 fn alter_constraint_name(api: TestApi) {
+    if cfg!(target_os = "windows") {
+        return;
+    }
+
     let plain_dm = api.datamodel_with_provider(
         r#"
          model A {
