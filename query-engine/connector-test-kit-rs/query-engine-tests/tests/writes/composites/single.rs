@@ -106,6 +106,7 @@ mod create {
         Ok(())
     }
 
+    // Ensures default values are set when using an explicit set empty object
     #[connector_test(schema(to_one_composites))]
     async fn explicit_set_empty_object_to_one(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
@@ -139,6 +140,7 @@ mod create {
         Ok(())
     }
 
+    // Ensures default values are set when using a shorthand empty object
     #[connector_test(schema(to_one_composites))]
     async fn shorthand_set_empty_object_to_one(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
