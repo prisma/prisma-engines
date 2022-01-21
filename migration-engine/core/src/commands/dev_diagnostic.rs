@@ -2,23 +2,8 @@ use super::{
     diagnose_migration_history, DiagnoseMigrationHistoryInput, DiagnoseMigrationHistoryOutput, DriftDiagnostic,
     HistoryDiagnostic,
 };
+use crate::json_rpc::types::{DevAction, DevActionReset, DevDiagnosticInput, DevDiagnosticOutput};
 use migration_connector::{migrations_directory, ConnectorResult, MigrationConnector};
-use serde::{Deserialize, Serialize};
-
-/// The `devDiagnostic` input.
-#[derive(Debug, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct DevDiagnosticInput {
-    /// The location of the migrations directory.
-    pub migrations_directory_path: String,
-}
-
-/// The response type for `devDiagnostic`.
-#[derive(Debug, Serialize)]
-pub struct DevDiagnosticOutput {
-    /// The suggested course of action for the CLI.
-    pub action: DevAction,
-}
 
 /// Method called at the beginning of `migrate dev` to decide the course of
 /// action based on the current state of the workspace.
@@ -39,7 +24,7 @@ pub(crate) async fn dev_diagnostic(
 
     if let Some(reason) = check_for_reset_conditions(&diagnose_migration_history_output) {
         return Ok(DevDiagnosticOutput {
-            action: DevAction::Reset { reason },
+            action: DevAction::Reset(DevActionReset { reason }),
         });
     }
 
@@ -129,34 +114,6 @@ If you are running this the first time on an existing database, please make sure
 https://www.prisma.io/docs/guides/database/developing-with-prisma-migrate/troubleshooting-development
 "#;
 
-/// A suggested action for the CLI `migrate dev` command.
-#[derive(Debug, Serialize)]
-#[serde(tag = "tag", rename_all = "camelCase")]
-pub enum DevAction {
-    /// Reset the database.
-    Reset {
-        /// Why do we need to reset?
-        reason: String,
-    },
-    /// Proceed to the next step.
-    CreateMigration,
-}
-
-impl DevAction {
-    /// Attempts to convert to a `Reset` and returns the reason.
-    pub fn as_reset(&self) -> Option<&str> {
-        match self {
-            DevAction::Reset { reason } => Some(reason),
-            _ => None,
-        }
-    }
-
-    /// Returns `true` if the action is CreateMigration.
-    pub fn is_create_migration(&self) -> bool {
-        matches!(self, DevAction::CreateMigration)
-    }
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -164,9 +121,9 @@ mod tests {
 
     #[test]
     fn dev_action_serializes_as_expected() {
-        let reset = serde_json::to_value(DevAction::Reset {
+        let reset = serde_json::to_value(DevAction::Reset(DevActionReset {
             reason: "Because I said so".to_owned(),
-        })
+        }))
         .unwrap();
 
         assert_eq!(reset, json!({ "tag": "reset", "reason": "Because I said so" }));

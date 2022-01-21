@@ -1447,6 +1447,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "json-rpc-api-build"
+version = "0.1.0"
+dependencies = [
+ "backtrace",
+ "heck",
+ "serde",
+ "toml",
+]
+
+[[package]]
 name = "json-rpc-stdio"
 version = "0.1.0"
 dependencies = [
@@ -1706,6 +1716,7 @@ dependencies = [
  "chrono",
  "datamodel",
  "enumflags2",
+ "json-rpc-api-build",
  "jsonrpc-core",
  "migration-connector",
  "mongodb-migration-connector",

@@ -3,6 +3,8 @@
 
 //! The top-level library crate for the migration engine.
 
+include!(concat!(env!("OUT_DIR"), "/methods.rs"));
+
 pub mod commands;
 
 mod api;

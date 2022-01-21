@@ -1,41 +1,5 @@
-use crate::{parse_schema, CoreResult};
+use crate::{json_rpc::types::*, parse_schema, CoreResult};
 use migration_connector::{migrations_directory::*, DiffTarget, MigrationConnector};
-use serde::{Deserialize, Serialize};
-
-/// The input to the `evaluateDataLoss` command.
-#[derive(Deserialize, Debug)]
-#[serde(rename_all = "camelCase")]
-pub struct EvaluateDataLossInput {
-    /// The location of the migrations directory.
-    pub migrations_directory_path: String,
-    /// The prisma schema to migrate to.
-    pub prisma_schema: String,
-}
-
-/// The output of the `evaluateDataLoss` command.
-#[derive(Serialize, Debug, PartialEq)]
-#[serde(rename_all = "camelCase")]
-pub struct EvaluateDataLossOutput {
-    /// The number of migration steps the engine would generate.
-    pub migration_steps: usize,
-    /// Destructive change warnings for the local database. These are the
-    /// warnings *for the migration that would be generated*. This does not
-    /// include other potentially yet unapplied migrations.
-    pub warnings: Vec<MigrationFeedback>,
-    /// Steps that cannot be executed on the local database in the migration
-    /// that would be generated.
-    pub unexecutable_steps: Vec<MigrationFeedback>,
-}
-
-/// A data loss warning or an unexecutable migration error, associated with the step that triggered it.
-#[derive(Serialize, Debug, PartialEq)]
-#[serde(rename_all = "camelCase")]
-pub struct MigrationFeedback {
-    /// The human-readable message.
-    pub message: String,
-    /// The index of the step this pertains to.
-    pub step_index: usize,
-}
 
 /// Development command for migrations. Evaluate the data loss induced by the
 /// next migration the engine would generate on the main database.
@@ -61,7 +25,7 @@ pub(crate) async fn evaluate_data_loss(
         )
         .await?;
 
-    let migration_steps = connector.migration_len(&migration);
+    let migration_steps = connector.migration_len(&migration) as u32;
     let diagnostics = checker.check(&migration).await?;
 
     let warnings = diagnostics
@@ -69,7 +33,7 @@ pub(crate) async fn evaluate_data_loss(
         .into_iter()
         .map(|warning| MigrationFeedback {
             message: warning.description,
-            step_index: warning.step_index,
+            step_index: warning.step_index as u32,
         })
         .collect();
 
@@ -78,7 +42,7 @@ pub(crate) async fn evaluate_data_loss(
         .into_iter()
         .map(|unexecutable| MigrationFeedback {
             message: unexecutable.description,
-            step_index: unexecutable.step_index,
+            step_index: unexecutable.step_index as u32,
         })
         .collect();
 

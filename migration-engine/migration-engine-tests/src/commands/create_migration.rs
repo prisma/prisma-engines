@@ -1,6 +1,4 @@
-use migration_core::{
-    commands::CreateMigrationInput, commands::CreateMigrationOutput, CoreError, CoreResult, GenericApi,
-};
+use migration_core::{json_rpc::types::*, CoreError, CoreResult, GenericApi};
 use pretty_assertions::assert_eq;
 use std::path::Path;
 use tempfile::TempDir;
