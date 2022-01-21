@@ -6,7 +6,7 @@ The generated span’s name will be the name of the function.
 By default, all arguments to the function are included as fields on the
 span. Arguments that are <code>tracing</code> <a href="https://docs.rs/tracing/latest/tracing/field/trait.Value.html#foreign-impls">primitive types</a> implementing the
 <a href="https://docs.rs/tracing/latest/tracing/field/trait.Value.html."><code>Value</code> trait</a> will be recorded as fields of that type. Types which do
-not implement <code>Value</code> will be recorded using <a href="https://doc.rust-lang.org/1.58.0/core/fmt/trait.Debug.html" title="std::fmt::Debug"><code>std::fmt::Debug</code></a>.</p>
+not implement <code>Value</code> will be recorded using <a href="https://doc.rust-lang.org/1.58.1/core/fmt/trait.Debug.html" title="std::fmt::Debug"><code>std::fmt::Debug</code></a>.</p>
 <h2 id="overriding-span-attributes" class="section-header"><a href="#overriding-span-attributes">Overriding Span Attributes</a></h2>
 <p>To change the <a href="https://docs.rs/tracing/latest/tracing/struct.Metadata.html#method.name">name</a> of the generated span, add a <code>name</code> argument to the
 <code>#[instrument]</code> macro, followed by an equals sign and a string literal. For

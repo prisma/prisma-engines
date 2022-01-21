@@ -1,1 +1,0 @@
-initSidebarItems({"trait":[["CommandExt","Unix-specific extensions to the [`Command`] builder."]]});

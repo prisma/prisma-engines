@@ -91,11 +91,7 @@
 <span id="90">90</span>
 <span id="91">91</span>
 <span id="92">92</span>
-<span id="93">93</span>
-<span id="94">94</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">migration_core</span>::{
-    <span class="ident">commands::ApplyMigrationsInput</span>, <span class="ident">commands::ApplyMigrationsOutput</span>, <span class="ident">CoreError</span>, <span class="ident">CoreResult</span>, <span class="ident">GenericApi</span>,
-};
+</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">migration_core</span>::{<span class="ident">json_rpc::types</span>::<span class="kw-2">*</span>, <span class="ident">CoreError</span>, <span class="ident">CoreResult</span>, <span class="ident">GenericApi</span>};
 <span class="kw">use</span> <span class="ident">tempfile::TempDir</span>;
 
 <span class="attribute">#[<span class="ident">must_use</span> <span class="op">=</span> <span class="string">&quot;This struct does nothing on its own. See ApplyMigrations::send()&quot;</span>]</span>

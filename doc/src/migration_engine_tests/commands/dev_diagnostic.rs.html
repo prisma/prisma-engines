@@ -62,7 +62,7 @@
 <span id="61">61</span>
 <span id="62">62</span>
 <span id="63">63</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">migration_core</span>::{<span class="ident">commands::DevDiagnosticInput</span>, <span class="ident">commands::DevDiagnosticOutput</span>, <span class="ident">CoreError</span>, <span class="ident">CoreResult</span>, <span class="ident">GenericApi</span>};
+</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">migration_core</span>::{<span class="ident">json_rpc::types</span>::<span class="kw-2">*</span>, <span class="ident">CoreError</span>, <span class="ident">CoreResult</span>, <span class="ident">GenericApi</span>};
 <span class="kw">use</span> <span class="ident">tempfile::TempDir</span>;
 
 <span class="attribute">#[<span class="ident">must_use</span> <span class="op">=</span> <span class="string">&quot;This struct does nothing on its own. See DevDiagnostic::send()&quot;</span>]</span>

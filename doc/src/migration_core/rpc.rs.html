@@ -64,65 +64,9 @@
 <span id="63">63</span>
 <span id="64">64</span>
 <span id="65">65</span>
-<span id="66">66</span>
-<span id="67">67</span>
-<span id="68">68</span>
-<span id="69">69</span>
-<span id="70">70</span>
-<span id="71">71</span>
-<span id="72">72</span>
-<span id="73">73</span>
-<span id="74">74</span>
-<span id="75">75</span>
-<span id="76">76</span>
-<span id="77">77</span>
-<span id="78">78</span>
-<span id="79">79</span>
-<span id="80">80</span>
-<span id="81">81</span>
-<span id="82">82</span>
-<span id="83">83</span>
-<span id="84">84</span>
-<span id="85">85</span>
-<span id="86">86</span>
-<span id="87">87</span>
-<span id="88">88</span>
-<span id="89">89</span>
-<span id="90">90</span>
-<span id="91">91</span>
-<span id="92">92</span>
-<span id="93">93</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">CoreError</span>, <span class="ident">CoreResult</span>, <span class="ident">GenericApi</span>};
+</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">json_rpc::method_names</span>::<span class="kw-2">*</span>, <span class="ident">CoreError</span>, <span class="ident">CoreResult</span>, <span class="ident">GenericApi</span>};
 <span class="kw">use</span> <span class="ident">jsonrpc_core</span>::{<span class="ident">types::error::Error</span> <span class="kw">as</span> <span class="ident">JsonRpcError</span>, <span class="ident">IoHandler</span>, <span class="ident">Params</span>};
 <span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
-
-<span class="kw">const</span> <span class="ident">APPLY_MIGRATIONS</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;applyMigrations&quot;</span>;
-<span class="kw">const</span> <span class="ident">CREATE_MIGRATION</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;createMigration&quot;</span>;
-<span class="kw">const</span> <span class="ident">DEBUG_PANIC</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;debugPanic&quot;</span>;
-<span class="kw">const</span> <span class="ident">DEV_DIAGNOSTIC</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;devDiagnostic&quot;</span>;
-<span class="kw">const</span> <span class="ident">DIAGNOSE_MIGRATION_HISTORY</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;diagnoseMigrationHistory&quot;</span>;
-<span class="kw">const</span> <span class="ident">EVALUATE_DATA_LOSS</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;evaluateDataLoss&quot;</span>;
-<span class="kw">const</span> <span class="ident">GET_DATABASE_VERSION</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;getDatabaseVersion&quot;</span>;
-<span class="kw">const</span> <span class="ident">LIST_MIGRATION_DIRECTORIES</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;listMigrationDirectories&quot;</span>;
-<span class="kw">const</span> <span class="ident">MARK_MIGRATION_APPLIED</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;markMigrationApplied&quot;</span>;
-<span class="kw">const</span> <span class="ident">MARK_MIGRATION_ROLLED_BACK</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;markMigrationRolledBack&quot;</span>;
-<span class="kw">const</span> <span class="ident">RESET</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;reset&quot;</span>;
-<span class="kw">const</span> <span class="ident">SCHEMA_PUSH</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;schemaPush&quot;</span>;
-
-<span class="kw">const</span> <span class="ident">AVAILABLE_COMMANDS</span>: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="ident">str</span>] <span class="op">=</span> <span class="kw-2">&amp;</span>[
-    <span class="ident">APPLY_MIGRATIONS</span>,
-    <span class="ident">CREATE_MIGRATION</span>,
-    <span class="ident">DEBUG_PANIC</span>,
-    <span class="ident">DEV_DIAGNOSTIC</span>,
-    <span class="ident">DIAGNOSE_MIGRATION_HISTORY</span>,
-    <span class="ident">EVALUATE_DATA_LOSS</span>,
-    <span class="ident">GET_DATABASE_VERSION</span>,
-    <span class="ident">LIST_MIGRATION_DIRECTORIES</span>,
-    <span class="ident">MARK_MIGRATION_APPLIED</span>,
-    <span class="ident">MARK_MIGRATION_ROLLED_BACK</span>,
-    <span class="ident">RESET</span>,
-    <span class="ident">SCHEMA_PUSH</span>,
-];
 
 <span class="doccomment">/// Initialize a JSON-RPC ready migration engine API. This entails starting</span>
 <span class="doccomment">/// a database connection.</span>
@@ -134,7 +78,7 @@
 
     <span class="ident">api</span>.<span class="ident">ensure_connection_validity</span>().<span class="kw">await</span><span class="question-mark">?</span>;
 
-    <span class="kw">for</span> <span class="ident">cmd</span> <span class="kw">in</span> <span class="ident">AVAILABLE_COMMANDS</span> {
+    <span class="kw">for</span> <span class="ident">cmd</span> <span class="kw">in</span> <span class="ident">METHOD_NAMES</span> {
         <span class="kw">let</span> <span class="ident">api</span> <span class="op">=</span> <span class="ident">api</span>.<span class="ident">clone</span>();
         <span class="ident">io_handler</span>.<span class="ident">add_method</span>(<span class="ident">cmd</span>, <span class="kw">move</span> <span class="op">|</span><span class="ident">params</span>: <span class="ident">Params</span><span class="op">|</span> {
             <span class="ident">Box::pin</span>(<span class="ident">run_command</span>(<span class="ident">api</span>.<span class="ident">clone</span>(), <span class="ident">cmd</span>, <span class="ident">params</span>))

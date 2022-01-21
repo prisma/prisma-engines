@@ -200,11 +200,7 @@
 <span id="199">199</span>
 <span id="200">200</span>
 <span id="201">201</span>
-<span id="202">202</span>
-<span id="203">203</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">migration_core</span>::{
-    <span class="ident">commands::CreateMigrationInput</span>, <span class="ident">commands::CreateMigrationOutput</span>, <span class="ident">CoreError</span>, <span class="ident">CoreResult</span>, <span class="ident">GenericApi</span>,
-};
+</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">migration_core</span>::{<span class="ident">json_rpc::types</span>::<span class="kw-2">*</span>, <span class="ident">CoreError</span>, <span class="ident">CoreResult</span>, <span class="ident">GenericApi</span>};
 <span class="kw">use</span> <span class="ident">pretty_assertions::assert_eq</span>;
 <span class="kw">use</span> <span class="ident">std::path::Path</span>;
 <span class="kw">use</span> <span class="ident">tempfile::TempDir</span>;

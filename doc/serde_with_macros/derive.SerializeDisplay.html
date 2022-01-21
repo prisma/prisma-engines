@@ -4,12 +4,12 @@
     // Attributes available to this derive:
     #[serde_with]
 }
-</code></pre></div><details class="rustdoc-toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>Serialize value by using it’s <a href="https://doc.rust-lang.org/1.58.0/core/fmt/trait.Display.html"><code>Display</code></a> implementation</p>
-<p>This is an alternative way to implement <code>Serialize</code> for types which also implement <a href="https://doc.rust-lang.org/1.58.0/core/fmt/trait.Display.html"><code>Display</code></a> by serializing the type as string.
-Ensure that the struct/enum also implements <a href="https://doc.rust-lang.org/1.58.0/core/fmt/trait.Display.html"><code>Display</code></a>.
+</code></pre></div><details class="rustdoc-toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>Serialize value by using it’s <a href="https://doc.rust-lang.org/1.58.1/core/fmt/trait.Display.html"><code>Display</code></a> implementation</p>
+<p>This is an alternative way to implement <code>Serialize</code> for types which also implement <a href="https://doc.rust-lang.org/1.58.1/core/fmt/trait.Display.html"><code>Display</code></a> by serializing the type as string.
+Ensure that the struct/enum also implements <a href="https://doc.rust-lang.org/1.58.1/core/fmt/trait.Display.html"><code>Display</code></a>.
 If the implementation is missing, you will get an error message like</p>
 <div class="example-wrap"><pre class="language-text"><code>error[E0277]: `Struct` doesn&#39;t implement `std::fmt::Display`</code></pre></div>
-<p>Deserialization with <a href="https://doc.rust-lang.org/1.58.0/core/str/traits/trait.FromStr.html"><code>FromStr</code></a> is available with the matching <a href="derive.DeserializeFromStr.html" title="DeserializeFromStr"><code>DeserializeFromStr</code></a> derive.</p>
+<p>Deserialization with <a href="https://doc.rust-lang.org/1.58.1/core/str/traits/trait.FromStr.html"><code>FromStr</code></a> is available with the matching <a href="derive.DeserializeFromStr.html" title="DeserializeFromStr"><code>DeserializeFromStr</code></a> derive.</p>
 <h2 id="attributes" class="section-header"><a href="#attributes">Attributes</a></h2>
 <p>Attributes for the derive can be specified via the <code>#[serde_with(...)]</code> attribute on the struct or enum.
 Currently, these arguments to the attribute are possible:</p>

@@ -110,7 +110,7 @@
 
     <span class="kw">for</span> <span class="ident">span</span> <span class="kw">in</span> <span class="ident">referential_action_spans</span> {
         <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_validation_error</span>(
-            <span class="string">&quot;Referential actions on many-to-many relations are not supported&quot;</span>.<span class="ident">to_owned</span>(),
+            <span class="string">&quot;Referential actions on implicit many-to-many relations are not supported&quot;</span>.<span class="ident">to_owned</span>(),
             <span class="ident">span</span>,
         ));
     }

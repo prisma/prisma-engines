@@ -260,42 +260,136 @@
 <span id="259">259</span>
 <span id="260">260</span>
 <span id="261">261</span>
-</pre><pre class="rust"><code><span class="attribute">#![<span class="ident">deny</span>(<span class="ident">missing_docs</span>)]</span>
-
-<span class="kw">mod</span> <span class="ident">elapsed_middleware</span>;
-
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">context::PrismaContext</span>, <span class="ident">opt::PrismaOpt</span>, <span class="ident">PrismaResult</span>};
+<span id="262">262</span>
+<span id="263">263</span>
+<span id="264">264</span>
+<span id="265">265</span>
+<span id="266">266</span>
+<span id="267">267</span>
+<span id="268">268</span>
+<span id="269">269</span>
+<span id="270">270</span>
+<span id="271">271</span>
+<span id="272">272</span>
+<span id="273">273</span>
+<span id="274">274</span>
+<span id="275">275</span>
+<span id="276">276</span>
+<span id="277">277</span>
+<span id="278">278</span>
+<span id="279">279</span>
+<span id="280">280</span>
+<span id="281">281</span>
+<span id="282">282</span>
+<span id="283">283</span>
+<span id="284">284</span>
+<span id="285">285</span>
+<span id="286">286</span>
+<span id="287">287</span>
+<span id="288">288</span>
+<span id="289">289</span>
+<span id="290">290</span>
+<span id="291">291</span>
+<span id="292">292</span>
+<span id="293">293</span>
+<span id="294">294</span>
+<span id="295">295</span>
+<span id="296">296</span>
+<span id="297">297</span>
+<span id="298">298</span>
+<span id="299">299</span>
+<span id="300">300</span>
+<span id="301">301</span>
+<span id="302">302</span>
+<span id="303">303</span>
+<span id="304">304</span>
+<span id="305">305</span>
+<span id="306">306</span>
+<span id="307">307</span>
+<span id="308">308</span>
+<span id="309">309</span>
+<span id="310">310</span>
+<span id="311">311</span>
+<span id="312">312</span>
+<span id="313">313</span>
+<span id="314">314</span>
+<span id="315">315</span>
+<span id="316">316</span>
+<span id="317">317</span>
+<span id="318">318</span>
+<span id="319">319</span>
+<span id="320">320</span>
+<span id="321">321</span>
+<span id="322">322</span>
+<span id="323">323</span>
+<span id="324">324</span>
+<span id="325">325</span>
+<span id="326">326</span>
+<span id="327">327</span>
+<span id="328">328</span>
+<span id="329">329</span>
+<span id="330">330</span>
+<span id="331">331</span>
+<span id="332">332</span>
+<span id="333">333</span>
+<span id="334">334</span>
+<span id="335">335</span>
+<span id="336">336</span>
+<span id="337">337</span>
+<span id="338">338</span>
+<span id="339">339</span>
+<span id="340">340</span>
+<span id="341">341</span>
+<span id="342">342</span>
+<span id="343">343</span>
+<span id="344">344</span>
+<span id="345">345</span>
+<span id="346">346</span>
+<span id="347">347</span>
+<span id="348">348</span>
+<span id="349">349</span>
+<span id="350">350</span>
+<span id="351">351</span>
+<span id="352">352</span>
+<span id="353">353</span>
+<span id="354">354</span>
+<span id="355">355</span>
+<span id="356">356</span>
+<span id="357">357</span>
+<span id="358">358</span>
+</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">context::PrismaContext</span>, <span class="ident">opt::PrismaOpt</span>, <span class="ident">PrismaResult</span>};
 <span class="kw">use</span> <span class="ident">datamodel::common::preview_features::PreviewFeature</span>;
-<span class="kw">use</span> <span class="ident">elapsed_middleware::ElapsedMiddleware</span>;
-<span class="kw">use</span> <span class="ident">opentelemetry</span>::{<span class="ident">global</span>, <span class="ident">Context</span>};
+<span class="kw">use</span> <span class="ident">hyper::service</span>::{<span class="ident">make_service_fn</span>, <span class="ident">service_fn</span>};
+<span class="kw">use</span> <span class="ident">hyper</span>::{<span class="ident">header::CONTENT_TYPE</span>, <span class="ident">Body</span>, <span class="ident">HeaderMap</span>, <span class="ident">Method</span>, <span class="ident">Request</span>, <span class="ident">Response</span>, <span class="ident">Server</span>, <span class="ident">StatusCode</span>};
+<span class="kw">use</span> <span class="ident">opentelemetry</span>::{<span class="ident">global</span>, <span class="ident">propagation::Extractor</span>, <span class="ident">Context</span>};
 <span class="kw">use</span> <span class="ident">query_core</span>::{<span class="ident">schema::QuerySchemaRenderer</span>, <span class="ident">TxId</span>};
-<span class="kw">use</span> <span class="ident">request_handlers</span>::{<span class="ident">dmmf</span>, <span class="ident">GraphQLSchemaRenderer</span>, <span class="ident">GraphQlBody</span>, <span class="ident">GraphQlHandler</span>, <span class="ident">TxInput</span>};
+<span class="kw">use</span> <span class="ident">request_handlers</span>::{<span class="ident">dmmf</span>, <span class="ident">GraphQLSchemaRenderer</span>, <span class="ident">GraphQlHandler</span>, <span class="ident">TxInput</span>};
 <span class="kw">use</span> <span class="ident">serde_json::json</span>;
-<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">collections::HashMap</span>, <span class="ident">sync::Arc</span>};
-<span class="kw">use</span> <span class="ident">tide</span>::{
-    <span class="ident">http</span>::{<span class="ident">mime</span>, <span class="ident">StatusCode</span>},
-    <span class="ident">prelude</span>::<span class="kw-2">*</span>,
-    <span class="ident">Body</span>, <span class="ident">Request</span>, <span class="ident">Response</span>,
-};
-<span class="kw">use</span> <span class="ident">tide_server_timing::TimingMiddleware</span>;
+<span class="kw">use</span> <span class="ident">std::net::SocketAddr</span>;
+<span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
+<span class="kw">use</span> <span class="ident">std::time::Instant</span>;
 <span class="kw">use</span> <span class="ident">tracing::Level</span>;
 <span class="kw">use</span> <span class="ident">tracing_futures::Instrument</span>;
 <span class="kw">use</span> <span class="ident">tracing_opentelemetry::OpenTelemetrySpanExt</span>;
 
+<span class="kw">const</span> <span class="ident">TRANSACTION_ID_HEADER</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;X-transaction-id&quot;</span>;
+
 <span class="comment">//// Shared application state.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">State</span> {
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">State</span> {
     <span class="ident">cx</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">PrismaContext</span><span class="op">&gt;</span>,
     <span class="ident">enable_playground</span>: <span class="ident">bool</span>,
     <span class="ident">enable_debug_mode</span>: <span class="ident">bool</span>,
+    <span class="ident">enable_itx</span>: <span class="ident">bool</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">State</span> {
     <span class="doccomment">/// Create a new instance of `State`.</span>
-    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">cx</span>: <span class="ident">PrismaContext</span>, <span class="ident">enable_playground</span>: <span class="ident">bool</span>, <span class="ident">enable_debug_mode</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">cx</span>: <span class="ident">PrismaContext</span>, <span class="ident">enable_playground</span>: <span class="ident">bool</span>, <span class="ident">enable_debug_mode</span>: <span class="ident">bool</span>, <span class="ident">enable_itx</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">cx</span>: <span class="ident">Arc::new</span>(<span class="ident">cx</span>),
             <span class="ident">enable_playground</span>,
             <span class="ident">enable_debug_mode</span>,
+            <span class="ident">enable_itx</span>,
         }
     }
 }
@@ -306,13 +400,12 @@
             <span class="ident">cx</span>: <span class="self">self</span>.<span class="ident">cx</span>.<span class="ident">clone</span>(),
             <span class="ident">enable_playground</span>: <span class="self">self</span>.<span class="ident">enable_playground</span>,
             <span class="ident">enable_debug_mode</span>: <span class="self">self</span>.<span class="ident">enable_debug_mode</span>,
+            <span class="ident">enable_itx</span>: <span class="self">self</span>.<span class="ident">enable_itx</span>,
         }
     }
 }
 
-<span class="doccomment">/// Create a new server and listen.</span>
-<span class="attribute">#[<span class="ident">tracing::instrument</span>(<span class="ident">skip</span>(<span class="ident">opts</span>))]</span>
-<span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">listen</span>(<span class="ident">opts</span>: <span class="ident">PrismaOpt</span>) -&gt; <span class="ident">PrismaResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">setup</span>(<span class="ident">opts</span>: <span class="kw-2">&amp;</span><span class="ident">PrismaOpt</span>) -&gt; <span class="ident">PrismaResult</span><span class="op">&lt;</span><span class="ident">State</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">config</span> <span class="op">=</span> <span class="ident">opts</span>.<span class="ident">configuration</span>(<span class="bool-val">false</span>)<span class="question-mark">?</span>.<span class="ident">subject</span>;
     <span class="ident">config</span>.<span class="ident">validate_that_one_datasource_is_provided</span>()<span class="question-mark">?</span>;
 
@@ -327,69 +420,138 @@
         .<span class="ident">build</span>()
         .<span class="kw">await</span><span class="question-mark">?</span>;
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">app</span> <span class="op">=</span> <span class="ident">tide::with_state</span>(<span class="ident">State::new</span>(<span class="ident">cx</span>, <span class="ident">opts</span>.<span class="ident">enable_playground</span>, <span class="ident">opts</span>.<span class="ident">enable_debug_mode</span>));
-    <span class="ident">app</span>.<span class="ident">with</span>(<span class="ident">ElapsedMiddleware::new</span>());
+    <span class="kw">let</span> <span class="ident">state</span> <span class="op">=</span> <span class="ident">State::new</span>(<span class="ident">cx</span>, <span class="ident">opts</span>.<span class="ident">enable_playground</span>, <span class="ident">opts</span>.<span class="ident">enable_debug_mode</span>, <span class="ident">enable_itx</span>);
+    <span class="prelude-val">Ok</span>(<span class="ident">state</span>)
+}
 
-    <span class="kw">if</span> <span class="ident">opts</span>.<span class="ident">enable_playground</span> {
-        <span class="ident">app</span>.<span class="ident">with</span>(<span class="ident">TimingMiddleware::new</span>());
+<span class="doccomment">/// Starts up the graphql query engine server</span>
+<span class="attribute">#[<span class="ident">tracing::instrument</span>(<span class="ident">skip</span>(<span class="ident">opts</span>))]</span>
+<span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">listen</span>(<span class="ident">opts</span>: <span class="ident">PrismaOpt</span>) -&gt; <span class="ident">PrismaResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">let</span> <span class="ident">state</span> <span class="op">=</span> <span class="ident">setup</span>(<span class="kw-2">&amp;</span><span class="ident">opts</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+
+    <span class="kw">let</span> <span class="ident">query_engine</span> <span class="op">=</span> <span class="ident">make_service_fn</span>(<span class="kw">move</span> <span class="op">|</span><span class="kw">_</span><span class="op">|</span> {
+        <span class="kw">let</span> <span class="ident">state</span> <span class="op">=</span> <span class="ident">state</span>.<span class="ident">clone</span>();
+        <span class="kw">async</span> <span class="kw">move</span> { <span class="prelude-val">Ok</span>::<span class="op">&lt;</span><span class="kw">_</span>, <span class="ident">hyper::Error</span><span class="op">&gt;</span>(<span class="ident">service_fn</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">req</span><span class="op">|</span> <span class="ident">routes</span>(<span class="ident">state</span>.<span class="ident">clone</span>(), <span class="ident">req</span>))) }
+    });
+
+    <span class="kw">let</span> <span class="ident">ip</span> <span class="op">=</span> <span class="ident">opts</span>.<span class="ident">host</span>.<span class="ident">parse</span>().<span class="ident">expect</span>(<span class="string">&quot;Host was not a valid IP address.&quot;</span>);
+    <span class="kw">let</span> <span class="ident">addr</span> <span class="op">=</span> <span class="ident">SocketAddr::new</span>(<span class="ident">ip</span>, <span class="ident">opts</span>.<span class="ident">port</span>);
+
+    <span class="kw">let</span> <span class="ident">server</span> <span class="op">=</span> <span class="ident">Server::bind</span>(<span class="kw-2">&amp;</span><span class="ident">addr</span>).<span class="ident">tcp_nodelay</span>(<span class="bool-val">true</span>).<span class="ident">serve</span>(<span class="ident">query_engine</span>);
+
+    <span class="macro">info!</span>(<span class="string">&quot;Started http server on http://{}&quot;</span>, <span class="ident">addr</span>);
+
+    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span> <span class="ident">server</span>.<span class="kw">await</span> {
+        <span class="macro">eprintln!</span>(<span class="string">&quot;server error: {}&quot;</span>, <span class="ident">e</span>);
     }
 
-    <span class="ident">app</span>.<span class="ident">at</span>(<span class="string">&quot;/&quot;</span>).<span class="ident">post</span>(<span class="ident">graphql_handler</span>);
-    <span class="ident">app</span>.<span class="ident">at</span>(<span class="string">&quot;/&quot;</span>).<span class="ident">get</span>(<span class="ident">playground_handler</span>);
-    <span class="ident">app</span>.<span class="ident">at</span>(<span class="string">&quot;/sdl&quot;</span>).<span class="ident">get</span>(<span class="ident">sdl_handler</span>);
-    <span class="ident">app</span>.<span class="ident">at</span>(<span class="string">&quot;/dmmf&quot;</span>).<span class="ident">get</span>(<span class="ident">dmmf_handler</span>);
-    <span class="ident">app</span>.<span class="ident">at</span>(<span class="string">&quot;/server_info&quot;</span>).<span class="ident">get</span>(<span class="ident">server_info_handler</span>);
-    <span class="ident">app</span>.<span class="ident">at</span>(<span class="string">&quot;/status&quot;</span>).<span class="ident">get</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="kw">async</span> <span class="kw">move</span> { <span class="prelude-val">Ok</span>(<span class="macro">json!</span>({<span class="string">&quot;status&quot;</span>: <span class="string">&quot;ok&quot;</span>})) });
+    <span class="prelude-val">Ok</span>(())
+}
 
-    <span class="kw">if</span> <span class="ident">enable_itx</span> {
-        <span class="comment">// Transaction routes.</span>
-        <span class="ident">app</span>.<span class="ident">at</span>(<span class="string">&quot;/transaction/start&quot;</span>).<span class="ident">post</span>(<span class="ident">transaction_start_handler</span>);
-        <span class="ident">app</span>.<span class="ident">at</span>(<span class="string">&quot;/transaction/:id/commit&quot;</span>).<span class="ident">post</span>(<span class="ident">transaction_commit_handler</span>);
-        <span class="ident">app</span>.<span class="ident">at</span>(<span class="string">&quot;/transaction/:id/rollback&quot;</span>).<span class="ident">post</span>(<span class="ident">transaction_rollback_handler</span>);
+<span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">routes</span>(<span class="ident">state</span>: <span class="ident">State</span>, <span class="ident">req</span>: <span class="ident">Request</span><span class="op">&lt;</span><span class="ident">Body</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Response</span><span class="op">&lt;</span><span class="ident">Body</span><span class="op">&gt;</span>, <span class="ident">hyper::Error</span><span class="op">&gt;</span> {
+    <span class="kw">let</span> <span class="ident">start</span> <span class="op">=</span> <span class="ident">Instant::now</span>();
+
+    <span class="kw">if</span> <span class="ident">req</span>.<span class="ident">method</span>() <span class="op">==</span> <span class="ident">Method::POST</span> <span class="op">&amp;&amp;</span> <span class="ident">req</span>.<span class="ident">uri</span>().<span class="ident">path</span>().<span class="ident">contains</span>(<span class="string">&quot;transaction&quot;</span>) <span class="op">&amp;&amp;</span> <span class="ident">state</span>.<span class="ident">enable_itx</span> {
+        <span class="kw">return</span> <span class="ident">handle_transaction</span>(<span class="ident">state</span>, <span class="ident">req</span>).<span class="kw">await</span>;
     }
 
-    <span class="comment">// Start the Tide server and log the server details.</span>
-    <span class="comment">// NOTE: The `info!` statement is essential for the correct working of the client.</span>
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">listener</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">opts</span>.<span class="ident">unix_path</span>() {
-        <span class="prelude-val">Some</span>(<span class="ident">path</span>) =&gt; <span class="ident">app</span>.<span class="ident">bind</span>(<span class="macro">format!</span>(<span class="string">&quot;http+unix://{}&quot;</span>, <span class="ident">path</span>)).<span class="kw">await</span><span class="question-mark">?</span>,
-        <span class="prelude-val">None</span> =&gt; <span class="ident">app</span>.<span class="ident">bind</span>(<span class="macro">format!</span>(<span class="string">&quot;{}:{}&quot;</span>, <span class="ident">opts</span>.<span class="ident">host</span>.<span class="ident">as_str</span>(), <span class="ident">opts</span>.<span class="ident">port</span>)).<span class="kw">await</span><span class="question-mark">?</span>,
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">res</span> <span class="op">=</span> <span class="kw">match</span> (<span class="ident">req</span>.<span class="ident">method</span>(), <span class="ident">req</span>.<span class="ident">uri</span>().<span class="ident">path</span>()) {
+        (<span class="kw-2">&amp;</span><span class="ident">Method::POST</span>, <span class="string">&quot;/&quot;</span>) =&gt; <span class="ident">graphql_handler</span>(<span class="ident">state</span>, <span class="ident">req</span>).<span class="kw">await</span><span class="question-mark">?</span>,
+        (<span class="kw-2">&amp;</span><span class="ident">Method::GET</span>, <span class="string">&quot;/&quot;</span>) <span class="kw">if</span> <span class="ident">state</span>.<span class="ident">enable_playground</span> =&gt; <span class="ident">playground_handler</span>(),
+        (<span class="kw-2">&amp;</span><span class="ident">Method::GET</span>, <span class="string">&quot;/status&quot;</span>) =&gt; <span class="ident">Response::builder</span>()
+            .<span class="ident">status</span>(<span class="ident">StatusCode::OK</span>)
+            .<span class="ident">header</span>(<span class="ident">CONTENT_TYPE</span>, <span class="string">&quot;application/json&quot;</span>)
+            .<span class="ident">body</span>(<span class="ident">Body::from</span>(<span class="string">r#&quot;{&quot;status&quot;:&quot;ok&quot;}&quot;#</span>))
+            .<span class="ident">unwrap</span>(),
+
+        (<span class="kw-2">&amp;</span><span class="ident">Method::GET</span>, <span class="string">&quot;/sdl&quot;</span>) =&gt; {
+            <span class="kw">let</span> <span class="ident">schema</span> <span class="op">=</span> <span class="ident">GraphQLSchemaRenderer::render</span>(<span class="ident">state</span>.<span class="ident">cx</span>.<span class="ident">query_schema</span>().<span class="ident">clone</span>());
+
+            <span class="ident">Response::builder</span>()
+                .<span class="ident">status</span>(<span class="ident">StatusCode::OK</span>)
+                .<span class="ident">header</span>(<span class="ident">CONTENT_TYPE</span>, <span class="string">&quot;application/text&quot;</span>)
+                .<span class="ident">body</span>(<span class="ident">Body::from</span>(<span class="ident">schema</span>))
+                .<span class="ident">unwrap</span>()
+        }
+
+        (<span class="kw-2">&amp;</span><span class="ident">Method::GET</span>, <span class="string">&quot;/dmmf&quot;</span>) =&gt; {
+            <span class="kw">let</span> <span class="ident">schema</span> <span class="op">=</span> <span class="ident">dmmf::render_dmmf</span>(<span class="ident">state</span>.<span class="ident">cx</span>.<span class="ident">datamodel</span>(), <span class="ident">Arc::clone</span>(<span class="ident">state</span>.<span class="ident">cx</span>.<span class="ident">query_schema</span>()));
+
+            <span class="ident">Response::builder</span>()
+                .<span class="ident">status</span>(<span class="ident">StatusCode::OK</span>)
+                .<span class="ident">header</span>(<span class="ident">CONTENT_TYPE</span>, <span class="string">&quot;application/json&quot;</span>)
+                .<span class="ident">body</span>(<span class="ident">Body::from</span>(<span class="ident">serde_json::to_vec</span>(<span class="kw-2">&amp;</span><span class="ident">schema</span>).<span class="ident">unwrap</span>()))
+                .<span class="ident">unwrap</span>()
+        }
+
+        (<span class="kw-2">&amp;</span><span class="ident">Method::GET</span>, <span class="string">&quot;/server_info&quot;</span>) =&gt; {
+            <span class="kw">let</span> <span class="ident">body</span> <span class="op">=</span> <span class="macro">json!</span>({
+                <span class="string">&quot;commit&quot;</span>: <span class="macro">env!</span>(<span class="string">&quot;GIT_HASH&quot;</span>),
+                <span class="string">&quot;version&quot;</span>: <span class="macro">env!</span>(<span class="string">&quot;CARGO_PKG_VERSION&quot;</span>),
+                <span class="string">&quot;primary_connector&quot;</span>: <span class="ident">state</span>.<span class="ident">cx</span>.<span class="ident">primary_connector</span>(),
+            });
+
+            <span class="ident">Response::builder</span>()
+                .<span class="ident">status</span>(<span class="ident">StatusCode::OK</span>)
+                .<span class="ident">header</span>(<span class="ident">CONTENT_TYPE</span>, <span class="string">&quot;application/json&quot;</span>)
+                .<span class="ident">body</span>(<span class="ident">Body::from</span>(<span class="ident">serde_json::to_vec</span>(<span class="kw-2">&amp;</span><span class="ident">body</span>).<span class="ident">unwrap</span>()))
+                .<span class="ident">unwrap</span>()
+        }
+        <span class="kw">_</span> =&gt; <span class="ident">Response::builder</span>()
+            .<span class="ident">status</span>(<span class="ident">StatusCode::NOT_FOUND</span>)
+            .<span class="ident">body</span>(<span class="ident">Body::empty</span>())
+            .<span class="ident">unwrap</span>(),
     };
 
-    <span class="macro">info!</span>(<span class="string">&quot;Started http server on {}&quot;</span>, <span class="ident">listener</span>);
-    <span class="ident">listener</span>.<span class="ident">accept</span>().<span class="kw">await</span><span class="question-mark">?</span>;
-    <span class="prelude-val">Ok</span>(())
+    <span class="kw">let</span> <span class="ident">elapsed</span> <span class="op">=</span> <span class="ident">Instant::now</span>().<span class="ident">duration_since</span>(<span class="ident">start</span>).<span class="ident">as_micros</span>() <span class="kw">as</span> <span class="ident">u64</span>;
+    <span class="ident">res</span>.<span class="ident">headers_mut</span>().<span class="ident">insert</span>(<span class="string">&quot;x-elapsed&quot;</span>, <span class="ident">elapsed</span>.<span class="ident">into</span>());
+
+    <span class="prelude-val">Ok</span>(<span class="ident">res</span>)
 }
 
 <span class="doccomment">/// The main query handler. This handles incoming GraphQL queries and passes it</span>
 <span class="doccomment">/// to the query engine.</span>
-<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">graphql_handler</span>(<span class="kw-2">mut</span> <span class="ident">req</span>: <span class="ident">Request</span><span class="op">&lt;</span><span class="ident">State</span><span class="op">&gt;</span>) -&gt; <span class="ident">tide::Result</span> {
+<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">graphql_handler</span>(<span class="ident">state</span>: <span class="ident">State</span>, <span class="ident">req</span>: <span class="ident">Request</span><span class="op">&lt;</span><span class="ident">Body</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Response</span><span class="op">&lt;</span><span class="ident">Body</span><span class="op">&gt;</span>, <span class="ident">hyper::Error</span><span class="op">&gt;</span> {
     <span class="comment">// Check for debug headers if enabled.</span>
-    <span class="kw">if</span> <span class="ident">req</span>.<span class="ident">state</span>().<span class="ident">enable_debug_mode</span> {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">res</span>) <span class="op">=</span> <span class="ident">handle_debug_headers</span>(<span class="kw-2">&amp;</span><span class="ident">req</span>).<span class="kw">await</span><span class="question-mark">?</span> {
-            <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">res</span>.<span class="ident">into</span>());
-        }
+    <span class="kw">if</span> <span class="ident">state</span>.<span class="ident">enable_debug_mode</span> {
+        <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">handle_debug_headers</span>(<span class="kw-2">&amp;</span><span class="ident">req</span>));
     }
 
     <span class="kw">let</span> <span class="ident">cx</span> <span class="op">=</span> <span class="ident">get_parent_span_context</span>(<span class="kw-2">&amp;</span><span class="ident">req</span>);
     <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="macro">tracing::span!</span>(<span class="ident">Level::TRACE</span>, <span class="string">&quot;graphql_handler&quot;</span>);
     <span class="ident">span</span>.<span class="ident">set_parent</span>(<span class="ident">cx</span>);
 
-    <span class="kw">let</span> <span class="ident">tx_id</span> <span class="op">=</span> <span class="ident">req</span>
-        .<span class="ident">header</span>(<span class="string">&quot;X-transaction-id&quot;</span>)
-        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">values</span><span class="op">|</span> <span class="ident">values</span>.<span class="ident">last</span>().<span class="ident">to_string</span>())
-        .<span class="ident">map</span>(<span class="ident">TxId::from</span>);
+    <span class="kw">let</span> <span class="ident">tx_id</span> <span class="op">=</span> <span class="ident">get_transaction_id_from_header</span>(<span class="kw-2">&amp;</span><span class="ident">req</span>);
 
     <span class="kw">let</span> <span class="ident">work</span> <span class="op">=</span> <span class="kw">async</span> <span class="kw">move</span> {
-        <span class="kw">let</span> <span class="ident">body</span>: <span class="ident">GraphQlBody</span> <span class="op">=</span> <span class="ident">req</span>.<span class="ident">body_json</span>().<span class="kw">await</span><span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">cx</span> <span class="op">=</span> <span class="ident">req</span>.<span class="ident">state</span>().<span class="ident">cx</span>.<span class="ident">clone</span>();
+        <span class="kw">let</span> <span class="ident">body_start</span> <span class="op">=</span> <span class="ident">req</span>.<span class="ident">into_body</span>();
+        <span class="comment">// block and buffer request until the request has completed</span>
+        <span class="kw">let</span> <span class="ident">full_body</span> <span class="op">=</span> <span class="ident">hyper::body::to_bytes</span>(<span class="ident">body_start</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">handler</span> <span class="op">=</span> <span class="ident">GraphQlHandler::new</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">cx</span>.<span class="ident">executor</span>, <span class="ident">cx</span>.<span class="ident">query_schema</span>());
-        <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">handler</span>.<span class="ident">handle</span>(<span class="ident">body</span>, <span class="ident">tx_id</span>, <span class="prelude-val">None</span>).<span class="kw">await</span>;
+        <span class="kw">match</span> <span class="ident">serde_json::from_slice</span>(<span class="ident">full_body</span>.<span class="ident">as_ref</span>()) {
+            <span class="prelude-val">Ok</span>(<span class="ident">body</span>) =&gt; {
+                <span class="kw">let</span> <span class="ident">handler</span> <span class="op">=</span> <span class="ident">GraphQlHandler::new</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">state</span>.<span class="ident">cx</span>.<span class="ident">executor</span>, <span class="ident">state</span>.<span class="ident">cx</span>.<span class="ident">query_schema</span>());
+                <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">handler</span>.<span class="ident">handle</span>(<span class="ident">body</span>, <span class="ident">tx_id</span>, <span class="prelude-val">None</span>).<span class="kw">await</span>;
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">Response::new</span>(<span class="ident">StatusCode::Ok</span>);
-        <span class="ident">res</span>.<span class="ident">set_body</span>(<span class="ident">Body::from_json</span>(<span class="kw-2">&amp;</span><span class="ident">result</span>)<span class="question-mark">?</span>);
+                <span class="kw">let</span> <span class="ident">result_bytes</span> <span class="op">=</span> <span class="ident">serde_json::to_vec</span>(<span class="kw-2">&amp;</span><span class="ident">result</span>).<span class="ident">unwrap</span>();
 
-        <span class="prelude-val">Ok</span>(<span class="ident">res</span>)
+                <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">Response::builder</span>()
+                    .<span class="ident">status</span>(<span class="ident">StatusCode::OK</span>)
+                    .<span class="ident">header</span>(<span class="ident">CONTENT_TYPE</span>, <span class="string">&quot;application/json&quot;</span>)
+                    .<span class="ident">body</span>(<span class="ident">Body::from</span>(<span class="ident">result_bytes</span>))
+                    .<span class="ident">unwrap</span>();
+
+                <span class="prelude-val">Ok</span>(<span class="ident">res</span>)
+            }
+            <span class="prelude-val">Err</span>(<span class="ident">_e</span>) =&gt; {
+                <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">Response::builder</span>()
+                    .<span class="ident">status</span>(<span class="ident">StatusCode::BAD_REQUEST</span>)
+                    .<span class="ident">body</span>(<span class="ident">Body::empty</span>())
+                    .<span class="ident">unwrap</span>();
+
+                <span class="prelude-val">Ok</span>(<span class="ident">res</span>)
+            }
+        }
     };
 
     <span class="ident">work</span>.<span class="ident">instrument</span>(<span class="ident">span</span>).<span class="kw">await</span>
@@ -401,107 +563,141 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// In production exposing the playground is equivalent to exposing the database</span>
 <span class="doccomment">/// on a port. This should never be enabled on production servers.</span>
-<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">playground_handler</span>(<span class="ident">req</span>: <span class="ident">Request</span><span class="op">&lt;</span><span class="ident">State</span><span class="op">&gt;</span>) -&gt; <span class="ident">tide::Result</span> {
-    <span class="kw">if</span> <span class="op">!</span><span class="ident">req</span>.<span class="ident">state</span>().<span class="ident">enable_playground</span> {
-        <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">Response::new</span>(<span class="ident">StatusCode::NotFound</span>));
+<span class="kw">fn</span> <span class="ident">playground_handler</span>() -&gt; <span class="ident">Response</span><span class="op">&lt;</span><span class="ident">Body</span><span class="op">&gt;</span> {
+    <span class="kw">let</span> <span class="ident">playground</span> <span class="op">=</span> <span class="macro">include_bytes!</span>(<span class="string">&quot;../../static_files/playground.html&quot;</span>).<span class="ident">to_vec</span>();
+
+    <span class="ident">Response::builder</span>()
+        .<span class="ident">status</span>(<span class="ident">StatusCode::OK</span>)
+        .<span class="ident">header</span>(<span class="ident">CONTENT_TYPE</span>, <span class="string">&quot;text/html&quot;</span>)
+        .<span class="ident">body</span>(<span class="ident">Body::from</span>(<span class="ident">playground</span>))
+        .<span class="ident">unwrap</span>()
+}
+
+<span class="doccomment">/// Sadly the routing doesn&#39;t make it obvious what the transaction routes are:</span>
+<span class="doccomment">/// POST /transaction/start -&gt; start a transaction</span>
+<span class="doccomment">/// POST /transaction/{tx_id}/commit -&gt; commit a transaction</span>
+<span class="doccomment">/// POST /transaction/{tx_id}/rollback -&gt; rollback a transaction</span>
+<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">handle_transaction</span>(<span class="ident">state</span>: <span class="ident">State</span>, <span class="ident">req</span>: <span class="ident">Request</span><span class="op">&lt;</span><span class="ident">Body</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Response</span><span class="op">&lt;</span><span class="ident">Body</span><span class="op">&gt;</span>, <span class="ident">hyper::Error</span><span class="op">&gt;</span> {
+    <span class="kw">let</span> <span class="ident">path</span> <span class="op">=</span> <span class="ident">req</span>.<span class="ident">uri</span>().<span class="ident">path</span>();
+
+    <span class="kw">if</span> <span class="ident">path</span>.<span class="ident">contains</span>(<span class="string">&quot;start&quot;</span>) {
+        <span class="kw">return</span> <span class="ident">transaction_start_handler</span>(<span class="ident">state</span>, <span class="ident">req</span>).<span class="kw">await</span>;
     }
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">Response::new</span>(<span class="ident">StatusCode::Ok</span>);
-    <span class="ident">res</span>.<span class="ident">set_body</span>(<span class="macro">include_bytes!</span>(<span class="string">&quot;../../static_files/playground.html&quot;</span>).<span class="ident">to_vec</span>());
-    <span class="ident">res</span>.<span class="ident">set_content_type</span>(<span class="ident">mime::HTML</span>);
-    <span class="prelude-val">Ok</span>(<span class="ident">res</span>)
+    <span class="kw">let</span> <span class="ident">sections</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">path</span>.<span class="ident">split</span>(<span class="string">&#39;/&#39;</span>).<span class="ident">collect</span>();
+
+    <span class="kw">if</span> <span class="ident">sections</span>.<span class="ident">len</span>() <span class="op">&lt;</span> <span class="number">2</span> {
+        <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">Response::builder</span>()
+            .<span class="ident">status</span>(<span class="ident">StatusCode::INTERNAL_SERVER_ERROR</span>)
+            .<span class="ident">body</span>(<span class="ident">Body::from</span>(<span class="string">&quot;Request does not contain the transaction id&quot;</span>))
+            .<span class="ident">unwrap</span>());
+    }
+
+    <span class="kw">let</span> <span class="ident">tx_id</span>: <span class="ident">TxId</span> <span class="op">=</span> <span class="ident">sections</span>[<span class="number">2</span>].<span class="ident">into</span>();
+
+    <span class="kw">let</span> <span class="ident">succuss_resp</span> <span class="op">=</span> <span class="ident">Response::builder</span>()
+        .<span class="ident">status</span>(<span class="ident">StatusCode::OK</span>)
+        .<span class="ident">header</span>(<span class="ident">CONTENT_TYPE</span>, <span class="string">&quot;application/json&quot;</span>)
+        .<span class="ident">body</span>(<span class="ident">Body::from</span>(<span class="string">r#&quot;{}&quot;#</span>))
+        .<span class="ident">unwrap</span>();
+
+    <span class="kw">if</span> <span class="ident">path</span>.<span class="ident">contains</span>(<span class="string">&quot;commit&quot;</span>) {
+        <span class="kw">match</span> <span class="ident">state</span>.<span class="ident">cx</span>.<span class="ident">executor</span>.<span class="ident">commit_tx</span>(<span class="ident">tx_id</span>).<span class="kw">await</span> {
+            <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">succuss_resp</span>),
+            <span class="prelude-val">Err</span>(<span class="ident">err</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">err_to_http_resp</span>(<span class="ident">err</span>)),
+        }
+    } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">path</span>.<span class="ident">contains</span>(<span class="string">&quot;rollback&quot;</span>) {
+        <span class="kw">match</span> <span class="ident">state</span>.<span class="ident">cx</span>.<span class="ident">executor</span>.<span class="ident">rollback_tx</span>(<span class="ident">tx_id</span>).<span class="kw">await</span> {
+            <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">succuss_resp</span>),
+            <span class="prelude-val">Err</span>(<span class="ident">err</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">err_to_http_resp</span>(<span class="ident">err</span>)),
+        }
+    } <span class="kw">else</span> {
+        <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">Response::builder</span>()
+            .<span class="ident">status</span>(<span class="ident">StatusCode::BAD_REQUEST</span>)
+            .<span class="ident">body</span>(<span class="ident">Body::empty</span>())
+            .<span class="ident">unwrap</span>();
+        <span class="prelude-val">Ok</span>(<span class="ident">res</span>)
+    }
 }
 
-<span class="doccomment">/// Handler for the playground to work with the SDL-rendered query schema.</span>
-<span class="doccomment">/// Serves a raw SDL string created from the query schema.</span>
-<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">sdl_handler</span>(<span class="ident">req</span>: <span class="ident">Request</span><span class="op">&lt;</span><span class="ident">State</span><span class="op">&gt;</span>) -&gt; <span class="ident">tide::Result</span><span class="op">&lt;</span><span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Response</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">schema</span> <span class="op">=</span> <span class="ident">Arc::clone</span>(<span class="kw-2">&amp;</span><span class="ident">req</span>.<span class="ident">state</span>().<span class="ident">cx</span>.<span class="ident">query_schema</span>());
-    <span class="prelude-val">Ok</span>(<span class="ident">GraphQLSchemaRenderer::render</span>(<span class="ident">schema</span>))
-}
-
-<span class="doccomment">/// Renders the Data Model Meta Format.</span>
-<span class="doccomment">/// Only callable if prisma was initialized using a v2 data model.</span>
-<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">dmmf_handler</span>(<span class="ident">req</span>: <span class="ident">Request</span><span class="op">&lt;</span><span class="ident">State</span><span class="op">&gt;</span>) -&gt; <span class="ident">tide::Result</span> {
-    <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">dmmf::render_dmmf</span>(<span class="ident">req</span>.<span class="ident">state</span>().<span class="ident">cx</span>.<span class="ident">datamodel</span>(), <span class="ident">Arc::clone</span>(<span class="ident">req</span>.<span class="ident">state</span>().<span class="ident">cx</span>.<span class="ident">query_schema</span>()));
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">Response::new</span>(<span class="ident">StatusCode::Ok</span>);
-
-    <span class="ident">res</span>.<span class="ident">set_body</span>(<span class="ident">Body::from_json</span>(<span class="kw-2">&amp;</span><span class="ident">result</span>)<span class="question-mark">?</span>);
-    <span class="prelude-val">Ok</span>(<span class="ident">res</span>)
-}
-
-<span class="doccomment">/// Simple status endpoint</span>
-<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">server_info_handler</span>(<span class="ident">req</span>: <span class="ident">Request</span><span class="op">&lt;</span><span class="ident">State</span><span class="op">&gt;</span>) -&gt; <span class="ident">tide::Result</span><span class="op">&lt;</span><span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Response</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="prelude-val">Ok</span>(<span class="macro">json!</span>({
-        <span class="string">&quot;commit&quot;</span>: <span class="macro">env!</span>(<span class="string">&quot;GIT_HASH&quot;</span>),
-        <span class="string">&quot;version&quot;</span>: <span class="macro">env!</span>(<span class="string">&quot;CARGO_PKG_VERSION&quot;</span>),
-        <span class="string">&quot;primary_connector&quot;</span>: <span class="ident">req</span>.<span class="ident">state</span>().<span class="ident">cx</span>.<span class="ident">primary_connector</span>(),
-    }))
-}
-
-<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">transaction_start_handler</span>(<span class="kw-2">mut</span> <span class="ident">req</span>: <span class="ident">Request</span><span class="op">&lt;</span><span class="ident">State</span><span class="op">&gt;</span>) -&gt; <span class="ident">tide::Result</span><span class="op">&lt;</span><span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Response</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">input</span>: <span class="ident">TxInput</span> <span class="op">=</span> <span class="ident">req</span>.<span class="ident">body_json</span>().<span class="kw">await</span><span class="question-mark">?</span>;
-    <span class="kw">let</span> <span class="ident">state</span> <span class="op">=</span> <span class="ident">req</span>.<span class="ident">state</span>();
+<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">transaction_start_handler</span>(<span class="ident">state</span>: <span class="ident">State</span>, <span class="ident">req</span>: <span class="ident">Request</span><span class="op">&lt;</span><span class="ident">Body</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Response</span><span class="op">&lt;</span><span class="ident">Body</span><span class="op">&gt;</span>, <span class="ident">hyper::Error</span><span class="op">&gt;</span> {
+    <span class="kw">let</span> <span class="ident">body_start</span> <span class="op">=</span> <span class="ident">req</span>.<span class="ident">into_body</span>();
+    <span class="comment">// block and buffer request until the request has completed</span>
+    <span class="kw">let</span> <span class="ident">full_body</span> <span class="op">=</span> <span class="ident">hyper::body::to_bytes</span>(<span class="ident">body_start</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+    <span class="kw">let</span> <span class="ident">input</span>: <span class="ident">TxInput</span> <span class="op">=</span> <span class="ident">serde_json::from_slice</span>(<span class="ident">full_body</span>.<span class="ident">as_ref</span>()).<span class="ident">unwrap</span>();
 
     <span class="kw">match</span> <span class="ident">state</span>.<span class="ident">cx</span>.<span class="ident">executor</span>.<span class="ident">start_tx</span>(<span class="ident">input</span>.<span class="ident">max_wait</span>, <span class="ident">input</span>.<span class="ident">timeout</span>).<span class="kw">await</span> {
-        <span class="prelude-val">Ok</span>(<span class="ident">tx_id</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="macro">json!</span>({ <span class="string">&quot;id&quot;</span>: <span class="ident">tx_id</span>.<span class="ident">to_string</span>() }).<span class="ident">into</span>()),
-        <span class="prelude-val">Err</span>(<span class="ident">err</span>) =&gt; <span class="ident">err_to_http_resp</span>(<span class="ident">err</span>),
+        <span class="prelude-val">Ok</span>(<span class="ident">tx_id</span>) =&gt; {
+            <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="macro">json!</span>({ <span class="string">&quot;id&quot;</span>: <span class="ident">tx_id</span>.<span class="ident">to_string</span>() });
+            <span class="kw">let</span> <span class="ident">result_bytes</span> <span class="op">=</span> <span class="ident">serde_json::to_vec</span>(<span class="kw-2">&amp;</span><span class="ident">result</span>).<span class="ident">unwrap</span>();
+
+            <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">Response::builder</span>()
+                .<span class="ident">status</span>(<span class="ident">StatusCode::OK</span>)
+                .<span class="ident">header</span>(<span class="ident">CONTENT_TYPE</span>, <span class="string">&quot;application/json&quot;</span>)
+                .<span class="ident">body</span>(<span class="ident">Body::from</span>(<span class="ident">result_bytes</span>))
+                .<span class="ident">unwrap</span>();
+
+            <span class="prelude-val">Ok</span>(<span class="ident">res</span>)
+        }
+        <span class="prelude-val">Err</span>(<span class="ident">err</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">err_to_http_resp</span>(<span class="ident">err</span>)),
     }
 }
 
-<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">transaction_commit_handler</span>(<span class="ident">req</span>: <span class="ident">Request</span><span class="op">&lt;</span><span class="ident">State</span><span class="op">&gt;</span>) -&gt; <span class="ident">tide::Result</span><span class="op">&lt;</span><span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Response</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">tx_id</span> <span class="op">=</span> <span class="ident">TxId::from</span>(<span class="ident">req</span>.<span class="ident">param</span>(<span class="string">&quot;id&quot;</span>)<span class="question-mark">?</span>);
-    <span class="kw">let</span> <span class="ident">state</span> <span class="op">=</span> <span class="ident">req</span>.<span class="ident">state</span>();
+<span class="kw">fn</span> <span class="ident">get_transaction_id_from_header</span>(<span class="ident">req</span>: <span class="kw-2">&amp;</span><span class="ident">Request</span><span class="op">&lt;</span><span class="ident">Body</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">TxId</span><span class="op">&gt;</span> {
+    <span class="kw">match</span> <span class="ident">req</span>.<span class="ident">headers</span>().<span class="ident">get</span>(<span class="ident">TRANSACTION_ID_HEADER</span>) {
+        <span class="prelude-val">Some</span>(<span class="ident">id_header</span>) =&gt; {
+            <span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;{} has not been correctly set.&quot;</span>, <span class="ident">TRANSACTION_ID_HEADER</span>);
+            <span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span> <span class="ident">id_header</span>.<span class="ident">to_str</span>().<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">msg</span>.<span class="ident">as_str</span>());
+            <span class="prelude-val">Some</span>(<span class="ident">TxId::from</span>(<span class="ident">id</span>))
+        }
 
-    <span class="kw">match</span> <span class="ident">state</span>.<span class="ident">cx</span>.<span class="ident">executor</span>.<span class="ident">commit_tx</span>(<span class="ident">tx_id</span>).<span class="kw">await</span> {
-        <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="macro">json!</span>({}).<span class="ident">into</span>()),
-        <span class="prelude-val">Err</span>(<span class="ident">err</span>) =&gt; <span class="ident">err_to_http_resp</span>(<span class="ident">err</span>),
-    }
-}
-
-<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">transaction_rollback_handler</span>(<span class="ident">req</span>: <span class="ident">Request</span><span class="op">&lt;</span><span class="ident">State</span><span class="op">&gt;</span>) -&gt; <span class="ident">tide::Result</span><span class="op">&lt;</span><span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Response</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">tx_id</span> <span class="op">=</span> <span class="ident">TxId::from</span>(<span class="ident">req</span>.<span class="ident">param</span>(<span class="string">&quot;id&quot;</span>)<span class="question-mark">?</span>);
-    <span class="kw">let</span> <span class="ident">state</span> <span class="op">=</span> <span class="ident">req</span>.<span class="ident">state</span>();
-
-    <span class="kw">match</span> <span class="ident">state</span>.<span class="ident">cx</span>.<span class="ident">executor</span>.<span class="ident">rollback_tx</span>(<span class="ident">tx_id</span>).<span class="kw">await</span> {
-        <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="macro">json!</span>({}).<span class="ident">into</span>()),
-        <span class="prelude-val">Err</span>(<span class="ident">err</span>) =&gt; <span class="ident">err_to_http_resp</span>(<span class="ident">err</span>),
+        <span class="prelude-val">None</span> =&gt; <span class="prelude-val">None</span>,
     }
 }
 
 <span class="doccomment">/// Handle debug headers inside the main GraphQL endpoint.</span>
-<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">handle_debug_headers</span>(<span class="ident">req</span>: <span class="kw-2">&amp;</span><span class="ident">Request</span><span class="op">&lt;</span><span class="ident">State</span><span class="op">&gt;</span>) -&gt; <span class="ident">tide::Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Response</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">handle_debug_headers</span>(<span class="ident">req</span>: <span class="kw-2">&amp;</span><span class="ident">Request</span><span class="op">&lt;</span><span class="ident">Body</span><span class="op">&gt;</span>) -&gt; <span class="ident">Response</span><span class="op">&lt;</span><span class="ident">Body</span><span class="op">&gt;</span> {
     <span class="doccomment">/// Debug header that triggers a panic in the request thread.</span>
     <span class="kw">static</span> <span class="ident">DEBUG_NON_FATAL_HEADER</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;x-debug-non-fatal&quot;</span>;
 
     <span class="doccomment">/// Debug header that causes the query engine to crash.</span>
     <span class="kw">static</span> <span class="ident">DEBUG_FATAL_HEADER</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;x-debug-fatal&quot;</span>;
 
-    <span class="kw">if</span> <span class="ident">req</span>.<span class="ident">header</span>(<span class="ident">DEBUG_FATAL_HEADER</span>).<span class="ident">is_some</span>() {
+    <span class="kw">let</span> <span class="ident">headers</span> <span class="op">=</span> <span class="ident">req</span>.<span class="ident">headers</span>();
+
+    <span class="kw">if</span> <span class="ident">headers</span>.<span class="ident">contains_key</span>(<span class="ident">DEBUG_FATAL_HEADER</span>) {
         <span class="macro">info!</span>(<span class="string">&quot;Query engine debug fatal error, shutting down.&quot;</span>);
         <span class="ident">std::process::exit</span>(<span class="number">1</span>)
-    } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">req</span>.<span class="ident">header</span>(<span class="ident">DEBUG_NON_FATAL_HEADER</span>).<span class="ident">is_some</span>() {
+    } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">headers</span>.<span class="ident">contains_key</span>(<span class="ident">DEBUG_NON_FATAL_HEADER</span>) {
         <span class="kw">let</span> <span class="ident">err</span> <span class="op">=</span> <span class="ident">user_facing_errors::Error::from_panic_payload</span>(<span class="ident">Box::new</span>(<span class="string">&quot;Debug panic&quot;</span>));
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">Response::new</span>(<span class="number">200</span>);
+        <span class="kw">let</span> <span class="ident">body</span> <span class="op">=</span> <span class="ident">Body::from</span>(<span class="ident">serde_json::to_vec</span>(<span class="kw-2">&amp;</span><span class="ident">err</span>).<span class="ident">unwrap</span>());
 
-        <span class="ident">res</span>.<span class="ident">set_body</span>(<span class="ident">Body::from_json</span>(<span class="kw-2">&amp;</span><span class="ident">err</span>)<span class="question-mark">?</span>);
-        <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">res</span>))
+        <span class="ident">Response::builder</span>().<span class="ident">status</span>(<span class="ident">StatusCode::OK</span>).<span class="ident">body</span>(<span class="ident">body</span>).<span class="ident">unwrap</span>()
     } <span class="kw">else</span> {
-        <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>)
+        <span class="ident">Response::builder</span>().<span class="ident">status</span>(<span class="ident">StatusCode::OK</span>).<span class="ident">body</span>(<span class="ident">Body::empty</span>()).<span class="ident">unwrap</span>()
+    }
+}
+
+<span class="kw">struct</span> <span class="ident">HeaderExtractor</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">HeaderMap</span>);
+
+<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Extractor</span> <span class="kw">for</span> <span class="ident">HeaderExtractor</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">get</span>(<span class="ident">key</span>).<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">hv</span><span class="op">|</span> <span class="ident">hv</span>.<span class="ident">to_str</span>().<span class="ident">ok</span>())
+    }
+
+    <span class="kw">fn</span> <span class="ident">keys</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">keys</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">hk</span><span class="op">|</span> <span class="ident">hk</span>.<span class="ident">as_str</span>()).<span class="ident">collect</span>()
     }
 }
 
 <span class="doccomment">/// If the client sends us a trace and span id, extracting a new context if the</span>
 <span class="doccomment">/// headers are set. If not, returns current context.</span>
-<span class="kw">fn</span> <span class="ident">get_parent_span_context</span>(<span class="ident">req</span>: <span class="kw-2">&amp;</span><span class="ident">Request</span><span class="op">&lt;</span><span class="ident">State</span><span class="op">&gt;</span>) -&gt; <span class="ident">Context</span> {
-    <span class="kw">let</span> <span class="ident">headers</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">String</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">req</span>
-        .<span class="ident">iter</span>()
-        .<span class="ident">filter_map</span>(<span class="op">|</span>(<span class="ident">hn</span>, <span class="ident">hvs</span>)<span class="op">|</span> <span class="ident">hvs</span>.<span class="ident">get</span>(<span class="number">0</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">hv</span><span class="op">|</span> (<span class="ident">hn</span>.<span class="ident">as_str</span>().<span class="ident">into</span>(), <span class="ident">hv</span>.<span class="ident">as_str</span>().<span class="ident">into</span>())))
-        .<span class="ident">collect</span>();
-
-    <span class="ident">global::get_text_map_propagator</span>(<span class="op">|</span><span class="ident">propagator</span><span class="op">|</span> <span class="ident">propagator</span>.<span class="ident">extract</span>(<span class="kw-2">&amp;</span><span class="ident">headers</span>))
+<span class="kw">fn</span> <span class="ident">get_parent_span_context</span>(<span class="ident">req</span>: <span class="kw-2">&amp;</span><span class="ident">Request</span><span class="op">&lt;</span><span class="ident">Body</span><span class="op">&gt;</span>) -&gt; <span class="ident">Context</span> {
+    <span class="kw">let</span> <span class="ident">extractor</span> <span class="op">=</span> <span class="ident">HeaderExtractor</span>(<span class="ident">req</span>.<span class="ident">headers</span>());
+    <span class="ident">global::get_text_map_propagator</span>(<span class="op">|</span><span class="ident">propagator</span><span class="op">|</span> <span class="ident">propagator</span>.<span class="ident">extract</span>(<span class="kw-2">&amp;</span><span class="ident">extractor</span>))
 }
 
-<span class="kw">fn</span> <span class="ident">err_to_http_resp</span>(<span class="ident">err</span>: <span class="ident">query_core::CoreError</span>) -&gt; <span class="ident">tide::Result</span><span class="op">&lt;</span><span class="ident">Response</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">err_to_http_resp</span>(<span class="ident">err</span>: <span class="ident">query_core::CoreError</span>) -&gt; <span class="ident">Response</span><span class="op">&lt;</span><span class="ident">Body</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">status</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">err</span> {
         <span class="ident">query_core::CoreError::TransactionError</span>(<span class="kw-2">ref</span> <span class="ident">err</span>) =&gt; <span class="kw">match</span> <span class="ident">err</span> {
             <span class="ident">query_core::TransactionError::AcquisitionTimeout</span> =&gt; <span class="number">504</span>,
@@ -515,11 +711,9 @@
     };
 
     <span class="kw">let</span> <span class="ident">user_error</span>: <span class="ident">user_facing_errors::Error</span> <span class="op">=</span> <span class="ident">err</span>.<span class="ident">into</span>();
-    <span class="kw">let</span> <span class="ident">body</span> <span class="op">=</span> <span class="ident">Body::from_json</span>(<span class="kw-2">&amp;</span><span class="ident">user_error</span>)<span class="question-mark">?</span>;
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">resp</span> <span class="op">=</span> <span class="ident">Response::new</span>(<span class="ident">status</span>);
+    <span class="kw">let</span> <span class="ident">body</span> <span class="op">=</span> <span class="ident">Body::from</span>(<span class="ident">serde_json::to_vec</span>(<span class="kw-2">&amp;</span><span class="ident">user_error</span>).<span class="ident">unwrap</span>());
 
-    <span class="ident">resp</span>.<span class="ident">set_body</span>(<span class="ident">body</span>);
-    <span class="prelude-val">Ok</span>(<span class="ident">resp</span>)
+    <span class="ident">Response::builder</span>().<span class="ident">status</span>(<span class="ident">status</span>).<span class="ident">body</span>(<span class="ident">body</span>).<span class="ident">unwrap</span>()
 }
 </code></pre></div>
 </section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="query_engine" data-search-index-js="../../../search-index.js" data-search-js="../../../search.js"></div>

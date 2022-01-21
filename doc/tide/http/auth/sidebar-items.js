@@ -1,1 +1,0 @@
-initSidebarItems({"enum":[["AuthenticationScheme","HTTP Mutual Authentication Algorithms"]],"struct":[["Authorization","Credentials to authenticate a user agent with a server."],["BasicAuth","HTTP Basic authorization."],["WwwAuthenticate","Define the authentication method that should be used to gain access to a resource."]]});

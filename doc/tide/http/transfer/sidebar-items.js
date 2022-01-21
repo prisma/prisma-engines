@@ -1,1 +1,0 @@
-initSidebarItems({"enum":[["Encoding","Available compression algorithms."]],"struct":[["EncodingProposal","A proposed `Encoding` in `AcceptEncoding`."],["TE","Client header advertising the transfer encodings the user agent is willing to accept."],["TransferEncoding","The form of encoding used to safely transfer the payload body to the user."]]});

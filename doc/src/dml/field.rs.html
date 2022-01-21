@@ -591,6 +591,10 @@
 <span id="590">590</span>
 <span id="591">591</span>
 <span id="592">592</span>
+<span id="593">593</span>
+<span id="594">594</span>
+<span id="595">595</span>
+<span id="596">596</span>
 </pre><pre class="rust"><code><span class="doccomment">//! A field in a model.</span>
 
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::native_type_instance::NativeTypeInstance</span>;
@@ -1144,6 +1148,9 @@
 
     <span class="doccomment">/// Indicates if this field has to be ignored by the Client.</span>
     <span class="kw">pub</span> <span class="ident">is_ignored</span>: <span class="ident">bool</span>,
+
+    <span class="doccomment">/// The default value of this field</span>
+    <span class="kw">pub</span> <span class="ident">default_value</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">DefaultValue</span><span class="op">&gt;</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">CompositeField</span> {
@@ -1156,6 +1163,7 @@
             <span class="ident">documentation</span>: <span class="prelude-val">None</span>,
             <span class="ident">is_commented_out</span>: <span class="bool-val">false</span>,
             <span class="ident">is_ignored</span>: <span class="bool-val">false</span>,
+            <span class="ident">default_value</span>: <span class="prelude-val">None</span>,
         }
     }
 }

@@ -12,8 +12,30 @@
 <span id="11">11</span>
 <span id="12">12</span>
 <span id="13">13</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::transform::ast_to_dml</span>::{<span class="ident">db::walkers::CompositeTypeWalker</span>, <span class="ident">validation_pipeline::context::Context</span>};
+<span id="14">14</span>
+<span id="15">15</span>
+<span id="16">16</span>
+<span id="17">17</span>
+<span id="18">18</span>
+<span id="19">19</span>
+<span id="20">20</span>
+<span id="21">21</span>
+<span id="22">22</span>
+<span id="23">23</span>
+<span id="24">24</span>
+<span id="25">25</span>
+<span id="26">26</span>
+<span id="27">27</span>
+<span id="28">28</span>
+<span id="29">29</span>
+<span id="30">30</span>
+<span id="31">31</span>
+<span id="32">32</span>
+<span id="33">33</span>
+</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">super</span>::default_value</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::transform::ast_to_dml</span>::{<span class="ident">db::walkers::CompositeTypeWalker</span>, <span class="ident">validation_pipeline::context::Context</span>};
 <span class="kw">use</span> <span class="ident">diagnostics::DatamodelError</span>;
+<span class="kw">use</span> <span class="ident">parser_database::walkers::CompositeTypeFieldWalker</span>;
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">composite_types_support</span>(<span class="ident">composite_type</span>: <span class="ident">CompositeTypeWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
     <span class="kw">if</span> <span class="ident">ctx</span>.<span class="ident">connector</span>.<span class="ident">supports_composite_types</span>() {
@@ -24,6 +46,24 @@
         <span class="macro">format!</span>(<span class="string">&quot;Composite types are not supported on {}.&quot;</span>, <span class="ident">ctx</span>.<span class="ident">connector</span>.<span class="ident">name</span>()),
         <span class="ident">composite_type</span>.<span class="ident">ast_composite_type</span>().<span class="ident">span</span>,
     ));
+}
+
+<span class="doccomment">/// Validates the @default attribute of a composite scalar field</span>
+<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">validate_default_value</span>(<span class="ident">field</span>: <span class="ident">CompositeTypeFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
+    <span class="kw">let</span> <span class="ident">default_value</span> <span class="op">=</span> <span class="ident">field</span>.<span class="ident">default_value</span>();
+    <span class="kw">let</span> <span class="ident">default_attribute</span> <span class="op">=</span> <span class="ident">field</span>.<span class="ident">default_attribute</span>();
+
+    <span class="kw">if</span> <span class="ident">field</span>.<span class="ident">default_mapped_name</span>().<span class="ident">is_some</span>() {
+        <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_attribute_validation_error</span>(
+            <span class="string">&quot;A `map` argument for the default value of a field on a composite type is not allowed. Consider removing it.&quot;</span>,
+            <span class="string">&quot;default&quot;</span>,
+            <span class="ident">default_attribute</span>.<span class="ident">unwrap</span>().<span class="ident">span</span>,
+        ));
+    }
+
+    <span class="kw">let</span> <span class="ident">scalar_type</span> <span class="op">=</span> <span class="ident">field</span>.<span class="ident">r#type</span>().<span class="ident">as_builtin_scalar</span>();
+
+    <span class="ident">default_value::validate_default_value</span>(<span class="ident">default_value</span>, <span class="ident">scalar_type</span>, <span class="ident">ctx</span>);
 }
 </code></pre></div>
 </section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../../../../" data-current-crate="datamodel" data-search-index-js="../../../../../../search-index.js" data-search-js="../../../../../../search.js"></div>

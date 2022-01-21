@@ -4,7 +4,7 @@ data.</p>
 <p>All calls to <a href="trait.AsyncWrite.html#tymethod.poll_write"><code>poll_write</code></a> on the returned instance will return
 <code>Poll::Ready(Ok(buf.len()))</code> and the contents of the buffer will not be
 inspected.</p>
-<p>This is an asynchronous version of <a href="https://doc.rust-lang.org/1.58.0/std/io/util/fn.sink.html"><code>std::io::sink</code></a>.</p>
+<p>This is an asynchronous version of <a href="https://doc.rust-lang.org/1.58.1/std/io/util/fn.sink.html"><code>std::io::sink</code></a>.</p>
 <h2 id="examples" class="section-header"><a href="#examples">Examples</a></h2>
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">tokio::io</span>::{<span class="self">self</span>, <span class="ident">AsyncWriteExt</span>};
 

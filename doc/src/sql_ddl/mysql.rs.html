@@ -426,6 +426,18 @@
 <span id="425">425</span>
 <span id="426">426</span>
 <span id="427">427</span>
+<span id="428">428</span>
+<span id="429">429</span>
+<span id="430">430</span>
+<span id="431">431</span>
+<span id="432">432</span>
+<span id="433">433</span>
+<span id="434">434</span>
+<span id="435">435</span>
+<span id="436">436</span>
+<span id="437">437</span>
+<span id="438">438</span>
+<span id="439">439</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::common</span>::{<span class="ident">Indented</span>, <span class="ident">IndexColumn</span>, <span class="ident">IteratorJoin</span>, <span class="ident">SQL_INDENTATION</span>};
 <span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">borrow::Cow</span>, <span class="ident">fmt::Display</span>};
 
@@ -606,20 +618,26 @@
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Default</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CreateIndex</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span> <span class="ident">unique</span>: <span class="ident">bool</span>,
+    <span class="kw">pub</span> <span class="ident">r#type</span>: <span class="ident">IndexType</span>,
     <span class="kw">pub</span> <span class="ident">index_name</span>: <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">str</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">on</span>: (<span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">str</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">IndexColumn</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>),
 }
 
 <span class="kw">impl</span> <span class="ident">Display</span> <span class="kw">for</span> <span class="ident">CreateIndex</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
     <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">std::fmt::Result</span> {
-        <span class="macro">write!</span>(
-            <span class="ident">f</span>,
-            <span class="string">&quot;CREATE {maybe_unique}INDEX `{index_name}` ON `{table_name}`(&quot;</span>,
-            <span class="ident">maybe_unique</span> <span class="op">=</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">unique</span> { <span class="string">&quot;UNIQUE &quot;</span> } <span class="kw">else</span> { <span class="string">&quot;&quot;</span> },
-            <span class="ident">index_name</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">index_name</span>,
-            <span class="ident">table_name</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">on</span>.<span class="number">0</span>,
-        )<span class="question-mark">?</span>;
+        <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;CREATE &quot;</span>)<span class="question-mark">?</span>;
+
+        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">r#type</span> {
+            <span class="ident">IndexType::Normal</span> =&gt; (),
+            <span class="ident">IndexType::Unique</span> =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;UNIQUE &quot;</span>)<span class="question-mark">?</span>,
+            <span class="ident">IndexType::Fulltext</span> =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;FULLTEXT &quot;</span>)<span class="question-mark">?</span>,
+        }
+
+        <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;INDEX `&quot;</span>)<span class="question-mark">?</span>;
+        <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">index_name</span>)<span class="question-mark">?</span>;
+        <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;` ON `&quot;</span>)<span class="question-mark">?</span>;
+        <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">on</span>.<span class="number">0</span>)<span class="question-mark">?</span>;
+        <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;`(&quot;</span>)<span class="question-mark">?</span>;
 
         <span class="self">self</span>.<span class="ident">on</span>
             .<span class="number">1</span>
@@ -739,6 +757,12 @@
     <span class="ident">Normal</span>,
     <span class="ident">Unique</span>,
     <span class="ident">Fulltext</span>,
+}
+
+<span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">IndexType</span> {
+    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
+        <span class="ident"><span class="self">Self</span>::Normal</span>
+    }
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>

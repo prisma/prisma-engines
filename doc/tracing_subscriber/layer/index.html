@@ -335,7 +335,7 @@ different types. For example, the following <em>will not</em> work:</p>
 
 <span class="ident">tracing::subscriber::set_global_default</span>(<span class="ident">subscriber</span>)
     .<span class="ident">expect</span>(<span class="string">&quot;Unable to set global subscriber&quot;</span>);</code></pre></div>
-<p>However, a <a href="trait.Layer.html" title="Layer"><code>Layer</code></a> wrapped in an <a href="https://doc.rust-lang.org/1.58.0/core/option/enum.Option.html" title="Option"><code>Option</code></a> <a href="trait.Layer.html#impl-Layer%3CS%3E-for-Option%3CL%3E">also implements the <code>Layer</code>
+<p>However, a <a href="trait.Layer.html" title="Layer"><code>Layer</code></a> wrapped in an <a href="https://doc.rust-lang.org/1.58.1/core/option/enum.Option.html" title="Option"><code>Option</code></a> <a href="trait.Layer.html#impl-Layer%3CS%3E-for-Option%3CL%3E">also implements the <code>Layer</code>
 trait</a>. This allows individual layers to be enabled or disabled at
 runtime while always producing a <a href="https://docs.rs/tracing-core/latest/tracing_core/subscriber/trait.Subscriber.html"><code>Subscriber</code></a> of the same type. For
 example:</p>

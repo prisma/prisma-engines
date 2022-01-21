@@ -29,8 +29,9 @@
 <span id="28">28</span>
 <span id="29">29</span>
 <span id="30">30</span>
+<span id="31">31</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">parent_container::ParentContainer</span>, <span class="ident">CompositeField</span>, <span class="ident">CompositeFieldRef</span>, <span class="ident">CompositeTypeRef</span>};
-<span class="kw">use</span> <span class="ident">datamodel::FieldArity</span>;
+<span class="kw">use</span> <span class="ident">datamodel</span>::{<span class="ident">DefaultValue</span>, <span class="ident">FieldArity</span>};
 <span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">fmt::Debug</span>, <span class="ident">sync::Arc</span>};
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
@@ -39,6 +40,7 @@
     <span class="kw">pub</span> <span class="ident">db_name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">arity</span>: <span class="ident">FieldArity</span>,
     <span class="kw">pub</span> <span class="ident">type_name</span>: <span class="ident">String</span>,
+    <span class="kw">pub</span> <span class="ident">default_value</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">DefaultValue</span><span class="op">&gt;</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">CompositeFieldBuilder</span> {

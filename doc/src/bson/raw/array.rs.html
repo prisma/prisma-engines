@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;git&#x2F;checkouts&#x2F;bson-rust-adbe8b8987a394af&#x2F;b44b202&#x2F;src&#x2F;raw&#x2F;array.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>array.rs - source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><script defer src="../../../main.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;bson-2.1.0&#x2F;src&#x2F;raw&#x2F;array.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>array.rs - source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><script defer src="../../../main.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script>
     <noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../bson/index.html'><div class='logo-container rust-logo'><img src='../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
@@ -241,7 +241,33 @@
 <span id="240">240</span>
 <span id="241">241</span>
 <span id="242">242</span>
+<span id="243">243</span>
+<span id="244">244</span>
+<span id="245">245</span>
+<span id="246">246</span>
+<span id="247">247</span>
+<span id="248">248</span>
+<span id="249">249</span>
+<span id="250">250</span>
+<span id="251">251</span>
+<span id="252">252</span>
+<span id="253">253</span>
+<span id="254">254</span>
+<span id="255">255</span>
+<span id="256">256</span>
+<span id="257">257</span>
+<span id="258">258</span>
+<span id="259">259</span>
+<span id="260">260</span>
+<span id="261">261</span>
+<span id="262">262</span>
+<span id="263">263</span>
+<span id="264">264</span>
+<span id="265">265</span>
+<span id="266">266</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::convert::TryFrom</span>;
+
+<span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">ser::SerializeSeq</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
 
 <span class="kw">use</span> <span class="kw">super</span>::{
     <span class="ident">error</span>::{<span class="ident">ValueAccessError</span>, <span class="ident">ValueAccessErrorKind</span>, <span class="ident">ValueAccessResult</span>},
@@ -253,7 +279,14 @@
     <span class="ident">RawRegex</span>,
     <span class="prelude-ty">Result</span>,
 };
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">oid::ObjectId</span>, <span class="ident">spec::ElementType</span>, <span class="ident">Bson</span>, <span class="ident">DateTime</span>, <span class="ident">Timestamp</span>};
+<span class="kw">use</span> <span class="kw">crate</span>::{
+    <span class="ident">oid::ObjectId</span>,
+    <span class="ident">raw</span>::{<span class="ident">RawBsonVisitor</span>, <span class="ident">RAW_ARRAY_NEWTYPE</span>},
+    <span class="ident">spec</span>::{<span class="ident">BinarySubtype</span>, <span class="ident">ElementType</span>},
+    <span class="ident">Bson</span>,
+    <span class="ident">DateTime</span>,
+    <span class="ident">Timestamp</span>,
+};
 
 <span class="doccomment">/// A slice of a BSON document containing a BSON array value (akin to [`std::str`]). This can be</span>
 <span class="doccomment">/// retrieved from a [`RawDocument`] via [`RawDocument::get`].</span>
@@ -267,43 +300,10 @@
 <span class="doccomment">/// Iterating over a [`RawArray`] yields either an error or a value that borrows from the</span>
 <span class="doccomment">/// original document without making any additional allocations.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// use bson::{doc, raw::RawDocument};</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let doc = doc! {</span>
-<span class="doccomment">///     &quot;x&quot;: [1, true, &quot;two&quot;, 5.5]</span>
-<span class="doccomment">/// };</span>
-<span class="doccomment">/// let bytes = bson::to_vec(&amp;doc)?;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let rawdoc = RawDocument::new(bytes.as_slice())?;</span>
-<span class="doccomment">/// let rawarray = rawdoc.get_array(&quot;x&quot;)?;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// for v in rawarray {</span>
-<span class="doccomment">///     println!(&quot;{:?}&quot;, v?);</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// # Ok::&lt;(), Box&lt;dyn std::error::Error&gt;&gt;(())</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
 <span class="doccomment">/// Individual elements can be accessed using [`RawArray::get`] or any of</span>
 <span class="doccomment">/// the type-specific getters, such as [`RawArray::get_object_id`] or</span>
 <span class="doccomment">/// [`RawArray::get_str`]. Note that accessing elements is an O(N) operation, as it</span>
 <span class="doccomment">/// requires iterating through the array from the beginning to find the requested index.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// # use bson::raw::{ValueAccessError};</span>
-<span class="doccomment">/// use bson::{doc, raw::RawDocument};</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let doc = doc! {</span>
-<span class="doccomment">///     &quot;x&quot;: [1, true, &quot;two&quot;, 5.5]</span>
-<span class="doccomment">/// };</span>
-<span class="doccomment">/// let bytes = bson::to_vec(&amp;doc)?;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let rawdoc = RawDocument::new(bytes.as_slice())?;</span>
-<span class="doccomment">/// let rawarray = rawdoc.get_array(&quot;x&quot;)?;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// assert_eq!(rawarray.get_bool(1)?, true);</span>
-<span class="doccomment">/// # Ok::&lt;(), Box&lt;dyn std::error::Error&gt;&gt;(())</span>
-<span class="doccomment">/// ```</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialEq</span>)]</span>
 <span class="attribute">#[<span class="ident">repr</span>(<span class="ident">transparent</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">RawArray</span> {
@@ -481,6 +481,54 @@
             <span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(<span class="ident">e</span>)) =&gt; <span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(<span class="ident">e</span>)),
             <span class="prelude-val">None</span> =&gt; <span class="prelude-val">None</span>,
         }
+    }
+}
+
+<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span>: <span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">RawArray</span> {
+    <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) -&gt; <span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">D::Error</span><span class="op">&gt;</span>
+    <span class="kw">where</span>
+        <span class="ident">D</span>: <span class="ident">serde::Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
+    {
+        <span class="kw">match</span> <span class="ident">deserializer</span>.<span class="ident">deserialize_newtype_struct</span>(<span class="ident">RAW_ARRAY_NEWTYPE</span>, <span class="ident">RawBsonVisitor</span>)<span class="question-mark">?</span> {
+            <span class="ident">RawBson::Array</span>(<span class="ident">d</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">d</span>),
+            <span class="ident">RawBson::Binary</span>(<span class="ident">b</span>) <span class="kw">if</span> <span class="ident">b</span>.<span class="ident">subtype</span> <span class="op">==</span> <span class="ident">BinarySubtype::Generic</span> =&gt; {
+                <span class="kw">let</span> <span class="ident">doc</span> <span class="op">=</span> <span class="ident">RawDocument::new</span>(<span class="ident">b</span>.<span class="ident">bytes</span>).<span class="ident">map_err</span>(<span class="ident">serde::de::Error::custom</span>)<span class="question-mark">?</span>;
+                <span class="prelude-val">Ok</span>(<span class="ident">RawArray::from_doc</span>(<span class="ident">doc</span>))
+            }
+            <span class="ident">b</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">serde::de::Error::custom</span>(<span class="macro">format!</span>(
+                <span class="string">&quot;expected raw array reference, instead got {:?}&quot;</span>,
+                <span class="ident">b</span>
+            ))),
+        }
+    }
+}
+
+<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Serialize</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">RawArray</span> {
+    <span class="kw">fn</span> <span class="ident">serialize</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">serializer</span>: <span class="ident">S</span>) -&gt; <span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span>
+    <span class="kw">where</span>
+        <span class="ident">S</span>: <span class="ident">serde::Serializer</span>,
+    {
+        <span class="kw">struct</span> <span class="ident">SeqSerializer</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">RawArray</span>);
+
+        <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Serialize</span> <span class="kw">for</span> <span class="ident">SeqSerializer</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
+            <span class="kw">fn</span> <span class="ident">serialize</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">serializer</span>: <span class="ident">S</span>) -&gt; <span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span>
+            <span class="kw">where</span>
+                <span class="ident">S</span>: <span class="ident">serde::Serializer</span>,
+            {
+                <span class="kw">if</span> <span class="ident">serializer</span>.<span class="ident">is_human_readable</span>() {
+                    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">seq</span> <span class="op">=</span> <span class="ident">serializer</span>.<span class="ident">serialize_seq</span>(<span class="prelude-val">None</span>)<span class="question-mark">?</span>;
+                    <span class="kw">for</span> <span class="ident">v</span> <span class="kw">in</span> <span class="self">self</span>.<span class="number">0</span> {
+                        <span class="kw">let</span> <span class="ident">v</span> <span class="op">=</span> <span class="ident">v</span>.<span class="ident">map_err</span>(<span class="ident">serde::ser::Error::custom</span>)<span class="question-mark">?</span>;
+                        <span class="ident">seq</span>.<span class="ident">serialize_element</span>(<span class="kw-2">&amp;</span><span class="ident">v</span>)<span class="question-mark">?</span>;
+                    }
+                    <span class="ident">seq</span>.<span class="ident">end</span>()
+                } <span class="kw">else</span> {
+                    <span class="ident">serializer</span>.<span class="ident">serialize_bytes</span>(<span class="self">self</span>.<span class="number">0</span>.<span class="ident">as_bytes</span>())
+                }
+            }
+        }
+
+        <span class="ident">serializer</span>.<span class="ident">serialize_newtype_struct</span>(<span class="ident">RAW_ARRAY_NEWTYPE</span>, <span class="kw-2">&amp;</span><span class="ident">SeqSerializer</span>(<span class="self">self</span>))
     }
 }
 </code></pre></div>

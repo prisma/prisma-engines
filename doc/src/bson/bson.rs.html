@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;git&#x2F;checkouts&#x2F;bson-rust-adbe8b8987a394af&#x2F;b44b202&#x2F;src&#x2F;bson.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>bson.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><script defer src="../../main.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;bson-2.1.0&#x2F;src&#x2F;bson.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>bson.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><script defer src="../../main.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script>
     <noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../bson/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">   1</span>
 <span id="2">   2</span>
 <span id="3">   3</span>
@@ -1086,6 +1086,19 @@
 <span id="1085">1085</span>
 <span id="1086">1086</span>
 <span id="1087">1087</span>
+<span id="1088">1088</span>
+<span id="1089">1089</span>
+<span id="1090">1090</span>
+<span id="1091">1091</span>
+<span id="1092">1092</span>
+<span id="1093">1093</span>
+<span id="1094">1094</span>
+<span id="1095">1095</span>
+<span id="1096">1096</span>
+<span id="1097">1097</span>
+<span id="1098">1098</span>
+<span id="1099">1099</span>
+<span id="1100">1100</span>
 </pre><pre class="rust"><code><span class="comment">// The MIT License (MIT)</span>
 
 <span class="comment">// Copyright (c) 2015 Y. T. Chung &lt;zonyitoo@gmail.com&gt;</span>
@@ -1467,10 +1480,12 @@
             }
             <span class="ident">Bson::Double</span>(<span class="ident">v</span>) =&gt; <span class="macro">json!</span>(<span class="ident">v</span>),
             <span class="ident">Bson::String</span>(<span class="ident">v</span>) =&gt; <span class="macro">json!</span>(<span class="ident">v</span>),
-            <span class="ident">Bson::Array</span>(<span class="ident">v</span>) =&gt; <span class="macro">json!</span>(<span class="ident">v</span>),
-            <span class="ident">Bson::Document</span>(<span class="ident">v</span>) =&gt; {
-                <span class="ident">Value::Object</span>(<span class="ident">v</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">k</span>, <span class="ident">v</span>)<span class="op">|</span> (<span class="ident">k</span>, <span class="ident">Value::from</span>(<span class="ident">v</span>))).<span class="ident">collect</span>())
-            }
+            <span class="ident">Bson::Array</span>(<span class="ident">v</span>) =&gt; <span class="ident">Value::Array</span>(<span class="ident">v</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="ident">Bson::into_relaxed_extjson</span>).<span class="ident">collect</span>()),
+            <span class="ident">Bson::Document</span>(<span class="ident">v</span>) =&gt; <span class="ident">Value::Object</span>(
+                <span class="ident">v</span>.<span class="ident">into_iter</span>()
+                    .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">k</span>, <span class="ident">v</span>)<span class="op">|</span> (<span class="ident">k</span>, <span class="ident">v</span>.<span class="ident">into_relaxed_extjson</span>()))
+                    .<span class="ident">collect</span>(),
+            ),
             <span class="ident">Bson::Boolean</span>(<span class="ident">v</span>) =&gt; <span class="macro">json!</span>(<span class="ident">v</span>),
             <span class="ident">Bson::Null</span> =&gt; <span class="ident">Value::Null</span>,
             <span class="ident">Bson::RegularExpression</span>(<span class="ident">Regex</span> { <span class="ident">pattern</span>, <span class="ident">options</span> }) =&gt; {
@@ -2150,19 +2165,30 @@
 
 <span class="kw">impl</span> <span class="ident">Binary</span> {
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">from_extended_doc</span>(<span class="ident">doc</span>: <span class="kw-2">&amp;</span><span class="ident">Document</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">binary</span> <span class="op">=</span> <span class="ident">doc</span>.<span class="ident">get_document</span>(<span class="string">&quot;$binary&quot;</span>).<span class="ident">ok</span>()<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">bytes</span> <span class="op">=</span> <span class="ident">binary</span>.<span class="ident">get_str</span>(<span class="string">&quot;base64&quot;</span>).<span class="ident">ok</span>()<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">bytes</span> <span class="op">=</span> <span class="ident">base64::decode</span>(<span class="ident">bytes</span>).<span class="ident">ok</span>()<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">subtype</span> <span class="op">=</span> <span class="ident">binary</span>.<span class="ident">get_str</span>(<span class="string">&quot;subType&quot;</span>).<span class="ident">ok</span>()<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">subtype</span> <span class="op">=</span> <span class="ident">hex::decode</span>(<span class="ident">subtype</span>).<span class="ident">ok</span>()<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">binary_doc</span> <span class="op">=</span> <span class="ident">doc</span>.<span class="ident">get_document</span>(<span class="string">&quot;$binary&quot;</span>).<span class="ident">ok</span>()<span class="question-mark">?</span>;
 
-        <span class="kw">if</span> <span class="ident">subtype</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="number">1</span> {
-            <span class="prelude-val">Some</span>(<span class="self">Self</span> {
-                <span class="ident">bytes</span>,
-                <span class="ident">subtype</span>: <span class="ident">subtype</span>[<span class="number">0</span>].<span class="ident">into</span>(),
-            })
+        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">bytes</span>) <span class="op">=</span> <span class="ident">binary_doc</span>.<span class="ident">get_str</span>(<span class="string">&quot;base64&quot;</span>) {
+            <span class="kw">let</span> <span class="ident">bytes</span> <span class="op">=</span> <span class="ident">base64::decode</span>(<span class="ident">bytes</span>).<span class="ident">ok</span>()<span class="question-mark">?</span>;
+            <span class="kw">let</span> <span class="ident">subtype</span> <span class="op">=</span> <span class="ident">binary_doc</span>.<span class="ident">get_str</span>(<span class="string">&quot;subType&quot;</span>).<span class="ident">ok</span>()<span class="question-mark">?</span>;
+            <span class="kw">let</span> <span class="ident">subtype</span> <span class="op">=</span> <span class="ident">hex::decode</span>(<span class="ident">subtype</span>).<span class="ident">ok</span>()<span class="question-mark">?</span>;
+            <span class="kw">if</span> <span class="ident">subtype</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="number">1</span> {
+                <span class="prelude-val">Some</span>(<span class="self">Self</span> {
+                    <span class="ident">bytes</span>,
+                    <span class="ident">subtype</span>: <span class="ident">subtype</span>[<span class="number">0</span>].<span class="ident">into</span>(),
+                })
+            } <span class="kw">else</span> {
+                <span class="prelude-val">None</span>
+            }
         } <span class="kw">else</span> {
-            <span class="prelude-val">None</span>
+            <span class="comment">// in non-human-readable mode, RawBinary will serialize as</span>
+            <span class="comment">// { &quot;$binary&quot;: { &quot;bytes&quot;: &lt;bytes&gt;, &quot;subType&quot;: &lt;i32&gt; } };</span>
+            <span class="kw">let</span> <span class="ident">binary</span> <span class="op">=</span> <span class="ident">binary_doc</span>.<span class="ident">get_binary_generic</span>(<span class="string">&quot;bytes&quot;</span>).<span class="ident">ok</span>()<span class="question-mark">?</span>;
+            <span class="kw">let</span> <span class="ident">subtype</span> <span class="op">=</span> <span class="ident">binary_doc</span>.<span class="ident">get_i32</span>(<span class="string">&quot;subType&quot;</span>).<span class="ident">ok</span>()<span class="question-mark">?</span>;
+
+            <span class="prelude-val">Some</span>(<span class="self">Self</span> {
+                <span class="ident">bytes</span>: <span class="ident">binary</span>.<span class="ident">clone</span>(),
+                <span class="ident">subtype</span>: <span class="ident">u8::try_from</span>(<span class="ident">subtype</span>).<span class="ident">ok</span>()<span class="question-mark">?</span>.<span class="ident">into</span>(),
+            })
         }
     }
 }

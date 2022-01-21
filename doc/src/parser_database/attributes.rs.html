@@ -899,6 +899,11 @@
 <span id="898">898</span>
 <span id="899">899</span>
 <span id="900">900</span>
+<span id="901">901</span>
+<span id="902">902</span>
+<span id="903">903</span>
+<span id="904">904</span>
+<span id="905">905</span>
 </pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">default</span>;
 <span class="kw">mod</span> <span class="ident">id</span>;
 <span class="kw">mod</span> <span class="ident">map</span>;
@@ -940,6 +945,11 @@
             <span class="comment">// @map</span>
             <span class="ident">attributes</span>.<span class="ident">visit_optional_single</span>(<span class="string">&quot;map&quot;</span>, <span class="ident">ctx</span>, <span class="op">|</span><span class="ident">map_args</span>, <span class="ident">ctx</span><span class="op">|</span> {
                 <span class="ident">map::composite_type_field</span>(<span class="ident">ct</span>, <span class="ident">field</span>, <span class="ident">ctid</span>, <span class="ident">field_id</span>, <span class="kw-2">&amp;mut</span> <span class="ident">ctfield</span>, <span class="ident">map_args</span>, <span class="ident">ctx</span>);
+            });
+
+            <span class="comment">// @default</span>
+            <span class="ident">attributes</span>.<span class="ident">visit_optional_single</span>(<span class="string">&quot;default&quot;</span>, <span class="ident">ctx</span>, <span class="op">|</span><span class="ident">args</span>, <span class="ident">ctx</span><span class="op">|</span> {
+                <span class="ident">default::visit_composite_field_default</span>(<span class="ident">args</span>, <span class="kw-2">&amp;mut</span> <span class="ident">ctfield</span>, <span class="ident">ctid</span>, <span class="ident">field_id</span>, <span class="ident">ctx</span>);
             });
         });
 
@@ -1095,7 +1105,7 @@
 
         <span class="comment">// @default</span>
         <span class="ident">attributes</span>.<span class="ident">visit_optional_single</span>(<span class="string">&quot;default&quot;</span>, <span class="ident">ctx</span>, <span class="op">|</span><span class="ident">args</span>, <span class="ident">ctx</span><span class="op">|</span> {
-            <span class="ident">default::visit_field_default</span>(<span class="ident">args</span>, <span class="ident">scalar_field_data</span>, <span class="ident">model_id</span>, <span class="ident">field_id</span>, <span class="ident">ctx</span>);
+            <span class="ident">default::visit_model_field_default</span>(<span class="ident">args</span>, <span class="ident">scalar_field_data</span>, <span class="ident">model_id</span>, <span class="ident">field_id</span>, <span class="ident">ctx</span>);
         });
 
         <span class="kw">if</span> <span class="kw">let</span> <span class="ident">ScalarFieldType::BuiltInScalar</span>(<span class="ident">_scalar_type</span>) <span class="op">=</span> <span class="ident">scalar_field_data</span>.<span class="ident">r#type</span> {

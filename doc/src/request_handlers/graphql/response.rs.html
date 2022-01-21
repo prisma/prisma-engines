@@ -209,7 +209,7 @@
     <span class="ident">errors</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">GQLError</span><span class="op">&gt;</span>,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">serde::Serialize</span>, <span class="ident">PartialEq</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">serde::Serialize</span>, <span class="ident">serde::Deserialize</span>, <span class="ident">PartialEq</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">GQLError</span> {
     <span class="ident">error</span>: <span class="ident">String</span>,
     <span class="ident">user_facing_error</span>: <span class="ident">user_facing_errors::Error</span>,
@@ -217,7 +217,7 @@
 
 <span class="kw">impl</span> <span class="ident">GQLError</span> {
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">code</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">user_facing_error</span>.<span class="ident">as_known</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">err</span><span class="op">|</span> <span class="ident">err</span>.<span class="ident">error_code</span>)
+        <span class="self">self</span>.<span class="ident">user_facing_error</span>.<span class="ident">as_known</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">err</span><span class="op">|</span> <span class="ident">err</span>.<span class="ident">error_code</span>.<span class="ident">as_ref</span>())
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">message</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {

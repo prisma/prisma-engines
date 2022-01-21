@@ -784,6 +784,13 @@
 <span id="783">783</span>
 <span id="784">784</span>
 <span id="785">785</span>
+<span id="786">786</span>
+<span id="787">787</span>
+<span id="788">788</span>
+<span id="789">789</span>
+<span id="790">790</span>
+<span id="791">791</span>
+<span id="792">792</span>
 </pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">migration_assertions</span>;
 <span class="kw">mod</span> <span class="ident">quaint_result_set_ext</span>;
 
@@ -1056,6 +1063,7 @@
         }
     }
 
+    <span class="attribute">#[<span class="ident">track_caller</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">assert_indexes_count</span>(<span class="self">self</span>, <span class="ident">n</span>: <span class="ident">usize</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">let</span> <span class="ident">idx_count</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">table</span>.<span class="ident">indices</span>.<span class="ident">len</span>();
         <span class="macro">assert!</span>(<span class="ident">idx_count</span> <span class="op">==</span> <span class="ident">n</span>, <span class="string">&quot;Expected {} indexes, found {}.&quot;</span>, <span class="ident">n</span>, <span class="ident">idx_count</span>);
@@ -1533,6 +1541,12 @@
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">assert_is_fulltext</span>(<span class="self">self</span>) -&gt; <span class="self">Self</span> {
         <span class="macro">assert_eq!</span>(<span class="self">self</span>.<span class="number">0</span>.<span class="ident">tpe</span>, <span class="ident">IndexType::Fulltext</span>);
+
+        <span class="self">self</span>
+    }
+
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">assert_is_normal</span>(<span class="self">self</span>) -&gt; <span class="self">Self</span> {
+        <span class="macro">assert_eq!</span>(<span class="self">self</span>.<span class="number">0</span>.<span class="ident">tpe</span>, <span class="ident">IndexType::Normal</span>);
 
         <span class="self">self</span>
     }

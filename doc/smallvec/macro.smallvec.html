@@ -22,7 +22,7 @@ There are two forms of this macro:</p>
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">let</span> <span class="ident">v</span>: <span class="ident">SmallVec</span><span class="op">&lt;</span>[<span class="kw">_</span>; <span class="number">0x8000</span>]<span class="op">&gt;</span> <span class="op">=</span> <span class="macro">smallvec!</span>[<span class="number">1</span>; <span class="number">3</span>];
 <span class="macro">assert_eq!</span>(<span class="ident">v</span>, <span class="ident">SmallVec::from_buf</span>([<span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>]));</code></pre></div>
 <p>Note that unlike array expressions this syntax supports all elements
-which implement <a href="https://doc.rust-lang.org/1.58.0/core/clone/trait.Clone.html" title="Clone"><code>Clone</code></a> and the number of elements doesn’t have to be
+which implement <a href="https://doc.rust-lang.org/1.58.1/core/clone/trait.Clone.html" title="Clone"><code>Clone</code></a> and the number of elements doesn’t have to be
 a constant.</p>
 <p>This will use <code>clone</code> to duplicate an expression, so one should be careful
 using this with types having a nonstandard <code>Clone</code> implementation. For

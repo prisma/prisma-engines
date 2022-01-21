@@ -4,7 +4,7 @@
 Sometimes it is desirable to know when such an event happens, as the first value is overwritten
 and it can indicate an error in the serialized data.</p>
 <p>This helper returns an error if two identical keys exist in a map.</p>
-<p>The implementation supports both the <a href="https://doc.rust-lang.org/1.58.0/std/collections/hash/map/struct.HashMap.html"><code>HashMap</code></a> and the <a href="https://doc.rust-lang.org/1.58.0/std/collections/hash/map/struct.HashMap.html"><code>BTreeMap</code></a> from the standard library.</p>
+<p>The implementation supports both the <a href="https://doc.rust-lang.org/1.58.1/std/collections/hash/map/struct.HashMap.html"><code>HashMap</code></a> and the <a href="https://doc.rust-lang.org/1.58.1/std/collections/hash/map/struct.HashMap.html"><code>BTreeMap</code></a> from the standard library.</p>
 <h2 id="example" class="section-header"><a href="#example">Example</a></h2>
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Deserialize</span>)]</span>
 <span class="kw">struct</span> <span class="ident">Doc</span> {

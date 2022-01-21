@@ -23,14 +23,6 @@
 <span id="22">22</span>
 <span id="23">23</span>
 <span id="24">24</span>
-<span id="25">25</span>
-<span id="26">26</span>
-<span id="27">27</span>
-<span id="28">28</span>
-<span id="29">29</span>
-<span id="30">30</span>
-<span id="31">31</span>
-<span id="32">32</span>
 </pre><pre class="rust"><code><span class="doccomment">//! The commands exposed by the migration engine core are defined in this</span>
 <span class="doccomment">//! module.</span>
 
@@ -39,27 +31,19 @@
 <span class="kw">mod</span> <span class="ident">dev_diagnostic</span>;
 <span class="kw">mod</span> <span class="ident">diagnose_migration_history</span>;
 <span class="kw">mod</span> <span class="ident">evaluate_data_loss</span>;
-<span class="kw">mod</span> <span class="ident">list_migration_directories</span>;
 <span class="kw">mod</span> <span class="ident">mark_migration_applied</span>;
 <span class="kw">mod</span> <span class="ident">mark_migration_rolled_back</span>;
 <span class="kw">mod</span> <span class="ident">schema_push</span>;
 
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">apply_migrations</span>::{<span class="ident">ApplyMigrationsInput</span>, <span class="ident">ApplyMigrationsOutput</span>};
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">create_migration</span>::{<span class="ident">CreateMigrationInput</span>, <span class="ident">CreateMigrationOutput</span>};
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">dev_diagnostic</span>::{<span class="ident">DevAction</span>, <span class="ident">DevDiagnosticInput</span>, <span class="ident">DevDiagnosticOutput</span>};
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">diagnose_migration_history</span>::{
     <span class="ident">DiagnoseMigrationHistoryInput</span>, <span class="ident">DiagnoseMigrationHistoryOutput</span>, <span class="ident">DriftDiagnostic</span>, <span class="ident">HistoryDiagnostic</span>,
 };
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">evaluate_data_loss</span>::<span class="kw-2">*</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">list_migration_directories</span>::<span class="kw-2">*</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">mark_migration_applied</span>::{<span class="ident">MarkMigrationAppliedInput</span>, <span class="ident">MarkMigrationAppliedOutput</span>};
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">mark_migration_rolled_back</span>::{<span class="ident">MarkMigrationRolledBackInput</span>, <span class="ident">MarkMigrationRolledBackOutput</span>};
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">schema_push</span>::{<span class="ident">SchemaPushInput</span>, <span class="ident">SchemaPushOutput</span>};
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="ident">apply_migrations::apply_migrations</span>;
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="ident">create_migration::create_migration</span>;
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="ident">dev_diagnostic::dev_diagnostic</span>;
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="ident">diagnose_migration_history::diagnose_migration_history</span>;
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="ident">evaluate_data_loss::evaluate_data_loss</span>;
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="ident">mark_migration_applied::mark_migration_applied</span>;
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="ident">mark_migration_rolled_back::mark_migration_rolled_back</span>;
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="ident">schema_push::schema_push</span>;

@@ -1,1 +1,0 @@
-initSidebarItems({"struct":[["TimingLayer","A subscriber for `tracing` that encodes metadata for the Tide middleware to read out."],["TimingMiddleware","Middleware that captures encodes all traces in a handler as `Server-Timing` headers."]]});

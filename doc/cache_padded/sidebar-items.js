@@ -1,1 +1,0 @@
-initSidebarItems({"struct":[["CachePadded","Pads and aligns data to the length of a cache line."]]});

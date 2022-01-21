@@ -461,6 +461,9 @@
 <span id="460">460</span>
 <span id="461">461</span>
 <span id="462">462</span>
+<span id="463">463</span>
+<span id="464">464</span>
+<span id="465">465</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::{
     <span class="ident">build_composites</span>, <span class="ident">field_builders::RelationFieldBuilder</span>, <span class="ident">relation_builder::RelationBuilder</span>, <span class="ident">CompositeTypeBuilder</span>,
     <span class="ident">FieldBuilder</span>, <span class="ident">IndexBuilder</span>, <span class="ident">ModelBuilder</span>, <span class="ident">PrimaryKeyBuilder</span>,
@@ -575,6 +578,7 @@
                 <span class="ident">db_name</span>: <span class="ident">cf</span>.<span class="ident">database_name</span>.<span class="ident">clone</span>(),
                 <span class="ident">arity</span>: <span class="ident">cf</span>.<span class="ident">arity</span>,
                 <span class="ident">type_name</span>: <span class="ident">cf</span>.<span class="ident">composite_type</span>.<span class="ident">clone</span>(),
+                <span class="ident">default_value</span>: <span class="ident">cf</span>.<span class="ident">default_value</span>.<span class="ident">clone</span>(),
             })),
             <span class="ident">dml::Field::RelationField</span>(<span class="ident">rf</span>) =&gt; {
                 <span class="kw">let</span> <span class="ident">relation</span> <span class="op">=</span> <span class="ident">relations</span>
@@ -636,6 +640,8 @@
                 <span class="ident">db_name</span>: <span class="ident">field</span>.<span class="ident">database_name</span>.<span class="ident">clone</span>(),
                 <span class="ident">arity</span>: <span class="ident">field</span>.<span class="ident">arity</span>,
                 <span class="ident">type_name</span>: <span class="ident">type_name</span>.<span class="ident">clone</span>(),
+                <span class="comment">// No defaults on composite fields of type composite</span>
+                <span class="ident">default_value</span>: <span class="prelude-val">None</span>,
             })),
             <span class="ident">CompositeTypeFieldType::Scalar</span>(<span class="ident">st</span>, <span class="ident">_alias</span>, <span class="ident">nt</span>) =&gt; {
                 <span class="kw">let</span> <span class="ident">type_ident</span> <span class="op">=</span> (<span class="kw-2">*</span><span class="ident">st</span>).<span class="ident">into</span>();
@@ -653,7 +659,7 @@
                         <span class="ident">internal_enum</span>: <span class="prelude-val">None</span>,  <span class="comment">// Todo: No enums on composites?</span>
                         <span class="ident">arity</span>: <span class="ident">field</span>.<span class="ident">arity</span>,
                         <span class="ident">db_name</span>: <span class="ident">field</span>.<span class="ident">database_name</span>.<span class="ident">clone</span>(),
-                        <span class="ident">default_value</span>: <span class="prelude-val">None</span>, <span class="comment">// Todo: No defaults?</span>
+                        <span class="ident">default_value</span>: <span class="ident">field</span>.<span class="ident">default_value</span>.<span class="ident">as_ref</span>().<span class="ident">cloned</span>(),
                         <span class="ident">native_type</span>: <span class="ident">nt</span>.<span class="ident">clone</span>(),
                     }))
                 }

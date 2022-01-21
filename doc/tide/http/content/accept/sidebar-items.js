@@ -1,1 +1,0 @@
-initSidebarItems({"struct":[["Accept","Client header advertising which media types the client is able to understand."],["IntoIter","A borrowing iterator over entries in `Accept`."],["Iter","A lending iterator over entries in `Accept`."],["IterMut","A mutable iterator over entries in `Accept`."]]});

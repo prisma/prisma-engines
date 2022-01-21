@@ -193,9 +193,27 @@
 <span id="192">192</span>
 <span id="193">193</span>
 <span id="194">194</span>
+<span id="195">195</span>
+<span id="196">196</span>
+<span id="197">197</span>
+<span id="198">198</span>
+<span id="199">199</span>
+<span id="200">200</span>
+<span id="201">201</span>
+<span id="202">202</span>
+<span id="203">203</span>
 </pre><pre class="rust"><code><span class="doccomment">//! The external facing programmatic API to the migration engine.</span>
 
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">commands</span>::<span class="kw-2">*</span>, <span class="ident">CoreResult</span>};
+<span class="kw">use</span> <span class="kw">crate</span>::{
+    <span class="ident">commands</span>::<span class="kw-2">*</span>,
+    <span class="ident">json_rpc::types</span>::{
+        <span class="ident">ApplyMigrationsInput</span>, <span class="ident">ApplyMigrationsOutput</span>, <span class="ident">CreateMigrationInput</span>, <span class="ident">CreateMigrationOutput</span>, <span class="ident">DevDiagnosticInput</span>,
+        <span class="ident">DevDiagnosticOutput</span>, <span class="ident">EvaluateDataLossInput</span>, <span class="ident">EvaluateDataLossOutput</span>, <span class="ident">ListMigrationDirectoriesInput</span>,
+        <span class="ident">ListMigrationDirectoriesOutput</span>, <span class="ident">MarkMigrationAppliedInput</span>, <span class="ident">MarkMigrationAppliedOutput</span>,
+        <span class="ident">MarkMigrationRolledBackInput</span>, <span class="ident">MarkMigrationRolledBackOutput</span>, <span class="ident">SchemaPushInput</span>, <span class="ident">SchemaPushOutput</span>,
+    },
+    <span class="ident">CoreResult</span>,
+};
 <span class="kw">use</span> <span class="ident">migration_connector</span>::{<span class="ident">migrations_directory</span>, <span class="ident">MigrationConnector</span>};
 <span class="kw">use</span> <span class="ident">std::path::Path</span>;
 <span class="kw">use</span> <span class="ident">tracing_futures::Instrument</span>;

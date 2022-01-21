@@ -605,6 +605,16 @@
 <span id="604">604</span>
 <span id="605">605</span>
 <span id="606">606</span>
+<span id="607">607</span>
+<span id="608">608</span>
+<span id="609">609</span>
+<span id="610">610</span>
+<span id="611">611</span>
+<span id="612">612</span>
+<span id="613">613</span>
+<span id="614">614</span>
+<span id="615">615</span>
+<span id="616">616</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">context::Context</span>, <span class="ident">walkers::CompositeTypeFieldWalker</span>, <span class="ident">walkers::CompositeTypeWalker</span>, <span class="ident">DatamodelError</span>};
 <span class="kw">use</span> <span class="ident">schema_ast::ast</span>::{<span class="self">self</span>, <span class="ident">WithName</span>};
 <span class="kw">use</span> <span class="ident">std</span>::{
@@ -672,6 +682,7 @@
 <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">struct</span> <span class="ident">CompositeTypeField</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span> {
     <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">r#type</span>: <span class="ident">ScalarFieldType</span>,
     <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">mapped_name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;ast</span> <span class="ident">str</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">default</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">DefaultAttribute</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span><span class="op">&gt;</span>,
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
@@ -705,7 +716,7 @@
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">DefaultAttribute</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span> {
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">mapped_name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;ast</span> <span class="ident">str</span><span class="op">&gt;</span>,
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;ast</span> <span class="ident">ast::Expression</span>,
@@ -1075,10 +1086,19 @@
 <span class="kw">fn</span> <span class="ident">visit_composite_type</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span>(<span class="ident">ct_id</span>: <span class="ident">ast::CompositeTypeId</span>, <span class="ident">ct</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;ast</span> <span class="ident">ast::CompositeType</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span>) {
     <span class="kw">for</span> (<span class="ident">field_id</span>, <span class="ident">ast_field</span>) <span class="kw">in</span> <span class="ident">ct</span>.<span class="ident">iter_fields</span>() {
         <span class="kw">match</span> <span class="ident">field_type</span>(<span class="ident">ast_field</span>, <span class="ident">ctx</span>) {
+            <span class="prelude-val">Ok</span>(<span class="ident">FieldType::Scalar</span>(<span class="ident">ScalarFieldType::Alias</span>(<span class="kw">_</span>))) =&gt; {
+                <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_composite_type_validation_error</span>(
+                    <span class="string">&quot;Type aliases are not allowed on composite types. Consider using the resolved type instead.&quot;</span>
+                        .<span class="ident">to_string</span>(),
+                    <span class="ident">ct</span>.<span class="ident">name</span>.<span class="ident">name</span>.<span class="ident">clone</span>(),
+                    <span class="ident">ast_field</span>.<span class="ident">field_type</span>.<span class="ident">span</span>(),
+                ))
+            }
             <span class="prelude-val">Ok</span>(<span class="ident">FieldType::Scalar</span>(<span class="ident">scalar_type</span>)) =&gt; {
                 <span class="kw">let</span> <span class="ident">field</span> <span class="op">=</span> <span class="ident">CompositeTypeField</span> {
                     <span class="ident">r#type</span>: <span class="ident">scalar_type</span>,
                     <span class="ident">mapped_name</span>: <span class="prelude-val">None</span>,
+                    <span class="ident">default</span>: <span class="prelude-val">None</span>,
                 };
                 <span class="ident">ctx</span>.<span class="ident">db</span>.<span class="ident">types</span>.<span class="ident">composite_type_fields</span>.<span class="ident">insert</span>((<span class="ident">ct_id</span>, <span class="ident">field_id</span>), <span class="ident">field</span>);
             }

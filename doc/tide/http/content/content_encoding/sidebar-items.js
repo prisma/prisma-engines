@@ -1,1 +1,0 @@
-initSidebarItems({"struct":[["ContentEncoding","Specify the compression algorithm."]]});

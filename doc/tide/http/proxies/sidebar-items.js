@@ -1,1 +1,0 @@
-initSidebarItems({"struct":[["Forwarded","A rust representation of the forwarded header."]]});

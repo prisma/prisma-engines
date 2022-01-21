@@ -118,10 +118,14 @@
 <span id="117">117</span>
 <span id="118">118</span>
 <span id="119">119</span>
+<span id="120">120</span>
+<span id="121">121</span>
 </pre><pre class="rust"><code><span class="attribute">#![<span class="ident">deny</span>(<span class="ident">rust_2018_idioms</span>, <span class="ident">unsafe_code</span>, <span class="ident">missing_docs</span>)]</span>
 <span class="attribute">#![<span class="ident">allow</span>(<span class="ident">clippy::needless_collect</span>)]</span> <span class="comment">// the implementation of that rule is way too eager, it rejects necessary collects</span>
 
 <span class="doccomment">//! The top-level library crate for the migration engine.</span>
+
+<span class="macro">include!</span>(<span class="macro">concat!</span>(<span class="macro">env!</span>(<span class="string">&quot;OUT_DIR&quot;</span>), <span class="string">&quot;/methods.rs&quot;</span>));
 
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">commands</span>;
 

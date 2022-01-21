@@ -1,1 +1,0 @@
-initSidebarItems({"fn":[["is_elf","Returns whether a buffer is an ELF."],["is_exe","Returns whether a buffer is an EXE."],["is_java","Returns whether a buffer is compiled Java bytecode."],["is_llvm","Returns whether a buffer is LLVM Bitcode."],["is_wasm","Returns whether a buffer is a wasm."]]});

@@ -5,9 +5,9 @@ In case of JSON, keys are restricted to strings.
 Rust features more powerful keys, for example tuple, which can not be serialized to JSON.</p>
 <p>This helper serializes the Map into a list of tuples, which does not have the same type restrictions.
 The module can be applied on any type implementing <code>IntoIterator&lt;Item = (&amp;'a K, &amp;'a V)&gt;</code> and <code>FromIterator&lt;(K, V)&gt;</code>, with <code>K</code> and <code>V</code> being the key and value types.
-From the standard library both <a href="https://doc.rust-lang.org/1.58.0/std/collections/hash/map/struct.HashMap.html" title="HashMap"><code>HashMap</code></a> and <a href="https://doc.rust-lang.org/1.58.0/alloc/collections/btree/map/struct.BTreeMap.html" title="BTreeMap"><code>BTreeMap</code></a> fullfil the condition and can be used here.</p>
+From the standard library both <a href="https://doc.rust-lang.org/1.58.1/std/collections/hash/map/struct.HashMap.html" title="HashMap"><code>HashMap</code></a> and <a href="https://doc.rust-lang.org/1.58.1/alloc/collections/btree/map/struct.BTreeMap.html" title="BTreeMap"><code>BTreeMap</code></a> fullfil the condition and can be used here.</p>
 <h3 id="converting-to-serde_as" class="section-header"><a href="#converting-to-serde_as">Converting to <code>serde_as</code></a></h3>
-<p>If the map is of type <a href="https://doc.rust-lang.org/1.58.0/std/collections/hash/map/struct.HashMap.html" title="HashMap"><code>HashMap</code></a> or <a href="https://doc.rust-lang.org/1.58.0/alloc/collections/btree/map/struct.BTreeMap.html" title="BTreeMap"><code>BTreeMap</code></a> the same functionality can be expressed more clearly using the <a href="crate::guide::serde_as"><code>serde_as</code></a> macro.
+<p>If the map is of type <a href="https://doc.rust-lang.org/1.58.1/std/collections/hash/map/struct.HashMap.html" title="HashMap"><code>HashMap</code></a> or <a href="https://doc.rust-lang.org/1.58.1/alloc/collections/btree/map/struct.BTreeMap.html" title="BTreeMap"><code>BTreeMap</code></a> the same functionality can be expressed more clearly using the <a href="crate::guide::serde_as"><code>serde_as</code></a> macro.
 The <code>_</code> is a placeholder which works for any type which implements <a href="../../../serde/ser/trait.Serialize.html" title="Serialize"><code>Serialize</code></a>/<a href="../../../serde/de/trait.Deserialize.html" title="Deserialize"><code>Deserialize</code></a>, such as the tuple and <code>u32</code> type.</p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="attribute">#[<span class="ident">serde_as</span>]</span>
@@ -34,7 +34,7 @@ The <code>_</code> is a placeholder which works for any type which implements <a
 
 <span class="macro">assert_eq!</span>(<span class="number">2</span>, <span class="ident">v</span>.<span class="ident">s</span>.<span class="ident">len</span>());
 <span class="macro">assert_eq!</span>(<span class="number">1</span>, <span class="ident">v</span>.<span class="ident">s</span>[<span class="kw-2">&amp;</span>(<span class="string">&quot;World&quot;</span>.<span class="ident">to_string</span>(), <span class="number">456</span>)]);</code></pre></div>
-<p>The helper is generic over the hasher type of the <a href="https://doc.rust-lang.org/1.58.0/std/collections/hash/map/struct.HashMap.html" title="HashMap"><code>HashMap</code></a> and works with different variants, such as <code>FnvHashMap</code>.</p>
+<p>The helper is generic over the hasher type of the <a href="https://doc.rust-lang.org/1.58.1/std/collections/hash/map/struct.HashMap.html" title="HashMap"><code>HashMap</code></a> and works with different variants, such as <code>FnvHashMap</code>.</p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">fnv::FnvHashMap</span>;
 
