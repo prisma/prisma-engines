@@ -1,5 +1,6 @@
 pub use crate::assertions::{MigrationsAssertions, ResultSetExt, SchemaAssertion};
 pub use expect_test::expect;
+pub use migration_core::json_rpc::types::{DbExecuteDatasourceType, DbExecuteParams};
 pub use test_macros::test_connector;
 pub use test_setup::{BitFlags, Capabilities, Tags};
 
@@ -51,6 +52,11 @@ impl TestApi {
 
     pub fn connection_info(&self) -> ConnectionInfo {
         self.root.connection_info()
+    }
+
+    pub fn db_execute(&self, params: &migration_core::json_rpc::types::DbExecuteParams) -> ConnectorResult<()> {
+        let api: &dyn migration_core::GenericApi = &self.connector;
+        self.block_on(api.db_execute(params))
     }
 
     pub fn ensure_connection_validity(&self) -> ConnectorResult<()> {
