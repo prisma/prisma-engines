@@ -64,6 +64,7 @@
 <span id="63">63</span>
 <span id="64">64</span>
 <span id="65">65</span>
+<span id="66">66</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">json_rpc::method_names</span>::<span class="kw-2">*</span>, <span class="ident">CoreError</span>, <span class="ident">CoreResult</span>, <span class="ident">GenericApi</span>};
 <span class="kw">use</span> <span class="ident">jsonrpc_core</span>::{<span class="ident">types::error::Error</span> <span class="kw">as</span> <span class="ident">JsonRpcError</span>, <span class="ident">IoHandler</span>, <span class="ident">Params</span>};
 <span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
@@ -98,6 +99,7 @@
     <span class="kw">match</span> <span class="ident">cmd</span> {
         <span class="ident">APPLY_MIGRATIONS</span> =&gt; <span class="ident">render</span>(<span class="ident">executor</span>.<span class="ident">apply_migrations</span>(<span class="kw-2">&amp;</span><span class="ident">params</span>.<span class="ident">parse</span>()<span class="question-mark">?</span>).<span class="kw">await</span>),
         <span class="ident">CREATE_MIGRATION</span> =&gt; <span class="ident">render</span>(<span class="ident">executor</span>.<span class="ident">create_migration</span>(<span class="kw-2">&amp;</span><span class="ident">params</span>.<span class="ident">parse</span>()<span class="question-mark">?</span>).<span class="kw">await</span>),
+        <span class="ident">DB_EXECUTE</span> =&gt; <span class="ident">render</span>(<span class="ident">executor</span>.<span class="ident">db_execute</span>(<span class="kw-2">&amp;</span><span class="ident">params</span>.<span class="ident">parse</span>()<span class="question-mark">?</span>).<span class="kw">await</span>),
         <span class="ident">DEV_DIAGNOSTIC</span> =&gt; <span class="ident">render</span>(<span class="ident">executor</span>.<span class="ident">dev_diagnostic</span>(<span class="kw-2">&amp;</span><span class="ident">params</span>.<span class="ident">parse</span>()<span class="question-mark">?</span>).<span class="kw">await</span>),
         <span class="ident">DEBUG_PANIC</span> =&gt; <span class="ident">render</span>(<span class="ident">executor</span>.<span class="ident">debug_panic</span>().<span class="kw">await</span>),
         <span class="ident">DIAGNOSE_MIGRATION_HISTORY</span> =&gt; <span class="ident">render</span>(<span class="ident">executor</span>.<span class="ident">diagnose_migration_history</span>(<span class="kw-2">&amp;</span><span class="ident">params</span>.<span class="ident">parse</span>()<span class="question-mark">?</span>).<span class="kw">await</span>),
