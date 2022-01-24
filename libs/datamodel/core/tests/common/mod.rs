@@ -65,6 +65,7 @@ pub(crate) trait ModelAsserts {
 pub(crate) trait CompositeTypeAsserts {
     fn assert_field_count(&self, count: usize) -> &Self;
     fn assert_has_scalar_field(&self, t: &str) -> &dml::CompositeTypeField;
+    fn assert_has_enum_field(&self, t: &str) -> &dml::CompositeTypeField;
     fn assert_has_composite_type_field(&self, t: &str) -> &dml::CompositeTypeField;
 }
 
@@ -205,8 +206,13 @@ impl CompositeTypeFieldAsserts for dml::CompositeTypeField {
         self
     }
 
-    fn assert_enum_type(&self, _en: &str) -> &Self {
-        todo!()
+    fn assert_enum_type(&self, en: &str) -> &Self {
+        if let dml::CompositeTypeFieldType::Enum(enum_type) = &self.r#type {
+            assert_eq!(enum_type, en);
+        } else {
+            panic!("Enum expected, but found {:?}", self.r#type);
+        }
+        self
     }
 }
 
@@ -360,6 +366,12 @@ impl CompositeTypeAsserts for dml::CompositeType {
 
     fn assert_has_scalar_field(&self, t: &str) -> &dml::CompositeTypeField {
         self.scalar_fields()
+            .find(|field| field.name == t)
+            .unwrap_or_else(|| panic!("Field {} not found", t))
+    }
+
+    fn assert_has_enum_field(&self, t: &str) -> &dml::CompositeTypeField {
+        self.enum_fields()
             .find(|field| field.name == t)
             .unwrap_or_else(|| panic!("Field {} not found", t))
     }

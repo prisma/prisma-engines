@@ -53,13 +53,13 @@ pub(super) fn visit_model_field_default<'ast>(
                         if ctx.db.ast[enum_id].values.iter().any(|v| v.name() == enum_value) {
                             accept()
                         } else {
-                            validate_invalid_default_enum_value(args, ctx);
+                            validate_invalid_default_enum_value(enum_value, args, ctx);
                         }
                     }
                     ast::Expression::Function(funcname, funcargs, _) if funcname == FN_DBGENERATED => {
                         validate_dbgenerated_args(&funcargs.arguments, args, accept, ctx);
                     }
-                    value => validate_invalid_default_enum_expr(value, args, ctx),
+                    bad_value => validate_invalid_default_enum_expr(bad_value, args, ctx),
                 };
             }
             ScalarFieldType::BuiltInScalar(scalar_type) => {
@@ -135,7 +135,7 @@ pub(super) fn visit_composite_field_default<'ast>(
                     if ctx.db.ast[enum_id].values.iter().any(|v| v.name() == enum_value) {
                         accept()
                     } else {
-                        validate_invalid_default_enum_value(args, ctx);
+                        validate_invalid_default_enum_value(enum_value, args, ctx);
                     }
                 }
                 bad_value => validate_invalid_default_enum_expr(bad_value, args, ctx),
@@ -294,17 +294,14 @@ fn validate_default_bool_value(
     }
 }
 
-fn validate_invalid_default_enum_value(args: &mut Arguments<'_>, ctx: &mut Context<'_>) {
-    ctx.push_error(args.new_attribute_validation_error(
-        "The defined default value is not a valid value of the enum specified for the field.",
-    ));
+fn validate_invalid_default_enum_value(enum_value: &str, args: &mut Arguments<'_>, ctx: &mut Context<'_>) {
+    ctx.push_error(args.new_attribute_validation_error(&format!(
+        "The defined default value `{enum_value}` is not a valid value of the enum specified for the field."
+    )));
 }
 
-fn validate_invalid_default_enum_expr(value: &ast::Expression, args: &mut Arguments<'_>, ctx: &mut Context<'_>) {
-    ctx.push_error(args.new_attribute_validation_error(&format!(
-        "Expected a an enum value, but found `{bad_value}`.",
-        bad_value = value
-    )))
+fn validate_invalid_default_enum_expr(bad_value: &ast::Expression, args: &mut Arguments<'_>, ctx: &mut Context<'_>) {
+    ctx.push_error(args.new_attribute_validation_error(&format!("Expected an enum value, but found `{bad_value}`.")))
 }
 
 fn validate_unknown_function_default(fn_name: &str, args: &Arguments<'_>, ctx: &mut Context<'_>) {
