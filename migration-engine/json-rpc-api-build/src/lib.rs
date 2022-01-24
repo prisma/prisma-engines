@@ -18,6 +18,10 @@ pub fn generate_rust_modules(out_dir: &Path) -> CrateResult {
         if !entry.file_type()?.is_file() {
             continue;
         }
+
+        // https://doc.rust-lang.org/cargo/reference/build-scripts.html
+        println!("cargo:rerun-if-changed={}", entry.path().to_string_lossy());
+
         let contents = std::fs::read_to_string(entry.path())?;
         eprintln!("Merging {}", entry.path().file_name().unwrap().to_string_lossy());
         let api_fragment: Api = toml::from_str(&contents)?;

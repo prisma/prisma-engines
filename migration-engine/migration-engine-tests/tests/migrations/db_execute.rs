@@ -1,6 +1,27 @@
 use migration_engine_tests::test_api::*;
 use quaint::prelude::Queryable;
 
+#[test]
+fn db_execute_input_source_takes_expected_json_shape() {
+    let value = DbExecuteParams {
+        datasource_type: DbExecuteDatasourceType::Url(UrlContainer {
+            url: "uiuiui".to_owned(),
+        }),
+        script: "SQL goes here".to_owned(),
+    };
+
+    let expected = expect![[r#"
+        {
+          "datasourceType": {
+            "tag": "url",
+            "url": "uiuiui"
+          },
+          "script": "SQL goes here"
+        }"#]];
+
+    expected.assert_eq(&serde_json::to_string_pretty(&value).unwrap());
+}
+
 #[test_connector(tags(Sqlite))]
 fn db_execute_happy_path_with_literal_url(api: TestApi) {
     let tmpdir = tempfile::TempDir::new().unwrap();
@@ -12,7 +33,7 @@ fn db_execute_happy_path_with_literal_url(api: TestApi) {
 
     // Execute the command.
     api.db_execute(&DbExecuteParams {
-        datasource_type: DbExecuteDatasourceType::Url(url.clone()),
+        datasource_type: DbExecuteDatasourceType::Url(UrlContainer { url: url.clone() }),
         script: script.to_owned(),
     })
     .unwrap();
@@ -47,7 +68,9 @@ fn db_execute_happy_path_with_prisma_schema(api: TestApi) {
 
     // Execute the command.
     api.db_execute(&DbExecuteParams {
-        datasource_type: DbExecuteDatasourceType::Schema(schema_path.to_string_lossy().into_owned()),
+        datasource_type: DbExecuteDatasourceType::Schema(SchemaContainer {
+            schema: schema_path.to_string_lossy().into_owned(),
+        }),
         script: script.to_owned(),
     })
     .unwrap();

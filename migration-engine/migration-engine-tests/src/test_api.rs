@@ -1,6 +1,6 @@
 pub use crate::assertions::{MigrationsAssertions, ResultSetExt, SchemaAssertion};
 pub use expect_test::expect;
-pub use migration_core::json_rpc::types::{DbExecuteDatasourceType, DbExecuteParams};
+pub use migration_core::json_rpc::types::{DbExecuteDatasourceType, DbExecuteParams, SchemaContainer, UrlContainer};
 pub use test_macros::test_connector;
 pub use test_setup::{BitFlags, Capabilities, Tags};
 
