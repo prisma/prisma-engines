@@ -229,7 +229,16 @@ mod interactive_tx {
         batch_results.assert_failure(2002, None);
 
         let res = runner.commit_tx(tx_id.clone()).await?;
-        assert!(res.is_ok());
+
+        if matches!(runner.connector(), ConnectorTag::MongoDb(_)) {
+            assert!(res.is_err());
+            let err = res.err().unwrap();
+            let known_err = err.as_known().unwrap();
+            assert!(known_err.message.contains("has been aborted."));
+            assert_eq!(known_err.error_code, "P2028");
+        } else {
+            assert!(res.is_ok());
+        }
         runner.clear_active_tx();
 
         match_connector_result!(

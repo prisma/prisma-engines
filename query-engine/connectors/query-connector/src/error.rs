@@ -86,6 +86,9 @@ impl ConnectorError {
             ErrorKind::MissingFullTextSearchIndex => Some(KnownError::new(
                 user_facing_errors::query_engine::MissingFullTextSearchIndex {},
             )),
+            ErrorKind::TransactionAborted { message } => Some(KnownError::new(
+                user_facing_errors::query_engine::InteractiveTransactionError { error: message.clone() },
+            )),
             _ => None,
         };
 
