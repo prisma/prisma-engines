@@ -155,7 +155,11 @@ fn composite_create_envelope_object_type(ctx: &mut BuilderContext, cf: &Composit
     let ident = Identifier::new(name, PRISMA_NAMESPACE);
     return_cached_input!(ctx, &ident);
 
-    let input_object = Arc::new(init_input_object_type(ident.clone()));
+    let mut input_object = init_input_object_type(ident.clone());
+    input_object.require_exactly_one_field();
+
+    let input_object = Arc::new(input_object);
+
     ctx.cache_input_type(ident, input_object.clone());
 
     let create_input = InputType::Object(composite_create_object_type(ctx, cf));

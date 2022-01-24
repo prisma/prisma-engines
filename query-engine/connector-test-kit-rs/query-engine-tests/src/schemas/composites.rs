@@ -68,17 +68,17 @@ pub fn to_one_composites() -> String {
         }
 
         type A {
-            a_1 String @map("a1")
+            a_1 String @default("a_1 default") @map("a1")
             a_2 Int?
         }
 
         type B {
-            b_field String
-            c       C      @map("nested_c")
+            b_field String @default("b_field default")
+            c C @map("nested_c")
         }
 
         type C {
-            c_field String
+            c_field String @default("c_field default")
             b B?
         }
         "#
@@ -94,52 +94,28 @@ pub fn to_many_composites() -> String {
             #id(id, Int, @id)
             field String?
             a     A[]       @map("top_a")
+            c     C[]       @map("top_c")
         }
 
         type A {
-            a_1 String @map("a1")
+            a_1 String @default("a_1 default") @map("a1")
             a_2 Int?
             b B[]
         }
 
         type B {
-            b_field String
+            b_field String   @default("b_field default")
             a       A[]      @map("nested_a")
+        }
+
+        type C {
+          c_field String @default("c_field default")
         }
         "#
     };
 
     schema.to_owned()
 }
-
-// pub fn to_one_composites() -> String {
-//     let schema = indoc! {
-//         r#"model TestModel {
-//             #id(id, Int, @id)
-//             field String?
-//             a     A       @map("nested_a")
-//             b     B?
-//         }
-
-//         type A {
-//             a_1 String @default("a_1 default") @map("a1")
-//             a_2 Int?   @map("a2")
-//         }
-
-//         type B {
-//             b_field String @default("b_field default")
-//             c C @map("nested_c")
-//         }
-
-//         type C {
-//             c_field String @default("c_field default")
-//             b B?
-//         }
-//         "#
-//     };
-
-//     schema.to_owned()
-// }
 
 // defaults
 // maps

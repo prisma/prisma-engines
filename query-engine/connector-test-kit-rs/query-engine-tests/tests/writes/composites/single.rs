@@ -1,15 +1,12 @@
 use query_engine_tests::*;
 
-// [Composites] Flavian Todo
-// - Include defaults here as well (no need for separate tests, can be part of the normal tests here, see composites.rs for the commented out schema)
-// - Make tests below pass where they don't.
-// - Implement missing tests, suggestions:
-//     - Error cases: Check that parsing correctly errors no required fields missing etc.
-#[test_suite(schema(to_one_composites), only(MongoDb))]
+#[test_suite(only(MongoDb))]
 mod create {
+    use query_engine_tests::{assert_error, run_query};
+
     /// Using explicit `set` operator, create (deeply nested) composites.
-    #[connector_test]
-    async fn set_create(runner: Runner) -> TestResult<()> {
+    #[connector_test(schema(to_one_composites))]
+    async fn set_create_to_one(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
           run_query!(runner, r#"mutation {
             createOneTestModel(
@@ -42,8 +39,8 @@ mod create {
     }
 
     /// Using only shorthand syntax, create (deeply nested) composites.
-    #[connector_test]
-    async fn shorthand_set_create(runner: Runner) -> TestResult<()> {
+    #[connector_test(schema(to_one_composites))]
+    async fn shorthand_set_create_to_one(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
           run_query!(runner, r#"mutation {
             createOneTestModel(
@@ -76,8 +73,8 @@ mod create {
     }
 
     /// Using explicit `set` operators and shorthands mixed together, create (deeply nested) composites.
-    #[connector_test]
-    async fn mixed_set_create(runner: Runner) -> TestResult<()> {
+    #[connector_test(schema(to_one_composites))]
+    async fn mixed_set_create_to_one(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
           run_query!(runner, r#"mutation {
             createOneTestModel(
@@ -109,17 +106,16 @@ mod create {
         Ok(())
     }
 
-    // Todo: Relies on defaults being there.
-
-    #[connector_test]
-    async fn explicit_set_empty_object(runner: Runner) -> TestResult<()> {
+    // Ensures default values are set when using an explicit set empty object
+    #[connector_test(schema(to_one_composites))]
+    async fn explicit_set_empty_object_to_one(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
           run_query!(runner, r#"mutation {
           createOneTestModel(
             data: {
               id: 1
               a: { set: { a_1: "a1", a_2: null } }
-              b: { set: {} }
+              b: { set: { c: {} } }
             }
           ) {
             a {
@@ -138,22 +134,22 @@ mod create {
           }
         }
         "#),
-          @r###""###
+          @r###"{"data":{"createOneTestModel":{"a":{"a_1":"a1","a_2":null},"b":{"b_field":"b_field default","c":{"c_field":"c_field default","b":null}}}}}"###
         );
 
         Ok(())
     }
 
-    // Todo: Relies on defaults being there.
-    #[connector_test]
-    async fn shorthand_set_empty_object(runner: Runner) -> TestResult<()> {
+    // Ensures default values are set when using a shorthand empty object
+    #[connector_test(schema(to_one_composites))]
+    async fn shorthand_set_empty_object_to_one(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
           run_query!(runner, r#"mutation {
             createOneTestModel(
               data: {
                 id: 1
                 a: { set: { a_1: "a1", a_2: null } }
-                b: {}
+                b: { c: {} }
               }
             ) {
               a {
@@ -172,7 +168,49 @@ mod create {
             }
           }
           "#),
-          @r###""###
+          @r###"{"data":{"createOneTestModel":{"a":{"a_1":"a1","a_2":null},"b":{"b_field":"b_field default","c":{"c_field":"c_field default","b":null}}}}}"###
+        );
+
+        Ok(())
+    }
+
+    // Fails on both the envelope and the actual input type
+    #[connector_test(schema(to_one_composites))]
+    async fn error_when_missing_required_fields(runner: Runner) -> TestResult<()> {
+        // Envelope type failure
+        assert_error!(
+          runner,
+          r#"mutation {
+            createOneTestModel(
+              data: {
+                id: 1
+                a: { set: { a_1: "a1", a_2: null } }
+                b: {}
+              }
+            ) {
+              id
+            }
+          }"#,
+          2009,
+          "Mutation.createOneTestModel.data.TestModelUncheckedCreateInput.b.BCreateEnvelopeInput`: Expected exactly one field to be present, got 0."
+        );
+
+        // Missing required field without default failure on field `B.c`
+        assert_error!(
+            runner,
+            r#"mutation {
+            createOneTestModel(
+              data: {
+                id: 1
+                a: { set: { a_1: "a1", a_2: null } }
+                b: {}
+              }
+            ) {
+              id
+            }
+          }"#,
+            2009,
+            "Mutation.createOneTestModel.data.TestModelCreateInput.b.BCreateInput.c`: A value is required but not set."
         );
 
         Ok(())

@@ -391,14 +391,17 @@ fn read_composite_value(bson: Bson, meta: &CompositeOutputMeta) -> crate::Result
                 // This approach ensures that missing fields are filled,
                 // so that the serialization can decide if this is invalid or not.
                 for (field, meta) in meta.inner.iter() {
-                    match doc.remove(field) {
-                        Some(value) => {
+                    match (doc.remove(field), meta) {
+                        (Some(value), _) => {
                             let value = value_from_bson(value, meta)?;
                             pairs.push((field.clone(), value))
                         }
-
+                        // Coerce missing scalar lists as empty lists
+                        (None, OutputMeta::Composite(meta)) if meta.list => {
+                            pairs.push((field.clone(), PrismaValue::List(Vec::new())))
+                        }
                         // Fill missing fields with nulls.
-                        None => pairs.push((field.clone(), PrismaValue::Null)),
+                        (None, _) => pairs.push((field.clone(), PrismaValue::Null)),
                     }
                 }
 

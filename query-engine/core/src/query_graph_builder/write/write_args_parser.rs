@@ -112,9 +112,11 @@ impl WriteArgsParser {
 }
 
 fn is_composite_envelope(map: &ParsedInputMap) -> bool {
-    let (key, _) = map.iter().next().unwrap();
-
-    map.len() == 1 && key == operations::SET // [Composites] Flavian Todo
+    // [Composites] Flavian Todo
+    map.iter()
+        .next()
+        .map(|(key, _)| map.len() == 1 && key == operations::SET)
+        .unwrap_or(false)
 }
 
 fn parse_composite_envelope(envelope: ParsedInputMap) -> QueryGraphBuilderResult<WriteExpression> {
