@@ -7,7 +7,7 @@ use crate::{
         DbExecuteDatasourceType, DbExecuteParams, DevDiagnosticInput, DevDiagnosticOutput, EvaluateDataLossInput,
         EvaluateDataLossOutput, ListMigrationDirectoriesInput, ListMigrationDirectoriesOutput,
         MarkMigrationAppliedInput, MarkMigrationAppliedOutput, MarkMigrationRolledBackInput,
-        MarkMigrationRolledBackOutput, SchemaPushInput, SchemaPushOutput,
+        MarkMigrationRolledBackOutput, SchemaContainer, SchemaPushInput, SchemaPushOutput, UrlContainer,
     },
     CoreResult,
 };
@@ -119,8 +119,8 @@ impl<C: MigrationConnector> GenericApi for C {
         use std::io::Read;
 
         let url = match &params.datasource_type {
-            DbExecuteDatasourceType::Url(url) => url.to_owned(),
-            DbExecuteDatasourceType::Schema(file_path) => {
+            DbExecuteDatasourceType::Url(UrlContainer { url }) => url.to_owned(),
+            DbExecuteDatasourceType::Schema(SchemaContainer { schema: file_path }) => {
                 let mut schema_file = std::fs::File::open(&file_path)
                     .map_err(|err| ConnectorError::from_source(err, "Opening Prisma schema file."))?;
                 let mut schema_string = String::new();
