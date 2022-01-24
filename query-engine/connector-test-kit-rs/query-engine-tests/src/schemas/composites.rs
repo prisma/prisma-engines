@@ -41,15 +41,15 @@ pub fn all_composite_types() -> String {
         }
 
         type AllLists {
-            field String[]
+            str String[]
             bool  Boolean[]
             int   Int[]
-            bInt  BigInt
-            float Float
-            dt    DateTime
-            json  Json
-            bytes Bytes
-            enum  TestEnum
+            bInt  BigInt[]
+            float Float[]
+            dt    DateTime[]
+            json  Json[]
+            bytes Bytes[]
+            enum  TestEnum[]
         }
         "#
     };
