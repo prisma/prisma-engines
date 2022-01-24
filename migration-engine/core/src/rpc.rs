@@ -32,6 +32,7 @@ async fn run_command(
     match cmd {
         APPLY_MIGRATIONS => render(executor.apply_migrations(&params.parse()?).await),
         CREATE_MIGRATION => render(executor.create_migration(&params.parse()?).await),
+        DB_EXECUTE => render(executor.db_execute(&params.parse()?).await),
         DEV_DIAGNOSTIC => render(executor.dev_diagnostic(&params.parse()?).await),
         DEBUG_PANIC => render(executor.debug_panic().await),
         DIAGNOSE_MIGRATION_HISTORY => render(executor.diagnose_migration_history(&params.parse()?).await),

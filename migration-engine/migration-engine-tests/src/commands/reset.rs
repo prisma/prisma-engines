@@ -7,10 +7,6 @@ pub struct Reset<'a> {
 }
 
 impl<'a> Reset<'a> {
-    pub fn new(api: &'a dyn GenericApi) -> Self {
-        Reset { api, rt: None }
-    }
-
     pub fn new_sync(api: &'a dyn GenericApi, rt: &'a tokio::runtime::Runtime) -> Self {
         Reset { api, rt: Some(rt) }
     }

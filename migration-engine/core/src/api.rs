@@ -3,14 +3,15 @@
 use crate::{
     commands::*,
     json_rpc::types::{
-        ApplyMigrationsInput, ApplyMigrationsOutput, CreateMigrationInput, CreateMigrationOutput, DevDiagnosticInput,
-        DevDiagnosticOutput, EvaluateDataLossInput, EvaluateDataLossOutput, ListMigrationDirectoriesInput,
-        ListMigrationDirectoriesOutput, MarkMigrationAppliedInput, MarkMigrationAppliedOutput,
-        MarkMigrationRolledBackInput, MarkMigrationRolledBackOutput, SchemaPushInput, SchemaPushOutput,
+        ApplyMigrationsInput, ApplyMigrationsOutput, CreateMigrationInput, CreateMigrationOutput,
+        DbExecuteDatasourceType, DbExecuteParams, DevDiagnosticInput, DevDiagnosticOutput, EvaluateDataLossInput,
+        EvaluateDataLossOutput, ListMigrationDirectoriesInput, ListMigrationDirectoriesOutput,
+        MarkMigrationAppliedInput, MarkMigrationAppliedOutput, MarkMigrationRolledBackInput,
+        MarkMigrationRolledBackOutput, SchemaPushInput, SchemaPushOutput,
     },
     CoreResult,
 };
-use migration_connector::{migrations_directory, MigrationConnector};
+use migration_connector::{migrations_directory, ConnectorError, MigrationConnector};
 use std::path::Path;
 use tracing_futures::Instrument;
 
@@ -28,6 +29,9 @@ pub trait GenericApi: Send + Sync + 'static {
 
     /// Generate a new migration, based on the provided schema and existing migrations history.
     async fn create_migration(&self, input: &CreateMigrationInput) -> CoreResult<CreateMigrationOutput>;
+
+    /// Send a raw command to the database.
+    async fn db_execute(&self, params: &DbExecuteParams) -> CoreResult<()>;
 
     /// Debugging method that only panics, for CLI tests.
     async fn debug_panic(&self) -> CoreResult<()>;
@@ -109,6 +113,25 @@ impl<C: MigrationConnector> GenericApi for C {
                 draft = input.draft,
             ))
             .await
+    }
+
+    async fn db_execute(&self, params: &DbExecuteParams) -> CoreResult<()> {
+        use std::io::Read;
+
+        let url = match &params.datasource_type {
+            DbExecuteDatasourceType::Url(url) => url.to_owned(),
+            DbExecuteDatasourceType::Schema(file_path) => {
+                let mut schema_file = std::fs::File::open(&file_path)
+                    .map_err(|err| ConnectorError::from_source(err, "Opening Prisma schema file."))?;
+                let mut schema_string = String::new();
+                schema_file
+                    .read_to_string(&mut schema_string)
+                    .map_err(|err| ConnectorError::from_source(err, "Reading Prisma schema file."))?;
+                let (_, url, _, _) = crate::parse_configuration(&schema_string)?;
+                url
+            }
+        };
+        self.db_execute(&url, &params.script).await
     }
 
     async fn debug_panic(&self) -> CoreResult<()> {

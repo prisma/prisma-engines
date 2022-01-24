@@ -251,6 +251,15 @@ impl MigrationConnector for SqlMigrationConnector {
         self.flavour.create_database(&self.connection_string).await
     }
 
+    async fn db_execute(&self, url: &str, script: &str) -> ConnectorResult<()> {
+        if url == self.connection_string {
+            self.conn().await?.raw_cmd(script).await?;
+        } else {
+            connect(url).await?.raw_cmd(script).await?;
+        };
+        Ok(())
+    }
+
     async fn diff(&self, from: DiffTarget<'_>, to: DiffTarget<'_>) -> ConnectorResult<Migration> {
         let previous_schema = self.sql_schema_from_diff_target(&from).await?;
         let next_schema = self.sql_schema_from_diff_target(&to).await?;

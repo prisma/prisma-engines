@@ -75,6 +75,9 @@ pub trait MigrationConnector: Send + Sync + 'static {
     /// Create the database referenced by Prisma schema that was used to initialize the connector.
     async fn create_database(&self) -> ConnectorResult<String>;
 
+    /// Send a command to the database directly.
+    async fn db_execute(&self, url: &str, script: &str) -> ConnectorResult<()>;
+
     /// Create a migration by comparing two database schemas. See
     /// [DiffTarget](/enum.DiffTarget.html) for possible inputs.
     async fn diff(&self, from: DiffTarget<'_>, to: DiffTarget<'_>) -> ConnectorResult<Migration>;
