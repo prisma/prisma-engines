@@ -263,6 +263,30 @@ mod create {
           @r###"{"data":{"createOneTestModel":{"a":[{"a_1":"a_1 default","a_2":null,"b":[{"b_field":"b_field default"}]}]}}}"###
         );
 
+        // Using single-object shorthand syntax
+        insta::assert_snapshot!(
+          run_query!(runner, r#"mutation {
+              createOneTestModel(
+                data: {
+                  id: 2
+                  a: { set: [{
+                    a_2: null,
+                    b: {}
+                  }] }
+                  c: { set: [] }
+                }
+              ) {
+                a {
+                  a_1
+                  a_2
+                  b { b_field }
+                }
+              }
+            }
+            "#),
+          @r###"{"data":{"createOneTestModel":{"a":[{"a_1":"a_1 default","a_2":null,"b":[{"b_field":"b_field default"}]}]}}}"###
+        );
+
         Ok(())
     }
 
@@ -277,6 +301,30 @@ mod create {
                 a: [{
                   a_2: null,
                   b: [{}]
+                }]
+                c: []
+              }
+            ) {
+              a {
+                a_1
+                a_2
+                b { b_field }
+              }
+            }
+          }
+        "#),
+          @r###"{"data":{"createOneTestModel":{"a":[{"a_1":"a_1 default","a_2":null,"b":[{"b_field":"b_field default"}]}]}}}"###
+        );
+
+        // Using single-object shorthand syntax
+        insta::assert_snapshot!(
+          run_query!(runner, r#"mutation {
+            createOneTestModel(
+              data: {
+                id: 2
+                a: [{
+                  a_2: null,
+                  b: {}
                 }]
                 c: []
               }
