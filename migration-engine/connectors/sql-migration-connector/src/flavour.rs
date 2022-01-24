@@ -93,7 +93,6 @@ pub(crate) trait SqlFlavour:
     async fn sql_schema_from_migration_history(
         &self,
         migrations: &[MigrationDirectory],
-        connection: &Connection,
         connector: &SqlMigrationConnector,
     ) -> ConnectorResult<SqlSchema>;
 

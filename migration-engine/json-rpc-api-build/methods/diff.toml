@@ -19,6 +19,20 @@ responseShape = "diffResult"
 
 [recordShapes.diffParams]
 description = "The type of params for the `diff` method."
+# Example: generate a new migration
+example = """
+{
+    "from": {
+        "tag": "migrations",
+        "path": "./prisma/migrations"
+    },
+    "to": {
+        "tag": "schemaDatamodel",
+        "schema": "./prisma/schema.prisma",
+    }
+    "shadowDatabaseUrl": "mysql://test/test"
+}
+"""
 
 [recordShapes.diffParams.fields.from]
 description = """
@@ -49,7 +63,6 @@ description = """
 By default, the response will contain a human-readable diff. If you want an
 executable script, pass the `"script": true` param.
 """
-isNullable = true
 shape = "bool"
 
 [recordShapes.diffResult]
@@ -70,14 +83,14 @@ description = """
 The path to a Prisma schema. The _datasource url_ will be considered, and the
 live database it points to introspected for its schema.
 """
-shape = "string"
+shape = "SchemaContainer"
 
 [enumShapes.DiffTarget.variants.schemaDatamodel]
 description = """
 The path to a Prisma schema. The contents of the schema itself will be
 considered. This source does not need any database connection.
 """
-shape = "string"
+shape = "SchemaContainer"
 
 [enumShapes.DiffTarget.variants.url]
 description = """
@@ -86,7 +99,7 @@ The url to a live database. Its schema will be considered.
 This will cause the migration engine to connect to the database and read from
 it. It will not write.
 """
-shape = "string"
+shape = "UrlContainer"
 
 [enumShapes.DiffTarget.variants.migrations]
 description = """
@@ -94,4 +107,7 @@ The path to a migrations directory of the shape expected by Prisma Migrate. The
 migrations will be applied to a **shadow database**, and the resulting schema
 considered for diffing.
 """
-shape = "string"
+shape = "PathContainer"
+
+[recordShapes.PathContainer]
+fields.path.shape = "string"

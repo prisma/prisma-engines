@@ -15,8 +15,11 @@ use client_wrapper::Client;
 use datamodel::common::preview_features::PreviewFeature;
 use enumflags2::BitFlags;
 use migration::MongoDbMigration;
-use migration_connector::{ConnectorError, ConnectorResult, DiffTarget, Migration, MigrationConnector};
+use migration_connector::{
+    ConnectorError, ConnectorHost, ConnectorResult, DiffTarget, EmptyHost, Migration, MigrationConnector,
+};
 use mongodb_schema_describer::MongoSchema;
+use std::sync::Arc;
 use tokio::sync::OnceCell;
 
 /// The top-level MongoDB migration connector.
@@ -24,6 +27,7 @@ pub struct MongoDbMigrationConnector {
     connection_string: String,
     client: OnceCell<Client>,
     preview_features: BitFlags<PreviewFeature>,
+    host: Arc<dyn ConnectorHost>,
 }
 
 impl MongoDbMigrationConnector {
@@ -32,6 +36,7 @@ impl MongoDbMigrationConnector {
             connection_string,
             preview_features,
             client: OnceCell::new(),
+            host: Arc::new(EmptyHost),
         }
     }
 
@@ -48,8 +53,22 @@ impl MongoDbMigrationConnector {
 
     async fn mongodb_schema_from_diff_target(&self, target: DiffTarget<'_>) -> ConnectorResult<MongoSchema> {
         match target {
-            DiffTarget::Datamodel(schema) => Ok(schema_calculator::calculate(schema)),
-            DiffTarget::Database => self.client().await?.describe().await,
+            DiffTarget::Datamodel(schema) => {
+                let ast = datamodel::parse_schema_ast(&schema).map_err(|err| {
+                    ConnectorError::new_schema_parser_error(err.to_pretty_string("schema.prisma", &schema))
+                })?;
+                let validated_schema =
+                    datamodel::parse_schema_parserdb(&schema, &ast).map_err(ConnectorError::new_schema_parser_error)?;
+                Ok(schema_calculator::calculate(&validated_schema))
+            }
+            DiffTarget::Database(url) => {
+                if self.connection_string == url {
+                    self.client().await?.describe().await
+                } else {
+                    let client = Client::connect(&url, self.preview_features).await?;
+                    client.describe().await
+                }
+            }
             DiffTarget::Migrations(_) => Err(unsupported_command_error()),
             DiffTarget::Empty => Ok(MongoSchema::default()),
         }
@@ -58,6 +77,14 @@ impl MongoDbMigrationConnector {
 
 #[async_trait::async_trait]
 impl MigrationConnector for MongoDbMigrationConnector {
+    fn connection_string(&self) -> &str {
+        &self.connection_string
+    }
+
+    fn host(&self) -> &Arc<dyn ConnectorHost> {
+        &self.host
+    }
+
     fn connector_type(&self) -> &'static str {
         "mongodb"
     }
@@ -124,7 +151,9 @@ impl MigrationConnector for MongoDbMigrationConnector {
         Ok(())
     }
 
-    fn set_host(&mut self, _host: Box<dyn migration_connector::ConnectorHost>) {}
+    fn set_host(&mut self, host: Arc<dyn migration_connector::ConnectorHost>) {
+        self.host = host;
+    }
 
     async fn validate_migrations(
         &self,

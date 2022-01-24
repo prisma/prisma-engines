@@ -1,4 +1,4 @@
-use crate::{json_rpc::types::*, parse_schema, CoreResult};
+use crate::{json_rpc::types::*, CoreResult};
 use migration_connector::{migrations_directory::*, DiffTarget, MigrationConnector};
 
 /// Development command for migrations. Evaluate the data loss induced by the
@@ -15,13 +15,11 @@ pub(crate) async fn evaluate_data_loss(
     error_on_changed_provider(&input.migrations_directory_path, connector.connector_type())?;
 
     let migrations_from_directory = list_migrations(input.migrations_directory_path.as_ref())?;
-    let target_ast = crate::parse_ast(&input.prisma_schema)?;
-    let target_schema = parse_schema(&input.prisma_schema, &target_ast)?;
 
     let migration = connector
         .diff(
-            DiffTarget::Migrations(&migrations_from_directory),
-            DiffTarget::Datamodel(&target_schema),
+            DiffTarget::Migrations((&migrations_from_directory).into()),
+            DiffTarget::Datamodel((&input.prisma_schema).into()),
         )
         .await?;
 

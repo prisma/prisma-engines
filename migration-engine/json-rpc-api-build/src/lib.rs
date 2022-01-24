@@ -133,6 +133,8 @@ struct RecordShape {
     description: Option<String>,
     #[serde(default)]
     fields: BTreeMap<String, RecordField>,
+    #[allow(dead_code)]
+    example: Option<String>,
 }
 
 #[derive(Debug, Deserialize)]

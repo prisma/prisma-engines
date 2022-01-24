@@ -3,6 +3,8 @@
 mod commands;
 mod logger;
 
+use std::sync::Arc;
+
 use crate::logger::log_error_and_exit;
 use migration_core::rpc_api;
 use structopt::StructOpt;
@@ -92,7 +94,7 @@ async fn start_engine(datamodel_location: &str) {
     let mut datamodel = String::new();
     file.read_to_string(&mut datamodel).unwrap();
 
-    match rpc_api(&datamodel, Box::new(JsonRpcHost)).await {
+    match rpc_api(&datamodel, Arc::new(JsonRpcHost)).await {
         // Block the thread and handle IO in async until EOF.
         Ok(api) => json_rpc_stdio::run(&api).await.unwrap(),
         Err(err) => {

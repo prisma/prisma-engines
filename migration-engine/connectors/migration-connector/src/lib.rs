@@ -21,6 +21,7 @@ pub use migration_persistence::{MigrationPersistence, MigrationRecord, Persisten
 
 use datamodel::ValidatedSchema;
 use migrations_directory::MigrationDirectory;
+use std::sync::Arc;
 
 /// A boxed migration, opaque to the migration engine core. The connectors are
 /// sole responsible for producing and understanding migrations — the core just
@@ -63,7 +64,7 @@ impl ConnectorHost for EmptyHost {
 #[async_trait::async_trait]
 pub trait MigrationConnector: Send + Sync + 'static {
     /// Accept a new ConnectorHost.
-    fn set_host(&mut self, host: Box<dyn ConnectorHost>);
+    fn set_host(&mut self, host: Arc<dyn ConnectorHost>);
 
     /// If possible on the target connector, acquire an advisory lock, so multiple instances of migrate do not run concurrently.
     async fn acquire_lock(&self) -> ConnectorResult<()>;
@@ -71,6 +72,9 @@ pub trait MigrationConnector: Send + Sync + 'static {
     /// A string that should identify what database backend is being used. Note that this is not necessarily
     /// the connector name. The SQL connector for example can return "postgresql", "mysql" or "sqlite".
     fn connector_type(&self) -> &'static str;
+
+    /// Return the connection string that was used to initialize this connector.
+    fn connection_string(&self) -> &str;
 
     /// Create the database referenced by Prisma schema that was used to initialize the connector.
     async fn create_database(&self) -> ConnectorResult<String>;
@@ -89,6 +93,9 @@ pub trait MigrationConnector: Send + Sync + 'static {
     /// Connectors can choose to connect lazily, but this method should force
     /// them to connect.
     async fn ensure_connection_validity(&self) -> ConnectorResult<()>;
+
+    /// Return the ConnectorHost passed with set_host.
+    fn host(&self) -> &Arc<dyn ConnectorHost>;
 
     /// The version of the underlying database.
     async fn version(&self) -> ConnectorResult<String>;

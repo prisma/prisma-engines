@@ -118,11 +118,10 @@ impl SqlFlavour for SqliteFlavour {
         Ok(())
     }
 
-    #[tracing::instrument(skip(self, migrations, _connection, _connector))]
+    #[tracing::instrument(skip(self, migrations, _connector))]
     async fn sql_schema_from_migration_history(
         &self,
         migrations: &[MigrationDirectory],
-        _connection: &Connection,
         _connector: &SqlMigrationConnector,
     ) -> ConnectorResult<SqlSchema> {
         tracing::debug!("Applying migrations to temporary in-memory SQLite database.");
