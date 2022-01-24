@@ -136,7 +136,7 @@ impl DatamodelFieldExtensions for dml::CompositeTypeField {
     fn type_identifier(&self) -> TypeIdentifier {
         match &self.r#type {
             datamodel::CompositeTypeFieldType::CompositeType(_) => {
-                todo!("composite type support in datamodel_converter")
+                unreachable!("Composite fields should not use type identifiers")
             }
             datamodel::CompositeTypeFieldType::Scalar(scalar, _, _) => (*scalar).into(),
             datamodel::CompositeTypeFieldType::Enum(e) => TypeIdentifier::Enum(e.clone()),
