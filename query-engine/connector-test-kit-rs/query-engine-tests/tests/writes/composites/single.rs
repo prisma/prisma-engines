@@ -174,64 +174,6 @@ mod create {
         Ok(())
     }
 
-    /// Using explicit `set` operator, create (deeply nested) composites.
-    #[connector_test(schema(to_many_composites))]
-    async fn set_create_to_many(runner: Runner) -> TestResult<()> {
-        insta::assert_snapshot!(
-          run_query!(runner, r#"mutation {
-                createOneTestModel(
-                  data: {
-                    id: 1
-                    a: { set: [{
-                      a_1: "a1",
-                      a_2: null,
-                      b: [{ b_field: "b_field" }]
-                    }] }
-                  }
-                ) {
-                  a {
-                    a_1
-                    a_2
-                    b { b_field }
-                  }
-                }
-              }
-              "#),
-          @r###"{"data":{"createOneTestModel":{"a":[{"a_1":"a1","a_2":null,"b":[{"b_field":"b_field"}]}]}}}"###
-        );
-
-        Ok(())
-    }
-
-    /// Using only shorthand syntax, create (deeply nested) composites.
-    #[connector_test(schema(to_many_composites))]
-    async fn shorthand_set_create_to_many(runner: Runner) -> TestResult<()> {
-        insta::assert_snapshot!(
-          run_query!(runner, r#"mutation {
-              createOneTestModel(
-                data: {
-                  id: 1
-                  a: [{
-                    a_1: "a1",
-                    a_2: null,
-                    b: [{ b_field: "b_field" }]
-                  }]
-                }
-              ) {
-                a {
-                  a_1
-                  a_2
-                  b { b_field }
-                }
-              }
-            }
-          "#),
-          @r###"{"data":{"createOneTestModel":{"a":[{"a_1":"a1","a_2":null,"b":[{"b_field":"b_field"}]}]}}}"###
-        );
-
-        Ok(())
-    }
-
     // Fails on both the envelope and the actual input type
     #[connector_test(schema(to_one_composites))]
     async fn error_when_missing_required_fields(runner: Runner) -> TestResult<()> {

@@ -94,17 +94,22 @@ pub fn to_many_composites() -> String {
             #id(id, Int, @id)
             field String?
             a     A[]       @map("top_a")
+            c     C[]       @map("top_c")
         }
 
         type A {
-            a_1 String @map("a1")
+            a_1 String @default("a_1 default") @map("a1")
             a_2 Int?
             b B[]
         }
 
         type B {
-            b_field String
+            b_field String   @default("b_field default")
             a       A[]      @map("nested_a")
+        }
+
+        type C {
+          c_field String @default("c_field default")
         }
         "#
     };
