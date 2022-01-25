@@ -10,7 +10,7 @@ use crate::{
         EnumAttributes, FieldWithArgs, IndexAlgorithm, IndexAttribute, IndexType, ModelAttributes, RelationField,
         ScalarField, ScalarFieldType, SortOrder,
     },
-    DatamodelError, ValueValidator,
+    AstString, DatamodelError, ValueValidator,
 };
 use diagnostics::Span;
 
@@ -652,6 +652,7 @@ fn visit_relation<'ast>(
             }) => {
                 if !unknown_fields.is_empty() {
                     let msg = format!(
+
                         "The argument `references` must refer only to existing fields in the related model `{}`. The following fields do not exist in the related model: {}",
                         ctx.db.ast[relation_field.referenced_model].name(),
                         unknown_fields.join(", "),
@@ -676,10 +677,12 @@ fn visit_relation<'ast>(
     }
 
     // Validate the `name` argument if present.
-    match args.optional_default_arg("name").map(|arg| arg.as_str()) {
-        Some(Ok("")) => ctx.push_error(args.new_attribute_validation_error("A relation cannot have an empty name.")),
-        Some(Ok(name)) => {
-            relation_field.name = Some(name);
+    match args.optional_default_arg("name").map(|arg| arg.as_str_with_span()) {
+        Some(Ok(("", _))) => {
+            ctx.push_error(args.new_attribute_validation_error("A relation cannot have an empty name."))
+        }
+        Some(Ok((name, span))) => {
+            relation_field.name = Some(AstString::from_literal(name.to_owned(), span));
         }
         Some(Err(err)) => ctx.push_error(err),
         None => (),

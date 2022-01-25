@@ -18,7 +18,7 @@ pub struct Reformatter<'a> {
 impl<'a> Reformatter<'a> {
     pub fn new(input: &'a str) -> Self {
         let info = crate::parse_schema_ast(input)
-            .and_then(|ast| crate::parse_datamodel_for_formatter(&ast).map(|datamodel| (ast, datamodel)));
+            .and_then(|ast| crate::parse_datamodel_for_formatter(input, &ast).map(|datamodel| (ast, datamodel)));
         match info {
             Ok((schema_ast, (datamodel, mut datasources))) => {
                 let datasource = datasources.pop();

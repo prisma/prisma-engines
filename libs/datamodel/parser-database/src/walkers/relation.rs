@@ -20,7 +20,7 @@ impl<'ast, 'db> RelationWalker<'ast, 'db> {
     }
 
     /// The relation attributes parsed from the AST.
-    fn get(self) -> &'db Relation<'ast> {
+    fn get(self) -> &'db Relation {
         &self.db.relations[self.id]
     }
 }
@@ -77,7 +77,7 @@ pub struct InlineRelationWalker<'ast, 'db>(RelationWalker<'ast, 'db>);
 
 impl<'ast, 'db> InlineRelationWalker<'ast, 'db> {
     /// Get the relation attributes defined in the AST.
-    fn get(self) -> &'db Relation<'ast> {
+    fn get(self) -> &'db Relation {
         &self.0.db.relations[self.0.id]
     }
 
@@ -223,10 +223,11 @@ impl<'ast, 'db> InlineRelationWalker<'ast, 'db> {
 
     /// The name of the relation. Either uses the `name` (or default) argument,
     /// or generates an implicit name.
-    pub fn relation_name(self) -> RelationName<'ast> {
+    pub fn relation_name(self) -> RelationName<'db> {
         self.get()
             .relation_name
-            .map(RelationName::Explicit)
+            .as_ref()
+            .map(|s| RelationName::Explicit(self.0.db.resolve_str(s)))
             .unwrap_or_else(|| RelationName::generated(self.referencing_model().name(), self.referenced_model().name()))
     }
 }
@@ -238,7 +239,7 @@ pub struct ImplicitManyToManyRelationWalker<'ast, 'db>(RelationWalker<'ast, 'db>
 
 impl<'ast, 'db> ImplicitManyToManyRelationWalker<'ast, 'db> {
     /// Gets the relation attributes from the AST.
-    fn get(&self) -> &'db Relation<'ast> {
+    fn get(&self) -> &'db Relation {
         &self.0.db.relations[self.0.id]
     }
 
@@ -269,7 +270,7 @@ impl<'ast, 'db> ImplicitManyToManyRelationWalker<'ast, 'db> {
     }
 
     /// The name of the relation.
-    pub fn relation_name(self) -> RelationName<'ast> {
+    pub fn relation_name(self) -> RelationName<'db> {
         self.field_a().relation_name()
     }
 }

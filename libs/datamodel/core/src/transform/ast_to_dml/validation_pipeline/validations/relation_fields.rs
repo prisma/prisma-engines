@@ -55,7 +55,7 @@ impl<'ast, 'db> fmt::Display for Fields<'ast, 'db> {
     }
 }
 
-pub(super) fn ambiguity(field: RelationFieldWalker<'_, '_>, names: &Names<'_>) -> Result<(), DatamodelError> {
+pub(super) fn ambiguity(field: RelationFieldWalker<'_, '_>, names: &Names<'_, '_>) -> Result<(), DatamodelError> {
     let model = field.model();
     let related_model = field.related_model();
 

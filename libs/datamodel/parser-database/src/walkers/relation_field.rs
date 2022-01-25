@@ -80,8 +80,8 @@ impl<'ast, 'db> RelationFieldWalker<'ast, 'db> {
     }
 
     /// The relation name explicitly written in the schema source.
-    pub fn explicit_relation_name(self) -> Option<&'ast str> {
-        self.relation_field.name
+    pub fn explicit_relation_name(self) -> Option<&'db str> {
+        self.relation_field.name.as_ref().map(|s| self.db.resolve_str(s))
     }
 
     /// Is there an `@ignore` attribute on the field?
@@ -141,7 +141,7 @@ impl<'ast, 'db> RelationFieldWalker<'ast, 'db> {
 
     /// The name of the relation. Either uses the `name` (or default) argument,
     /// or generates an implicit name.
-    pub fn relation_name(self) -> RelationName<'ast> {
+    pub fn relation_name(self) -> RelationName<'db> {
         self.explicit_relation_name()
             .map(RelationName::Explicit)
             .unwrap_or_else(|| RelationName::generated(self.model().name(), self.related_model().name()))
@@ -270,7 +270,7 @@ impl<'ast> fmt::Display for RelationName<'ast> {
     }
 }
 
-impl<'ast> AsRef<str> for RelationName<'ast> {
+impl<'db> AsRef<str> for RelationName<'db> {
     fn as_ref(&self) -> &str {
         match self {
             RelationName::Explicit(s) => s,

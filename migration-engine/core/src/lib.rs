@@ -36,7 +36,7 @@ fn parse_ast(schema: &str) -> CoreResult<SchemaAst> {
         .map_err(|err| CoreError::new_schema_parser_error(err.to_pretty_string("schema.prisma", schema)))
 }
 
-fn parse_schema<'ast>(schema: &str, ast: &'ast SchemaAst) -> CoreResult<ValidatedSchema<'ast>> {
+fn parse_schema<'a>(schema: &'a str, ast: &'a SchemaAst) -> CoreResult<ValidatedSchema<'a>> {
     datamodel::parse_schema_parserdb(schema, ast).map_err(CoreError::new_schema_parser_error)
 }
 

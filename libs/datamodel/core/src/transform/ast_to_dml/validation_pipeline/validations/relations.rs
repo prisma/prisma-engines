@@ -34,7 +34,7 @@ const STATE_ERROR: &str = "Failed lookup of model, field or optional property du
 /// Depending on the database, a constraint name might need to be unique in a certain namespace.
 /// Validates per database that we do not use a name that is already in use.
 pub(super) fn has_a_unique_constraint_name(
-    names: &super::Names<'_>,
+    names: &super::Names<'_, '_>,
     relation: InlineRelationWalker<'_, '_>,
     ctx: &mut Context<'_>,
 ) {

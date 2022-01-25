@@ -15,7 +15,7 @@ use schema_ast::ast::{WithName, WithSpan};
 /// Validates index and unique constraint names against the database requirements.
 pub(super) fn has_a_unique_constraint_name(
     index: IndexWalker<'_, '_>,
-    names: &super::Names<'_>,
+    names: &super::Names<'_, '_>,
     ctx: &mut Context<'_>,
 ) {
     let name = index.constraint_name(ctx.connector);
@@ -51,7 +51,7 @@ pub(super) fn has_a_unique_constraint_name(
 /// needs to be unique per model. It can be found on the primary key or unique indexes.
 pub(super) fn unique_index_has_a_unique_custom_name_per_model(
     index: IndexWalker<'_, '_>,
-    names: &super::Names<'_>,
+    names: &super::Names<'_, '_>,
     ctx: &mut Context<'_>,
 ) {
     let model = index.model();

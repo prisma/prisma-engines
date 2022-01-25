@@ -42,9 +42,9 @@ impl RelationId {
 ///   key constraint, while model B would correspond to the table referenced
 ///   by the foreign key.
 #[derive(Debug, Default)]
-pub(crate) struct Relations<'ast> {
+pub(crate) struct Relations {
     /// Storage. Private. Do not use directly.
-    relations_storage: Vec<Relation<'ast>>,
+    relations_storage: Vec<Relation>,
 
     // Indexes for efficient querying.
     //
@@ -69,15 +69,15 @@ pub(crate) struct Relations<'ast> {
     back: BTreeSet<(ast::ModelId, ast::ModelId, RelationId)>,
 }
 
-impl<'ast> std::ops::Index<RelationId> for Relations<'ast> {
-    type Output = Relation<'ast>;
+impl std::ops::Index<RelationId> for Relations {
+    type Output = Relation;
 
     fn index(&self, index: RelationId) -> &Self::Output {
         &self.relations_storage[index.0 as usize]
     }
 }
 
-impl<'ast> Relations<'ast> {
+impl Relations {
     /// Iterate over all relations in the schema.
     pub(crate) fn iter(&self) -> impl Iterator<Item = RelationId> {
         (0..self.relations_storage.len()).map(|idx| RelationId(idx as u32))
@@ -86,7 +86,7 @@ impl<'ast> Relations<'ast> {
     /// Iterator over all the relations in a schema.
     ///
     /// (model_a_id, model_b_id, relation)
-    pub(crate) fn iter_relations(&self) -> impl Iterator<Item = (ast::ModelId, ast::ModelId, &Relation<'ast>)> + '_ {
+    pub(crate) fn iter_relations(&self) -> impl Iterator<Item = (ast::ModelId, ast::ModelId, &Relation)> + '_ {
         self.forward
             .iter()
             .map(move |(model_a_id, model_b_id, relation_idx)| (*model_a_id, *model_b_id, &self[*relation_idx]))
@@ -107,20 +107,20 @@ impl<'ast> Relations<'ast> {
     }
 }
 
-#[derive(PartialOrd, Ord, PartialEq, Eq, Debug)]
+#[derive(Debug)]
 pub(super) enum OneToManyRelationFields {
     Forward(ast::FieldId),
     Back(ast::FieldId),
     Both(ast::FieldId, ast::FieldId),
 }
 
-#[derive(PartialOrd, Ord, PartialEq, Eq, Debug)]
+#[derive(Debug)]
 pub(super) enum OneToOneRelationFields {
     Forward(ast::FieldId),
     Both(ast::FieldId, ast::FieldId),
 }
 
-#[derive(PartialOrd, Ord, PartialEq, Eq, Debug)]
+#[derive(Debug)]
 pub(super) enum RelationAttributes {
     ImplicitManyToMany {
         field_a: ast::FieldId,
@@ -145,16 +145,16 @@ impl RelationAttributes {
     }
 }
 
-#[derive(PartialOrd, Ord, PartialEq, Eq, Debug)]
-pub(crate) struct Relation<'ast> {
+#[derive(Debug)]
+pub(crate) struct Relation {
     /// The `name` argument in `@relation`.
-    pub(super) relation_name: Option<&'ast str>,
+    pub(super) relation_name: Option<crate::AstString>,
     pub(super) attributes: RelationAttributes,
     pub(super) model_a: ast::ModelId,
     pub(super) model_b: ast::ModelId,
 }
 
-impl<'ast> Relation<'ast> {
+impl Relation {
     pub(crate) fn has_field(&self, model_id: ast::ModelId, field_id: ast::FieldId) -> bool {
         match self.attributes.fields() {
             (Some(field_a), _) if self.model_a == model_id && field_a == field_id => true,
@@ -199,6 +199,7 @@ pub(super) fn relation_evidence<'ast, 'db>(
     let ast_field = &ast_model[*field_id];
     let opposite_model = &ctx.db.ast[relation_field.referenced_model];
     let is_self_relation = *model_id == relation_field.referenced_model;
+    let relation_name = relation_field.name.as_ref().map(|s| ctx.db.resolve_str(s));
     let opposite_relation_field: Option<(ast::FieldId, &ast::Field, &RelationField<'_>)> = ctx
         .db
         .walk_model(relation_field.referenced_model)
@@ -207,7 +208,7 @@ pub(super) fn relation_evidence<'ast, 'db>(
         .filter(|opposite_relation_field| opposite_relation_field.references_model(*model_id))
         // Filter out the field itself, in case of self-relations
         .filter(|opposite_relation_field| !is_self_relation || opposite_relation_field.field_id != *field_id)
-        .find(|opposite_relation_field| opposite_relation_field.explicit_relation_name() == relation_field.name)
+        .find(|opposite_relation_field| opposite_relation_field.explicit_relation_name() == relation_name)
         .map(|opp_rf| (opp_rf.field_id(), opp_rf.ast_field(), opp_rf.relation_field));
 
     RelationEvidence {
@@ -224,7 +225,7 @@ pub(super) fn relation_evidence<'ast, 'db>(
 
 pub(super) fn ingest_relation<'ast, 'db>(
     evidence: RelationEvidence<'ast, 'db>,
-    relations: &mut Relations<'ast>,
+    relations: &mut Relations,
     ctx: &'db Context<'ast>,
 ) {
     // In this function, we want to ingest the relation only once,
@@ -331,13 +332,13 @@ pub(super) fn ingest_relation<'ast, 'db>(
         // except in this case, because there is no forward side.
         RelationAttributes::OneToMany(OneToManyRelationFields::Back(_)) => Relation {
             attributes: relation_type,
-            relation_name: evidence.relation_field.name,
+            relation_name: evidence.relation_field.name.clone(),
             model_a: evidence.relation_field.referenced_model,
             model_b: evidence.model_id,
         },
         _ => Relation {
             attributes: relation_type,
-            relation_name: evidence.relation_field.name,
+            relation_name: evidence.relation_field.name.clone(),
             model_a: evidence.model_id,
             model_b: evidence.relation_field.referenced_model,
         },

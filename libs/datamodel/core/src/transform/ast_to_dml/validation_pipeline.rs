@@ -23,6 +23,7 @@ pub struct ValidateOutput<'ast> {
 /// * ...
 /// * Validate the schema
 pub(crate) fn validate<'ast>(
+    src: &'ast str,
     ast_schema: &'ast ast::SchemaAst,
     sources: &[configuration::Datasource],
     preview_features: BitFlags<PreviewFeature>,
@@ -33,7 +34,7 @@ pub(crate) fn validate<'ast>(
     let referential_integrity = source.map(|s| s.referential_integrity()).unwrap_or_default();
 
     // Make sense of the AST.
-    let (db, diagnostics) = ParserDatabase::new(ast_schema, diagnostics);
+    let (db, diagnostics) = ParserDatabase::new(src, ast_schema, diagnostics);
 
     let mut output = ValidateOutput {
         db,

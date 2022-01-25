@@ -59,6 +59,12 @@ impl<'a> ValueValidator<'a> {
             .ok_or_else(|| self.construct_type_mismatch_error("String"))
     }
 
+    /// Tries to convert the wrapped value to a Prisma String.
+    pub fn as_str_with_span(&self) -> Result<(&'a str, ast::Span), DatamodelError> {
+        self.as_string_literal()
+            .ok_or_else(|| self.construct_type_mismatch_error("String"))
+    }
+
     /// Returns true if this argument is derived from an env() function
     pub fn is_from_env(&self) -> bool {
         self.value.is_env_expression()

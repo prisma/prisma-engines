@@ -27,6 +27,7 @@
 
 pub mod walkers;
 
+mod ast_string;
 mod attributes;
 mod context;
 mod indexes;
@@ -41,7 +42,7 @@ pub use schema_ast::ast;
 pub use types::{IndexAlgorithm, IndexType, ScalarFieldType, ScalarType, SortOrder};
 pub use value_validator::{ValueListValidator, ValueValidator};
 
-use self::{context::Context, relations::Relations, types::Types};
+use self::{ast_string::AstString, context::Context, relations::Relations, types::Types};
 use diagnostics::{DatamodelError, Diagnostics};
 use names::Names;
 
@@ -73,17 +74,19 @@ use names::Names;
 /// Apart from that, everything should be owned or locally borrowed, to keep
 /// lifetime management simple.
 pub struct ParserDatabase<'ast> {
+    src: &'ast str,
     ast: &'ast ast::SchemaAst,
     names: Names<'ast>,
     types: Types<'ast>,
-    relations: Relations<'ast>,
+    relations: Relations,
 }
 
 impl<'ast> ParserDatabase<'ast> {
     /// See the docs on [ParserDatabase](/struct.ParserDatabase.html).
-    pub fn new(ast: &'ast ast::SchemaAst, diagnostics: Diagnostics) -> (Self, Diagnostics) {
+    pub fn new(src: &'ast str, ast: &'ast ast::SchemaAst, diagnostics: Diagnostics) -> (Self, Diagnostics) {
         let db = ParserDatabase {
             ast,
+            src,
             names: Names::default(),
             types: Types::default(),
             relations: Relations::default(),
@@ -129,6 +132,14 @@ impl<'ast> ParserDatabase<'ast> {
     /// The parsed AST.
     pub fn ast(&self) -> &'ast ast::SchemaAst {
         self.ast
+    }
+
+    pub(crate) fn resolve_str<'a>(&'a self, s: &'a AstString) -> &str {
+        if let Some(unescaped) = &s.unescaped {
+            unescaped
+        } else {
+            &self.src[s.span.start..s.span.end]
+        }
     }
 
     /// Find a specific field in a specific model.

@@ -21,7 +21,7 @@ use datamodel_connector::{
     ConnectorCapability,
 };
 
-pub(super) fn validate_client_name(field: FieldWalker<'_, '_>, names: &Names<'_>, ctx: &mut Context<'_>) {
+pub(super) fn validate_client_name(field: FieldWalker<'_, '_>, names: &Names<'_, '_>, ctx: &mut Context<'_>) {
     let model = field.model();
 
     for taken in names.name_taken(model.model_id(), field.name()).into_iter() {
@@ -61,7 +61,7 @@ pub(super) fn validate_client_name(field: FieldWalker<'_, '_>, names: &Names<'_>
 /// namespace. Validates the field default constraint against name clases.
 pub(super) fn has_a_unique_default_constraint_name(
     field: ScalarFieldWalker<'_, '_>,
-    names: &Names<'_>,
+    names: &Names<'_, '_>,
     ctx: &mut Context<'_>,
 ) {
     let name = match field.default_value().map(|w| w.constraint_name(ctx.connector)) {

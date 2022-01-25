@@ -59,7 +59,7 @@ pub(super) fn has_a_strict_unique_criteria(model: ModelWalker<'_, '_>, ctx: &mut
 /// model's primary key against the database requirements.
 pub(super) fn has_a_unique_primary_key_name(
     model: ModelWalker<'_, '_>,
-    names: &super::Names<'_>,
+    names: &super::Names<'_, '_>,
     ctx: &mut Context<'_>,
 ) {
     let (pk, name): (PrimaryKeyWalker<'_, '_>, Cow<'_, str>) = match model
@@ -101,7 +101,7 @@ pub(super) fn has_a_unique_primary_key_name(
 /// needs to be unique per model. It can be found on the primary key or unique indexes.
 pub(super) fn has_a_unique_custom_primary_key_name_per_model(
     model: ModelWalker<'_, '_>,
-    names: &super::Names<'_>,
+    names: &super::Names<'_, '_>,
     ctx: &mut Context<'_>,
 ) {
     let pk = match model.primary_key() {

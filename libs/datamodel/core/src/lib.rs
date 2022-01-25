@@ -122,7 +122,7 @@ impl<'a> ValidatedSchema<'a> {
 
 /// Parse and validate the whole schema. This function's signature is obviously less than optimal,
 /// let's work towards something simpler.
-pub fn parse_schema_parserdb<'ast>(src: &str, ast: &'ast ast::SchemaAst) -> Result<ValidatedSchema<'ast>, String> {
+pub fn parse_schema_parserdb<'ast>(src: &'ast str, ast: &'ast ast::SchemaAst) -> Result<ValidatedSchema<'ast>, String> {
     let mut diagnostics = Diagnostics::new();
     let generators = GeneratorLoader::load_generators_from_ast(ast, &mut diagnostics);
     let preview_features = preview_features(&generators);
@@ -132,7 +132,7 @@ pub fn parse_schema_parserdb<'ast>(src: &str, ast: &'ast ast::SchemaAst) -> Resu
         .to_result()
         .map_err(|err| err.to_pretty_string("schema.prisma", src))?;
 
-    let out = validate(ast, &datasources, preview_features, diagnostics);
+    let out = validate(src, ast, &datasources, preview_features, diagnostics);
 
     out.diagnostics
         .to_result()
@@ -156,10 +156,10 @@ pub fn parse_datamodel(datamodel_string: &str) -> Result<ValidatedDatamodel, dia
     })
 }
 
-fn parse_datamodel_for_formatter(ast: &SchemaAst) -> Result<(Datamodel, Vec<Datasource>), Diagnostics> {
+fn parse_datamodel_for_formatter(src: &str, ast: &SchemaAst) -> Result<(Datamodel, Vec<Datasource>), Diagnostics> {
     let mut diagnostics = diagnostics::Diagnostics::new();
     let datasources = load_sources(ast, Default::default(), &mut diagnostics);
-    let (db, diagnostics) = parser_database::ParserDatabase::new(ast, diagnostics);
+    let (db, diagnostics) = parser_database::ParserDatabase::new(src, ast, diagnostics);
     diagnostics.to_result()?;
     let (connector, referential_integrity) = datasources
         .get(0)
@@ -182,7 +182,7 @@ fn parse_datamodel_internal(
 
     diagnostics.to_result()?;
 
-    let out = validate(&ast, &datasources, preview_features, diagnostics);
+    let out = validate(datamodel_string, &ast, &datasources, preview_features, diagnostics);
 
     if !out.diagnostics.errors().is_empty() {
         return Err(out.diagnostics);

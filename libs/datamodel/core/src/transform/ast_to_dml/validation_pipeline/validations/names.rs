@@ -1,12 +1,10 @@
-use datamodel_connector::Connector;
-
 use super::constraint_namespace::ConstraintNamespace;
-use std::collections::{HashMap, HashSet};
-
 use crate::{
     ast::{FieldId, ModelId},
     transform::ast_to_dml::db::{walkers::RelationName, ParserDatabase},
 };
+use datamodel_connector::Connector;
+use std::collections::{HashMap, HashSet};
 
 type RelationIdentifier<'ast> = (ModelId, ModelId, RelationName<'ast>);
 
@@ -17,17 +15,17 @@ pub(super) enum NameTaken {
     PrimaryKey,
 }
 
-pub(super) struct Names<'ast> {
-    pub(super) relation_names: HashMap<RelationIdentifier<'ast>, Vec<FieldId>>,
+pub(super) struct Names<'ast, 'db> {
+    pub(super) relation_names: HashMap<RelationIdentifier<'db>, Vec<FieldId>>,
     index_names: HashMap<ModelId, HashSet<&'ast str>>,
     unique_names: HashMap<ModelId, HashSet<&'ast str>>,
     primary_key_names: HashMap<ModelId, &'ast str>,
     pub(super) constraint_namespace: ConstraintNamespace<'ast>,
 }
 
-impl<'ast> Names<'ast> {
-    pub(super) fn new(db: &ParserDatabase<'ast>, connector: &dyn Connector) -> Self {
-        let mut relation_names: HashMap<RelationIdentifier<'ast>, Vec<FieldId>> = HashMap::new();
+impl<'ast, 'db> Names<'ast, 'db> {
+    pub(super) fn new(db: &'db ParserDatabase<'ast>, connector: &dyn Connector) -> Self {
+        let mut relation_names: HashMap<RelationIdentifier<'db>, Vec<FieldId>> = HashMap::new();
         let mut index_names: HashMap<ModelId, HashSet<&'ast str>> = HashMap::new();
         let mut unique_names: HashMap<ModelId, HashSet<&'ast str>> = HashMap::new();
         let mut primary_key_names: HashMap<ModelId, &'ast str> = HashMap::new();

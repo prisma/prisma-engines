@@ -1,4 +1,6 @@
-use crate::{context::Context, walkers::CompositeTypeFieldWalker, walkers::CompositeTypeWalker, DatamodelError};
+use crate::{
+    context::Context, walkers::CompositeTypeFieldWalker, walkers::CompositeTypeWalker, AstString, DatamodelError,
+};
 use schema_ast::ast::{self, WithName};
 use std::{
     collections::{BTreeMap, HashMap},
@@ -132,7 +134,7 @@ pub(crate) struct RelationField<'ast> {
     /// The `references` fields _explicitly present_ in the AST.
     pub(crate) references: Option<Vec<ast::FieldId>>,
     /// The name _explicitly present_ in the AST.
-    pub(crate) name: Option<&'ast str>,
+    pub(crate) name: Option<AstString>,
     pub(crate) is_ignored: bool,
     /// The foreign key name _explicitly present_ in the AST through the `@map` attribute.
     pub(crate) mapped_name: Option<&'ast str>,
