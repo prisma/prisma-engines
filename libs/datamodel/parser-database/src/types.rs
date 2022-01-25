@@ -61,7 +61,7 @@ impl<'ast> Types<'ast> {
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub(super) struct CompositeTypeField<'ast> {
     pub(super) r#type: ScalarFieldType,
     pub(super) mapped_name: Option<&'ast str>,
@@ -99,7 +99,7 @@ impl ScalarFieldType {
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub(crate) struct DefaultAttribute<'ast> {
     pub(crate) mapped_name: Option<&'ast str>,
     pub(crate) value: &'ast ast::Expression,
@@ -243,7 +243,7 @@ pub(crate) struct IdAttribute<'ast> {
     pub(super) mapped_name: Option<&'ast str>,
 }
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug)]
 pub struct FieldWithArgs {
     pub(crate) field_id: ast::FieldId,
     pub(crate) sort_order: Option<SortOrder>,

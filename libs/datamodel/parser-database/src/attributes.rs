@@ -33,7 +33,7 @@ fn resolve_composite_type_attributes<'ast>(
     ctx: &mut Context<'ast>,
 ) {
     for (field_id, field) in ct.iter_fields() {
-        let mut ctfield = ctx.db.types.composite_type_fields[&(ctid, field_id)].clone();
+        let mut ctfield = ctx.db.types.composite_type_fields.remove(&(ctid, field_id)).unwrap();
 
         ctx.visit_attributes(&field.attributes, |attributes, ctx| {
             // @map
