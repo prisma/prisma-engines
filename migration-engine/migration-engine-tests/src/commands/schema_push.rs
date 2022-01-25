@@ -40,7 +40,7 @@ impl<'a> SchemaPush<'a> {
 
         let fut = self
             .api
-            .schema_push(&input)
+            .schema_push(input)
             .instrument(tracing::info_span!("SchemaPush", migration_id = ?self.migration_id));
 
         let output = self.rt.block_on(fut)?;

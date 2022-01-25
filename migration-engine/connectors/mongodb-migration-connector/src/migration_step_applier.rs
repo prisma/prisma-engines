@@ -65,7 +65,7 @@ impl DatabaseMigrationStepApplier for MongoDbMigrationConnector {
     }
 
     fn render_script(&self, _migration: &Migration, _diagnostics: &DestructiveChangeDiagnostics) -> String {
-        unreachable!()
+        panic!("rendering to a script is not supported on MongoDB");
     }
 
     async fn apply_script(&self, _migration_name: &str, _script: &str) -> ConnectorResult<()> {

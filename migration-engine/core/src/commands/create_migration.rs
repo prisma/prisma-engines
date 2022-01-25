@@ -5,7 +5,7 @@ use user_facing_errors::migration_engine::MigrationNameTooLong;
 
 /// Create a new migration.
 pub async fn create_migration(
-    input: &CreateMigrationInput,
+    input: CreateMigrationInput,
     connector: &dyn MigrationConnector,
 ) -> CoreResult<CreateMigrationOutput> {
     let applier = connector.database_migration_step_applier();

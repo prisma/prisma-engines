@@ -1,18 +1,15 @@
 use crate::{json_rpc::types::*, CoreError, CoreResult};
 use migration_connector::{
     migrations_directory::{error_on_changed_provider, list_migrations, MigrationDirectory},
-    ConnectorError, MigrationRecord, PersistenceNotInitializedError,
+    ConnectorError, MigrationConnector, MigrationRecord, PersistenceNotInitializedError,
 };
 use std::{path::Path, time::Instant};
 use user_facing_errors::migration_engine::FoundFailedMigrations;
 
-pub(crate) async fn apply_migrations<C>(
-    input: &ApplyMigrationsInput,
-    connector: &C,
-) -> CoreResult<ApplyMigrationsOutput>
-where
-    C: migration_connector::MigrationConnector,
-{
+pub(crate) async fn apply_migrations(
+    input: ApplyMigrationsInput,
+    connector: &dyn MigrationConnector,
+) -> CoreResult<ApplyMigrationsOutput> {
     let start = Instant::now();
     let applier = connector.database_migration_step_applier();
     let migration_persistence = connector.migration_persistence();

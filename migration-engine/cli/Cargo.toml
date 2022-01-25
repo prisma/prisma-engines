@@ -6,7 +6,7 @@ edition = "2021"
 
 [dependencies]
 migration-connector = { path = "../connectors/migration-connector" }
-migration-core = { path = "../core", features = ["sql", "mongodb"] }
+migration-core = { path = "../core" }
 user-facing-errors = { path = "../../libs/user-facing-errors" }
 
 async-trait = "0.1.0"
@@ -28,11 +28,6 @@ connection-string = "0.1"
 
 [dev-dependencies.quaint]
 git = "https://github.com/prisma/quaint"
-
-[features]
-default = ["sql"]
-sql = ["migration-core/sql"]
-vendored-openssl = ["quaint/vendored-openssl"]
 
 [[bin]]
 name = "migration-engine"

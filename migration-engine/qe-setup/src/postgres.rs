@@ -1,4 +1,4 @@
-use migration_core::migration_connector::{ConnectorError, ConnectorResult, DiffTarget};
+use migration_core::migration_connector::{ConnectorError, ConnectorResult};
 use quaint::{prelude::*, single::Quaint};
 use std::collections::HashMap;
 use url::Url;
@@ -31,18 +31,7 @@ pub(crate) async fn postgres_setup(url: String, prisma_schema: &str) -> Connecto
     {
         //TODO: remove this once cockroachdb is supported in migrations
         let prisma_schema2 = prisma_schema.replace("provider = \"cockroachdb\"", "provider = \"postgres\"");
-        let api = migration_core::migration_api(&prisma_schema2)?;
-        // 2. create the database schema for given Prisma schema
-        let migration = api
-            .connector()
-            .diff(DiffTarget::Empty, DiffTarget::Datamodel(prisma_schema.into()))
-            .await
-            .unwrap();
-        api.connector()
-            .database_migration_step_applier()
-            .apply_migration(&migration)
-            .await
-            .unwrap();
+        crate::diff_and_apply(&prisma_schema2).await;
     };
 
     Ok(())

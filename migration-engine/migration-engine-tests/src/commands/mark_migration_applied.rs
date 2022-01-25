@@ -27,7 +27,7 @@ impl<'a> MarkMigrationApplied<'a> {
     pub fn send_impl(self) -> CoreResult<MarkMigrationAppliedAssertion<'a>> {
         let output = self
             .rt
-            .block_on(self.api.mark_migration_applied(&MarkMigrationAppliedInput {
+            .block_on(self.api.mark_migration_applied(MarkMigrationAppliedInput {
                 migrations_directory_path: self.migrations_directory.path().to_str().unwrap().to_owned(),
                 migration_name: self.migration_name,
             }))?;

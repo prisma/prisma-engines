@@ -26,7 +26,7 @@ impl<'a> EvaluateDataLoss<'a> {
     }
 
     fn send_impl(self) -> CoreResult<EvaluateDataLossAssertion<'a>> {
-        let output = self.rt.block_on(self.api.evaluate_data_loss(&EvaluateDataLossInput {
+        let output = self.rt.block_on(self.api.evaluate_data_loss(EvaluateDataLossInput {
             migrations_directory_path: self.migrations_directory.path().to_str().unwrap().to_owned(),
             prisma_schema: self.prisma_schema,
         }))?;

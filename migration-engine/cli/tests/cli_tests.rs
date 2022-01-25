@@ -40,38 +40,9 @@ impl TestApi {
             .unwrap()
     }
 
-    fn run_raw(&self, args: &[&str]) -> Output {
-        Command::new(self.migration_engine_bin_path())
-            .args(args)
-            .env("RUST_LOG", "INFO")
-            .output()
-            .unwrap()
-    }
-
     fn migration_engine_bin_path(&self) -> &'static str {
         env!("CARGO_BIN_EXE_migration-engine")
     }
-}
-
-#[test_connector(tags(Sqlite))]
-fn test_starting_the_engine_with_empty_schema(api: TestApi) {
-    let tmpdir = tempfile::tempdir().unwrap();
-    let schema_path = tmpdir.path().join("schema.prisma");
-    std::fs::write(&schema_path, "").unwrap();
-    let output = api.run_raw(&["--datamodel", schema_path.to_string_lossy().as_ref()]);
-
-    assert!(!output.status.success(), "{:?}", output);
-    let stderr = String::from_utf8_lossy(&output.stderr);
-    assert!(stderr.contains("no datasource in the schema"), "{:?}", stderr);
-}
-
-#[test_connector(tags(Sqlite))]
-fn test_starting_the_engine_with_no_schema(api: TestApi) {
-    let output = api.run_raw(&[]);
-
-    assert!(!output.status.success(), "{:?}", output);
-    let stderr = String::from_utf8_lossy(&output.stderr);
-    assert!(stderr.contains("Missing --datamodel"), "{:?}", stderr);
 }
 
 #[test_connector(tags(Mysql))]
@@ -197,8 +168,8 @@ fn test_create_sqlite_database(api: TestApi) {
 
     let url = format!("file:{}", sqlite_path.to_string_lossy());
     let output = api.run(&["--datasource", &url, "create-database"]);
-    assert!(output.status.success());
     let stderr = String::from_utf8_lossy(&output.stderr);
+    assert!(output.status.success(), "{:?}", stderr);
     assert!(stderr.contains("success"));
     assert!(stderr.contains("test_create_sqlite_database.db"));
 

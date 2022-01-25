@@ -9,8 +9,7 @@ pub use test_setup::{BitFlags, Capabilities, Tags};
 use crate::{commands::*, multi_engine_test_api::TestApi as RootTestApi};
 use datamodel::common::preview_features::PreviewFeature;
 use migration_core::migration_connector::{
-    ConnectorHost, ConnectorResult, DatabaseMigrationStepApplier, DiffTarget, EmptyHost, MigrationConnector,
-    MigrationPersistence,
+    ConnectorHost, ConnectorResult, DatabaseMigrationStepApplier, DiffTarget, MigrationConnector, MigrationPersistence,
 };
 use quaint::{
     prelude::{ConnectionInfo, ResultSet},
@@ -21,15 +20,9 @@ use std::{
     borrow::Cow,
     fmt::{Display, Write},
     future::Future,
-    sync::Arc,
 };
 use tempfile::TempDir;
 use test_setup::{DatasourceBlock, TestApiArgs};
-
-/// For error testing.
-pub async fn rpc_api(schema: &str) -> ConnectorResult<()> {
-    migration_core::rpc_api(schema, Arc::new(EmptyHost)).await.map(drop)
-}
 
 #[derive(Debug, Default)]
 pub struct TestConnectorHost {
@@ -75,7 +68,7 @@ impl TestApi {
         self.root.connection_info()
     }
 
-    pub fn db_execute(&self, params: &migration_core::json_rpc::types::DbExecuteParams) -> ConnectorResult<()> {
+    pub fn db_execute(&self, params: migration_core::json_rpc::types::DbExecuteParams) -> ConnectorResult<()> {
         let api: &dyn migration_core::GenericApi = &self.connector;
         self.block_on(api.db_execute(params))
     }
@@ -112,7 +105,7 @@ impl TestApi {
         DiagnoseMigrationHistory::new_sync(&self.connector, migrations_directory, &self.root.rt)
     }
 
-    pub fn diff(&self, params: &DiffParams) -> ConnectorResult<DiffResult> {
+    pub fn diff(&self, params: DiffParams) -> ConnectorResult<DiffResult> {
         let api: &dyn migration_core::GenericApi = &self.connector;
         self.block_on(api.diff(params))
     }
