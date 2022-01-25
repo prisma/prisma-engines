@@ -377,7 +377,7 @@ fn read_composite_value(bson: Bson, meta: &CompositeOutputMeta) -> crate::Result
             _ => {
                 return Err(MongoError::ConversionError {
                     from: format!("{}", bson),
-                    to: format!("List"),
+                    to: "List".to_owned(),
                 });
             }
         }

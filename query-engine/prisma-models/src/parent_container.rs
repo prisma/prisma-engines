@@ -61,7 +61,7 @@ impl ParentContainer {
                 .upgrade()
                 .unwrap()
                 .fields()
-                .into_iter()
+                .iter()
                 .find(|field| field.name() == prisma_name)
                 .cloned(),
         }
@@ -70,7 +70,7 @@ impl ParentContainer {
 
 impl From<&ModelRef> for ParentContainer {
     fn from(model: &ModelRef) -> Self {
-        Self::Model(Arc::downgrade(&model))
+        Self::Model(Arc::downgrade(model))
     }
 }
 
@@ -82,7 +82,7 @@ impl From<ModelWeakRef> for ParentContainer {
 
 impl From<&CompositeTypeRef> for ParentContainer {
     fn from(composite: &CompositeTypeRef) -> Self {
-        Self::CompositeType(Arc::downgrade(&composite))
+        Self::CompositeType(Arc::downgrade(composite))
     }
 }
 

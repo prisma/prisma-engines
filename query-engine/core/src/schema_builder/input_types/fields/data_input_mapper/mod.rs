@@ -13,7 +13,7 @@ use prisma_models::prelude::*;
 pub(crate) trait DataInputFieldMapper {
     fn map_all(&self, ctx: &mut BuilderContext, fields: &[Field]) -> Vec<InputField> {
         fields
-            .into_iter()
+            .iter()
             .map(|field| match field {
                 Field::Scalar(sf) if sf.is_list() => self.map_scalar_list(ctx, sf),
                 Field::Scalar(sf) => self.map_scalar(ctx, sf),
