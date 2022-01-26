@@ -172,9 +172,10 @@ fn foreign_key_renaming_to_default_works(api: TestApi) {
         }
     "#;
 
-    let ast = datamodel::parse_schema_ast(target_schema).unwrap();
-    let parsed = datamodel::parse_schema_parserdb(target_schema, &ast).unwrap();
-    let migration = api.diff(DiffTarget::Database, DiffTarget::Datamodel(&parsed));
+    let migration = api.connector_diff(
+        DiffTarget::Database(api.connection_string().into()),
+        DiffTarget::Datamodel(target_schema.into()),
+    );
     let expected = expect![[r#"
         BEGIN TRY
 

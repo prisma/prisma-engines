@@ -1,13 +1,16 @@
 pub use crate::assertions::{MigrationsAssertions, ResultSetExt, SchemaAssertion};
 pub use expect_test::expect;
-pub use migration_core::json_rpc::types::{DbExecuteDatasourceType, DbExecuteParams, SchemaContainer, UrlContainer};
+pub use migration_core::json_rpc::types::{
+    DbExecuteDatasourceType, DbExecuteParams, DiffParams, DiffResult, SchemaContainer, UrlContainer,
+};
 pub use test_macros::test_connector;
 pub use test_setup::{BitFlags, Capabilities, Tags};
 
 use crate::{commands::*, multi_engine_test_api::TestApi as RootTestApi};
 use datamodel::common::preview_features::PreviewFeature;
 use migration_core::migration_connector::{
-    ConnectorResult, DatabaseMigrationStepApplier, DiffTarget, EmptyHost, MigrationConnector, MigrationPersistence,
+    ConnectorHost, ConnectorResult, DatabaseMigrationStepApplier, DiffTarget, EmptyHost, MigrationConnector,
+    MigrationPersistence,
 };
 use quaint::{
     prelude::{ConnectionInfo, ResultSet},
@@ -18,18 +21,32 @@ use std::{
     borrow::Cow,
     fmt::{Display, Write},
     future::Future,
+    sync::Arc,
 };
 use tempfile::TempDir;
 use test_setup::{DatasourceBlock, TestApiArgs};
 
 /// For error testing.
 pub async fn rpc_api(schema: &str) -> ConnectorResult<()> {
-    migration_core::rpc_api(schema, Box::new(EmptyHost)).await.map(drop)
+    migration_core::rpc_api(schema, Arc::new(EmptyHost)).await.map(drop)
+}
+
+#[derive(Debug, Default)]
+pub struct TestConnectorHost {
+    pub printed_messages: std::sync::Mutex<Vec<String>>,
+}
+
+#[async_trait::async_trait]
+impl ConnectorHost for TestConnectorHost {
+    async fn print(&self, message: &str) -> ConnectorResult<()> {
+        self.printed_messages.lock().unwrap().push(message.to_owned());
+        Ok(())
+    }
 }
 
 pub struct TestApi {
     root: RootTestApi,
-    connector: SqlMigrationConnector,
+    pub connector: SqlMigrationConnector,
 }
 
 impl TestApi {
@@ -39,6 +56,10 @@ impl TestApi {
         let connector = root.new_engine().connector;
 
         TestApi { root, connector }
+    }
+
+    pub fn args(&self) -> &TestApiArgs {
+        &self.root.args
     }
 
     /// Plan an `applyMigrations` command
@@ -89,6 +110,11 @@ impl TestApi {
 
     pub fn diagnose_migration_history<'a>(&'a self, migrations_directory: &'a TempDir) -> DiagnoseMigrationHistory<'a> {
         DiagnoseMigrationHistory::new_sync(&self.connector, migrations_directory, &self.root.rt)
+    }
+
+    pub fn diff(&self, params: &DiffParams) -> ConnectorResult<DiffResult> {
+        let api: &dyn migration_core::GenericApi = &self.connector;
+        self.block_on(api.diff(params))
     }
 
     pub fn dump_table(&self, table_name: &str) -> ResultSet {
@@ -213,7 +239,7 @@ impl TestApi {
     }
 
     /// Generate a migration script using `MigrationConnector::diff()`.
-    pub fn diff(&self, from: DiffTarget<'_>, to: DiffTarget<'_>) -> String {
+    pub fn connector_diff(&self, from: DiffTarget<'_>, to: DiffTarget<'_>) -> String {
         let migration = self.block_on(self.connector.diff(from, to)).unwrap();
         self.connector.render_script(&migration, &Default::default())
     }

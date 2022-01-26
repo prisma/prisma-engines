@@ -1,15 +1,15 @@
 use crate::migrations_directory::MigrationDirectory;
-use datamodel::ValidatedSchema;
-use std::fmt::Debug;
+use std::{borrow::Cow, fmt::Debug};
 
 /// Diffable things
 pub enum DiffTarget<'a> {
     /// A Prisma schema
-    Datamodel(&'a ValidatedSchema<'a>),
-    /// A migrations folder. What is diffable is the state of the database schema at the end of the migrations history.
-    Migrations(&'a [MigrationDirectory]),
+    Datamodel(Cow<'a, str>),
+    /// A migrations folder. What is diffable is the state of the database schema at the end of the
+    /// migrations history.
+    Migrations(Cow<'a, [MigrationDirectory]>),
     /// A live database connection string.
-    Database,
+    Database(Cow<'a, str>),
     /// Assume an empty database schema
     Empty,
 }
@@ -19,7 +19,7 @@ impl Debug for DiffTarget<'_> {
         match self {
             DiffTarget::Datamodel(_) => f.debug_struct("DiffTarget::Datamodel").finish(),
             DiffTarget::Migrations(_) => f.debug_struct("DiffTarget::Migrations").finish(),
-            DiffTarget::Database => f.debug_struct("DiffTarget::Database").finish(),
+            DiffTarget::Database(_) => f.debug_struct("DiffTarget::Database").finish(),
             DiffTarget::Empty => f.debug_struct("DiffTarget::Empty").finish(),
         }
     }
@@ -27,9 +27,9 @@ impl Debug for DiffTarget<'_> {
 
 impl DiffTarget<'_> {
     /// Try interpreting the DiffTarget as a Datamodel variant.
-    pub fn as_datamodel(&self) -> Option<&ValidatedSchema<'_>> {
+    pub fn as_datamodel(&self) -> Option<&str> {
         match self {
-            DiffTarget::Datamodel(schema) => Some(*schema),
+            DiffTarget::Datamodel(schema) => Some(schema),
             _ => None,
         }
     }

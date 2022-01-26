@@ -37,10 +37,8 @@ pub(crate) async fn mssql_setup(url: String, prisma_schema: &str) -> ConnectorRe
 
     // 2. create the database schema for given Prisma schema
     {
-        let ast = datamodel::parse_schema_ast(prisma_schema).unwrap();
-        let schema = datamodel::parse_schema_parserdb(prisma_schema, &ast).unwrap();
         let migration = api
-            .diff(DiffTarget::Empty, DiffTarget::Datamodel(&schema))
+            .diff(DiffTarget::Empty, DiffTarget::Datamodel(prisma_schema.into()))
             .await
             .unwrap();
         api.database_migration_step_applier()

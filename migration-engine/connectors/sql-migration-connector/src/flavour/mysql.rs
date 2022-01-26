@@ -73,14 +73,13 @@ impl MysqlFlavour {
 
     async fn shadow_database_connection(
         &self,
-        main_connection: &Connection,
         connector: &SqlMigrationConnector,
         shadow_database_name: Option<&str>,
     ) -> ConnectorResult<Connection> {
         if let Some(shadow_database_connection_string) = &connector.shadow_database_connection_string {
             let conn = crate::connect(shadow_database_connection_string).await?;
             let shadow_conninfo = conn.connection_info();
-            let main_conninfo = main_connection.connection_info();
+            let main_conninfo = &connector.connection_info;
 
             super::validate_connection_infos_do_not_match((shadow_conninfo, main_conninfo))?;
 
@@ -100,7 +99,9 @@ impl MysqlFlavour {
         let database_name = shadow_database_name.unwrap();
         let create_database = format!("CREATE DATABASE `{}`", database_name);
 
-        main_connection
+        connector
+            .conn()
+            .await?
             .raw_cmd(&create_database)
             .await
             .map_err(ConnectorError::from)
@@ -402,17 +403,16 @@ impl SqlFlavour for MysqlFlavour {
         }
     }
 
-    #[tracing::instrument(skip(self, migrations, connection, connector))]
+    #[tracing::instrument(skip(self, migrations, connector))]
     async fn sql_schema_from_migration_history(
         &self,
         migrations: &[MigrationDirectory],
-        connection: &Connection,
         connector: &SqlMigrationConnector,
     ) -> ConnectorResult<SqlSchema> {
         let shadow_database_name = connector.shadow_database_name();
 
         let temp_database = self
-            .shadow_database_connection(connection, connector, shadow_database_name.as_deref())
+            .shadow_database_connection(connector, shadow_database_name.as_deref())
             .await?;
 
         // We go through the whole process without early return, then clean up
@@ -443,7 +443,7 @@ impl SqlFlavour for MysqlFlavour {
 
         if let Some(database_name) = shadow_database_name {
             let drop_database = format!("DROP DATABASE IF EXISTS `{}`", database_name);
-            connection.raw_cmd(&drop_database).await?;
+            connector.conn().await?.raw_cmd(&drop_database).await?;
         }
 
         sql_schema_result

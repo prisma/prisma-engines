@@ -4,7 +4,7 @@ use std::sync::Arc;
 
 /// Initialize a JSON-RPC ready migration engine API. This entails starting
 /// a database connection.
-pub async fn rpc_api(datamodel: &str, host: Box<dyn migration_connector::ConnectorHost>) -> CoreResult<IoHandler> {
+pub async fn rpc_api(datamodel: &str, host: Arc<dyn migration_connector::ConnectorHost>) -> CoreResult<IoHandler> {
     let mut io_handler = IoHandler::default();
     let mut api = crate::migration_api(datamodel)?;
     api.set_host(host);
@@ -34,6 +34,7 @@ async fn run_command(
         CREATE_MIGRATION => render(executor.create_migration(&params.parse()?).await),
         DB_EXECUTE => render(executor.db_execute(&params.parse()?).await),
         DEV_DIAGNOSTIC => render(executor.dev_diagnostic(&params.parse()?).await),
+        DIFF => render(executor.diff(&params.parse()?).await),
         DEBUG_PANIC => render(executor.debug_panic().await),
         DIAGNOSE_MIGRATION_HISTORY => render(executor.diagnose_migration_history(&params.parse()?).await),
         EVALUATE_DATA_LOSS => render(executor.evaluate_data_loss(&params.parse()?).await),

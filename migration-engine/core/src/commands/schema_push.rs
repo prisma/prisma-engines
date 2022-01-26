@@ -18,7 +18,10 @@ pub(crate) async fn schema_push(
     };
 
     let database_migration = connector
-        .diff(DiffTarget::Database, DiffTarget::Datamodel(&datamodel))
+        .diff(
+            DiffTarget::Database(connector.connection_string().into()),
+            DiffTarget::Datamodel((&input.schema).into()),
+        )
         .await?;
 
     let checks = checker.check(&database_migration).await?;

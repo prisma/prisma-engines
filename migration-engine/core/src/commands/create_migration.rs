@@ -1,4 +1,4 @@
-use crate::{json_rpc::types::*, parse_schema, CoreError, CoreResult};
+use crate::{json_rpc::types::*, CoreError, CoreResult};
 use migration_connector::{migrations_directory::*, DiffTarget, MigrationConnector};
 use std::path::Path;
 use user_facing_errors::migration_engine::MigrationNameTooLong;
@@ -21,13 +21,11 @@ pub async fn create_migration(
 
     // Infer the migration.
     let previous_migrations = list_migrations(Path::new(&input.migrations_directory_path))?;
-    let target_ast = crate::parse_ast(&input.prisma_schema)?;
-    let target_schema = parse_schema(&input.prisma_schema, &target_ast)?;
 
     let migration = connector
         .diff(
-            DiffTarget::Migrations(&previous_migrations),
-            DiffTarget::Datamodel(&target_schema),
+            DiffTarget::Migrations((&previous_migrations).into()),
+            DiffTarget::Datamodel((&input.prisma_schema).into()),
         )
         .await?;
 

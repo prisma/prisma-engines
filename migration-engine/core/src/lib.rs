@@ -119,3 +119,35 @@ fn parse_configuration(datamodel: &str) -> CoreResult<(Datasource, String, BitFl
 
     Ok((source, url, preview_features, shadow_database_url))
 }
+
+/// This is a hack. Please do not rely on this. It will disappear some day.
+pub fn datasource_from_database_str(database_str: &str) -> CoreResult<String> {
+    let provider = match database_str.split(':').next() {
+        Some("postgres") => "postgresql",
+        Some("file") => "sqlite",
+        Some("mongodb+srv") => "mongodb",
+        Some(other) => other,
+        None => {
+            return Err(CoreError::user_facing(InvalidConnectionString {
+                details: String::new(),
+            }))
+        }
+    };
+
+    let url = if provider == "sqlite" {
+        database_str.replace('\\', "\\\\")
+    } else {
+        database_str.to_owned()
+    };
+
+    let schema = format!(
+        r#"
+            datasource db {{
+                provider = "{provider}"
+                url = "{url}"
+            }}
+        "#,
+    );
+
+    Ok(schema)
+}

@@ -55,7 +55,6 @@ impl MssqlFlavour {
     /// Returns a connection, and maybe a database name to clean up.
     async fn shadow_database_connection(
         &self,
-        main_connection: &Connection,
         connector: &SqlMigrationConnector,
         shadow_database_name: Option<&str>,
     ) -> ConnectorResult<Connection> {
@@ -63,7 +62,7 @@ impl MssqlFlavour {
             let conn = crate::connect(shadow_database_connection_string).await?;
 
             let shadow_conninfo = conn.connection_info();
-            let main_conninfo = main_connection.connection_info();
+            let main_conninfo = &connector.connection_info;
 
             super::validate_connection_infos_do_not_match((shadow_conninfo, main_conninfo))?;
 
@@ -85,7 +84,9 @@ impl MssqlFlavour {
         let database_name = shadow_database_name.unwrap();
         let create_database = format!("CREATE DATABASE [{}]", database_name);
 
-        main_connection
+        connector
+            .conn()
+            .await?
             .raw_cmd(&create_database)
             .await
             .map_err(ConnectorError::from)
@@ -338,7 +339,6 @@ impl SqlFlavour for MssqlFlavour {
     async fn sql_schema_from_migration_history(
         &self,
         migrations: &[MigrationDirectory],
-        connection: &Connection,
         connector: &SqlMigrationConnector,
     ) -> ConnectorResult<SqlSchema> {
         let shadow_database_name = connector.shadow_database_name();
@@ -352,7 +352,7 @@ impl SqlFlavour for MssqlFlavour {
             // migrations.
 
             let temp_database = self
-                .shadow_database_connection(connection, connector, shadow_database_name.as_deref())
+                .shadow_database_connection(connector, shadow_database_name.as_deref())
                 .await?;
 
             if self.schema_name() != "dbo" {
@@ -385,7 +385,8 @@ impl SqlFlavour for MssqlFlavour {
         };
 
         if let Some(shadow_database_name) = shadow_database_name {
-            self.clean_up_shadow_database(connection, &shadow_database_name).await?;
+            self.clean_up_shadow_database(connector.conn().await?, &shadow_database_name)
+                .await?;
         }
 
         sql_schema_result

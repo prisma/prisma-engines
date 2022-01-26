@@ -191,8 +191,9 @@ jobs:
       fail-fast: false
       matrix:
         db:
-          - name: mysql
-            url: "mysql://root@localhost:3306?connect_timeout=20&socket_timeout=60"
+          # # https://github.com/prisma/prisma-engines/pull/2610
+          # - name: mysql
+          #   url: "mysql://root@localhost:3306?connect_timeout=20&socket_timeout=60"
           - name: mariadb
             url: "mysql://root@localhost:3306?connect_timeout=20&socket_timeout=60"
         rust:

@@ -131,7 +131,10 @@ pub(crate) async fn diagnose_migration_history(
     let (drift, error_in_unapplied_migration) = {
         if input.opt_in_to_shadow_database {
             let drift = match connector
-                .diff(DiffTarget::Migrations(&applied_migrations), DiffTarget::Database)
+                .diff(
+                    DiffTarget::Migrations((&applied_migrations).into()),
+                    DiffTarget::Database(connector.connection_string().into()),
+                )
                 .await
                 .map(|mig| {
                     if connector.migration_is_empty(&mig) {
