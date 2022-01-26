@@ -1,7 +1,7 @@
 use query_engine_tests::*;
 
 /// Asserts common basics for composite type writes.
-#[test_suite(schema(all_composite_types))]
+#[test_suite(schema(all_composite_types), only(MongoDb))]
 mod common {
     use query_engine_tests::run_query;
 

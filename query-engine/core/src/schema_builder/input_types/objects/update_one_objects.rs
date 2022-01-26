@@ -105,7 +105,7 @@ pub(super) fn filter_checked_update_fields(
                         true
                     };
 
-                    is_not_autoinc && is_not_disallowed_id
+                    !sf.is_read_only() && is_not_autoinc && is_not_disallowed_id
                 }
 
                 // If the relation field `rf` is the one that was traversed to by the parent relation field `parent_field`,
