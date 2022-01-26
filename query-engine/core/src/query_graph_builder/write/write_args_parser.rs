@@ -133,13 +133,6 @@ fn parse_composite_writes(
     }
 }
 
-// TODO: This is _NOT_ a good heuristic.
-fn is_composite_envelope(map: &ParsedInputMap) -> bool {
-    let envelope_keys = [operations::SET, operations::UPDATE];
-
-    map.iter().any(|(k, _)| envelope_keys.contains(&k.as_str()))
-}
-
 fn parse_composite_envelope(
     cf: &CompositeFieldRef,
     envelope: ParsedInputMap,
