@@ -363,15 +363,15 @@ impl TransactionProcessManager {
         let clients: Arc<RwLock<HashMap<TxId, ITXClient>>> = Arc::new(RwLock::new(HashMap::new()));
 
         let (send_done, mut rx) = channel::<TxId>(CHANNEL_SIZE);
-        // let c = clients.clone();
-        // tokio::task::spawn(async move {
-        //     loop {
-        //         if let Some(id) = rx.recv().await {
-        //             debug!("removing {} from client list", id);
-        //             c.write().await.remove(&id);
-        //         }
-        //     }
-        // });
+        let c = clients.clone();
+        tokio::task::spawn(async move {
+            loop {
+                if let Some(id) = rx.recv().await {
+                    debug!("removing {} from client list", id);
+                    c.write().await.remove(&id);
+                }
+            }
+        });
 
         Self { clients, send_done }
     }
@@ -443,7 +443,7 @@ impl TransactionProcessManager {
                 }
             }
 
-            // let _ = send_done.send(server.id.clone()).await;
+            let _ = send_done.send(server.id.clone()).await;
             debug!("[{}] has stopped with {}", server.id.to_string(), server.cached_tx);
         });
     }

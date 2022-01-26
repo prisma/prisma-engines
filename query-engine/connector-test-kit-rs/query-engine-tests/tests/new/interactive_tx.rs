@@ -61,46 +61,46 @@ mod interactive_tx {
         Ok(())
     }
 
-    // #[connector_test]
-    // async fn tx_expiration_cycle(mut runner: Runner) -> TestResult<()> {
-    //     // Tx expires after one second.
-    //     let tx_id = runner.start_tx(5000, 1000).await?;
-    //     runner.set_active_tx(tx_id.clone());
+    #[connector_test]
+    async fn tx_expiration_cycle(mut runner: Runner) -> TestResult<()> {
+        // Tx expires after one second.
+        let tx_id = runner.start_tx(5000, 1000).await?;
+        runner.set_active_tx(tx_id.clone());
 
-    //     insta::assert_snapshot!(
-    //       run_query!(&runner, r#"mutation { createOneTestModel(data: { id: 1 }) { id }}"#),
-    //       @r###"{"data":{"createOneTestModel":{"id":1}}}"###
-    //     );
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"mutation { createOneTestModel(data: { id: 1 }) { id }}"#),
+          @r###"{"data":{"createOneTestModel":{"id":1}}}"###
+        );
 
-    //     time::sleep(time::Duration::from_millis(1500)).await;
-    //     runner.clear_active_tx();
+        time::sleep(time::Duration::from_millis(1500)).await;
+        runner.clear_active_tx();
 
-    //     // Everything must be rolled back.
-    //     insta::assert_snapshot!(
-    //       run_query!(&runner, r#"query { findManyTestModel { id field }}"#),
-    //       @r###"{"data":{"findManyTestModel":[]}}"###
-    //     );
+        // Everything must be rolled back.
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"query { findManyTestModel { id field }}"#),
+          @r###"{"data":{"findManyTestModel":[]}}"###
+        );
 
-    //     // Status of the tx must be `Expired`
-    //     let res = runner.commit_tx(tx_id.clone()).await?;
+        // Status of the tx must be `Expired`
+        let res = runner.commit_tx(tx_id.clone()).await?;
 
-    //     let error = res.err().unwrap();
-    //     let known_err = error.as_known().unwrap();
+        let error = res.err().unwrap();
+        let known_err = error.as_known().unwrap();
 
-    //     assert_eq!(known_err.error_code, Cow::Borrowed("P2028"));
-    //     assert!(known_err.message.contains("Transaction is no longer valid. Last state"));
+        assert_eq!(known_err.error_code, Cow::Borrowed("P2028"));
+        assert!(known_err.message.contains("Transaction is no longer valid. Last state"));
 
-    //     // Wait for cache eviction, no tx should be found.
-    //     time::sleep(time::Duration::from_secs(2)).await;
-    //     let res = runner.commit_tx(tx_id).await?;
-    //     let error = res.err().unwrap();
-    //     let known_err = error.as_known().unwrap();
+        // Wait for cache eviction, no tx should be found.
+        time::sleep(time::Duration::from_secs(2)).await;
+        let res = runner.commit_tx(tx_id).await?;
+        let error = res.err().unwrap();
+        let known_err = error.as_known().unwrap();
 
-    //     assert_eq!(known_err.error_code, Cow::Borrowed("P2028"));
-    //     assert!(known_err.message.contains("Transaction not found."));
+        assert_eq!(known_err.error_code, Cow::Borrowed("P2028"));
+        assert!(known_err.message.contains("Transaction not found."));
 
-    //     Ok(())
-    // }
+        Ok(())
+    }
 
     #[connector_test]
     async fn no_auto_rollback(mut runner: Runner) -> TestResult<()> {
