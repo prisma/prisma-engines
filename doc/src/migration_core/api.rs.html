@@ -225,21 +225,28 @@
 <span id="224">224</span>
 <span id="225">225</span>
 <span id="226">226</span>
+<span id="227">227</span>
+<span id="228">228</span>
+<span id="229">229</span>
+<span id="230">230</span>
+<span id="231">231</span>
+<span id="232">232</span>
+<span id="233">233</span>
 </pre><pre class="rust"><code><span class="doccomment">//! The external facing programmatic API to the migration engine.</span>
 
 <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">commands</span>::<span class="kw-2">*</span>,
     <span class="ident">json_rpc::types</span>::{
         <span class="ident">ApplyMigrationsInput</span>, <span class="ident">ApplyMigrationsOutput</span>, <span class="ident">CreateMigrationInput</span>, <span class="ident">CreateMigrationOutput</span>,
-        <span class="ident">DbExecuteDatasourceType</span>, <span class="ident">DbExecuteParams</span>, <span class="ident">DevDiagnosticInput</span>, <span class="ident">DevDiagnosticOutput</span>, <span class="ident">EvaluateDataLossInput</span>,
-        <span class="ident">EvaluateDataLossOutput</span>, <span class="ident">ListMigrationDirectoriesInput</span>, <span class="ident">ListMigrationDirectoriesOutput</span>,
+        <span class="ident">DbExecuteDatasourceType</span>, <span class="ident">DbExecuteParams</span>, <span class="ident">DevDiagnosticInput</span>, <span class="ident">DevDiagnosticOutput</span>, <span class="ident">DiffParams</span>, <span class="ident">DiffResult</span>,
+        <span class="ident">EvaluateDataLossInput</span>, <span class="ident">EvaluateDataLossOutput</span>, <span class="ident">ListMigrationDirectoriesInput</span>, <span class="ident">ListMigrationDirectoriesOutput</span>,
         <span class="ident">MarkMigrationAppliedInput</span>, <span class="ident">MarkMigrationAppliedOutput</span>, <span class="ident">MarkMigrationRolledBackInput</span>,
         <span class="ident">MarkMigrationRolledBackOutput</span>, <span class="ident">SchemaContainer</span>, <span class="ident">SchemaPushInput</span>, <span class="ident">SchemaPushOutput</span>, <span class="ident">UrlContainer</span>,
     },
     <span class="ident">CoreResult</span>,
 };
 <span class="kw">use</span> <span class="ident">migration_connector</span>::{<span class="ident">migrations_directory</span>, <span class="ident">ConnectorError</span>, <span class="ident">MigrationConnector</span>};
-<span class="kw">use</span> <span class="ident">std::path::Path</span>;
+<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">path::Path</span>, <span class="ident">sync::Arc</span>};
 <span class="kw">use</span> <span class="ident">tracing_futures::Instrument</span>;
 
 <span class="doccomment">/// The programmatic, generic, fantastic migration engine API.</span>
@@ -250,6 +257,9 @@
 
     <span class="doccomment">/// Apply all the unapplied migrations from the migrations folder.</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">apply_migrations</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="ident">ApplyMigrationsInput</span>) -&gt; <span class="ident">CoreResult</span><span class="op">&lt;</span><span class="ident">ApplyMigrationsOutput</span><span class="op">&gt;</span>;
+
+    <span class="doccomment">/// Access to the migration connector.</span>
+    <span class="kw">fn</span> <span class="ident">connector</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">MigrationConnector</span>;
 
     <span class="doccomment">/// Create the database referenced by Prisma schema that was used to initialize the connector.</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">create_database</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">CoreResult</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>;
@@ -265,6 +275,9 @@
 
     <span class="doccomment">/// Tells the CLI what to do in `migrate dev`.</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">dev_diagnostic</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="ident">DevDiagnosticInput</span>) -&gt; <span class="ident">CoreResult</span><span class="op">&lt;</span><span class="ident">DevDiagnosticOutput</span><span class="op">&gt;</span>;
+
+    <span class="doccomment">/// Create a migration between any two sources of database schemas.</span>
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">diff</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">params</span>: <span class="kw-2">&amp;</span><span class="ident">DiffParams</span>) -&gt; <span class="ident">CoreResult</span><span class="op">&lt;</span><span class="ident">DiffResult</span><span class="op">&gt;</span>;
 
     <span class="doccomment">/// Drop the database referenced by Prisma schema that was used to initialize the connector.</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">drop_database</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">CoreResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span>;
@@ -306,10 +319,7 @@
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">schema_push</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="ident">SchemaPushInput</span>) -&gt; <span class="ident">CoreResult</span><span class="op">&lt;</span><span class="ident">SchemaPushOutput</span><span class="op">&gt;</span>;
 
     <span class="doccomment">/// Set the `ConnectorHost` to use.</span>
-    <span class="kw">fn</span> <span class="ident">set_host</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">host</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">migration_connector::ConnectorHost</span><span class="op">&gt;</span>);
-
-    <span class="doccomment">/// Access to the migration connector.</span>
-    <span class="kw">fn</span> <span class="ident">connector</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">MigrationConnector</span>;
+    <span class="kw">fn</span> <span class="ident">set_host</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">host</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">migration_connector::ConnectorHost</span><span class="op">&gt;</span>);
 }
 
 <span class="attribute">#[<span class="ident">async_trait::async_trait</span>]</span>
@@ -380,6 +390,10 @@
             .<span class="kw">await</span>
     }
 
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">diff</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">params</span>: <span class="kw-2">&amp;</span><span class="ident">DiffParams</span>) -&gt; <span class="ident">CoreResult</span><span class="op">&lt;</span><span class="ident">DiffResult</span><span class="op">&gt;</span> {
+        <span class="ident"><span class="kw">crate</span>::commands::diff</span>(<span class="ident">params</span>, <span class="self">self</span>).<span class="kw">await</span>
+    }
+
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">drop_database</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">CoreResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="ident">MigrationConnector::drop_database</span>(<span class="self">self</span>).<span class="kw">await</span>
     }
@@ -447,7 +461,7 @@
             .<span class="kw">await</span>
     }
 
-    <span class="kw">fn</span> <span class="ident">set_host</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">host</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">migration_connector::ConnectorHost</span><span class="op">&gt;</span>) {
+    <span class="kw">fn</span> <span class="ident">set_host</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">host</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">migration_connector::ConnectorHost</span><span class="op">&gt;</span>) {
         <span class="ident">MigrationConnector::set_host</span>(<span class="self">self</span>, <span class="ident">host</span>)
     }
 }

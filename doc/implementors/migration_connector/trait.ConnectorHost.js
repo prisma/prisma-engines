@@ -1,4 +1,5 @@
 (function() {var implementors = {};
 implementors["migration_connector"] = [];
 implementors["migration_engine"] = [{"text":"impl <a class=\"trait\" href=\"migration_connector/trait.ConnectorHost.html\" title=\"trait migration_connector::ConnectorHost\">ConnectorHost</a> for <a class=\"struct\" href=\"migration_engine/struct.JsonRpcHost.html\" title=\"struct migration_engine::JsonRpcHost\">JsonRpcHost</a>","synthetic":false,"types":["migration_engine::JsonRpcHost"]}];
+implementors["migration_engine_tests"] = [{"text":"impl <a class=\"trait\" href=\"migration_connector/trait.ConnectorHost.html\" title=\"trait migration_connector::ConnectorHost\">ConnectorHost</a> for <a class=\"struct\" href=\"migration_engine_tests/test_api/struct.TestConnectorHost.html\" title=\"struct migration_engine_tests::test_api::TestConnectorHost\">TestConnectorHost</a>","synthetic":false,"types":["migration_engine_tests::test_api::TestConnectorHost"]}];
 if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()

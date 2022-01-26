@@ -200,6 +200,7 @@
 <span id="199">199</span>
 <span id="200">200</span>
 <span id="201">201</span>
+<span id="202">202</span>
 </pre><pre class="rust"><code><span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">proc_macro</span>;
 
 <span class="kw">use</span> <span class="ident">proc_macro::TokenStream</span>;
@@ -307,7 +308,8 @@
                     <span class="ident">BitFlags::empty</span>() #(<span class="op">|</span> <span class="ident">Capabilities</span>::#<span class="ident">capabilities</span>)<span class="kw-2">*</span>,
                 ) { <span class="kw">return</span> }
 
-                <span class="kw">let</span> #<span class="ident">arg_name</span> <span class="op">=</span> #<span class="ident">arg_type::new</span>(<span class="ident">args</span>);
+                <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">all</span>)]</span>
+                <span class="kw">let</span> <span class="kw-2">mut</span> #<span class="ident">arg_name</span> <span class="op">=</span> #<span class="ident">arg_type::new</span>(<span class="ident">args</span>);
 
                 #<span class="ident">body</span>
             }

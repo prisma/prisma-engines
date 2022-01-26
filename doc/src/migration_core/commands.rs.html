@@ -23,6 +23,8 @@
 <span id="22">22</span>
 <span id="23">23</span>
 <span id="24">24</span>
+<span id="25">25</span>
+<span id="26">26</span>
 </pre><pre class="rust"><code><span class="doccomment">//! The commands exposed by the migration engine core are defined in this</span>
 <span class="doccomment">//! module.</span>
 
@@ -30,6 +32,7 @@
 <span class="kw">mod</span> <span class="ident">create_migration</span>;
 <span class="kw">mod</span> <span class="ident">dev_diagnostic</span>;
 <span class="kw">mod</span> <span class="ident">diagnose_migration_history</span>;
+<span class="kw">mod</span> <span class="ident">diff</span>;
 <span class="kw">mod</span> <span class="ident">evaluate_data_loss</span>;
 <span class="kw">mod</span> <span class="ident">mark_migration_applied</span>;
 <span class="kw">mod</span> <span class="ident">mark_migration_rolled_back</span>;
@@ -43,6 +46,7 @@
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="ident">create_migration::create_migration</span>;
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="ident">dev_diagnostic::dev_diagnostic</span>;
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="ident">diagnose_migration_history::diagnose_migration_history</span>;
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="ident">diff::diff</span>;
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="ident">evaluate_data_loss::evaluate_data_loss</span>;
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="ident">mark_migration_applied::mark_migration_applied</span>;
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="ident">mark_migration_rolled_back::mark_migration_rolled_back</span>;

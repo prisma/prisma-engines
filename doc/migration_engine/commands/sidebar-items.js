@@ -1,1 +1,1 @@
-initSidebarItems({"enum":[["CliCommand",""]],"fn":[["datasource_from_database_str",""],["parse_base64_string",""]],"struct":[["Cli",""]]});
+initSidebarItems({"enum":[["CliCommand",""]],"fn":[["parse_base64_string",""]],"struct":[["Cli",""]]});

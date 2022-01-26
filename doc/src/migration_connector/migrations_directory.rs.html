@@ -241,6 +241,13 @@
 <span id="240">240</span>
 <span id="241">241</span>
 <span id="242">242</span>
+<span id="243">243</span>
+<span id="244">244</span>
+<span id="245">245</span>
+<span id="246">246</span>
+<span id="247">247</span>
+<span id="248">248</span>
+<span id="249">249</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Migrations directory management.</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! This module is responsible for the management of the contents of the</span>
@@ -329,24 +336,31 @@ provider = &quot;{}&quot;&quot;##</span>,
     }
 }
 
-<span class="doccomment">/// Check whether provider matches.</span>
+<span class="doccomment">/// Check whether provider matches. `None` means there was no migration_lock.toml file.</span>
 <span class="attribute">#[<span class="ident">tracing::instrument</span>]</span>
 <span class="kw">fn</span> <span class="ident">match_provider_in_lock_file</span>(<span class="ident">migrations_directory_path</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">provider</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="ident">read_provider_from_lock_file</span>(<span class="ident">migrations_directory_path</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">found_provider</span><span class="op">|</span> {
+        <span class="kw">if</span> <span class="ident">found_provider</span> <span class="op">==</span> <span class="ident">provider</span> {
+            <span class="prelude-val">Ok</span>(())
+        } <span class="kw">else</span> {
+            <span class="prelude-val">Err</span>(<span class="ident">found_provider</span>)
+        }
+    })
+}
+
+<span class="doccomment">/// Read the provider from the migration_lock.toml. `None` means there was no migration_lock.toml</span>
+<span class="doccomment">/// file in the directory.</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">read_provider_from_lock_file</span>(<span class="ident">migrations_directory_path</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">directory_path</span> <span class="op">=</span> <span class="ident">Path::new</span>(<span class="ident">migrations_directory_path</span>);
     <span class="kw">let</span> <span class="ident">file_path</span> <span class="op">=</span> <span class="ident">directory_path</span>.<span class="ident">join</span>(<span class="string">&quot;migration_lock.toml&quot;</span>);
 
     <span class="ident">std::fs::read_to_string</span>(<span class="ident">file_path</span>).<span class="ident">ok</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">content</span><span class="op">|</span> {
-        <span class="kw">let</span> <span class="ident">found_provider</span> <span class="op">=</span> <span class="ident">content</span>
+        <span class="ident">content</span>
             .<span class="ident">lines</span>()
             .<span class="ident">find</span>(<span class="op">|</span><span class="ident">line</span><span class="op">|</span> <span class="ident">line</span>.<span class="ident">starts_with</span>(<span class="string">&quot;provider&quot;</span>))
             .<span class="ident">map</span>(<span class="op">|</span><span class="ident">line</span><span class="op">|</span> <span class="ident">line</span>.<span class="ident">trim_start_matches</span>(<span class="string">&quot;provider = &quot;</span>).<span class="ident">trim_matches</span>(<span class="string">&#39;&quot;&#39;</span>))
-            .<span class="ident">unwrap_or</span>(<span class="string">&quot;&lt;PROVIDER NOT FOUND&gt;&quot;</span>);
-
-        <span class="kw">if</span> <span class="ident">found_provider</span> <span class="op">==</span> <span class="ident">provider</span> {
-            <span class="prelude-val">Ok</span>(())
-        } <span class="kw">else</span> {
-            <span class="prelude-val">Err</span>(<span class="ident">found_provider</span>.<span class="ident">to_owned</span>())
-        }
+            .<span class="ident">unwrap_or</span>(<span class="string">&quot;&lt;PROVIDER NOT FOUND&gt;&quot;</span>)
+            .<span class="ident">to_owned</span>()
     })
 }
 
