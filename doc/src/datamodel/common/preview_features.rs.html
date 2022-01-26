@@ -167,6 +167,8 @@
 <span id="166">166</span>
 <span id="167">167</span>
 <span id="168">168</span>
+<span id="169">169</span>
+<span id="170">170</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">once_cell::sync::Lazy</span>;
 <span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Serialize</span>, <span class="ident">Serializer</span>};
 <span class="kw">use</span> <span class="ident">std::fmt</span>;
@@ -233,6 +235,7 @@
     <span class="ident">DataProxy</span>,
     <span class="ident">ExtendedIndexes</span>,
     <span class="ident">Cockroachdb</span>,
+    <span class="ident">Tracing</span>,
 );
 
 <span class="comment">// Mapping of which active, deprecated and hidden</span>
@@ -251,6 +254,7 @@
             <span class="ident">DataProxy</span>,
             <span class="ident">ExtendedIndexes</span>,
             <span class="ident">Cockroachdb</span>,
+            <span class="ident">Tracing</span>,
         ])
         .<span class="ident">with_deprecated</span>(<span class="macro">vec!</span>[
             <span class="ident">AtomicNumberOperations</span>,
