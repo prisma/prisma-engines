@@ -360,3 +360,92 @@ mod create {
         Ok(())
     }
 }
+
+#[test_suite(schema(to_many_composites), only(MongoDb))]
+mod update {
+    #[connector_test]
+    async fn update_set_explicit(runner: Runner) -> TestResult<()> {
+        create_test_data(&runner).await?;
+
+        insta::assert_snapshot!(
+          run_query!(runner, r#"mutation {
+            updateOneTestModel(
+              where: { id: 1 }
+              data: {
+                a: { set: [{ a_1: "updated", a_2: 1337, b: { b_field: "updated", a: [{}] } }] }
+                c: { set: [{ c_field: "updated" }] }
+              }
+            ) {
+              a {
+                a_1
+                a_2
+                b {
+                  b_field
+                  a {
+                      a_1
+                  }
+                }
+              }
+              c { c_field }
+            }
+          }"#),
+          @r###"{"data":{"updateOneTestModel":{"a":[{"a_1":"updated","a_2":1337,"b":[{"b_field":"updated","a":[{"a_1":"a_1 default"}]}]}],"c":[{"c_field":"updated"}]}}}"###
+        );
+
+        Ok(())
+    }
+
+    #[connector_test]
+    async fn update_set_shorthand(runner: Runner) -> TestResult<()> {
+        create_test_data(&runner).await?;
+
+        insta::assert_snapshot!(
+          run_query!(runner, r#"mutation {
+            updateOneTestModel(
+              where: { id: 1 }
+              data: {
+                a: [{ a_1: "updated", a_2: 1337, b: { b_field: "updated", a: [{}] } }]
+                c: [{ c_field: "updated" }]
+              }
+            ) {
+              a {
+                a_1
+                a_2
+                b {
+                  b_field
+                  a {
+                      a_1
+                  }
+                }
+              }
+              c { c_field }
+            }
+          }"#),
+          @r###"{"data":{"updateOneTestModel":{"a":[{"a_1":"updated","a_2":1337,"b":[{"b_field":"updated","a":[{"a_1":"a_1 default"}]}]}],"c":[{"c_field":"updated"}]}}}"###
+        );
+
+        Ok(())
+    }
+
+    async fn create_test_data(runner: &Runner) -> TestResult<()> {
+        create_row(
+            runner,
+            r#"{
+                   id: 1
+                   a: [{ a_1: "a1", a_2: null, b: { b_field: "b_field", a: [] } }]
+                   c: []
+                 }"#,
+        )
+        .await?;
+
+        Ok(())
+    }
+
+    async fn create_row(runner: &Runner, data: &str) -> TestResult<()> {
+        runner
+            .query(format!("mutation {{ createOneTestModel(data: {}) {{ id }} }}", data))
+            .await?
+            .assert_success();
+        Ok(())
+    }
+}

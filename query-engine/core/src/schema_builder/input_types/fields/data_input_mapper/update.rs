@@ -233,7 +233,7 @@ fn composite_update_envelope_object_type(ctx: &mut BuilderContext, cf: &Composit
 }
 
 fn composite_unset_update_input_field(cf: &CompositeFieldRef) -> Option<InputField> {
-    if cf.is_required() {
+    if cf.is_required() || cf.is_list() {
         return None;
     }
 
