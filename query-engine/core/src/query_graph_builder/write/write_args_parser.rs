@@ -2,6 +2,7 @@ use super::*;
 use crate::{
     constants::{json_null, operations},
     query_document::{ParsedInputMap, ParsedInputValue},
+    ObjectTag,
 };
 use connector::{WriteArgs, WriteExpression};
 use prisma_models::{Field, ModelRef, PrismaValue, RelationFieldRef, TypeIdentifier};
@@ -112,11 +113,7 @@ impl WriteArgsParser {
 }
 
 fn is_composite_envelope(map: &ParsedInputMap) -> bool {
-    // [Composites] Flavian Todo
-    map.iter()
-        .next()
-        .map(|(key, _)| map.len() == 1 && key == operations::SET)
-        .unwrap_or(false)
+    matches!(map.tag, Some(ObjectTag::CompositeEnvelope))
 }
 
 fn parse_composite_envelope(envelope: ParsedInputMap) -> QueryGraphBuilderResult<WriteExpression> {

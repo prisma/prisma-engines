@@ -22,7 +22,7 @@ pub fn create_record(
 
     let data_map = match field.arguments.lookup(args::DATA) {
         Some(data) => data.value.try_into()?,
-        None => ParsedInputMap::new(),
+        None => ParsedInputMap::default(),
     };
 
     let create_node = create::create_record_node(graph, connector_ctx, Arc::clone(&model), data_map)?;

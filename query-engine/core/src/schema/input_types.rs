@@ -9,6 +9,14 @@ pub struct InputObjectType {
     pub identifier: Identifier,
     pub constraints: InputObjectTypeConstraints,
     pub fields: OnceCell<Vec<InputFieldRef>>,
+    pub tag: Option<ObjectTag>,
+}
+
+/// Object tags help differentiating objects during parsing / raw input data processing,
+/// especially if complex object unions are present.
+#[derive(Debug, PartialEq, Copy, Clone)]
+pub enum ObjectTag {
+    CompositeEnvelope,
 }
 
 #[derive(Debug, Default, PartialEq)]
@@ -74,6 +82,10 @@ impl InputObjectType {
     /// Require a minimum of `min` fields to be present in the input.
     pub fn set_min_fields(&mut self, min: usize) {
         self.constraints.min_num_fields = Some(min);
+    }
+
+    pub fn set_tag(&mut self, tag: ObjectTag) {
+        self.tag = Some(tag);
     }
 }
 

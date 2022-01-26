@@ -157,6 +157,7 @@ fn composite_create_envelope_object_type(ctx: &mut BuilderContext, cf: &Composit
 
     let mut input_object = init_input_object_type(ident.clone());
     input_object.require_exactly_one_field();
+    input_object.set_tag(ObjectTag::CompositeEnvelope);
 
     let input_object = Arc::new(input_object);
 
