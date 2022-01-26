@@ -14,6 +14,7 @@ use mongodb::{
 };
 use prisma_models::{ModelRef, PrismaValue, SelectionResult};
 use std::convert::TryInto;
+use update_utils::IntoUpdateDocumentExtension;
 
 /// Create a single record to the database resulting in a
 /// `RecordProjection` as an identifier pointing to the just-created document.
@@ -145,15 +146,15 @@ pub async fn update_records<'conn>(
         .iter()
         .filter_map(|field| {
             args.take_field_value(field.db_name())
-                .map(|write_expr| (field.clone(), write_expr))
+                .map(|write_op| (field.clone(), write_op))
         })
         .collect();
 
     let mut update_docs: Vec<Document> = vec![];
 
-    for (field, write_expr) in fields {
+    for (field, write_op) in fields {
         let field_name = field.db_name();
-        let docs = update_utils::render_update_docs(write_expr, &field, field_name)?;
+        let docs = write_op.into_update_docs(&field, field_name)?;
 
         update_docs.extend(docs);
     }

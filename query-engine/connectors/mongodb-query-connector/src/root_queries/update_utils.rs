@@ -1,127 +1,119 @@
 use super::*;
 use crate::IntoBson;
-use connector_interface::{DatasourceFieldName, NestedWrite, WriteExpression};
+use connector_interface::{CompositeWriteOperation, ScalarWriteOperation, WriteOperation};
 use itertools::Itertools;
 use mongodb::bson::{doc, Document};
 use prisma_models::PrismaValue;
 
-pub fn render_update_docs(
-    write_expr: WriteExpression,
-    field: &Field,
-    field_name: &str,
-) -> crate::Result<Vec<Document>> {
-    if let WriteExpression::NestedWrite(nested_write) = write_expr {
-        let docs = unfold_nested_write(field, nested_write, vec![field.db_name().to_owned()])
-            .into_iter()
-            // TODO: figure out why we can't flat_map here
-            // TODO: the trait `FromIterator<Vec<mongodb::bson::Document>>` is not implemented for `std::result::Result<Vec<mongodb::bson::Document>, MongoError>`
-            .map(|(write_expr, field, field_name)| render_update_docs(write_expr, field, &field_name))
-            .collect::<crate::Result<Vec<_>>>()?;
+pub trait IntoUpdateDocumentExtension {
+    fn into_update_docs(self, field: &Field, field_name: &str) -> crate::Result<Vec<Document>>;
+}
 
-        return Ok(docs.into_iter().flatten().collect_vec());
-    };
+impl IntoUpdateDocumentExtension for WriteOperation {
+    fn into_update_docs(self, field: &Field, field_name: &str) -> crate::Result<Vec<Document>> {
+        match self {
+            WriteOperation::Scalar(op) => op.into_update_docs(field, field_name),
+            WriteOperation::Composite(op) => op.into_update_docs(field, field_name),
+        }
+    }
+}
 
-    let dollar_field_name = format!("${}", field_name);
+impl IntoUpdateDocumentExtension for ScalarWriteOperation {
+    fn into_update_docs(self, field: &Field, field_name: &str) -> crate::Result<Vec<Document>> {
+        let dollar_field_name = format!("${}", field_name);
 
-    let doc = match write_expr {
-        WriteExpression::Add(rhs) if field.is_list() => match rhs {
-            PrismaValue::List(vals) => {
-                let vals = vals
-                    .into_iter()
-                    .map(|val| (field, val).into_bson())
-                    .collect::<crate::Result<Vec<_>>>()?
-                    .into_iter()
-                    .map(|bson| {
-                        // Strip the list from the BSON values. [Todo] This is unfortunately necessary right now due to how the
-                        // conversion is set up with native types, we should clean that up at some point (move from traits to fns?).
-                        if let Bson::Array(mut inner) = bson {
-                            inner.pop().unwrap()
-                        } else {
-                            bson
-                        }
-                    })
-                    .collect();
+        let doc = match self {
+            ScalarWriteOperation::Add(rhs) if field.is_list() => match rhs {
+                PrismaValue::List(vals) => {
+                    let vals = vals
+                        .into_iter()
+                        .map(|val| (field, val).into_bson())
+                        .collect::<crate::Result<Vec<_>>>()?
+                        .into_iter()
+                        .map(|bson| {
+                            // Strip the list from the BSON values. [Todo] This is unfortunately necessary right now due to how the
+                            // conversion is set up with native types, we should clean that up at some point (move from traits to fns?).
+                            if let Bson::Array(mut inner) = bson {
+                                inner.pop().unwrap()
+                            } else {
+                                bson
+                            }
+                        })
+                        .collect();
 
-                let bson_array = Bson::Array(vals);
+                    let bson_array = Bson::Array(vals);
 
-                doc! {
-                    "$set": { field_name: {
-                        "$ifNull": [
-                            { "$concatArrays": [dollar_field_name, bson_array.clone()] },
-                            bson_array
-                        ]
-                    } }
-                }
-            }
-            val => {
-                let bson_val = match (field, val).into_bson()? {
-                    bson @ Bson::Array(_) => bson,
-                    bson => Bson::Array(vec![bson]),
-                };
-
-                doc! {
-                    "$set": {
-                        field_name: {
+                    doc! {
+                        "$set": { field_name: {
                             "$ifNull": [
-                                { "$concatArrays": [dollar_field_name, bson_val.clone()] },
-                                bson_val
+                                { "$concatArrays": [dollar_field_name, bson_array.clone()] },
+                                bson_array
                             ]
+                        } }
+                    }
+                }
+                val => {
+                    let bson_val = match (field, val).into_bson()? {
+                        bson @ Bson::Array(_) => bson,
+                        bson => Bson::Array(vec![bson]),
+                    };
+
+                    doc! {
+                        "$set": {
+                            field_name: {
+                                "$ifNull": [
+                                    { "$concatArrays": [dollar_field_name, bson_val.clone()] },
+                                    bson_val
+                                ]
+                            }
                         }
                     }
                 }
-            }
-        },
-        // We use $literal to enable the set of empty object, which is otherwise considered a syntax error
-        WriteExpression::Value(rhs) => doc! {
-            "$set": { field_name: { "$literal": (field, rhs).into_bson()? } }
-        },
-        WriteExpression::Add(rhs) => doc! {
-            "$set": { field_name: { "$add": [dollar_field_name, (field, rhs).into_bson()?] } }
-        },
-        WriteExpression::Substract(rhs) => doc! {
-            "$set": { field_name: { "$subtract": [dollar_field_name, (field, rhs).into_bson()?] } }
-        },
-        WriteExpression::Multiply(rhs) => doc! {
-            "$set": { field_name: { "$multiply": [dollar_field_name, (field, rhs).into_bson()?] } }
-        },
-        WriteExpression::Divide(rhs) => doc! {
-            "$set": { field_name: { "$divide": [dollar_field_name, (field, rhs).into_bson()?] } }
-        },
-        WriteExpression::NestedWrite(_) => unreachable!(),
-        WriteExpression::Field(_) => unimplemented!(),
-    };
+            },
+            // We use $literal to enable the set of empty object, which is otherwise considered a syntax error
+            ScalarWriteOperation::Set(rhs) => doc! {
+                "$set": { field_name: { "$literal": (field, rhs).into_bson()? } }
+            },
+            ScalarWriteOperation::Add(rhs) => doc! {
+                "$set": { field_name: { "$add": [dollar_field_name, (field, rhs).into_bson()?] } }
+            },
+            ScalarWriteOperation::Substract(rhs) => doc! {
+                "$set": { field_name: { "$subtract": [dollar_field_name, (field, rhs).into_bson()?] } }
+            },
+            ScalarWriteOperation::Multiply(rhs) => doc! {
+                "$set": { field_name: { "$multiply": [dollar_field_name, (field, rhs).into_bson()?] } }
+            },
+            ScalarWriteOperation::Divide(rhs) => doc! {
+                "$set": { field_name: { "$divide": [dollar_field_name, (field, rhs).into_bson()?] } }
+            },
+            ScalarWriteOperation::Field(_) => unimplemented!(),
+        };
 
-    Ok(vec![doc])
+        Ok(vec![doc])
+    }
 }
 
-fn unfold_nested_write<'a>(
-    field: &'a Field,
-    nested_write: NestedWrite,
-    path: Vec<String>,
-) -> Vec<(WriteExpression, &'a Field, String)> {
-    let mut nested_writes: Vec<(WriteExpression, &'a Field, String)> = vec![];
+impl IntoUpdateDocumentExtension for CompositeWriteOperation {
+    fn into_update_docs(self, field: &Field, field_name: &str) -> crate::Result<Vec<Document>> {
+        let docs = match self {
+            // We use $literal to enable the set of empty object, which is otherwise considered a syntax error
+            CompositeWriteOperation::Set(rhs) => vec![doc! {
+                "$set": { field_name: { "$literal": (field, rhs).into_bson()? } }
+            }],
+            CompositeWriteOperation::Update(nested_write) => {
+                let docs = nested_write
+                    .unfold(field)
+                    .into_iter()
+                    // TODO: figure out why we can't flat_map here
+                    // TODO: the trait `FromIterator<Vec<mongodb::bson::Document>>` is not implemented for `std::result::Result<Vec<mongodb::bson::Document>, MongoError>`
+                    .map(|(write_op, field, field_name)| write_op.into_update_docs(field, &field_name))
+                    .collect::<crate::Result<Vec<_>>>()?;
 
-    for (DatasourceFieldName(db_name), write) in nested_write.writes {
-        let nested_field = field
-            .as_composite()
-            .unwrap()
-            .typ
-            .find_field_by_db_name(&db_name)
-            .unwrap();
-        let mut path = path.clone();
-
-        match write {
-            WriteExpression::NestedWrite(nested_write) => {
-                path.push(db_name);
-
-                nested_writes.extend(unfold_nested_write(nested_field, nested_write, path));
+                docs.into_iter().flatten().collect_vec()
             }
-            _ => {
-                path.push(db_name);
-                nested_writes.push((write, nested_field, path.join(".").to_owned()));
-            }
-        }
+            CompositeWriteOperation::Unset => todo!(),
+        };
+
+        Ok(docs)
     }
-
-    nested_writes
 }
