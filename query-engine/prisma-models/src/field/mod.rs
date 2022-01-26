@@ -106,6 +106,14 @@ impl Field {
             Field::Composite(field) => FieldWeak::Composite(Arc::downgrade(field)),
         }
     }
+
+    pub fn as_composite(&self) -> Option<&CompositeFieldRef> {
+        if let Self::Composite(v) = self {
+            Some(v)
+        } else {
+            None
+        }
+    }
 }
 
 #[derive(Debug, Clone)]

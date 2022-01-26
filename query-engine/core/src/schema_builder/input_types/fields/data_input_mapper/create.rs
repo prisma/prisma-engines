@@ -126,7 +126,7 @@ impl DataInputFieldMapper for CreateDataInputFieldMapper {
         // If the composite field in _not_ on a model, then it's nested and we're skipping the create envelope for now.
         // (This allows us to simplify the parsing code for now.)
         let mut input_types = if cf.container().as_model().is_some() {
-            vec![shorthand_type.clone(), envelope_type]
+            vec![envelope_type, shorthand_type.clone()]
         } else {
             vec![shorthand_type.clone()]
         };

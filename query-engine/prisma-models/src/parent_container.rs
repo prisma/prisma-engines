@@ -32,7 +32,7 @@ impl ParentContainer {
         }
     }
 
-    fn as_composite(&self) -> Option<CompositeTypeRef> {
+    pub fn as_composite(&self) -> Option<CompositeTypeRef> {
         match self {
             ParentContainer::Model(_) => None,
             ParentContainer::CompositeType(ct) => ct.upgrade(),

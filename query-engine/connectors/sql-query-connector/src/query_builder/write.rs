@@ -166,7 +166,7 @@ pub fn update_many(
                     e / field.value(rhs).into()
                 }
 
-                WriteExpression::CompositeWrite(_) => unreachable!("SQL Connectors do not support composite writes."),
+                WriteExpression::NestedWrite(_) => unreachable!("SQL Connectors do not support composite writes."),
             };
 
             acc.set(name, value)

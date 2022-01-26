@@ -49,8 +49,8 @@ pub enum WriteExpression {
     /// Reference to another field on the same model (unused at the moment).
     Field(DatasourceFieldName),
 
-    ///
-    CompositeWrite(CompositeWrite),
+    /// Represents nested writes for composites
+    NestedWrite(NestedWrite),
 
     /// Write plain value to field.
     Value(PrismaValue),
@@ -69,9 +69,8 @@ pub enum WriteExpression {
 }
 
 #[derive(Debug, PartialEq, Clone)]
-pub struct CompositeWrite {
-    field_name: DatasourceFieldName,
-    writes: Vec<WriteExpression>,
+pub struct NestedWrite {
+    pub writes: Vec<(DatasourceFieldName, WriteExpression)>,
 }
 
 impl From<PrismaValue> for WriteExpression {
@@ -262,6 +261,6 @@ pub fn apply_expression(val: PrismaValue, expr: WriteExpression) -> PrismaValue 
         WriteExpression::Substract(rhs) => val - rhs,
         WriteExpression::Multiply(rhs) => val * rhs,
         WriteExpression::Divide(rhs) => val / rhs,
-        WriteExpression::CompositeWrite(_) => unimplemented!(),
+        WriteExpression::NestedWrite(_) => unimplemented!(),
     }
 }
