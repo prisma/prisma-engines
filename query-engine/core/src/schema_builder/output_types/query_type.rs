@@ -120,7 +120,7 @@ fn mongo_aggregate_raw_field(model: &ModelRef) -> OutputField {
     field(
         field_name,
         vec![
-            input_field("pipeline", InputType::json(), None).optional(),
+            input_field("pipeline", InputType::list(InputType::json()), None).optional(),
             input_field("options", InputType::json(), None).optional(),
         ],
         OutputType::json(),
@@ -139,7 +139,7 @@ fn mongo_find_raw_field(model: &ModelRef) -> OutputField {
     field(
         field_name,
         vec![
-            input_field("query", InputType::json(), None).optional(),
+            input_field("filter", InputType::json(), None).optional(),
             input_field("options", InputType::json(), None).optional(),
         ],
         OutputType::json(),

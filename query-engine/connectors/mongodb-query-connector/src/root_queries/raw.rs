@@ -41,7 +41,7 @@ impl MongoCommand {
     }
 
     fn find(model: &ModelRef, inputs: HashMap<String, PrismaValue>) -> crate::Result<MongoCommand> {
-        let query = inputs.get_document("query")?;
+        let filter = inputs.get_document("filter")?;
         let options = inputs
             .get_document("options")?
             .map(Bson::Document)
@@ -50,7 +50,7 @@ impl MongoCommand {
 
         Ok(Self::Handled {
             collection: model.name.clone(),
-            operation: MongoOperation::Find(query, options),
+            operation: MongoOperation::Find(filter, options),
         })
     }
 
@@ -120,14 +120,23 @@ trait QueryRawConversionExtension {
 
 impl QueryRawConversionExtension for &PrismaValue {
     fn try_as_bson(&self, arg_name: &str) -> crate::Result<Bson> {
-        let json_str = match self {
-            PrismaValue::Json(json) => Ok(json),
-            x => Err(MongoError::argument_type_mismatch(arg_name, format!("{:?}", x), "Json")),
-        }?;
-        let json: serde_json::Value = serde_json::from_str(json_str.as_str())?;
-        let bson = Bson::try_from(json)?;
+        match self {
+            PrismaValue::Json(json) => {
+                let json: serde_json::Value = serde_json::from_str(json.as_str())?;
+                let bson = Bson::try_from(json)?;
 
-        Ok(bson)
+                Ok(bson)
+            }
+            PrismaValue::List(list) => {
+                let bson = list
+                    .iter()
+                    .map(|pv| pv.try_as_bson(arg_name))
+                    .collect::<crate::Result<Vec<_>>>()?;
+
+                Ok(Bson::Array(bson))
+            }
+            x => Err(MongoError::argument_type_mismatch(arg_name, format!("{:?}", x), "Json")),
+        }
     }
 
     fn try_as_bson_document(&self, arg_name: &str) -> crate::Result<Document> {

@@ -101,8 +101,11 @@ mod raw_mongo {
         );
 
         // Should fail if pipeline is not an array of document
-        assert_error!(runner, aggregate_raw(Some(json!({ "pipeline": [] })), None), 0);
-        assert_error!(runner, aggregate_raw(Some(json!([{ "a": "b" }, 2])), None), 0);
+        assert_error!(
+            runner,
+            aggregate_raw(Some(vec![json!({ "a": "b" }), json!(2)]), None),
+            0
+        );
 
         // Should fail if options is not a document
         assert_error!(runner, aggregate_raw(None, Some(json!([]))), 0);
@@ -117,7 +120,7 @@ mod raw_mongo {
 
         // Should work with pipeline only
         insta::assert_snapshot!(
-          run_query!(runner, aggregate_raw(Some(json!([{ "$project": { "_id": 1 } }])), None)),
+          run_query!(runner, aggregate_raw(Some(vec![json!({ "$project": { "_id": 1 } })]), None)),
           @r###"{"data":{"aggregateTestModelRaw":[{"_id":1},{"_id":2},{"_id":3}]}}"###
         );
 
@@ -129,7 +132,7 @@ mod raw_mongo {
 
         // Should work with options & pipeline
         insta::assert_snapshot!(
-          run_query!(&runner, aggregate_raw(Some(json!([{ "$project": { "_id": 1 } }])), Some(json!({ "unknown_option": true, "allowDiskUse": true })))),
+          run_query!(&runner, aggregate_raw(Some(vec![json!({ "$project": { "_id": 1 } })]), Some(json!({ "unknown_option": true, "allowDiskUse": true })))),
           @r###"{"data":{"aggregateTestModelRaw":[{"_id":1},{"_id":2},{"_id":3}]}}"###
         );
 
@@ -193,11 +196,11 @@ mod raw_mongo {
         Ok(())
     }
 
-    fn find_raw(query: Option<serde_json::Value>, options: Option<serde_json::Value>) -> String {
-        let query = query.map(|q| format!(r#"query: "{}""#, q.to_string().replace("\"", "\\\"")));
+    fn find_raw(filter: Option<serde_json::Value>, options: Option<serde_json::Value>) -> String {
+        let filter = filter.map(|q| format!(r#"filter: "{}""#, q.to_string().replace("\"", "\\\"")));
         let options = options.map(|o| format!(r#"options: "{}""#, o.to_string().replace("\"", "\\\"")));
 
-        match (query, options) {
+        match (filter, options) {
             (None, None) => r#"query { findTestModelRaw }"#.to_string(),
             (q, o) => {
                 format!(
@@ -209,8 +212,13 @@ mod raw_mongo {
         }
     }
 
-    fn aggregate_raw(pipeline: Option<serde_json::Value>, options: Option<serde_json::Value>) -> String {
-        let pipeline = pipeline.map(|p| format!(r#"pipeline: "{}""#, p.to_string().replace("\"", "\\\"")));
+    fn aggregate_raw(pipeline: Option<Vec<serde_json::Value>>, options: Option<serde_json::Value>) -> String {
+        let pipeline = pipeline.map(|p| {
+            p.into_iter()
+                .map(|stage| format!(r#""{}""#, stage.to_string().replace("\"", "\\\"")))
+                .collect::<Vec<_>>()
+        });
+        let pipeline = pipeline.map(|p| format!(r#"pipeline: [{}]"#, p.join(", ")));
         let options = options.map(|o| format!(r#"options: "{}""#, o.to_string().replace("\"", "\\\"")));
 
         match (pipeline, options) {
