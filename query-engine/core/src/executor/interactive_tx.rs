@@ -356,6 +356,14 @@ impl ITXClient {
 pub(crate) struct TransactionProcessManager {
     pub clients: Arc<RwLock<HashMap<TxId, ITXClient>>>,
     send_done: Sender<TxId>,
+    bg_reader_clear: JoinHandle<()>,
+}
+
+impl Drop for TransactionProcessManager {
+    fn drop(&mut self) {
+        debug!("DROPPING TPM");
+        self.bg_reader_clear.abort();
+    }
 }
 
 impl TransactionProcessManager {
@@ -364,7 +372,7 @@ impl TransactionProcessManager {
 
         let (send_done, mut rx) = channel::<TxId>(CHANNEL_SIZE);
         let c = clients.clone();
-        tokio::task::spawn(async move {
+        let handle = tokio::task::spawn(async move {
             loop {
                 if let Some(id) = rx.recv().await {
                     debug!("removing {} from client list", id);
@@ -373,7 +381,11 @@ impl TransactionProcessManager {
             }
         });
 
-        Self { clients, send_done }
+        Self {
+            clients,
+            send_done,
+            bg_reader_clear: handle,
+        }
     }
 
     pub async fn create_tx(&self, query_schema: QuerySchemaRef, tx_id: TxId, value: OpenTx, timeout: Duration) {
