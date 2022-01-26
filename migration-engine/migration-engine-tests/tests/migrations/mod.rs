@@ -1,8 +1,10 @@
 mod advisory_locking;
 mod basic;
+mod db_execute;
 mod defaults;
 mod dev_diagnostic_tests;
 mod diagnose_migration_history_tests;
+mod diff;
 mod drift_summary;
 mod enums;
 mod foreign_keys;

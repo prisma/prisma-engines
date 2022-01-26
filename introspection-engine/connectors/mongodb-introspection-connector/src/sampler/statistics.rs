@@ -157,6 +157,7 @@ impl<'a> Statistics<'a> {
                         arity,
                         documentation,
                         database_name,
+                        default_value: None,
                     });
                 }
             }

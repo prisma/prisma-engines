@@ -105,7 +105,8 @@ pub fn test_connector(attr: TokenStream, input: TokenStream) -> TokenStream {
                     BitFlags::empty() #(| Capabilities::#capabilities)*,
                 ) { return }
 
-                let #arg_name = #arg_type::new(args);
+                #[allow(all)]
+                let mut #arg_name = #arg_type::new(args);
 
                 #body
             }

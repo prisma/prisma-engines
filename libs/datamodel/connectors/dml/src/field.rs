@@ -551,6 +551,9 @@ pub struct CompositeField {
 
     /// Indicates if this field has to be ignored by the Client.
     pub is_ignored: bool,
+
+    /// The default value of this field
+    pub default_value: Option<DefaultValue>,
 }
 
 impl CompositeField {
@@ -563,6 +566,7 @@ impl CompositeField {
             documentation: None,
             is_commented_out: false,
             is_ignored: false,
+            default_value: None,
         }
     }
 }

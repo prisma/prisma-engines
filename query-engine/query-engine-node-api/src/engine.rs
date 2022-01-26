@@ -13,7 +13,7 @@ use std::{
     sync::Arc,
 };
 use tokio::sync::RwLock;
-use tracing::Level;
+use tracing::{warn, Level};
 use tracing_opentelemetry::OpenTelemetrySpanExt;
 
 /// The main engine, that can be cloned between threads when using JavaScript
@@ -100,6 +100,7 @@ pub struct ConstructorOptions {
 
 #[derive(Debug, Deserialize, Default)]
 #[serde(rename_all = "camelCase")]
+#[allow(dead_code)]
 pub struct TelemetryOptions {
     enabled: bool,
     endpoint: Option<String>,
@@ -149,10 +150,12 @@ impl QueryEngine {
 
         let datamodel = EngineDatamodel { ast, raw: datamodel };
 
-        let logger = if telemetry.enabled {
-            ChannelLogger::new_with_telemetry(log_callback, telemetry.endpoint)
-        } else {
-            ChannelLogger::new(&log_level, log_queries, log_callback)
+        // OTEL is not ready (in our Node API code) to production
+        // it will require redoing the logging collector, ignoring it for now
+        let logger = ChannelLogger::new(&log_level, log_queries, log_callback);
+
+        if telemetry.enabled {
+            warn!("Telemetry is not ready for usage yet");
         };
 
         let builder = EngineBuilder {
@@ -269,9 +272,10 @@ impl QueryEngine {
                         let span = tracing::span!(Level::TRACE, "query");
 
                         span.set_parent(cx);
+                        let trace_id = trace.get("traceparent").map(String::from);
 
                         let handler = GraphQlHandler::new(engine.executor(), engine.query_schema());
-                        Ok(handler.handle(query, tx_id.map(TxId::from)).await)
+                        Ok(handler.handle(query, tx_id.map(TxId::from), trace_id).await)
                     })
                     .await
             }

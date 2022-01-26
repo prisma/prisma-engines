@@ -1,8 +1,18 @@
 //! The external facing programmatic API to the migration engine.
 
-use crate::{commands::*, CoreResult};
-use migration_connector::{migrations_directory, MigrationConnector};
-use std::path::Path;
+use crate::{
+    commands::*,
+    json_rpc::types::{
+        ApplyMigrationsInput, ApplyMigrationsOutput, CreateMigrationInput, CreateMigrationOutput,
+        DbExecuteDatasourceType, DbExecuteParams, DevDiagnosticInput, DevDiagnosticOutput, DiffParams, DiffResult,
+        EvaluateDataLossInput, EvaluateDataLossOutput, ListMigrationDirectoriesInput, ListMigrationDirectoriesOutput,
+        MarkMigrationAppliedInput, MarkMigrationAppliedOutput, MarkMigrationRolledBackInput,
+        MarkMigrationRolledBackOutput, SchemaContainer, SchemaPushInput, SchemaPushOutput, UrlContainer,
+    },
+    CoreResult,
+};
+use migration_connector::{migrations_directory, ConnectorError, MigrationConnector};
+use std::{path::Path, sync::Arc};
 use tracing_futures::Instrument;
 
 /// The programmatic, generic, fantastic migration engine API.
@@ -14,17 +24,26 @@ pub trait GenericApi: Send + Sync + 'static {
     /// Apply all the unapplied migrations from the migrations folder.
     async fn apply_migrations(&self, input: &ApplyMigrationsInput) -> CoreResult<ApplyMigrationsOutput>;
 
+    /// Access to the migration connector.
+    fn connector(&self) -> &dyn MigrationConnector;
+
     /// Create the database referenced by Prisma schema that was used to initialize the connector.
     async fn create_database(&self) -> CoreResult<String>;
 
     /// Generate a new migration, based on the provided schema and existing migrations history.
     async fn create_migration(&self, input: &CreateMigrationInput) -> CoreResult<CreateMigrationOutput>;
 
+    /// Send a raw command to the database.
+    async fn db_execute(&self, params: &DbExecuteParams) -> CoreResult<()>;
+
     /// Debugging method that only panics, for CLI tests.
     async fn debug_panic(&self) -> CoreResult<()>;
 
     /// Tells the CLI what to do in `migrate dev`.
     async fn dev_diagnostic(&self, input: &DevDiagnosticInput) -> CoreResult<DevDiagnosticOutput>;
+
+    /// Create a migration between any two sources of database schemas.
+    async fn diff(&self, params: &DiffParams) -> CoreResult<DiffResult>;
 
     /// Drop the database referenced by Prisma schema that was used to initialize the connector.
     async fn drop_database(&self) -> CoreResult<()>;
@@ -66,10 +85,7 @@ pub trait GenericApi: Send + Sync + 'static {
     async fn schema_push(&self, input: &SchemaPushInput) -> CoreResult<SchemaPushOutput>;
 
     /// Set the `ConnectorHost` to use.
-    fn set_host(&mut self, host: Box<dyn migration_connector::ConnectorHost>);
-
-    /// Access to the migration connector.
-    fn connector(&self) -> &dyn MigrationConnector;
+    fn set_host(&mut self, host: Arc<dyn migration_connector::ConnectorHost>);
 }
 
 #[async_trait::async_trait]
@@ -102,6 +118,25 @@ impl<C: MigrationConnector> GenericApi for C {
             .await
     }
 
+    async fn db_execute(&self, params: &DbExecuteParams) -> CoreResult<()> {
+        use std::io::Read;
+
+        let url = match &params.datasource_type {
+            DbExecuteDatasourceType::Url(UrlContainer { url }) => url.to_owned(),
+            DbExecuteDatasourceType::Schema(SchemaContainer { schema: file_path }) => {
+                let mut schema_file = std::fs::File::open(&file_path)
+                    .map_err(|err| ConnectorError::from_source(err, "Opening Prisma schema file."))?;
+                let mut schema_string = String::new();
+                schema_file
+                    .read_to_string(&mut schema_string)
+                    .map_err(|err| ConnectorError::from_source(err, "Reading Prisma schema file."))?;
+                let (_, url, _, _) = crate::parse_configuration(&schema_string)?;
+                url
+            }
+        };
+        self.db_execute(&url, &params.script).await
+    }
+
     async fn debug_panic(&self) -> CoreResult<()> {
         panic!("This is the debugPanic artificial panic")
     }
@@ -119,6 +154,10 @@ impl<C: MigrationConnector> GenericApi for C {
         diagnose_migration_history(input, self)
             .instrument(tracing::info_span!("DiagnoseMigrationHistory"))
             .await
+    }
+
+    async fn diff(&self, params: &DiffParams) -> CoreResult<DiffResult> {
+        crate::commands::diff(params, self).await
     }
 
     async fn drop_database(&self) -> CoreResult<()> {
@@ -188,7 +227,7 @@ impl<C: MigrationConnector> GenericApi for C {
             .await
     }
 
-    fn set_host(&mut self, host: Box<dyn migration_connector::ConnectorHost>) {
+    fn set_host(&mut self, host: Arc<dyn migration_connector::ConnectorHost>) {
         MigrationConnector::set_host(self, host)
     }
 }

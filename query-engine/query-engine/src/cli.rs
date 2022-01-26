@@ -39,7 +39,7 @@ pub enum CliCommand {
 
 impl CliCommand {
     /// Create a CLI command from a `PrismaOpt` instance.
-    pub(crate) fn from_opt(opts: &PrismaOpt) -> crate::PrismaResult<Option<CliCommand>> {
+    pub fn from_opt(opts: &PrismaOpt) -> crate::PrismaResult<Option<CliCommand>> {
         let subcommand = opts.subcommand.as_ref();
         let subcommand = match subcommand {
             Some(cmd) => cmd,
@@ -143,7 +143,9 @@ impl CliCommand {
         let cx = Arc::new(cx);
 
         let handler = GraphQlHandler::new(&*cx.executor, cx.query_schema());
-        let res = handler.handle(serde_json::from_str(&decoded_request)?, None).await;
+        let res = handler
+            .handle(serde_json::from_str(&decoded_request)?, None, None)
+            .await;
         let res = serde_json::to_string(&res).unwrap();
 
         let encoded_response = base64::encode(&res);

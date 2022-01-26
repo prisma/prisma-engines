@@ -65,6 +65,7 @@ impl<'ast> Types<'ast> {
 pub(super) struct CompositeTypeField<'ast> {
     pub(super) r#type: ScalarFieldType,
     pub(super) mapped_name: Option<&'ast str>,
+    pub(super) default: Option<DefaultAttribute<'ast>>,
 }
 
 #[derive(Debug)]
@@ -98,7 +99,7 @@ impl ScalarFieldType {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub(crate) struct DefaultAttribute<'ast> {
     pub(crate) mapped_name: Option<&'ast str>,
     pub(crate) value: &'ast ast::Expression,
@@ -468,10 +469,19 @@ fn detect_alias_cycles(ctx: &mut Context<'_>) {
 fn visit_composite_type<'ast>(ct_id: ast::CompositeTypeId, ct: &'ast ast::CompositeType, ctx: &mut Context<'ast>) {
     for (field_id, ast_field) in ct.iter_fields() {
         match field_type(ast_field, ctx) {
+            Ok(FieldType::Scalar(ScalarFieldType::Alias(_))) => {
+                ctx.push_error(DatamodelError::new_composite_type_validation_error(
+                    "Type aliases are not allowed on composite types. Consider using the resolved type instead."
+                        .to_string(),
+                    ct.name.name.clone(),
+                    ast_field.field_type.span(),
+                ))
+            }
             Ok(FieldType::Scalar(scalar_type)) => {
                 let field = CompositeTypeField {
                     r#type: scalar_type,
                     mapped_name: None,
+                    default: None,
                 };
                 ctx.db.types.composite_type_fields.insert((ct_id, field_id), field);
             }

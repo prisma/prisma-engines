@@ -1,8 +1,6 @@
 use migration_core::{
-    commands::{
-        CreateMigrationOutput, DiagnoseMigrationHistoryInput, DiagnoseMigrationHistoryOutput, DriftDiagnostic,
-        HistoryDiagnostic,
-    },
+    commands::{DiagnoseMigrationHistoryInput, DiagnoseMigrationHistoryOutput, DriftDiagnostic, HistoryDiagnostic},
+    json_rpc::types::CreateMigrationOutput,
     migration_api,
 };
 use migration_engine_tests::test_api::*;

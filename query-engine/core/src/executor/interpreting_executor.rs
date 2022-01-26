@@ -43,10 +43,11 @@ where
         graph: QueryGraph,
         serializer: IrSerializer,
         force_transactions: bool,
+        trace_id: Option<String>,
     ) -> crate::Result<ResponseData> {
         if force_transactions || graph.needs_transaction() {
             let mut tx = conn.start_transaction().await?;
-            let result = Self::execute_on(tx.as_connection_like(), graph, serializer).await;
+            let result = Self::execute_on(tx.as_connection_like(), graph, serializer, trace_id).await;
 
             if result.is_ok() {
                 tx.commit().await?;
@@ -56,7 +57,7 @@ where
 
             result
         } else {
-            Self::execute_on(conn.as_connection_like(), graph, serializer).await
+            Self::execute_on(conn.as_connection_like(), graph, serializer, trace_id).await
         }
     }
 
@@ -66,9 +67,12 @@ where
         conn: &mut dyn ConnectionLike,
         graph: QueryGraph,
         serializer: IrSerializer,
+        trace_id: Option<String>,
     ) -> crate::Result<ResponseData> {
         let interpreter = QueryInterpreter::new(conn);
-        let result = QueryPipeline::new(graph, interpreter, serializer).execute().await;
+        let result = QueryPipeline::new(graph, interpreter, serializer)
+            .execute(trace_id)
+            .await;
 
         result
     }
@@ -116,6 +120,7 @@ where
         tx_id: Option<TxId>,
         operation: Operation,
         query_schema: QuerySchemaRef,
+        trace_id: Option<String>,
     ) -> crate::Result<ResponseData> {
         // Parse, validate, and extract query graph from query document.
         let (query_graph, serializer) = QueryGraphBuilder::new(query_schema).build(operation)?;
@@ -125,10 +130,10 @@ where
             let mut c_tx = self.tx_cache.get_or_err(&tx_id)?;
             let otx = c_tx.as_open()?;
 
-            Self::execute_on(otx.tx.as_connection_like(), query_graph, serializer).await
+            Self::execute_on(otx.tx.as_connection_like(), query_graph, serializer, trace_id).await
         } else {
             let conn = self.connector.get_connection().await?;
-            Self::execute_self_contained(conn, query_graph, serializer, self.force_transactions).await
+            Self::execute_self_contained(conn, query_graph, serializer, self.force_transactions, trace_id).await
         }
     }
 
@@ -151,6 +156,7 @@ where
         operations: Vec<Operation>,
         transactional: bool,
         query_schema: QuerySchemaRef,
+        trace_id: Option<String>,
     ) -> crate::Result<Vec<crate::Result<ResponseData>>> {
         if let Some(tx_id) = tx_id {
             let queries = operations
@@ -165,7 +171,7 @@ where
             let tx = otx.as_connection_like();
 
             for (graph, serializer) in queries {
-                let result = Self::execute_on(tx, graph, serializer).await?;
+                let result = Self::execute_on(tx, graph, serializer, trace_id.clone()).await?;
                 results.push(Ok(result));
             }
 
@@ -181,7 +187,7 @@ where
             let mut results = Vec::with_capacity(queries.len());
 
             for (graph, serializer) in queries {
-                let result = Self::execute_on(tx.as_connection_like(), graph, serializer).await;
+                let result = Self::execute_on(tx.as_connection_like(), graph, serializer, trace_id.clone()).await;
 
                 if result.is_err() {
                     tx.rollback().await?;
@@ -205,6 +211,7 @@ where
                             graph,
                             serializer,
                             self.force_transactions,
+                            trace_id.clone(),
                         )));
                     }
 

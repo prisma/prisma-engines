@@ -13,6 +13,7 @@ pub async fn m2m(
     query: &RelatedRecordsQuery,
     parent_result: Option<&ManyRecords>,
     processor: InMemoryRecordProcessor,
+    trace_id: Option<String>,
 ) -> InterpretationResult<(ManyRecords, Option<Vec<RelAggregationRow>>)> {
     let parent_field = &query.parent_field;
     let child_link_id = parent_field.related_field().linking_fields();
@@ -32,7 +33,9 @@ pub async fn m2m(
         return Ok((ManyRecords::empty(&query.selected_fields), None));
     }
 
-    let ids = tx.get_related_m2m_record_ids(&query.parent_field, &parent_ids).await?;
+    let ids = tx
+        .get_related_m2m_record_ids(&query.parent_field, &parent_ids, trace_id.clone())
+        .await?;
     if ids.is_empty() {
         return Ok((ManyRecords::empty(&query.selected_fields), None));
     }
@@ -69,6 +72,7 @@ pub async fn m2m(
                 args,
                 &query.selected_fields,
                 &query.aggregation_selections,
+                trace_id.clone(),
             )
             .await?
         };
@@ -145,6 +149,7 @@ pub async fn one2m(
     selected_fields: &FieldSelection,
     aggr_selections: Vec<RelAggregationSelection>,
     processor: InMemoryRecordProcessor,
+    trace_id: Option<String>,
 ) -> InterpretationResult<(ManyRecords, Option<Vec<RelAggregationRow>>)> {
     let parent_model_id = parent_field.model().primary_identifier();
     let parent_link_id = parent_field.linking_fields();
@@ -202,8 +207,14 @@ pub async fn one2m(
             Some(existing_filter) => Some(Filter::and(vec![existing_filter, filter])),
             None => Some(filter),
         };
-        tx.get_many_records(&parent_field.related_model(), args, selected_fields, &aggr_selections)
-            .await?
+        tx.get_many_records(
+            &parent_field.related_model(),
+            args,
+            selected_fields,
+            &aggr_selections,
+            trace_id,
+        )
+        .await?
     };
 
     // Inlining is done on the parent, this means that we need to write the primary parent ID

@@ -170,12 +170,13 @@ impl<'conn> QueryInterpreter<'conn> {
         exp: Expression,
         env: Env,
         level: usize,
+        trace_id: Option<String>,
     ) -> BoxFuture<'_, InterpretationResult<ExpressionResult>> {
         match exp {
             Expression::Func { func } => {
                 let expr = func(env.clone());
 
-                Box::pin(async move { self.interpret(expr?, env, level).await })
+                Box::pin(async move { self.interpret(expr?, env, level, trace_id).await })
             }
 
             Expression::Sequence { seq } if seq.is_empty() => Box::pin(async { Ok(ExpressionResult::Empty) }),
@@ -187,7 +188,7 @@ impl<'conn> QueryInterpreter<'conn> {
                     let mut results = Vec::with_capacity(seq.len());
 
                     for expr in seq {
-                        results.push(self.interpret(expr, env.clone(), level + 1).await?);
+                        results.push(self.interpret(expr, env.clone(), level + 1, trace_id.clone()).await?);
                     }
 
                     // Last result gets returned
@@ -206,7 +207,9 @@ impl<'conn> QueryInterpreter<'conn> {
                     for binding in bindings {
                         self.log_line(level + 1, || format!("bind {} ", &binding.name));
 
-                        let result = self.interpret(binding.expr, env.clone(), level + 2).await?;
+                        let result = self
+                            .interpret(binding.expr, env.clone(), level + 2, trace_id.clone())
+                            .await?;
                         inner_env.insert(binding.name, result);
                     }
 
@@ -217,7 +220,7 @@ impl<'conn> QueryInterpreter<'conn> {
                         Expression::Sequence { seq: expressions }
                     };
 
-                    self.interpret(next_expression, inner_env, level + 1).await
+                    self.interpret(next_expression, inner_env, level + 1, trace_id).await
                 })
             }
 
@@ -225,14 +228,16 @@ impl<'conn> QueryInterpreter<'conn> {
                 match *query {
                     Query::Read(read) => {
                         self.log_line(level, || format!("READ {}", read));
-                        Ok(read::execute(self.conn, read, None)
+                        Ok(read::execute(self.conn, read, None, trace_id)
                             .await
                             .map(ExpressionResult::Query)?)
                     }
 
                     Query::Write(write) => {
                         self.log_line(level, || format!("WRITE {}", write));
-                        Ok(write::execute(self.conn, write).await.map(ExpressionResult::Query)?)
+                        Ok(write::execute(self.conn, write, trace_id)
+                            .await
+                            .map(ExpressionResult::Query)?)
                     }
                 }
             }),
@@ -262,9 +267,11 @@ impl<'conn> QueryInterpreter<'conn> {
                 self.log_line(level, || "IF");
 
                 if func() {
-                    self.interpret(Expression::Sequence { seq: then }, env, level + 1).await
+                    self.interpret(Expression::Sequence { seq: then }, env, level + 1, trace_id)
+                        .await
                 } else {
-                    self.interpret(Expression::Sequence { seq: elze }, env, level + 1).await
+                    self.interpret(Expression::Sequence { seq: elze }, env, level + 1, trace_id)
+                        .await
                 }
             }),
 

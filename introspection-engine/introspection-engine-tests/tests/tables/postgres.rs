@@ -201,3 +201,28 @@ async fn introspecting_now_functions(api: &TestApi) -> TestResult {
 
     Ok(())
 }
+
+#[test_connector(tags(CockroachDb))]
+async fn introspecting_json_defaults_on_cockroach(api: &TestApi) -> TestResult {
+    let setup = indoc! {r#"
+       CREATE TABLE "A" (
+           id INTEGER NOT NULL Primary Key,
+           json Json Default '[]'::json,
+           jsonb JsonB Default '{}'::jsonb
+         );
+
+       "#};
+    api.raw_cmd(setup).await;
+
+    let expectation = expect![[r#"
+        model A {
+          id    Int   @id
+          json  Json? @default("[]")
+          jsonb Json? @default("{}")
+        }
+    "#]];
+
+    expectation.assert_eq(&api.introspect_dml().await?);
+
+    Ok(())
+}

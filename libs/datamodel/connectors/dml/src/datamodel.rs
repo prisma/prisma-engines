@@ -42,6 +42,11 @@ impl Datamodel {
         self.models.iter()
     }
 
+    /// Gets an iterator over all composite types.
+    pub fn composite_types(&self) -> std::slice::Iter<CompositeType> {
+        self.composite_types.iter()
+    }
+
     /// Gets an iterator over all enums.
     pub fn enums(&self) -> std::slice::Iter<Enum> {
         self.enums.iter()
@@ -60,6 +65,11 @@ impl Datamodel {
     /// Finds a model by name.
     pub fn find_model(&self, name: &str) -> Option<&Model> {
         self.models().find(|model| model.name == name)
+    }
+
+    /// Finds a composite type by name.
+    pub fn find_composite_type(&self, name: &str) -> Option<&CompositeType> {
+        self.composite_types().find(|composite| composite.name == name)
     }
 
     /// Finds a model by database name. This will only find models with a name

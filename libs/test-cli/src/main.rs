@@ -6,7 +6,7 @@ use anyhow::Context;
 use colored::Colorize;
 use introspection_connector::CompositeTypeDepth;
 use migration_connector::{DestructiveChangeDiagnostics, DiffTarget};
-use migration_core::commands::{ApplyMigrationsInput, CreateMigrationInput, SchemaPushInput};
+use migration_core::json_rpc::types::*;
 use std::{fmt, fs::File, io::Read, str::FromStr};
 use structopt::*;
 
@@ -357,7 +357,7 @@ async fn schema_push(cmd: &SchemaPush) -> anyhow::Result<()> {
             "✔️".bold(),
             format!("Schema pushed to database. ({} steps)", response.executed_steps).green()
         );
-    } else if response.had_no_changes_to_push() {
+    } else if response.unexecutable.is_empty() && response.warnings.is_empty() && response.executed_steps == 0 {
         eprintln!(
             "{}  {}",
             "✔️".bold(),
@@ -384,7 +384,15 @@ async fn migrate_diff(cmd: &MigrateDiff) -> anyhow::Result<()> {
 
     let migration = api
         .connector()
-        .diff(DiffTarget::Database, DiffTarget::Datamodel(&parsed_schema))
+        .diff(
+            DiffTarget::Database(
+                parsed_schema.configuration.datasources[0]
+                    .load_url(|v| std::env::var(v).ok())
+                    .unwrap()
+                    .into(),
+            ),
+            DiffTarget::Datamodel(datamodel.into()),
+        )
         .await?;
 
     match cmd.output_type {

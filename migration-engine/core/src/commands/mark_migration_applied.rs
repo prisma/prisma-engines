@@ -1,24 +1,10 @@
-use crate::{CoreError, CoreResult};
+use crate::{json_rpc::types::*, CoreError, CoreResult};
 use migration_connector::{
     migrations_directory::{error_on_changed_provider, MigrationDirectory},
     MigrationConnector,
 };
-use serde::Deserialize;
-use std::{collections::HashMap, path::Path};
+use std::path::Path;
 use user_facing_errors::migration_engine::{MigrationAlreadyApplied, MigrationToMarkAppliedNotFound};
-
-/// The input to the `markMigrationApplied` command.
-#[derive(Debug, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct MarkMigrationAppliedInput {
-    /// The name of the migration to mark applied.
-    pub migration_name: String,
-    /// The path to the root of the migrations directory.
-    pub migrations_directory_path: String,
-}
-
-/// The output of the `markMigrationApplied` command.
-pub type MarkMigrationAppliedOutput = HashMap<(), ()>;
 
 /// Mark a migration as applied.
 pub async fn mark_migration_applied(
@@ -73,5 +59,5 @@ pub async fn mark_migration_applied(
         .mark_migration_applied(migration_directory.migration_name(), &script)
         .await?;
 
-    Ok(Default::default())
+    Ok(MarkMigrationAppliedOutput {})
 }

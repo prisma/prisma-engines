@@ -1,7 +1,4 @@
-use migration_core::{
-    commands::{EvaluateDataLossInput, EvaluateDataLossOutput},
-    CoreResult, GenericApi,
-};
+use migration_core::{json_rpc::types::*, CoreResult, GenericApi};
 use std::borrow::Cow;
 use tempfile::TempDir;
 
@@ -61,7 +58,7 @@ impl std::fmt::Debug for EvaluateDataLossAssertion<'_> {
 
 impl<'a> EvaluateDataLossAssertion<'a> {
     #[track_caller]
-    pub fn assert_steps_count(self, count: usize) -> Self {
+    pub fn assert_steps_count(self, count: u32) -> Self {
         assert!(
             self.output.migration_steps == count,
             "Assertion failed. Expected evaluateDataLoss to return {} steps, found {}",
@@ -94,7 +91,7 @@ impl<'a> EvaluateDataLossAssertion<'a> {
         self
     }
 
-    pub fn assert_warnings_with_indices(self, warnings: &[(Cow<'_, str>, usize)]) -> Self {
+    pub fn assert_warnings_with_indices(self, warnings: &[(Cow<'_, str>, u32)]) -> Self {
         assert!(
             self.output.warnings.len() == warnings.len(),
             "Expected {} warnings, got {}.\n{:#?}",
@@ -103,7 +100,7 @@ impl<'a> EvaluateDataLossAssertion<'a> {
             self.output.warnings
         );
 
-        let descriptions: Vec<(Cow<'_, str>, usize)> = self
+        let descriptions: Vec<(Cow<'_, str>, u32)> = self
             .output
             .warnings
             .iter()
@@ -136,7 +133,7 @@ impl<'a> EvaluateDataLossAssertion<'a> {
         self
     }
 
-    pub fn assert_unexecutables_with_indices(self, unexecutables: &[(Cow<'_, str>, usize)]) -> Self {
+    pub fn assert_unexecutables_with_indices(self, unexecutables: &[(Cow<'_, str>, u32)]) -> Self {
         assert!(
             self.output.unexecutable_steps.len() == unexecutables.len(),
             "Expected {} unexecutables, got {}.\n{:#?}",
@@ -145,7 +142,7 @@ impl<'a> EvaluateDataLossAssertion<'a> {
             self.output.unexecutable_steps
         );
 
-        let descriptions: Vec<(Cow<'_, str>, usize)> = self
+        let descriptions: Vec<(Cow<'_, str>, u32)> = self
             .output
             .unexecutable_steps
             .iter()

@@ -86,24 +86,31 @@ pub fn error_on_changed_provider(migrations_directory_path: &str, provider: &str
     }
 }
 
-/// Check whether provider matches.
+/// Check whether provider matches. `None` means there was no migration_lock.toml file.
 #[tracing::instrument]
 fn match_provider_in_lock_file(migrations_directory_path: &str, provider: &str) -> Option<Result<(), String>> {
+    read_provider_from_lock_file(migrations_directory_path).map(|found_provider| {
+        if found_provider == provider {
+            Ok(())
+        } else {
+            Err(found_provider)
+        }
+    })
+}
+
+/// Read the provider from the migration_lock.toml. `None` means there was no migration_lock.toml
+/// file in the directory.
+pub fn read_provider_from_lock_file(migrations_directory_path: &str) -> Option<String> {
     let directory_path = Path::new(migrations_directory_path);
     let file_path = directory_path.join("migration_lock.toml");
 
     std::fs::read_to_string(file_path).ok().map(|content| {
-        let found_provider = content
+        content
             .lines()
             .find(|line| line.starts_with("provider"))
             .map(|line| line.trim_start_matches("provider = ").trim_matches('"'))
-            .unwrap_or("<PROVIDER NOT FOUND>");
-
-        if found_provider == provider {
-            Ok(())
-        } else {
-            Err(found_provider.to_owned())
-        }
+            .unwrap_or("<PROVIDER NOT FOUND>")
+            .to_owned()
     })
 }
 

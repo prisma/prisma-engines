@@ -1,6 +1,4 @@
-use migration_core::{
-    commands::MarkMigrationRolledBackInput, commands::MarkMigrationRolledBackOutput, CoreError, CoreResult, GenericApi,
-};
+use migration_core::{json_rpc::types::*, CoreError, CoreResult, GenericApi};
 
 #[must_use = "This struct does nothing on its own. See MarkMigrationRolledBack::send()"]
 pub struct MarkMigrationRolledBack<'a> {

@@ -1,8 +1,8 @@
 use crate::logger::log_error_and_exit;
 use migration_connector::ConnectorError;
-use migration_core::migration_api;
+use migration_core::{datasource_from_database_str, migration_api};
 use structopt::StructOpt;
-use user_facing_errors::common::{InvalidConnectionString, SchemaParserError};
+use user_facing_errors::common::SchemaParserError;
 
 #[derive(Debug, StructOpt)]
 pub(crate) struct Cli {
@@ -64,31 +64,4 @@ fn parse_base64_string(s: &str) -> Result<String, ConnectorError> {
         },
         Err(_) => Ok(String::from(s)),
     }
-}
-
-fn datasource_from_database_str(database_str: &str) -> Result<String, ConnectorError> {
-    let provider = match database_str.split(':').next() {
-        Some("postgres") => "postgresql",
-        Some("file") => "sqlite",
-        Some("mongodb+srv") => "mongodb",
-        Some(other) => other,
-        None => {
-            return Err(ConnectorError::user_facing(InvalidConnectionString {
-                details: String::new(),
-            }))
-        }
-    };
-
-    let schema = format!(
-        r#"
-            datasource db {{
-                provider = "{provider}"
-                url = "{url}"
-            }}
-        "#,
-        provider = provider,
-        url = database_str,
-    );
-
-    Ok(schema)
 }

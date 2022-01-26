@@ -81,8 +81,8 @@ pub static GENERATOR: Lazy<FeatureMap> = Lazy::new(|| {
             FullTextIndex,
             DataProxy,
             ExtendedIndexes,
+            Cockroachdb,
         ])
-        .with_hidden(vec![Cockroachdb])
         .with_deprecated(vec![
             AtomicNumberOperations,
             AggregateApi,

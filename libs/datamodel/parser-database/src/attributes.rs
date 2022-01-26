@@ -40,6 +40,11 @@ fn resolve_composite_type_attributes<'ast>(
             attributes.visit_optional_single("map", ctx, |map_args, ctx| {
                 map::composite_type_field(ct, field, ctid, field_id, &mut ctfield, map_args, ctx);
             });
+
+            // @default
+            attributes.visit_optional_single("default", ctx, |args, ctx| {
+                default::visit_composite_field_default(args, &mut ctfield, ctid, field_id, ctx);
+            });
         });
 
         ctx.db.types.composite_type_fields.insert((ctid, field_id), ctfield);
@@ -194,7 +199,7 @@ fn visit_scalar_field_attributes<'ast>(
 
         // @default
         attributes.visit_optional_single("default", ctx, |args, ctx| {
-            default::visit_field_default(args, scalar_field_data, model_id, field_id, ctx);
+            default::visit_model_field_default(args, scalar_field_data, model_id, field_id, ctx);
         });
 
         if let ScalarFieldType::BuiltInScalar(_scalar_type) = scalar_field_data.r#type {
