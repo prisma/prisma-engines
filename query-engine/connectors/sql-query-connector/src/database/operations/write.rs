@@ -4,7 +4,11 @@ use itertools::Itertools;
 use prisma_models::*;
 use prisma_value::PrismaValue;
 use quaint::error::ErrorKind;
-use std::{collections::HashSet, ops::Deref, usize};
+use std::{
+    collections::{HashMap, HashSet},
+    ops::Deref,
+    usize,
+};
 use tracing::log::trace;
 use user_facing_errors::query_engine::DatabaseConstraint;
 
@@ -311,20 +315,18 @@ pub async fn m2m_disconnect(
 
 /// Execute a plain SQL query with the given parameters, returning the number of
 /// affected rows.
-#[tracing::instrument(skip(conn, query, parameters))]
-pub async fn execute_raw(conn: &dyn QueryExt, query: String, parameters: Vec<PrismaValue>) -> crate::Result<usize> {
-    let value = conn.raw_count(query, parameters).await?;
+#[tracing::instrument(skip(conn, inputs))]
+pub async fn execute_raw(conn: &dyn QueryExt, inputs: HashMap<String, PrismaValue>) -> crate::Result<usize> {
+    let value = conn.raw_count(inputs).await?;
+
     Ok(value)
 }
 
 /// Execute a plain SQL query with the given parameters, returning the answer as
 /// a JSON `Value`.
-#[tracing::instrument(skip(conn, query, parameters))]
-pub async fn query_raw(
-    conn: &dyn QueryExt,
-    query: String,
-    parameters: Vec<PrismaValue>,
-) -> crate::Result<serde_json::Value> {
-    let value = conn.raw_json(query, parameters).await?;
+#[tracing::instrument(skip(conn, inputs))]
+pub async fn query_raw(conn: &dyn QueryExt, inputs: HashMap<String, PrismaValue>) -> crate::Result<serde_json::Value> {
+    let value = conn.raw_json(inputs).await?;
+
     Ok(value)
 }

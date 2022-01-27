@@ -180,7 +180,10 @@ pub enum ErrorKind {
     AuthenticationFailed { user: String },
 
     #[error("Database error. error code: {}, error message: {}", code, message)]
-    RawError { code: String, message: String },
+    RawDatabaseError { code: String, message: String },
+
+    #[error("Raw API error: {0}")]
+    RawApiError(String),
 
     #[error("{}", details)]
     InvalidDatabaseUrl { details: String, url: String },

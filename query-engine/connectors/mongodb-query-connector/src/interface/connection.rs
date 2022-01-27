@@ -1,6 +1,5 @@
 use super::catch;
 use crate::{
-    error::MongoError,
     root_queries::{aggregate, read, write},
     MongoDbTransaction,
 };
@@ -10,6 +9,7 @@ use connector_interface::{
 };
 use mongodb::{ClientSession, Database};
 use prisma_models::{prelude::*, SelectionResult};
+use std::collections::HashMap;
 
 pub struct MongoDbConnection {
     /// The session to use for operations.
@@ -103,20 +103,17 @@ impl WriteOperations for MongoDbConnection {
         .await
     }
 
-    async fn execute_raw(
-        &mut self,
-        _query: String,
-        _parameters: Vec<prisma_value::PrismaValue>,
-    ) -> connector_interface::Result<usize> {
-        Err(MongoError::Unsupported("Raw queries".to_owned()).into_connector_error())
+    async fn execute_raw(&mut self, inputs: HashMap<String, PrismaValue>) -> connector_interface::Result<usize> {
+        catch(async move { write::execute_raw(&self.database, &mut self.session, inputs).await }).await
     }
 
     async fn query_raw(
         &mut self,
-        _query: String,
-        _parameters: Vec<prisma_value::PrismaValue>,
+        model: Option<&ModelRef>,
+        inputs: HashMap<String, PrismaValue>,
+        query_type: Option<String>,
     ) -> connector_interface::Result<serde_json::Value> {
-        Err(MongoError::Unsupported("Raw queries".to_owned()).into_connector_error())
+        catch(async move { write::query_raw(&self.database, &mut self.session, model, inputs, query_type).await }).await
     }
 }
 

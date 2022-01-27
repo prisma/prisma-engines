@@ -3,6 +3,7 @@ use crate::{
     filter::{convert_filter, MongoFilter},
     output_meta,
     query_builder::MongoReadQueryBuilder,
+    root_queries::raw::{MongoCommand, MongoOperation},
     IntoBson,
 };
 use connector_interface::*;
@@ -13,7 +14,7 @@ use mongodb::{
     ClientSession, Collection, Database,
 };
 use prisma_models::{ModelRef, PrismaValue, SelectionResult};
-use std::convert::TryInto;
+use std::{collections::HashMap, convert::TryInto};
 
 /// Create a single record to the database resulting in a
 /// `RecordProjection` as an identifier pointing to the just-created document.
@@ -408,4 +409,60 @@ pub async fn m2m_disconnect<'conn>(
         .await?;
 
     Ok(())
+}
+
+/// Execute raw is not implemented on MongoDB
+pub async fn execute_raw<'conn>(
+    _database: &Database,
+    _session: &mut ClientSession,
+    _inputs: HashMap<String, PrismaValue>,
+) -> crate::Result<usize> {
+    unimplemented!()
+}
+
+/// Execute a plain MongoDB query, returning the answer as a JSON `Value`.
+#[tracing::instrument(skip(database, session, model, inputs, query_type))]
+pub async fn query_raw<'conn>(
+    database: &Database,
+    session: &mut ClientSession,
+    model: Option<&ModelRef>,
+    inputs: HashMap<String, PrismaValue>,
+    query_type: Option<String>,
+) -> crate::Result<serde_json::Value> {
+    let mongo_command = MongoCommand::from_raw_query(model, inputs, query_type)?;
+
+    let json_result = match mongo_command {
+        MongoCommand::Raw { cmd } => {
+            let mut result = database.run_command_with_session(cmd, None, session).await?;
+
+            // Removes unnecessary properties from raw response
+            // See https://docs.mongodb.com/v5.0/reference/method/db.runCommand
+            result.remove("operationTime");
+            result.remove("$clusterTime");
+            result.remove("opTime");
+            result.remove("electionId");
+
+            let json_result: serde_json::Value = Bson::Document(result).into();
+
+            json_result
+        }
+        MongoCommand::Handled { collection, operation } => {
+            let coll = database.collection::<Document>(collection.as_str());
+
+            match operation {
+                MongoOperation::Find(filter, options) => {
+                    let cursor = coll.find_with_session(filter, options, session).await?;
+
+                    raw::cursor_to_json(cursor, session).await?
+                }
+                MongoOperation::Aggregate(pipeline, options) => {
+                    let cursor = coll.aggregate_with_session(pipeline, options, session).await?;
+
+                    raw::cursor_to_json(cursor, session).await?
+                }
+            }
+        }
+    };
+
+    Ok(json_result)
 }
