@@ -149,12 +149,28 @@ pub struct NestedWrite {
 
 impl NestedWrite {
     /// Unfolds nested writes into a flat list of `WriteOperation`s.
-    pub fn unfold<'a>(self, field: &'a Field) -> Vec<(WriteOperation, &'a Field, String)> {
-        self.unfold_impl(field, &mut vec![])
+    ///
+    /// Given the following `NestedWrite`:
+    /// ```rust
+    /// Vec [(
+    ///       "field_a",
+    ///       WriteOperation::Composite(Update(Vec[("field_b", WriteOperation::Composite(Set("3")))]))
+    ///     )]
+    /// ```
+    /// `unfold` will roughly return:
+    /// ```rust
+    /// Vec[(Set("3"), Field("field_b"), "field_a.field_b")]
+    /// ```
+    /// where:
+    ///  - `Set("3")` is the write operation to execute
+    ///  - `Field("field_b")` is the field on which to execute the write operation
+    /// - `"field_a.field_b"` is the path for MongoDB to access the nested field
+    pub fn unfold(self, field: &Field) -> Vec<(WriteOperation, &Field, String)> {
+        self.unfold_internal(field, &mut vec![])
     }
 
-    fn unfold_impl<'a>(self, field: &'a Field, path: &mut Vec<String>) -> Vec<(WriteOperation, &'a Field, String)> {
-        let mut nested_writes: Vec<(WriteOperation, &'a Field, String)> = vec![];
+    fn unfold_internal<'a>(self, field: &'a Field, path: &mut Vec<String>) -> Vec<(WriteOperation, &'a Field, String)> {
+        let mut nested_writes: Vec<(WriteOperation, &Field, String)> = vec![];
 
         for (DatasourceFieldName(db_name), write) in self.writes {
             let nested_field = field
@@ -169,7 +185,7 @@ impl NestedWrite {
                     let mut path = path.clone();
                     path.push(db_name);
 
-                    nested_writes.extend(nested_write.unfold_impl(nested_field, &mut path));
+                    nested_writes.extend(nested_write.unfold_internal(nested_field, &mut path));
                 }
                 _ => {
                     path.push(db_name);
