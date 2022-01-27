@@ -21,7 +21,7 @@ pub fn render_update_docs(
         return Ok(docs.into_iter().flatten().collect_vec());
     };
 
-    let dollar_field_name = format!("${}", field.db_name());
+    let dollar_field_name = format!("${}", field_name);
 
     let doc = match write_expr {
         WriteExpression::Add(rhs) if field.is_list() => match rhs {

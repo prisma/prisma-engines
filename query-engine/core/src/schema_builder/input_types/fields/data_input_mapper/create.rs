@@ -179,7 +179,7 @@ fn composite_create_envelope_object_type(ctx: &mut BuilderContext, cf: &Composit
     Arc::downgrade(&input_object)
 }
 
-fn composite_create_object_type(ctx: &mut BuilderContext, cf: &CompositeFieldRef) -> InputObjectTypeWeakRef {
+pub(crate) fn composite_create_object_type(ctx: &mut BuilderContext, cf: &CompositeFieldRef) -> InputObjectTypeWeakRef {
     // It's called "Create" input because it's used across multiple create-type operations, not only "set".
     let name = format!("{}CreateInput", cf.typ.name);
 

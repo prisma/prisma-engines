@@ -176,7 +176,7 @@ mod create {
 
     // Fails on both the envelope and the actual input type
     #[connector_test]
-    async fn error_when_missing_required_fields(runner: Runner) -> TestResult<()> {
+    async fn fails_when_missing_required_fields(runner: Runner) -> TestResult<()> {
         // Envelope type failure
         assert_error!(
           runner,
@@ -243,7 +243,7 @@ mod update {
           @r###"{"data":{"updateOneTestModel":{"a":{"a_1":"a_1 default","a_2":1337},"b":{"b_field":"b_field default","c":{"c_field":"updated"}}}}}"###
         );
 
-        // Nested empty object
+        // Nested empty object with defaults
         insta::assert_snapshot!(
           run_query!(&runner, r#"mutation { updateOneTestModel(
             where: { id: 1 },
@@ -277,7 +277,7 @@ mod update {
           @r###"{"data":{"updateOneTestModel":{"a":{"a_1":"a_1 default","a_2":1337},"b":{"b_field":"b_field default","c":{"c_field":"updated"}}}}}"###
         );
 
-        // Nested empty object
+        // Nested empty object with defaults
         insta::assert_snapshot!(
           run_query!(&runner, r#"mutation { updateOneTestModel(
             where: { id: 1 },
@@ -316,7 +316,7 @@ mod update {
         insta::assert_snapshot!(
           run_query!(&runner, r#"mutation { updateOneTestModel(
             where: { id: 1 },
-            data: { a: { update: { a_2: 1337 } } }
+            data: { a: { update: { a_2: { increment: 1335 } } } }
           ) { a { a_1 a_2 } b { b_field c { c_field } } } }"#),
           @r###"{"data":{"updateOneTestModel":{"a":{"a_1":"a1","a_2":1337},"b":{"b_field":"b1","c":{"c_field":"c1"}}}}}"###
         );
@@ -325,9 +325,12 @@ mod update {
         insta::assert_snapshot!(
           run_query!(&runner, r#"mutation { updateOneTestModel(
             where: { id: 1 },
-            data: { b: { update: { c: { update: { c_field: "updated" } } } } }
+            data: {
+              a: { update: { a_2: { decrement: 1 } } }
+              b: { update: { c: { update: { c_field: "updated" } } } }
+            }
           ) { a { a_1 a_2 } b { b_field c { c_field } } } }"#),
-          @r###"{"data":{"updateOneTestModel":{"a":{"a_1":"a1","a_2":1337},"b":{"b_field":"b1","c":{"c_field":"updated"}}}}}"###
+          @r###"{"data":{"updateOneTestModel":{"a":{"a_1":"a1","a_2":1336},"b":{"b_field":"b1","c":{"c_field":"updated"}}}}}"###
         );
 
         Ok(())
@@ -365,7 +368,7 @@ mod update {
             }
           }"#,
           2009,
-          "`Mutation.updateOneTestModel.data.TestModelUpdateInput.b.BUpdateEnvelopeInput.set.BSetUpdateInput.c.CCreateInput.update`: Field does not exist on enclosing type."
+          "`Mutation.updateOneTestModel.data.TestModelUpdateInput.b.BUpdateEnvelopeInput.set.BCreateInput.c.CCreateInput.update`: Field does not exist on enclosing type."
         );
 
         assert_error!(
@@ -381,14 +384,14 @@ mod update {
             }
           }"#,
           2009,
-          "`Mutation.updateOneTestModel.data.TestModelUpdateInput.b.BSetUpdateInput.c.CCreateInput.update`: Field does not exist on enclosing type."
+          "`Mutation.updateOneTestModel.data.TestModelUpdateInput.b.BCreateInput.c.CCreateInput.update`: Field does not exist on enclosing type."
         );
 
         Ok(())
     }
 
     #[connector_test]
-    async fn error_when_missing_required_fields(runner: Runner) -> TestResult<()> {
+    async fn fails_when_missing_required_fields(runner: Runner) -> TestResult<()> {
         // Envelope type failure
         assert_error!(
               runner,
@@ -422,7 +425,7 @@ mod update {
                 }
               }"#,
                 2009,
-                "`Mutation.updateOneTestModel.data.TestModelUpdateInput.b.BSetUpdateInput.c`: A value is required but not set."
+                "`Mutation.updateOneTestModel.data.TestModelUpdateInput.b.BCreateInput.c`: A value is required but not set."
             );
 
         // Missing required field on nested `update`

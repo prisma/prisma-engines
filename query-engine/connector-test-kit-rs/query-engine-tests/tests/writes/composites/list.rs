@@ -427,6 +427,38 @@ mod update {
         Ok(())
     }
 
+    #[connector_test]
+    async fn fails_on_nested_update_after_a_set(runner: Runner) -> TestResult<()> {
+        create_test_data(&runner).await?;
+
+        let query = r#"mutation {
+          updateOneTestModel(
+            where: { id: 1 }
+            data: {
+              a: { set: [{ a_1: "updated", a_2: { update: { increment: 3 } }, b: [] }] }
+            }
+          ) { id }
+        }"#;
+
+        // Ensure `update` cannot be used in the Checked type
+        assert_error!(
+          runner,
+          query,
+          2009,
+          "`Mutation.updateOneTestModel.data.TestModelUpdateInput.a.AUpdateEnvelopeInput.set.ACreateInput.a_2`: Value types mismatch. Have: Object({\"update\": Object({\"increment\": Int(3)})}), want: Int"
+        );
+
+        // Ensure `update` cannot be used in the Unchecked type
+        assert_error!(
+          runner,
+          query,
+          2009,
+          "`Mutation.updateOneTestModel.data.TestModelUncheckedUpdateInput.a.AUpdateEnvelopeInput.set.ACreateInput.a_2`: Value types mismatch. Have: Object({\"update\": Object({\"increment\": Int(3)})}), want: Int"
+        );
+
+        Ok(())
+    }
+
     async fn create_test_data(runner: &Runner) -> TestResult<()> {
         create_row(
             runner,

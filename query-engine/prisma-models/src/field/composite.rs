@@ -27,6 +27,10 @@ impl CompositeField {
         matches!(self.arity, FieldArity::Required)
     }
 
+    pub fn is_optional(&self) -> bool {
+        matches!(self.arity, FieldArity::Optional)
+    }
+
     pub fn db_name(&self) -> &str {
         self.db_name.as_deref().unwrap_or_else(|| self.name.as_str())
     }
