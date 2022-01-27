@@ -94,6 +94,12 @@ impl PostgresFlavour {
 #[async_trait::async_trait]
 impl SqlFlavour for PostgresFlavour {
     async fn acquire_lock(&self, connection: &Connection) -> ConnectorResult<()> {
+        // They are not supporting advisory locking:
+        // https://github.com/cockroachdb/cockroach/issues/13546
+        if connection.is_cockroachdb().await? {
+            return Ok(());
+        }
+
         // https://www.postgresql.org/docs/current/explicit-locking.html#ADVISORY-LOCKS
 
         // 72707369 is a unique number we chose to identify Migrate. It does not

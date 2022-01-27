@@ -8,7 +8,9 @@ use quaint::{
     prelude::{ConnectionInfo, Query, Queryable, ResultSet},
     single::Quaint,
 };
-use sql_schema_describer::{DescriberErrorKind, IndexType, SqlSchema, SqlSchemaDescriberBackend};
+use sql_schema_describer::{
+    postgres::Circumstances, DescriberErrorKind, IndexType, SqlSchema, SqlSchemaDescriberBackend,
+};
 use std::sync::Arc;
 use user_facing_errors::{introspection_engine::DatabaseSchemaInconsistent, KnownError};
 
@@ -99,6 +101,16 @@ impl Connection {
         &self.1
     }
 
+    pub(crate) async fn is_cockroachdb(&self) -> ConnectorResult<bool> {
+        let res = self
+            .version()
+            .await?
+            .map(|v| v.contains("CockroachDB"))
+            .unwrap_or(false);
+
+        Ok(res)
+    }
+
     fn queryable(&self) -> &dyn Queryable {
         match &self.0 {
             ConnectionInner::Postgres(pg) => &pg.0,
@@ -114,7 +126,13 @@ impl Connection {
         let connection_info = self.connection_info();
         let mut schema = match connection_info {
             ConnectionInfo::Postgres(_) => {
-                sql_schema_describer::postgres::SqlSchemaDescriber::new(self.queryable(), Default::default())
+                let mut circumstances = BitFlags::empty();
+
+                if self.is_cockroachdb().await? {
+                    circumstances |= Circumstances::Cockroach;
+                }
+
+                sql_schema_describer::postgres::SqlSchemaDescriber::new(self.queryable(), circumstances)
                     .describe(connection_info.schema_name())
                     .await
                     .map_err(|err| match err.into_kind() {
