@@ -66,6 +66,14 @@ impl ParentContainer {
                 .cloned(),
         }
     }
+
+    pub fn is_composite(&self) -> bool {
+        matches!(self, Self::CompositeType(..))
+    }
+
+    pub fn is_model(&self) -> bool {
+        matches!(self, Self::Model(..))
+    }
 }
 
 impl From<&ModelRef> for ParentContainer {

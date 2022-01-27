@@ -162,14 +162,19 @@ impl DataInputFieldMapper for UpdateDataInputFieldMapper {
 fn update_operations_object_type(
     ctx: &mut BuilderContext,
     prefix: &str,
-    field: &ScalarFieldRef,
+    sf: &ScalarFieldRef,
     with_number_operators: bool,
 ) -> InputObjectTypeWeakRef {
-    // Nullability is important for the `set` operation, so we need to
-    // construct and cache different objects to reflect that.
-    let nullable = if field.is_required() { "" } else { "Nullable" };
+    // Different names are required to construct and cache different objects.
+    // - "Nullable" affects the `set` operation (`set` is nullable)
+    // - "NullableComposite" affects the `set` & `unset` operation (`unset` only present when the container is a composite)
+    let null_composite = match (sf.is_required(), sf.container()) {
+        (false, ParentContainer::CompositeType(_)) => "NullableComposite",
+        (false, _) => "Nullable",
+        _ => "",
+    };
     let ident = Identifier::new(
-        format!("{}{}FieldUpdateOperationsInput", nullable, prefix),
+        format!("{}{}FieldUpdateOperationsInput", null_composite, prefix),
         PRISMA_NAMESPACE,
     );
     return_cached_input!(ctx, &ident);
@@ -180,10 +185,15 @@ fn update_operations_object_type(
     let obj = Arc::new(obj);
     ctx.cache_input_type(ident, obj.clone());
 
-    let typ = map_scalar_input_type_for_field(ctx, field);
+    let typ = map_scalar_input_type_for_field(ctx, sf);
     let mut fields = vec![input_field(operations::SET, typ.clone(), None)
         .optional()
-        .nullable_if(!field.is_required())];
+        .nullable_if(!sf.is_required())];
+
+    // Adds the "unset" field for scalars within composite types
+    if sf.container().is_composite() {
+        append_opt(&mut fields, unset_update_input_field(sf.is_required(), sf.is_list()));
+    }
 
     if with_number_operators {
         fields.push(input_field(operations::INCREMENT, typ.clone(), None).optional());
@@ -230,7 +240,7 @@ fn composite_update_envelope_object_type(ctx: &mut BuilderContext, cf: &Composit
 
     append_opt(&mut fields, composite_update_input_field(ctx, cf));
     append_opt(&mut fields, composite_push_update_input_field(ctx, cf));
-    append_opt(&mut fields, composite_unset_update_input_field(cf));
+    append_opt(&mut fields, unset_update_input_field(cf.is_required(), cf.is_list()));
 
     input_object.set_fields(fields);
 

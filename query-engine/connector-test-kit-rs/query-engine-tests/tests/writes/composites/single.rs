@@ -479,6 +479,70 @@ mod update {
     }
 
     #[connector_test]
+    async fn update_unset_explicit(runner: Runner) -> TestResult<()> {
+        create_test_data(&runner).await?;
+
+        // Nested scalar
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"mutation { updateOneTestModel(
+            where: { id: 1 },
+            data: { b: { update: { c: { update: { c_opt: { unset: true } } } } } }
+          ) { a { a_1 a_2 } b { b_field c { c_opt c_field } } } }"#),
+          @r###"{"data":{"updateOneTestModel":{"a":{"a_1":"a1","a_2":2},"b":{"b_field":"b1","c":{"c_opt":null,"c_field":"c1"}}}}}"###
+        );
+
+        // Top-level scalar
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"mutation { updateOneTestModel(
+            where: { id: 1 },
+            data: { a: { update: { a_2: { unset: true } } } }
+          ) { a { a_1 a_2 } b { b_field c { c_field } } } }"#),
+          @r###"{"data":{"updateOneTestModel":{"a":{"a_1":"a1","a_2":null},"b":{"b_field":"b1","c":{"c_field":"c1"}}}}}"###
+        );
+
+        // Top-level composite
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"mutation { updateOneTestModel(
+            where: { id: 1 },
+            data: { b: { unset: true } }
+          ) { a { a_1 a_2 } b { b_field c { c_field } } } }"#),
+          @r###"{"data":{"updateOneTestModel":{"a":{"a_1":"a1","a_2":null},"b":null}}}"###
+        );
+
+        Ok(())
+    }
+
+    // Ensures unset is only available in composite types of type:
+    // - Scalar
+    // - Composite
+    #[connector_test]
+    async fn ensure_unset_unavailable_on_fields(runner: Runner) -> TestResult<()> {
+        create_test_data(&runner).await?;
+    
+        assert_error!(
+            runner,
+            r#"mutation { updateOneTestModel(
+              where: { id: 1 },
+              data: { field: { unset: true } }
+            ) { id }}"#,
+            2009,
+            "Mutation.updateOneTestModel.data.TestModelUpdateInput.field.NullableStringFieldUpdateOperationsInput.unset`: Field does not exist on enclosing type"
+        );
+
+        assert_error!(
+          runner,
+          r#"mutation { updateOneTestModel(
+            where: { id: 1 },
+            data: { a: { update: { a_1: { unset: true } } } }
+          ) { id }}"#,
+          2009,
+          "`Mutation.updateOneTestModel.data.TestModelUncheckedUpdateInput.a.AUpdateEnvelopeInput.update.AUpdateInput.a_1.StringFieldUpdateOperationsInput.unset`: Field does not exist on enclosing type."
+        );
+    
+        Ok(())
+    }
+
+    #[connector_test]
     async fn fails_on_nested_update_after_a_set(runner: Runner) -> TestResult<()> {
         create_test_data(&runner).await?;
 

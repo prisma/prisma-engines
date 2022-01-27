@@ -77,6 +77,10 @@ impl WriteOperation {
         Self::Composite(CompositeWriteOperation::Set(pv))
     }
 
+    pub fn composite_unset(should_unset: bool) -> Self {
+        Self::Composite(CompositeWriteOperation::Unset(should_unset))
+    }
+
     pub fn composite_update(writes: Vec<(DatasourceFieldName, WriteOperation)>) -> Self {
         Self::Composite(CompositeWriteOperation::Update(NestedWrite { writes }))
     }
@@ -138,7 +142,7 @@ pub enum ScalarWriteOperation {
 #[derive(Debug, PartialEq, Clone)]
 pub enum CompositeWriteOperation {
     Set(PrismaValue),
-    Unset,
+    Unset(bool),
     Update(NestedWrite),
 }
 

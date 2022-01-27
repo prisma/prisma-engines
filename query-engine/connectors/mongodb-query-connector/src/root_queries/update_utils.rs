@@ -108,7 +108,16 @@ impl IntoUpdateDocumentExtension for CompositeWriteOperation {
 
                 update_docs
             }
-            CompositeWriteOperation::Unset => todo!(),
+            CompositeWriteOperation::Unset(should_unset) => {
+                let mut docs = Vec::with_capacity(1);
+
+                if should_unset {
+                    docs.push(doc! { "$unset": field_name })
+                }
+
+                docs
+            }
+            CompositeWriteOperation::Push(_) => todo!(),
         };
 
         Ok(docs)
