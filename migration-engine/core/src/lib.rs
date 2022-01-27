@@ -101,14 +101,6 @@ fn parse_configuration(datamodel: &str) -> CoreResult<(Datasource, String, BitFl
         .map(|validated_config| validated_config.subject)
         .map_err(|err| CoreError::new_schema_parser_error(err.to_pretty_string("schema.prisma", datamodel)))?;
 
-    let url = config.datasources[0]
-        .load_url(|key| env::var(key).ok())
-        .map_err(|err| CoreError::new_schema_parser_error(err.to_pretty_string("schema.prisma", datamodel)))?;
-
-    let shadow_database_url = config.datasources[0]
-        .load_shadow_database_url()
-        .map_err(|err| CoreError::new_schema_parser_error(err.to_pretty_string("schema.prisma", datamodel)))?;
-
     let preview_features = config.preview_features();
 
     let source = config
@@ -116,6 +108,14 @@ fn parse_configuration(datamodel: &str) -> CoreResult<(Datasource, String, BitFl
         .into_iter()
         .next()
         .ok_or_else(|| CoreError::from_msg("There is no datasource in the schema.".into()))?;
+
+    let url = source
+        .load_url(|key| env::var(key).ok())
+        .map_err(|err| CoreError::new_schema_parser_error(err.to_pretty_string("schema.prisma", datamodel)))?;
+
+    let shadow_database_url = source
+        .load_shadow_database_url()
+        .map_err(|err| CoreError::new_schema_parser_error(err.to_pretty_string("schema.prisma", datamodel)))?;
 
     Ok((source, url, preview_features, shadow_database_url))
 }

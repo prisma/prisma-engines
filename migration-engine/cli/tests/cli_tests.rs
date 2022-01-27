@@ -24,6 +24,8 @@ impl TestApi {
             rt.block_on(args.create_mysql_database()).1
         } else if args.tags().contains(Tags::Mssql) {
             rt.block_on(args.create_mssql_database()).1
+        } else if args.tags().contains(Tags::Sqlite) {
+            args.database_url().to_owned()
         } else {
             unreachable!()
         }
@@ -38,9 +40,38 @@ impl TestApi {
             .unwrap()
     }
 
+    fn run_raw(&self, args: &[&str]) -> Output {
+        Command::new(self.migration_engine_bin_path())
+            .args(args)
+            .env("RUST_LOG", "INFO")
+            .output()
+            .unwrap()
+    }
+
     fn migration_engine_bin_path(&self) -> &'static str {
         env!("CARGO_BIN_EXE_migration-engine")
     }
+}
+
+#[test_connector(tags(Sqlite))]
+fn test_starting_the_engine_with_empty_schema(api: TestApi) {
+    let tmpdir = tempfile::tempdir().unwrap();
+    let schema_path = tmpdir.path().join("schema.prisma");
+    std::fs::write(&schema_path, "").unwrap();
+    let output = api.run_raw(&["--datamodel", schema_path.to_string_lossy().as_ref()]);
+
+    assert!(!output.status.success(), "{:?}", output);
+    let stderr = String::from_utf8_lossy(&output.stderr);
+    assert!(stderr.contains("no datasource in the schema"), "{:?}", stderr);
+}
+
+#[test_connector(tags(Sqlite))]
+fn test_starting_the_engine_with_no_schema(api: TestApi) {
+    let output = api.run_raw(&[]);
+
+    assert!(!output.status.success(), "{:?}", output);
+    let stderr = String::from_utf8_lossy(&output.stderr);
+    assert!(stderr.contains("Missing --datamodel"), "{:?}", stderr);
 }
 
 #[test_connector(tags(Mysql))]
