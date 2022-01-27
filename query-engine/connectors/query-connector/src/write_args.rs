@@ -151,14 +151,14 @@ impl NestedWrite {
     /// Unfolds nested writes into a flat list of `WriteOperation`s.
     ///
     /// Given the following `NestedWrite`:
-    /// ```rust
+    /// ```text
     /// Vec [(
     ///       "field_a",
     ///       WriteOperation::Composite(Update(Vec[("field_b", WriteOperation::Composite(Set("3")))]))
     ///     )]
     /// ```
     /// `unfold` will roughly return:
-    /// ```rust
+    /// ```text
     /// Vec[(Set("3"), Field("field_b"), "field_a.field_b")]
     /// ```
     /// where:
