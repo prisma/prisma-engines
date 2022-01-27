@@ -233,11 +233,15 @@
 <span id="232">232</span>
 <span id="233">233</span>
 <span id="234">234</span>
+<span id="235">235</span>
+<span id="236">236</span>
+<span id="237">237</span>
+<span id="238">238</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Write query AST</span>
 <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::FilteredQuery</span>;
 <span class="kw">use</span> <span class="ident">connector</span>::{<span class="ident">filter::Filter</span>, <span class="ident">DatasourceFieldName</span>, <span class="ident">RecordFilter</span>, <span class="ident">WriteArgs</span>};
 <span class="kw">use</span> <span class="ident">prisma_models::prelude</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
+<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">collections::HashMap</span>, <span class="ident">sync::Arc</span>};
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">WriteQuery</span> {
@@ -347,8 +351,8 @@
             <span class="ident"><span class="self">Self</span>::DeleteManyRecords</span>(<span class="ident">q</span>) =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;DeleteManyRecords: {}&quot;</span>, <span class="ident">q</span>.<span class="ident">model</span>.<span class="ident">name</span>),
             <span class="ident"><span class="self">Self</span>::ConnectRecords</span>(<span class="kw">_</span>) =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;ConnectRecords&quot;</span>),
             <span class="ident"><span class="self">Self</span>::DisconnectRecords</span>(<span class="kw">_</span>) =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;DisconnectRecords&quot;</span>),
-            <span class="ident"><span class="self">Self</span>::ExecuteRaw</span>(<span class="ident">r</span>) =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;ExecuteRaw: {} ({:?})&quot;</span>, <span class="ident">r</span>.<span class="ident">query</span>, <span class="ident">r</span>.<span class="ident">parameters</span>),
-            <span class="ident"><span class="self">Self</span>::QueryRaw</span>(<span class="ident">r</span>) =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;QueryRaw: {} ({:?})&quot;</span>, <span class="ident">r</span>.<span class="ident">query</span>, <span class="ident">r</span>.<span class="ident">parameters</span>),
+            <span class="ident"><span class="self">Self</span>::ExecuteRaw</span>(<span class="ident">r</span>) =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;ExecuteRaw: {:?}&quot;</span>, <span class="ident">r</span>.<span class="ident">inputs</span>),
+            <span class="ident"><span class="self">Self</span>::QueryRaw</span>(<span class="ident">r</span>) =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;QueryRaw: {:?}&quot;</span>, <span class="ident">r</span>.<span class="ident">inputs</span>),
         }
     }
 }
@@ -419,8 +423,12 @@
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">RawQuery</span> {
-    <span class="kw">pub</span> <span class="ident">query</span>: <span class="ident">String</span>,
-    <span class="kw">pub</span> <span class="ident">parameters</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">PrismaValue</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Model associated with the raw query, if one is necessary</span>
+    <span class="kw">pub</span> <span class="ident">model</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ModelRef</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Map of query arguments and their values</span>
+    <span class="kw">pub</span> <span class="ident">inputs</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">PrismaValue</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Hint as to what kind of query is being executed</span>
+    <span class="kw">pub</span> <span class="ident">query_type</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">FilteredQuery</span> <span class="kw">for</span> <span class="ident">UpdateRecord</span> {

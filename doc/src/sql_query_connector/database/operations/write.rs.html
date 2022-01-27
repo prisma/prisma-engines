@@ -329,13 +329,19 @@
 <span id="328">328</span>
 <span id="329">329</span>
 <span id="330">330</span>
+<span id="331">331</span>
+<span id="332">332</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">error::SqlError</span>, <span class="ident">model_extensions</span>::<span class="kw-2">*</span>, <span class="ident">query_builder::write</span>, <span class="ident">sql_info::SqlInfo</span>, <span class="ident">QueryExt</span>};
 <span class="kw">use</span> <span class="ident">connector_interface</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident">itertools::Itertools</span>;
 <span class="kw">use</span> <span class="ident">prisma_models</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident">prisma_value::PrismaValue</span>;
 <span class="kw">use</span> <span class="ident">quaint::error::ErrorKind</span>;
-<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">collections::HashSet</span>, <span class="ident">ops::Deref</span>, <span class="ident">usize</span>};
+<span class="kw">use</span> <span class="ident">std</span>::{
+    <span class="ident">collections</span>::{<span class="ident">HashMap</span>, <span class="ident">HashSet</span>},
+    <span class="ident">ops::Deref</span>,
+    <span class="ident">usize</span>,
+};
 <span class="kw">use</span> <span class="ident">tracing::log::trace</span>;
 <span class="kw">use</span> <span class="ident">user_facing_errors::query_engine::DatabaseConstraint</span>;
 
@@ -642,21 +648,19 @@
 
 <span class="doccomment">/// Execute a plain SQL query with the given parameters, returning the number of</span>
 <span class="doccomment">/// affected rows.</span>
-<span class="attribute">#[<span class="ident">tracing::instrument</span>(<span class="ident">skip</span>(<span class="ident">conn</span>, <span class="ident">query</span>, <span class="ident">parameters</span>))]</span>
-<span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">execute_raw</span>(<span class="ident">conn</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">QueryExt</span>, <span class="ident">query</span>: <span class="ident">String</span>, <span class="ident">parameters</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">PrismaValue</span><span class="op">&gt;</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="ident">conn</span>.<span class="ident">raw_count</span>(<span class="ident">query</span>, <span class="ident">parameters</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+<span class="attribute">#[<span class="ident">tracing::instrument</span>(<span class="ident">skip</span>(<span class="ident">conn</span>, <span class="ident">inputs</span>))]</span>
+<span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">execute_raw</span>(<span class="ident">conn</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">QueryExt</span>, <span class="ident">inputs</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">PrismaValue</span><span class="op">&gt;</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
+    <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="ident">conn</span>.<span class="ident">raw_count</span>(<span class="ident">inputs</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+
     <span class="prelude-val">Ok</span>(<span class="ident">value</span>)
 }
 
 <span class="doccomment">/// Execute a plain SQL query with the given parameters, returning the answer as</span>
 <span class="doccomment">/// a JSON `Value`.</span>
-<span class="attribute">#[<span class="ident">tracing::instrument</span>(<span class="ident">skip</span>(<span class="ident">conn</span>, <span class="ident">query</span>, <span class="ident">parameters</span>))]</span>
-<span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">query_raw</span>(
-    <span class="ident">conn</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">QueryExt</span>,
-    <span class="ident">query</span>: <span class="ident">String</span>,
-    <span class="ident">parameters</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">PrismaValue</span><span class="op">&gt;</span>,
-) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">serde_json::Value</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="ident">conn</span>.<span class="ident">raw_json</span>(<span class="ident">query</span>, <span class="ident">parameters</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+<span class="attribute">#[<span class="ident">tracing::instrument</span>(<span class="ident">skip</span>(<span class="ident">conn</span>, <span class="ident">inputs</span>))]</span>
+<span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">query_raw</span>(<span class="ident">conn</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">QueryExt</span>, <span class="ident">inputs</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">PrismaValue</span><span class="op">&gt;</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">serde_json::Value</span><span class="op">&gt;</span> {
+    <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="ident">conn</span>.<span class="ident">raw_json</span>(<span class="ident">inputs</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+
     <span class="prelude-val">Ok</span>(<span class="ident">value</span>)
 }
 </code></pre></div>

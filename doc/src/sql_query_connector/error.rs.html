@@ -547,7 +547,7 @@
                         <span class="ident">message</span>: <span class="ident">message</span>.<span class="ident">clone</span>(),
                     },
                 )),
-                <span class="ident">kind</span>: <span class="ident">ErrorKind::RawError</span> { <span class="ident">code</span>, <span class="ident">message</span> },
+                <span class="ident">kind</span>: <span class="ident">ErrorKind::RawDatabaseError</span> { <span class="ident">code</span>, <span class="ident">message</span> },
             },
             <span class="ident">SqlError::ConnectionClosed</span> =&gt; <span class="ident">ConnectorError</span> {
                 <span class="ident">user_facing_error</span>: <span class="prelude-val">Some</span>(<span class="ident">user_facing_errors::KnownError::new</span>(

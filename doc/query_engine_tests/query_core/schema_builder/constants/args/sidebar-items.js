@@ -1,1 +1,1 @@
-initSidebarItems({"constant":[["BY",""],["CREATE",""],["CURSOR",""],["DATA",""],["DISTINCT",""],["HAVING",""],["ORDER_BY",""],["PARAMETERS",""],["QUERY",""],["SKIP",""],["SKIP_DUPLICATES",""],["TAKE",""],["UPDATE",""],["WHERE",""]]});
+initSidebarItems({"constant":[["BY",""],["CREATE",""],["CURSOR",""],["DATA",""],["DISTINCT",""],["HAVING",""],["ORDER_BY",""],["SKIP",""],["SKIP_DUPLICATES",""],["TAKE",""],["UPDATE",""],["WHERE",""]]});

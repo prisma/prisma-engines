@@ -157,9 +157,67 @@
 <span id="156">156</span>
 <span id="157">157</span>
 <span id="158">158</span>
+<span id="159">159</span>
+<span id="160">160</span>
+<span id="161">161</span>
+<span id="162">162</span>
+<span id="163">163</span>
+<span id="164">164</span>
+<span id="165">165</span>
+<span id="166">166</span>
+<span id="167">167</span>
+<span id="168">168</span>
+<span id="169">169</span>
+<span id="170">170</span>
+<span id="171">171</span>
+<span id="172">172</span>
+<span id="173">173</span>
+<span id="174">174</span>
+<span id="175">175</span>
+<span id="176">176</span>
+<span id="177">177</span>
+<span id="178">178</span>
+<span id="179">179</span>
+<span id="180">180</span>
+<span id="181">181</span>
+<span id="182">182</span>
+<span id="183">183</span>
+<span id="184">184</span>
+<span id="185">185</span>
+<span id="186">186</span>
+<span id="187">187</span>
+<span id="188">188</span>
+<span id="189">189</span>
+<span id="190">190</span>
+<span id="191">191</span>
+<span id="192">192</span>
+<span id="193">193</span>
+<span id="194">194</span>
+<span id="195">195</span>
+<span id="196">196</span>
+<span id="197">197</span>
+<span id="198">198</span>
+<span id="199">199</span>
+<span id="200">200</span>
+<span id="201">201</span>
+<span id="202">202</span>
+<span id="203">203</span>
+<span id="204">204</span>
+<span id="205">205</span>
+<span id="206">206</span>
+<span id="207">207</span>
+<span id="208">208</span>
+<span id="209">209</span>
+<span id="210">210</span>
+<span id="211">211</span>
+<span id="212">212</span>
+<span id="213">213</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">connector_interface::error</span>::{<span class="ident">ConnectorError</span>, <span class="ident">ErrorKind</span>, <span class="ident">MultiError</span>};
 <span class="kw">use</span> <span class="ident">itertools::Itertools</span>;
-<span class="kw">use</span> <span class="ident">mongodb::error</span>::{<span class="ident">CommandError</span>, <span class="ident">Error</span> <span class="kw">as</span> <span class="ident">DriverError</span>};
+<span class="kw">use</span> <span class="ident">mongodb</span>::{
+    <span class="ident">bson</span>::{<span class="self">self</span>, <span class="ident">extjson</span>},
+    <span class="ident">error</span>::{<span class="ident">CommandError</span>, <span class="ident">Error</span> <span class="kw">as</span> <span class="ident">DriverError</span>},
+};
 <span class="kw">use</span> <span class="ident">regex::Regex</span>;
 <span class="kw">use</span> <span class="ident">thiserror::Error</span>;
 <span class="kw">use</span> <span class="ident">user_facing_errors::query_engine::DatabaseConstraint</span>;
@@ -172,6 +230,10 @@
     <span class="doccomment">/// Generic conversion error.</span>
     <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Failed to convert &#39;{}&#39; to &#39;{}&#39;.&quot;</span>, <span class="ident">from</span>, <span class="ident">to</span>)]</span>
     <span class="ident">ConversionError</span> { <span class="ident">from</span>: <span class="ident">String</span>, <span class="ident">to</span>: <span class="ident">String</span> },
+
+    <span class="doccomment">/// Unhandled behavior error.</span>
+    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Unhandled behavior: {0}.&quot;</span>)]</span>
+    <span class="ident">UnhandledError</span>(<span class="ident">String</span>),
 
     <span class="doccomment">/// ObjectID specific conversion error.</span>
     <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Malformed ObjectID: {0}.&quot;</span>)]</span>
@@ -186,14 +248,48 @@
 
     <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;{0}&quot;</span>)]</span>
     <span class="ident">JsonError</span>(<span class="attribute">#[<span class="ident">from</span>]</span> <span class="ident">serde_json::Error</span>),
+
+    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;{0}&quot;</span>)]</span>
+    <span class="ident">BsonDeserializationError</span>(<span class="attribute">#[<span class="ident">from</span>]</span> <span class="ident">bson::de::Error</span>),
+
+    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Missing required argument: &#39;{}&#39;.&quot;</span>, <span class="ident">argument</span>)]</span>
+    <span class="ident">MissingRequiredArgumentError</span> { <span class="ident">argument</span>: <span class="ident">String</span> },
+
+    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Argument type mismatch for &#39;{}&#39;. Have: {:?}, want: {}.&quot;</span>, <span class="ident">argument</span>, <span class="ident">have</span>, <span class="ident">want</span>)]</span>
+    <span class="ident">ArgumentTypeMismatchError</span> {
+        <span class="ident">argument</span>: <span class="ident">String</span>,
+        <span class="ident">have</span>: <span class="ident">String</span>,
+        <span class="ident">want</span>: <span class="ident">String</span>,
+    },
 }
 
 <span class="kw">impl</span> <span class="ident">MongoError</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">argument_type_mismatch</span>(<span class="ident">argument</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">have</span>: <span class="ident">String</span>, <span class="ident">want</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="self">Self</span> {
+        <span class="ident"><span class="self">Self</span>::ArgumentTypeMismatchError</span> {
+            <span class="ident">argument</span>: <span class="ident">argument</span>.<span class="ident">to_string</span>(),
+            <span class="ident">have</span>,
+            <span class="ident">want</span>: <span class="ident">want</span>.<span class="ident">to_string</span>(),
+        }
+    }
+
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_connector_error</span>(<span class="self">self</span>) -&gt; <span class="ident">ConnectorError</span> {
         <span class="kw">match</span> <span class="self">self</span> {
             <span class="ident">MongoError::Unsupported</span>(<span class="ident">feature</span>) =&gt; <span class="ident">ConnectorError::from_kind</span>(<span class="ident">ErrorKind::UnsupportedFeature</span>(<span class="ident">feature</span>)),
+            <span class="ident">MongoError::UnhandledError</span>(<span class="ident">reason</span>) =&gt; <span class="ident">ConnectorError::from_kind</span>(<span class="ident">ErrorKind::RawApiError</span>(<span class="ident">reason</span>)),
             <span class="ident">MongoError::UuidError</span>(<span class="ident">err</span>) =&gt; <span class="ident">ConnectorError::from_kind</span>(<span class="ident">ErrorKind::ConversionError</span>(<span class="ident">err</span>.<span class="ident">into</span>())),
             <span class="ident">MongoError::JsonError</span>(<span class="ident">err</span>) =&gt; <span class="ident">ConnectorError::from_kind</span>(<span class="ident">ErrorKind::ConversionError</span>(<span class="ident">err</span>.<span class="ident">into</span>())),
+            <span class="ident">MongoError::BsonDeserializationError</span>(<span class="ident">err</span>) =&gt; {
+                <span class="ident">ConnectorError::from_kind</span>(<span class="ident">ErrorKind::ConversionError</span>(<span class="ident">err</span>.<span class="ident">into</span>()))
+            }
+            <span class="ident">MongoError::MissingRequiredArgumentError</span> { <span class="ident">argument</span> } =&gt; <span class="ident">ConnectorError::from_kind</span>(<span class="ident">ErrorKind::RawApiError</span>(
+                <span class="macro">format!</span>(<span class="string">&quot;Missing required argument: &#39;{}&#39;.&quot;</span>, <span class="ident">argument</span>),
+            )),
+            <span class="ident">MongoError::ArgumentTypeMismatchError</span> { <span class="ident">argument</span>, <span class="ident">have</span>, <span class="ident">want</span> } =&gt; {
+                <span class="ident">ConnectorError::from_kind</span>(<span class="ident">ErrorKind::RawApiError</span>(<span class="macro">format!</span>(
+                    <span class="string">&quot;Argument type mismatch for &#39;{}&#39;. Have: {}, want: {}.&quot;</span>,
+                    <span class="ident">argument</span>, <span class="ident">have</span>, <span class="ident">want</span>
+                )))
+            }
 
             <span class="ident">err</span> @ <span class="ident">MongoError::ConversionError</span> { .. } =&gt; {
                 <span class="ident">ConnectorError::from_kind</span>(<span class="ident">ErrorKind::ConversionError</span>(<span class="ident">err</span>.<span class="ident">into</span>()))
@@ -220,7 +316,7 @@
                 <span class="ident">mongodb::error::ErrorKind::Write</span>(<span class="ident">write_failure</span>) =&gt; <span class="kw">match</span> <span class="ident">write_failure</span> {
                     <span class="ident">mongodb::error::WriteFailure::WriteConcernError</span>(<span class="ident">concern_error</span>) =&gt; <span class="kw">match</span> <span class="ident">concern_error</span>.<span class="ident">code</span> {
                         <span class="number">11000</span> =&gt; <span class="ident">ConnectorError::from_kind</span>(<span class="ident">unique_violation_error</span>(<span class="ident">concern_error</span>.<span class="ident">message</span>.<span class="ident">as_str</span>())),
-                        <span class="ident">code</span> =&gt; <span class="ident">ConnectorError::from_kind</span>(<span class="ident">ErrorKind::RawError</span> {
+                        <span class="ident">code</span> =&gt; <span class="ident">ConnectorError::from_kind</span>(<span class="ident">ErrorKind::RawDatabaseError</span> {
                             <span class="ident">code</span>: <span class="ident">code</span>.<span class="ident">to_string</span>(),
                             <span class="ident">message</span>: <span class="ident">concern_error</span>.<span class="ident">message</span>.<span class="ident">clone</span>(),
                         }),
@@ -228,7 +324,7 @@
 
                     <span class="ident">mongodb::error::WriteFailure::WriteError</span>(<span class="ident">write_error</span>) =&gt; <span class="kw">match</span> <span class="ident">write_error</span>.<span class="ident">code</span> {
                         <span class="number">11000</span> =&gt; <span class="ident">ConnectorError::from_kind</span>(<span class="ident">unique_violation_error</span>(<span class="ident">write_error</span>.<span class="ident">message</span>.<span class="ident">as_str</span>())),
-                        <span class="ident">code</span> =&gt; <span class="ident">ConnectorError::from_kind</span>(<span class="ident">ErrorKind::RawError</span> {
+                        <span class="ident">code</span> =&gt; <span class="ident">ConnectorError::from_kind</span>(<span class="ident">ErrorKind::RawDatabaseError</span> {
                             <span class="ident">code</span>: <span class="ident">code</span>.<span class="ident">to_string</span>(),
                             <span class="ident">message</span>: <span class="ident">write_error</span>.<span class="ident">message</span>.<span class="ident">clone</span>(),
                         }),
@@ -243,7 +339,7 @@
                             .<span class="ident">iter</span>()
                             .<span class="ident">map</span>(<span class="op">|</span><span class="ident">err</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">err</span>.<span class="ident">code</span> {
                                 <span class="number">11000</span> =&gt; <span class="ident">unique_violation_error</span>(<span class="ident">err</span>.<span class="ident">message</span>.<span class="ident">as_str</span>()),
-                                <span class="kw">_</span> =&gt; <span class="ident">ErrorKind::RawError</span> {
+                                <span class="kw">_</span> =&gt; <span class="ident">ErrorKind::RawDatabaseError</span> {
                                     <span class="ident">code</span>: <span class="ident">err</span>.<span class="ident">code</span>.<span class="ident">to_string</span>(),
                                     <span class="ident">message</span>: <span class="macro">format!</span>(
                                         <span class="string">&quot;Bulk write error on write index &#39;{}&#39;: {}&quot;</span>,
@@ -259,7 +355,7 @@
                     <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">err</span>) <span class="op">=</span> <span class="ident">err</span>.<span class="ident">write_concern_error</span> {
                         <span class="kw">let</span> <span class="ident">kind</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">err</span>.<span class="ident">code</span> {
                             <span class="number">11000</span> =&gt; <span class="ident">unique_violation_error</span>(<span class="ident">err</span>.<span class="ident">message</span>.<span class="ident">as_str</span>()),
-                            <span class="kw">_</span> =&gt; <span class="ident">ErrorKind::RawError</span> {
+                            <span class="kw">_</span> =&gt; <span class="ident">ErrorKind::RawDatabaseError</span> {
                                 <span class="ident">code</span>: <span class="ident">err</span>.<span class="ident">code</span>.<span class="ident">to_string</span>(),
                                 <span class="ident">message</span>: <span class="macro">format!</span>(<span class="string">&quot;Bulk write concern error: {}&quot;</span>, <span class="ident">err</span>.<span class="ident">message</span>),
                             },
@@ -283,7 +379,7 @@
                     <span class="ident">ErrorKind::InternalConversionError</span>(<span class="macro">format!</span>(<span class="string">&quot;BSON encode error: {}&quot;</span>, <span class="ident">err</span>)),
                 ),
 
-                <span class="kw">_</span> =&gt; <span class="ident">ConnectorError::from_kind</span>(<span class="ident">ErrorKind::RawError</span> {
+                <span class="kw">_</span> =&gt; <span class="ident">ConnectorError::from_kind</span>(<span class="ident">ErrorKind::RawDatabaseError</span> {
                     <span class="ident">code</span>: <span class="string">&quot;unknown&quot;</span>.<span class="ident">to_owned</span>(),
                     <span class="ident">message</span>: <span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">err</span>),
                 }),
@@ -313,6 +409,20 @@
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">mongodb::bson::oid::Error</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">MongoError</span> {
     <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">err</span>: <span class="ident">mongodb::bson::oid::Error</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">MongoError::MalformedObjectId</span>(<span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">err</span>))
+    }
+}
+
+<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">extjson::de::Error</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">MongoError</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">err</span>: <span class="ident">extjson::de::Error</span>) -&gt; <span class="self">Self</span> {
+        <span class="kw">match</span> <span class="ident">err</span> {
+            <span class="ident">extjson::de::Error::InvalidObjectId</span>(<span class="ident">oid_err</span>) =&gt; <span class="ident">oid_err</span>.<span class="ident">into</span>(),
+            <span class="ident">extjson::de::Error::DeserializationError</span> { <span class="ident">message</span>: <span class="kw">_</span> } =&gt; <span class="ident">MongoError::ConversionError</span> {
+                <span class="ident">from</span>: <span class="string">&quot;JSON&quot;</span>.<span class="ident">to_string</span>(),
+                <span class="ident">to</span>: <span class="string">&quot;BSON&quot;</span>.<span class="ident">to_string</span>(),
+            },
+            <span class="comment">// Needed because `extjson::de::Error` is flagged as #[non_exhaustive]</span>
+            <span class="ident">err</span> =&gt; <span class="ident">MongoError::UnhandledError</span>(<span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="ident">err</span>)),
+        }
     }
 }
 </code></pre></div>

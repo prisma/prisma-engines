@@ -238,6 +238,9 @@
 <span id="237">237</span>
 <span id="238">238</span>
 <span id="239">239</span>
+<span id="240">240</span>
+<span id="241">241</span>
+<span id="242">242</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::fmt::Display</span>;
 
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::filter::Filter</span>;
@@ -420,7 +423,10 @@
     <span class="ident">AuthenticationFailed</span> { <span class="ident">user</span>: <span class="ident">String</span> },
 
     <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Database error. error code: {}, error message: {}&quot;</span>, <span class="ident">code</span>, <span class="ident">message</span>)]</span>
-    <span class="ident">RawError</span> { <span class="ident">code</span>: <span class="ident">String</span>, <span class="ident">message</span>: <span class="ident">String</span> },
+    <span class="ident">RawDatabaseError</span> { <span class="ident">code</span>: <span class="ident">String</span>, <span class="ident">message</span>: <span class="ident">String</span> },
+
+    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Raw API error: {0}&quot;</span>)]</span>
+    <span class="ident">RawApiError</span>(<span class="ident">String</span>),
 
     <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">details</span>)]</span>
     <span class="ident">InvalidDatabaseUrl</span> { <span class="ident">details</span>: <span class="ident">String</span>, <span class="ident">url</span>: <span class="ident">String</span> },

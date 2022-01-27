@@ -152,6 +152,7 @@
 <span id="151">151</span>
 <span id="152">152</span>
 <span id="153">153</span>
+<span id="154">154</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">fmt</span>, <span class="ident">str::FromStr</span>};
 
 <span class="doccomment">/// Not all Databases are created equal. Hence connectors for our datasources support different capabilities.</span>
@@ -232,7 +233,8 @@
     <span class="ident">JsonFilteringAlphanumeric</span>,
     <span class="ident">CompoundIds</span>,
     <span class="ident">AnyId</span>, <span class="comment">// Any (or combination of) uniques and not only id fields can constitute an id for a model.</span>
-    <span class="ident">QueryRaw</span>,
+    <span class="ident">SqlQueryRaw</span>,
+    <span class="ident">MongoDbQueryRaw</span>,
     <span class="ident">FullTextSearchWithoutIndex</span>,
     <span class="ident">FullTextSearchWithIndex</span>,
     <span class="ident">AdvancedJsonNullability</span>, <span class="comment">// Database distinguishes between their null type and JSON null.</span>
