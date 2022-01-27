@@ -255,14 +255,6 @@
         .<span class="ident">map</span>(<span class="op">|</span><span class="ident">validated_config</span><span class="op">|</span> <span class="ident">validated_config</span>.<span class="ident">subject</span>)
         .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">err</span><span class="op">|</span> <span class="ident">CoreError::new_schema_parser_error</span>(<span class="ident">err</span>.<span class="ident">to_pretty_string</span>(<span class="string">&quot;schema.prisma&quot;</span>, <span class="ident">datamodel</span>)))<span class="question-mark">?</span>;
 
-    <span class="kw">let</span> <span class="ident">url</span> <span class="op">=</span> <span class="ident">config</span>.<span class="ident">datasources</span>[<span class="number">0</span>]
-        .<span class="ident">load_url</span>(<span class="op">|</span><span class="ident">key</span><span class="op">|</span> <span class="ident">env::var</span>(<span class="ident">key</span>).<span class="ident">ok</span>())
-        .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">err</span><span class="op">|</span> <span class="ident">CoreError::new_schema_parser_error</span>(<span class="ident">err</span>.<span class="ident">to_pretty_string</span>(<span class="string">&quot;schema.prisma&quot;</span>, <span class="ident">datamodel</span>)))<span class="question-mark">?</span>;
-
-    <span class="kw">let</span> <span class="ident">shadow_database_url</span> <span class="op">=</span> <span class="ident">config</span>.<span class="ident">datasources</span>[<span class="number">0</span>]
-        .<span class="ident">load_shadow_database_url</span>()
-        .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">err</span><span class="op">|</span> <span class="ident">CoreError::new_schema_parser_error</span>(<span class="ident">err</span>.<span class="ident">to_pretty_string</span>(<span class="string">&quot;schema.prisma&quot;</span>, <span class="ident">datamodel</span>)))<span class="question-mark">?</span>;
-
     <span class="kw">let</span> <span class="ident">preview_features</span> <span class="op">=</span> <span class="ident">config</span>.<span class="ident">preview_features</span>();
 
     <span class="kw">let</span> <span class="ident">source</span> <span class="op">=</span> <span class="ident">config</span>
@@ -270,6 +262,14 @@
         .<span class="ident">into_iter</span>()
         .<span class="ident">next</span>()
         .<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">CoreError::from_msg</span>(<span class="string">&quot;There is no datasource in the schema.&quot;</span>.<span class="ident">into</span>()))<span class="question-mark">?</span>;
+
+    <span class="kw">let</span> <span class="ident">url</span> <span class="op">=</span> <span class="ident">source</span>
+        .<span class="ident">load_url</span>(<span class="op">|</span><span class="ident">key</span><span class="op">|</span> <span class="ident">env::var</span>(<span class="ident">key</span>).<span class="ident">ok</span>())
+        .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">err</span><span class="op">|</span> <span class="ident">CoreError::new_schema_parser_error</span>(<span class="ident">err</span>.<span class="ident">to_pretty_string</span>(<span class="string">&quot;schema.prisma&quot;</span>, <span class="ident">datamodel</span>)))<span class="question-mark">?</span>;
+
+    <span class="kw">let</span> <span class="ident">shadow_database_url</span> <span class="op">=</span> <span class="ident">source</span>
+        .<span class="ident">load_shadow_database_url</span>()
+        .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">err</span><span class="op">|</span> <span class="ident">CoreError::new_schema_parser_error</span>(<span class="ident">err</span>.<span class="ident">to_pretty_string</span>(<span class="string">&quot;schema.prisma&quot;</span>, <span class="ident">datamodel</span>)))<span class="question-mark">?</span>;
 
     <span class="prelude-val">Ok</span>((<span class="ident">source</span>, <span class="ident">url</span>, <span class="ident">preview_features</span>, <span class="ident">shadow_database_url</span>))
 }
