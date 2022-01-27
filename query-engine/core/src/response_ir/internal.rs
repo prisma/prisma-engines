@@ -308,7 +308,6 @@ fn serialize_objects(
             model
                 .fields()
                 .find_from_all_by_db_name(f)
-                // .map(|x| x.name().to_owned())
                 .ok()
         })
         .collect();

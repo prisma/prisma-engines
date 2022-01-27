@@ -405,18 +405,6 @@ fn read_composite_value(bson: Bson, meta: &CompositeOutputMeta) -> crate::Result
                     }
                 }
 
-                // for (field, bson) in doc {
-                //     match meta.inner.get(&field) {
-                //         Some(meta) => {
-                //             let value = value_from_bson(bson, meta)?;
-                //             pairs.push((field, value))
-                //         }
-                //         None => {
-                //             trace!("Warning: Found extra field '{}', skipping.", field);
-                //         }
-                //     }
-                // }
-
                 PrismaValue::Object(pairs)
             }
             bson => {

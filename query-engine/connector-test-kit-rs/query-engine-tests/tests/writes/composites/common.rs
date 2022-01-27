@@ -42,7 +42,7 @@ mod common {
         Ok(())
     }
 
-    /// Asserts that all required types that are expected to work on composites do indeed work.
+    /// Asserts that all optional types that are expected to work on composites do indeed work.
     #[connector_test]
     async fn all_optional_types_work(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
