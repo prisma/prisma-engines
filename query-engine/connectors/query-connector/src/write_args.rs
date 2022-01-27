@@ -166,7 +166,7 @@ impl NestedWrite {
     ///  - `Field("field_b")` is the field on which to execute the write operation
     /// - `"field_a.field_b"` is the path for MongoDB to access the nested field
     pub fn unfold(self, field: &Field) -> Vec<(WriteOperation, &Field, String)> {
-        self.unfold_internal(field, &mut vec![])
+        self.unfold_internal(field, &mut vec![field.db_name().to_owned()])
     }
 
     fn unfold_internal<'a>(self, field: &'a Field, path: &mut Vec<String>) -> Vec<(WriteOperation, &'a Field, String)> {
