@@ -24,7 +24,7 @@ use pair::Pair;
 use quaint::prelude::ConnectionInfo;
 use sql_migration::{DropUserDefinedType, DropView, SqlMigration, SqlMigrationStep};
 use sql_schema_describer::{walkers::SqlSchemaExt, ColumnId, SqlSchema, TableId};
-use std::env;
+use std::{env, sync::Arc};
 use user_facing_errors::KnownError;
 
 /// The top-level SQL migration connector.
@@ -35,7 +35,7 @@ pub struct SqlMigrationConnector {
     flavour: Box<dyn SqlFlavour + Send + Sync + 'static>,
     shadow_database_connection_string: Option<String>,
     preview_features: BitFlags<PreviewFeature>,
-    host: Box<dyn ConnectorHost>,
+    host: Arc<dyn ConnectorHost>,
 }
 
 impl SqlMigrationConnector {
@@ -59,7 +59,7 @@ impl SqlMigrationConnector {
             flavour,
             shadow_database_connection_string,
             preview_features,
-            host: Box::new(EmptyHost),
+            host: Arc::new(EmptyHost),
         })
     }
 
@@ -203,17 +203,27 @@ impl SqlMigrationConnector {
 
     async fn sql_schema_from_diff_target(&self, target: &DiffTarget<'_>) -> ConnectorResult<SqlSchema> {
         match target {
-            DiffTarget::Datamodel(schema) => Ok(sql_schema_calculator::calculate_sql_schema(
-                schema,
-                self.flavour.as_ref(),
-            )),
-            DiffTarget::Migrations(migrations) => {
-                let conn = self.conn().await?;
-                self.flavour()
-                    .sql_schema_from_migration_history(migrations, conn, self)
-                    .await
+            DiffTarget::Datamodel(schema) => {
+                let ast = datamodel::parse_schema_ast(schema).map_err(|err| {
+                    ConnectorError::new_schema_parser_error(err.to_pretty_string("schema.prisma", schema))
+                })?;
+                let schema =
+                    datamodel::parse_schema_parserdb(schema, &ast).map_err(ConnectorError::new_schema_parser_error)?;
+                Ok(sql_schema_calculator::calculate_sql_schema(
+                    &schema,
+                    self.flavour.as_ref(),
+                ))
             }
-            DiffTarget::Database => self.describe_schema().await,
+            DiffTarget::Migrations(migrations) => {
+                self.flavour().sql_schema_from_migration_history(migrations, self).await
+            }
+            DiffTarget::Database(url) => {
+                if *url == self.connection_string {
+                    self.describe_schema().await
+                } else {
+                    connect(url).await?.describe_schema(self.preview_features).await
+                }
+            }
             DiffTarget::Empty => Ok(SqlSchema::empty()),
         }
     }
@@ -221,7 +231,7 @@ impl SqlMigrationConnector {
 
 #[async_trait::async_trait]
 impl MigrationConnector for SqlMigrationConnector {
-    fn set_host(&mut self, host: Box<dyn migration_connector::ConnectorHost>) {
+    fn set_host(&mut self, host: Arc<dyn migration_connector::ConnectorHost>) {
         self.host = host;
     }
 
@@ -234,9 +244,17 @@ impl MigrationConnector for SqlMigrationConnector {
         self.flavour().acquire_lock(conn).await
     }
 
+    fn connection_string(&self) -> &str {
+        &self.connection_string
+    }
+
     async fn ensure_connection_validity(&self) -> ConnectorResult<()> {
         let conn = self.conn().await?;
         self.flavour().ensure_connection_validity(conn).await
+    }
+
+    fn host(&self) -> &Arc<dyn ConnectorHost> {
+        &self.host
     }
 
     async fn version(&self) -> ConnectorResult<String> {
@@ -269,6 +287,11 @@ impl MigrationConnector for SqlMigrationConnector {
 
         let added_columns_with_virtual_defaults: Vec<(TableId, ColumnId)> =
             if let Some(next_datamodel) = to.as_datamodel() {
+                let ast = datamodel::parse_schema_ast(next_datamodel).map_err(|err| {
+                    ConnectorError::new_schema_parser_error(err.to_pretty_string("schema.prisma", next_datamodel))
+                })?;
+                let schema = datamodel::parse_schema_parserdb(next_datamodel, &ast)
+                    .map_err(ConnectorError::new_schema_parser_error)?;
                 walk_added_columns(&steps)
                     .map(|(table_index, column_index)| {
                         let table = next_schema.table_walker_at(table_index);
@@ -277,7 +300,7 @@ impl MigrationConnector for SqlMigrationConnector {
                         (table, column)
                     })
                     .filter(|(table, column)| {
-                        next_datamodel
+                        schema
                             .db
                             .walk_models()
                             .find(|model| model.database_name() == table.name())
@@ -352,9 +375,8 @@ impl MigrationConnector for SqlMigrationConnector {
 
     #[tracing::instrument(skip(self, migrations))]
     async fn validate_migrations(&self, migrations: &[MigrationDirectory]) -> ConnectorResult<()> {
-        let conn = self.conn().await?;
         self.flavour()
-            .sql_schema_from_migration_history(migrations, conn, self)
+            .sql_schema_from_migration_history(migrations, self)
             .await?;
 
         Ok(())

@@ -384,7 +384,15 @@ async fn migrate_diff(cmd: &MigrateDiff) -> anyhow::Result<()> {
 
     let migration = api
         .connector()
-        .diff(DiffTarget::Database, DiffTarget::Datamodel(&parsed_schema))
+        .diff(
+            DiffTarget::Database(
+                parsed_schema.configuration.datasources[0]
+                    .load_url(|v| std::env::var(v).ok())
+                    .unwrap()
+                    .into(),
+            ),
+            DiffTarget::Datamodel(datamodel.into()),
+        )
         .await?;
 
     match cmd.output_type {

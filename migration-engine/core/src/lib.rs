@@ -101,14 +101,6 @@ fn parse_configuration(datamodel: &str) -> CoreResult<(Datasource, String, BitFl
         .map(|validated_config| validated_config.subject)
         .map_err(|err| CoreError::new_schema_parser_error(err.to_pretty_string("schema.prisma", datamodel)))?;
 
-    let url = config.datasources[0]
-        .load_url(|key| env::var(key).ok())
-        .map_err(|err| CoreError::new_schema_parser_error(err.to_pretty_string("schema.prisma", datamodel)))?;
-
-    let shadow_database_url = config.datasources[0]
-        .load_shadow_database_url()
-        .map_err(|err| CoreError::new_schema_parser_error(err.to_pretty_string("schema.prisma", datamodel)))?;
-
     let preview_features = config.preview_features();
 
     let source = config
@@ -117,5 +109,45 @@ fn parse_configuration(datamodel: &str) -> CoreResult<(Datasource, String, BitFl
         .next()
         .ok_or_else(|| CoreError::from_msg("There is no datasource in the schema.".into()))?;
 
+    let url = source
+        .load_url(|key| env::var(key).ok())
+        .map_err(|err| CoreError::new_schema_parser_error(err.to_pretty_string("schema.prisma", datamodel)))?;
+
+    let shadow_database_url = source
+        .load_shadow_database_url()
+        .map_err(|err| CoreError::new_schema_parser_error(err.to_pretty_string("schema.prisma", datamodel)))?;
+
     Ok((source, url, preview_features, shadow_database_url))
+}
+
+/// This is a hack. Please do not rely on this. It will disappear some day.
+pub fn datasource_from_database_str(database_str: &str) -> CoreResult<String> {
+    let provider = match database_str.split(':').next() {
+        Some("postgres") => "postgresql",
+        Some("file") => "sqlite",
+        Some("mongodb+srv") => "mongodb",
+        Some(other) => other,
+        None => {
+            return Err(CoreError::user_facing(InvalidConnectionString {
+                details: String::new(),
+            }))
+        }
+    };
+
+    let url = if provider == "sqlite" {
+        database_str.replace('\\', "\\\\")
+    } else {
+        database_str.to_owned()
+    };
+
+    let schema = format!(
+        r#"
+            datasource db {{
+                provider = "{provider}"
+                url = "{url}"
+            }}
+        "#,
+    );
+
+    Ok(schema)
 }

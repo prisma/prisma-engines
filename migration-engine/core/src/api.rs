@@ -4,15 +4,15 @@ use crate::{
     commands::*,
     json_rpc::types::{
         ApplyMigrationsInput, ApplyMigrationsOutput, CreateMigrationInput, CreateMigrationOutput,
-        DbExecuteDatasourceType, DbExecuteParams, DevDiagnosticInput, DevDiagnosticOutput, EvaluateDataLossInput,
-        EvaluateDataLossOutput, ListMigrationDirectoriesInput, ListMigrationDirectoriesOutput,
+        DbExecuteDatasourceType, DbExecuteParams, DevDiagnosticInput, DevDiagnosticOutput, DiffParams, DiffResult,
+        EvaluateDataLossInput, EvaluateDataLossOutput, ListMigrationDirectoriesInput, ListMigrationDirectoriesOutput,
         MarkMigrationAppliedInput, MarkMigrationAppliedOutput, MarkMigrationRolledBackInput,
         MarkMigrationRolledBackOutput, SchemaContainer, SchemaPushInput, SchemaPushOutput, UrlContainer,
     },
     CoreResult,
 };
 use migration_connector::{migrations_directory, ConnectorError, MigrationConnector};
-use std::path::Path;
+use std::{path::Path, sync::Arc};
 use tracing_futures::Instrument;
 
 /// The programmatic, generic, fantastic migration engine API.
@@ -23,6 +23,9 @@ pub trait GenericApi: Send + Sync + 'static {
 
     /// Apply all the unapplied migrations from the migrations folder.
     async fn apply_migrations(&self, input: &ApplyMigrationsInput) -> CoreResult<ApplyMigrationsOutput>;
+
+    /// Access to the migration connector.
+    fn connector(&self) -> &dyn MigrationConnector;
 
     /// Create the database referenced by Prisma schema that was used to initialize the connector.
     async fn create_database(&self) -> CoreResult<String>;
@@ -38,6 +41,9 @@ pub trait GenericApi: Send + Sync + 'static {
 
     /// Tells the CLI what to do in `migrate dev`.
     async fn dev_diagnostic(&self, input: &DevDiagnosticInput) -> CoreResult<DevDiagnosticOutput>;
+
+    /// Create a migration between any two sources of database schemas.
+    async fn diff(&self, params: &DiffParams) -> CoreResult<DiffResult>;
 
     /// Drop the database referenced by Prisma schema that was used to initialize the connector.
     async fn drop_database(&self) -> CoreResult<()>;
@@ -79,10 +85,7 @@ pub trait GenericApi: Send + Sync + 'static {
     async fn schema_push(&self, input: &SchemaPushInput) -> CoreResult<SchemaPushOutput>;
 
     /// Set the `ConnectorHost` to use.
-    fn set_host(&mut self, host: Box<dyn migration_connector::ConnectorHost>);
-
-    /// Access to the migration connector.
-    fn connector(&self) -> &dyn MigrationConnector;
+    fn set_host(&mut self, host: Arc<dyn migration_connector::ConnectorHost>);
 }
 
 #[async_trait::async_trait]
@@ -153,6 +156,10 @@ impl<C: MigrationConnector> GenericApi for C {
             .await
     }
 
+    async fn diff(&self, params: &DiffParams) -> CoreResult<DiffResult> {
+        crate::commands::diff(params, self).await
+    }
+
     async fn drop_database(&self) -> CoreResult<()> {
         MigrationConnector::drop_database(self).await
     }
@@ -220,7 +227,7 @@ impl<C: MigrationConnector> GenericApi for C {
             .await
     }
 
-    fn set_host(&mut self, host: Box<dyn migration_connector::ConnectorHost>) {
+    fn set_host(&mut self, host: Arc<dyn migration_connector::ConnectorHost>) {
         MigrationConnector::set_host(self, host)
     }
 }

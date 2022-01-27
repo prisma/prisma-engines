@@ -64,6 +64,7 @@ features!(
     DataProxy,
     ExtendedIndexes,
     Cockroachdb,
+    Tracing,
 );
 
 // Mapping of which active, deprecated and hidden
@@ -82,6 +83,7 @@ pub static GENERATOR: Lazy<FeatureMap> = Lazy::new(|| {
             DataProxy,
             ExtendedIndexes,
             Cockroachdb,
+            Tracing,
         ])
         .with_deprecated(vec![
             AtomicNumberOperations,
