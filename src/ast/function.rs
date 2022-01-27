@@ -17,6 +17,9 @@ mod search;
 mod sum;
 mod upper;
 
+#[cfg(feature = "mysql")]
+mod uuid;
+
 pub use aggregate_to_string::*;
 pub use average::*;
 pub use coalesce::*;
@@ -35,6 +38,9 @@ pub use row_to_json::*;
 pub use search::*;
 pub use sum::*;
 pub use upper::*;
+
+#[cfg(feature = "mysql")]
+pub use self::uuid::*;
 
 use super::{Aliasable, Expression};
 use std::borrow::Cow;
@@ -71,6 +77,10 @@ pub(crate) enum FunctionType<'a> {
     TextSearch(TextSearch<'a>),
     #[cfg(any(feature = "postgresql", feature = "mysql"))]
     TextSearchRelevance(TextSearchRelevance<'a>),
+    #[cfg(feature = "mysql")]
+    UuidToBin,
+    #[cfg(feature = "mysql")]
+    Uuid,
 }
 
 impl<'a> Aliasable<'a> for Function<'a> {
