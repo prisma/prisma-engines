@@ -85,6 +85,10 @@ impl WriteOperation {
         Self::Composite(CompositeWriteOperation::Update(NestedWrite { writes }))
     }
 
+    pub fn composite_push(pv: PrismaValue) -> Self {
+        Self::Composite(CompositeWriteOperation::Push(pv))
+    }
+
     pub fn as_scalar(&self) -> Option<&ScalarWriteOperation> {
         if let Self::Scalar(v) = self {
             Some(v)
@@ -142,6 +146,7 @@ pub enum ScalarWriteOperation {
 #[derive(Debug, PartialEq, Clone)]
 pub enum CompositeWriteOperation {
     Set(PrismaValue),
+    Push(PrismaValue),
     Unset(bool),
     Update(NestedWrite),
 }

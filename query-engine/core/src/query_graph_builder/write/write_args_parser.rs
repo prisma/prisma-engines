@@ -147,7 +147,7 @@ fn parse_composite_envelope(
         // Everything in a set operation can only be plain values, no more nested operations.
         operations::SET => WriteOperation::composite_set(value.try_into()?),
         operations::UNSET => parse_composite_unset(value.try_into()?),
-        // operations::PUSH => WriteOperation::composite_push(value.try_into()?),
+        operations::PUSH => WriteOperation::composite_push(value.try_into()?),
         operations::UPDATE => parse_composite_updates(cf, value.try_into()?, path)?,
         _ => unimplemented!(),
     };

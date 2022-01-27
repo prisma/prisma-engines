@@ -22,53 +22,9 @@ impl IntoUpdateDocumentExtension for ScalarWriteOperation {
         let dollar_field_path = format!("${}", field_path);
 
         let doc = match self {
-            ScalarWriteOperation::Add(rhs) if field.is_list() => match rhs {
-                PrismaValue::List(vals) => {
-                    let vals = vals
-                        .into_iter()
-                        .map(|val| (field, val).into_bson())
-                        .collect::<crate::Result<Vec<_>>>()?
-                        .into_iter()
-                        .map(|bson| {
-                            // Strip the list from the BSON values. [Todo] This is unfortunately necessary right now due to how the
-                            // conversion is set up with native types, we should clean that up at some point (move from traits to fns?).
-                            if let Bson::Array(mut inner) = bson {
-                                inner.pop().unwrap()
-                            } else {
-                                bson
-                            }
-                        })
-                        .collect();
-
-                    let bson_array = Bson::Array(vals);
-
-                    doc! {
-                        "$set": { field_path: {
-                            "$ifNull": [
-                                { "$concatArrays": [dollar_field_path, bson_array.clone()] },
-                                bson_array
-                            ]
-                        } }
-                    }
-                }
-                val => {
-                    let bson_val = match (field, val).into_bson()? {
-                        bson @ Bson::Array(_) => bson,
-                        bson => Bson::Array(vec![bson]),
-                    };
-
-                    doc! {
-                        "$set": {
-                            field_path: {
-                                "$ifNull": [
-                                    { "$concatArrays": [dollar_field_path, bson_val.clone()] },
-                                    bson_val
-                                ]
-                            }
-                        }
-                    }
-                }
-            },
+            ScalarWriteOperation::Add(rhs) if field.is_list() => {
+                render_push_update_doc(rhs, field, field_path, &dollar_field_path)?
+            }
             // We use $literal to enable the set of empty object, which is otherwise considered a syntax error
             ScalarWriteOperation::Set(rhs) => doc! {
                 "$set": { field_path: { "$literal": (field, rhs).into_bson()? } }
@@ -94,6 +50,8 @@ impl IntoUpdateDocumentExtension for ScalarWriteOperation {
 
 impl IntoUpdateDocumentExtension for CompositeWriteOperation {
     fn into_update_docs(self, field: &Field, field_path: &str) -> crate::Result<Vec<Document>> {
+        let dollar_field_path = format!("${}", field_path);
+
         let docs = match self {
             // We use $literal to enable the set of empty object, which is otherwise considered a syntax error
             CompositeWriteOperation::Set(rhs) => vec![doc! {
@@ -112,14 +70,73 @@ impl IntoUpdateDocumentExtension for CompositeWriteOperation {
                 let mut docs = Vec::with_capacity(1);
 
                 if should_unset {
-                    docs.push(doc! { "$unset": field_name })
+                    docs.push(doc! { "$unset": field_path })
                 }
 
                 docs
             }
-            CompositeWriteOperation::Push(_) => todo!(),
+            CompositeWriteOperation::Push(rhs) => {
+                vec![render_push_update_doc(rhs, field, field_path, &dollar_field_path)?]
+            }
         };
 
         Ok(docs)
     }
+}
+
+fn render_push_update_doc(
+    rhs: PrismaValue,
+    field: &Field,
+    field_name: &str,
+    dollar_field_name: &str,
+) -> crate::Result<Document> {
+    let doc = match rhs {
+        PrismaValue::List(vals) => {
+            let vals = vals
+                .into_iter()
+                .map(|val| (field, val).into_bson())
+                .collect::<crate::Result<Vec<_>>>()?
+                .into_iter()
+                .map(|bson| {
+                    // Strip the list from the BSON values. [Todo] This is unfortunately necessary right now due to how the
+                    // conversion is set up with native types, we should clean that up at some point (move from traits to fns?).
+                    if let Bson::Array(mut inner) = bson {
+                        inner.pop().unwrap()
+                    } else {
+                        bson
+                    }
+                })
+                .collect();
+
+            let bson_array = Bson::Array(vals);
+
+            doc! {
+                "$set": { field_name: {
+                    "$ifNull": [
+                        { "$concatArrays": [dollar_field_name, bson_array.clone()] },
+                        bson_array
+                    ]
+                } }
+            }
+        }
+        val => {
+            let bson_val = match (field, val).into_bson()? {
+                bson @ Bson::Array(_) => bson,
+                bson => Bson::Array(vec![bson]),
+            };
+
+            doc! {
+                "$set": {
+                    field_name: {
+                        "$ifNull": [
+                            { "$concatArrays": [dollar_field_name, bson_val.clone()] },
+                            bson_val
+                        ]
+                    }
+                }
+            }
+        }
+    };
+
+    Ok(doc)
 }

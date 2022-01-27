@@ -459,6 +459,187 @@ mod update {
         Ok(())
     }
 
+    #[connector_test]
+    async fn update_push_explicit(runner: Runner) -> TestResult<()> {
+        create_test_data(&runner).await?;
+
+        // Test push with array & object syntax
+        insta::assert_snapshot!(
+          run_query!(runner, r#"mutation {
+            updateOneTestModel(
+              where: { id: 1 }
+              data: {
+                a: { push: [{ a_1: "new item", a_2: 1337, b: { b_field: "new item", a: [] } }] }
+                c: { push: { c_field: "new item" } }
+              }
+            ) {
+              a {
+                a_1
+                a_2
+                b {
+                  b_field
+                  a {
+                      a_1
+                  }
+                }
+              }
+              c { c_field }
+            }
+          }"#),
+          @r###"{"data":{"updateOneTestModel":{"a":[{"a_1":"a1","a_2":null,"b":[{"b_field":"b_field","a":[]}]},{"a_1":"new item","a_2":1337,"b":[{"b_field":"new item","a":[]}]}],"c":[{"c_field":"new item"}]}}}"###
+        );
+
+        Ok(())
+    }
+
+    #[connector_test]
+    async fn update_push_explicit_with_default(runner: Runner) -> TestResult<()> {
+        create_test_data(&runner).await?;
+
+        // Tests push with array & object syntax
+        insta::assert_snapshot!(
+          run_query!(runner, r#"mutation {
+            updateOneTestModel(
+              where: { id: 1 }
+              data: {
+                a: { push: [{ b: { a: [{}] } }] }
+                c: { push: {} }
+              }
+            ) {
+              a {
+                a_1
+                a_2
+                b {
+                  b_field
+                  a {
+                      a_1
+                  }
+                }
+              }
+              c { c_field }
+            }
+          }"#),
+          @r###"{"data":{"updateOneTestModel":{"a":[{"a_1":"a1","a_2":null,"b":[{"b_field":"b_field","a":[]}]},{"a_1":"a_1 default","a_2":null,"b":[{"b_field":"b_field default","a":[{"a_1":"a_1 default"}]}]}],"c":[{"c_field":"c_field default"}]}}}"###
+        );
+
+        Ok(())
+    }
+
+    fn mixed_composites() -> String {
+        let schema = indoc! {
+            r#"model TestModel {
+              #id(id, Int, @id)
+              field String?
+              a     A       @map("top_a")
+          }
+  
+          type A {
+              a_1 String @default("a_1 default") @map("a1")
+              b B[]
+          }
+  
+          type B {
+              b_field String   @default("b_field default")
+          }"#
+        };
+
+        schema.to_owned()
+    }
+
+    #[connector_test(schema(mixed_composites))]
+    async fn update_push_explicit_nested(runner: Runner) -> TestResult<()> {
+        create_row(
+            &runner,
+            r#"{
+          id: 1
+          a: { a_1: "a1", b: [{ b_field: "b_field" }] }
+        }"#,
+        )
+        .await?;
+
+        // Test nested push (object syntax)
+        insta::assert_snapshot!(
+          run_query!(runner, r#"mutation {
+            updateOneTestModel(
+              where: { id: 1 }
+              data: {
+                a: { update: { b: { push: { b_field: "nested1" } } } }
+              }
+            ) {
+              a {
+                a_1
+                b {
+                  b_field
+                }
+              }
+            }
+          }"#),
+          @r###"{"data":{"updateOneTestModel":{"a":{"a_1":"a1","b":[{"b_field":"b_field"},{"b_field":"nested1"}]}}}}"###
+        );
+
+        // Test nested push with defaults (object syntax)
+        insta::assert_snapshot!(
+          run_query!(runner, r#"mutation {
+            updateOneTestModel(
+              where: { id: 1 }
+              data: {
+                a: { update: { b: { push: {} } } }
+              }
+            ) {
+              a {
+                a_1
+                b {
+                  b_field
+                }
+              }
+            }
+          }"#),
+          @r###"{"data":{"updateOneTestModel":{"a":{"a_1":"a1","b":[{"b_field":"b_field"},{"b_field":"nested1"},{"b_field":"b_field default"}]}}}}"###
+        );
+
+        // Test nested push (array syntax)
+        insta::assert_snapshot!(
+          run_query!(runner, r#"mutation {
+            updateOneTestModel(
+              where: { id: 1 }
+              data: {
+                a: { update: { b: { push: [{ b_field: "nested2" }, { b_field: "nested3" }] } } }
+              }
+            ) {
+              a {
+                a_1
+                b {
+                  b_field
+                }
+              }
+            }
+          }"#),
+          @r###"{"data":{"updateOneTestModel":{"a":{"a_1":"a1","b":[{"b_field":"b_field"},{"b_field":"nested1"},{"b_field":"b_field default"},{"b_field":"nested2"},{"b_field":"nested3"}]}}}}"###
+        );
+
+        // Test nested push with defaults (array syntax)
+        insta::assert_snapshot!(
+          run_query!(runner, r#"mutation {
+            updateOneTestModel(
+              where: { id: 1 }
+              data: {
+                a: { update: { b: { push: [{}] } } }
+              }
+            ) {
+              a {
+                a_1
+                b {
+                  b_field
+                }
+              }
+            }
+          }"#),
+          @r###"{"data":{"updateOneTestModel":{"a":{"a_1":"a1","b":[{"b_field":"b_field"},{"b_field":"nested1"},{"b_field":"b_field default"},{"b_field":"nested2"},{"b_field":"nested3"},{"b_field":"b_field default"}]}}}}"###
+        );
+
+        Ok(())
+    }
+
     async fn create_test_data(runner: &Runner) -> TestResult<()> {
         create_row(
             runner,

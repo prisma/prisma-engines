@@ -518,7 +518,7 @@ mod update {
     #[connector_test]
     async fn ensure_unset_unavailable_on_fields(runner: Runner) -> TestResult<()> {
         create_test_data(&runner).await?;
-    
+
         assert_error!(
             runner,
             r#"mutation { updateOneTestModel(
@@ -538,7 +538,7 @@ mod update {
           2009,
           "`Mutation.updateOneTestModel.data.TestModelUncheckedUpdateInput.a.AUpdateEnvelopeInput.update.AUpdateInput.a_1.StringFieldUpdateOperationsInput.unset`: Field does not exist on enclosing type."
         );
-    
+
         Ok(())
     }
 
