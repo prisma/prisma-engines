@@ -117,6 +117,3 @@ pub fn to_many_composites() -> String {
     schema.to_owned()
 }
 
-// defaults
-// maps
-// native types
