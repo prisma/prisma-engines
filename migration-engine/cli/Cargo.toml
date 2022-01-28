@@ -32,3 +32,6 @@ git = "https://github.com/prisma/quaint"
 [[bin]]
 name = "migration-engine"
 path = "src/main.rs"
+
+[features]
+vendored-openssl = []
