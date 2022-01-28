@@ -57,6 +57,10 @@
 <span id="56">56</span>
 <span id="57">57</span>
 <span id="58">58</span>
+<span id="59">59</span>
+<span id="60">60</span>
+<span id="61">61</span>
+<span id="62">62</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">mongodb_schema_describer</span>::{<span class="ident">CollectionId</span>, <span class="ident">IndexId</span>, <span class="ident">IndexType</span>, <span class="ident">MongoSchema</span>};
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
@@ -68,6 +72,10 @@
 
 <span class="kw">impl</span> <span class="ident">MongoDbMigration</span> {
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">summary</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">String</span> {
+        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">steps</span>.<span class="ident">is_empty</span>() {
+            <span class="kw">return</span> <span class="string">&quot;No difference detected.&quot;</span>.<span class="ident">to_owned</span>();
+        }
+
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">out</span> <span class="op">=</span> <span class="ident">String::with_capacity</span>(<span class="self">self</span>.<span class="ident">steps</span>.<span class="ident">len</span>() <span class="op">*</span> <span class="number">10</span>);
 
         <span class="kw">for</span> <span class="ident">step</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">steps</span> {

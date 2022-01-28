@@ -618,6 +618,10 @@
 <span id="617">617</span>
 <span id="618">618</span>
 <span id="619">619</span>
+<span id="620">620</span>
+<span id="621">621</span>
+<span id="622">622</span>
+<span id="623">623</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">pair::Pair</span>,
     <span class="ident">sql_renderer::IteratorJoin</span>,
@@ -657,6 +661,10 @@
     <span class="doccomment">/// - Based on the computed sections and their ordering, we render each</span>
     <span class="doccomment">///   block in the summary one by one.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">drift_summary</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">String</span> {
+        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">steps</span>.<span class="ident">is_empty</span>() {
+            <span class="kw">return</span> <span class="string">&quot;No difference detected.&quot;</span>.<span class="ident">to_owned</span>();
+        }
+
         <span class="comment">// The order of the variants matters</span>
         <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">Eq</span>)]</span>
         <span class="attribute">#[<span class="ident">repr</span>(<span class="ident">u8</span>)]</span>
