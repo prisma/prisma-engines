@@ -158,6 +158,10 @@
 <span id="157">157</span>
 <span id="158">158</span>
 <span id="159">159</span>
+<span id="160">160</span>
+<span id="161">161</span>
+<span id="162">162</span>
+<span id="163">163</span>
 </pre><pre class="rust"><code><span class="attribute">#![<span class="ident">deny</span>(<span class="ident">rust_2018_idioms</span>, <span class="ident">unsafe_code</span>, <span class="ident">missing_docs</span>)]</span>
 <span class="attribute">#![<span class="ident">allow</span>(<span class="ident">clippy::needless_collect</span>)]</span> <span class="comment">// the implementation of that rule is way too eager, it rejects necessary collects</span>
 
@@ -211,7 +215,11 @@
             <span class="kw">let</span> <span class="ident">connector</span> <span class="op">=</span> <span class="ident">SqlMigrationConnector::new</span>(<span class="ident">url</span>, <span class="ident">preview_features</span>, <span class="ident">shadow_database_connection_string</span>)<span class="question-mark">?</span>;
             <span class="prelude-val">Ok</span>(<span class="ident">Box::new</span>(<span class="ident">connector</span>))
         }
-        <span class="prelude-val">Some</span>(<span class="string">&quot;file&quot;</span>) <span class="op">|</span> <span class="prelude-val">Some</span>(<span class="string">&quot;mysql&quot;</span>) <span class="op">|</span> <span class="prelude-val">Some</span>(<span class="string">&quot;sqlserver&quot;</span>) =&gt; {
+        <span class="comment">// TODO: `sqlite:` connection strings may not work if we try to connect to them, but they</span>
+        <span class="comment">// seem to be used by some tests in prisma/prisma. They are not tested at all engine-side.</span>
+        <span class="comment">//</span>
+        <span class="comment">// Tracking issue: https://github.com/prisma/prisma/issues/11468</span>
+        <span class="prelude-val">Some</span>(<span class="string">&quot;file&quot;</span>) <span class="op">|</span> <span class="prelude-val">Some</span>(<span class="string">&quot;mysql&quot;</span>) <span class="op">|</span> <span class="prelude-val">Some</span>(<span class="string">&quot;sqlserver&quot;</span>) <span class="op">|</span> <span class="prelude-val">Some</span>(<span class="string">&quot;sqlite&quot;</span>) =&gt; {
             <span class="kw">let</span> <span class="ident">connector</span> <span class="op">=</span>
                 <span class="ident">SqlMigrationConnector::new</span>(<span class="ident">connection_string</span>, <span class="ident">preview_features</span>, <span class="ident">shadow_database_connection_string</span>)<span class="question-mark">?</span>;
             <span class="prelude-val">Ok</span>(<span class="ident">Box::new</span>(<span class="ident">connector</span>))
