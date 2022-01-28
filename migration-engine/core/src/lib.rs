@@ -51,7 +51,11 @@ fn connector_for_connection_string(
             let connector = SqlMigrationConnector::new(url, preview_features, shadow_database_connection_string)?;
             Ok(Box::new(connector))
         }
-        Some("file") | Some("mysql") | Some("sqlserver") => {
+        // TODO: `sqlite:` connection strings may not work if we try to connect to them, but they
+        // seem to be used by some tests in prisma/prisma. They are not tested at all engine-side.
+        //
+        // Tracking issue: https://github.com/prisma/prisma/issues/11468
+        Some("file") | Some("mysql") | Some("sqlserver") | Some("sqlite") => {
             let connector =
                 SqlMigrationConnector::new(connection_string, preview_features, shadow_database_connection_string)?;
             Ok(Box::new(connector))
