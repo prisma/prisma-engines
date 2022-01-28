@@ -21,7 +21,7 @@ fn empty_schemas() {
         }
         "#,
         "",
-        expect![[""]],
+        expect![[r#"No difference detected."#]],
     )
 }
 
