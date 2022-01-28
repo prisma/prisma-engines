@@ -45,7 +45,7 @@ impl<'a> CreateMigration<'a> {
     pub async fn send(self) -> CoreResult<CreateMigrationAssertion<'a>> {
         let output = self
             .api
-            .create_migration(&CreateMigrationInput {
+            .create_migration(CreateMigrationInput {
                 migrations_directory_path: self.migrations_directory.path().to_str().unwrap().to_owned(),
                 prisma_schema: self.schema.to_owned(),
                 draft: self.draft,

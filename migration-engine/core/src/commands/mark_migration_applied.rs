@@ -8,7 +8,7 @@ use user_facing_errors::migration_engine::{MigrationAlreadyApplied, MigrationToM
 
 /// Mark a migration as applied.
 pub async fn mark_migration_applied(
-    input: &MarkMigrationAppliedInput,
+    input: MarkMigrationAppliedInput,
     connector: &dyn MigrationConnector,
 ) -> CoreResult<MarkMigrationAppliedOutput> {
     let persistence = connector.migration_persistence();

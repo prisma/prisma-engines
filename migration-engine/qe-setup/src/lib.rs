@@ -19,8 +19,8 @@ use datamodel::{
     Datasource,
 };
 use enumflags2::BitFlags;
-use migration_core::migration_connector::{ConnectorResult, DiffTarget};
-use std::env;
+use migration_core::{json_rpc::types::*, migration_connector::ConnectorResult};
+use std::{env, sync::Arc};
 
 fn parse_configuration(datamodel: &str) -> ConnectorResult<(Datasource, String, BitFlags<PreviewFeature>)> {
     let config = datamodel::parse_configuration(datamodel)
@@ -53,35 +53,21 @@ pub async fn setup(prisma_schema: &str) -> ConnectorResult<()> {
         provider if [MSSQL_SOURCE_NAME].contains(&provider.as_str()) => mssql_setup(url, prisma_schema).await?,
         provider if [MYSQL_SOURCE_NAME].contains(&provider.as_str()) => {
             mysql_reset(&url).await?;
-            let api = migration_core::migration_api(prisma_schema)?;
-            let api = api.connector();
-            let migration = api
-                .diff(DiffTarget::Empty, DiffTarget::Datamodel(prisma_schema.into()))
-                .await
-                .unwrap();
-            api.database_migration_step_applier()
-                .apply_migration(&migration)
-                .await
-                .unwrap();
+            diff_and_apply(prisma_schema).await;
         }
         provider if [SQLITE_SOURCE_NAME].contains(&provider.as_str()) => {
             // 1. creates schema & database
-            let api = migration_core::migration_api(prisma_schema)?;
-            let api = api.connector();
-            api.drop_database().await.ok();
-            api.create_database().await?;
+            let api = migration_core::migration_api(Some(prisma_schema.to_owned()), None)?;
+            api.drop_database(url).await.ok();
+            api.create_database(CreateDatabaseParams {
+                datasource: DatasourceParam::SchemaString(SchemaContainer {
+                    schema: prisma_schema.to_owned(),
+                }),
+            })
+            .await?;
 
             // 2. create the database schema for given Prisma schema
-            {
-                let migration = api
-                    .diff(DiffTarget::Empty, DiffTarget::Datamodel(prisma_schema.into()))
-                    .await
-                    .unwrap();
-                api.database_migration_step_applier()
-                    .apply_migration(&migration)
-                    .await
-                    .unwrap();
-            };
+            diff_and_apply(prisma_schema).await;
         }
 
         provider if provider == MONGODB_SOURCE_NAME => mongo_setup(prisma_schema, &url).await?,
@@ -114,4 +100,49 @@ pub async fn teardown(prisma_schema: &str) -> ConnectorResult<()> {
     };
 
     Ok(())
+}
+
+#[derive(Default)]
+struct LoggingHost {
+    printed: std::sync::Mutex<Vec<String>>,
+}
+
+#[async_trait::async_trait]
+impl migration_core::migration_connector::ConnectorHost for LoggingHost {
+    async fn print(&self, text: &str) -> ConnectorResult<()> {
+        let mut msgs = self.printed.lock().unwrap();
+        msgs.push(text.to_owned());
+        Ok(())
+    }
+}
+
+async fn diff_and_apply(schema: &str) {
+    let tmpdir = tempfile::tempdir().unwrap();
+    let host = Arc::new(LoggingHost::default());
+    let api = migration_core::migration_api(Some(schema.to_owned()), Some(host.clone())).unwrap();
+    let schema_file_path = tmpdir.path().join("schema.prisma");
+    std::fs::write(&schema_file_path, schema).unwrap();
+
+    // 2. create the database schema for given Prisma schema
+    api.diff(DiffParams {
+        from: DiffTarget::Empty,
+        to: DiffTarget::SchemaDatamodel(SchemaContainer {
+            schema: schema_file_path.to_string_lossy().into(),
+        }),
+        script: true,
+        shadow_database_url: None,
+    })
+    .await
+    .unwrap();
+    let migrations = host.printed.lock().unwrap();
+    let migration = &migrations[0];
+
+    api.db_execute(DbExecuteParams {
+        datasource_type: DbExecuteDatasourceType::Schema(SchemaContainer {
+            schema: schema_file_path.to_string_lossy().into(),
+        }),
+        script: migration.to_owned(),
+    })
+    .await
+    .unwrap();
 }

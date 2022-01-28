@@ -808,15 +808,13 @@ fn shadow_database_creation_error_is_special_cased_mysql(api: TestApi) {
         dbport = api.connection_info().port().unwrap_or(3306),
     );
 
-    let migration_api = migration_api(&datamodel).unwrap();
+    let migration_api = migration_api(Some(datamodel), None).unwrap();
 
     let output = api
-        .block_on(
-            migration_api.diagnose_migration_history(&DiagnoseMigrationHistoryInput {
-                migrations_directory_path: directory.path().as_os_str().to_string_lossy().into_owned(),
-                opt_in_to_shadow_database: true,
-            }),
-        )
+        .block_on(migration_api.diagnose_migration_history(DiagnoseMigrationHistoryInput {
+            migrations_directory_path: directory.path().as_os_str().to_string_lossy().into_owned(),
+            opt_in_to_shadow_database: true,
+        }))
         .unwrap();
 
     assert!(
@@ -859,9 +857,9 @@ fn shadow_database_creation_error_is_special_cased_postgres(api: TestApi) {
 
     let output = api
         .block_on(async {
-            migration_api(&datamodel)
+            migration_api(Some(datamodel.clone()), None)
                 .unwrap()
-                .diagnose_migration_history(&DiagnoseMigrationHistoryInput {
+                .diagnose_migration_history(DiagnoseMigrationHistoryInput {
                     migrations_directory_path: directory.path().as_os_str().to_string_lossy().into_owned(),
                     opt_in_to_shadow_database: true,
                 })
@@ -918,7 +916,7 @@ fn shadow_database_creation_error_is_special_cased_mssql(api: TestApi) {
             panic!("Failed to connect to mssql more than five times.");
         }
 
-        let result = migration_api(&datamodel);
+        let result = migration_api(Some(datamodel.clone()), None);
 
         match result {
             Ok(api) => break api,
@@ -931,12 +929,10 @@ fn shadow_database_creation_error_is_special_cased_mssql(api: TestApi) {
     };
 
     let output = api
-        .block_on(
-            migration_api.diagnose_migration_history(&DiagnoseMigrationHistoryInput {
-                migrations_directory_path: directory.path().as_os_str().to_string_lossy().into_owned(),
-                opt_in_to_shadow_database: true,
-            }),
-        )
+        .block_on(migration_api.diagnose_migration_history(DiagnoseMigrationHistoryInput {
+            migrations_directory_path: directory.path().as_os_str().to_string_lossy().into_owned(),
+            opt_in_to_shadow_database: true,
+        }))
         .unwrap();
 
     assert!(

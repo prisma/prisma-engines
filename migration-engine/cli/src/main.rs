@@ -3,10 +3,8 @@
 mod commands;
 mod logger;
 
-use std::sync::Arc;
-
-use crate::logger::log_error_and_exit;
 use migration_core::rpc_api;
+use std::sync::Arc;
 use structopt::StructOpt;
 
 /// When no subcommand is specified, the migration engine will default to starting as a JSON-RPC
@@ -36,13 +34,7 @@ async fn main() {
     let input = MigrationEngineCli::from_args();
 
     match input.cli_subcommand {
-        None => {
-            if let Some(datamodel_location) = input.datamodel.as_ref() {
-                start_engine(datamodel_location).await
-            } else {
-                panic!("Missing --datamodel");
-            }
-        }
+        None => start_engine(input.datamodel.as_deref()).await,
         Some(SubCommand::Cli(cli_command)) => {
             tracing::info!(git_hash = env!("GIT_HASH"), "Starting migration engine CLI");
             cli_command.run().await;
@@ -85,20 +77,21 @@ impl migration_connector::ConnectorHost for JsonRpcHost {
     }
 }
 
-async fn start_engine(datamodel_location: &str) {
+async fn start_engine(datamodel_location: Option<&str>) {
     use std::io::Read as _;
 
     tracing::info!(git_hash = env!("GIT_HASH"), "Starting migration engine RPC server",);
-    let mut file = std::fs::File::open(datamodel_location).expect("error opening datamodel file");
 
-    let mut datamodel = String::new();
-    file.read_to_string(&mut datamodel).unwrap();
+    let datamodel = datamodel_location.map(|location| {
+        let mut file = std::fs::File::open(location).expect("error opening datamodel file");
 
-    match rpc_api(&datamodel, Arc::new(JsonRpcHost)).await {
-        // Block the thread and handle IO in async until EOF.
-        Ok(api) => json_rpc_stdio::run(&api).await.unwrap(),
-        Err(err) => {
-            log_error_and_exit(err);
-        }
-    }
+        let mut datamodel = String::new();
+        file.read_to_string(&mut datamodel).unwrap();
+        datamodel
+    });
+
+    let api = rpc_api(datamodel, Arc::new(JsonRpcHost));
+
+    // Block the thread and handle IO in async until EOF.
+    json_rpc_stdio::run(&api).await.unwrap();
 }

@@ -95,7 +95,7 @@ impl MigrationConnector for MongoDbMigrationConnector {
         ))
     }
 
-    async fn db_execute(&self, _url: &str, _script: &str) -> ConnectorResult<()> {
+    async fn db_execute(&self, _url: String, _script: String) -> ConnectorResult<()> {
         Err(ConnectorError::from_msg(
             "dbExecute is not supported on MongoDB".to_owned(),
         ))

@@ -47,7 +47,7 @@ fn diffing_postgres_schemas_when_initialized_on_sqlite(mut api: TestApi) {
 
     let to_file = write_file_to_tmp(to, &tempdir, "to");
 
-    api.diff(&DiffParams {
+    api.diff(DiffParams {
         from: DiffTarget::SchemaDatamodel(SchemaContainer {
             schema: from_file.to_string_lossy().into_owned(),
         }),
@@ -59,7 +59,7 @@ fn diffing_postgres_schemas_when_initialized_on_sqlite(mut api: TestApi) {
     })
     .unwrap();
 
-    api.diff(&DiffParams {
+    api.diff(DiffParams {
         from: DiffTarget::SchemaDatamodel(SchemaContainer {
             schema: from_file.to_string_lossy().into_owned(),
         }),
@@ -110,7 +110,7 @@ fn from_empty_to_migrations_directory(mut api: TestApi) {
         shadow_database_url: Some(api.connection_string().to_owned()),
     };
 
-    api.diff(&params).unwrap();
+    api.diff(params).unwrap();
 
     let expected_printed_messages = expect![[r#"
         [
@@ -149,7 +149,7 @@ fn from_empty_to_migrations_folder_without_shadow_db_url_must_error(mut api: Tes
         shadow_database_url: None, // TODO: ?
     };
 
-    let err = api.diff(&params).unwrap_err();
+    let err = api.diff(params).unwrap_err();
 
     let expected_error = expect![[r#"
         You must pass the --shadow-database-url if you want to diff a migrations directory.
@@ -195,7 +195,7 @@ fn from_schema_datamodel_to_url(mut api: TestApi) {
         to: DiffTarget::Url(UrlContainer { url: second_url }),
     };
 
-    api.diff(&input).unwrap();
+    api.diff(input).unwrap();
 
     let expected_printed_messages = expect![[r#"
         [
@@ -250,7 +250,7 @@ fn from_schema_datasource_to_url(mut api: TestApi) {
         to: DiffTarget::Url(UrlContainer { url: second_url }),
     };
 
-    api.diff(&input).unwrap();
+    api.diff(input).unwrap();
 
     let expected_printed_messages = expect![[r#"
         [
@@ -291,7 +291,7 @@ fn from_url_to_url(mut api: TestApi) {
         to: DiffTarget::Url(UrlContainer { url: second_url }),
     };
 
-    api.diff(&input).unwrap();
+    api.diff(input).unwrap();
 
     let expected_printed_messages = expect![[r#"
         [
@@ -352,7 +352,7 @@ fn diffing_mongo_schemas_works(mut api: TestApi) {
 
     let to_file = write_file_to_tmp(to, &tempdir, "to");
 
-    api.diff(&DiffParams {
+    api.diff(DiffParams {
         from: DiffTarget::SchemaDatamodel(SchemaContainer {
             schema: from_file.to_string_lossy().into_owned(),
         }),

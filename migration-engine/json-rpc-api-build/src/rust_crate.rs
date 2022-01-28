@@ -116,21 +116,21 @@ fn generate_types_rs(mut file: impl std::io::Write, api: &Api) -> CrateResult {
         for (variant_name, variant) in &variants.variants {
             if let Some(description) = &variant.description {
                 for line in description.lines() {
-                    writeln!(file, "    /// {}", line)?;
+                    writeln!(file, "/// {}", line)?;
                 }
+            }
 
-                let cc_variant_name = variant_name.to_camel_case();
+            let cc_variant_name = variant_name.to_camel_case();
 
-                if cc_variant_name.as_str() != variant_name {
-                    writeln!(file, "///\n/// JSON name: {}", variant_name)?;
-                    writeln!(file, "#[serde(rename = \"{}\")]", variant_name)?;
-                }
+            if cc_variant_name.as_str() != variant_name {
+                writeln!(file, "///\n/// JSON name: {}", variant_name)?;
+                writeln!(file, "#[serde(rename = \"{}\")]", variant_name)?;
+            }
 
-                if let Some(shape) = &variant.shape {
-                    writeln!(file, "    {}({}),", cc_variant_name, rustify_type_name(shape))?;
-                } else {
-                    writeln!(file, "    {},", cc_variant_name)?;
-                }
+            if let Some(shape) = &variant.shape {
+                writeln!(file, "    {}({}),", cc_variant_name, rustify_type_name(shape))?;
+            } else {
+                writeln!(file, "    {},", cc_variant_name)?;
             }
         }
 

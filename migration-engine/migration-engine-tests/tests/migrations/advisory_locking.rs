@@ -18,7 +18,7 @@ fn advisory_locking_works(api: TestApi) {
     );
 
     let output = api
-        .block_on(first_me.generic_api().create_migration(&CreateMigrationInput {
+        .block_on(first_me.generic_api().create_migration(CreateMigrationInput {
             migrations_directory_path: migrations_directory.path().to_string_lossy().into(),
             prisma_schema: dm,
             migration_name: "01initial".into(),

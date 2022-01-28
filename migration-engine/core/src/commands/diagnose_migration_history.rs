@@ -64,7 +64,7 @@ impl DiagnoseMigrationHistoryOutput {
 /// returns their relative statuses. At this stage, the migration engine only
 /// reads, it does not write to the dev database nor the migrations directory.
 pub(crate) async fn diagnose_migration_history(
-    input: &DiagnoseMigrationHistoryInput,
+    input: DiagnoseMigrationHistoryInput,
     connector: &dyn MigrationConnector,
 ) -> CoreResult<DiagnoseMigrationHistoryOutput> {
     let migration_persistence = connector.migration_persistence();

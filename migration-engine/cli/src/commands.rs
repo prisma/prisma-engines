@@ -1,6 +1,6 @@
 use crate::logger::log_error_and_exit;
 use migration_connector::ConnectorError;
-use migration_core::{datasource_from_database_str, migration_api};
+use migration_core::json_rpc::types::{DatasourceParam, UrlContainer};
 use structopt::StructOpt;
 use user_facing_errors::common::SchemaParserError;
 
@@ -24,19 +24,29 @@ impl Cli {
     }
 
     pub(crate) async fn run_inner(self) -> Result<String, ConnectorError> {
-        let datamodel = datasource_from_database_str(&self.datasource)?;
-        let api = migration_api(&datamodel)?;
+        let api = migration_core::migration_api(None, None)?;
         match self.command {
             CliCommand::CreateDatabase => {
-                let db_name = api.create_database().await?;
-                Ok(format!("Database '{}' was successfully created.", db_name))
+                let migration_core::json_rpc::types::CreateDatabaseResult { database_name } = api
+                    .create_database(migration_core::json_rpc::types::CreateDatabaseParams {
+                        datasource: DatasourceParam::ConnectionString(UrlContainer {
+                            url: self.datasource.clone(),
+                        }),
+                    })
+                    .await?;
+                Ok(format!("Database '{}' was successfully created.", database_name))
             }
             CliCommand::CanConnectToDatabase => {
-                api.ensure_connection_validity().await?;
+                api.ensure_connection_validity(migration_core::json_rpc::types::EnsureConnectionValidityParams {
+                    datasource: DatasourceParam::ConnectionString(UrlContainer {
+                        url: self.datasource.clone(),
+                    }),
+                })
+                .await?;
                 Ok("Connection successful".to_owned())
             }
             CliCommand::DropDatabase => {
-                api.drop_database().await?;
+                api.drop_database(self.datasource.clone()).await?;
                 Ok("The database was successfully dropped.".to_owned())
             }
         }
