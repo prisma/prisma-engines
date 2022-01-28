@@ -304,12 +304,7 @@ fn serialize_objects(
 
     let fields: Vec<_> = db_field_names
         .iter()
-        .filter_map(|f| {
-            model
-                .fields()
-                .find_from_all_by_db_name(f)
-                .ok()
-        })
+        .filter_map(|f| model.fields().find_from_all_by_db_name(f).ok())
         .collect();
 
     // Write all fields, nested and list fields unordered into a map, afterwards order all into the final order.
