@@ -204,7 +204,7 @@ impl<'ast, 'db> InlineRelationWalker<'ast, 'db> {
     }
 
     /// The contents of the `map: ...` argument of the `@relation` attribute.
-    pub fn mapped_name(self) -> Option<&'ast str> {
+    pub fn mapped_name(self) -> Option<&'db str> {
         self.forward_relation_field().and_then(|field| field.mapped_name())
     }
 
@@ -365,11 +365,7 @@ impl<'ast, 'db> CompleteInlineRelationWalker<'ast, 'db> {
     pub fn on_update(self) -> ReferentialAction {
         use ReferentialAction::*;
 
-        self.referencing_field()
-            .attributes()
-            .on_update
-            .map(|(action, _)| action)
-            .unwrap_or(Cascade)
+        self.referencing_field().explicit_on_update().unwrap_or(Cascade)
     }
 
     /// Prisma allows setting the relation field as optional, even if one of the

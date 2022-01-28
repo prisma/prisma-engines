@@ -34,8 +34,12 @@ fn resolve_composite_type_attributes<'ast>(
 ) {
     for (field_id, field) in ct.iter_fields() {
         let mut ctfield = ctx.db.types.composite_type_fields.remove(&(ctid, field_id)).unwrap();
-
-        ctx.visit_attributes(&field.attributes, |attributes, ctx| {
+        let field_attributes = field
+            .attributes
+            .iter()
+            .enumerate()
+            .map(|(attr_idx, attr)| (attr, ast::AttributeId::CompositeTypeField(ctid, field_id, attr_idx)));
+        ctx.visit_attributes(field_attributes, |attributes, ctx| {
             // @map
             attributes.visit_optional_single("map", ctx, |map_args, ctx| {
                 map::composite_type_field(ct, field, ctid, field_id, &mut ctfield, map_args, ctx);
@@ -55,7 +59,12 @@ fn resolve_enum_attributes<'ast>(enum_id: ast::EnumId, ast_enum: &'ast ast::Enum
     let mut enum_attributes = EnumAttributes::default();
 
     for (field_idx, field) in ast_enum.values.iter().enumerate() {
-        ctx.visit_attributes(&field.attributes, |attributes, ctx| {
+        let attrs = field
+            .attributes
+            .iter()
+            .enumerate()
+            .map(|(attr_idx, attr)| (attr, ast::AttributeId::EnumValue(enum_id, field_idx, attr_idx)));
+        ctx.visit_attributes(attrs, |attributes, ctx| {
             // @map
             attributes.visit_optional_single("map", ctx, |map_args, ctx| {
                 if let Some(mapped_name) = map::visit_map_attribute(map_args, ctx) {
@@ -67,7 +76,12 @@ fn resolve_enum_attributes<'ast>(enum_id: ast::EnumId, ast_enum: &'ast ast::Enum
         });
     }
 
-    ctx.visit_attributes(&ast_enum.attributes, |attributes, ctx| {
+    let attrs = ast_enum
+        .attributes
+        .iter()
+        .enumerate()
+        .map(|(attr_idx, attr)| (attr, ast::AttributeId::Enum(enum_id, attr_idx)));
+    ctx.visit_attributes(attrs, |attributes, ctx| {
         // @@map
         attributes.visit_optional_single("map", ctx, |map_args, ctx| {
             if let Some(mapped_name) = map::visit_map_attribute(map_args, ctx) {
@@ -98,7 +112,7 @@ fn resolve_model_attributes<'ast>(model_id: ast::ModelId, ast_model: &'ast ast::
 
             ctx.db.types.scalar_fields.insert((model_id, field_id), scalar_field);
         } else if let Some(mut rf) = ctx.db.types.take_relation_field(model_id, field_id) {
-            visit_relation_field_attributes(model_id, ast_field, &mut rf, ctx);
+            visit_relation_field_attributes(model_id, ast_field, field_id, &mut rf, ctx);
             ctx.db.types.relation_fields.insert((model_id, field_id), rf);
         } else {
             unreachable!(
@@ -110,7 +124,12 @@ fn resolve_model_attributes<'ast>(model_id: ast::ModelId, ast_model: &'ast ast::
     }
 
     // First resolve all the attributes defined on the model itself **in isolation**.
-    ctx.visit_attributes(&ast_model.attributes, |attributes, ctx| {
+    let attributes = ast_model
+        .attributes
+        .iter()
+        .enumerate()
+        .map(|(attr_idx, attr)| (attr, ast::AttributeId::Model(model_id, attr_idx)));
+    ctx.visit_attributes(attributes, |attributes, ctx| {
         // @@ignore
         attributes.visit_optional_single("ignore", ctx, |_, ctx| {
             visit_model_ignore(model_id, &mut model_attributes, ctx);
@@ -262,7 +281,7 @@ fn visit_field_unique<'ast>(
     };
 
     model_attributes.ast_indexes.push((
-        args.attribute(),
+        args.attribute().0,
         IndexAttribute {
             r#type: IndexType::Unique,
             fields: vec![FieldWithArgs {
@@ -280,10 +299,21 @@ fn visit_field_unique<'ast>(
 fn visit_relation_field_attributes<'ast>(
     model_id: ast::ModelId,
     ast_field: &'ast ast::Field,
-    relation_field: &mut RelationField<'ast>,
+    field_id: ast::FieldId,
+    relation_field: &mut RelationField,
     ctx: &mut Context<'ast>,
 ) {
-    ctx.visit_attributes(&ast_field.attributes, |attributes, ctx| {
+    let attributes = ast_field
+        .attributes
+        .iter()
+        .enumerate()
+        .map(|(attribute_idx, attribute)| {
+            (
+                attribute,
+                ast::AttributeId::ModelField(model_id, field_id, attribute_idx),
+            )
+        });
+    ctx.visit_attributes(attributes, |attributes, ctx| {
         // @relation
         // Relation attributes are not required at this stage.
         attributes.visit_optional_single("relation", ctx, |relation_args, ctx| {
@@ -403,7 +433,7 @@ fn model_fulltext<'ast>(
 
     index_attribute.mapped_name = mapped_name;
 
-    data.ast_indexes.push((args.attribute(), index_attribute));
+    data.ast_indexes.push((args.attribute().0, index_attribute));
 }
 
 /// Validate @@index on models.
@@ -475,7 +505,7 @@ fn model_index<'ast>(
         None => None,
     };
 
-    data.ast_indexes.push((args.attribute(), index_attribute));
+    data.ast_indexes.push((args.attribute().0, index_attribute));
 }
 
 /// Validate @@unique on models.
@@ -528,7 +558,7 @@ fn model_unique<'ast>(
     index_attribute.name = name;
     index_attribute.mapped_name = mapped_name;
 
-    data.ast_indexes.push((args.attribute(), index_attribute));
+    data.ast_indexes.push((args.attribute().0, index_attribute));
 }
 
 fn common_index_validations<'ast>(
@@ -609,10 +639,10 @@ fn common_index_validations<'ast>(
 fn visit_relation<'ast>(
     args: &mut Arguments<'ast>,
     model_id: ast::ModelId,
-    relation_field: &mut RelationField<'ast>,
+    relation_field: &mut RelationField,
     ctx: &mut Context<'ast>,
 ) {
-    relation_field.relation_attribute = Some(args.attribute());
+    relation_field.relation_attribute = Some(args.attribute().1);
 
     if let Some(fields) = args.optional_arg("fields") {
         let fields = match resolve_field_array_without_args(&fields, args.span(), model_id, ctx) {
@@ -708,8 +738,8 @@ fn visit_relation<'ast>(
     }
 
     let fk_name = {
-        let mapped_name = match args.optional_arg("map").map(|name| name.as_str()) {
-            Some(Ok("")) => {
+        let mapped_name = match args.optional_arg("map").map(|name| name.as_str_with_span()) {
+            Some(Ok(("", _))) => {
                 ctx.push_error(args.new_attribute_validation_error("The `map` argument cannot be an empty string."));
                 None
             }
@@ -724,7 +754,7 @@ fn visit_relation<'ast>(
         mapped_name
     };
 
-    relation_field.mapped_name = fk_name;
+    relation_field.mapped_name = fk_name.map(|(s, span)| AstString::from_literal(s.to_owned(), span));
 }
 
 enum FieldResolutionError<'ast> {

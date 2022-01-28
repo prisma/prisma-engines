@@ -6,15 +6,19 @@ use std::collections::HashMap;
 /// Represents a list of arguments.
 #[derive(Debug, Default)]
 pub(crate) struct Arguments<'a> {
-    attribute: Option<&'a ast::Attribute>,
+    attribute: Option<(&'a ast::Attribute, ast::AttributeId)>,
     args: HashMap<Option<&'a str>, &'a ast::Argument>, // the _remaining_ arguments
 }
 
 impl<'a> Arguments<'a> {
     /// Starts validating the arguments for an attribute, checking for duplicate arguments in the process.
-    pub(super) fn set_attribute(&mut self, attribute: &'a ast::Attribute) -> Result<(), Diagnostics> {
+    pub(super) fn set_attribute(
+        &mut self,
+        attribute: &'a ast::Attribute,
+        attribute_id: ast::AttributeId,
+    ) -> Result<(), Diagnostics> {
         let arguments = &attribute.arguments;
-        self.attribute = Some(attribute);
+        self.attribute = Some((attribute, attribute_id));
         self.args.clear();
         self.args.reserve(arguments.arguments.len());
         let mut errors = Diagnostics::new();
@@ -78,7 +82,7 @@ impl<'a> Arguments<'a> {
         errors.to_result()
     }
 
-    pub(crate) fn attribute(&self) -> &'a ast::Attribute {
+    pub(crate) fn attribute(&self) -> (&'a ast::Attribute, ast::AttributeId) {
         self.attribute.unwrap()
     }
 
@@ -94,7 +98,7 @@ impl<'a> Arguments<'a> {
 
     /// Gets the span of all arguments wrapped by this instance.
     pub(crate) fn span(&self) -> ast::Span {
-        self.attribute().span
+        self.attribute().0.span
     }
 
     pub(crate) fn optional_arg(&mut self, name: &'a str) -> Option<ValueValidator<'a>> {
@@ -114,7 +118,7 @@ impl<'a> Arguments<'a> {
     }
 
     pub(crate) fn new_attribute_validation_error(&self, message: &str) -> DatamodelError {
-        DatamodelError::new_attribute_validation_error(message, self.attribute().name(), self.span())
+        DatamodelError::new_attribute_validation_error(message, self.attribute().0.name(), self.span())
     }
 
     pub(crate) fn optional_default_arg(&mut self, name: &'a str) -> Option<ValueValidator<'a>> {

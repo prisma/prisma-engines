@@ -7,28 +7,28 @@ use std::{borrow::Cow, collections::HashMap, ops::Deref};
 /// - Global ones can be triggering validation errors between different models.
 /// - Local ones are only valid in the given model.
 #[derive(Debug, Default)]
-pub(crate) struct ConstraintNamespace<'ast> {
-    global: HashMap<(ConstraintScope, Cow<'ast, str>), usize>,
-    local: HashMap<(ast::ModelId, ConstraintScope, Cow<'ast, str>), usize>,
-    local_custom_name: HashMap<(ast::ModelId, Cow<'ast, str>), usize>,
+pub(crate) struct ConstraintNamespace<'db> {
+    global: HashMap<(ConstraintScope, Cow<'db, str>), usize>,
+    local: HashMap<(ast::ModelId, ConstraintScope, Cow<'db, str>), usize>,
+    local_custom_name: HashMap<(ast::ModelId, Cow<'db, str>), usize>,
 }
 
-impl<'ast> ConstraintNamespace<'ast> {
+impl<'db> ConstraintNamespace<'db> {
     /// An iterator of namespace violations with the given name, first globally followed up with
     /// local violations in the given model.
     pub(crate) fn constraint_name_scope_violations(
         &self,
         model_id: ast::ModelId,
-        name: ConstraintName<'ast>,
-    ) -> impl Iterator<Item = &'ast ConstraintScope> + '_ {
+        name: ConstraintName<'db>,
+    ) -> impl Iterator<Item = &'db ConstraintScope> + '_ {
         self.global_constraint_name_scope_violations(name)
             .chain(self.local_constraint_name_scope_violations(model_id, name))
     }
 
     fn global_constraint_name_scope_violations(
         &self,
-        name: ConstraintName<'ast>,
-    ) -> impl Iterator<Item = &'ast ConstraintScope> + '_ {
+        name: ConstraintName<'db>,
+    ) -> impl Iterator<Item = &'db ConstraintScope> + '_ {
         name.possible_scopes().filter(
             move |scope| match self.global.get(&(**scope, Cow::from(name.as_ref()))) {
                 Some(count) => *count > 1,
@@ -40,8 +40,8 @@ impl<'ast> ConstraintNamespace<'ast> {
     fn local_constraint_name_scope_violations(
         &self,
         model_id: ast::ModelId,
-        name: ConstraintName<'ast>,
-    ) -> impl Iterator<Item = &'ast ConstraintScope> + '_ {
+        name: ConstraintName<'db>,
+    ) -> impl Iterator<Item = &'db ConstraintScope> + '_ {
         name.possible_scopes().filter(move |scope| {
             match self.local.get(&(model_id, **scope, Cow::from(name.as_ref()))) {
                 Some(count) => *count > 1,
@@ -50,7 +50,7 @@ impl<'ast> ConstraintNamespace<'ast> {
         })
     }
 
-    pub(crate) fn local_custom_name_scope_violations(&self, model_id: ast::ModelId, name: &'ast str) -> bool {
+    pub(crate) fn local_custom_name_scope_violations(&self, model_id: ast::ModelId, name: &'db str) -> bool {
         match self.local_custom_name.get(&(model_id, Cow::from(name))) {
             Some(count) => *count > 1,
             None => false,
@@ -60,7 +60,7 @@ impl<'ast> ConstraintNamespace<'ast> {
     /// Add all index and unique constraints from the data model to a global validation scope.
     pub(super) fn add_global_indexes(
         &mut self,
-        db: &ParserDatabase<'ast>,
+        db: &ParserDatabase<'db>,
         connector: &dyn Connector,
         scope: ConstraintScope,
     ) {
@@ -76,7 +76,7 @@ impl<'ast> ConstraintNamespace<'ast> {
     /// Add all foreign key constraints from the data model to a global validation scope.
     pub(super) fn add_global_relations(
         &mut self,
-        db: &ParserDatabase<'ast>,
+        db: &'db ParserDatabase<'_>,
         connector: &dyn Connector,
         scope: ConstraintScope,
     ) {
@@ -93,7 +93,7 @@ impl<'ast> ConstraintNamespace<'ast> {
     /// Add all primary key constraints from the data model to a global validation scope.
     pub(super) fn add_global_primary_keys(
         &mut self,
-        db: &ParserDatabase<'ast>,
+        db: &ParserDatabase<'db>,
         connector: &dyn Connector,
         scope: ConstraintScope,
     ) {
@@ -108,7 +108,7 @@ impl<'ast> ConstraintNamespace<'ast> {
     /// Add all default constraints from the data model to a global validation scope.
     pub(super) fn add_global_default_constraints(
         &mut self,
-        db: &ParserDatabase<'ast>,
+        db: &ParserDatabase<'db>,
         connector: &dyn Connector,
         scope: ConstraintScope,
     ) {
@@ -128,7 +128,7 @@ impl<'ast> ConstraintNamespace<'ast> {
     /// Add all index and unique constraints to separate namespaces per model.
     pub(super) fn add_local_indexes(
         &mut self,
-        db: &ParserDatabase<'ast>,
+        db: &'db ParserDatabase<'_>,
         connector: &dyn Connector,
         scope: ConstraintScope,
     ) {
@@ -147,7 +147,7 @@ impl<'ast> ConstraintNamespace<'ast> {
     /// Add all primary key constraints to separate namespaces per model.
     pub(super) fn add_local_primary_keys(
         &mut self,
-        db: &ParserDatabase<'ast>,
+        db: &ParserDatabase<'db>,
         connector: &dyn Connector,
         scope: ConstraintScope,
     ) {
@@ -160,7 +160,7 @@ impl<'ast> ConstraintNamespace<'ast> {
     }
 
     /// Add all primary key and unique index custom names to separate namespaces per model.
-    pub(super) fn add_local_custom_names_for_primary_keys_and_uniques(&mut self, db: &ParserDatabase<'ast>) {
+    pub(super) fn add_local_custom_names_for_primary_keys_and_uniques(&mut self, db: &ParserDatabase<'db>) {
         for model in db.walk_models() {
             if let Some(name) = model.primary_key().and_then(|pk| pk.name()) {
                 let counter = self
@@ -184,7 +184,7 @@ impl<'ast> ConstraintNamespace<'ast> {
     /// Add all foreign key constraints to separate namespaces per model.
     pub(super) fn add_local_relations(
         &mut self,
-        db: &ParserDatabase<'ast>,
+        db: &'db ParserDatabase<'_>,
         connector: &dyn Connector,
         scope: ConstraintScope,
     ) {
@@ -205,16 +205,16 @@ impl<'ast> ConstraintNamespace<'ast> {
 /// A constraint name marked by the constraint type it belongs. The variant decides on which
 /// validation scopes it will be checked on.
 #[derive(Clone, Copy, Debug)]
-pub(crate) enum ConstraintName<'ast> {
-    Index(&'ast str),
-    Relation(&'ast str),
-    Default(&'ast str),
-    PrimaryKey(&'ast str),
+pub(crate) enum ConstraintName<'db> {
+    Index(&'db str),
+    Relation(&'db str),
+    Default(&'db str),
+    PrimaryKey(&'db str),
 }
 
-impl<'ast> ConstraintName<'ast> {
+impl<'db> ConstraintName<'db> {
     /// An iterator of scopes the given name should be checked against.
-    fn possible_scopes(self) -> impl Iterator<Item = &'ast ConstraintScope> {
+    fn possible_scopes(self) -> impl Iterator<Item = &'db ConstraintScope> {
         use ConstraintScope::*;
 
         match self {
@@ -243,7 +243,7 @@ impl<'ast> ConstraintName<'ast> {
     }
 }
 
-impl<'ast> AsRef<str> for ConstraintName<'ast> {
+impl<'db> AsRef<str> for ConstraintName<'db> {
     fn as_ref(&self) -> &str {
         match self {
             ConstraintName::Index(x) => x,
@@ -254,7 +254,7 @@ impl<'ast> AsRef<str> for ConstraintName<'ast> {
     }
 }
 
-impl<'ast> Deref for ConstraintName<'ast> {
+impl<'db> Deref for ConstraintName<'db> {
     type Target = str;
 
     fn deref(&self) -> &Self::Target {

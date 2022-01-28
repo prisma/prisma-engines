@@ -32,7 +32,7 @@ pub(super) fn visit_model_field_default<'ast>(
         let default_value = DefaultAttribute {
             value: value.value,
             mapped_name,
-            default_attribute,
+            default_attribute: default_attribute.0,
         };
 
         field_data.default = Some(default_value);
@@ -117,7 +117,7 @@ pub(super) fn visit_composite_field_default<'ast>(
         let default_value = DefaultAttribute {
             value: value.value,
             mapped_name: None,
-            default_attribute,
+            default_attribute: default_attribute.0,
         };
 
         field_data.default = Some(default_value);

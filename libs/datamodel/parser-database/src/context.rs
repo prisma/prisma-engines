@@ -66,12 +66,22 @@ impl<'ast> Context<'ast> {
         mut scalar_field_type: ScalarFieldType,
         f: impl FnOnce(&'_ mut Attributes<'ast>, &'_ mut Context<'ast>),
     ) {
-        self.attributes
-            .set_attributes(&self.db.ast[model_id][field_id].attributes);
+        self.attributes.set_attributes(
+            self.db.ast[model_id][field_id]
+                .attributes
+                .iter()
+                .enumerate()
+                .map(|(attr_idx, attr)| (attr, ast::AttributeId::ModelField(model_id, field_id, attr_idx))),
+        );
 
         while let ScalarFieldType::Alias(alias_id) = scalar_field_type {
             let alias = &self.db.ast[alias_id];
-            self.attributes.extend_attributes(&alias.attributes);
+            let attrs = alias
+                .attributes
+                .iter()
+                .enumerate()
+                .map(|(attr_idx, attr)| (attr, ast::AttributeId::TypeAlias(alias_id, attr_idx)));
+            self.attributes.extend_attributes(attrs);
             scalar_field_type = self.db.types.type_aliases[&alias_id];
         }
 
@@ -89,7 +99,7 @@ impl<'ast> Context<'ast> {
     /// closure that all attributes were validated.
     pub(super) fn visit_attributes(
         &mut self,
-        ast_attributes: &'ast [ast::Attribute],
+        ast_attributes: impl ExactSizeIterator<Item = (&'ast ast::Attribute, ast::AttributeId)>,
         f: impl FnOnce(&'_ mut Attributes<'ast>, &'_ mut Context<'ast>),
     ) {
         self.attributes.set_attributes(ast_attributes);
@@ -115,9 +125,10 @@ impl<'ast> Context<'ast> {
     fn with_arguments(
         &mut self,
         attribute: &'ast ast::Attribute,
+        attribute_id: ast::AttributeId,
         f: impl FnOnce(&mut Arguments<'ast>, &mut Context<'ast>),
     ) {
-        let mut arguments = match self.arguments.set_attribute(attribute) {
+        let mut arguments = match self.arguments.set_attribute(attribute, attribute_id) {
             Ok(()) => std::mem::take(&mut self.arguments), // reuse the allocation for arguments
             Err(mut err) => {
                 self.diagnostics.append(&mut err);

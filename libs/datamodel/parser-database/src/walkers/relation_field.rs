@@ -16,7 +16,7 @@ pub struct RelationFieldWalker<'ast, 'db> {
     pub(crate) model_id: ast::ModelId,
     pub(crate) field_id: ast::FieldId,
     pub(crate) db: &'db ParserDatabase<'ast>,
-    pub(crate) relation_field: &'db RelationField<'ast>,
+    pub(crate) relation_field: &'db RelationField,
 }
 
 impl<'ast, 'db> PartialEq for RelationFieldWalker<'ast, 'db> {
@@ -41,8 +41,8 @@ impl<'ast, 'db> RelationFieldWalker<'ast, 'db> {
     }
 
     /// The foreign key name of the relation (`@relation(map: ...)`).
-    pub fn mapped_name(self) -> Option<&'ast str> {
-        self.attributes().mapped_name
+    pub fn mapped_name(self) -> Option<&'db str> {
+        self.attributes().mapped_name.as_ref().map(|s| self.db.resolve_str(s))
     }
 
     /// The field name.
@@ -55,7 +55,7 @@ impl<'ast, 'db> RelationFieldWalker<'ast, 'db> {
         &self.db.ast[self.model_id][self.field_id]
     }
 
-    pub(crate) fn attributes(self) -> &'db RelationField<'ast> {
+    fn attributes(self) -> &'db RelationField {
         self.relation_field
     }
 
@@ -105,7 +105,9 @@ impl<'ast, 'db> RelationFieldWalker<'ast, 'db> {
 
     /// The `@relation` attribute in the field AST.
     pub fn relation_attribute(self) -> Option<&'ast ast::Attribute> {
-        self.attributes().relation_attribute
+        self.attributes()
+            .relation_attribute
+            .map(|attr_id| &self.db.ast[attr_id])
     }
 
     pub(crate) fn references_model(self, other: ast::ModelId) -> bool {

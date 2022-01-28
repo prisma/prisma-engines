@@ -20,7 +20,7 @@ pub(super) struct Names<'ast, 'db> {
     index_names: HashMap<ModelId, HashSet<&'ast str>>,
     unique_names: HashMap<ModelId, HashSet<&'ast str>>,
     primary_key_names: HashMap<ModelId, &'ast str>,
-    pub(super) constraint_namespace: ConstraintNamespace<'ast>,
+    pub(super) constraint_namespace: ConstraintNamespace<'db>,
 }
 
 impl<'ast, 'db> Names<'ast, 'db> {
@@ -101,7 +101,7 @@ impl<'ast, 'db> Names<'ast, 'db> {
 
 /// Generate namespaces per database requirements, and add the names to it from the constraints
 /// part of the namespace.
-fn infer_namespaces<'ast>(db: &ParserDatabase<'ast>, connector: &dyn Connector) -> ConstraintNamespace<'ast> {
+fn infer_namespaces<'db>(db: &'db ParserDatabase<'_>, connector: &dyn Connector) -> ConstraintNamespace<'db> {
     use datamodel_connector::ConstraintScope;
 
     let mut namespaces = ConstraintNamespace::default();

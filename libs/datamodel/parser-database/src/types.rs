@@ -31,7 +31,7 @@ pub(super) struct Types<'ast> {
     pub(super) scalar_fields: BTreeMap<(ast::ModelId, ast::FieldId), ScalarField<'ast>>,
     /// This contains only the relation fields actually present in the schema
     /// source text.
-    pub(super) relation_fields: BTreeMap<(ast::ModelId, ast::FieldId), RelationField<'ast>>,
+    pub(super) relation_fields: BTreeMap<(ast::ModelId, ast::FieldId), RelationField>,
     pub(super) enum_attributes: HashMap<ast::EnumId, EnumAttributes<'ast>>,
     pub(super) model_attributes: HashMap<ast::ModelId, ModelAttributes<'ast>>,
 }
@@ -58,7 +58,7 @@ impl<'ast> Types<'ast> {
         &mut self,
         model_id: ast::ModelId,
         field_id: ast::FieldId,
-    ) -> Option<RelationField<'ast>> {
+    ) -> Option<RelationField> {
         self.relation_fields.remove(&(model_id, field_id))
     }
 }
@@ -125,7 +125,7 @@ pub(crate) struct ScalarField<'ast> {
 }
 
 #[derive(Debug)]
-pub(crate) struct RelationField<'ast> {
+pub(crate) struct RelationField {
     pub(crate) referenced_model: ast::ModelId,
     pub(crate) on_delete: Option<(crate::ReferentialAction, ast::Span)>,
     pub(crate) on_update: Option<(crate::ReferentialAction, ast::Span)>,
@@ -137,11 +137,11 @@ pub(crate) struct RelationField<'ast> {
     pub(crate) name: Option<AstString>,
     pub(crate) is_ignored: bool,
     /// The foreign key name _explicitly present_ in the AST through the `@map` attribute.
-    pub(crate) mapped_name: Option<&'ast str>,
-    pub(crate) relation_attribute: Option<&'ast ast::Attribute>,
+    pub(crate) mapped_name: Option<AstString>,
+    pub(crate) relation_attribute: Option<ast::AttributeId>,
 }
 
-impl RelationField<'_> {
+impl RelationField {
     fn new(referenced_model: ast::ModelId) -> Self {
         RelationField {
             referenced_model,

@@ -15,7 +15,7 @@ mod top;
 mod traits;
 
 pub use argument::{Argument, ArgumentsList, EmptyArgument};
-pub use attribute::Attribute;
+pub use attribute::{Attribute, AttributeId};
 pub use comment::Comment;
 pub use composite_type::{CompositeType, CompositeTypeId};
 pub use config::ConfigBlockProperty;
