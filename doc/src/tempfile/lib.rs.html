@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;tempfile-3.2.0&#x2F;src&#x2F;lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><script defer src="../../main.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;tempfile-3.3.0&#x2F;src&#x2F;lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><script defer src="../../main.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script>
     <noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="shortcut icon" href="https:&#x2F;&#x2F;www.rust-lang.org&#x2F;favicon.ico"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../tempfile/index.html'><div class='logo-container rust-logo'><img src='https:&#x2F;&#x2F;www.rust-lang.org&#x2F;logos&#x2F;rust-logo-128x128-blk-v2.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
@@ -499,6 +499,43 @@
 <span id="498">498</span>
 <span id="499">499</span>
 <span id="500">500</span>
+<span id="501">501</span>
+<span id="502">502</span>
+<span id="503">503</span>
+<span id="504">504</span>
+<span id="505">505</span>
+<span id="506">506</span>
+<span id="507">507</span>
+<span id="508">508</span>
+<span id="509">509</span>
+<span id="510">510</span>
+<span id="511">511</span>
+<span id="512">512</span>
+<span id="513">513</span>
+<span id="514">514</span>
+<span id="515">515</span>
+<span id="516">516</span>
+<span id="517">517</span>
+<span id="518">518</span>
+<span id="519">519</span>
+<span id="520">520</span>
+<span id="521">521</span>
+<span id="522">522</span>
+<span id="523">523</span>
+<span id="524">524</span>
+<span id="525">525</span>
+<span id="526">526</span>
+<span id="527">527</span>
+<span id="528">528</span>
+<span id="529">529</span>
+<span id="530">530</span>
+<span id="531">531</span>
+<span id="532">532</span>
+<span id="533">533</span>
+<span id="534">534</span>
+<span id="535">535</span>
+<span id="536">536</span>
+<span id="537">537</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Temporary files and directories.</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! - Use the [`tempfile()`] function for temporary files</span>
@@ -527,6 +564,42 @@
 <span class="doccomment">//! `tempfile` doesn&#39;t rely on file paths so this isn&#39;t an issue. However, `NamedTempFile` does</span>
 <span class="doccomment">//! rely on file paths for _some_ operations. See the security documentation on</span>
 <span class="doccomment">//! the `NamedTempFile` type for more information.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! ## Early drop pitfall</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! Because `TempDir` and `NamedTempFile` rely on their destructors for cleanup, this can lead</span>
+<span class="doccomment">//! to an unexpected early removal of the directory/file, usually when working with APIs which are</span>
+<span class="doccomment">//! generic over `AsRef&lt;Path&gt;`. Consider the following example:</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! ```no_run</span>
+<span class="doccomment">//! # use tempfile::tempdir;</span>
+<span class="doccomment">//! # use std::io;</span>
+<span class="doccomment">//! # use std::process::Command;</span>
+<span class="doccomment">//! # fn main() {</span>
+<span class="doccomment">//! #     if let Err(_) = run() {</span>
+<span class="doccomment">//! #         ::std::process::exit(1);</span>
+<span class="doccomment">//! #     }</span>
+<span class="doccomment">//! # }</span>
+<span class="doccomment">//! # fn run() -&gt; Result&lt;(), io::Error&gt; {</span>
+<span class="doccomment">//! // Create a directory inside of `std::env::temp_dir()`.</span>
+<span class="doccomment">//! let temp_dir = tempdir()?;</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! // Spawn the `touch` command inside the temporary directory and collect the exit status</span>
+<span class="doccomment">//! // Note that `temp_dir` is **not** moved into `current_dir`, but passed as a reference</span>
+<span class="doccomment">//! let exit_status = Command::new(&quot;touch&quot;).arg(&quot;tmp&quot;).current_dir(&amp;temp_dir).status()?;</span>
+<span class="doccomment">//! assert!(exit_status.success());</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! # Ok(())</span>
+<span class="doccomment">//! # }</span>
+<span class="doccomment">//! ```</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! This works because a reference to `temp_dir` is passed to `current_dir`, resulting in the</span>
+<span class="doccomment">//! destructor of `temp_dir` being run after the `Command` has finished execution. Moving the</span>
+<span class="doccomment">//! `TempDir` into the `current_dir` call would result in the `TempDir` being converted into</span>
+<span class="doccomment">//! an internal representation, with the original value being dropped and the directory thus</span>
+<span class="doccomment">//! being deleted, before the command can be executed.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! The `touch` command would fail with an `No such file or directory` error.</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! ## Examples</span>
 <span class="doccomment">//!</span>
@@ -626,9 +699,10 @@
 <span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">test</span>, <span class="ident">deny</span>(<span class="ident">warnings</span>))]</span>
 <span class="attribute">#![<span class="ident">deny</span>(<span class="ident">rust_2018_idioms</span>)]</span>
 <span class="attribute">#![<span class="ident">allow</span>(<span class="ident">clippy::redundant_field_names</span>)]</span>
+<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;nightly&quot;</span>, <span class="ident">feature</span>(<span class="ident">wasi_ext</span>))]</span>
 
-<span class="attribute">#[<span class="ident">macro_use</span>]</span>
-<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">cfg_if</span>;
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">doctest</span>)]</span>
+<span class="macro">doc_comment::doctest!</span>(<span class="string">&quot;../README.md&quot;</span>);
 
 <span class="kw">const</span> <span class="ident">NUM_RETRIES</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">31</span>;
 <span class="kw">const</span> <span class="ident">NUM_RAND_CHARS</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">6</span>;

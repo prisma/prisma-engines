@@ -142,24 +142,18 @@
 <span id="141">141</span>
 <span id="142">142</span>
 <span id="143">143</span>
-<span id="144">144</span>
-<span id="145">145</span>
-<span id="146">146</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">json_rpc::types</span>::<span class="kw-2">*</span>, <span class="ident">CoreError</span>, <span class="ident">CoreResult</span>};
 <span class="kw">use</span> <span class="ident">migration_connector</span>::{
     <span class="ident">migrations_directory</span>::{<span class="ident">error_on_changed_provider</span>, <span class="ident">list_migrations</span>, <span class="ident">MigrationDirectory</span>},
-    <span class="ident">ConnectorError</span>, <span class="ident">MigrationRecord</span>, <span class="ident">PersistenceNotInitializedError</span>,
+    <span class="ident">ConnectorError</span>, <span class="ident">MigrationConnector</span>, <span class="ident">MigrationRecord</span>, <span class="ident">PersistenceNotInitializedError</span>,
 };
 <span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">path::Path</span>, <span class="ident">time::Instant</span>};
 <span class="kw">use</span> <span class="ident">user_facing_errors::migration_engine::FoundFailedMigrations</span>;
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">apply_migrations</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span>(
-    <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="ident">ApplyMigrationsInput</span>,
-    <span class="ident">connector</span>: <span class="kw-2">&amp;</span><span class="ident">C</span>,
-) -&gt; <span class="ident">CoreResult</span><span class="op">&lt;</span><span class="ident">ApplyMigrationsOutput</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">C</span>: <span class="ident">migration_connector::MigrationConnector</span>,
-{
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">apply_migrations</span>(
+    <span class="ident">input</span>: <span class="ident">ApplyMigrationsInput</span>,
+    <span class="ident">connector</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">MigrationConnector</span>,
+) -&gt; <span class="ident">CoreResult</span><span class="op">&lt;</span><span class="ident">ApplyMigrationsOutput</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">start</span> <span class="op">=</span> <span class="ident">Instant::now</span>();
     <span class="kw">let</span> <span class="ident">applier</span> <span class="op">=</span> <span class="ident">connector</span>.<span class="ident">database_migration_step_applier</span>();
     <span class="kw">let</span> <span class="ident">migration_persistence</span> <span class="op">=</span> <span class="ident">connector</span>.<span class="ident">migration_persistence</span>();

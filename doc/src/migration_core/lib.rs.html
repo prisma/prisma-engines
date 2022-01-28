@@ -152,6 +152,12 @@
 <span id="151">151</span>
 <span id="152">152</span>
 <span id="153">153</span>
+<span id="154">154</span>
+<span id="155">155</span>
+<span id="156">156</span>
+<span id="157">157</span>
+<span id="158">158</span>
+<span id="159">159</span>
 </pre><pre class="rust"><code><span class="attribute">#![<span class="ident">deny</span>(<span class="ident">rust_2018_idioms</span>, <span class="ident">unsafe_code</span>, <span class="ident">missing_docs</span>)]</span>
 <span class="attribute">#![<span class="ident">allow</span>(<span class="ident">clippy::needless_collect</span>)]</span> <span class="comment">// the implementation of that rule is way too eager, it rejects necessary collects</span>
 
@@ -164,24 +170,26 @@
 <span class="kw">mod</span> <span class="ident">api</span>;
 <span class="kw">mod</span> <span class="ident">core_error</span>;
 <span class="kw">mod</span> <span class="ident">rpc</span>;
+<span class="kw">mod</span> <span class="ident">state</span>;
 
 <span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::{<span class="ident">api::GenericApi</span>, <span class="ident">core_error</span>::<span class="kw-2">*</span>, <span class="ident">rpc::rpc_api</span>};
-
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">core_error</span>::<span class="kw-2">*</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">migration_connector</span>;
 
 <span class="kw">use</span> <span class="ident">datamodel</span>::{
     <span class="ident">common</span>::{
         <span class="ident">preview_features::PreviewFeature</span>,
-        <span class="ident">provider_names</span>::{<span class="ident">MSSQL_SOURCE_NAME</span>, <span class="ident">MYSQL_SOURCE_NAME</span>, <span class="ident">POSTGRES_SOURCE_NAME</span>, <span class="ident">SQLITE_SOURCE_NAME</span>},
+        <span class="ident">provider_names</span>::{
+            <span class="ident">MONGODB_SOURCE_NAME</span>, <span class="ident">MSSQL_SOURCE_NAME</span>, <span class="ident">MYSQL_SOURCE_NAME</span>, <span class="ident">POSTGRES_SOURCE_NAME</span>, <span class="ident">SQLITE_SOURCE_NAME</span>,
+        },
     },
     <span class="ident">Datasource</span>,
 };
+<span class="kw">use</span> <span class="ident">datamodel</span>::{<span class="ident">schema_ast::ast::SchemaAst</span>, <span class="ident">ValidatedSchema</span>};
 <span class="kw">use</span> <span class="ident">enumflags2::BitFlags</span>;
+<span class="kw">use</span> <span class="ident">mongodb_migration_connector::MongoDbMigrationConnector</span>;
+<span class="kw">use</span> <span class="ident">sql_migration_connector::SqlMigrationConnector</span>;
 <span class="kw">use</span> <span class="ident">std::env</span>;
 <span class="kw">use</span> <span class="ident">user_facing_errors</span>::{<span class="ident">common::InvalidConnectionString</span>, <span class="ident">KnownError</span>};
-
-<span class="kw">use</span> <span class="ident">datamodel</span>::{<span class="ident">schema_ast::ast::SchemaAst</span>, <span class="ident">ValidatedSchema</span>};
 
 <span class="kw">fn</span> <span class="ident">parse_ast</span>(<span class="ident">schema</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">CoreResult</span><span class="op">&lt;</span><span class="ident">SchemaAst</span><span class="op">&gt;</span> {
     <span class="ident">datamodel::parse_schema_ast</span>(<span class="ident">schema</span>)
@@ -192,62 +200,69 @@
     <span class="ident">datamodel::parse_schema_parserdb</span>(<span class="ident">schema</span>, <span class="ident">ast</span>).<span class="ident">map_err</span>(<span class="ident">CoreError::new_schema_parser_error</span>)
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;mongodb&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">datamodel::common::provider_names::MONGODB_SOURCE_NAME</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;mongodb&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">mongodb_migration_connector::MongoDbMigrationConnector</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;sql&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">sql_migration_connector::SqlMigrationConnector</span>;
+<span class="kw">fn</span> <span class="ident">connector_for_connection_string</span>(
+    <span class="ident">connection_string</span>: <span class="ident">String</span>,
+    <span class="ident">shadow_database_connection_string</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+    <span class="ident">preview_features</span>: <span class="ident">BitFlags</span><span class="op">&lt;</span><span class="ident">PreviewFeature</span><span class="op">&gt;</span>,
+) -&gt; <span class="ident">CoreResult</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">migration_connector::MigrationConnector</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">match</span> <span class="ident">connection_string</span>.<span class="ident">split</span>(<span class="string">&#39;:&#39;</span>).<span class="ident">next</span>() {
+        <span class="prelude-val">Some</span>(<span class="string">&quot;postgres&quot;</span>) <span class="op">|</span> <span class="prelude-val">Some</span>(<span class="string">&quot;postgresql&quot;</span>) =&gt; {
+            <span class="kw">let</span> <span class="ident">url</span> <span class="op">=</span> <span class="ident">disable_postgres_statement_cache</span>(<span class="kw-2">&amp;</span><span class="ident">connection_string</span>)<span class="question-mark">?</span>;
+            <span class="kw">let</span> <span class="ident">connector</span> <span class="op">=</span> <span class="ident">SqlMigrationConnector::new</span>(<span class="ident">url</span>, <span class="ident">preview_features</span>, <span class="ident">shadow_database_connection_string</span>)<span class="question-mark">?</span>;
+            <span class="prelude-val">Ok</span>(<span class="ident">Box::new</span>(<span class="ident">connector</span>))
+        }
+        <span class="prelude-val">Some</span>(<span class="string">&quot;file&quot;</span>) <span class="op">|</span> <span class="prelude-val">Some</span>(<span class="string">&quot;mysql&quot;</span>) <span class="op">|</span> <span class="prelude-val">Some</span>(<span class="string">&quot;sqlserver&quot;</span>) =&gt; {
+            <span class="kw">let</span> <span class="ident">connector</span> <span class="op">=</span>
+                <span class="ident">SqlMigrationConnector::new</span>(<span class="ident">connection_string</span>, <span class="ident">preview_features</span>, <span class="ident">shadow_database_connection_string</span>)<span class="question-mark">?</span>;
+            <span class="prelude-val">Ok</span>(<span class="ident">Box::new</span>(<span class="ident">connector</span>))
+        }
+        <span class="prelude-val">Some</span>(<span class="string">&quot;mongodb+srv&quot;</span>) <span class="op">|</span> <span class="prelude-val">Some</span>(<span class="string">&quot;mongodb&quot;</span>) =&gt; {
+            <span class="kw">let</span> <span class="ident">connector</span> <span class="op">=</span> <span class="ident">MongoDbMigrationConnector::new</span>(<span class="ident">connection_string</span>, <span class="ident">preview_features</span>);
+            <span class="prelude-val">Ok</span>(<span class="ident">Box::new</span>(<span class="ident">connector</span>))
+        }
+        <span class="prelude-val">Some</span>(<span class="ident">other</span>) =&gt; <span class="prelude-val">Err</span>(<span class="ident">CoreError::url_parse_error</span>(<span class="macro">format!</span>(
+            <span class="string">&quot;`{other}` is not a known connection URL scheme. Prisma cannot determine the connector.&quot;</span>
+        ))),
+        <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">CoreError::user_facing</span>(<span class="ident">InvalidConnectionString</span> {
+            <span class="ident">details</span>: <span class="ident">String::new</span>(),
+        })),
+    }
+}
 
-<span class="doccomment">/// Top-level constructor for the migration engine API.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">migration_api</span>(<span class="ident">datamodel</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">CoreResult</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">api::GenericApi</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+<span class="doccomment">/// Go from a schema to a connector</span>
+<span class="kw">fn</span> <span class="ident">schema_to_connector</span>(<span class="ident">datamodel</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">CoreResult</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">migration_connector::MigrationConnector</span><span class="op">&gt;</span><span class="op">&gt;</span> {
     <span class="kw">let</span> (<span class="ident">source</span>, <span class="ident">url</span>, <span class="ident">preview_features</span>, <span class="ident">shadow_database_url</span>) <span class="op">=</span> <span class="ident">parse_configuration</span>(<span class="ident">datamodel</span>)<span class="question-mark">?</span>;
 
     <span class="kw">match</span> <span class="ident">source</span>.<span class="ident">active_provider</span>.<span class="ident">as_str</span>() {
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;sql&quot;</span>)]</span>
         <span class="ident">POSTGRES_SOURCE_NAME</span> =&gt; {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">u</span> <span class="op">=</span> <span class="ident">url::Url::parse</span>(<span class="kw-2">&amp;</span><span class="ident">url</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">err</span><span class="op">|</span> {
-                <span class="kw">let</span> <span class="ident">details</span> <span class="op">=</span> <span class="ident">user_facing_errors::quaint::invalid_connection_string_description</span>(<span class="kw-2">&amp;</span><span class="macro">format!</span>(
-                    <span class="string">&quot;Error parsing connection string: {}&quot;</span>,
-                    <span class="ident">err</span>
-                ));
-
-                <span class="ident">CoreError::from</span>(<span class="ident">KnownError::new</span>(<span class="ident">InvalidConnectionString</span> { <span class="ident">details</span> }))
-            })<span class="question-mark">?</span>;
-
-            <span class="kw">let</span> <span class="ident">params</span>: <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">String</span>, <span class="ident">String</span>)<span class="op">&gt;</span> <span class="op">=</span> <span class="ident">u</span>.<span class="ident">query_pairs</span>().<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">k</span>, <span class="ident">v</span>)<span class="op">|</span> (<span class="ident">k</span>.<span class="ident">to_string</span>(), <span class="ident">v</span>.<span class="ident">to_string</span>())).<span class="ident">collect</span>();
-
-            <span class="ident">u</span>.<span class="ident">query_pairs_mut</span>().<span class="ident">clear</span>();
-
-            <span class="kw">for</span> (<span class="ident">k</span>, <span class="ident">v</span>) <span class="kw">in</span> <span class="ident">params</span>.<span class="ident">into_iter</span>() {
-                <span class="kw">if</span> <span class="ident">k</span> <span class="op">==</span> <span class="string">&quot;statement_cache_size&quot;</span> {
-                    <span class="ident">u</span>.<span class="ident">query_pairs_mut</span>().<span class="ident">append_pair</span>(<span class="string">&quot;statement_cache_size&quot;</span>, <span class="string">&quot;0&quot;</span>);
-                } <span class="kw">else</span> {
-                    <span class="ident">u</span>.<span class="ident">query_pairs_mut</span>().<span class="ident">append_pair</span>(<span class="kw-2">&amp;</span><span class="ident">k</span>, <span class="kw-2">&amp;</span><span class="ident">v</span>);
-                }
-            }
-
-            <span class="kw">if</span> <span class="op">!</span><span class="ident">u</span>.<span class="ident">query_pairs</span>().<span class="ident">any</span>(<span class="op">|</span>(<span class="ident">k</span>, <span class="kw">_</span>)<span class="op">|</span> <span class="ident">k</span> <span class="op">==</span> <span class="string">&quot;statement_cache_size&quot;</span>) {
-                <span class="ident">u</span>.<span class="ident">query_pairs_mut</span>().<span class="ident">append_pair</span>(<span class="string">&quot;statement_cache_size&quot;</span>, <span class="string">&quot;0&quot;</span>);
-            }
-
-            <span class="kw">let</span> <span class="ident">connector</span> <span class="op">=</span> <span class="ident">SqlMigrationConnector::new</span>(<span class="ident">u</span>.<span class="ident">to_string</span>(), <span class="ident">preview_features</span>, <span class="ident">shadow_database_url</span>)<span class="question-mark">?</span>;
-
+            <span class="kw">let</span> <span class="ident">url</span> <span class="op">=</span> <span class="ident">disable_postgres_statement_cache</span>(<span class="kw-2">&amp;</span><span class="ident">url</span>)<span class="question-mark">?</span>;
+            <span class="kw">let</span> <span class="ident">connector</span> <span class="op">=</span> <span class="ident">SqlMigrationConnector::new</span>(<span class="ident">url</span>, <span class="ident">preview_features</span>, <span class="ident">shadow_database_url</span>)<span class="question-mark">?</span>;
             <span class="prelude-val">Ok</span>(<span class="ident">Box::new</span>(<span class="ident">connector</span>))
         }
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;sql&quot;</span>)]</span>
         <span class="ident">MYSQL_SOURCE_NAME</span> <span class="op">|</span> <span class="ident">SQLITE_SOURCE_NAME</span> <span class="op">|</span> <span class="ident">MSSQL_SOURCE_NAME</span> =&gt; {
             <span class="kw">let</span> <span class="ident">connector</span> <span class="op">=</span> <span class="ident">SqlMigrationConnector::new</span>(<span class="ident">url</span>, <span class="ident">preview_features</span>, <span class="ident">shadow_database_url</span>)<span class="question-mark">?</span>;
-
             <span class="prelude-val">Ok</span>(<span class="ident">Box::new</span>(<span class="ident">connector</span>))
         }
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;mongodb&quot;</span>)]</span>
         <span class="ident">MONGODB_SOURCE_NAME</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Box::new</span>(<span class="ident">MongoDbMigrationConnector::new</span>(<span class="ident">url</span>, <span class="ident">preview_features</span>))),
         <span class="ident">provider</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">CoreError::from_msg</span>(<span class="macro">format!</span>(
             <span class="string">&quot;`{}` is not a supported connector.&quot;</span>,
             <span class="ident">provider</span>
         ))),
     }
+}
+
+<span class="doccomment">/// Top-level constructor for the migration engine API.</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">migration_api</span>(
+    <span class="ident">datamodel</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+    <span class="ident">host</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">std::sync::Arc</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">migration_connector::ConnectorHost</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+) -&gt; <span class="ident">CoreResult</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">api::GenericApi</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="comment">// Eagerly load the default schema, for validation errors.</span>
+    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">datamodel</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">datamodel</span> {
+        <span class="ident">parse_configuration</span>(<span class="ident">datamodel</span>)<span class="question-mark">?</span>;
+    }
+
+    <span class="kw">let</span> <span class="ident">state</span> <span class="op">=</span> <span class="ident">state::EngineState::new</span>(<span class="ident">datamodel</span>, <span class="ident">host</span>);
+    <span class="prelude-val">Ok</span>(<span class="ident">Box::new</span>(<span class="ident">state</span>))
 }
 
 <span class="kw">fn</span> <span class="ident">parse_configuration</span>(<span class="ident">datamodel</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">CoreResult</span><span class="op">&lt;</span>(<span class="ident">Datasource</span>, <span class="ident">String</span>, <span class="ident">BitFlags</span><span class="op">&lt;</span><span class="ident">PreviewFeature</span><span class="op">&gt;</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>)<span class="op">&gt;</span> {
@@ -274,36 +289,33 @@
     <span class="prelude-val">Ok</span>((<span class="ident">source</span>, <span class="ident">url</span>, <span class="ident">preview_features</span>, <span class="ident">shadow_database_url</span>))
 }
 
-<span class="doccomment">/// This is a hack. Please do not rely on this. It will disappear some day.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">datasource_from_database_str</span>(<span class="ident">database_str</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">CoreResult</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">provider</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">database_str</span>.<span class="ident">split</span>(<span class="string">&#39;:&#39;</span>).<span class="ident">next</span>() {
-        <span class="prelude-val">Some</span>(<span class="string">&quot;postgres&quot;</span>) =&gt; <span class="string">&quot;postgresql&quot;</span>,
-        <span class="prelude-val">Some</span>(<span class="string">&quot;file&quot;</span>) =&gt; <span class="string">&quot;sqlite&quot;</span>,
-        <span class="prelude-val">Some</span>(<span class="string">&quot;mongodb+srv&quot;</span>) =&gt; <span class="string">&quot;mongodb&quot;</span>,
-        <span class="prelude-val">Some</span>(<span class="ident">other</span>) =&gt; <span class="ident">other</span>,
-        <span class="prelude-val">None</span> =&gt; {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">CoreError::user_facing</span>(<span class="ident">InvalidConnectionString</span> {
-                <span class="ident">details</span>: <span class="ident">String::new</span>(),
-            }))
+<span class="kw">fn</span> <span class="ident">disable_postgres_statement_cache</span>(<span class="ident">url</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">CoreResult</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">u</span> <span class="op">=</span> <span class="ident">url::Url::parse</span>(<span class="ident">url</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">err</span><span class="op">|</span> {
+        <span class="kw">let</span> <span class="ident">details</span> <span class="op">=</span> <span class="ident">user_facing_errors::quaint::invalid_connection_string_description</span>(<span class="kw-2">&amp;</span><span class="macro">format!</span>(
+            <span class="string">&quot;Error parsing connection string: {}&quot;</span>,
+            <span class="ident">err</span>
+        ));
+
+        <span class="ident">CoreError::from</span>(<span class="ident">KnownError::new</span>(<span class="ident">InvalidConnectionString</span> { <span class="ident">details</span> }))
+    })<span class="question-mark">?</span>;
+
+    <span class="kw">let</span> <span class="ident">params</span>: <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">String</span>, <span class="ident">String</span>)<span class="op">&gt;</span> <span class="op">=</span> <span class="ident">u</span>.<span class="ident">query_pairs</span>().<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">k</span>, <span class="ident">v</span>)<span class="op">|</span> (<span class="ident">k</span>.<span class="ident">to_string</span>(), <span class="ident">v</span>.<span class="ident">to_string</span>())).<span class="ident">collect</span>();
+
+    <span class="ident">u</span>.<span class="ident">query_pairs_mut</span>().<span class="ident">clear</span>();
+
+    <span class="kw">for</span> (<span class="ident">k</span>, <span class="ident">v</span>) <span class="kw">in</span> <span class="ident">params</span>.<span class="ident">into_iter</span>() {
+        <span class="kw">if</span> <span class="ident">k</span> <span class="op">==</span> <span class="string">&quot;statement_cache_size&quot;</span> {
+            <span class="ident">u</span>.<span class="ident">query_pairs_mut</span>().<span class="ident">append_pair</span>(<span class="string">&quot;statement_cache_size&quot;</span>, <span class="string">&quot;0&quot;</span>);
+        } <span class="kw">else</span> {
+            <span class="ident">u</span>.<span class="ident">query_pairs_mut</span>().<span class="ident">append_pair</span>(<span class="kw-2">&amp;</span><span class="ident">k</span>, <span class="kw-2">&amp;</span><span class="ident">v</span>);
         }
-    };
+    }
 
-    <span class="kw">let</span> <span class="ident">url</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">provider</span> <span class="op">==</span> <span class="string">&quot;sqlite&quot;</span> {
-        <span class="ident">database_str</span>.<span class="ident">replace</span>(<span class="string">&#39;\\&#39;</span>, <span class="string">&quot;\\\\&quot;</span>)
-    } <span class="kw">else</span> {
-        <span class="ident">database_str</span>.<span class="ident">to_owned</span>()
-    };
+    <span class="kw">if</span> <span class="op">!</span><span class="ident">u</span>.<span class="ident">query_pairs</span>().<span class="ident">any</span>(<span class="op">|</span>(<span class="ident">k</span>, <span class="kw">_</span>)<span class="op">|</span> <span class="ident">k</span> <span class="op">==</span> <span class="string">&quot;statement_cache_size&quot;</span>) {
+        <span class="ident">u</span>.<span class="ident">query_pairs_mut</span>().<span class="ident">append_pair</span>(<span class="string">&quot;statement_cache_size&quot;</span>, <span class="string">&quot;0&quot;</span>);
+    }
 
-    <span class="kw">let</span> <span class="ident">schema</span> <span class="op">=</span> <span class="macro">format!</span>(
-        <span class="string">r#&quot;
-            datasource db {{
-                provider = &quot;{provider}&quot;
-                url = &quot;{url}&quot;
-            }}
-        &quot;#</span>,
-    );
-
-    <span class="prelude-val">Ok</span>(<span class="ident">schema</span>)
+    <span class="prelude-val">Ok</span>(<span class="ident">u</span>.<span class="ident">to_string</span>())
 }
 </code></pre></div>
 </section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="migration_core" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>

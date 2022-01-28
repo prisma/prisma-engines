@@ -144,7 +144,7 @@
 <span class="doccomment">/// Method called at the beginning of `migrate dev` to decide the course of</span>
 <span class="doccomment">/// action based on the current state of the workspace.</span>
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">dev_diagnostic</span>(
-    <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="ident">DevDiagnosticInput</span>,
+    <span class="ident">input</span>: <span class="ident">DevDiagnosticInput</span>,
     <span class="ident">connector</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">MigrationConnector</span>,
 ) -&gt; <span class="ident">ConnectorResult</span><span class="op">&lt;</span><span class="ident">DevDiagnosticOutput</span><span class="op">&gt;</span> {
     <span class="ident">migrations_directory::error_on_changed_provider</span>(<span class="kw-2">&amp;</span><span class="ident">input</span>.<span class="ident">migrations_directory_path</span>, <span class="ident">connector</span>.<span class="ident">connector_type</span>())<span class="question-mark">?</span>;
@@ -154,7 +154,7 @@
         <span class="ident">opt_in_to_shadow_database</span>: <span class="bool-val">true</span>,
     };
 
-    <span class="kw">let</span> <span class="ident">diagnose_migration_history_output</span> <span class="op">=</span> <span class="ident">diagnose_migration_history</span>(<span class="kw-2">&amp;</span><span class="ident">diagnose_input</span>, <span class="ident">connector</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+    <span class="kw">let</span> <span class="ident">diagnose_migration_history_output</span> <span class="op">=</span> <span class="ident">diagnose_migration_history</span>(<span class="ident">diagnose_input</span>, <span class="ident">connector</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 
     <span class="ident">check_for_broken_migrations</span>(<span class="kw-2">&amp;</span><span class="ident">diagnose_migration_history_output</span>)<span class="question-mark">?</span>;
 

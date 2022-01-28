@@ -206,47 +206,11 @@
 <span id="205">205</span>
 <span id="206">206</span>
 <span id="207">207</span>
-<span id="208">208</span>
-<span id="209">209</span>
-<span id="210">210</span>
-<span id="211">211</span>
-<span id="212">212</span>
-<span id="213">213</span>
-<span id="214">214</span>
-<span id="215">215</span>
-<span id="216">216</span>
-<span id="217">217</span>
-<span id="218">218</span>
-<span id="219">219</span>
-<span id="220">220</span>
-<span id="221">221</span>
-<span id="222">222</span>
-<span id="223">223</span>
-<span id="224">224</span>
-<span id="225">225</span>
-<span id="226">226</span>
-<span id="227">227</span>
-<span id="228">228</span>
-<span id="229">229</span>
-<span id="230">230</span>
-<span id="231">231</span>
-<span id="232">232</span>
-<span id="233">233</span>
 </pre><pre class="rust"><code><span class="doccomment">//! The external facing programmatic API to the migration engine.</span>
 
-<span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">commands</span>::<span class="kw-2">*</span>,
-    <span class="ident">json_rpc::types</span>::{
-        <span class="ident">ApplyMigrationsInput</span>, <span class="ident">ApplyMigrationsOutput</span>, <span class="ident">CreateMigrationInput</span>, <span class="ident">CreateMigrationOutput</span>,
-        <span class="ident">DbExecuteDatasourceType</span>, <span class="ident">DbExecuteParams</span>, <span class="ident">DevDiagnosticInput</span>, <span class="ident">DevDiagnosticOutput</span>, <span class="ident">DiffParams</span>, <span class="ident">DiffResult</span>,
-        <span class="ident">EvaluateDataLossInput</span>, <span class="ident">EvaluateDataLossOutput</span>, <span class="ident">ListMigrationDirectoriesInput</span>, <span class="ident">ListMigrationDirectoriesOutput</span>,
-        <span class="ident">MarkMigrationAppliedInput</span>, <span class="ident">MarkMigrationAppliedOutput</span>, <span class="ident">MarkMigrationRolledBackInput</span>,
-        <span class="ident">MarkMigrationRolledBackOutput</span>, <span class="ident">SchemaContainer</span>, <span class="ident">SchemaPushInput</span>, <span class="ident">SchemaPushOutput</span>, <span class="ident">UrlContainer</span>,
-    },
-    <span class="ident">CoreResult</span>,
-};
+<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">commands</span>, <span class="ident">json_rpc::types</span>::<span class="kw-2">*</span>, <span class="ident">CoreResult</span>};
 <span class="kw">use</span> <span class="ident">migration_connector</span>::{<span class="ident">migrations_directory</span>, <span class="ident">ConnectorError</span>, <span class="ident">MigrationConnector</span>};
-<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">path::Path</span>, <span class="ident">sync::Arc</span>};
+<span class="kw">use</span> <span class="ident">std::path::Path</span>;
 <span class="kw">use</span> <span class="ident">tracing_futures::Instrument</span>;
 
 <span class="doccomment">/// The programmatic, generic, fantastic migration engine API.</span>
@@ -256,103 +220,95 @@
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">version</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">CoreResult</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>;
 
     <span class="doccomment">/// Apply all the unapplied migrations from the migrations folder.</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">apply_migrations</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="ident">ApplyMigrationsInput</span>) -&gt; <span class="ident">CoreResult</span><span class="op">&lt;</span><span class="ident">ApplyMigrationsOutput</span><span class="op">&gt;</span>;
-
-    <span class="doccomment">/// Access to the migration connector.</span>
-    <span class="kw">fn</span> <span class="ident">connector</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">MigrationConnector</span>;
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">apply_migrations</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">input</span>: <span class="ident">ApplyMigrationsInput</span>) -&gt; <span class="ident">CoreResult</span><span class="op">&lt;</span><span class="ident">ApplyMigrationsOutput</span><span class="op">&gt;</span>;
 
     <span class="doccomment">/// Create the database referenced by Prisma schema that was used to initialize the connector.</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">create_database</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">CoreResult</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>;
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">create_database</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">params</span>: <span class="ident">CreateDatabaseParams</span>) -&gt; <span class="ident">CoreResult</span><span class="op">&lt;</span><span class="ident">CreateDatabaseResult</span><span class="op">&gt;</span>;
 
     <span class="doccomment">/// Generate a new migration, based on the provided schema and existing migrations history.</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">create_migration</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="ident">CreateMigrationInput</span>) -&gt; <span class="ident">CoreResult</span><span class="op">&lt;</span><span class="ident">CreateMigrationOutput</span><span class="op">&gt;</span>;
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">create_migration</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">input</span>: <span class="ident">CreateMigrationInput</span>) -&gt; <span class="ident">CoreResult</span><span class="op">&lt;</span><span class="ident">CreateMigrationOutput</span><span class="op">&gt;</span>;
 
     <span class="doccomment">/// Send a raw command to the database.</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">db_execute</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">params</span>: <span class="kw-2">&amp;</span><span class="ident">DbExecuteParams</span>) -&gt; <span class="ident">CoreResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span>;
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">db_execute</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">params</span>: <span class="ident">DbExecuteParams</span>) -&gt; <span class="ident">CoreResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span>;
 
     <span class="doccomment">/// Debugging method that only panics, for CLI tests.</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">debug_panic</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">CoreResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span>;
 
     <span class="doccomment">/// Tells the CLI what to do in `migrate dev`.</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">dev_diagnostic</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="ident">DevDiagnosticInput</span>) -&gt; <span class="ident">CoreResult</span><span class="op">&lt;</span><span class="ident">DevDiagnosticOutput</span><span class="op">&gt;</span>;
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">dev_diagnostic</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">input</span>: <span class="ident">DevDiagnosticInput</span>) -&gt; <span class="ident">CoreResult</span><span class="op">&lt;</span><span class="ident">DevDiagnosticOutput</span><span class="op">&gt;</span>;
 
     <span class="doccomment">/// Create a migration between any two sources of database schemas.</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">diff</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">params</span>: <span class="kw-2">&amp;</span><span class="ident">DiffParams</span>) -&gt; <span class="ident">CoreResult</span><span class="op">&lt;</span><span class="ident">DiffResult</span><span class="op">&gt;</span>;
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">diff</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">params</span>: <span class="ident">DiffParams</span>) -&gt; <span class="ident">CoreResult</span><span class="op">&lt;</span><span class="ident">DiffResult</span><span class="op">&gt;</span>;
 
     <span class="doccomment">/// Drop the database referenced by Prisma schema that was used to initialize the connector.</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">drop_database</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">CoreResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span>;
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">drop_database</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">url</span>: <span class="ident">String</span>) -&gt; <span class="ident">CoreResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span>;
 
     <span class="doccomment">/// Looks at the migrations folder and the database, and returns a bunch of useful information.</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">diagnose_migration_history</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="ident">DiagnoseMigrationHistoryInput</span>,
-    ) -&gt; <span class="ident">CoreResult</span><span class="op">&lt;</span><span class="ident">DiagnoseMigrationHistoryOutput</span><span class="op">&gt;</span>;
+        <span class="ident">input</span>: <span class="ident">commands::DiagnoseMigrationHistoryInput</span>,
+    ) -&gt; <span class="ident">CoreResult</span><span class="op">&lt;</span><span class="ident">commands::DiagnoseMigrationHistoryOutput</span><span class="op">&gt;</span>;
 
     <span class="doccomment">/// Make sure the connection to the database is established and valid.</span>
     <span class="doccomment">/// Connectors can choose to connect lazily, but this method should force</span>
     <span class="doccomment">/// them to connect.</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">ensure_connection_validity</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">CoreResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span>;
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">ensure_connection_validity</span>(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        <span class="ident">params</span>: <span class="ident">EnsureConnectionValidityParams</span>,
+    ) -&gt; <span class="ident">CoreResult</span><span class="op">&lt;</span><span class="ident">EnsureConnectionValidityResult</span><span class="op">&gt;</span>;
 
     <span class="doccomment">/// Evaluate the consequences of running the next migration we would generate, given the current state of a Prisma schema.</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">evaluate_data_loss</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="ident">EvaluateDataLossInput</span>) -&gt; <span class="ident">CoreResult</span><span class="op">&lt;</span><span class="ident">EvaluateDataLossOutput</span><span class="op">&gt;</span>;
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">evaluate_data_loss</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">input</span>: <span class="ident">EvaluateDataLossInput</span>) -&gt; <span class="ident">CoreResult</span><span class="op">&lt;</span><span class="ident">EvaluateDataLossOutput</span><span class="op">&gt;</span>;
 
     <span class="doccomment">/// List the migration directories.</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">list_migration_directories</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="ident">ListMigrationDirectoriesInput</span>,
+        <span class="ident">input</span>: <span class="ident">ListMigrationDirectoriesInput</span>,
     ) -&gt; <span class="ident">CoreResult</span><span class="op">&lt;</span><span class="ident">ListMigrationDirectoriesOutput</span><span class="op">&gt;</span>;
 
     <span class="doccomment">/// Mark a migration from the migrations folder as applied, without actually applying it.</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">mark_migration_applied</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="ident">MarkMigrationAppliedInput</span>)
-        -&gt; <span class="ident">CoreResult</span><span class="op">&lt;</span><span class="ident">MarkMigrationAppliedOutput</span><span class="op">&gt;</span>;
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">mark_migration_applied</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">input</span>: <span class="ident">MarkMigrationAppliedInput</span>) -&gt; <span class="ident">CoreResult</span><span class="op">&lt;</span><span class="ident">MarkMigrationAppliedOutput</span><span class="op">&gt;</span>;
 
     <span class="doccomment">/// Mark a migration as rolled back.</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">mark_migration_rolled_back</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="ident">MarkMigrationRolledBackInput</span>,
+        <span class="ident">input</span>: <span class="ident">MarkMigrationRolledBackInput</span>,
     ) -&gt; <span class="ident">CoreResult</span><span class="op">&lt;</span><span class="ident">MarkMigrationRolledBackOutput</span><span class="op">&gt;</span>;
 
     <span class="doccomment">/// Reset a database to an empty state (no data, no schema).</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">reset</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">CoreResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span>;
 
     <span class="doccomment">/// The command behind `prisma db push`.</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">schema_push</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="ident">SchemaPushInput</span>) -&gt; <span class="ident">CoreResult</span><span class="op">&lt;</span><span class="ident">SchemaPushOutput</span><span class="op">&gt;</span>;
-
-    <span class="doccomment">/// Set the `ConnectorHost` to use.</span>
-    <span class="kw">fn</span> <span class="ident">set_host</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">host</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">migration_connector::ConnectorHost</span><span class="op">&gt;</span>);
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">schema_push</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">input</span>: <span class="ident">SchemaPushInput</span>) -&gt; <span class="ident">CoreResult</span><span class="op">&lt;</span><span class="ident">SchemaPushOutput</span><span class="op">&gt;</span>;
 }
 
 <span class="attribute">#[<span class="ident">async_trait::async_trait</span>]</span>
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">C</span>: <span class="ident">MigrationConnector</span><span class="op">&gt;</span> <span class="ident">GenericApi</span> <span class="kw">for</span> <span class="ident">C</span> {
-    <span class="kw">fn</span> <span class="ident">connector</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">MigrationConnector</span> {
-        <span class="self">self</span>
-    }
-
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">version</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">CoreResult</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
         <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">version</span>().<span class="kw">await</span><span class="question-mark">?</span>)
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">apply_migrations</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="ident">ApplyMigrationsInput</span>) -&gt; <span class="ident">CoreResult</span><span class="op">&lt;</span><span class="ident">ApplyMigrationsOutput</span><span class="op">&gt;</span> {
-        <span class="ident">apply_migrations</span>(<span class="ident">input</span>, <span class="self">self</span>)
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">apply_migrations</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">input</span>: <span class="ident">ApplyMigrationsInput</span>) -&gt; <span class="ident">CoreResult</span><span class="op">&lt;</span><span class="ident">ApplyMigrationsOutput</span><span class="op">&gt;</span> {
+        <span class="ident">commands::apply_migrations</span>(<span class="ident">input</span>, <span class="self">self</span>)
             .<span class="ident">instrument</span>(<span class="macro">tracing::info_span!</span>(<span class="string">&quot;ApplyMigrations&quot;</span>))
             .<span class="kw">await</span>
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">create_database</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">CoreResult</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
-        <span class="ident">MigrationConnector::create_database</span>(<span class="self">self</span>).<span class="kw">await</span>
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">create_database</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_params</span>: <span class="ident">CreateDatabaseParams</span>) -&gt; <span class="ident">CoreResult</span><span class="op">&lt;</span><span class="ident">CreateDatabaseResult</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">database_name</span> <span class="op">=</span> <span class="ident">MigrationConnector::create_database</span>(<span class="self">self</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="prelude-val">Ok</span>(<span class="ident">CreateDatabaseResult</span> { <span class="ident">database_name</span> })
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">create_migration</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="ident">CreateMigrationInput</span>) -&gt; <span class="ident">CoreResult</span><span class="op">&lt;</span><span class="ident">CreateMigrationOutput</span><span class="op">&gt;</span> {
-        <span class="ident">create_migration</span>(<span class="ident">input</span>, <span class="self">self</span>)
-            .<span class="ident">instrument</span>(<span class="macro">tracing::info_span!</span>(
-                <span class="string">&quot;CreateMigration&quot;</span>,
-                <span class="ident">migration_name</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">migration_name</span>.<span class="ident">as_str</span>(),
-                <span class="ident">draft</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">draft</span>,
-            ))
-            .<span class="kw">await</span>
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">create_migration</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">input</span>: <span class="ident">CreateMigrationInput</span>) -&gt; <span class="ident">CoreResult</span><span class="op">&lt;</span><span class="ident">CreateMigrationOutput</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="macro">tracing::info_span!</span>(
+            <span class="string">&quot;CreateMigration&quot;</span>,
+            <span class="ident">migration_name</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">migration_name</span>.<span class="ident">as_str</span>(),
+            <span class="ident">draft</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">draft</span>,
+        );
+        <span class="ident">commands::create_migration</span>(<span class="ident">input</span>, <span class="self">self</span>).<span class="ident">instrument</span>(<span class="ident">span</span>).<span class="kw">await</span>
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">db_execute</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">params</span>: <span class="kw-2">&amp;</span><span class="ident">DbExecuteParams</span>) -&gt; <span class="ident">CoreResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">db_execute</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">params</span>: <span class="ident">DbExecuteParams</span>) -&gt; <span class="ident">CoreResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">use</span> <span class="ident">std::io::Read</span>;
 
         <span class="kw">let</span> <span class="ident">url</span> <span class="op">=</span> <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">params</span>.<span class="ident">datasource_type</span> {
@@ -368,49 +324,53 @@
                 <span class="ident">url</span>
             }
         };
-        <span class="self">self</span>.<span class="ident">db_execute</span>(<span class="kw-2">&amp;</span><span class="ident">url</span>, <span class="kw-2">&amp;</span><span class="ident">params</span>.<span class="ident">script</span>).<span class="kw">await</span>
+        <span class="self">self</span>.<span class="ident">db_execute</span>(<span class="ident">url</span>, <span class="ident">params</span>.<span class="ident">script</span>).<span class="kw">await</span>
     }
 
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">debug_panic</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">CoreResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="macro">panic!</span>(<span class="string">&quot;This is the debugPanic artificial panic&quot;</span>)
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">dev_diagnostic</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="ident">DevDiagnosticInput</span>) -&gt; <span class="ident">CoreResult</span><span class="op">&lt;</span><span class="ident">DevDiagnosticOutput</span><span class="op">&gt;</span> {
-        <span class="ident">dev_diagnostic</span>(<span class="ident">input</span>, <span class="self">self</span>)
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">dev_diagnostic</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">input</span>: <span class="ident">DevDiagnosticInput</span>) -&gt; <span class="ident">CoreResult</span><span class="op">&lt;</span><span class="ident">DevDiagnosticOutput</span><span class="op">&gt;</span> {
+        <span class="ident">commands::dev_diagnostic</span>(<span class="ident">input</span>, <span class="self">self</span>)
             .<span class="ident">instrument</span>(<span class="macro">tracing::info_span!</span>(<span class="string">&quot;DevDiagnostic&quot;</span>))
             .<span class="kw">await</span>
     }
 
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">diagnose_migration_history</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="ident">DiagnoseMigrationHistoryInput</span>,
-    ) -&gt; <span class="ident">CoreResult</span><span class="op">&lt;</span><span class="ident">DiagnoseMigrationHistoryOutput</span><span class="op">&gt;</span> {
-        <span class="ident">diagnose_migration_history</span>(<span class="ident">input</span>, <span class="self">self</span>)
+        <span class="ident">input</span>: <span class="ident">commands::DiagnoseMigrationHistoryInput</span>,
+    ) -&gt; <span class="ident">CoreResult</span><span class="op">&lt;</span><span class="ident">commands::DiagnoseMigrationHistoryOutput</span><span class="op">&gt;</span> {
+        <span class="ident">commands::diagnose_migration_history</span>(<span class="ident">input</span>, <span class="self">self</span>)
             .<span class="ident">instrument</span>(<span class="macro">tracing::info_span!</span>(<span class="string">&quot;DiagnoseMigrationHistory&quot;</span>))
             .<span class="kw">await</span>
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">diff</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">params</span>: <span class="kw-2">&amp;</span><span class="ident">DiffParams</span>) -&gt; <span class="ident">CoreResult</span><span class="op">&lt;</span><span class="ident">DiffResult</span><span class="op">&gt;</span> {
-        <span class="ident"><span class="kw">crate</span>::commands::diff</span>(<span class="ident">params</span>, <span class="self">self</span>).<span class="kw">await</span>
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">diff</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">params</span>: <span class="ident">DiffParams</span>) -&gt; <span class="ident">CoreResult</span><span class="op">&lt;</span><span class="ident">DiffResult</span><span class="op">&gt;</span> {
+        <span class="ident">commands::diff</span>(<span class="ident">params</span>, <span class="self">self</span>.<span class="ident">host</span>().<span class="ident">clone</span>()).<span class="kw">await</span>
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">drop_database</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">CoreResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">drop_database</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_url</span>: <span class="ident">String</span>) -&gt; <span class="ident">CoreResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="ident">MigrationConnector::drop_database</span>(<span class="self">self</span>).<span class="kw">await</span>
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">ensure_connection_validity</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">CoreResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="ident">MigrationConnector::ensure_connection_validity</span>(<span class="self">self</span>).<span class="kw">await</span>
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">ensure_connection_validity</span>(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        <span class="ident">_params</span>: <span class="ident">EnsureConnectionValidityParams</span>,
+    ) -&gt; <span class="ident">CoreResult</span><span class="op">&lt;</span><span class="ident">EnsureConnectionValidityResult</span><span class="op">&gt;</span> {
+        <span class="ident">MigrationConnector::ensure_connection_validity</span>(<span class="self">self</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="prelude-val">Ok</span>(<span class="ident">EnsureConnectionValidityResult</span> {})
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">evaluate_data_loss</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="ident">EvaluateDataLossInput</span>) -&gt; <span class="ident">CoreResult</span><span class="op">&lt;</span><span class="ident">EvaluateDataLossOutput</span><span class="op">&gt;</span> {
-        <span class="ident">evaluate_data_loss</span>(<span class="ident">input</span>, <span class="self">self</span>)
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">evaluate_data_loss</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">input</span>: <span class="ident">EvaluateDataLossInput</span>) -&gt; <span class="ident">CoreResult</span><span class="op">&lt;</span><span class="ident">EvaluateDataLossOutput</span><span class="op">&gt;</span> {
+        <span class="ident">commands::evaluate_data_loss</span>(<span class="ident">input</span>, <span class="self">self</span>)
             .<span class="ident">instrument</span>(<span class="macro">tracing::info_span!</span>(<span class="string">&quot;EvaluateDataLoss&quot;</span>))
             .<span class="kw">await</span>
     }
 
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">list_migration_directories</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="ident">ListMigrationDirectoriesInput</span>,
+        <span class="ident">input</span>: <span class="ident">ListMigrationDirectoriesInput</span>,
     ) -&gt; <span class="ident">CoreResult</span><span class="op">&lt;</span><span class="ident">ListMigrationDirectoriesOutput</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">migrations_from_filesystem</span> <span class="op">=</span>
             <span class="ident">migrations_directory::list_migrations</span>(<span class="ident">Path::new</span>(<span class="kw-2">&amp;</span><span class="ident">input</span>.<span class="ident">migrations_directory_path</span>))<span class="question-mark">?</span>;
@@ -423,28 +383,20 @@
         <span class="prelude-val">Ok</span>(<span class="ident">ListMigrationDirectoriesOutput</span> { <span class="ident">migrations</span> })
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">mark_migration_applied</span>(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="ident">MarkMigrationAppliedInput</span>,
-    ) -&gt; <span class="ident">CoreResult</span><span class="op">&lt;</span><span class="ident">MarkMigrationAppliedOutput</span><span class="op">&gt;</span> {
-        <span class="ident">mark_migration_applied</span>(<span class="ident">input</span>, <span class="self">self</span>)
-            .<span class="ident">instrument</span>(<span class="macro">tracing::info_span!</span>(
-                <span class="string">&quot;MarkMigrationApplied&quot;</span>,
-                <span class="ident">migration_name</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">migration_name</span>.<span class="ident">as_str</span>()
-            ))
-            .<span class="kw">await</span>
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">mark_migration_applied</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">input</span>: <span class="ident">MarkMigrationAppliedInput</span>) -&gt; <span class="ident">CoreResult</span><span class="op">&lt;</span><span class="ident">MarkMigrationAppliedOutput</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="macro">tracing::info_span!</span>(<span class="string">&quot;MarkMigrationApplied&quot;</span>, <span class="ident">migration_name</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">migration_name</span>.<span class="ident">as_str</span>());
+        <span class="ident">commands::mark_migration_applied</span>(<span class="ident">input</span>, <span class="self">self</span>).<span class="ident">instrument</span>(<span class="ident">span</span>).<span class="kw">await</span>
     }
 
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">mark_migration_rolled_back</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="ident">MarkMigrationRolledBackInput</span>,
+        <span class="ident">input</span>: <span class="ident">MarkMigrationRolledBackInput</span>,
     ) -&gt; <span class="ident">CoreResult</span><span class="op">&lt;</span><span class="ident">MarkMigrationRolledBackOutput</span><span class="op">&gt;</span> {
-        <span class="ident">mark_migration_rolled_back</span>(<span class="ident">input</span>, <span class="self">self</span>)
-            .<span class="ident">instrument</span>(<span class="macro">tracing::info_span!</span>(
-                <span class="string">&quot;MarkMigrationRolledBack&quot;</span>,
-                <span class="ident">migration_name</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">migration_name</span>.<span class="ident">as_str</span>()
-            ))
-            .<span class="kw">await</span>
+        <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="macro">tracing::info_span!</span>(
+            <span class="string">&quot;MarkMigrationRolledBack&quot;</span>,
+            <span class="ident">migration_name</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">migration_name</span>.<span class="ident">as_str</span>()
+        );
+        <span class="ident">commands::mark_migration_rolled_back</span>(<span class="ident">input</span>, <span class="self">self</span>).<span class="ident">instrument</span>(<span class="ident">span</span>).<span class="kw">await</span>
     }
 
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">reset</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">CoreResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
@@ -455,14 +407,10 @@
             .<span class="kw">await</span><span class="question-mark">?</span>)
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">schema_push</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="ident">SchemaPushInput</span>) -&gt; <span class="ident">CoreResult</span><span class="op">&lt;</span><span class="ident">SchemaPushOutput</span><span class="op">&gt;</span> {
-        <span class="ident">schema_push</span>(<span class="ident">input</span>, <span class="self">self</span>)
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">schema_push</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">input</span>: <span class="ident">SchemaPushInput</span>) -&gt; <span class="ident">CoreResult</span><span class="op">&lt;</span><span class="ident">SchemaPushOutput</span><span class="op">&gt;</span> {
+        <span class="ident">commands::schema_push</span>(<span class="ident">input</span>, <span class="self">self</span>)
             .<span class="ident">instrument</span>(<span class="macro">tracing::info_span!</span>(<span class="string">&quot;SchemaPush&quot;</span>))
             .<span class="kw">await</span>
-    }
-
-    <span class="kw">fn</span> <span class="ident">set_host</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">host</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">migration_connector::ConnectorHost</span><span class="op">&gt;</span>) {
-        <span class="ident">MigrationConnector::set_host</span>(<span class="self">self</span>, <span class="ident">host</span>)
     }
 }
 </code></pre></div>

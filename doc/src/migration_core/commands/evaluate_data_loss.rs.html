@@ -60,7 +60,7 @@
 <span class="doccomment">/// At this stage, the engine does not create or mutate anything in the database</span>
 <span class="doccomment">/// nor in the migrations directory.</span>
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">evaluate_data_loss</span>(
-    <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="ident">EvaluateDataLossInput</span>,
+    <span class="ident">input</span>: <span class="ident">EvaluateDataLossInput</span>,
     <span class="ident">connector</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">MigrationConnector</span>,
 ) -&gt; <span class="ident">CoreResult</span><span class="op">&lt;</span><span class="ident">EvaluateDataLossOutput</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">checker</span> <span class="op">=</span> <span class="ident">connector</span>.<span class="ident">destructive_change_checker</span>();

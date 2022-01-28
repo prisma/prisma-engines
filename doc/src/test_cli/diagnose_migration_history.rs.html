@@ -32,9 +32,9 @@
         };
         <span class="kw">let</span> <span class="ident">schema</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::read_datamodel_from_file</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">schema_path</span>)<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">engine</span> <span class="op">=</span> <span class="ident">migration_core::migration_api</span>(<span class="kw-2">&amp;</span><span class="ident">schema</span>)<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">engine</span> <span class="op">=</span> <span class="ident">migration_core::migration_api</span>(<span class="prelude-val">Some</span>(<span class="ident">schema</span>), <span class="prelude-val">None</span>)<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">output</span> <span class="op">=</span> <span class="ident">engine</span>.<span class="ident">diagnose_migration_history</span>(<span class="kw-2">&amp;</span><span class="ident">input</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">output</span> <span class="op">=</span> <span class="ident">engine</span>.<span class="ident">diagnose_migration_history</span>(<span class="ident">input</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="macro">eprintln!</span>(<span class="string">&quot;{:#?}&quot;</span>, <span class="ident">output</span>);
 

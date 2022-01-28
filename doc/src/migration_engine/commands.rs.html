@@ -66,9 +66,19 @@
 <span id="65">65</span>
 <span id="66">66</span>
 <span id="67">67</span>
+<span id="68">68</span>
+<span id="69">69</span>
+<span id="70">70</span>
+<span id="71">71</span>
+<span id="72">72</span>
+<span id="73">73</span>
+<span id="74">74</span>
+<span id="75">75</span>
+<span id="76">76</span>
+<span id="77">77</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::logger::log_error_and_exit</span>;
 <span class="kw">use</span> <span class="ident">migration_connector::ConnectorError</span>;
-<span class="kw">use</span> <span class="ident">migration_core</span>::{<span class="ident">datasource_from_database_str</span>, <span class="ident">migration_api</span>};
+<span class="kw">use</span> <span class="ident">migration_core::json_rpc::types</span>::{<span class="ident">DatasourceParam</span>, <span class="ident">UrlContainer</span>};
 <span class="kw">use</span> <span class="ident">structopt::StructOpt</span>;
 <span class="kw">use</span> <span class="ident">user_facing_errors::common::SchemaParserError</span>;
 
@@ -92,19 +102,29 @@
     }
 
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">run_inner</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">ConnectorError</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">datamodel</span> <span class="op">=</span> <span class="ident">datasource_from_database_str</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">datasource</span>)<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">api</span> <span class="op">=</span> <span class="ident">migration_api</span>(<span class="kw-2">&amp;</span><span class="ident">datamodel</span>)<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">api</span> <span class="op">=</span> <span class="ident">migration_core::migration_api</span>(<span class="prelude-val">None</span>, <span class="prelude-val">None</span>)<span class="question-mark">?</span>;
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">command</span> {
             <span class="ident">CliCommand::CreateDatabase</span> =&gt; {
-                <span class="kw">let</span> <span class="ident">db_name</span> <span class="op">=</span> <span class="ident">api</span>.<span class="ident">create_database</span>().<span class="kw">await</span><span class="question-mark">?</span>;
-                <span class="prelude-val">Ok</span>(<span class="macro">format!</span>(<span class="string">&quot;Database &#39;{}&#39; was successfully created.&quot;</span>, <span class="ident">db_name</span>))
+                <span class="kw">let</span> <span class="ident">migration_core::json_rpc::types::CreateDatabaseResult</span> { <span class="ident">database_name</span> } <span class="op">=</span> <span class="ident">api</span>
+                    .<span class="ident">create_database</span>(<span class="ident">migration_core::json_rpc::types::CreateDatabaseParams</span> {
+                        <span class="ident">datasource</span>: <span class="ident">DatasourceParam::ConnectionString</span>(<span class="ident">UrlContainer</span> {
+                            <span class="ident">url</span>: <span class="self">self</span>.<span class="ident">datasource</span>.<span class="ident">clone</span>(),
+                        }),
+                    })
+                    .<span class="kw">await</span><span class="question-mark">?</span>;
+                <span class="prelude-val">Ok</span>(<span class="macro">format!</span>(<span class="string">&quot;Database &#39;{}&#39; was successfully created.&quot;</span>, <span class="ident">database_name</span>))
             }
             <span class="ident">CliCommand::CanConnectToDatabase</span> =&gt; {
-                <span class="ident">api</span>.<span class="ident">ensure_connection_validity</span>().<span class="kw">await</span><span class="question-mark">?</span>;
+                <span class="ident">api</span>.<span class="ident">ensure_connection_validity</span>(<span class="ident">migration_core::json_rpc::types::EnsureConnectionValidityParams</span> {
+                    <span class="ident">datasource</span>: <span class="ident">DatasourceParam::ConnectionString</span>(<span class="ident">UrlContainer</span> {
+                        <span class="ident">url</span>: <span class="self">self</span>.<span class="ident">datasource</span>.<span class="ident">clone</span>(),
+                    }),
+                })
+                .<span class="kw">await</span><span class="question-mark">?</span>;
                 <span class="prelude-val">Ok</span>(<span class="string">&quot;Connection successful&quot;</span>.<span class="ident">to_owned</span>())
             }
             <span class="ident">CliCommand::DropDatabase</span> =&gt; {
-                <span class="ident">api</span>.<span class="ident">drop_database</span>().<span class="kw">await</span><span class="question-mark">?</span>;
+                <span class="ident">api</span>.<span class="ident">drop_database</span>(<span class="self">self</span>.<span class="ident">datasource</span>.<span class="ident">clone</span>()).<span class="kw">await</span><span class="question-mark">?</span>;
                 <span class="prelude-val">Ok</span>(<span class="string">&quot;The database was successfully dropped.&quot;</span>.<span class="ident">to_owned</span>())
             }
         }

@@ -269,21 +269,21 @@
         <span class="kw">for</span> (<span class="ident">variant_name</span>, <span class="ident">variant</span>) <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">variants</span>.<span class="ident">variants</span> {
             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">description</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">variant</span>.<span class="ident">description</span> {
                 <span class="kw">for</span> <span class="ident">line</span> <span class="kw">in</span> <span class="ident">description</span>.<span class="ident">lines</span>() {
-                    <span class="macro">writeln!</span>(<span class="ident">file</span>, <span class="string">&quot;    /// {}&quot;</span>, <span class="ident">line</span>)<span class="question-mark">?</span>;
+                    <span class="macro">writeln!</span>(<span class="ident">file</span>, <span class="string">&quot;/// {}&quot;</span>, <span class="ident">line</span>)<span class="question-mark">?</span>;
                 }
+            }
 
-                <span class="kw">let</span> <span class="ident">cc_variant_name</span> <span class="op">=</span> <span class="ident">variant_name</span>.<span class="ident">to_camel_case</span>();
+            <span class="kw">let</span> <span class="ident">cc_variant_name</span> <span class="op">=</span> <span class="ident">variant_name</span>.<span class="ident">to_camel_case</span>();
 
-                <span class="kw">if</span> <span class="ident">cc_variant_name</span>.<span class="ident">as_str</span>() <span class="op">!</span><span class="op">=</span> <span class="ident">variant_name</span> {
-                    <span class="macro">writeln!</span>(<span class="ident">file</span>, <span class="string">&quot;///\n/// JSON name: {}&quot;</span>, <span class="ident">variant_name</span>)<span class="question-mark">?</span>;
-                    <span class="macro">writeln!</span>(<span class="ident">file</span>, <span class="string">&quot;#[serde(rename = \&quot;{}\&quot;)]&quot;</span>, <span class="ident">variant_name</span>)<span class="question-mark">?</span>;
-                }
+            <span class="kw">if</span> <span class="ident">cc_variant_name</span>.<span class="ident">as_str</span>() <span class="op">!</span><span class="op">=</span> <span class="ident">variant_name</span> {
+                <span class="macro">writeln!</span>(<span class="ident">file</span>, <span class="string">&quot;///\n/// JSON name: {}&quot;</span>, <span class="ident">variant_name</span>)<span class="question-mark">?</span>;
+                <span class="macro">writeln!</span>(<span class="ident">file</span>, <span class="string">&quot;#[serde(rename = \&quot;{}\&quot;)]&quot;</span>, <span class="ident">variant_name</span>)<span class="question-mark">?</span>;
+            }
 
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">shape</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">variant</span>.<span class="ident">shape</span> {
-                    <span class="macro">writeln!</span>(<span class="ident">file</span>, <span class="string">&quot;    {}({}),&quot;</span>, <span class="ident">cc_variant_name</span>, <span class="ident">rustify_type_name</span>(<span class="ident">shape</span>))<span class="question-mark">?</span>;
-                } <span class="kw">else</span> {
-                    <span class="macro">writeln!</span>(<span class="ident">file</span>, <span class="string">&quot;    {},&quot;</span>, <span class="ident">cc_variant_name</span>)<span class="question-mark">?</span>;
-                }
+            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">shape</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">variant</span>.<span class="ident">shape</span> {
+                <span class="macro">writeln!</span>(<span class="ident">file</span>, <span class="string">&quot;    {}({}),&quot;</span>, <span class="ident">cc_variant_name</span>, <span class="ident">rustify_type_name</span>(<span class="ident">shape</span>))<span class="question-mark">?</span>;
+            } <span class="kw">else</span> {
+                <span class="macro">writeln!</span>(<span class="ident">file</span>, <span class="string">&quot;    {},&quot;</span>, <span class="ident">cc_variant_name</span>)<span class="question-mark">?</span>;
             }
         }
 

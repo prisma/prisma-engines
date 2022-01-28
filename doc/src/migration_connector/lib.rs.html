@@ -222,7 +222,7 @@
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">create_database</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">ConnectorResult</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>;
 
     <span class="doccomment">/// Send a command to the database directly.</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">db_execute</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">url</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">script</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span>;
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">db_execute</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">url</span>: <span class="ident">String</span>, <span class="ident">script</span>: <span class="ident">String</span>) -&gt; <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span>;
 
     <span class="doccomment">/// Create a migration by comparing two database schemas. See</span>
     <span class="doccomment">/// [DiffTarget](/enum.DiffTarget.html) for possible inputs.</span>
