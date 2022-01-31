@@ -175,7 +175,7 @@
         <span class="kw">let</span> <span class="ident">script_string</span> <span class="op">=</span> <span class="ident">connector</span>.<span class="ident">database_migration_step_applier</span>().<span class="ident">render_script</span>(
             <span class="kw-2">&amp;</span><span class="ident">migration</span>,
             <span class="kw-2">&amp;</span><span class="ident">migration_connector::DestructiveChangeDiagnostics::default</span>(),
-        );
+        )<span class="question-mark">?</span>;
         <span class="ident">connector</span>.<span class="ident">host</span>().<span class="ident">print</span>(<span class="kw-2">&amp;</span><span class="ident">script_string</span>).<span class="kw">await</span><span class="question-mark">?</span>;
     } <span class="kw">else</span> {
         <span class="kw">let</span> <span class="ident">summary</span> <span class="op">=</span> <span class="ident">connector</span>.<span class="ident">migration_summary</span>(<span class="kw-2">&amp;</span><span class="ident">migration</span>);

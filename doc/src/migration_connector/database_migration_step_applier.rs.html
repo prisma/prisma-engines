@@ -14,6 +14,13 @@
 <span id="13">13</span>
 <span id="14">14</span>
 <span id="15">15</span>
+<span id="16">16</span>
+<span id="17">17</span>
+<span id="18">18</span>
+<span id="19">19</span>
+<span id="20">20</span>
+<span id="21">21</span>
+<span id="22">22</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">destructive_change_checker::DestructiveChangeDiagnostics</span>, <span class="ident">ConnectorResult</span>, <span class="ident">Migration</span>};
 
 <span class="doccomment">/// Apply a single migration step to the connector&#39;s database.</span>
@@ -23,7 +30,14 @@
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">apply_migration</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">migration</span>: <span class="kw-2">&amp;</span><span class="ident">Migration</span>) -&gt; <span class="ident">ConnectorResult</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>;
 
     <span class="doccomment">/// Render the migration to a runnable script.</span>
-    <span class="kw">fn</span> <span class="ident">render_script</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">migration</span>: <span class="kw-2">&amp;</span><span class="ident">Migration</span>, <span class="ident">diagnostics</span>: <span class="kw-2">&amp;</span><span class="ident">DestructiveChangeDiagnostics</span>) -&gt; <span class="ident">String</span>;
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// This should always return with `Ok` in normal circumstances. The result is currently only</span>
+    <span class="doccomment">/// used to signal when the connector does not support rendering to a script.</span>
+    <span class="kw">fn</span> <span class="ident">render_script</span>(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        <span class="ident">migration</span>: <span class="kw-2">&amp;</span><span class="ident">Migration</span>,
+        <span class="ident">diagnostics</span>: <span class="kw-2">&amp;</span><span class="ident">DestructiveChangeDiagnostics</span>,
+    ) -&gt; <span class="ident">ConnectorResult</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>;
 
     <span class="doccomment">/// Apply a migration script to the database. The migration persistence is</span>
     <span class="doccomment">/// managed by the core.</span>

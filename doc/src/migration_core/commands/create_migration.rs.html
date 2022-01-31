@@ -108,7 +108,7 @@
 
     <span class="kw">let</span> <span class="ident">destructive_change_diagnostics</span> <span class="op">=</span> <span class="ident">checker</span>.<span class="ident">pure_check</span>(<span class="kw-2">&amp;</span><span class="ident">migration</span>);
 
-    <span class="kw">let</span> <span class="ident">migration_script</span> <span class="op">=</span> <span class="ident">applier</span>.<span class="ident">render_script</span>(<span class="kw-2">&amp;</span><span class="ident">migration</span>, <span class="kw-2">&amp;</span><span class="ident">destructive_change_diagnostics</span>);
+    <span class="kw">let</span> <span class="ident">migration_script</span> <span class="op">=</span> <span class="ident">applier</span>.<span class="ident">render_script</span>(<span class="kw-2">&amp;</span><span class="ident">migration</span>, <span class="kw-2">&amp;</span><span class="ident">destructive_change_diagnostics</span>)<span class="question-mark">?</span>;
 
     <span class="comment">// Write the migration script to a file.</span>
     <span class="kw">let</span> <span class="ident">directory</span> <span class="op">=</span> <span class="ident">create_migration_directory</span>(<span class="ident">Path::new</span>(<span class="kw-2">&amp;</span><span class="ident">input</span>.<span class="ident">migrations_directory_path</span>), <span class="kw-2">&amp;</span><span class="ident">input</span>.<span class="ident">migration_name</span>)
