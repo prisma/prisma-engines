@@ -81,7 +81,7 @@ where
         match final_state {
             CachedTx::Committed => self.itx_manager.commit_tx(&tx_id).await?,
             CachedTx::RolledBack => self.itx_manager.rollback_tx(&tx_id).await?,
-            _ => panic!("SHOULD NOT GET HERE"),
+            _ => unreachable!(),
         };
         debug!("[{tx_id}] FINALIZE DONE {final_state}");
 

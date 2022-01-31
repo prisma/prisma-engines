@@ -18,26 +18,26 @@ use crate::Operation;
 /*
 How Interactive Transactions work
 The Interactive Transactions (iTx) follow an actor model design. Where each iTx is created in its own process.
-When a prisma client requests to start a new transaction, the Transaction Manager spawns a new iTXServer. The iTxServer runs in its own
+When a prisma client requests to start a new transaction, the Transaction Manager spawns a new ITXServer. The ITXServer runs in its own
 process and waits for messages to arrive via its receive channel to process.
-The iTx Manager will also create an iTxClient and add it to hashmap managed by an RwLock. The iTx client is the only way to communicate
-with the iTxServer.
+The iTx Manager will also create an ITXClient and add it to hashmap managed by an RwLock. The iTx client is the only way to communicate
+with the ITXServer.
 
 Once the prisma client receives the iTx Id it can perform database operations using that iTx id. When an operation request is received by the
 TransactionManager, it looks for the client in the hashmap and passes the operation to the client. The iTx client sends a message to the
-iTx server and waits for a response. The iTxServer will then perform the operation and return the result. The iTxServer will perform one
+iTx server and waits for a response. The ITXServer will then perform the operation and return the result. The ITXServer will perform one
 operation at a time. All other operations will sit in the message queue waiting to be processed.
-Once all the operations have been done, the prisma client can ask the Transaction Manager to commit or rollback the iTx.
-Again, the Transaction Manager will find the iTx Client, and tell it to commit or rollback. The iTx Client will send a message to
-the iTxServer to commit or rollback. The iTxServer will perform that, send the response back to the iTxClient
-and then the iTxServer will move into the cache eviction state. In this state, the connection is closed, and any messages it receives, the will
-will only reply with its last state. i.e committed, rollbacked or timeout.
+The ITXServer will handle all messages until it transitions state, e.g "rollback" or "commit".
 
-Once the eviction timeout is exceeded, the iTxServer will send a message to the TransactionManager to say that it is completed, and it will end.
-The TransactionManager will remove the iTxClient from the hashmap.
+After that the ITXServer will move into the cache eviction state. In this state, the connection is closed, and any messages it receives, the will
+will only reply with its last state. i.e committed, rollbacked or timeout. The eviction state is there so that if a prisma wants to
+perform an action on a iTx that has completed it will get a better message rather than the error message that this transaction doesn't exist
 
-During the time the iTxServer is active there is also a timer running and if that timeout is exceeded, the
-transaction is rolledback and the connection to the database is closed. The iTxServer will then move into the eviction state.
+Once the eviction timeout is exceeded, the ITXServer will send a message to the Background Client list process to say that it is completed,
+and the ITXServer will end. The Background Client list process removes the client from the list of clients that are active.
+
+During the time the ITXServer is active there is a timer running and if that timeout is exceeded, the
+transaction is rolledback and the connection to the database is closed. The ITXServer will then move into the eviction state.
 */
 
 pub static CACHE_EVICTION_SECS: Lazy<u64> = Lazy::new(|| match std::env::var("CLOSED_TX_CLEANUP") {
@@ -159,27 +159,31 @@ impl ITXServer {
         }
     }
 
+    // The bool returned notifies the actor loop if the process should continue receiving msg's
+    // or if it should finish. `true` means the process is finished.
     pub async fn process_msg(&mut self, op: TxOpRequest) -> bool {
+        let is_finished = true;
+        let should_continue = false;
         match op.msg {
             TxOpRequestMsg::Single(ref operation, trace_id) => {
                 let result = self.execute_single(&operation, trace_id).await;
                 let _ = op.respond_to.send(TxOpResponse::Single(result));
-                false
+                should_continue
             }
             TxOpRequestMsg::Batch(ref operations, trace_id) => {
                 let result = self.execute_batch(&operations, trace_id).await;
                 let _ = op.respond_to.send(TxOpResponse::Batch(result));
-                false
+                should_continue
             }
             TxOpRequestMsg::Commit => {
                 let resp = self.commit().await;
                 let _ = op.respond_to.send(TxOpResponse::Committed(resp));
-                true
+                is_finished
             }
             TxOpRequestMsg::Rollback => {
                 let resp = self.rollback(false).await;
                 let _ = op.respond_to.send(TxOpResponse::RolledBack(resp));
-                true
+                is_finished
             }
         }
     }
@@ -306,7 +310,7 @@ impl ITXClient {
     }
 
     async fn send_and_receive(&self, msg: TxOpRequestMsg) -> Result<TxOpResponse, crate::CoreError> {
-        let (rx, req) = self.create_rx_and_req(msg);
+        let (receiver, req) = self.create_receive_and_req(msg);
         if let Err(err) = self.send.send(req).await {
             debug!("channel send error {err}");
             return Err(TransactionError::Closed {
@@ -315,7 +319,7 @@ impl ITXClient {
             .into());
         }
 
-        match rx.await {
+        match receiver.await {
             Ok(resp) => Ok(resp),
             Err(_err) => Err(TransactionError::Closed {
                 reason: "Cound not perform operation".to_string(),
@@ -324,7 +328,7 @@ impl ITXClient {
         }
     }
 
-    fn create_rx_and_req(&self, msg: TxOpRequestMsg) -> (oneshot::Receiver<TxOpResponse>, TxOpRequest) {
+    fn create_receive_and_req(&self, msg: TxOpRequestMsg) -> (oneshot::Receiver<TxOpResponse>, TxOpRequest) {
         let (send, rx) = oneshot::channel::<TxOpResponse>();
         let request = TxOpRequest { msg, respond_to: send };
         (rx, request)
@@ -408,7 +412,7 @@ impl TransactionProcessManager {
             loop {
                 tokio::select! {
                     _ = &mut sleep => {
-                        debug!("[{}] operation timed out", server.id.to_string());
+                        debug!("[{}] interactive transaction timed out", server.id.to_string());
                         let _ = server.rollback(true).await;
                         break;
                     }
