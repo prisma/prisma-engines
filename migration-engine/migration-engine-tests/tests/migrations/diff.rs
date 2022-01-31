@@ -373,6 +373,54 @@ fn diffing_mongo_schemas_works(mut api: TestApi) {
     expected_printed_messages.assert_debug_eq(&host.printed_messages.lock().unwrap());
 }
 
+#[test]
+fn with_missing_prisma_schema_should_return_helpful_error() {
+    // We are counting on this path not existing.
+    let tmp_path = std::env::temp_dir().join("prisma_migrate_diff_test_this_file_does_not_exist");
+    let tmp_path_str = tmp_path.to_str().unwrap();
+
+    // We want to test for both --schema-datamodel and --schema-datasource
+    let test_with_from_target = |from_target: DiffTarget| {
+        let params = DiffParams {
+            from: from_target,
+            script: false,
+            shadow_database_url: None,
+            to: DiffTarget::Empty,
+        };
+
+        let error = diff_error(params);
+        assert!(error.match_indices(tmp_path_str).next().is_some());
+
+        let expected = if cfg!(windows) {
+            expect![[r#"
+                Error trying to read Prisma schema file at `<the-path>`.
+                The system cannot find the file specified. (os error 2)
+            "#]]
+        } else {
+            expect![[r#"
+                Error trying to read Prisma schema file at `<the-path>`.
+                No such file or directory (os error 2)
+            "#]]
+        };
+
+        expected.assert_eq(&error.replace(tmp_path_str, "<the-path>"));
+    };
+
+    test_with_from_target(DiffTarget::SchemaDatamodel(SchemaContainer {
+        schema: tmp_path_str.to_owned(),
+    }));
+    test_with_from_target(DiffTarget::SchemaDatasource(SchemaContainer {
+        schema: tmp_path_str.to_owned(),
+    }));
+}
+
+// Call diff, and expect it to error. Return the error.
+fn diff_error(params: DiffParams) -> String {
+    let api = migration_core::migration_api(None, None).unwrap();
+    let result = test_setup::runtime::run_with_tokio(api.diff(params));
+    result.unwrap_err().to_string()
+}
+
 fn write_file_to_tmp(contents: &str, tempdir: &tempfile::TempDir, name: &str) -> std::path::PathBuf {
     let tempfile_path = tempdir.path().join(name);
     std::fs::write(&tempfile_path, contents.as_bytes()).unwrap();
