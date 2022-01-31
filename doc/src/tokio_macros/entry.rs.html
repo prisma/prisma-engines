@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;tokio-macros-1.4.1&#x2F;src&#x2F;entry.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>entry.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><script defer src="../../main.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;tokio-macros-1.7.0&#x2F;src&#x2F;entry.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>entry.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><script defer src="../../main.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script>
     <noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../tokio_macros/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
@@ -388,9 +388,52 @@
 <span id="387">387</span>
 <span id="388">388</span>
 <span id="389">389</span>
+<span id="390">390</span>
+<span id="391">391</span>
+<span id="392">392</span>
+<span id="393">393</span>
+<span id="394">394</span>
+<span id="395">395</span>
+<span id="396">396</span>
+<span id="397">397</span>
+<span id="398">398</span>
+<span id="399">399</span>
+<span id="400">400</span>
+<span id="401">401</span>
+<span id="402">402</span>
+<span id="403">403</span>
+<span id="404">404</span>
+<span id="405">405</span>
+<span id="406">406</span>
+<span id="407">407</span>
+<span id="408">408</span>
+<span id="409">409</span>
+<span id="410">410</span>
+<span id="411">411</span>
+<span id="412">412</span>
+<span id="413">413</span>
+<span id="414">414</span>
+<span id="415">415</span>
+<span id="416">416</span>
+<span id="417">417</span>
+<span id="418">418</span>
+<span id="419">419</span>
+<span id="420">420</span>
+<span id="421">421</span>
+<span id="422">422</span>
+<span id="423">423</span>
+<span id="424">424</span>
+<span id="425">425</span>
+<span id="426">426</span>
+<span id="427">427</span>
+<span id="428">428</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">proc_macro::TokenStream</span>;
 <span class="kw">use</span> <span class="ident">proc_macro2::Span</span>;
 <span class="kw">use</span> <span class="ident">quote</span>::{<span class="ident">quote</span>, <span class="ident">quote_spanned</span>, <span class="ident">ToTokens</span>};
+<span class="kw">use</span> <span class="ident">syn::parse::Parser</span>;
+
+<span class="comment">// syn::AttributeArgs does not implement syn::Parse</span>
+<span class="kw">type</span> <span class="ident">AttributeArgs</span> <span class="op">=</span> <span class="ident">syn::punctuated::Punctuated</span><span class="op">&lt;</span><span class="ident">syn::NestedMeta</span>, <span class="macro">syn::Token!</span>[,]<span class="op">&gt;</span>;
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">PartialEq</span>)]</span>
 <span class="kw">enum</span> <span class="ident">RuntimeFlavor</span> {
@@ -416,6 +459,13 @@
     <span class="ident">worker_threads</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>,
     <span class="ident">start_paused</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,
 }
+
+<span class="doccomment">/// Config used in case of the attribute not being able to build a valid config</span>
+<span class="kw">const</span> <span class="ident">DEFAULT_ERROR_CONFIG</span>: <span class="ident">FinalConfig</span> <span class="op">=</span> <span class="ident">FinalConfig</span> {
+    <span class="ident">flavor</span>: <span class="ident">RuntimeFlavor::CurrentThread</span>,
+    <span class="ident">worker_threads</span>: <span class="prelude-val">None</span>,
+    <span class="ident">start_paused</span>: <span class="prelude-val">None</span>,
+};
 
 <span class="kw">struct</span> <span class="ident">Configuration</span> {
     <span class="ident">rt_multi_thread_available</span>: <span class="ident">bool</span>,
@@ -574,13 +624,13 @@
     }
 }
 
-<span class="kw">fn</span> <span class="ident">parse_knobs</span>(
-    <span class="kw-2">mut</span> <span class="ident">input</span>: <span class="ident">syn::ItemFn</span>,
-    <span class="ident">args</span>: <span class="ident">syn::AttributeArgs</span>,
+<span class="kw">fn</span> <span class="ident">build_config</span>(
+    <span class="ident">input</span>: <span class="ident">syn::ItemFn</span>,
+    <span class="ident">args</span>: <span class="ident">AttributeArgs</span>,
     <span class="ident">is_test</span>: <span class="ident">bool</span>,
     <span class="ident">rt_multi_thread</span>: <span class="ident">bool</span>,
-) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">TokenStream</span>, <span class="ident">syn::Error</span><span class="op">&gt;</span> {
-    <span class="kw">if</span> <span class="ident">input</span>.<span class="ident">sig</span>.<span class="ident">asyncness</span>.<span class="ident">take</span>().<span class="ident">is_none</span>() {
+) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">FinalConfig</span>, <span class="ident">syn::Error</span><span class="op">&gt;</span> {
+    <span class="kw">if</span> <span class="ident">input</span>.<span class="ident">sig</span>.<span class="ident">asyncness</span>.<span class="ident">is_none</span>() {
         <span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span> <span class="string">&quot;the `async` keyword is missing from the function declaration&quot;</span>;
         <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">syn::Error::new_spanned</span>(<span class="ident">input</span>.<span class="ident">sig</span>.<span class="ident">fn_token</span>, <span class="ident">msg</span>));
     }
@@ -668,7 +718,11 @@
         }
     }
 
-    <span class="kw">let</span> <span class="ident">config</span> <span class="op">=</span> <span class="ident">config</span>.<span class="ident">build</span>()<span class="question-mark">?</span>;
+    <span class="ident">config</span>.<span class="ident">build</span>()
+}
+
+<span class="kw">fn</span> <span class="ident">parse_knobs</span>(<span class="kw-2">mut</span> <span class="ident">input</span>: <span class="ident">syn::ItemFn</span>, <span class="ident">is_test</span>: <span class="ident">bool</span>, <span class="ident">config</span>: <span class="ident">FinalConfig</span>) -&gt; <span class="ident">TokenStream</span> {
+    <span class="ident">input</span>.<span class="ident">sig</span>.<span class="ident">asyncness</span> <span class="op">=</span> <span class="prelude-val">None</span>;
 
     <span class="comment">// If type mismatch occurs, the current rustc points to the last statement.</span>
     <span class="kw">let</span> (<span class="ident">last_stmt_start_span</span>, <span class="ident">last_stmt_end_span</span>) <span class="op">=</span> {
@@ -714,15 +768,17 @@
     <span class="kw">let</span> <span class="ident">body</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">input</span>.<span class="ident">block</span>;
     <span class="kw">let</span> <span class="ident">brace_token</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">block</span>.<span class="ident">brace_token</span>;
     <span class="kw">let</span> (<span class="ident">tail_return</span>, <span class="ident">tail_semicolon</span>) <span class="op">=</span> <span class="kw">match</span> <span class="ident">body</span>.<span class="ident">stmts</span>.<span class="ident">last</span>() {
-        <span class="prelude-val">Some</span>(<span class="ident">syn::Stmt::Semi</span>(<span class="ident">expr</span>, <span class="kw">_</span>)) =&gt; (
-            <span class="kw">match</span> <span class="ident">expr</span> {
-                <span class="ident">syn::Expr::Return</span>(<span class="kw">_</span>) =&gt; <span class="macro">quote!</span> { <span class="kw">return</span> },
-                <span class="kw">_</span> =&gt; <span class="macro">quote!</span> {},
-            },
-            <span class="macro">quote!</span> {
-                ;
-            },
-        ),
+        <span class="prelude-val">Some</span>(<span class="ident">syn::Stmt::Semi</span>(<span class="ident">syn::Expr::Return</span>(<span class="kw">_</span>), <span class="kw">_</span>)) =&gt; (<span class="macro">quote!</span> { <span class="kw">return</span> }, <span class="macro">quote!</span> { ; }),
+        <span class="prelude-val">Some</span>(<span class="ident">syn::Stmt::Semi</span>(..)) <span class="op">|</span> <span class="prelude-val">Some</span>(<span class="ident">syn::Stmt::Local</span>(..)) <span class="op">|</span> <span class="prelude-val">None</span> =&gt; {
+            <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">input</span>.<span class="ident">sig</span>.<span class="ident">output</span> {
+                <span class="ident">syn::ReturnType::Type</span>(<span class="kw">_</span>, <span class="ident">ty</span>) <span class="kw">if</span> <span class="macro">matches!</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">ty</span>, <span class="ident">syn::Type::Tuple</span>(<span class="ident">ty</span>) <span class="kw">if</span> <span class="ident">ty</span>.<span class="ident">elems</span>.<span class="ident">is_empty</span>()) =&gt;
+                {
+                    (<span class="macro">quote!</span> {}, <span class="macro">quote!</span> { ; }) <span class="comment">// unit</span>
+                }
+                <span class="ident">syn::ReturnType::Default</span> =&gt; (<span class="macro">quote!</span> {}, <span class="macro">quote!</span> { ; }), <span class="comment">// unit</span>
+                <span class="ident">syn::ReturnType::Type</span>(..) =&gt; (<span class="macro">quote!</span> {}, <span class="macro">quote!</span> {}),   <span class="comment">// ! or another</span>
+            }
+        }
         <span class="kw">_</span> =&gt; (<span class="macro">quote!</span> {}, <span class="macro">quote!</span> {}),
     };
     <span class="ident">input</span>.<span class="ident">block</span> <span class="op">=</span> <span class="ident">syn::parse2</span>(<span class="macro">quote_spanned!</span> {<span class="ident">last_stmt_end_span</span>=&gt;
@@ -744,38 +800,60 @@
         #<span class="ident">input</span>
     };
 
-    <span class="prelude-val">Ok</span>(<span class="ident">result</span>.<span class="ident">into</span>())
+    <span class="ident">result</span>.<span class="ident">into</span>()
+}
+
+<span class="kw">fn</span> <span class="ident">token_stream_with_error</span>(<span class="kw-2">mut</span> <span class="ident">tokens</span>: <span class="ident">TokenStream</span>, <span class="ident">error</span>: <span class="ident">syn::Error</span>) -&gt; <span class="ident">TokenStream</span> {
+    <span class="ident">tokens</span>.<span class="ident">extend</span>(<span class="ident">TokenStream::from</span>(<span class="ident">error</span>.<span class="ident">into_compile_error</span>()));
+    <span class="ident">tokens</span>
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">test</span>))]</span> <span class="comment">// Work around for rust-lang/rust#62127</span>
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">main</span>(<span class="ident">args</span>: <span class="ident">TokenStream</span>, <span class="ident">item</span>: <span class="ident">TokenStream</span>, <span class="ident">rt_multi_thread</span>: <span class="ident">bool</span>) -&gt; <span class="ident">TokenStream</span> {
-    <span class="kw">let</span> <span class="ident">input</span> <span class="op">=</span> <span class="macro">syn::parse_macro_input!</span>(<span class="ident">item</span> <span class="kw">as</span> <span class="ident">syn::ItemFn</span>);
-    <span class="kw">let</span> <span class="ident">args</span> <span class="op">=</span> <span class="macro">syn::parse_macro_input!</span>(<span class="ident">args</span> <span class="kw">as</span> <span class="ident">syn::AttributeArgs</span>);
+    <span class="comment">// If any of the steps for this macro fail, we still want to expand to an item that is as close</span>
+    <span class="comment">// to the expected output as possible. This helps out IDEs such that completions and other</span>
+    <span class="comment">// related features keep working.</span>
+    <span class="kw">let</span> <span class="ident">input</span>: <span class="ident">syn::ItemFn</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">syn::parse</span>(<span class="ident">item</span>.<span class="ident">clone</span>()) {
+        <span class="prelude-val">Ok</span>(<span class="ident">it</span>) =&gt; <span class="ident">it</span>,
+        <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; <span class="kw">return</span> <span class="ident">token_stream_with_error</span>(<span class="ident">item</span>, <span class="ident">e</span>),
+    };
 
-    <span class="kw">if</span> <span class="ident">input</span>.<span class="ident">sig</span>.<span class="ident">ident</span> <span class="op">==</span> <span class="string">&quot;main&quot;</span> <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">input</span>.<span class="ident">sig</span>.<span class="ident">inputs</span>.<span class="ident">is_empty</span>() {
+    <span class="kw">let</span> <span class="ident">config</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">input</span>.<span class="ident">sig</span>.<span class="ident">ident</span> <span class="op">==</span> <span class="string">&quot;main&quot;</span> <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">input</span>.<span class="ident">sig</span>.<span class="ident">inputs</span>.<span class="ident">is_empty</span>() {
         <span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span> <span class="string">&quot;the main function cannot accept arguments&quot;</span>;
-        <span class="kw">return</span> <span class="ident">syn::Error::new_spanned</span>(<span class="kw-2">&amp;</span><span class="ident">input</span>.<span class="ident">sig</span>.<span class="ident">ident</span>, <span class="ident">msg</span>)
-            .<span class="ident">to_compile_error</span>()
-            .<span class="ident">into</span>();
-    }
+        <span class="prelude-val">Err</span>(<span class="ident">syn::Error::new_spanned</span>(<span class="kw-2">&amp;</span><span class="ident">input</span>.<span class="ident">sig</span>.<span class="ident">ident</span>, <span class="ident">msg</span>))
+    } <span class="kw">else</span> {
+        <span class="ident">AttributeArgs::parse_terminated</span>
+            .<span class="ident">parse</span>(<span class="ident">args</span>)
+            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">args</span><span class="op">|</span> <span class="ident">build_config</span>(<span class="ident">input</span>.<span class="ident">clone</span>(), <span class="ident">args</span>, <span class="bool-val">false</span>, <span class="ident">rt_multi_thread</span>))
+    };
 
-    <span class="ident">parse_knobs</span>(<span class="ident">input</span>, <span class="ident">args</span>, <span class="bool-val">false</span>, <span class="ident">rt_multi_thread</span>).<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">e</span>.<span class="ident">to_compile_error</span>().<span class="ident">into</span>())
+    <span class="kw">match</span> <span class="ident">config</span> {
+        <span class="prelude-val">Ok</span>(<span class="ident">config</span>) =&gt; <span class="ident">parse_knobs</span>(<span class="ident">input</span>, <span class="bool-val">false</span>, <span class="ident">config</span>),
+        <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; <span class="ident">token_stream_with_error</span>(<span class="ident">parse_knobs</span>(<span class="ident">input</span>, <span class="bool-val">false</span>, <span class="ident">DEFAULT_ERROR_CONFIG</span>), <span class="ident">e</span>),
+    }
 }
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">test</span>(<span class="ident">args</span>: <span class="ident">TokenStream</span>, <span class="ident">item</span>: <span class="ident">TokenStream</span>, <span class="ident">rt_multi_thread</span>: <span class="ident">bool</span>) -&gt; <span class="ident">TokenStream</span> {
-    <span class="kw">let</span> <span class="ident">input</span> <span class="op">=</span> <span class="macro">syn::parse_macro_input!</span>(<span class="ident">item</span> <span class="kw">as</span> <span class="ident">syn::ItemFn</span>);
-    <span class="kw">let</span> <span class="ident">args</span> <span class="op">=</span> <span class="macro">syn::parse_macro_input!</span>(<span class="ident">args</span> <span class="kw">as</span> <span class="ident">syn::AttributeArgs</span>);
+    <span class="comment">// If any of the steps for this macro fail, we still want to expand to an item that is as close</span>
+    <span class="comment">// to the expected output as possible. This helps out IDEs such that completions and other</span>
+    <span class="comment">// related features keep working.</span>
+    <span class="kw">let</span> <span class="ident">input</span>: <span class="ident">syn::ItemFn</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">syn::parse</span>(<span class="ident">item</span>.<span class="ident">clone</span>()) {
+        <span class="prelude-val">Ok</span>(<span class="ident">it</span>) =&gt; <span class="ident">it</span>,
+        <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; <span class="kw">return</span> <span class="ident">token_stream_with_error</span>(<span class="ident">item</span>, <span class="ident">e</span>),
+    };
+    <span class="kw">let</span> <span class="ident">config</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">attr</span>) <span class="op">=</span> <span class="ident">input</span>.<span class="ident">attrs</span>.<span class="ident">iter</span>().<span class="ident">find</span>(<span class="op">|</span><span class="ident">attr</span><span class="op">|</span> <span class="ident">attr</span>.<span class="ident">path</span>.<span class="ident">is_ident</span>(<span class="string">&quot;test&quot;</span>)) {
+        <span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span> <span class="string">&quot;second test attribute is supplied&quot;</span>;
+        <span class="prelude-val">Err</span>(<span class="ident">syn::Error::new_spanned</span>(<span class="kw-2">&amp;</span><span class="ident">attr</span>, <span class="ident">msg</span>))
+    } <span class="kw">else</span> {
+        <span class="ident">AttributeArgs::parse_terminated</span>
+            .<span class="ident">parse</span>(<span class="ident">args</span>)
+            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">args</span><span class="op">|</span> <span class="ident">build_config</span>(<span class="ident">input</span>.<span class="ident">clone</span>(), <span class="ident">args</span>, <span class="bool-val">true</span>, <span class="ident">rt_multi_thread</span>))
+    };
 
-    <span class="kw">for</span> <span class="ident">attr</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">input</span>.<span class="ident">attrs</span> {
-        <span class="kw">if</span> <span class="ident">attr</span>.<span class="ident">path</span>.<span class="ident">is_ident</span>(<span class="string">&quot;test&quot;</span>) {
-            <span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span> <span class="string">&quot;second test attribute is supplied&quot;</span>;
-            <span class="kw">return</span> <span class="ident">syn::Error::new_spanned</span>(<span class="kw-2">&amp;</span><span class="ident">attr</span>, <span class="ident">msg</span>)
-                .<span class="ident">to_compile_error</span>()
-                .<span class="ident">into</span>();
-        }
+    <span class="kw">match</span> <span class="ident">config</span> {
+        <span class="prelude-val">Ok</span>(<span class="ident">config</span>) =&gt; <span class="ident">parse_knobs</span>(<span class="ident">input</span>, <span class="bool-val">true</span>, <span class="ident">config</span>),
+        <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; <span class="ident">token_stream_with_error</span>(<span class="ident">parse_knobs</span>(<span class="ident">input</span>, <span class="bool-val">true</span>, <span class="ident">DEFAULT_ERROR_CONFIG</span>), <span class="ident">e</span>),
     }
-
-    <span class="ident">parse_knobs</span>(<span class="ident">input</span>, <span class="ident">args</span>, <span class="bool-val">true</span>, <span class="ident">rt_multi_thread</span>).<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">e</span>.<span class="ident">to_compile_error</span>().<span class="ident">into</span>())
 }
 </code></pre></div>
 </section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="tokio_macros" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>

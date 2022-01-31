@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;tokio-1.12.0&#x2F;src&#x2F;sync&#x2F;task&#x2F;atomic_waker.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>atomic_waker.rs - source</title><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../../../storage.js"></script><script src="../../../../crates.js"></script><script defer src="../../../../main.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;tokio-1.15.0&#x2F;src&#x2F;sync&#x2F;task&#x2F;atomic_waker.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>atomic_waker.rs - source</title><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../../../storage.js"></script><script src="../../../../crates.js"></script><script defer src="../../../../main.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script>
     <noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../../tokio/index.html'><div class='logo-container rust-logo'><img src='../../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
@@ -322,12 +322,73 @@
 <span id="321">321</span>
 <span id="322">322</span>
 <span id="323">323</span>
+<span id="324">324</span>
+<span id="325">325</span>
+<span id="326">326</span>
+<span id="327">327</span>
+<span id="328">328</span>
+<span id="329">329</span>
+<span id="330">330</span>
+<span id="331">331</span>
+<span id="332">332</span>
+<span id="333">333</span>
+<span id="334">334</span>
+<span id="335">335</span>
+<span id="336">336</span>
+<span id="337">337</span>
+<span id="338">338</span>
+<span id="339">339</span>
+<span id="340">340</span>
+<span id="341">341</span>
+<span id="342">342</span>
+<span id="343">343</span>
+<span id="344">344</span>
+<span id="345">345</span>
+<span id="346">346</span>
+<span id="347">347</span>
+<span id="348">348</span>
+<span id="349">349</span>
+<span id="350">350</span>
+<span id="351">351</span>
+<span id="352">352</span>
+<span id="353">353</span>
+<span id="354">354</span>
+<span id="355">355</span>
+<span id="356">356</span>
+<span id="357">357</span>
+<span id="358">358</span>
+<span id="359">359</span>
+<span id="360">360</span>
+<span id="361">361</span>
+<span id="362">362</span>
+<span id="363">363</span>
+<span id="364">364</span>
+<span id="365">365</span>
+<span id="366">366</span>
+<span id="367">367</span>
+<span id="368">368</span>
+<span id="369">369</span>
+<span id="370">370</span>
+<span id="371">371</span>
+<span id="372">372</span>
+<span id="373">373</span>
+<span id="374">374</span>
+<span id="375">375</span>
+<span id="376">376</span>
+<span id="377">377</span>
+<span id="378">378</span>
+<span id="379">379</span>
+<span id="380">380</span>
+<span id="381">381</span>
+<span id="382">382</span>
+<span id="383">383</span>
 </pre><pre class="rust"><code><span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">any</span>(<span class="ident">loom</span>, <span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;sync&quot;</span>)), <span class="ident">allow</span>(<span class="ident">dead_code</span>, <span class="ident">unreachable_pub</span>))]</span>
 
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::loom::cell::UnsafeCell</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::loom::sync::atomic</span>::{<span class="self">self</span>, <span class="ident">AtomicUsize</span>};
 
 <span class="kw">use</span> <span class="ident">std::fmt</span>;
+<span class="kw">use</span> <span class="ident">std::panic</span>::{<span class="ident">resume_unwind</span>, <span class="ident">AssertUnwindSafe</span>, <span class="ident">RefUnwindSafe</span>, <span class="ident">UnwindSafe</span>};
 <span class="kw">use</span> <span class="ident">std::sync::atomic::Ordering</span>::{<span class="ident">AcqRel</span>, <span class="ident">Acquire</span>, <span class="ident">Release</span>};
 <span class="kw">use</span> <span class="ident">std::task::Waker</span>;
 
@@ -350,6 +411,9 @@
     <span class="ident">state</span>: <span class="ident">AtomicUsize</span>,
     <span class="ident">waker</span>: <span class="ident">UnsafeCell</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Waker</span><span class="op">&gt;</span><span class="op">&gt;</span>,
 }
+
+<span class="kw">impl</span> <span class="ident">RefUnwindSafe</span> <span class="kw">for</span> <span class="ident">AtomicWaker</span> {}
+<span class="kw">impl</span> <span class="ident">UnwindSafe</span> <span class="kw">for</span> <span class="ident">AtomicWaker</span> {}
 
 <span class="comment">// `AtomicWaker` is a multi-consumer, single-producer transfer cell. The cell</span>
 <span class="comment">// stores a `Waker` value produced by calls to `register` and many threads can</span>
@@ -408,7 +472,7 @@
 <span class="comment">// back to `WAITING`. This transition must succeed as, at this point, the state</span>
 <span class="comment">// cannot be transitioned by another thread.</span>
 <span class="comment">//</span>
-<span class="comment">// If the thread is unable to obtain the lock, the `WAKING` bit is still.</span>
+<span class="comment">// If the thread is unable to obtain the lock, the `WAKING` bit is still set.</span>
 <span class="comment">// This is because it has either been set by the current thread but the previous</span>
 <span class="comment">// value included the `REGISTERING` bit **or** a concurrent thread is in the</span>
 <span class="comment">// `WAKING` critical section. Either way, no action must be taken.</span>
@@ -447,7 +511,7 @@
 <span class="comment">//    Thread A still holds the `wake` lock, the call to `register` will result</span>
 <span class="comment">//    in the task waking itself and get scheduled again.</span>
 
-<span class="doccomment">/// Idle state</span>
+<span class="doccomment">/// Idle state.</span>
 <span class="kw">const</span> <span class="ident">WAITING</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">0</span>;
 
 <span class="doccomment">/// A new waker value is being registered with the `AtomicWaker` cell.</span>
@@ -495,6 +559,10 @@
     <span class="kw">where</span>
         <span class="ident">W</span>: <span class="ident">WakerRef</span>,
     {
+        <span class="kw">fn</span> <span class="ident">catch_unwind</span><span class="op">&lt;</span><span class="ident">F</span>: <span class="ident">FnOnce</span>() -&gt; <span class="ident">R</span>, <span class="ident">R</span><span class="op">&gt;</span>(<span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="ident">std::thread::Result</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span> {
+            <span class="ident">std::panic::catch_unwind</span>(<span class="ident">AssertUnwindSafe</span>(<span class="ident">f</span>))
+        }
+
         <span class="kw">match</span> <span class="self">self</span>
             .<span class="ident">state</span>
             .<span class="ident">compare_exchange</span>(<span class="ident">WAITING</span>, <span class="ident">REGISTERING</span>, <span class="ident">Acquire</span>, <span class="ident">Acquire</span>)
@@ -502,8 +570,24 @@
         {
             <span class="ident">WAITING</span> =&gt; {
                 <span class="kw">unsafe</span> {
-                    <span class="comment">// Locked acquired, update the waker cell</span>
-                    <span class="self">self</span>.<span class="ident">waker</span>.<span class="ident">with_mut</span>(<span class="op">|</span><span class="ident">t</span><span class="op">|</span> <span class="kw-2">*</span><span class="ident">t</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">waker</span>.<span class="ident">into_waker</span>()));
+                    <span class="comment">// If `into_waker` panics (because it&#39;s code outside of</span>
+                    <span class="comment">// AtomicWaker) we need to prime a guard that is called on</span>
+                    <span class="comment">// unwind to restore the waker to a WAITING state. Otherwise</span>
+                    <span class="comment">// any future calls to register will incorrectly be stuck</span>
+                    <span class="comment">// believing it&#39;s being updated by someone else.</span>
+                    <span class="kw">let</span> <span class="ident">new_waker_or_panic</span> <span class="op">=</span> <span class="ident">catch_unwind</span>(<span class="kw">move</span> <span class="op">|</span><span class="op">|</span> <span class="ident">waker</span>.<span class="ident">into_waker</span>());
+
+                    <span class="comment">// Set the field to contain the new waker, or if</span>
+                    <span class="comment">// `into_waker` panicked, leave the old value.</span>
+                    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">maybe_panic</span> <span class="op">=</span> <span class="prelude-val">None</span>;
+                    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">old_waker</span> <span class="op">=</span> <span class="prelude-val">None</span>;
+                    <span class="kw">match</span> <span class="ident">new_waker_or_panic</span> {
+                        <span class="prelude-val">Ok</span>(<span class="ident">new_waker</span>) =&gt; {
+                            <span class="ident">old_waker</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">waker</span>.<span class="ident">with_mut</span>(<span class="op">|</span><span class="ident">t</span><span class="op">|</span> (<span class="kw-2">*</span><span class="ident">t</span>).<span class="ident">take</span>());
+                            <span class="self">self</span>.<span class="ident">waker</span>.<span class="ident">with_mut</span>(<span class="op">|</span><span class="ident">t</span><span class="op">|</span> <span class="kw-2">*</span><span class="ident">t</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">new_waker</span>));
+                        }
+                        <span class="prelude-val">Err</span>(<span class="ident">panic</span>) =&gt; <span class="ident">maybe_panic</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">panic</span>),
+                    }
 
                     <span class="comment">// Release the lock. If the state transitioned to include</span>
                     <span class="comment">// the `WAKING` bit, this means that a wake has been</span>
@@ -517,26 +601,57 @@
                         .<span class="ident">compare_exchange</span>(<span class="ident">REGISTERING</span>, <span class="ident">WAITING</span>, <span class="ident">AcqRel</span>, <span class="ident">Acquire</span>);
 
                     <span class="kw">match</span> <span class="ident">res</span> {
-                        <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; {}
+                        <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; {
+                            <span class="comment">// We don&#39;t want to give the caller the panic if it</span>
+                            <span class="comment">// was someone else who put in that waker.</span>
+                            <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">catch_unwind</span>(<span class="kw">move</span> <span class="op">|</span><span class="op">|</span> {
+                                <span class="ident">drop</span>(<span class="ident">old_waker</span>);
+                            });
+                        }
                         <span class="prelude-val">Err</span>(<span class="ident">actual</span>) =&gt; {
                             <span class="comment">// This branch can only be reached if a</span>
                             <span class="comment">// concurrent thread called `wake`. In this</span>
                             <span class="comment">// case, `actual` **must** be `REGISTERING |</span>
-                            <span class="comment">// `WAKING`.</span>
+                            <span class="comment">// WAKING`.</span>
                             <span class="macro">debug_assert_eq!</span>(<span class="ident">actual</span>, <span class="ident">REGISTERING</span> <span class="op">|</span> <span class="ident">WAKING</span>);
 
                             <span class="comment">// Take the waker to wake once the atomic operation has</span>
                             <span class="comment">// completed.</span>
-                            <span class="kw">let</span> <span class="ident">waker</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">waker</span>.<span class="ident">with_mut</span>(<span class="op">|</span><span class="ident">t</span><span class="op">|</span> (<span class="kw-2">*</span><span class="ident">t</span>).<span class="ident">take</span>()).<span class="ident">unwrap</span>();
+                            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">waker</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">waker</span>.<span class="ident">with_mut</span>(<span class="op">|</span><span class="ident">t</span><span class="op">|</span> (<span class="kw-2">*</span><span class="ident">t</span>).<span class="ident">take</span>());
 
                             <span class="comment">// Just swap, because no one could change state</span>
                             <span class="comment">// while state == `Registering | `Waking`</span>
                             <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">swap</span>(<span class="ident">WAITING</span>, <span class="ident">AcqRel</span>);
 
-                            <span class="comment">// The atomic swap was complete, now</span>
-                            <span class="comment">// wake the waker and return.</span>
-                            <span class="ident">waker</span>.<span class="ident">wake</span>();
+                            <span class="comment">// If `into_waker` panicked, then the waker in the</span>
+                            <span class="comment">// waker slot is actually the old waker.</span>
+                            <span class="kw">if</span> <span class="ident">maybe_panic</span>.<span class="ident">is_some</span>() {
+                                <span class="ident">old_waker</span> <span class="op">=</span> <span class="ident">waker</span>.<span class="ident">take</span>();
+                            }
+
+                            <span class="comment">// We don&#39;t want to give the caller the panic if it</span>
+                            <span class="comment">// was someone else who put in that waker.</span>
+                            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">old_waker</span>) <span class="op">=</span> <span class="ident">old_waker</span> {
+                                <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">catch_unwind</span>(<span class="kw">move</span> <span class="op">|</span><span class="op">|</span> {
+                                    <span class="ident">old_waker</span>.<span class="ident">wake</span>();
+                                });
+                            }
+
+                            <span class="comment">// The atomic swap was complete, now wake the waker</span>
+                            <span class="comment">// and return.</span>
+                            <span class="comment">//</span>
+                            <span class="comment">// If this panics, we end up in a consumed state and</span>
+                            <span class="comment">// return the panic to the caller.</span>
+                            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">waker</span>) <span class="op">=</span> <span class="ident">waker</span> {
+                                <span class="macro">debug_assert!</span>(<span class="ident">maybe_panic</span>.<span class="ident">is_none</span>());
+                                <span class="ident">waker</span>.<span class="ident">wake</span>();
+                            }
                         }
+                    }
+
+                    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">panic</span>) <span class="op">=</span> <span class="ident">maybe_panic</span> {
+                        <span class="comment">// If `into_waker` panicked, return the panic to the caller.</span>
+                        <span class="ident">resume_unwind</span>(<span class="ident">panic</span>);
                     }
                 }
             }
@@ -544,6 +659,9 @@
                 <span class="comment">// Currently in the process of waking the task, i.e.,</span>
                 <span class="comment">// `wake` is currently being called on the old waker.</span>
                 <span class="comment">// So, we call wake on the new waker.</span>
+                <span class="comment">//</span>
+                <span class="comment">// If this panics, someone else is responsible for restoring the</span>
+                <span class="comment">// state of the waker.</span>
                 <span class="ident">waker</span>.<span class="ident">wake</span>();
 
                 <span class="comment">// This is equivalent to a spin lock, so use a spin hint.</span>
@@ -569,6 +687,8 @@
     <span class="doccomment">/// If `register` has not been called yet, then this does nothing.</span>
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">wake</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) {
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">waker</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">take_waker</span>() {
+            <span class="comment">// If wake panics, we&#39;ve consumed the waker which is a legitimate</span>
+            <span class="comment">// outcome.</span>
             <span class="ident">waker</span>.<span class="ident">wake</span>();
         }
     }

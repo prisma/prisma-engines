@@ -241,6 +241,9 @@
 <span id="240">240</span>
 <span id="241">241</span>
 <span id="242">242</span>
+<span id="243">243</span>
+<span id="244">244</span>
+<span id="245">245</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::fmt::Display</span>;
 
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::filter::Filter</span>;
@@ -328,6 +331,9 @@
 
             <span class="ident">ErrorKind::MissingFullTextSearchIndex</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">KnownError::new</span>(
                 <span class="ident">user_facing_errors::query_engine::MissingFullTextSearchIndex</span> {},
+            )),
+            <span class="ident">ErrorKind::TransactionAborted</span> { <span class="ident">message</span> } =&gt; <span class="prelude-val">Some</span>(<span class="ident">KnownError::new</span>(
+                <span class="ident">user_facing_errors::query_engine::InteractiveTransactionError</span> { <span class="ident">error</span>: <span class="ident">message</span>.<span class="ident">clone</span>() },
             )),
             <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
         };

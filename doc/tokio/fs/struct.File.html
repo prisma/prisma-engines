@@ -22,7 +22,7 @@ methods found on the <a href="../io/trait.AsyncReadExt.html"><code>AsyncReadExt<
 
 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">file</span> <span class="op">=</span> <span class="ident">File::create</span>(<span class="string">&quot;foo.txt&quot;</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 <span class="ident">file</span>.<span class="ident">write_all</span>(<span class="string">b&quot;hello, world!&quot;</span>).<span class="kw">await</span><span class="question-mark">?</span>;</code></pre></div>
-<p>Read the contents of a file into a buffer</p>
+<p>Read the contents of a file into a buffer:</p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">tokio::fs::File</span>;
 <span class="kw">use</span> <span class="ident">tokio::io::AsyncReadExt</span>; <span class="comment">// for read_to_end()</span>
@@ -119,7 +119,7 @@ writing.</p>
 <span class="kw">let</span> <span class="ident">metadata</span> <span class="op">=</span> <span class="ident">file</span>.<span class="ident">metadata</span>().<span class="kw">await</span><span class="question-mark">?</span>;
 
 <span class="macro">println!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="ident">metadata</span>);</code></pre></div>
-</div></details><details class="rustdoc-toggle method-toggle" open><summary><div id="method.try_clone" class="method has-srclink"><div class="rightside"><a class="srclink" href="../../src/tokio/fs/file.rs.html#401-405" title="goto source code">[src]</a></div><a href="#method.try_clone" class="anchor"></a><h4 class="code-header">pub async fn <a href="#method.try_clone" class="fnname">try_clone</a>(&amp;self) -&gt; <a class="type" href="https://doc.rust-lang.org/1.58.1/std/io/error/type.Result.html" title="type std::io::error::Result">Result</a>&lt;<a class="struct" href="struct.File.html" title="struct tokio::fs::File">File</a>&gt;</h4></div></summary><div class="docblock"><p>Create a new <code>File</code> instance that shares the same underlying file handle
+</div></details><details class="rustdoc-toggle method-toggle" open><summary><div id="method.try_clone" class="method has-srclink"><div class="rightside"><a class="srclink" href="../../src/tokio/fs/file.rs.html#401-405" title="goto source code">[src]</a></div><a href="#method.try_clone" class="anchor"></a><h4 class="code-header">pub async fn <a href="#method.try_clone" class="fnname">try_clone</a>(&amp;self) -&gt; <a class="type" href="https://doc.rust-lang.org/1.58.1/std/io/error/type.Result.html" title="type std::io::error::Result">Result</a>&lt;<a class="struct" href="struct.File.html" title="struct tokio::fs::File">File</a>&gt;</h4></div></summary><div class="docblock"><p>Creates a new <code>File</code> instance that shares the same underlying file handle
 as the existing <code>File</code> instance. Reads, writes, and seeks will affect both
 File instances simultaneously.</p>
 <h5 id="examples-8" class="section-header"><a href="#examples-8">Examples</a></h5>

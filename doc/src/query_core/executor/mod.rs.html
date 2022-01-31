@@ -64,6 +64,11 @@
 <span id="63">63</span>
 <span id="64">64</span>
 <span id="65">65</span>
+<span id="66">66</span>
+<span id="67">67</span>
+<span id="68">68</span>
+<span id="69">69</span>
+<span id="70">70</span>
 </pre><pre class="rust"><code><span class="doccomment">//! What the executor module DOES:</span>
 <span class="doccomment">//! - Defining an overarching executor trait, to be used on consumers of the core crate.</span>
 <span class="doccomment">//! - Defining executor implementations that combine the different core modules into a coherent</span>
@@ -121,7 +126,12 @@
     <span class="doccomment">/// Expected to throw an error if no transaction could be opened for `max_acquisition_millis` milliseconds.</span>
     <span class="doccomment">/// The new transaction must only live for `valid_for_millis` milliseconds before it automatically rolls back.</span>
     <span class="doccomment">/// This rollback mechanism is an implementation detail of the trait implementer.</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">start_tx</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">max_acquisition_millis</span>: <span class="ident">u64</span>, <span class="ident">valid_for_millis</span>: <span class="ident">u64</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">TxId</span><span class="op">&gt;</span>;
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">start_tx</span>(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        <span class="ident">query_schema</span>: <span class="ident">QuerySchemaRef</span>,
+        <span class="ident">max_acquisition_millis</span>: <span class="ident">u64</span>,
+        <span class="ident">valid_for_millis</span>: <span class="ident">u64</span>,
+    ) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">TxId</span><span class="op">&gt;</span>;
 
     <span class="doccomment">/// Commits a transaction.</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">commit_tx</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">tx_id</span>: <span class="ident">TxId</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span>;

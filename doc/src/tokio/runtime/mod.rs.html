@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;tokio-1.12.0&#x2F;src&#x2F;runtime&#x2F;mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><script defer src="../../../main.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;tokio-1.15.0&#x2F;src&#x2F;runtime&#x2F;mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><script defer src="../../../main.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script>
     <noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../tokio/index.html'><div class='logo-container rust-logo'><img src='../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
@@ -573,6 +573,32 @@
 <span id="572">572</span>
 <span id="573">573</span>
 <span id="574">574</span>
+<span id="575">575</span>
+<span id="576">576</span>
+<span id="577">577</span>
+<span id="578">578</span>
+<span id="579">579</span>
+<span id="580">580</span>
+<span id="581">581</span>
+<span id="582">582</span>
+<span id="583">583</span>
+<span id="584">584</span>
+<span id="585">585</span>
+<span id="586">586</span>
+<span id="587">587</span>
+<span id="588">588</span>
+<span id="589">589</span>
+<span id="590">590</span>
+<span id="591">591</span>
+<span id="592">592</span>
+<span id="593">593</span>
+<span id="594">594</span>
+<span id="595">595</span>
+<span id="596">596</span>
+<span id="597">597</span>
+<span id="598">598</span>
+<span id="599">599</span>
+<span id="600">600</span>
 </pre><pre class="rust"><code><span class="doccomment">//! The Tokio runtime.</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! Unlike other Rust programs, asynchronous applications require runtime</span>
@@ -780,7 +806,7 @@
     <span class="kw">use</span> <span class="ident"><span class="self">self</span>::enter::enter</span>;
 
     <span class="kw">mod</span> <span class="ident">handle</span>;
-    <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">handle</span>::{<span class="ident">EnterGuard</span>, <span class="ident">Handle</span>};
+    <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">handle</span>::{<span class="ident">EnterGuard</span>, <span class="ident">Handle</span>, <span class="ident">TryCurrentError</span>};
 
     <span class="kw">mod</span> <span class="ident">spawner</span>;
     <span class="kw">use</span> <span class="ident"><span class="self">self</span>::spawner::Spawner</span>;
@@ -869,7 +895,7 @@
     <span class="kw">type</span> <span class="ident">Callback</span> <span class="op">=</span> <span class="ident">std::sync::Arc</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Fn</span>() <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span>;
 
     <span class="kw">impl</span> <span class="ident">Runtime</span> {
-        <span class="doccomment">/// Create a new runtime instance with default configuration values.</span>
+        <span class="doccomment">/// Creates a new runtime instance with default configuration values.</span>
         <span class="doccomment">///</span>
         <span class="doccomment">/// This results in the multi threaded scheduler, I/O driver, and time driver being</span>
         <span class="doccomment">/// initialized.</span>
@@ -904,7 +930,7 @@
             <span class="ident">Builder::new_multi_thread</span>().<span class="ident">enable_all</span>().<span class="ident">build</span>()
         }
 
-        <span class="doccomment">/// Return a handle to the runtime&#39;s spawner.</span>
+        <span class="doccomment">/// Returns a handle to the runtime&#39;s spawner.</span>
         <span class="doccomment">///</span>
         <span class="doccomment">/// The returned handle can be used to spawn tasks that run on this runtime, and can</span>
         <span class="doccomment">/// be cloned to allow moving the `Handle` to other threads.</span>
@@ -925,7 +951,7 @@
             <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">handle</span>
         }
 
-        <span class="doccomment">/// Spawn a future onto the Tokio runtime.</span>
+        <span class="doccomment">/// Spawns a future onto the Tokio runtime.</span>
         <span class="doccomment">///</span>
         <span class="doccomment">/// This spawns the given future onto the runtime&#39;s executor, usually a</span>
         <span class="doccomment">/// thread pool. The thread pool is then responsible for polling the future</span>
@@ -950,7 +976,7 @@
         <span class="doccomment">/// });</span>
         <span class="doccomment">/// # }</span>
         <span class="doccomment">/// ```</span>
-        <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">tokio_track_caller</span>, <span class="ident">track_caller</span>)]</span>
+        <span class="attribute">#[<span class="ident">track_caller</span>]</span>
         <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">spawn</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">future</span>: <span class="ident">F</span>) -&gt; <span class="ident">JoinHandle</span><span class="op">&lt;</span><span class="ident">F::Output</span><span class="op">&gt;</span>
         <span class="kw">where</span>
             <span class="ident">F</span>: <span class="ident">Future</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
@@ -959,7 +985,7 @@
             <span class="self">self</span>.<span class="ident">handle</span>.<span class="ident">spawn</span>(<span class="ident">future</span>)
         }
 
-        <span class="doccomment">/// Run the provided function on an executor dedicated to blocking operations.</span>
+        <span class="doccomment">/// Runs the provided function on an executor dedicated to blocking operations.</span>
         <span class="doccomment">///</span>
         <span class="doccomment">/// # Examples</span>
         <span class="doccomment">///</span>
@@ -975,7 +1001,7 @@
         <span class="doccomment">///     println!(&quot;now running on a worker thread&quot;);</span>
         <span class="doccomment">/// });</span>
         <span class="doccomment">/// # }</span>
-        <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">tokio_track_caller</span>, <span class="ident">track_caller</span>)]</span>
+        <span class="attribute">#[<span class="ident">track_caller</span>]</span>
         <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">spawn_blocking</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">R</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">func</span>: <span class="ident">F</span>) -&gt; <span class="ident">JoinHandle</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>
         <span class="kw">where</span>
             <span class="ident">F</span>: <span class="ident">FnOnce</span>() -&gt; <span class="ident">R</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
@@ -984,7 +1010,7 @@
             <span class="self">self</span>.<span class="ident">handle</span>.<span class="ident">spawn_blocking</span>(<span class="ident">func</span>)
         }
 
-        <span class="doccomment">/// Run a future to completion on the Tokio runtime. This is the</span>
+        <span class="doccomment">/// Runs a future to completion on the Tokio runtime. This is the</span>
         <span class="doccomment">/// runtime&#39;s entry point.</span>
         <span class="doccomment">///</span>
         <span class="doccomment">/// This runs the given future on the current thread, blocking until it is</span>
@@ -1025,7 +1051,7 @@
         <span class="doccomment">/// ```</span>
         <span class="doccomment">///</span>
         <span class="doccomment">/// [handle]: fn@Handle::block_on</span>
-        <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">tokio_track_caller</span>, <span class="ident">track_caller</span>)]</span>
+        <span class="attribute">#[<span class="ident">track_caller</span>]</span>
         <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">block_on</span><span class="op">&lt;</span><span class="ident">F</span>: <span class="ident">Future</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">future</span>: <span class="ident">F</span>) -&gt; <span class="ident">F::Output</span> {
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">tokio_unstable</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tracing&quot;</span>))]</span>
             <span class="kw">let</span> <span class="ident">future</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::util::trace::task</span>(<span class="ident">future</span>, <span class="string">&quot;block_on&quot;</span>, <span class="prelude-val">None</span>);
@@ -1039,7 +1065,7 @@
             }
         }
 
-        <span class="doccomment">/// Enter the runtime context.</span>
+        <span class="doccomment">/// Enters the runtime context.</span>
         <span class="doccomment">///</span>
         <span class="doccomment">/// This allows you to construct types that must have an executor</span>
         <span class="doccomment">/// available on creation such as [`Sleep`] or [`TcpStream`]. It will</span>
@@ -1075,7 +1101,7 @@
             <span class="self">self</span>.<span class="ident">handle</span>.<span class="ident">enter</span>()
         }
 
-        <span class="doccomment">/// Shutdown the runtime, waiting for at most `duration` for all spawned</span>
+        <span class="doccomment">/// Shuts down the runtime, waiting for at most `duration` for all spawned</span>
         <span class="doccomment">/// task to shutdown.</span>
         <span class="doccomment">///</span>
         <span class="doccomment">/// Usually, dropping a `Runtime` handle is sufficient as tasks are able to</span>
@@ -1112,11 +1138,11 @@
         <span class="doccomment">/// ```</span>
         <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">shutdown_timeout</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">duration</span>: <span class="ident">Duration</span>) {
             <span class="comment">// Wakeup and shutdown all the worker threads</span>
-            <span class="self">self</span>.<span class="ident">handle</span>.<span class="ident">shutdown</span>();
+            <span class="self">self</span>.<span class="ident">handle</span>.<span class="ident">clone</span>().<span class="ident">shutdown</span>();
             <span class="self">self</span>.<span class="ident">blocking_pool</span>.<span class="ident">shutdown</span>(<span class="prelude-val">Some</span>(<span class="ident">duration</span>));
         }
 
-        <span class="doccomment">/// Shutdown the runtime, without waiting for any spawned tasks to shutdown.</span>
+        <span class="doccomment">/// Shuts down the runtime, without waiting for any spawned tasks to shutdown.</span>
         <span class="doccomment">///</span>
         <span class="doccomment">/// This can be useful if you want to drop a runtime from within another runtime.</span>
         <span class="doccomment">/// Normally, dropping a runtime will block indefinitely for spawned blocking tasks</span>
@@ -1144,6 +1170,32 @@
         <span class="doccomment">/// ```</span>
         <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">shutdown_background</span>(<span class="self">self</span>) {
             <span class="self">self</span>.<span class="ident">shutdown_timeout</span>(<span class="ident">Duration::from_nanos</span>(<span class="number">0</span>))
+        }
+    }
+
+    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::single_match</span>)]</span> <span class="comment">// there are comments in the error branch, so we don&#39;t want if-let</span>
+    <span class="kw">impl</span> <span class="ident">Drop</span> <span class="kw">for</span> <span class="ident">Runtime</span> {
+        <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
+            <span class="kw">match</span> <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">kind</span> {
+                <span class="ident">Kind::CurrentThread</span>(<span class="ident">basic</span>) =&gt; {
+                    <span class="comment">// This ensures that tasks spawned on the basic runtime are dropped inside the</span>
+                    <span class="comment">// runtime&#39;s context.</span>
+                    <span class="kw">match</span> <span class="ident"><span class="self">self</span>::context::try_enter</span>(<span class="self">self</span>.<span class="ident">handle</span>.<span class="ident">clone</span>()) {
+                        <span class="prelude-val">Some</span>(<span class="ident">guard</span>) =&gt; <span class="ident">basic</span>.<span class="ident">set_context_guard</span>(<span class="ident">guard</span>),
+                        <span class="prelude-val">None</span> =&gt; {
+                            <span class="comment">// The context thread-local has already been destroyed.</span>
+                            <span class="comment">//</span>
+                            <span class="comment">// We don&#39;t set the guard in this case. Calls to tokio::spawn in task</span>
+                            <span class="comment">// destructors would fail regardless if this happens.</span>
+                        },
+                    }
+                },
+                <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rt-multi-thread&quot;</span>)]</span>
+                <span class="ident">Kind::ThreadPool</span>(<span class="kw">_</span>) =&gt; {
+                    <span class="comment">// The threaded scheduler drops its tasks on its worker threads, which is</span>
+                    <span class="comment">// already in the runtime&#39;s context.</span>
+                },
+            }
         }
     }
 }

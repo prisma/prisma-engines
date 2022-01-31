@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;tokio-1.12.0&#x2F;src&#x2F;time&#x2F;driver&#x2F;mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../../../storage.js"></script><script src="../../../../crates.js"></script><script defer src="../../../../main.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;tokio-1.15.0&#x2F;src&#x2F;time&#x2F;driver&#x2F;mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../../../storage.js"></script><script src="../../../../crates.js"></script><script defer src="../../../../main.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script>
     <noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../../tokio/index.html'><div class='logo-container rust-logo'><img src='../../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
@@ -533,7 +533,7 @@
 <span class="attribute">#![<span class="ident">allow</span>(<span class="ident">unused_unsafe</span>)]</span>
 <span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rt&quot;</span>), <span class="ident">allow</span>(<span class="ident">dead_code</span>))]</span>
 
-<span class="doccomment">//! Time driver</span>
+<span class="doccomment">//! Time driver.</span>
 
 <span class="kw">mod</span> <span class="ident">entry</span>;
 <span class="kw">pub</span>(<span class="self">self</span>) <span class="kw">use</span> <span class="ident"><span class="self">self</span>::entry</span>::{<span class="ident">EntryList</span>, <span class="ident">TimerEntry</span>, <span class="ident">TimerHandle</span>, <span class="ident">TimerShared</span>};
@@ -612,13 +612,13 @@
 <span class="doccomment">/// [interval]: crate::time::Interval</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">Driver</span><span class="op">&lt;</span><span class="ident">P</span>: <span class="ident">Park</span> <span class="op">+</span> <span class="lifetime">&#39;static</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Timing backend in use</span>
+    <span class="doccomment">/// Timing backend in use.</span>
     <span class="ident">time_source</span>: <span class="ident">ClockTime</span>,
 
-    <span class="doccomment">/// Shared state</span>
+    <span class="doccomment">/// Shared state.</span>
     <span class="ident">handle</span>: <span class="ident">Handle</span>,
 
-    <span class="doccomment">/// Parker to delegate to</span>
+    <span class="doccomment">/// Parker to delegate to.</span>
     <span class="ident">park</span>: <span class="ident">P</span>,
 
     <span class="comment">// When `true`, a call to `park_timeout` should immediately return and time</span>
@@ -675,25 +675,25 @@
     <span class="comment">// The state is split like this so `Handle` can access `is_shutdown` without locking the mutex</span>
     <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">state</span>: <span class="ident">Mutex</span><span class="op">&lt;</span><span class="ident">InnerState</span><span class="op">&gt;</span>,
 
-    <span class="doccomment">/// True if the driver is being shutdown</span>
+    <span class="doccomment">/// True if the driver is being shutdown.</span>
     <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">is_shutdown</span>: <span class="ident">AtomicBool</span>,
 }
 
 <span class="doccomment">/// Time state shared which must be protected by a `Mutex`</span>
 <span class="kw">struct</span> <span class="ident">InnerState</span> {
-    <span class="doccomment">/// Timing backend in use</span>
+    <span class="doccomment">/// Timing backend in use.</span>
     <span class="ident">time_source</span>: <span class="ident">ClockTime</span>,
 
     <span class="doccomment">/// The last published timer `elapsed` value.</span>
     <span class="ident">elapsed</span>: <span class="ident">u64</span>,
 
-    <span class="doccomment">/// The earliest time at which we promise to wake up without unparking</span>
+    <span class="doccomment">/// The earliest time at which we promise to wake up without unparking.</span>
     <span class="ident">next_wake</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">NonZeroU64</span><span class="op">&gt;</span>,
 
-    <span class="doccomment">/// Timer wheel</span>
+    <span class="doccomment">/// Timer wheel.</span>
     <span class="ident">wheel</span>: <span class="ident">wheel::Wheel</span>,
 
-    <span class="doccomment">/// Unparker that can be used to wake the time driver</span>
+    <span class="doccomment">/// Unparker that can be used to wake the time driver.</span>
     <span class="ident">unpark</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Unpark</span><span class="op">&gt;</span>,
 }
 
