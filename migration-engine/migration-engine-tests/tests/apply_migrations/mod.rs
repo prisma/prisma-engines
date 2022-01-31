@@ -1,4 +1,4 @@
-use indoc::formatdoc;
+use indoc::{formatdoc, indoc};
 use migration_engine_tests::test_api::*;
 use pretty_assertions::assert_eq;
 use user_facing_errors::{migration_engine::ApplyMigrationError, UserFacingError};
@@ -131,6 +131,13 @@ fn migrations_should_fail_when_the_script_is_invalid(api: TestApi) {
                 _ => todo!(),
             },
             message = match api.tags() {
+                t if t.contains(Tags::CockroachDb) => indoc! {r#"
+                    ERROR: at or near "^": syntax error
+                    DETAIL: source SQL:
+                    SELECT (^.^)_n
+                            ^
+                    HINT: try \h SELECT
+                "#},
                 t if t.contains(Tags::Vitess) => "syntax error at position 10",
                 t if t.contains(Tags::Mariadb) => "You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near \'^.^)_n\' at line 1",
                 t if t.contains(Tags::Mysql) => "You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near \'^.^)_n\' at line 1",

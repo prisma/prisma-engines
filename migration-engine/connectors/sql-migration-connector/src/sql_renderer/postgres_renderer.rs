@@ -432,6 +432,7 @@ impl SqlRenderer for PostgresFlavour {
     fn render_drop_table(&self, table_name: &str) -> Vec<String> {
         vec![ddl::DropTable {
             table_name: table_name.into(),
+            cascade: false,
         }
         .to_string()]
     }
@@ -443,8 +444,52 @@ impl SqlRenderer for PostgresFlavour {
         .to_string()
     }
 
-    fn render_redefine_tables(&self, _names: &[RedefineTable], _schemas: &Pair<&SqlSchema>) -> Vec<String> {
-        unreachable!("render_redefine_table on Postgres")
+    fn render_redefine_tables(&self, tables: &[RedefineTable], schemas: &Pair<&SqlSchema>) -> Vec<String> {
+        let mut result = Vec::new();
+
+        for redefine_table in tables {
+            let tables = schemas.tables(&redefine_table.table_ids);
+            let temporary_table_name = format!("_prisma_new_{}", &tables.next().name());
+            result.push(self.render_create_table_as(tables.next(), &temporary_table_name));
+
+            let columns: Vec<_> = redefine_table
+                .column_pairs
+                .iter()
+                .map(|(column_indexes, _, _)| tables.columns(column_indexes).next().name())
+                .map(|c| self.quote(c).to_string())
+                .collect();
+
+            let table = tables.previous().name();
+
+            for index in tables.previous().indexes() {
+                result.push(self.render_drop_index(&index));
+            }
+            let column_names = columns.join(",");
+
+            result.push(format!(
+                r#"INSERT INTO "{temporary_table_name}" ({column_names}) SELECT {column_names} FROM "{table}""#
+            ));
+
+            result.push(
+                ddl::DropTable {
+                    table_name: tables.previous().name().into(),
+                    cascade: true,
+                }
+                .to_string(),
+            );
+
+            result.push(self.render_rename_table(&temporary_table_name, tables.next().name()));
+
+            for index in tables.next().indexes() {
+                result.push(self.render_create_index(&index));
+            }
+
+            for fk in tables.next().foreign_keys() {
+                result.push(self.render_add_foreign_key(&fk));
+            }
+        }
+
+        result
     }
 
     fn render_rename_table(&self, name: &str, new_name: &str) -> String {

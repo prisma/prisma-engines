@@ -124,12 +124,19 @@ impl Display for DropIndex<'_> {
 pub struct DropTable<'a> {
     /// The name of the table to be dropped.
     pub table_name: PostgresIdentifier<'a>,
+    pub cascade: bool,
 }
 
 impl Display for DropTable<'_> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.write_str("DROP TABLE ")?;
-        Display::fmt(&self.table_name, f)
+        Display::fmt(&self.table_name, f)?;
+
+        if self.cascade {
+            f.write_str(" CASCADE")?;
+        }
+
+        Ok(())
     }
 }
 
