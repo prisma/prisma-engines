@@ -219,6 +219,16 @@
 <span id="218">218</span>
 <span id="219">219</span>
 <span id="220">220</span>
+<span id="221">221</span>
+<span id="222">222</span>
+<span id="223">223</span>
+<span id="224">224</span>
+<span id="225">225</span>
+<span id="226">226</span>
+<span id="227">227</span>
+<span id="228">228</span>
+<span id="229">229</span>
+<span id="230">230</span>
 </pre><pre class="rust"><code><span class="doccomment">//! The migration connector ConnectorError type.</span>
 
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::migrations_directory</span>::{<span class="ident">ListMigrationsError</span>, <span class="ident">ReadMigrationScriptError</span>};
@@ -303,6 +313,16 @@
             <span class="ident">context</span>: <span class="ident">SpanTrace::capture</span>(),
             <span class="ident">message</span>: <span class="prelude-val">Some</span>(<span class="ident">msg</span>.<span class="ident">into_boxed_str</span>()),
             <span class="ident">source</span>: <span class="prelude-val">None</span>,
+        }))
+    }
+
+    <span class="doccomment">/// Build a generic unknown error from a source error, with some additional context.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_source_with_context</span><span class="op">&lt;</span><span class="ident">E</span>: <span class="ident">StdError</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span><span class="op">&gt;</span>(<span class="ident">source</span>: <span class="ident">E</span>, <span class="ident">context</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
+        <span class="ident">ConnectorError</span>(<span class="ident">Box::new</span>(<span class="ident">ConnectorErrorImpl</span> {
+            <span class="ident">user_facing_error</span>: <span class="prelude-val">None</span>,
+            <span class="ident">message</span>: <span class="prelude-val">Some</span>(<span class="ident">context</span>),
+            <span class="ident">source</span>: <span class="prelude-val">Some</span>(<span class="ident">Arc::new</span>(<span class="ident">source</span>)),
+            <span class="ident">context</span>: <span class="ident">SpanTrace::capture</span>(),
         }))
     }
 
