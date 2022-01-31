@@ -6,7 +6,7 @@ use migration_engine_tests::test_api::*;
 use quaint::prelude::Queryable;
 use std::sync::Arc;
 
-#[test_connector]
+#[test_connector(tags(Sqlite))]
 fn diffing_postgres_schemas_when_initialized_on_sqlite(mut api: TestApi) {
     // We should get a postgres diff.
 
@@ -301,11 +301,9 @@ fn from_url_to_url(mut api: TestApi) {
     expected_printed_messages.assert_debug_eq(&host.printed_messages.lock().unwrap());
 }
 
-#[test_connector]
-fn diffing_mongo_schemas_works(mut api: TestApi) {
+#[test]
+fn diffing_mongo_schemas_works() {
     let tempdir = tempfile::tempdir().unwrap();
-    let host = Arc::new(TestConnectorHost::default());
-    api.connector.set_host(host.clone());
 
     let from = r#"
         datasource db {
@@ -352,7 +350,7 @@ fn diffing_mongo_schemas_works(mut api: TestApi) {
 
     let to_file = write_file_to_tmp(to, &tempdir, "to");
 
-    api.diff(DiffParams {
+    let params = DiffParams {
         from: DiffTarget::SchemaDatamodel(SchemaContainer {
             schema: from_file.to_string_lossy().into_owned(),
         }),
@@ -360,17 +358,15 @@ fn diffing_mongo_schemas_works(mut api: TestApi) {
         to: DiffTarget::SchemaDatamodel(SchemaContainer {
             schema: to_file.to_string_lossy().into_owned(),
         }),
-        script: false, // TODO: `true` here panics
-    })
-    .unwrap();
+        script: false,
+    };
 
     let expected_printed_messages = expect![[r#"
-        [
-            "[+] Collection `TestModel2`\n[+] Index `TestModel_names_idx` on ({\"names\":1})\n",
-        ]
+        [+] Collection `TestModel2`
+        [+] Index `TestModel_names_idx` on ({"names":1})
     "#]];
 
-    expected_printed_messages.assert_debug_eq(&host.printed_messages.lock().unwrap());
+    expected_printed_messages.assert_eq(&diff_output(params));
 }
 
 #[test]
@@ -419,6 +415,16 @@ fn diff_error(params: DiffParams) -> String {
     let api = migration_core::migration_api(None, None).unwrap();
     let result = test_setup::runtime::run_with_tokio(api.diff(params));
     result.unwrap_err().to_string()
+}
+
+// Call diff, and expect it to succeed. Return what would be printed to stdout.
+fn diff_output(params: DiffParams) -> String {
+    let host = Arc::new(TestConnectorHost::default());
+    let api = migration_core::migration_api(None, Some(host.clone())).unwrap();
+    test_setup::runtime::run_with_tokio(api.diff(params)).unwrap();
+    let printed_messages = host.printed_messages.lock().unwrap();
+    assert!(printed_messages.len() == 1, "{:?}", printed_messages);
+    printed_messages[0].clone()
 }
 
 fn write_file_to_tmp(contents: &str, tempdir: &tempfile::TempDir, name: &str) -> std::path::PathBuf {
