@@ -54,14 +54,22 @@ fn json_rpc_diff_target_to_migration_connector_diff_target(
     target: &DiffTarget,
     shadow_database_url: Option<&str>,
 ) -> CoreResult<RefinedDiffTarget> {
+    let read_prisma_schema_from_path = |schema_path: &str| -> CoreResult<String> {
+        std::fs::read_to_string(schema_path).map_err(|err| {
+            ConnectorError::from_source_with_context(
+                err,
+                format!("Error trying to read Prisma schema file at `{}`.", schema_path).into_boxed_str(),
+            )
+        })
+    };
+
     match target {
         DiffTarget::Empty => Ok(RefinedDiffTarget {
             target: McDiff::Empty,
             connector: None,
         }),
         DiffTarget::SchemaDatasource(SchemaContainer { schema }) => {
-            let schema_contents = std::fs::read_to_string(&schema)
-                .map_err(|err| ConnectorError::from_source(err, "Reading Prisma schema file."))?;
+            let schema_contents = read_prisma_schema_from_path(schema)?;
             let (_, url, _, _) = crate::parse_configuration(&schema_contents)?;
             let api = crate::schema_to_connector(&schema_contents)?;
             Ok(RefinedDiffTarget {
@@ -70,8 +78,7 @@ fn json_rpc_diff_target_to_migration_connector_diff_target(
             })
         }
         DiffTarget::SchemaDatamodel(SchemaContainer { schema }) => {
-            let schema_contents = std::fs::read_to_string(&schema)
-                .map_err(|err| ConnectorError::from_source(err, "Reading Prisma schema file."))?;
+            let schema_contents = read_prisma_schema_from_path(schema)?;
             Ok(RefinedDiffTarget {
                 connector: Some(crate::schema_to_connector(&schema_contents)?),
                 target: McDiff::Datamodel(schema_contents.into()),
