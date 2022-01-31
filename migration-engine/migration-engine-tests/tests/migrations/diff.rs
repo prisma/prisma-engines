@@ -302,6 +302,72 @@ fn from_url_to_url(mut api: TestApi) {
 }
 
 #[test]
+fn diffing_mongo_schemas_to_script_returns_a_nice_error() {
+    let tempdir = tempfile::tempdir().unwrap();
+
+    let from = r#"
+        datasource db {
+            provider = "mongodb"
+            url = "mongo+srv://test"
+        }
+
+        generator js {
+            provider = "prisma-client-js"
+            previewFeatures = ["mongodb"]
+        }
+
+        model TestModel {
+            id Int @id @default(autoincrement()) @map("_id")
+            names String
+        }
+    "#;
+
+    let from_file = write_file_to_tmp(from, &tempdir, "from");
+
+    let to = r#"
+        datasource db {
+            provider = "mongodb"
+            url = "mongo+srv://test"
+        }
+
+        generator js {
+            provider = "prisma-client-js"
+            previewFeatures = ["mongodb"]
+        }
+
+
+        model TestModel {
+            id Int @id @default(autoincrement()) @map("_id")
+            names String[]
+
+            @@index([names])
+        }
+
+        model TestModel2 {
+            id Int @id @default(autoincrement()) @map("_id")
+        }
+    "#;
+
+    let to_file = write_file_to_tmp(to, &tempdir, "to");
+
+    let params = DiffParams {
+        from: DiffTarget::SchemaDatamodel(SchemaContainer {
+            schema: from_file.to_string_lossy().into_owned(),
+        }),
+        shadow_database_url: None,
+        to: DiffTarget::SchemaDatamodel(SchemaContainer {
+            schema: to_file.to_string_lossy().into_owned(),
+        }),
+        script: true,
+    };
+
+    let expected = expect![[r#"
+        Rendering to a script is not supported on MongoDB.
+    "#]];
+    expected.assert_eq(&diff_error(params));
+}
+
+#[test]
 fn diffing_mongo_schemas_works() {
     let tempdir = tempfile::tempdir().unwrap();
 

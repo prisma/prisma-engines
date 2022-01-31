@@ -141,7 +141,7 @@ impl SqlMigrationConnector {
             return Ok(());
         }
 
-        let migration = self.render_script(&Migration::new(migration), &DestructiveChangeDiagnostics::default());
+        let migration = self.render_script(&Migration::new(migration), &DestructiveChangeDiagnostics::default())?;
         connection.raw_cmd(&migration).await?;
 
         Ok(())

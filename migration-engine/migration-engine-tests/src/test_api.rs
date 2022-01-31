@@ -234,7 +234,7 @@ impl TestApi {
     /// Generate a migration script using `MigrationConnector::diff()`.
     pub fn connector_diff(&self, from: DiffTarget<'_>, to: DiffTarget<'_>) -> String {
         let migration = self.block_on(self.connector.diff(from, to)).unwrap();
-        self.connector.render_script(&migration, &Default::default())
+        self.connector.render_script(&migration, &Default::default()).unwrap()
     }
 
     pub fn normalize_identifier<'a>(&self, identifier: &'a str) -> Cow<'a, str> {

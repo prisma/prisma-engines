@@ -39,7 +39,7 @@ pub async fn create_migration(
 
     let destructive_change_diagnostics = checker.pure_check(&migration);
 
-    let migration_script = applier.render_script(&migration, &destructive_change_diagnostics);
+    let migration_script = applier.render_script(&migration, &destructive_change_diagnostics)?;
 
     // Write the migration script to a file.
     let directory = create_migration_directory(Path::new(&input.migrations_directory_path), &input.migration_name)
