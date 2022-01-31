@@ -33,7 +33,7 @@ pub(crate) async fn diff(params: DiffParams, host: Arc<dyn ConnectorHost>) -> Co
         let script_string = connector.database_migration_step_applier().render_script(
             &migration,
             &migration_connector::DestructiveChangeDiagnostics::default(),
-        );
+        )?;
         connector.host().print(&script_string).await?;
     } else {
         let summary = connector.migration_summary(&migration);
