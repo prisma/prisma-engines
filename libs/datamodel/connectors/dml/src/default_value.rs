@@ -133,11 +133,7 @@ impl DefaultValue {
     pub fn dbgenerated_func(&self) -> Option<String> {
         match self.kind {
             DefaultKind::Expression(ref expr) if expr.is_dbgenerated() => {
-                if let Some(val) = expr.args.get(0) {
-                    Some(val.to_string())
-                } else {
-                    None
-                }
+                expr.args.get(0).map(|val| val.to_string())
             }
             _ => None,
         }
