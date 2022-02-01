@@ -6,15 +6,14 @@
 //! What the executor module DOES NOT DO:
 //! - Define low level execution of queries. This is considered an implementation detail of the modules used by the executors.
 mod execute_operation;
-mod interactive_tx;
 mod interpreting_executor;
 mod loader;
 mod pipeline;
 
-pub use interactive_tx::*;
+pub use execute_operation::*;
 pub use loader::*;
 
-use crate::{query_document::Operation, response_ir::ResponseData, schema::QuerySchemaRef};
+use crate::{query_document::Operation, response_ir::ResponseData, schema::QuerySchemaRef, TxId};
 use async_trait::async_trait;
 use connector::Connector;
 

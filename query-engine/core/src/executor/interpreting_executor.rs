@@ -1,21 +1,11 @@
-use super::{
-<<<<<<< HEAD
-    execute_operation::{execute_many_operations, execute_many_self_containted, execute_single_operation},
-    interactive_tx::{CachedTx, TxId},
-    pipeline::QueryPipeline,
-=======
-    execute_operation::{execute_many_operations, execute_many_self_contained, execute_single_self_contained},
->>>>>>> 68566c348c (squash 1)
-    QueryExecutor,
-};
+use super::execute_operation::{execute_many_operations, execute_many_self_contained, execute_single_self_contained};
 use crate::{
-    IrSerializer, OpenTx, Operation, QueryGraph, QueryGraphBuilder, QueryInterpreter, QuerySchemaRef, ResponseData,
-    TransactionError, TransactionManager, TransactionProcessManager,
+    OpenTx, Operation, QueryExecutor, QuerySchemaRef, ResponseData, TransactionActorManager, TransactionError,
+    TransactionManager, TxId,
 };
 
 use async_trait::async_trait;
-use connector::{Connection, ConnectionLike, Connector};
-use futures::future;
+use connector::Connector;
 use tokio::time::{self, Duration};
 
 /// Central query executor and main entry point into the query core.
@@ -23,7 +13,7 @@ pub struct InterpretingExecutor<C> {
     /// The loaded connector
     connector: C,
 
-    itx_manager: TransactionProcessManager,
+    itx_manager: TransactionActorManager,
 
     /// Flag that forces individual operations to run in a transaction.
     /// Does _not_ force batches to use transactions.
@@ -38,19 +28,8 @@ where
         InterpretingExecutor {
             connector,
             force_transactions,
-            itx_manager: TransactionProcessManager::new(),
+            itx_manager: TransactionActorManager::new(),
         }
-    }
-
-    async fn finalize_tx(&self, tx_id: TxId, final_state: CachedTx) -> crate::Result<()> {
-        match final_state {
-            CachedTx::Committed => self.itx_manager.commit_tx(&tx_id).await?,
-            CachedTx::RolledBack => self.itx_manager.rollback_tx(&tx_id).await?,
-            _ => unreachable!(),
-        };
-        debug!("[{tx_id}] FINALIZE DONE {final_state}");
-
-        Ok(())
     }
 }
 
@@ -172,11 +151,11 @@ where
 
     async fn commit_tx(&self, tx_id: TxId) -> crate::Result<()> {
         trace!("[{}] Committing.", tx_id);
-        self.finalize_tx(tx_id, CachedTx::Committed).await
+        self.itx_manager.commit_tx(&tx_id).await
     }
 
     async fn rollback_tx(&self, tx_id: TxId) -> crate::Result<()> {
         trace!("[{}] Rolling back.", tx_id);
-        self.finalize_tx(tx_id, CachedTx::RolledBack).await
+        self.itx_manager.rollback_tx(&tx_id).await
     }
 }
