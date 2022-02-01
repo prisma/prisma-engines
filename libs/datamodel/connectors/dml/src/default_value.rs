@@ -132,9 +132,7 @@ impl DefaultValue {
     // intended for primary key values!
     pub fn dbgenerated_func(&self) -> Option<String> {
         match self.kind {
-            DefaultKind::Expression(ref expr) if expr.is_dbgenerated() => {
-                expr.args.get(0).map(|val| val.to_string())
-            }
+            DefaultKind::Expression(ref expr) if expr.is_dbgenerated() => expr.args.get(0).map(|val| val.to_string()),
             _ => None,
         }
     }
