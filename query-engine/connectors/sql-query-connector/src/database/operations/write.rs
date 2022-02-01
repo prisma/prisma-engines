@@ -49,7 +49,7 @@ async fn generate_id(
             match func.trim() {
                 "(uuid())" => (query.value(native_uuid().alias(alias)), true),
                 "(uuid_to_bin(uuid()))" => (query.value(uuid_to_bin().alias(alias)), true),
-                _ => (query, generated || false),
+                _ => (query, generated),
             }
         });
 
