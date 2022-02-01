@@ -1,4 +1,7 @@
-use super::pipeline::QueryPipeline;
+use super::{
+    execute_operation::{execute_many_operations, execute_single_operation},
+    pipeline::QueryPipeline,
+};
 use crate::{CoreError, QueryGraphBuilder, QueryInterpreter, QuerySchemaRef, ResponseData};
 use connector::{Connection, ConnectionLike, Transaction};
 use once_cell::sync::Lazy;
@@ -188,38 +191,32 @@ impl ITXServer {
         }
     }
 
+    #[tracing::instrument(skip(self, operation))]
     async fn execute_single(&mut self, operation: &Operation, trace_id: Option<String>) -> crate::Result<ResponseData> {
         let conn = self.cached_tx.as_open()?;
-        let interpreter = QueryInterpreter::new(conn.as_connection_like());
-        let (query_graph, serializer) = QueryGraphBuilder::new(self.query_schema.clone()).build(operation.clone())?;
-
-        QueryPipeline::new(query_graph, interpreter, serializer)
-            .execute(trace_id)
-            .await
+        execute_single_operation(
+            self.query_schema.clone(),
+            conn.as_connection_like(),
+            operation,
+            trace_id,
+        )
+        .await
     }
 
+    #[tracing::instrument(skip(self, operations))]
     async fn execute_batch(
         &mut self,
         operations: &[Operation],
         trace_id: Option<String>,
     ) -> crate::Result<Vec<crate::Result<ResponseData>>> {
         let conn = self.cached_tx.as_open()?;
-        let queries = operations
-            .iter()
-            .map(|operation| QueryGraphBuilder::new(self.query_schema.clone()).build(operation.clone()))
-            .collect::<std::result::Result<Vec<_>, _>>()?;
-
-        let mut results = Vec::with_capacity(queries.len());
-
-        for (query_graph, serializer) in queries {
-            let interpreter = QueryInterpreter::new(conn.as_connection_like());
-            let result = QueryPipeline::new(query_graph, interpreter, serializer)
-                .execute(trace_id.clone())
-                .await?;
-            results.push(Ok(result));
-        }
-
-        Ok(results)
+        execute_many_operations(
+            self.query_schema.clone(),
+            conn.as_connection_like(),
+            operations,
+            trace_id,
+        )
+        .await
     }
 
     pub async fn commit(&mut self) -> crate::Result<()> {

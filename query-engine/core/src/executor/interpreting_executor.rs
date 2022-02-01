@@ -1,12 +1,18 @@
 use super::{
+<<<<<<< HEAD
+    execute_operation::{execute_many_operations, execute_many_self_containted, execute_single_operation},
     interactive_tx::{CachedTx, TxId},
     pipeline::QueryPipeline,
+=======
+    execute_operation::{execute_many_operations, execute_many_self_contained, execute_single_self_contained},
+>>>>>>> 68566c348c (squash 1)
     QueryExecutor,
 };
 use crate::{
     IrSerializer, OpenTx, Operation, QueryGraph, QueryGraphBuilder, QueryInterpreter, QuerySchemaRef, ResponseData,
     TransactionError, TransactionManager, TransactionProcessManager,
 };
+
 use async_trait::async_trait;
 use connector::{Connection, ConnectionLike, Connector};
 use futures::future;
@@ -34,47 +40,6 @@ where
             force_transactions,
             itx_manager: TransactionProcessManager::new(),
         }
-    }
-
-    /// Execute the operation as a self-contained operation, if necessary wrapped in a transaction.
-    #[tracing::instrument(skip(conn, graph, serializer, force_transactions))]
-    async fn execute_self_contained(
-        mut conn: Box<dyn Connection>,
-        graph: QueryGraph,
-        serializer: IrSerializer,
-        force_transactions: bool,
-        trace_id: Option<String>,
-    ) -> crate::Result<ResponseData> {
-        if force_transactions || graph.needs_transaction() {
-            let mut tx = conn.start_transaction().await?;
-            let result = Self::execute_on(tx.as_connection_like(), graph, serializer, trace_id).await;
-
-            if result.is_ok() {
-                tx.commit().await?;
-            } else {
-                tx.rollback().await?;
-            }
-
-            result
-        } else {
-            Self::execute_on(conn.as_connection_like(), graph, serializer, trace_id).await
-        }
-    }
-
-    /// Simplest execution on anything that's a ConnectionLike. Caller decides handling of connections and transactions.
-    #[tracing::instrument(skip(conn, graph, serializer))]
-    async fn execute_on(
-        conn: &mut dyn ConnectionLike,
-        graph: QueryGraph,
-        serializer: IrSerializer,
-        trace_id: Option<String>,
-    ) -> crate::Result<ResponseData> {
-        let interpreter = QueryInterpreter::new(conn);
-        let result = QueryPipeline::new(graph, interpreter, serializer)
-            .execute(trace_id)
-            .await;
-
-        result
     }
 
     async fn finalize_tx(&self, tx_id: TxId, final_state: CachedTx) -> crate::Result<()> {
@@ -106,9 +71,14 @@ where
         if let Some(tx_id) = tx_id {
             self.itx_manager.execute(&tx_id, operation, trace_id).await
         } else {
-            let (query_graph, serializer) = QueryGraphBuilder::new(query_schema).build(operation)?;
-            let conn = self.connector.get_connection().await?;
-            Self::execute_self_contained(conn, query_graph, serializer, self.force_transactions, trace_id).await
+            execute_single_self_contained(
+                &self.connector,
+                query_schema,
+                operation,
+                trace_id,
+                self.force_transactions,
+            )
+            .await
         }
     }
 
@@ -136,56 +106,27 @@ where
         if let Some(tx_id) = tx_id {
             self.itx_manager.batch_execute(&tx_id, operations, trace_id).await
         } else if transactional {
-            let queries = operations
-                .into_iter()
-                .map(|op| QueryGraphBuilder::new(query_schema.clone()).build(op))
-                .collect::<std::result::Result<Vec<_>, _>>()?;
-
             let mut conn = self.connector.get_connection().await?;
             let mut tx = conn.start_transaction().await?;
-            let mut results = Vec::with_capacity(queries.len());
 
-            for (graph, serializer) in queries {
-                let result = Self::execute_on(tx.as_connection_like(), graph, serializer, trace_id.clone()).await;
+            let results = execute_many_operations(query_schema, tx.as_connection_like(), &operations, trace_id).await;
 
-                if result.is_err() {
-                    tx.rollback().await?;
-                }
-
-                results.push(Ok(result?));
+            if results.is_err() {
+                tx.rollback().await?;
+            } else {
+                tx.commit().await?;
             }
 
-            tx.commit().await?;
-            Ok(results)
+            results
         } else {
-            let mut futures = Vec::with_capacity(operations.len());
-
-            for op in operations {
-                match QueryGraphBuilder::new(query_schema.clone()).build(op) {
-                    Ok((graph, serializer)) => {
-                        let conn = self.connector.get_connection().await?;
-
-                        futures.push(tokio::spawn(Self::execute_self_contained(
-                            conn,
-                            graph,
-                            serializer,
-                            self.force_transactions,
-                            trace_id.clone(),
-                        )));
-                    }
-
-                    // This looks unnecessary, but is the simplest way to preserve ordering of results for the batch.
-                    Err(err) => futures.push(tokio::spawn(async move { Err(err.into()) })),
-                }
-            }
-
-            let responses: Vec<_> = future::join_all(futures)
-                .await
-                .into_iter()
-                .map(|res| res.expect("IO Error in tokio::spawn"))
-                .collect();
-
-            Ok(responses)
+            execute_many_self_contained(
+                &self.connector,
+                query_schema,
+                &operations,
+                trace_id,
+                self.force_transactions,
+            )
+            .await
         }
     }
 
@@ -206,7 +147,7 @@ where
         valid_for_millis: u64,
     ) -> crate::Result<TxId> {
         let id = TxId::default();
-        debug!("[{}] Starting...", id);
+        trace!("[{}] Starting...", id);
         let conn = time::timeout(
             Duration::from_millis(max_acquisition_millis),
             self.connector.get_connection(),
@@ -230,12 +171,12 @@ where
     }
 
     async fn commit_tx(&self, tx_id: TxId) -> crate::Result<()> {
-        debug!("[{}] Committing.", tx_id);
+        trace!("[{}] Committing.", tx_id);
         self.finalize_tx(tx_id, CachedTx::Committed).await
     }
 
     async fn rollback_tx(&self, tx_id: TxId) -> crate::Result<()> {
-        debug!("[{}] Rolling back.", tx_id);
+        trace!("[{}] Rolling back.", tx_id);
         self.finalize_tx(tx_id, CachedTx::RolledBack).await
     }
 }
