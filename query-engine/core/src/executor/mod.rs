@@ -5,6 +5,7 @@
 //!
 //! What the executor module DOES NOT DO:
 //! - Define low level execution of queries. This is considered an implementation detail of the modules used by the executors.
+mod execute_operation;
 mod interactive_tx;
 mod interpreting_executor;
 mod loader;
