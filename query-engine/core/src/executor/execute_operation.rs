@@ -3,7 +3,7 @@ use crate::{IrSerializer, Operation, QueryGraph, QueryGraphBuilder, QueryInterpr
 use connector::{Connection, ConnectionLike, Connector};
 use futures::future;
 
-pub(crate) async fn execute_single_operation(
+pub async fn execute_single_operation(
     query_schema: QuerySchemaRef,
     conn: &mut dyn ConnectionLike,
     operation: &Operation,
@@ -17,7 +17,7 @@ pub(crate) async fn execute_single_operation(
         .await
 }
 
-pub(crate) async fn execute_many_operations(
+pub async fn execute_many_operations(
     query_schema: QuerySchemaRef,
     conn: &mut dyn ConnectionLike,
     operations: &[Operation],
