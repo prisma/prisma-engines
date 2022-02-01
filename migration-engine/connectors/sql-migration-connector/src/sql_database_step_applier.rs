@@ -25,10 +25,14 @@ impl DatabaseMigrationStepApplier for SqlMigrationConnector {
         Ok(migration.steps.len() as u32)
     }
 
-    fn render_script(&self, migration: &Migration, diagnostics: &DestructiveChangeDiagnostics) -> String {
+    fn render_script(
+        &self,
+        migration: &Migration,
+        diagnostics: &DestructiveChangeDiagnostics,
+    ) -> ConnectorResult<String> {
         let migration: &SqlMigration = migration.downcast_ref();
         if migration.steps.is_empty() {
-            return "-- This is an empty migration.".to_string();
+            return Ok("-- This is an empty migration.".to_owned());
         }
 
         let mut script = String::with_capacity(40 * migration.steps.len());
@@ -94,7 +98,7 @@ impl DatabaseMigrationStepApplier for SqlMigrationConnector {
             script.push_str(commit);
         }
 
-        script
+        Ok(script)
     }
 
     #[tracing::instrument(skip(self, script))]

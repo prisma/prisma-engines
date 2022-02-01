@@ -1,8 +1,8 @@
 use crate::logger::log_error_and_exit;
 use migration_connector::ConnectorError;
-use migration_core::migration_api;
+use migration_core::json_rpc::types::{DatasourceParam, UrlContainer};
 use structopt::StructOpt;
-use user_facing_errors::common::{InvalidConnectionString, SchemaParserError};
+use user_facing_errors::common::SchemaParserError;
 
 #[derive(Debug, StructOpt)]
 pub(crate) struct Cli {
@@ -24,19 +24,29 @@ impl Cli {
     }
 
     pub(crate) async fn run_inner(self) -> Result<String, ConnectorError> {
-        let datamodel = datasource_from_database_str(&self.datasource)?;
-        let api = migration_api(&datamodel)?;
+        let api = migration_core::migration_api(None, None)?;
         match self.command {
             CliCommand::CreateDatabase => {
-                let db_name = api.create_database().await?;
-                Ok(format!("Database '{}' was successfully created.", db_name))
+                let migration_core::json_rpc::types::CreateDatabaseResult { database_name } = api
+                    .create_database(migration_core::json_rpc::types::CreateDatabaseParams {
+                        datasource: DatasourceParam::ConnectionString(UrlContainer {
+                            url: self.datasource.clone(),
+                        }),
+                    })
+                    .await?;
+                Ok(format!("Database '{}' was successfully created.", database_name))
             }
             CliCommand::CanConnectToDatabase => {
-                api.ensure_connection_validity().await?;
+                api.ensure_connection_validity(migration_core::json_rpc::types::EnsureConnectionValidityParams {
+                    datasource: DatasourceParam::ConnectionString(UrlContainer {
+                        url: self.datasource.clone(),
+                    }),
+                })
+                .await?;
                 Ok("Connection successful".to_owned())
             }
             CliCommand::DropDatabase => {
-                api.drop_database().await?;
+                api.drop_database(self.datasource.clone()).await?;
                 Ok("The database was successfully dropped.".to_owned())
             }
         }
@@ -64,31 +74,4 @@ fn parse_base64_string(s: &str) -> Result<String, ConnectorError> {
         },
         Err(_) => Ok(String::from(s)),
     }
-}
-
-fn datasource_from_database_str(database_str: &str) -> Result<String, ConnectorError> {
-    let provider = match database_str.split(':').next() {
-        Some("postgres") => "postgresql",
-        Some("file") => "sqlite",
-        Some("mongodb+srv") => "mongodb",
-        Some(other) => other,
-        None => {
-            return Err(ConnectorError::user_facing(InvalidConnectionString {
-                details: String::new(),
-            }))
-        }
-    };
-
-    let schema = format!(
-        r#"
-            datasource db {{
-                provider = "{provider}"
-                url = "{url}"
-            }}
-        "#,
-        provider = provider,
-        url = database_str,
-    );
-
-    Ok(schema)
 }

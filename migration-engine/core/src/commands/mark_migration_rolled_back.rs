@@ -1,23 +1,10 @@
-use crate::{CoreError, CoreResult};
+use crate::{json_rpc::types::*, CoreError, CoreResult};
 use migration_connector::MigrationConnector;
-use serde::Deserialize;
-use std::collections::HashMap;
 use user_facing_errors::migration_engine::{CannotRollBackSucceededMigration, CannotRollBackUnappliedMigration};
-
-/// The input to the `markMigrationRolledBack` command.
-#[derive(Debug, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct MarkMigrationRolledBackInput {
-    /// The name of the migration to mark rolled back.
-    pub migration_name: String,
-}
-
-/// The output of the `markMigrationRolledBack` command.
-pub type MarkMigrationRolledBackOutput = HashMap<(), ()>;
 
 /// Mark a migration as rolled back.
 pub(crate) async fn mark_migration_rolled_back(
-    input: &MarkMigrationRolledBackInput,
+    input: MarkMigrationRolledBackInput,
     connector: &dyn MigrationConnector,
 ) -> CoreResult<MarkMigrationRolledBackOutput> {
     let persistence = connector.migration_persistence();
@@ -63,17 +50,16 @@ pub(crate) async fn mark_migration_rolled_back(
         persistence.mark_migration_rolled_back_by_id(&migration.id).await?;
     }
 
-    Ok(Default::default())
+    Ok(MarkMigrationRolledBackOutput {})
 }
 
 #[cfg(test)]
 mod tests {
-    use super::MarkMigrationRolledBackOutput;
-    use std::collections::HashMap;
+    use super::*;
 
     #[test]
     fn mark_migration_rolled_back_output_serializes_as_expected() {
-        let output: MarkMigrationRolledBackOutput = HashMap::new();
+        let output = MarkMigrationRolledBackOutput {};
 
         let expected = serde_json::json!({});
         let actual = serde_json::to_value(output).unwrap();

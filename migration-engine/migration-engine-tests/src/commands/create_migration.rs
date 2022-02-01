@@ -1,6 +1,4 @@
-use migration_core::{
-    commands::CreateMigrationInput, commands::CreateMigrationOutput, CoreError, CoreResult, GenericApi,
-};
+use migration_core::{json_rpc::types::*, CoreError, CoreResult, GenericApi};
 use pretty_assertions::assert_eq;
 use std::path::Path;
 use tempfile::TempDir;
@@ -47,7 +45,7 @@ impl<'a> CreateMigration<'a> {
     pub async fn send(self) -> CoreResult<CreateMigrationAssertion<'a>> {
         let output = self
             .api
-            .create_migration(&CreateMigrationInput {
+            .create_migration(CreateMigrationInput {
                 migrations_directory_path: self.migrations_directory.path().to_str().unwrap().to_owned(),
                 prisma_schema: self.schema.to_owned(),
                 draft: self.draft,

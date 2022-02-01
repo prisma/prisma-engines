@@ -1,23 +1,23 @@
 use super::{
-    interactive_tx::{CachedTx, TransactionCache, TxId},
+    interactive_tx::{CachedTx, TxId},
     pipeline::QueryPipeline,
     QueryExecutor,
 };
 use crate::{
     IrSerializer, OpenTx, Operation, QueryGraph, QueryGraphBuilder, QueryInterpreter, QuerySchemaRef, ResponseData,
-    TransactionError, TransactionManager,
+    TransactionError, TransactionManager, TransactionProcessManager,
 };
 use async_trait::async_trait;
-use connector::{error::ErrorKind, Connection, ConnectionLike, Connector};
-use futures::{future, Future};
-use tokio::time;
+use connector::{Connection, ConnectionLike, Connector};
+use futures::future;
+use tokio::time::{self, Duration};
 
 /// Central query executor and main entry point into the query core.
 pub struct InterpretingExecutor<C> {
     /// The loaded connector
     connector: C,
 
-    tx_cache: TransactionCache,
+    itx_manager: TransactionProcessManager,
 
     /// Flag that forces individual operations to run in a transaction.
     /// Does _not_ force batches to use transactions.
@@ -31,8 +31,8 @@ where
     pub fn new(connector: C, force_transactions: bool) -> Self {
         InterpretingExecutor {
             connector,
-            tx_cache: TransactionCache::default(),
             force_transactions,
+            itx_manager: TransactionProcessManager::new(),
         }
     }
 
@@ -77,34 +77,14 @@ where
         result
     }
 
-    async fn finalize_tx<F>(&self, tx_id: TxId, final_state: CachedTx, finalizer: F) -> crate::Result<()>
-    where
-        F: Fn(&mut OpenTx) -> Box<dyn Future<Output = connector::Result<()>> + Unpin + Send + '_>,
-    {
-        // The references need to be dropped before finalization,
-        // or else the DashMap deadlocks with the finalization cleanup task.
-        let final_state = {
-            let mut tx = self.tx_cache.get_or_err(&tx_id)?;
-            let otx = tx.as_open()?;
-
-            // Some connectors hard-abort transactions after an error
-            // and refuse to execute any subsequent operation. Handle cleanup for those cases.
-            let state = if let Err(err) = finalizer(otx).await {
-                if let ErrorKind::TransactionAborted { message } = err.kind {
-                    debug!("[{}] Aborted with {}.", tx_id, message);
-                    CachedTx::Aborted
-                } else {
-                    return Err(err.into());
-                }
-            } else {
-                final_state
-            };
-
-            otx.cancel_expiration_timer();
-            state
+    async fn finalize_tx(&self, tx_id: TxId, final_state: CachedTx) -> crate::Result<()> {
+        match final_state {
+            CachedTx::Committed => self.itx_manager.commit_tx(&tx_id).await?,
+            CachedTx::RolledBack => self.itx_manager.rollback_tx(&tx_id).await?,
+            _ => unreachable!(),
         };
+        debug!("[{tx_id}] FINALIZE DONE {final_state}");
 
-        self.tx_cache.finalize_tx(tx_id, final_state);
         Ok(())
     }
 }
@@ -122,16 +102,11 @@ where
         query_schema: QuerySchemaRef,
         trace_id: Option<String>,
     ) -> crate::Result<ResponseData> {
-        // Parse, validate, and extract query graph from query document.
-        let (query_graph, serializer) = QueryGraphBuilder::new(query_schema).build(operation)?;
-
         // If a Tx id is provided, execute on that one. Else execute normally as a single operation.
         if let Some(tx_id) = tx_id {
-            let mut c_tx = self.tx_cache.get_or_err(&tx_id)?;
-            let otx = c_tx.as_open()?;
-
-            Self::execute_on(otx.tx.as_connection_like(), query_graph, serializer, trace_id).await
+            self.itx_manager.execute(&tx_id, operation, trace_id).await
         } else {
+            let (query_graph, serializer) = QueryGraphBuilder::new(query_schema).build(operation)?;
             let conn = self.connector.get_connection().await?;
             Self::execute_self_contained(conn, query_graph, serializer, self.force_transactions, trace_id).await
         }
@@ -159,23 +134,7 @@ where
         trace_id: Option<String>,
     ) -> crate::Result<Vec<crate::Result<ResponseData>>> {
         if let Some(tx_id) = tx_id {
-            let queries = operations
-                .into_iter()
-                .map(|op| QueryGraphBuilder::new(query_schema.clone()).build(op))
-                .collect::<std::result::Result<Vec<_>, _>>()?;
-
-            let mut c_tx = self.tx_cache.get_or_err(&tx_id)?;
-            let otx = c_tx.as_open()?;
-            let mut results = Vec::with_capacity(queries.len());
-
-            let tx = otx.as_connection_like();
-
-            for (graph, serializer) in queries {
-                let result = Self::execute_on(tx, graph, serializer, trace_id.clone()).await?;
-                results.push(Ok(result));
-            }
-
-            Ok(results)
+            self.itx_manager.batch_execute(&tx_id, operations, trace_id).await
         } else if transactional {
             let queries = operations
                 .into_iter()
@@ -240,12 +199,16 @@ impl<C> TransactionManager for InterpretingExecutor<C>
 where
     C: Connector + Send + Sync,
 {
-    async fn start_tx(&self, max_acquisition_millis: u64, valid_for_millis: u64) -> crate::Result<TxId> {
+    async fn start_tx(
+        &self,
+        query_schema: QuerySchemaRef,
+        max_acquisition_millis: u64,
+        valid_for_millis: u64,
+    ) -> crate::Result<TxId> {
         let id = TxId::default();
         debug!("[{}] Starting...", id);
-
         let conn = time::timeout(
-            time::Duration::from_millis(max_acquisition_millis),
+            Duration::from_millis(max_acquisition_millis),
             self.connector.get_connection(),
         )
         .await;
@@ -253,7 +216,14 @@ where
         let conn = conn.map_err(|_| TransactionError::AcquisitionTimeout)??;
         let c_tx = OpenTx::start(conn).await?;
 
-        self.tx_cache.insert(id.clone(), c_tx, valid_for_millis).await;
+        self.itx_manager
+            .create_tx(
+                query_schema.clone(),
+                id.clone(),
+                c_tx,
+                Duration::from_millis(valid_for_millis),
+            )
+            .await;
 
         debug!("[{}] Started.", id);
         Ok(id)
@@ -261,13 +231,11 @@ where
 
     async fn commit_tx(&self, tx_id: TxId) -> crate::Result<()> {
         debug!("[{}] Committing.", tx_id);
-        self.finalize_tx(tx_id, CachedTx::Committed, |otx| Box::new(otx.tx.commit()))
-            .await
+        self.finalize_tx(tx_id, CachedTx::Committed).await
     }
 
     async fn rollback_tx(&self, tx_id: TxId) -> crate::Result<()> {
         debug!("[{}] Rolling back.", tx_id);
-        self.finalize_tx(tx_id, CachedTx::RolledBack, |otx| Box::new(otx.tx.rollback()))
-            .await
+        self.finalize_tx(tx_id, CachedTx::RolledBack).await
     }
 }

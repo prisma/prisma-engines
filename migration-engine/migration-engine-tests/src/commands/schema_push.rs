@@ -1,7 +1,4 @@
-use migration_core::{
-    commands::{SchemaPushInput, SchemaPushOutput},
-    CoreError, CoreResult, GenericApi,
-};
+use migration_core::{json_rpc::types::*, CoreError, CoreResult, GenericApi};
 use std::{borrow::Cow, fmt::Debug};
 use tracing_futures::Instrument;
 
@@ -43,7 +40,7 @@ impl<'a> SchemaPush<'a> {
 
         let fut = self
             .api
-            .schema_push(&input)
+            .schema_push(input)
             .instrument(tracing::info_span!("SchemaPush", migration_id = ?self.migration_id));
 
         let output = self.rt.block_on(fut)?;

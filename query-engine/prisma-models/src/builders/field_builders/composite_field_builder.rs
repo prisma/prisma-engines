@@ -1,5 +1,5 @@
 use crate::{parent_container::ParentContainer, CompositeField, CompositeFieldRef, CompositeTypeRef};
-use datamodel::FieldArity;
+use datamodel::{DefaultValue, FieldArity};
 use std::{fmt::Debug, sync::Arc};
 
 #[derive(Debug)]
@@ -8,6 +8,7 @@ pub struct CompositeFieldBuilder {
     pub db_name: Option<String>,
     pub arity: FieldArity,
     pub type_name: String,
+    pub default_value: Option<DefaultValue>,
 }
 
 impl CompositeFieldBuilder {

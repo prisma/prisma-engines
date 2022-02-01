@@ -37,6 +37,10 @@ impl SqlMigration {
     /// - Based on the computed sections and their ordering, we render each
     ///   block in the summary one by one.
     pub fn drift_summary(&self) -> String {
+        if self.steps.is_empty() {
+            return "No difference detected.".to_owned();
+        }
+
         // The order of the variants matters
         #[derive(Clone, Copy, Debug, PartialEq, PartialOrd, Ord, Eq)]
         #[repr(u8)]

@@ -24,6 +24,8 @@ impl TestApi {
             rt.block_on(args.create_mysql_database()).1
         } else if args.tags().contains(Tags::Mssql) {
             rt.block_on(args.create_mssql_database()).1
+        } else if args.tags().contains(Tags::Sqlite) {
+            args.database_url().to_owned()
         } else {
             unreachable!()
         }
@@ -166,8 +168,8 @@ fn test_create_sqlite_database(api: TestApi) {
 
     let url = format!("file:{}", sqlite_path.to_string_lossy());
     let output = api.run(&["--datasource", &url, "create-database"]);
-    assert!(output.status.success());
     let stderr = String::from_utf8_lossy(&output.stderr);
+    assert!(output.status.success(), "{:?}", stderr);
     assert!(stderr.contains("success"));
     assert!(stderr.contains("test_create_sqlite_database.db"));
 

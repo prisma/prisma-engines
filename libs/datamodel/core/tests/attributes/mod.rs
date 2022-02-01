@@ -3,6 +3,8 @@ mod builtin_attributes;
 mod constraint_names;
 mod constraint_names_negative;
 mod constraint_names_positive;
+mod default_composite_negative;
+mod default_composite_positive;
 mod default_negative;
 mod default_positive;
 mod id_negative;

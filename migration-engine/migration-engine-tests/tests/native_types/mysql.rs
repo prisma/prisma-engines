@@ -37,7 +37,6 @@ const SAFE_CASTS: Cases = &[
             "Char(64)",
             "Decimal(10,0)",
             "Double",
-            "Float",
             "LongBlob",
             "LongText",
             "MediumBlob",
@@ -488,11 +487,6 @@ const IMPOSSIBLE_CASTS: Cases = &[
             "Float",
             "Double",
         ],
-    ),
-    (
-        "Json",
-        quaint::Value::Text(Some(Cow::Borrowed("\"2020-06-02\""))),
-        &["Date", "Time(0)", "Timestamp(0)", "DateTime(0)", "Year"],
     ),
     (
         "LongBlob",

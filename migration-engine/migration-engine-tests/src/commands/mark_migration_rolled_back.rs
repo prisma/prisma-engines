@@ -1,6 +1,4 @@
-use migration_core::{
-    commands::MarkMigrationRolledBackInput, commands::MarkMigrationRolledBackOutput, CoreError, CoreResult, GenericApi,
-};
+use migration_core::{json_rpc::types::*, CoreError, CoreResult, GenericApi};
 
 #[must_use = "This struct does nothing on its own. See MarkMigrationRolledBack::send()"]
 pub struct MarkMigrationRolledBack<'a> {
@@ -21,7 +19,7 @@ impl<'a> MarkMigrationRolledBack<'a> {
     fn send_impl(self) -> CoreResult<MarkMigrationRolledBackAssertion<'a>> {
         let output = self
             .rt
-            .block_on(self.api.mark_migration_rolled_back(&MarkMigrationRolledBackInput {
+            .block_on(self.api.mark_migration_rolled_back(MarkMigrationRolledBackInput {
                 migration_name: self.migration_name,
             }))?;
 

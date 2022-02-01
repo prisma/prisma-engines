@@ -1,5 +1,6 @@
-use migration_engine_tests::{multi_engine_test_api::*, test_api::rpc_api};
-use serde_json::json;
+use super::error_tests::connection_error;
+use expect_test::expect;
+use migration_engine_tests::multi_engine_test_api::*;
 use test_macros::test_connector;
 use url::Url;
 
@@ -23,18 +24,18 @@ fn database_access_denied_must_return_a_proper_error_in_rpc(api: TestApi) {
         url,
     );
 
-    let error = api.block_on(rpc_api(&dm)).unwrap_err();
-    let json_error = serde_json::to_value(&error.to_user_facing()).unwrap();
+    let error = api.block_on(connection_error(dm));
+    let json_error = serde_json::to_string_pretty(&error.to_user_facing()).unwrap();
 
-    let expected = json!({
-        "is_panic": false,
-        "message": "User `jeanyves` was denied access on the database `access_denied_test`",
-        "meta": {
+    let expected = expect![[r#"
+        {
+          "is_panic": false,
+          "message": "User `jeanyves` was denied access on the database `access_denied_test`",
+          "meta": {
             "database_user": "jeanyves",
-            "database_name": "access_denied_test",
-        },
-        "error_code": "P1010",
-    });
-
-    assert_eq!(json_error, expected);
+            "database_name": "access_denied_test"
+          },
+          "error_code": "P1010"
+        }"#]];
+    expected.assert_eq(&json_error);
 }

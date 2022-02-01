@@ -1,34 +1,11 @@
-use crate::{parse_schema, CoreError, CoreResult};
+use crate::{json_rpc::types::*, CoreError, CoreResult};
 use migration_connector::{migrations_directory::*, DiffTarget, MigrationConnector};
-use serde::{Deserialize, Serialize};
 use std::path::Path;
 use user_facing_errors::migration_engine::MigrationNameTooLong;
 
-/// The input to the `createMigration` command.
-#[derive(Deserialize, Debug)]
-#[serde(rename_all = "camelCase")]
-pub struct CreateMigrationInput {
-    /// The filesystem path of the migrations directory to use.
-    pub migrations_directory_path: String,
-    /// The current prisma schema to use as a target for the generated migration.
-    pub prisma_schema: String,
-    /// The user-given name for the migration. This will be used in the migration directory.
-    pub migration_name: String,
-    /// If true, always generate a migration, but do not apply.
-    pub draft: bool,
-}
-
-/// The output of the `createMigration` command.
-#[derive(Serialize, Debug)]
-#[serde(rename_all = "camelCase")]
-pub struct CreateMigrationOutput {
-    /// The name of the newly generated migration directory, if any.
-    pub generated_migration_name: Option<String>,
-}
-
 /// Create a new migration.
 pub async fn create_migration(
-    input: &CreateMigrationInput,
+    input: CreateMigrationInput,
     connector: &dyn MigrationConnector,
 ) -> CoreResult<CreateMigrationOutput> {
     let applier = connector.database_migration_step_applier();
@@ -44,13 +21,11 @@ pub async fn create_migration(
 
     // Infer the migration.
     let previous_migrations = list_migrations(Path::new(&input.migrations_directory_path))?;
-    let target_ast = crate::parse_ast(&input.prisma_schema)?;
-    let target_schema = parse_schema(&input.prisma_schema, &target_ast)?;
 
     let migration = connector
         .diff(
-            DiffTarget::Migrations(&previous_migrations),
-            DiffTarget::Datamodel(&target_schema),
+            DiffTarget::Migrations((&previous_migrations).into()),
+            DiffTarget::Datamodel((&input.prisma_schema).into()),
         )
         .await?;
 
@@ -64,7 +39,7 @@ pub async fn create_migration(
 
     let destructive_change_diagnostics = checker.pure_check(&migration);
 
-    let migration_script = applier.render_script(&migration, &destructive_change_diagnostics);
+    let migration_script = applier.render_script(&migration, &destructive_change_diagnostics)?;
 
     // Write the migration script to a file.
     let directory = create_migration_directory(Path::new(&input.migrations_directory_path), &input.migration_name)

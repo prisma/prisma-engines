@@ -1,5 +1,5 @@
 use connection_string::JdbcString;
-use migration_core::migration_connector::{ConnectorError, ConnectorResult, DiffTarget};
+use migration_core::migration_connector::{ConnectorError, ConnectorResult};
 use quaint::{prelude::*, single::Quaint};
 use std::str::FromStr;
 
@@ -20,8 +20,7 @@ pub(crate) async fn mssql_setup(url: String, prisma_schema: &str) -> ConnectorRe
 
     conn.raw_cmd(&allow_snapshot_isolation).await.unwrap();
 
-    let api = migration_core::migration_api(prisma_schema)?;
-    let api = api.connector();
+    let api = migration_core::migration_api(Some(prisma_schema.to_owned()), None)?;
     api.reset().await.ok();
 
     conn.raw_cmd(&format!(
@@ -37,16 +36,7 @@ pub(crate) async fn mssql_setup(url: String, prisma_schema: &str) -> ConnectorRe
 
     // 2. create the database schema for given Prisma schema
     {
-        let ast = datamodel::parse_schema_ast(prisma_schema).unwrap();
-        let schema = datamodel::parse_schema_parserdb(prisma_schema, &ast).unwrap();
-        let migration = api
-            .diff(DiffTarget::Empty, DiffTarget::Datamodel(&schema))
-            .await
-            .unwrap();
-        api.database_migration_step_applier()
-            .apply_migration(&migration)
-            .await
-            .unwrap();
+        crate::diff_and_apply(prisma_schema).await;
     };
     Ok(())
 }

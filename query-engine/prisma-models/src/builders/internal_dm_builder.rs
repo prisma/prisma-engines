@@ -112,6 +112,7 @@ fn model_field_builders(
                 db_name: cf.database_name.clone(),
                 arity: cf.arity,
                 type_name: cf.composite_type.clone(),
+                default_value: cf.default_value.clone(),
             })),
             dml::Field::RelationField(rf) => {
                 let relation = relations
@@ -162,7 +163,7 @@ fn model_field_builders(
         .collect()
 }
 
-fn composite_field_builders(composite: &dml::CompositeType) -> Vec<FieldBuilder> {
+fn composite_field_builders(datamodel: &Datamodel, composite: &dml::CompositeType) -> Vec<FieldBuilder> {
     composite
         .fields
         .iter()
@@ -173,9 +174,12 @@ fn composite_field_builders(composite: &dml::CompositeType) -> Vec<FieldBuilder>
                 db_name: field.database_name.clone(),
                 arity: field.arity,
                 type_name: type_name.clone(),
+                // No defaults on composite fields of type composite
+                default_value: None,
             })),
-            CompositeTypeFieldType::Scalar(st, _alias, nt) => {
-                let type_ident = (*st).into();
+            CompositeTypeFieldType::Scalar(_, _, _) | CompositeTypeFieldType::Enum(_) => {
+                let type_ident = field.type_identifier();
+
                 if type_ident == TypeIdentifier::Unsupported {
                     None
                 } else {
@@ -187,11 +191,11 @@ fn composite_field_builders(composite: &dml::CompositeType) -> Vec<FieldBuilder>
                         is_auto_generated_int_id: false,
                         is_autoincrement: false,
                         is_updated_at: false, // Todo: This info isn't available here.
-                        internal_enum: None,  // Todo: No enums on composites?
+                        internal_enum: field.internal_enum(datamodel),
                         arity: field.arity,
                         db_name: field.database_name.clone(),
-                        default_value: None, // Todo: No defaults?
-                        native_type: nt.clone(),
+                        default_value: field.default_value.as_ref().cloned(),
+                        native_type: field.native_type(),
                     }))
                 }
             }
@@ -244,7 +248,7 @@ fn composite_type_builders(datamodel: &Datamodel) -> Vec<CompositeTypeBuilder> {
         .iter()
         .map(|ct| CompositeTypeBuilder {
             name: ct.name.clone(),
-            fields: composite_field_builders(ct),
+            fields: composite_field_builders(datamodel, ct),
         })
         .collect()
 }

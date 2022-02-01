@@ -4,7 +4,8 @@ use crate::{
     MongoDbMigrationConnector,
 };
 use migration_connector::{
-    ConnectorResult, DatabaseMigrationStepApplier, DestructiveChangeDiagnostics, Migration, MigrationConnector,
+    ConnectorError, ConnectorResult, DatabaseMigrationStepApplier, DestructiveChangeDiagnostics, Migration,
+    MigrationConnector,
 };
 use mongodb::bson::{self, Bson, Document};
 
@@ -64,8 +65,14 @@ impl DatabaseMigrationStepApplier for MongoDbMigrationConnector {
         Ok(migration.steps.len() as u32)
     }
 
-    fn render_script(&self, _migration: &Migration, _diagnostics: &DestructiveChangeDiagnostics) -> String {
-        unreachable!()
+    fn render_script(
+        &self,
+        _migration: &Migration,
+        _diagnostics: &DestructiveChangeDiagnostics,
+    ) -> ConnectorResult<String> {
+        Err(ConnectorError::from_msg(
+            "Rendering to a script is not supported on MongoDB.".to_owned(),
+        ))
     }
 
     async fn apply_script(&self, _migration_name: &str, _script: &str) -> ConnectorResult<()> {

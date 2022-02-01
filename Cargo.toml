@@ -14,6 +14,7 @@ members = [
   "migration-engine/connectors/sql-migration-connector",
   "migration-engine/connectors/mongodb-migration-connector",
   "migration-engine/core",
+  "migration-engine/json-rpc-api-build",
   "migration-engine/migration-engine-tests",
   "migration-engine/qe-setup",
   "query-engine/connectors/query-connector",

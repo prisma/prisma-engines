@@ -1,10 +1,25 @@
-use migration_core::{
-    commands::{CreateMigrationOutput, DevDiagnosticInput, DevDiagnosticOutput},
-    migration_api,
-};
+use migration_core::{json_rpc::types::*, migration_api};
 use migration_engine_tests::test_api::*;
 use pretty_assertions::assert_eq;
 use user_facing_errors::{migration_engine::MigrationDoesNotApplyCleanly, UserFacingError};
+
+trait DevActionExt {
+    fn is_create_migration(&self) -> bool;
+    fn as_reset(&self) -> Option<&str>;
+}
+
+impl DevActionExt for DevAction {
+    fn is_create_migration(&self) -> bool {
+        matches!(self, DevAction::CreateMigration)
+    }
+
+    fn as_reset(&self) -> Option<&str> {
+        match self {
+            DevAction::Reset(rst) => Some(&rst.reason),
+            _ => None,
+        }
+    }
+}
 
 #[test_connector]
 fn dev_diagnostic_on_an_empty_database_without_migration_returns_create_migration(api: TestApi) {
@@ -608,9 +623,9 @@ fn dev_diagnostic_shadow_database_creation_error_is_special_cased_mysql(api: Tes
 
     let err = api
         .block_on(async {
-            let migration_api = migration_api(&datamodel).unwrap();
+            let migration_api = migration_api(Some(datamodel), None).unwrap();
             migration_api
-                .dev_diagnostic(&DevDiagnosticInput {
+                .dev_diagnostic(DevDiagnosticInput {
                     migrations_directory_path: directory.path().as_os_str().to_string_lossy().into_owned(),
                 })
                 .await
@@ -656,10 +671,10 @@ fn dev_diagnostic_shadow_database_creation_error_is_special_cased_postgres(api: 
     );
 
     let err = api
-        .block_on(async {
-            let migration_api = migration_api(&datamodel).unwrap();
+        .block_on(async move {
+            let migration_api = migration_api(Some(datamodel), None).unwrap();
             migration_api
-                .dev_diagnostic(&DevDiagnosticInput {
+                .dev_diagnostic(DevDiagnosticInput {
                     migrations_directory_path: directory.path().as_os_str().to_string_lossy().into_owned(),
                 })
                 .await

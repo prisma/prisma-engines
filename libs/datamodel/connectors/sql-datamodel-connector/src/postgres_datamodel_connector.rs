@@ -93,7 +93,7 @@ const CAPABILITIES: &[ConnectorCapability] = &[
     ConnectorCapability::JsonFilteringAlphanumeric,
     ConnectorCapability::NamedForeignKeys,
     ConnectorCapability::NamedPrimaryKeys,
-    ConnectorCapability::QueryRaw,
+    ConnectorCapability::SqlQueryRaw,
     ConnectorCapability::RelationFieldsInArbitraryOrder,
     ConnectorCapability::ScalarLists,
     ConnectorCapability::JsonLists,

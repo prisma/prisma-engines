@@ -1,6 +1,4 @@
-use migration_core::{
-    commands::ApplyMigrationsInput, commands::ApplyMigrationsOutput, CoreError, CoreResult, GenericApi,
-};
+use migration_core::{json_rpc::types::*, CoreError, CoreResult, GenericApi};
 use tempfile::TempDir;
 
 #[must_use = "This struct does nothing on its own. See ApplyMigrations::send()"]
@@ -34,7 +32,7 @@ impl<'a> ApplyMigrations<'a> {
     pub async fn send(self) -> CoreResult<ApplyMigrationsAssertion<'a>> {
         let output = self
             .api
-            .apply_migrations(&ApplyMigrationsInput {
+            .apply_migrations(ApplyMigrationsInput {
                 migrations_directory_path: self.migrations_directory.path().to_str().unwrap().to_owned(),
             })
             .await?;

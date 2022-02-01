@@ -1,5 +1,3 @@
-use crate::constants::args::*;
-
 use super::*;
 use datamodel_connector::ConnectorCapability;
 use input_types::input_fields;
@@ -35,9 +33,13 @@ pub(crate) fn build(ctx: &mut BuilderContext) -> (OutputType, ObjectTypeStrongRe
 
     create_nested_inputs(ctx);
 
-    if ctx.enable_raw_queries && ctx.capabilities.contains(ConnectorCapability::QueryRaw) {
+    if ctx.enable_raw_queries && ctx.capabilities.contains(ConnectorCapability::SqlQueryRaw) {
         fields.push(create_execute_raw_field());
         fields.push(create_query_raw_field());
+    }
+
+    if ctx.enable_raw_queries && ctx.capabilities.contains(ConnectorCapability::MongoDbQueryRaw) {
+        fields.push(create_mongodb_run_command_raw());
     }
 
     let ident = Identifier::new("Mutation".to_owned(), PRISMA_NAMESPACE);
@@ -102,9 +104,9 @@ fn create_execute_raw_field() -> OutputField {
     field(
         "executeRaw",
         vec![
-            input_field(QUERY, InputType::string(), None),
+            input_field("query", InputType::string(), None),
             input_field(
-                PARAMETERS,
+                "parameters",
                 InputType::json_list(),
                 Some(dml::DefaultValue::new_single(PrismaValue::String("[]".into()))),
             )
@@ -122,9 +124,9 @@ fn create_query_raw_field() -> OutputField {
     field(
         "queryRaw",
         vec![
-            input_field(QUERY, InputType::string(), None),
+            input_field("query", InputType::string(), None),
             input_field(
-                PARAMETERS,
+                "parameters",
                 InputType::json_list(),
                 Some(dml::DefaultValue::new_single(PrismaValue::String("[]".into()))),
             )
@@ -132,7 +134,21 @@ fn create_query_raw_field() -> OutputField {
         ],
         OutputType::json(),
         Some(QueryInfo {
-            tag: QueryTag::QueryRaw,
+            tag: QueryTag::QueryRaw { query_type: None },
+            model: None,
+        }),
+    )
+}
+
+fn create_mongodb_run_command_raw() -> OutputField {
+    field(
+        "runCommandRaw",
+        vec![input_field("command", InputType::json(), None)],
+        OutputType::json(),
+        Some(QueryInfo {
+            tag: QueryTag::QueryRaw {
+                query_type: Some("runCommandRaw".to_string()),
+            },
             model: None,
         }),
     )

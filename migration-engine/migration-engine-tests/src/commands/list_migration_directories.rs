@@ -1,7 +1,4 @@
-use migration_core::{
-    commands::{ListMigrationDirectoriesInput, ListMigrationDirectoriesOutput},
-    GenericApi,
-};
+use migration_core::{json_rpc::types::*, GenericApi};
 use tempfile::TempDir;
 
 #[must_use = "This struct does nothing on its own. See ListMigrationDirectories::send()"]
@@ -24,7 +21,7 @@ impl<'a> ListMigrationDirectories<'a> {
     pub fn send(self) -> ListMigrationDirectoriesAssertion<'a> {
         let output = self
             .rt
-            .block_on(self.api.list_migration_directories(&ListMigrationDirectoriesInput {
+            .block_on(self.api.list_migration_directories(ListMigrationDirectoriesInput {
                 migrations_directory_path: self.migrations_directory.path().to_str().unwrap().to_owned(),
             }))
             .unwrap();

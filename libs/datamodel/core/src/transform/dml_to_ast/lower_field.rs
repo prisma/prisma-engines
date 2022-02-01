@@ -23,6 +23,9 @@ impl<'a> LowerDmlToAst<'a> {
             ::dml::composite_type::CompositeTypeFieldType::CompositeType(name) => {
                 ast::FieldType::Supported(ast::Identifier::new(name))
             }
+            ::dml::composite_type::CompositeTypeFieldType::Enum(name) => {
+                ast::FieldType::Supported(ast::Identifier::new(name))
+            }
             ::dml::composite_type::CompositeTypeFieldType::Unsupported(name) => {
                 ast::FieldType::Unsupported(name.clone(), Span::empty())
             }

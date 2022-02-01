@@ -1,6 +1,4 @@
-use migration_core::commands::EvaluateDataLossOutput;
 use migration_engine_tests::test_api::*;
-use pretty_assertions::assert_eq;
 
 #[test_connector]
 fn evaluate_data_loss_with_an_up_to_date_database_returns_no_step(api: TestApi) {
@@ -19,13 +17,15 @@ fn evaluate_data_loss_with_an_up_to_date_database_returns_no_step(api: TestApi) 
     api.apply_migrations(&directory).send_sync();
 
     let output = api.evaluate_data_loss(&directory, dm).send().into_output();
-    let expected_output = EvaluateDataLossOutput {
-        migration_steps: 0,
-        warnings: vec![],
-        unexecutable_steps: vec![],
-    };
+    let expected = expect_test::expect![[r#"
+        EvaluateDataLossOutput {
+            migration_steps: 0,
+            unexecutable_steps: [],
+            warnings: [],
+        }
+    "#]];
 
-    assert_eq!(output, expected_output);
+    expected.assert_debug_eq(&output);
 }
 
 #[test_connector]

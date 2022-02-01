@@ -1,4 +1,4 @@
-use migration_core::{commands::DevDiagnosticInput, commands::DevDiagnosticOutput, CoreError, CoreResult, GenericApi};
+use migration_core::{json_rpc::types::*, CoreError, CoreResult, GenericApi};
 use tempfile::TempDir;
 
 #[must_use = "This struct does nothing on its own. See DevDiagnostic::send()"]
@@ -22,7 +22,7 @@ impl<'a> DevDiagnostic<'a> {
     }
 
     fn send_impl(self) -> CoreResult<DevDiagnosticAssertions<'a>> {
-        let output = self.rt.block_on(self.api.dev_diagnostic(&DevDiagnosticInput {
+        let output = self.rt.block_on(self.api.dev_diagnostic(DevDiagnosticInput {
             migrations_directory_path: self.migrations_directory.path().to_str().unwrap().to_owned(),
         }))?;
 

@@ -1,35 +1,15 @@
-use crate::{CoreError, CoreResult};
+use crate::{json_rpc::types::*, CoreError, CoreResult};
 use migration_connector::{
     migrations_directory::{error_on_changed_provider, list_migrations, MigrationDirectory},
-    ConnectorError, MigrationRecord, PersistenceNotInitializedError,
+    ConnectorError, MigrationConnector, MigrationRecord, PersistenceNotInitializedError,
 };
-use serde::{Deserialize, Serialize};
 use std::{path::Path, time::Instant};
 use user_facing_errors::migration_engine::FoundFailedMigrations;
 
-/// The input to the `ApplyMigrations` command.
-#[derive(Deserialize, Debug)]
-#[serde(rename_all = "camelCase")]
-pub struct ApplyMigrationsInput {
-    /// The location of the migrations directory.
-    pub migrations_directory_path: String,
-}
-
-/// The output of the `ApplyMigrations` command.
-#[derive(Serialize, Debug)]
-#[serde(rename_all = "camelCase")]
-pub struct ApplyMigrationsOutput {
-    /// The names of the migrations that were just applied. Empty if no migration was applied.
-    pub applied_migration_names: Vec<String>,
-}
-
-pub(crate) async fn apply_migrations<C>(
-    input: &ApplyMigrationsInput,
-    connector: &C,
-) -> CoreResult<ApplyMigrationsOutput>
-where
-    C: migration_connector::MigrationConnector,
-{
+pub(crate) async fn apply_migrations(
+    input: ApplyMigrationsInput,
+    connector: &dyn MigrationConnector,
+) -> CoreResult<ApplyMigrationsOutput> {
     let start = Instant::now();
     let applier = connector.database_migration_step_applier();
     let migration_persistence = connector.migration_persistence();

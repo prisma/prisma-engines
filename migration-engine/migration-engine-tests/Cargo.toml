@@ -7,7 +7,7 @@ edition = "2021"
 [dependencies]
 datamodel = { path = "../../libs/datamodel/core" }
 sql-datamodel-connector= { path = "../../libs/datamodel/connectors/sql-datamodel-connector" }
-migration-core = { path = "../core", features = ["sql"] }
+migration-core = { path = "../core" }
 sql-migration-connector = { path = "../connectors/sql-migration-connector" }
 sql-schema-describer = { path = "../../libs/sql-schema-describer" }
 user-facing-errors = { path = "../../libs/user-facing-errors" }
@@ -22,6 +22,7 @@ connection-string = "0.1.13"
 enumflags2 = "0.7"
 expect-test = "1.1.0"
 indoc = "1.0.3"
+jsonrpc-core = "17.0.0"
 once_cell = "1.8.0"
 pretty_assertions = "0.6"
 serde = "1"

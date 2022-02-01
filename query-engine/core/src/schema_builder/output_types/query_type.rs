@@ -3,7 +3,7 @@ use super::*;
 /// Builds the root `Query` type.
 #[tracing::instrument(name = "build_query_type", skip(ctx))]
 pub(crate) fn build(ctx: &mut BuilderContext) -> (OutputType, ObjectTypeStrongRef) {
-    let fields = ctx
+    let fields: Vec<_> = ctx
         .internal_data_model
         .models_cloned()
         .into_iter()
@@ -16,6 +16,11 @@ pub(crate) fn build(ctx: &mut BuilderContext) -> (OutputType, ObjectTypeStrongRe
 
             vec.push(group_by_aggregation_field(ctx, &model));
             append_opt(&mut vec, find_unique_field(ctx, &model));
+
+            if ctx.enable_raw_queries && ctx.has_capability(ConnectorCapability::MongoDbQueryRaw) {
+                vec.push(mongo_find_raw_field(&model));
+                vec.push(mongo_aggregate_raw_field(&model));
+            }
 
             vec
         })
@@ -105,6 +110,44 @@ fn group_by_aggregation_field(ctx: &mut BuilderContext, model: &ModelRef) -> Out
         Some(QueryInfo {
             model: Some(Arc::clone(&model)),
             tag: QueryTag::GroupBy,
+        }),
+    )
+}
+
+fn mongo_aggregate_raw_field(model: &ModelRef) -> OutputField {
+    let field_name = format!("aggregate{}Raw", model.name);
+
+    field(
+        field_name,
+        vec![
+            input_field("pipeline", InputType::list(InputType::json()), None).optional(),
+            input_field("options", InputType::json(), None).optional(),
+        ],
+        OutputType::json(),
+        Some(QueryInfo {
+            tag: QueryTag::QueryRaw {
+                query_type: Some("aggregateRaw".to_owned()),
+            },
+            model: Some(model.clone()),
+        }),
+    )
+}
+
+fn mongo_find_raw_field(model: &ModelRef) -> OutputField {
+    let field_name = format!("find{}Raw", model.name);
+
+    field(
+        field_name,
+        vec![
+            input_field("filter", InputType::json(), None).optional(),
+            input_field("options", InputType::json(), None).optional(),
+        ],
+        OutputType::json(),
+        Some(QueryInfo {
+            tag: QueryTag::QueryRaw {
+                query_type: Some("findRaw".to_owned()),
+            },
+            model: Some(model.clone()),
         }),
     )
 }

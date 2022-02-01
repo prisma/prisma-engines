@@ -9,6 +9,7 @@ use connector_interface::{
 use prisma_models::{prelude::*, SelectionResult};
 use prisma_value::PrismaValue;
 use quaint::prelude::ConnectionInfo;
+use std::collections::HashMap;
 
 use super::catch;
 
@@ -227,16 +228,21 @@ impl<'tx> WriteOperations for SqlConnectorTransaction<'tx> {
         .await
     }
 
-    async fn execute_raw(&mut self, query: String, parameters: Vec<PrismaValue>) -> connector::Result<usize> {
+    async fn execute_raw(&mut self, inputs: HashMap<String, PrismaValue>) -> connector::Result<usize> {
         catch(self.connection_info.clone(), async move {
-            write::execute_raw(&self.inner, query, parameters).await
+            write::execute_raw(&self.inner, inputs).await
         })
         .await
     }
 
-    async fn query_raw(&mut self, query: String, parameters: Vec<PrismaValue>) -> connector::Result<serde_json::Value> {
+    async fn query_raw(
+        &mut self,
+        _model: Option<&ModelRef>,
+        inputs: HashMap<String, PrismaValue>,
+        _query_type: Option<String>,
+    ) -> connector::Result<serde_json::Value> {
         catch(self.connection_info.clone(), async move {
-            write::query_raw(&self.inner, query, parameters).await
+            write::query_raw(&self.inner, inputs).await
         })
         .await
     }
