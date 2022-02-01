@@ -207,7 +207,14 @@ fn update_operations_object_type(
 /// }
 /// ```
 fn composite_update_envelope_object_type(ctx: &mut BuilderContext, cf: &CompositeFieldRef) -> InputObjectTypeWeakRef {
-    let name = format!("{}UpdateEnvelopeInput", cf.typ.name);
+    let arity = if cf.is_optional() {
+        "Nullable"
+    } else if cf.is_list() {
+        "List"
+    } else {
+        ""
+    };
+    let name = format!("{}{}UpdateEnvelopeInput", cf.typ.name, arity);
 
     let ident = Identifier::new(name, PRISMA_NAMESPACE);
     return_cached_input!(ctx, &ident);
@@ -253,22 +260,22 @@ fn composite_update_object_type(ctx: &mut BuilderContext, cf: &CompositeFieldRef
 
 // Builds an `update` input field. Should only be used in the envelope type.
 fn composite_update_input_field(ctx: &mut BuilderContext, cf: &CompositeFieldRef) -> Option<InputField> {
-    if cf.is_list() {
-        return None;
+    if cf.is_required() {
+        let update_object_type = composite_update_object_type(ctx, cf);
+
+        Some(input_field(operations::UPDATE, InputType::Object(update_object_type.clone()), None).optional())
+    } else {
+        None
     }
-
-    let update_object_type = composite_update_object_type(ctx, cf);
-
-    Some(input_field(operations::UPDATE, InputType::Object(update_object_type.clone()), None).optional())
 }
 
 // Builds an `unset` input field. Should only be used in the envelope type.
 fn composite_unset_update_input_field(cf: &CompositeFieldRef) -> Option<InputField> {
-    if cf.is_required() || cf.is_list() {
-        return None;
+    if cf.is_optional() {
+        Some(input_field(operations::UNSET, InputType::boolean(), None).optional())
+    } else {
+        None
     }
-
-    Some(input_field(operations::UNSET, InputType::boolean(), None).optional())
 }
 
 // Builds an `set` input field. Should only be used in the envelope type.
@@ -286,12 +293,12 @@ fn composite_set_update_input_field(ctx: &mut BuilderContext, cf: &CompositeFiel
 
 // Builds an `push` input field. Should only be used in the envelope type.
 fn composite_push_update_input_field(ctx: &mut BuilderContext, cf: &CompositeFieldRef) -> Option<InputField> {
-    if !cf.is_list() {
-        return None;
+    if cf.is_list() {
+        let set_object_type = InputType::Object(create::composite_create_object_type(ctx, cf));
+        let input_types = vec![set_object_type.clone(), InputType::list(set_object_type)];
+
+        Some(input_field(operations::PUSH, input_types, None).optional())
+    } else {
+        None
     }
-
-    let set_object_type = InputType::Object(create::composite_create_object_type(ctx, cf));
-    let input_types = vec![set_object_type.clone(), InputType::list(set_object_type)];
-
-    Some(input_field(operations::PUSH, input_types, None).optional())
 }

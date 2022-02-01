@@ -12,13 +12,22 @@ mod create {
             createOneTestModel(
               data: {
                 id: 1
-                a: { set: { a_1: "a1", a_2: null } }
+                a: { set: { a_1: "a1", a_2: null, b: { b_field: "b_field", c: { c_field: "c_field" } } } }
                 b: { set: { b_field: "b_field", c: { c_field: "c_field" } } }
               }
             ) {
               a {
                 a_1
                 a_2
+                b {
+                  b_field
+                  c {
+                    c_field
+                    b {
+                      b_field
+                    }
+                  }
+                }
               }
               b {
                 b_field
@@ -32,7 +41,7 @@ mod create {
             }
           }
           "#),
-          @r###"{"data":{"createOneTestModel":{"a":{"a_1":"a1","a_2":null},"b":{"b_field":"b_field","c":{"c_field":"c_field","b":null}}}}}"###
+          @r###"{"data":{"createOneTestModel":{"a":{"a_1":"a1","a_2":null,"b":{"b_field":"b_field","c":{"c_field":"c_field","b":null}}},"b":{"b_field":"b_field","c":{"c_field":"c_field","b":null}}}}}"###
         );
 
         Ok(())
@@ -46,13 +55,22 @@ mod create {
             createOneTestModel(
               data: {
                 id: 1
-                a: { a_1: "a1", a_2: null }
+                a: { a_1: "a1", a_2: null, b: { b_field: "b_field", c: { c_field: "c_field" } } }
                 b: { b_field: "b_field", c: { c_field: "c_field" } }
               }
             ) {
               a {
                 a_1
                 a_2
+                b {
+                  b_field
+                  c {
+                    c_field
+                    b {
+                      b_field
+                    }
+                  }
+                }
               }
               b {
                 b_field
@@ -66,7 +84,7 @@ mod create {
             }
           }
           "#),
-          @r###"{"data":{"createOneTestModel":{"a":{"a_1":"a1","a_2":null},"b":{"b_field":"b_field","c":{"c_field":"c_field","b":null}}}}}"###
+          @r###"{"data":{"createOneTestModel":{"a":{"a_1":"a1","a_2":null,"b":{"b_field":"b_field","c":{"c_field":"c_field","b":null}}},"b":{"b_field":"b_field","c":{"c_field":"c_field","b":null}}}}}"###
         );
 
         Ok(())
@@ -80,13 +98,22 @@ mod create {
             createOneTestModel(
               data: {
                 id: 1
-                a: { set: { a_1: "a1", a_2: null } }
+                a: { set: { a_1: "a1", a_2: null, b: { b_field: "b_field", c: { c_field: "c_field" } } } }
                 b: { b_field: "b_field", c: { c_field: "c_field" } }
               }
             ) {
               a {
                 a_1
                 a_2
+                b {
+                  b_field
+                  c {
+                    c_field
+                    b {
+                      b_field
+                    }
+                  }
+                }
               }
               b {
                 b_field
@@ -100,7 +127,7 @@ mod create {
             }
           }
           "#),
-          @r###"{"data":{"createOneTestModel":{"a":{"a_1":"a1","a_2":null},"b":{"b_field":"b_field","c":{"c_field":"c_field","b":null}}}}}"###
+          @r###"{"data":{"createOneTestModel":{"a":{"a_1":"a1","a_2":null,"b":{"b_field":"b_field","c":{"c_field":"c_field","b":null}}},"b":{"b_field":"b_field","c":{"c_field":"c_field","b":null}}}}}"###
         );
 
         Ok(())
@@ -114,13 +141,22 @@ mod create {
           createOneTestModel(
             data: {
               id: 1
-              a: { set: { a_1: "a1", a_2: null } }
+              a: { set: { a_1: "a1", a_2: null, b: { c: {} } } }
               b: { set: { c: {} } }
             }
           ) {
             a {
               a_1
               a_2
+              b {
+                b_field
+                c {
+                  c_field
+                  b {
+                    b_field
+                  }
+                }
+              }
             }
             b {
               b_field
@@ -134,7 +170,7 @@ mod create {
           }
         }
         "#),
-          @r###"{"data":{"createOneTestModel":{"a":{"a_1":"a1","a_2":null},"b":{"b_field":"b_field default","c":{"c_field":"c_field default","b":null}}}}}"###
+          @r###"{"data":{"createOneTestModel":{"a":{"a_1":"a1","a_2":null,"b":{"b_field":"b_field default","c":{"c_field":"c_field default","b":null}}},"b":{"b_field":"b_field default","c":{"c_field":"c_field default","b":null}}}}}"###
         );
 
         Ok(())
@@ -148,13 +184,22 @@ mod create {
             createOneTestModel(
               data: {
                 id: 1
-                a: { set: { a_1: "a1", a_2: null } }
+                a: { a_1: "a1", a_2: null, b: { c: {} } }
                 b: { c: {} }
               }
             ) {
               a {
                 a_1
                 a_2
+                b {
+                  b_field
+                  c {
+                    c_field
+                    b {
+                      b_field
+                    }
+                  }
+                }
               }
               b {
                 b_field
@@ -168,7 +213,7 @@ mod create {
             }
           }
           "#),
-          @r###"{"data":{"createOneTestModel":{"a":{"a_1":"a1","a_2":null},"b":{"b_field":"b_field default","c":{"c_field":"c_field default","b":null}}}}}"###
+          @r###"{"data":{"createOneTestModel":{"a":{"a_1":"a1","a_2":null,"b":{"b_field":"b_field default","c":{"c_field":"c_field default","b":null}}},"b":{"b_field":"b_field default","c":{"c_field":"c_field default","b":null}}}}}"###
         );
 
         Ok(())
@@ -184,7 +229,7 @@ mod create {
             createOneTestModel(
               data: {
                 id: 1
-                a: { set: { a_1: "a1", a_2: null } }
+                a: { set: { a_1: "a1", a_2: null, b: { c: {} } } }
                 b: {}
               }
             ) {
@@ -202,7 +247,7 @@ mod create {
             createOneTestModel(
               data: {
                 id: 1
-                a: { set: { a_1: "a1", a_2: null } }
+                a: { set: { a_1: "a1", a_2: null, b: { c: {} } } }
                 b: {}
               }
             ) {
@@ -225,31 +270,52 @@ mod update {
     async fn update_set_envelope(runner: Runner) -> TestResult<()> {
         create_test_data(&runner).await?;
 
-        // Top-level
+        // Update set on required composite
         insta::assert_snapshot!(
           run_query!(&runner, r#"mutation { updateOneTestModel(
             where: { id: 1 },
-            data: { a: { set: { a_2: 1337 } } }
-          ) { a { a_1 a_2 } b { b_field c { c_field } } } }"#),
-          @r###"{"data":{"updateOneTestModel":{"a":{"a_1":"a_1 default","a_2":1337},"b":{"b_field":"b1","c":{"c_field":"c1"}}}}}"###
+            data: { a: { set: { a_1: "a_updated", a_2: 1337, b: { b_field: "b_updated", c: { c_field: "c_updated" } } } } }
+          ) {
+            a {
+              a_1 a_2
+              b { b_field c { c_field } }
+            }
+            b { b_field c { c_field } }
+          } }"#),
+          @r###"{"data":{"updateOneTestModel":{"a":{"a_1":"a_updated","a_2":1337,"b":{"b_field":"b_updated","c":{"c_field":"c_updated"}}},"b":{"b_field":"b1","c":{"c_field":"c1"}}}}}"###
         );
 
-        // Nested
+        // Update set on optional composite
         insta::assert_snapshot!(
           run_query!(&runner, r#"mutation { updateOneTestModel(
             where: { id: 1 },
             data: { b: { set: { c: { c_field: "updated" } } } }
-          ) { a { a_1 a_2 } b { b_field c { c_field } } } }"#),
-          @r###"{"data":{"updateOneTestModel":{"a":{"a_1":"a_1 default","a_2":1337},"b":{"b_field":"b_field default","c":{"c_field":"updated"}}}}}"###
+          ) {
+            a {
+              a_1 a_2
+              b { b_field c { c_field } }
+            }
+            b { b_field c { c_field } }
+          } }"#),
+          @r###"{"data":{"updateOneTestModel":{"a":{"a_1":"a_updated","a_2":1337,"b":{"b_field":"b_updated","c":{"c_field":"c_updated"}}},"b":{"b_field":"b_field default","c":{"c_field":"updated"}}}}}"###
         );
 
         // Nested empty object with defaults
         insta::assert_snapshot!(
           run_query!(&runner, r#"mutation { updateOneTestModel(
             where: { id: 1 },
-            data: { b: { set: { c: {} } } }
-          ) { a { a_1 a_2 } b { b_field c { c_field } } } }"#),
-          @r###"{"data":{"updateOneTestModel":{"a":{"a_1":"a_1 default","a_2":1337},"b":{"b_field":"b_field default","c":{"c_field":"c_field default"}}}}}"###
+            data: {
+              a: { set: { b: { c: {} } } }
+              b: { set: { c: {} } }
+            }
+          ) {
+            a {
+              a_1 a_2
+              b { b_field c { c_field } }
+            }
+            b { b_field c { c_field } }
+          } }"#),
+          @r###"{"data":{"updateOneTestModel":{"a":{"a_1":"a_1 default","a_2":null,"b":{"b_field":"b_field default","c":{"c_field":"c_field default"}}},"b":{"b_field":"b_field default","c":{"c_field":"c_field default"}}}}}"###
         );
 
         Ok(())
@@ -259,31 +325,52 @@ mod update {
     async fn update_set_shorthand(runner: Runner) -> TestResult<()> {
         create_test_data(&runner).await?;
 
-        // Top-level
+        // Update set on required composite
         insta::assert_snapshot!(
           run_query!(&runner, r#"mutation { updateOneTestModel(
             where: { id: 1 },
-            data: { a: { a_2: 1337 } }
-          ) { a { a_1 a_2 } b { b_field c { c_field } } } }"#),
-          @r###"{"data":{"updateOneTestModel":{"a":{"a_1":"a_1 default","a_2":1337},"b":{"b_field":"b1","c":{"c_field":"c1"}}}}}"###
+            data: { a: { a_1: "a_updated", a_2: 1337, b: { b_field: "b_updated", c: { c_field: "c_updated" } } } }
+          ) {
+            a {
+              a_1 a_2
+              b { b_field c { c_field } }
+            }
+            b { b_field c { c_field } }
+          } }"#),
+          @r###"{"data":{"updateOneTestModel":{"a":{"a_1":"a_updated","a_2":1337,"b":{"b_field":"b_updated","c":{"c_field":"c_updated"}}},"b":{"b_field":"b1","c":{"c_field":"c1"}}}}}"###
         );
 
-        // Nested
+        // Update set on optional composite
         insta::assert_snapshot!(
           run_query!(&runner, r#"mutation { updateOneTestModel(
             where: { id: 1 },
             data: { b: { c: { c_field: "updated" } } }
-          ) { a { a_1 a_2 } b { b_field c { c_field } } } }"#),
-          @r###"{"data":{"updateOneTestModel":{"a":{"a_1":"a_1 default","a_2":1337},"b":{"b_field":"b_field default","c":{"c_field":"updated"}}}}}"###
+          ) {
+            a {
+              a_1 a_2
+              b { b_field c { c_field } }
+            }
+            b { b_field c { c_field } }
+          } }"#),
+          @r###"{"data":{"updateOneTestModel":{"a":{"a_1":"a_updated","a_2":1337,"b":{"b_field":"b_updated","c":{"c_field":"c_updated"}}},"b":{"b_field":"b_field default","c":{"c_field":"updated"}}}}}"###
         );
 
         // Nested empty object with defaults
         insta::assert_snapshot!(
           run_query!(&runner, r#"mutation { updateOneTestModel(
             where: { id: 1 },
-            data: { b: { c: {} } }
-          ) { a { a_1 a_2 } b { b_field c { c_field } } } }"#),
-          @r###"{"data":{"updateOneTestModel":{"a":{"a_1":"a_1 default","a_2":1337},"b":{"b_field":"b_field default","c":{"c_field":"c_field default"}}}}}"###
+            data: {
+              a: { b: { c: {} } }
+              b: { c: {} }
+            }
+          ) {
+            a {
+              a_1 a_2
+              b { b_field c { c_field } }
+            }
+            b { b_field c { c_field } }
+          } }"#),
+          @r###"{"data":{"updateOneTestModel":{"a":{"a_1":"a_1 default","a_2":null,"b":{"b_field":"b_field default","c":{"c_field":"c_field default"}}},"b":{"b_field":"b_field default","c":{"c_field":"c_field default"}}}}}"###
         );
 
         Ok(())
@@ -298,11 +385,17 @@ mod update {
           run_query!(&runner, r#"mutation { updateOneTestModel(
             where: { id: 1 },
             data: {
-              a: { set: { a_2: 1337 } },
-              b: { c: { c_field: "updated" } }
+              a: { set: { a_2: 1337, b: { b_field: "b_updated", c: { c_field: "c_updated" } } } },
+              b: { c: { c_field: "c_updated" } }
             }
-          ) { a { a_1 a_2 } b { b_field c { c_field } } } }"#),
-          @r###"{"data":{"updateOneTestModel":{"a":{"a_1":"a_1 default","a_2":1337},"b":{"b_field":"b_field default","c":{"c_field":"updated"}}}}}"###
+          ) {
+            a {
+              a_1 a_2
+              b { b_field c { c_field } }
+            }
+            b { b_field c { c_field } }
+          } }"#),
+          @r###"{"data":{"updateOneTestModel":{"a":{"a_1":"a_1 default","a_2":1337,"b":{"b_field":"b_updated","c":{"c_field":"c_updated"}}},"b":{"b_field":"b_field default","c":{"c_field":"c_updated"}}}}}"###
         );
 
         Ok(())
@@ -316,9 +409,17 @@ mod update {
         insta::assert_snapshot!(
           run_query!(&runner, r#"mutation { updateOneTestModel(
             where: { id: 1 },
-            data: { a: { update: { a_2: { increment: 1335 } } } }
-          ) { a { a_1 a_2 } b { b_field c { c_field } } } }"#),
-          @r###"{"data":{"updateOneTestModel":{"a":{"a_1":"a1","a_2":1337},"b":{"b_field":"b1","c":{"c_field":"c1"}}}}}"###
+            data: { a: { update: {
+              a_2: { increment: 1335 },
+            }}}
+          ){
+            a {
+              a_1 a_2
+              b { b_field c { c_field } }
+            }
+            b { b_field c { c_field } }
+          } }"#),
+          @r###"{"data":{"updateOneTestModel":{"a":{"a_1":"a1","a_2":1337,"b":{"b_field":"b1","c":{"c_field":"c1"}}},"b":{"b_field":"b1","c":{"c_field":"c1"}}}}}"###
         );
 
         // Nested
@@ -326,11 +427,26 @@ mod update {
           run_query!(&runner, r#"mutation { updateOneTestModel(
             where: { id: 1 },
             data: {
-              a: { update: { a_2: { decrement: 1 } } }
-              b: { update: { c: { update: { c_field: "updated" } } } }
+              a: {
+                update: {
+                  a_2: { decrement: 1 }
+                  b: {
+                    update: {
+                      b_field: "b_updated"
+                      c: { update: { c_field: "c_updated" } }
+                    }
+                  }
+                }
+              }
             }
-          ) { a { a_1 a_2 } b { b_field c { c_field } } } }"#),
-          @r###"{"data":{"updateOneTestModel":{"a":{"a_1":"a1","a_2":1336},"b":{"b_field":"b1","c":{"c_field":"updated"}}}}}"###
+          ){
+            a {
+              a_1 a_2
+              b { b_field c { c_field } }
+            }
+            b { b_field c { c_field } }
+          } }"#),
+          @r###"{"data":{"updateOneTestModel":{"a":{"a_1":"a1","a_2":1336,"b":{"b_field":"b_updated","c":{"c_field":"c_updated"}}},"b":{"b_field":"b1","c":{"c_field":"c1"}}}}}"###
         );
 
         Ok(())
@@ -343,9 +459,20 @@ mod update {
         insta::assert_snapshot!(
           run_query!(&runner, r#"mutation { updateOneTestModel(
             where: { id: 1 },
-            data: { b: { update: { c: {} } } }
-          ) { a { a_1 a_2 } b { b_field c { c_field } } } }"#),
-          @r###"{"data":{"updateOneTestModel":{"a":{"a_1":"a1","a_2":2},"b":{"b_field":"b1","c":{"c_field":"c_field default"}}}}}"###
+            data: {
+              a: {
+                update: {
+                  b: { update: { c: {} } }
+                }
+              }
+            }
+          ) {
+            a {
+              a_1 a_2
+              b { b_field c { c_field } }
+            }
+          }}"#),
+          @r###"{"data":{"updateOneTestModel":{"a":{"a_1":"a1","a_2":2,"b":{"b_field":"b1","c":{"c_field":"c_field default"}}}}}}"###
         );
 
         Ok(())
@@ -368,7 +495,7 @@ mod update {
             }
           }"#,
           2009,
-          "`Mutation.updateOneTestModel.data.TestModelUpdateInput.b.BUpdateEnvelopeInput.set.BCreateInput.c.CCreateInput.update`: Field does not exist on enclosing type."
+          "`Mutation.updateOneTestModel.data.TestModelUpdateInput.b.BNullableUpdateEnvelopeInput.set.BCreateInput.c.CCreateInput.update`: Field does not exist on enclosing type."
         );
 
         assert_error!(
@@ -399,7 +526,6 @@ mod update {
                 updateOneTestModel(
                   where: { id: 1 }
                   data: {
-                    a: { set: { a_1: "a1", a_2: null } }
                     b: {}
                   }
                 ) {
@@ -407,7 +533,7 @@ mod update {
                 }
               }"#,
               2009,
-              "`Mutation.updateOneTestModel.data.TestModelUpdateInput.b.BUpdateEnvelopeInput`: Expected exactly one field to be present, got 0."
+              "`Mutation.updateOneTestModel.data.TestModelUpdateInput.b.BNullableUpdateEnvelopeInput`: Expected exactly one field to be present, got 0."
             );
 
         // Missing required field without default failure on field `B.c`
@@ -417,7 +543,6 @@ mod update {
                 updateOneTestModel(
                   where: { id: 1 }
                   data: {
-                    a: { set: { a_1: "a1", a_2: null } }
                     b: {}
                   }
                 ) {
@@ -428,23 +553,29 @@ mod update {
                 "`Mutation.updateOneTestModel.data.TestModelUpdateInput.b.BCreateInput.c`: A value is required but not set."
             );
 
-        // Missing required field on nested `update`
+        Ok(())
+    }
+
+    #[connector_test]
+    async fn fails_update_on_optional_composite(runner: Runner) -> TestResult<()> {
+        create_test_data(&runner).await?;
+
+        // Invalid `update` on optional composite field
         assert_error!(
-              runner,
-              r#"mutation {
-              updateOneTestModel(
-                where: { id: 1 }
-                data: {
-                  a: { set: { a_1: "a1", a_2: null } }
-                  b: { update: {} }
-                }
-              ) {
-                id
-              }
-            }"#,
-              2009,
-              "`Mutation.updateOneTestModel.data.TestModelUpdateInput.b.BUpdateEnvelopeInput.update.BUpdateInput`: Expected a minimum of 1 fields to be present, got 0."
-          );
+          runner,
+          r#"mutation {
+          updateOneTestModel(
+            where: { id: 1 }
+            data: {
+              b: { update: { b_field: "b_updated" } }
+            }
+          ) {
+            id
+          }
+        }"#,
+          2009,
+          "`Mutation.updateOneTestModel.data.TestModelUpdateInput.b.BNullableUpdateEnvelopeInput.update`: Field does not exist on enclosing type."
+      );
 
         Ok(())
     }
@@ -454,7 +585,7 @@ mod update {
             runner,
             r#"{
           id: 1
-          a: { set: { a_1: "a1", a_2: 2 } }
+          a: { set: { a_1: "a1", a_2: 2, b: { b_field: "b1", c: { c_field: "c1" } } } }
           b: { set: { b_field: "b1", c: { c_field: "c1" } } }
         }"#,
         )

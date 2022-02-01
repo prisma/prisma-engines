@@ -11,7 +11,7 @@ pub fn render_update_docs(
     field_name: &str,
 ) -> crate::Result<Vec<Document>> {
     if let WriteExpression::NestedWrite(nested_write) = write_expr {
-        let docs = unfold_nested_write(field, nested_write, &mut vec![field.db_name().to_owned()])
+        let docs = unfold_nested_write(field, nested_write, vec![field.db_name().to_owned()])
             .into_iter()
             // TODO: figure out why we can't flat_map here
             // TODO: the trait `FromIterator<Vec<mongodb::bson::Document>>` is not implemented for `std::result::Result<Vec<mongodb::bson::Document>, MongoError>`
@@ -97,7 +97,7 @@ pub fn render_update_docs(
 fn unfold_nested_write<'a>(
     field: &'a Field,
     nested_write: NestedWrite,
-    path: &mut Vec<String>,
+    path: Vec<String>,
 ) -> Vec<(WriteExpression, &'a Field, String)> {
     let mut nested_writes: Vec<(WriteExpression, &'a Field, String)> = vec![];
 
@@ -108,13 +108,13 @@ fn unfold_nested_write<'a>(
             .typ
             .find_field_by_db_name(&db_name)
             .unwrap();
+        let mut path = path.clone();
 
         match write {
             WriteExpression::NestedWrite(nested_write) => {
-                let mut path = path.clone();
                 path.push(db_name);
 
-                nested_writes.extend(unfold_nested_write(nested_field, nested_write, &mut path));
+                nested_writes.extend(unfold_nested_write(nested_field, nested_write, path));
             }
             _ => {
                 path.push(db_name);
