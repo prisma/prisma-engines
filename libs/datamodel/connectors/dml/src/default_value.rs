@@ -127,6 +127,21 @@ impl DefaultValue {
     pub fn db_name(&self) -> Option<&str> {
         self.db_name.as_deref()
     }
+
+    // Returns the dbgenerated function for a default value
+    // intended for primary key values!
+    pub fn dbgenerated_func(&self) -> Option<String> {
+        match self.kind {
+            DefaultKind::Expression(ref expr) if expr.is_dbgenerated() => {
+                if let Some(val) = expr.args.get(0) {
+                    Some(val.to_string())
+                } else {
+                    None
+                }
+            }
+            _ => None,
+        }
+    }
 }
 
 #[derive(Clone)]
