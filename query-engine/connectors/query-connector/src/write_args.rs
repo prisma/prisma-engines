@@ -166,10 +166,10 @@ impl NestedWrite {
     ///  - `Field("field_b")` is the field on which to execute the write operation
     /// - `"field_a.field_b"` is the path for MongoDB to access the nested field
     pub fn unfold(self, field: &Field) -> Vec<(WriteOperation, &Field, String)> {
-        self.unfold_internal(field, &mut vec![field.db_name().to_owned()])
+        self.unfold_internal(field, vec![field.db_name().to_owned()])
     }
 
-    fn unfold_internal<'a>(self, field: &'a Field, path: &mut Vec<String>) -> Vec<(WriteOperation, &'a Field, String)> {
+    fn unfold_internal(self, field: &'_ Field, path: Vec<String>) -> Vec<(WriteOperation, &'_ Field, String)> {
         let mut nested_writes: Vec<(WriteOperation, &Field, String)> = vec![];
 
         for (DatasourceFieldName(db_name), write) in self.writes {
@@ -179,13 +179,13 @@ impl NestedWrite {
                 .typ
                 .find_field_by_db_name(&db_name)
                 .unwrap();
+            let mut path = path.clone();
 
             match write {
                 WriteOperation::Composite(CompositeWriteOperation::Update(nested_write)) => {
-                    let mut path = path.clone();
                     path.push(db_name);
 
-                    nested_writes.extend(nested_write.unfold_internal(nested_field, &mut path));
+                    nested_writes.extend(nested_write.unfold_internal(nested_field, path));
                 }
                 _ => {
                     path.push(db_name);
