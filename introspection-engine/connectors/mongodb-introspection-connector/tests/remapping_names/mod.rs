@@ -28,7 +28,7 @@ fn remapping_fields_with_invalid_characters() {
 
     let expected = expect![[r#"
         model A {
-          id  String @id @default(dbgenerated()) @map("_id") @db.ObjectId
+          id  String @id @default(auto()) @map("_id") @db.ObjectId
           d   Int    @map("(d")
           e   Int    @map(")e")
           b   Int    @map("*b")
@@ -55,13 +55,13 @@ fn remapping_models_with_invalid_characters() {
 
     let expected = expect![[r#"
         model A {
-          id String @id @default(dbgenerated()) @map("_id") @db.ObjectId
+          id String @id @default(auto()) @map("_id") @db.ObjectId
 
           @@map("?A")
         }
 
         model A_b_c {
-          id String @id @default(dbgenerated()) @map("_id") @db.ObjectId
+          id String @id @default(auto()) @map("_id") @db.ObjectId
 
           @@map("A b c")
         }

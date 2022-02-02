@@ -193,6 +193,11 @@ impl<'ast, 'db> DefaultValueWalker<'ast, 'db> {
         matches!(self.default.value, ast::Expression::Function(name, _, _) if name == "dbgenerated")
     }
 
+    /// Is this an `@default(auto())`?
+    pub fn is_auto(self) -> bool {
+        matches!(self.default.value, ast::Expression::Function(name, _, _) if name == "auto")
+    }
+
     /// Is this an `@default(now())`?
     pub fn is_now(self) -> bool {
         matches!(self.default.value, ast::Expression::Function(name, _, _) if name == "now")

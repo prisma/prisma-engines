@@ -1229,7 +1229,7 @@ fn test_composite_types_in_models() {
         }
 
         model A {
-          id String @id @default(dbgenerated()) @map("_id") @db.ObjectId
+          id String @id @default(auto()) @map("_id") @db.ObjectId
           b  B
           c  C[]
         }
@@ -1257,7 +1257,7 @@ fn test_composite_types_in_models() {
         }
 
         model A {
-          id String @id @default(dbgenerated()) @map("_id") @db.ObjectId
+          id String @id @default(auto()) @map("_id") @db.ObjectId
           b  B
           c  C[]
         }

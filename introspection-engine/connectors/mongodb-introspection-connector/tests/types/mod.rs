@@ -22,7 +22,7 @@ fn string() {
 
     let expected = expect![[r#"
         model A {
-          id     String  @id @default(dbgenerated()) @map("_id") @db.ObjectId
+          id     String  @id @default(auto()) @map("_id") @db.ObjectId
           first  String
           second String?
           third  String?
@@ -51,7 +51,7 @@ fn double() {
 
     let expected = expect![[r#"
         model A {
-          id     String @id @default(dbgenerated()) @map("_id") @db.ObjectId
+          id     String @id @default(auto()) @map("_id") @db.ObjectId
           first  Float
           second Float?
           third  Float?
@@ -80,7 +80,7 @@ fn bool() {
 
     let expected = expect![[r#"
         model A {
-          id     String   @id @default(dbgenerated()) @map("_id") @db.ObjectId
+          id     String   @id @default(auto()) @map("_id") @db.ObjectId
           first  Boolean
           second Boolean?
           third  Boolean?
@@ -109,7 +109,7 @@ fn int() {
 
     let expected = expect![[r#"
         model A {
-          id     String @id @default(dbgenerated()) @map("_id") @db.ObjectId
+          id     String @id @default(auto()) @map("_id") @db.ObjectId
           first  Int
           second Int?
           third  Int?
@@ -138,7 +138,7 @@ fn bigint() {
 
     let expected = expect![[r#"
         model A {
-          id     String  @id @default(dbgenerated()) @map("_id") @db.ObjectId
+          id     String  @id @default(auto()) @map("_id") @db.ObjectId
           first  BigInt
           second BigInt?
           third  BigInt?
@@ -178,7 +178,7 @@ fn timestamp() {
 
     let expected = expect![[r#"
         model A {
-          id     String    @id @default(dbgenerated()) @map("_id") @db.ObjectId
+          id     String    @id @default(auto()) @map("_id") @db.ObjectId
           first  DateTime
           second DateTime?
           third  DateTime?
@@ -223,7 +223,7 @@ fn binary() {
 
     let expected = expect![[r#"
         model A {
-          id     String @id @default(dbgenerated()) @map("_id") @db.ObjectId
+          id     String @id @default(auto()) @map("_id") @db.ObjectId
           first  Bytes
           second Bytes?
           third  Bytes?
@@ -263,7 +263,7 @@ fn object_id() {
 
     let expected = expect![[r#"
         model A {
-          id     String  @id @default(dbgenerated()) @map("_id") @db.ObjectId
+          id     String  @id @default(auto()) @map("_id") @db.ObjectId
           first  String  @db.ObjectId
           second String? @db.ObjectId
           third  String? @db.ObjectId
@@ -303,7 +303,7 @@ fn date() {
 
     let expected = expect![[r#"
         model A {
-          id     String    @id @default(dbgenerated()) @map("_id") @db.ObjectId
+          id     String    @id @default(auto()) @map("_id") @db.ObjectId
           first  DateTime  @db.Date
           second DateTime? @db.Date
           third  DateTime? @db.Date
@@ -343,7 +343,7 @@ fn decimal() {
 
     let expected = expect![[r#"
         model A {
-          id     String   @id @default(dbgenerated()) @map("_id") @db.ObjectId
+          id     String   @id @default(auto()) @map("_id") @db.ObjectId
           first  Decimal
           second Decimal?
           third  Decimal?
@@ -383,7 +383,7 @@ fn array() {
 
     let expected = expect![[r#"
         model A {
-          id     String @id @default(dbgenerated()) @map("_id") @db.ObjectId
+          id     String @id @default(auto()) @map("_id") @db.ObjectId
           first  Int[]
           second Int[]
           third  Int[]
@@ -409,7 +409,7 @@ fn empty_arrays() {
 
     let expected = expect![[r#"
         model A {
-          id   String                  @id @default(dbgenerated()) @map("_id") @db.ObjectId
+          id   String                  @id @default(auto()) @map("_id") @db.ObjectId
           data Unsupported("Unknown")?
         }
     "#]];

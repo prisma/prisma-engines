@@ -23,7 +23,7 @@ fn singular() {
         }
 
         model Cat {
-          id      String     @id @default(dbgenerated()) @map("_id") @db.ObjectId
+          id      String     @id @default(auto()) @map("_id") @db.ObjectId
           address CatAddress
           name    String
         }
@@ -54,7 +54,7 @@ fn dirty_data() {
         }
 
         model Cat {
-          id      String     @id @default(dbgenerated()) @map("_id") @db.ObjectId
+          id      String     @id @default(auto()) @map("_id") @db.ObjectId
           address CatAddress
           name    String
         }
@@ -84,7 +84,7 @@ fn array() {
         }
 
         model Blog {
-          id    String      @id @default(dbgenerated()) @map("_id") @db.ObjectId
+          id    String      @id @default(auto()) @map("_id") @db.ObjectId
           posts BlogPosts[]
           title String
         }
@@ -108,7 +108,7 @@ fn deep_array() {
 
     let expected = expect![[r#"
         model Blog {
-          id    String @id @default(dbgenerated()) @map("_id") @db.ObjectId
+          id    String @id @default(auto()) @map("_id") @db.ObjectId
           posts Json[]
           title String
         }
@@ -147,7 +147,7 @@ fn nullability() {
         }
 
         model Model {
-          id     String       @id @default(dbgenerated()) @map("_id") @db.ObjectId
+          id     String       @id @default(auto()) @map("_id") @db.ObjectId
           first  ModelFirst
           second ModelSecond?
           third  ModelThird?
@@ -176,7 +176,7 @@ fn unsupported() {
         }
 
         model FrontendEngineerWritesBackendCode {
-          id       String                                @id @default(dbgenerated()) @map("_id") @db.ObjectId
+          id       String                                @id @default(auto()) @map("_id") @db.ObjectId
           data     FrontendEngineerWritesBackendCodeData
           dataType String
         }
@@ -200,7 +200,7 @@ fn underscores_in_names() {
         }
 
         model Cat {
-          id           String         @id @default(dbgenerated()) @map("_id") @db.ObjectId
+          id           String         @id @default(auto()) @map("_id") @db.ObjectId
           home_address CatHomeAddress
           name         String
         }
@@ -219,7 +219,7 @@ fn depth_none() {
 
     let expected = expect![[r#"
         model Cat {
-          id           String @id @default(dbgenerated()) @map("_id") @db.ObjectId
+          id           String @id @default(auto()) @map("_id") @db.ObjectId
           home_address Json
           name         String
         }
@@ -238,7 +238,7 @@ fn depth_none_level_1_array() {
 
     let expected = expect![[r#"
         model Cat {
-          id           String @id @default(dbgenerated()) @map("_id") @db.ObjectId
+          id           String @id @default(auto()) @map("_id") @db.ObjectId
           home_address Json[]
           name         String
         }
@@ -262,7 +262,7 @@ fn depth_1_level_1() {
         }
 
         model Cat {
-          id           String         @id @default(dbgenerated()) @map("_id") @db.ObjectId
+          id           String         @id @default(auto()) @map("_id") @db.ObjectId
           home_address CatHomeAddress
           name         String
         }
@@ -289,7 +289,7 @@ fn depth_1_level_2() {
         }
 
         model Cat {
-          id           String         @id @default(dbgenerated()) @map("_id") @db.ObjectId
+          id           String         @id @default(auto()) @map("_id") @db.ObjectId
           home_address CatHomeAddress
           name         String
         }
@@ -316,7 +316,7 @@ fn depth_1_level_2_array() {
         }
 
         model Cat {
-          id           String           @id @default(dbgenerated()) @map("_id") @db.ObjectId
+          id           String           @id @default(auto()) @map("_id") @db.ObjectId
           home_address CatHomeAddress[]
           name         String
         }
@@ -347,7 +347,7 @@ fn depth_2_level_2_array() {
         }
 
         model Cat {
-          id           String           @id @default(dbgenerated()) @map("_id") @db.ObjectId
+          id           String           @id @default(auto()) @map("_id") @db.ObjectId
           home_address CatHomeAddress[]
           name         String
         }
@@ -375,13 +375,13 @@ fn name_clashes() {
         }
 
         model Cat {
-          id      String      @id @default(dbgenerated()) @map("_id") @db.ObjectId
+          id      String      @id @default(auto()) @map("_id") @db.ObjectId
           address CatAddress_
           name    String
         }
 
         model CatAddress {
-          id     String  @id @default(dbgenerated()) @map("_id") @db.ObjectId
+          id     String  @id @default(auto()) @map("_id") @db.ObjectId
           knock  Boolean
           number Int
           street String

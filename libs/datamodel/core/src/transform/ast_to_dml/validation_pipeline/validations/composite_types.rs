@@ -1,7 +1,7 @@
 use super::default_value;
 use crate::transform::ast_to_dml::{db::walkers::CompositeTypeWalker, validation_pipeline::context::Context};
 use diagnostics::DatamodelError;
-use parser_database::walkers::CompositeTypeFieldWalker;
+use parser_database::{ast::Expression, walkers::CompositeTypeFieldWalker};
 
 pub(crate) fn composite_types_support(composite_type: CompositeTypeWalker<'_, '_>, ctx: &mut Context<'_>) {
     if ctx.connector.supports_composite_types() {
@@ -25,6 +25,17 @@ pub(super) fn validate_default_value(field: CompositeTypeFieldWalker<'_, '_>, ct
             "default",
             default_attribute.unwrap().span,
         ));
+    }
+
+    match default_value {
+        Some(Expression::Function(name, _, span)) if name == "auto" => {
+            ctx.push_error(DatamodelError::new_attribute_validation_error(
+                "The `auto()` function is not allowed in a composite type.",
+                "default",
+                *span,
+            ));
+        }
+        _ => (),
     }
 
     let scalar_type = field.r#type().as_builtin_scalar();
