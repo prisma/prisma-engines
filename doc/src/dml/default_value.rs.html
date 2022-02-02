@@ -334,6 +334,14 @@
 <span id="333">333</span>
 <span id="334">334</span>
 <span id="335">335</span>
+<span id="336">336</span>
+<span id="337">337</span>
+<span id="338">338</span>
+<span id="339">339</span>
+<span id="340">340</span>
+<span id="341">341</span>
+<span id="342">342</span>
+<span id="343">343</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::scalars::ScalarType</span>;
 <span class="kw">use</span> <span class="ident">prisma_value::PrismaValue</span>;
 <span class="kw">use</span> <span class="ident">std::fmt</span>;
@@ -491,6 +499,10 @@
         }
     }
 
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_auto</span>() -&gt; <span class="self">Self</span> {
+        <span class="ident">ValueGenerator::new</span>(<span class="string">&quot;auto&quot;</span>.<span class="ident">to_owned</span>(), <span class="ident">Vec::new</span>()).<span class="ident">unwrap</span>()
+    }
+
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_now</span>() -&gt; <span class="self">Self</span> {
         <span class="ident">ValueGenerator::new</span>(<span class="string">&quot;now&quot;</span>.<span class="ident">to_owned</span>(), <span class="macro">vec!</span>[]).<span class="ident">unwrap</span>()
     }
@@ -556,6 +568,7 @@
     <span class="ident">Now</span>,
     <span class="ident">Autoincrement</span>,
     <span class="ident">DbGenerated</span>,
+    <span class="ident">Auto</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">ValueGeneratorFn</span> {
@@ -566,6 +579,7 @@
             <span class="string">&quot;now&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::Now</span>),
             <span class="string">&quot;autoincrement&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::Autoincrement</span>),
             <span class="string">&quot;dbgenerated&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::DbGenerated</span>),
+            <span class="string">&quot;auto&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::Auto</span>),
             <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(<span class="macro">format!</span>(<span class="string">&quot;The function {} is not a known function.&quot;</span>, <span class="ident">name</span>)),
         }
     }
@@ -578,6 +592,7 @@
             <span class="ident"><span class="self">Self</span>::Now</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident"><span class="self">Self</span>::generate_now</span>()),
             <span class="ident"><span class="self">Self</span>::Autoincrement</span> =&gt; <span class="prelude-val">None</span>,
             <span class="ident"><span class="self">Self</span>::DbGenerated</span> =&gt; <span class="prelude-val">None</span>,
+            <span class="ident"><span class="self">Self</span>::Auto</span> =&gt; <span class="prelude-val">None</span>,
         }
     }
 
@@ -590,6 +605,7 @@
             (<span class="ident"><span class="self">Self</span>::Autoincrement</span>, <span class="ident">ScalarType::Int</span>) =&gt; <span class="bool-val">true</span>,
             (<span class="ident"><span class="self">Self</span>::Autoincrement</span>, <span class="ident">ScalarType::BigInt</span>) =&gt; <span class="bool-val">true</span>,
             (<span class="ident"><span class="self">Self</span>::DbGenerated</span>, <span class="kw">_</span>) =&gt; <span class="bool-val">true</span>,
+            (<span class="ident"><span class="self">Self</span>::Auto</span>, <span class="kw">_</span>) =&gt; <span class="bool-val">true</span>,
             <span class="kw">_</span> =&gt; <span class="bool-val">false</span>,
         }
     }

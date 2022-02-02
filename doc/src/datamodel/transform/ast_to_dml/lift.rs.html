@@ -540,6 +540,9 @@
 <span id="539">539</span>
 <span id="540">540</span>
 <span id="541">541</span>
+<span id="542">542</span>
+<span id="543">543</span>
+<span id="544">544</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">ast</span>, <span class="ident">dml</span>,
     <span class="ident">transform::ast_to_dml::db</span>::{<span class="self">self</span>, <span class="ident">walkers</span>::<span class="kw-2">*</span>, <span class="ident">IndexAlgorithm</span>},
@@ -1043,6 +1046,9 @@
                     .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">val</span>, <span class="kw">_</span>)<span class="op">|</span> <span class="ident">val</span>.<span class="ident">to_owned</span>())
                     .<span class="ident">unwrap_or_else</span>(<span class="ident">String::new</span>),
             ))
+        }
+        <span class="ident">ast::Expression::Function</span>(<span class="ident">funcname</span>, <span class="kw">_</span>, <span class="kw">_</span>) <span class="kw">if</span> <span class="ident">funcname</span> <span class="op">==</span> <span class="string">&quot;auto&quot;</span> =&gt; {
+            <span class="ident">DefaultKind::Expression</span>(<span class="ident">ValueGenerator::new_auto</span>())
         }
         <span class="ident">ast::Expression::Function</span>(<span class="ident">funcname</span>, <span class="ident">_args</span>, <span class="kw">_</span>) <span class="kw">if</span> <span class="ident">funcname</span> <span class="op">==</span> <span class="string">&quot;autoincrement&quot;</span> =&gt; {
             <span class="ident">DefaultKind::Expression</span>(<span class="ident">ValueGenerator::new_autoincrement</span>())

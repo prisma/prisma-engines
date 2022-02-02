@@ -463,8 +463,6 @@
 <span id="462">462</span>
 <span id="463">463</span>
 <span id="464">464</span>
-<span id="465">465</span>
-<span id="466">466</span>
 </pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">name</span>;
 
 <span class="kw">use</span> <span class="ident">mongodb_schema_describer</span>::{<span class="ident">IndexFieldProperty</span>, <span class="ident">IndexWalker</span>};
@@ -840,9 +838,7 @@
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">sf</span> <span class="op">=</span> <span class="ident">ScalarField::new</span>(<span class="string">&quot;id&quot;</span>, <span class="ident">datamodel::FieldArity::Required</span>, <span class="ident">field_type</span>);
 
         <span class="ident">sf</span>.<span class="ident">set_database_name</span>(<span class="prelude-val">Some</span>(<span class="string">&quot;_id&quot;</span>.<span class="ident">to_string</span>()));
-        <span class="ident">sf</span>.<span class="ident">set_default_value</span>(<span class="ident">DefaultValue::new_expression</span>(
-            <span class="ident">ValueGenerator::new</span>(<span class="string">&quot;dbgenerated&quot;</span>.<span class="ident">to_owned</span>(), <span class="ident">Vec::new</span>()).<span class="ident">unwrap</span>(),
-        ));
+        <span class="ident">sf</span>.<span class="ident">set_default_value</span>(<span class="ident">DefaultValue::new_expression</span>(<span class="ident">ValueGenerator::new_auto</span>()));
 
         <span class="ident">sf</span>
     });
