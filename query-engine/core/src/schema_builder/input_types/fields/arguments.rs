@@ -2,6 +2,7 @@ use super::*;
 use constants::args;
 use datamodel_connector::ConnectorCapability;
 use objects::*;
+use prisma_models::prelude::ParentContainer;
 
 /// Builds "where" argument.
 pub(crate) fn where_argument(ctx: &mut BuilderContext, model: &ModelRef) -> InputField {
@@ -116,7 +117,7 @@ pub(crate) fn many_records_arguments(
 
     let mut args = vec![
         where_argument(ctx, &model),
-        order_by_argument(ctx, &model, true, false, ctx.can_full_text_search()),
+        order_by_argument(ctx, &model.into(), true, false, ctx.can_full_text_search()),
         input_field(args::CURSOR, unique_input_type, None).optional(),
         input_field(args::TAKE, InputType::int(), None).optional(),
         input_field(args::SKIP, InputType::int(), None).optional(),
@@ -139,14 +140,14 @@ pub(crate) fn many_records_arguments(
 // Builds "orderBy" argument.
 pub(crate) fn order_by_argument(
     ctx: &mut BuilderContext,
-    model: &ModelRef,
+    container: &ParentContainer,
     include_relations: bool,
     include_scalar_aggregations: bool,
     include_full_text_search: bool,
 ) -> InputField {
     let order_object_type = InputType::object(order_by_objects::order_by_object_type(
         ctx,
-        model,
+        container,
         include_relations,
         include_scalar_aggregations,
         include_full_text_search,
@@ -165,7 +166,7 @@ pub(crate) fn group_by_arguments(ctx: &mut BuilderContext, model: &ModelRef) -> 
 
     vec![
         where_argument(ctx, &model),
-        order_by_argument(ctx, &model, false, true, false),
+        order_by_argument(ctx, &model.into(), false, true, false),
         input_field(
             args::BY,
             vec![InputType::list(field_enum_type.clone()), field_enum_type],
