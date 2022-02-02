@@ -46,14 +46,14 @@ impl<'ast> DefaultValueExt<'ast> for DefaultValueWalker<'ast, '_> {
     }
 }
 
-pub trait PrimaryKeyWalkerExt<'ast> {
+pub trait PrimaryKeyWalkerExt<'db> {
     /// This will be None if and only if the connector does not support named primary keys. It can
     /// be a generated name or one explicitly set in the schema.
-    fn constraint_name(self, connector: &dyn Connector) -> Option<Cow<'ast, str>>;
+    fn constraint_name(self, connector: &dyn Connector) -> Option<Cow<'db, str>>;
 }
 
-impl<'ast> PrimaryKeyWalkerExt<'ast> for PrimaryKeyWalker<'ast, '_> {
-    fn constraint_name(self, connector: &dyn Connector) -> Option<Cow<'ast, str>> {
+impl<'db> PrimaryKeyWalkerExt<'db> for PrimaryKeyWalker<'_, 'db> {
+    fn constraint_name(self, connector: &dyn Connector) -> Option<Cow<'db, str>> {
         if !connector.supports_named_primary_keys() {
             return None;
         }

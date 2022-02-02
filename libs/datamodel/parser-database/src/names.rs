@@ -4,6 +4,7 @@ pub use reserved_model_names::is_reserved_type_name;
 
 use crate::{
     ast::{self, ConfigBlockProperty, TopId, WithAttributes, WithIdentifier},
+    ast_string::InternedString,
     types::ScalarType,
     Context, DatamodelError,
 };
@@ -12,15 +13,15 @@ use std::collections::{BTreeMap, HashMap, HashSet};
 
 /// Resolved names for use in the validation process.
 #[derive(Default)]
-pub(super) struct Names<'ast> {
+pub(super) struct Names {
     /// Models, enums, composite types and type aliases
-    pub(super) tops: HashMap<&'ast str, TopId>,
+    pub(super) tops: HashMap<InternedString, TopId>,
     /// Generators have their own namespace.
-    pub(super) generators: HashMap<&'ast str, TopId>,
+    pub(super) generators: HashMap<InternedString, TopId>,
     /// Datasources have their own namespace.
-    pub(super) datasources: HashMap<&'ast str, TopId>,
-    pub(super) model_fields: BTreeMap<(ast::ModelId, &'ast str), ast::FieldId>,
-    pub(super) composite_type_fields: HashMap<(ast::CompositeTypeId, &'ast str), ast::FieldId>,
+    pub(super) datasources: HashMap<InternedString, TopId>,
+    pub(super) model_fields: BTreeMap<(ast::ModelId, InternedString), ast::FieldId>,
+    pub(super) composite_type_fields: HashMap<(ast::CompositeTypeId, InternedString), ast::FieldId>,
 }
 
 /// `resolve_names()` is responsible for populating `ParserDatabase.names` and
@@ -122,13 +123,8 @@ pub(super) fn resolve_names(ctx: &mut Context<'_>) {
     ctx.db.names = names;
 }
 
-fn insert_name<'ast>(
-    top_id: TopId,
-    top: &'ast ast::Top,
-    namespace: &mut HashMap<&'ast str, TopId>,
-    ctx: &mut Context<'_>,
-) {
-    if let Some(existing) = namespace.insert(top.name(), top_id) {
+fn insert_name(top_id: TopId, top: &ast::Top, namespace: &mut HashMap<InternedString, TopId>, ctx: &mut Context<'_>) {
+    if let Some(existing) = namespace.insert(ctx.db.interner.intern(top.name()), top_id) {
         ctx.push_error(duplicate_top_error(&ctx.db.ast[existing], top));
     }
 }

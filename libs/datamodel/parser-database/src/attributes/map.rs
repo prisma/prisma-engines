@@ -5,11 +5,11 @@ use crate::{
     DatamodelError,
 };
 
-pub(super) fn model<'ast>(
-    model_attributes: &mut ModelAttributes<'ast>,
+pub(super) fn model(
+    model_attributes: &mut ModelAttributes,
     model_id: ast::ModelId,
-    args: &mut Arguments<'ast>,
-    ctx: &mut Context<'ast>,
+    args: &mut Arguments<'_>,
+    ctx: &mut Context<'_>,
 ) {
     let mapped_name = match visit_map_attribute(args, ctx) {
         Some(name) => name,
@@ -42,7 +42,7 @@ pub(super) fn scalar_field<'ast>(
     ast_field: &ast::Field,
     model_id: ast::ModelId,
     field_id: ast::FieldId,
-    scalar_field_data: &mut ScalarField<'ast>,
+    scalar_field_data: &mut ScalarField,
     map_args: &mut Arguments<'ast>,
     ctx: &mut Context<'ast>,
 ) {
@@ -93,7 +93,7 @@ pub(super) fn composite_type_field<'ast>(
     ast_field: &'ast ast::Field,
     ctid: ast::CompositeTypeId,
     field_id: ast::FieldId,
-    field: &mut CompositeTypeField<'ast>,
+    field: &mut CompositeTypeField,
     map_args: &mut Arguments<'ast>,
     ctx: &mut Context<'ast>,
 ) {

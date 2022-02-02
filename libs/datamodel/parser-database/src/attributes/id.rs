@@ -8,11 +8,11 @@ use crate::{
 };
 
 /// @@id on models
-pub(super) fn model<'ast>(
-    args: &mut Arguments<'ast>,
-    model_data: &mut ModelAttributes<'ast>,
+pub(super) fn model<'db>(
+    args: &mut Arguments<'db>,
+    model_data: &mut ModelAttributes,
     model_id: ast::ModelId,
-    ctx: &mut Context<'ast>,
+    ctx: &mut Context<'db>,
 ) {
     let fields = match args.default_arg("fields") {
         Ok(value) => value,
@@ -86,9 +86,9 @@ pub(super) fn model<'ast>(
     };
 
     model_data.primary_key = Some(IdAttribute {
-        name,
+        name: name.map(|name| ctx.db.interner.intern(name)),
         source_attribute: args.attribute().0,
-        mapped_name,
+        mapped_name: mapped_name.map(|mapped_name| ctx.db.interner.intern(mapped_name)),
         fields: resolved_fields,
         source_field: None,
     });
@@ -96,7 +96,7 @@ pub(super) fn model<'ast>(
 pub(super) fn field<'ast>(
     ast_model: &'ast ast::Model,
     field_id: ast::FieldId,
-    model_attributes: &mut ModelAttributes<'ast>,
+    model_attributes: &mut ModelAttributes,
     args: &mut Arguments<'ast>,
     ctx: &mut Context<'ast>,
 ) {
@@ -137,7 +137,7 @@ pub(super) fn field<'ast>(
 
             model_attributes.primary_key = Some(IdAttribute {
                 name: None,
-                mapped_name,
+                mapped_name: mapped_name.map(|n| ctx.db.interner.intern(n)),
                 source_attribute: args.attribute().0,
                 fields: vec![FieldWithArgs {
                     field_id,
@@ -152,7 +152,7 @@ pub(super) fn field<'ast>(
 
 pub(super) fn validate_id_field_arities(
     model_id: ast::ModelId,
-    model_attributes: &ModelAttributes<'_>,
+    model_attributes: &ModelAttributes,
     ctx: &mut Context<'_>,
 ) {
     if model_attributes.is_ignored {

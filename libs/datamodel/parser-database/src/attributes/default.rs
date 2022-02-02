@@ -8,7 +8,7 @@ use crate::{
 /// @default on model scalar fields
 pub(super) fn visit_model_field_default<'ast>(
     args: &mut Arguments<'ast>,
-    field_data: &mut ScalarField<'ast>,
+    field_data: &mut ScalarField,
     model_id: ast::ModelId,
     field_id: ast::FieldId,
     ctx: &mut Context<'ast>,
@@ -88,7 +88,7 @@ pub(super) fn visit_model_field_default<'ast>(
 /// @default on composite type fields
 pub(super) fn visit_composite_field_default<'ast>(
     args: &mut Arguments<'ast>,
-    field_data: &mut CompositeTypeField<'ast>,
+    field_data: &mut CompositeTypeField,
     ct_id: ast::CompositeTypeId,
     field_id: ast::FieldId,
     ctx: &mut Context<'ast>,

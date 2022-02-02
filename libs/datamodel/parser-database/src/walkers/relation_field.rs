@@ -12,29 +12,29 @@ use std::{
 
 /// A relation field on a model in the schema.
 #[derive(Copy, Clone, Debug)]
-pub struct RelationFieldWalker<'ast, 'db> {
+pub struct RelationFieldWalker<'db> {
     pub(crate) model_id: ast::ModelId,
     pub(crate) field_id: ast::FieldId,
-    pub(crate) db: &'db ParserDatabase<'ast>,
+    pub(crate) db: &'db ParserDatabase,
     pub(crate) relation_field: &'db RelationField,
 }
 
-impl<'ast, 'db> PartialEq for RelationFieldWalker<'ast, 'db> {
+impl<'db> PartialEq for RelationFieldWalker<'db> {
     fn eq(&self, other: &Self) -> bool {
         self.model_id == other.model_id && self.field_id == other.field_id
     }
 }
 
-impl<'ast, 'db> Eq for RelationFieldWalker<'ast, 'db> {}
+impl<'db> Eq for RelationFieldWalker<'db> {}
 
-impl<'ast, 'db> Hash for RelationFieldWalker<'ast, 'db> {
+impl<'db> Hash for RelationFieldWalker<'db> {
     fn hash<H: Hasher>(&self, state: &mut H) {
         self.model_id.hash(state);
         self.field_id.hash(state);
     }
 }
 
-impl<'ast, 'db> RelationFieldWalker<'ast, 'db> {
+impl<'db> RelationFieldWalker<'db> {
     /// The ID of the AST node of the field.
     pub fn field_id(self) -> ast::FieldId {
         self.field_id
@@ -42,16 +42,16 @@ impl<'ast, 'db> RelationFieldWalker<'ast, 'db> {
 
     /// The foreign key name of the relation (`@relation(map: ...)`).
     pub fn mapped_name(self) -> Option<&'db str> {
-        self.attributes().mapped_name.as_ref().map(|s| self.db.resolve_str(s))
+        self.attributes().mapped_name.as_ref().map(|s| &self.db.interner[s.value])
     }
 
     /// The field name.
-    pub fn name(self) -> &'ast str {
+    pub fn name(self) -> &'db str {
         self.ast_field().name()
     }
 
     /// The AST node of the field.
-    pub fn ast_field(self) -> &'ast ast::Field {
+    pub fn ast_field(self) -> &'db ast::Field {
         &self.db.ast[self.model_id][self.field_id]
     }
 
@@ -81,7 +81,7 @@ impl<'ast, 'db> RelationFieldWalker<'ast, 'db> {
 
     /// The relation name explicitly written in the schema source.
     pub fn explicit_relation_name(self) -> Option<&'db str> {
-        self.relation_field.name.as_ref().map(|s| self.db.resolve_str(s))
+        self.relation_field.name.as_ref().map(|s| &self.db.interner[s.value])
     }
 
     /// Is there an `@ignore` attribute on the field?
@@ -95,7 +95,7 @@ impl<'ast, 'db> RelationFieldWalker<'ast, 'db> {
     }
 
     /// The model containing the field.
-    pub fn model(self) -> ModelWalker<'ast, 'db> {
+    pub fn model(self) -> ModelWalker<'db> {
         ModelWalker {
             model_id: self.model_id,
             db: self.db,
@@ -104,7 +104,7 @@ impl<'ast, 'db> RelationFieldWalker<'ast, 'db> {
     }
 
     /// The `@relation` attribute in the field AST.
-    pub fn relation_attribute(self) -> Option<&'ast ast::Attribute> {
+    pub fn relation_attribute(self) -> Option<&'db ast::Attribute> {
         self.attributes()
             .relation_attribute
             .map(|attr_id| &self.db.ast[attr_id])
@@ -115,7 +115,7 @@ impl<'ast, 'db> RelationFieldWalker<'ast, 'db> {
     }
 
     /// The model referenced by the relation.
-    pub fn related_model(self) -> ModelWalker<'ast, 'db> {
+    pub fn related_model(self) -> ModelWalker<'db> {
         let model_id = self.relation_field.referenced_model;
 
         ModelWalker {
@@ -126,7 +126,7 @@ impl<'ast, 'db> RelationFieldWalker<'ast, 'db> {
     }
 
     /// The fields in the `@relation(references: ...)` argument.
-    pub fn referenced_fields(self) -> Option<impl ExactSizeIterator<Item = ScalarFieldWalker<'ast, 'db>> + 'db> {
+    pub fn referenced_fields(self) -> Option<impl ExactSizeIterator<Item = ScalarFieldWalker<'db>> + 'db> {
         self.attributes().references.as_ref().map(|references| {
             references
                 .iter()
@@ -135,7 +135,7 @@ impl<'ast, 'db> RelationFieldWalker<'ast, 'db> {
     }
 
     /// The relation this field is part of.
-    pub fn relation(self) -> RelationWalker<'ast, 'db> {
+    pub fn relation(self) -> RelationWalker<'db> {
         let model = self.model();
         let mut relations = model.relations_from().chain(model.relations_to());
         relations.find(|r| r.has_field(self.model_id, self.field_id)).unwrap()
@@ -181,12 +181,12 @@ impl<'ast, 'db> RelationFieldWalker<'ast, 'db> {
     }
 
     /// The fields in the `fields: [...]` argument in the forward relation field.
-    pub fn referencing_fields(self) -> Option<impl ExactSizeIterator<Item = ScalarFieldWalker<'ast, 'db>>> {
+    pub fn referencing_fields(self) -> Option<impl ExactSizeIterator<Item = ScalarFieldWalker<'db>>> {
         self.fields()
     }
 
     /// The fields in the `fields: [...]` argument in the forward relation field.
-    pub fn fields(self) -> Option<impl ExactSizeIterator<Item = ScalarFieldWalker<'ast, 'db>>> {
+    pub fn fields(self) -> Option<impl ExactSizeIterator<Item = ScalarFieldWalker<'db>>> {
         let model_id = self.model_id;
         let attributes = self.attributes();
         attributes.fields.as_ref().map(move |fields| {
@@ -202,9 +202,9 @@ impl<'ast, 'db> RelationFieldWalker<'ast, 'db> {
 
 /// The relation name.
 #[derive(Debug, Clone)]
-pub enum RelationName<'ast> {
+pub enum RelationName<'db> {
     /// A relation name specified in the AST.
-    Explicit(&'ast str),
+    Explicit(&'db str),
     /// An inferred relation name.
     Generated(String),
 }

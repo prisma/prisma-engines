@@ -1,5 +1,6 @@
 use crate::{
-    context::Context, walkers::CompositeTypeFieldWalker, walkers::CompositeTypeWalker, AstString, DatamodelError,
+    ast_string::InternedString, context::Context, walkers::CompositeTypeFieldWalker, walkers::CompositeTypeWalker,
+    AstString, DatamodelError,
 };
 use schema_ast::ast::{self, WithName};
 use std::{
@@ -25,32 +26,28 @@ pub(super) fn resolve_types(ctx: &mut Context<'_>) {
 }
 
 #[derive(Debug, Default)]
-pub(super) struct Types<'ast> {
-    pub(super) composite_type_fields: BTreeMap<(ast::CompositeTypeId, ast::FieldId), CompositeTypeField<'ast>>,
+pub(super) struct Types {
+    pub(super) composite_type_fields: BTreeMap<(ast::CompositeTypeId, ast::FieldId), CompositeTypeField>,
     pub(super) type_aliases: HashMap<ast::AliasId, ScalarFieldType>,
-    pub(super) scalar_fields: BTreeMap<(ast::ModelId, ast::FieldId), ScalarField<'ast>>,
+    pub(super) scalar_fields: BTreeMap<(ast::ModelId, ast::FieldId), ScalarField>,
     /// This contains only the relation fields actually present in the schema
     /// source text.
     pub(super) relation_fields: BTreeMap<(ast::ModelId, ast::FieldId), RelationField>,
-    pub(super) enum_attributes: HashMap<ast::EnumId, EnumAttributes<'ast>>,
-    pub(super) model_attributes: HashMap<ast::ModelId, ModelAttributes<'ast>>,
+    pub(super) enum_attributes: HashMap<ast::EnumId, EnumAttributes>,
+    pub(super) model_attributes: HashMap<ast::ModelId, ModelAttributes>,
 }
 
-impl<'ast> Types<'ast> {
+impl Types {
     pub(super) fn range_model_scalar_fields(
         &self,
         model_id: ast::ModelId,
-    ) -> impl Iterator<Item = (ast::FieldId, &ScalarField<'ast>)> {
+    ) -> impl Iterator<Item = (ast::FieldId, &ScalarField)> {
         self.scalar_fields
             .range((model_id, ast::FieldId::ZERO)..=(model_id, ast::FieldId::MAX))
             .map(|((_, field_id), scalar_field)| (*field_id, scalar_field))
     }
 
-    pub(super) fn take_scalar_field(
-        &mut self,
-        model_id: ast::ModelId,
-        field_id: ast::FieldId,
-    ) -> Option<ScalarField<'ast>> {
+    pub(super) fn take_scalar_field(&mut self, model_id: ast::ModelId, field_id: ast::FieldId) -> Option<ScalarField> {
         self.scalar_fields.remove(&(model_id, field_id))
     }
 
@@ -64,10 +61,10 @@ impl<'ast> Types<'ast> {
 }
 
 #[derive(Debug)]
-pub(super) struct CompositeTypeField<'ast> {
+pub(super) struct CompositeTypeField {
     pub(super) r#type: ScalarFieldType,
-    pub(super) mapped_name: Option<&'ast str>,
-    pub(super) default: Option<DefaultAttribute<'ast>>,
+    pub(super) mapped_name: Option<InternedString>,
+    pub(super) default: Option<DefaultAttribute>,
 }
 
 #[derive(Debug)]
@@ -102,26 +99,27 @@ impl ScalarFieldType {
 }
 
 #[derive(Debug)]
-pub(crate) struct DefaultAttribute<'ast> {
-    pub(crate) mapped_name: Option<&'ast str>,
-    pub(crate) value: &'ast ast::Expression,
-    pub(crate) default_attribute: &'ast ast::Attribute,
+pub(crate) struct DefaultAttribute {
+    pub(crate) mapped_name: Option<InternedString>,
+    /// The index of the `value` (default) argument in the attribute.
+    pub(crate) value_arg_idx: usize,
+    pub(crate) default_attribute: ast::AttributeId,
 }
 
 #[derive(Debug)]
-pub(crate) struct ScalarField<'ast> {
+pub(crate) struct ScalarField {
     pub(crate) r#type: ScalarFieldType,
     pub(crate) is_ignored: bool,
     pub(crate) is_updated_at: bool,
-    pub(crate) default: Option<DefaultAttribute<'ast>>,
+    pub(crate) default: Option<DefaultAttribute>,
     /// @map
-    pub(crate) mapped_name: Option<&'ast str>,
+    pub(crate) mapped_name: Option<InternedString>,
     /// Native type name and arguments
     ///
     /// (attribute scope, native type name, arguments, span)
     ///
     /// For example: `@db.Text` would translate to ("db", "Text", &[], <the span>)
-    pub(crate) native_type: Option<(&'ast str, &'ast str, Vec<String>, ast::Span)>,
+    pub(crate) native_type: Option<(InternedString, InternedString, Vec<String>, ast::Span)>,
 }
 
 #[derive(Debug)]
@@ -159,17 +157,17 @@ impl RelationField {
 
 /// Information gathered from validating attributes on a model.
 #[derive(Default, Debug)]
-pub(crate) struct ModelAttributes<'ast> {
+pub(crate) struct ModelAttributes {
     /// @(@)id
-    pub(super) primary_key: Option<IdAttribute<'ast>>,
+    pub(super) primary_key: Option<IdAttribute>,
     /// @@ignore
     pub(crate) is_ignored: bool,
     /// @@index and @(@)unique explicitely written to the schema AST.
-    pub(super) ast_indexes: Vec<(&'ast ast::Attribute, IndexAttribute<'ast>)>,
-    /// @(@)unique added implicitely to the datamodel by us.
-    pub(super) implicit_indexes: Vec<IndexAttribute<'static>>,
+    pub(super) ast_indexes: Vec<(ast::AttributeId, IndexAttribute)>,
+    /// @(@)unique added implicitly to the datamodel by us.
+    pub(super) implicit_indexes: Vec<IndexAttribute>,
     /// @@map
-    pub(crate) mapped_name: Option<&'ast str>,
+    pub(crate) mapped_name: Option<InternedString>,
 }
 
 /// A type of index as defined by the `type: ...` argument on an index attribute.
@@ -217,16 +215,16 @@ impl Default for IndexType {
 }
 
 #[derive(Debug, Default)]
-pub(crate) struct IndexAttribute<'ast> {
+pub(crate) struct IndexAttribute {
     pub(crate) r#type: IndexType,
     pub(crate) fields: Vec<FieldWithArgs>,
     pub(crate) source_field: Option<ast::FieldId>,
-    pub(crate) name: Option<&'ast str>,
-    pub(crate) mapped_name: Option<&'ast str>,
+    pub(crate) name: Option<InternedString>,
+    pub(crate) mapped_name: Option<InternedString>,
     pub(crate) algorithm: Option<IndexAlgorithm>,
 }
 
-impl<'ast> IndexAttribute<'ast> {
+impl IndexAttribute {
     pub(crate) fn is_unique(&self) -> bool {
         matches!(self.r#type, IndexType::Unique)
     }
@@ -237,12 +235,12 @@ impl<'ast> IndexAttribute<'ast> {
 }
 
 #[derive(Debug)]
-pub(crate) struct IdAttribute<'ast> {
+pub(crate) struct IdAttribute {
     pub(crate) fields: Vec<FieldWithArgs>,
     pub(super) source_field: Option<ast::FieldId>,
-    pub(super) source_attribute: &'ast ast::Attribute,
-    pub(super) name: Option<&'ast str>,
-    pub(super) mapped_name: Option<&'ast str>,
+    pub(super) source_attribute: ast::AttributeId,
+    pub(super) name: Option<InternedString>,
+    pub(super) mapped_name: Option<InternedString>,
 }
 
 #[derive(Debug)]
@@ -253,10 +251,10 @@ pub struct FieldWithArgs {
 }
 
 #[derive(Debug, Default)]
-pub(super) struct EnumAttributes<'ast> {
-    pub(super) mapped_name: Option<&'ast str>,
+pub(super) struct EnumAttributes {
+    pub(super) mapped_name: Option<InternedString>,
     /// @map on enum values.
-    pub(super) mapped_values: HashMap<u32, &'ast str>,
+    pub(super) mapped_values: HashMap<u32, InternedString>,
 }
 
 fn visit_model<'ast>(model_id: ast::ModelId, ast_model: &'ast ast::Model, ctx: &mut Context<'ast>) {
@@ -286,20 +284,20 @@ fn visit_model<'ast>(model_id: ast::ModelId, ast_model: &'ast ast::Model, ctx: &
     }
 }
 
-struct CompositeTypePath<'ast, 'db> {
-    previous: Option<Rc<CompositeTypePath<'ast, 'db>>>,
-    current: CompositeTypeWalker<'ast, 'db>,
+struct CompositeTypePath<'db> {
+    previous: Option<Rc<CompositeTypePath<'db>>>,
+    current: CompositeTypeWalker<'db>,
 }
 
-impl<'ast, 'db> CompositeTypePath<'ast, 'db> {
-    fn root(current: CompositeTypeWalker<'ast, 'db>) -> Self {
+impl<'db> CompositeTypePath<'db> {
+    fn root(current: CompositeTypeWalker<'db>) -> Self {
         Self {
             previous: None,
             current,
         }
     }
 
-    fn link(self: &Rc<Self>, current: CompositeTypeWalker<'ast, 'db>) -> Self {
+    fn link(self: &Rc<Self>, current: CompositeTypeWalker<'db>) -> Self {
         Self {
             previous: Some(self.clone()),
             current,
@@ -307,7 +305,7 @@ impl<'ast, 'db> CompositeTypePath<'ast, 'db> {
     }
 }
 
-impl<'ast, 'db> fmt::Display for CompositeTypePath<'ast, 'db> {
+impl<'db> fmt::Display for CompositeTypePath<'db> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let mut traversed = vec![self.current];
         let mut this = self;

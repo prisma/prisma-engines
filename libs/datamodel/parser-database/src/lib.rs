@@ -36,6 +36,7 @@ mod relations;
 mod types;
 mod value_validator;
 
+use ast_string::StringInterner;
 pub use names::is_reserved_type_name;
 pub use relations::ReferentialAction;
 pub use schema_ast::ast;
@@ -73,20 +74,20 @@ use names::Names;
 /// to the AST contained in ParserDatabase, that we call by convention `'ast`.
 /// Apart from that, everything should be owned or locally borrowed, to keep
 /// lifetime management simple.
-pub struct ParserDatabase<'ast> {
-    src: &'ast str,
-    ast: &'ast ast::SchemaAst,
-    names: Names<'ast>,
-    types: Types<'ast>,
+pub struct ParserDatabase {
+    ast: ast::SchemaAst,
+    interner: ast_string::StringInterner,
+    names: Names,
+    types: Types,
     relations: Relations,
 }
 
-impl<'ast> ParserDatabase<'ast> {
+impl ParserDatabase {
     /// See the docs on [ParserDatabase](/struct.ParserDatabase.html).
-    pub fn new(src: &'ast str, ast: &'ast ast::SchemaAst, diagnostics: Diagnostics) -> (Self, Diagnostics) {
+    pub fn new(ast: ast::SchemaAst, diagnostics: &mut Diagnostics) -> Self {
         let db = ParserDatabase {
             ast,
-            src,
+            interner: StringInterner::default(),
             names: Names::default(),
             types: Types::default(),
             relations: Relations::default(),
@@ -130,16 +131,8 @@ impl<'ast> ParserDatabase<'ast> {
     }
 
     /// The parsed AST.
-    pub fn ast(&self) -> &'ast ast::SchemaAst {
+    pub fn ast(&self) -> &ast::SchemaAst {
         self.ast
-    }
-
-    pub(crate) fn resolve_str<'a>(&'a self, s: &'a AstString) -> &str {
-        if let Some(unescaped) = &s.unescaped {
-            unescaped
-        } else {
-            &self.src[s.span.start..s.span.end]
-        }
     }
 
     /// Find a specific field in a specific model.
@@ -148,7 +141,7 @@ impl<'ast> ParserDatabase<'ast> {
     }
 }
 
-impl std::fmt::Debug for ParserDatabase<'_> {
+impl std::fmt::Debug for ParserDatabase {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.write_str("ParserDatabase { ... }")
     }

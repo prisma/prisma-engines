@@ -9,22 +9,22 @@ use std::collections::{HashMap, HashSet};
 /// Validation context. This is an implementation detail of ParserDatabase. It
 /// contains the database itself, as well as context that is discarded after
 /// validation.
-pub(crate) struct Context<'ast> {
-    pub(super) db: ParserDatabase<'ast>,
-    pub(super) diagnostics: Diagnostics,
-    arguments: Arguments<'ast>,
-    attributes: Attributes<'ast>,
+pub(crate) struct Context<'a> {
+    pub(super) db: &'a mut ParserDatabase,
+    pub(super) diagnostics: &'a mut Diagnostics,
+    arguments: Arguments<'a>,
+    attributes: Attributes<'a>,
 
     // @map'ed names indexes. These are not in the db because they are only used for validation.
-    pub(super) mapped_model_names: HashMap<&'ast str, ast::ModelId>,
-    pub(super) mapped_model_scalar_field_names: HashMap<(ast::ModelId, &'ast str), ast::FieldId>,
-    pub(super) mapped_composite_type_names: HashMap<(ast::CompositeTypeId, &'ast str), ast::FieldId>,
-    pub(super) mapped_enum_names: HashMap<&'ast str, ast::EnumId>,
-    pub(super) mapped_enum_value_names: HashMap<(ast::EnumId, &'ast str), u32>,
+    pub(super) mapped_model_names: HashMap<&'a str, ast::ModelId>,
+    pub(super) mapped_model_scalar_field_names: HashMap<(ast::ModelId, &'a str), ast::FieldId>,
+    pub(super) mapped_composite_type_names: HashMap<(ast::CompositeTypeId, &'a str), ast::FieldId>,
+    pub(super) mapped_enum_names: HashMap<&'a str, ast::EnumId>,
+    pub(super) mapped_enum_value_names: HashMap<(ast::EnumId, &'a str), u32>,
 }
 
-impl<'ast> Context<'ast> {
-    pub(super) fn new(db: ParserDatabase<'ast>, diagnostics: Diagnostics) -> Self {
+impl<'a> Context<'a> {
+    pub(super) fn new(db: &'a ParserDatabase, diagnostics: Diagnostics) -> Self {
         Context {
             db,
             diagnostics,
@@ -37,10 +37,6 @@ impl<'ast> Context<'ast> {
             mapped_enum_value_names: Default::default(),
             mapped_composite_type_names: Default::default(),
         }
-    }
-
-    pub(super) fn finish(self) -> (ParserDatabase<'ast>, Diagnostics) {
-        (self.db, self.diagnostics)
     }
 
     pub(super) fn push_error(&mut self, error: DatamodelError) {
@@ -64,7 +60,7 @@ impl<'ast> Context<'ast> {
         model_id: ast::ModelId,
         field_id: ast::FieldId,
         mut scalar_field_type: ScalarFieldType,
-        f: impl FnOnce(&'_ mut Attributes<'ast>, &'_ mut Context<'ast>),
+        f: impl FnOnce(&'_ mut Attributes<'a>, &'_ mut Context<'a>),
     ) {
         self.attributes.set_attributes(
             self.db.ast[model_id][field_id]
@@ -99,14 +95,14 @@ impl<'ast> Context<'ast> {
     /// closure that all attributes were validated.
     pub(super) fn visit_attributes(
         &mut self,
-        ast_attributes: impl ExactSizeIterator<Item = (&'ast ast::Attribute, ast::AttributeId)>,
-        f: impl FnOnce(&'_ mut Attributes<'ast>, &'_ mut Context<'ast>),
+        ast_attributes: impl ExactSizeIterator<Item = (&'a ast::Attribute, ast::AttributeId)>,
+        f: impl FnOnce(&'_ mut Attributes<'a>, &'_ mut Context<'a>),
     ) {
         self.attributes.set_attributes(ast_attributes);
         self.visit_attributes_impl(f)
     }
 
-    fn visit_attributes_impl(&mut self, f: impl FnOnce(&'_ mut Attributes<'ast>, &'_ mut Context<'ast>)) {
+    fn visit_attributes_impl(&mut self, f: impl FnOnce(&'_ mut Attributes<'a>, &'_ mut Context<'a>)) {
         let mut attributes = std::mem::take(&mut self.attributes);
 
         f(&mut attributes, self);
@@ -124,9 +120,9 @@ impl<'ast> Context<'ast> {
     /// Implementation detail. Used by `Attributes`.
     fn with_arguments(
         &mut self,
-        attribute: &'ast ast::Attribute,
+        attribute: &'a ast::Attribute,
         attribute_id: ast::AttributeId,
-        f: impl FnOnce(&mut Arguments<'ast>, &mut Context<'ast>),
+        f: impl FnOnce(&mut Arguments<'a>, &mut Context<'a>),
     ) {
         let mut arguments = match self.arguments.set_attribute(attribute, attribute_id) {
             Ok(()) => std::mem::take(&mut self.arguments), // reuse the allocation for arguments

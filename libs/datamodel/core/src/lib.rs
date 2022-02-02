@@ -132,7 +132,7 @@ pub fn parse_schema_parserdb<'ast>(src: &'ast str, ast: &'ast ast::SchemaAst) ->
         .to_result()
         .map_err(|err| err.to_pretty_string("schema.prisma", src))?;
 
-    let out = validate(src, ast, &datasources, preview_features, diagnostics);
+    let out = validate(ast, &datasources, preview_features, diagnostics);
 
     out.diagnostics
         .to_result()
@@ -156,10 +156,10 @@ pub fn parse_datamodel(datamodel_string: &str) -> Result<ValidatedDatamodel, dia
     })
 }
 
-fn parse_datamodel_for_formatter(src: &str, ast: &SchemaAst) -> Result<(Datamodel, Vec<Datasource>), Diagnostics> {
+fn parse_datamodel_for_formatter(ast: &SchemaAst) -> Result<(Datamodel, Vec<Datasource>), Diagnostics> {
     let mut diagnostics = diagnostics::Diagnostics::new();
     let datasources = load_sources(ast, Default::default(), &mut diagnostics);
-    let (db, diagnostics) = parser_database::ParserDatabase::new(src, ast, diagnostics);
+    let (db, diagnostics) = parser_database::ParserDatabase::new(ast, diagnostics);
     diagnostics.to_result()?;
     let (connector, referential_integrity) = datasources
         .get(0)
@@ -182,7 +182,7 @@ fn parse_datamodel_internal(
 
     diagnostics.to_result()?;
 
-    let out = validate(datamodel_string, &ast, &datasources, preview_features, diagnostics);
+    let out = validate(&ast, &datasources, preview_features, diagnostics);
 
     if !out.diagnostics.errors().is_empty() {
         return Err(out.diagnostics);

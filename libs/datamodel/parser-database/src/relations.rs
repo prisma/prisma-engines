@@ -199,7 +199,7 @@ fn relation_evidence<'ast, 'db>(
     let ast_field = &ast_model[*field_id];
     let opposite_model = &ctx.db.ast[relation_field.referenced_model];
     let is_self_relation = *model_id == relation_field.referenced_model;
-    let relation_name = relation_field.name.as_ref().map(|s| ctx.db.resolve_str(s));
+    let relation_name = relation_field.name.as_ref().map(|s| &ctx.db.interner[s.value]);
     let opposite_relation_field: Option<(ast::FieldId, &ast::Field, &RelationField)> = ctx
         .db
         .walk_model(relation_field.referenced_model)

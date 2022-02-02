@@ -68,7 +68,8 @@ fn resolve_enum_attributes<'ast>(enum_id: ast::EnumId, ast_enum: &'ast ast::Enum
             // @map
             attributes.visit_optional_single("map", ctx, |map_args, ctx| {
                 if let Some(mapped_name) = map::visit_map_attribute(map_args, ctx) {
-                    enum_attributes.mapped_values.insert(field_idx as u32, mapped_name);
+                    let interned_mapped_name = ctx.db.interner.intern(mapped_name);
+                    enum_attributes.mapped_values.insert(field_idx as u32, interned_mapped_name);
                     ctx.mapped_enum_value_names
                         .insert((enum_id, mapped_name), field_idx as u32);
                 }
@@ -85,7 +86,7 @@ fn resolve_enum_attributes<'ast>(enum_id: ast::EnumId, ast_enum: &'ast ast::Enum
         // @@map
         attributes.visit_optional_single("map", ctx, |map_args, ctx| {
             if let Some(mapped_name) = map::visit_map_attribute(map_args, ctx) {
-                enum_attributes.mapped_name = Some(mapped_name);
+                enum_attributes.mapped_name = Some(ctx.db.interner.intern(mapped_name));
                 ctx.mapped_enum_names.insert(mapped_name, enum_id);
             }
         })
@@ -172,8 +173,8 @@ fn visit_scalar_field_attributes<'ast>(
     field_id: ast::FieldId,
     ast_model: &'ast ast::Model,
     ast_field: &'ast ast::Field,
-    model_attributes: &mut ModelAttributes<'ast>,
-    scalar_field_data: &mut ScalarField<'ast>,
+    model_attributes: &mut ModelAttributes,
+    scalar_field_data: &mut ScalarField,
     ctx: &mut Context<'ast>,
 ) {
     ctx.visit_scalar_field_attributes(model_id, field_id, scalar_field_data.r#type, |attributes, ctx| {
@@ -237,7 +238,7 @@ fn visit_scalar_field_attributes<'ast>(
 
 fn visit_field_unique<'ast>(
     field_id: ast::FieldId,
-    model_attributes: &mut ModelAttributes<'ast>,
+    model_attributes: &mut ModelAttributes,
     args: &mut Arguments<'ast>,
     ctx: &mut Context<'ast>,
 ) {
@@ -383,7 +384,7 @@ fn visit_relation_field_attributes<'ast>(
     });
 }
 
-fn visit_model_ignore(model_id: ast::ModelId, model_data: &mut ModelAttributes<'_>, ctx: &mut Context<'_>) {
+fn visit_model_ignore(model_id: ast::ModelId, model_data: &mut ModelAttributes, ctx: &mut Context<'_>) {
     let ignored_field_errors: Vec<_> = ctx
         .db
         .types
@@ -408,7 +409,7 @@ fn visit_model_ignore(model_id: ast::ModelId, model_data: &mut ModelAttributes<'
 /// Validate @@fulltext on models
 fn model_fulltext<'ast>(
     args: &mut Arguments<'ast>,
-    data: &mut ModelAttributes<'ast>,
+    data: &mut ModelAttributes,
     model_id: ast::ModelId,
     ctx: &mut Context<'ast>,
 ) {
@@ -439,7 +440,7 @@ fn model_fulltext<'ast>(
 /// Validate @@index on models.
 fn model_index<'ast>(
     args: &mut Arguments<'ast>,
-    data: &mut ModelAttributes<'ast>,
+    data: &mut ModelAttributes,
     model_id: ast::ModelId,
     ctx: &mut Context<'ast>,
 ) {
@@ -511,7 +512,7 @@ fn model_index<'ast>(
 /// Validate @@unique on models.
 fn model_unique<'ast>(
     args: &mut Arguments<'ast>,
-    data: &mut ModelAttributes<'ast>,
+    data: &mut ModelAttributes,
     model_id: ast::ModelId,
     ctx: &mut Context<'ast>,
 ) {
@@ -561,11 +562,11 @@ fn model_unique<'ast>(
     data.ast_indexes.push((args.attribute().0, index_attribute));
 }
 
-fn common_index_validations<'ast>(
-    args: &mut Arguments<'ast>,
-    index_data: &mut IndexAttribute<'ast>,
+fn common_index_validations<'db>(
+    args: &mut Arguments<'db>,
+    index_data: &mut IndexAttribute,
     model_id: ast::ModelId,
-    ctx: &mut Context<'ast>,
+    ctx: &mut Context<'db>,
 ) {
     let fields = match args.default_arg("fields") {
         Ok(fields) => fields,
@@ -712,7 +713,10 @@ fn visit_relation<'ast>(
             ctx.push_error(args.new_attribute_validation_error("A relation cannot have an empty name."))
         }
         Some(Ok((name, span))) => {
-            relation_field.name = Some(AstString::from_literal(name.to_owned(), span));
+            relation_field.name = Some(AstString {
+                value: ctx.db.interner.intern(name),
+                span,
+            });
         }
         Some(Err(err)) => ctx.push_error(err),
         None => (),
@@ -754,7 +758,10 @@ fn visit_relation<'ast>(
         mapped_name
     };
 
-    relation_field.mapped_name = fk_name.map(|(s, span)| AstString::from_literal(s.to_owned(), span));
+    relation_field.mapped_name = fk_name.map(|(s, span)| AstString {
+        span,
+        value: ctx.db.interner.intern(s),
+    });
 }
 
 enum FieldResolutionError<'ast> {

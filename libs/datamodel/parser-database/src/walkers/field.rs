@@ -1,20 +1,20 @@
 use super::{ModelWalker, RelationFieldWalker, ScalarFieldWalker};
 
 #[derive(Copy, Clone)]
-enum InnerWalker<'ast, 'db> {
-    Scalar(ScalarFieldWalker<'ast, 'db>),
-    Relation(RelationFieldWalker<'ast, 'db>),
+enum InnerWalker<'db> {
+    Scalar(ScalarFieldWalker<'db>),
+    Relation(RelationFieldWalker<'db>),
 }
 
 /// A model field, scalar or relation.
 #[derive(Clone, Copy)]
-pub struct FieldWalker<'ast, 'db> {
-    inner: InnerWalker<'ast, 'db>,
+pub struct FieldWalker<'db> {
+    inner: InnerWalker<'db>,
 }
 
-impl<'ast, 'db> FieldWalker<'ast, 'db> {
+impl<'db> FieldWalker<'db> {
     /// The field name.
-    pub fn name(self) -> &'ast str {
+    pub fn name(self) -> &'db str {
         match self.inner {
             InnerWalker::Scalar(f) => f.name(),
             InnerWalker::Relation(f) => f.name(),
@@ -22,7 +22,7 @@ impl<'ast, 'db> FieldWalker<'ast, 'db> {
     }
 
     /// The model name.
-    pub fn model(self) -> ModelWalker<'ast, 'db> {
+    pub fn model(self) -> ModelWalker<'db> {
         match self.inner {
             InnerWalker::Scalar(f) => f.model(),
             InnerWalker::Relation(f) => f.model(),
@@ -30,16 +30,16 @@ impl<'ast, 'db> FieldWalker<'ast, 'db> {
     }
 }
 
-impl<'ast, 'db> From<ScalarFieldWalker<'ast, 'db>> for FieldWalker<'ast, 'db> {
-    fn from(w: ScalarFieldWalker<'ast, 'db>) -> Self {
+impl<'db> From<ScalarFieldWalker<'db>> for FieldWalker<'db> {
+    fn from(w: ScalarFieldWalker<'db>) -> Self {
         Self {
             inner: InnerWalker::Scalar(w),
         }
     }
 }
 
-impl<'ast, 'db> From<RelationFieldWalker<'ast, 'db>> for FieldWalker<'ast, 'db> {
-    fn from(w: RelationFieldWalker<'ast, 'db>) -> Self {
+impl<'db> From<RelationFieldWalker<'db>> for FieldWalker<'db> {
+    fn from(w: RelationFieldWalker<'db>) -> Self {
         Self {
             inner: InnerWalker::Relation(w),
         }
