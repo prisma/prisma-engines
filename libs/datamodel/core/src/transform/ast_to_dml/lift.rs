@@ -441,6 +441,7 @@ impl<'a> LiftAstToDml<'a> {
                 CompositeTypeFieldType::CompositeType(self.db.ast()[*ctid].name.name.to_owned())
             }
             db::ScalarFieldType::BuiltInScalar(scalar_type) => {
+                //TODO(matthias) lift native type
                 CompositeTypeFieldType::Scalar(parser_database_scalar_type_to_dml_scalar_type(*scalar_type), None, None)
             }
             db::ScalarFieldType::Enum(enum_id) => {
