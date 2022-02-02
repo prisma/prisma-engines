@@ -51,6 +51,7 @@ capabilities!(
     AutoIncrement,
     RelationFieldsInArbitraryOrder,
     CompositeTypes,
+    DefaultValueAuto,
     //Start of ME/IE only capabilities
     AutoIncrementAllowedOnNonId,
     AutoIncrementMultipleAllowed,

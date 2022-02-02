@@ -251,6 +251,7 @@ pub(super) fn validate_default_value(field: ScalarFieldWalker<'_, '_>, ctx: &mut
     let scalar_type = field.scalar_type();
 
     default_value::validate_default_value(default_value, scalar_type, ctx);
+    default_value::validate_auto_param(default_value, ctx);
 }
 
 pub(super) fn validate_scalar_field_connector_specific(field: ScalarFieldWalker<'_, '_>, ctx: &mut Context<'_>) {

@@ -373,9 +373,7 @@ fn new_model(model_name: &str) -> Model {
         let mut sf = ScalarField::new("id", datamodel::FieldArity::Required, field_type);
 
         sf.set_database_name(Some("_id".to_string()));
-        sf.set_default_value(DefaultValue::new_expression(
-            ValueGenerator::new("dbgenerated".to_owned(), Vec::new()).unwrap(),
-        ));
+        sf.set_default_value(DefaultValue::new_expression(ValueGenerator::new_auto()));
 
         sf
     });

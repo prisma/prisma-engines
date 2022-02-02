@@ -502,6 +502,9 @@ fn dml_default_kind(default_value: &ast::Expression, scalar_type: Option<ScalarT
                     .unwrap_or_else(String::new),
             ))
         }
+        ast::Expression::Function(funcname, _, _) if funcname == "auto" => {
+            DefaultKind::Expression(ValueGenerator::new_auto())
+        }
         ast::Expression::Function(funcname, _args, _) if funcname == "autoincrement" => {
             DefaultKind::Expression(ValueGenerator::new_autoincrement())
         }
