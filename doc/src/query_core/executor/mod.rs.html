@@ -76,15 +76,15 @@
 <span class="doccomment">//!</span>
 <span class="doccomment">//! What the executor module DOES NOT DO:</span>
 <span class="doccomment">//! - Define low level execution of queries. This is considered an implementation detail of the modules used by the executors.</span>
-<span class="kw">mod</span> <span class="ident">interactive_tx</span>;
+<span class="kw">mod</span> <span class="ident">execute_operation</span>;
 <span class="kw">mod</span> <span class="ident">interpreting_executor</span>;
 <span class="kw">mod</span> <span class="ident">loader</span>;
 <span class="kw">mod</span> <span class="ident">pipeline</span>;
 
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">interactive_tx</span>::<span class="kw-2">*</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">execute_operation</span>::<span class="kw-2">*</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">loader</span>::<span class="kw-2">*</span>;
 
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">query_document::Operation</span>, <span class="ident">response_ir::ResponseData</span>, <span class="ident">schema::QuerySchemaRef</span>};
+<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">query_document::Operation</span>, <span class="ident">response_ir::ResponseData</span>, <span class="ident">schema::QuerySchemaRef</span>, <span class="ident">TxId</span>};
 <span class="kw">use</span> <span class="ident">async_trait::async_trait</span>;
 <span class="kw">use</span> <span class="ident">connector::Connector</span>;
 
