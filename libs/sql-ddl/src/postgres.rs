@@ -117,8 +117,11 @@ impl Display for DropIndex<'_> {
 /// ```
 /// # use sql_ddl::postgres::DropTable;
 ///
-/// let drop_table = DropTable { table_name: "Cat".into() };
+/// let drop_table = DropTable { table_name: "Cat".into(), cascade: false };
 /// assert_eq!(drop_table.to_string(), r#"DROP TABLE "Cat""#);
+///
+/// let drop_table = DropTable { table_name: "Cat".into(), cascade: true };
+/// assert_eq!(drop_table.to_string(), r#"DROP TABLE "Cat" CASCADE"#);
 /// ```
 #[derive(Debug)]
 pub struct DropTable<'a> {
