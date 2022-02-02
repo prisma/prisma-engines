@@ -1,6 +1,6 @@
 use query_engine_tests::*;
 
-#[test_suite(schema(schema))]
+#[test_suite(schema(schema), only(MySql("8")))]
 mod special_id_values {
     use indoc::indoc;
 
@@ -25,7 +25,7 @@ mod special_id_values {
         prisma.to_string()
     }
 
-    #[connector_test(only(MySql("8")))]
+    #[connector_test]
     async fn binary_uuid(runner: Runner) -> TestResult<()> {
         runner
             .query(indoc! {r#"
@@ -41,7 +41,7 @@ mod special_id_values {
         Ok(())
     }
 
-    #[connector_test(only(MySql))]
+    #[connector_test]
     async fn str_uuid(runner: Runner) -> TestResult<()> {
         runner
             .query(indoc! {r#"
@@ -57,7 +57,7 @@ mod special_id_values {
         Ok(())
     }
 
-    #[connector_test(only(MySql("8")))]
+    #[connector_test]
     async fn binary_str_composite(runner: Runner) -> TestResult<()> {
         runner
             .query(indoc! {r#"
