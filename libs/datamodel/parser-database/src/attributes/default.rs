@@ -247,7 +247,7 @@ fn validate_composite_builtin_scalar_type_default(
             validate_empty_function_args(FN_NOW, &funcargs.arguments, args, accept, ctx)
         }
         (_, ast::Expression::Function(funcname, _, _))
-            if funcname == FN_DBGENERATED || funcname == FN_AUTOINCREMENT =>
+            if funcname == FN_DBGENERATED || funcname == FN_AUTOINCREMENT || funcname == FN_AUTO =>
         {
             ctx.push_error(args.new_attribute_validation_error(&format!(
                 "The function `{funcname}()` is not a supported on composite fields.",

@@ -741,18 +741,24 @@ fn must_error_on_auto_default_on_mongodb_composite() {
         }
 
         type Meow {
-            id String @default(auto())
+            id String @default(auto()) @db.ObjectId
         }
     "#;
 
     let error = datamodel::parse_schema(schema).map(drop).unwrap_err();
 
     let expected = expect![[r#"
-        [1;91merror[0m: [1mError parsing attribute "@default": The function `auto()` cannot be used on fields of type `String`.[0m
+        [1;91merror[0m: [1mError parsing attribute "@default": The function `auto()` is not a supported on composite fields.[0m
           [1;94m-->[0m  [4mschema.prisma:18[0m
         [1;94m   | [0m
         [1;94m17 | [0m        type Meow {
-        [1;94m18 | [0m            id String @[1;91mdefault(auto())[0m
+        [1;94m18 | [0m            id String @[1;91mdefault(auto())[0m @db.ObjectId
+        [1;94m   | [0m
+        [1;91merror[0m: [1mAttribute not known: "@db.ObjectId".[0m
+          [1;94m-->[0m  [4mschema.prisma:18[0m
+        [1;94m   | [0m
+        [1;94m17 | [0m        type Meow {
+        [1;94m18 | [0m            id String @default(auto()) @[1;91mdb.ObjectId[0m
         [1;94m   | [0m
     "#]];
 
