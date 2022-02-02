@@ -167,14 +167,9 @@ fn update_operations_object_type(
 ) -> InputObjectTypeWeakRef {
     // Different names are required to construct and cache different objects.
     // - "Nullable" affects the `set` operation (`set` is nullable)
-    // - "NullableComposite" affects the `set` & `unset` operation (`unset` only present when the container is a composite)
-    let null_composite = match (sf.is_required(), sf.container()) {
-        (false, ParentContainer::CompositeType(_)) => "NullableComposite",
-        (false, _) => "Nullable",
-        _ => "",
-    };
+    let nullable = if !sf.is_required() { "Nullable" } else { "" };
     let ident = Identifier::new(
-        format!("{}{}FieldUpdateOperationsInput", null_composite, prefix),
+        format!("{}{}FieldUpdateOperationsInput", nullable, prefix),
         PRISMA_NAMESPACE,
     );
     return_cached_input!(ctx, &ident);
@@ -189,11 +184,6 @@ fn update_operations_object_type(
     let mut fields = vec![input_field(operations::SET, typ.clone(), None)
         .optional()
         .nullable_if(!sf.is_required())];
-
-    // Adds the "unset" field for scalars within composite types
-    if sf.container().is_composite() {
-        append_opt(&mut fields, unset_update_input_field(sf.is_required(), sf.is_list()));
-    }
 
     if with_number_operators {
         fields.push(input_field(operations::INCREMENT, typ.clone(), None).optional());
@@ -240,7 +230,8 @@ fn composite_update_envelope_object_type(ctx: &mut BuilderContext, cf: &Composit
 
     append_opt(&mut fields, composite_update_input_field(ctx, cf));
     append_opt(&mut fields, composite_push_update_input_field(ctx, cf));
-    append_opt(&mut fields, unset_update_input_field(cf.is_required(), cf.is_list()));
+    append_opt(&mut fields, composite_unset_update_input_field(cf));
+    append_opt(&mut fields, composite_upsert_update_input_field(ctx, cf));
 
     input_object.set_fields(fields);
 
@@ -273,7 +264,7 @@ fn composite_update_input_field(ctx: &mut BuilderContext, cf: &CompositeFieldRef
     if cf.is_required() {
         let update_object_type = composite_update_object_type(ctx, cf);
 
-        Some(input_field(operations::UPDATE, InputType::Object(update_object_type.clone()), None).optional())
+        Some(input_field(operations::UPDATE, InputType::Object(update_object_type), None).optional())
     } else {
         None
     }
@@ -308,6 +299,43 @@ fn composite_push_update_input_field(ctx: &mut BuilderContext, cf: &CompositeFie
         let input_types = vec![set_object_type.clone(), InputType::list(set_object_type)];
 
         Some(input_field(operations::PUSH, input_types, None).optional())
+    } else {
+        None
+    }
+}
+
+/// Builds the `upsert` input object type. Should only be used in the envelope type.
+// TODO: remove upsert from update child object
+fn composite_upsert_object_type(ctx: &mut BuilderContext, cf: &CompositeFieldRef) -> InputObjectTypeWeakRef {
+    let name = format!("{}UpsertInput", cf.typ.name);
+
+    let ident = Identifier::new(name, PRISMA_NAMESPACE);
+    return_cached_input!(ctx, &ident);
+
+    let mut input_object = init_input_object_type(ident.clone());
+    input_object.set_tag(ObjectTag::CompositeEnvelope);
+
+    let input_object = Arc::new(input_object);
+
+    ctx.cache_input_type(ident, input_object.clone());
+
+    let update_object_type = composite_update_object_type(ctx, cf);
+    let update_field = input_field(operations::UPDATE, InputType::Object(update_object_type), None);
+    let set_field = composite_set_update_input_field(ctx, cf).required();
+
+    let fields = vec![set_field, update_field];
+
+    input_object.set_fields(fields);
+
+    Arc::downgrade(&input_object)
+}
+
+// Builds an `upsert` input field. Should only be used in the envelope type.
+fn composite_upsert_update_input_field(ctx: &mut BuilderContext, cf: &CompositeFieldRef) -> Option<InputField> {
+    if cf.is_optional() {
+        let upsert_object_type = InputType::Object(composite_upsert_object_type(ctx, cf));
+
+        Some(input_field(operations::UPSERT, upsert_object_type, None).optional())
     } else {
         None
     }

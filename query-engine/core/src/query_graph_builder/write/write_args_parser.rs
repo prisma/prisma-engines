@@ -82,7 +82,6 @@ fn parse_scalar(sf: &ScalarFieldRef, v: ParsedInputValue) -> Result<WriteOperati
                 operations::DECREMENT => WriteOperation::scalar_substract(value),
                 operations::MULTIPLY => WriteOperation::scalar_multiply(value),
                 operations::DIVIDE => WriteOperation::scalar_divide(value),
-                operations::UNSET if sf.container().is_composite() => parse_composite_unset(value),
                 _ => unreachable!("Invalid update operation"),
             };
 
@@ -146,13 +145,27 @@ fn parse_composite_envelope(
     let write_op = match op.as_str() {
         // Everything in a set operation can only be plain values, no more nested operations.
         operations::SET => WriteOperation::composite_set(value.try_into()?),
-        operations::UNSET => parse_composite_unset(value.try_into()?),
         operations::PUSH => WriteOperation::composite_push(value.try_into()?),
+        operations::UNSET => parse_composite_unset(value.try_into()?),
         operations::UPDATE => parse_composite_updates(cf, value.try_into()?, path)?,
+        operations::UPSERT => parse_composite_upsert(cf, value.try_into()?, path)?,
         _ => unimplemented!(),
     };
 
     Ok(write_op)
+}
+
+fn parse_composite_upsert(
+    cf: &CompositeFieldRef,
+    mut value: ParsedInputMap,
+    path: &mut Vec<DatasourceFieldName>,
+) -> QueryGraphBuilderResult<WriteOperation> {
+    let set = value.remove(operations::SET).unwrap();
+    let set = parse_composite_writes(cf, set, path)?.try_into_composite().unwrap();
+    let update: ParsedInputMap = value.remove(operations::UPDATE).unwrap().try_into()?;
+    let update = parse_composite_updates(cf, update, path)?.try_into_composite().unwrap();
+
+    Ok(WriteOperation::composite_upsert(set, update))
 }
 
 fn parse_composite_unset(pv: PrismaValue) -> WriteOperation {

@@ -110,6 +110,12 @@ impl InputField {
         self
     }
 
+    /// Sets the field as optional (not required to be present on the input).
+    pub fn required(mut self) -> Self {
+        self.is_required = true;
+        self
+    }
+
     /// Sets the field as optional if the condition is true.
     pub fn optional_if(self, condition: bool) -> Self {
         if condition {

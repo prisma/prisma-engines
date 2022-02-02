@@ -480,24 +480,28 @@ mod update {
 
     #[connector_test]
     async fn update_unset_explicit(runner: Runner) -> TestResult<()> {
-        create_test_data(&runner).await?;
+        create_row(
+            &runner,
+            r#"{
+          id: 1
+          a: { b: { c: { b: { c: {}} } } }
+          b: { c: {} }
+        }"#,
+        )
+        .await?;
 
-        // Nested scalar
+        // Nested composite
         insta::assert_snapshot!(
           run_query!(&runner, r#"mutation { updateOneTestModel(
             where: { id: 1 },
-            data: { b: { update: { c: { update: { c_opt: { unset: true } } } } } }
-          ) { a { a_1 a_2 } b { b_field c { c_opt c_field } } } }"#),
-          @r###"{"data":{"updateOneTestModel":{"a":{"a_1":"a1","a_2":2},"b":{"b_field":"b1","c":{"c_opt":null,"c_field":"c1"}}}}}"###
-        );
-
-        // Top-level scalar
-        insta::assert_snapshot!(
-          run_query!(&runner, r#"mutation { updateOneTestModel(
-            where: { id: 1 },
-            data: { a: { update: { a_2: { unset: true } } } }
-          ) { a { a_1 a_2 } b { b_field c { c_field } } } }"#),
-          @r###"{"data":{"updateOneTestModel":{"a":{"a_1":"a1","a_2":null},"b":{"b_field":"b1","c":{"c_field":"c1"}}}}}"###
+            data: { a: { update: { b: { update: { c: { update: { b: { unset: true } } } } } } } }
+          ) {
+            a {
+              a_1 a_2
+              b { c { b { b_field } } }
+            }
+          }}"#),
+          @r###"{"data":{"updateOneTestModel":{"a":{"a_1":"a_1 default","a_2":null,"b":{"c":{"b":null}}}}}}"###
         );
 
         // Top-level composite
@@ -505,16 +509,22 @@ mod update {
           run_query!(&runner, r#"mutation { updateOneTestModel(
             where: { id: 1 },
             data: { b: { unset: true } }
-          ) { a { a_1 a_2 } b { b_field c { c_field } } } }"#),
-          @r###"{"data":{"updateOneTestModel":{"a":{"a_1":"a1","a_2":null},"b":null}}}"###
+          ) {
+            a {
+              a_1 a_2
+              b { c { b { b_field } } }
+            }
+            b {
+              b_field
+            }
+          }}"#),
+          @r###"{"data":{"updateOneTestModel":{"a":{"a_1":"a_1 default","a_2":null,"b":{"c":{"b":null}}},"b":null}}}"###
         );
 
         Ok(())
     }
 
-    // Ensures unset is only available in composite types of type:
-    // - Scalar
-    // - Composite
+    // Ensures unset is only available on optional field of type composite
     #[connector_test]
     async fn ensure_unset_unavailable_on_fields(runner: Runner) -> TestResult<()> {
         create_test_data(&runner).await?;
@@ -537,6 +547,190 @@ mod update {
           ) { id }}"#,
           2009,
           "`Mutation.updateOneTestModel.data.TestModelUncheckedUpdateInput.a.AUpdateEnvelopeInput.update.AUpdateInput.a_1.StringFieldUpdateOperationsInput.unset`: Field does not exist on enclosing type."
+        );
+
+        Ok(())
+    }
+
+    #[connector_test]
+    async fn update_upsert_explicit(runner: Runner) -> TestResult<()> {
+        create_row(
+            &runner,
+            r#"{
+              id: 1
+              a: { set: { a_1: "a1", a_2: 2, b: { c: {} } } }
+            }"#,
+        )
+        .await?;
+
+        let nested_query = r#"mutation { updateOneTestModel(
+          where: { id: 1 },
+          data: {
+            a: { update: { b: { update: { c: { update: { b: {
+              upsert: {
+                set: { b_field: "new", c: { c_field: "new" } },
+                update: {
+                  b_field: "updated",
+                  c: {
+                    update: {
+                      c_field: "updated"
+                      b: {
+                        upsert: {
+                          set: { b_field: "new", c: { c_field: "new" } },
+                          update: {
+                            b_field: "updated",
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            } } } } } } }
+          }
+        ) {
+          a {
+            a_1 a_2
+            b {
+              b_field
+              c {
+                c_field
+                b {
+                  b_field
+                  c {
+                    c_field
+                    b { b_field }
+                  }
+                }
+              }
+            }
+          }
+        }}"#;
+
+        // Nested composite - upsert set
+        insta::assert_snapshot!(
+          run_query!(&runner, nested_query),
+          @r###"{"data":{"updateOneTestModel":{"a":{"a_1":"a1","a_2":2,"b":{"b_field":"b_field default","c":{"c_field":"c_field default","b":{"b_field":"new","c":{"c_field":"new","b":{"b_field":"new"}}}}}}}}}"###
+        );
+
+        // Nested composite - upsert update
+        insta::assert_snapshot!(
+          run_query!(&runner, nested_query),
+          @r###"{"data":{"updateOneTestModel":{"a":{"a_1":"a1","a_2":2,"b":{"b_field":"b_field default","c":{"c_field":"c_field default","b":{"b_field":"updated","c":{"c_field":"updated","b":{"b_field":"updated"}}}}}}}}}"###
+        );
+
+        let top_level_query = r#"mutation { updateOneTestModel(
+          where: { id: 1 },
+          data: { b: { upsert: {
+            set: { b_field: "new", c: { c_field: "new" } },
+            update: { b_field: "updated", c: { c_field: "updated" } }
+          } } }
+        ) { a { a_1 a_2 } b { b_field c { c_field } } } }"#;
+
+        // Top-level composite
+        insta::assert_snapshot!(
+          run_query!(&runner, top_level_query),
+          @r###"{"data":{"updateOneTestModel":{"a":{"a_1":"a1","a_2":2},"b":{"b_field":"new","c":{"c_field":"new"}}}}}"###
+        );
+
+        insta::assert_snapshot!(
+          run_query!(&runner, top_level_query),
+          @r###"{"data":{"updateOneTestModel":{"a":{"a_1":"a1","a_2":2},"b":{"b_field":"updated","c":{"c_field":"updated"}}}}}"###
+        );
+
+        Ok(())
+    }
+
+    #[connector_test]
+    async fn mixed_upsert_update_set_unset(runner: Runner) -> TestResult<()> {
+        create_row(
+            &runner,
+            r#"{
+              id: 1
+              a: { set: { a_1: "a1", a_2: 2, b: { c: {} } } }
+            }"#,
+        )
+        .await?;
+
+        let query = r#"mutation {
+          updateOneTestModel(
+            where: { id: 1 }
+            data: {
+              a: {
+                update: {
+                  a_1: { set: "a.a_1.updated" }
+                  a_2: { increment: 1335 }
+                  b: {
+                    update: {
+                      b_field: "a.b.b_field.updated"
+                      c: {
+                        update: {
+                          c_field: "a.b.c.c_field.updated"
+                          b: {
+                            upsert: {
+                              set: { b_field: "a.b.c.b.b_field.new", c: { c_field: "a.b.c.b.c.c_field.new", b: { c: {} } } }
+                              update: {
+                                b_field: { set: "a.b.c.b.b_field.updated" }
+                                c: { update: { b: { unset: true } } }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          ) {
+            a {
+              a_1
+              a_2
+              b {
+                b_field
+                c {
+                  c_field
+                  b {
+                    b_field
+                    c {
+                      c_field
+                      b {
+                        b_field
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+        "#;
+
+        insta::assert_snapshot!(
+          run_query!(&runner, query),
+          @r###"{"data":{"updateOneTestModel":{"a":{"a_1":"a.a_1.updated","a_2":1337,"b":{"b_field":"a.b.b_field.updated","c":{"c_field":"a.b.c.c_field.updated","b":{"b_field":"a.b.c.b.b_field.new","c":{"c_field":"a.b.c.b.c.c_field.new","b":{"b_field":"b_field default"}}}}}}}}}"###
+        );
+
+        insta::assert_snapshot!(
+          run_query!(&runner, query),
+          @r###"{"data":{"updateOneTestModel":{"a":{"a_1":"a.a_1.updated","a_2":2672,"b":{"b_field":"a.b.b_field.updated","c":{"c_field":"a.b.c.c_field.updated","b":{"b_field":"a.b.c.b.b_field.updated","c":{"c_field":"a.b.c.b.c.c_field.new","b":null}}}}}}}}"###
+        );
+
+        Ok(())
+    }
+
+    #[connector_test]
+    async fn fails_upsert_on_required_field(runner: Runner) -> TestResult<()> {
+        create_test_data(&runner).await?;
+
+        assert_error!(
+            runner,
+            r#"mutation { updateOneTestModel(
+              where: { id: 1 },
+              data: { a: { upsert: { set: {}, update: {} } } }
+            ) { id }}"#,
+            2009,
+            "`Mutation.updateOneTestModel.data.TestModelUpdateInput.a.AUpdateEnvelopeInput.upsert`: Field does not exist on enclosing type."
         );
 
         Ok(())
