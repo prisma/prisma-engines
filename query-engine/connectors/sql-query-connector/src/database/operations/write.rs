@@ -36,7 +36,6 @@ async fn generate_id(
         .fold((Select::default(), false), |(query, generated), value| {
             let alias = value.0;
             let func = value.1.to_lowercase().replace(" ", "");
-            dbg!(func.clone());
 
             match func.as_str() {
                 "(uuid())" => (query.value(native_uuid().alias(alias)), true),
