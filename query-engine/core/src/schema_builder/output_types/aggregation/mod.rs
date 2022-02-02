@@ -1,5 +1,5 @@
 use super::*;
-use prisma_models::ScalarFieldRef;
+use prisma_models::{prelude::ParentContainer, ScalarFieldRef};
 
 pub(crate) mod group_by;
 pub(crate) mod plain;
@@ -12,21 +12,25 @@ fn field_avg_output_type(ctx: &mut BuilderContext, field: &ScalarFieldRef) -> Ou
     }
 }
 
-pub fn collect_non_list_nor_json_fields(model: &ModelRef) -> Vec<ScalarFieldRef> {
-    model
+pub fn collect_non_list_nor_json_fields(container: &ParentContainer) -> Vec<ScalarFieldRef> {
+    container
         .fields()
-        .scalar()
         .into_iter()
-        .filter(|f| !f.is_list() && f.type_identifier != TypeIdentifier::Json)
+        .filter_map(|field| match field {
+            ModelField::Scalar(sf) if !sf.is_list() && sf.type_identifier != TypeIdentifier::Json => Some(sf),
+            _ => None,
+        })
         .collect()
 }
 
-pub fn collect_numeric_fields(model: &ModelRef) -> Vec<ScalarFieldRef> {
-    model
+pub fn collect_numeric_fields(container: &ParentContainer) -> Vec<ScalarFieldRef> {
+    container
         .fields()
-        .scalar()
         .into_iter()
-        .filter(|field| field.is_numeric())
+        .filter_map(|field| match field {
+            ModelField::Scalar(sf) if sf.is_numeric() => Some(sf),
+            _ => None,
+        })
         .collect()
 }
 

@@ -44,6 +44,13 @@ impl Field {
         }
     }
 
+    pub fn into_scalar(self) -> Option<ScalarFieldRef> {
+        match self {
+            Field::Scalar(sf) => Some(sf.clone()),
+            _ => None,
+        }
+    }
+
     pub fn is_id(&self) -> bool {
         match self {
             Field::Scalar(sf) => sf.is_id,
