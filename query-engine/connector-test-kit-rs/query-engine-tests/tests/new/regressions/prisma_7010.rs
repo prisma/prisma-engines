@@ -1,6 +1,6 @@
 use query_engine_tests::*;
 
-#[test_suite(schema(schema), only(MySql("8")))]
+#[test_suite(schema(schema), only(MySql(8)))]
 mod special_id_values {
     use indoc::indoc;
 
@@ -20,6 +20,14 @@ mod special_id_values {
             name String
             @@unique([one, two])
         }
+        model SpacesTest {
+            id String @id @default(dbgenerated(" ( uuid( ) ) ")) @test.Char(36)
+            name String
+        }
+        model ChoppedTest {
+            id String @id @default(dbgenerated("(uuid())"))
+            name String
+        }
         "#};
 
         prisma.to_string()
@@ -27,32 +35,32 @@ mod special_id_values {
 
     #[connector_test]
     async fn binary_uuid(runner: Runner) -> TestResult<()> {
-        runner
-            .query(indoc! {r#"
+        run_query!(
+            runner,
+            indoc! {r#"
         mutation {
             createOneBinTest(data: {
                 name: "test"
             }) { id }
         }
-        "#})
-            .await?
-            .assert_success();
+        "#}
+        );
 
         Ok(())
     }
 
     #[connector_test]
     async fn str_uuid(runner: Runner) -> TestResult<()> {
-        runner
-            .query(indoc! {r#"
+        run_query!(
+            runner,
+            indoc! {r#"
         mutation {
             createOneStrTest(data: {
                 name: "test"
             }) { id }
         }
-        "#})
-            .await?
-            .assert_success();
+        "#}
+        );
 
         Ok(())
     }
@@ -65,6 +73,38 @@ mod special_id_values {
             createOneBinStrTest(data: {
                 name: "foo"
             }) { one, two }
+        }
+        "#})
+            .await?
+            .assert_success();
+
+        Ok(())
+    }
+
+    #[connector_test]
+    async fn extra_spaces_are_removed(runner: Runner) -> TestResult<()> {
+        runner
+            .query(indoc! {r#"
+        mutation {
+            createOneSpacesTest(data: {
+                name: "foo"
+            }) { id }
+        }
+        "#})
+            .await?
+            .assert_success();
+
+        Ok(())
+    }
+
+    #[connector_test]
+    async fn uuid_without_native_type(runner: Runner) -> TestResult<()> {
+        runner
+            .query(indoc! {r#"
+        mutation {
+            createOneChoppedTest(data: {
+                name: "foo"
+            }) { id }
         }
         "#})
             .await?

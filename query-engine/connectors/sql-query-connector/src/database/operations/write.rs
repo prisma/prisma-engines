@@ -6,7 +6,7 @@ use prisma_models::*;
 use prisma_value::PrismaValue;
 use quaint::{
     error::ErrorKind,
-    prelude::{native_uuid, uuid_to_bin, Aliasable, ConnectionInfo, Select, SqlFamily},
+    prelude::{native_uuid, uuid_to_bin, Aliasable, Select, SqlFamily},
 };
 use std::{
     collections::{HashMap, HashSet},
@@ -18,35 +18,27 @@ use user_facing_errors::query_engine::DatabaseConstraint;
 
 async fn generate_id(
     conn: &dyn QueryExt,
-    conn_info: ConnectionInfo,
-    model: &ModelRef,
-    args: WriteArgs,
+    primary_key: &FieldSelection,
     trace_id: Option<String>,
-) -> crate::Result<(Option<SelectionResult>, bool)> {
-    let pk = model.primary_identifier();
-
-    // fast path if it's not mysql
-    if conn_info.sql_family() != SqlFamily::Mysql {
-        return Ok((args.as_record_projection(pk.into()), false));
-    }
-
-    // Go to all the values and generate a select statement with the correct mysql function
-    let (pk_select, generated) = pk
-        .clone()
+) -> crate::Result<Option<SelectionResult>> {
+    // Go through all the values and generate a select statement with the correct MySQL function
+    let (pk_select, need_select) = primary_key
         .selections()
         .filter_map(|field| match field {
             SelectedField::Scalar(x) if x.default_value.is_some() => x
                 .default_value
                 .clone()
                 .unwrap()
-                .dbgenerated_func()
+                .to_dbgenerated_func()
                 .map(|func| (field.db_name().to_string(), func)),
             _ => None,
         })
         .fold((Select::default(), false), |(query, generated), value| {
             let alias = value.0;
-            let func = value.1.to_lowercase();
-            match func.trim() {
+            let func = value.1.to_lowercase().replace(" ", "");
+            dbg!(func.clone());
+
+            match func.as_str() {
                 "(uuid())" => (query.value(native_uuid().alias(alias)), true),
                 "(uuid_to_bin(uuid()))" => (query.value(uuid_to_bin().alias(alias)), true),
                 _ => (query, generated),
@@ -54,14 +46,14 @@ async fn generate_id(
         });
 
     // db generate values only if needed
-    if generated {
+    if need_select {
         let pk_select = pk_select.add_trace_id(trace_id);
         let pk_result = conn.query(pk_select.into()).await?;
-        let result = try_convert(&pk.into(), pk_result)?;
+        let result = try_convert(&(primary_key.into()), pk_result)?;
 
-        Ok((Some(result), true))
+        Ok(Some(result))
     } else {
-        Ok((args.as_record_projection(pk.into()), false))
+        Ok(None)
     }
 }
 
@@ -70,21 +62,26 @@ async fn generate_id(
 #[tracing::instrument(skip(conn, model, args))]
 pub async fn create_record(
     conn: &dyn QueryExt,
-    conn_info: ConnectionInfo,
+    sql_family: &SqlFamily,
     model: &ModelRef,
     args: WriteArgs,
     trace_id: Option<String>,
 ) -> crate::Result<SelectionResult> {
-    let (returned_id, generated) = generate_id(conn, conn_info, model, args.clone(), trace_id.clone()).await?;
+    let pk = model.primary_identifier();
 
-    // Append db generated values if required
+    let returned_id = if *sql_family == SqlFamily::Mysql {
+        generate_id(conn, &pk, trace_id.clone()).await?
+    } else {
+        args.as_record_projection(pk.into())
+    };
+
     let args = match returned_id {
-        Some(ref pk) if generated => {
+        Some(ref pk) if *sql_family == SqlFamily::Mysql => {
             let mut args = args.clone();
             for (field, value) in pk.pairs.iter() {
-                let field = DatasourceFieldName(field.prisma_name().to_string());
+                let field = DatasourceFieldName(field.db_name().into());
                 let value = WriteExpression::from(value.clone());
-                args.insert(field, value);
+                args.insert(field, value)
             }
             args
         }
@@ -136,7 +133,6 @@ pub async fn create_record(
         },
     };
 
-    // TODO: fix dbgenerated
     match (returned_id, result_set.len(), result_set.last_insert_id()) {
         // All values provided in the write arrghs
         (Some(identifier), _, _) if !identifier.misses_autogen_value() => Ok(identifier),
