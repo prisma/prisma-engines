@@ -31,7 +31,10 @@ impl WriteQuery {
         };
 
         for (selected_field, value) in result {
-            args.insert(DatasourceFieldName(selected_field.db_name().to_owned()), value)
+            args.insert(
+                DatasourceFieldName(selected_field.db_name().to_owned()),
+                (&selected_field, value),
+            )
         }
 
         args.update_datetimes(model);
@@ -136,7 +139,10 @@ impl CreateManyRecords {
     pub fn inject_result_into_all(&mut self, result: SelectionResult) {
         for (selected_field, value) in result {
             for args in self.args.iter_mut() {
-                args.insert(DatasourceFieldName(selected_field.db_name().to_owned()), value.clone())
+                args.insert(
+                    DatasourceFieldName(selected_field.db_name().to_owned()),
+                    (&selected_field, value.clone()),
+                )
             }
         }
     }
