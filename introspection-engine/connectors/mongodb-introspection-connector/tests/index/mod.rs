@@ -30,7 +30,7 @@ fn single_column_normal_index() {
 
     let expected = expect![[r#"
         model A {
-          id   String @id @default(dbgenerated()) @map("_id") @db.ObjectId
+          id   String @id @default(auto()) @map("_id") @db.ObjectId
           age  Int
           name String
 
@@ -67,7 +67,7 @@ fn single_column_descending_index_no_preview_enabled() {
 
     let expected = expect![[r#"
         model A {
-          id   String @id @default(dbgenerated()) @map("_id") @db.ObjectId
+          id   String @id @default(auto()) @map("_id") @db.ObjectId
           age  Int
           name String
 
@@ -101,7 +101,7 @@ fn single_column_descending_index() {
 
     let expected = expect![[r#"
         model A {
-          id   String @id @default(dbgenerated()) @map("_id") @db.ObjectId
+          id   String @id @default(auto()) @map("_id") @db.ObjectId
           age  Int
           name String
 
@@ -135,7 +135,7 @@ fn single_column_fulltext_index() {
 
     let expected = expect![[r#"
         model A {
-          id   String @id @default(dbgenerated()) @map("_id") @db.ObjectId
+          id   String @id @default(auto()) @map("_id") @db.ObjectId
           age  Int
           name String
 
@@ -169,7 +169,7 @@ fn multi_column_fulltext_index() {
 
     let expected = expect![[r#"
         model A {
-          id    String @id @default(dbgenerated()) @map("_id") @db.ObjectId
+          id    String @id @default(auto()) @map("_id") @db.ObjectId
           age   Int
           name  String
           title String
@@ -204,7 +204,7 @@ fn multi_column_fulltext_index_with_desc_in_end() {
 
     let expected = expect![[r#"
         model A {
-          id    String @id @default(dbgenerated()) @map("_id") @db.ObjectId
+          id    String @id @default(auto()) @map("_id") @db.ObjectId
           age   Int
           name  String
           title String
@@ -239,7 +239,7 @@ fn multi_column_fulltext_index_with_desc_in_beginning() {
 
     let expected = expect![[r#"
         model A {
-          id    String @id @default(dbgenerated()) @map("_id") @db.ObjectId
+          id    String @id @default(auto()) @map("_id") @db.ObjectId
           age   Int
           name  String
           title String
@@ -274,7 +274,7 @@ fn multi_column_fulltext_index_with_asc_in_end() {
 
     let expected = expect![[r#"
         model A {
-          id    String @id @default(dbgenerated()) @map("_id") @db.ObjectId
+          id    String @id @default(auto()) @map("_id") @db.ObjectId
           age   Int
           name  String
           title String
@@ -309,7 +309,7 @@ fn multi_column_fulltext_index_with_asc_in_beginning() {
 
     let expected = expect![[r#"
         model A {
-          id    String @id @default(dbgenerated()) @map("_id") @db.ObjectId
+          id    String @id @default(auto()) @map("_id") @db.ObjectId
           age   Int
           name  String
           title String
@@ -348,7 +348,7 @@ fn multi_column_fulltext_index_with_asc_in_beginning_desc_in_end() {
 
     let expected = expect![[r#"
         model A {
-          id     String @id @default(dbgenerated()) @map("_id") @db.ObjectId
+          id     String @id @default(auto()) @map("_id") @db.ObjectId
           age    Int
           name   String
           title  String
@@ -387,7 +387,7 @@ fn fultext_index_without_preview_flag() {
 
     let expected = expect![[r#"
         model A {
-          id   String @id @default(dbgenerated()) @map("_id") @db.ObjectId
+          id   String @id @default(auto()) @map("_id") @db.ObjectId
           age  Int
           name String
         }
@@ -419,7 +419,7 @@ fn index_pointing_to_a_renamed_field() {
 
     let expected = expect![[r#"
         model A {
-          id   String @id @default(dbgenerated()) @map("_id") @db.ObjectId
+          id   String @id @default(auto()) @map("_id") @db.ObjectId
           age  Int    @map("_age")
           name String
 
@@ -456,7 +456,7 @@ fn single_column_normal_index_default_name() {
 
     let expected = expect![[r#"
         model A {
-          id   String @id @default(dbgenerated()) @map("_id") @db.ObjectId
+          id   String @id @default(auto()) @map("_id") @db.ObjectId
           age  Int
           name String
 
@@ -493,7 +493,7 @@ fn multi_column_normal_index_no_preview() {
 
     let expected = expect![[r#"
         model A {
-          id   String @id @default(dbgenerated()) @map("_id") @db.ObjectId
+          id   String @id @default(auto()) @map("_id") @db.ObjectId
           age  Int
           name String
 
@@ -527,7 +527,7 @@ fn multi_column_normal_index() {
 
     let expected = expect![[r#"
         model A {
-          id   String @id @default(dbgenerated()) @map("_id") @db.ObjectId
+          id   String @id @default(auto()) @map("_id") @db.ObjectId
           age  Int
           name String
 
@@ -561,7 +561,7 @@ fn single_column_unique_index() {
 
     let expected = expect![[r#"
         model A {
-          id   String @id @default(dbgenerated()) @map("_id") @db.ObjectId
+          id   String @id @default(auto()) @map("_id") @db.ObjectId
           age  Int    @unique(map: "age_1")
           name String
         }
@@ -596,7 +596,7 @@ fn single_column_unique_index_default_name() {
 
     let expected = expect![[r#"
         model A {
-          id   String @id @default(dbgenerated()) @map("_id") @db.ObjectId
+          id   String @id @default(auto()) @map("_id") @db.ObjectId
           age  Int    @unique
           name String
         }
@@ -631,7 +631,7 @@ fn multi_column_unique_index_no_preview() {
 
     let expected = expect![[r#"
         model A {
-          id   String @id @default(dbgenerated()) @map("_id") @db.ObjectId
+          id   String @id @default(auto()) @map("_id") @db.ObjectId
           age  Int
           name String
 
@@ -665,7 +665,7 @@ fn multi_column_unique_index() {
 
     let expected = expect![[r#"
         model A {
-          id   String @id @default(dbgenerated()) @map("_id") @db.ObjectId
+          id   String @id @default(auto()) @map("_id") @db.ObjectId
           age  Int
           name String
 
@@ -699,7 +699,7 @@ fn unsupported_types_in_a_unique_index() {
 
     let expected = expect![[r#"
         model A {
-          id   String                        @id @default(dbgenerated()) @map("_id") @db.ObjectId
+          id   String                        @id @default(auto()) @map("_id") @db.ObjectId
           data Unsupported("JavaScriptCode") @unique(map: "data_1")
         }
     "#]];
@@ -730,7 +730,7 @@ fn unsupported_types_in_an_index() {
 
     let expected = expect![[r#"
         model A {
-          id   String                        @id @default(dbgenerated()) @map("_id") @db.ObjectId
+          id   String                        @id @default(auto()) @map("_id") @db.ObjectId
           data Unsupported("JavaScriptCode")
 
           @@index([data], map: "data_1")
@@ -770,7 +770,7 @@ fn partial_indices_should_be_ignored() {
 
     let expected = expect![[r#"
         model A {
-          id   String @id @default(dbgenerated()) @map("_id") @db.ObjectId
+          id   String @id @default(auto()) @map("_id") @db.ObjectId
           age  Int
           name String
         }
@@ -802,7 +802,7 @@ fn skip_index_pointing_to_non_existing_field() {
 
     let expected = expect![[r#"
         model A {
-          id   String @id @default(dbgenerated()) @map("_id") @db.ObjectId
+          id   String @id @default(auto()) @map("_id") @db.ObjectId
           name String
         }
     "#]];

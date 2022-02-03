@@ -155,6 +155,10 @@ impl ValueGenerator {
         }
     }
 
+    pub fn new_auto() -> Self {
+        ValueGenerator::new("auto".to_owned(), Vec::new()).unwrap()
+    }
+
     pub fn new_now() -> Self {
         ValueGenerator::new("now".to_owned(), vec![]).unwrap()
     }
@@ -220,6 +224,7 @@ pub enum ValueGeneratorFn {
     Now,
     Autoincrement,
     DbGenerated,
+    Auto,
 }
 
 impl ValueGeneratorFn {
@@ -230,6 +235,7 @@ impl ValueGeneratorFn {
             "now" => Ok(Self::Now),
             "autoincrement" => Ok(Self::Autoincrement),
             "dbgenerated" => Ok(Self::DbGenerated),
+            "auto" => Ok(Self::Auto),
             _ => Err(format!("The function {} is not a known function.", name)),
         }
     }
@@ -242,6 +248,7 @@ impl ValueGeneratorFn {
             Self::Now => Some(Self::generate_now()),
             Self::Autoincrement => None,
             Self::DbGenerated => None,
+            Self::Auto => None,
         }
     }
 
@@ -254,6 +261,7 @@ impl ValueGeneratorFn {
             (Self::Autoincrement, ScalarType::Int) => true,
             (Self::Autoincrement, ScalarType::BigInt) => true,
             (Self::DbGenerated, _) => true,
+            (Self::Auto, _) => true,
             _ => false,
         }
     }

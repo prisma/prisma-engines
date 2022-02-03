@@ -8,7 +8,6 @@ use serde_json::Value;
 pub enum MongoDbType {
     String,
     Double,
-    Array(Box<MongoDbType>),
     BinData,
     ObjectId,
     Bool,

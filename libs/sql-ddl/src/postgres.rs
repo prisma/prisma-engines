@@ -117,19 +117,29 @@ impl Display for DropIndex<'_> {
 /// ```
 /// # use sql_ddl::postgres::DropTable;
 ///
-/// let drop_table = DropTable { table_name: "Cat".into() };
+/// let drop_table = DropTable { table_name: "Cat".into(), cascade: false };
 /// assert_eq!(drop_table.to_string(), r#"DROP TABLE "Cat""#);
+///
+/// let drop_table = DropTable { table_name: "Cat".into(), cascade: true };
+/// assert_eq!(drop_table.to_string(), r#"DROP TABLE "Cat" CASCADE"#);
 /// ```
 #[derive(Debug)]
 pub struct DropTable<'a> {
     /// The name of the table to be dropped.
     pub table_name: PostgresIdentifier<'a>,
+    pub cascade: bool,
 }
 
 impl Display for DropTable<'_> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.write_str("DROP TABLE ")?;
-        Display::fmt(&self.table_name, f)
+        Display::fmt(&self.table_name, f)?;
+
+        if self.cascade {
+            f.write_str(" CASCADE")?;
+        }
+
+        Ok(())
     }
 }
 

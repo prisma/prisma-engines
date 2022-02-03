@@ -60,7 +60,7 @@ mod mongodb {
     fn m2m() -> String {
         let schema = indoc! {
             r#"model A {
-                id  String  @id @default(dbgenerated()) @map("_id") @test.ObjectId
+                id  String  @id @default(auto()) @map("_id") @test.ObjectId
                 gql String?
 
                 b_ids String[]
@@ -68,10 +68,10 @@ mod mongodb {
             }
 
             model B {
-                id  String  @id @default(dbgenerated()) @map("_id") @test.ObjectId
+                id  String  @id @default(auto()) @map("_id") @test.ObjectId
                 gql String?
 
-                a_ids String[] @test.Array(ObjectId)
+                a_ids String[] @test.ObjectId
                 as    A[]      @relation(fields: [a_ids])
             }"#
         };
@@ -109,8 +109,8 @@ mod mongodb {
         let schema = indoc! {
             r#"
             model A {
-                id  String  @id @default(dbgenerated()) @map("_id") @test.ObjectId
-                list_field String[] @test.Array(ObjectId)
+                id  String  @id @default(auto()) @map("_id") @test.ObjectId
+                list_field String[] @test.ObjectId
             }
             "#
         };
