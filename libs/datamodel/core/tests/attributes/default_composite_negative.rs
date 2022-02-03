@@ -131,7 +131,7 @@ fn must_error_if_autoincrement_function_is_used() {
     let error = datamodel::parse_schema(dml).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
-        [1;91merror[0m: [1mError parsing attribute "@default": The function `autoincrement()` is not a supported on composite fields.[0m
+        [1;91merror[0m: [1mError parsing attribute "@default": The function `autoincrement()` is not supported on composite fields.[0m
           [1;94m-->[0m  [4mschema.prisma:2[0m
         [1;94m   | [0m
         [1;94m 1 | [0mtype Composite {
@@ -290,7 +290,7 @@ fn must_error_on_dbgenerated_default() {
     let error = datamodel::parse_schema(schema).map(drop).unwrap_err();
 
     let expected = expect![[r#"
-        [1;91merror[0m: [1mError parsing attribute "@default": The function `dbgenerated()` is not a supported on composite fields.[0m
+        [1;91merror[0m: [1mError parsing attribute "@default": The function `dbgenerated()` is not supported on composite fields.[0m
           [1;94m-->[0m  [4mschema.prisma:3[0m
         [1;94m   | [0m
         [1;94m 2 | [0m        type User {

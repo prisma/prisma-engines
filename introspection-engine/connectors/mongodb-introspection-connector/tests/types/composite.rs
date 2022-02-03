@@ -1,4 +1,5 @@
 use crate::test_api::*;
+use crate::types::ObjectId;
 use introspection_connector::CompositeTypeDepth;
 use mongodb::bson::{doc, Bson};
 
@@ -385,6 +386,33 @@ fn name_clashes() {
           knock  Boolean
           number Int
           street String
+        }
+    "#]];
+
+    expected.assert_eq(res.datamodel());
+}
+
+#[test]
+fn non_id_object_ids() {
+    let res = introspect(|db| async move {
+        let docs = vec![
+            doc! { "non_id_object_id": Bson::ObjectId(ObjectId::new()), "data": {"non_id_object_id": Bson::ObjectId(ObjectId::new())}},
+        ];
+
+        db.collection("Test").insert_many(docs, None).await?;
+
+        Ok(())
+    });
+
+    let expected = expect![[r#"
+        type TestData {
+          non_id_object_id String @db.ObjectId
+        }
+
+        model Test {
+          id               String   @id @default(auto()) @map("_id") @db.ObjectId
+          data             TestData
+          non_id_object_id String   @db.ObjectId
         }
     "#]];
 

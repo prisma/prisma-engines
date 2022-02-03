@@ -66,6 +66,12 @@ pub(super) struct CompositeTypeField<'ast> {
     pub(super) r#type: ScalarFieldType,
     pub(super) mapped_name: Option<&'ast str>,
     pub(super) default: Option<DefaultAttribute<'ast>>,
+    /// Native type name and arguments
+    ///
+    /// (attribute scope, native type name, arguments, span)
+    ///
+    /// For example: `@db.Text` would translate to ("db", "Text", &[], <the span>)
+    pub(crate) native_type: Option<(&'ast str, &'ast str, Vec<String>, ast::Span)>,
 }
 
 #[derive(Debug)]
@@ -482,6 +488,7 @@ fn visit_composite_type<'ast>(ct_id: ast::CompositeTypeId, ct: &'ast ast::Compos
                     r#type: scalar_type,
                     mapped_name: None,
                     default: None,
+                    native_type: None,
                 };
                 ctx.db.types.composite_type_fields.insert((ct_id, field_id), field);
             }

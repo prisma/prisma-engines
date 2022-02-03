@@ -45,6 +45,18 @@ fn resolve_composite_type_attributes<'ast>(
             attributes.visit_optional_single("default", ctx, |args, ctx| {
                 default::visit_composite_field_default(args, &mut ctfield, ctid, field_id, ctx);
             });
+
+            if let ScalarFieldType::BuiltInScalar(_scalar_type) = ctfield.r#type {
+                // native type attributes
+                attributes.visit_datasource_scoped(ctx, |datasource_name, type_name, args, _ctx| {
+                    native_types::visit_composite_type_field_native_type_attribute(
+                        datasource_name,
+                        type_name,
+                        args,
+                        &mut ctfield,
+                    )
+                });
+            }
         });
 
         ctx.db.types.composite_type_fields.insert((ctid, field_id), ctfield);
@@ -205,7 +217,7 @@ fn visit_scalar_field_attributes<'ast>(
         if let ScalarFieldType::BuiltInScalar(_scalar_type) = scalar_field_data.r#type {
             // native type attributes
             attributes.visit_datasource_scoped(ctx, |datasource_name, type_name, args, _ctx| {
-                native_types::visit_native_type_attribute(datasource_name, type_name, args, scalar_field_data)
+                native_types::visit_model_field_native_type_attribute(datasource_name, type_name, args, scalar_field_data)
             });
         }
 

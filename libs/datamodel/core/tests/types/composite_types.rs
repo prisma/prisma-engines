@@ -5,29 +5,161 @@ use indoc::indoc;
 #[test]
 fn composite_types_are_parsed_without_error() {
     let datamodel = r#"
+        datasource db{
+            provider = "mongodb"
+            url = "mongo+srv:/...."
+        }
+    
+        generator client {
+          provider        = "prisma-client-js"
+          previewFeatures = ["mongoDb"]
+        }
+
         type Address {
             name String?
-            street String
-            number Int
-            zipCode Int?
+            street String @db.ObjectId
         }
 
         model User {
-            id Int @id
+            id  String @id @default(auto()) @map("_id") @db.ObjectId
             address Address?
         }
     "#;
 
-    let expected = expect![[r#"
+    let expected_ast = expect![[r#"
         SchemaAst {
             tops: [
+                Source(
+                    SourceConfig {
+                        name: Identifier {
+                            name: "db",
+                            span: Span {
+                                start: 20,
+                                end: 22,
+                            },
+                        },
+                        properties: [
+                            ConfigBlockProperty {
+                                name: Identifier {
+                                    name: "provider",
+                                    span: Span {
+                                        start: 36,
+                                        end: 44,
+                                    },
+                                },
+                                value: StringValue(
+                                    "mongodb",
+                                    Span {
+                                        start: 47,
+                                        end: 56,
+                                    },
+                                ),
+                                span: Span {
+                                    start: 36,
+                                    end: 57,
+                                },
+                            },
+                            ConfigBlockProperty {
+                                name: Identifier {
+                                    name: "url",
+                                    span: Span {
+                                        start: 69,
+                                        end: 72,
+                                    },
+                                },
+                                value: StringValue(
+                                    "mongo+srv:/....",
+                                    Span {
+                                        start: 75,
+                                        end: 92,
+                                    },
+                                ),
+                                span: Span {
+                                    start: 69,
+                                    end: 93,
+                                },
+                            },
+                        ],
+                        documentation: None,
+                        span: Span {
+                            start: 9,
+                            end: 102,
+                        },
+                    },
+                ),
+                Generator(
+                    GeneratorConfig {
+                        name: Identifier {
+                            name: "client",
+                            span: Span {
+                                start: 126,
+                                end: 132,
+                            },
+                        },
+                        properties: [
+                            ConfigBlockProperty {
+                                name: Identifier {
+                                    name: "provider",
+                                    span: Span {
+                                        start: 145,
+                                        end: 153,
+                                    },
+                                },
+                                value: StringValue(
+                                    "prisma-client-js",
+                                    Span {
+                                        start: 163,
+                                        end: 181,
+                                    },
+                                ),
+                                span: Span {
+                                    start: 145,
+                                    end: 182,
+                                },
+                            },
+                            ConfigBlockProperty {
+                                name: Identifier {
+                                    name: "previewFeatures",
+                                    span: Span {
+                                        start: 192,
+                                        end: 207,
+                                    },
+                                },
+                                value: Array(
+                                    [
+                                        StringValue(
+                                            "mongoDb",
+                                            Span {
+                                                start: 211,
+                                                end: 220,
+                                            },
+                                        ),
+                                    ],
+                                    Span {
+                                        start: 210,
+                                        end: 221,
+                                    },
+                                ),
+                                span: Span {
+                                    start: 192,
+                                    end: 222,
+                                },
+                            },
+                        ],
+                        documentation: None,
+                        span: Span {
+                            start: 116,
+                            end: 231,
+                        },
+                    },
+                ),
                 CompositeType(
                     CompositeType {
                         name: Identifier {
                             name: "Address",
                             span: Span {
-                                start: 14,
-                                end: 21,
+                                start: 246,
+                                end: 253,
                             },
                         },
                         fields: [
@@ -36,24 +168,24 @@ fn composite_types_are_parsed_without_error() {
                                     Identifier {
                                         name: "String",
                                         span: Span {
-                                            start: 41,
-                                            end: 47,
+                                            start: 273,
+                                            end: 279,
                                         },
                                     },
                                 ),
                                 name: Identifier {
                                     name: "name",
                                     span: Span {
-                                        start: 36,
-                                        end: 40,
+                                        start: 268,
+                                        end: 272,
                                     },
                                 },
                                 arity: Optional,
                                 attributes: [],
                                 documentation: None,
                                 span: Span {
-                                    start: 36,
-                                    end: 49,
+                                    start: 268,
+                                    end: 281,
                                 },
                                 is_commented_out: false,
                             },
@@ -62,122 +194,26 @@ fn composite_types_are_parsed_without_error() {
                                     Identifier {
                                         name: "String",
                                         span: Span {
-                                            start: 68,
-                                            end: 74,
+                                            start: 300,
+                                            end: 306,
                                         },
                                     },
                                 ),
                                 name: Identifier {
                                     name: "street",
                                     span: Span {
-                                        start: 61,
-                                        end: 67,
-                                    },
-                                },
-                                arity: Required,
-                                attributes: [],
-                                documentation: None,
-                                span: Span {
-                                    start: 61,
-                                    end: 75,
-                                },
-                                is_commented_out: false,
-                            },
-                            Field {
-                                field_type: Supported(
-                                    Identifier {
-                                        name: "Int",
-                                        span: Span {
-                                            start: 94,
-                                            end: 97,
-                                        },
-                                    },
-                                ),
-                                name: Identifier {
-                                    name: "number",
-                                    span: Span {
-                                        start: 87,
-                                        end: 93,
-                                    },
-                                },
-                                arity: Required,
-                                attributes: [],
-                                documentation: None,
-                                span: Span {
-                                    start: 87,
-                                    end: 98,
-                                },
-                                is_commented_out: false,
-                            },
-                            Field {
-                                field_type: Supported(
-                                    Identifier {
-                                        name: "Int",
-                                        span: Span {
-                                            start: 118,
-                                            end: 121,
-                                        },
-                                    },
-                                ),
-                                name: Identifier {
-                                    name: "zipCode",
-                                    span: Span {
-                                        start: 110,
-                                        end: 117,
-                                    },
-                                },
-                                arity: Optional,
-                                attributes: [],
-                                documentation: None,
-                                span: Span {
-                                    start: 110,
-                                    end: 123,
-                                },
-                                is_commented_out: false,
-                            },
-                        ],
-                        documentation: None,
-                        span: Span {
-                            start: 9,
-                            end: 132,
-                        },
-                    },
-                ),
-                Model(
-                    Model {
-                        name: Identifier {
-                            name: "User",
-                            span: Span {
-                                start: 148,
-                                end: 152,
-                            },
-                        },
-                        fields: [
-                            Field {
-                                field_type: Supported(
-                                    Identifier {
-                                        name: "Int",
-                                        span: Span {
-                                            start: 170,
-                                            end: 173,
-                                        },
-                                    },
-                                ),
-                                name: Identifier {
-                                    name: "id",
-                                    span: Span {
-                                        start: 167,
-                                        end: 169,
+                                        start: 293,
+                                        end: 299,
                                     },
                                 },
                                 arity: Required,
                                 attributes: [
                                     Attribute {
                                         name: Identifier {
-                                            name: "id",
+                                            name: "db.ObjectId",
                                             span: Span {
-                                                start: 175,
-                                                end: 177,
+                                                start: 308,
+                                                end: 319,
                                             },
                                         },
                                         arguments: ArgumentsList {
@@ -186,15 +222,167 @@ fn composite_types_are_parsed_without_error() {
                                             trailing_comma: None,
                                         },
                                         span: Span {
-                                            start: 175,
-                                            end: 177,
+                                            start: 308,
+                                            end: 319,
                                         },
                                     },
                                 ],
                                 documentation: None,
                                 span: Span {
-                                    start: 167,
-                                    end: 178,
+                                    start: 293,
+                                    end: 320,
+                                },
+                                is_commented_out: false,
+                            },
+                        ],
+                        documentation: None,
+                        span: Span {
+                            start: 241,
+                            end: 329,
+                        },
+                    },
+                ),
+                Model(
+                    Model {
+                        name: Identifier {
+                            name: "User",
+                            span: Span {
+                                start: 345,
+                                end: 349,
+                            },
+                        },
+                        fields: [
+                            Field {
+                                field_type: Supported(
+                                    Identifier {
+                                        name: "String",
+                                        span: Span {
+                                            start: 368,
+                                            end: 374,
+                                        },
+                                    },
+                                ),
+                                name: Identifier {
+                                    name: "id",
+                                    span: Span {
+                                        start: 364,
+                                        end: 366,
+                                    },
+                                },
+                                arity: Required,
+                                attributes: [
+                                    Attribute {
+                                        name: Identifier {
+                                            name: "id",
+                                            span: Span {
+                                                start: 376,
+                                                end: 378,
+                                            },
+                                        },
+                                        arguments: ArgumentsList {
+                                            arguments: [],
+                                            empty_arguments: [],
+                                            trailing_comma: None,
+                                        },
+                                        span: Span {
+                                            start: 376,
+                                            end: 378,
+                                        },
+                                    },
+                                    Attribute {
+                                        name: Identifier {
+                                            name: "default",
+                                            span: Span {
+                                                start: 380,
+                                                end: 387,
+                                            },
+                                        },
+                                        arguments: ArgumentsList {
+                                            arguments: [
+                                                Argument {
+                                                    name: None,
+                                                    value: Function(
+                                                        "auto",
+                                                        ArgumentsList {
+                                                            arguments: [],
+                                                            empty_arguments: [],
+                                                            trailing_comma: None,
+                                                        },
+                                                        Span {
+                                                            start: 388,
+                                                            end: 394,
+                                                        },
+                                                    ),
+                                                    span: Span {
+                                                        start: 388,
+                                                        end: 394,
+                                                    },
+                                                },
+                                            ],
+                                            empty_arguments: [],
+                                            trailing_comma: None,
+                                        },
+                                        span: Span {
+                                            start: 380,
+                                            end: 395,
+                                        },
+                                    },
+                                    Attribute {
+                                        name: Identifier {
+                                            name: "map",
+                                            span: Span {
+                                                start: 397,
+                                                end: 400,
+                                            },
+                                        },
+                                        arguments: ArgumentsList {
+                                            arguments: [
+                                                Argument {
+                                                    name: None,
+                                                    value: StringValue(
+                                                        "_id",
+                                                        Span {
+                                                            start: 401,
+                                                            end: 406,
+                                                        },
+                                                    ),
+                                                    span: Span {
+                                                        start: 401,
+                                                        end: 406,
+                                                    },
+                                                },
+                                            ],
+                                            empty_arguments: [],
+                                            trailing_comma: None,
+                                        },
+                                        span: Span {
+                                            start: 397,
+                                            end: 407,
+                                        },
+                                    },
+                                    Attribute {
+                                        name: Identifier {
+                                            name: "db.ObjectId",
+                                            span: Span {
+                                                start: 409,
+                                                end: 420,
+                                            },
+                                        },
+                                        arguments: ArgumentsList {
+                                            arguments: [],
+                                            empty_arguments: [],
+                                            trailing_comma: None,
+                                        },
+                                        span: Span {
+                                            start: 409,
+                                            end: 420,
+                                        },
+                                    },
+                                ],
+                                documentation: None,
+                                span: Span {
+                                    start: 364,
+                                    end: 421,
                                 },
                                 is_commented_out: false,
                             },
@@ -203,24 +391,24 @@ fn composite_types_are_parsed_without_error() {
                                     Identifier {
                                         name: "Address",
                                         span: Span {
-                                            start: 198,
-                                            end: 205,
+                                            start: 441,
+                                            end: 448,
                                         },
                                     },
                                 ),
                                 name: Identifier {
                                     name: "address",
                                     span: Span {
-                                        start: 190,
-                                        end: 197,
+                                        start: 433,
+                                        end: 440,
                                     },
                                 },
                                 arity: Optional,
                                 attributes: [],
                                 documentation: None,
                                 span: Span {
-                                    start: 190,
-                                    end: 207,
+                                    start: 433,
+                                    end: 450,
                                 },
                                 is_commented_out: false,
                             },
@@ -228,8 +416,8 @@ fn composite_types_are_parsed_without_error() {
                         attributes: [],
                         documentation: None,
                         span: Span {
-                            start: 142,
-                            end: 216,
+                            start: 339,
+                            end: 459,
                         },
                         commented_out: false,
                     },
@@ -237,9 +425,126 @@ fn composite_types_are_parsed_without_error() {
             ],
         }
     "#]];
-    let found = parse_schema_ast(datamodel).unwrap();
 
-    expected.assert_debug_eq(&found);
+    let found = parse_schema_ast(datamodel).unwrap();
+    let (_, datamodel) = parse_schema(datamodel).unwrap();
+
+    let expected_datamodel = expect![[r#"
+        Datamodel {
+            enums: [],
+            models: [
+                Model {
+                    name: "User",
+                    fields: [
+                        CompositeField(
+                            CompositeField {
+                                name: "address",
+                                database_name: None,
+                                composite_type: "Address",
+                                arity: Optional,
+                                documentation: None,
+                                is_commented_out: false,
+                                is_ignored: false,
+                                default_value: None,
+                            },
+                        ),
+                        ScalarField(
+                            ScalarField {
+                                name: "id",
+                                field_type: Scalar(
+                                    String,
+                                    None,
+                                    Some(
+                                        NativeTypeInstance {
+                                            name: "ObjectId",
+                                            args: [],
+                                            serialized_native_type: String(
+                                                "ObjectId",
+                                            ),
+                                        },
+                                    ),
+                                ),
+                                arity: Required,
+                                database_name: Some(
+                                    "_id",
+                                ),
+                                default_value: Some(
+                                    DefaultValue::Expression(auto()[]),
+                                ),
+                                documentation: None,
+                                is_generated: false,
+                                is_updated_at: false,
+                                is_commented_out: false,
+                                is_ignored: false,
+                            },
+                        ),
+                    ],
+                    documentation: None,
+                    database_name: None,
+                    indices: [],
+                    primary_key: Some(
+                        PrimaryKeyDefinition {
+                            name: None,
+                            db_name: None,
+                            fields: [
+                                PrimaryKeyField {
+                                    name: "id",
+                                    sort_order: None,
+                                    length: None,
+                                },
+                            ],
+                            defined_on_field: true,
+                        },
+                    ),
+                    is_generated: false,
+                    is_commented_out: false,
+                    is_ignored: false,
+                },
+            ],
+            composite_types: [
+                CompositeType {
+                    name: "Address",
+                    fields: [
+                        CompositeTypeField {
+                            name: "name",
+                            type: Scalar(
+                                String,
+                                None,
+                                None,
+                            ),
+                            arity: Optional,
+                            database_name: None,
+                            documentation: None,
+                            default_value: None,
+                        },
+                        CompositeTypeField {
+                            name: "street",
+                            type: Scalar(
+                                String,
+                                None,
+                                Some(
+                                    NativeTypeInstance {
+                                        name: "ObjectId",
+                                        args: [],
+                                        serialized_native_type: String(
+                                            "ObjectId",
+                                        ),
+                                    },
+                                ),
+                            ),
+                            arity: Required,
+                            database_name: None,
+                            documentation: None,
+                            default_value: None,
+                        },
+                    ],
+                },
+            ],
+        }
+    "#]];
+
+    expected_ast.assert_debug_eq(&found);
+    expected_datamodel.assert_debug_eq(&datamodel);
 }
 
 #[test]
