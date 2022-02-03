@@ -3,6 +3,7 @@ use crate::{
     types::{self},
     ParserDatabase, ScalarFieldType,
 };
+use diagnostics::Span;
 
 /// A composite type, introduced with the `type` keyword in the schema.
 ///
@@ -112,6 +113,16 @@ impl<'ast, 'db> CompositeTypeFieldWalker<'ast, 'db> {
     /// The `@default()` AST attribute on the field, if any.
     pub fn default_attribute(self) -> Option<&'ast ast::Attribute> {
         self.field.default.as_ref().map(|d| d.default_attribute)
+    }
+
+    /// (attribute scope, native type name, arguments, span)
+    ///
+    /// For example: `@db.Text` would translate to ("db", "Text", &[], <the span>)
+    pub fn raw_native_type(self) -> Option<(&'ast str, &'ast str, &'db [String], Span)> {
+        self.field
+            .native_type
+            .as_ref()
+            .map(move |(datasource_name, name, args, span)| (*datasource_name, *name, args.as_slice(), *span))
     }
 
     /// The value expression in the `@default` attribute.
