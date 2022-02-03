@@ -525,7 +525,7 @@ mod update {
     }
 
     #[connector_test]
-    async fn update_unset_false_idempotent(runner: Runner) -> TestResult<()> {
+    async fn update_unset_false_is_noop(runner: Runner) -> TestResult<()> {
         create_test_data(&runner).await?;
 
         // Top-level composite

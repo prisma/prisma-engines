@@ -654,7 +654,7 @@ mod update {
         )
         .await?;
 
-        // No push on required composite
+        // No push on to-one composite
         assert_error!(
             runner,
             r#"mutation {
