@@ -331,12 +331,84 @@
 <span id="330">330</span>
 <span id="331">331</span>
 <span id="332">332</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">error::SqlError</span>, <span class="ident">model_extensions</span>::<span class="kw-2">*</span>, <span class="ident">query_builder::write</span>, <span class="ident">sql_info::SqlInfo</span>, <span class="ident">QueryExt</span>};
+<span id="333">333</span>
+<span id="334">334</span>
+<span id="335">335</span>
+<span id="336">336</span>
+<span id="337">337</span>
+<span id="338">338</span>
+<span id="339">339</span>
+<span id="340">340</span>
+<span id="341">341</span>
+<span id="342">342</span>
+<span id="343">343</span>
+<span id="344">344</span>
+<span id="345">345</span>
+<span id="346">346</span>
+<span id="347">347</span>
+<span id="348">348</span>
+<span id="349">349</span>
+<span id="350">350</span>
+<span id="351">351</span>
+<span id="352">352</span>
+<span id="353">353</span>
+<span id="354">354</span>
+<span id="355">355</span>
+<span id="356">356</span>
+<span id="357">357</span>
+<span id="358">358</span>
+<span id="359">359</span>
+<span id="360">360</span>
+<span id="361">361</span>
+<span id="362">362</span>
+<span id="363">363</span>
+<span id="364">364</span>
+<span id="365">365</span>
+<span id="366">366</span>
+<span id="367">367</span>
+<span id="368">368</span>
+<span id="369">369</span>
+<span id="370">370</span>
+<span id="371">371</span>
+<span id="372">372</span>
+<span id="373">373</span>
+<span id="374">374</span>
+<span id="375">375</span>
+<span id="376">376</span>
+<span id="377">377</span>
+<span id="378">378</span>
+<span id="379">379</span>
+<span id="380">380</span>
+<span id="381">381</span>
+<span id="382">382</span>
+<span id="383">383</span>
+<span id="384">384</span>
+<span id="385">385</span>
+<span id="386">386</span>
+<span id="387">387</span>
+<span id="388">388</span>
+<span id="389">389</span>
+<span id="390">390</span>
+<span id="391">391</span>
+<span id="392">392</span>
+<span id="393">393</span>
+<span id="394">394</span>
+<span id="395">395</span>
+<span id="396">396</span>
+<span id="397">397</span>
+<span id="398">398</span>
+<span id="399">399</span>
+<span id="400">400</span>
+</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::sql_trace::SqlTraceComment</span>;
+<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">error::SqlError</span>, <span class="ident">model_extensions</span>::<span class="kw-2">*</span>, <span class="ident">query_builder::write</span>, <span class="ident">sql_info::SqlInfo</span>, <span class="ident">QueryExt</span>};
 <span class="kw">use</span> <span class="ident">connector_interface</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident">itertools::Itertools</span>;
 <span class="kw">use</span> <span class="ident">prisma_models</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident">prisma_value::PrismaValue</span>;
-<span class="kw">use</span> <span class="ident">quaint::error::ErrorKind</span>;
+<span class="kw">use</span> <span class="ident">quaint</span>::{
+    <span class="ident">error::ErrorKind</span>,
+    <span class="ident">prelude</span>::{<span class="ident">native_uuid</span>, <span class="ident">uuid_to_bin</span>, <span class="ident">Aliasable</span>, <span class="ident">Select</span>, <span class="ident">SqlFamily</span>},
+};
 <span class="kw">use</span> <span class="ident">std</span>::{
     <span class="ident">collections</span>::{<span class="ident">HashMap</span>, <span class="ident">HashSet</span>},
     <span class="ident">ops::Deref</span>,
@@ -345,16 +417,80 @@
 <span class="kw">use</span> <span class="ident">tracing::log::trace</span>;
 <span class="kw">use</span> <span class="ident">user_facing_errors::query_engine::DatabaseConstraint</span>;
 
+<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">generate_id</span>(
+    <span class="ident">conn</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">QueryExt</span>,
+    <span class="ident">primary_key</span>: <span class="kw-2">&amp;</span><span class="ident">FieldSelection</span>,
+    <span class="ident">trace_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">SelectionResult</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="comment">// Go through all the values and generate a select statement with the correct MySQL function</span>
+    <span class="kw">let</span> (<span class="ident">pk_select</span>, <span class="ident">need_select</span>) <span class="op">=</span> <span class="ident">primary_key</span>
+        .<span class="ident">selections</span>()
+        .<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">field</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">field</span> {
+            <span class="ident">SelectedField::Scalar</span>(<span class="ident">x</span>) <span class="kw">if</span> <span class="ident">x</span>.<span class="ident">default_value</span>.<span class="ident">is_some</span>() =&gt; <span class="ident">x</span>
+                .<span class="ident">default_value</span>
+                .<span class="ident">clone</span>()
+                .<span class="ident">unwrap</span>()
+                .<span class="ident">to_dbgenerated_func</span>()
+                .<span class="ident">map</span>(<span class="op">|</span><span class="ident">func</span><span class="op">|</span> (<span class="ident">field</span>.<span class="ident">db_name</span>().<span class="ident">to_string</span>(), <span class="ident">func</span>)),
+            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+        })
+        .<span class="ident">fold</span>((<span class="ident">Select::default</span>(), <span class="bool-val">false</span>), <span class="op">|</span>(<span class="ident">query</span>, <span class="ident">generated</span>), <span class="ident">value</span><span class="op">|</span> {
+            <span class="kw">let</span> <span class="ident">alias</span> <span class="op">=</span> <span class="ident">value</span>.<span class="number">0</span>;
+            <span class="kw">let</span> <span class="ident">func</span> <span class="op">=</span> <span class="ident">value</span>.<span class="number">1</span>.<span class="ident">to_lowercase</span>().<span class="ident">replace</span>(<span class="string">&quot; &quot;</span>, <span class="string">&quot;&quot;</span>);
+
+            <span class="kw">match</span> <span class="ident">func</span>.<span class="ident">as_str</span>() {
+                <span class="string">&quot;(uuid())&quot;</span> =&gt; (<span class="ident">query</span>.<span class="ident">value</span>(<span class="ident">native_uuid</span>().<span class="ident">alias</span>(<span class="ident">alias</span>)), <span class="bool-val">true</span>),
+                <span class="string">&quot;(uuid_to_bin(uuid()))&quot;</span> =&gt; (<span class="ident">query</span>.<span class="ident">value</span>(<span class="ident">uuid_to_bin</span>().<span class="ident">alias</span>(<span class="ident">alias</span>)), <span class="bool-val">true</span>),
+                <span class="kw">_</span> =&gt; (<span class="ident">query</span>, <span class="ident">generated</span>),
+            }
+        });
+
+    <span class="comment">// db generate values only if needed</span>
+    <span class="kw">if</span> <span class="ident">need_select</span> {
+        <span class="kw">let</span> <span class="ident">pk_select</span> <span class="op">=</span> <span class="ident">pk_select</span>.<span class="ident">add_trace_id</span>(<span class="ident">trace_id</span>);
+        <span class="kw">let</span> <span class="ident">pk_result</span> <span class="op">=</span> <span class="ident">conn</span>.<span class="ident">query</span>(<span class="ident">pk_select</span>.<span class="ident">into</span>()).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">try_convert</span>(<span class="kw-2">&amp;</span>(<span class="ident">primary_key</span>.<span class="ident">into</span>()), <span class="ident">pk_result</span>)<span class="question-mark">?</span>;
+
+        <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">result</span>))
+    } <span class="kw">else</span> {
+        <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>)
+    }
+}
+
 <span class="doccomment">/// Create a single record to the database defined in `conn`, resulting into a</span>
 <span class="doccomment">/// `RecordProjection` as an identifier pointing to the just-created record.</span>
 <span class="attribute">#[<span class="ident">tracing::instrument</span>(<span class="ident">skip</span>(<span class="ident">conn</span>, <span class="ident">model</span>, <span class="ident">args</span>))]</span>
 <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">create_record</span>(
     <span class="ident">conn</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">QueryExt</span>,
+    <span class="ident">sql_family</span>: <span class="kw-2">&amp;</span><span class="ident">SqlFamily</span>,
     <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>,
     <span class="ident">args</span>: <span class="ident">WriteArgs</span>,
     <span class="ident">trace_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
 ) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">SelectionResult</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> (<span class="ident">insert</span>, <span class="ident">returned_id</span>) <span class="op">=</span> <span class="ident">write::create_record</span>(<span class="ident">model</span>, <span class="ident">args</span>, <span class="ident">trace_id</span>);
+    <span class="kw">let</span> <span class="ident">pk</span> <span class="op">=</span> <span class="ident">model</span>.<span class="ident">primary_identifier</span>();
+
+    <span class="kw">let</span> <span class="ident">returned_id</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">sql_family</span> <span class="op">==</span> <span class="ident">SqlFamily::Mysql</span> {
+        <span class="ident">generate_id</span>(<span class="ident">conn</span>, <span class="kw-2">&amp;</span><span class="ident">pk</span>, <span class="ident">trace_id</span>.<span class="ident">clone</span>()).<span class="kw">await</span><span class="question-mark">?</span>
+    } <span class="kw">else</span> {
+        <span class="ident">args</span>.<span class="ident">as_record_projection</span>(<span class="ident">pk</span>.<span class="ident">clone</span>().<span class="ident">into</span>())
+    };
+
+    <span class="kw">let</span> <span class="ident">returned_id</span> <span class="op">=</span> <span class="ident">returned_id</span>.<span class="ident">or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">args</span>.<span class="ident">as_record_projection</span>(<span class="ident">pk</span>.<span class="ident">clone</span>().<span class="ident">into</span>()));
+
+    <span class="kw">let</span> <span class="ident">args</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">returned_id</span> {
+        <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">pk</span>) <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">sql_family</span> <span class="op">==</span> <span class="ident">SqlFamily::Mysql</span> =&gt; {
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">args</span> <span class="op">=</span> <span class="ident">args</span>.<span class="ident">clone</span>();
+            <span class="kw">for</span> (<span class="ident">field</span>, <span class="ident">value</span>) <span class="kw">in</span> <span class="ident">pk</span>.<span class="ident">pairs</span>.<span class="ident">iter</span>() {
+                <span class="kw">let</span> <span class="ident">field</span> <span class="op">=</span> <span class="ident">DatasourceFieldName</span>(<span class="ident">field</span>.<span class="ident">db_name</span>().<span class="ident">into</span>());
+                <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="ident">WriteExpression::from</span>(<span class="ident">value</span>.<span class="ident">clone</span>());
+                <span class="ident">args</span>.<span class="ident">insert</span>(<span class="ident">field</span>, <span class="ident">value</span>)
+            }
+            <span class="ident">args</span>
+        }
+        <span class="kw">_</span> =&gt; <span class="ident">args</span>,
+    };
+
+    <span class="kw">let</span> <span class="ident">insert</span> <span class="op">=</span> <span class="ident">write::create_record</span>(<span class="ident">model</span>, <span class="ident">args</span>, <span class="ident">trace_id</span>);
 
     <span class="kw">let</span> <span class="ident">result_set</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">conn</span>.<span class="ident">insert</span>(<span class="ident">insert</span>).<span class="kw">await</span> {
         <span class="prelude-val">Ok</span>(<span class="ident">id</span>) =&gt; <span class="ident">id</span>,

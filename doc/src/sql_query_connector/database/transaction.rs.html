@@ -402,7 +402,7 @@
         <span class="ident">trace_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
     ) -&gt; <span class="ident">connector::Result</span><span class="op">&lt;</span><span class="ident">SelectionResult</span><span class="op">&gt;</span> {
         <span class="ident">catch</span>(<span class="self">self</span>.<span class="ident">connection_info</span>.<span class="ident">clone</span>(), <span class="kw">async</span> <span class="kw">move</span> {
-            <span class="ident">write::create_record</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">inner</span>, <span class="ident">model</span>, <span class="ident">args</span>, <span class="ident">trace_id</span>).<span class="kw">await</span>
+            <span class="ident">write::create_record</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">inner</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">connection_info</span>.<span class="ident">sql_family</span>(), <span class="ident">model</span>, <span class="ident">args</span>, <span class="ident">trace_id</span>).<span class="kw">await</span>
         })
         .<span class="kw">await</span>
     }
