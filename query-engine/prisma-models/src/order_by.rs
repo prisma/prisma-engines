@@ -1,6 +1,32 @@
-use crate::{RelationFieldRef, ScalarFieldRef};
+use crate::{CompositeFieldRef, RelationFieldRef, ScalarFieldRef};
 use quaint::prelude::Order;
 use std::string::ToString;
+
+#[derive(Clone, Copy, PartialEq, Debug, Eq, Hash)]
+pub enum SortOrder {
+    Ascending,
+    Descending,
+}
+
+impl SortOrder {
+    pub fn into_order(self, reverse: bool) -> Order {
+        match (self, reverse) {
+            (SortOrder::Ascending, false) => Order::Asc,
+            (SortOrder::Descending, false) => Order::Desc,
+            (SortOrder::Ascending, true) => Order::Desc,
+            (SortOrder::Descending, true) => Order::Asc,
+        }
+    }
+}
+
+#[derive(Clone, Copy, PartialEq, Debug, Eq, Hash)]
+pub enum SortAggregation {
+    Count,
+    Avg,
+    Sum,
+    Min,
+    Max,
+}
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum OrderBy {
@@ -44,57 +70,7 @@ impl OrderBy {
             path.get(len - 2).map(|rf| !rf.is_list()).unwrap_or(false)
         }
     }
-}
 
-#[derive(Clone, Debug, PartialEq, Eq, Hash)]
-pub struct OrderByScalar {
-    pub field: ScalarFieldRef,
-    pub path: Vec<RelationFieldRef>,
-    pub sort_order: SortOrder,
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct OrderByAggregation {
-    pub field: Option<ScalarFieldRef>,
-    pub path: Vec<RelationFieldRef>,
-    pub sort_order: SortOrder,
-    pub sort_aggregation: SortAggregation,
-}
-
-impl OrderByAggregation {
-    pub fn field(&self) -> ScalarFieldRef {
-        match &self.field {
-            Some(sf) => sf.clone(),
-            // TODO: This is a hack that should be removed once MongoDB is refactored too
-            None => self.id_field_from_relation(),
-        }
-    }
-
-    fn id_field_from_relation(&self) -> ScalarFieldRef {
-        let ids: Vec<_> = self
-            .path
-            .last()
-            .unwrap()
-            .related_model()
-            .primary_identifier()
-            .as_scalar_fields()
-            .expect("Primary identifier contains non-scalar fields.");
-
-        ids.into_iter().next().unwrap()
-    }
-
-    pub fn is_scalar_aggregation(&self) -> bool {
-        self.field.is_some() && self.path.is_empty()
-    }
-}
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct OrderByRelevance {
-    pub fields: Vec<ScalarFieldRef>,
-    pub sort_order: SortOrder,
-    pub search: String,
-}
-
-impl OrderBy {
     pub fn scalar(field: ScalarFieldRef, path: Vec<RelationFieldRef>, sort_order: SortOrder) -> Self {
         Self::Scalar(OrderByScalar {
             field,
@@ -126,30 +102,59 @@ impl OrderBy {
     }
 }
 
-#[derive(Clone, Copy, PartialEq, Debug, Eq, Hash)]
-pub enum SortOrder {
-    Ascending,
-    Descending,
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum OrderByHop {
+    Relation(RelationFieldRef),
+    Composite(CompositeFieldRef),
 }
 
-impl SortOrder {
-    pub fn into_order(self, reverse: bool) -> Order {
-        match (self, reverse) {
-            (SortOrder::Ascending, false) => Order::Asc,
-            (SortOrder::Descending, false) => Order::Desc,
-            (SortOrder::Ascending, true) => Order::Desc,
-            (SortOrder::Descending, true) => Order::Asc,
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
+pub struct OrderByScalar {
+    pub field: ScalarFieldRef,
+    pub path: Vec<OrderByHop>,
+    pub sort_order: SortOrder,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct OrderByAggregation {
+    pub field: Option<ScalarFieldRef>,
+    pub path: Vec<OrderByHop>,
+    pub sort_order: SortOrder,
+    pub sort_aggregation: SortAggregation,
+}
+
+impl OrderByAggregation {
+    pub fn field(&self) -> ScalarFieldRef {
+        match &self.field {
+            Some(sf) => sf.clone(),
+            // TODO: This is a hack that should be removed once MongoDB is refactored too
+            None => self.id_field_from_relation(),
         }
+    }
+
+    fn id_field_from_relation(&self) -> ScalarFieldRef {
+        let ids: Vec<_> = self
+            .path
+            .last()
+            .unwrap()
+            .related_model()
+            .primary_identifier()
+            .as_scalar_fields()
+            .expect("Primary identifier contains non-scalar fields.");
+
+        ids.into_iter().next().unwrap()
+    }
+
+    pub fn is_scalar_aggregation(&self) -> bool {
+        self.field.is_some() && self.path.is_empty()
     }
 }
 
-#[derive(Clone, Copy, PartialEq, Debug, Eq, Hash)]
-pub enum SortAggregation {
-    Count,
-    Avg,
-    Sum,
-    Min,
-    Max,
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct OrderByRelevance {
+    pub fields: Vec<ScalarFieldRef>,
+    pub sort_order: SortOrder,
+    pub search: String,
 }
 
 impl ToString for SortOrder {

@@ -12,24 +12,45 @@ lazy_static! {
     ));
 }
 
+#[derive(Debug, Default)]
+pub(crate) struct OrderByOptions {
+    pub(crate) include_relations: bool,
+    pub(crate) include_scalar_aggregations: bool,
+    pub(crate) include_full_text_search: bool,
+}
+
+impl OrderByOptions {
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    pub fn with_aggregates(mut self) -> Self {
+        self.include_scalar_aggregations = true;
+        self
+    }
+
+    pub fn type_suffix(&self) -> &'static str {
+        match (
+            self.include_relations,
+            self.include_scalar_aggregations,
+            self.include_full_text_search,
+        ) {
+            (true, false, false) => "WithRelation",
+            (false, true, false) => "WithAggregation",
+            (true, false, true) => "WithRelationAndSearchRelevance",
+            _ => "",
+        }
+    }
+}
+
 /// Builds "<Container>OrderBy<Suffixes>Input" object types.
 pub(crate) fn order_by_object_type(
     ctx: &mut BuilderContext,
     container: &ParentContainer,
-    // model: &ModelRef,
-    include_relations: bool,
-    include_scalar_aggregations: bool,
-    include_full_text_search: bool,
+    options: &OrderByOptions,
 ) -> InputObjectTypeWeakRef {
-    let ident_suffix = match (include_relations, include_scalar_aggregations, include_full_text_search) {
-        (true, false, false) => "WithRelation",
-        (false, true, false) => "WithAggregation",
-        (true, false, true) => "WithRelationAndSearchRelevance",
-        _ => "",
-    };
-
     let ident = Identifier::new(
-        format!("{}OrderBy{}Input", container.name(), ident_suffix),
+        format!("{}OrderBy{}Input", container.name(), options.type_suffix()),
         PRISMA_NAMESPACE,
     );
     return_cached_input!(ctx, &ident);
@@ -44,28 +65,17 @@ pub(crate) fn order_by_object_type(
     let mut fields: Vec<_> = container
         .fields()
         .iter()
-        .filter_map(|field| {
-            orderby_field_mapper(
-                field,
-                ctx,
-                include_relations,
-                include_scalar_aggregations,
-                include_full_text_search,
-            )
-        })
+        .filter_map(|field| orderby_field_mapper(field, ctx, options))
         .collect();
 
-    if include_scalar_aggregations {
+    if options.include_scalar_aggregations {
         // orderBy Fields for aggregation orderings.
         fields.extend(compute_scalar_aggregation_fields(ctx, container));
     }
 
-    if include_full_text_search {
+    if options.include_full_text_search {
         // orderBy Fields for full text searches.
-        append_opt(
-            &mut fields,
-            order_by_field_text_search(ctx, container, &SORT_ORDER_ENUM),
-        )
+        append_opt(&mut fields, order_by_field_text_search(ctx, container))
     }
 
     input_object.set_fields(fields);
@@ -126,32 +136,20 @@ fn compute_scalar_aggregation_fields(ctx: &mut BuilderContext, container: &Paren
     fields.into_iter().flatten().collect()
 }
 
-fn orderby_field_mapper(
-    field: &ModelField,
-    ctx: &mut BuilderContext,
-    include_relations: bool,
-    include_scalar_aggregations: bool,
-    include_full_text_search: bool,
-) -> Option<InputField> {
+fn orderby_field_mapper(field: &ModelField, ctx: &mut BuilderContext, options: &OrderByOptions) -> Option<InputField> {
     match field {
         // To-many relation field.
-        ModelField::Relation(rf) if rf.is_list() && include_relations => {
+        ModelField::Relation(rf) if rf.is_list() && options.include_relations => {
             let related_model = rf.related_model();
-            let related_object_type = order_by_object_type_rel_aggregate(ctx, &related_model, &SORT_ORDER_ENUM);
+            let to_many_aggregate_type = order_by_to_many_aggregate_object_type(ctx, &related_model.into());
 
-            Some(input_field(rf.name.clone(), InputType::object(related_object_type), None).optional())
+            Some(input_field(rf.name.clone(), InputType::object(to_many_aggregate_type), None).optional())
         }
 
         // To-one relation field.
-        ModelField::Relation(rf) if include_relations => {
+        ModelField::Relation(rf) if options.include_relations => {
             let related_model = rf.related_model();
-            let related_object_type = order_by_object_type(
-                ctx,
-                &related_model.into(),
-                include_relations,
-                include_scalar_aggregations,
-                include_full_text_search,
-            );
+            let related_object_type = order_by_object_type(ctx, &related_model.into(), options);
 
             Some(input_field(rf.name.clone(), InputType::object(related_object_type), None).optional())
         }
@@ -162,8 +160,15 @@ fn orderby_field_mapper(
         }
 
         // Composite field.
+        ModelField::Composite(cf) if cf.is_list() => {
+            let to_many_aggregate_type = order_by_to_many_aggregate_object_type(ctx, &(&cf.typ).into());
+            Some(input_field(cf.name.clone(), InputType::object(to_many_aggregate_type), None).optional())
+        }
+
         ModelField::Composite(cf) => {
-            let composite_order_object_type = order_by_object_type(ctx, &(&cf.typ).into(), false, true, false);
+            let composite_order_object_type =
+                order_by_object_type(ctx, &(&cf.typ).into(), &OrderByOptions::new().with_aggregates());
+
             Some(input_field(cf.name.clone(), InputType::object(composite_order_object_type), None).optional())
         }
 
@@ -220,13 +225,19 @@ fn order_by_object_type_aggregate(
     Arc::downgrade(&input_object)
 }
 
-fn order_by_object_type_rel_aggregate(
+fn order_by_to_many_aggregate_object_type(
     ctx: &mut BuilderContext,
-    model: &ModelRef,
-    ordering_enum: &Arc<EnumType>,
+    container: &ParentContainer,
 ) -> InputObjectTypeWeakRef {
-    let ident = Identifier::new(format!("{}OrderByRelationAggregateInput", model.name), PRISMA_NAMESPACE);
+    let container_type = match container {
+        ParentContainer::Model(_) => "Relation",
+        ParentContainer::CompositeType(_) => "Composite",
+    };
 
+    let ident = Identifier::new(
+        format!("{}OrderBy{}AggregateInput", container.name(), container_type),
+        PRISMA_NAMESPACE,
+    );
     return_cached_input!(ctx, &ident);
 
     let mut input_object = init_input_object_type(ident.clone());
@@ -237,7 +248,7 @@ fn order_by_object_type_rel_aggregate(
 
     let fields = vec![input_field(
         aggregations::UNDERSCORE_COUNT,
-        InputType::Enum(ordering_enum.clone()),
+        InputType::Enum(SORT_ORDER_ENUM.clone()),
         None,
     )
     .optional()];
@@ -247,11 +258,7 @@ fn order_by_object_type_rel_aggregate(
     Arc::downgrade(&input_object)
 }
 
-fn order_by_field_text_search(
-    ctx: &mut BuilderContext,
-    container: &ParentContainer,
-    enum_type: &Arc<EnumType>,
-) -> Option<InputField> {
+fn order_by_field_text_search(ctx: &mut BuilderContext, container: &ParentContainer) -> Option<InputField> {
     let scalar_fields: Vec<_> = container
         .fields()
         .into_iter()
@@ -267,12 +274,7 @@ fn order_by_field_text_search(
         Some(
             input_field(
                 ordering::UNDERSCORE_RELEVANCE,
-                InputType::object(order_by_object_type_text_search(
-                    ctx,
-                    container,
-                    scalar_fields,
-                    &enum_type,
-                )),
+                InputType::object(order_by_object_type_text_search(ctx, container, scalar_fields)),
                 None,
             )
             .optional(),
@@ -284,7 +286,6 @@ fn order_by_object_type_text_search(
     ctx: &mut BuilderContext,
     container: &ParentContainer,
     scalar_fields: Vec<ScalarFieldRef>,
-    order_enum_type: &Arc<EnumType>,
 ) -> InputObjectTypeWeakRef {
     let ident = Identifier::new(format!("{}OrderByRelevanceInput", container.name()), PRISMA_NAMESPACE);
 
@@ -312,7 +313,7 @@ fn order_by_object_type_text_search(
         &mut fields,
         Some(input_field(
             ordering::SORT,
-            InputType::Enum(order_enum_type.clone()),
+            InputType::Enum(SORT_ORDER_ENUM.clone()),
             None,
         )),
     );

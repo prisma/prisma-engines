@@ -125,6 +125,7 @@ pub fn compute_joins_aggregation(
         .path
         .split_last()
         .expect("An order by relation aggregation has to have at least one hop");
+
     let mut joins = rest_hops
         .iter()
         .map(|rf| compute_one2m_join(base_model, rf, join_prefix.as_str()))
@@ -134,6 +135,7 @@ pub fn compute_joins_aggregation(
         SortAggregation::Count => AggregationType::Count,
         _ => unreachable!("Order by relation aggregation other than count are not supported"),
     };
+
     // We perform the aggregation on the last join
     let last_aggr_join = compute_aggr_join(
         last_hop,
@@ -142,6 +144,7 @@ pub fn compute_joins_aggregation(
         join_prefix.as_str(),
         joins.last(),
     );
+
     // This is the final column identifier to be used for the scalar field to order by.
     // `{last_join_alias}.{ORDER_AGGREGATOR_ALIAS}`
     let order_by_column = Column::from((last_aggr_join.alias.to_owned(), ORDER_AGGREGATOR_ALIAS.to_owned()));
