@@ -524,6 +524,26 @@ mod update {
         Ok(())
     }
 
+    #[connector_test]
+    async fn update_unset_false_idempotent(runner: Runner) -> TestResult<()> {
+        create_test_data(&runner).await?;
+
+        // Top-level composite
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"mutation { updateOneTestModel(
+            where: { id: 1 },
+            data: { b: { unset: false } }
+          ) {
+            b {
+              b_field
+            }
+          }}"#),
+          @r###"{"data":{"updateOneTestModel":{"b":{"b_field":"b1"}}}}"###
+        );
+
+        Ok(())
+    }
+
     // Ensures unset is only available on optional field of type composite
     #[connector_test]
     async fn ensure_unset_unavailable_on_fields(runner: Runner) -> TestResult<()> {
@@ -720,6 +740,23 @@ mod update {
     }
 
     #[connector_test]
+    async fn fails_unset_on_required_field(runner: Runner) -> TestResult<()> {
+        create_test_data(&runner).await?;
+
+        assert_error!(
+            runner,
+            r#"mutation { updateOneTestModel(
+              where: { id: 1 },
+              data: { a: { unset: true } }
+            ) { id }}"#,
+            2009,
+            "`Mutation.updateOneTestModel.data.TestModelUpdateInput.a.AUpdateEnvelopeInput.unset`: Field does not exist on enclosing type."
+        );
+
+        Ok(())
+    }
+
+    #[connector_test]
     async fn fails_upsert_on_required_field(runner: Runner) -> TestResult<()> {
         create_test_data(&runner).await?;
 
@@ -776,7 +813,7 @@ mod update {
     }
 
     #[connector_test]
-    async fn fails_when_missing_required_fields(runner: Runner) -> TestResult<()> {
+    async fn fails_set_when_missing_required_fields(runner: Runner) -> TestResult<()> {
         // Envelope type failure
         assert_error!(
               runner,

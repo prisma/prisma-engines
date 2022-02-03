@@ -363,6 +363,9 @@ mod create {
 
 #[test_suite(schema(to_many_composites), only(MongoDb))]
 mod update {
+    use indoc::indoc;
+    use query_engine_tests::{assert_error, run_query};
+
     #[connector_test]
     async fn update_set_explicit(runner: Runner) -> TestResult<()> {
         create_test_data(&runner).await?;
@@ -635,6 +638,86 @@ mod update {
             }
           }"#),
           @r###"{"data":{"updateOneTestModel":{"a":{"a_1":"a1","b":[{"b_field":"b_field"},{"b_field":"nested1"},{"b_field":"b_field default"},{"b_field":"nested2"},{"b_field":"nested3"},{"b_field":"b_field default"}]}}}}"###
+        );
+
+        Ok(())
+    }
+
+    #[connector_test(schema(mixed_composites))]
+    async fn fails_push_on_non_list_field(runner: Runner) -> TestResult<()> {
+        create_row(
+            &runner,
+            r#"{
+              id: 1
+              a: { a_1: "a1", b: [{ b_field: "b_field" }] }
+            }"#,
+        )
+        .await?;
+
+        // No push on required composite
+        assert_error!(
+            runner,
+            r#"mutation {
+              updateOneTestModel(
+                where: { id: 1 }
+                data: { a: { push: {} } }
+              ) { id }
+            }"#,
+            2009,
+            "`Mutation.updateOneTestModel.data.TestModelUpdateInput.a.ACreateInput.push`: Field does not exist on enclosing type."
+        );
+
+        // No push on scalar
+        assert_error!(
+          runner,
+          r#"mutation {
+            updateOneTestModel(
+              where: { id: 1 }
+              data: { a: { update: { a_1: { push: {} } } } }
+            ) { id }
+          }"#,
+          2009,
+          "Mutation.updateOneTestModel.data.TestModelUpdateInput.a.AUpdateEnvelopeInput.update.AUpdateInput.a_1.StringFieldUpdateOperationsInput.push`: Field does not exist on enclosing type."
+        );
+
+        Ok(())
+    }
+
+    #[connector_test]
+    async fn fails_unset_on_list_field(runner: Runner) -> TestResult<()> {
+        create_test_data(&runner).await?;
+
+        // No unset on list fields
+        assert_error!(
+            runner,
+            r#"mutation {
+              updateOneTestModel(
+                where: { id: 1 }
+                data: { a: { unset: true } }
+              ) { id }
+            }"#,
+            2009,
+            "`Mutation.updateOneTestModel.data.TestModelUncheckedUpdateInput.a.ACreateInput.unset`: Field does not exist on enclosing type."
+        );
+
+        Ok(())
+    }
+
+    #[connector_test]
+    async fn fails_upsert_on_list_field(runner: Runner) -> TestResult<()> {
+        create_test_data(&runner).await?;
+
+        // No upsert on list fields
+        assert_error!(
+            runner,
+            r#"mutation {
+              updateOneTestModel(
+                where: { id: 1 }
+                data: { a: { upsert: {} } }
+              ) { id }
+            }"#,
+            2009,
+            "`Mutation.updateOneTestModel.data.TestModelUncheckedUpdateInput.a.ACreateInput.upsert`: Field does not exist on enclosing type."
         );
 
         Ok(())
