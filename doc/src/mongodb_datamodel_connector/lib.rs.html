@@ -378,7 +378,7 @@
     }
 
     <span class="kw">fn</span> <span class="ident">parse_native_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">args</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">NativeTypeInstance</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">mongo_type</span> <span class="op">=</span> <span class="ident">mongo_type_from_input</span>(<span class="ident">name</span>, <span class="kw-2">&amp;</span><span class="ident">args</span>)<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">mongo_type</span> <span class="op">=</span> <span class="ident">mongo_type_from_input</span>(<span class="ident">name</span>)<span class="question-mark">?</span>;
 
         <span class="prelude-val">Ok</span>(<span class="ident">NativeTypeInstance::new</span>(<span class="ident">name</span>, <span class="ident">args</span>, <span class="ident">mongo_type</span>.<span class="ident">to_json</span>()))
     }
