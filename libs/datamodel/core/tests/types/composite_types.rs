@@ -21,7 +21,7 @@ fn composite_types_are_parsed_without_error() {
         }
 
         model User {
-            id  String @id @default(dbgenerated()) @map("_id") @db.ObjectId
+            id  String @id @default(auto()) @map("_id") @db.ObjectId
             address Address?
         }
     "#;
@@ -302,7 +302,7 @@ fn composite_types_are_parsed_without_error() {
                                                 Argument {
                                                     name: None,
                                                     value: Function(
-                                                        "dbgenerated",
+                                                        "auto",
                                                         ArgumentsList {
                                                             arguments: [],
                                                             empty_arguments: [],
@@ -310,12 +310,12 @@ fn composite_types_are_parsed_without_error() {
                                                         },
                                                         Span {
                                                             start: 388,
-                                                            end: 401,
+                                                            end: 394,
                                                         },
                                                     ),
                                                     span: Span {
                                                         start: 388,
-                                                        end: 401,
+                                                        end: 394,
                                                     },
                                                 },
                                             ],
@@ -324,15 +324,15 @@ fn composite_types_are_parsed_without_error() {
                                         },
                                         span: Span {
                                             start: 380,
-                                            end: 402,
+                                            end: 395,
                                         },
                                     },
                                     Attribute {
                                         name: Identifier {
                                             name: "map",
                                             span: Span {
-                                                start: 404,
-                                                end: 407,
+                                                start: 397,
+                                                end: 400,
                                             },
                                         },
                                         arguments: ArgumentsList {
@@ -342,13 +342,13 @@ fn composite_types_are_parsed_without_error() {
                                                     value: StringValue(
                                                         "_id",
                                                         Span {
-                                                            start: 408,
-                                                            end: 413,
+                                                            start: 401,
+                                                            end: 406,
                                                         },
                                                     ),
                                                     span: Span {
-                                                        start: 408,
-                                                        end: 413,
+                                                        start: 401,
+                                                        end: 406,
                                                     },
                                                 },
                                             ],
@@ -356,16 +356,16 @@ fn composite_types_are_parsed_without_error() {
                                             trailing_comma: None,
                                         },
                                         span: Span {
-                                            start: 404,
-                                            end: 414,
+                                            start: 397,
+                                            end: 407,
                                         },
                                     },
                                     Attribute {
                                         name: Identifier {
                                             name: "db.ObjectId",
                                             span: Span {
-                                                start: 416,
-                                                end: 427,
+                                                start: 409,
+                                                end: 420,
                                             },
                                         },
                                         arguments: ArgumentsList {
@@ -374,15 +374,15 @@ fn composite_types_are_parsed_without_error() {
                                             trailing_comma: None,
                                         },
                                         span: Span {
-                                            start: 416,
-                                            end: 427,
+                                            start: 409,
+                                            end: 420,
                                         },
                                     },
                                 ],
                                 documentation: None,
                                 span: Span {
                                     start: 364,
-                                    end: 428,
+                                    end: 421,
                                 },
                                 is_commented_out: false,
                             },
@@ -391,24 +391,24 @@ fn composite_types_are_parsed_without_error() {
                                     Identifier {
                                         name: "Address",
                                         span: Span {
-                                            start: 448,
-                                            end: 455,
+                                            start: 441,
+                                            end: 448,
                                         },
                                     },
                                 ),
                                 name: Identifier {
                                     name: "address",
                                     span: Span {
-                                        start: 440,
-                                        end: 447,
+                                        start: 433,
+                                        end: 440,
                                     },
                                 },
                                 arity: Optional,
                                 attributes: [],
                                 documentation: None,
                                 span: Span {
-                                    start: 440,
-                                    end: 457,
+                                    start: 433,
+                                    end: 450,
                                 },
                                 is_commented_out: false,
                             },
@@ -417,7 +417,7 @@ fn composite_types_are_parsed_without_error() {
                         documentation: None,
                         span: Span {
                             start: 339,
-                            end: 466,
+                            end: 459,
                         },
                         commented_out: false,
                     },
@@ -469,7 +469,7 @@ fn composite_types_are_parsed_without_error() {
                                     "_id",
                                 ),
                                 default_value: Some(
-                                    DefaultValue::Expression(dbgenerated()[]),
+                                    DefaultValue::Expression(auto()[]),
                                 ),
                                 documentation: None,
                                 is_generated: false,
