@@ -81,15 +81,6 @@ impl IntoBson for (MongoDbType, PrismaValue) {
             (MongoDbType::Long, PrismaValue::Float(d)) => Bson::Int64(d.to_i64().convert(expl::MONGO_I64)?),
 
             // Array
-            (MongoDbType::Array(inner), PrismaValue::List(vals)) => {
-                let inner = *inner;
-                Bson::Array(
-                    vals.into_iter()
-                        .map(|val| (inner.clone(), val).into_bson())
-                        .collect::<crate::Result<Vec<_>>>()?,
-                )
-            }
-            (MongoDbType::Array(inner), val) => Bson::Array(vec![(*inner, val).into_bson()?]),
             (typ, PrismaValue::List(vals)) => Bson::Array(
                 vals.into_iter()
                     .map(|val| (typ.clone(), val).into_bson())

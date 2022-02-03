@@ -172,7 +172,7 @@ impl Connector for MongoDbDatamodelConnector {
     }
 
     fn parse_native_type(&self, name: &str, args: Vec<String>) -> Result<NativeTypeInstance> {
-        let mongo_type = mongo_type_from_input(name, &args)?;
+        let mongo_type = mongo_type_from_input(name)?;
 
         Ok(NativeTypeInstance::new(name, args, mongo_type.to_json()))
     }
