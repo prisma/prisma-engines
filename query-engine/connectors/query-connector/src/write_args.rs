@@ -77,8 +77,23 @@ impl WriteOperation {
         Self::Composite(CompositeWriteOperation::Set(pv))
     }
 
+    pub fn composite_unset(should_unset: bool) -> Self {
+        Self::Composite(CompositeWriteOperation::Unset(should_unset))
+    }
+
     pub fn composite_update(writes: Vec<(DatasourceFieldName, WriteOperation)>) -> Self {
         Self::Composite(CompositeWriteOperation::Update(NestedWrite { writes }))
+    }
+
+    pub fn composite_push(pv: PrismaValue) -> Self {
+        Self::Composite(CompositeWriteOperation::Push(pv))
+    }
+
+    pub fn composite_upsert(set: CompositeWriteOperation, update: CompositeWriteOperation) -> Self {
+        Self::Composite(CompositeWriteOperation::Upsert {
+            set: Box::new(set),
+            update: Box::new(update),
+        })
     }
 
     pub fn as_scalar(&self) -> Option<&ScalarWriteOperation> {
@@ -97,19 +112,19 @@ impl WriteOperation {
         }
     }
 
-    pub fn try_into_scalar(self) -> Result<ScalarWriteOperation, Self> {
+    pub fn try_into_scalar(self) -> Option<ScalarWriteOperation> {
         if let Self::Scalar(v) = self {
-            Ok(v)
+            Some(v)
         } else {
-            Err(self)
+            None
         }
     }
 
-    pub fn try_into_composite(self) -> Result<CompositeWriteOperation, Self> {
+    pub fn try_into_composite(self) -> Option<CompositeWriteOperation> {
         if let Self::Composite(v) = self {
-            Ok(v)
+            Some(v)
         } else {
-            Err(self)
+            None
         }
     }
 }
@@ -138,13 +153,48 @@ pub enum ScalarWriteOperation {
 #[derive(Debug, PartialEq, Clone)]
 pub enum CompositeWriteOperation {
     Set(PrismaValue),
-    Unset,
+    Push(PrismaValue),
+    Unset(bool),
     Update(NestedWrite),
+    Upsert {
+        set: Box<CompositeWriteOperation>,
+        update: Box<CompositeWriteOperation>,
+    },
 }
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct NestedWrite {
     pub writes: Vec<(DatasourceFieldName, WriteOperation)>,
+}
+
+#[derive(Debug, Clone, Default)]
+pub struct FieldPath {
+    path: Vec<String>,
+}
+
+impl FieldPath {
+    pub fn new_from_segment(field: &Field) -> Self {
+        let mut path = Self::default();
+        path.add_segment(field);
+
+        path
+    }
+
+    pub fn add_segment(&mut self, field: &Field) {
+        self.path.push(field.db_name().to_owned());
+    }
+
+    pub fn path(&self) -> String {
+        self.path.join(".")
+    }
+
+    pub fn dollar_path(&self) -> String {
+        format!("${}", self.path())
+    }
+
+    pub fn identifier(&self) -> String {
+        self.path.join("_")
+    }
 }
 
 impl NestedWrite {
@@ -165,12 +215,12 @@ impl NestedWrite {
     ///  - `Set("3")` is the write operation to execute
     ///  - `Field("field_b")` is the field on which to execute the write operation
     /// - `"field_a.field_b"` is the path for MongoDB to access the nested field
-    pub fn unfold(self, field: &Field) -> Vec<(WriteOperation, &Field, String)> {
-        self.unfold_internal(field, vec![field.db_name().to_owned()])
+    pub fn unfold(self, field: &Field, field_path: FieldPath) -> Vec<(WriteOperation, &Field, FieldPath)> {
+        self.unfold_internal(field, field_path)
     }
 
-    fn unfold_internal(self, field: &'_ Field, path: Vec<String>) -> Vec<(WriteOperation, &'_ Field, String)> {
-        let mut nested_writes: Vec<(WriteOperation, &Field, String)> = vec![];
+    fn unfold_internal(self, field: &'_ Field, field_path: FieldPath) -> Vec<(WriteOperation, &'_ Field, FieldPath)> {
+        let mut nested_writes: Vec<(WriteOperation, &Field, FieldPath)> = vec![];
 
         for (DatasourceFieldName(db_name), write) in self.writes {
             let nested_field = field
@@ -179,17 +229,16 @@ impl NestedWrite {
                 .typ
                 .find_field_by_db_name(&db_name)
                 .unwrap();
-            let mut path = path.clone();
+            let mut new_path = field_path.clone();
+
+            new_path.add_segment(nested_field);
 
             match write {
                 WriteOperation::Composite(CompositeWriteOperation::Update(nested_write)) => {
-                    path.push(db_name);
-
-                    nested_writes.extend(nested_write.unfold_internal(nested_field, path));
+                    nested_writes.extend(nested_write.unfold_internal(nested_field, new_path));
                 }
                 _ => {
-                    path.push(db_name);
-                    nested_writes.push((write, nested_field, path.join(".").to_owned()));
+                    nested_writes.push((write, nested_field, new_path));
                 }
             }
         }
