@@ -126,7 +126,7 @@ impl<'a> LowerDmlToAst<'a> {
                     .as_ref()
                     .map(|text| ast::Comment { text: text.to_owned() }),
                 span: ast::Span::empty(),
-                is_commented_out: false,
+                is_commented_out: field.is_commented_out,
             });
         }
 

@@ -3,6 +3,7 @@ use crate::transform::ast_to_dml::{db::walkers::CompositeTypeWalker, validation_
 use diagnostics::DatamodelError;
 use parser_database::walkers::CompositeTypeFieldWalker;
 
+/// Does the connector support composite types.
 pub(crate) fn composite_types_support(composite_type: CompositeTypeWalker<'_, '_>, ctx: &mut Context<'_>) {
     if ctx.connector.supports_composite_types() {
         return;
@@ -10,6 +11,20 @@ pub(crate) fn composite_types_support(composite_type: CompositeTypeWalker<'_, '_
 
     ctx.push_error(DatamodelError::new_validation_error(
         format!("Composite types are not supported on {}.", ctx.connector.name()),
+        composite_type.ast_composite_type().span,
+    ));
+}
+
+/// A composite type must have at least one visible field.
+pub(crate) fn more_than_one_field(composite_type: CompositeTypeWalker<'_, '_>, ctx: &mut Context<'_>) {
+    let num_of_fields = composite_type.fields().filter(|f| f.is_visible()).count();
+
+    if num_of_fields > 0 {
+        return;
+    }
+
+    ctx.push_error(DatamodelError::new_validation_error(
+        String::from("A type must have at least one field defined."),
         composite_type.ast_composite_type().span,
     ));
 }

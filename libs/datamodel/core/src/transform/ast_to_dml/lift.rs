@@ -255,6 +255,7 @@ impl<'a> LiftAstToDml<'a> {
                     kind: dml_default_kind(value, field.r#type().as_builtin_scalar()),
                     db_name: None,
                 }),
+                is_commented_out: field.ast_field().is_commented_out,
             };
 
             fields.push(field);
