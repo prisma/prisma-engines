@@ -71,8 +71,10 @@ pub async fn create_record(
     let returned_id = if *sql_family == SqlFamily::Mysql {
         generate_id(conn, &pk, trace_id.clone()).await?
     } else {
-        args.as_record_projection(pk.into())
+        args.as_record_projection(pk.clone().into())
     };
+
+    let returned_id = returned_id.or(args.as_record_projection(pk.clone().into()));
 
     let args = match returned_id {
         Some(ref pk) if *sql_family == SqlFamily::Mysql => {
