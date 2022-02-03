@@ -36,7 +36,7 @@ mod relations;
 mod types;
 mod value_validator;
 
-use ast_string::StringInterner;
+use ast_string::{InternedString, StringInterner};
 pub use names::is_reserved_type_name;
 pub use relations::ReferentialAction;
 pub use schema_ast::ast;
@@ -93,14 +93,14 @@ impl ParserDatabase {
             relations: Relations::default(),
         };
 
-        let mut ctx = Context::new(db, diagnostics);
+        let mut ctx = Context::new(&mut db, diagnostics);
 
         // First pass: resolve names.
         names::resolve_names(&mut ctx);
 
         // Return early on name resolution errors.
         if ctx.has_errors() {
-            return ctx.finish();
+            return db;
         }
 
         // Second pass: resolve top-level items and field types.
@@ -108,7 +108,7 @@ impl ParserDatabase {
 
         // Return early on type resolution errors.
         if ctx.has_errors() {
-            return ctx.finish();
+            return db;
         }
 
         // Third pass: validate model and field attributes. All these
@@ -122,7 +122,7 @@ impl ParserDatabase {
         // Fifth step: infer implicit indices
         indexes::infer_implicit_indexes(&mut ctx);
 
-        ctx.finish()
+        db
     }
 
     /// The fully resolved (non alias) scalar field type of an alias. .
@@ -132,11 +132,11 @@ impl ParserDatabase {
 
     /// The parsed AST.
     pub fn ast(&self) -> &ast::SchemaAst {
-        self.ast
+        &self.ast
     }
 
     /// Find a specific field in a specific model.
-    fn find_model_field(&self, model_id: ast::ModelId, field_name: &str) -> Option<ast::FieldId> {
+    fn find_model_field(&self, model_id: ast::ModelId, field_name: InternedString) -> Option<ast::FieldId> {
         self.names.model_fields.get(&(model_id, field_name)).cloned()
     }
 }

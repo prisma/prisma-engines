@@ -1,20 +1,21 @@
 use crate::ast::{self, WithName};
+use crate::ast_string::InternedString;
 use crate::ValueValidator;
 use crate::{DatamodelError, Diagnostics};
 use std::collections::HashMap;
 
 /// Represents a list of arguments.
 #[derive(Debug, Default)]
-pub(crate) struct Arguments<'a> {
-    attribute: Option<(&'a ast::Attribute, ast::AttributeId)>,
-    args: HashMap<Option<&'a str>, &'a ast::Argument>, // the _remaining_ arguments
+pub(crate) struct Arguments {
+    attribute: Option<ast::AttributeId>,
+    args: HashMap<Option<InternedString>, usize>, // the _remaining_ arguments
 }
 
-impl<'a> Arguments<'a> {
+impl Arguments {
     /// Starts validating the arguments for an attribute, checking for duplicate arguments in the process.
     pub(super) fn set_attribute(
         &mut self,
-        attribute: &'a ast::Attribute,
+        attribute: &ast::Attribute,
         attribute_id: ast::AttributeId,
     ) -> Result<(), Diagnostics> {
         let arguments = &attribute.arguments;
@@ -82,7 +83,7 @@ impl<'a> Arguments<'a> {
         errors.to_result()
     }
 
-    pub(crate) fn attribute(&self) -> (&'a ast::Attribute, ast::AttributeId) {
+    pub(crate) fn attribute(&self) -> ast::AttributeId {
         self.attribute.unwrap()
     }
 
@@ -101,14 +102,14 @@ impl<'a> Arguments<'a> {
         self.attribute().0.span
     }
 
-    pub(crate) fn optional_arg(&mut self, name: &'a str) -> Option<ValueValidator<'a>> {
+    pub(crate) fn optional_arg(&mut self, name: &str) -> Option<ValueValidator<'_>> {
         self.args.remove(&Some(name)).map(|arg| ValueValidator::new(&arg.value))
     }
 
     /// Gets the arg with the given name, or if it is not found, the first unnamed argument.
     ///
     /// Use this to implement unnamed argument behavior.
-    pub(crate) fn default_arg(&mut self, name: &'a str) -> Result<ValueValidator<'a>, DatamodelError> {
+    pub(crate) fn default_arg(&mut self, name: & str) -> Result<ValueValidator<'_>, DatamodelError> {
         match (self.args.remove(&Some(name)), self.args.remove(&None)) {
             (Some(arg), None) => Ok(ValueValidator::new(&arg.value)),
             (None, Some(arg)) => Ok(ValueValidator::new(&arg.value)),
@@ -121,7 +122,7 @@ impl<'a> Arguments<'a> {
         DatamodelError::new_attribute_validation_error(message, self.attribute().0.name(), self.span())
     }
 
-    pub(crate) fn optional_default_arg(&mut self, name: &'a str) -> Option<ValueValidator<'a>> {
+    pub(crate) fn optional_default_arg(&mut self, name: &str) -> Option<ValueValidator<'_>> {
         self.default_arg(name).ok()
     }
 }

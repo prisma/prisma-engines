@@ -257,7 +257,7 @@ pub(super) struct EnumAttributes {
     pub(super) mapped_values: HashMap<u32, InternedString>,
 }
 
-fn visit_model<'ast>(model_id: ast::ModelId, ast_model: &'ast ast::Model, ctx: &mut Context<'ast>) {
+fn visit_model(model_id: ast::ModelId, ast_model: &ast::Model, ctx: &mut Context<'_>) {
     for (field_id, ast_field) in ast_model.iter_fields() {
         match field_type(ast_field, ctx) {
             Ok(FieldType::Model(referenced_model)) => {
@@ -332,7 +332,7 @@ fn detect_composite_cycles(ctx: &mut Context<'_>) {
     let mut visited: Vec<ast::CompositeTypeId> = Vec::new();
     let mut errors: Vec<(ast::CompositeTypeId, DatamodelError)> = Vec::new();
 
-    let mut fields_to_traverse: Vec<(CompositeTypeFieldWalker<'_, '_>, Option<Rc<CompositeTypePath<'_, '_>>>)> = ctx
+    let mut fields_to_traverse: Vec<(CompositeTypeFieldWalker<'_>, Option<Rc<CompositeTypePath<'_>>>)> = ctx
         .db
         .walk_composite_types()
         .flat_map(|ct| ct.fields())
@@ -466,7 +466,7 @@ fn detect_alias_cycles(ctx: &mut Context<'_>) {
     }
 }
 
-fn visit_composite_type<'ast>(ct_id: ast::CompositeTypeId, ct: &'ast ast::CompositeType, ctx: &mut Context<'ast>) {
+fn visit_composite_type(ct_id: ast::CompositeTypeId, ct: &ast::CompositeType, ctx: &mut Context<'_>) {
     for (field_id, ast_field) in ct.iter_fields() {
         match field_type(ast_field, ctx) {
             Ok(FieldType::Scalar(ScalarFieldType::Alias(_))) => {
@@ -497,7 +497,7 @@ fn visit_composite_type<'ast>(ct_id: ast::CompositeTypeId, ct: &'ast ast::Compos
     }
 }
 
-fn visit_enum<'ast>(enm: &'ast ast::Enum, ctx: &mut Context<'ast>) {
+fn visit_enum(enm: &ast::Enum, ctx: &mut Context<'_>) {
     if enm.values.is_empty() {
         ctx.push_error(DatamodelError::new_validation_error(
             "An enum must have at least one value.".to_owned(),
@@ -506,7 +506,7 @@ fn visit_enum<'ast>(enm: &'ast ast::Enum, ctx: &mut Context<'ast>) {
     }
 }
 
-fn visit_type_alias<'ast>(alias_id: ast::AliasId, alias: &'ast ast::Field, ctx: &mut Context<'ast>) {
+fn visit_type_alias(alias_id: ast::AliasId, alias: &ast::Field, ctx: &mut Context<'_>) {
     match field_type(alias, ctx) {
         Ok(FieldType::Scalar(scalar_field_type)) => {
             ctx.db.types.type_aliases.insert(alias_id, scalar_field_type);
@@ -524,7 +524,7 @@ fn visit_type_alias<'ast>(alias_id: ast::AliasId, alias: &'ast ast::Field, ctx: 
 
 /// Either a structured, supported type, or an Err(unsupported) if the type name
 /// does not match any we know of.
-fn field_type<'ast>(field: &'ast ast::Field, ctx: &mut Context<'ast>) -> Result<FieldType, &'ast str> {
+fn field_type<'a>(field: &'a ast::Field, ctx: &mut Context<'_>) -> Result<FieldType, &'a str> {
     let supported = match &field.field_type {
         ast::FieldType::Supported(ident) => &ident.name,
         ast::FieldType::Unsupported(_, _) => return Ok(FieldType::Scalar(ScalarFieldType::Unsupported)),
@@ -538,7 +538,7 @@ fn field_type<'ast>(field: &'ast ast::Field, ctx: &mut Context<'ast>) -> Result<
         .db
         .names
         .tops
-        .get(supported.as_str())
+        .get(&ctx.db.interner.intern(supported.as_str()))
         .map(|id| (*id, &ctx.db.ast[*id]))
     {
         Some((ast::TopId::Model(model_id), ast::Top::Model(_))) => Ok(FieldType::Model(model_id)),

@@ -3,7 +3,7 @@ mod attributes;
 
 pub(super) use self::{arguments::Arguments, attributes::Attributes};
 
-use crate::{ast, DatamodelError, Diagnostics, ParserDatabase, ScalarFieldType};
+use crate::{ast, DatamodelError, Diagnostics, ParserDatabase, ScalarFieldType, ValueValidator};
 use std::collections::{HashMap, HashSet};
 
 /// Validation context. This is an implementation detail of ParserDatabase. It
@@ -12,8 +12,8 @@ use std::collections::{HashMap, HashSet};
 pub(crate) struct Context<'a> {
     pub(super) db: &'a mut ParserDatabase,
     pub(super) diagnostics: &'a mut Diagnostics,
-    arguments: Arguments<'a>,
-    attributes: Attributes<'a>,
+    arguments: Arguments,
+    attributes: Attributes,
 
     // @map'ed names indexes. These are not in the db because they are only used for validation.
     pub(super) mapped_model_names: HashMap<&'a str, ast::ModelId>,
@@ -24,7 +24,7 @@ pub(crate) struct Context<'a> {
 }
 
 impl<'a> Context<'a> {
-    pub(super) fn new(db: &'a ParserDatabase, diagnostics: Diagnostics) -> Self {
+    pub(super) fn new(db: &'a mut ParserDatabase, diagnostics: &'a mut Diagnostics) -> Self {
         Context {
             db,
             diagnostics,
@@ -60,7 +60,7 @@ impl<'a> Context<'a> {
         model_id: ast::ModelId,
         field_id: ast::FieldId,
         mut scalar_field_type: ScalarFieldType,
-        f: impl FnOnce(&'_ mut Attributes<'a>, &'_ mut Context<'a>),
+        f: impl FnOnce(&mut Attributes<'a>, &mut Context<'a>),
     ) {
         self.attributes.set_attributes(
             self.db.ast[model_id][field_id]
@@ -122,7 +122,7 @@ impl<'a> Context<'a> {
         &mut self,
         attribute: &'a ast::Attribute,
         attribute_id: ast::AttributeId,
-        f: impl FnOnce(&mut Arguments<'a>, &mut Context<'a>),
+        f: impl FnOnce(&mut AttributeContext<'_, 'a>),
     ) {
         let mut arguments = match self.arguments.set_attribute(attribute, attribute_id) {
             Ok(()) => std::mem::take(&mut self.arguments), // reuse the allocation for arguments
@@ -137,4 +137,44 @@ impl<'a> Context<'a> {
 
         self.arguments = arguments;
     }
+}
+
+pub(crate) struct AttributeListContext<'ctx, 'db> {
+    attributes: Attributes,
+    pub(crate) ctx: &'ctx mut Context<'db>,
+}
+
+impl<'ctx, 'db> AttributeListContext<'ctx, 'db> {}
+
+pub(crate) struct AttributeContext<'ctx, 'db> {
+    arguments: Arguments,
+    pub(crate) ctx: &'ctx mut Context<'db>,
+}
+
+impl<'ctx, 'db> AttributeContext<'ctx, 'db> {
+    pub(crate) fn optional_arg(&mut self, name: &str) -> Option<ValueValidator<'db>> {
+        self.args.remove(&Some(name)).map(|arg| ValueValidator::new(&arg.value))
+    }
+
+    /// Gets the arg with the given name, or if it is not found, the first unnamed argument.
+    ///
+    /// Use this to implement unnamed argument behavior.
+    pub(crate) fn default_arg(&mut self, name: &str) -> Result<ValueValidator<'db>, DatamodelError> {
+        match (self.args.remove(&Some(name)), self.args.remove(&None)) {
+            (Some(arg), None) => Ok(ValueValidator::new(&arg.value)),
+            (None, Some(arg)) => Ok(ValueValidator::new(&arg.value)),
+            (Some(arg), Some(_)) => Err(DatamodelError::new_duplicate_default_argument_error(name, arg.span)),
+            (None, None) => Err(DatamodelError::new_argument_not_found_error(name, self.span())),
+        }
+    }
+
+    pub(crate) fn new_attribute_validation_error(&self, message: &str) -> DatamodelError {
+        DatamodelError::new_attribute_validation_error(message, self.attribute().0.name(), self.span())
+    }
+
+    pub(crate) fn optional_default_arg(&mut self, name: &str) -> Option<ValueValidator<'_>> {
+        self.default_arg(name).ok()
+    }
+
+    pub(crate) fn attribute(&self) -> &'db ast::Attribute {}
 }

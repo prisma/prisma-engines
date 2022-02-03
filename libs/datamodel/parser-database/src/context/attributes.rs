@@ -1,25 +1,19 @@
 use super::*;
 
 #[derive(Default)]
-pub(crate) struct Attributes<'ast> {
-    attributes: Vec<(&'ast ast::Attribute, ast::AttributeId)>,
+pub(crate) struct Attributes {
+    attributes: Vec<ast::AttributeId>,
     unused_attributes: HashSet<usize>,
 }
 
-impl<'ast> Attributes<'ast> {
-    pub(super) fn set_attributes(
-        &mut self,
-        ast_attributes: impl ExactSizeIterator<Item = (&'ast ast::Attribute, ast::AttributeId)>,
-    ) {
+impl Attributes {
+    pub(super) fn set_attributes(&mut self, ast_attributes: impl ExactSizeIterator<Item = ast::AttributeId>) {
         self.attributes.clear();
         self.unused_attributes.clear();
         self.extend_attributes(ast_attributes)
     }
 
-    pub(super) fn extend_attributes(
-        &mut self,
-        ast_attributes: impl ExactSizeIterator<Item = (&'ast ast::Attribute, ast::AttributeId)>,
-    ) {
+    pub(super) fn extend_attributes(&mut self, ast_attributes: impl ExactSizeIterator<Item = ast::AttributeId>) {
         self.unused_attributes
             .extend(self.attributes.len()..(self.attributes.len() + ast_attributes.len()));
         for attr in ast_attributes {
@@ -27,16 +21,16 @@ impl<'ast> Attributes<'ast> {
         }
     }
 
-    pub(super) fn unused_attributes(&self) -> impl Iterator<Item = &'ast ast::Attribute> + '_ {
+    pub(super) fn unused_attributes(&self) -> impl Iterator<Item = ast::AttributeId> + '_ {
         self.unused_attributes.iter().map(move |idx| self.attributes[*idx].0)
     }
 
     /// Validate an _optional_ attribute that should occur only once.
-    pub(crate) fn visit_optional_single<'ctx>(
+    pub(crate) fn visit_optional_single<'db>(
         &mut self,
         name: &str,
-        ctx: &'ctx mut Context<'ast>,
-        f: impl FnOnce(&mut Arguments<'ast>, &mut Context<'ast>),
+        ctx: &mut Context<'db>,
+        f: impl FnOnce(&mut Arguments, &mut Context<'db>),
     ) {
         let mut attrs = self
             .attributes
@@ -71,11 +65,11 @@ impl<'ast> Attributes<'ast> {
     }
 
     /// Extract an attribute that can occur zero or more times. Example: @@index on models.
-    pub(crate) fn visit_repeated<'ctx>(
+    pub(crate) fn visit_repeated<'db>(
         &mut self,
         name: &'static str,
-        ctx: &'ctx mut Context<'ast>,
-        mut f: impl FnMut(&mut Arguments<'ast>, &mut Context<'ast>),
+        ctx: &mut Context<'db>,
+        mut f: impl FnMut(&mut Arguments, &mut Context<'db>),
     ) {
         for (attr_idx, (attr, attr_id)) in self
             .attributes
@@ -96,10 +90,10 @@ impl<'ast> Attributes<'ast> {
     /// arguments to other attributes: everywhere else, attributes are named,
     /// with a default that can be first, but with native types, arguments are
     /// purely positional.
-    pub(crate) fn visit_datasource_scoped<'ctx>(
+    pub(crate) fn visit_datasource_scoped<'db>(
         &mut self,
-        ctx: &'ctx mut Context<'ast>,
-        f: impl FnOnce(&'ast str, &'ast str, &'ast ast::Attribute, &mut Context<'ast>),
+        ctx: &mut Context<'db>,
+        f: impl FnOnce(&'db str, &'db str, &'db ast::Attribute, &mut Context<'db>),
     ) {
         let attrs = self
             .attributes

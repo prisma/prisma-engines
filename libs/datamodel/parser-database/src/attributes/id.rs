@@ -9,17 +9,17 @@ use crate::{
 
 /// @@id on models
 pub(super) fn model<'db>(
-    args: &mut Arguments<'db>,
+    id: &mut Arguments<'db>,
     model_data: &mut ModelAttributes,
     model_id: ast::ModelId,
     ctx: &mut Context<'db>,
 ) {
-    let fields = match args.default_arg("fields") {
+    let fields = match id.default_arg("fields") {
         Ok(value) => value,
         Err(err) => return ctx.push_error(err),
     };
 
-    let resolved_fields = match resolve_field_array_with_args(&fields, args.span(), model_id, ctx) {
+    let resolved_fields = match resolve_field_array_with_args(&fields, id.span(), model_id, ctx) {
         Ok(fields) => fields,
         Err(FieldResolutionError::AlreadyDealtWith) => return,
         Err(FieldResolutionError::ProblematicFields {
@@ -38,7 +38,7 @@ pub(super) fn model<'db>(
             }
 
             if !relation_fields.is_empty() {
-                ctx.push_error(DatamodelError::new_model_validation_error(&format!("The id definition refers to the relation fields {}. ID definitions must reference only scalar fields.", relation_fields.iter().map(|(f, _)| f.name()).collect::<Vec<_>>().join(", ")), ctx.db.ast[model_id].name(), args.span()));
+                ctx.push_error(DatamodelError::new_model_validation_error(&format!("The id definition refers to the relation fields {}. ID definitions must reference only scalar fields.", relation_fields.iter().map(|(f, _)| f.name()).collect::<Vec<_>>().join(", ")), ctx.db.ast[model_id].name(), id.span()));
             }
 
             return;
@@ -62,7 +62,7 @@ pub(super) fn model<'db>(
                 fields_that_are_not_required.join(", ")
             ),
             &ast_model.name.name,
-            args.span(),
+            id.span(),
         ))
     }
 
@@ -75,11 +75,11 @@ pub(super) fn model<'db>(
     }
 
     let (name, mapped_name) = {
-        let mapped_name = primary_key_mapped_name(args, ctx);
-        let name = super::get_name_argument(args, ctx);
+        let mapped_name = primary_key_mapped_name(id, ctx);
+        let name = super::get_name_argument(id, ctx);
 
         if let Some(name) = name {
-            super::validate_client_name(args.span(), &ast_model.name.name, name, "@@id", ctx);
+            super::validate_client_name(id.span(), &ast_model.name.name, name, "@@id", ctx);
         }
 
         (name, mapped_name)
@@ -87,7 +87,7 @@ pub(super) fn model<'db>(
 
     model_data.primary_key = Some(IdAttribute {
         name: name.map(|name| ctx.db.interner.intern(name)),
-        source_attribute: args.attribute().0,
+        source_attribute: id.attribute().0,
         mapped_name: mapped_name.map(|mapped_name| ctx.db.interner.intern(mapped_name)),
         fields: resolved_fields,
         source_field: None,

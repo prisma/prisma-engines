@@ -72,7 +72,7 @@ pub(super) fn resolve_names(ctx: &mut Context<'_>) {
 
                     if names
                         .model_fields
-                        .insert((model_id, &field.name.name), field_id)
+                        .insert((model_id, ctx.db.interner.intern(&field.name.name)), field_id)
                         .is_some()
                     {
                         ctx.push_error(DatamodelError::new_duplicate_field_error(
@@ -92,7 +92,7 @@ pub(super) fn resolve_names(ctx: &mut Context<'_>) {
                     // Check that there is no duplicate field on the composite type
                     if names
                         .composite_type_fields
-                        .insert((ctid, &field.name.name), field_id)
+                        .insert((ctid, ctx.db.interner.intern(&field.name.name)), field_id)
                         .is_some()
                     {
                         ctx.push_error(DatamodelError::new_composite_type_duplicate_field_error(

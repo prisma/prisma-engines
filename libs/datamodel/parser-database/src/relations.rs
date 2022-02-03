@@ -180,21 +180,21 @@ impl Relation {
 }
 
 // Implementation detail for this module. Should stay private.
-struct RelationEvidence<'ast, 'db> {
-    pub(super) ast_model: &'ast ast::Model,
+struct RelationEvidence<'db> {
+    pub(super) ast_model: &'db ast::Model,
     pub(super) model_id: ast::ModelId,
-    pub(super) ast_field: &'ast ast::Field,
+    pub(super) ast_field: &'db ast::Field,
     pub(super) field_id: ast::FieldId,
     pub(super) is_self_relation: bool,
     pub(super) relation_field: &'db RelationField,
-    pub(super) opposite_model: &'ast ast::Model,
-    pub(super) opposite_relation_field: Option<(ast::FieldId, &'ast ast::Field, &'db RelationField)>,
+    pub(super) opposite_model: &'db ast::Model,
+    pub(super) opposite_relation_field: Option<(ast::FieldId, &'db ast::Field, &'db RelationField)>,
 }
 
-fn relation_evidence<'ast, 'db>(
-    ((model_id, field_id), relation_field): (&(ast::ModelId, ast::FieldId), &'db RelationField),
-    ctx: &'db Context<'ast>,
-) -> RelationEvidence<'ast, 'db> {
+fn relation_evidence<'db>(
+    ((model_id, field_id), relation_field): (&'db (ast::ModelId, ast::FieldId), &'db RelationField),
+    ctx: &'db Context<'db>,
+) -> RelationEvidence<'db> {
     let ast_model = &ctx.db.ast[*model_id];
     let ast_field = &ast_model[*field_id];
     let opposite_model = &ctx.db.ast[relation_field.referenced_model];
@@ -223,10 +223,10 @@ fn relation_evidence<'ast, 'db>(
     }
 }
 
-fn ingest_relation<'ast, 'db>(
-    evidence: RelationEvidence<'ast, 'db>,
+fn ingest_relation<'db>(
+    evidence: RelationEvidence<'db>,
     relations: &mut Relations,
-    ctx: &'db Context<'ast>,
+    ctx: &Context<'db>,
 ) {
     // In this function, we want to ingest the relation only once,
     // so if we know that we will create a relation for the opposite
