@@ -74,7 +74,7 @@ pub async fn create_record(
         args.as_record_projection(pk.clone().into())
     };
 
-    let returned_id = returned_id.or(args.as_record_projection(pk.clone().into()));
+    let returned_id = returned_id.or_else(|| args.as_record_projection(pk.clone().into()));
 
     let args = match returned_id {
         Some(ref pk) if *sql_family == SqlFamily::Mysql => {

@@ -67,48 +67,48 @@ mod special_id_values {
 
     #[connector_test]
     async fn binary_str_composite(runner: Runner) -> TestResult<()> {
-        runner
-            .query(indoc! {r#"
+        run_query!(
+            runner,
+            indoc! {r#"
         mutation {
             createOneBinStrTest(data: {
                 name: "foo"
             }) { one, two }
         }
-        "#})
-            .await?
-            .assert_success();
+        "#}
+        );
 
         Ok(())
     }
 
     #[connector_test]
     async fn extra_spaces_are_removed(runner: Runner) -> TestResult<()> {
-        runner
-            .query(indoc! {r#"
+        run_query!(
+            runner,
+            indoc! {r#"
         mutation {
             createOneSpacesTest(data: {
                 name: "foo"
             }) { id }
         }
-        "#})
-            .await?
-            .assert_success();
+        "#}
+        );
 
         Ok(())
     }
 
     #[connector_test]
     async fn uuid_without_native_type(runner: Runner) -> TestResult<()> {
-        runner
-            .query(indoc! {r#"
+        run_query!(
+            runner,
+            indoc! {r#"
         mutation {
             createOneChoppedTest(data: {
                 name: "foo"
             }) { id }
         }
-        "#})
-            .await?
-            .assert_success();
+        "#}
+        );
 
         Ok(())
     }
