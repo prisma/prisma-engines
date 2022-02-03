@@ -305,7 +305,6 @@ fn composite_push_update_input_field(ctx: &mut BuilderContext, cf: &CompositeFie
 }
 
 /// Builds the `upsert` input object type. Should only be used in the envelope type.
-// TODO: remove upsert from update child object
 fn composite_upsert_object_type(ctx: &mut BuilderContext, cf: &CompositeFieldRef) -> InputObjectTypeWeakRef {
     let name = format!("{}UpsertInput", cf.typ.name);
 
