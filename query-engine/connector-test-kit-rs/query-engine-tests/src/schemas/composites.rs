@@ -70,6 +70,7 @@ pub fn to_one_composites() -> String {
         type A {
             a_1 String @default("a_1 default") @map("a1")
             a_2 Int?
+            b   B @map("nested_b")
         }
 
         type B {
@@ -79,6 +80,7 @@ pub fn to_one_composites() -> String {
 
         type C {
             c_field String @default("c_field default")
+            c_opt   String?
             b B?
         }
         "#

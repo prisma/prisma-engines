@@ -40,6 +40,7 @@ pub mod operations {
 
     // scalar lists and composites
     pub const PUSH: &str = "push";
+    pub const UNSET: &str = "unset";
 
     // numbers
     pub const INCREMENT: &str = "increment";

@@ -37,11 +37,15 @@ impl Field {
     }
 
     pub fn is_scalar(&self) -> bool {
-        match self {
-            Field::Scalar(_) => true,
-            Field::Relation(_) => false,
-            Field::Composite(_) => false,
-        }
+        matches!(self, Self::Scalar(_))
+    }
+
+    pub fn is_relation(&self) -> bool {
+        matches!(self, Self::Relation(..))
+    }
+
+    pub fn is_composite(&self) -> bool {
+        matches!(self, Self::Composite(_))
     }
 
     pub fn is_id(&self) -> bool {
@@ -104,6 +108,14 @@ impl Field {
             Field::Relation(field) => FieldWeak::Relation(Arc::downgrade(field)),
             Field::Scalar(field) => FieldWeak::Scalar(Arc::downgrade(field)),
             Field::Composite(field) => FieldWeak::Composite(Arc::downgrade(field)),
+        }
+    }
+
+    pub fn as_composite(&self) -> Option<&CompositeFieldRef> {
+        if let Self::Composite(v) = self {
+            Some(v)
+        } else {
+            None
         }
     }
 }

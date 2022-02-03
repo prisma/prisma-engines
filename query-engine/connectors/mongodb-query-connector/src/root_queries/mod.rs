@@ -4,6 +4,8 @@ mod raw;
 pub mod read;
 pub mod write;
 
+mod update_utils;
+
 use crate::{output_meta::OutputMetaMapping, value::value_from_bson};
 use mongodb::bson::Bson;
 use mongodb::bson::Document;

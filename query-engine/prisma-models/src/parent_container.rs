@@ -32,7 +32,7 @@ impl ParentContainer {
         }
     }
 
-    fn as_composite(&self) -> Option<CompositeTypeRef> {
+    pub fn as_composite(&self) -> Option<CompositeTypeRef> {
         match self {
             ParentContainer::Model(_) => None,
             ParentContainer::CompositeType(ct) => ct.upgrade(),
@@ -65,6 +65,14 @@ impl ParentContainer {
                 .find(|field| field.name() == prisma_name)
                 .cloned(),
         }
+    }
+
+    pub fn is_composite(&self) -> bool {
+        matches!(self, Self::CompositeType(..))
+    }
+
+    pub fn is_model(&self) -> bool {
+        matches!(self, Self::Model(..))
     }
 }
 
