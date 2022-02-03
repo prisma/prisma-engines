@@ -1,5 +1,5 @@
 use crate::test_api::*;
-use crate::types::ObjectId as MdbOid;
+use crate::types::ObjectId;
 use introspection_connector::CompositeTypeDepth;
 use mongodb::bson::{doc, Bson};
 
@@ -396,7 +396,7 @@ fn name_clashes() {
 fn non_id_object_ids() {
     let res = introspect(|db| async move {
         let docs = vec![
-            doc! { "non_id_object_id": Bson::ObjectId(MdbOid::new()), "data": {"non_id_object_id": Bson::ObjectId(MdbOid::new())}},
+            doc! { "non_id_object_id": Bson::ObjectId(ObjectId::new()), "data": {"non_id_object_id": Bson::ObjectId(ObjectId::new())}},
         ];
 
         db.collection("Test").insert_many(docs, None).await?;
