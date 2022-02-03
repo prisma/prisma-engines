@@ -521,6 +521,7 @@ fn composite_types_are_parsed_without_error() {
                             database_name: None,
                             documentation: None,
                             default_value: None,
+                            is_commented_out: false,
                         },
                         CompositeTypeField {
                             name: "street",
@@ -541,6 +542,7 @@ fn composite_types_are_parsed_without_error() {
                             database_name: None,
                             documentation: None,
                             default_value: None,
+                            is_commented_out: false,
                         },
                     ],
                 },

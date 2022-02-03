@@ -43,9 +43,9 @@ impl TestResult {
     }
 
     #[track_caller]
-    pub fn assert_affected(&self, affected: serde_json::Value) {
+    pub fn assert_warning_affected(&self, affected: &serde_json::Value) {
         dbg!(&self.warnings);
-        assert_eq!(self.warnings[0].affected, affected)
+        assert!(&self.warnings[0].affected == affected);
     }
 }
 

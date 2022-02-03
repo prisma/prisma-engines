@@ -344,6 +344,7 @@ fn populate_fields(
 
     let mut unsupported = Vec::new();
     let mut undecided_types = Vec::new();
+    let mut fields_with_empty_names = Vec::new();
 
     for ((container, field_name), sampler) in fields.into_iter() {
         let doc_count = *samples.get(&container).unwrap_or(&0);
@@ -392,6 +393,8 @@ fn populate_fields(
                         documentation = Some(COMMENTED_OUT_FIELD.to_string());
                     }
                 };
+
+                fields_with_empty_names.push((container.clone(), field_name.clone()));
 
                 (field_name.clone(), Some(field_name), true)
             }
@@ -443,6 +446,10 @@ fn populate_fields(
 
     if !undecided_types.is_empty() {
         warnings.push(crate::warnings::undecided_field_type(&undecided_types));
+    }
+
+    if !fields_with_empty_names.is_empty() {
+        warnings.push(crate::warnings::fields_with_empty_names(&fields_with_empty_names));
     }
 
     (models, types)
