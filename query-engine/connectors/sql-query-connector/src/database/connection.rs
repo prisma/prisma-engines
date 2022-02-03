@@ -150,7 +150,7 @@ where
         trace_id: Option<String>,
     ) -> connector::Result<SelectionResult> {
         catch(self.connection_info.clone(), async move {
-            write::create_record(&self.inner, model, args, trace_id).await
+            write::create_record(&self.inner, &self.connection_info.sql_family(), model, args, trace_id).await
         })
         .await
     }
