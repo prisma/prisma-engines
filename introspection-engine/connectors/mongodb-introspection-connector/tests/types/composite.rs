@@ -410,7 +410,7 @@ fn non_id_object_ids() {
         }
 
         model Test {
-          id               String   @id @default(dbgenerated()) @map("_id") @db.ObjectId
+          id               String   @id @default(auto()) @map("_id") @db.ObjectId
           data             TestData
           non_id_object_id String   @db.ObjectId
         }
