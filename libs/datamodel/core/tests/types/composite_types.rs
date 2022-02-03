@@ -4,7 +4,7 @@ use indoc::indoc;
 
 use crate::{
     common::{CompositeTypeAsserts, DatamodelAsserts},
-    with_header,
+    with_header, Provider,
 };
 
 #[test]

@@ -1,4 +1,3 @@
-use crate::sampler::Name;
 use introspection_connector::Warning;
 use serde_json::json;
 

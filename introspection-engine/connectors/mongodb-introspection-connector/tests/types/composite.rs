@@ -38,7 +38,7 @@ fn singular() {
 fn dirty_data() {
     let res = introspect(|db| async move {
         let docs = vec![
-            doc! { "name": "Musti", "address": { "street": "Meowstrasse", "number": 123 }},
+            doc! { "name": "Musti", "address": { "street": "Meowstrasse", "number": 123i32 }},
             doc! { "name": "Naukio", "address": { "street": "Meowstrasse", "number": "123" }},
             doc! { "name": "Bob", "address": { "street": "Kantstrasse", "number": "123" }},
         ];
@@ -64,7 +64,7 @@ fn dirty_data() {
 
     expected.assert_eq(res.datamodel());
 
-    res.assert_affected(json!([{
+    res.assert_warning_affected(&json!([{
         "compositeType": "CatAddress",
         "field": "number",
         "tpe": "String",
