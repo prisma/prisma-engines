@@ -6,6 +6,7 @@ use crate::{
 use connector_interface::{ConnectionLike, ReadOperations, RelAggregationSelection, Transaction, WriteOperations};
 use mongodb::options::{Acknowledgment, ReadConcern, TransactionOptions, WriteConcern};
 use prisma_models::SelectionResult;
+use std::collections::HashMap;
 
 pub struct MongoDbTransaction<'conn> {
     connection: &'conn mut MongoDbConnection,
@@ -170,18 +171,15 @@ impl<'conn> WriteOperations for MongoDbTransaction<'conn> {
         .await
     }
 
-    async fn execute_raw(
-        &mut self,
-        _query: String,
-        _parameters: Vec<prisma_value::PrismaValue>,
-    ) -> connector_interface::Result<usize> {
+    async fn execute_raw(&mut self, _inputs: HashMap<String, PrismaValue>) -> connector_interface::Result<usize> {
         Err(MongoError::Unsupported("Raw queries".to_owned()).into_connector_error())
     }
 
     async fn query_raw(
         &mut self,
-        _query: String,
-        _parameters: Vec<prisma_value::PrismaValue>,
+        _model: Option<&ModelRef>,
+        _inputs: HashMap<String, PrismaValue>,
+        _query_type: Option<String>,
     ) -> connector_interface::Result<serde_json::Value> {
         Err(MongoError::Unsupported("Raw queries".to_owned()).into_connector_error())
     }

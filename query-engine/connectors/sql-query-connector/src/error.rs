@@ -222,7 +222,7 @@ impl SqlError {
                         message: message.clone(),
                     },
                 )),
-                kind: ErrorKind::RawError { code, message },
+                kind: ErrorKind::RawDatabaseError { code, message },
             },
             SqlError::ConnectionClosed => ConnectorError {
                 user_facing_error: Some(user_facing_errors::KnownError::new(

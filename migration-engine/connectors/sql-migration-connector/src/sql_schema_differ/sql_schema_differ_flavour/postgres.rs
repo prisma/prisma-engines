@@ -75,6 +75,7 @@ impl SqlSchemaDifferFlavour for PostgresFlavour {
 
     fn column_type_change(&self, differ: Pair<ColumnWalker<'_>>) -> Option<ColumnTypeChange> {
         use ColumnTypeChange::*;
+
         let from_list_to_scalar = differ.previous.arity().is_list() && !differ.next.arity().is_list();
         let from_scalar_to_list = !differ.previous.arity().is_list() && differ.next.arity().is_list();
 
@@ -90,6 +91,8 @@ impl SqlSchemaDifferFlavour for PostgresFlavour {
         let next_type: Option<PostgresType> = differ.next.column_native_type();
 
         match (previous_type, next_type) {
+            // https://go.crdb.dev/issue-v/49329/v22.1
+            (prev, next) if prev != next && self.is_cockroachdb() => Some(NotCastable),
             (_, Some(PostgresType::Text)) if from_list_to_scalar => Some(SafeCast),
             (_, Some(PostgresType::VarChar(None))) if from_list_to_scalar => Some(SafeCast),
             (_, Some(PostgresType::VarChar(_))) if from_list_to_scalar => Some(RiskyCast),
@@ -110,6 +113,26 @@ impl SqlSchemaDifferFlavour for PostgresFlavour {
 
     fn view_should_be_ignored(&self, view_name: &str) -> bool {
         POSTGIS_TABLES_OR_VIEWS.is_match(view_name) || EXTENSION_VIEWS.is_match(view_name)
+    }
+
+    fn set_tables_to_redefine(&self, db: &mut DifferDatabase<'_>) {
+        if !self.is_cockroachdb() {
+            return;
+        }
+
+        let id_gets_dropped = db
+            .table_pairs()
+            .filter(|tables| {
+                tables.column_pairs().any(|columns| {
+                    let type_change = self.column_type_change(columns);
+                    let is_id = columns.previous.is_single_primary_key();
+
+                    is_id && matches!(type_change, Some(ColumnTypeChange::NotCastable))
+                })
+            })
+            .map(|t| t.table_ids());
+
+        db.tables_to_redefine = id_gets_dropped.collect();
     }
 }
 

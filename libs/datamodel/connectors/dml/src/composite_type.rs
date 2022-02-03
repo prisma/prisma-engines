@@ -76,4 +76,12 @@ impl CompositeTypeFieldType {
             None
         }
     }
+
+    pub fn as_native_type(&self) -> Option<(&ScalarType, &NativeTypeInstance)> {
+        if let Self::Scalar(typ, _, Some(native_type)) = self {
+            Some((typ, native_type))
+        } else {
+            None
+        }
+    }
 }

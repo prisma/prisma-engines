@@ -6,7 +6,7 @@ use migration_engine_tests::test_api::*;
 use quaint::prelude::Queryable;
 use std::sync::Arc;
 
-#[test_connector]
+#[test_connector(tags(Sqlite))]
 fn diffing_postgres_schemas_when_initialized_on_sqlite(mut api: TestApi) {
     // We should get a postgres diff.
 
@@ -47,7 +47,7 @@ fn diffing_postgres_schemas_when_initialized_on_sqlite(mut api: TestApi) {
 
     let to_file = write_file_to_tmp(to, &tempdir, "to");
 
-    api.diff(&DiffParams {
+    api.diff(DiffParams {
         from: DiffTarget::SchemaDatamodel(SchemaContainer {
             schema: from_file.to_string_lossy().into_owned(),
         }),
@@ -59,7 +59,7 @@ fn diffing_postgres_schemas_when_initialized_on_sqlite(mut api: TestApi) {
     })
     .unwrap();
 
-    api.diff(&DiffParams {
+    api.diff(DiffParams {
         from: DiffTarget::SchemaDatamodel(SchemaContainer {
             schema: from_file.to_string_lossy().into_owned(),
         }),
@@ -110,7 +110,7 @@ fn from_empty_to_migrations_directory(mut api: TestApi) {
         shadow_database_url: Some(api.connection_string().to_owned()),
     };
 
-    api.diff(&params).unwrap();
+    api.diff(params).unwrap();
 
     let expected_printed_messages = expect![[r#"
         [
@@ -149,7 +149,7 @@ fn from_empty_to_migrations_folder_without_shadow_db_url_must_error(mut api: Tes
         shadow_database_url: None, // TODO: ?
     };
 
-    let err = api.diff(&params).unwrap_err();
+    let err = api.diff(params).unwrap_err();
 
     let expected_error = expect![[r#"
         You must pass the --shadow-database-url if you want to diff a migrations directory.
@@ -195,7 +195,7 @@ fn from_schema_datamodel_to_url(mut api: TestApi) {
         to: DiffTarget::Url(UrlContainer { url: second_url }),
     };
 
-    api.diff(&input).unwrap();
+    api.diff(input).unwrap();
 
     let expected_printed_messages = expect![[r#"
         [
@@ -250,7 +250,7 @@ fn from_schema_datasource_to_url(mut api: TestApi) {
         to: DiffTarget::Url(UrlContainer { url: second_url }),
     };
 
-    api.diff(&input).unwrap();
+    api.diff(input).unwrap();
 
     let expected_printed_messages = expect![[r#"
         [
@@ -291,7 +291,7 @@ fn from_url_to_url(mut api: TestApi) {
         to: DiffTarget::Url(UrlContainer { url: second_url }),
     };
 
-    api.diff(&input).unwrap();
+    api.diff(input).unwrap();
 
     let expected_printed_messages = expect![[r#"
         [
@@ -301,11 +301,9 @@ fn from_url_to_url(mut api: TestApi) {
     expected_printed_messages.assert_debug_eq(&host.printed_messages.lock().unwrap());
 }
 
-#[test_connector]
-fn diffing_mongo_schemas_works(mut api: TestApi) {
+#[test]
+fn diffing_mongo_schemas_to_script_returns_a_nice_error() {
     let tempdir = tempfile::tempdir().unwrap();
-    let host = Arc::new(TestConnectorHost::default());
-    api.connector.set_host(host.clone());
 
     let from = r#"
         datasource db {
@@ -352,7 +350,7 @@ fn diffing_mongo_schemas_works(mut api: TestApi) {
 
     let to_file = write_file_to_tmp(to, &tempdir, "to");
 
-    api.diff(&DiffParams {
+    let params = DiffParams {
         from: DiffTarget::SchemaDatamodel(SchemaContainer {
             schema: from_file.to_string_lossy().into_owned(),
         }),
@@ -360,17 +358,139 @@ fn diffing_mongo_schemas_works(mut api: TestApi) {
         to: DiffTarget::SchemaDatamodel(SchemaContainer {
             schema: to_file.to_string_lossy().into_owned(),
         }),
-        script: false, // TODO: `true` here panics
-    })
-    .unwrap();
+        script: true,
+    };
+
+    let expected = expect![[r#"
+        Rendering to a script is not supported on MongoDB.
+    "#]];
+    expected.assert_eq(&diff_error(params));
+}
+
+#[test]
+fn diffing_mongo_schemas_works() {
+    let tempdir = tempfile::tempdir().unwrap();
+
+    let from = r#"
+        datasource db {
+            provider = "mongodb"
+            url = "mongo+srv://test"
+        }
+
+        generator js {
+            provider = "prisma-client-js"
+            previewFeatures = ["mongodb"]
+        }
+
+        model TestModel {
+            id Int @id @default(autoincrement()) @map("_id")
+            names String
+        }
+    "#;
+
+    let from_file = write_file_to_tmp(from, &tempdir, "from");
+
+    let to = r#"
+        datasource db {
+            provider = "mongodb"
+            url = "mongo+srv://test"
+        }
+
+        generator js {
+            provider = "prisma-client-js"
+            previewFeatures = ["mongodb"]
+        }
+
+
+        model TestModel {
+            id Int @id @default(autoincrement()) @map("_id")
+            names String[]
+
+            @@index([names])
+        }
+
+        model TestModel2 {
+            id Int @id @default(autoincrement()) @map("_id")
+        }
+    "#;
+
+    let to_file = write_file_to_tmp(to, &tempdir, "to");
+
+    let params = DiffParams {
+        from: DiffTarget::SchemaDatamodel(SchemaContainer {
+            schema: from_file.to_string_lossy().into_owned(),
+        }),
+        shadow_database_url: None,
+        to: DiffTarget::SchemaDatamodel(SchemaContainer {
+            schema: to_file.to_string_lossy().into_owned(),
+        }),
+        script: false,
+    };
 
     let expected_printed_messages = expect![[r#"
-        [
-            "[+] Collection `TestModel2`\n[+] Index `TestModel_names_idx` on ({\"names\":1})\n",
-        ]
+        [+] Collection `TestModel2`
+        [+] Index `TestModel_names_idx` on ({"names":1})
     "#]];
 
-    expected_printed_messages.assert_debug_eq(&host.printed_messages.lock().unwrap());
+    expected_printed_messages.assert_eq(&diff_output(params));
+}
+
+#[test]
+fn with_missing_prisma_schema_should_return_helpful_error() {
+    // We are counting on this path not existing.
+    let tmp_path = std::env::temp_dir().join("prisma_migrate_diff_test_this_file_does_not_exist");
+    let tmp_path_str = tmp_path.to_str().unwrap();
+
+    // We want to test for both --schema-datamodel and --schema-datasource
+    let test_with_from_target = |from_target: DiffTarget| {
+        let params = DiffParams {
+            from: from_target,
+            script: false,
+            shadow_database_url: None,
+            to: DiffTarget::Empty,
+        };
+
+        let error = diff_error(params);
+        assert!(error.match_indices(tmp_path_str).next().is_some());
+
+        let expected = if cfg!(windows) {
+            expect![[r#"
+                Error trying to read Prisma schema file at `<the-path>`.
+                The system cannot find the file specified. (os error 2)
+            "#]]
+        } else {
+            expect![[r#"
+                Error trying to read Prisma schema file at `<the-path>`.
+                No such file or directory (os error 2)
+            "#]]
+        };
+
+        expected.assert_eq(&error.replace(tmp_path_str, "<the-path>"));
+    };
+
+    test_with_from_target(DiffTarget::SchemaDatamodel(SchemaContainer {
+        schema: tmp_path_str.to_owned(),
+    }));
+    test_with_from_target(DiffTarget::SchemaDatasource(SchemaContainer {
+        schema: tmp_path_str.to_owned(),
+    }));
+}
+
+// Call diff, and expect it to error. Return the error.
+fn diff_error(params: DiffParams) -> String {
+    let api = migration_core::migration_api(None, None).unwrap();
+    let result = test_setup::runtime::run_with_tokio(api.diff(params));
+    result.unwrap_err().to_string()
+}
+
+// Call diff, and expect it to succeed. Return what would be printed to stdout.
+fn diff_output(params: DiffParams) -> String {
+    let host = Arc::new(TestConnectorHost::default());
+    let api = migration_core::migration_api(None, Some(host.clone())).unwrap();
+    test_setup::runtime::run_with_tokio(api.diff(params)).unwrap();
+    let printed_messages = host.printed_messages.lock().unwrap();
+    assert!(printed_messages.len() == 1, "{:?}", printed_messages);
+    printed_messages[0].clone()
 }
 
 fn write_file_to_tmp(contents: &str, tempdir: &tempfile::TempDir, name: &str) -> std::path::PathBuf {

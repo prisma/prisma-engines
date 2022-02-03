@@ -2,15 +2,10 @@ use crate::{json_rpc::method_names::*, CoreError, CoreResult, GenericApi};
 use jsonrpc_core::{types::error::Error as JsonRpcError, IoHandler, Params};
 use std::sync::Arc;
 
-/// Initialize a JSON-RPC ready migration engine API. This entails starting
-/// a database connection.
-pub async fn rpc_api(datamodel: &str, host: Arc<dyn migration_connector::ConnectorHost>) -> CoreResult<IoHandler> {
+/// Initialize a JSON-RPC ready migration engine API.
+pub fn rpc_api(datamodel: Option<String>, host: Arc<dyn migration_connector::ConnectorHost>) -> IoHandler {
     let mut io_handler = IoHandler::default();
-    let mut api = crate::migration_api(datamodel)?;
-    api.set_host(host);
-    let api = Arc::new(api);
-
-    api.ensure_connection_validity().await?;
+    let api = Arc::new(crate::state::EngineState::new(datamodel, Some(host)));
 
     for cmd in METHOD_NAMES {
         let api = api.clone();
@@ -19,31 +14,33 @@ pub async fn rpc_api(datamodel: &str, host: Arc<dyn migration_connector::Connect
         });
     }
 
-    Ok(io_handler)
+    io_handler
 }
 
 #[allow(clippy::redundant_allocation)]
 async fn run_command(
-    executor: Arc<Box<dyn GenericApi>>,
+    executor: Arc<dyn GenericApi>,
     cmd: &str,
     params: Params,
 ) -> Result<serde_json::Value, JsonRpcError> {
     tracing::debug!(?cmd, "running the command");
     match cmd {
-        APPLY_MIGRATIONS => render(executor.apply_migrations(&params.parse()?).await),
-        CREATE_MIGRATION => render(executor.create_migration(&params.parse()?).await),
-        DB_EXECUTE => render(executor.db_execute(&params.parse()?).await),
-        DEV_DIAGNOSTIC => render(executor.dev_diagnostic(&params.parse()?).await),
-        DIFF => render(executor.diff(&params.parse()?).await),
+        APPLY_MIGRATIONS => render(executor.apply_migrations(params.parse()?).await),
+        CREATE_DATABASE => render(executor.create_database(params.parse()?).await),
+        CREATE_MIGRATION => render(executor.create_migration(params.parse()?).await),
+        DB_EXECUTE => render(executor.db_execute(params.parse()?).await),
+        DEV_DIAGNOSTIC => render(executor.dev_diagnostic(params.parse()?).await),
+        DIFF => render(executor.diff(params.parse()?).await),
         DEBUG_PANIC => render(executor.debug_panic().await),
-        DIAGNOSE_MIGRATION_HISTORY => render(executor.diagnose_migration_history(&params.parse()?).await),
-        EVALUATE_DATA_LOSS => render(executor.evaluate_data_loss(&params.parse()?).await),
+        DIAGNOSE_MIGRATION_HISTORY => render(executor.diagnose_migration_history(params.parse()?).await),
+        ENSURE_CONNECTION_VALIDITY => render(executor.ensure_connection_validity(params.parse()?).await),
+        EVALUATE_DATA_LOSS => render(executor.evaluate_data_loss(params.parse()?).await),
         GET_DATABASE_VERSION => render(executor.version().await),
-        LIST_MIGRATION_DIRECTORIES => render(executor.list_migration_directories(&params.parse()?).await),
-        MARK_MIGRATION_APPLIED => render(executor.mark_migration_applied(&params.parse()?).await),
-        MARK_MIGRATION_ROLLED_BACK => render(executor.mark_migration_rolled_back(&params.parse()?).await),
+        LIST_MIGRATION_DIRECTORIES => render(executor.list_migration_directories(params.parse()?).await),
+        MARK_MIGRATION_APPLIED => render(executor.mark_migration_applied(params.parse()?).await),
+        MARK_MIGRATION_ROLLED_BACK => render(executor.mark_migration_rolled_back(params.parse()?).await),
         RESET => render(executor.reset().await),
-        SCHEMA_PUSH => render(executor.schema_push(&params.parse()?).await),
+        SCHEMA_PUSH => render(executor.schema_push(params.parse()?).await),
         other => unreachable!("Unknown command {}", other),
     }
 }

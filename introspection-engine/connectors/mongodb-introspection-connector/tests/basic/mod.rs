@@ -11,7 +11,7 @@ fn empty_collection() {
 
     let expected = expect![[r#"
         model A {
-          id String @id @default(dbgenerated()) @map("_id") @db.ObjectId
+          id String @id @default(auto()) @map("_id") @db.ObjectId
         }
     "#]];
 
@@ -38,12 +38,12 @@ fn multiple_collections_with_data() {
 
     let expected = expect![[r#"
         model A {
-          id    String @id @default(dbgenerated()) @map("_id") @db.ObjectId
+          id    String @id @default(auto()) @map("_id") @db.ObjectId
           first String
         }
 
         model B {
-          id     String @id @default(dbgenerated()) @map("_id") @db.ObjectId
+          id     String @id @default(auto()) @map("_id") @db.ObjectId
           second String
         }
     "#]];

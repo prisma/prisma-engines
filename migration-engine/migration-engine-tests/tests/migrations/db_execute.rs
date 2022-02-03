@@ -32,7 +32,7 @@ fn db_execute_happy_path_with_literal_url(api: TestApi) {
     "#;
 
     // Execute the command.
-    api.db_execute(&DbExecuteParams {
+    api.db_execute(DbExecuteParams {
         datasource_type: DbExecuteDatasourceType::Url(UrlContainer { url: url.clone() }),
         script: script.to_owned(),
     })
@@ -67,7 +67,7 @@ fn db_execute_happy_path_with_prisma_schema(api: TestApi) {
     "#;
 
     // Execute the command.
-    api.db_execute(&DbExecuteParams {
+    api.db_execute(DbExecuteParams {
         datasource_type: DbExecuteDatasourceType::Schema(SchemaContainer {
             schema: schema_path.to_string_lossy().into_owned(),
         }),
@@ -93,7 +93,7 @@ fn mysql_incomplete_script_works(api: TestApi) {
     let url = api.connection_string().to_owned();
 
     // Execute the command.
-    api.db_execute(&DbExecuteParams {
+    api.db_execute(DbExecuteParams {
         datasource_type: DbExecuteDatasourceType::Url(UrlContainer { url: url.clone() }),
         script: script.to_owned(),
     })
@@ -114,7 +114,7 @@ fn db_execute_error_path(api: TestApi) {
     "#;
 
     // Execute the command.
-    let result = api.db_execute(&DbExecuteParams {
+    let result = api.db_execute(DbExecuteParams {
         datasource_type: DbExecuteDatasourceType::Url(UrlContainer {
             url: api.connection_string().to_owned(),
         }),

@@ -520,7 +520,7 @@ fn mongodb_inline_many_to_many_relations_are_allowed() {
         id  String  @id @map("_id") @db.ObjectId
         gql String?
 
-        b_ids String[] @db.Array(ObjectId)
+        b_ids String[] @db.ObjectId
         bs    B[]      @relation(fields: [b_ids])
     }
 
@@ -528,7 +528,7 @@ fn mongodb_inline_many_to_many_relations_are_allowed() {
         id  String  @id @map("_id") @db.ObjectId
         gql String?
 
-        a_ids String[] @db.Array(ObjectId)
+        a_ids String[] @db.ObjectId
         as    A[]      @relation(fields: [a_ids])
     }
     "#};

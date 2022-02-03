@@ -192,6 +192,10 @@ fn validate_model_builtin_scalar_type_default(
             validate_empty_function_args(FN_NOW, &funcargs.arguments, args, accept, ctx)
         }
 
+        (_, ast::Expression::Function(funcname, funcargs, _)) if funcname == FN_AUTO => {
+            validate_auto_args(&funcargs.arguments, args, accept, ctx)
+        }
+
         (_, ast::Expression::Function(funcname, funcargs, _)) if funcname == FN_DBGENERATED => {
             validate_dbgenerated_args(&funcargs.arguments, args, accept, ctx)
         }
@@ -243,10 +247,10 @@ fn validate_composite_builtin_scalar_type_default(
             validate_empty_function_args(FN_NOW, &funcargs.arguments, args, accept, ctx)
         }
         (_, ast::Expression::Function(funcname, _, _))
-            if funcname == FN_DBGENERATED || funcname == FN_AUTOINCREMENT =>
+            if funcname == FN_DBGENERATED || funcname == FN_AUTOINCREMENT || funcname == FN_AUTO =>
         {
             ctx.push_error(args.new_attribute_validation_error(&format!(
-                "The function `{funcname}()` is not a supported on composite fields.",
+                "The function `{funcname}()` is not supported on composite fields.",
             )));
         }
         (_, ast::Expression::Function(funcname, _, _)) if !KNOWN_FUNCTIONS.contains(&funcname.as_str()) => {
@@ -368,6 +372,19 @@ fn validate_empty_function_args(
     )));
 }
 
+fn validate_auto_args(
+    args: &[ast::Argument],
+    arguments: &Arguments<'_>,
+    mut accept: impl FnMut(),
+    ctx: &mut Context<'_>,
+) {
+    if !args.is_empty() {
+        ctx.push_error(arguments.new_attribute_validation_error("`auto()` takes no arguments"));
+    } else {
+        accept()
+    }
+}
+
 fn validate_dbgenerated_args(
     args: &[ast::Argument],
     arguments: &Arguments<'_>,
@@ -399,5 +416,6 @@ const FN_CUID: &str = "cuid";
 const FN_DBGENERATED: &str = "dbgenerated";
 const FN_NOW: &str = "now";
 const FN_UUID: &str = "uuid";
+const FN_AUTO: &str = "auto";
 
-const KNOWN_FUNCTIONS: &[&str] = &[FN_AUTOINCREMENT, FN_CUID, FN_DBGENERATED, FN_NOW, FN_UUID];
+const KNOWN_FUNCTIONS: &[&str] = &[FN_AUTOINCREMENT, FN_CUID, FN_DBGENERATED, FN_NOW, FN_UUID, FN_AUTO];

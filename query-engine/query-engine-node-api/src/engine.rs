@@ -295,7 +295,11 @@ impl QueryEngine {
 
                         span.set_parent(cx);
 
-                        match engine.executor().start_tx(input.max_wait, input.timeout).await {
+                        match engine
+                            .executor()
+                            .start_tx(engine.query_schema().clone(), input.max_wait, input.timeout)
+                            .await
+                        {
                             Ok(tx_id) => Ok(json!({ "id": tx_id.to_string() }).to_string()),
                             Err(err) => Ok(map_known_error(err)?),
                         }

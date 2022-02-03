@@ -1,5 +1,6 @@
 //! Top level queries to satisfy the connector interface operations.
 pub mod aggregate;
+mod raw;
 pub mod read;
 pub mod write;
 

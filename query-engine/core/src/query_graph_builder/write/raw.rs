@@ -1,39 +1,48 @@
 use super::*;
-use crate::{constants::args, query_ast::*, query_graph::QueryGraph, ArgumentListLookup, ParsedField};
+use crate::{query_ast::*, query_graph::QueryGraph, ParsedField};
+use prisma_models::ModelRef;
 use prisma_value::PrismaValue;
-use std::convert::TryInto;
+use std::{collections::HashMap, convert::TryInto};
 
 #[tracing::instrument(skip(graph, field))]
 pub fn execute_raw(graph: &mut QueryGraph, field: ParsedField) -> QueryGraphBuilderResult<()> {
-    let raw_query = Query::Write(WriteQuery::ExecuteRaw(raw_query(field)?));
+    let raw_query = Query::Write(WriteQuery::ExecuteRaw(raw_query(None, None, field)?));
 
     graph.create_node(raw_query);
     Ok(())
 }
 
 #[tracing::instrument(skip(graph, field))]
-pub fn query_raw(graph: &mut QueryGraph, field: ParsedField) -> QueryGraphBuilderResult<()> {
-    let raw_query = Query::Write(WriteQuery::QueryRaw(raw_query(field)?));
+pub fn query_raw(
+    graph: &mut QueryGraph,
+    model: Option<ModelRef>,
+    query_type: &Option<String>,
+    field: ParsedField,
+) -> QueryGraphBuilderResult<()> {
+    let raw_query = Query::Write(WriteQuery::QueryRaw(raw_query(model, query_type.to_owned(), field)?));
 
     graph.create_node(raw_query);
     Ok(())
 }
 
-fn raw_query(mut field: ParsedField) -> QueryGraphBuilderResult<RawQuery> {
-    let query_arg = field.arguments.lookup(args::QUERY).unwrap().value;
-    let parameters_arg = field.arguments.lookup(args::PARAMETERS);
+fn raw_query(
+    model: Option<ModelRef>,
+    query_type: Option<String>,
+    field: ParsedField,
+) -> QueryGraphBuilderResult<RawQuery> {
+    let inputs = field
+        .arguments
+        .into_iter()
+        .map(|arg| {
+            let parsed_arg_value: PrismaValue = arg.value.try_into()?;
 
-    let query_value: PrismaValue = query_arg.try_into()?;
-    let parameters: Vec<PrismaValue> = match parameters_arg {
-        Some(parsed) => {
-            let val: PrismaValue = parsed.value.try_into()?;
-            val.into_list().unwrap()
-        }
-        None => vec![],
-    };
+            Ok((arg.name, parsed_arg_value))
+        })
+        .collect::<QueryGraphBuilderResult<HashMap<_, _>>>()?;
 
     Ok(RawQuery {
-        query: query_value.into_string().unwrap(),
-        parameters,
+        model,
+        inputs,
+        query_type: query_type.to_owned(),
     })
 }

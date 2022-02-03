@@ -32,7 +32,7 @@ impl<'a> ApplyMigrations<'a> {
     pub async fn send(self) -> CoreResult<ApplyMigrationsAssertion<'a>> {
         let output = self
             .api
-            .apply_migrations(&ApplyMigrationsInput {
+            .apply_migrations(ApplyMigrationsInput {
                 migrations_directory_path: self.migrations_directory.path().to_str().unwrap().to_owned(),
             })
             .await?;

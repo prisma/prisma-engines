@@ -1005,6 +1005,29 @@ fn alter_constraint_name(api: TestApi) {
                     END CATCH
                  "#
                  }
+            } else if api.is_cockroach() {
+                indoc! {r#"
+                    -- AlterTable
+                    ALTER TABLE "A" RENAME CONSTRAINT "A_pkey" TO "CustomId";
+
+                    -- AlterTable
+                    ALTER TABLE "B" RENAME CONSTRAINT "B_pkey" TO "CustomCompoundId";
+
+                    -- RenameForeignKey
+                    ALTER TABLE "B" RENAME CONSTRAINT "B_aId_fkey" TO "CustomFK";
+
+                    -- RenameIndex
+                    ALTER INDEX "A_a_idx" RENAME TO "CustomIndex";
+
+                    -- RenameIndex
+                    ALTER INDEX "A_a_b_key" RENAME TO "CustomCompoundUnique";
+
+                    -- RenameIndex
+                    ALTER INDEX "A_name_key" RENAME TO "CustomUnique";
+
+                    -- RenameIndex
+                    ALTER INDEX "B_a_b_idx" RENAME TO "AnotherCustomIndex";
+                "#}
             } else if api.is_postgres() {
                 indoc! {
                      r#"

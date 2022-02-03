@@ -8,7 +8,7 @@ use migration_connector::{migrations_directory, ConnectorResult, MigrationConnec
 /// Method called at the beginning of `migrate dev` to decide the course of
 /// action based on the current state of the workspace.
 pub(crate) async fn dev_diagnostic(
-    input: &DevDiagnosticInput,
+    input: DevDiagnosticInput,
     connector: &dyn MigrationConnector,
 ) -> ConnectorResult<DevDiagnosticOutput> {
     migrations_directory::error_on_changed_provider(&input.migrations_directory_path, connector.connector_type())?;
@@ -18,7 +18,7 @@ pub(crate) async fn dev_diagnostic(
         opt_in_to_shadow_database: true,
     };
 
-    let diagnose_migration_history_output = diagnose_migration_history(&diagnose_input, connector).await?;
+    let diagnose_migration_history_output = diagnose_migration_history(diagnose_input, connector).await?;
 
     check_for_broken_migrations(&diagnose_migration_history_output)?;
 

@@ -267,7 +267,12 @@ async fn transaction_start_handler(state: State, req: Request<Body>) -> Result<R
     let full_body = hyper::body::to_bytes(body_start).await?;
     let input: TxInput = serde_json::from_slice(full_body.as_ref()).unwrap();
 
-    match state.cx.executor.start_tx(input.max_wait, input.timeout).await {
+    match state
+        .cx
+        .executor
+        .start_tx(state.cx.query_schema().clone(), input.max_wait, input.timeout)
+        .await
+    {
         Ok(tx_id) => {
             let result = json!({ "id": tx_id.to_string() });
             let result_bytes = serde_json::to_vec(&result).unwrap();
@@ -345,6 +350,7 @@ fn err_to_http_resp(err: query_core::CoreError) -> Response<Body> {
             query_core::TransactionError::AlreadyStarted => todo!(),
             query_core::TransactionError::NotFound => 404,
             query_core::TransactionError::Closed { reason: _ } => 422,
+            query_core::TransactionError::Unknown { reason: _ } => 500,
         },
 
         // All other errors are treated as 500s, most of these paths should never be hit, only connector errors may occur.

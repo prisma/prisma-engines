@@ -193,3 +193,29 @@ fn string_literals_with_double_quotes_work() {
         .assert_base_type(&ScalarType::String)
         .assert_default_value(DefaultValue::new_single(PrismaValue::String(String::from("\""))));
 }
+
+#[test]
+fn mongodb_auto_id() {
+    let dml = indoc! {r#"
+        datasource db {
+          provider = "mongodb"
+          url = env("DATABASE_URL")
+        }
+
+        generator client {
+          provider = "prisma-client-js"
+          previewFeatures = ["mongoDb"]
+        }
+
+        model a {
+          id String @id @default(auto()) @db.ObjectId @map("_id")
+        }
+    "#};
+
+    let (_, datamodel) = datamodel::parse_schema(dml).unwrap();
+
+    datamodel
+        .assert_has_model("a")
+        .assert_has_scalar_field("id")
+        .assert_default_value(DefaultValue::new_expression(ValueGenerator::new_auto()));
+}

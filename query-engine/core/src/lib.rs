@@ -22,6 +22,7 @@ extern crate tracing;
 
 pub mod error;
 pub mod executor;
+pub mod interactive_transactions;
 pub mod interpreter;
 pub mod query_ast;
 pub mod query_document;
@@ -34,6 +35,7 @@ pub mod schema_builder;
 
 pub use error::*;
 pub use executor::*;
+pub use interactive_transactions::*;
 pub use interpreter::*;
 pub use query_ast::*;
 pub use query_document::*;

@@ -1,35 +1,35 @@
 datasource db {
-    provider = "mongodb"
-    url      = "mongodb://prisma:prisma@127.0.0.1:27017/testdb2?authSource=admin"
+  provider = "mongodb"
+  url      = "mongodb://prisma:prisma@127.0.0.1:27017/testdb2?authSource=admin"
 }
 
 generator js {
-    previewFeatures = ["mongodb", "interactiveTransactions"]
-    provider        = "prisma-client-js"
+  previewFeatures = ["mongodb", "interactiveTransactions"]
+  provider        = "prisma-client-js"
 }
 
 model A {
-    id  String  @id @default(dbgenerated()) @map("_id") @db.ObjectId
-    gql String?
-    bs  B[]
+  id  String  @id @default(auto()) @map("_id") @db.ObjectId
+  gql String?
+  bs  B[]
 }
 
 model B {
-    id  String  @id @default(dbgenerated()) @map("_id") @db.ObjectId
-    gql String?
+  id  String  @id @default(auto()) @map("_id") @db.ObjectId
+  gql String?
 
-    a_id String @db.ObjectId
-    a    A      @relation(fields: [a_id], references: [id])
+  a_id String @db.ObjectId
+  a    A      @relation(fields: [a_id], references: [id])
 
-    cs C[]
+  cs C[]
 }
 
 model C {
-    id  String  @id @default(dbgenerated()) @map("_id") @db.ObjectId
-    gql String?
+  id  String  @id @default(auto()) @map("_id") @db.ObjectId
+  gql String?
 
-    b_id String @db.ObjectId
-    b    B      @relation(fields: [b_id], references: [id])
+  b_id String @db.ObjectId
+  b    B      @relation(fields: [b_id], references: [id])
 
-    bId String?
+  bId String?
 }

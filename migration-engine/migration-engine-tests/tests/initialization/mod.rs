@@ -1,5 +1,5 @@
 use migration_core::migration_api;
-use migration_engine_tests::multi_engine_test_api::*;
+use migration_engine_tests::{multi_engine_test_api::*, test_api::SchemaContainer};
 use test_macros::test_connector;
 use url::Url;
 
@@ -44,7 +44,7 @@ fn connecting_to_a_postgres_database_with_missing_schema_creates_it(api: TestApi
 
         url.set_query(Some(new_qs.trim_end_matches('&')));
 
-        let datamodel = format!(
+        let schema = format!(
             r#"
                 datasource db {{
                     provider = "postgresql"
@@ -54,8 +54,13 @@ fn connecting_to_a_postgres_database_with_missing_schema_creates_it(api: TestApi
             url
         );
 
-        let me = migration_api(&datamodel).unwrap();
-        api.block_on(me.ensure_connection_validity()).unwrap();
+        let me = migration_api(Some(schema.clone()), None).unwrap();
+        api.block_on(
+            me.ensure_connection_validity(migration_core::json_rpc::types::EnsureConnectionValidityParams {
+                datasource: migration_core::json_rpc::types::DatasourceParam::SchemaString(SchemaContainer { schema }),
+            }),
+        )
+        .unwrap();
     }
 
     // Check that the "unexpected" schema now exists.

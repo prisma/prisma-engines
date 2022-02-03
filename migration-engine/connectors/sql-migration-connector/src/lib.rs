@@ -141,7 +141,7 @@ impl SqlMigrationConnector {
             return Ok(());
         }
 
-        let migration = self.render_script(&Migration::new(migration), &DestructiveChangeDiagnostics::default());
+        let migration = self.render_script(&Migration::new(migration), &DestructiveChangeDiagnostics::default())?;
         connection.raw_cmd(&migration).await?;
 
         Ok(())
@@ -269,11 +269,11 @@ impl MigrationConnector for SqlMigrationConnector {
         self.flavour.create_database(&self.connection_string).await
     }
 
-    async fn db_execute(&self, url: &str, script: &str) -> ConnectorResult<()> {
+    async fn db_execute(&self, url: String, script: String) -> ConnectorResult<()> {
         if url == self.connection_string {
-            self.conn().await?.raw_cmd(script).await?;
+            self.conn().await?.raw_cmd(&script).await?;
         } else {
-            connect(url).await?.raw_cmd(script).await?;
+            connect(&url).await?.raw_cmd(&script).await?;
         };
         Ok(())
     }

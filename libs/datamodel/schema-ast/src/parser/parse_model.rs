@@ -10,8 +10,8 @@ use diagnostics::{DatamodelError, Diagnostics};
 
 pub(crate) fn parse_model(token: &Token<'_>, diagnostics: &mut Diagnostics) -> Model {
     let mut name: Option<Identifier> = None;
-    let mut attributes: Vec<Attribute> = vec![];
-    let mut fields: Vec<Field> = vec![];
+    let mut attributes: Vec<Attribute> = Vec::new();
+    let mut fields: Vec<Field> = Vec::new();
     let mut comment: Option<Comment> = None;
 
     for current in token.relevant_children() {

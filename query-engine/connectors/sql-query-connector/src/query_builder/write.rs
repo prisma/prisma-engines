@@ -10,13 +10,7 @@ use tracing::Span;
 /// `INSERT` a new record to the database. Resulting an `INSERT` ast and an
 /// optional `RecordProjection` if available from the arguments or model.
 #[tracing::instrument(skip(model, args))]
-pub fn create_record(
-    model: &ModelRef,
-    mut args: WriteArgs,
-    trace_id: Option<String>,
-) -> (Insert<'static>, Option<SelectionResult>) {
-    let return_id = args.as_record_projection(model.primary_identifier().into());
-
+pub fn create_record(model: &ModelRef, mut args: WriteArgs, trace_id: Option<String>) -> Insert<'static> {
     let fields: Vec<_> = model
         .fields()
         .scalar()
@@ -36,13 +30,10 @@ pub fn create_record(
             insert.value(db_name.to_owned(), field.value(value))
         });
 
-    (
-        Insert::from(insert)
-            .returning(ModelProjection::from(model.primary_identifier()).as_columns())
-            .append_trace(&Span::current())
-            .add_trace_id(trace_id),
-        return_id,
-    )
+    Insert::from(insert)
+        .returning(ModelProjection::from(model.primary_identifier()).as_columns())
+        .append_trace(&Span::current())
+        .add_trace_id(trace_id)
 }
 
 /// `INSERT` new records into the database based on the given write arguments,

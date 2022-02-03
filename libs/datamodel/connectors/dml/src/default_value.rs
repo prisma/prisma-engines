@@ -127,6 +127,15 @@ impl DefaultValue {
     pub fn db_name(&self) -> Option<&str> {
         self.db_name.as_deref()
     }
+
+    // Returns the dbgenerated function for a default value
+    // intended for primary key values!
+    pub fn to_dbgenerated_func(&self) -> Option<String> {
+        match self.kind {
+            DefaultKind::Expression(ref expr) if expr.is_dbgenerated() => expr.args.get(0).map(|val| val.to_string()),
+            _ => None,
+        }
+    }
 }
 
 #[derive(Clone)]
@@ -153,6 +162,10 @@ impl ValueGenerator {
         } else {
             ValueGenerator::new("dbgenerated".to_owned(), vec![PrismaValue::String(description)]).unwrap()
         }
+    }
+
+    pub fn new_auto() -> Self {
+        ValueGenerator::new("auto".to_owned(), Vec::new()).unwrap()
     }
 
     pub fn new_now() -> Self {
@@ -220,6 +233,7 @@ pub enum ValueGeneratorFn {
     Now,
     Autoincrement,
     DbGenerated,
+    Auto,
 }
 
 impl ValueGeneratorFn {
@@ -230,6 +244,7 @@ impl ValueGeneratorFn {
             "now" => Ok(Self::Now),
             "autoincrement" => Ok(Self::Autoincrement),
             "dbgenerated" => Ok(Self::DbGenerated),
+            "auto" => Ok(Self::Auto),
             _ => Err(format!("The function {} is not a known function.", name)),
         }
     }
@@ -242,6 +257,7 @@ impl ValueGeneratorFn {
             Self::Now => Some(Self::generate_now()),
             Self::Autoincrement => None,
             Self::DbGenerated => None,
+            Self::Auto => None,
         }
     }
 
@@ -254,6 +270,7 @@ impl ValueGeneratorFn {
             (Self::Autoincrement, ScalarType::Int) => true,
             (Self::Autoincrement, ScalarType::BigInt) => true,
             (Self::DbGenerated, _) => true,
+            (Self::Auto, _) => true,
             _ => false,
         }
     }

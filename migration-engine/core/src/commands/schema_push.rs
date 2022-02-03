@@ -5,7 +5,7 @@ use migration_connector::{ConnectorError, DiffTarget, MigrationConnector};
 /// interacting with the migrations directory nor the migrations table.
 
 pub(crate) async fn schema_push(
-    input: &SchemaPushInput,
+    input: SchemaPushInput,
     connector: &dyn MigrationConnector,
 ) -> CoreResult<SchemaPushOutput> {
     let ast = crate::parse_ast(&input.schema)?;

@@ -7,7 +7,7 @@ use migration_connector::{migrations_directory::*, DiffTarget, MigrationConnecto
 /// At this stage, the engine does not create or mutate anything in the database
 /// nor in the migrations directory.
 pub(crate) async fn evaluate_data_loss(
-    input: &EvaluateDataLossInput,
+    input: EvaluateDataLossInput,
     connector: &dyn MigrationConnector,
 ) -> CoreResult<EvaluateDataLossOutput> {
     let checker = connector.destructive_change_checker();

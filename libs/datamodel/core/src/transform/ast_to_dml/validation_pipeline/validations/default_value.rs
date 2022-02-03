@@ -1,9 +1,35 @@
+use datamodel_connector::ConnectorCapability;
+use parser_database::ast::Expression;
+
 use crate::{
     ast,
     diagnostics::DatamodelError,
     transform::ast_to_dml::{db::ScalarType, validation_pipeline::context::Context},
 };
 use std::str::FromStr;
+
+/// Function `auto()` works for now only with MongoDB.
+pub(super) fn validate_auto_param(default_value: Option<&ast::Expression>, ctx: &mut Context<'_>) {
+    if ctx.connector.has_capability(ConnectorCapability::DefaultValueAuto) {
+        return;
+    }
+
+    let expression = match default_value {
+        Some(default_value) => default_value,
+        None => return,
+    };
+
+    match expression {
+        Expression::Function(name, _, span) if name == "auto" => {
+            let message = "The current connector does not support the `auto()` function.";
+
+            ctx.push_error(DatamodelError::new_attribute_validation_error(
+                message, "default", *span,
+            ));
+        }
+        _ => (),
+    }
+}
 
 /// Validates the @default attribute of a scalar field
 pub(super) fn validate_default_value(

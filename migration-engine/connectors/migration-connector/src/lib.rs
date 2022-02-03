@@ -80,7 +80,7 @@ pub trait MigrationConnector: Send + Sync + 'static {
     async fn create_database(&self) -> ConnectorResult<String>;
 
     /// Send a command to the database directly.
-    async fn db_execute(&self, url: &str, script: &str) -> ConnectorResult<()>;
+    async fn db_execute(&self, url: String, script: String) -> ConnectorResult<()>;
 
     /// Create a migration by comparing two database schemas. See
     /// [DiffTarget](/enum.DiffTarget.html) for possible inputs.

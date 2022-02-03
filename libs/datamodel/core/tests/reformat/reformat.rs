@@ -1229,7 +1229,7 @@ fn test_composite_types_in_models() {
         }
 
         model A {
-          id String @id @default(dbgenerated()) @map("_id") @db.ObjectId
+          id String @id @default(auto()) @map("_id") @db.ObjectId
           b  B
           c  C[]
         }
@@ -1257,7 +1257,7 @@ fn test_composite_types_in_models() {
         }
 
         model A {
-          id String @id @default(dbgenerated()) @map("_id") @db.ObjectId
+          id String @id @default(auto()) @map("_id") @db.ObjectId
           b  B
           c  C[]
         }
@@ -1314,6 +1314,60 @@ fn empty_arguments_reformat_properly() {
           email String  @unique
           name  String?
           posts Post[]
+        }
+    "#]];
+
+    let result = Reformatter::new(schema).reformat_to_string();
+    expected.assert_eq(&result);
+}
+
+#[test]
+fn composite_type_native_types_roundtrip() {
+    let schema = r#"
+        datasource db{
+            provider = "mongodb"
+            url = "mongo+srv:/...."
+        }
+
+        generator client {
+            provider        = "prisma-client-js"
+            previewFeatures = ["mongoDb"]
+        }
+
+        type Address {
+            name String?
+            street String @db.ObjectId
+            number Int
+            zipCode Int?
+        }
+
+        model User {
+            id  String @id @default(dbgenerated()) @map("_id") @db.ObjectId
+            address Address?
+        }
+    "#;
+
+    let expected = expect![[r#"
+        datasource db {
+          provider = "mongodb"
+          url      = "mongo+srv:/...."
+        }
+
+        generator client {
+          provider        = "prisma-client-js"
+          previewFeatures = ["mongoDb"]
+        }
+
+        type Address {
+          name    String?
+          street  String  @db.ObjectId
+          number  Int
+          zipCode Int?
+        }
+
+        model User {
+          id      String   @id @default(dbgenerated()) @map("_id") @db.ObjectId
+          address Address?
         }
     "#]];
 

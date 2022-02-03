@@ -90,7 +90,7 @@ const CAPABILITIES: &[ConnectorCapability] = &[
     ConnectorCapability::NamedDefaultValues,
     ConnectorCapability::NamedForeignKeys,
     ConnectorCapability::NamedPrimaryKeys,
-    ConnectorCapability::QueryRaw,
+    ConnectorCapability::SqlQueryRaw,
     ConnectorCapability::ReferenceCycleDetection,
     ConnectorCapability::UpdateableId,
     ConnectorCapability::PrimaryKeySortOrderDefinition,

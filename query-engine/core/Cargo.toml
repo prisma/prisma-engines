@@ -40,5 +40,4 @@ url = "2"
 user-facing-errors = { path = "../../libs/user-facing-errors" }
 uuid = "0.8"
 cuid = { git = "https://github.com/prisma/cuid-rust" }
-dashmap = "4.0"
 pin-utils = "0.1"

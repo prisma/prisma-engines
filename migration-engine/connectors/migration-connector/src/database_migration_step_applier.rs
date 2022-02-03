@@ -7,7 +7,14 @@ pub trait DatabaseMigrationStepApplier: Send + Sync {
     async fn apply_migration(&self, migration: &Migration) -> ConnectorResult<u32>;
 
     /// Render the migration to a runnable script.
-    fn render_script(&self, migration: &Migration, diagnostics: &DestructiveChangeDiagnostics) -> String;
+    ///
+    /// This should always return with `Ok` in normal circumstances. The result is currently only
+    /// used to signal when the connector does not support rendering to a script.
+    fn render_script(
+        &self,
+        migration: &Migration,
+        diagnostics: &DestructiveChangeDiagnostics,
+    ) -> ConnectorResult<String>;
 
     /// Apply a migration script to the database. The migration persistence is
     /// managed by the core.

@@ -247,7 +247,7 @@ impl<'a> LiftAstToDml<'a> {
         for field in walker.fields() {
             let field = CompositeTypeField {
                 name: field.name().to_owned(),
-                r#type: self.lift_composite_type_field_type(field.r#type()),
+                r#type: self.lift_composite_type_field_type(field, field.r#type()),
                 arity: self.lift_field_arity(&field.arity()),
                 database_name: field.mapped_name().map(String::from),
                 documentation: field.documentation().map(ToString::to_string),
@@ -436,13 +436,25 @@ impl<'a> LiftAstToDml<'a> {
         }
     }
 
-    fn lift_composite_type_field_type(&self, scalar_field_type: &db::ScalarFieldType) -> CompositeTypeFieldType {
+    fn lift_composite_type_field_type(
+        &self,
+        composite_type_field: CompositeTypeFieldWalker<'_, '_>,
+        scalar_field_type: &db::ScalarFieldType,
+    ) -> CompositeTypeFieldType {
         match scalar_field_type {
             db::ScalarFieldType::CompositeType(ctid) => {
                 CompositeTypeFieldType::CompositeType(self.db.ast()[*ctid].name.name.to_owned())
             }
             db::ScalarFieldType::BuiltInScalar(scalar_type) => {
-                CompositeTypeFieldType::Scalar(parser_database_scalar_type_to_dml_scalar_type(*scalar_type), None, None)
+                let native_type = composite_type_field
+                    .raw_native_type()
+                    .map(|(_, name, args, _)| self.connector.parse_native_type(name, args.to_owned()).unwrap());
+
+                CompositeTypeFieldType::Scalar(
+                    parser_database_scalar_type_to_dml_scalar_type(*scalar_type),
+                    None,
+                    native_type.map(datamodel_connector_native_type_to_dml_native_type),
+                )
             }
             db::ScalarFieldType::Enum(enum_id) => {
                 let enum_name = &self.db.ast()[*enum_id].name.name;
@@ -502,6 +514,9 @@ fn dml_default_kind(default_value: &ast::Expression, scalar_type: Option<ScalarT
                     .map(|(val, _)| val.to_owned())
                     .unwrap_or_else(String::new),
             ))
+        }
+        ast::Expression::Function(funcname, _, _) if funcname == "auto" => {
+            DefaultKind::Expression(ValueGenerator::new_auto())
         }
         ast::Expression::Function(funcname, _args, _) if funcname == "autoincrement" => {
             DefaultKind::Expression(ValueGenerator::new_autoincrement())
