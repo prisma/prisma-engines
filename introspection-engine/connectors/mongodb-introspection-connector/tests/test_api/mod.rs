@@ -41,6 +41,12 @@ impl TestResult {
         dbg!(&self.warnings);
         assert!(self.warnings.iter().any(|w| w.message == warning))
     }
+
+    #[track_caller]
+    pub fn assert_affected(&self, affected: serde_json::Value) {
+        dbg!(&self.warnings);
+        assert_eq!(self.warnings[0].affected, affected)
+    }
 }
 
 pub(super) fn introspect_features<F, U>(

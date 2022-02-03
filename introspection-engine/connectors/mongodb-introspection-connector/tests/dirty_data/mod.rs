@@ -1,5 +1,6 @@
 use crate::test_api::*;
 use mongodb::bson::{doc, Bson, DateTime, Timestamp};
+use serde_json::json;
 
 #[test]
 fn explicit_id_field() {
@@ -46,6 +47,12 @@ fn mixing_types() {
     expected.assert_eq(res.datamodel());
 
     res.assert_warning("The following fields had data stored in multiple types. The most common type was chosen. If loading data with a type that does not match the one in the data model, the client will crash. Please see the issue: https://github.com/prisma/prisma/issues/9654");
+
+    res.assert_affected(json!([{
+        "model": "A",
+        "field": "first",
+        "tpe": "Int32",
+    }]));
 }
 
 #[test]
@@ -74,6 +81,12 @@ fn mixing_types_with_the_same_base_type() {
     "#]];
 
     expected.assert_eq(res.datamodel());
+
+    res.assert_affected(json!([{
+        "model": "A",
+        "field": "first",
+        "tpe": "Timestamp",
+    }]));
 }
 
 #[test]
@@ -97,4 +110,10 @@ fn the_most_common_type_wins() {
     "#]];
 
     expected.assert_eq(res.datamodel());
+
+    res.assert_affected(json!([{
+        "model": "A",
+        "field": "first",
+        "tpe": "String",
+    }]));
 }
