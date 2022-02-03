@@ -6,7 +6,7 @@ use enumflags2::bitflags;
 use std::collections::BTreeSet;
 
 /// Detect relation types and construct relation objects to the database.
-pub(super) fn infer_relations(ctx: &mut Context<'_>) {
+pub(super) fn infer_relations(ctx: &mut Context<'_, '_>) {
     let mut relations = Relations::default();
 
     for rf in ctx.db.types.relation_fields.iter() {
@@ -193,7 +193,7 @@ pub(super) struct RelationEvidence<'ast, 'db> {
 
 pub(super) fn relation_evidence<'ast, 'db>(
     ((model_id, field_id), relation_field): (&(ast::ModelId, ast::FieldId), &'db RelationField<'ast>),
-    ctx: &'db Context<'ast>,
+    ctx: &'db Context<'_, 'ast>,
 ) -> RelationEvidence<'ast, 'db> {
     let ast_model = &ctx.db.ast[*model_id];
     let ast_field = &ast_model[*field_id];
@@ -225,7 +225,7 @@ pub(super) fn relation_evidence<'ast, 'db>(
 pub(super) fn ingest_relation<'ast, 'db>(
     evidence: RelationEvidence<'ast, 'db>,
     relations: &mut Relations<'ast>,
-    ctx: &'db Context<'ast>,
+    ctx: &'db Context<'_, 'ast>,
 ) {
     // In this function, we want to ingest the relation only once,
     // so if we know that we will create a relation for the opposite

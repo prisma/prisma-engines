@@ -31,7 +31,7 @@ pub(super) struct Names<'ast> {
 /// - Datasources
 /// - Model fields for each model
 /// - Enum variants for each enum
-pub(super) fn resolve_names(ctx: &mut Context<'_>) {
+pub(super) fn resolve_names(ctx: &mut Context<'_, '_>) {
     let mut tmp_names: HashSet<&str> = HashSet::new(); // throwaway container for duplicate checking
     let mut names = Names::default();
 
@@ -42,7 +42,7 @@ pub(super) fn resolve_names(ctx: &mut Context<'_>) {
             (_, ast::Top::Enum(ast_enum)) => {
                 tmp_names.clear();
                 validate_identifier(&ast_enum.name, "Enum", ctx);
-                validate_enum_name(ast_enum, &mut ctx.diagnostics);
+                validate_enum_name(ast_enum, ctx.diagnostics);
                 validate_attribute_identifiers(ast_enum, ctx);
 
                 for value in &ast_enum.values {
@@ -62,7 +62,7 @@ pub(super) fn resolve_names(ctx: &mut Context<'_>) {
             }
             (ast::TopId::Model(model_id), ast::Top::Model(model)) => {
                 validate_identifier(&model.name, "Model", ctx);
-                validate_model_name(model, &mut ctx.diagnostics);
+                validate_model_name(model, ctx.diagnostics);
                 validate_attribute_identifiers(model, ctx);
 
                 for (field_id, field) in model.iter_fields() {
@@ -126,7 +126,7 @@ fn insert_name<'ast>(
     top_id: TopId,
     top: &'ast ast::Top,
     namespace: &mut HashMap<&'ast str, TopId>,
-    ctx: &mut Context<'_>,
+    ctx: &mut Context<'_, '_>,
 ) {
     if let Some(existing) = namespace.insert(top.name(), top_id) {
         ctx.push_error(duplicate_top_error(&ctx.db.ast[existing], top));
@@ -142,7 +142,7 @@ fn duplicate_top_error(existing: &ast::Top, duplicate: &ast::Top) -> DatamodelEr
     )
 }
 
-fn assert_is_not_a_reserved_scalar_type(ident: &ast::Identifier, ctx: &mut Context<'_>) {
+fn assert_is_not_a_reserved_scalar_type(ident: &ast::Identifier, ctx: &mut Context<'_, '_>) {
     if ScalarType::try_from_str(&ident.name).is_some() {
         ctx.push_error(DatamodelError::new_reserved_scalar_type_error(&ident.name, ident.span));
     }
@@ -152,7 +152,7 @@ fn check_for_duplicate_properties<'a>(
     top: &ast::Top,
     props: &'a [ConfigBlockProperty],
     tmp_names: &mut HashSet<&'a str>,
-    ctx: &mut Context<'_>,
+    ctx: &mut Context<'_, '_>,
 ) {
     tmp_names.clear();
     for arg in props {
@@ -166,13 +166,13 @@ fn check_for_duplicate_properties<'a>(
     }
 }
 
-fn validate_attribute_identifiers(with_attrs: &dyn WithAttributes, ctx: &mut Context<'_>) {
+fn validate_attribute_identifiers(with_attrs: &dyn WithAttributes, ctx: &mut Context<'_, '_>) {
     for attribute in with_attrs.attributes() {
         validate_identifier(&attribute.name, "Attribute", ctx);
     }
 }
 
-fn validate_identifier(ident: &ast::Identifier, schema_item: &str, ctx: &mut Context<'_>) {
+fn validate_identifier(ident: &ast::Identifier, schema_item: &str, ctx: &mut Context<'_, '_>) {
     if ident.name.is_empty() {
         ctx.push_error(DatamodelError::new_validation_error(
             format!("The name of a {} must not be empty.", schema_item),

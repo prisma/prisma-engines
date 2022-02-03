@@ -26,14 +26,14 @@ pub(crate) fn validate<'ast>(
     ast_schema: &'ast ast::SchemaAst,
     sources: &[configuration::Datasource],
     preview_features: BitFlags<PreviewFeature>,
-    diagnostics: Diagnostics,
+    mut diagnostics: Diagnostics,
 ) -> ValidateOutput<'ast> {
     let source = sources.first();
     let connector = source.map(|s| s.active_connector).unwrap_or(&EmptyDatamodelConnector);
     let referential_integrity = source.map(|s| s.referential_integrity()).unwrap_or_default();
 
     // Make sense of the AST.
-    let (db, diagnostics) = ParserDatabase::new(ast_schema, diagnostics);
+    let db = ParserDatabase::new(ast_schema, &mut diagnostics);
 
     let mut output = ValidateOutput {
         db,

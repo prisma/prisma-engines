@@ -30,6 +30,7 @@ pub mod walkers;
 mod attributes;
 mod context;
 mod indexes;
+mod interner;
 mod names;
 mod relations;
 mod types;
@@ -41,7 +42,7 @@ pub use schema_ast::ast;
 pub use types::{IndexAlgorithm, IndexType, ScalarFieldType, ScalarType, SortOrder};
 pub use value_validator::{ValueListValidator, ValueValidator};
 
-use self::{context::Context, relations::Relations, types::Types};
+use self::{context::Context, interner::StringId, relations::Relations, types::Types};
 use diagnostics::{DatamodelError, Diagnostics};
 use names::Names;
 
@@ -74,6 +75,7 @@ use names::Names;
 /// lifetime management simple.
 pub struct ParserDatabase<'ast> {
     ast: &'ast ast::SchemaAst,
+    interner: interner::StringInterner,
     names: Names<'ast>,
     types: Types<'ast>,
     relations: Relations<'ast>,
@@ -81,30 +83,33 @@ pub struct ParserDatabase<'ast> {
 
 impl<'ast> ParserDatabase<'ast> {
     /// See the docs on [ParserDatabase](/struct.ParserDatabase.html).
-    pub fn new(ast: &'ast ast::SchemaAst, diagnostics: Diagnostics) -> (Self, Diagnostics) {
-        let db = ParserDatabase {
+    pub fn new(ast: &'ast ast::SchemaAst, diagnostics: &mut Diagnostics) -> Self {
+        let mut db = ParserDatabase {
             ast,
+            interner: interner::StringInterner::default(),
             names: Names::default(),
             types: Types::default(),
             relations: Relations::default(),
         };
 
-        let mut ctx = Context::new(db, diagnostics);
+        let mut ctx = Context::new(&mut db, diagnostics);
 
         // First pass: resolve names.
         names::resolve_names(&mut ctx);
 
         // Return early on name resolution errors.
-        if ctx.has_errors() {
-            return ctx.finish();
+        if ctx.diagnostics.has_errors() {
+            drop(ctx);
+            return db;
         }
 
         // Second pass: resolve top-level items and field types.
         types::resolve_types(&mut ctx);
 
         // Return early on type resolution errors.
-        if ctx.has_errors() {
-            return ctx.finish();
+        if ctx.diagnostics.has_errors() {
+            drop(ctx);
+            return db;
         }
 
         // Third pass: validate model and field attributes. All these
@@ -118,7 +123,9 @@ impl<'ast> ParserDatabase<'ast> {
         // Fifth step: infer implicit indices
         indexes::infer_implicit_indexes(&mut ctx);
 
-        ctx.finish()
+        drop(ctx);
+
+        db
     }
 
     /// The fully resolved (non alias) scalar field type of an alias. .
@@ -140,5 +147,13 @@ impl<'ast> ParserDatabase<'ast> {
 impl std::fmt::Debug for ParserDatabase<'_> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.write_str("ParserDatabase { ... }")
+    }
+}
+
+impl std::ops::Index<StringId> for ParserDatabase<'_> {
+    type Output = str;
+
+    fn index(&self, index: StringId) -> &Self::Output {
+        self.interner.get(index).unwrap()
     }
 }

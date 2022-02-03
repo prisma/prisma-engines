@@ -1,6 +1,6 @@
 use crate::{
     ast::{self, WithName},
-    context::{Arguments, Context},
+    context::Context,
     types::{CompositeTypeField, ModelAttributes, ScalarField},
     DatamodelError,
 };
@@ -8,10 +8,9 @@ use crate::{
 pub(super) fn model<'ast>(
     model_attributes: &mut ModelAttributes<'ast>,
     model_id: ast::ModelId,
-    args: &mut Arguments<'ast>,
-    ctx: &mut Context<'ast>,
+    ctx: &mut Context<'_, 'ast>,
 ) {
-    let mapped_name = match visit_map_attribute(args, ctx) {
+    let mapped_name = match visit_map_attribute(ctx) {
         Some(name) => name,
         None => return,
     };
@@ -32,7 +31,7 @@ pub(super) fn model<'ast>(
         ctx.push_error(DatamodelError::new_duplicate_model_database_name_error(
             mapped_name.to_owned(),
             existing_model_name.to_owned(),
-            args.span(),
+            ctx.current_attribute().span,
         ));
     }
 }
@@ -43,10 +42,9 @@ pub(super) fn scalar_field<'ast>(
     model_id: ast::ModelId,
     field_id: ast::FieldId,
     scalar_field_data: &mut ScalarField<'ast>,
-    map_args: &mut Arguments<'ast>,
-    ctx: &mut Context<'ast>,
+    ctx: &mut Context<'_, 'ast>,
 ) {
-    let mapped_name = match visit_map_attribute(map_args, ctx) {
+    let mapped_name = match visit_map_attribute(ctx) {
         Some(name) => name,
         None => return,
     };
@@ -94,10 +92,9 @@ pub(super) fn composite_type_field<'ast>(
     ctid: ast::CompositeTypeId,
     field_id: ast::FieldId,
     field: &mut CompositeTypeField<'ast>,
-    map_args: &mut Arguments<'ast>,
-    ctx: &mut Context<'ast>,
+    ctx: &mut Context<'_, 'ast>,
 ) {
-    let mapped_name = match visit_map_attribute(map_args, ctx) {
+    let mapped_name = match visit_map_attribute(ctx) {
         Some(name) => name,
         None => return,
     };
@@ -134,11 +131,11 @@ pub(super) fn composite_type_field<'ast>(
     }
 }
 
-pub(super) fn visit_map_attribute<'ast>(map_args: &mut Arguments<'ast>, ctx: &mut Context<'ast>) -> Option<&'ast str> {
-    match map_args.default_arg("name").map(|value| value.as_str()) {
+pub(super) fn visit_map_attribute<'ast>(ctx: &mut Context<'_, 'ast>) -> Option<&'ast str> {
+    match ctx.visit_default_arg("name").map(|value| value.as_str()) {
         Ok(Ok(name)) => return Some(name),
         Err(err) => ctx.push_error(err), // not flattened for error handing legacy reasons
-        Ok(Err(err)) => ctx.push_error(map_args.new_attribute_validation_error(&err.to_string())),
+        Ok(Err(err)) => ctx.push_attribute_validation_error(&err.to_string()),
     };
 
     None
