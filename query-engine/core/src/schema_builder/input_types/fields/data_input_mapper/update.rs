@@ -141,40 +141,33 @@ impl DataInputFieldMapper for UpdateDataInputFieldMapper {
         input_field(rf.name.clone(), InputType::object(input_object), None).optional()
     }
 
-    fn map_composite(&self, ctx: &mut BuilderContext, _cf: &CompositeFieldRef) -> InputField {
-        // Todo: Build composite types
-        // - Include scalar update operators (`set` value, `increment`, `decrement`, ...) (name clash potential? double check)
-        // - `set`, `push`
-        // - If `set` is used for a composite: We can simplify the input parsing by _NOT_ having any other nested operations below a set.
+    fn map_composite(&self, ctx: &mut BuilderContext, cf: &CompositeFieldRef) -> InputField {
+        // Shorthand object (equivalent to the "set" operation).
+        let shorthand_type = InputType::Object(create::composite_create_object_type(ctx, cf));
+        // Operation envelope object.
+        let envelope_type = InputType::Object(composite_update_envelope_object_type(ctx, cf));
 
-        // Dummy code to let the engine boot
-        let ident = Identifier::new("dummy".to_string(), PRISMA_NAMESPACE);
+        let mut input_types = vec![envelope_type, shorthand_type.clone()];
 
-        let obj = match ctx.get_input_type(&ident) {
-            Some(o) => o,
-            None => {
-                let input_object = Arc::new(input_object_type(
-                    ident.clone(),
-                    vec![input_field("foo", InputType::int(), None)],
-                ));
-                ctx.cache_input_type(ident, input_object.clone());
-                Arc::downgrade(&input_object)
-            }
-        };
+        if cf.is_list() {
+            input_types.push(InputType::list(shorthand_type));
+        }
 
-        input_field("foo", InputType::object(obj), None)
+        input_field(cf.name.clone(), input_types, None)
+            .nullable_if(cf.is_optional())
+            .optional()
     }
 }
 
 fn update_operations_object_type(
     ctx: &mut BuilderContext,
     prefix: &str,
-    field: &ScalarFieldRef,
+    sf: &ScalarFieldRef,
     with_number_operators: bool,
 ) -> InputObjectTypeWeakRef {
-    // Nullability is important for the `set` operation, so we need to
-    // construct and cache different objects to reflect that.
-    let nullable = if field.is_required() { "" } else { "Nullable" };
+    // Different names are required to construct and cache different objects.
+    // - "Nullable" affects the `set` operation (`set` is nullable)
+    let nullable = if !sf.is_required() { "Nullable" } else { "" };
     let ident = Identifier::new(
         format!("{}{}FieldUpdateOperationsInput", nullable, prefix),
         PRISMA_NAMESPACE,
@@ -187,10 +180,10 @@ fn update_operations_object_type(
     let obj = Arc::new(obj);
     ctx.cache_input_type(ident, obj.clone());
 
-    let typ = map_scalar_input_type_for_field(ctx, field);
+    let typ = map_scalar_input_type_for_field(ctx, sf);
     let mut fields = vec![input_field(operations::SET, typ.clone(), None)
         .optional()
-        .nullable_if(!field.is_required())];
+        .nullable_if(!sf.is_required())];
 
     if with_number_operators {
         fields.push(input_field(operations::INCREMENT, typ.clone(), None).optional());
@@ -202,4 +195,147 @@ fn update_operations_object_type(
     obj.set_fields(fields);
 
     Arc::downgrade(&obj)
+}
+
+/// Build an operation envelope object type for composite updates.
+/// An operation envelope is an object that encapsulates the possible operations, like:
+/// ```text
+/// cf_field: { // this is the envelope object
+///   set:    { ... set type ... }
+///   update: { ... update type ... }
+///   ... more ops ...
+/// }
+/// ```
+fn composite_update_envelope_object_type(ctx: &mut BuilderContext, cf: &CompositeFieldRef) -> InputObjectTypeWeakRef {
+    let arity = if cf.is_optional() {
+        "Nullable"
+    } else if cf.is_list() {
+        "List"
+    } else {
+        ""
+    };
+    let name = format!("{}{}UpdateEnvelopeInput", cf.typ.name, arity);
+
+    let ident = Identifier::new(name, PRISMA_NAMESPACE);
+    return_cached_input!(ctx, &ident);
+
+    let mut input_object = init_input_object_type(ident.clone());
+    input_object.require_exactly_one_field();
+    input_object.set_tag(ObjectTag::CompositeEnvelope);
+
+    let input_object = Arc::new(input_object);
+    ctx.cache_input_type(ident, input_object.clone());
+
+    let mut fields = vec![composite_set_update_input_field(ctx, cf)];
+
+    append_opt(&mut fields, composite_update_input_field(ctx, cf));
+    append_opt(&mut fields, composite_push_update_input_field(ctx, cf));
+    append_opt(&mut fields, composite_unset_update_input_field(cf));
+    append_opt(&mut fields, composite_upsert_update_input_field(ctx, cf));
+
+    input_object.set_fields(fields);
+
+    Arc::downgrade(&input_object)
+}
+
+/// Builds the `update` input object type. Should be used in the envelope type.
+fn composite_update_object_type(ctx: &mut BuilderContext, cf: &CompositeFieldRef) -> InputObjectTypeWeakRef {
+    let name = format!("{}UpdateInput", cf.typ.name);
+
+    let ident = Identifier::new(name, PRISMA_NAMESPACE);
+    return_cached_input!(ctx, &ident);
+
+    let mut input_object = init_input_object_type(ident.clone());
+    input_object.set_min_fields(1);
+
+    let input_object = Arc::new(input_object);
+    ctx.cache_input_type(ident, input_object.clone());
+
+    let mapper = UpdateDataInputFieldMapper::new_checked();
+    let fields = mapper.map_all(ctx, cf.typ.fields());
+
+    input_object.set_fields(fields);
+
+    Arc::downgrade(&input_object)
+}
+
+// Builds an `update` input field. Should only be used in the envelope type.
+fn composite_update_input_field(ctx: &mut BuilderContext, cf: &CompositeFieldRef) -> Option<InputField> {
+    if cf.is_required() {
+        let update_object_type = composite_update_object_type(ctx, cf);
+
+        Some(input_field(operations::UPDATE, InputType::Object(update_object_type), None).optional())
+    } else {
+        None
+    }
+}
+
+// Builds an `unset` input field. Should only be used in the envelope type.
+fn composite_unset_update_input_field(cf: &CompositeFieldRef) -> Option<InputField> {
+    if cf.is_optional() {
+        Some(input_field(operations::UNSET, InputType::boolean(), None).optional())
+    } else {
+        None
+    }
+}
+
+// Builds an `set` input field. Should only be used in the envelope type.
+fn composite_set_update_input_field(ctx: &mut BuilderContext, cf: &CompositeFieldRef) -> InputField {
+    let set_object_type = InputType::Object(create::composite_create_object_type(ctx, cf));
+
+    let mut input_types = vec![set_object_type.clone()];
+
+    if cf.is_list() {
+        input_types.push(InputType::list(set_object_type));
+    }
+
+    input_field(operations::SET, input_types, None).optional()
+}
+
+// Builds an `push` input field. Should only be used in the envelope type.
+fn composite_push_update_input_field(ctx: &mut BuilderContext, cf: &CompositeFieldRef) -> Option<InputField> {
+    if cf.is_list() {
+        let set_object_type = InputType::Object(create::composite_create_object_type(ctx, cf));
+        let input_types = vec![set_object_type.clone(), InputType::list(set_object_type)];
+
+        Some(input_field(operations::PUSH, input_types, None).optional())
+    } else {
+        None
+    }
+}
+
+/// Builds the `upsert` input object type. Should only be used in the envelope type.
+fn composite_upsert_object_type(ctx: &mut BuilderContext, cf: &CompositeFieldRef) -> InputObjectTypeWeakRef {
+    let name = format!("{}UpsertInput", cf.typ.name);
+
+    let ident = Identifier::new(name, PRISMA_NAMESPACE);
+    return_cached_input!(ctx, &ident);
+
+    let mut input_object = init_input_object_type(ident.clone());
+    input_object.set_tag(ObjectTag::CompositeEnvelope);
+
+    let input_object = Arc::new(input_object);
+
+    ctx.cache_input_type(ident, input_object.clone());
+
+    let update_object_type = composite_update_object_type(ctx, cf);
+    let update_field = input_field(operations::UPDATE, InputType::Object(update_object_type), None);
+    let set_field = composite_set_update_input_field(ctx, cf).required();
+
+    let fields = vec![set_field, update_field];
+
+    input_object.set_fields(fields);
+
+    Arc::downgrade(&input_object)
+}
+
+// Builds an `upsert` input field. Should only be used in the envelope type.
+fn composite_upsert_update_input_field(ctx: &mut BuilderContext, cf: &CompositeFieldRef) -> Option<InputField> {
+    if cf.is_optional() {
+        let upsert_object_type = InputType::Object(composite_upsert_object_type(ctx, cf));
+
+        Some(input_field(operations::UPSERT, upsert_object_type, None).optional())
+    } else {
+        None
+    }
 }

@@ -64,6 +64,10 @@ impl ScalarField {
     pub fn is_numeric(&self) -> bool {
         self.type_identifier.is_numeric()
     }
+
+    pub fn container(&self) -> &ParentContainer {
+        &self.container
+    }
 }
 
 impl Debug for ScalarField {

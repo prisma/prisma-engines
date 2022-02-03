@@ -126,7 +126,7 @@ impl DataInputFieldMapper for CreateDataInputFieldMapper {
         // If the composite field in _not_ on a model, then it's nested and we're skipping the create envelope for now.
         // (This allows us to simplify the parsing code for now.)
         let mut input_types = if cf.container().as_model().is_some() {
-            vec![shorthand_type.clone(), envelope_type]
+            vec![envelope_type, shorthand_type.clone()]
         } else {
             vec![shorthand_type.clone()]
         };
@@ -179,7 +179,7 @@ fn composite_create_envelope_object_type(ctx: &mut BuilderContext, cf: &Composit
     Arc::downgrade(&input_object)
 }
 
-fn composite_create_object_type(ctx: &mut BuilderContext, cf: &CompositeFieldRef) -> InputObjectTypeWeakRef {
+pub(crate) fn composite_create_object_type(ctx: &mut BuilderContext, cf: &CompositeFieldRef) -> InputObjectTypeWeakRef {
     // It's called "Create" input because it's used across multiple create-type operations, not only "set".
     let name = format!("{}CreateInput", cf.typ.name);
 

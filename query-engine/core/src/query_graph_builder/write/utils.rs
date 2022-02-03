@@ -3,8 +3,9 @@ use crate::{
     query_graph::{Flow, Node, NodeRef, QueryGraph, QueryGraphDependency},
     ConnectorContext, ParsedInputValue, QueryGraphBuilderError, QueryGraphBuilderResult,
 };
-use connector::{DatasourceFieldName, Filter, RecordFilter, WriteArgs};
+use connector::{DatasourceFieldName, Filter, RecordFilter, WriteArgs, WriteOperation};
 use datamodel::ReferentialAction;
+use indexmap::IndexMap;
 use prisma_models::{FieldSelection, ModelRef, PrismaValue, RelationFieldRef, SelectionResult};
 use std::sync::Arc;
 
@@ -546,11 +547,16 @@ pub fn emulate_on_delete_set_null(
         relation_field.related_field().referenced_fields()
     };
 
-    let child_update_args: Vec<_> = child_fks
+    let child_update_args: IndexMap<_, _> = child_fks
         .into_iter()
         // Only the nullable fks should be updated to null
         .filter(|sf| !sf.is_required())
-        .map(|child_fk| (DatasourceFieldName::from(&child_fk), PrismaValue::Null))
+        .map(|child_fk| {
+            (
+                DatasourceFieldName::from(&child_fk),
+                WriteOperation::scalar_set(PrismaValue::Null),
+            )
+        })
         .collect();
 
     if child_update_args.is_empty() {
@@ -671,10 +677,15 @@ pub fn emulate_on_update_set_null(
         return Ok(());
     }
 
-    let child_update_args: Vec<_> = child_fks
+    let child_update_args: IndexMap<_, _> = child_fks
         .iter()
         .filter(|child_fk| !child_fk.is_required())
-        .map(|child_fk| (DatasourceFieldName::from(child_fk), PrismaValue::Null))
+        .map(|child_fk| {
+            (
+                DatasourceFieldName::from(child_fk),
+                WriteOperation::scalar_set(PrismaValue::Null),
+            )
+        })
         .collect();
 
     // Records that need to be updated for the cascade.
