@@ -615,6 +615,13 @@
 <span id="614">614</span>
 <span id="615">615</span>
 <span id="616">616</span>
+<span id="617">617</span>
+<span id="618">618</span>
+<span id="619">619</span>
+<span id="620">620</span>
+<span id="621">621</span>
+<span id="622">622</span>
+<span id="623">623</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">context::Context</span>, <span class="ident">walkers::CompositeTypeFieldWalker</span>, <span class="ident">walkers::CompositeTypeWalker</span>, <span class="ident">DatamodelError</span>};
 <span class="kw">use</span> <span class="ident">schema_ast::ast</span>::{<span class="self">self</span>, <span class="ident">WithName</span>};
 <span class="kw">use</span> <span class="ident">std</span>::{
@@ -683,6 +690,12 @@
     <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">r#type</span>: <span class="ident">ScalarFieldType</span>,
     <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">mapped_name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;ast</span> <span class="ident">str</span><span class="op">&gt;</span>,
     <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">default</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">DefaultAttribute</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Native type name and arguments</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// (attribute scope, native type name, arguments, span)</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// For example: `@db.Text` would translate to (&quot;db&quot;, &quot;Text&quot;, &amp;[], &lt;the span&gt;)</span>
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">native_type</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;ast</span> <span class="ident">str</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;ast</span> <span class="ident">str</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>, <span class="ident">ast::Span</span>)<span class="op">&gt;</span>,
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
@@ -1099,6 +1112,7 @@
                     <span class="ident">r#type</span>: <span class="ident">scalar_type</span>,
                     <span class="ident">mapped_name</span>: <span class="prelude-val">None</span>,
                     <span class="ident">default</span>: <span class="prelude-val">None</span>,
+                    <span class="ident">native_type</span>: <span class="prelude-val">None</span>,
                 };
                 <span class="ident">ctx</span>.<span class="ident">db</span>.<span class="ident">types</span>.<span class="ident">composite_type_fields</span>.<span class="ident">insert</span>((<span class="ident">ct_id</span>, <span class="ident">field_id</span>), <span class="ident">field</span>);
             }

@@ -205,6 +205,14 @@
 <span id="204">204</span>
 <span id="205">205</span>
 <span id="206">206</span>
+<span id="207">207</span>
+<span id="208">208</span>
+<span id="209">209</span>
+<span id="210">210</span>
+<span id="211">211</span>
+<span id="212">212</span>
+<span id="213">213</span>
+<span id="214">214</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::common::preview_features::PreviewFeature</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">ast</span>, <span class="ident">dml</span>, <span class="ident">Datasource</span>, <span class="ident">IndexField</span>, <span class="ident">PrimaryKeyField</span>, <span class="ident">SortOrder</span>};
 <span class="kw">use</span> <span class="ident">enumflags2::BitFlags</span>;
@@ -303,23 +311,31 @@
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">fields</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ast::Field</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
 
         <span class="kw">for</span> <span class="ident">field</span> <span class="kw">in</span> <span class="ident">r#type</span>.<span class="ident">fields</span>.<span class="ident">iter</span>() {
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">attributes</span> <span class="op">=</span> <span class="ident">field</span>
+                .<span class="ident">database_name</span>
+                .<span class="ident">as_ref</span>()
+                .<span class="ident">map</span>(<span class="op">|</span><span class="ident">db_name</span><span class="op">|</span> {
+                    <span class="macro">vec!</span>[<span class="ident">ast::Attribute::new</span>(
+                        <span class="string">&quot;map&quot;</span>,
+                        <span class="macro">vec!</span>[<span class="ident">ast::Argument::new_unnamed</span>(<span class="ident">ast::Expression::StringValue</span>(
+                            <span class="ident">String::from</span>(<span class="ident">db_name</span>),
+                            <span class="ident">ast::Span::empty</span>(),
+                        ))],
+                    )]
+                })
+                .<span class="ident">unwrap_or_else</span>(<span class="ident">Vec::new</span>);
+
+            <span class="kw">let</span> <span class="ident">native_type</span> <span class="op">=</span> <span class="ident">field</span>.<span class="ident">r#type</span>.<span class="ident">as_native_type</span>();
+
+            <span class="kw">if</span> <span class="kw">let</span> (<span class="prelude-val">Some</span>((<span class="ident">scalar_type</span>, <span class="ident">native_type</span>)), <span class="prelude-val">Some</span>(<span class="ident">datasource</span>)) <span class="op">=</span> (<span class="ident">native_type</span>, <span class="self">self</span>.<span class="ident">datasource</span>) {
+                <span class="self">self</span>.<span class="ident">lower_native_type_attribute</span>(<span class="ident">scalar_type</span>, <span class="ident">native_type</span>, <span class="kw-2">&amp;mut</span> <span class="ident">attributes</span>, <span class="ident">datasource</span>);
+            }
+
             <span class="ident">fields</span>.<span class="ident">push</span>(<span class="ident">ast::Field</span> {
                 <span class="ident">field_type</span>: <span class="self">self</span>.<span class="ident">lower_composite_field_type</span>(<span class="kw-2">&amp;</span><span class="ident">field</span>.<span class="ident">r#type</span>),
                 <span class="ident">name</span>: <span class="ident">ast::Identifier::new</span>(<span class="kw-2">&amp;</span><span class="ident">field</span>.<span class="ident">name</span>),
                 <span class="ident">arity</span>: <span class="self">self</span>.<span class="ident">lower_field_arity</span>(<span class="kw-2">&amp;</span><span class="ident">field</span>.<span class="ident">arity</span>),
-                <span class="ident">attributes</span>: <span class="ident">field</span>
-                    .<span class="ident">database_name</span>
-                    .<span class="ident">as_ref</span>()
-                    .<span class="ident">map</span>(<span class="op">|</span><span class="ident">db_name</span><span class="op">|</span> {
-                        <span class="macro">vec!</span>[<span class="ident">ast::Attribute::new</span>(
-                            <span class="string">&quot;map&quot;</span>,
-                            <span class="macro">vec!</span>[<span class="ident">ast::Argument::new_unnamed</span>(<span class="ident">ast::Expression::StringValue</span>(
-                                <span class="ident">String::from</span>(<span class="ident">db_name</span>),
-                                <span class="ident">ast::Span::empty</span>(),
-                            ))],
-                        )]
-                    })
-                    .<span class="ident">unwrap_or_else</span>(<span class="ident">Vec::new</span>),
+                <span class="ident">attributes</span>,
                 <span class="ident">documentation</span>: <span class="ident">field</span>
                     .<span class="ident">documentation</span>
                     .<span class="ident">as_ref</span>()

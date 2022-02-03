@@ -135,11 +135,23 @@
 <span id="134">134</span>
 <span id="135">135</span>
 <span id="136">136</span>
+<span id="137">137</span>
+<span id="138">138</span>
+<span id="139">139</span>
+<span id="140">140</span>
+<span id="141">141</span>
+<span id="142">142</span>
+<span id="143">143</span>
+<span id="144">144</span>
+<span id="145">145</span>
+<span id="146">146</span>
+<span id="147">147</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">ast</span>,
     <span class="ident">types</span>::{<span class="self">self</span>},
     <span class="ident">ParserDatabase</span>, <span class="ident">ScalarFieldType</span>,
 };
+<span class="kw">use</span> <span class="ident">diagnostics::Span</span>;
 
 <span class="doccomment">/// A composite type, introduced with the `type` keyword in the schema.</span>
 <span class="doccomment">///</span>
@@ -249,6 +261,16 @@
     <span class="doccomment">/// The `@default()` AST attribute on the field, if any.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">default_attribute</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;ast</span> <span class="ident">ast::Attribute</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">field</span>.<span class="ident">default</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">d</span><span class="op">|</span> <span class="ident">d</span>.<span class="ident">default_attribute</span>)
+    }
+
+    <span class="doccomment">/// (attribute scope, native type name, arguments, span)</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// For example: `@db.Text` would translate to (&quot;db&quot;, &quot;Text&quot;, &amp;[], &lt;the span&gt;)</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">raw_native_type</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;ast</span> <span class="ident">str</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;ast</span> <span class="ident">str</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> [<span class="ident">String</span>], <span class="ident">Span</span>)<span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">field</span>
+            .<span class="ident">native_type</span>
+            .<span class="ident">as_ref</span>()
+            .<span class="ident">map</span>(<span class="kw">move</span> <span class="op">|</span>(<span class="ident">datasource_name</span>, <span class="ident">name</span>, <span class="ident">args</span>, <span class="ident">span</span>)<span class="op">|</span> (<span class="kw-2">*</span><span class="ident">datasource_name</span>, <span class="kw-2">*</span><span class="ident">name</span>, <span class="ident">args</span>.<span class="ident">as_slice</span>(), <span class="kw-2">*</span><span class="ident">span</span>))
     }
 
     <span class="doccomment">/// The value expression in the `@default` attribute.</span>
