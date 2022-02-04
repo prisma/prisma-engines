@@ -566,6 +566,7 @@
 <span id="565">565</span>
 <span id="566">566</span>
 <span id="567">567</span>
+<span id="568">568</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">ast</span>, <span class="ident">dml</span>,
     <span class="ident">transform::ast_to_dml::db</span>::{<span class="self">self</span>, <span class="ident">walkers</span>::<span class="kw-2">*</span>, <span class="ident">IndexAlgorithm</span>},
@@ -823,6 +824,7 @@
                     <span class="ident">kind</span>: <span class="ident">dml_default_kind</span>(<span class="ident">value</span>, <span class="ident">field</span>.<span class="ident">r#type</span>().<span class="ident">as_builtin_scalar</span>()),
                     <span class="ident">db_name</span>: <span class="prelude-val">None</span>,
                 }),
+                <span class="ident">is_commented_out</span>: <span class="ident">field</span>.<span class="ident">ast_field</span>().<span class="ident">is_commented_out</span>,
             };
 
             <span class="ident">fields</span>.<span class="ident">push</span>(<span class="ident">field</span>);

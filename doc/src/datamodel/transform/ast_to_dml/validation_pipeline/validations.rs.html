@@ -154,6 +154,10 @@
 <span id="153">153</span>
 <span id="154">154</span>
 <span id="155">155</span>
+<span id="156">156</span>
+<span id="157">157</span>
+<span id="158">158</span>
+<span id="159">159</span>
 </pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">autoincrement</span>;
 <span class="kw">mod</span> <span class="ident">composite_types</span>;
 <span class="kw">mod</span> <span class="ident">constraint_namespace</span>;
@@ -180,8 +184,12 @@
     <span class="kw">for</span> <span class="ident">composite_type</span> <span class="kw">in</span> <span class="ident">db</span>.<span class="ident">walk_composite_types</span>() {
         <span class="ident">composite_types::composite_types_support</span>(<span class="ident">composite_type</span>, <span class="ident">ctx</span>);
 
-        <span class="kw">for</span> <span class="ident">field</span> <span class="kw">in</span> <span class="ident">composite_type</span>.<span class="ident">fields</span>() {
-            <span class="ident">composite_types::validate_default_value</span>(<span class="ident">field</span>, <span class="ident">ctx</span>);
+        <span class="kw">if</span> <span class="op">!</span><span class="ident">ctx</span>.<span class="ident">diagnostics</span>.<span class="ident">has_errors</span>() {
+            <span class="ident">composite_types::more_than_one_field</span>(<span class="ident">composite_type</span>, <span class="ident">ctx</span>);
+
+            <span class="kw">for</span> <span class="ident">field</span> <span class="kw">in</span> <span class="ident">composite_type</span>.<span class="ident">fields</span>() {
+                <span class="ident">composite_types::validate_default_value</span>(<span class="ident">field</span>, <span class="ident">ctx</span>);
+            }
         }
     }
 

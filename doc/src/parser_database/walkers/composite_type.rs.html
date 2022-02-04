@@ -146,6 +146,11 @@
 <span id="145">145</span>
 <span id="146">146</span>
 <span id="147">147</span>
+<span id="148">148</span>
+<span id="149">149</span>
+<span id="150">150</span>
+<span id="151">151</span>
+<span id="152">152</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">ast</span>,
     <span class="ident">types</span>::{<span class="self">self</span>},
@@ -271,6 +276,11 @@
             .<span class="ident">native_type</span>
             .<span class="ident">as_ref</span>()
             .<span class="ident">map</span>(<span class="kw">move</span> <span class="op">|</span>(<span class="ident">datasource_name</span>, <span class="ident">name</span>, <span class="ident">args</span>, <span class="ident">span</span>)<span class="op">|</span> (<span class="kw-2">*</span><span class="ident">datasource_name</span>, <span class="kw-2">*</span><span class="ident">name</span>, <span class="ident">args</span>.<span class="ident">as_slice</span>(), <span class="kw-2">*</span><span class="ident">span</span>))
+    }
+
+    <span class="doccomment">/// Can the client use the field.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_visible</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+        <span class="op">!</span><span class="self">self</span>.<span class="ident">ast_field</span>().<span class="ident">is_commented_out</span>
     }
 
     <span class="doccomment">/// The value expression in the `@default` attribute.</span>

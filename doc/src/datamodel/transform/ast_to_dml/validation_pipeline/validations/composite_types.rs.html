@@ -32,11 +32,27 @@
 <span id="31">31</span>
 <span id="32">32</span>
 <span id="33">33</span>
+<span id="34">34</span>
+<span id="35">35</span>
+<span id="36">36</span>
+<span id="37">37</span>
+<span id="38">38</span>
+<span id="39">39</span>
+<span id="40">40</span>
+<span id="41">41</span>
+<span id="42">42</span>
+<span id="43">43</span>
+<span id="44">44</span>
+<span id="45">45</span>
+<span id="46">46</span>
+<span id="47">47</span>
+<span id="48">48</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">super</span>::default_value</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::transform::ast_to_dml</span>::{<span class="ident">db::walkers::CompositeTypeWalker</span>, <span class="ident">validation_pipeline::context::Context</span>};
 <span class="kw">use</span> <span class="ident">diagnostics::DatamodelError</span>;
 <span class="kw">use</span> <span class="ident">parser_database::walkers::CompositeTypeFieldWalker</span>;
 
+<span class="doccomment">/// Does the connector support composite types.</span>
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">composite_types_support</span>(<span class="ident">composite_type</span>: <span class="ident">CompositeTypeWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
     <span class="kw">if</span> <span class="ident">ctx</span>.<span class="ident">connector</span>.<span class="ident">supports_composite_types</span>() {
         <span class="kw">return</span>;
@@ -44,6 +60,20 @@
 
     <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_validation_error</span>(
         <span class="macro">format!</span>(<span class="string">&quot;Composite types are not supported on {}.&quot;</span>, <span class="ident">ctx</span>.<span class="ident">connector</span>.<span class="ident">name</span>()),
+        <span class="ident">composite_type</span>.<span class="ident">ast_composite_type</span>().<span class="ident">span</span>,
+    ));
+}
+
+<span class="doccomment">/// A composite type must have at least one visible field.</span>
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">more_than_one_field</span>(<span class="ident">composite_type</span>: <span class="ident">CompositeTypeWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
+    <span class="kw">let</span> <span class="ident">num_of_fields</span> <span class="op">=</span> <span class="ident">composite_type</span>.<span class="ident">fields</span>().<span class="ident">filter</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">is_visible</span>()).<span class="ident">count</span>();
+
+    <span class="kw">if</span> <span class="ident">num_of_fields</span> <span class="op">&gt;</span> <span class="number">0</span> {
+        <span class="kw">return</span>;
+    }
+
+    <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_validation_error</span>(
+        <span class="ident">String::from</span>(<span class="string">&quot;A type must have at least one field defined.&quot;</span>),
         <span class="ident">composite_type</span>.<span class="ident">ast_composite_type</span>().<span class="ident">span</span>,
     ));
 }

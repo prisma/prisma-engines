@@ -341,7 +341,7 @@
                     .<span class="ident">as_ref</span>()
                     .<span class="ident">map</span>(<span class="op">|</span><span class="ident">text</span><span class="op">|</span> <span class="ident">ast::Comment</span> { <span class="ident">text</span>: <span class="ident">text</span>.<span class="ident">to_owned</span>() }),
                 <span class="ident">span</span>: <span class="ident">ast::Span::empty</span>(),
-                <span class="ident">is_commented_out</span>: <span class="bool-val">false</span>,
+                <span class="ident">is_commented_out</span>: <span class="ident">field</span>.<span class="ident">is_commented_out</span>,
             });
         }
 
