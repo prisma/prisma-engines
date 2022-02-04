@@ -58,12 +58,13 @@ pub(crate) const NATIVE_TYPE_CONSTRUCTORS: &[NativeTypeConstructor] = &[
     NativeTypeConstructor::with_args(ARRAY, 1, all_types()),
 ];
 
-pub(crate) fn mongo_type_from_input(name: &str) -> crate::Result<MongoDbType> {
+pub(crate) fn mongo_type_from_input(name: &str, args: &[String]) -> crate::Result<MongoDbType> {
     let mongo_type = match name {
         STRING => MongoDbType::String,
         DOUBLE => MongoDbType::Double,
         LONG => MongoDbType::Long,
         INT => MongoDbType::Int,
+        ARRAY => parse_array_type(args)?,
         BIN_DATA => MongoDbType::BinData,
         OBJECT_ID => MongoDbType::ObjectId,
         BOOL => MongoDbType::Bool,
@@ -95,4 +96,15 @@ const fn all_types() -> &'static [ScalarType] {
         ScalarType::Bytes,
         ScalarType::Decimal,
     ]
+}
+
+fn parse_array_type(args: &[String]) -> crate::Result<MongoDbType> {
+    if args.len() != 1 {
+        return Err(ConnectorError::new_argument_count_mismatch_error(ARRAY, 1, args.len()));
+    }
+
+    let type_arg = args.iter().next().unwrap();
+    let inner_type = mongo_type_from_input(type_arg.as_str(), &[])?;
+
+    Ok(MongoDbType::Array(Box::new(inner_type)))
 }

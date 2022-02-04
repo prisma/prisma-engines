@@ -75,6 +75,32 @@ impl MongoDbDatamodelConnector {
             span: field.ast_field().span,
         });
     }
+
+    fn validate_array_native_type(field: ScalarFieldWalker<'_, '_>, errors: &mut datamodel_connector::Diagnostics) {
+        let (ds_name, type_name, args, span) = match field.raw_native_type() {
+            Some(nt) => nt,
+            None => return,
+        };
+
+        if type_name != type_names::ARRAY {
+            return;
+        }
+
+        // `db.Array` expects exactly 1 argument, which is validated before this code path.
+        let arg = args.get(0).unwrap();
+
+        errors.push_error(datamodel_connector::DatamodelError::ConnectorError {
+            message: ConnectorError::from_kind(ErrorKind::FieldValidationError {
+                field: field.name().to_owned(),
+                message: format!(
+                    "Native type `{ds_name}.{}` is deprecated. Please use `{ds_name}.{arg}` instead.",
+                    type_names::ARRAY
+                ),
+            })
+            .to_string(),
+            span,
+        });
+    }
 }
 
 impl Connector for MongoDbDatamodelConnector {
@@ -98,6 +124,7 @@ impl Connector for MongoDbDatamodelConnector {
         for field in model.scalar_fields() {
             Self::validate_auto(field, errors);
             Self::validate_dbgenerated(field, errors);
+            Self::validate_array_native_type(field, errors);
         }
 
         let mut push_error = |err: ConnectorError| {
@@ -172,7 +199,7 @@ impl Connector for MongoDbDatamodelConnector {
     }
 
     fn parse_native_type(&self, name: &str, args: Vec<String>) -> Result<NativeTypeInstance> {
-        let mongo_type = mongo_type_from_input(name)?;
+        let mongo_type = mongo_type_from_input(name, &args)?;
 
         Ok(NativeTypeInstance::new(name, args, mongo_type.to_json()))
     }
