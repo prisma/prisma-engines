@@ -562,11 +562,11 @@
             };
 
             <span class="kw">if</span> <span class="kw">let</span> <span class="ident">FieldType::Unsupported</span>(<span class="ident">r#type</span>) <span class="op">=</span> <span class="ident">field_type</span> {
-                <span class="ident">unsupported</span>.<span class="ident">push</span>((<span class="ident">name</span>.<span class="ident">to_string</span>(), <span class="ident">field_name</span>.<span class="ident">to_string</span>(), <span class="ident">r#type</span>));
+                <span class="ident">unsupported</span>.<span class="ident">push</span>((<span class="ident">name</span>.<span class="ident">clone</span>(), <span class="ident">field_name</span>.<span class="ident">to_string</span>(), <span class="ident">r#type</span>));
             }
 
             <span class="kw">if</span> <span class="ident">percentages</span>.<span class="ident">data</span>.<span class="ident">len</span>() <span class="op">&gt;</span> <span class="number">1</span> {
-                <span class="ident">undecided_types</span>.<span class="ident">push</span>((<span class="ident">name</span>.<span class="ident">to_string</span>(), <span class="ident">field_name</span>.<span class="ident">to_string</span>(), <span class="ident">field_type</span>.<span class="ident">to_string</span>()));
+                <span class="ident">undecided_types</span>.<span class="ident">push</span>((<span class="ident">name</span>.<span class="ident">clone</span>(), <span class="ident">field_name</span>.<span class="ident">to_string</span>(), <span class="ident">field_type</span>.<span class="ident">to_string</span>()));
             }
 
             <span class="kw">let</span> <span class="ident">arity</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">field_type</span>.<span class="ident">is_array</span>() {

@@ -56,6 +56,7 @@
 <span id="55">55</span>
 <span id="56">56</span>
 <span id="57">57</span>
+<span id="58">58</span>
 </pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">field_type</span>;
 <span class="kw">mod</span> <span class="ident">statistics</span>;
 
@@ -67,6 +68,7 @@
     <span class="ident">Database</span>,
 };
 <span class="kw">use</span> <span class="ident">mongodb_schema_describer::MongoSchema</span>;
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="ident">statistics::Name</span>;
 <span class="kw">use</span> <span class="ident">statistics</span>::<span class="kw-2">*</span>;
 
 <span class="doccomment">/// From the given database, lists all collections as models, and samples</span>
