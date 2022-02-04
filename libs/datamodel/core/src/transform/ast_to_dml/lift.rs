@@ -460,7 +460,18 @@ impl<'a> LiftAstToDml<'a> {
 
                 CompositeTypeFieldType::Enum(enum_name.to_owned())
             }
-            db::ScalarFieldType::Alias(_) | db::ScalarFieldType::Unsupported => {
+            db::ScalarFieldType::Unsupported => {
+                let field = composite_type_field
+                    .ast_field()
+                    .field_type
+                    .as_unsupported()
+                    .unwrap()
+                    .0
+                    .to_owned();
+
+                CompositeTypeFieldType::Unsupported(field)
+            }
+            db::ScalarFieldType::Alias(_) => {
                 unreachable!()
             }
         }

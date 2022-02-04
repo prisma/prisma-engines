@@ -47,6 +47,13 @@ impl CompositeType {
             .iter()
             .filter(|f| matches!(f.r#type, CompositeTypeFieldType::CompositeType(_)))
     }
+
+    /// Gets an iterator over all unsupported fields.
+    pub fn unsupported_fields(&self) -> impl Iterator<Item = &CompositeTypeField> {
+        self.fields
+            .iter()
+            .filter(|f| matches!(f.r#type, CompositeTypeFieldType::Unsupported(_)))
+    }
 }
 
 #[derive(Debug, PartialEq, Clone)]
