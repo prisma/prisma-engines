@@ -4,7 +4,7 @@ use indoc::indoc;
 
 use crate::{
     common::{CompositeTypeAsserts, DatamodelAsserts},
-    with_header,
+    with_header, Provider,
 };
 
 #[test]
@@ -521,6 +521,7 @@ fn composite_types_are_parsed_without_error() {
                             database_name: None,
                             documentation: None,
                             default_value: None,
+                            is_commented_out: false,
                         },
                         CompositeTypeField {
                             name: "street",
@@ -541,6 +542,7 @@ fn composite_types_are_parsed_without_error() {
                             database_name: None,
                             documentation: None,
                             default_value: None,
+                            is_commented_out: false,
                         },
                     ],
                 },
@@ -550,6 +552,32 @@ fn composite_types_are_parsed_without_error() {
 
     expected_ast.assert_debug_eq(&found);
     expected_datamodel.assert_debug_eq(&datamodel);
+}
+
+#[test]
+fn composite_types_must_have_at_least_one_visible_field() {
+    let schema = indoc! {r#"
+        type Address {
+          // name String?
+        }
+    "#};
+
+    let datamodel = with_header(schema, Provider::Mongo, &["mongoDb"]);
+
+    let expected = expect![[r#"
+        [1;91merror[0m: [1mError validating: A type must have at least one field defined.[0m
+          [1;94m-->[0m  [4mschema.prisma:11[0m
+        [1;94m   | [0m
+        [1;94m10 | [0m
+        [1;94m11 | [0m[1;91mtype Address {[0m
+        [1;94m12 | [0m  // name String?
+        [1;94m13 | [0m}
+        [1;94m   | [0m
+    "#]];
+
+    let error = datamodel::parse_schema(&datamodel).map(drop).unwrap_err();
+
+    expected.assert_eq(&error);
 }
 
 #[test]

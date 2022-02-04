@@ -24,6 +24,9 @@ pub struct CompositeTypeField {
 
     /// The default value of this field
     pub default_value: Option<DefaultValue>,
+
+    /// Should we comment this field out.
+    pub is_commented_out: bool,
 }
 
 impl CompositeType {

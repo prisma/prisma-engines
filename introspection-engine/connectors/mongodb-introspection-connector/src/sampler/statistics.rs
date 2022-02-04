@@ -25,13 +25,14 @@ use std::{
 pub(super) const SAMPLE_SIZE: i32 = 1000;
 
 static RESERVED_NAMES: &[&str] = &["PrismaClient"];
+static COMMENTED_OUT_FIELD: &str = "This field was commented out because of an invalid name. Please provide a valid one that matches [a-zA-Z][a-zA-Z0-9_]*";
 
 /// Statistical data from a MongoDB database for determining a Prisma data
 /// model.
 #[derive(Default)]
 pub(super) struct Statistics<'a> {
-    /// (model_name, field_name) -> type percentages
-    fields: BTreeMap<(Name, String), FieldSampler>,
+    /// (container_name, field_name) -> type percentages
+    samples: BTreeMap<(Name, String), FieldSampler>,
     /// model_name -> document count
     models: HashMap<Name, usize>,
     /// model_name -> indices
@@ -68,100 +69,7 @@ impl<'a> Statistics<'a> {
     pub(super) fn into_datamodel(self, warnings: &mut Vec<Warning>) -> Datamodel {
         let mut data_model = Datamodel::new();
         let mut indices = self.indices;
-        let mut unsupported = Vec::new();
-        let mut undecided_types = Vec::new();
-
-        let mut models: BTreeMap<String, Model> = self
-            .models
-            .iter()
-            .flat_map(|(name, _)| name.as_model_name())
-            .map(|model_name| (model_name.to_string(), new_model(model_name)))
-            .collect();
-
-        let mut types: BTreeMap<String, CompositeType> = self
-            .models
-            .iter()
-            .flat_map(|(name, _)| name.as_type_name())
-            .map(|type_name| (type_name.to_string(), new_composite_type(type_name)))
-            .collect();
-
-        for ((name, field_name), sampler) in self.fields.into_iter() {
-            let doc_count = *self.models.get(&name).unwrap_or(&0);
-            let field_count = sampler.counter;
-
-            let percentages = sampler.percentages();
-
-            let field_type = match percentages.find_most_common() {
-                Some(field_type) => field_type.to_owned(),
-                None => FieldType::Unsupported("Unknown"),
-            };
-
-            if let FieldType::Unsupported(r#type) = field_type {
-                unsupported.push((name.clone(), field_name.to_string(), r#type));
-            }
-
-            if percentages.data.len() > 1 {
-                undecided_types.push((name.clone(), field_name.to_string(), field_type.to_string()));
-            }
-
-            let arity = if field_type.is_array() {
-                datamodel::FieldArity::List
-            } else if doc_count > field_count || sampler.nullable {
-                datamodel::FieldArity::Optional
-            } else {
-                datamodel::FieldArity::Required
-            };
-
-            let documentation = if percentages.has_type_variety() {
-                Some(format!(
-                    "Multiple data types found: {} out of {} sampled entries",
-                    percentages, field_count
-                ))
-            } else {
-                None
-            };
-
-            let (sanitized_name, database_name) = match sanitize_string(&field_name) {
-                Some(sanitized) => (sanitized, Some(field_name)),
-                None if field_name == "id" => ("id_".to_string(), Some(field_name)),
-                None => (field_name, None),
-            };
-
-            match name {
-                Name::Model(model_name) => {
-                    let model = models.get_mut(&model_name).unwrap();
-
-                    if database_name.as_deref() == Some("_id") {
-                        continue;
-                    }
-
-                    model.fields.push(Field::ScalarField(ScalarField {
-                        name: sanitized_name,
-                        field_type: field_type.into(),
-                        arity,
-                        database_name,
-                        default_value: None,
-                        documentation,
-                        is_generated: false,
-                        is_updated_at: false,
-                        is_commented_out: false,
-                        is_ignored: false,
-                    }));
-                }
-                Name::CompositeType(type_name) => {
-                    let r#type = types.get_mut(&type_name).unwrap();
-
-                    r#type.fields.push(CompositeTypeField {
-                        name: sanitized_name,
-                        r#type: field_type.into(),
-                        arity,
-                        documentation,
-                        database_name,
-                        default_value: None,
-                    });
-                }
-            }
-        }
+        let (mut models, types) = populate_fields(&self.models, self.samples, warnings);
 
         add_indices_to_models(&mut models, &mut indices);
 
@@ -173,17 +81,13 @@ impl<'a> Statistics<'a> {
             data_model.composite_types.push(composite_type);
         }
 
-        if !unsupported.is_empty() {
-            warnings.push(crate::warnings::unsupported_type(&unsupported));
-        }
-
-        if !undecided_types.is_empty() {
-            warnings.push(crate::warnings::undecided_field_type(&undecided_types));
-        }
-
         data_model
     }
 
+    /// Creates a new name for a composite type with the following rules:
+    ///
+    /// - if model is foo and field is bar, the type is FooBar
+    /// - if a model already exists with the name, we'll use FooBar_
     fn composite_type_name(&self, model: &str, field: &str) -> Name {
         let name = Name::Model(format!("{}_{}", model, field).to_case(Case::Pascal));
 
@@ -196,6 +100,7 @@ impl<'a> Statistics<'a> {
         Name::CompositeType(name)
     }
 
+    /// Tracking the usage of types and names in a composite type.
     fn track_composite_type_fields(
         &mut self,
         model: &str,
@@ -207,6 +112,10 @@ impl<'a> Statistics<'a> {
         self.track_document_types(name, document, depth);
     }
 
+    /// If a document has a nested document, we'll introspect it as a composite
+    /// type until a certain depth. The depth can be given by user, and if we
+    /// reach enough nesting the following composite types are introspected as
+    /// `Json`.
     fn find_and_track_composite_types(
         &mut self,
         model: &str,
@@ -265,10 +174,12 @@ impl<'a> Statistics<'a> {
                 None
             };
 
-            let sampler = self.fields.entry((name.clone(), field.to_string())).or_default();
+            let sampler = self.samples.entry((name.clone(), field.to_string())).or_default();
             sampler.counter += 1;
 
             match FieldType::from_bson(val, compound_name) {
+                // We cannot have arrays of arrays, so multi-dimensional arrays
+                // are introspected as `Json[]`.
                 Some(_) if found_composite && array_layers > 1 => {
                     let counter = sampler
                         .types
@@ -276,10 +187,13 @@ impl<'a> Statistics<'a> {
                         .or_default();
                     *counter += 1;
                 }
+                // Counting the types.
                 Some(field_type) => {
                     let counter = sampler.types.entry(field_type).or_default();
                     *counter += 1;
                 }
+                // If the value is null, the field must be optional and we
+                // cannot detect the type.
                 None => {
                     sampler.nullable = true;
                 }
@@ -296,6 +210,7 @@ pub struct FieldSampler {
 }
 
 impl FieldSampler {
+    /// Counting the percentages of different types per field.
     fn percentages(&self) -> FieldPercentages {
         let total = self.types.iter().fold(0, |acc, (_, count)| acc + count);
         let mut data = BTreeMap::new();
@@ -400,6 +315,144 @@ fn new_model(model_name: &str) -> Model {
         documentation,
         ..Default::default()
     }
+}
+
+/// Read all samples from the data, returning models and composite types.
+///
+/// ## Input
+///
+/// - Samples, counting how many documents altogether there was in the model or
+///   in how many documents we had data for the composite type.
+/// - Fields counts from model or type and field name combination to statistics
+///   of different types seen in the data.
+fn populate_fields(
+    samples: &HashMap<Name, usize>,
+    fields: BTreeMap<(Name, String), FieldSampler>,
+    warnings: &mut Vec<Warning>,
+) -> (BTreeMap<String, Model>, BTreeMap<String, CompositeType>) {
+    let mut models: BTreeMap<String, Model> = samples
+        .iter()
+        .flat_map(|(name, _)| name.as_model_name())
+        .map(|model_name| (model_name.to_string(), new_model(model_name)))
+        .collect();
+
+    let mut types: BTreeMap<String, CompositeType> = samples
+        .iter()
+        .flat_map(|(name, _)| name.as_type_name())
+        .map(|type_name| (type_name.to_string(), new_composite_type(type_name)))
+        .collect();
+
+    let mut unsupported = Vec::new();
+    let mut undecided_types = Vec::new();
+    let mut fields_with_empty_names = Vec::new();
+
+    for ((container, field_name), sampler) in fields.into_iter() {
+        let doc_count = *samples.get(&container).unwrap_or(&0);
+        let field_count = sampler.counter;
+
+        let percentages = sampler.percentages();
+
+        let field_type = match percentages.find_most_common() {
+            Some(field_type) => field_type.to_owned(),
+            None => FieldType::Unsupported("Unknown"),
+        };
+
+        if let FieldType::Unsupported(r#type) = field_type {
+            unsupported.push((container.clone(), field_name.to_string(), r#type));
+        }
+
+        if percentages.data.len() > 1 {
+            undecided_types.push((container.clone(), field_name.to_string(), field_type.to_string()));
+        }
+
+        let arity = if field_type.is_array() {
+            datamodel::FieldArity::List
+        } else if doc_count > field_count || sampler.nullable {
+            datamodel::FieldArity::Optional
+        } else {
+            datamodel::FieldArity::Required
+        };
+
+        let mut documentation = if percentages.has_type_variety() {
+            Some(format!(
+                "Multiple data types found: {} out of {} sampled entries",
+                percentages, field_count
+            ))
+        } else {
+            None
+        };
+
+        let (name, database_name, is_commented_out) = match sanitize_string(&field_name) {
+            Some(sanitized) if sanitized.is_empty() => {
+                match documentation.as_mut() {
+                    Some(ref mut existing) => {
+                        existing.push('\n');
+                        existing.push_str(COMMENTED_OUT_FIELD);
+                    }
+                    None => {
+                        documentation = Some(COMMENTED_OUT_FIELD.to_string());
+                    }
+                };
+
+                fields_with_empty_names.push((container.clone(), field_name.clone()));
+
+                (field_name.clone(), Some(field_name), true)
+            }
+            Some(sanitized) => (sanitized, Some(field_name), false),
+            None if field_name == "id" => ("id_".to_string(), Some(field_name), false),
+            None => (field_name, None, false),
+        };
+
+        match container {
+            Name::Model(model_name) => {
+                let model = models.get_mut(&model_name).unwrap();
+
+                if database_name.as_deref() == Some("_id") {
+                    continue;
+                }
+
+                model.fields.push(Field::ScalarField(ScalarField {
+                    name,
+                    field_type: field_type.into(),
+                    arity,
+                    database_name,
+                    default_value: None,
+                    documentation,
+                    is_generated: false,
+                    is_updated_at: false,
+                    is_commented_out,
+                    is_ignored: false,
+                }));
+            }
+            Name::CompositeType(type_name) => {
+                let r#type = types.get_mut(&type_name).unwrap();
+
+                r#type.fields.push(CompositeTypeField {
+                    name,
+                    r#type: field_type.into(),
+                    default_value: None,
+                    arity,
+                    documentation,
+                    database_name,
+                    is_commented_out,
+                });
+            }
+        }
+    }
+
+    if !unsupported.is_empty() {
+        warnings.push(crate::warnings::unsupported_type(&unsupported));
+    }
+
+    if !undecided_types.is_empty() {
+        warnings.push(crate::warnings::undecided_field_type(&undecided_types));
+    }
+
+    if !fields_with_empty_names.is_empty() {
+        warnings.push(crate::warnings::fields_with_empty_names(&fields_with_empty_names));
+    }
+
+    (models, types)
 }
 
 fn add_indices_to_models(models: &mut BTreeMap<String, Model>, indices: &mut BTreeMap<String, Vec<IndexWalker<'_>>>) {

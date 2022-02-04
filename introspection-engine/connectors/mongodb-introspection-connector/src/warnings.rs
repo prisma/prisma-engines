@@ -54,3 +54,27 @@ pub(crate) fn undecided_field_type(affected: &[(Name, String, String)]) -> Warni
         affected,
     }
 }
+
+pub(crate) fn fields_with_empty_names(fields_with_empty_names: &[(Name, String)]) -> Warning {
+    let affected = serde_json::Value::Array({
+        fields_with_empty_names
+            .iter()
+            .map(|(container, field)| match container {
+                Name::Model(name) => json!({
+                    "model": name,
+                    "field": field
+                }),
+                Name::CompositeType(name) => json!({
+                    "type": name,
+                    "field": field
+                }),
+            })
+            .collect()
+    });
+
+    Warning {
+        code: 4,
+        message: "These enum values were commented out because their names are currently not supported by Prisma. Please provide valid ones that match [a-zA-Z][a-zA-Z0-9_]* using the `@map` attribute.".into(),
+        affected,
+    }
+}
