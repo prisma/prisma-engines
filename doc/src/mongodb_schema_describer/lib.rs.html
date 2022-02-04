@@ -100,6 +100,10 @@
 <span id="99"> 99</span>
 <span id="100">100</span>
 <span id="101">101</span>
+<span id="102">102</span>
+<span id="103">103</span>
+<span id="104">104</span>
+<span id="105">105</span>
 </pre><pre class="rust"><code><span class="doccomment">//! The MongoDB Schema describer.</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! A common place to query all the possible schema data we can from a MongoDB instance.</span>
@@ -134,8 +138,12 @@
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">indexes_cursor</span> <span class="op">=</span> <span class="ident">collection</span>.<span class="ident">list_indexes</span>(<span class="prelude-val">None</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">index</span>) <span class="op">=</span> <span class="ident">indexes_cursor</span>.<span class="ident">try_next</span>().<span class="kw">await</span><span class="question-mark">?</span> {
-            <span class="kw">let</span> <span class="ident">options</span> <span class="op">=</span> <span class="ident">index</span>.<span class="ident">options</span>.<span class="ident">unwrap</span>();
-            <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">options</span>.<span class="ident">name</span>.<span class="ident">unwrap</span>();
+            <span class="kw">let</span> <span class="ident">options</span> <span class="op">=</span> <span class="ident">index</span>.<span class="ident">options</span>.<span class="ident">unwrap_or_default</span>();
+
+            <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">options</span>.<span class="ident">name</span> {
+                <span class="prelude-val">Some</span>(<span class="ident">name</span>) =&gt; <span class="ident">name</span>,
+                <span class="prelude-val">None</span> =&gt; <span class="kw">continue</span>,
+            };
 
             <span class="kw">let</span> <span class="ident">r#type</span> <span class="op">=</span> <span class="kw">match</span> (<span class="ident">options</span>.<span class="ident">unique</span>, <span class="ident">options</span>.<span class="ident">text_index_version</span>.<span class="ident">as_ref</span>()) {
                 (<span class="prelude-val">Some</span>(<span class="kw">_</span>), <span class="kw">_</span>) =&gt; <span class="ident">IndexType::Unique</span>,
