@@ -555,6 +555,17 @@
 <span id="554">554</span>
 <span id="555">555</span>
 <span id="556">556</span>
+<span id="557">557</span>
+<span id="558">558</span>
+<span id="559">559</span>
+<span id="560">560</span>
+<span id="561">561</span>
+<span id="562">562</span>
+<span id="563">563</span>
+<span id="564">564</span>
+<span id="565">565</span>
+<span id="566">566</span>
+<span id="567">567</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">ast</span>, <span class="ident">dml</span>,
     <span class="ident">transform::ast_to_dml::db</span>::{<span class="self">self</span>, <span class="ident">walkers</span>::<span class="kw-2">*</span>, <span class="ident">IndexAlgorithm</span>},
@@ -1017,7 +1028,18 @@
 
                 <span class="ident">CompositeTypeFieldType::Enum</span>(<span class="ident">enum_name</span>.<span class="ident">to_owned</span>())
             }
-            <span class="ident">db::ScalarFieldType::Alias</span>(<span class="kw">_</span>) <span class="op">|</span> <span class="ident">db::ScalarFieldType::Unsupported</span> =&gt; {
+            <span class="ident">db::ScalarFieldType::Unsupported</span> =&gt; {
+                <span class="kw">let</span> <span class="ident">field</span> <span class="op">=</span> <span class="ident">composite_type_field</span>
+                    .<span class="ident">ast_field</span>()
+                    .<span class="ident">field_type</span>
+                    .<span class="ident">as_unsupported</span>()
+                    .<span class="ident">unwrap</span>()
+                    .<span class="number">0</span>
+                    .<span class="ident">to_owned</span>();
+
+                <span class="ident">CompositeTypeFieldType::Unsupported</span>(<span class="ident">field</span>)
+            }
+            <span class="ident">db::ScalarFieldType::Alias</span>(<span class="kw">_</span>) =&gt; {
                 <span class="macro">unreachable!</span>()
             }
         }
