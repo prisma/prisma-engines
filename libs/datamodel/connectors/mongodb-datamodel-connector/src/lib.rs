@@ -82,21 +82,24 @@ impl MongoDbDatamodelConnector {
             None => return,
         };
 
-        if type_name == type_names::ARRAY {
-            let arg = args.get(0).unwrap();
-
-            errors.push_error(datamodel_connector::DatamodelError::ConnectorError {
-                message: ConnectorError::from_kind(ErrorKind::FieldValidationError {
-                    field: field.name().to_owned(),
-                    message: format!(
-                        "Native type `{ds_name}.{}` is deprecated. Please use `{ds_name}.{arg}` instead.",
-                        type_names::ARRAY
-                    ),
-                })
-                .to_string(),
-                span,
-            });
+        if type_name != type_names::ARRAY {
+            return;
         }
+
+        // `db.Array` expects exactly 1 argument, which is validated before this code path.
+        let arg = args.get(0).unwrap();
+
+        errors.push_error(datamodel_connector::DatamodelError::ConnectorError {
+            message: ConnectorError::from_kind(ErrorKind::FieldValidationError {
+                field: field.name().to_owned(),
+                message: format!(
+                    "Native type `{ds_name}.{}` is deprecated. Please use `{ds_name}.{arg}` instead.",
+                    type_names::ARRAY
+                ),
+            })
+            .to_string(),
+            span,
+        });
     }
 }
 
