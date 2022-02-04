@@ -86,7 +86,7 @@ impl<'a> Statistics<'a> {
                 if let Some(field) = composite_type
                     .fields
                     .iter_mut()
-                    .find(|f| f.name == "id".to_string() && f.database_name.is_none())
+                    .find(|f| f.name == *"id" && f.database_name.is_none())
                 {
                     field.name = "id_".into();
                     field.database_name = Some("id".into());
