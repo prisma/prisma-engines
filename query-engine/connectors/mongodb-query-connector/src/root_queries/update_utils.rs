@@ -6,32 +6,33 @@ use mongodb::bson::{doc, Document};
 use prisma_models::PrismaValue;
 
 pub(crate) trait IntoUpdateDocumentExtension {
-    fn into_update_docs(self) -> crate::Result<Vec<Document>>;
+    fn into_update_docs(self, field: &Field, path: FieldPath) -> crate::Result<Vec<Document>>;
 }
 
-impl IntoUpdateDocumentExtension for Vec<UpdateExpression> {
-    fn into_update_docs(self) -> crate::Result<Vec<Document>> {
-        self.into_iter()
+impl IntoUpdateDocumentExtension for WriteOperation {
+    fn into_update_docs(self, field: &Field, path: FieldPath) -> crate::Result<Vec<Document>> {
+        self.into_update_expressions(field, path)?
+            .into_iter()
             .map(|op| op.into_bson()?.into_document())
             .collect::<crate::Result<Vec<_>>>()
     }
 }
 
-pub(crate) trait IntoUpdateOperationExtension {
-    fn into_update_ops(self, field: &Field, path: FieldPath) -> crate::Result<Vec<UpdateExpression>>;
+trait IntoUpdateExpressionExtension {
+    fn into_update_expressions(self, field: &Field, path: FieldPath) -> crate::Result<Vec<UpdateExpression>>;
 }
 
-impl IntoUpdateOperationExtension for WriteOperation {
-    fn into_update_ops(self, field: &Field, path: FieldPath) -> crate::Result<Vec<UpdateExpression>> {
+impl IntoUpdateExpressionExtension for WriteOperation {
+    fn into_update_expressions(self, field: &Field, path: FieldPath) -> crate::Result<Vec<UpdateExpression>> {
         match self {
-            WriteOperation::Scalar(op) => op.into_update_ops(field, path),
-            WriteOperation::Composite(op) => op.into_update_ops(field, path),
+            WriteOperation::Scalar(op) => op.into_update_expressions(field, path),
+            WriteOperation::Composite(op) => op.into_update_expressions(field, path),
         }
     }
 }
 
-impl IntoUpdateOperationExtension for ScalarWriteOperation {
-    fn into_update_ops(self, field: &Field, field_path: FieldPath) -> crate::Result<Vec<UpdateExpression>> {
+impl IntoUpdateExpressionExtension for ScalarWriteOperation {
+    fn into_update_expressions(self, field: &Field, field_path: FieldPath) -> crate::Result<Vec<UpdateExpression>> {
         let dollar_field_path = field_path.dollar_path();
 
         let doc = match self {
@@ -63,8 +64,8 @@ impl IntoUpdateOperationExtension for ScalarWriteOperation {
     }
 }
 
-impl IntoUpdateOperationExtension for CompositeWriteOperation {
-    fn into_update_ops(self, field: &Field, path: FieldPath) -> crate::Result<Vec<UpdateExpression>> {
+impl IntoUpdateExpressionExtension for CompositeWriteOperation {
+    fn into_update_expressions(self, field: &Field, path: FieldPath) -> crate::Result<Vec<UpdateExpression>> {
         let dollar_field_path = path.dollar_path();
 
         let docs = match self {
@@ -79,7 +80,7 @@ impl IntoUpdateOperationExtension for CompositeWriteOperation {
                 let mut update_docs = vec![];
 
                 for (write_op, field, field_path) in nested_write.unfold(field, path) {
-                    update_docs.extend(write_op.into_update_ops(field, field_path)?);
+                    update_docs.extend(write_op.into_update_expressions(field, field_path)?);
                 }
 
                 update_docs
@@ -101,7 +102,7 @@ impl IntoUpdateOperationExtension for CompositeWriteOperation {
                 let should_set_ref_id = format!("${}", &should_set_id);
 
                 let set_docs = (*set)
-                    .into_update_ops(field, path.clone())?
+                    .into_update_expressions(field, path.clone())?
                     .into_iter()
                     .map(|op| {
                         let set = op.try_into_set().unwrap();
@@ -122,7 +123,7 @@ impl IntoUpdateOperationExtension for CompositeWriteOperation {
                     })
                     .collect_vec();
                 let update_docs = (*update)
-                    .into_update_ops(field, path)?
+                    .into_update_expressions(field, path)?
                     .into_iter()
                     .map(|op| match op {
                         UpdateExpression::Set(set) => {
@@ -169,6 +170,14 @@ impl IntoUpdateOperationExtension for CompositeWriteOperation {
                 docs.push(doc! { "$unset": Bson::from(should_set_id) }.into());
 
                 docs
+            }
+            CompositeWriteOperation::UpdateMany { filter: _, update: _ } => {
+                // TODO(composite): render updateMany mutation
+                // Notes: `arrayFilters` does not work with pipeline-style updates
+                // There's an SO answer to a similar problem here: https://stackoverflow.com/a/60946322
+                // Disclaimer: it's pretty terrible
+                // (*update).into_update_expressions(field, path)?
+                todo!()
             }
         };
 
@@ -240,18 +249,16 @@ pub(crate) enum UpdateExpression {
 impl IntoBson for UpdateExpression {
     fn into_bson(self) -> crate::Result<Bson> {
         let bson: Bson = match self {
-            UpdateExpression::Set(set) => {
-                doc! { "$set": { set.field_path.path(): (*set.expression).into_bson()? } }.into()
-            }
-            UpdateExpression::IfThenElse(if_then_else) => doc! {
+            UpdateExpression::Set(set) => Bson::from(doc! {
+                "$set": { set.field_path.path(): (*set.expression).into_bson()? }
+            }),
+            UpdateExpression::IfThenElse(if_then_else) => Bson::from(doc! {
                 "$cond": {
                     "if": (*if_then_else.cond).into_bson()?,
                     "then": (*if_then_else.then).into_bson()?,
                     "else": (*if_then_else.els).into_bson()?
                 }
-
-            }
-            .into(),
+            }),
             UpdateExpression::Generic(bson) => bson,
         };
 

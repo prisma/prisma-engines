@@ -234,6 +234,7 @@ fn composite_update_envelope_object_type(ctx: &mut BuilderContext, cf: &Composit
     append_opt(&mut fields, composite_push_update_input_field(ctx, cf));
     append_opt(&mut fields, composite_unset_update_input_field(cf));
     append_opt(&mut fields, composite_upsert_update_input_field(ctx, cf));
+    append_opt(&mut fields, composite_update_many_update_input_field(ctx, cf));
 
     input_object.set_fields(fields);
 
@@ -339,6 +340,42 @@ fn composite_upsert_update_input_field(ctx: &mut BuilderContext, cf: &CompositeF
         let upsert_object_type = InputType::Object(composite_upsert_object_type(ctx, cf));
 
         Some(input_field(operations::UPSERT, upsert_object_type, None).optional())
+    } else {
+        None
+    }
+}
+
+fn composite_update_many_object_type(ctx: &mut BuilderContext, cf: &CompositeFieldRef) -> InputObjectTypeWeakRef {
+    let name = format!("{}UpdateManyInput", cf.typ.name);
+
+    let ident = Identifier::new(name, PRISMA_NAMESPACE);
+    return_cached_input!(ctx, &ident);
+
+    let mut input_object = init_input_object_type(ident.clone());
+    input_object.set_tag(ObjectTag::CompositeEnvelope);
+
+    let input_object = Arc::new(input_object);
+
+    ctx.cache_input_type(ident, input_object.clone());
+
+    let update_object_type = composite_update_object_type(ctx, cf);
+    let data_field = input_field(args::DATA, InputType::Object(update_object_type), None);
+    // TODO(composite): replace stub where field with actual composite where input
+    let where_field = input_field(args::WHERE, InputType::boolean(), None);
+
+    let fields = vec![where_field, data_field];
+
+    input_object.set_fields(fields);
+
+    Arc::downgrade(&input_object)
+}
+
+// Builds an `updateMany` input field. Should only be used in the envelope type.
+fn composite_update_many_update_input_field(ctx: &mut BuilderContext, cf: &CompositeFieldRef) -> Option<InputField> {
+    if cf.is_list() {
+        let update_many = InputType::Object(composite_update_many_object_type(ctx, cf));
+
+        Some(input_field(operations::UPDATE_MANY, update_many, None).optional())
     } else {
         None
     }

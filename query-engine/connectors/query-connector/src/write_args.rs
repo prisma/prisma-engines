@@ -1,4 +1,7 @@
-use crate::error::{ConnectorError, ErrorKind};
+use crate::{
+    error::{ConnectorError, ErrorKind},
+    Filter,
+};
 use chrono::Utc;
 use indexmap::{map::Keys, IndexMap};
 use prisma_models::{
@@ -96,6 +99,13 @@ impl WriteOperation {
         })
     }
 
+    pub fn composite_update_many(filter: Filter, update: CompositeWriteOperation) -> Self {
+        Self::Composite(CompositeWriteOperation::UpdateMany {
+            filter,
+            update: Box::new(update),
+        })
+    }
+
     pub fn as_scalar(&self) -> Option<&ScalarWriteOperation> {
         if let Self::Scalar(v) = self {
             Some(v)
@@ -158,6 +168,10 @@ pub enum CompositeWriteOperation {
     Update(NestedWrite),
     Upsert {
         set: Box<CompositeWriteOperation>,
+        update: Box<CompositeWriteOperation>,
+    },
+    UpdateMany {
+        filter: Filter,
         update: Box<CompositeWriteOperation>,
     },
 }

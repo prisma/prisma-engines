@@ -1,10 +1,10 @@
 use super::*;
 use crate::{
-    constants::{json_null, operations},
+    constants::{args, json_null, operations},
     query_document::{ParsedInputMap, ParsedInputValue},
     ObjectTag,
 };
-use connector::{DatasourceFieldName, WriteArgs, WriteOperation};
+use connector::{DatasourceFieldName, Filter, WriteArgs, WriteOperation};
 use prisma_models::{
     CompositeFieldRef, Field, ModelRef, PrismaValue, RelationFieldRef, ScalarFieldRef, TypeIdentifier,
 };
@@ -149,10 +149,25 @@ fn parse_composite_envelope(
         operations::UNSET => parse_composite_unset(value.try_into()?),
         operations::UPDATE => parse_composite_updates(cf, value.try_into()?, path)?,
         operations::UPSERT => parse_composite_upsert(cf, value.try_into()?, path)?,
+        operations::UPDATE_MANY => parse_composite_update_many(cf, value.try_into()?, path)?,
         _ => unimplemented!(),
     };
 
     Ok(write_op)
+}
+
+fn parse_composite_update_many(
+    cf: &CompositeFieldRef,
+    mut value: ParsedInputMap,
+    path: &mut Vec<DatasourceFieldName>,
+) -> QueryGraphBuilderResult<WriteOperation> {
+    let filter = value.remove(args::WHERE).unwrap();
+    // TODO(composite): replace stub bool filter with actual composite read filter
+    let filter = Filter::BoolFilter(filter.try_into()?);
+    let update: ParsedInputMap = value.remove(args::DATA).unwrap().try_into()?;
+    let update = parse_composite_updates(cf, update, path)?.try_into_composite().unwrap();
+
+    Ok(WriteOperation::composite_update_many(filter, update))
 }
 
 fn parse_composite_upsert(
