@@ -204,6 +204,33 @@
 <span id="203">203</span>
 <span id="204">204</span>
 <span id="205">205</span>
+<span id="206">206</span>
+<span id="207">207</span>
+<span id="208">208</span>
+<span id="209">209</span>
+<span id="210">210</span>
+<span id="211">211</span>
+<span id="212">212</span>
+<span id="213">213</span>
+<span id="214">214</span>
+<span id="215">215</span>
+<span id="216">216</span>
+<span id="217">217</span>
+<span id="218">218</span>
+<span id="219">219</span>
+<span id="220">220</span>
+<span id="221">221</span>
+<span id="222">222</span>
+<span id="223">223</span>
+<span id="224">224</span>
+<span id="225">225</span>
+<span id="226">226</span>
+<span id="227">227</span>
+<span id="228">228</span>
+<span id="229">229</span>
+<span id="230">230</span>
+<span id="231">231</span>
+<span id="232">232</span>
 </pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">mongodb_types</span>;
 
 <span class="kw">use</span> <span class="ident">datamodel_connector</span>::{
@@ -281,6 +308,32 @@
             <span class="ident">span</span>: <span class="ident">field</span>.<span class="ident">ast_field</span>().<span class="ident">span</span>,
         });
     }
+
+    <span class="kw">fn</span> <span class="ident">validate_array_native_type</span>(<span class="ident">field</span>: <span class="ident">ScalarFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">errors</span>: <span class="kw-2">&amp;mut</span> <span class="ident">datamodel_connector::Diagnostics</span>) {
+        <span class="kw">let</span> (<span class="ident">ds_name</span>, <span class="ident">type_name</span>, <span class="ident">args</span>, <span class="ident">span</span>) <span class="op">=</span> <span class="kw">match</span> <span class="ident">field</span>.<span class="ident">raw_native_type</span>() {
+            <span class="prelude-val">Some</span>(<span class="ident">nt</span>) =&gt; <span class="ident">nt</span>,
+            <span class="prelude-val">None</span> =&gt; <span class="kw">return</span>,
+        };
+
+        <span class="kw">if</span> <span class="ident">type_name</span> <span class="op">!</span><span class="op">=</span> <span class="ident">type_names::ARRAY</span> {
+            <span class="kw">return</span>;
+        }
+
+        <span class="comment">// `db.Array` expects exactly 1 argument, which is validated before this code path.</span>
+        <span class="kw">let</span> <span class="ident">arg</span> <span class="op">=</span> <span class="ident">args</span>.<span class="ident">get</span>(<span class="number">0</span>).<span class="ident">unwrap</span>();
+
+        <span class="ident">errors</span>.<span class="ident">push_error</span>(<span class="ident">datamodel_connector::DatamodelError::ConnectorError</span> {
+            <span class="ident">message</span>: <span class="ident">ConnectorError::from_kind</span>(<span class="ident">ErrorKind::FieldValidationError</span> {
+                <span class="ident">field</span>: <span class="ident">field</span>.<span class="ident">name</span>().<span class="ident">to_owned</span>(),
+                <span class="ident">message</span>: <span class="macro">format!</span>(
+                    <span class="string">&quot;Native type `{ds_name}.{}` is deprecated. Please use `{ds_name}.{arg}` instead.&quot;</span>,
+                    <span class="ident">type_names::ARRAY</span>
+                ),
+            })
+            .<span class="ident">to_string</span>(),
+            <span class="ident">span</span>,
+        });
+    }
 }
 
 <span class="kw">impl</span> <span class="ident">Connector</span> <span class="kw">for</span> <span class="ident">MongoDbDatamodelConnector</span> {
@@ -304,6 +357,7 @@
         <span class="kw">for</span> <span class="ident">field</span> <span class="kw">in</span> <span class="ident">model</span>.<span class="ident">scalar_fields</span>() {
             <span class="ident"><span class="self">Self</span>::validate_auto</span>(<span class="ident">field</span>, <span class="ident">errors</span>);
             <span class="ident"><span class="self">Self</span>::validate_dbgenerated</span>(<span class="ident">field</span>, <span class="ident">errors</span>);
+            <span class="ident"><span class="self">Self</span>::validate_array_native_type</span>(<span class="ident">field</span>, <span class="ident">errors</span>);
         }
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">push_error</span> <span class="op">=</span> <span class="op">|</span><span class="ident">err</span>: <span class="ident">ConnectorError</span><span class="op">|</span> {
@@ -378,7 +432,7 @@
     }
 
     <span class="kw">fn</span> <span class="ident">parse_native_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">args</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">NativeTypeInstance</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">mongo_type</span> <span class="op">=</span> <span class="ident">mongo_type_from_input</span>(<span class="ident">name</span>)<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">mongo_type</span> <span class="op">=</span> <span class="ident">mongo_type_from_input</span>(<span class="ident">name</span>, <span class="kw-2">&amp;</span><span class="ident">args</span>)<span class="question-mark">?</span>;
 
         <span class="prelude-val">Ok</span>(<span class="ident">NativeTypeInstance::new</span>(<span class="ident">name</span>, <span class="ident">args</span>, <span class="ident">mongo_type</span>.<span class="ident">to_json</span>()))
     }
