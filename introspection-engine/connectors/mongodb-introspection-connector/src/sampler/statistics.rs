@@ -123,7 +123,7 @@ impl<'a> Statistics<'a> {
 
             let (sanitized_name, database_name) = match sanitize_string(&field_name) {
                 Some(sanitized) => (sanitized, Some(field_name)),
-                None if field_name == "id" => ("id_".to_string(), Some(field_name)),
+                None if matches!(name, Name::Model(_)) && field_name == "id" => ("id_".to_string(), Some(field_name)),
                 None => (field_name, None),
             };
 
@@ -169,7 +169,22 @@ impl<'a> Statistics<'a> {
             data_model.add_model(model);
         }
 
-        for (_, composite_type) in types.into_iter() {
+        for (_, mut composite_type) in types.into_iter() {
+            if composite_type
+                .fields
+                .iter()
+                .any(|f| f.database_name == Some("_id".into()))
+            {
+                if let Some(field) = composite_type
+                    .fields
+                    .iter_mut()
+                    .find(|f| f.name == "id".to_string() && f.database_name.is_none())
+                {
+                    field.name = "id_".into();
+                    field.database_name = Some("id".into());
+                }
+            }
+
             data_model.composite_types.push(composite_type);
         }
 
