@@ -9,6 +9,7 @@ use mongodb::{
     Database,
 };
 use mongodb_schema_describer::MongoSchema;
+pub(crate) use statistics::Name;
 use statistics::*;
 
 /// From the given database, lists all collections as models, and samples

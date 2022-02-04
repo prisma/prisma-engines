@@ -97,11 +97,11 @@ impl<'a> Statistics<'a> {
             };
 
             if let FieldType::Unsupported(r#type) = field_type {
-                unsupported.push((name.to_string(), field_name.to_string(), r#type));
+                unsupported.push((name.clone(), field_name.to_string(), r#type));
             }
 
             if percentages.data.len() > 1 {
-                undecided_types.push((name.to_string(), field_name.to_string(), field_type.to_string()));
+                undecided_types.push((name.clone(), field_name.to_string(), field_type.to_string()));
             }
 
             let arity = if field_type.is_array() {

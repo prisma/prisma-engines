@@ -2,6 +2,7 @@ use crate::test_api::*;
 use crate::types::ObjectId;
 use introspection_connector::CompositeTypeDepth;
 use mongodb::bson::{doc, Bson};
+use serde_json::json;
 
 #[test]
 fn singular() {
@@ -62,6 +63,12 @@ fn dirty_data() {
     "#]];
 
     expected.assert_eq(res.datamodel());
+
+    res.assert_affected(json!([{
+        "compositeType": "CatAddress",
+        "field": "number",
+        "tpe": "String",
+    }]));
 }
 
 #[test]
