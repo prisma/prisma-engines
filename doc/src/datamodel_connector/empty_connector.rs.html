@@ -71,6 +71,7 @@
 <span id="70">70</span>
 <span id="71">71</span>
 <span id="72">72</span>
+<span id="73">73</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">connector_error::ConnectorError</span>, <span class="ident">Connector</span>, <span class="ident">ConnectorCapability</span>, <span class="ident">NativeTypeInstance</span>, <span class="ident">ReferentialAction</span>, <span class="ident">ScalarType</span>,
 };
@@ -91,6 +92,7 @@
 
     <span class="kw">fn</span> <span class="ident">capabilities</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [<span class="ident">ConnectorCapability</span>] {
         <span class="kw-2">&amp;</span>[
+            <span class="ident">ConnectorCapability::AutoIncrement</span>,
             <span class="ident">ConnectorCapability::CompoundIds</span>,
             <span class="ident">ConnectorCapability::Enums</span>,
             <span class="ident">ConnectorCapability::Json</span>,
