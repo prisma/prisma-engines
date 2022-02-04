@@ -425,3 +425,34 @@ fn non_id_object_ids() {
 
     expected.assert_eq(res.datamodel());
 }
+
+#[test]
+fn fields_named_id_in_composite() {
+    let res = introspect(|db| async move {
+        let docs = vec![doc! {"id": "test","data": {"id": "test"}, "data2": {"_id": "test", "id": "test"}}];
+
+        db.collection("Test").insert_many(docs, None).await?;
+
+        Ok(())
+    });
+
+    let expected = expect![[r#"
+        type TestData {
+          id String
+        }
+
+        type TestData2 {
+          id  String @map("_id")
+          id_ String @map("id")
+        }
+
+        model Test {
+          id    String    @id @default(auto()) @map("_id") @db.ObjectId
+          data  TestData
+          data2 TestData2
+          id_   String    @map("id")
+        }
+    "#]];
+
+    expected.assert_eq(res.datamodel());
+}

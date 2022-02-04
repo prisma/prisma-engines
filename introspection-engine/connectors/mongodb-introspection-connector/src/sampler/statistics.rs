@@ -77,7 +77,22 @@ impl<'a> Statistics<'a> {
             data_model.add_model(model);
         }
 
-        for (_, composite_type) in types.into_iter() {
+        for (_, mut composite_type) in types.into_iter() {
+            if composite_type
+                .fields
+                .iter()
+                .any(|f| f.database_name == Some("_id".into()))
+            {
+                if let Some(field) = composite_type
+                    .fields
+                    .iter_mut()
+                    .find(|f| f.name == *"id" && f.database_name.is_none())
+                {
+                    field.name = "id_".into();
+                    field.database_name = Some("id".into());
+                }
+            }
+
             data_model.composite_types.push(composite_type);
         }
 
@@ -399,7 +414,9 @@ fn populate_fields(
                 (field_name.clone(), Some(field_name), true)
             }
             Some(sanitized) => (sanitized, Some(field_name), false),
-            None if field_name == "id" => ("id_".to_string(), Some(field_name), false),
+            None if matches!(container, Name::Model(_)) && field_name == "id" => {
+                ("id_".to_string(), Some(field_name), false)
+            }
             None => (field_name, None, false),
         };
 
