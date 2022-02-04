@@ -317,7 +317,7 @@ fn diffing_mongo_schemas_to_script_returns_a_nice_error() {
         }
 
         model TestModel {
-            id Int @id @default(autoincrement()) @map("_id")
+            id String @id @default(auto()) @map("_id") @db.ObjectId
             names String
         }
     "#;
@@ -337,14 +337,14 @@ fn diffing_mongo_schemas_to_script_returns_a_nice_error() {
 
 
         model TestModel {
-            id Int @id @default(autoincrement()) @map("_id")
+            id String @id @default(auto()) @map("_id") @db.ObjectId
             names String[]
 
             @@index([names])
         }
 
         model TestModel2 {
-            id Int @id @default(autoincrement()) @map("_id")
+            id String @id @default(auto()) @map("_id") @db.ObjectId
         }
     "#;
 
@@ -383,7 +383,7 @@ fn diffing_mongo_schemas_works() {
         }
 
         model TestModel {
-            id Int @id @default(autoincrement()) @map("_id")
+            id String @id @default(auto()) @map("_id") @db.ObjectId
             names String
         }
     "#;
@@ -403,14 +403,14 @@ fn diffing_mongo_schemas_works() {
 
 
         model TestModel {
-            id Int @id @default(autoincrement()) @map("_id")
+            id String @id @default(auto()) @map("_id") @db.ObjectId
             names String[]
 
             @@index([names])
         }
 
         model TestModel2 {
-            id Int @id @default(autoincrement()) @map("_id")
+            id String @id @default(auto()) @map("_id") @db.ObjectId
         }
     "#;
 

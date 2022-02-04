@@ -1,4 +1,4 @@
-use indoc::indoc;
+use indoc::{formatdoc, indoc};
 use introspection_engine_tests::test_api::*;
 use quaint::prelude::Queryable;
 use test_macros::test_connector;
@@ -31,7 +31,19 @@ async fn sequences_should_work(api: &TestApi) -> TestResult {
         }
     "#};
 
-    let result = api.re_introspect(dm).await?;
+    let with_ds = formatdoc!(
+        r#"
+        datasource ds {{
+          provider = "postgres"
+          url = "postgres://"
+        }}
+
+        {}
+    "#,
+        dm
+    );
+
+    let result = api.re_introspect(&with_ds).await?;
 
     println!("EXPECTATION: \n {:#}", dm);
     println!("RESULT: \n {:#}", result);

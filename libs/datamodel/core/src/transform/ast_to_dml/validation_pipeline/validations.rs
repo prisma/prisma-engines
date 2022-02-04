@@ -24,8 +24,12 @@ pub(super) fn validate(ctx: &mut Context<'_>) {
     for composite_type in db.walk_composite_types() {
         composite_types::composite_types_support(composite_type, ctx);
 
-        for field in composite_type.fields() {
-            composite_types::validate_default_value(field, ctx);
+        if !ctx.diagnostics.has_errors() {
+            composite_types::more_than_one_field(composite_type, ctx);
+
+            for field in composite_type.fields() {
+                composite_types::validate_default_value(field, ctx);
+            }
         }
     }
 

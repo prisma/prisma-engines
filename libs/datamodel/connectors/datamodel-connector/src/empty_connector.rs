@@ -18,6 +18,7 @@ impl Connector for EmptyDatamodelConnector {
 
     fn capabilities(&self) -> &'static [ConnectorCapability] {
         &[
+            ConnectorCapability::AutoIncrement,
             ConnectorCapability::CompoundIds,
             ConnectorCapability::Enums,
             ConnectorCapability::Json,
