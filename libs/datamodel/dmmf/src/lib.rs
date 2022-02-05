@@ -18,6 +18,8 @@ pub struct Field {
     pub field_type: String,
     pub has_default_value: bool,
     #[serde(skip_serializing_if = "Option::is_none")]
+    pub native_type: Option<NativeType>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub default: Option<serde_json::Value>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub relation_name: Option<String>,
@@ -33,6 +35,13 @@ pub struct Field {
     pub is_updated_at: Option<bool>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub documentation: Option<String>,
+}
+
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct NativeType {
+    pub name: String,
+    pub args: Vec<String>,
 }
 
 #[derive(Debug, serde::Serialize, serde::Deserialize)]

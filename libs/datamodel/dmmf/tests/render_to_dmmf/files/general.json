@@ -722,6 +722,80 @@
       "primaryKey": null,
       "uniqueFields": [],
       "uniqueIndexes": []
+    },
+    {
+      "name": "NativeTypes",
+      "dbName": null,
+      "fields": [
+        {
+          "name": "id",
+          "kind": "scalar",
+          "isList": false,
+          "isRequired": true,
+          "isUnique": false,
+          "isId": true,
+          "isReadOnly": false,
+          "type": "Int",
+          "hasDefaultValue": false,
+          "isGenerated": false,
+          "isUpdatedAt": false
+        },
+        {
+          "name": "a",
+          "kind": "scalar",
+          "isList": false,
+          "isRequired": true,
+          "isUnique": false,
+          "isId": false,
+          "isReadOnly": false,
+          "type": "String",
+          "hasDefaultValue": false,
+          "nativeType": {
+            "name": "Char",
+            "args": ["6"]
+          },
+          "isGenerated": false,
+          "isUpdatedAt": false
+        },
+        {
+          "name": "b",
+          "kind": "scalar",
+          "isList": false,
+          "isRequired": true,
+          "isUnique": false,
+          "isId": false,
+          "isReadOnly": false,
+          "type": "Decimal",
+          "hasDefaultValue": false,
+          "nativeType": {
+            "name": "Decimal",
+            "args": ["2", "2"]
+          },
+          "isGenerated": false,
+          "isUpdatedAt": false
+        },
+        {
+          "name": "c",
+          "kind": "scalar",
+          "isList": false,
+          "isRequired": true,
+          "isUnique": false,
+          "isId": false,
+          "isReadOnly": false,
+          "type": "DateTime",
+          "hasDefaultValue": false,
+          "nativeType": {
+            "name": "Date",
+            "args": []
+          },
+          "isGenerated": false,
+          "isUpdatedAt": false
+        }
+      ],
+      "isGenerated": false,
+      "primaryKey": null,
+      "uniqueFields": [],
+      "uniqueIndexes": []
     }
   ],
   "types": []

@@ -1,4 +1,4 @@
-use crate::{Datamodel, Enum, EnumValue, Field, Function, Model, PrimaryKey, UniqueIndex};
+use crate::{Datamodel, Enum, EnumValue, Field, Function, Model, NativeType, PrimaryKey, UniqueIndex};
 use bigdecimal::ToPrimitive;
 use datamodel::{
     dml::{self, CompositeTypeFieldType, FieldType, Ignorable, ScalarType},
@@ -103,7 +103,7 @@ fn composite_type_field_to_dmmf(field: &dml::CompositeTypeField) -> Field {
             CompositeTypeFieldType::Unsupported(t) => t.clone(),
             CompositeTypeFieldType::Scalar(t, _, _) => type_to_string(t),
         },
-
+        native_type: None,
         is_generated: None,
         is_updated_at: None,
         documentation: None,
@@ -173,6 +173,7 @@ fn field_to_dmmf(model: &dml::Model, field: &dml::Field) -> Field {
         relation_to_fields: get_relation_to_fields(field),
         relation_on_delete: get_relation_delete_strategy(field),
         field_type: get_field_type(field),
+        native_type: get_native_type(field),
         is_generated: Some(field.is_generated()),
         is_updated_at: Some(field.is_updated_at()),
         documentation: field.documentation().map(|v| v.to_owned()),
@@ -240,6 +241,16 @@ fn get_field_type(field: &dml::Field) -> String {
         dml::FieldType::Enum(t) => t.clone(),
         dml::FieldType::Unsupported(t) => t.clone(),
         dml::FieldType::Scalar(t, _, _) => type_to_string(t),
+    }
+}
+
+fn get_native_type(field: &dml::Field) -> Option<NativeType> {
+    match field.field_type().as_native_type() {
+        Some((_, native_type)) => Some(NativeType {
+            name: native_type.name.clone(),
+            args: native_type.args.clone(),
+        }),
+        _ => None,
     }
 }
 

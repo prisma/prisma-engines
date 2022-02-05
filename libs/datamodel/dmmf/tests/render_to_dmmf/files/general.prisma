@@ -96,3 +96,10 @@ enum CategoryEnum {
   B
   C
 }
+
+model NativeTypes {
+  id  Int       @id
+  a   String    @pg1.Char(6)
+  b   Decimal   @pg1.Decimal(2, 2)
+  c   DateTime  @pg1.Date
+}
