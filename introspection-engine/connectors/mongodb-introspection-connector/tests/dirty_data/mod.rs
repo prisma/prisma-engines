@@ -25,6 +25,31 @@ fn explicit_id_field() {
 }
 
 #[test]
+fn mixed_id_types() {
+    let res = introspect(|db| async move {
+        db.collection("A")
+            .insert_many(
+                vec![doc! { "_id": 12345 }, doc! { "_id": "foo" }, doc! { "foo": false }],
+                None,
+            )
+            .await
+            .unwrap();
+
+        Ok(())
+    });
+
+    let expected = expect![[r#"
+        model A {
+          /// Multiple data types found: String: 33.3%, ObjectId: 33.3%, Int32: 33.3% out of 3 sampled entries
+          id  Int      @id @map("_id")
+          foo Boolean?
+        }
+    "#]];
+
+    expected.assert_eq(res.datamodel());
+}
+
+#[test]
 fn mixing_types() {
     let res = introspect(|db| async move {
         db.create_collection("A", None).await?;

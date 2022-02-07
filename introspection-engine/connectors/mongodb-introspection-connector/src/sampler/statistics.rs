@@ -7,12 +7,10 @@ use super::{field_type::FieldType, CompositeTypeDepth};
 use convert_case::{Case, Casing};
 use datamodel::{
     CompositeType, CompositeTypeField, Datamodel, DefaultValue, Field, IndexDefinition, IndexField, IndexType, Model,
-    NativeTypeInstance, PrimaryKeyDefinition, PrimaryKeyField, ScalarField, ScalarType, SortOrder, ValueGenerator,
-    WithDatabaseName,
+    PrimaryKeyDefinition, PrimaryKeyField, ScalarField, SortOrder, ValueGenerator, WithDatabaseName,
 };
 use introspection_connector::Warning;
 use mongodb::bson::{Bson, Document};
-use native_types::MongoDbType;
 use once_cell::sync::Lazy;
 use regex::Regex;
 use std::{
@@ -72,6 +70,7 @@ impl<'a> Statistics<'a> {
         let (mut models, types) = populate_fields(&self.models, self.samples, warnings);
 
         add_indices_to_models(&mut models, &mut indices);
+        add_missing_ids_to_models(&mut models);
 
         for (_, model) in models.into_iter() {
             data_model.add_model(model);
@@ -217,6 +216,31 @@ impl<'a> Statistics<'a> {
     }
 }
 
+/// A document must have a id column and the name is always `_id`. If we have no
+/// data in the collection, we must assume an id field exists.
+fn add_missing_ids_to_models(models: &mut BTreeMap<String, Model>) {
+    for (_, model) in models.iter_mut() {
+        if model.fields.iter().any(|f| f.database_name() == Some("_id")) {
+            continue;
+        }
+
+        let field = ScalarField {
+            name: String::from("id"),
+            field_type: datamodel::FieldType::from(FieldType::ObjectId),
+            arity: datamodel::FieldArity::Required,
+            database_name: Some(String::from("_id")),
+            default_value: Some(DefaultValue::new_expression(ValueGenerator::new_auto())),
+            documentation: None,
+            is_generated: false,
+            is_updated_at: false,
+            is_commented_out: false,
+            is_ignored: false,
+        };
+
+        model.fields.insert(0, Field::ScalarField(field));
+    }
+}
+
 #[derive(Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash, Clone)]
 pub struct FieldSampler {
     types: BTreeMap<FieldType, usize>,
@@ -293,21 +317,6 @@ fn new_model(model_name: &str) -> Model {
         defined_on_field: true,
     };
 
-    let field_type = datamodel::FieldType::Scalar(
-        ScalarType::String,
-        None,
-        Some(NativeTypeInstance::new("ObjectId", Vec::new(), &MongoDbType::ObjectId)),
-    );
-
-    let primary_key_field = Field::ScalarField({
-        let mut sf = ScalarField::new("id", datamodel::FieldArity::Required, field_type);
-
-        sf.set_database_name(Some("_id".to_string()));
-        sf.set_default_value(DefaultValue::new_expression(ValueGenerator::new_auto()));
-
-        sf
-    });
-
     let (name, database_name, documentation) = match sanitize_string(model_name) {
         Some(sanitized) => (Cow::from(sanitized), Some(model_name.to_string()), None),
         None if RESERVED_NAMES.contains(&model_name) => {
@@ -325,7 +334,7 @@ fn new_model(model_name: &str) -> Model {
     Model {
         name: name.to_string(),
         primary_key: Some(primary_key),
-        fields: vec![primary_key_field],
+        fields: vec![],
         database_name,
         documentation,
         ..Default::default()
@@ -424,13 +433,9 @@ fn populate_fields(
             Name::Model(model_name) => {
                 let model = models.get_mut(&model_name).unwrap();
 
-                if database_name.as_deref() == Some("_id") {
-                    continue;
-                }
-
-                model.fields.push(Field::ScalarField(ScalarField {
+                let mut field = ScalarField {
                     name,
-                    field_type: field_type.into(),
+                    field_type: datamodel::FieldType::from(field_type.clone()),
                     arity,
                     database_name,
                     default_value: None,
@@ -439,7 +444,18 @@ fn populate_fields(
                     is_updated_at: false,
                     is_commented_out,
                     is_ignored: false,
-                }));
+                };
+
+                match &field.database_name {
+                    Some(name) if name == "_id" => {
+                        if let FieldType::ObjectId = &field_type {
+                            field.set_default_value(DefaultValue::new_expression(ValueGenerator::new_auto()));
+                        };
+
+                        model.fields.insert(0, Field::ScalarField(field));
+                    }
+                    _ => model.fields.push(Field::ScalarField(field)),
+                };
             }
             Name::CompositeType(type_name) => {
                 let r#type = types.get_mut(&type_name).unwrap();
