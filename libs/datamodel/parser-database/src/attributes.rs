@@ -317,7 +317,7 @@ fn visit_relation_field_attributes<'ast>(
     model_id: ast::ModelId,
     field_id: ast::FieldId,
     ast_field: &'ast ast::Field,
-    relation_field: &mut RelationField<'ast>,
+    relation_field: &mut RelationField,
     ctx: &mut Context<'_, 'ast>,
 ) {
     ctx.visit_attributes((model_id, field_id).into());
@@ -630,9 +630,9 @@ fn common_index_validations<'ast>(
 }
 
 /// @relation validation for relation fields.
-fn visit_relation<'ast>(model_id: ast::ModelId, relation_field: &mut RelationField<'ast>, ctx: &mut Context<'_, 'ast>) {
+fn visit_relation<'ast>(model_id: ast::ModelId, relation_field: &mut RelationField, ctx: &mut Context<'_, 'ast>) {
     let attr = ctx.current_attribute();
-    relation_field.relation_attribute = Some(attr);
+    relation_field.relation_attribute = Some(ctx.current_attribute_id());
 
     if let Some(fields) = ctx.visit_optional_arg("fields") {
         let fields = match resolve_field_array_without_args(&fields, attr.span, model_id, ctx) {
@@ -699,7 +699,8 @@ fn visit_relation<'ast>(model_id: ast::ModelId, relation_field: &mut RelationFie
     match ctx.visit_default_arg("name").map(|arg| arg.as_str()).ok() {
         Some(Ok("")) => ctx.push_attribute_validation_error("A relation cannot have an empty name."),
         Some(Ok(name)) => {
-            relation_field.name = Some(name);
+            let interned_name = ctx.db.interner.intern(name);
+            relation_field.name = Some(interned_name);
         }
         Some(Err(err)) => ctx.push_error(err),
         None => (),
@@ -730,7 +731,7 @@ fn visit_relation<'ast>(model_id: ast::ModelId, relation_field: &mut RelationFie
                 ctx.push_attribute_validation_error("The `map` argument cannot be an empty string.");
                 None
             }
-            Some(Ok(name)) => Some(name),
+            Some(Ok(name)) => Some(ctx.db.interner.intern(name)),
             Some(Err(err)) => {
                 ctx.push_error(err);
                 None

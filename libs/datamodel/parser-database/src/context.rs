@@ -55,6 +55,13 @@ impl<'db, 'ast> Context<'db, 'ast> {
     /// Return the attribute currently being validated. Panics if the context is not in the right
     /// state.
     #[track_caller]
+    pub(crate) fn current_attribute_id(&self) -> ast::AttributeId {
+        self.attributes.attribute.unwrap()
+    }
+
+    /// Return the attribute currently being validated. Panics if the context is not in the right
+    /// state.
+    #[track_caller]
     pub(crate) fn current_attribute(&self) -> &'ast ast::Attribute {
         let id = self.attributes.attribute.unwrap();
         &self.db.ast[id]

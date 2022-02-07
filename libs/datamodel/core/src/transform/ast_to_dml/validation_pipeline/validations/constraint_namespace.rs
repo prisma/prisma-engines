@@ -76,7 +76,7 @@ impl<'ast> ConstraintNamespace<'ast> {
     /// Add all foreign key constraints from the data model to a global validation scope.
     pub(super) fn add_global_relations(
         &mut self,
-        db: &ParserDatabase<'ast>,
+        db: &'ast ParserDatabase<'ast>,
         connector: &dyn Connector,
         scope: ConstraintScope,
     ) {
@@ -184,7 +184,7 @@ impl<'ast> ConstraintNamespace<'ast> {
     /// Add all foreign key constraints to separate namespaces per model.
     pub(super) fn add_local_relations(
         &mut self,
-        db: &ParserDatabase<'ast>,
+        db: &'ast ParserDatabase<'ast>,
         connector: &dyn Connector,
         scope: ConstraintScope,
     ) {

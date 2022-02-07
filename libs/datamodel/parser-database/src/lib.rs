@@ -78,7 +78,7 @@ pub struct ParserDatabase<'ast> {
     interner: interner::StringInterner,
     names: Names<'ast>,
     types: Types<'ast>,
-    relations: Relations<'ast>,
+    relations: Relations,
 }
 
 impl<'ast> ParserDatabase<'ast> {
