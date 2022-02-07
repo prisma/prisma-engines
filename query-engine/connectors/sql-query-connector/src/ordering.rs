@@ -128,7 +128,7 @@ pub fn compute_joins_aggregation(
 
     let mut joins = rest_hops
         .iter()
-        .map(|rf| compute_one2m_join(base_model, rf, join_prefix.as_str()))
+        .map(|hop| compute_one2m_join(base_model, hop.into_relation_hop().unwrap(), join_prefix.as_str()))
         .collect_vec();
 
     let aggregation_type = match order_by.sort_aggregation {
@@ -138,7 +138,7 @@ pub fn compute_joins_aggregation(
 
     // We perform the aggregation on the last join
     let last_aggr_join = compute_aggr_join(
-        last_hop,
+        last_hop.into_relation_hop().unwrap(),
         aggregation_type,
         ORDER_AGGREGATOR_ALIAS,
         join_prefix.as_str(),
@@ -163,8 +163,9 @@ pub fn compute_joins_scalar(
     let joins = order_by
         .path
         .iter()
-        .map(|rf| compute_one2m_join(base_model, rf, join_prefix.as_str()))
+        .map(|hop| compute_one2m_join(base_model, hop.into_relation_hop().unwrap(), join_prefix.as_str()))
         .collect_vec();
+
     // This is the final column identifier to be used for the scalar field to order by.
     // - If we order by a scalar field on the base model, we simply use the model's scalar field. eg:
     //   `{modelTable}.{field}`

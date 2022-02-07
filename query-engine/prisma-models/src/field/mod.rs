@@ -50,7 +50,7 @@ impl Field {
 
     pub fn into_scalar(self) -> Option<ScalarFieldRef> {
         match self {
-            Field::Scalar(sf) => Some(sf.clone()),
+            Field::Scalar(sf) => Some(sf),
             _ => None,
         }
     }

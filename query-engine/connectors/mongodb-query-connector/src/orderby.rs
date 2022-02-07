@@ -1,7 +1,7 @@
 use crate::join::JoinStage;
 use itertools::Itertools;
 use mongodb::bson::{doc, Document};
-use prisma_models::{OrderBy, SortOrder};
+use prisma_models::{OrderBy, OrderByHop, SortOrder};
 
 #[derive(Debug)]
 pub(crate) struct OrderByData {
@@ -20,7 +20,12 @@ impl OrderByData {
     }
 
     pub(crate) fn compute(order_by: OrderBy, index: usize) -> Self {
-        if order_by.path().is_empty() {
+        // Determine if we need to compute join stages. Composite paths do not count as join - they're on the same document.
+        if order_by
+            .path()
+            .iter()
+            .all(|path| matches!(path, OrderByHop::Composite(_)))
+        {
             Self {
                 join: None,
                 prefix: None,
@@ -31,7 +36,10 @@ impl OrderByData {
             let mut stages = order_by
                 .path()
                 .iter()
-                .map(|rf| JoinStage::new(rf.clone()))
+                .filter_map(|hop| match hop {
+                    OrderByHop::Relation(rf) => Some(JoinStage::new(rf.clone())),
+                    OrderByHop::Composite(_) => None, // We don't need to join if we're looking at composites - they're already present on the document.
+                })
                 .collect_vec();
 
             // We fold from right to left because the right hand side needs to be always contained
@@ -56,14 +64,24 @@ impl OrderByData {
         }
     }
 
+    /// Prefixes are join-only, meaning that composites are ignored.
+    /// In theory, the path for orderBy allows for mixing relations and composites, in practice that's not possible:
+    /// Composites can't have relations to other models (yet), so this means that it either starts with relation hops
+    /// and ends in a scalar (e.g. order by: model A -> B -> C.field), or it starts with relations and ends in composites
+    /// (e.g. order by: model A -> B -> C.composite.field) or it's without relations all together.
+    /// The join, and with that the prefix, only cares about the path to the object we joined to (above it would be A -> B -> C),
+    /// The path on the object (e.g. `composite.field`) is handled as a scalar later.
     fn compute_prefix(index: usize, order_by: &OrderBy) -> OrderByPrefix {
         let mut parts = order_by
             .path()
             .iter()
-            .map(|rf| rf.relation().name.clone())
+            .filter_map(|hop| match hop {
+                OrderByHop::Relation(rf) => Some(rf.relation().name.clone()),
+                OrderByHop::Composite(_) => None,
+            })
             .collect_vec();
-        let alias = format!("orderby_{}_{}", parts[0], index);
 
+        let alias = format!("orderby_{}_{}", parts[0], index);
         parts[0] = alias;
 
         OrderByPrefix::new(parts)
@@ -266,23 +284,26 @@ fn unwind_aggregate_joins(
         .path
         .iter()
         .enumerate()
-        .filter_map(|(i, rf)| {
-            if rf.is_list() {
-                None
-            } else {
-                // Prefix parts are mapped 1-1 with order by path.
-                // We can safely access (i + 1) here since the last path cannot be a to-one relation for an order by aggregate.
-                let next_part_name = data.prefix.as_ref().unwrap().parts.get(i + 1).unwrap();
+        .filter_map(|(i, hop)| {
+            match hop {
+                // Todo: This may not work for composites yet, I'm unsure if we need to unwind to-ones too.
+                OrderByHop::Composite(_) => None,
+                OrderByHop::Relation(rf) if rf.is_list() => None,
+                OrderByHop::Relation(_) => {
+                    // Prefix parts are mapped 1-1 with order by path.
+                    // We can safely access (i + 1) here since the last path cannot be a to-one relation for an order by aggregate.
+                    let next_part_name = data.prefix.as_ref().unwrap().parts.get(i + 1).unwrap();
 
-                Some(vec![
-                    doc! {
-                        "$unwind": {
-                            "path": format!("${}", join_name),
-                            "preserveNullAndEmptyArrays": true
-                        }
-                    },
-                    doc! { "$addFields": { join_name: format!("${}.{}", join_name, next_part_name) } },
-                ])
+                    Some(vec![
+                        doc! {
+                            "$unwind": {
+                                "path": format!("${}", join_name),
+                                "preserveNullAndEmptyArrays": true
+                            }
+                        },
+                        doc! { "$addFields": { join_name: format!("${}.{}", join_name, next_part_name) } },
+                    ])
+                }
             }
         })
         .flatten()

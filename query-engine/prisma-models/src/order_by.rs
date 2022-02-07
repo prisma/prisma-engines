@@ -36,7 +36,7 @@ pub enum OrderBy {
 }
 
 impl OrderBy {
-    pub fn path(&self) -> Vec<RelationFieldRef> {
+    pub fn path(&self) -> Vec<OrderByHop> {
         match self {
             OrderBy::Scalar(o) => o.path.clone(),
             OrderBy::Aggregation(o) => o.path.clone(),
@@ -55,7 +55,7 @@ impl OrderBy {
     pub fn field(&self) -> Option<ScalarFieldRef> {
         match self {
             OrderBy::Scalar(o) => Some(o.field.clone()),
-            OrderBy::Aggregation(o) => Some(o.field()),
+            OrderBy::Aggregation(o) => o.field.clone(),
             OrderBy::Relevance(_) => None,
         }
     }
@@ -67,11 +67,16 @@ impl OrderBy {
         if len < 2 {
             false
         } else {
-            path.get(len - 2).map(|rf| !rf.is_list()).unwrap_or(false)
+            path.get(len - 2)
+                .map(|hop| match hop {
+                    OrderByHop::Relation(rf) => !rf.is_list(),
+                    OrderByHop::Composite(cf) => !cf.is_list(),
+                })
+                .unwrap_or(false)
         }
     }
 
-    pub fn scalar(field: ScalarFieldRef, path: Vec<RelationFieldRef>, sort_order: SortOrder) -> Self {
+    pub fn scalar(field: ScalarFieldRef, path: Vec<OrderByHop>, sort_order: SortOrder) -> Self {
         Self::Scalar(OrderByScalar {
             field,
             path,
@@ -81,7 +86,7 @@ impl OrderBy {
 
     pub fn aggregation(
         field: Option<ScalarFieldRef>,
-        path: Vec<RelationFieldRef>,
+        path: Vec<OrderByHop>,
         sort_order: SortOrder,
         sort_aggregation: SortAggregation,
     ) -> Self {
@@ -102,10 +107,44 @@ impl OrderBy {
     }
 }
 
+/// Describes a hop over to a relation or composite for an orderBy statement.
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum OrderByHop {
     Relation(RelationFieldRef),
     Composite(CompositeFieldRef),
+}
+
+impl OrderByHop {
+    pub fn into_relation_hop(&self) -> Option<&RelationFieldRef> {
+        match self {
+            OrderByHop::Relation(rf) => Some(rf),
+            OrderByHop::Composite(_) => None,
+        }
+    }
+}
+
+impl From<&RelationFieldRef> for OrderByHop {
+    fn from(rf: &RelationFieldRef) -> Self {
+        rf.clone().into()
+    }
+}
+
+impl From<&CompositeFieldRef> for OrderByHop {
+    fn from(cf: &CompositeFieldRef) -> Self {
+        cf.clone().into()
+    }
+}
+
+impl From<RelationFieldRef> for OrderByHop {
+    fn from(rf: RelationFieldRef) -> Self {
+        Self::Relation(rf)
+    }
+}
+
+impl From<CompositeFieldRef> for OrderByHop {
+    fn from(cf: CompositeFieldRef) -> Self {
+        Self::Composite(cf)
+    }
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Hash)]
@@ -124,26 +163,26 @@ pub struct OrderByAggregation {
 }
 
 impl OrderByAggregation {
-    pub fn field(&self) -> ScalarFieldRef {
-        match &self.field {
-            Some(sf) => sf.clone(),
-            // TODO: This is a hack that should be removed once MongoDB is refactored too
-            None => self.id_field_from_relation(),
-        }
-    }
+    // pub fn field(&self) -> ScalarFieldRef {
+    //     match &self.field {
+    //         Some(sf) => sf.clone(),
+    //         // TODO: This is a hack that should be removed once MongoDB is refactored too
+    //         None => self.id_field_from_relation(),
+    //     }
+    // }
 
-    fn id_field_from_relation(&self) -> ScalarFieldRef {
-        let ids: Vec<_> = self
-            .path
-            .last()
-            .unwrap()
-            .related_model()
-            .primary_identifier()
-            .as_scalar_fields()
-            .expect("Primary identifier contains non-scalar fields.");
+    // fn id_field_from_relation(&self) -> ScalarFieldRef {
+    //     let ids: Vec<_> = self
+    //         .path
+    //         .last()
+    //         .unwrap()
+    //         .related_model()
+    //         .primary_identifier()
+    //         .as_scalar_fields()
+    //         .expect("Primary identifier contains non-scalar fields.");
 
-        ids.into_iter().next().unwrap()
-    }
+    //     ids.into_iter().next().unwrap()
+    // }
 
     pub fn is_scalar_aggregation(&self) -> bool {
         self.field.is_some() && self.path.is_empty()
