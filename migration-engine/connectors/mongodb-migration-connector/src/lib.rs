@@ -90,9 +90,9 @@ impl MigrationConnector for MongoDbMigrationConnector {
     }
 
     async fn create_database(&self) -> ConnectorResult<String> {
-        Err(ConnectorError::from_msg(
-            "create_database() is not supported on mongodb: databases are created automatically when used.".to_owned(),
-        ))
+        let name = self.client().await?.db_name();
+        tracing::warn!("MongoDB database will be created on first use.");
+        Ok(name.into())
     }
 
     async fn db_execute(&self, _url: String, _script: String) -> ConnectorResult<()> {
