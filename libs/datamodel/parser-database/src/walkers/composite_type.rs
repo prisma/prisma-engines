@@ -47,6 +47,18 @@ impl<'ast, 'db> CompositeTypeWalker<'ast, 'db> {
         &self.db.ast[self.ctid].name.name
     }
 
+    /// Get the field with the given ID.
+    pub fn field(self, field_id: ast::FieldId) -> CompositeTypeFieldWalker<'ast, 'db> {
+        let field = &self.db.types.composite_type_fields[&(self.ctid, field_id)];
+
+        CompositeTypeFieldWalker {
+            ctid: self.ctid,
+            field_id,
+            field,
+            db: self.db,
+        }
+    }
+
     /// Iterator over all the fields of the composite type.
     pub fn fields(self) -> impl Iterator<Item = CompositeTypeFieldWalker<'ast, 'db>> {
         let db = self.db;
