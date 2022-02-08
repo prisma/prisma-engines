@@ -35,18 +35,25 @@ impl<'ast, 'db> ScalarFieldWalker<'ast, 'db> {
     }
 
     /// The name of the field.
-    pub fn name(self) -> &'ast str {
+    pub fn name(self) -> &'db str {
         self.ast_field().name()
     }
 
     /// The `@default()` AST attribute on the field, if any.
     pub fn default_attribute(self) -> Option<&'ast ast::Attribute> {
-        self.scalar_field.default.as_ref().map(|d| d.default_attribute)
+        self.scalar_field
+            .default
+            .as_ref()
+            .map(|d| d.default_attribute)
+            .map(|id| &self.db.ast[id])
     }
 
     /// The final database name of the field. See crate docs for explanations on database names.
-    pub fn database_name(self) -> &'ast str {
-        self.attributes().mapped_name.unwrap_or_else(|| self.name())
+    pub fn database_name(self) -> &'db str {
+        self.attributes()
+            .mapped_name
+            .map(|id| &self.db[id])
+            .unwrap_or_else(|| self.name())
     }
 
     /// Does the field have an `@default(autoincrement())` attribute?
@@ -88,8 +95,8 @@ impl<'ast, 'db> ScalarFieldWalker<'ast, 'db> {
     }
 
     /// The name in the `@map(<name>)` attribute.
-    pub fn mapped_name(self) -> Option<&'ast str> {
-        self.attributes().mapped_name
+    pub fn mapped_name(self) -> Option<&'db str> {
+        self.attributes().mapped_name.map(|id| &self.db[id])
     }
 
     /// The model that contains the field.
@@ -165,7 +172,7 @@ pub struct DefaultValueWalker<'ast, 'db> {
 impl<'ast, 'db> DefaultValueWalker<'ast, 'db> {
     /// The AST node of the attribute.
     pub fn ast_attribute(self) -> &'ast ast::Attribute {
-        self.default.default_attribute
+        &self.db.ast[self.default.default_attribute]
     }
 
     /// The value expression in the `@default` attribute.
@@ -215,8 +222,8 @@ impl<'ast, 'db> DefaultValueWalker<'ast, 'db> {
     /// name String @default("george", map: "name_default_to_george")
     ///                                     ^^^^^^^^^^^^^^^^^^^^^^^^
     /// ```
-    pub fn mapped_name(self) -> Option<&'ast str> {
-        self.default.mapped_name
+    pub fn mapped_name(self) -> Option<&'db str> {
+        self.default.mapped_name.map(|id| &self.db[id])
     }
 
     /// The field carrying the default attribute.

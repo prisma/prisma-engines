@@ -1,17 +1,16 @@
 use crate::{
     ast::{self, WithName},
-    context::{Arguments, Context},
+    context::Context,
     types::{CompositeTypeField, ModelAttributes, ScalarField},
-    DatamodelError,
+    DatamodelError, StringId,
 };
 
 pub(super) fn model<'ast>(
     model_attributes: &mut ModelAttributes<'ast>,
     model_id: ast::ModelId,
-    args: &mut Arguments<'ast>,
-    ctx: &mut Context<'ast>,
+    ctx: &mut Context<'_, 'ast>,
 ) {
-    let mapped_name = match visit_map_attribute(args, ctx) {
+    let mapped_name = match visit_map_attribute(ctx) {
         Some(name) => name,
         None => return,
     };
@@ -21,18 +20,18 @@ pub(super) fn model<'ast>(
     if let Some(existing_model_id) = ctx.mapped_model_names.insert(mapped_name, model_id) {
         let existing_model_name = ctx.db.ast[existing_model_id].name();
         ctx.push_error(DatamodelError::new_duplicate_model_database_name_error(
-            mapped_name.to_owned(),
+            ctx.db[mapped_name].to_owned(),
             existing_model_name.to_owned(),
             ctx.db.ast[model_id].span,
         ));
     }
 
-    if let Some(existing_model_id) = ctx.db.names.tops.get(mapped_name).and_then(|id| id.as_model_id()) {
+    if let Some(existing_model_id) = ctx.db.names.tops.get(&mapped_name).and_then(|id| id.as_model_id()) {
         let existing_model_name = ctx.db.ast[existing_model_id].name();
         ctx.push_error(DatamodelError::new_duplicate_model_database_name_error(
-            mapped_name.to_owned(),
+            ctx.db[mapped_name].to_owned(),
             existing_model_name.to_owned(),
-            args.span(),
+            ctx.current_attribute().span,
         ));
     }
 }
@@ -43,10 +42,9 @@ pub(super) fn scalar_field<'ast>(
     model_id: ast::ModelId,
     field_id: ast::FieldId,
     scalar_field_data: &mut ScalarField<'ast>,
-    map_args: &mut Arguments<'ast>,
-    ctx: &mut Context<'ast>,
+    ctx: &mut Context<'_, 'ast>,
 ) {
-    let mapped_name = match visit_map_attribute(map_args, ctx) {
+    let mapped_name = match visit_map_attribute(ctx) {
         Some(name) => name,
         None => return,
     };
@@ -94,29 +92,28 @@ pub(super) fn composite_type_field<'ast>(
     ctid: ast::CompositeTypeId,
     field_id: ast::FieldId,
     field: &mut CompositeTypeField<'ast>,
-    map_args: &mut Arguments<'ast>,
-    ctx: &mut Context<'ast>,
+    ctx: &mut Context<'_, 'ast>,
 ) {
-    let mapped_name = match visit_map_attribute(map_args, ctx) {
+    let mapped_name_id = match visit_map_attribute(ctx) {
         Some(name) => name,
         None => return,
     };
 
-    field.mapped_name = Some(mapped_name);
+    field.mapped_name = Some(mapped_name_id);
 
     if ctx
         .mapped_composite_type_names
-        .insert((ctid, mapped_name), field_id)
+        .insert((ctid, mapped_name_id), field_id)
         .is_some()
     {
         ctx.push_error(DatamodelError::new_composite_type_duplicate_field_error(
             &ct.name.name,
-            mapped_name,
+            &ctx.db[mapped_name_id],
             ast_field.span,
         ));
     }
 
-    if let Some(f) = ctx.db.names.composite_type_fields.get(&(ctid, mapped_name)) {
+    if let Some(f) = ctx.db.names.composite_type_fields.get(&(ctid, mapped_name_id)) {
         let r#type = ctx.db.walk_composite_type(ctid);
         let other_field = r#type.field(*f);
 
@@ -134,11 +131,11 @@ pub(super) fn composite_type_field<'ast>(
     }
 }
 
-pub(super) fn visit_map_attribute<'ast>(map_args: &mut Arguments<'ast>, ctx: &mut Context<'ast>) -> Option<&'ast str> {
-    match map_args.default_arg("name").map(|value| value.as_str()) {
-        Ok(Ok(name)) => return Some(name),
+pub(super) fn visit_map_attribute(ctx: &mut Context<'_, '_>) -> Option<StringId> {
+    match ctx.visit_default_arg("name").map(|value| value.as_str()) {
+        Ok(Ok(name)) => return Some(ctx.db.interner.intern(name)),
         Err(err) => ctx.push_error(err), // not flattened for error handing legacy reasons
-        Ok(Err(err)) => ctx.push_error(map_args.new_attribute_validation_error(&err.to_string())),
+        Ok(Err(err)) => ctx.push_attribute_validation_error(&err.to_string()),
     };
 
     None

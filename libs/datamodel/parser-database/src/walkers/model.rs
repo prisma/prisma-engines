@@ -90,18 +90,20 @@ impl<'ast, 'db> ModelWalker<'ast, 'db> {
 
     /// The name of the database table the model points to.
     #[allow(clippy::unnecessary_lazy_evaluations)] // respectfully disagree
-    pub fn database_name(self) -> &'ast str {
+    pub fn database_name(self) -> &'db str {
         self.model_attributes
             .mapped_name
+            .map(|id| &self.db[id])
             .unwrap_or_else(|| &self.db.ast[self.model_id].name.name)
     }
 
     /// Get the database names of the constrained scalar fields.
     #[allow(clippy::unnecessary_lazy_evaluations)] // respectfully disagree
-    pub fn get_field_database_names<'a>(&'a self, fields: &'a [ast::FieldId]) -> impl Iterator<Item = &'ast str> + 'a {
+    pub fn get_field_database_names<'a>(&'a self, fields: &'a [ast::FieldId]) -> impl Iterator<Item = &'db str> + 'a {
         fields.iter().map(move |&field_id| {
             self.db.types.scalar_fields[&(self.model_id, field_id)]
                 .mapped_name
+                .map(|id| &self.db[id])
                 .unwrap_or_else(|| &self.db.ast[self.model_id][field_id].name.name)
         })
     }
@@ -112,8 +114,8 @@ impl<'ast, 'db> ModelWalker<'ast, 'db> {
     }
 
     /// The name in the @@map attribute.
-    pub fn mapped_name(self) -> Option<&'ast str> {
-        self.attributes().mapped_name
+    pub fn mapped_name(self) -> Option<&'db str> {
+        self.attributes().mapped_name.map(|id| &self.db[id])
     }
 
     /// The primary key of the model, if defined.

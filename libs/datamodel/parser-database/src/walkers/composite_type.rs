@@ -1,8 +1,4 @@
-use crate::{
-    ast,
-    types::{self},
-    ParserDatabase, ScalarFieldType,
-};
+use crate::{ast, types, ParserDatabase, ScalarFieldType};
 use diagnostics::Span;
 
 /// A composite type, introduced with the `type` keyword in the schema.
@@ -103,8 +99,8 @@ impl<'ast, 'db> CompositeTypeFieldWalker<'ast, 'db> {
     }
 
     /// The name contained in the `@map()` attribute of the field, if any.
-    pub fn mapped_name(self) -> Option<&'ast str> {
-        self.field.mapped_name
+    pub fn mapped_name(self) -> Option<&'db str> {
+        self.field.mapped_name.map(|id| &self.db[id])
     }
 
     /// The name of the field.
@@ -124,7 +120,7 @@ impl<'ast, 'db> CompositeTypeFieldWalker<'ast, 'db> {
 
     /// The `@default()` AST attribute on the field, if any.
     pub fn default_attribute(self) -> Option<&'ast ast::Attribute> {
-        self.field.default.as_ref().map(|d| d.default_attribute)
+        self.field.default.as_ref().map(|d| &self.db.ast[d.default_attribute])
     }
 
     /// (attribute scope, native type name, arguments, span)
@@ -158,7 +154,11 @@ impl<'ast, 'db> CompositeTypeFieldWalker<'ast, 'db> {
     /// name String @default("george", map: "name_default_to_george")
     ///                                     ^^^^^^^^^^^^^^^^^^^^^^^^
     /// ```
-    pub fn default_mapped_name(self) -> Option<&'ast str> {
-        self.field.default.as_ref().and_then(|d| d.mapped_name)
+    pub fn default_mapped_name(self) -> Option<&'db str> {
+        self.field
+            .default
+            .as_ref()
+            .and_then(|d| d.mapped_name)
+            .map(|id| &self.db[id])
     }
 }

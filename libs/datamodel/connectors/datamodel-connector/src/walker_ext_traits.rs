@@ -28,12 +28,12 @@ impl<'ast> IndexWalkerExt<'ast> for IndexWalker<'ast, '_> {
     }
 }
 
-pub trait DefaultValueExt<'ast> {
-    fn constraint_name(self, connector: &dyn Connector) -> Cow<'ast, str>;
+pub trait DefaultValueExt<'db> {
+    fn constraint_name(self, connector: &dyn Connector) -> Cow<'db, str>;
 }
 
-impl<'ast> DefaultValueExt<'ast> for DefaultValueWalker<'ast, '_> {
-    fn constraint_name(self, connector: &dyn Connector) -> Cow<'ast, str> {
+impl<'db> DefaultValueExt<'db> for DefaultValueWalker<'_, 'db> {
+    fn constraint_name(self, connector: &dyn Connector) -> Cow<'db, str> {
         self.mapped_name().map(Cow::from).unwrap_or_else(|| {
             let name = ConstraintNames::default_name(
                 self.field().model().database_name(),
@@ -88,12 +88,12 @@ impl<'ast> CompleteInlineRelationWalkerExt<'ast> for CompleteInlineRelationWalke
     }
 }
 
-pub trait InlineRelationWalkerExt<'ast> {
-    fn constraint_name(self, connector: &dyn Connector) -> Cow<'ast, str>;
+pub trait InlineRelationWalkerExt<'db> {
+    fn constraint_name(self, connector: &dyn Connector) -> Cow<'db, str>;
 }
 
-impl<'ast> InlineRelationWalkerExt<'ast> for InlineRelationWalker<'ast, '_> {
-    fn constraint_name(self, connector: &dyn Connector) -> Cow<'ast, str> {
+impl<'db> InlineRelationWalkerExt<'db> for InlineRelationWalker<'_, 'db> {
+    fn constraint_name(self, connector: &dyn Connector) -> Cow<'db, str> {
         self.mapped_name().map(Cow::Borrowed).unwrap_or_else(|| {
             let model_database_name = self.referencing_model().database_name();
             let field_names: Vec<&str> = match self.referencing_fields() {

@@ -159,7 +159,7 @@ pub fn parse_datamodel(datamodel_string: &str) -> Result<ValidatedDatamodel, dia
 fn parse_datamodel_for_formatter(ast: &SchemaAst) -> Result<(Datamodel, Vec<Datasource>), Diagnostics> {
     let mut diagnostics = diagnostics::Diagnostics::new();
     let datasources = load_sources(ast, Default::default(), &mut diagnostics);
-    let (db, diagnostics) = parser_database::ParserDatabase::new(ast, diagnostics);
+    let db = parser_database::ParserDatabase::new(ast, &mut diagnostics);
     diagnostics.to_result()?;
     let (connector, referential_integrity) = datasources
         .get(0)

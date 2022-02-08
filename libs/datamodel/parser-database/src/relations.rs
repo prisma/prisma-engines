@@ -1,12 +1,13 @@
 use crate::{
     ast,
+    interner::StringId,
     {context::Context, types::RelationField},
 };
 use enumflags2::bitflags;
 use std::collections::BTreeSet;
 
 /// Detect relation types and construct relation objects to the database.
-pub(super) fn infer_relations(ctx: &mut Context<'_>) {
+pub(super) fn infer_relations(ctx: &mut Context<'_, '_>) {
     let mut relations = Relations::default();
 
     for rf in ctx.db.types.relation_fields.iter() {
@@ -42,9 +43,9 @@ impl RelationId {
 ///   key constraint, while model B would correspond to the table referenced
 ///   by the foreign key.
 #[derive(Debug, Default)]
-pub(crate) struct Relations<'ast> {
+pub(crate) struct Relations {
     /// Storage. Private. Do not use directly.
-    relations_storage: Vec<Relation<'ast>>,
+    relations_storage: Vec<Relation>,
 
     // Indexes for efficient querying.
     //
@@ -69,15 +70,15 @@ pub(crate) struct Relations<'ast> {
     back: BTreeSet<(ast::ModelId, ast::ModelId, RelationId)>,
 }
 
-impl<'ast> std::ops::Index<RelationId> for Relations<'ast> {
-    type Output = Relation<'ast>;
+impl std::ops::Index<RelationId> for Relations {
+    type Output = Relation;
 
     fn index(&self, index: RelationId) -> &Self::Output {
         &self.relations_storage[index.0 as usize]
     }
 }
 
-impl<'ast> Relations<'ast> {
+impl Relations {
     /// Iterate over all relations in the schema.
     pub(crate) fn iter(&self) -> impl Iterator<Item = RelationId> {
         (0..self.relations_storage.len()).map(|idx| RelationId(idx as u32))
@@ -86,7 +87,7 @@ impl<'ast> Relations<'ast> {
     /// Iterator over all the relations in a schema.
     ///
     /// (model_a_id, model_b_id, relation)
-    pub(crate) fn iter_relations(&self) -> impl Iterator<Item = (ast::ModelId, ast::ModelId, &Relation<'ast>)> + '_ {
+    pub(crate) fn iter_relations(&self) -> impl Iterator<Item = (ast::ModelId, ast::ModelId, &Relation)> + '_ {
         self.forward
             .iter()
             .map(move |(model_a_id, model_b_id, relation_idx)| (*model_a_id, *model_b_id, &self[*relation_idx]))
@@ -146,15 +147,15 @@ impl RelationAttributes {
 }
 
 #[derive(PartialOrd, Ord, PartialEq, Eq, Debug)]
-pub(crate) struct Relation<'ast> {
+pub(crate) struct Relation {
     /// The `name` argument in `@relation`.
-    pub(super) relation_name: Option<&'ast str>,
+    pub(super) relation_name: Option<StringId>,
     pub(super) attributes: RelationAttributes,
     pub(super) model_a: ast::ModelId,
     pub(super) model_b: ast::ModelId,
 }
 
-impl<'ast> Relation<'ast> {
+impl Relation {
     pub(crate) fn has_field(&self, model_id: ast::ModelId, field_id: ast::FieldId) -> bool {
         match self.attributes.fields() {
             (Some(field_a), _) if self.model_a == model_id && field_a == field_id => true,
@@ -186,20 +187,20 @@ pub(super) struct RelationEvidence<'ast, 'db> {
     pub(super) ast_field: &'ast ast::Field,
     pub(super) field_id: ast::FieldId,
     pub(super) is_self_relation: bool,
-    pub(super) relation_field: &'db RelationField<'ast>,
+    pub(super) relation_field: &'db RelationField,
     pub(super) opposite_model: &'ast ast::Model,
-    pub(super) opposite_relation_field: Option<(ast::FieldId, &'ast ast::Field, &'db RelationField<'ast>)>,
+    pub(super) opposite_relation_field: Option<(ast::FieldId, &'ast ast::Field, &'db RelationField)>,
 }
 
 pub(super) fn relation_evidence<'ast, 'db>(
-    ((model_id, field_id), relation_field): (&(ast::ModelId, ast::FieldId), &'db RelationField<'ast>),
-    ctx: &'db Context<'ast>,
+    ((model_id, field_id), relation_field): (&(ast::ModelId, ast::FieldId), &'db RelationField),
+    ctx: &'db Context<'_, 'ast>,
 ) -> RelationEvidence<'ast, 'db> {
     let ast_model = &ctx.db.ast[*model_id];
     let ast_field = &ast_model[*field_id];
     let opposite_model = &ctx.db.ast[relation_field.referenced_model];
     let is_self_relation = *model_id == relation_field.referenced_model;
-    let opposite_relation_field: Option<(ast::FieldId, &ast::Field, &RelationField<'_>)> = ctx
+    let opposite_relation_field: Option<(ast::FieldId, &ast::Field, &RelationField)> = ctx
         .db
         .walk_model(relation_field.referenced_model)
         .relation_fields()
@@ -207,7 +208,7 @@ pub(super) fn relation_evidence<'ast, 'db>(
         .filter(|opposite_relation_field| opposite_relation_field.references_model(*model_id))
         // Filter out the field itself, in case of self-relations
         .filter(|opposite_relation_field| !is_self_relation || opposite_relation_field.field_id != *field_id)
-        .find(|opposite_relation_field| opposite_relation_field.explicit_relation_name() == relation_field.name)
+        .find(|opposite_relation_field| opposite_relation_field.relation_field.name == relation_field.name)
         .map(|opp_rf| (opp_rf.field_id(), opp_rf.ast_field(), opp_rf.relation_field));
 
     RelationEvidence {
@@ -224,8 +225,8 @@ pub(super) fn relation_evidence<'ast, 'db>(
 
 pub(super) fn ingest_relation<'ast, 'db>(
     evidence: RelationEvidence<'ast, 'db>,
-    relations: &mut Relations<'ast>,
-    ctx: &'db Context<'ast>,
+    relations: &mut Relations,
+    ctx: &'db Context<'_, 'ast>,
 ) {
     // In this function, we want to ingest the relation only once,
     // so if we know that we will create a relation for the opposite

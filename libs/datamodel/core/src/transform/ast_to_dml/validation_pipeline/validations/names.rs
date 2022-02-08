@@ -1,12 +1,10 @@
-use datamodel_connector::Connector;
-
 use super::constraint_namespace::ConstraintNamespace;
-use std::collections::{HashMap, HashSet};
-
 use crate::{
     ast::{FieldId, ModelId},
     transform::ast_to_dml::db::{walkers::RelationName, ParserDatabase},
 };
+use datamodel_connector::Connector;
+use std::collections::{HashMap, HashSet};
 
 type RelationIdentifier<'ast> = (ModelId, ModelId, RelationName<'ast>);
 
@@ -26,7 +24,7 @@ pub(super) struct Names<'ast> {
 }
 
 impl<'ast> Names<'ast> {
-    pub(super) fn new(db: &ParserDatabase<'ast>, connector: &dyn Connector) -> Self {
+    pub(super) fn new(db: &'ast ParserDatabase<'ast>, connector: &dyn Connector) -> Self {
         let mut relation_names: HashMap<RelationIdentifier<'ast>, Vec<FieldId>> = HashMap::new();
         let mut index_names: HashMap<ModelId, HashSet<&'ast str>> = HashMap::new();
         let mut unique_names: HashMap<ModelId, HashSet<&'ast str>> = HashMap::new();
@@ -103,7 +101,7 @@ impl<'ast> Names<'ast> {
 
 /// Generate namespaces per database requirements, and add the names to it from the constraints
 /// part of the namespace.
-fn infer_namespaces<'ast>(db: &ParserDatabase<'ast>, connector: &dyn Connector) -> ConstraintNamespace<'ast> {
+fn infer_namespaces<'ast>(db: &'ast ParserDatabase<'ast>, connector: &dyn Connector) -> ConstraintNamespace<'ast> {
     use datamodel_connector::ConstraintScope;
 
     let mut namespaces = ConstraintNamespace::default();

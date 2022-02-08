@@ -1,4 +1,7 @@
-use crate::{context::Context, walkers::CompositeTypeFieldWalker, walkers::CompositeTypeWalker, DatamodelError};
+use crate::{
+    context::Context, interner::StringId, walkers::CompositeTypeFieldWalker, walkers::CompositeTypeWalker,
+    DatamodelError,
+};
 use schema_ast::ast::{self, WithName};
 use std::{
     collections::{BTreeMap, HashMap},
@@ -6,7 +9,7 @@ use std::{
     rc::Rc,
 };
 
-pub(super) fn resolve_types(ctx: &mut Context<'_>) {
+pub(super) fn resolve_types(ctx: &mut Context<'_, '_>) {
     for (top_id, top) in ctx.db.ast.iter_tops() {
         match (top_id, top) {
             (ast::TopId::Alias(alias_id), ast::Top::Type(type_alias)) => visit_type_alias(alias_id, type_alias, ctx),
@@ -29,8 +32,8 @@ pub(super) struct Types<'ast> {
     pub(super) scalar_fields: BTreeMap<(ast::ModelId, ast::FieldId), ScalarField<'ast>>,
     /// This contains only the relation fields actually present in the schema
     /// source text.
-    pub(super) relation_fields: BTreeMap<(ast::ModelId, ast::FieldId), RelationField<'ast>>,
-    pub(super) enum_attributes: HashMap<ast::EnumId, EnumAttributes<'ast>>,
+    pub(super) relation_fields: BTreeMap<(ast::ModelId, ast::FieldId), RelationField>,
+    pub(super) enum_attributes: HashMap<ast::EnumId, EnumAttributes>,
     pub(super) model_attributes: HashMap<ast::ModelId, ModelAttributes<'ast>>,
 }
 
@@ -56,7 +59,7 @@ impl<'ast> Types<'ast> {
         &mut self,
         model_id: ast::ModelId,
         field_id: ast::FieldId,
-    ) -> Option<RelationField<'ast>> {
+    ) -> Option<RelationField> {
         self.relation_fields.remove(&(model_id, field_id))
     }
 }
@@ -64,7 +67,7 @@ impl<'ast> Types<'ast> {
 #[derive(Debug, Clone)]
 pub(super) struct CompositeTypeField<'ast> {
     pub(super) r#type: ScalarFieldType,
-    pub(super) mapped_name: Option<&'ast str>,
+    pub(super) mapped_name: Option<StringId>,
     pub(super) default: Option<DefaultAttribute<'ast>>,
     /// Native type name and arguments
     ///
@@ -107,9 +110,9 @@ impl ScalarFieldType {
 
 #[derive(Debug, Clone)]
 pub(crate) struct DefaultAttribute<'ast> {
-    pub(crate) mapped_name: Option<&'ast str>,
+    pub(crate) mapped_name: Option<StringId>,
     pub(crate) value: &'ast ast::Expression,
-    pub(crate) default_attribute: &'ast ast::Attribute,
+    pub(crate) default_attribute: ast::AttributeId,
 }
 
 #[derive(Debug)]
@@ -119,7 +122,7 @@ pub(crate) struct ScalarField<'ast> {
     pub(crate) is_updated_at: bool,
     pub(crate) default: Option<DefaultAttribute<'ast>>,
     /// @map
-    pub(crate) mapped_name: Option<&'ast str>,
+    pub(crate) mapped_name: Option<StringId>,
     /// Native type name and arguments
     ///
     /// (attribute scope, native type name, arguments, span)
@@ -129,7 +132,7 @@ pub(crate) struct ScalarField<'ast> {
 }
 
 #[derive(Debug)]
-pub(crate) struct RelationField<'ast> {
+pub(crate) struct RelationField {
     pub(crate) referenced_model: ast::ModelId,
     pub(crate) on_delete: Option<(crate::ReferentialAction, ast::Span)>,
     pub(crate) on_update: Option<(crate::ReferentialAction, ast::Span)>,
@@ -138,14 +141,14 @@ pub(crate) struct RelationField<'ast> {
     /// The `references` fields _explicitly present_ in the AST.
     pub(crate) references: Option<Vec<ast::FieldId>>,
     /// The name _explicitly present_ in the AST.
-    pub(crate) name: Option<&'ast str>,
+    pub(crate) name: Option<StringId>,
     pub(crate) is_ignored: bool,
     /// The foreign key name _explicitly present_ in the AST through the `@map` attribute.
-    pub(crate) mapped_name: Option<&'ast str>,
-    pub(crate) relation_attribute: Option<&'ast ast::Attribute>,
+    pub(crate) mapped_name: Option<StringId>,
+    pub(crate) relation_attribute: Option<ast::AttributeId>,
 }
 
-impl RelationField<'_> {
+impl RelationField {
     fn new(referenced_model: ast::ModelId) -> Self {
         RelationField {
             referenced_model,
@@ -173,7 +176,7 @@ pub(crate) struct ModelAttributes<'ast> {
     /// @(@)unique added implicitely to the datamodel by us.
     pub(super) implicit_indexes: Vec<IndexAttribute<'static>>,
     /// @@map
-    pub(crate) mapped_name: Option<&'ast str>,
+    pub(crate) mapped_name: Option<StringId>,
 }
 
 /// A type of index as defined by the `type: ...` argument on an index attribute.
@@ -257,13 +260,13 @@ pub struct FieldWithArgs {
 }
 
 #[derive(Debug, Default)]
-pub(super) struct EnumAttributes<'ast> {
-    pub(super) mapped_name: Option<&'ast str>,
+pub(super) struct EnumAttributes {
+    pub(super) mapped_name: Option<StringId>,
     /// @map on enum values.
-    pub(super) mapped_values: HashMap<u32, &'ast str>,
+    pub(super) mapped_values: HashMap<u32, StringId>,
 }
 
-fn visit_model<'ast>(model_id: ast::ModelId, ast_model: &'ast ast::Model, ctx: &mut Context<'ast>) {
+fn visit_model<'ast>(model_id: ast::ModelId, ast_model: &'ast ast::Model, ctx: &mut Context<'_, 'ast>) {
     for (field_id, ast_field) in ast_model.iter_fields() {
         match field_type(ast_field, ctx) {
             Ok(FieldType::Model(referenced_model)) => {
@@ -334,7 +337,7 @@ impl<'ast, 'db> fmt::Display for CompositeTypePath<'ast, 'db> {
 
 /// Detect compound type chains that form a cycle, that is not broken with either an optional or an
 /// array type.
-fn detect_composite_cycles(ctx: &mut Context<'_>) {
+fn detect_composite_cycles(ctx: &mut Context<'_, '_>) {
     let mut visited: Vec<ast::CompositeTypeId> = Vec::new();
     let mut errors: Vec<(ast::CompositeTypeId, DatamodelError)> = Vec::new();
 
@@ -412,7 +415,7 @@ fn detect_composite_cycles(ctx: &mut Context<'_>) {
 /// alias — which may in turn reference another type alias —, we check that
 /// it is not self-referencing. If a type alias ends up transitively
 /// referencing itself, we create an error diagnostic.
-fn detect_alias_cycles(ctx: &mut Context<'_>) {
+fn detect_alias_cycles(ctx: &mut Context<'_, '_>) {
     // The IDs of the type aliases we traversed to get to the current type alias.
     let mut path = Vec::new();
     // We accumulate the errors here because we want to sort them at the end.
@@ -472,7 +475,7 @@ fn detect_alias_cycles(ctx: &mut Context<'_>) {
     }
 }
 
-fn visit_composite_type<'ast>(ct_id: ast::CompositeTypeId, ct: &'ast ast::CompositeType, ctx: &mut Context<'ast>) {
+fn visit_composite_type<'ast>(ct_id: ast::CompositeTypeId, ct: &'ast ast::CompositeType, ctx: &mut Context<'_, 'ast>) {
     for (field_id, ast_field) in ct.iter_fields() {
         match field_type(ast_field, ctx) {
             Ok(FieldType::Scalar(ScalarFieldType::Alias(_))) => {
@@ -504,7 +507,7 @@ fn visit_composite_type<'ast>(ct_id: ast::CompositeTypeId, ct: &'ast ast::Compos
     }
 }
 
-fn visit_enum<'ast>(enm: &'ast ast::Enum, ctx: &mut Context<'ast>) {
+fn visit_enum<'ast>(enm: &'ast ast::Enum, ctx: &mut Context<'_, 'ast>) {
     if enm.values.is_empty() {
         ctx.push_error(DatamodelError::new_validation_error(
             "An enum must have at least one value.".to_owned(),
@@ -513,7 +516,7 @@ fn visit_enum<'ast>(enm: &'ast ast::Enum, ctx: &mut Context<'ast>) {
     }
 }
 
-fn visit_type_alias<'ast>(alias_id: ast::AliasId, alias: &'ast ast::Field, ctx: &mut Context<'ast>) {
+fn visit_type_alias<'ast>(alias_id: ast::AliasId, alias: &'ast ast::Field, ctx: &mut Context<'_, 'ast>) {
     match field_type(alias, ctx) {
         Ok(FieldType::Scalar(scalar_field_type)) => {
             ctx.db.types.type_aliases.insert(alias_id, scalar_field_type);
@@ -531,11 +534,12 @@ fn visit_type_alias<'ast>(alias_id: ast::AliasId, alias: &'ast ast::Field, ctx: 
 
 /// Either a structured, supported type, or an Err(unsupported) if the type name
 /// does not match any we know of.
-fn field_type<'ast>(field: &'ast ast::Field, ctx: &mut Context<'ast>) -> Result<FieldType, &'ast str> {
+fn field_type<'ast>(field: &'ast ast::Field, ctx: &mut Context<'_, 'ast>) -> Result<FieldType, &'ast str> {
     let supported = match &field.field_type {
         ast::FieldType::Supported(ident) => &ident.name,
         ast::FieldType::Unsupported(_, _) => return Ok(FieldType::Scalar(ScalarFieldType::Unsupported)),
     };
+    let supported_string_id = ctx.db.interner.intern(supported);
 
     if let Some(tpe) = ScalarType::try_from_str(supported) {
         return Ok(FieldType::Scalar(ScalarFieldType::BuiltInScalar(tpe)));
@@ -545,7 +549,7 @@ fn field_type<'ast>(field: &'ast ast::Field, ctx: &mut Context<'ast>) -> Result<
         .db
         .names
         .tops
-        .get(supported.as_str())
+        .get(&supported_string_id)
         .map(|id| (*id, &ctx.db.ast[*id]))
     {
         Some((ast::TopId::Model(model_id), ast::Top::Model(_))) => Ok(FieldType::Model(model_id)),

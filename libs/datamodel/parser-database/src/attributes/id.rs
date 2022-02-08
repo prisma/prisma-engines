@@ -2,24 +2,20 @@ use super::FieldResolutionError;
 use crate::{
     ast::{self, WithName, WithSpan},
     attributes::resolve_field_array_with_args,
-    context::{Arguments, Context},
+    context::Context,
     types::{FieldWithArgs, IdAttribute, ModelAttributes, SortOrder},
     DatamodelError,
 };
 
 /// @@id on models
-pub(super) fn model<'ast>(
-    args: &mut Arguments<'ast>,
-    model_data: &mut ModelAttributes<'ast>,
-    model_id: ast::ModelId,
-    ctx: &mut Context<'ast>,
-) {
-    let fields = match args.default_arg("fields") {
+pub(super) fn model<'ast>(model_data: &mut ModelAttributes<'ast>, model_id: ast::ModelId, ctx: &mut Context<'_, 'ast>) {
+    let attr = ctx.current_attribute();
+    let fields = match ctx.visit_default_arg("fields") {
         Ok(value) => value,
         Err(err) => return ctx.push_error(err),
     };
 
-    let resolved_fields = match resolve_field_array_with_args(&fields, args.span(), model_id, ctx) {
+    let resolved_fields = match resolve_field_array_with_args(&fields, attr.span, model_id, ctx) {
         Ok(fields) => fields,
         Err(FieldResolutionError::AlreadyDealtWith) => return,
         Err(FieldResolutionError::ProblematicFields {
@@ -38,7 +34,7 @@ pub(super) fn model<'ast>(
             }
 
             if !relation_fields.is_empty() {
-                ctx.push_error(DatamodelError::new_model_validation_error(&format!("The id definition refers to the relation fields {}. ID definitions must reference only scalar fields.", relation_fields.iter().map(|(f, _)| f.name()).collect::<Vec<_>>().join(", ")), ctx.db.ast[model_id].name(), args.span()));
+                ctx.push_error(DatamodelError::new_model_validation_error(&format!("The id definition refers to the relation fields {}. ID definitions must reference only scalar fields.", relation_fields.iter().map(|(f, _)| f.name()).collect::<Vec<_>>().join(", ")), ctx.db.ast[model_id].name(), attr.span));
             }
 
             return;
@@ -62,7 +58,7 @@ pub(super) fn model<'ast>(
                 fields_that_are_not_required.join(", ")
             ),
             &ast_model.name.name,
-            args.span(),
+            attr.span,
         ))
     }
 
@@ -75,11 +71,11 @@ pub(super) fn model<'ast>(
     }
 
     let (name, mapped_name) = {
-        let mapped_name = primary_key_mapped_name(args, ctx);
-        let name = super::get_name_argument(args, ctx);
+        let mapped_name = primary_key_mapped_name(ctx);
+        let name = super::get_name_argument(ctx);
 
         if let Some(name) = name {
-            super::validate_client_name(args.span(), &ast_model.name.name, name, "@@id", ctx);
+            super::validate_client_name(attr.span, &ast_model.name.name, name, "@@id", ctx);
         }
 
         (name, mapped_name)
@@ -87,7 +83,7 @@ pub(super) fn model<'ast>(
 
     model_data.primary_key = Some(IdAttribute {
         name,
-        source_attribute: args.attribute(),
+        source_attribute: attr,
         mapped_name,
         fields: resolved_fields,
         source_field: None,
@@ -97,8 +93,7 @@ pub(super) fn field<'ast>(
     ast_model: &'ast ast::Model,
     field_id: ast::FieldId,
     model_attributes: &mut ModelAttributes<'ast>,
-    args: &mut Arguments<'ast>,
-    ctx: &mut Context<'ast>,
+    ctx: &mut Context<'_, 'ast>,
 ) {
     match model_attributes.primary_key {
         Some(_) => ctx.push_error(DatamodelError::new_model_validation_error(
@@ -107,9 +102,9 @@ pub(super) fn field<'ast>(
             ast_model.span,
         )),
         None => {
-            let mapped_name = primary_key_mapped_name(args, ctx);
+            let mapped_name = primary_key_mapped_name(ctx);
 
-            let length = match args.optional_arg("length").map(|length| length.as_int()) {
+            let length = match ctx.visit_optional_arg("length").map(|length| length.as_int()) {
                 Some(Ok(length)) => Some(length as u32),
                 Some(Err(err)) => {
                     ctx.push_error(err);
@@ -118,14 +113,14 @@ pub(super) fn field<'ast>(
                 None => None,
             };
 
-            let sort_order = match args.optional_arg("sort").map(|sort| sort.as_constant_literal()) {
+            let sort_order = match ctx.visit_optional_arg("sort").map(|sort| sort.as_constant_literal()) {
                 Some(Ok("Desc")) => Some(SortOrder::Desc),
                 Some(Ok("Asc")) => Some(SortOrder::Asc),
                 Some(Ok(other)) => {
-                    ctx.push_error(args.new_attribute_validation_error(&format!(
+                    ctx.push_attribute_validation_error(&format!(
                         "The `sort` argument can only be `Asc` or `Desc` you provided: {}.",
                         other
-                    )));
+                    ));
                     None
                 }
                 Some(Err(err)) => {
@@ -138,7 +133,7 @@ pub(super) fn field<'ast>(
             model_attributes.primary_key = Some(IdAttribute {
                 name: None,
                 mapped_name,
-                source_attribute: args.attribute(),
+                source_attribute: ctx.current_attribute(),
                 fields: vec![FieldWithArgs {
                     field_id,
                     sort_order,
@@ -153,7 +148,7 @@ pub(super) fn field<'ast>(
 pub(super) fn validate_id_field_arities(
     model_id: ast::ModelId,
     model_attributes: &ModelAttributes<'_>,
-    ctx: &mut Context<'_>,
+    ctx: &mut Context<'_, '_>,
 ) {
     if model_attributes.is_ignored {
         return;
@@ -180,10 +175,10 @@ pub(super) fn validate_id_field_arities(
     }
 }
 
-fn primary_key_mapped_name<'ast>(args: &mut Arguments<'ast>, ctx: &mut Context<'ast>) -> Option<&'ast str> {
-    let mapped_name = match args.optional_arg("map").map(|name| name.as_str()) {
+fn primary_key_mapped_name<'ast>(ctx: &mut Context<'_, 'ast>) -> Option<&'ast str> {
+    let mapped_name = match ctx.visit_optional_arg("map").map(|name| name.as_str()) {
         Some(Ok("")) => {
-            ctx.push_error(args.new_attribute_validation_error("The `map` argument cannot be an empty string."));
+            ctx.push_attribute_validation_error("The `map` argument cannot be an empty string.");
             None
         }
         Some(Ok(name)) => Some(name),
