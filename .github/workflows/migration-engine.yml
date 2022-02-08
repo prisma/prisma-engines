@@ -4,6 +4,13 @@ on:
     branches:
       - main
   pull_request:
+    paths-ignore:
+      - '.buildkite/**'
+      - '*.md'
+      - 'LICENSE'
+      - 'CODEOWNERS'
+      - 'renovate.json'
+
 jobs:
   test-mongodb-introspection-and-migration-connector:
     name: "Test ${{ matrix.database.name }} on Linux"
