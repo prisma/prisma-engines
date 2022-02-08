@@ -1,3 +1,5 @@
+use std::iter;
+
 use crate::join::JoinStage;
 use itertools::Itertools;
 use mongodb::bson::{doc, Document};
@@ -32,7 +34,7 @@ impl OrderByData {
                 order_by,
             }
         } else {
-            let prefix = Self::compute_prefix(index, &order_by);
+            let prefix = Self::compute_join_prefix(index, &order_by);
             let mut stages = order_by
                 .path()
                 .iter()
@@ -71,7 +73,7 @@ impl OrderByData {
     /// (e.g. order by: model A -> B -> C.composite.field) or it's without relations all together.
     /// The join, and with that the prefix, only cares about the path to the object we joined to (above it would be A -> B -> C),
     /// The path on the object (e.g. `composite.field`) is handled as a scalar later.
-    fn compute_prefix(index: usize, order_by: &OrderBy) -> OrderByPrefix {
+    fn compute_join_prefix(index: usize, order_by: &OrderBy) -> OrderByPrefix {
         let mut parts = order_by
             .path()
             .iter()
@@ -132,17 +134,50 @@ impl OrderByData {
             if matches!(self.order_by, OrderBy::Aggregation(_)) {
                 prefix.to_string()
             } else {
-                format!("{}.{}", prefix.to_string(), self.scalar_field_name())
+                iter::once(prefix.to_string())
+                    .chain(self.composite_suffix())
+                    .chain(iter::once(self.scalar_field_name()))
+                    .join(".")
             }
         } else if use_bindings {
             self.binding_names().0
         } else {
-            self.scalar_field_name()
+            self.composite_suffix()
+                .into_iter()
+                .chain(iter::once(self.scalar_field_name()))
+                .join(".")
         }
     }
 
     pub(crate) fn sort_order(&self) -> SortOrder {
         self.order_by.sort_order()
+    }
+
+    /// Currently, composites can't have relations, meaning that a path to an orderBy can only have the form of:
+    /// - `document.scalar` (no relations and composites)
+    /// - `document.<composites>.scalar`
+    /// - `document`.<relations>.scalar`
+    /// - `document.<relations>.<composites>.scalar`
+    ///
+    /// This function gives us the `composites` part of the above path, and it's always a suffix to the `<relations>` segment,
+    /// (even if it doesn't exist).
+    fn composite_suffix(&self) -> Option<String> {
+        // Note that relations and composites are never mixed, so it's fine to just throw out relations during mapping and keep composites.
+        let segments: Vec<_> = self
+            .order_by
+            .path()
+            .into_iter()
+            .filter_map(|hop| match hop {
+                OrderByHop::Relation(_) => None,
+                OrderByHop::Composite(cf) => Some(cf.db_name().to_string()),
+            })
+            .collect();
+
+        if segments.is_empty() {
+            None
+        } else {
+            Some(segments.join("."))
+        }
     }
 }
 
@@ -214,12 +249,12 @@ impl OrderByBuilder {
                 } else {
                     // Explanation: All group by fields go into the _id key of the result document.
                     // As it is the only point where the flat scalars are contained for the group,
-                    // we need to refer to the object
+                    // we need to refer to the object.
                     format!("_id.{}", data.scalar_field_name())
                 }
-            // Since Order by aggregate with middle to-one path will be unwinded,
-            // we need to refer to it with its top-level join alias
             } else if matches!(&data.order_by, OrderBy::Aggregation(_)) && data.order_by.has_middle_to_one_path() {
+                // Since Order by aggregate with middle to-one path will be unwinded,
+                // we need to refer to it with its top-level join alias
                 data.binding_names().0
             } else {
                 data.full_reference_path(false)
