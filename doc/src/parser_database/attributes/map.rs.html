@@ -135,6 +135,15 @@
 <span id="134">134</span>
 <span id="135">135</span>
 <span id="136">136</span>
+<span id="137">137</span>
+<span id="138">138</span>
+<span id="139">139</span>
+<span id="140">140</span>
+<span id="141">141</span>
+<span id="142">142</span>
+<span id="143">143</span>
+<span id="144">144</span>
+<span id="145">145</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">ast</span>::{<span class="self">self</span>, <span class="ident">WithName</span>},
     <span class="ident">context</span>::{<span class="ident">Arguments</span>, <span class="ident">Context</span>},
@@ -246,15 +255,24 @@
         .<span class="ident">insert</span>((<span class="ident">ctid</span>, <span class="ident">mapped_name</span>), <span class="ident">field_id</span>)
         .<span class="ident">is_some</span>()
     {
-        <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_duplicate_field_error</span>(
+        <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_composite_type_duplicate_field_error</span>(
             <span class="kw-2">&amp;</span><span class="ident">ct</span>.<span class="ident">name</span>.<span class="ident">name</span>,
-            <span class="kw-2">&amp;</span><span class="ident">ast_field</span>.<span class="ident">name</span>.<span class="ident">name</span>,
+            <span class="ident">mapped_name</span>,
             <span class="ident">ast_field</span>.<span class="ident">span</span>,
         ));
     }
 
-    <span class="kw">if</span> <span class="ident">ctx</span>.<span class="ident">db</span>.<span class="ident">names</span>.<span class="ident">composite_type_fields</span>.<span class="ident">contains_key</span>(<span class="kw-2">&amp;</span>(<span class="ident">ctid</span>, <span class="ident">mapped_name</span>)) {
-        <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_duplicate_field_error</span>(
+    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">f</span>) <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">db</span>.<span class="ident">names</span>.<span class="ident">composite_type_fields</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span>(<span class="ident">ctid</span>, <span class="ident">mapped_name</span>)) {
+        <span class="kw">let</span> <span class="ident">r#type</span> <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">db</span>.<span class="ident">walk_composite_type</span>(<span class="ident">ctid</span>);
+        <span class="kw">let</span> <span class="ident">other_field</span> <span class="op">=</span> <span class="ident">r#type</span>.<span class="ident">field</span>(<span class="kw-2">*</span><span class="ident">f</span>);
+
+        <span class="comment">// We check mapped name collisions above. In this part, if the other</span>
+        <span class="comment">// field has a mapped name, they cannot collide.</span>
+        <span class="kw">if</span> <span class="ident">other_field</span>.<span class="ident">mapped_name</span>().<span class="ident">is_some</span>() {
+            <span class="kw">return</span>;
+        }
+
+        <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_composite_type_duplicate_field_error</span>(
             <span class="kw-2">&amp;</span><span class="ident">ct</span>.<span class="ident">name</span>.<span class="ident">name</span>,
             <span class="kw-2">&amp;</span><span class="ident">ast_field</span>.<span class="ident">name</span>.<span class="ident">name</span>,
             <span class="ident">ast_field</span>.<span class="ident">span</span>,
