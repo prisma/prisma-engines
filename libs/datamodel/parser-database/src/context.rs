@@ -1,7 +1,7 @@
 mod attributes;
 
 use self::attributes::AttributesValidationState;
-use crate::{ast, DatamodelError, Diagnostics, ParserDatabase, ScalarFieldType, ValueValidator};
+use crate::{ast, DatamodelError, Diagnostics, ParserDatabase, ScalarFieldType, StringId, ValueValidator};
 use schema_ast::ast::WithName;
 use std::collections::{HashMap, HashSet};
 
@@ -26,11 +26,11 @@ pub(crate) struct Context<'db, 'ast> {
     attributes: AttributesValidationState,
 
     // @map'ed names indexes. These are not in the db because they are only used for validation.
-    pub(super) mapped_model_names: HashMap<&'ast str, ast::ModelId>,
-    pub(super) mapped_model_scalar_field_names: HashMap<(ast::ModelId, &'ast str), ast::FieldId>,
-    pub(super) mapped_composite_type_names: HashMap<(ast::CompositeTypeId, &'ast str), ast::FieldId>,
-    pub(super) mapped_enum_names: HashMap<&'ast str, ast::EnumId>,
-    pub(super) mapped_enum_value_names: HashMap<(ast::EnumId, &'ast str), u32>,
+    pub(super) mapped_model_names: HashMap<StringId, ast::ModelId>,
+    pub(super) mapped_model_scalar_field_names: HashMap<(ast::ModelId, StringId), ast::FieldId>,
+    pub(super) mapped_composite_type_names: HashMap<(ast::CompositeTypeId, StringId), ast::FieldId>,
+    pub(super) mapped_enum_names: HashMap<StringId, ast::EnumId>,
+    pub(super) mapped_enum_value_names: HashMap<(ast::EnumId, StringId), u32>,
 }
 
 impl<'db, 'ast> Context<'db, 'ast> {

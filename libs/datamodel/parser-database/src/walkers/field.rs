@@ -14,7 +14,7 @@ pub struct FieldWalker<'ast, 'db> {
 
 impl<'ast, 'db> FieldWalker<'ast, 'db> {
     /// The field name.
-    pub fn name(self) -> &'ast str {
+    pub fn name(self) -> &'db str {
         match self.inner {
             InnerWalker::Scalar(f) => f.name(),
             InnerWalker::Relation(f) => f.name(),

@@ -35,7 +35,7 @@ impl<'ast, 'db> ScalarFieldWalker<'ast, 'db> {
     }
 
     /// The name of the field.
-    pub fn name(self) -> &'ast str {
+    pub fn name(self) -> &'db str {
         self.ast_field().name()
     }
 
@@ -45,8 +45,11 @@ impl<'ast, 'db> ScalarFieldWalker<'ast, 'db> {
     }
 
     /// The final database name of the field. See crate docs for explanations on database names.
-    pub fn database_name(self) -> &'ast str {
-        self.attributes().mapped_name.unwrap_or_else(|| self.name())
+    pub fn database_name(self) -> &'db str {
+        self.attributes()
+            .mapped_name
+            .map(|id| &self.db[id])
+            .unwrap_or_else(|| self.name())
     }
 
     /// Does the field have an `@default(autoincrement())` attribute?
@@ -88,8 +91,8 @@ impl<'ast, 'db> ScalarFieldWalker<'ast, 'db> {
     }
 
     /// The name in the `@map(<name>)` attribute.
-    pub fn mapped_name(self) -> Option<&'ast str> {
-        self.attributes().mapped_name
+    pub fn mapped_name(self) -> Option<&'db str> {
+        self.attributes().mapped_name.map(|id| &self.db[id])
     }
 
     /// The model that contains the field.

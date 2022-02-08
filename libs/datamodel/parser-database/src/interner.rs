@@ -19,6 +19,11 @@ impl StringInterner {
         self.map.get_index(id.0).map(|s| s.as_str())
     }
 
+    /// Get an already-interned string.
+    pub(crate) fn lookup(&self, s: &str) -> Option<StringId> {
+        self.map.get_index_of(s).map(StringId)
+    }
+
     pub(crate) fn intern(&mut self, s: &str) -> StringId {
         if let Some(index) = self.map.get_index_of(s) {
             StringId(index)

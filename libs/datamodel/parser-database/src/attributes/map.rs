@@ -2,7 +2,7 @@ use crate::{
     ast::{self, WithName},
     context::Context,
     types::{CompositeTypeField, ModelAttributes, ScalarField},
-    DatamodelError,
+    DatamodelError, StringId,
 };
 
 pub(super) fn model<'ast>(
@@ -20,16 +20,16 @@ pub(super) fn model<'ast>(
     if let Some(existing_model_id) = ctx.mapped_model_names.insert(mapped_name, model_id) {
         let existing_model_name = ctx.db.ast[existing_model_id].name();
         ctx.push_error(DatamodelError::new_duplicate_model_database_name_error(
-            mapped_name.to_owned(),
+            ctx.db[mapped_name].to_owned(),
             existing_model_name.to_owned(),
             ctx.db.ast[model_id].span,
         ));
     }
 
-    if let Some(existing_model_id) = ctx.db.names.tops.get(mapped_name).and_then(|id| id.as_model_id()) {
+    if let Some(existing_model_id) = ctx.db.names.tops.get(&mapped_name).and_then(|id| id.as_model_id()) {
         let existing_model_name = ctx.db.ast[existing_model_id].name();
         ctx.push_error(DatamodelError::new_duplicate_model_database_name_error(
-            mapped_name.to_owned(),
+            ctx.db[mapped_name].to_owned(),
             existing_model_name.to_owned(),
             ctx.current_attribute().span,
         ));
@@ -131,9 +131,9 @@ pub(super) fn composite_type_field<'ast>(
     }
 }
 
-pub(super) fn visit_map_attribute<'ast>(ctx: &mut Context<'_, 'ast>) -> Option<&'ast str> {
+pub(super) fn visit_map_attribute(ctx: &mut Context<'_, '_>) -> Option<StringId> {
     match ctx.visit_default_arg("name").map(|value| value.as_str()) {
-        Ok(Ok(name)) => return Some(name),
+        Ok(Ok(name)) => return Some(ctx.db.interner.intern(name)),
         Err(err) => ctx.push_error(err), // not flattened for error handing legacy reasons
         Ok(Err(err)) => ctx.push_attribute_validation_error(&err.to_string()),
     };

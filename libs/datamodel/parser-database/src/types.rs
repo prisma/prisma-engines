@@ -33,7 +33,7 @@ pub(super) struct Types<'ast> {
     /// This contains only the relation fields actually present in the schema
     /// source text.
     pub(super) relation_fields: BTreeMap<(ast::ModelId, ast::FieldId), RelationField>,
-    pub(super) enum_attributes: HashMap<ast::EnumId, EnumAttributes<'ast>>,
+    pub(super) enum_attributes: HashMap<ast::EnumId, EnumAttributes>,
     pub(super) model_attributes: HashMap<ast::ModelId, ModelAttributes<'ast>>,
 }
 
@@ -67,7 +67,7 @@ impl<'ast> Types<'ast> {
 #[derive(Debug, Clone)]
 pub(super) struct CompositeTypeField<'ast> {
     pub(super) r#type: ScalarFieldType,
-    pub(super) mapped_name: Option<&'ast str>,
+    pub(super) mapped_name: Option<StringId>,
     pub(super) default: Option<DefaultAttribute<'ast>>,
     /// Native type name and arguments
     ///
@@ -122,7 +122,7 @@ pub(crate) struct ScalarField<'ast> {
     pub(crate) is_updated_at: bool,
     pub(crate) default: Option<DefaultAttribute<'ast>>,
     /// @map
-    pub(crate) mapped_name: Option<&'ast str>,
+    pub(crate) mapped_name: Option<StringId>,
     /// Native type name and arguments
     ///
     /// (attribute scope, native type name, arguments, span)
@@ -176,7 +176,7 @@ pub(crate) struct ModelAttributes<'ast> {
     /// @(@)unique added implicitely to the datamodel by us.
     pub(super) implicit_indexes: Vec<IndexAttribute<'static>>,
     /// @@map
-    pub(crate) mapped_name: Option<&'ast str>,
+    pub(crate) mapped_name: Option<StringId>,
 }
 
 /// A type of index as defined by the `type: ...` argument on an index attribute.
@@ -260,10 +260,10 @@ pub struct FieldWithArgs {
 }
 
 #[derive(Debug, Default)]
-pub(super) struct EnumAttributes<'ast> {
-    pub(super) mapped_name: Option<&'ast str>,
+pub(super) struct EnumAttributes {
+    pub(super) mapped_name: Option<StringId>,
     /// @map on enum values.
-    pub(super) mapped_values: HashMap<u32, &'ast str>,
+    pub(super) mapped_values: HashMap<u32, StringId>,
 }
 
 fn visit_model<'ast>(model_id: ast::ModelId, ast_model: &'ast ast::Model, ctx: &mut Context<'_, 'ast>) {
@@ -539,6 +539,7 @@ fn field_type<'ast>(field: &'ast ast::Field, ctx: &mut Context<'_, 'ast>) -> Res
         ast::FieldType::Supported(ident) => &ident.name,
         ast::FieldType::Unsupported(_, _) => return Ok(FieldType::Scalar(ScalarFieldType::Unsupported)),
     };
+    let supported_string_id = ctx.db.interner.intern(supported);
 
     if let Some(tpe) = ScalarType::try_from_str(supported) {
         return Ok(FieldType::Scalar(ScalarFieldType::BuiltInScalar(tpe)));
@@ -548,7 +549,7 @@ fn field_type<'ast>(field: &'ast ast::Field, ctx: &mut Context<'_, 'ast>) -> Res
         .db
         .names
         .tops
-        .get(supported.as_str())
+        .get(&supported_string_id)
         .map(|id| (*id, &ctx.db.ast[*id]))
     {
         Some((ast::TopId::Model(model_id), ast::Top::Model(_))) => Ok(FieldType::Model(model_id)),

@@ -76,7 +76,7 @@ use names::Names;
 pub struct ParserDatabase<'ast> {
     ast: &'ast ast::SchemaAst,
     interner: interner::StringInterner,
-    names: Names<'ast>,
+    names: Names,
     types: Types<'ast>,
     relations: Relations,
 }
@@ -140,7 +140,8 @@ impl<'ast> ParserDatabase<'ast> {
 
     /// Find a specific field in a specific model.
     fn find_model_field(&self, model_id: ast::ModelId, field_name: &str) -> Option<ast::FieldId> {
-        self.names.model_fields.get(&(model_id, field_name)).cloned()
+        let name = self.interner.lookup(field_name)?;
+        self.names.model_fields.get(&(model_id, name)).cloned()
     }
 }
 

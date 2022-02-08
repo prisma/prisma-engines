@@ -103,8 +103,8 @@ impl<'ast, 'db> CompositeTypeFieldWalker<'ast, 'db> {
     }
 
     /// The name contained in the `@map()` attribute of the field, if any.
-    pub fn mapped_name(self) -> Option<&'ast str> {
-        self.field.mapped_name
+    pub fn mapped_name(self) -> Option<&'db str> {
+        self.field.mapped_name.map(|id| &self.db[id])
     }
 
     /// The name of the field.
