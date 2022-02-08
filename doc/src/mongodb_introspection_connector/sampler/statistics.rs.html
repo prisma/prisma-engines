@@ -533,6 +533,22 @@
 <span id="532">532</span>
 <span id="533">533</span>
 <span id="534">534</span>
+<span id="535">535</span>
+<span id="536">536</span>
+<span id="537">537</span>
+<span id="538">538</span>
+<span id="539">539</span>
+<span id="540">540</span>
+<span id="541">541</span>
+<span id="542">542</span>
+<span id="543">543</span>
+<span id="544">544</span>
+<span id="545">545</span>
+<span id="546">546</span>
+<span id="547">547</span>
+<span id="548">548</span>
+<span id="549">549</span>
+<span id="550">550</span>
 </pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">name</span>;
 
 <span class="kw">use</span> <span class="ident">mongodb_schema_describer</span>::{<span class="ident">IndexFieldProperty</span>, <span class="ident">IndexWalker</span>};
@@ -542,12 +558,10 @@
 <span class="kw">use</span> <span class="ident">convert_case</span>::{<span class="ident">Case</span>, <span class="ident">Casing</span>};
 <span class="kw">use</span> <span class="ident">datamodel</span>::{
     <span class="ident">CompositeType</span>, <span class="ident">CompositeTypeField</span>, <span class="ident">Datamodel</span>, <span class="ident">DefaultValue</span>, <span class="ident">Field</span>, <span class="ident">IndexDefinition</span>, <span class="ident">IndexField</span>, <span class="ident">IndexType</span>, <span class="ident">Model</span>,
-    <span class="ident">NativeTypeInstance</span>, <span class="ident">PrimaryKeyDefinition</span>, <span class="ident">PrimaryKeyField</span>, <span class="ident">ScalarField</span>, <span class="ident">ScalarType</span>, <span class="ident">SortOrder</span>, <span class="ident">ValueGenerator</span>,
-    <span class="ident">WithDatabaseName</span>,
+    <span class="ident">PrimaryKeyDefinition</span>, <span class="ident">PrimaryKeyField</span>, <span class="ident">ScalarField</span>, <span class="ident">SortOrder</span>, <span class="ident">ValueGenerator</span>, <span class="ident">WithDatabaseName</span>,
 };
 <span class="kw">use</span> <span class="ident">introspection_connector::Warning</span>;
 <span class="kw">use</span> <span class="ident">mongodb::bson</span>::{<span class="ident">Bson</span>, <span class="ident">Document</span>};
-<span class="kw">use</span> <span class="ident">native_types::MongoDbType</span>;
 <span class="kw">use</span> <span class="ident">once_cell::sync::Lazy</span>;
 <span class="kw">use</span> <span class="ident">regex::Regex</span>;
 <span class="kw">use</span> <span class="ident">std</span>::{
@@ -607,6 +621,7 @@
         <span class="kw">let</span> (<span class="kw-2">mut</span> <span class="ident">models</span>, <span class="ident">types</span>) <span class="op">=</span> <span class="ident">populate_fields</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">models</span>, <span class="self">self</span>.<span class="ident">samples</span>, <span class="ident">warnings</span>);
 
         <span class="ident">add_indices_to_models</span>(<span class="kw-2">&amp;mut</span> <span class="ident">models</span>, <span class="kw-2">&amp;mut</span> <span class="ident">indices</span>);
+        <span class="ident">add_missing_ids_to_models</span>(<span class="kw-2">&amp;mut</span> <span class="ident">models</span>);
 
         <span class="kw">for</span> (<span class="kw">_</span>, <span class="ident">model</span>) <span class="kw">in</span> <span class="ident">models</span>.<span class="ident">into_iter</span>() {
             <span class="ident">data_model</span>.<span class="ident">add_model</span>(<span class="ident">model</span>);
@@ -752,6 +767,31 @@
     }
 }
 
+<span class="doccomment">/// A document must have a id column and the name is always `_id`. If we have no</span>
+<span class="doccomment">/// data in the collection, we must assume an id field exists.</span>
+<span class="kw">fn</span> <span class="ident">add_missing_ids_to_models</span>(<span class="ident">models</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">Model</span><span class="op">&gt;</span>) {
+    <span class="kw">for</span> (<span class="kw">_</span>, <span class="ident">model</span>) <span class="kw">in</span> <span class="ident">models</span>.<span class="ident">iter_mut</span>() {
+        <span class="kw">if</span> <span class="ident">model</span>.<span class="ident">fields</span>.<span class="ident">iter</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">database_name</span>() <span class="op">==</span> <span class="prelude-val">Some</span>(<span class="string">&quot;_id&quot;</span>)) {
+            <span class="kw">continue</span>;
+        }
+
+        <span class="kw">let</span> <span class="ident">field</span> <span class="op">=</span> <span class="ident">ScalarField</span> {
+            <span class="ident">name</span>: <span class="ident">String::from</span>(<span class="string">&quot;id&quot;</span>),
+            <span class="ident">field_type</span>: <span class="ident">datamodel::FieldType::from</span>(<span class="ident">FieldType::ObjectId</span>),
+            <span class="ident">arity</span>: <span class="ident">datamodel::FieldArity::Required</span>,
+            <span class="ident">database_name</span>: <span class="prelude-val">Some</span>(<span class="ident">String::from</span>(<span class="string">&quot;_id&quot;</span>)),
+            <span class="ident">default_value</span>: <span class="prelude-val">Some</span>(<span class="ident">DefaultValue::new_expression</span>(<span class="ident">ValueGenerator::new_auto</span>())),
+            <span class="ident">documentation</span>: <span class="prelude-val">None</span>,
+            <span class="ident">is_generated</span>: <span class="bool-val">false</span>,
+            <span class="ident">is_updated_at</span>: <span class="bool-val">false</span>,
+            <span class="ident">is_commented_out</span>: <span class="bool-val">false</span>,
+            <span class="ident">is_ignored</span>: <span class="bool-val">false</span>,
+        };
+
+        <span class="ident">model</span>.<span class="ident">fields</span>.<span class="ident">insert</span>(<span class="number">0</span>, <span class="ident">Field::ScalarField</span>(<span class="ident">field</span>));
+    }
+}
+
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Default</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">Hash</span>, <span class="ident">Clone</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">FieldSampler</span> {
     <span class="ident">types</span>: <span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">FieldType</span>, <span class="ident">usize</span><span class="op">&gt;</span>,
@@ -828,21 +868,6 @@
         <span class="ident">defined_on_field</span>: <span class="bool-val">true</span>,
     };
 
-    <span class="kw">let</span> <span class="ident">field_type</span> <span class="op">=</span> <span class="ident">datamodel::FieldType::Scalar</span>(
-        <span class="ident">ScalarType::String</span>,
-        <span class="prelude-val">None</span>,
-        <span class="prelude-val">Some</span>(<span class="ident">NativeTypeInstance::new</span>(<span class="string">&quot;ObjectId&quot;</span>, <span class="ident">Vec::new</span>(), <span class="kw-2">&amp;</span><span class="ident">MongoDbType::ObjectId</span>)),
-    );
-
-    <span class="kw">let</span> <span class="ident">primary_key_field</span> <span class="op">=</span> <span class="ident">Field::ScalarField</span>({
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">sf</span> <span class="op">=</span> <span class="ident">ScalarField::new</span>(<span class="string">&quot;id&quot;</span>, <span class="ident">datamodel::FieldArity::Required</span>, <span class="ident">field_type</span>);
-
-        <span class="ident">sf</span>.<span class="ident">set_database_name</span>(<span class="prelude-val">Some</span>(<span class="string">&quot;_id&quot;</span>.<span class="ident">to_string</span>()));
-        <span class="ident">sf</span>.<span class="ident">set_default_value</span>(<span class="ident">DefaultValue::new_expression</span>(<span class="ident">ValueGenerator::new_auto</span>()));
-
-        <span class="ident">sf</span>
-    });
-
     <span class="kw">let</span> (<span class="ident">name</span>, <span class="ident">database_name</span>, <span class="ident">documentation</span>) <span class="op">=</span> <span class="kw">match</span> <span class="ident">sanitize_string</span>(<span class="ident">model_name</span>) {
         <span class="prelude-val">Some</span>(<span class="ident">sanitized</span>) =&gt; (<span class="ident">Cow::from</span>(<span class="ident">sanitized</span>), <span class="prelude-val">Some</span>(<span class="ident">model_name</span>.<span class="ident">to_string</span>()), <span class="prelude-val">None</span>),
         <span class="prelude-val">None</span> <span class="kw">if</span> <span class="ident">RESERVED_NAMES</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">model_name</span>) =&gt; {
@@ -860,7 +885,7 @@
     <span class="ident">Model</span> {
         <span class="ident">name</span>: <span class="ident">name</span>.<span class="ident">to_string</span>(),
         <span class="ident">primary_key</span>: <span class="prelude-val">Some</span>(<span class="ident">primary_key</span>),
-        <span class="ident">fields</span>: <span class="macro">vec!</span>[<span class="ident">primary_key_field</span>],
+        <span class="ident">fields</span>: <span class="macro">vec!</span>[],
         <span class="ident">database_name</span>,
         <span class="ident">documentation</span>,
         ..<span class="ident">Default::default</span>()
@@ -959,13 +984,9 @@
             <span class="ident">Name::Model</span>(<span class="ident">model_name</span>) =&gt; {
                 <span class="kw">let</span> <span class="ident">model</span> <span class="op">=</span> <span class="ident">models</span>.<span class="ident">get_mut</span>(<span class="kw-2">&amp;</span><span class="ident">model_name</span>).<span class="ident">unwrap</span>();
 
-                <span class="kw">if</span> <span class="ident">database_name</span>.<span class="ident">as_deref</span>() <span class="op">==</span> <span class="prelude-val">Some</span>(<span class="string">&quot;_id&quot;</span>) {
-                    <span class="kw">continue</span>;
-                }
-
-                <span class="ident">model</span>.<span class="ident">fields</span>.<span class="ident">push</span>(<span class="ident">Field::ScalarField</span>(<span class="ident">ScalarField</span> {
+                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">field</span> <span class="op">=</span> <span class="ident">ScalarField</span> {
                     <span class="ident">name</span>,
-                    <span class="ident">field_type</span>: <span class="ident">field_type</span>.<span class="ident">into</span>(),
+                    <span class="ident">field_type</span>: <span class="ident">datamodel::FieldType::from</span>(<span class="ident">field_type</span>.<span class="ident">clone</span>()),
                     <span class="ident">arity</span>,
                     <span class="ident">database_name</span>,
                     <span class="ident">default_value</span>: <span class="prelude-val">None</span>,
@@ -974,7 +995,18 @@
                     <span class="ident">is_updated_at</span>: <span class="bool-val">false</span>,
                     <span class="ident">is_commented_out</span>,
                     <span class="ident">is_ignored</span>: <span class="bool-val">false</span>,
-                }));
+                };
+
+                <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">field</span>.<span class="ident">database_name</span> {
+                    <span class="prelude-val">Some</span>(<span class="ident">name</span>) <span class="kw">if</span> <span class="ident">name</span> <span class="op">==</span> <span class="string">&quot;_id&quot;</span> =&gt; {
+                        <span class="kw">if</span> <span class="kw">let</span> <span class="ident">FieldType::ObjectId</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">field_type</span> {
+                            <span class="ident">field</span>.<span class="ident">set_default_value</span>(<span class="ident">DefaultValue::new_expression</span>(<span class="ident">ValueGenerator::new_auto</span>()));
+                        };
+
+                        <span class="ident">model</span>.<span class="ident">fields</span>.<span class="ident">insert</span>(<span class="number">0</span>, <span class="ident">Field::ScalarField</span>(<span class="ident">field</span>));
+                    }
+                    <span class="kw">_</span> =&gt; <span class="ident">model</span>.<span class="ident">fields</span>.<span class="ident">push</span>(<span class="ident">Field::ScalarField</span>(<span class="ident">field</span>)),
+                };
             }
             <span class="ident">Name::CompositeType</span>(<span class="ident">type_name</span>) =&gt; {
                 <span class="kw">let</span> <span class="ident">r#type</span> <span class="op">=</span> <span class="ident">types</span>.<span class="ident">get_mut</span>(<span class="kw-2">&amp;</span><span class="ident">type_name</span>).<span class="ident">unwrap</span>();
