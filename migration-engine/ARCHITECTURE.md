@@ -26,6 +26,70 @@ Migrate has two main blocks of functionality:
    to A (this is part of `migrate dev`). Generating a migration between two
    schemas is called **diffing** in the Migration Engine.
 
+## Implementation
+
+### The _prisma_migrations table
+
+We will just call it "the migrations table". It serves the same purpose as the
+migrations tables that nearly all migration tools have. The terminology we use
+is SQL specific, because we only use a migrations table where we have
+migrations, and currently (2022-02), that means SQL connectors.
+
+Prisma's migrations table is a bit more extensive than other tools' tend to be.
+Let's examine the schema (on Postgres — it's identical everywhere else, modulo
+small idiosyncrasies):
+
+```sql
+CREATE TABLE _prisma_migrations (
+    id                      VARCHAR(36) PRIMARY KEY NOT NULL,
+    checksum                VARCHAR(64) NOT NULL,
+    finished_at             TIMESTAMPTZ,
+    migration_name          VARCHAR(255) NOT NULL,
+    logs                    TEXT,
+    rolled_back_at          TIMESTAMPTZ,
+    started_at              TIMESTAMPTZ NOT NULL DEFAULT now(),
+    applied_steps_count     INTEGER NOT NULL DEFAULT 0
+);
+```
+
+- `id` is a random unique identifier. In practice, a v4 UUID.
+- `checksum` is the sha256 checksum of the migration file. We never ovewrite
+  this once it has been written.
+- `finished_at` is the timestamp at which the migration completed. We only
+  write this at the end of a successful migration, so this column being not
+  null means the migration completed without error.
+- `migration_name` is the complete name of the migration directory (without path prefix).
+- `logs` is where we record the error, in case of error.
+- `rolled_back_at` is written by `prisma migrate resolve`, and causes the
+  row to be ignored by migrate when not null.
+- `started_at` is the creation timestamp of the row in the migrations table. We write this before starting to apply the migration.
+- `applied_steps_count` should be considered deprecated.
+
+On `resolve`, Migrate will:
+
+- with `--applied`, mark the existing row as rolled back, and create a new one
+  with `finished_at` == `started_at`. We do this to avoid overwriting the
+  existing record's checksum and timestamps, because that would erase an event
+  that actually happened from the record.
+- with `--rolled-back`, the row's `rolled_back_at` column is populated with the
+  current timestamp.
+
+On `deploy`, Migrate compares the migrations directory on disk with the
+migrations table. If for any row in the migrations table, `finished_at` is null
+and `rolled_back_at` is null, it means the migration failed and the failure
+hasn't been resolved yet, so deploy stops there with a detailed error.
+Otherwise, for each migrations in the migrations directory:
+
+- If there is a row in the migrations table,
+    - And `rolled_back_at` is not null: ignore it
+    - And `finished_at` is not null: do not apply the migration
+- If there is no corresponding row in the migrations table,
+    - Create a new row with the name, checksum and `started_at`
+    - Apply the migration
+    - Set `finished_at` with the current timestamp if it was successful
+    - No specific action is taken on error: started_at without finished_at nor
+      rolled_back_at is the error state, by definition.
+
 ## FAQ
 
 ### Why does Migrate not have down/rollback migrations?
