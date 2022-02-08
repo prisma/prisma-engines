@@ -8,6 +8,7 @@ edition = "2021"
 query-core = { path = "../core" }
 user-facing-errors = { path = "../../libs/user-facing-errors" }
 datamodel = { path = "../../libs/datamodel/core" }
+dmmf_crate = { path = "../../libs/datamodel/dmmf", package = "dmmf" }
 itertools = "0.10"
 graphql-parser = { git = "https://github.com/prisma/graphql-parser" }
 serde = { version = "1.0", features = ["derive"] }
