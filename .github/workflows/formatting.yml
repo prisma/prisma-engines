@@ -4,6 +4,13 @@ on:
     branches:
       - main
   pull_request:
+    paths-ignore:
+      - '.buildkite/**'
+      - '*.md'
+      - 'LICENSE'
+      - 'CODEOWNERS'
+      - 'renovate.json'
+
 jobs:
   clippy:
     runs-on: ubuntu-latest
