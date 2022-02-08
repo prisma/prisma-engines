@@ -19,6 +19,24 @@ fn empty_collection() {
 }
 
 #[test]
+fn integer_id() {
+    let res = introspect(|db| async move {
+        let collection = db.collection("A");
+        collection.insert_one(doc! { "_id": 12345 }, None).await.unwrap();
+
+        Ok(())
+    });
+
+    let expected = expect![[r#"
+        model A {
+          id Int @id @map("_id")
+        }
+    "#]];
+
+    expected.assert_eq(res.datamodel());
+}
+
+#[test]
 fn multiple_collections_with_data() {
     let res = introspect(|db| async move {
         db.create_collection("A", None).await?;
