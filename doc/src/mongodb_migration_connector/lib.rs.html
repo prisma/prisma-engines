@@ -262,9 +262,9 @@
     }
 
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">create_database</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">ConnectorResult</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Err</span>(<span class="ident">ConnectorError::from_msg</span>(
-            <span class="string">&quot;create_database() is not supported on mongodb: databases are created automatically when used.&quot;</span>.<span class="ident">to_owned</span>(),
-        ))
+        <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">client</span>().<span class="kw">await</span><span class="question-mark">?</span>.<span class="ident">db_name</span>();
+        <span class="macro">tracing::warn!</span>(<span class="string">&quot;MongoDB database will be created on first use.&quot;</span>);
+        <span class="prelude-val">Ok</span>(<span class="ident">name</span>.<span class="ident">into</span>())
     }
 
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">db_execute</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_url</span>: <span class="ident">String</span>, <span class="ident">_script</span>: <span class="ident">String</span>) -&gt; <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
