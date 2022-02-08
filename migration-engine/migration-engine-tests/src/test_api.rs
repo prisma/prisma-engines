@@ -9,7 +9,7 @@ pub use test_setup::{BitFlags, Capabilities, Tags};
 use crate::{commands::*, multi_engine_test_api::TestApi as RootTestApi};
 use datamodel::common::preview_features::PreviewFeature;
 use migration_core::migration_connector::{
-    ConnectorHost, ConnectorResult, DatabaseMigrationStepApplier, DiffTarget, MigrationConnector, MigrationPersistence,
+    BoxFuture, ConnectorHost, ConnectorResult, DiffTarget, MigrationConnector, MigrationPersistence,
 };
 use quaint::{
     prelude::{ConnectionInfo, ResultSet},
@@ -29,11 +29,10 @@ pub struct TestConnectorHost {
     pub printed_messages: std::sync::Mutex<Vec<String>>,
 }
 
-#[async_trait::async_trait]
 impl ConnectorHost for TestConnectorHost {
-    async fn print(&self, message: &str) -> ConnectorResult<()> {
+    fn print(&self, message: &str) -> BoxFuture<'_, ConnectorResult<()>> {
         self.printed_messages.lock().unwrap().push(message.to_owned());
-        Ok(())
+        Box::pin(std::future::ready(Ok(())))
     }
 }
 

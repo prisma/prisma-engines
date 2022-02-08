@@ -3,11 +3,11 @@
 #![deny(rust_2018_idioms, unsafe_code, missing_docs)]
 #![allow(clippy::trivial_regex)] // these will grow
 
+mod apply_migration;
 mod connection_wrapper;
 mod error;
 mod flavour;
 mod pair;
-mod sql_database_step_applier;
 mod sql_destructive_change_checker;
 mod sql_migration;
 mod sql_migration_persistence;
@@ -233,6 +233,14 @@ impl MigrationConnector for SqlMigrationConnector {
         self.flavour().acquire_lock(conn).await
     }
 
+    fn apply_migration<'a>(&'a self, migration: &'a Migration) -> BoxFuture<'a, ConnectorResult<u32>> {
+        Box::pin(apply_migration::apply_migration(migration, self))
+    }
+
+    fn apply_script<'a>(&'a self, migration_name: &'a str, script: &'a str) -> BoxFuture<'a, ConnectorResult<()>> {
+        Box::pin(apply_migration::apply_script(migration_name, script, self))
+    }
+
     fn connection_string(&self) -> &str {
         &self.params.connection_string
     }
@@ -325,6 +333,14 @@ impl MigrationConnector for SqlMigrationConnector {
         migration.downcast_ref::<SqlMigration>().steps.len()
     }
 
+    fn render_script(
+        &self,
+        migration: &Migration,
+        diagnostics: &DestructiveChangeDiagnostics,
+    ) -> ConnectorResult<String> {
+        apply_migration::render_script(migration, diagnostics, self)
+    }
+
     async fn reset(&self) -> ConnectorResult<()> {
         let conn = self.conn().await?;
         if self.flavour.reset(conn).await.is_err() {
@@ -345,10 +361,6 @@ impl MigrationConnector for SqlMigrationConnector {
         datamodel: &ValidatedSchema,
     ) -> Option<user_facing_errors::common::DatabaseVersionIncompatibility> {
         self.flavour.check_database_version_compatibility(datamodel)
-    }
-
-    fn database_migration_step_applier(&self) -> &dyn DatabaseMigrationStepApplier {
-        self
     }
 
     fn destructive_change_checker(&self) -> &dyn DestructiveChangeChecker {

@@ -3,7 +3,7 @@
 mod commands;
 mod logger;
 
-use migration_connector::ConnectorError;
+use migration_connector::{BoxFuture, ConnectorError};
 use migration_core::rpc_api;
 use std::sync::Arc;
 use structopt::StructOpt;
@@ -83,11 +83,7 @@ impl migration_connector::ConnectorHost for JsonRpcHost {
 
         let notification = serde_json::json!({ "content": text });
 
-        let _: std::collections::HashMap<(), ()> = self
-            .client
-            .call("print".to_owned(), notification)
-            .await
-            .map_err(|err| ConnectorError::from_source(err, "JSON-RPC error"))?;
+        let _: std::collections::HashMap<(), ()> = self.client.call("print".to_owned(), notification).await;
         Ok(())
     }
 }

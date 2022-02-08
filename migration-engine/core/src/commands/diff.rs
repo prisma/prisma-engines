@@ -30,9 +30,7 @@ pub(crate) async fn diff(params: DiffParams, host: Arc<dyn ConnectorHost>) -> Co
     let migration: migration_connector::Migration = connector.diff(from.target, to.target).await?;
 
     if params.script {
-        let mut script_string = connector
-            .database_migration_step_applier()
-            .render_script(&migration, &Default::default())?;
+        let mut script_string = connector.render_script(&migration, &Default::default())?;
         if !script_string.ends_with('\n') {
             script_string.push('\n');
         }

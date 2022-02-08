@@ -11,7 +11,6 @@ pub(crate) async fn apply_migrations(
     connector: &dyn MigrationConnector,
 ) -> CoreResult<ApplyMigrationsOutput> {
     let start = Instant::now();
-    let applier = connector.database_migration_step_applier();
     let migration_persistence = connector.migration_persistence();
 
     error_on_changed_provider(&input.migrations_directory_path, connector.connector_type())?;
@@ -68,7 +67,7 @@ pub(crate) async fn apply_migrations(
             .record_migration_started(unapplied_migration.migration_name(), &script)
             .await?;
 
-        match applier
+        match connector
             .apply_script(unapplied_migration.migration_name(), &script)
             .await
         {

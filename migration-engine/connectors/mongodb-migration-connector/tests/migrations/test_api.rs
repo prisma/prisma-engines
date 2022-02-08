@@ -1,7 +1,7 @@
 use datamodel::common::preview_features::PreviewFeature;
 use enumflags2::BitFlags;
 use futures::TryStreamExt;
-use migration_connector::{DiffTarget, MigrationConnector};
+use migration_connector::{ConnectorParams, DiffTarget, MigrationConnector};
 use mongodb::bson::{self, doc};
 use mongodb_migration_connector::MongoDbMigrationConnector;
 use once_cell::sync::Lazy;
@@ -71,10 +71,12 @@ fn new_connector(preview_features: BitFlags<PreviewFeature>) -> (String, MongoDb
     let db_name = fresh_db_name();
     let mut url: url::Url = CONN_STR.parse().unwrap();
     url.set_path(&db_name);
-    (
-        db_name,
-        MongoDbMigrationConnector::new(url.to_string(), preview_features),
-    )
+    let params = ConnectorParams {
+        connection_string: url.to_string(),
+        preview_features,
+        shadow_database_connection_string: None,
+    };
+    (db_name, MongoDbMigrationConnector::new(params))
 }
 
 async fn get_state(db: &mongodb::Database) -> State {
@@ -180,11 +182,7 @@ pub(crate) fn test_scenario(scenario_name: &str) {
             .await
             .unwrap();
 
-        connector
-            .database_migration_step_applier()
-            .apply_migration(&migration)
-            .await
-            .unwrap();
+        connector.apply_migration(&migration).await.unwrap();
 
         let state = get_state(&db).await;
 

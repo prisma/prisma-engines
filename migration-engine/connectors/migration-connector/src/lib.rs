@@ -2,9 +2,8 @@
 
 //! This crate defines the API exposed by the connectors to the migration engine core. The entry point for this API is the [MigrationConnector](trait.MigrationConnector.html) trait.
 
-mod connector_params;
 mod checksum;
-mod database_migration_step_applier;
+mod connector_params;
 mod destructive_change_checker;
 mod diff;
 mod error;
@@ -13,7 +12,6 @@ mod migration_persistence;
 pub mod migrations_directory;
 
 pub use connector_params::ConnectorParams;
-pub use database_migration_step_applier::DatabaseMigrationStepApplier;
 pub use destructive_change_checker::{
     DestructiveChangeChecker, DestructiveChangeDiagnostics, MigrationWarning, UnexecutableMigration,
 };
@@ -24,6 +22,9 @@ pub use migration_persistence::{MigrationPersistence, MigrationRecord, Persisten
 use datamodel::ValidatedSchema;
 use migrations_directory::MigrationDirectory;
 use std::sync::Arc;
+
+/// Alias for a pinned, boxed future, used by the traits.
+pub type BoxFuture<'a, O> = std::pin::Pin<Box<dyn std::future::Future<Output = O> + Send + 'a>>;
 
 /// A boxed migration, opaque to the migration engine core. The connectors are
 /// sole responsible for producing and understanding migrations — the core just
@@ -44,20 +45,18 @@ impl Migration {
 
 /// An abstract host for a migration connector. It exposes IO that is not directly performed by the
 /// connectors.
-#[async_trait::async_trait]
 pub trait ConnectorHost: Sync + Send + 'static {
     /// Print to the console.
-    async fn print(&self, text: &str) -> ConnectorResult<()>;
+    fn print(&self, text: &str) -> BoxFuture<'_, ConnectorResult<()>>;
 }
 
 /// A no-op ConnectorHost.
 #[derive(Debug, Clone)]
 pub struct EmptyHost;
 
-#[async_trait::async_trait]
 impl ConnectorHost for EmptyHost {
-    async fn print(&self, _text: &str) -> ConnectorResult<()> {
-        Ok(())
+    fn print(&self, _text: &str) -> BoxFuture<'_, ConnectorResult<()>> {
+        Box::pin(std::future::ready(Ok(())))
     }
 }
 
@@ -65,11 +64,22 @@ impl ConnectorHost for EmptyHost {
 /// interface with different database backends.
 #[async_trait::async_trait]
 pub trait MigrationConnector: Send + Sync + 'static {
+    // Setup methods
+
     /// Accept a new ConnectorHost.
     fn set_host(&mut self, host: Arc<dyn ConnectorHost>);
 
+    // Connector methods
+
     /// If possible on the target connector, acquire an advisory lock, so multiple instances of migrate do not run concurrently.
     async fn acquire_lock(&self) -> ConnectorResult<()>;
+
+    /// Applies the migration to the database. Returns the number of executed steps.
+    fn apply_migration<'a>(&'a self, migration: &'a Migration) -> BoxFuture<'a, ConnectorResult<u32>>;
+
+    /// Apply a migration script to the database. The migration persistence is
+    /// managed by the core.
+    fn apply_script<'a>(&'a self, migration_name: &'a str, script: &'a str) -> BoxFuture<'a, ConnectorResult<()>>;
 
     /// A string that should identify what database backend is being used. Note that this is not necessarily
     /// the connector name. The SQL connector for example can return "postgresql", "mysql" or "sqlite".
@@ -102,6 +112,16 @@ pub trait MigrationConnector: Send + Sync + 'static {
     /// The version of the underlying database.
     async fn version(&self) -> ConnectorResult<String>;
 
+    /// Render the migration to a runnable script.
+    ///
+    /// This should always return with `Ok` in normal circumstances. The result is currently only
+    /// used to signal when the connector does not support rendering to a script.
+    fn render_script(
+        &self,
+        migration: &Migration,
+        diagnostics: &DestructiveChangeDiagnostics,
+    ) -> ConnectorResult<String>;
+
     /// Drop all database state.
     async fn reset(&self) -> ConnectorResult<()>;
 
@@ -131,9 +151,6 @@ pub trait MigrationConnector: Send + Sync + 'static {
 
     /// Render a human-readable drift summary for the migration.
     fn migration_summary(&self, migration: &Migration) -> String;
-
-    /// See [DatabaseMigrationStepApplier](trait.DatabaseMigrationStepApplier.html).
-    fn database_migration_step_applier(&self) -> &dyn DatabaseMigrationStepApplier;
 
     /// See [DestructiveChangeChecker](trait.DestructiveChangeChecker.html).
     fn destructive_change_checker(&self) -> &dyn DestructiveChangeChecker;

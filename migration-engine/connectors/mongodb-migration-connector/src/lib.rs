@@ -16,8 +16,8 @@ use datamodel::common::preview_features::PreviewFeature;
 use enumflags2::BitFlags;
 use migration::MongoDbMigration;
 use migration_connector::{
-    ConnectorError, ConnectorHost, ConnectorParams, ConnectorResult, DiffTarget, EmptyHost, Migration,
-    MigrationConnector,
+    BoxFuture, ConnectorError, ConnectorHost, ConnectorParams, ConnectorResult, DestructiveChangeDiagnostics,
+    DiffTarget, EmptyHost, Migration, MigrationConnector,
 };
 use mongodb_schema_describer::MongoSchema;
 use std::sync::Arc;
@@ -83,6 +83,14 @@ impl MigrationConnector for MongoDbMigrationConnector {
         &self.host
     }
 
+    fn apply_migration<'a>(&'a self, migration: &'a Migration) -> BoxFuture<'a, ConnectorResult<u32>> {
+        Box::pin(self.apply_migration(migration))
+    }
+
+    fn apply_script(&self, _migration_name: &str, _script: &str) -> BoxFuture<ConnectorResult<()>> {
+        Box::pin(std::future::ready(Err(crate::unsupported_command_error())))
+    }
+
     fn connector_type(&self) -> &'static str {
         "mongodb"
     }
@@ -137,16 +145,22 @@ impl MigrationConnector for MongoDbMigrationConnector {
         self
     }
 
-    fn database_migration_step_applier(&self) -> &dyn migration_connector::DatabaseMigrationStepApplier {
-        self
-    }
-
     fn destructive_change_checker(&self) -> &dyn migration_connector::DestructiveChangeChecker {
         self
     }
 
     async fn acquire_lock(&self) -> ConnectorResult<()> {
         Ok(())
+    }
+
+    fn render_script(
+        &self,
+        _migration: &Migration,
+        _diagnostics: &DestructiveChangeDiagnostics,
+    ) -> ConnectorResult<String> {
+        Err(ConnectorError::from_msg(
+            "Rendering to a script is not supported on MongoDB.".to_owned(),
+        ))
     }
 
     fn set_host(&mut self, host: Arc<dyn migration_connector::ConnectorHost>) {

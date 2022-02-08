@@ -5,6 +5,7 @@ mod diagnose_migration_history;
 use anyhow::Context;
 use colored::Colorize;
 use introspection_connector::CompositeTypeDepth;
+use migration_connector::BoxFuture;
 use migration_core::json_rpc::types::*;
 use std::{fmt, fs::File, io::Read, str::FromStr, sync::Arc};
 use structopt::*;
@@ -415,11 +416,10 @@ async fn schema_push(cmd: &SchemaPush) -> anyhow::Result<()> {
 
 struct DiffHost;
 
-#[async_trait::async_trait]
 impl migration_connector::ConnectorHost for DiffHost {
-    async fn print(&self, s: &str) -> migration_core::CoreResult<()> {
+    fn print(&self, s: &str) -> BoxFuture<'_, migration_core::CoreResult<()>> {
         print!("{}", s);
-        Ok(())
+        Box::pin(std::future::ready(Ok(())))
     }
 }
 
