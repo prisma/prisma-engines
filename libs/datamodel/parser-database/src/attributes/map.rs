@@ -109,15 +109,24 @@ pub(super) fn composite_type_field<'ast>(
         .insert((ctid, mapped_name), field_id)
         .is_some()
     {
-        ctx.push_error(DatamodelError::new_duplicate_field_error(
+        ctx.push_error(DatamodelError::new_composite_type_duplicate_field_error(
             &ct.name.name,
-            &ast_field.name.name,
+            mapped_name,
             ast_field.span,
         ));
     }
 
-    if ctx.db.names.composite_type_fields.contains_key(&(ctid, mapped_name)) {
-        ctx.push_error(DatamodelError::new_duplicate_field_error(
+    if let Some(f) = ctx.db.names.composite_type_fields.get(&(ctid, mapped_name)) {
+        let r#type = ctx.db.walk_composite_type(ctid);
+        let other_field = r#type.field(*f);
+
+        // We check mapped name collisions above. In this part, if the other
+        // field has a mapped name, they cannot collide.
+        if other_field.mapped_name().is_some() {
+            return;
+        }
+
+        ctx.push_error(DatamodelError::new_composite_type_duplicate_field_error(
             &ct.name.name,
             &ast_field.name.name,
             ast_field.span,
