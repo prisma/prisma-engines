@@ -3,6 +3,7 @@
 mod commands;
 mod logger;
 
+use migration_connector::BoxFuture;
 use migration_core::rpc_api;
 use std::sync::Arc;
 use structopt::StructOpt;
@@ -71,9 +72,9 @@ struct JsonRpcHost;
 
 #[async_trait::async_trait]
 impl migration_connector::ConnectorHost for JsonRpcHost {
-    async fn print(&self, text: &str) -> migration_connector::ConnectorResult<()> {
+    fn print(&self, text: &str) -> BoxFuture<'_, migration_connector::ConnectorResult<()>> {
         tracing::info!(migrate_action = "log", "{}", text);
-        Ok(())
+        Box::pin(std::future::ready(Ok(())))
     }
 }
 

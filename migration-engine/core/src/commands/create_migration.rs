@@ -8,7 +8,6 @@ pub async fn create_migration(
     input: CreateMigrationInput,
     connector: &dyn MigrationConnector,
 ) -> CoreResult<CreateMigrationOutput> {
-    let applier = connector.database_migration_step_applier();
     let checker = connector.destructive_change_checker();
     let connector_type = connector.connector_type();
 
@@ -39,7 +38,7 @@ pub async fn create_migration(
 
     let destructive_change_diagnostics = checker.pure_check(&migration);
 
-    let migration_script = applier.render_script(&migration, &destructive_change_diagnostics)?;
+    let migration_script = connector.render_script(&migration, &destructive_change_diagnostics)?;
 
     // Write the migration script to a file.
     let directory = create_migration_directory(Path::new(&input.migrations_directory_path), &input.migration_name)

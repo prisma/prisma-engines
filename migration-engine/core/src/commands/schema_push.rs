@@ -10,7 +10,6 @@ pub(crate) async fn schema_push(
 ) -> CoreResult<SchemaPushOutput> {
     let ast = crate::parse_ast(&input.schema)?;
     let datamodel = parse_schema(&input.schema, &ast)?;
-    let applier = connector.database_migration_step_applier();
     let checker = connector.destructive_change_checker();
 
     if let Some(err) = connector.check_database_version_compatibility(&datamodel) {
@@ -32,7 +31,7 @@ pub(crate) async fn schema_push(
 
             0
         }
-        (0, 0, _) | (0, _, true) => applier.apply_migration(&database_migration).await?,
+        (0, 0, _) | (0, _, true) => connector.apply_migration(&database_migration).await?,
         _ => {
             tracing::info!(
                 "The migration was not applied because it triggered warnings and the force flag was not passed."

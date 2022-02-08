@@ -5,7 +5,7 @@ authors = ["Marcus Böhm <boehm@prisma.io>"]
 edition = "2021"
 
 [dependencies]
-datamodel = { path = "../../../libs/datamodel/core" }
+datamodel = { path = "../../../libs/datamodel/core", default_features = false }
 user-facing-errors = { path = "../../../libs/user-facing-errors" }
 
 async-trait = "0.1.17"
