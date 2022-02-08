@@ -2,7 +2,7 @@ use crate::{
     ast::{self, WithName},
     context::Context,
     types::{CompositeTypeField, DefaultAttribute, ScalarField, ScalarFieldType, ScalarType},
-    DatamodelError,
+    DatamodelError, StringId,
 };
 
 /// @default on model scalar fields
@@ -25,13 +25,13 @@ pub(super) fn visit_model_field_default<'ast>(
     }
 
     let mapped_name = default_attribute_mapped_name(ctx);
-    let default_attribute = ctx.current_attribute();
+    let default_attribute_id = ctx.current_attribute_id();
 
     let mut accept = || {
         let default_value = DefaultAttribute {
             value: value.value,
             mapped_name,
-            default_attribute,
+            default_attribute: default_attribute_id,
         };
 
         field_data.default = Some(default_value);
@@ -104,7 +104,7 @@ pub(super) fn visit_composite_field_default<'ast>(
         ctx.push_attribute_validation_error("The `map` argument is not allowed on a composite type field.");
     }
 
-    let default_attribute = ctx.current_attribute();
+    let default_attribute = ctx.current_attribute_id();
 
     let mut accept = || {
         let default_value = DefaultAttribute {
@@ -147,7 +147,7 @@ pub(super) fn visit_composite_field_default<'ast>(
 fn validate_model_builtin_scalar_type_default(
     scalar_type: ScalarType,
     value: &ast::Expression,
-    mapped_name: Option<&str>,
+    mapped_name: Option<StringId>,
     mut accept: impl FnMut(),
     ctx: &mut Context<'_, '_>,
 ) {
@@ -258,13 +258,13 @@ fn validate_composite_builtin_scalar_type_default(
     }
 }
 
-fn default_attribute_mapped_name<'ast>(ctx: &mut Context<'_, 'ast>) -> Option<&'ast str> {
+fn default_attribute_mapped_name<'ast>(ctx: &mut Context<'_, 'ast>) -> Option<StringId> {
     match ctx.visit_optional_arg("map").map(|name| name.as_str()) {
         Some(Ok("")) => {
             ctx.push_attribute_validation_error("The `map` argument cannot be an empty string.");
             None
         }
-        Some(Ok(name)) => Some(name),
+        Some(Ok(name)) => Some(ctx.db.interner.intern(name)),
         Some(Err(err)) => {
             ctx.push_error(err);
             None

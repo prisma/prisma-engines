@@ -68,9 +68,9 @@ pub(super) fn resolve_names(ctx: &mut Context<'_, '_>) {
                 for (field_id, field) in model.iter_fields() {
                     validate_identifier(&field.name, "Field", ctx);
                     validate_attribute_identifiers(field, ctx);
-                    let field_name = ctx.db.interner.intern(field.name());
+                    let field_name_id = ctx.db.interner.intern(field.name());
 
-                    if names.model_fields.insert((model_id, field_name), field_id).is_some() {
+                    if names.model_fields.insert((model_id, field_name_id), field_id).is_some() {
                         ctx.push_error(DatamodelError::new_duplicate_field_error(
                             &model.name.name,
                             &field.name.name,
@@ -85,11 +85,11 @@ pub(super) fn resolve_names(ctx: &mut Context<'_, '_>) {
                 validate_identifier(&ct.name, "Composite type", ctx);
 
                 for (field_id, field) in ct.iter_fields() {
-                    let field_name = ctx.db.interner.intern(field.name());
+                    let field_name_id = ctx.db.interner.intern(field.name());
                     // Check that there is no duplicate field on the composite type
                     if names
                         .composite_type_fields
-                        .insert((ctid, field_name), field_id)
+                        .insert((ctid, field_name_id), field_id)
                         .is_some()
                     {
                         ctx.push_error(DatamodelError::new_composite_type_duplicate_field_error(

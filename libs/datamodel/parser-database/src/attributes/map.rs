@@ -94,26 +94,26 @@ pub(super) fn composite_type_field<'ast>(
     field: &mut CompositeTypeField<'ast>,
     ctx: &mut Context<'_, 'ast>,
 ) {
-    let mapped_name = match visit_map_attribute(ctx) {
+    let mapped_name_id = match visit_map_attribute(ctx) {
         Some(name) => name,
         None => return,
     };
 
-    field.mapped_name = Some(mapped_name);
+    field.mapped_name = Some(mapped_name_id);
 
     if ctx
         .mapped_composite_type_names
-        .insert((ctid, mapped_name), field_id)
+        .insert((ctid, mapped_name_id), field_id)
         .is_some()
     {
         ctx.push_error(DatamodelError::new_composite_type_duplicate_field_error(
             &ct.name.name,
-            mapped_name,
+            &ctx.db[mapped_name_id],
             ast_field.span,
         ));
     }
 
-    if let Some(f) = ctx.db.names.composite_type_fields.get(&(ctid, mapped_name)) {
+    if let Some(f) = ctx.db.names.composite_type_fields.get(&(ctid, mapped_name_id)) {
         let r#type = ctx.db.walk_composite_type(ctid);
         let other_field = r#type.field(*f);
 

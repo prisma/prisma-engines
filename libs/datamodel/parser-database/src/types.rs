@@ -110,9 +110,9 @@ impl ScalarFieldType {
 
 #[derive(Debug, Clone)]
 pub(crate) struct DefaultAttribute<'ast> {
-    pub(crate) mapped_name: Option<&'ast str>,
+    pub(crate) mapped_name: Option<StringId>,
     pub(crate) value: &'ast ast::Expression,
-    pub(crate) default_attribute: &'ast ast::Attribute,
+    pub(crate) default_attribute: ast::AttributeId,
 }
 
 #[derive(Debug)]

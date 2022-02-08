@@ -20,10 +20,7 @@ use std::collections::{HashMap, HashSet};
 pub(crate) struct Context<'db, 'ast> {
     pub(super) db: &'db mut ParserDatabase<'ast>,
     pub(super) diagnostics: &'db mut Diagnostics,
-    // "parking space" for an Attributes struct. When we start using it, we move it out of the
-    // Context, then move it back in for final validation of things like duplicate or unused
-    // attributes.
-    attributes: AttributesValidationState,
+    attributes: AttributesValidationState, // state machine for attribute validation
 
     // @map'ed names indexes. These are not in the db because they are only used for validation.
     pub(super) mapped_model_names: HashMap<StringId, ast::ModelId>,

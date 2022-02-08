@@ -25,8 +25,8 @@ impl StringInterner {
     }
 
     pub(crate) fn intern(&mut self, s: &str) -> StringId {
-        if let Some(index) = self.map.get_index_of(s) {
-            StringId(index)
+        if let Some(id) = self.lookup(s) {
+            id
         } else {
             let (idx, is_new) = self.map.insert_full(s.to_owned());
             debug_assert!(is_new);
