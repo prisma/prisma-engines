@@ -3,7 +3,7 @@ use napi::{
 };
 use napi_derive::js_function;
 
-use crate::engine::{ConstructorOptions, QueryEngine};
+use crate::engine::{ConstructorOptions, Msg, QueryEngine};
 
 #[js_function(2)]
 pub fn constructor(ctx: CallContext) -> napi::Result<JsUndefined> {
@@ -34,11 +34,13 @@ pub fn constructor(ctx: CallContext) -> napi::Result<JsUndefined> {
 #[js_function(0)]
 pub fn connect(ctx: CallContext) -> napi::Result<JsObject> {
     let this: JsObject = ctx.this_unchecked();
-    let engine: &QueryEngine = ctx.env.unwrap(&this)?;
-    let engine: QueryEngine = engine.clone();
+    let mut engine: &mut QueryEngine = ctx.env.unwrap(&this)?;
+    let (send, rx) = tokio::sync::mpsc::channel::<Msg>(100);
+    engine.handler = Some(send);
 
+    let mut engine: QueryEngine = engine.clone();
     ctx.env
-        .execute_tokio_future(async move { Ok(engine.connect().await?) }, |env, ()| {
+        .execute_tokio_future(async move { Ok(engine.connect(rx).await?) }, |env, ()| {
             env.get_undefined()
         })
 }

@@ -21,6 +21,7 @@ use tracing_opentelemetry::OpenTelemetrySpanExt;
 #[derive(Clone)]
 pub struct QueryEngine {
     inner: Arc<RwLock<Inner>>,
+    pub handler: Option<tokio::sync::mpsc::Sender<Msg>>,
 }
 
 /// The state of the engine.
@@ -106,6 +107,30 @@ pub struct TelemetryOptions {
     endpoint: Option<String>,
 }
 
+pub struct Msg {
+    query: GraphQlBody,
+    send: tokio::sync::oneshot::Sender<PrismaResponse>,
+}
+
+fn run_actor(inner_arc: Arc<RwLock<Inner>>, mut rx: tokio::sync::mpsc::Receiver<Msg>) {
+    tokio::spawn(async move {
+        loop {
+            if let Some(msg) = rx.recv().await {
+                let inner = inner_arc.read().await;
+                match *inner {
+                    Inner::Connected(ref engine) => {
+                        let handler = GraphQlHandler::new(engine.executor(), engine.query_schema());
+                        let res = handler.handle(msg.query, None, None).await;
+                        msg.send.send(res);
+                    }
+
+                    _ => continue,
+                }
+            }
+        }
+    });
+}
+
 impl QueryEngine {
     /// Parse a validated datamodel and configuration to allow connecting later on.
     pub fn new(opts: ConstructorOptions, log_callback: ThreadsafeFunction<String>) -> crate::Result<Self> {
@@ -166,13 +191,15 @@ impl QueryEngine {
             env,
         };
 
-        Ok(Self {
-            inner: Arc::new(RwLock::new(Inner::Builder(builder))),
-        })
+        let inner = Arc::new(RwLock::new(Inner::Builder(builder)));
+
+        Ok(Self { inner, handler: None })
     }
 
     /// Connect to the database, allow queries to be run.
-    pub async fn connect(&self) -> crate::Result<()> {
+    pub async fn connect(&mut self, rx: tokio::sync::mpsc::Receiver<Msg>) -> crate::Result<()> {
+        run_actor(self.inner.clone(), rx);
+
         let mut inner = self.inner.write().await;
 
         match *inner {
@@ -263,24 +290,32 @@ impl QueryEngine {
         trace: HashMap<String, String>,
         tx_id: Option<String>,
     ) -> crate::Result<PrismaResponse> {
-        match *self.inner.read().await {
-            Inner::Connected(ref engine) => {
-                engine
-                    .logger
-                    .with_logging(|| async move {
-                        let cx = global::get_text_map_propagator(|propagator| propagator.extract(&trace));
-                        let span = tracing::span!(Level::TRACE, "query");
+        let (send, rx) = tokio::sync::oneshot::channel::<PrismaResponse>();
 
-                        span.set_parent(cx);
-                        let trace_id = trace.get("traceparent").map(String::from);
+        let msg = Msg { query, send };
 
-                        let handler = GraphQlHandler::new(engine.executor(), engine.query_schema());
-                        Ok(handler.handle(query, tx_id.map(TxId::from), trace_id).await)
-                    })
-                    .await
-            }
-            Inner::Builder(_) => Err(ApiError::NotConnected),
-        }
+        let _ = self.handler.clone().unwrap().send(msg).await;
+        let res = rx.await.unwrap();
+        Ok(res)
+
+        // match *self.inner.read().await {
+        //     Inner::Connected(ref engine) => {
+        //         engine
+        //             .logger
+        //             .with_logging(|| async move {
+        //                 let cx = global::get_text_map_propagator(|propagator| propagator.extract(&trace));
+        //                 let span = tracing::span!(Level::TRACE, "query");
+
+        //                 span.set_parent(cx);
+        //                 let trace_id = trace.get("traceparent").map(String::from);
+
+        //                 let handler = GraphQlHandler::new(engine.executor(), engine.query_schema());
+        //                 Ok(handler.handle(query, tx_id.map(TxId::from), trace_id).await)
+        //             })
+        //             .await
+        //     }
+        //     Inner::Builder(_) => Err(ApiError::NotConnected),
+        // }
     }
 
     /// If connected, attempts to start a transaction in the core and returns its ID.
