@@ -87,7 +87,7 @@
 <span class="doccomment">/// Prisma forces a 1:1 relation to be unique from the defining side. If the</span>
 <span class="doccomment">/// field is not a primary key or already defined in a unique index, we add an</span>
 <span class="doccomment">/// implicit unique index to that field here.</span>
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">infer_implicit_indexes</span>(<span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
+<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">infer_implicit_indexes</span>(<span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">indexes</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
 
     <span class="kw">for</span> <span class="ident">relation</span> <span class="kw">in</span> <span class="ident">ctx</span>.<span class="ident">db</span>.<span class="ident">walk_relations</span>().<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">rel</span><span class="op">|</span> <span class="ident">rel</span>.<span class="ident">refine</span>().<span class="ident">as_inline</span>()) {

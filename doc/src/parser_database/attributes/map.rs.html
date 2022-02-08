@@ -141,23 +141,19 @@
 <span id="140">140</span>
 <span id="141">141</span>
 <span id="142">142</span>
-<span id="143">143</span>
-<span id="144">144</span>
-<span id="145">145</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">ast</span>::{<span class="self">self</span>, <span class="ident">WithName</span>},
-    <span class="ident">context</span>::{<span class="ident">Arguments</span>, <span class="ident">Context</span>},
+    <span class="ident">context::Context</span>,
     <span class="ident">types</span>::{<span class="ident">CompositeTypeField</span>, <span class="ident">ModelAttributes</span>, <span class="ident">ScalarField</span>},
-    <span class="ident">DatamodelError</span>,
+    <span class="ident">DatamodelError</span>, <span class="ident">StringId</span>,
 };
 
 <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">model</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span>(
     <span class="ident">model_attributes</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ModelAttributes</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span>,
     <span class="ident">model_id</span>: <span class="ident">ast::ModelId</span>,
-    <span class="ident">args</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Arguments</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span>,
-    <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span>,
+    <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="lifetime">&#39;ast</span><span class="op">&gt;</span>,
 ) {
-    <span class="kw">let</span> <span class="ident">mapped_name</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">visit_map_attribute</span>(<span class="ident">args</span>, <span class="ident">ctx</span>) {
+    <span class="kw">let</span> <span class="ident">mapped_name</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">visit_map_attribute</span>(<span class="ident">ctx</span>) {
         <span class="prelude-val">Some</span>(<span class="ident">name</span>) =&gt; <span class="ident">name</span>,
         <span class="prelude-val">None</span> =&gt; <span class="kw">return</span>,
     };
@@ -167,18 +163,18 @@
     <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">existing_model_id</span>) <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">mapped_model_names</span>.<span class="ident">insert</span>(<span class="ident">mapped_name</span>, <span class="ident">model_id</span>) {
         <span class="kw">let</span> <span class="ident">existing_model_name</span> <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">db</span>.<span class="ident">ast</span>[<span class="ident">existing_model_id</span>].<span class="ident">name</span>();
         <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_duplicate_model_database_name_error</span>(
-            <span class="ident">mapped_name</span>.<span class="ident">to_owned</span>(),
+            <span class="ident">ctx</span>.<span class="ident">db</span>[<span class="ident">mapped_name</span>].<span class="ident">to_owned</span>(),
             <span class="ident">existing_model_name</span>.<span class="ident">to_owned</span>(),
             <span class="ident">ctx</span>.<span class="ident">db</span>.<span class="ident">ast</span>[<span class="ident">model_id</span>].<span class="ident">span</span>,
         ));
     }
 
-    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">existing_model_id</span>) <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">db</span>.<span class="ident">names</span>.<span class="ident">tops</span>.<span class="ident">get</span>(<span class="ident">mapped_name</span>).<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">id</span><span class="op">|</span> <span class="ident">id</span>.<span class="ident">as_model_id</span>()) {
+    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">existing_model_id</span>) <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">db</span>.<span class="ident">names</span>.<span class="ident">tops</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">mapped_name</span>).<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">id</span><span class="op">|</span> <span class="ident">id</span>.<span class="ident">as_model_id</span>()) {
         <span class="kw">let</span> <span class="ident">existing_model_name</span> <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">db</span>.<span class="ident">ast</span>[<span class="ident">existing_model_id</span>].<span class="ident">name</span>();
         <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_duplicate_model_database_name_error</span>(
-            <span class="ident">mapped_name</span>.<span class="ident">to_owned</span>(),
+            <span class="ident">ctx</span>.<span class="ident">db</span>[<span class="ident">mapped_name</span>].<span class="ident">to_owned</span>(),
             <span class="ident">existing_model_name</span>.<span class="ident">to_owned</span>(),
-            <span class="ident">args</span>.<span class="ident">span</span>(),
+            <span class="ident">ctx</span>.<span class="ident">current_attribute</span>().<span class="ident">span</span>,
         ));
     }
 }
@@ -189,10 +185,9 @@
     <span class="ident">model_id</span>: <span class="ident">ast::ModelId</span>,
     <span class="ident">field_id</span>: <span class="ident">ast::FieldId</span>,
     <span class="ident">scalar_field_data</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ScalarField</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span>,
-    <span class="ident">map_args</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Arguments</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span>,
-    <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span>,
+    <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="lifetime">&#39;ast</span><span class="op">&gt;</span>,
 ) {
-    <span class="kw">let</span> <span class="ident">mapped_name</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">visit_map_attribute</span>(<span class="ident">map_args</span>, <span class="ident">ctx</span>) {
+    <span class="kw">let</span> <span class="ident">mapped_name</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">visit_map_attribute</span>(<span class="ident">ctx</span>) {
         <span class="prelude-val">Some</span>(<span class="ident">name</span>) =&gt; <span class="ident">name</span>,
         <span class="prelude-val">None</span> =&gt; <span class="kw">return</span>,
     };
@@ -240,29 +235,28 @@
     <span class="ident">ctid</span>: <span class="ident">ast::CompositeTypeId</span>,
     <span class="ident">field_id</span>: <span class="ident">ast::FieldId</span>,
     <span class="ident">field</span>: <span class="kw-2">&amp;mut</span> <span class="ident">CompositeTypeField</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span>,
-    <span class="ident">map_args</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Arguments</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span>,
-    <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span>,
+    <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="lifetime">&#39;ast</span><span class="op">&gt;</span>,
 ) {
-    <span class="kw">let</span> <span class="ident">mapped_name</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">visit_map_attribute</span>(<span class="ident">map_args</span>, <span class="ident">ctx</span>) {
+    <span class="kw">let</span> <span class="ident">mapped_name_id</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">visit_map_attribute</span>(<span class="ident">ctx</span>) {
         <span class="prelude-val">Some</span>(<span class="ident">name</span>) =&gt; <span class="ident">name</span>,
         <span class="prelude-val">None</span> =&gt; <span class="kw">return</span>,
     };
 
-    <span class="ident">field</span>.<span class="ident">mapped_name</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">mapped_name</span>);
+    <span class="ident">field</span>.<span class="ident">mapped_name</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">mapped_name_id</span>);
 
     <span class="kw">if</span> <span class="ident">ctx</span>
         .<span class="ident">mapped_composite_type_names</span>
-        .<span class="ident">insert</span>((<span class="ident">ctid</span>, <span class="ident">mapped_name</span>), <span class="ident">field_id</span>)
+        .<span class="ident">insert</span>((<span class="ident">ctid</span>, <span class="ident">mapped_name_id</span>), <span class="ident">field_id</span>)
         .<span class="ident">is_some</span>()
     {
         <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_composite_type_duplicate_field_error</span>(
             <span class="kw-2">&amp;</span><span class="ident">ct</span>.<span class="ident">name</span>.<span class="ident">name</span>,
-            <span class="ident">mapped_name</span>,
+            <span class="kw-2">&amp;</span><span class="ident">ctx</span>.<span class="ident">db</span>[<span class="ident">mapped_name_id</span>],
             <span class="ident">ast_field</span>.<span class="ident">span</span>,
         ));
     }
 
-    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">f</span>) <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">db</span>.<span class="ident">names</span>.<span class="ident">composite_type_fields</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span>(<span class="ident">ctid</span>, <span class="ident">mapped_name</span>)) {
+    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">f</span>) <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">db</span>.<span class="ident">names</span>.<span class="ident">composite_type_fields</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span>(<span class="ident">ctid</span>, <span class="ident">mapped_name_id</span>)) {
         <span class="kw">let</span> <span class="ident">r#type</span> <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">db</span>.<span class="ident">walk_composite_type</span>(<span class="ident">ctid</span>);
         <span class="kw">let</span> <span class="ident">other_field</span> <span class="op">=</span> <span class="ident">r#type</span>.<span class="ident">field</span>(<span class="kw-2">*</span><span class="ident">f</span>);
 
@@ -280,11 +274,11 @@
     }
 }
 
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">visit_map_attribute</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span>(<span class="ident">map_args</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Arguments</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;ast</span> <span class="ident">str</span><span class="op">&gt;</span> {
-    <span class="kw">match</span> <span class="ident">map_args</span>.<span class="ident">default_arg</span>(<span class="string">&quot;name&quot;</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">value</span><span class="op">|</span> <span class="ident">value</span>.<span class="ident">as_str</span>()) {
-        <span class="prelude-val">Ok</span>(<span class="prelude-val">Ok</span>(<span class="ident">name</span>)) =&gt; <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">name</span>),
+<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">visit_map_attribute</span>(<span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">StringId</span><span class="op">&gt;</span> {
+    <span class="kw">match</span> <span class="ident">ctx</span>.<span class="ident">visit_default_arg</span>(<span class="string">&quot;name&quot;</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">value</span><span class="op">|</span> <span class="ident">value</span>.<span class="ident">as_str</span>()) {
+        <span class="prelude-val">Ok</span>(<span class="prelude-val">Ok</span>(<span class="ident">name</span>)) =&gt; <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">ctx</span>.<span class="ident">db</span>.<span class="ident">interner</span>.<span class="ident">intern</span>(<span class="ident">name</span>)),
         <span class="prelude-val">Err</span>(<span class="ident">err</span>) =&gt; <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">err</span>), <span class="comment">// not flattened for error handing legacy reasons</span>
-        <span class="prelude-val">Ok</span>(<span class="prelude-val">Err</span>(<span class="ident">err</span>)) =&gt; <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">map_args</span>.<span class="ident">new_attribute_validation_error</span>(<span class="kw-2">&amp;</span><span class="ident">err</span>.<span class="ident">to_string</span>())),
+        <span class="prelude-val">Ok</span>(<span class="prelude-val">Err</span>(<span class="ident">err</span>)) =&gt; <span class="ident">ctx</span>.<span class="ident">push_attribute_validation_error</span>(<span class="kw-2">&amp;</span><span class="ident">err</span>.<span class="ident">to_string</span>()),
     };
 
     <span class="prelude-val">None</span>

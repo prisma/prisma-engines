@@ -292,6 +292,13 @@
 <span id="291">291</span>
 <span id="292">292</span>
 <span id="293">293</span>
+<span id="294">294</span>
+<span id="295">295</span>
+<span id="296">296</span>
+<span id="297">297</span>
+<span id="298">298</span>
+<span id="299">299</span>
+<span id="300">300</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">ast</span>,
     <span class="ident">types</span>::{<span class="ident">DefaultAttribute</span>, <span class="ident">FieldWithArgs</span>, <span class="ident">ScalarField</span>, <span class="ident">ScalarType</span>, <span class="ident">SortOrder</span>},
@@ -329,18 +336,25 @@
     }
 
     <span class="doccomment">/// The name of the field.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">name</span>(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;ast</span> <span class="ident">str</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">name</span>(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">str</span> {
         <span class="self">self</span>.<span class="ident">ast_field</span>().<span class="ident">name</span>()
     }
 
     <span class="doccomment">/// The `@default()` AST attribute on the field, if any.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">default_attribute</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;ast</span> <span class="ident">ast::Attribute</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">scalar_field</span>.<span class="ident">default</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">d</span><span class="op">|</span> <span class="ident">d</span>.<span class="ident">default_attribute</span>)
+        <span class="self">self</span>.<span class="ident">scalar_field</span>
+            .<span class="ident">default</span>
+            .<span class="ident">as_ref</span>()
+            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">d</span><span class="op">|</span> <span class="ident">d</span>.<span class="ident">default_attribute</span>)
+            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">id</span><span class="op">|</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">db</span>.<span class="ident">ast</span>[<span class="ident">id</span>])
     }
 
     <span class="doccomment">/// The final database name of the field. See crate docs for explanations on database names.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">database_name</span>(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;ast</span> <span class="ident">str</span> {
-        <span class="self">self</span>.<span class="ident">attributes</span>().<span class="ident">mapped_name</span>.<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">name</span>())
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">database_name</span>(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">str</span> {
+        <span class="self">self</span>.<span class="ident">attributes</span>()
+            .<span class="ident">mapped_name</span>
+            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">id</span><span class="op">|</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">db</span>[<span class="ident">id</span>])
+            .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">name</span>())
     }
 
     <span class="doccomment">/// Does the field have an `@default(autoincrement())` attribute?</span>
@@ -382,8 +396,8 @@
     }
 
     <span class="doccomment">/// The name in the `@map(&lt;name&gt;)` attribute.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">mapped_name</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;ast</span> <span class="ident">str</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">attributes</span>().<span class="ident">mapped_name</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">mapped_name</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">str</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">attributes</span>().<span class="ident">mapped_name</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">id</span><span class="op">|</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">db</span>[<span class="ident">id</span>])
     }
 
     <span class="doccomment">/// The model that contains the field.</span>
@@ -459,7 +473,7 @@
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;db</span><span class="op">&gt;</span> <span class="ident">DefaultValueWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
     <span class="doccomment">/// The AST node of the attribute.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ast_attribute</span>(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;ast</span> <span class="ident">ast::Attribute</span> {
-        <span class="self">self</span>.<span class="ident">default</span>.<span class="ident">default_attribute</span>
+        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">db</span>.<span class="ident">ast</span>[<span class="self">self</span>.<span class="ident">default</span>.<span class="ident">default_attribute</span>]
     }
 
     <span class="doccomment">/// The value expression in the `@default` attribute.</span>
@@ -509,8 +523,8 @@
     <span class="doccomment">/// name String @default(&quot;george&quot;, map: &quot;name_default_to_george&quot;)</span>
     <span class="doccomment">///                                     ^^^^^^^^^^^^^^^^^^^^^^^^</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">mapped_name</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;ast</span> <span class="ident">str</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">default</span>.<span class="ident">mapped_name</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">mapped_name</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">str</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">default</span>.<span class="ident">mapped_name</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">id</span><span class="op">|</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">db</span>[<span class="ident">id</span>])
     }
 
     <span class="doccomment">/// The field carrying the default attribute.</span>

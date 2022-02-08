@@ -163,11 +163,7 @@
 <span id="162">162</span>
 <span id="163">163</span>
 <span id="164">164</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">ast</span>,
-    <span class="ident">types</span>::{<span class="self">self</span>},
-    <span class="ident">ParserDatabase</span>, <span class="ident">ScalarFieldType</span>,
-};
+</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">ast</span>, <span class="ident">types</span>, <span class="ident">ParserDatabase</span>, <span class="ident">ScalarFieldType</span>};
 <span class="kw">use</span> <span class="ident">diagnostics::Span</span>;
 
 <span class="doccomment">/// A composite type, introduced with the `type` keyword in the schema.</span>
@@ -268,8 +264,8 @@
     }
 
     <span class="doccomment">/// The name contained in the `@map()` attribute of the field, if any.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">mapped_name</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;ast</span> <span class="ident">str</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">field</span>.<span class="ident">mapped_name</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">mapped_name</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">str</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">field</span>.<span class="ident">mapped_name</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">id</span><span class="op">|</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">db</span>[<span class="ident">id</span>])
     }
 
     <span class="doccomment">/// The name of the field.</span>
@@ -289,7 +285,7 @@
 
     <span class="doccomment">/// The `@default()` AST attribute on the field, if any.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">default_attribute</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;ast</span> <span class="ident">ast::Attribute</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">field</span>.<span class="ident">default</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">d</span><span class="op">|</span> <span class="ident">d</span>.<span class="ident">default_attribute</span>)
+        <span class="self">self</span>.<span class="ident">field</span>.<span class="ident">default</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">d</span><span class="op">|</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">db</span>.<span class="ident">ast</span>[<span class="ident">d</span>.<span class="ident">default_attribute</span>])
     }
 
     <span class="doccomment">/// (attribute scope, native type name, arguments, span)</span>
@@ -323,8 +319,12 @@
     <span class="doccomment">/// name String @default(&quot;george&quot;, map: &quot;name_default_to_george&quot;)</span>
     <span class="doccomment">///                                     ^^^^^^^^^^^^^^^^^^^^^^^^</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">default_mapped_name</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;ast</span> <span class="ident">str</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">field</span>.<span class="ident">default</span>.<span class="ident">as_ref</span>().<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">d</span><span class="op">|</span> <span class="ident">d</span>.<span class="ident">mapped_name</span>)
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">default_mapped_name</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">str</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">field</span>
+            .<span class="ident">default</span>
+            .<span class="ident">as_ref</span>()
+            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">d</span><span class="op">|</span> <span class="ident">d</span>.<span class="ident">mapped_name</span>)
+            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">id</span><span class="op">|</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">db</span>[<span class="ident">id</span>])
     }
 }
 </code></pre></div>

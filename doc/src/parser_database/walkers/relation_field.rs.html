@@ -306,7 +306,7 @@
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">model_id</span>: <span class="ident">ast::ModelId</span>,
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">field_id</span>: <span class="ident">ast::FieldId</span>,
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">db</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">ParserDatabase</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">relation_field</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">RelationField</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">relation_field</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">RelationField</span>,
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;db</span><span class="op">&gt;</span> <span class="ident">PartialEq</span> <span class="kw">for</span> <span class="ident">RelationFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
@@ -331,8 +331,8 @@
     }
 
     <span class="doccomment">/// The foreign key name of the relation (`@relation(map: ...)`).</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">mapped_name</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;ast</span> <span class="ident">str</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">attributes</span>().<span class="ident">mapped_name</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">mapped_name</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">str</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">attributes</span>().<span class="ident">mapped_name</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">string_id</span><span class="op">|</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">db</span>[<span class="ident">string_id</span>])
     }
 
     <span class="doccomment">/// The field name.</span>
@@ -345,7 +345,7 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">db</span>.<span class="ident">ast</span>[<span class="self">self</span>.<span class="ident">model_id</span>][<span class="self">self</span>.<span class="ident">field_id</span>]
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">attributes</span>(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">RelationField</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">attributes</span>(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">RelationField</span> {
         <span class="self">self</span>.<span class="ident">relation_field</span>
     }
 
@@ -370,8 +370,8 @@
     }
 
     <span class="doccomment">/// The relation name explicitly written in the schema source.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">explicit_relation_name</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;ast</span> <span class="ident">str</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">relation_field</span>.<span class="ident">name</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">explicit_relation_name</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">str</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">relation_field</span>.<span class="ident">name</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">string_id</span><span class="op">|</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">db</span>[<span class="ident">string_id</span>])
     }
 
     <span class="doccomment">/// Is there an `@ignore` attribute on the field?</span>
@@ -395,7 +395,7 @@
 
     <span class="doccomment">/// The `@relation` attribute in the field AST.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">relation_attribute</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;ast</span> <span class="ident">ast::Attribute</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">attributes</span>().<span class="ident">relation_attribute</span>
+        <span class="self">self</span>.<span class="ident">attributes</span>().<span class="ident">relation_attribute</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">id</span><span class="op">|</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">db</span>.<span class="ident">ast</span>[<span class="ident">id</span>])
     }
 
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">references_model</span>(<span class="self">self</span>, <span class="ident">other</span>: <span class="ident">ast::ModelId</span>) -&gt; <span class="ident">bool</span> {
@@ -431,7 +431,7 @@
 
     <span class="doccomment">/// The name of the relation. Either uses the `name` (or default) argument,</span>
     <span class="doccomment">/// or generates an implicit name.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">relation_name</span>(<span class="self">self</span>) -&gt; <span class="ident">RelationName</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">relation_name</span>(<span class="self">self</span>) -&gt; <span class="ident">RelationName</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">explicit_relation_name</span>()
             .<span class="ident">map</span>(<span class="ident">RelationName::Explicit</span>)
             .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">RelationName::generated</span>(<span class="self">self</span>.<span class="ident">model</span>().<span class="ident">name</span>(), <span class="self">self</span>.<span class="ident">related_model</span>().<span class="ident">name</span>()))

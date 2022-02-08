@@ -90,6 +90,8 @@
 <span id="89">89</span>
 <span id="90">90</span>
 <span id="91">91</span>
+<span id="92">92</span>
+<span id="93">93</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">ast</span>, <span class="ident">walkers::Walker</span>};
 
 <span class="doccomment">/// An `enum` declaration in the schema.</span>
@@ -109,7 +111,7 @@
     }
 
     <span class="doccomment">/// The database name of the enum.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">database_name</span>(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;ast</span> <span class="ident">str</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">database_name</span>(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">str</span> {
         <span class="self">self</span>.<span class="ident">mapped_name</span>().<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">name</span>())
     }
 
@@ -125,8 +127,10 @@
     <span class="doccomment">///           ^^^^^^^</span>
     <span class="doccomment">/// }</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">mapped_name</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;ast</span> <span class="ident">str</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">db</span>.<span class="ident">types</span>.<span class="ident">enum_attributes</span>[<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">id</span>].<span class="ident">mapped_name</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">mapped_name</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">str</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">db</span>.<span class="ident">types</span>.<span class="ident">enum_attributes</span>[<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">id</span>]
+            .<span class="ident">mapped_name</span>
+            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">id</span><span class="op">|</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">db</span>[<span class="ident">id</span>])
     }
 
     <span class="doccomment">/// The values of the enum.</span>
@@ -160,7 +164,7 @@
     }
 
     <span class="doccomment">/// The database name of the enum.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">database_name</span>(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;ast</span> <span class="ident">str</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">database_name</span>(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">str</span> {
         <span class="self">self</span>.<span class="ident">mapped_name</span>().<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">name</span>())
     }
 
@@ -174,11 +178,11 @@
     <span class="doccomment">///     BLUE @map(&quot;schmurf&quot;)</span>
     <span class="doccomment">/// }</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">mapped_name</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;ast</span> <span class="ident">str</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">mapped_name</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">str</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">db</span>.<span class="ident">types</span>.<span class="ident">enum_attributes</span>[<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">id</span>.<span class="number">0</span>]
             .<span class="ident">mapped_values</span>
             .<span class="ident">get</span>(<span class="kw-2">&amp;</span>(<span class="self">self</span>.<span class="ident">id</span>.<span class="number">1</span> <span class="kw">as</span> <span class="ident">u32</span>))
-            .<span class="ident">cloned</span>()
+            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">id</span><span class="op">|</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">db</span>[<span class="kw-2">*</span><span class="ident">id</span>])
     }
 }
 </code></pre></div>

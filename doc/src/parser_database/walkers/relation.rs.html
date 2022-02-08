@@ -396,6 +396,7 @@
 <span id="395">395</span>
 <span id="396">396</span>
 <span id="397">397</span>
+<span id="398">398</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">ast</span>, <span class="ident">relations</span>::<span class="kw-2">*</span>, <span class="ident">walkers</span>::<span class="kw-2">*</span>, <span class="ident">ParserDatabase</span>, <span class="ident">ScalarFieldType</span>};
 
 <span class="doccomment">/// A relation that has the minimal amount of information for us to create one. Useful for</span>
@@ -418,7 +419,7 @@
     }
 
     <span class="doccomment">/// The relation attributes parsed from the AST.</span>
-    <span class="kw">fn</span> <span class="ident">get</span>(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">Relation</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">get</span>(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">Relation</span> {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">db</span>.<span class="ident">relations</span>[<span class="self">self</span>.<span class="ident">id</span>]
     }
 }
@@ -475,7 +476,7 @@
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;db</span><span class="op">&gt;</span> <span class="ident">InlineRelationWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
     <span class="doccomment">/// Get the relation attributes defined in the AST.</span>
-    <span class="kw">fn</span> <span class="ident">get</span>(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">Relation</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">get</span>(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">Relation</span> {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>.<span class="ident">db</span>.<span class="ident">relations</span>[<span class="self">self</span>.<span class="number">0</span>.<span class="ident">id</span>]
     }
 
@@ -602,7 +603,7 @@
     }
 
     <span class="doccomment">/// The contents of the `map: ...` argument of the `@relation` attribute.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">mapped_name</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;ast</span> <span class="ident">str</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">mapped_name</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">str</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">forward_relation_field</span>().<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">field</span><span class="op">|</span> <span class="ident">field</span>.<span class="ident">mapped_name</span>())
     }
 
@@ -621,9 +622,10 @@
 
     <span class="doccomment">/// The name of the relation. Either uses the `name` (or default) argument,</span>
     <span class="doccomment">/// or generates an implicit name.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">relation_name</span>(<span class="self">self</span>) -&gt; <span class="ident">RelationName</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">relation_name</span>(<span class="self">self</span>) -&gt; <span class="ident">RelationName</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">get</span>()
             .<span class="ident">relation_name</span>
+            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">string_id</span><span class="op">|</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>.<span class="ident">db</span>[<span class="ident">string_id</span>])
             .<span class="ident">map</span>(<span class="ident">RelationName::Explicit</span>)
             .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">RelationName::generated</span>(<span class="self">self</span>.<span class="ident">referencing_model</span>().<span class="ident">name</span>(), <span class="self">self</span>.<span class="ident">referenced_model</span>().<span class="ident">name</span>()))
     }
@@ -636,7 +638,7 @@
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;db</span><span class="op">&gt;</span> <span class="ident">ImplicitManyToManyRelationWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
     <span class="doccomment">/// Gets the relation attributes from the AST.</span>
-    <span class="kw">fn</span> <span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">Relation</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">Relation</span> {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>.<span class="ident">db</span>.<span class="ident">relations</span>[<span class="self">self</span>.<span class="number">0</span>.<span class="ident">id</span>]
     }
 
@@ -667,7 +669,7 @@
     }
 
     <span class="doccomment">/// The name of the relation.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">relation_name</span>(<span class="self">self</span>) -&gt; <span class="ident">RelationName</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">relation_name</span>(<span class="self">self</span>) -&gt; <span class="ident">RelationName</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">field_a</span>().<span class="ident">relation_name</span>()
     }
 }

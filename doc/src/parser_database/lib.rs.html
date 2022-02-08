@@ -143,6 +143,22 @@
 <span id="142">142</span>
 <span id="143">143</span>
 <span id="144">144</span>
+<span id="145">145</span>
+<span id="146">146</span>
+<span id="147">147</span>
+<span id="148">148</span>
+<span id="149">149</span>
+<span id="150">150</span>
+<span id="151">151</span>
+<span id="152">152</span>
+<span id="153">153</span>
+<span id="154">154</span>
+<span id="155">155</span>
+<span id="156">156</span>
+<span id="157">157</span>
+<span id="158">158</span>
+<span id="159">159</span>
+<span id="160">160</span>
 </pre><pre class="rust"><code><span class="attribute">#![<span class="ident">deny</span>(<span class="ident">unsafe_code</span>, <span class="ident">rust_2018_idioms</span>, <span class="ident">missing_docs</span>)]</span>
 
 <span class="doccomment">//! See the docs on [ParserDatabase](./struct.ParserDatabase.html).</span>
@@ -175,6 +191,7 @@
 <span class="kw">mod</span> <span class="ident">attributes</span>;
 <span class="kw">mod</span> <span class="ident">context</span>;
 <span class="kw">mod</span> <span class="ident">indexes</span>;
+<span class="kw">mod</span> <span class="ident">interner</span>;
 <span class="kw">mod</span> <span class="ident">names</span>;
 <span class="kw">mod</span> <span class="ident">relations</span>;
 <span class="kw">mod</span> <span class="ident">types</span>;
@@ -186,7 +203,7 @@
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">types</span>::{<span class="ident">IndexAlgorithm</span>, <span class="ident">IndexType</span>, <span class="ident">ScalarFieldType</span>, <span class="ident">ScalarType</span>, <span class="ident">SortOrder</span>};
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">value_validator</span>::{<span class="ident">ValueListValidator</span>, <span class="ident">ValueValidator</span>};
 
-<span class="kw">use</span> <span class="self">self</span>::{<span class="ident">context::Context</span>, <span class="ident">relations::Relations</span>, <span class="ident">types::Types</span>};
+<span class="kw">use</span> <span class="self">self</span>::{<span class="ident">context::Context</span>, <span class="ident">interner::StringId</span>, <span class="ident">relations::Relations</span>, <span class="ident">types::Types</span>};
 <span class="kw">use</span> <span class="ident">diagnostics</span>::{<span class="ident">DatamodelError</span>, <span class="ident">Diagnostics</span>};
 <span class="kw">use</span> <span class="ident">names::Names</span>;
 
@@ -219,37 +236,41 @@
 <span class="doccomment">/// lifetime management simple.</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ParserDatabase</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span> {
     <span class="ident">ast</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;ast</span> <span class="ident">ast::SchemaAst</span>,
-    <span class="ident">names</span>: <span class="ident">Names</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span>,
+    <span class="ident">interner</span>: <span class="ident">interner::StringInterner</span>,
+    <span class="ident">names</span>: <span class="ident">Names</span>,
     <span class="ident">types</span>: <span class="ident">Types</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span>,
-    <span class="ident">relations</span>: <span class="ident">Relations</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span>,
+    <span class="ident">relations</span>: <span class="ident">Relations</span>,
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span> <span class="ident">ParserDatabase</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span> {
     <span class="doccomment">/// See the docs on [ParserDatabase](/struct.ParserDatabase.html).</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">ast</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;ast</span> <span class="ident">ast::SchemaAst</span>, <span class="ident">diagnostics</span>: <span class="ident">Diagnostics</span>) -&gt; (<span class="self">Self</span>, <span class="ident">Diagnostics</span>) {
-        <span class="kw">let</span> <span class="ident">db</span> <span class="op">=</span> <span class="ident">ParserDatabase</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">ast</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;ast</span> <span class="ident">ast::SchemaAst</span>, <span class="ident">diagnostics</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Diagnostics</span>) -&gt; <span class="self">Self</span> {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">db</span> <span class="op">=</span> <span class="ident">ParserDatabase</span> {
             <span class="ident">ast</span>,
+            <span class="ident">interner</span>: <span class="ident">interner::StringInterner::default</span>(),
             <span class="ident">names</span>: <span class="ident">Names::default</span>(),
             <span class="ident">types</span>: <span class="ident">Types::default</span>(),
             <span class="ident">relations</span>: <span class="ident">Relations::default</span>(),
         };
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ctx</span> <span class="op">=</span> <span class="ident">Context::new</span>(<span class="ident">db</span>, <span class="ident">diagnostics</span>);
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ctx</span> <span class="op">=</span> <span class="ident">Context::new</span>(<span class="kw-2">&amp;mut</span> <span class="ident">db</span>, <span class="ident">diagnostics</span>);
 
         <span class="comment">// First pass: resolve names.</span>
         <span class="ident">names::resolve_names</span>(<span class="kw-2">&amp;mut</span> <span class="ident">ctx</span>);
 
         <span class="comment">// Return early on name resolution errors.</span>
-        <span class="kw">if</span> <span class="ident">ctx</span>.<span class="ident">has_errors</span>() {
-            <span class="kw">return</span> <span class="ident">ctx</span>.<span class="ident">finish</span>();
+        <span class="kw">if</span> <span class="ident">ctx</span>.<span class="ident">diagnostics</span>.<span class="ident">has_errors</span>() {
+            <span class="ident">drop</span>(<span class="ident">ctx</span>);
+            <span class="kw">return</span> <span class="ident">db</span>;
         }
 
         <span class="comment">// Second pass: resolve top-level items and field types.</span>
         <span class="ident">types::resolve_types</span>(<span class="kw-2">&amp;mut</span> <span class="ident">ctx</span>);
 
         <span class="comment">// Return early on type resolution errors.</span>
-        <span class="kw">if</span> <span class="ident">ctx</span>.<span class="ident">has_errors</span>() {
-            <span class="kw">return</span> <span class="ident">ctx</span>.<span class="ident">finish</span>();
+        <span class="kw">if</span> <span class="ident">ctx</span>.<span class="ident">diagnostics</span>.<span class="ident">has_errors</span>() {
+            <span class="ident">drop</span>(<span class="ident">ctx</span>);
+            <span class="kw">return</span> <span class="ident">db</span>;
         }
 
         <span class="comment">// Third pass: validate model and field attributes. All these</span>
@@ -263,7 +284,9 @@
         <span class="comment">// Fifth step: infer implicit indices</span>
         <span class="ident">indexes::infer_implicit_indexes</span>(<span class="kw-2">&amp;mut</span> <span class="ident">ctx</span>);
 
-        <span class="ident">ctx</span>.<span class="ident">finish</span>()
+        <span class="ident">drop</span>(<span class="ident">ctx</span>);
+
+        <span class="ident">db</span>
     }
 
     <span class="doccomment">/// The fully resolved (non alias) scalar field type of an alias. .</span>
@@ -278,13 +301,22 @@
 
     <span class="doccomment">/// Find a specific field in a specific model.</span>
     <span class="kw">fn</span> <span class="ident">find_model_field</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">model_id</span>: <span class="ident">ast::ModelId</span>, <span class="ident">field_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ast::FieldId</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">names</span>.<span class="ident">model_fields</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span>(<span class="ident">model_id</span>, <span class="ident">field_name</span>)).<span class="ident">cloned</span>()
+        <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">interner</span>.<span class="ident">lookup</span>(<span class="ident">field_name</span>)<span class="question-mark">?</span>;
+        <span class="self">self</span>.<span class="ident">names</span>.<span class="ident">model_fields</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span>(<span class="ident">model_id</span>, <span class="ident">name</span>)).<span class="ident">cloned</span>()
     }
 }
 
 <span class="kw">impl</span> <span class="ident">std::fmt::Debug</span> <span class="kw">for</span> <span class="ident">ParserDatabase</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
     <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">std::fmt::Result</span> {
         <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;ParserDatabase { ... }&quot;</span>)
+    }
+}
+
+<span class="kw">impl</span> <span class="ident">std::ops::Index</span><span class="op">&lt;</span><span class="ident">StringId</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ParserDatabase</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
+    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">str</span>;
+
+    <span class="kw">fn</span> <span class="ident">index</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">index</span>: <span class="ident">StringId</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Output</span> {
+        <span class="self">self</span>.<span class="ident">interner</span>.<span class="ident">get</span>(<span class="ident">index</span>).<span class="ident">unwrap</span>()
     }
 }
 </code></pre></div>
