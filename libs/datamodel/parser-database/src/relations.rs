@@ -7,15 +7,15 @@ use enumflags2::bitflags;
 use std::collections::BTreeSet;
 
 /// Detect relation types and construct relation objects to the database.
-pub(super) fn infer_relations(ctx: &mut Context<'_, '_>) {
+pub(super) fn infer_relations(ctx: &mut Context<'_>) {
     let mut relations = Relations::default();
 
-    for rf in ctx.db.types.relation_fields.iter() {
+    for rf in ctx.types.relation_fields.iter() {
         let evidence = relation_evidence(rf, ctx);
         ingest_relation(evidence, &mut relations, ctx);
     }
 
-    ctx.db.relations = relations;
+    let _ = std::mem::replace(ctx.relations, relations);
 }
 
 #[derive(Debug, Copy, Clone, PartialEq, PartialOrd, Ord, Eq)]
@@ -93,14 +93,16 @@ impl Relations {
             .map(move |(model_a_id, model_b_id, relation_idx)| (*model_a_id, *model_b_id, &self[*relation_idx]))
     }
 
-    /// Iterator over relation id
+    /// Iterator over relations where the provided model is model A, or the forward side of the
+    /// relation.
     pub(crate) fn from_model(&self, model_a_id: ast::ModelId) -> impl Iterator<Item = RelationId> + '_ {
         self.forward
             .range((model_a_id, ast::ModelId::ZERO, RelationId::MIN)..(model_a_id, ast::ModelId::MAX, RelationId::MAX))
             .map(move |(_, _, relation_id)| *relation_id)
     }
 
-    /// Iterator over relation id
+    /// Iterator over relationss where the provided model is model B, or the backrelation side of
+    /// the relation.
     pub(crate) fn to_model(&self, model_a_id: ast::ModelId) -> impl Iterator<Item = RelationId> + '_ {
         self.back
             .range((model_a_id, ast::ModelId::ZERO, RelationId::MIN)..(model_a_id, ast::ModelId::MAX, RelationId::MAX))
@@ -181,35 +183,38 @@ impl Relation {
 }
 
 // Implementation detail for this module. Should stay private.
-pub(super) struct RelationEvidence<'ast, 'db> {
-    pub(super) ast_model: &'ast ast::Model,
+pub(super) struct RelationEvidence<'db> {
+    pub(super) ast_model: &'db ast::Model,
     pub(super) model_id: ast::ModelId,
-    pub(super) ast_field: &'ast ast::Field,
+    pub(super) ast_field: &'db ast::Field,
     pub(super) field_id: ast::FieldId,
     pub(super) is_self_relation: bool,
     pub(super) relation_field: &'db RelationField,
-    pub(super) opposite_model: &'ast ast::Model,
-    pub(super) opposite_relation_field: Option<(ast::FieldId, &'ast ast::Field, &'db RelationField)>,
+    pub(super) opposite_model: &'db ast::Model,
+    pub(super) opposite_relation_field: Option<(ast::FieldId, &'db ast::Field, &'db RelationField)>,
 }
 
-pub(super) fn relation_evidence<'ast, 'db>(
+pub(super) fn relation_evidence<'db>(
     ((model_id, field_id), relation_field): (&(ast::ModelId, ast::FieldId), &'db RelationField),
-    ctx: &'db Context<'_, 'ast>,
-) -> RelationEvidence<'ast, 'db> {
-    let ast_model = &ctx.db.ast[*model_id];
+    ctx: &'db Context<'db>,
+) -> RelationEvidence<'db> {
+    let ast = ctx.ast;
+    let ast_model = &ast[*model_id];
     let ast_field = &ast_model[*field_id];
-    let opposite_model = &ctx.db.ast[relation_field.referenced_model];
+    let opposite_model = &ast[relation_field.referenced_model];
     let is_self_relation = *model_id == relation_field.referenced_model;
-    let opposite_relation_field: Option<(ast::FieldId, &ast::Field, &RelationField)> = ctx
-        .db
-        .walk_model(relation_field.referenced_model)
-        .relation_fields()
+    let opposite_relation_field: Option<(ast::FieldId, &ast::Field, &'db RelationField)> = ctx
+        .types
+        .relation_fields
+        .range(
+            (relation_field.referenced_model, ast::FieldId::MIN)..(relation_field.referenced_model, ast::FieldId::MAX),
+        )
         // Only considers relations between the same models
-        .filter(|opposite_relation_field| opposite_relation_field.references_model(*model_id))
+        .filter(|(_, opposite_relation_field)| opposite_relation_field.referenced_model == *model_id)
         // Filter out the field itself, in case of self-relations
-        .filter(|opposite_relation_field| !is_self_relation || opposite_relation_field.field_id != *field_id)
-        .find(|opposite_relation_field| opposite_relation_field.relation_field.name == relation_field.name)
-        .map(|opp_rf| (opp_rf.field_id(), opp_rf.ast_field(), opp_rf.relation_field));
+        .filter(|((_, opp_relation_field_id), _)| !is_self_relation || opp_relation_field_id != field_id)
+        .find(|(_, opposite_relation_field)| opposite_relation_field.name == relation_field.name)
+        .map(|((opp_model_id, opp_field_id), opp_rf)| (*opp_field_id, &ast[*opp_model_id][*opp_field_id], opp_rf));
 
     RelationEvidence {
         ast_model,
@@ -223,11 +228,7 @@ pub(super) fn relation_evidence<'ast, 'db>(
     }
 }
 
-pub(super) fn ingest_relation<'ast, 'db>(
-    evidence: RelationEvidence<'ast, 'db>,
-    relations: &mut Relations,
-    ctx: &'db Context<'_, 'ast>,
-) {
+pub(super) fn ingest_relation<'db>(evidence: RelationEvidence<'db>, relations: &mut Relations, ctx: &Context<'db>) {
     // In this function, we want to ingest the relation only once,
     // so if we know that we will create a relation for the opposite
     // field, we skip the field by returning early.
@@ -319,8 +320,19 @@ pub(super) fn ingest_relation<'ast, 'db>(
             // relation scalar fields are unique to determine whether it is a
             // 1:1 or a 1:m relation.
             match &evidence.relation_field.fields {
-                Some(fields) if ctx.db.walk_model(evidence.model_id).fields_are_unique(fields) => {
-                    RelationAttributes::OneToOne(OneToOneRelationFields::Forward(evidence.field_id))
+                Some(fields) => {
+                    let fields_are_unique =
+                        ctx.types.model_attributes[&evidence.model_id]
+                            .ast_indexes
+                            .iter()
+                            .any(|(_, idx)| {
+                                idx.is_unique() && &idx.fields.iter().map(|f| f.field_id).collect::<Vec<_>>() == fields
+                            });
+                    if fields_are_unique {
+                        RelationAttributes::OneToOne(OneToOneRelationFields::Forward(evidence.field_id))
+                    } else {
+                        RelationAttributes::OneToMany(OneToManyRelationFields::Forward(evidence.field_id))
+                    }
                 }
                 _ => RelationAttributes::OneToMany(OneToManyRelationFields::Forward(evidence.field_id)),
             }

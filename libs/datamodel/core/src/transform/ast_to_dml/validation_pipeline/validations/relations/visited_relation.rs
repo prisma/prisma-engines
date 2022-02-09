@@ -6,14 +6,14 @@ use crate::transform::ast_to_dml::db::walkers::CompleteInlineRelationWalker;
 
 /// A linked list structure for visited relation paths.
 #[derive(Clone)]
-pub(super) struct VisitedRelation<'ast, 'db> {
-    previous: Option<Rc<VisitedRelation<'ast, 'db>>>,
-    relation: CompleteInlineRelationWalker<'ast, 'db>,
+pub(super) struct VisitedRelation<'db> {
+    previous: Option<Rc<VisitedRelation<'db>>>,
+    relation: CompleteInlineRelationWalker<'db>,
 }
 
-impl<'ast, 'db> VisitedRelation<'ast, 'db> {
+impl<'db> VisitedRelation<'db> {
     /// Create a new root node, starting a new relation path.
-    pub(super) fn root(relation: CompleteInlineRelationWalker<'ast, 'db>) -> Self {
+    pub(super) fn root(relation: CompleteInlineRelationWalker<'db>) -> Self {
         Self {
             previous: None,
             relation,
@@ -21,7 +21,7 @@ impl<'ast, 'db> VisitedRelation<'ast, 'db> {
     }
 
     /// Links a relation to the current path.
-    pub(super) fn link_next(self: &Rc<Self>, relation: CompleteInlineRelationWalker<'ast, 'db>) -> Self {
+    pub(super) fn link_next(self: &Rc<Self>, relation: CompleteInlineRelationWalker<'db>) -> Self {
         Self {
             previous: Some(self.clone()),
             relation,
@@ -29,7 +29,7 @@ impl<'ast, 'db> VisitedRelation<'ast, 'db> {
     }
 
     /// Converts the list into an iterator.
-    pub(super) fn iter(&self) -> VisitedRelationIter<'ast, 'db> {
+    pub(super) fn iter(&self) -> VisitedRelationIter<'db> {
         let mut traversed = vec![self.relation];
         let mut this = self;
 
@@ -42,7 +42,7 @@ impl<'ast, 'db> VisitedRelation<'ast, 'db> {
     }
 }
 
-impl<'ast, 'db> fmt::Display for VisitedRelation<'ast, 'db> {
+impl<'db> fmt::Display for VisitedRelation<'db> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let mut traversed = self.iter().map(|relation| {
             format!(
@@ -56,12 +56,12 @@ impl<'ast, 'db> fmt::Display for VisitedRelation<'ast, 'db> {
     }
 }
 
-pub(super) struct VisitedRelationIter<'ast, 'db> {
-    traversed: Vec<CompleteInlineRelationWalker<'ast, 'db>>,
+pub(super) struct VisitedRelationIter<'db> {
+    traversed: Vec<CompleteInlineRelationWalker<'db>>,
 }
 
-impl<'ast, 'db> Iterator for VisitedRelationIter<'ast, 'db> {
-    type Item = CompleteInlineRelationWalker<'ast, 'db>;
+impl<'db> Iterator for VisitedRelationIter<'db> {
+    type Item = CompleteInlineRelationWalker<'db>;
 
     fn next(&mut self) -> Option<Self::Item> {
         self.traversed.pop()

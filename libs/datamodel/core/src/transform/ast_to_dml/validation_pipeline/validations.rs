@@ -21,6 +21,7 @@ pub(super) fn validate(ctx: &mut Context<'_>) {
 
     let names = Names::new(db, connector);
 
+    composite_types::detect_composite_cycles(ctx);
     for composite_type in db.walk_composite_types() {
         composite_types::composite_types_support(composite_type, ctx);
 

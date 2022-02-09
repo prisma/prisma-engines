@@ -3,7 +3,7 @@ use crate::{
     transform::ast_to_dml::{db::walkers::ModelWalker, validation_pipeline::context::Context},
 };
 
-pub(super) fn validate_auto_increment(model: ModelWalker<'_, '_>, ctx: &mut Context<'_>) {
+pub(super) fn validate_auto_increment(model: ModelWalker<'_>, ctx: &mut Context<'_>) {
     let autoincrement_fields = || model.scalar_fields().filter(|f| f.is_autoincrement());
 
     if autoincrement_fields().next().is_none() {

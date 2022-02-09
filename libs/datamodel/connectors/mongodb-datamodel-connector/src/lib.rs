@@ -3,8 +3,8 @@ mod mongodb_types;
 use datamodel_connector::{
     connector_error::{ConnectorError, ErrorKind},
     parser_database::{ast::Expression, walkers::*},
-    Connector, ConnectorCapability, NativeTypeConstructor, NativeTypeInstance, ReferentialAction, ReferentialIntegrity,
-    ScalarType,
+    Connector, ConnectorCapability, Diagnostics, NativeTypeConstructor, NativeTypeInstance, ReferentialAction,
+    ReferentialIntegrity, ScalarType,
 };
 use enumflags2::BitFlags;
 use mongodb_types::*;
@@ -33,7 +33,7 @@ type Result<T> = std::result::Result<T, ConnectorError>;
 pub struct MongoDbDatamodelConnector;
 
 impl MongoDbDatamodelConnector {
-    fn validate_auto(field: ScalarFieldWalker<'_, '_>, errors: &mut datamodel_connector::Diagnostics) {
+    fn validate_auto(field: ScalarFieldWalker<'_>, errors: &mut datamodel_connector::Diagnostics) {
         if !field.default_value().map(|val| val.is_auto()).unwrap_or(false) {
             return;
         }
@@ -60,7 +60,7 @@ impl MongoDbDatamodelConnector {
         }
     }
 
-    fn validate_dbgenerated(field: ScalarFieldWalker<'_, '_>, errors: &mut datamodel_connector::Diagnostics) {
+    fn validate_dbgenerated(field: ScalarFieldWalker<'_>, errors: &mut datamodel_connector::Diagnostics) {
         if !field.default_value().map(|val| val.is_dbgenerated()).unwrap_or(false) {
             return;
         }
@@ -76,7 +76,7 @@ impl MongoDbDatamodelConnector {
         });
     }
 
-    fn validate_array_native_type(field: ScalarFieldWalker<'_, '_>, errors: &mut datamodel_connector::Diagnostics) {
+    fn validate_array_native_type(field: ScalarFieldWalker<'_>, errors: &mut Diagnostics) {
         let (ds_name, type_name, args, span) = match field.raw_native_type() {
             Some(nt) => nt,
             None => return,
@@ -120,7 +120,7 @@ impl Connector for MongoDbDatamodelConnector {
         referential_integrity.allowed_referential_actions(BitFlags::empty())
     }
 
-    fn validate_model(&self, model: ModelWalker<'_, '_>, errors: &mut datamodel_connector::Diagnostics) {
+    fn validate_model(&self, model: ModelWalker<'_>, errors: &mut Diagnostics) {
         for field in model.scalar_fields() {
             Self::validate_auto(field, errors);
             Self::validate_dbgenerated(field, errors);

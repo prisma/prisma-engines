@@ -10,12 +10,12 @@ use crate::{
         EnumAttributes, FieldWithArgs, IndexAlgorithm, IndexAttribute, IndexType, ModelAttributes, RelationField,
         ScalarField, ScalarFieldType, SortOrder,
     },
-    DatamodelError, ValueValidator,
+    DatamodelError, StringId, ValueValidator,
 };
 use diagnostics::Span;
 
-pub(super) fn resolve_attributes(ctx: &mut Context<'_, '_>) {
-    for top in ctx.db.ast.iter_tops() {
+pub(super) fn resolve_attributes(ctx: &mut Context<'_>) {
+    for top in ctx.ast.iter_tops() {
         match top {
             (ast::TopId::Model(model_id), ast::Top::Model(model)) => resolve_model_attributes(model_id, model, ctx),
             (ast::TopId::Enum(enum_id), ast::Top::Enum(ast_enum)) => resolve_enum_attributes(enum_id, ast_enum, ctx),
@@ -27,13 +27,13 @@ pub(super) fn resolve_attributes(ctx: &mut Context<'_, '_>) {
     }
 }
 
-fn resolve_composite_type_attributes<'ast>(
+fn resolve_composite_type_attributes<'db>(
     ctid: ast::CompositeTypeId,
-    ct: &'ast ast::CompositeType,
-    ctx: &mut Context<'_, 'ast>,
+    ct: &'db ast::CompositeType,
+    ctx: &mut Context<'db>,
 ) {
     for (field_id, field) in ct.iter_fields() {
-        let mut ctfield = ctx.db.types.composite_type_fields[&(ctid, field_id)].clone();
+        let mut ctfield = ctx.types.composite_type_fields[&(ctid, field_id)].clone();
 
         ctx.visit_attributes((ctid, field_id).into());
 
@@ -43,7 +43,7 @@ fn resolve_composite_type_attributes<'ast>(
                 native_types::visit_composite_type_field_native_type_attribute(
                     datasource_name,
                     type_name,
-                    args,
+                    &ctx.ast[args],
                     &mut ctfield,
                 )
             }
@@ -61,12 +61,12 @@ fn resolve_composite_type_attributes<'ast>(
             ctx.validate_visited_arguments();
         }
 
-        ctx.db.types.composite_type_fields.insert((ctid, field_id), ctfield);
+        ctx.types.composite_type_fields.insert((ctid, field_id), ctfield);
         ctx.validate_visited_attributes();
     }
 }
 
-fn resolve_enum_attributes<'ast>(enum_id: ast::EnumId, ast_enum: &'ast ast::Enum, ctx: &mut Context<'_, 'ast>) {
+fn resolve_enum_attributes<'db>(enum_id: ast::EnumId, ast_enum: &'db ast::Enum, ctx: &mut Context<'db>) {
     let mut enum_attributes = EnumAttributes::default();
 
     for value_idx in 0..ast_enum.values.len() {
@@ -96,16 +96,16 @@ fn resolve_enum_attributes<'ast>(enum_id: ast::EnumId, ast_enum: &'ast ast::Enum
         ctx.validate_visited_arguments();
     }
 
-    ctx.db.types.enum_attributes.insert(enum_id, enum_attributes);
+    ctx.types.enum_attributes.insert(enum_id, enum_attributes);
     ctx.validate_visited_attributes();
 }
 
-fn resolve_model_attributes<'ast>(model_id: ast::ModelId, ast_model: &'ast ast::Model, ctx: &mut Context<'_, 'ast>) {
+fn resolve_model_attributes<'db>(model_id: ast::ModelId, ast_model: &'db ast::Model, ctx: &mut Context<'db>) {
     let mut model_attributes = ModelAttributes::default();
 
     // First resolve all the attributes defined on fields **in isolation**.
     for (field_id, ast_field) in ast_model.iter_fields() {
-        if let Some(mut scalar_field) = ctx.db.types.take_scalar_field(model_id, field_id) {
+        if let Some(mut scalar_field) = ctx.types.take_scalar_field(model_id, field_id) {
             visit_scalar_field_attributes(
                 model_id,
                 field_id,
@@ -116,10 +116,10 @@ fn resolve_model_attributes<'ast>(model_id: ast::ModelId, ast_model: &'ast ast::
                 ctx,
             );
 
-            ctx.db.types.scalar_fields.insert((model_id, field_id), scalar_field);
-        } else if let Some(mut rf) = ctx.db.types.take_relation_field(model_id, field_id) {
+            ctx.types.scalar_fields.insert((model_id, field_id), scalar_field);
+        } else if let Some(mut rf) = ctx.types.take_relation_field(model_id, field_id) {
             visit_relation_field_attributes(model_id, field_id, ast_field, &mut rf, ctx);
-            ctx.db.types.relation_fields.insert((model_id, field_id), rf);
+            ctx.types.relation_fields.insert((model_id, field_id), rf);
         } else {
             unreachable!(
                 "{}.{} is neither a scalar field nor a relation field",
@@ -171,18 +171,18 @@ fn resolve_model_attributes<'ast>(model_id: ast::ModelId, ast_model: &'ast ast::
     // Model-global validations
     id::validate_id_field_arities(model_id, &model_attributes, ctx);
 
-    ctx.db.types.model_attributes.insert(model_id, model_attributes);
+    ctx.types.model_attributes.insert(model_id, model_attributes);
     ctx.validate_visited_attributes();
 }
 
-fn visit_scalar_field_attributes<'ast>(
+fn visit_scalar_field_attributes<'db>(
     model_id: ast::ModelId,
     field_id: ast::FieldId,
-    ast_model: &'ast ast::Model,
-    ast_field: &'ast ast::Field,
-    model_attributes: &mut ModelAttributes<'ast>,
-    scalar_field_data: &mut ScalarField<'ast>,
-    ctx: &mut Context<'_, 'ast>,
+    ast_model: &'db ast::Model,
+    ast_field: &'db ast::Field,
+    model_attributes: &mut ModelAttributes,
+    scalar_field_data: &mut ScalarField,
+    ctx: &mut Context<'db>,
 ) {
     ctx.visit_scalar_field_attributes(model_id, field_id, scalar_field_data.r#type);
 
@@ -239,8 +239,14 @@ fn visit_scalar_field_attributes<'ast>(
 
     if let ScalarFieldType::BuiltInScalar(_scalar_type) = scalar_field_data.r#type {
         // native type attributes
-        if let Some((datasource_name, type_name, args)) = ctx.visit_datasource_scoped() {
-            native_types::visit_model_field_native_type_attribute(datasource_name, type_name, args, scalar_field_data);
+        if let Some((datasource_name, type_name, attribute_id)) = ctx.visit_datasource_scoped() {
+            let attribute = &ctx.ast[attribute_id];
+            native_types::visit_model_field_native_type_attribute(
+                datasource_name,
+                type_name,
+                attribute,
+                scalar_field_data,
+            );
         }
     }
 
@@ -253,17 +259,13 @@ fn visit_scalar_field_attributes<'ast>(
     ctx.validate_visited_attributes();
 }
 
-fn visit_field_unique<'ast>(
-    field_id: ast::FieldId,
-    model_attributes: &mut ModelAttributes<'ast>,
-    ctx: &mut Context<'_, 'ast>,
-) {
+fn visit_field_unique(field_id: ast::FieldId, model_attributes: &mut ModelAttributes, ctx: &mut Context<'_>) {
     let mapped_name = match ctx.visit_optional_arg("map").map(|name| name.as_str()) {
         Some(Ok("")) => {
             ctx.push_attribute_validation_error("The `map` argument cannot be an empty string.");
             None
         }
-        Some(Ok(name)) => Some(name),
+        Some(Ok(name)) => Some(ctx.interner.intern(name)),
         Some(Err(err)) => {
             ctx.push_error(err);
             None
@@ -298,7 +300,7 @@ fn visit_field_unique<'ast>(
     };
 
     model_attributes.ast_indexes.push((
-        ctx.current_attribute(),
+        ctx.current_attribute_id(),
         IndexAttribute {
             r#type: IndexType::Unique,
             fields: vec![FieldWithArgs {
@@ -313,12 +315,12 @@ fn visit_field_unique<'ast>(
     ))
 }
 
-fn visit_relation_field_attributes<'ast>(
+fn visit_relation_field_attributes<'db>(
     model_id: ast::ModelId,
     field_id: ast::FieldId,
-    ast_field: &'ast ast::Field,
+    ast_field: &'db ast::Field,
     relation_field: &mut RelationField,
-    ctx: &mut Context<'_, 'ast>,
+    ctx: &mut Context<'db>,
 ) {
     ctx.visit_attributes((model_id, field_id).into());
 
@@ -366,7 +368,7 @@ fn visit_relation_field_attributes<'ast>(
         let mut suggested_fields = Vec::new();
 
         for underlying_field in relation_field.fields.iter().flatten() {
-            suggested_fields.push(ctx.db.ast[model_id][*underlying_field].name());
+            suggested_fields.push(ctx.ast[model_id][*underlying_field].name());
         }
 
         let suggestion = match suggested_fields.len() {
@@ -393,9 +395,8 @@ fn visit_relation_field_attributes<'ast>(
     ctx.validate_visited_attributes();
 }
 
-fn visit_model_ignore(model_id: ast::ModelId, model_data: &mut ModelAttributes<'_>, ctx: &mut Context<'_, '_>) {
+fn visit_model_ignore(model_id: ast::ModelId, model_data: &mut ModelAttributes, ctx: &mut Context<'_>) {
     let ignored_field_errors: Vec<_> = ctx
-        .db
         .types
         .range_model_scalar_fields(model_id)
         .filter(|(_, sf)| sf.is_ignored)
@@ -403,7 +404,7 @@ fn visit_model_ignore(model_id: ast::ModelId, model_data: &mut ModelAttributes<'
             DatamodelError::new_attribute_validation_error(
                 "Fields on an already ignored Model do not need an `@ignore` annotation.",
                 "ignore",
-                *ctx.db.ast[model_id][field_id].span(),
+                *ctx.ast[model_id][field_id].span(),
             )
         })
         .collect();
@@ -416,7 +417,7 @@ fn visit_model_ignore(model_id: ast::ModelId, model_data: &mut ModelAttributes<'
 }
 
 /// Validate @@fulltext on models
-fn model_fulltext<'ast>(data: &mut ModelAttributes<'ast>, model_id: ast::ModelId, ctx: &mut Context<'_, 'ast>) {
+fn model_fulltext(data: &mut ModelAttributes, model_id: ast::ModelId, ctx: &mut Context<'_>) {
     let mut index_attribute = IndexAttribute {
         r#type: IndexType::Fulltext,
         ..Default::default()
@@ -428,7 +429,7 @@ fn model_fulltext<'ast>(data: &mut ModelAttributes<'ast>, model_id: ast::ModelId
             ctx.push_attribute_validation_error("The `map` argument cannot be an empty string.");
             None
         }
-        Some(Ok(name)) => Some(name),
+        Some(Ok(name)) => Some(ctx.interner.intern(name)),
         Some(Err(err)) => {
             ctx.push_error(err);
             None
@@ -438,11 +439,11 @@ fn model_fulltext<'ast>(data: &mut ModelAttributes<'ast>, model_id: ast::ModelId
 
     index_attribute.mapped_name = mapped_name;
 
-    data.ast_indexes.push((ctx.current_attribute(), index_attribute));
+    data.ast_indexes.push((ctx.current_attribute_id(), index_attribute));
 }
 
 /// Validate @@index on models.
-fn model_index<'ast>(data: &mut ModelAttributes<'ast>, model_id: ast::ModelId, ctx: &mut Context<'_, 'ast>) {
+fn model_index(data: &mut ModelAttributes, model_id: ast::ModelId, ctx: &mut Context<'_>) {
     let mut index_attribute = IndexAttribute {
         r#type: IndexType::Normal,
         ..Default::default()
@@ -456,7 +457,7 @@ fn model_index<'ast>(data: &mut ModelAttributes<'ast>, model_id: ast::ModelId, c
             ctx.push_attribute_validation_error("The `map` argument cannot be an empty string.");
             None
         }
-        Some(Ok(name)) => Some(name),
+        Some(Ok(name)) => Some(ctx.interner.intern(name)),
         Some(Err(err)) => {
             ctx.push_error(err);
             None
@@ -504,11 +505,11 @@ fn model_index<'ast>(data: &mut ModelAttributes<'ast>, model_id: ast::ModelId, c
         None => None,
     };
 
-    data.ast_indexes.push((ctx.current_attribute(), index_attribute));
+    data.ast_indexes.push((ctx.current_attribute_id(), index_attribute));
 }
 
 /// Validate @@unique on models.
-fn model_unique<'ast>(data: &mut ModelAttributes<'ast>, model_id: ast::ModelId, ctx: &mut Context<'_, 'ast>) {
+fn model_unique(data: &mut ModelAttributes, model_id: ast::ModelId, ctx: &mut Context<'_>) {
     let mut index_attribute = IndexAttribute {
         r#type: IndexType::Unique,
         ..Default::default()
@@ -516,7 +517,8 @@ fn model_unique<'ast>(data: &mut ModelAttributes<'ast>, model_id: ast::ModelId, 
     common_index_validations(&mut index_attribute, model_id, ctx);
 
     let current_attribute = ctx.current_attribute();
-    let ast_model = &ctx.db.ast()[model_id];
+    let current_attribute_id = ctx.current_attribute_id();
+    let ast_model = &ctx.ast[model_id];
     let name = get_name_argument(ctx);
 
     let mapped_name = {
@@ -535,7 +537,7 @@ fn model_unique<'ast>(data: &mut ModelAttributes<'ast>, model_id: ast::ModelId, 
                 ctx.push_attribute_validation_error("The `map` argument cannot be an empty string.");
                 None
             }
-            Some(Ok(name)) => Some(name),
+            Some(Ok(name)) => Some(ctx.interner.intern(name)),
             Some(Err(err)) => {
                 ctx.push_error(err);
                 None
@@ -553,14 +555,10 @@ fn model_unique<'ast>(data: &mut ModelAttributes<'ast>, model_id: ast::ModelId, 
     index_attribute.name = name;
     index_attribute.mapped_name = mapped_name;
 
-    data.ast_indexes.push((current_attribute, index_attribute));
+    data.ast_indexes.push((current_attribute_id, index_attribute));
 }
 
-fn common_index_validations<'ast>(
-    index_data: &mut IndexAttribute<'ast>,
-    model_id: ast::ModelId,
-    ctx: &mut Context<'_, 'ast>,
-) {
+fn common_index_validations(index_data: &mut IndexAttribute, model_id: ast::ModelId, ctx: &mut Context<'_>) {
     let current_attribute = ctx.current_attribute();
     let fields = match ctx.visit_default_arg("fields") {
         Ok(fields) => fields,
@@ -585,7 +583,7 @@ fn common_index_validations<'ast>(
                         if index_data.is_unique() { "unique " } else { "" },
                         unresolvable_fields.join(", "),
                     );
-                    let model_name = ctx.db.ast()[model_id].name();
+                    let model_name = ctx.ast[model_id].name();
                     DatamodelError::ModelValidationError {
                         message: String::from(message),
                         model_name: String::from(model_name),
@@ -598,9 +596,9 @@ fn common_index_validations<'ast>(
                 let mut suggested_fields = Vec::new();
 
                 for (_, field_id) in &relation_fields {
-                    let relation_field = &ctx.db.types.relation_fields[&(model_id, *field_id)];
+                    let relation_field = &ctx.types.relation_fields[&(model_id, *field_id)];
                     for underlying_field in relation_field.fields.iter().flatten() {
-                        suggested_fields.push(ctx.db.ast[model_id][*underlying_field].name());
+                        suggested_fields.push(ctx.ast[model_id][*underlying_field].name());
                     }
                 }
 
@@ -621,7 +619,7 @@ fn common_index_validations<'ast>(
                         the_fields = relation_fields.iter().map(|(f, _)| f.name()).collect::<Vec<_>>().join(", "),
                         suggestion = suggestion
                     ),
-                    ctx.db.ast[model_id].name(),
+                    ctx.ast[model_id].name(),
                     current_attribute.span,
                 ));
             }
@@ -630,7 +628,7 @@ fn common_index_validations<'ast>(
 }
 
 /// @relation validation for relation fields.
-fn visit_relation<'ast>(model_id: ast::ModelId, relation_field: &mut RelationField, ctx: &mut Context<'_, 'ast>) {
+fn visit_relation(model_id: ast::ModelId, relation_field: &mut RelationField, ctx: &mut Context<'_>) {
     let attr = ctx.current_attribute();
     relation_field.relation_attribute = Some(ctx.current_attribute_id());
 
@@ -673,7 +671,7 @@ fn visit_relation<'ast>(model_id: ast::ModelId, relation_field: &mut RelationFie
                 if !unknown_fields.is_empty() {
                     let msg = format!(
                         "The argument `references` must refer only to existing fields in the related model `{}`. The following fields do not exist in the related model: {}",
-                        ctx.db.ast[relation_field.referenced_model].name(),
+                        ctx.ast[relation_field.referenced_model].name(),
                         unknown_fields.join(", "),
                     );
                     ctx.push_error(DatamodelError::new_validation_error(msg, attr.span));
@@ -682,7 +680,7 @@ fn visit_relation<'ast>(model_id: ast::ModelId, relation_field: &mut RelationFie
                 if !relation_fields.is_empty() {
                     let msg = format!(
                         "The argument `references` must refer only to scalar fields in the related model `{}`. But it is referencing the following relation fields: {}",
-                        ctx.db.ast[relation_field.referenced_model].name(),
+                        ctx.ast[relation_field.referenced_model].name(),
                         relation_fields.iter().map(|(f, _)| f.name()).collect::<Vec<_>>().join(", "),
                     );
                     ctx.push_error(DatamodelError::new_validation_error(msg, attr.span));
@@ -699,7 +697,7 @@ fn visit_relation<'ast>(model_id: ast::ModelId, relation_field: &mut RelationFie
     match ctx.visit_default_arg("name").map(|arg| arg.as_str()).ok() {
         Some(Ok("")) => ctx.push_attribute_validation_error("A relation cannot have an empty name."),
         Some(Ok(name)) => {
-            let interned_name = ctx.db.interner.intern(name);
+            let interned_name = ctx.interner.intern(name);
             relation_field.name = Some(interned_name);
         }
         Some(Err(err)) => ctx.push_error(err),
@@ -731,7 +729,7 @@ fn visit_relation<'ast>(model_id: ast::ModelId, relation_field: &mut RelationFie
                 ctx.push_attribute_validation_error("The `map` argument cannot be an empty string.");
                 None
             }
-            Some(Ok(name)) => Some(ctx.db.interner.intern(name)),
+            Some(Ok(name)) => Some(ctx.interner.intern(name)),
             Some(Err(err)) => {
                 ctx.push_error(err);
                 None
@@ -758,12 +756,12 @@ enum FieldResolutionError<'ast> {
 /// Takes an attribute argument, validates it as an array of constants, then
 /// resolves  the constant as field names on the model. The error variant
 /// contains the fields that are not in the model.
-fn resolve_field_array_without_args<'ast>(
-    values: &ValueValidator<'ast>,
+fn resolve_field_array_without_args<'db>(
+    values: &ValueValidator<'db>,
     attribute_span: ast::Span,
     model_id: ast::ModelId,
-    ctx: &mut Context<'_, 'ast>,
-) -> Result<Vec<ast::FieldId>, FieldResolutionError<'ast>> {
+    ctx: &mut Context<'db>,
+) -> Result<Vec<ast::FieldId>, FieldResolutionError<'db>> {
     let constant_array = match values.as_constant_array() {
         Ok(values) => values,
         Err(err) => {
@@ -775,11 +773,11 @@ fn resolve_field_array_without_args<'ast>(
     let mut field_ids = Vec::with_capacity(constant_array.len());
     let mut unknown_fields = Vec::new();
     let mut relation_fields = Vec::new();
-    let ast_model = &ctx.db.ast[model_id];
+    let ast_model = &ctx.ast[model_id];
 
     for field_name in constant_array {
         // Does the field exist?
-        let field_id = if let Some(field_id) = ctx.db.find_model_field(model_id, field_name) {
+        let field_id = if let Some(field_id) = ctx.find_model_field(model_id, field_name) {
             field_id
         } else {
             unknown_fields.push(field_name);
@@ -787,8 +785,8 @@ fn resolve_field_array_without_args<'ast>(
         };
 
         // Is the field a scalar field?
-        if !ctx.db.types.scalar_fields.contains_key(&(model_id, field_id)) {
-            relation_fields.push((&ctx.db.ast[model_id][field_id], field_id));
+        if !ctx.types.scalar_fields.contains_key(&(model_id, field_id)) {
+            relation_fields.push((&ctx.ast[model_id][field_id], field_id));
             continue;
         }
 
@@ -821,12 +819,12 @@ fn resolve_field_array_without_args<'ast>(
 /// Takes an attribute argument, validates it as an array of fields with potentially args,
 /// then resolves  the constant literal as field names on the model. The error variant
 /// contains the fields that are not in the model.
-fn resolve_field_array_with_args<'ast>(
-    values: &ValueValidator<'ast>,
+fn resolve_field_array_with_args<'db>(
+    values: &ValueValidator<'db>,
     attribute_span: ast::Span,
     model_id: ast::ModelId,
-    ctx: &mut Context<'_, 'ast>,
-) -> Result<Vec<FieldWithArgs>, FieldResolutionError<'ast>> {
+    ctx: &mut Context<'db>,
+) -> Result<Vec<FieldWithArgs>, FieldResolutionError<'db>> {
     let constant_array = match values.as_field_array_with_args() {
         Ok(values) => values,
         Err(err) => {
@@ -838,11 +836,11 @@ fn resolve_field_array_with_args<'ast>(
     let mut field_ids = Vec::with_capacity(constant_array.len());
     let mut unknown_fields = Vec::new();
     let mut relation_fields = Vec::new();
-    let ast_model = &ctx.db.ast[model_id];
+    let ast_model = &ctx.ast[model_id];
 
     for (field_name, _, _) in &constant_array {
         // Does the field exist?
-        let field_id = if let Some(field_id) = ctx.db.find_model_field(model_id, field_name) {
+        let field_id = if let Some(field_id) = ctx.find_model_field(model_id, field_name) {
             field_id
         } else {
             unknown_fields.push(*field_name);
@@ -850,8 +848,8 @@ fn resolve_field_array_with_args<'ast>(
         };
 
         // Is the field a scalar field?
-        if !ctx.db.types.scalar_fields.contains_key(&(model_id, field_id)) {
-            relation_fields.push((&ctx.db.ast[model_id][field_id], field_id));
+        if !ctx.types.scalar_fields.contains_key(&(model_id, field_id)) {
+            relation_fields.push((&ctx.ast[model_id][field_id], field_id));
             continue;
         }
 
@@ -891,28 +889,32 @@ fn resolve_field_array_with_args<'ast>(
     }
 }
 
-fn get_name_argument<'ast>(ctx: &mut Context<'_, 'ast>) -> Option<&'ast str> {
+fn get_name_argument(ctx: &mut Context<'_>) -> Option<StringId> {
     match ctx.visit_optional_arg("name").map(|name| name.as_str()) {
         Some(Ok("")) => {
             ctx.push_attribute_validation_error("The `name` argument cannot be an empty string.");
         }
         Some(Err(err)) => ctx.push_error(err),
-        Some(Ok(name)) => return Some(name),
+        Some(Ok(name)) => return Some(ctx.interner.intern(name)),
         None => (),
     }
 
     None
 }
 
-fn validate_client_name(span: Span, object_name: &str, name: &str, attribute: &str, ctx: &mut Context<'_, '_>) {
+fn validate_client_name(span: Span, object_name: &str, name: StringId, attribute: &'static str, ctx: &mut Context<'_>) {
     // only Alphanumeric characters and underscore are allowed due to this making its way into the client API
     // todo what about starting with a number or underscore?
-    let is_valid = name
-        .chars()
-        .all(|c| c == '_' || c.is_ascii_digit() || c.is_ascii_alphabetic());
+    {
+        let name = &ctx[name];
 
-    if is_valid {
-        return;
+        let is_valid = name
+            .chars()
+            .all(|c| c == '_' || c.is_ascii_digit() || c.is_ascii_alphabetic());
+
+        if is_valid {
+            return;
+        }
     }
 
     ctx.push_error(DatamodelError::new_model_validation_error(

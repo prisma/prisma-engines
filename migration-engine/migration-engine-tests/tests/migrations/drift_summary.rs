@@ -1,11 +1,9 @@
-use datamodel::{parse_schema_ast, parse_schema_parserdb};
+use datamodel::parse_schema_parserdb;
 use expect_test::{expect, Expect};
 
 fn check(from: &str, to: &str, expectation: Expect) {
-    let from_ast = parse_schema_ast(from).unwrap();
-    let from_schema = parse_schema_parserdb(from, &from_ast).unwrap();
-    let to_ast = parse_schema_ast(to).unwrap();
-    let to_schema = parse_schema_parserdb(to, &to_ast).unwrap();
+    let from_schema = parse_schema_parserdb(from).unwrap();
+    let to_schema = parse_schema_parserdb(to).unwrap();
     let migration = sql_migration_connector::SqlMigrationConnector::migration_from_schemas(&from_schema, &to_schema);
 
     expectation.assert_eq(&migration.drift_summary())

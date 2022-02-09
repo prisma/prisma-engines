@@ -6,7 +6,7 @@ use crate::{
 use datamodel_connector::Connector;
 use std::collections::{HashMap, HashSet};
 
-type RelationIdentifier<'ast> = (ModelId, ModelId, RelationName<'ast>);
+type RelationIdentifier<'db> = (ModelId, ModelId, RelationName<'db>);
 
 #[derive(Clone, Copy)]
 pub(super) enum NameTaken {
@@ -15,20 +15,20 @@ pub(super) enum NameTaken {
     PrimaryKey,
 }
 
-pub(super) struct Names<'ast> {
-    pub(super) relation_names: HashMap<RelationIdentifier<'ast>, Vec<FieldId>>,
-    index_names: HashMap<ModelId, HashSet<&'ast str>>,
-    unique_names: HashMap<ModelId, HashSet<&'ast str>>,
-    primary_key_names: HashMap<ModelId, &'ast str>,
-    pub(super) constraint_namespace: ConstraintNamespace<'ast>,
+pub(super) struct Names<'db> {
+    pub(super) relation_names: HashMap<RelationIdentifier<'db>, Vec<FieldId>>,
+    index_names: HashMap<ModelId, HashSet<&'db str>>,
+    unique_names: HashMap<ModelId, HashSet<&'db str>>,
+    primary_key_names: HashMap<ModelId, &'db str>,
+    pub(super) constraint_namespace: ConstraintNamespace<'db>,
 }
 
-impl<'ast> Names<'ast> {
-    pub(super) fn new(db: &'ast ParserDatabase<'ast>, connector: &dyn Connector) -> Self {
-        let mut relation_names: HashMap<RelationIdentifier<'ast>, Vec<FieldId>> = HashMap::new();
-        let mut index_names: HashMap<ModelId, HashSet<&'ast str>> = HashMap::new();
-        let mut unique_names: HashMap<ModelId, HashSet<&'ast str>> = HashMap::new();
-        let mut primary_key_names: HashMap<ModelId, &'ast str> = HashMap::new();
+impl<'db> Names<'db> {
+    pub(super) fn new(db: &'db ParserDatabase, connector: &dyn Connector) -> Self {
+        let mut relation_names: HashMap<RelationIdentifier<'db>, Vec<FieldId>> = HashMap::new();
+        let mut index_names: HashMap<ModelId, HashSet<&'db str>> = HashMap::new();
+        let mut unique_names: HashMap<ModelId, HashSet<&'db str>> = HashMap::new();
+        let mut primary_key_names: HashMap<ModelId, &'db str> = HashMap::new();
 
         for model in db.walk_models() {
             for field in model.relation_fields() {
@@ -101,7 +101,7 @@ impl<'ast> Names<'ast> {
 
 /// Generate namespaces per database requirements, and add the names to it from the constraints
 /// part of the namespace.
-fn infer_namespaces<'ast>(db: &'ast ParserDatabase<'ast>, connector: &dyn Connector) -> ConstraintNamespace<'ast> {
+fn infer_namespaces<'db>(db: &'db ParserDatabase, connector: &dyn Connector) -> ConstraintNamespace<'db> {
     use datamodel_connector::ConstraintScope;
 
     let mut namespaces = ConstraintNamespace::default();

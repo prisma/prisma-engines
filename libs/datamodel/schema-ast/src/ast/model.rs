@@ -7,7 +7,7 @@ pub struct FieldId(pub(super) u32);
 
 impl FieldId {
     /// Used for range bounds when iterating over BTreeMaps.
-    pub const ZERO: FieldId = FieldId(0);
+    pub const MIN: FieldId = FieldId(0);
     /// Used for range bounds when iterating over BTreeMaps.
     pub const MAX: FieldId = FieldId(u32::MAX);
 }

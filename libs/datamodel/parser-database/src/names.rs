@@ -31,11 +31,11 @@ pub(super) struct Names {
 /// - Datasources
 /// - Model fields for each model
 /// - Enum variants for each enum
-pub(super) fn resolve_names(ctx: &mut Context<'_, '_>) {
+pub(super) fn resolve_names(ctx: &mut Context<'_>) {
     let mut tmp_names: HashSet<&str> = HashSet::new(); // throwaway container for duplicate checking
     let mut names = Names::default();
 
-    for (top_id, top) in ctx.db.ast.iter_tops() {
+    for (top_id, top) in ctx.ast.iter_tops() {
         assert_is_not_a_reserved_scalar_type(top.identifier(), ctx);
 
         let namespace = match (top_id, top) {
@@ -68,7 +68,7 @@ pub(super) fn resolve_names(ctx: &mut Context<'_, '_>) {
                 for (field_id, field) in model.iter_fields() {
                     validate_identifier(&field.name, "Field", ctx);
                     validate_attribute_identifiers(field, ctx);
-                    let field_name_id = ctx.db.interner.intern(field.name());
+                    let field_name_id = ctx.interner.intern(field.name());
 
                     if names.model_fields.insert((model_id, field_name_id), field_id).is_some() {
                         ctx.push_error(DatamodelError::new_duplicate_field_error(
@@ -85,7 +85,7 @@ pub(super) fn resolve_names(ctx: &mut Context<'_, '_>) {
                 validate_identifier(&ct.name, "Composite type", ctx);
 
                 for (field_id, field) in ct.iter_fields() {
-                    let field_name_id = ctx.db.interner.intern(field.name());
+                    let field_name_id = ctx.interner.intern(field.name());
                     // Check that there is no duplicate field on the composite type
                     if names
                         .composite_type_fields
@@ -117,13 +117,13 @@ pub(super) fn resolve_names(ctx: &mut Context<'_, '_>) {
         insert_name(top_id, top, namespace, ctx)
     }
 
-    ctx.db.names = names;
+    let _ = std::mem::replace(ctx.names, names);
 }
 
-fn insert_name(top_id: TopId, top: &ast::Top, namespace: &mut HashMap<StringId, TopId>, ctx: &mut Context<'_, '_>) {
-    let name = ctx.db.interner.intern(top.name());
+fn insert_name(top_id: TopId, top: &ast::Top, namespace: &mut HashMap<StringId, TopId>, ctx: &mut Context<'_>) {
+    let name = ctx.interner.intern(top.name());
     if let Some(existing) = namespace.insert(name, top_id) {
-        ctx.push_error(duplicate_top_error(&ctx.db.ast[existing], top));
+        ctx.push_error(duplicate_top_error(&ctx.ast[existing], top));
     }
 }
 
@@ -136,7 +136,7 @@ fn duplicate_top_error(existing: &ast::Top, duplicate: &ast::Top) -> DatamodelEr
     )
 }
 
-fn assert_is_not_a_reserved_scalar_type(ident: &ast::Identifier, ctx: &mut Context<'_, '_>) {
+fn assert_is_not_a_reserved_scalar_type(ident: &ast::Identifier, ctx: &mut Context<'_>) {
     if ScalarType::try_from_str(&ident.name).is_some() {
         ctx.push_error(DatamodelError::new_reserved_scalar_type_error(&ident.name, ident.span));
     }
@@ -146,7 +146,7 @@ fn check_for_duplicate_properties<'a>(
     top: &ast::Top,
     props: &'a [ConfigBlockProperty],
     tmp_names: &mut HashSet<&'a str>,
-    ctx: &mut Context<'_, '_>,
+    ctx: &mut Context<'_>,
 ) {
     tmp_names.clear();
     for arg in props {
@@ -160,13 +160,13 @@ fn check_for_duplicate_properties<'a>(
     }
 }
 
-fn validate_attribute_identifiers(with_attrs: &dyn WithAttributes, ctx: &mut Context<'_, '_>) {
+fn validate_attribute_identifiers(with_attrs: &dyn WithAttributes, ctx: &mut Context<'_>) {
     for attribute in with_attrs.attributes() {
         validate_identifier(&attribute.name, "Attribute", ctx);
     }
 }
 
-fn validate_identifier(ident: &ast::Identifier, schema_item: &str, ctx: &mut Context<'_, '_>) {
+fn validate_identifier(ident: &ast::Identifier, schema_item: &str, ctx: &mut Context<'_>) {
     if ident.name.is_empty() {
         ctx.push_error(DatamodelError::new_validation_error(
             format!("The name of a {} must not be empty.", schema_item),

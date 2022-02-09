@@ -6,7 +6,7 @@ use datamodel::{
 use mongodb_schema_describer::{IndexField, IndexFieldProperty, MongoSchema};
 
 /// Datamodel -> MongoSchema
-pub(crate) fn calculate(datamodel: &ValidatedSchema<'_>) -> MongoSchema {
+pub(crate) fn calculate(datamodel: &ValidatedSchema) -> MongoSchema {
     let mut schema = MongoSchema::default();
     let connector = mongodb_datamodel_connector::MongoDbDatamodelConnector;
 

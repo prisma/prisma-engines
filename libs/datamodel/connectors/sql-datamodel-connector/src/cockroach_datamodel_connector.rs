@@ -210,7 +210,7 @@ impl Connector for CockroachDatamodelConnector {
         }
     }
 
-    fn validate_model(&self, _model: parser_database::walkers::ModelWalker<'_, '_>, _diagnostics: &mut Diagnostics) {}
+    fn validate_model(&self, _model: parser_database::walkers::ModelWalker<'_>, _diagnostics: &mut Diagnostics) {}
 
     fn constraint_violation_scopes(&self) -> &'static [ConstraintScope] {
         CONSTRAINT_SCOPES

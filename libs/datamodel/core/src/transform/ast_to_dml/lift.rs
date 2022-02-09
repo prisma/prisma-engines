@@ -12,14 +12,14 @@ use std::collections::HashMap;
 /// When lifting, the AST is converted to the Datamodel data structure, and
 /// additional semantics are attached.
 pub(crate) struct LiftAstToDml<'a> {
-    db: &'a db::ParserDatabase<'a>,
+    db: &'a db::ParserDatabase,
     connector: &'static dyn Connector,
     referential_integrity: ReferentialIntegrity,
 }
 
 impl<'a> LiftAstToDml<'a> {
     pub(crate) fn new(
-        db: &'a db::ParserDatabase<'a>,
+        db: &'a db::ParserDatabase,
         connector: &'static dyn Connector,
         referential_integrity: ReferentialIntegrity,
     ) -> LiftAstToDml<'a> {
@@ -71,7 +71,7 @@ impl<'a> LiftAstToDml<'a> {
     ) {
         let active_connector = self.connector;
         let referential_integrity = self.referential_integrity;
-        let common_dml_fields = |field: &mut dml::RelationField, relation_field: RelationFieldWalker<'_, '_>| {
+        let common_dml_fields = |field: &mut dml::RelationField, relation_field: RelationFieldWalker<'_>| {
             let ast_field = relation_field.ast_field();
             field.relation_info.on_delete = relation_field
                 .explicit_on_delete()
@@ -241,7 +241,7 @@ impl<'a> LiftAstToDml<'a> {
         }
     }
 
-    fn lift_composite_type(&self, walker: CompositeTypeWalker<'_, '_>) -> CompositeType {
+    fn lift_composite_type(&self, walker: CompositeTypeWalker<'_>) -> CompositeType {
         let mut fields = Vec::new();
 
         for field in walker.fields() {
@@ -270,7 +270,7 @@ impl<'a> LiftAstToDml<'a> {
     /// Internal: Validates a model AST node and lifts it to a DML model.
     fn lift_model(
         &self,
-        walker: ModelWalker<'a, '_>,
+        walker: ModelWalker<'a>,
         field_ids_for_sorting: &mut HashMap<(&'a str, &'a str), ast::FieldId>,
     ) -> dml::Model {
         let ast_model = walker.ast_model();
@@ -372,7 +372,7 @@ impl<'a> LiftAstToDml<'a> {
     }
 
     /// Internal: Validates an enum AST node.
-    fn lift_enum(&self, r#enum: EnumWalker<'_, '_>) -> dml::Enum {
+    fn lift_enum(&self, r#enum: EnumWalker<'_>) -> dml::Enum {
         let mut en = dml::Enum::new(r#enum.name(), vec![]);
 
         for value in r#enum.values() {
@@ -385,7 +385,7 @@ impl<'a> LiftAstToDml<'a> {
     }
 
     /// Internal: Lifts an enum value AST node.
-    fn lift_enum_value(&self, value: EnumValueWalker<'_, '_>) -> dml::EnumValue {
+    fn lift_enum_value(&self, value: EnumValueWalker<'_>) -> dml::EnumValue {
         let mut enum_value = dml::EnumValue::new(value.name());
         enum_value.documentation = value.documentation().map(String::from);
         enum_value.database_name = value.mapped_name().map(String::from);
@@ -405,7 +405,7 @@ impl<'a> LiftAstToDml<'a> {
         &self,
         ast_field: &ast::Field,
         scalar_field_type: &db::ScalarFieldType,
-        scalar_field: ScalarFieldWalker<'_, '_>,
+        scalar_field: ScalarFieldWalker<'_>,
     ) -> dml::FieldType {
         match scalar_field_type {
             db::ScalarFieldType::CompositeType(_) => {
@@ -438,7 +438,7 @@ impl<'a> LiftAstToDml<'a> {
 
     fn lift_composite_type_field_type(
         &self,
-        composite_type_field: CompositeTypeFieldWalker<'_, '_>,
+        composite_type_field: CompositeTypeFieldWalker<'_>,
         scalar_field_type: &db::ScalarFieldType,
     ) -> CompositeTypeFieldType {
         match scalar_field_type {

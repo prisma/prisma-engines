@@ -226,7 +226,7 @@ impl Connector for PostgresDatamodelConnector {
         }
     }
 
-    fn validate_model(&self, model: ModelWalker<'_, '_>, errors: &mut Diagnostics) {
+    fn validate_model(&self, model: ModelWalker<'_>, errors: &mut Diagnostics) {
         let mut push_error = |err: ConnectorError| {
             errors.push_error(datamodel_connector::DatamodelError::ConnectorError {
                 message: err.to_string(),

@@ -5,7 +5,7 @@ use crate::{
 use itertools::Itertools;
 
 /// Our weird many-to-many requirement.
-pub(crate) fn validate_singular_id(relation: ImplicitManyToManyRelationWalker<'_, '_>, ctx: &mut Context<'_>) {
+pub(crate) fn validate_singular_id(relation: ImplicitManyToManyRelationWalker<'_>, ctx: &mut Context<'_>) {
     for relation_field in [relation.field_a(), relation.field_b()].iter() {
         if !relation_field.related_model().has_single_id_field() {
             let message = format!(
@@ -38,10 +38,7 @@ pub(crate) fn validate_singular_id(relation: ImplicitManyToManyRelationWalker<'_
     }
 }
 
-pub(crate) fn validate_no_referential_actions(
-    relation: ImplicitManyToManyRelationWalker<'_, '_>,
-    ctx: &mut Context<'_>,
-) {
+pub(crate) fn validate_no_referential_actions(relation: ImplicitManyToManyRelationWalker<'_>, ctx: &mut Context<'_>) {
     let referential_action_spans = [relation.field_a(), relation.field_b()].into_iter().flat_map(|field| {
         field
             .explicit_on_delete_span()

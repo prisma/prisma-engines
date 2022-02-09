@@ -21,7 +21,7 @@ use datamodel_connector::{
     ConnectorCapability,
 };
 
-pub(super) fn validate_client_name(field: FieldWalker<'_, '_>, names: &Names<'_>, ctx: &mut Context<'_>) {
+pub(super) fn validate_client_name(field: FieldWalker<'_>, names: &Names<'_>, ctx: &mut Context<'_>) {
     let model = field.model();
 
     for taken in names.name_taken(model.model_id(), field.name()).into_iter() {
@@ -60,7 +60,7 @@ pub(super) fn validate_client_name(field: FieldWalker<'_, '_>, names: &Names<'_>
 /// Some databases use constraints for default values, with a name that can be unique in a certain
 /// namespace. Validates the field default constraint against name clases.
 pub(super) fn has_a_unique_default_constraint_name(
-    field: ScalarFieldWalker<'_, '_>,
+    field: ScalarFieldWalker<'_>,
     names: &Names<'_>,
     ctx: &mut Context<'_>,
 ) {
@@ -92,7 +92,7 @@ pub(super) fn has_a_unique_default_constraint_name(
 
 /// The length prefix can be used with strings and byte columns.
 pub(crate) fn validate_length_used_with_correct_types(
-    attr: ScalarFieldAttributeWalker<'_, '_>,
+    attr: ScalarFieldAttributeWalker<'_>,
     attribute: (&str, ast::Span),
     ctx: &mut Context<'_>,
 ) {
@@ -122,7 +122,7 @@ pub(crate) fn validate_length_used_with_correct_types(
     ));
 }
 
-pub(super) fn validate_native_type_arguments(field: ScalarFieldWalker<'_, '_>, ctx: &mut Context<'_>) {
+pub(super) fn validate_native_type_arguments(field: ScalarFieldWalker<'_>, ctx: &mut Context<'_>) {
     let connector_name = ctx
         .datasource
         .map(|ds| ds.active_provider.clone())
@@ -229,7 +229,7 @@ pub(super) fn validate_native_type_arguments(field: ScalarFieldWalker<'_, '_>, c
 }
 
 /// Validates the @default attribute of a model scalar field
-pub(super) fn validate_default_value(field: ScalarFieldWalker<'_, '_>, ctx: &mut Context<'_>) {
+pub(super) fn validate_default_value(field: ScalarFieldWalker<'_>, ctx: &mut Context<'_>) {
     let model_name = field.model().name();
     let default_mapped_name = field.default_value().and_then(|d| d.mapped_name());
     let default_attribute = field.default_attribute();
@@ -254,7 +254,7 @@ pub(super) fn validate_default_value(field: ScalarFieldWalker<'_, '_>, ctx: &mut
     default_value::validate_auto_param(default_value, ctx);
 }
 
-pub(super) fn validate_scalar_field_connector_specific(field: ScalarFieldWalker<'_, '_>, ctx: &mut Context<'_>) {
+pub(super) fn validate_scalar_field_connector_specific(field: ScalarFieldWalker<'_>, ctx: &mut Context<'_>) {
     if matches!(
         field.scalar_field_type(),
         ScalarFieldType::BuiltInScalar(ScalarType::Json)
@@ -295,7 +295,7 @@ pub(super) fn validate_scalar_field_connector_specific(field: ScalarFieldWalker<
     }
 }
 
-pub(super) fn validate_unsupported_field_type(field: ScalarFieldWalker<'_, '_>, ctx: &mut Context<'_>) {
+pub(super) fn validate_unsupported_field_type(field: ScalarFieldWalker<'_>, ctx: &mut Context<'_>) {
     use once_cell::sync::Lazy;
     use regex::Regex;
 

@@ -261,7 +261,7 @@ impl Connector for MsSqlDatamodelConnector {
         }
     }
 
-    fn validate_model(&self, model: parser_database::walkers::ModelWalker<'_, '_>, errors: &mut Diagnostics) {
+    fn validate_model(&self, model: parser_database::walkers::ModelWalker<'_>, errors: &mut Diagnostics) {
         let mut push_error = |err: ConnectorError| {
             errors.push_error(datamodel_connector::DatamodelError::ConnectorError {
                 message: err.to_string(),
