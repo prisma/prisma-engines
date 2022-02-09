@@ -14,10 +14,16 @@ pub struct EventChannel {
 }
 
 impl EventChannel {
-    pub fn new(callback: ThreadsafeFunction<String>, filter: EnvFilter, telemetry: bool) -> Self {
+    pub fn new(level: &str, log_queries: bool, callback: ThreadsafeFunction<String>) -> Self {
+        let mut filter = EnvFilter::new(level);
+
+        if log_queries {
+            filter = filter.add_directive("quaint[{is_query}]".parse().unwrap());
+        }
+
         Self {
             callback,
-            telemetry,
+            telemetry: false,
             filter: Arc::new(filter),
         }
     }
