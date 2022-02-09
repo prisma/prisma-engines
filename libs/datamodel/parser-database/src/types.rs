@@ -72,7 +72,7 @@ enum FieldType {
 }
 
 /// The type of a scalar field, parsed and categorized.
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq)]
 pub enum ScalarFieldType {
     /// A composite type
     CompositeType(ast::CompositeTypeId),

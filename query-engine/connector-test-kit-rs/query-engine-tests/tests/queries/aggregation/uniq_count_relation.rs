@@ -11,7 +11,7 @@ mod uniq_count_rel {
               #id(id, Int, @id)
               title      String
               comments   Comment[]
-              #m2m(categories, Category[], Int)
+              #m2m(categories, Category[], id, Int)
             }
 
             model Comment {
@@ -22,7 +22,7 @@ mod uniq_count_rel {
 
             model Category {
               #id(id, Int, @id)
-              #m2m(posts, Post[], Int)
+              #m2m(posts, Post[], id, Int)
             }"#
         };
 
@@ -127,7 +127,7 @@ mod uniq_count_rel {
             user     User      @relation(fields: [userId], references: [id])
             userId   Int
             comments Comment[]
-            #m2m(tags, Tag[], Int)
+            #m2m(tags, Tag[], id, Int)
           }
 
           model Comment {
@@ -135,14 +135,14 @@ mod uniq_count_rel {
             body   String
             post   Post   @relation(fields: [postId], references: [id])
             postId Int
-            #m2m(tags, Tag[], Int)
+            #m2m(tags, Tag[], id, Int)
           }
 
           model Tag {
             #id(id, Int, @id)
             name     String
-            #m2m(posts, Post[], Int)
-            #m2m(comments, Comment[], Int)
+            #m2m(posts, Post[], id, Int)
+            #m2m(comments, Comment[], id, Int)
           }"#
         };
 

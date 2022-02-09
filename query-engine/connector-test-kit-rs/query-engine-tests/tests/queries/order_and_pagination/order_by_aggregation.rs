@@ -11,7 +11,7 @@ mod order_by_aggr {
               #id(id, Int, @id)
               name  String
               posts Post[]
-              #m2m(categories, Category[], Int)
+              #m2m(categories, Category[], id, Int)
             }
 
             model Post {
@@ -19,14 +19,14 @@ mod order_by_aggr {
               title  String
               user   User   @relation(fields: [userId], references: [id])
               userId Int
-              #m2m(categories, Category[], Int)
+              #m2m(categories, Category[], id, Int)
             }
 
             model Category {
               #id(id, Int, @id)
               name   String
-              #m2m(posts, Post[], Int)
-              #m2m(users, User[], Int)
+              #m2m(posts, Post[], id, Int)
+              #m2m(users, User[], id, Int)
             }"#
         };
 
@@ -755,13 +755,13 @@ mod order_by_aggr {
             r#"model Post {
               #id(id, Int, @id)
               title       String
-              #m2m(LikedPeople, Person[], Int)
+              #m2m(LikedPeople, Person[], id, Int)
             }
-            
+
             model Person {
               #id(id, Int, @id)
               name      String
-              #m2m(likePosts, Post[], Int)
+              #m2m(likePosts, Post[], id, Int)
             }
             "#
         };

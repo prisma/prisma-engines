@@ -160,13 +160,13 @@ mod update_inside_update {
             r#"model Todo {
               #id(id, String, @id, @default(cuid()))
               title String
-              #m2m(notes, Note[], String)
+              #m2m(notes, Note[], id, String)
              }
 
              model Note {
               #id(id, String, @id, @default(cuid()))
               text   String?
-              #m2m(todoes, Todo[], String)
+              #m2m(todoes, Todo[], id, String)
              }"#
         };
 
@@ -288,14 +288,14 @@ mod update_inside_update {
             r#"model Note {
               #id(id, String, @id, @default(cuid()))
               text  String? @unique
-              #m2m(todos, Todo[], String)
+              #m2m(todos, Todo[], id, String)
              }
 
              model Todo {
               #id(id, String, @id, @default(cuid()))
               title  String  @unique
               unique String? @unique
-              #m2m(notes, Note[], String)
+              #m2m(notes, Note[], id, String)
              }"#
         };
 
@@ -357,20 +357,20 @@ mod update_inside_update {
             r#"model Top {
               #id(id, String, @id, @default(cuid()))
               nameTop String   @unique
-              #m2m(middles, Middle[], String)
+              #m2m(middles, Middle[], id, String)
             }
 
             model Middle {
               #id(id, String, @id, @default(cuid()))
               nameMiddle String   @unique
-              #m2m(tops, Top[], String)
-              #m2m(bottoms, Bottom[], String)
+              #m2m(tops, Top[], id, String)
+              #m2m(bottoms, Bottom[], id, String)
             }
 
             model Bottom {
               #id(id, String, @id, @default(cuid()))
               nameBottom String   @unique
-              #m2m(middles, Middle[], String)
+              #m2m(middles, Middle[], id, String)
             }"#
         };
 

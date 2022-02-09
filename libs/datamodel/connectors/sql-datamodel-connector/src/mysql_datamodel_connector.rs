@@ -115,6 +115,7 @@ const CAPABILITIES: &[ConnectorCapability] = &[
     ConnectorCapability::FullTextIndex,
     ConnectorCapability::FullTextSearchWithIndex,
     ConnectorCapability::MultipleFullTextAttributesPerModel,
+    ConnectorCapability::ImplicitManyToManyRelation,
 ];
 
 const CONSTRAINT_SCOPES: &[ConstraintScope] = &[ConstraintScope::GlobalForeignKey, ConstraintScope::ModelKeyIndex];

@@ -92,7 +92,7 @@ impl ParserDatabase {
     pub fn walk_complete_inline_relations(&self) -> impl Iterator<Item = CompleteInlineRelationWalker<'_>> + '_ {
         self.relations
             .iter_relations()
-            .filter(|(_, _, relation)| !relation.is_many_to_many())
+            .filter(|(_, _, relation)| !relation.is_implicit_many_to_many())
             .filter_map(move |(model_a, model_b, relation)| {
                 relation
                     .as_complete_fields()
