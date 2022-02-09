@@ -95,23 +95,25 @@ pub fn to_many_composites() -> String {
         r#"model TestModel {
             #id(id, Int, @id)
             field String?
-            a     A[]       @map("top_a")
-            c     C[]       @map("top_c")
+            to_many_as CompositeA[] @map("top_a")
+            to_one_b   CompositeB?
         }
 
-        type A {
+        type CompositeA {
             a_1 String @default("a_1 default") @map("a1")
             a_2 Int?
-            b B[]
         }
 
-        type B {
-            b_field String   @default("b_field default")
-            a       A[]      @map("nested_a")
+        type CompositeB {
+            b_field      Int?         @default(10)
+            b_to_many_cs CompositeC[]
         }
 
-        type C {
-          c_field String @default("c_field default")
+        type CompositeC {
+          c_field Int @default(10)
+
+          // Mostly here to test ordering multiple nested selection sets.
+          c_to_many_as CompositeA[]
         }
         "#
     };
