@@ -17,8 +17,8 @@ pub(super) enum NameTaken {
 
 pub(super) struct Names<'db> {
     pub(super) relation_names: HashMap<RelationIdentifier<'db>, Vec<FieldId>>,
-    index_names: HashMap<ModelId, HashSet<&'db str>>,
-    unique_names: HashMap<ModelId, HashSet<&'db str>>,
+    index_names: HashSet<(ModelId, &'db str)>,
+    unique_names: HashSet<(ModelId, &'db str)>,
     primary_key_names: HashMap<ModelId, &'db str>,
     pub(super) constraint_namespace: ConstraintNamespace<'db>,
 }
@@ -26,11 +26,13 @@ pub(super) struct Names<'db> {
 impl<'db> Names<'db> {
     pub(super) fn new(db: &'db ParserDatabase, connector: &dyn Connector) -> Self {
         let mut relation_names: HashMap<RelationIdentifier<'db>, Vec<FieldId>> = HashMap::new();
-        let mut index_names: HashMap<ModelId, HashSet<&'db str>> = HashMap::new();
-        let mut unique_names: HashMap<ModelId, HashSet<&'db str>> = HashMap::new();
+        let mut index_names: HashSet<(ModelId, &'db str)> = HashSet::new();
+        let mut unique_names: HashSet<(ModelId, &'db str)> = HashSet::new();
         let mut primary_key_names: HashMap<ModelId, &'db str> = HashMap::new();
 
         for model in db.walk_models() {
+            let model_id = model.model_id();
+
             for field in model.relation_fields() {
                 let model_id = field.model().model_id();
                 let related_model_id = field.related_model().model_id();
@@ -44,9 +46,9 @@ impl<'db> Names<'db> {
             for index in model.indexes() {
                 if let Some(name) = index.name() {
                     if index.is_unique() {
-                        unique_names.entry(index.model().model_id()).or_default().insert(name);
+                        unique_names.insert((model_id, name));
                     } else {
-                        index_names.entry(index.model().model_id()).or_default().insert(name);
+                        index_names.insert((model_id, name));
                     }
                 }
             }
@@ -68,21 +70,11 @@ impl<'db> Names<'db> {
     pub(super) fn name_taken(&self, model_id: ModelId, name: &str) -> Vec<NameTaken> {
         let mut result = Vec::new();
 
-        if self
-            .index_names
-            .get(&model_id)
-            .map(|names| names.contains(name))
-            .unwrap_or(false)
-        {
+        if self.index_names.contains(&(model_id, name)) {
             result.push(NameTaken::Index);
         }
 
-        if self
-            .unique_names
-            .get(&model_id)
-            .map(|names| names.contains(name))
-            .unwrap_or(false)
-        {
+        if self.unique_names.contains(&(model_id, name)) {
             result.push(NameTaken::Unique);
         }
 

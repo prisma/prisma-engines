@@ -95,8 +95,6 @@ impl<'db> RelationFieldWalker<'db> {
     }
 
     /// The model containing the field.
-    ///
-    ///
     pub fn model(self) -> ModelWalker<'db> {
         ModelWalker {
             model_id: self.model_id,
