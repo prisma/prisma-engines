@@ -83,7 +83,7 @@ fn json_rpc_diff_target_to_migration_connector_diff_target(
         DiffTarget::SchemaDatamodel(SchemaContainer { schema }) => {
             let schema_contents = read_prisma_schema_from_path(schema)?;
             Ok(RefinedDiffTarget {
-                connector: Some(crate::schema_to_connector(&schema_contents)?),
+                connector: Some(crate::schema_to_connector_unchecked(&schema_contents)?),
                 target: McDiff::Datamodel(schema_contents.into()),
             })
         }

@@ -43,12 +43,12 @@ fn connector_for_connection_string(
 ) -> CoreResult<Box<dyn migration_connector::MigrationConnector>> {
     match connection_string.split(':').next() {
         Some("postgres") | Some("postgresql") => {
-            let connection_string = disable_postgres_statement_cache(&connection_string)?;
-            let params = ConnectorParams {
+            let mut params = ConnectorParams {
                 connection_string,
                 preview_features,
                 shadow_database_connection_string,
             };
+            disable_postgres_statement_cache(&mut params)?;
             let connector = SqlMigrationConnector::new(params)?;
             Ok(Box::new(connector))
         }
@@ -83,35 +83,57 @@ fn connector_for_connection_string(
     }
 }
 
-/// Go from a schema to a connector
-fn schema_to_connector(datamodel: &str) -> CoreResult<Box<dyn migration_connector::MigrationConnector>> {
-    let (source, url, preview_features, shadow_database_url) = parse_configuration(datamodel)?;
+/// Same as schema_to_connector, but it will not resolve env vars in the datasource.
+fn schema_to_connector_unchecked(schema: &str) -> CoreResult<Box<dyn migration_connector::MigrationConnector>> {
+    let config = datamodel::parse_configuration(schema)
+        .map(|validated_config| validated_config.subject)
+        .map_err(|err| CoreError::new_schema_parser_error(err.to_pretty_string("schema.prisma", schema)))?;
+    let preview_features = config.preview_features();
 
-    match source.active_provider.as_str() {
+    let source = config
+        .datasources
+        .into_iter()
+        .next()
+        .ok_or_else(|| CoreError::from_msg("There is no datasource in the schema.".into()))?;
+
+    let params = ConnectorParams {
+        // TODO: make ConnectorParams optional in connector construction so we don't need to do
+        // this
+        connection_string: source.active_provider.to_owned() + ":",
+        preview_features,
+        shadow_database_connection_string: None,
+    };
+
+    connector_for_provider(source.active_provider.as_str(), params)
+}
+
+/// Go from a schema to a connector
+fn schema_to_connector(schema: &str) -> CoreResult<Box<dyn migration_connector::MigrationConnector>> {
+    let (source, url, preview_features, shadow_database_url) = parse_configuration(schema)?;
+    let params = ConnectorParams {
+        connection_string: url,
+        preview_features,
+        shadow_database_connection_string: shadow_database_url,
+    };
+
+    connector_for_provider(source.active_provider.as_str(), params)
+}
+
+fn connector_for_provider(
+    provider: &str,
+    mut params: ConnectorParams,
+) -> CoreResult<Box<dyn migration_connector::MigrationConnector>> {
+    match provider {
         POSTGRES_SOURCE_NAME => {
-            let url = disable_postgres_statement_cache(&url)?;
-            let params = ConnectorParams {
-                connection_string: url,
-                preview_features,
-                shadow_database_connection_string: shadow_database_url,
-            };
+            disable_postgres_statement_cache(&mut params)?;
             let connector = SqlMigrationConnector::new(params)?;
             Ok(Box::new(connector))
         }
         MYSQL_SOURCE_NAME | SQLITE_SOURCE_NAME | MSSQL_SOURCE_NAME => {
-            let params = ConnectorParams {
-                connection_string: url,
-                preview_features,
-                shadow_database_connection_string: shadow_database_url,
-            };
             let connector = SqlMigrationConnector::new(params)?;
             Ok(Box::new(connector))
         }
-        MONGODB_SOURCE_NAME => Ok(Box::new(MongoDbMigrationConnector::new(ConnectorParams {
-            connection_string: url,
-            preview_features,
-            shadow_database_connection_string: None,
-        }))),
+        MONGODB_SOURCE_NAME => Ok(Box::new(MongoDbMigrationConnector::new(params))),
         provider => Err(CoreError::from_msg(format!(
             "`{}` is not a supported connector.",
             provider
@@ -157,8 +179,8 @@ fn parse_configuration(datamodel: &str) -> CoreResult<(Datasource, String, BitFl
     Ok((source, url, preview_features, shadow_database_url))
 }
 
-fn disable_postgres_statement_cache(url: &str) -> CoreResult<String> {
-    let mut u = url::Url::parse(url).map_err(|err| {
+fn disable_postgres_statement_cache(connector_params: &mut ConnectorParams) -> CoreResult<()> {
+    let mut u = url::Url::parse(&connector_params.connection_string).map_err(|err| {
         let details = user_facing_errors::quaint::invalid_connection_string_description(&format!(
             "Error parsing connection string: {}",
             err
@@ -183,5 +205,6 @@ fn disable_postgres_statement_cache(url: &str) -> CoreResult<String> {
         u.query_pairs_mut().append_pair("statement_cache_size", "0");
     }
 
-    Ok(u.to_string())
+    connector_params.connection_string = u.to_string();
+    Ok(())
 }

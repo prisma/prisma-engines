@@ -465,6 +465,7 @@ impl DatamodelError {
             span,
         }
         .into()
+        }
     }
 
     pub fn new_function_not_known_error(function_name: &str, span: Span) -> DatamodelError {
