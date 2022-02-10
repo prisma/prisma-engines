@@ -229,18 +229,18 @@
 
 <span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">database_name::validate_db_name</span>, <span class="ident">names::Names</span>};
 
-<span class="kw">struct</span> <span class="ident">Fields</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
-    <span class="ident">fields</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;ast</span> [<span class="ident">ast::FieldId</span>],
-    <span class="ident">model</span>: <span class="ident">ModelWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;db</span><span class="op">&gt;</span>,
+<span class="kw">struct</span> <span class="ident">Fields</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
+    <span class="ident">fields</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> [<span class="ident">ast::FieldId</span>],
+    <span class="ident">model</span>: <span class="ident">ModelWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span>,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;db</span><span class="op">&gt;</span> <span class="ident">Fields</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">fields</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;ast</span> [<span class="ident">ast::FieldId</span>], <span class="ident">model</span>: <span class="ident">ModelWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;db</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
+<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> <span class="ident">Fields</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">fields</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> [<span class="ident">ast::FieldId</span>], <span class="ident">model</span>: <span class="ident">ModelWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> { <span class="ident">fields</span>, <span class="ident">model</span> }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;db</span><span class="op">&gt;</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">Fields</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
+<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">Fields</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
     <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">fields</span> <span class="op">=</span> <span class="self">self</span>
             .<span class="ident">fields</span>
@@ -270,7 +270,7 @@
     }
 }
 
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">ambiguity</span>(<span class="ident">field</span>: <span class="ident">RelationFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">names</span>: <span class="kw-2">&amp;</span><span class="ident">Names</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">DatamodelError</span><span class="op">&gt;</span> {
+<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">ambiguity</span>(<span class="ident">field</span>: <span class="ident">RelationFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">names</span>: <span class="kw-2">&amp;</span><span class="ident">Names</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">DatamodelError</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">model</span> <span class="op">=</span> <span class="ident">field</span>.<span class="ident">model</span>();
     <span class="kw">let</span> <span class="ident">related_model</span> <span class="op">=</span> <span class="ident">field</span>.<span class="ident">related_model</span>();
 
@@ -334,7 +334,7 @@
 }
 
 <span class="doccomment">/// Validates if the related model for the relation is ignored.</span>
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">ignored_related_model</span>(<span class="ident">field</span>: <span class="ident">RelationFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
+<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">ignored_related_model</span>(<span class="ident">field</span>: <span class="ident">RelationFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
     <span class="kw">let</span> <span class="ident">related_model</span> <span class="op">=</span> <span class="ident">field</span>.<span class="ident">related_model</span>();
     <span class="kw">let</span> <span class="ident">model</span> <span class="op">=</span> <span class="ident">field</span>.<span class="ident">model</span>();
 
@@ -355,7 +355,7 @@
 }
 
 <span class="doccomment">/// Does the connector support the given referential actions.</span>
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">referential_actions</span>(<span class="ident">field</span>: <span class="ident">RelationFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
+<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">referential_actions</span>(<span class="ident">field</span>: <span class="ident">RelationFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
     <span class="kw">let</span> <span class="ident">connector</span> <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">connector</span>;
     <span class="kw">let</span> <span class="ident">referential_integrity</span> <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">referential_integrity</span>;
     <span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span> <span class="op">|</span><span class="ident">action</span>: <span class="ident">ReferentialAction</span><span class="op">|</span> {
@@ -401,7 +401,7 @@
     }
 }
 
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">map</span>(<span class="ident">field</span>: <span class="ident">RelationFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
+<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">map</span>(<span class="ident">field</span>: <span class="ident">RelationFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
     <span class="kw">if</span> <span class="ident">field</span>.<span class="ident">mapped_name</span>().<span class="ident">is_none</span>() {
         <span class="kw">return</span>;
     }

@@ -688,7 +688,7 @@
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">validate_model</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">model</span>: <span class="ident">ModelWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">errors</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Diagnostics</span>) {
+    <span class="kw">fn</span> <span class="ident">validate_model</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">model</span>: <span class="ident">ModelWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">errors</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Diagnostics</span>) {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">push_error</span> <span class="op">=</span> <span class="op">|</span><span class="ident">err</span>: <span class="ident">ConnectorError</span><span class="op">|</span> {
             <span class="ident">errors</span>.<span class="ident">push_error</span>(<span class="ident">datamodel_connector::DatamodelError::ConnectorError</span> {
                 <span class="ident">message</span>: <span class="ident">err</span>.<span class="ident">to_string</span>(),

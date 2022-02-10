@@ -25,14 +25,20 @@
 <span id="24">24</span>
 <span id="25">25</span>
 <span id="26">26</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::types::CompositeTypeField</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">ast</span>, <span class="ident">types::ScalarField</span>};
+<span id="27">27</span>
+<span id="28">28</span>
+<span id="29">29</span>
+</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{
+    <span class="ident">ast</span>,
+    <span class="ident">types</span>::{<span class="ident">CompositeTypeField</span>, <span class="ident">ScalarField</span>},
+    <span class="ident">StringId</span>,
+};
 
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">visit_model_field_native_type_attribute</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span>(
-    <span class="ident">datasource_name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;ast</span> <span class="ident">str</span>,
-    <span class="ident">type_name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;ast</span> <span class="ident">str</span>,
-    <span class="ident">attr</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;ast</span> <span class="ident">ast::Attribute</span>,
-    <span class="ident">scalar_field</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ScalarField</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span>,
+<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">visit_model_field_native_type_attribute</span>(
+    <span class="ident">datasource_name</span>: <span class="ident">StringId</span>,
+    <span class="ident">type_name</span>: <span class="ident">StringId</span>,
+    <span class="ident">attr</span>: <span class="kw-2">&amp;</span><span class="ident">ast::Attribute</span>,
+    <span class="ident">scalar_field</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ScalarField</span>,
 ) {
     <span class="kw">let</span> <span class="ident">args</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">attr</span>.<span class="ident">arguments</span>;
     <span class="kw">let</span> <span class="ident">args</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">args</span>.<span class="ident">arguments</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">arg</span><span class="op">|</span> <span class="ident">arg</span>.<span class="ident">value</span>.<span class="ident">to_string</span>()).<span class="ident">collect</span>();
@@ -40,11 +46,11 @@
     <span class="ident">scalar_field</span>.<span class="ident">native_type</span> <span class="op">=</span> <span class="prelude-val">Some</span>((<span class="ident">datasource_name</span>, <span class="ident">type_name</span>, <span class="ident">args</span>, <span class="ident">attr</span>.<span class="ident">span</span>))
 }
 
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">visit_composite_type_field_native_type_attribute</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span>(
-    <span class="ident">datasource_name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;ast</span> <span class="ident">str</span>,
-    <span class="ident">type_name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;ast</span> <span class="ident">str</span>,
-    <span class="ident">attr</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;ast</span> <span class="ident">ast::Attribute</span>,
-    <span class="ident">composite_type_field</span>: <span class="kw-2">&amp;mut</span> <span class="ident">CompositeTypeField</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span>,
+<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">visit_composite_type_field_native_type_attribute</span>(
+    <span class="ident">datasource_name</span>: <span class="ident">StringId</span>,
+    <span class="ident">type_name</span>: <span class="ident">StringId</span>,
+    <span class="ident">attr</span>: <span class="kw-2">&amp;</span><span class="ident">ast::Attribute</span>,
+    <span class="ident">composite_type_field</span>: <span class="kw-2">&amp;mut</span> <span class="ident">CompositeTypeField</span>,
 ) {
     <span class="kw">let</span> <span class="ident">args</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">attr</span>.<span class="ident">arguments</span>;
     <span class="kw">let</span> <span class="ident">args</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">args</span>.<span class="ident">arguments</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">arg</span><span class="op">|</span> <span class="ident">arg</span>.<span class="ident">value</span>.<span class="ident">to_string</span>()).<span class="ident">collect</span>();

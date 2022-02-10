@@ -363,7 +363,7 @@
     <span class="ident">ConnectorCapability</span>,
 };
 
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">validate_client_name</span>(<span class="ident">field</span>: <span class="ident">FieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">names</span>: <span class="kw-2">&amp;</span><span class="ident">Names</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
+<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">validate_client_name</span>(<span class="ident">field</span>: <span class="ident">FieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">names</span>: <span class="kw-2">&amp;</span><span class="ident">Names</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
     <span class="kw">let</span> <span class="ident">model</span> <span class="op">=</span> <span class="ident">field</span>.<span class="ident">model</span>();
 
     <span class="kw">for</span> <span class="ident">taken</span> <span class="kw">in</span> <span class="ident">names</span>.<span class="ident">name_taken</span>(<span class="ident">model</span>.<span class="ident">model_id</span>(), <span class="ident">field</span>.<span class="ident">name</span>()).<span class="ident">into_iter</span>() {
@@ -402,7 +402,7 @@
 <span class="doccomment">/// Some databases use constraints for default values, with a name that can be unique in a certain</span>
 <span class="doccomment">/// namespace. Validates the field default constraint against name clases.</span>
 <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">has_a_unique_default_constraint_name</span>(
-    <span class="ident">field</span>: <span class="ident">ScalarFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
+    <span class="ident">field</span>: <span class="ident">ScalarFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
     <span class="ident">names</span>: <span class="kw-2">&amp;</span><span class="ident">Names</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
     <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
 ) {
@@ -434,7 +434,7 @@
 
 <span class="doccomment">/// The length prefix can be used with strings and byte columns.</span>
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">validate_length_used_with_correct_types</span>(
-    <span class="ident">attr</span>: <span class="ident">ScalarFieldAttributeWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
+    <span class="ident">attr</span>: <span class="ident">ScalarFieldAttributeWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
     <span class="ident">attribute</span>: (<span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">ast::Span</span>),
     <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
 ) {
@@ -464,7 +464,7 @@
     ));
 }
 
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">validate_native_type_arguments</span>(<span class="ident">field</span>: <span class="ident">ScalarFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
+<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">validate_native_type_arguments</span>(<span class="ident">field</span>: <span class="ident">ScalarFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
     <span class="kw">let</span> <span class="ident">connector_name</span> <span class="op">=</span> <span class="ident">ctx</span>
         .<span class="ident">datasource</span>
         .<span class="ident">map</span>(<span class="op">|</span><span class="ident">ds</span><span class="op">|</span> <span class="ident">ds</span>.<span class="ident">active_provider</span>.<span class="ident">clone</span>())
@@ -571,7 +571,7 @@
 }
 
 <span class="doccomment">/// Validates the @default attribute of a model scalar field</span>
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">validate_default_value</span>(<span class="ident">field</span>: <span class="ident">ScalarFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
+<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">validate_default_value</span>(<span class="ident">field</span>: <span class="ident">ScalarFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
     <span class="kw">let</span> <span class="ident">model_name</span> <span class="op">=</span> <span class="ident">field</span>.<span class="ident">model</span>().<span class="ident">name</span>();
     <span class="kw">let</span> <span class="ident">default_mapped_name</span> <span class="op">=</span> <span class="ident">field</span>.<span class="ident">default_value</span>().<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">d</span><span class="op">|</span> <span class="ident">d</span>.<span class="ident">mapped_name</span>());
     <span class="kw">let</span> <span class="ident">default_attribute</span> <span class="op">=</span> <span class="ident">field</span>.<span class="ident">default_attribute</span>();
@@ -596,7 +596,7 @@
     <span class="ident">default_value::validate_auto_param</span>(<span class="ident">default_value</span>, <span class="ident">ctx</span>);
 }
 
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">validate_scalar_field_connector_specific</span>(<span class="ident">field</span>: <span class="ident">ScalarFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
+<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">validate_scalar_field_connector_specific</span>(<span class="ident">field</span>: <span class="ident">ScalarFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
     <span class="kw">if</span> <span class="macro">matches!</span>(
         <span class="ident">field</span>.<span class="ident">scalar_field_type</span>(),
         <span class="ident">ScalarFieldType::BuiltInScalar</span>(<span class="ident">ScalarType::Json</span>)
@@ -637,7 +637,7 @@
     }
 }
 
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">validate_unsupported_field_type</span>(<span class="ident">field</span>: <span class="ident">ScalarFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
+<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">validate_unsupported_field_type</span>(<span class="ident">field</span>: <span class="ident">ScalarFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
     <span class="kw">use</span> <span class="ident">once_cell::sync::Lazy</span>;
     <span class="kw">use</span> <span class="ident">regex::Regex</span>;
 

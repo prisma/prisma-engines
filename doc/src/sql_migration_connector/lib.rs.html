@@ -407,12 +407,6 @@
 <span id="406">406</span>
 <span id="407">407</span>
 <span id="408">408</span>
-<span id="409">409</span>
-<span id="410">410</span>
-<span id="411">411</span>
-<span id="412">412</span>
-<span id="413">413</span>
-<span id="414">414</span>
 </pre><pre class="rust"><code><span class="doccomment">//! The SQL migration connector.</span>
 
 <span class="attribute">#![<span class="ident">deny</span>(<span class="ident">rust_2018_idioms</span>, <span class="ident">unsafe_code</span>, <span class="ident">missing_docs</span>)]</span>
@@ -563,7 +557,7 @@
     }
 
     <span class="doccomment">/// For tests.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">migration_from_schemas</span>(<span class="ident">from</span>: <span class="kw-2">&amp;</span><span class="ident">ValidatedSchema</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">to</span>: <span class="kw-2">&amp;</span><span class="ident">ValidatedSchema</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">SqlMigration</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">migration_from_schemas</span>(<span class="ident">from</span>: <span class="kw-2">&amp;</span><span class="ident">ValidatedSchema</span>, <span class="ident">to</span>: <span class="kw-2">&amp;</span><span class="ident">ValidatedSchema</span>) -&gt; <span class="ident">SqlMigration</span> {
         <span class="kw">let</span> <span class="ident">connection_info</span> <span class="op">=</span> <span class="ident">ConnectionInfo::from_url</span>(
             <span class="kw-2">&amp;</span><span class="ident">from</span>.<span class="ident">configuration</span>.<span class="ident">datasources</span>[<span class="number">0</span>]
                 .<span class="ident">load_url</span>(<span class="op">|</span><span class="ident">key</span><span class="op">|</span> <span class="ident">env::var</span>(<span class="ident">key</span>).<span class="ident">ok</span>())
@@ -619,11 +613,8 @@
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">sql_schema_from_diff_target</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">target</span>: <span class="kw-2">&amp;</span><span class="ident">DiffTarget</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">ConnectorResult</span><span class="op">&lt;</span><span class="ident">SqlSchema</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="ident">target</span> {
             <span class="ident">DiffTarget::Datamodel</span>(<span class="ident">schema</span>) =&gt; {
-                <span class="kw">let</span> <span class="ident">ast</span> <span class="op">=</span> <span class="ident">datamodel::parse_schema_ast</span>(<span class="ident">schema</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">err</span><span class="op">|</span> {
-                    <span class="ident">ConnectorError::new_schema_parser_error</span>(<span class="ident">err</span>.<span class="ident">to_pretty_string</span>(<span class="string">&quot;schema.prisma&quot;</span>, <span class="ident">schema</span>))
-                })<span class="question-mark">?</span>;
                 <span class="kw">let</span> <span class="ident">schema</span> <span class="op">=</span>
-                    <span class="ident">datamodel::parse_schema_parserdb</span>(<span class="ident">schema</span>, <span class="kw-2">&amp;</span><span class="ident">ast</span>).<span class="ident">map_err</span>(<span class="ident">ConnectorError::new_schema_parser_error</span>)<span class="question-mark">?</span>;
+                    <span class="ident">datamodel::parse_schema_parserdb</span>(<span class="ident">schema</span>).<span class="ident">map_err</span>(<span class="ident">ConnectorError::new_schema_parser_error</span>)<span class="question-mark">?</span>;
                 <span class="prelude-val">Ok</span>(<span class="ident">sql_schema_calculator::calculate_sql_schema</span>(
                     <span class="kw-2">&amp;</span><span class="ident">schema</span>,
                     <span class="self">self</span>.<span class="ident">flavour</span>.<span class="ident">as_ref</span>(),
@@ -702,10 +693,7 @@
 
         <span class="kw">let</span> <span class="ident">added_columns_with_virtual_defaults</span>: <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">TableId</span>, <span class="ident">ColumnId</span>)<span class="op">&gt;</span> <span class="op">=</span>
             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">next_datamodel</span>) <span class="op">=</span> <span class="ident">to</span>.<span class="ident">as_datamodel</span>() {
-                <span class="kw">let</span> <span class="ident">ast</span> <span class="op">=</span> <span class="ident">datamodel::parse_schema_ast</span>(<span class="ident">next_datamodel</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">err</span><span class="op">|</span> {
-                    <span class="ident">ConnectorError::new_schema_parser_error</span>(<span class="ident">err</span>.<span class="ident">to_pretty_string</span>(<span class="string">&quot;schema.prisma&quot;</span>, <span class="ident">next_datamodel</span>))
-                })<span class="question-mark">?</span>;
-                <span class="kw">let</span> <span class="ident">schema</span> <span class="op">=</span> <span class="ident">datamodel::parse_schema_parserdb</span>(<span class="ident">next_datamodel</span>, <span class="kw-2">&amp;</span><span class="ident">ast</span>)
+                <span class="kw">let</span> <span class="ident">schema</span> <span class="op">=</span> <span class="ident">datamodel::parse_schema_parserdb</span>(<span class="ident">next_datamodel</span>)
                     .<span class="ident">map_err</span>(<span class="ident">ConnectorError::new_schema_parser_error</span>)<span class="question-mark">?</span>;
                 <span class="ident">walk_added_columns</span>(<span class="kw-2">&amp;</span><span class="ident">steps</span>)
                     .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">table_index</span>, <span class="ident">column_index</span>)<span class="op">|</span> {
@@ -771,7 +759,7 @@
     <span class="doccomment">/// the specific database version being used.</span>
     <span class="kw">fn</span> <span class="ident">check_database_version_compatibility</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">datamodel</span>: <span class="kw-2">&amp;</span><span class="ident">ValidatedSchema</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
+        <span class="ident">datamodel</span>: <span class="kw-2">&amp;</span><span class="ident">ValidatedSchema</span>,
     ) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">user_facing_errors::common::DatabaseVersionIncompatibility</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">flavour</span>.<span class="ident">check_database_version_compatibility</span>(<span class="ident">datamodel</span>)
     }

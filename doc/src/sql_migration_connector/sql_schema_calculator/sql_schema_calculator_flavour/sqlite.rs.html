@@ -28,7 +28,7 @@
     }
 
     <span class="comment">// Integer primary keys on SQLite are automatically assigned the rowid, which means they are automatically autoincrementing.</span>
-    <span class="kw">fn</span> <span class="ident">field_is_implicit_autoincrement_primary_key</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">field</span>: <span class="ident">ScalarFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">bool</span> {
+    <span class="kw">fn</span> <span class="ident">field_is_implicit_autoincrement_primary_key</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">field</span>: <span class="ident">ScalarFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">bool</span> {
         <span class="ident">field</span>
             .<span class="ident">model</span>()
             .<span class="ident">primary_key</span>()

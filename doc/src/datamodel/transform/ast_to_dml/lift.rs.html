@@ -581,14 +581,14 @@
 <span class="doccomment">/// When lifting, the AST is converted to the Datamodel data structure, and</span>
 <span class="doccomment">/// additional semantics are attached.</span>
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">LiftAstToDml</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="ident">db</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">db::ParserDatabase</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
+    <span class="ident">db</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">db::ParserDatabase</span>,
     <span class="ident">connector</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="kw">dyn</span> <span class="ident">Connector</span>,
     <span class="ident">referential_integrity</span>: <span class="ident">ReferentialIntegrity</span>,
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">LiftAstToDml</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(
-        <span class="ident">db</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">db::ParserDatabase</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
+        <span class="ident">db</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">db::ParserDatabase</span>,
         <span class="ident">connector</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="kw">dyn</span> <span class="ident">Connector</span>,
         <span class="ident">referential_integrity</span>: <span class="ident">ReferentialIntegrity</span>,
     ) -&gt; <span class="ident">LiftAstToDml</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
@@ -640,7 +640,7 @@
     ) {
         <span class="kw">let</span> <span class="ident">active_connector</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">connector</span>;
         <span class="kw">let</span> <span class="ident">referential_integrity</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">referential_integrity</span>;
-        <span class="kw">let</span> <span class="ident">common_dml_fields</span> <span class="op">=</span> <span class="op">|</span><span class="ident">field</span>: <span class="kw-2">&amp;mut</span> <span class="ident">dml::RelationField</span>, <span class="ident">relation_field</span>: <span class="ident">RelationFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">|</span> {
+        <span class="kw">let</span> <span class="ident">common_dml_fields</span> <span class="op">=</span> <span class="op">|</span><span class="ident">field</span>: <span class="kw-2">&amp;mut</span> <span class="ident">dml::RelationField</span>, <span class="ident">relation_field</span>: <span class="ident">RelationFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">|</span> {
             <span class="kw">let</span> <span class="ident">ast_field</span> <span class="op">=</span> <span class="ident">relation_field</span>.<span class="ident">ast_field</span>();
             <span class="ident">field</span>.<span class="ident">relation_info</span>.<span class="ident">on_delete</span> <span class="op">=</span> <span class="ident">relation_field</span>
                 .<span class="ident">explicit_on_delete</span>()
@@ -810,7 +810,7 @@
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">lift_composite_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">walker</span>: <span class="ident">CompositeTypeWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">CompositeType</span> {
+    <span class="kw">fn</span> <span class="ident">lift_composite_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">walker</span>: <span class="ident">CompositeTypeWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">CompositeType</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">fields</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
 
         <span class="kw">for</span> <span class="ident">field</span> <span class="kw">in</span> <span class="ident">walker</span>.<span class="ident">fields</span>() {
@@ -839,7 +839,7 @@
     <span class="doccomment">/// Internal: Validates a model AST node and lifts it to a DML model.</span>
     <span class="kw">fn</span> <span class="ident">lift_model</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">walker</span>: <span class="ident">ModelWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
+        <span class="ident">walker</span>: <span class="ident">ModelWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
         <span class="ident">field_ids_for_sorting</span>: <span class="kw-2">&amp;mut</span> <span class="ident">HashMap</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>), <span class="ident">ast::FieldId</span><span class="op">&gt;</span>,
     ) -&gt; <span class="ident">dml::Model</span> {
         <span class="kw">let</span> <span class="ident">ast_model</span> <span class="op">=</span> <span class="ident">walker</span>.<span class="ident">ast_model</span>();
@@ -941,7 +941,7 @@
     }
 
     <span class="doccomment">/// Internal: Validates an enum AST node.</span>
-    <span class="kw">fn</span> <span class="ident">lift_enum</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">r#enum</span>: <span class="ident">EnumWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">dml::Enum</span> {
+    <span class="kw">fn</span> <span class="ident">lift_enum</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">r#enum</span>: <span class="ident">EnumWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">dml::Enum</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">en</span> <span class="op">=</span> <span class="ident">dml::Enum::new</span>(<span class="ident">r#enum</span>.<span class="ident">name</span>(), <span class="macro">vec!</span>[]);
 
         <span class="kw">for</span> <span class="ident">value</span> <span class="kw">in</span> <span class="ident">r#enum</span>.<span class="ident">values</span>() {
@@ -954,7 +954,7 @@
     }
 
     <span class="doccomment">/// Internal: Lifts an enum value AST node.</span>
-    <span class="kw">fn</span> <span class="ident">lift_enum_value</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="ident">EnumValueWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">dml::EnumValue</span> {
+    <span class="kw">fn</span> <span class="ident">lift_enum_value</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="ident">EnumValueWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">dml::EnumValue</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">enum_value</span> <span class="op">=</span> <span class="ident">dml::EnumValue::new</span>(<span class="ident">value</span>.<span class="ident">name</span>());
         <span class="ident">enum_value</span>.<span class="ident">documentation</span> <span class="op">=</span> <span class="ident">value</span>.<span class="ident">documentation</span>().<span class="ident">map</span>(<span class="ident">String::from</span>);
         <span class="ident">enum_value</span>.<span class="ident">database_name</span> <span class="op">=</span> <span class="ident">value</span>.<span class="ident">mapped_name</span>().<span class="ident">map</span>(<span class="ident">String::from</span>);
@@ -974,7 +974,7 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">ast_field</span>: <span class="kw-2">&amp;</span><span class="ident">ast::Field</span>,
         <span class="ident">scalar_field_type</span>: <span class="kw-2">&amp;</span><span class="ident">db::ScalarFieldType</span>,
-        <span class="ident">scalar_field</span>: <span class="ident">ScalarFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
+        <span class="ident">scalar_field</span>: <span class="ident">ScalarFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
     ) -&gt; <span class="ident">dml::FieldType</span> {
         <span class="kw">match</span> <span class="ident">scalar_field_type</span> {
             <span class="ident">db::ScalarFieldType::CompositeType</span>(<span class="kw">_</span>) =&gt; {
@@ -1007,7 +1007,7 @@
 
     <span class="kw">fn</span> <span class="ident">lift_composite_type_field_type</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">composite_type_field</span>: <span class="ident">CompositeTypeFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
+        <span class="ident">composite_type_field</span>: <span class="ident">CompositeTypeFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
         <span class="ident">scalar_field_type</span>: <span class="kw-2">&amp;</span><span class="ident">db::ScalarFieldType</span>,
     ) -&gt; <span class="ident">CompositeTypeFieldType</span> {
         <span class="kw">match</span> <span class="ident">scalar_field_type</span> {

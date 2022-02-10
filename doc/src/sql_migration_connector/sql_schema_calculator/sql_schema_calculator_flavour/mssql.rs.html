@@ -34,7 +34,7 @@
 <span class="kw">use</span> <span class="ident">sql_schema_describer::ForeignKeyAction</span>;
 
 <span class="kw">impl</span> <span class="ident">SqlSchemaCalculatorFlavour</span> <span class="kw">for</span> <span class="ident">MssqlFlavour</span> {
-    <span class="kw">fn</span> <span class="ident">default_constraint_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">default_value</span>: <span class="ident">DefaultValueWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">default_constraint_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">default_value</span>: <span class="ident">DefaultValueWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
         <span class="prelude-val">Some</span>(<span class="ident">default_value</span>.<span class="ident">constraint_name</span>(<span class="self">self</span>.<span class="ident">datamodel_connector</span>()).<span class="ident">into_owned</span>())
     }
 
@@ -42,7 +42,7 @@
         <span class="ident">sql_datamodel_connector::MSSQL</span>.<span class="ident">default_native_type_for_scalar_type</span>(<span class="ident">scalar_type</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">m2m_foreign_key_action</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">model_a</span>: <span class="ident">ModelWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">model_b</span>: <span class="ident">ModelWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">ForeignKeyAction</span> {
+    <span class="kw">fn</span> <span class="ident">m2m_foreign_key_action</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">model_a</span>: <span class="ident">ModelWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">model_b</span>: <span class="ident">ModelWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">ForeignKeyAction</span> {
         <span class="comment">// MSSQL will crash when creating a cyclic cascade</span>
         <span class="kw">if</span> <span class="ident">model_a</span>.<span class="ident">name</span>() <span class="op">==</span> <span class="ident">model_b</span>.<span class="ident">name</span>() {
             <span class="ident">ForeignKeyAction::NoAction</span>

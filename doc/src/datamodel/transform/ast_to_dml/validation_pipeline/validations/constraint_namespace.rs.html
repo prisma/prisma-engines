@@ -271,28 +271,28 @@
 <span class="doccomment">/// - Global ones can be triggering validation errors between different models.</span>
 <span class="doccomment">/// - Local ones are only valid in the given model.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Default</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">ConstraintNamespace</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span> {
-    <span class="ident">global</span>: <span class="ident">HashMap</span><span class="op">&lt;</span>(<span class="ident">ConstraintScope</span>, <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="ident">str</span><span class="op">&gt;</span>), <span class="ident">usize</span><span class="op">&gt;</span>,
-    <span class="ident">local</span>: <span class="ident">HashMap</span><span class="op">&lt;</span>(<span class="ident">ast::ModelId</span>, <span class="ident">ConstraintScope</span>, <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="ident">str</span><span class="op">&gt;</span>), <span class="ident">usize</span><span class="op">&gt;</span>,
-    <span class="ident">local_custom_name</span>: <span class="ident">HashMap</span><span class="op">&lt;</span>(<span class="ident">ast::ModelId</span>, <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="ident">str</span><span class="op">&gt;</span>), <span class="ident">usize</span><span class="op">&gt;</span>,
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">ConstraintNamespace</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
+    <span class="ident">global</span>: <span class="ident">HashMap</span><span class="op">&lt;</span>(<span class="ident">ConstraintScope</span>, <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span>, <span class="ident">str</span><span class="op">&gt;</span>), <span class="ident">usize</span><span class="op">&gt;</span>,
+    <span class="ident">local</span>: <span class="ident">HashMap</span><span class="op">&lt;</span>(<span class="ident">ast::ModelId</span>, <span class="ident">ConstraintScope</span>, <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span>, <span class="ident">str</span><span class="op">&gt;</span>), <span class="ident">usize</span><span class="op">&gt;</span>,
+    <span class="ident">local_custom_name</span>: <span class="ident">HashMap</span><span class="op">&lt;</span>(<span class="ident">ast::ModelId</span>, <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span>, <span class="ident">str</span><span class="op">&gt;</span>), <span class="ident">usize</span><span class="op">&gt;</span>,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span> <span class="ident">ConstraintNamespace</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span> {
+<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> <span class="ident">ConstraintNamespace</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
     <span class="doccomment">/// An iterator of namespace violations with the given name, first globally followed up with</span>
     <span class="doccomment">/// local violations in the given model.</span>
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">constraint_name_scope_violations</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">model_id</span>: <span class="ident">ast::ModelId</span>,
-        <span class="ident">name</span>: <span class="ident">ConstraintName</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;ast</span> <span class="ident">ConstraintScope</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;_</span> {
+        <span class="ident">name</span>: <span class="ident">ConstraintName</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span>,
+    ) -&gt; <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">ConstraintScope</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;_</span> {
         <span class="self">self</span>.<span class="ident">global_constraint_name_scope_violations</span>(<span class="ident">name</span>)
             .<span class="ident">chain</span>(<span class="self">self</span>.<span class="ident">local_constraint_name_scope_violations</span>(<span class="ident">model_id</span>, <span class="ident">name</span>))
     }
 
     <span class="kw">fn</span> <span class="ident">global_constraint_name_scope_violations</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">name</span>: <span class="ident">ConstraintName</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;ast</span> <span class="ident">ConstraintScope</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;_</span> {
+        <span class="ident">name</span>: <span class="ident">ConstraintName</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span>,
+    ) -&gt; <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">ConstraintScope</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;_</span> {
         <span class="ident">name</span>.<span class="ident">possible_scopes</span>().<span class="ident">filter</span>(
             <span class="kw">move</span> <span class="op">|</span><span class="ident">scope</span><span class="op">|</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">global</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span>(<span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">scope</span>, <span class="ident">Cow::from</span>(<span class="ident">name</span>.<span class="ident">as_ref</span>()))) {
                 <span class="prelude-val">Some</span>(<span class="ident">count</span>) =&gt; <span class="kw-2">*</span><span class="ident">count</span> <span class="op">&gt;</span> <span class="number">1</span>,
@@ -304,8 +304,8 @@
     <span class="kw">fn</span> <span class="ident">local_constraint_name_scope_violations</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">model_id</span>: <span class="ident">ast::ModelId</span>,
-        <span class="ident">name</span>: <span class="ident">ConstraintName</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;ast</span> <span class="ident">ConstraintScope</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;_</span> {
+        <span class="ident">name</span>: <span class="ident">ConstraintName</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span>,
+    ) -&gt; <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">ConstraintScope</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;_</span> {
         <span class="ident">name</span>.<span class="ident">possible_scopes</span>().<span class="ident">filter</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">scope</span><span class="op">|</span> {
             <span class="kw">match</span> <span class="self">self</span>.<span class="ident">local</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span>(<span class="ident">model_id</span>, <span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">scope</span>, <span class="ident">Cow::from</span>(<span class="ident">name</span>.<span class="ident">as_ref</span>()))) {
                 <span class="prelude-val">Some</span>(<span class="ident">count</span>) =&gt; <span class="kw-2">*</span><span class="ident">count</span> <span class="op">&gt;</span> <span class="number">1</span>,
@@ -314,7 +314,7 @@
         })
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">local_custom_name_scope_violations</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">model_id</span>: <span class="ident">ast::ModelId</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;ast</span> <span class="ident">str</span>) -&gt; <span class="ident">bool</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">local_custom_name_scope_violations</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">model_id</span>: <span class="ident">ast::ModelId</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">str</span>) -&gt; <span class="ident">bool</span> {
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">local_custom_name</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span>(<span class="ident">model_id</span>, <span class="ident">Cow::from</span>(<span class="ident">name</span>))) {
             <span class="prelude-val">Some</span>(<span class="ident">count</span>) =&gt; <span class="kw-2">*</span><span class="ident">count</span> <span class="op">&gt;</span> <span class="number">1</span>,
             <span class="prelude-val">None</span> =&gt; <span class="bool-val">false</span>,
@@ -324,7 +324,7 @@
     <span class="doccomment">/// Add all index and unique constraints from the data model to a global validation scope.</span>
     <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">add_global_indexes</span>(
         <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">db</span>: <span class="kw-2">&amp;</span><span class="ident">ParserDatabase</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span>,
+        <span class="ident">db</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">ParserDatabase</span>,
         <span class="ident">connector</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">Connector</span>,
         <span class="ident">scope</span>: <span class="ident">ConstraintScope</span>,
     ) {
@@ -340,7 +340,7 @@
     <span class="doccomment">/// Add all foreign key constraints from the data model to a global validation scope.</span>
     <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">add_global_relations</span>(
         <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">db</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;ast</span> <span class="ident">ParserDatabase</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span>,
+        <span class="ident">db</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">ParserDatabase</span>,
         <span class="ident">connector</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">Connector</span>,
         <span class="ident">scope</span>: <span class="ident">ConstraintScope</span>,
     ) {
@@ -357,7 +357,7 @@
     <span class="doccomment">/// Add all primary key constraints from the data model to a global validation scope.</span>
     <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">add_global_primary_keys</span>(
         <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">db</span>: <span class="kw-2">&amp;</span><span class="ident">ParserDatabase</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span>,
+        <span class="ident">db</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">ParserDatabase</span>,
         <span class="ident">connector</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">Connector</span>,
         <span class="ident">scope</span>: <span class="ident">ConstraintScope</span>,
     ) {
@@ -372,7 +372,7 @@
     <span class="doccomment">/// Add all default constraints from the data model to a global validation scope.</span>
     <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">add_global_default_constraints</span>(
         <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">db</span>: <span class="kw-2">&amp;</span><span class="ident">ParserDatabase</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span>,
+        <span class="ident">db</span>: <span class="kw-2">&amp;</span><span class="ident">ParserDatabase</span>,
         <span class="ident">connector</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">Connector</span>,
         <span class="ident">scope</span>: <span class="ident">ConstraintScope</span>,
     ) {
@@ -392,7 +392,7 @@
     <span class="doccomment">/// Add all index and unique constraints to separate namespaces per model.</span>
     <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">add_local_indexes</span>(
         <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">db</span>: <span class="kw-2">&amp;</span><span class="ident">ParserDatabase</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span>,
+        <span class="ident">db</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">ParserDatabase</span>,
         <span class="ident">connector</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">Connector</span>,
         <span class="ident">scope</span>: <span class="ident">ConstraintScope</span>,
     ) {
@@ -411,7 +411,7 @@
     <span class="doccomment">/// Add all primary key constraints to separate namespaces per model.</span>
     <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">add_local_primary_keys</span>(
         <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">db</span>: <span class="kw-2">&amp;</span><span class="ident">ParserDatabase</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span>,
+        <span class="ident">db</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">ParserDatabase</span>,
         <span class="ident">connector</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">Connector</span>,
         <span class="ident">scope</span>: <span class="ident">ConstraintScope</span>,
     ) {
@@ -424,7 +424,7 @@
     }
 
     <span class="doccomment">/// Add all primary key and unique index custom names to separate namespaces per model.</span>
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">add_local_custom_names_for_primary_keys_and_uniques</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">db</span>: <span class="kw-2">&amp;</span><span class="ident">ParserDatabase</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span>) {
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">add_local_custom_names_for_primary_keys_and_uniques</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">db</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">ParserDatabase</span>) {
         <span class="kw">for</span> <span class="ident">model</span> <span class="kw">in</span> <span class="ident">db</span>.<span class="ident">walk_models</span>() {
             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">name</span>) <span class="op">=</span> <span class="ident">model</span>.<span class="ident">primary_key</span>().<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">pk</span><span class="op">|</span> <span class="ident">pk</span>.<span class="ident">name</span>()) {
                 <span class="kw">let</span> <span class="ident">counter</span> <span class="op">=</span> <span class="self">self</span>
@@ -448,7 +448,7 @@
     <span class="doccomment">/// Add all foreign key constraints to separate namespaces per model.</span>
     <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">add_local_relations</span>(
         <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">db</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;ast</span> <span class="ident">ParserDatabase</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span>,
+        <span class="ident">db</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">ParserDatabase</span>,
         <span class="ident">connector</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">Connector</span>,
         <span class="ident">scope</span>: <span class="ident">ConstraintScope</span>,
     ) {
@@ -469,16 +469,16 @@
 <span class="doccomment">/// A constraint name marked by the constraint type it belongs. The variant decides on which</span>
 <span class="doccomment">/// validation scopes it will be checked on.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum</span> <span class="ident">ConstraintName</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span> {
-    <span class="ident">Index</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;ast</span> <span class="ident">str</span>),
-    <span class="ident">Relation</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;ast</span> <span class="ident">str</span>),
-    <span class="ident">Default</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;ast</span> <span class="ident">str</span>),
-    <span class="ident">PrimaryKey</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;ast</span> <span class="ident">str</span>),
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum</span> <span class="ident">ConstraintName</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
+    <span class="ident">Index</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">str</span>),
+    <span class="ident">Relation</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">str</span>),
+    <span class="ident">Default</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">str</span>),
+    <span class="ident">PrimaryKey</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">str</span>),
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span> <span class="ident">ConstraintName</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span> {
+<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> <span class="ident">ConstraintName</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
     <span class="doccomment">/// An iterator of scopes the given name should be checked against.</span>
-    <span class="kw">fn</span> <span class="ident">possible_scopes</span>(<span class="self">self</span>) -&gt; <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;ast</span> <span class="ident">ConstraintScope</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">possible_scopes</span>(<span class="self">self</span>) -&gt; <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">ConstraintScope</span><span class="op">&gt;</span> {
         <span class="kw">use</span> <span class="ident">ConstraintScope</span>::<span class="kw-2">*</span>;
 
         <span class="kw">match</span> <span class="self">self</span> {
@@ -507,7 +507,7 @@
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ConstraintName</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span> {
+<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ConstraintName</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
     <span class="kw">fn</span> <span class="ident">as_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
         <span class="kw">match</span> <span class="self">self</span> {
             <span class="ident">ConstraintName::Index</span>(<span class="ident">x</span>) =&gt; <span class="ident">x</span>,
@@ -518,7 +518,7 @@
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span> <span class="ident">Deref</span> <span class="kw">for</span> <span class="ident">ConstraintName</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span> {
+<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> <span class="ident">Deref</span> <span class="kw">for</span> <span class="ident">ConstraintName</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
     <span class="kw">type</span> <span class="ident">Target</span> <span class="op">=</span> <span class="ident">str</span>;
 
     <span class="kw">fn</span> <span class="ident">deref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Target</span> {

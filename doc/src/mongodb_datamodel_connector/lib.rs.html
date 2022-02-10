@@ -236,8 +236,8 @@
 <span class="kw">use</span> <span class="ident">datamodel_connector</span>::{
     <span class="ident">connector_error</span>::{<span class="ident">ConnectorError</span>, <span class="ident">ErrorKind</span>},
     <span class="ident">parser_database</span>::{<span class="ident">ast::Expression</span>, <span class="ident">walkers</span>::<span class="kw-2">*</span>},
-    <span class="ident">Connector</span>, <span class="ident">ConnectorCapability</span>, <span class="ident">NativeTypeConstructor</span>, <span class="ident">NativeTypeInstance</span>, <span class="ident">ReferentialAction</span>, <span class="ident">ReferentialIntegrity</span>,
-    <span class="ident">ScalarType</span>,
+    <span class="ident">Connector</span>, <span class="ident">ConnectorCapability</span>, <span class="ident">Diagnostics</span>, <span class="ident">NativeTypeConstructor</span>, <span class="ident">NativeTypeInstance</span>, <span class="ident">ReferentialAction</span>,
+    <span class="ident">ReferentialIntegrity</span>, <span class="ident">ScalarType</span>,
 };
 <span class="kw">use</span> <span class="ident">enumflags2::BitFlags</span>;
 <span class="kw">use</span> <span class="ident">mongodb_types</span>::<span class="kw-2">*</span>;
@@ -266,7 +266,7 @@
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">MongoDbDatamodelConnector</span>;
 
 <span class="kw">impl</span> <span class="ident">MongoDbDatamodelConnector</span> {
-    <span class="kw">fn</span> <span class="ident">validate_auto</span>(<span class="ident">field</span>: <span class="ident">ScalarFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">errors</span>: <span class="kw-2">&amp;mut</span> <span class="ident">datamodel_connector::Diagnostics</span>) {
+    <span class="kw">fn</span> <span class="ident">validate_auto</span>(<span class="ident">field</span>: <span class="ident">ScalarFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">errors</span>: <span class="kw-2">&amp;mut</span> <span class="ident">datamodel_connector::Diagnostics</span>) {
         <span class="kw">if</span> <span class="op">!</span><span class="ident">field</span>.<span class="ident">default_value</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">val</span><span class="op">|</span> <span class="ident">val</span>.<span class="ident">is_auto</span>()).<span class="ident">unwrap_or</span>(<span class="bool-val">false</span>) {
             <span class="kw">return</span>;
         }
@@ -293,7 +293,7 @@
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">validate_dbgenerated</span>(<span class="ident">field</span>: <span class="ident">ScalarFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">errors</span>: <span class="kw-2">&amp;mut</span> <span class="ident">datamodel_connector::Diagnostics</span>) {
+    <span class="kw">fn</span> <span class="ident">validate_dbgenerated</span>(<span class="ident">field</span>: <span class="ident">ScalarFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">errors</span>: <span class="kw-2">&amp;mut</span> <span class="ident">datamodel_connector::Diagnostics</span>) {
         <span class="kw">if</span> <span class="op">!</span><span class="ident">field</span>.<span class="ident">default_value</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">val</span><span class="op">|</span> <span class="ident">val</span>.<span class="ident">is_dbgenerated</span>()).<span class="ident">unwrap_or</span>(<span class="bool-val">false</span>) {
             <span class="kw">return</span>;
         }
@@ -309,7 +309,7 @@
         });
     }
 
-    <span class="kw">fn</span> <span class="ident">validate_array_native_type</span>(<span class="ident">field</span>: <span class="ident">ScalarFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">errors</span>: <span class="kw-2">&amp;mut</span> <span class="ident">datamodel_connector::Diagnostics</span>) {
+    <span class="kw">fn</span> <span class="ident">validate_array_native_type</span>(<span class="ident">field</span>: <span class="ident">ScalarFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">errors</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Diagnostics</span>) {
         <span class="kw">let</span> (<span class="ident">ds_name</span>, <span class="ident">type_name</span>, <span class="ident">args</span>, <span class="ident">span</span>) <span class="op">=</span> <span class="kw">match</span> <span class="ident">field</span>.<span class="ident">raw_native_type</span>() {
             <span class="prelude-val">Some</span>(<span class="ident">nt</span>) =&gt; <span class="ident">nt</span>,
             <span class="prelude-val">None</span> =&gt; <span class="kw">return</span>,
@@ -353,7 +353,7 @@
         <span class="ident">referential_integrity</span>.<span class="ident">allowed_referential_actions</span>(<span class="ident">BitFlags::empty</span>())
     }
 
-    <span class="kw">fn</span> <span class="ident">validate_model</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">model</span>: <span class="ident">ModelWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">errors</span>: <span class="kw-2">&amp;mut</span> <span class="ident">datamodel_connector::Diagnostics</span>) {
+    <span class="kw">fn</span> <span class="ident">validate_model</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">model</span>: <span class="ident">ModelWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">errors</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Diagnostics</span>) {
         <span class="kw">for</span> <span class="ident">field</span> <span class="kw">in</span> <span class="ident">model</span>.<span class="ident">scalar_fields</span>() {
             <span class="ident"><span class="self">Self</span>::validate_auto</span>(<span class="ident">field</span>, <span class="ident">errors</span>);
             <span class="ident"><span class="self">Self</span>::validate_dbgenerated</span>(<span class="ident">field</span>, <span class="ident">errors</span>);

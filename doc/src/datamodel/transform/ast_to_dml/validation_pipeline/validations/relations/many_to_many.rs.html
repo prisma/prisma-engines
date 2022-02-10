@@ -54,9 +54,6 @@
 <span id="53">53</span>
 <span id="54">54</span>
 <span id="55">55</span>
-<span id="56">56</span>
-<span id="57">57</span>
-<span id="58">58</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">diagnostics::DatamodelError</span>,
     <span class="ident">transform::ast_to_dml</span>::{<span class="ident">db::walkers::ImplicitManyToManyRelationWalker</span>, <span class="ident">validation_pipeline::context::Context</span>},
@@ -64,7 +61,7 @@
 <span class="kw">use</span> <span class="ident">itertools::Itertools</span>;
 
 <span class="doccomment">/// Our weird many-to-many requirement.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">validate_singular_id</span>(<span class="ident">relation</span>: <span class="ident">ImplicitManyToManyRelationWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">validate_singular_id</span>(<span class="ident">relation</span>: <span class="ident">ImplicitManyToManyRelationWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
     <span class="kw">for</span> <span class="ident">relation_field</span> <span class="kw">in</span> [<span class="ident">relation</span>.<span class="ident">field_a</span>(), <span class="ident">relation</span>.<span class="ident">field_b</span>()].<span class="ident">iter</span>() {
         <span class="kw">if</span> <span class="op">!</span><span class="ident">relation_field</span>.<span class="ident">related_model</span>().<span class="ident">has_single_id_field</span>() {
             <span class="kw">let</span> <span class="ident">message</span> <span class="op">=</span> <span class="macro">format!</span>(
@@ -97,10 +94,7 @@
     }
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">validate_no_referential_actions</span>(
-    <span class="ident">relation</span>: <span class="ident">ImplicitManyToManyRelationWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-    <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-) {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">validate_no_referential_actions</span>(<span class="ident">relation</span>: <span class="ident">ImplicitManyToManyRelationWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
     <span class="kw">let</span> <span class="ident">referential_action_spans</span> <span class="op">=</span> [<span class="ident">relation</span>.<span class="ident">field_a</span>(), <span class="ident">relation</span>.<span class="ident">field_b</span>()].<span class="ident">into_iter</span>().<span class="ident">flat_map</span>(<span class="op">|</span><span class="ident">field</span><span class="op">|</span> {
         <span class="ident">field</span>
             .<span class="ident">explicit_on_delete_span</span>()

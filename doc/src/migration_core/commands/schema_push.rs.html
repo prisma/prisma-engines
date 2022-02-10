@@ -55,20 +55,16 @@
 <span id="54">54</span>
 <span id="55">55</span>
 <span id="56">56</span>
-<span id="57">57</span>
-<span id="58">58</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">json_rpc::types</span>::<span class="kw-2">*</span>, <span class="ident">parse_schema</span>, <span class="ident">CoreResult</span>};
 <span class="kw">use</span> <span class="ident">migration_connector</span>::{<span class="ident">ConnectorError</span>, <span class="ident">DiffTarget</span>, <span class="ident">MigrationConnector</span>};
 
 <span class="doccomment">/// Command to bring the local database in sync with the prisma schema, without</span>
 <span class="doccomment">/// interacting with the migrations directory nor the migrations table.</span>
-
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">schema_push</span>(
     <span class="ident">input</span>: <span class="ident">SchemaPushInput</span>,
     <span class="ident">connector</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">MigrationConnector</span>,
 ) -&gt; <span class="ident">CoreResult</span><span class="op">&lt;</span><span class="ident">SchemaPushOutput</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">ast</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::parse_ast</span>(<span class="kw-2">&amp;</span><span class="ident">input</span>.<span class="ident">schema</span>)<span class="question-mark">?</span>;
-    <span class="kw">let</span> <span class="ident">datamodel</span> <span class="op">=</span> <span class="ident">parse_schema</span>(<span class="kw-2">&amp;</span><span class="ident">input</span>.<span class="ident">schema</span>, <span class="kw-2">&amp;</span><span class="ident">ast</span>)<span class="question-mark">?</span>;
+    <span class="kw">let</span> <span class="ident">datamodel</span> <span class="op">=</span> <span class="ident">parse_schema</span>(<span class="kw-2">&amp;</span><span class="ident">input</span>.<span class="ident">schema</span>)<span class="question-mark">?</span>;
     <span class="kw">let</span> <span class="ident">applier</span> <span class="op">=</span> <span class="ident">connector</span>.<span class="ident">database_migration_step_applier</span>();
     <span class="kw">let</span> <span class="ident">checker</span> <span class="op">=</span> <span class="ident">connector</span>.<span class="ident">destructive_change_checker</span>();
 

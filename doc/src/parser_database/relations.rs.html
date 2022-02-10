@@ -418,6 +418,18 @@
 <span id="417">417</span>
 <span id="418">418</span>
 <span id="419">419</span>
+<span id="420">420</span>
+<span id="421">421</span>
+<span id="422">422</span>
+<span id="423">423</span>
+<span id="424">424</span>
+<span id="425">425</span>
+<span id="426">426</span>
+<span id="427">427</span>
+<span id="428">428</span>
+<span id="429">429</span>
+<span id="430">430</span>
+<span id="431">431</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">ast</span>,
     <span class="ident">interner::StringId</span>,
@@ -427,15 +439,15 @@
 <span class="kw">use</span> <span class="ident">std::collections::BTreeSet</span>;
 
 <span class="doccomment">/// Detect relation types and construct relation objects to the database.</span>
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">infer_relations</span>(<span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
+<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">infer_relations</span>(<span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">relations</span> <span class="op">=</span> <span class="ident">Relations::default</span>();
 
-    <span class="kw">for</span> <span class="ident">rf</span> <span class="kw">in</span> <span class="ident">ctx</span>.<span class="ident">db</span>.<span class="ident">types</span>.<span class="ident">relation_fields</span>.<span class="ident">iter</span>() {
+    <span class="kw">for</span> <span class="ident">rf</span> <span class="kw">in</span> <span class="ident">ctx</span>.<span class="ident">types</span>.<span class="ident">relation_fields</span>.<span class="ident">iter</span>() {
         <span class="kw">let</span> <span class="ident">evidence</span> <span class="op">=</span> <span class="ident">relation_evidence</span>(<span class="ident">rf</span>, <span class="ident">ctx</span>);
         <span class="ident">ingest_relation</span>(<span class="ident">evidence</span>, <span class="kw-2">&amp;mut</span> <span class="ident">relations</span>, <span class="ident">ctx</span>);
     }
 
-    <span class="ident">ctx</span>.<span class="ident">db</span>.<span class="ident">relations</span> <span class="op">=</span> <span class="ident">relations</span>;
+    <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">std::mem::replace</span>(<span class="ident">ctx</span>.<span class="ident">relations</span>, <span class="ident">relations</span>);
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">Eq</span>)]</span>
@@ -513,14 +525,16 @@
             .<span class="ident">map</span>(<span class="kw">move</span> <span class="op">|</span>(<span class="ident">model_a_id</span>, <span class="ident">model_b_id</span>, <span class="ident">relation_idx</span>)<span class="op">|</span> (<span class="kw-2">*</span><span class="ident">model_a_id</span>, <span class="kw-2">*</span><span class="ident">model_b_id</span>, <span class="kw-2">&amp;</span><span class="self">self</span>[<span class="kw-2">*</span><span class="ident">relation_idx</span>]))
     }
 
-    <span class="doccomment">/// Iterator over relation id</span>
+    <span class="doccomment">/// Iterator over relations where the provided model is model A, or the forward side of the</span>
+    <span class="doccomment">/// relation.</span>
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">from_model</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">model_a_id</span>: <span class="ident">ast::ModelId</span>) -&gt; <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">RelationId</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;_</span> {
         <span class="self">self</span>.<span class="ident">forward</span>
             .<span class="ident">range</span>((<span class="ident">model_a_id</span>, <span class="ident">ast::ModelId::ZERO</span>, <span class="ident">RelationId::MIN</span>)..(<span class="ident">model_a_id</span>, <span class="ident">ast::ModelId::MAX</span>, <span class="ident">RelationId::MAX</span>))
             .<span class="ident">map</span>(<span class="kw">move</span> <span class="op">|</span>(<span class="kw">_</span>, <span class="kw">_</span>, <span class="ident">relation_id</span>)<span class="op">|</span> <span class="kw-2">*</span><span class="ident">relation_id</span>)
     }
 
-    <span class="doccomment">/// Iterator over relation id</span>
+    <span class="doccomment">/// Iterator over relationss where the provided model is model B, or the backrelation side of</span>
+    <span class="doccomment">/// the relation.</span>
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">to_model</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">model_a_id</span>: <span class="ident">ast::ModelId</span>) -&gt; <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">RelationId</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;_</span> {
         <span class="self">self</span>.<span class="ident">back</span>
             .<span class="ident">range</span>((<span class="ident">model_a_id</span>, <span class="ident">ast::ModelId::ZERO</span>, <span class="ident">RelationId::MIN</span>)..(<span class="ident">model_a_id</span>, <span class="ident">ast::ModelId::MAX</span>, <span class="ident">RelationId::MAX</span>))
@@ -601,35 +615,38 @@
 }
 
 <span class="comment">// Implementation detail for this module. Should stay private.</span>
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">struct</span> <span class="ident">RelationEvidence</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">ast_model</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;ast</span> <span class="ident">ast::Model</span>,
+<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">struct</span> <span class="ident">RelationEvidence</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">ast_model</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">ast::Model</span>,
     <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">model_id</span>: <span class="ident">ast::ModelId</span>,
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">ast_field</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;ast</span> <span class="ident">ast::Field</span>,
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">ast_field</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">ast::Field</span>,
     <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">field_id</span>: <span class="ident">ast::FieldId</span>,
     <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">is_self_relation</span>: <span class="ident">bool</span>,
     <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">relation_field</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">RelationField</span>,
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">opposite_model</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;ast</span> <span class="ident">ast::Model</span>,
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">opposite_relation_field</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">ast::FieldId</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;ast</span> <span class="ident">ast::Field</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">RelationField</span>)<span class="op">&gt;</span>,
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">opposite_model</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">ast::Model</span>,
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">opposite_relation_field</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">ast::FieldId</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">ast::Field</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">RelationField</span>)<span class="op">&gt;</span>,
 }
 
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">relation_evidence</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;db</span><span class="op">&gt;</span>(
+<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">relation_evidence</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span>(
     ((<span class="ident">model_id</span>, <span class="ident">field_id</span>), <span class="ident">relation_field</span>): (<span class="kw-2">&amp;</span>(<span class="ident">ast::ModelId</span>, <span class="ident">ast::FieldId</span>), <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">RelationField</span>),
-    <span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="lifetime">&#39;ast</span><span class="op">&gt;</span>,
-) -&gt; <span class="ident">RelationEvidence</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">ast_model</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">ctx</span>.<span class="ident">db</span>.<span class="ident">ast</span>[<span class="kw-2">*</span><span class="ident">model_id</span>];
+    <span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span>,
+) -&gt; <span class="ident">RelationEvidence</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
+    <span class="kw">let</span> <span class="ident">ast</span> <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">ast</span>;
+    <span class="kw">let</span> <span class="ident">ast_model</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">ast</span>[<span class="kw-2">*</span><span class="ident">model_id</span>];
     <span class="kw">let</span> <span class="ident">ast_field</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">ast_model</span>[<span class="kw-2">*</span><span class="ident">field_id</span>];
-    <span class="kw">let</span> <span class="ident">opposite_model</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">ctx</span>.<span class="ident">db</span>.<span class="ident">ast</span>[<span class="ident">relation_field</span>.<span class="ident">referenced_model</span>];
+    <span class="kw">let</span> <span class="ident">opposite_model</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">ast</span>[<span class="ident">relation_field</span>.<span class="ident">referenced_model</span>];
     <span class="kw">let</span> <span class="ident">is_self_relation</span> <span class="op">=</span> <span class="kw-2">*</span><span class="ident">model_id</span> <span class="op">==</span> <span class="ident">relation_field</span>.<span class="ident">referenced_model</span>;
-    <span class="kw">let</span> <span class="ident">opposite_relation_field</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">ast::FieldId</span>, <span class="kw-2">&amp;</span><span class="ident">ast::Field</span>, <span class="kw-2">&amp;</span><span class="ident">RelationField</span>)<span class="op">&gt;</span> <span class="op">=</span> <span class="ident">ctx</span>
-        .<span class="ident">db</span>
-        .<span class="ident">walk_model</span>(<span class="ident">relation_field</span>.<span class="ident">referenced_model</span>)
-        .<span class="ident">relation_fields</span>()
+    <span class="kw">let</span> <span class="ident">opposite_relation_field</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">ast::FieldId</span>, <span class="kw-2">&amp;</span><span class="ident">ast::Field</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">RelationField</span>)<span class="op">&gt;</span> <span class="op">=</span> <span class="ident">ctx</span>
+        .<span class="ident">types</span>
+        .<span class="ident">relation_fields</span>
+        .<span class="ident">range</span>(
+            (<span class="ident">relation_field</span>.<span class="ident">referenced_model</span>, <span class="ident">ast::FieldId::MIN</span>)..(<span class="ident">relation_field</span>.<span class="ident">referenced_model</span>, <span class="ident">ast::FieldId::MAX</span>),
+        )
         <span class="comment">// Only considers relations between the same models</span>
-        .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">opposite_relation_field</span><span class="op">|</span> <span class="ident">opposite_relation_field</span>.<span class="ident">references_model</span>(<span class="kw-2">*</span><span class="ident">model_id</span>))
+        .<span class="ident">filter</span>(<span class="op">|</span>(<span class="kw">_</span>, <span class="ident">opposite_relation_field</span>)<span class="op">|</span> <span class="ident">opposite_relation_field</span>.<span class="ident">referenced_model</span> <span class="op">==</span> <span class="kw-2">*</span><span class="ident">model_id</span>)
         <span class="comment">// Filter out the field itself, in case of self-relations</span>
-        .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">opposite_relation_field</span><span class="op">|</span> <span class="op">!</span><span class="ident">is_self_relation</span> <span class="op">|</span><span class="op">|</span> <span class="ident">opposite_relation_field</span>.<span class="ident">field_id</span> <span class="op">!</span><span class="op">=</span> <span class="kw-2">*</span><span class="ident">field_id</span>)
-        .<span class="ident">find</span>(<span class="op">|</span><span class="ident">opposite_relation_field</span><span class="op">|</span> <span class="ident">opposite_relation_field</span>.<span class="ident">relation_field</span>.<span class="ident">name</span> <span class="op">==</span> <span class="ident">relation_field</span>.<span class="ident">name</span>)
-        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">opp_rf</span><span class="op">|</span> (<span class="ident">opp_rf</span>.<span class="ident">field_id</span>(), <span class="ident">opp_rf</span>.<span class="ident">ast_field</span>(), <span class="ident">opp_rf</span>.<span class="ident">relation_field</span>));
+        .<span class="ident">filter</span>(<span class="op">|</span>((<span class="kw">_</span>, <span class="ident">opp_relation_field_id</span>), <span class="kw">_</span>)<span class="op">|</span> <span class="op">!</span><span class="ident">is_self_relation</span> <span class="op">|</span><span class="op">|</span> <span class="ident">opp_relation_field_id</span> <span class="op">!</span><span class="op">=</span> <span class="ident">field_id</span>)
+        .<span class="ident">find</span>(<span class="op">|</span>(<span class="kw">_</span>, <span class="ident">opposite_relation_field</span>)<span class="op">|</span> <span class="ident">opposite_relation_field</span>.<span class="ident">name</span> <span class="op">==</span> <span class="ident">relation_field</span>.<span class="ident">name</span>)
+        .<span class="ident">map</span>(<span class="op">|</span>((<span class="ident">opp_model_id</span>, <span class="ident">opp_field_id</span>), <span class="ident">opp_rf</span>)<span class="op">|</span> (<span class="kw-2">*</span><span class="ident">opp_field_id</span>, <span class="kw-2">&amp;</span><span class="ident">ast</span>[<span class="kw-2">*</span><span class="ident">opp_model_id</span>][<span class="kw-2">*</span><span class="ident">opp_field_id</span>], <span class="ident">opp_rf</span>));
 
     <span class="ident">RelationEvidence</span> {
         <span class="ident">ast_model</span>,
@@ -643,11 +660,7 @@
     }
 }
 
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">ingest_relation</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;db</span><span class="op">&gt;</span>(
-    <span class="ident">evidence</span>: <span class="ident">RelationEvidence</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;db</span><span class="op">&gt;</span>,
-    <span class="ident">relations</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Relations</span>,
-    <span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="lifetime">&#39;ast</span><span class="op">&gt;</span>,
-) {
+<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">ingest_relation</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span>(<span class="ident">evidence</span>: <span class="ident">RelationEvidence</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span>, <span class="ident">relations</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Relations</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span>) {
     <span class="comment">// In this function, we want to ingest the relation only once,</span>
     <span class="comment">// so if we know that we will create a relation for the opposite</span>
     <span class="comment">// field, we skip the field by returning early.</span>
@@ -739,8 +752,19 @@
             <span class="comment">// relation scalar fields are unique to determine whether it is a</span>
             <span class="comment">// 1:1 or a 1:m relation.</span>
             <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">evidence</span>.<span class="ident">relation_field</span>.<span class="ident">fields</span> {
-                <span class="prelude-val">Some</span>(<span class="ident">fields</span>) <span class="kw">if</span> <span class="ident">ctx</span>.<span class="ident">db</span>.<span class="ident">walk_model</span>(<span class="ident">evidence</span>.<span class="ident">model_id</span>).<span class="ident">fields_are_unique</span>(<span class="ident">fields</span>) =&gt; {
-                    <span class="ident">RelationAttributes::OneToOne</span>(<span class="ident">OneToOneRelationFields::Forward</span>(<span class="ident">evidence</span>.<span class="ident">field_id</span>))
+                <span class="prelude-val">Some</span>(<span class="ident">fields</span>) =&gt; {
+                    <span class="kw">let</span> <span class="ident">fields_are_unique</span> <span class="op">=</span>
+                        <span class="ident">ctx</span>.<span class="ident">types</span>.<span class="ident">model_attributes</span>[<span class="kw-2">&amp;</span><span class="ident">evidence</span>.<span class="ident">model_id</span>]
+                            .<span class="ident">ast_indexes</span>
+                            .<span class="ident">iter</span>()
+                            .<span class="ident">any</span>(<span class="op">|</span>(<span class="kw">_</span>, <span class="ident">idx</span>)<span class="op">|</span> {
+                                <span class="ident">idx</span>.<span class="ident">is_unique</span>() <span class="op">&amp;&amp;</span> <span class="kw-2">&amp;</span><span class="ident">idx</span>.<span class="ident">fields</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">field_id</span>).<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>() <span class="op">==</span> <span class="ident">fields</span>
+                            });
+                    <span class="kw">if</span> <span class="ident">fields_are_unique</span> {
+                        <span class="ident">RelationAttributes::OneToOne</span>(<span class="ident">OneToOneRelationFields::Forward</span>(<span class="ident">evidence</span>.<span class="ident">field_id</span>))
+                    } <span class="kw">else</span> {
+                        <span class="ident">RelationAttributes::OneToMany</span>(<span class="ident">OneToManyRelationFields::Forward</span>(<span class="ident">evidence</span>.<span class="ident">field_id</span>))
+                    }
                 }
                 <span class="kw">_</span> =&gt; <span class="ident">RelationAttributes::OneToMany</span>(<span class="ident">OneToManyRelationFields::Forward</span>(<span class="ident">evidence</span>.<span class="ident">field_id</span>)),
             }

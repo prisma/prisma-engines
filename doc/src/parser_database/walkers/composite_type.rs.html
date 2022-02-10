@@ -163,6 +163,9 @@
 <span id="162">162</span>
 <span id="163">163</span>
 <span id="164">164</span>
+<span id="165">165</span>
+<span id="166">166</span>
+<span id="167">167</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">ast</span>, <span class="ident">types</span>, <span class="ident">ParserDatabase</span>, <span class="ident">ScalarFieldType</span>};
 <span class="kw">use</span> <span class="ident">diagnostics::Span</span>;
 
@@ -181,35 +184,35 @@
 <span class="doccomment">/// }</span>
 <span class="doccomment">/// ```</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CompositeTypeWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CompositeTypeWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
     <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">ctid</span>: <span class="ident">ast::CompositeTypeId</span>,
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">db</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">ParserDatabase</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">db</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">ParserDatabase</span>,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;db</span><span class="op">&gt;</span> <span class="ident">PartialEq</span> <span class="kw">for</span> <span class="ident">CompositeTypeWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
+<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> <span class="ident">PartialEq</span> <span class="kw">for</span> <span class="ident">CompositeTypeWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
     <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">ctid</span> <span class="op">==</span> <span class="ident">other</span>.<span class="ident">ctid</span>
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;db</span><span class="op">&gt;</span> <span class="ident">CompositeTypeWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
+<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> <span class="ident">CompositeTypeWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
     <span class="doccomment">/// The ID of the composite type node in the AST.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">composite_type_id</span>(<span class="self">self</span>) -&gt; <span class="ident">ast::CompositeTypeId</span> {
         <span class="self">self</span>.<span class="ident">ctid</span>
     }
 
     <span class="doccomment">/// The composite type node in the AST.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ast_composite_type</span>(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;ast</span> <span class="ident">ast::CompositeType</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ast_composite_type</span>(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">ast::CompositeType</span> {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">db</span>.<span class="ident">ast</span>()[<span class="self">self</span>.<span class="ident">ctid</span>]
     }
 
     <span class="doccomment">/// The name of the composite type in the schema.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">name</span>(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;ast</span> <span class="ident">str</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">name</span>(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">str</span> {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">db</span>.<span class="ident">ast</span>[<span class="self">self</span>.<span class="ident">ctid</span>].<span class="ident">name</span>.<span class="ident">name</span>
     }
 
     <span class="doccomment">/// Get the field with the given ID.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">field</span>(<span class="self">self</span>, <span class="ident">field_id</span>: <span class="ident">ast::FieldId</span>) -&gt; <span class="ident">CompositeTypeFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">field</span>(<span class="self">self</span>, <span class="ident">field_id</span>: <span class="ident">ast::FieldId</span>) -&gt; <span class="ident">CompositeTypeFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">field</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">db</span>.<span class="ident">types</span>.<span class="ident">composite_type_fields</span>[<span class="kw-2">&amp;</span>(<span class="self">self</span>.<span class="ident">ctid</span>, <span class="ident">field_id</span>)];
 
         <span class="ident">CompositeTypeFieldWalker</span> {
@@ -221,11 +224,11 @@
     }
 
     <span class="doccomment">/// Iterator over all the fields of the composite type.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">fields</span>(<span class="self">self</span>) -&gt; <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">CompositeTypeFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;db</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">fields</span>(<span class="self">self</span>) -&gt; <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">CompositeTypeFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">db</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">db</span>;
         <span class="ident">db</span>.<span class="ident">types</span>
             .<span class="ident">composite_type_fields</span>
-            .<span class="ident">range</span>((<span class="self">self</span>.<span class="ident">ctid</span>, <span class="ident">ast::FieldId::ZERO</span>)..(<span class="self">self</span>.<span class="ident">ctid</span>, <span class="ident">ast::FieldId::MAX</span>))
+            .<span class="ident">range</span>((<span class="self">self</span>.<span class="ident">ctid</span>, <span class="ident">ast::FieldId::MIN</span>)..(<span class="self">self</span>.<span class="ident">ctid</span>, <span class="ident">ast::FieldId::MAX</span>))
             .<span class="ident">map</span>(<span class="kw">move</span> <span class="op">|</span>((<span class="ident">ctid</span>, <span class="ident">field_id</span>), <span class="ident">field</span>)<span class="op">|</span> <span class="ident">CompositeTypeFieldWalker</span> {
                 <span class="ident">ctid</span>: <span class="kw-2">*</span><span class="ident">ctid</span>,
                 <span class="ident">field_id</span>: <span class="kw-2">*</span><span class="ident">field_id</span>,
@@ -237,21 +240,21 @@
 
 <span class="doccomment">/// A field in a composite type.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CompositeTypeFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CompositeTypeFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
     <span class="ident">ctid</span>: <span class="ident">ast::CompositeTypeId</span>,
     <span class="ident">field_id</span>: <span class="ident">ast::FieldId</span>,
-    <span class="ident">field</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">types::CompositeTypeField</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span>,
-    <span class="ident">db</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">ParserDatabase</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span>,
+    <span class="ident">field</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">types::CompositeTypeField</span>,
+    <span class="ident">db</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">ParserDatabase</span>,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;db</span><span class="op">&gt;</span> <span class="ident">CompositeTypeFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
+<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> <span class="ident">CompositeTypeFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
     <span class="doccomment">/// The AST node for the field.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ast_field</span>(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;ast</span> <span class="ident">ast::Field</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ast_field</span>(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">ast::Field</span> {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">db</span>.<span class="ident">ast</span>[<span class="self">self</span>.<span class="ident">ctid</span>][<span class="self">self</span>.<span class="ident">field_id</span>]
     }
 
     <span class="doccomment">/// The composite type containing the field.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">composite_type</span>(<span class="self">self</span>) -&gt; <span class="ident">CompositeTypeWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">composite_type</span>(<span class="self">self</span>) -&gt; <span class="ident">CompositeTypeWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
         <span class="ident">CompositeTypeWalker</span> {
             <span class="ident">ctid</span>: <span class="self">self</span>.<span class="ident">ctid</span>,
             <span class="ident">db</span>: <span class="self">self</span>.<span class="ident">db</span>,
@@ -269,7 +272,7 @@
     }
 
     <span class="doccomment">/// The name of the field.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">name</span>(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;ast</span> <span class="ident">str</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">name</span>(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">str</span> {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">ast_field</span>().<span class="ident">name</span>.<span class="ident">name</span>
     }
 
@@ -284,18 +287,19 @@
     }
 
     <span class="doccomment">/// The `@default()` AST attribute on the field, if any.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">default_attribute</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;ast</span> <span class="ident">ast::Attribute</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">default_attribute</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">ast::Attribute</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">field</span>.<span class="ident">default</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">d</span><span class="op">|</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">db</span>.<span class="ident">ast</span>[<span class="ident">d</span>.<span class="ident">default_attribute</span>])
     }
 
     <span class="doccomment">/// (attribute scope, native type name, arguments, span)</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// For example: `@db.Text` would translate to (&quot;db&quot;, &quot;Text&quot;, &amp;[], &lt;the span&gt;)</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">raw_native_type</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;ast</span> <span class="ident">str</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;ast</span> <span class="ident">str</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> [<span class="ident">String</span>], <span class="ident">Span</span>)<span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">raw_native_type</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">str</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">str</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> [<span class="ident">String</span>], <span class="ident">Span</span>)<span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">db</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">db</span>;
         <span class="self">self</span>.<span class="ident">field</span>
             .<span class="ident">native_type</span>
             .<span class="ident">as_ref</span>()
-            .<span class="ident">map</span>(<span class="kw">move</span> <span class="op">|</span>(<span class="ident">datasource_name</span>, <span class="ident">name</span>, <span class="ident">args</span>, <span class="ident">span</span>)<span class="op">|</span> (<span class="kw-2">*</span><span class="ident">datasource_name</span>, <span class="kw-2">*</span><span class="ident">name</span>, <span class="ident">args</span>.<span class="ident">as_slice</span>(), <span class="kw-2">*</span><span class="ident">span</span>))
+            .<span class="ident">map</span>(<span class="kw">move</span> <span class="op">|</span>(<span class="ident">datasource_name</span>, <span class="ident">name</span>, <span class="ident">args</span>, <span class="ident">span</span>)<span class="op">|</span> (<span class="kw-2">&amp;</span><span class="ident">db</span>[<span class="kw-2">*</span><span class="ident">datasource_name</span>], <span class="kw-2">&amp;</span><span class="ident">db</span>[<span class="kw-2">*</span><span class="ident">name</span>], <span class="ident">args</span>.<span class="ident">as_slice</span>(), <span class="kw-2">*</span><span class="ident">span</span>))
     }
 
     <span class="doccomment">/// Can the client use the field.</span>
@@ -309,8 +313,10 @@
     <span class="doccomment">/// score Int @default(0)</span>
     <span class="doccomment">///                    ^</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">default_value</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;ast</span> <span class="ident">ast::Expression</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">field</span>.<span class="ident">default</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">d</span><span class="op">|</span> <span class="ident">d</span>.<span class="ident">value</span>)
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">default_value</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">ast::Expression</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">argument_idx</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">field</span>.<span class="ident">default</span>.<span class="ident">as_ref</span>()<span class="question-mark">?</span>.<span class="ident">argument_idx</span>;
+        <span class="kw">let</span> <span class="ident">attr</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">default_attribute</span>()<span class="question-mark">?</span>;
+        <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">attr</span>.<span class="ident">arguments</span>.<span class="ident">arguments</span>[<span class="ident">argument_idx</span>].<span class="ident">value</span>)
     }
 
     <span class="doccomment">/// The mapped name of the default value. Always `None` in composite types at the moment.</span>

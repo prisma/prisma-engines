@@ -33,7 +33,7 @@
 <span class="doccomment">/// all relevant lifetimes. No data escapes for validations, so the context only need to be valid</span>
 <span class="doccomment">/// for the duration of validations.</span>
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">db</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">ParserDatabase</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">db</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">ParserDatabase</span>,
     <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">datasource</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Datasource</span><span class="op">&gt;</span>,
     <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">preview_features</span>: <span class="ident">BitFlags</span><span class="op">&lt;</span><span class="ident">PreviewFeature</span><span class="op">&gt;</span>,
     <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">connector</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="kw">dyn</span> <span class="ident">Connector</span>,

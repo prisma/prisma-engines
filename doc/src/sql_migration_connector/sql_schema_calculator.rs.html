@@ -444,7 +444,7 @@
 };
 <span class="kw">use</span> <span class="ident">sql_schema_describer</span> <span class="kw">as</span> <span class="ident">sql</span>;
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">calculate_sql_schema</span>(<span class="ident">datamodel</span>: <span class="kw-2">&amp;</span><span class="ident">ValidatedSchema</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">flavour</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">SqlFlavour</span>) -&gt; <span class="ident">sql::SqlSchema</span> {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">calculate_sql_schema</span>(<span class="ident">datamodel</span>: <span class="kw-2">&amp;</span><span class="ident">ValidatedSchema</span>, <span class="ident">flavour</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">SqlFlavour</span>) -&gt; <span class="ident">sql::SqlSchema</span> {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">schema</span> <span class="op">=</span> <span class="ident">sql::SqlSchema::empty</span>();
 
     <span class="ident">schema</span>.<span class="ident">enums</span> <span class="op">=</span> <span class="ident">flavour</span>.<span class="ident">calculate_enums</span>(<span class="ident">datamodel</span>);
@@ -539,7 +539,7 @@
     }
 }
 
-<span class="kw">fn</span> <span class="ident">push_inline_relations</span>(<span class="ident">model</span>: <span class="ident">ModelWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">table</span>: <span class="kw-2">&amp;mut</span> <span class="ident">sql::Table</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
+<span class="kw">fn</span> <span class="ident">push_inline_relations</span>(<span class="ident">model</span>: <span class="ident">ModelWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">table</span>: <span class="kw-2">&amp;mut</span> <span class="ident">sql::Table</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
     <span class="kw">let</span> <span class="ident">relations</span> <span class="op">=</span> <span class="ident">model</span>.<span class="ident">relations_from</span>().<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">r</span><span class="op">|</span> <span class="ident">r</span>.<span class="ident">refine</span>().<span class="ident">as_inline</span>());
 
     <span class="kw">for</span> <span class="ident">relation</span> <span class="kw">in</span> <span class="ident">relations</span> {
@@ -669,7 +669,7 @@
     }
 }
 
-<span class="kw">fn</span> <span class="ident">column_for_scalar_field</span>(<span class="ident">field</span>: <span class="ident">ScalarFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">sql::Column</span> {
+<span class="kw">fn</span> <span class="ident">column_for_scalar_field</span>(<span class="ident">field</span>: <span class="ident">ScalarFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">sql::Column</span> {
     <span class="kw">match</span> <span class="ident">field</span>.<span class="ident">resolved_scalar_field_type</span>() {
         <span class="ident">ScalarFieldType::Enum</span>(<span class="ident">enum_id</span>) =&gt; <span class="ident">column_for_model_enum_scalar_field</span>(<span class="ident">field</span>, <span class="ident">enum_id</span>, <span class="ident">ctx</span>),
         <span class="ident">ScalarFieldType::CompositeType</span>(<span class="kw">_</span>) =&gt; <span class="ident">column_for_builtin_scalar_type</span>(<span class="ident">field</span>, <span class="ident">ScalarType::Json</span>, <span class="ident">ctx</span>),
@@ -680,7 +680,7 @@
 }
 
 <span class="kw">fn</span> <span class="ident">column_for_model_enum_scalar_field</span>(
-    <span class="ident">field</span>: <span class="ident">ScalarFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
+    <span class="ident">field</span>: <span class="ident">ScalarFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
     <span class="ident">enum_id</span>: <span class="ident">ast::EnumId</span>,
     <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
 ) -&gt; <span class="ident">sql::Column</span> {
@@ -708,7 +708,7 @@
     }
 }
 
-<span class="kw">fn</span> <span class="ident">column_for_model_unsupported_scalar_field</span>(<span class="ident">field</span>: <span class="ident">ScalarFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">sql::Column</span> {
+<span class="kw">fn</span> <span class="ident">column_for_model_unsupported_scalar_field</span>(<span class="ident">field</span>: <span class="ident">ScalarFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">sql::Column</span> {
     <span class="ident">sql::Column</span> {
         <span class="ident">name</span>: <span class="ident">field</span>.<span class="ident">database_name</span>().<span class="ident">to_owned</span>(),
         <span class="ident">tpe</span>: <span class="ident">ctx</span>.<span class="ident">flavour</span>.<span class="ident">column_type_for_unsupported_type</span>(
@@ -731,7 +731,7 @@
 }
 
 <span class="kw">fn</span> <span class="ident">column_for_builtin_scalar_type</span>(
-    <span class="ident">field</span>: <span class="ident">ScalarFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
+    <span class="ident">field</span>: <span class="ident">ScalarFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
     <span class="ident">scalar_type</span>: <span class="ident">ScalarType</span>,
     <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
 ) -&gt; <span class="ident">sql::Column</span> {
@@ -831,7 +831,7 @@
 }
 
 <span class="kw">struct</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="ident">datamodel</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">ValidatedSchema</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
+    <span class="ident">datamodel</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">ValidatedSchema</span>,
     <span class="ident">schema</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">sql::SqlSchema</span>,
     <span class="ident">flavour</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw">dyn</span> <span class="ident">SqlFlavour</span>,
 }

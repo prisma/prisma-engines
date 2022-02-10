@@ -377,10 +377,6 @@
 <span id="376">376</span>
 <span id="377">377</span>
 <span id="378">378</span>
-<span id="379">379</span>
-<span id="380">380</span>
-<span id="381">381</span>
-<span id="382">382</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">constraint_namespace::ConstraintName</span>, <span class="ident">database_name::validate_db_name</span>};
 <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">ast::Span</span>,
@@ -396,11 +392,7 @@
 
 <span class="doccomment">/// Different databases validate index and unique constraint names in a certain namespace.</span>
 <span class="doccomment">/// Validates index and unique constraint names against the database requirements.</span>
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">has_a_unique_constraint_name</span>(
-    <span class="ident">index</span>: <span class="ident">IndexWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-    <span class="ident">names</span>: <span class="kw-2">&amp;</span><span class="ident"><span class="kw">super</span>::Names</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-    <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-) {
+<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">has_a_unique_constraint_name</span>(<span class="ident">index</span>: <span class="ident">IndexWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">names</span>: <span class="kw-2">&amp;</span><span class="ident"><span class="kw">super</span>::Names</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
     <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">index</span>.<span class="ident">constraint_name</span>(<span class="ident">ctx</span>.<span class="ident">connector</span>);
     <span class="kw">let</span> <span class="ident">model</span> <span class="op">=</span> <span class="ident">index</span>.<span class="ident">model</span>();
 
@@ -433,7 +425,7 @@
 <span class="doccomment">/// The custom name argument makes its way into the generated client API. Therefore the name argument</span>
 <span class="doccomment">/// needs to be unique per model. It can be found on the primary key or unique indexes.</span>
 <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">unique_index_has_a_unique_custom_name_per_model</span>(
-    <span class="ident">index</span>: <span class="ident">IndexWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
+    <span class="ident">index</span>: <span class="ident">IndexWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
     <span class="ident">names</span>: <span class="kw-2">&amp;</span><span class="ident"><span class="kw">super</span>::Names</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
     <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
 ) {
@@ -465,7 +457,7 @@
 }
 
 <span class="doccomment">/// sort and length are not yet allowed</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">uses_length_or_sort_without_preview_flag</span>(<span class="ident">index</span>: <span class="ident">IndexWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">uses_length_or_sort_without_preview_flag</span>(<span class="ident">index</span>: <span class="ident">IndexWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
     <span class="kw">if</span> <span class="ident">ctx</span>.<span class="ident">preview_features</span>.<span class="ident">contains</span>(<span class="ident">PreviewFeature::ExtendedIndexes</span>) {
         <span class="kw">return</span>;
     }
@@ -485,7 +477,7 @@
 }
 
 <span class="doccomment">/// The database must support the index length prefix for it to be allowed in the data model.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">field_length_prefix_supported</span>(<span class="ident">index</span>: <span class="ident">IndexWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">field_length_prefix_supported</span>(<span class="ident">index</span>: <span class="ident">IndexWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
     <span class="kw">if</span> <span class="ident">ctx</span>
         .<span class="ident">connector</span>
         .<span class="ident">has_capability</span>(<span class="ident">ConnectorCapability::IndexColumnLengthPrefixing</span>)
@@ -506,7 +498,7 @@
 }
 
 <span class="doccomment">/// Is `Hash` supported as `type`</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">index_algorithm_is_supported</span>(<span class="ident">index</span>: <span class="ident">IndexWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">index_algorithm_is_supported</span>(<span class="ident">index</span>: <span class="ident">IndexWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
     <span class="kw">if</span> <span class="ident">ctx</span>.<span class="ident">connector</span>.<span class="ident">has_capability</span>(<span class="ident">ConnectorCapability::UsingHashIndex</span>) {
         <span class="kw">return</span>;
     }
@@ -523,7 +515,7 @@
 }
 
 <span class="doccomment">/// `@@fulltext` attribute is not available without `fullTextIndex` preview feature.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">fulltext_index_preview_feature_enabled</span>(<span class="ident">index</span>: <span class="ident">IndexWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">fulltext_index_preview_feature_enabled</span>(<span class="ident">index</span>: <span class="ident">IndexWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
     <span class="kw">if</span> <span class="ident">ctx</span>.<span class="ident">preview_features</span>.<span class="ident">contains</span>(<span class="ident">PreviewFeature::FullTextIndex</span>) {
         <span class="kw">return</span>;
     }
@@ -543,7 +535,7 @@
 }
 
 <span class="doccomment">/// `@@fulltext` should only be available if we support it in the database.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">fulltext_index_supported</span>(<span class="ident">index</span>: <span class="ident">IndexWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">fulltext_index_supported</span>(<span class="ident">index</span>: <span class="ident">IndexWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
     <span class="kw">if</span> <span class="ident">ctx</span>.<span class="ident">connector</span>.<span class="ident">has_capability</span>(<span class="ident">ConnectorCapability::FullTextIndex</span>) {
         <span class="kw">return</span>;
     }
@@ -563,7 +555,7 @@
 }
 
 <span class="doccomment">/// Defining the `type` must be with `extendedIndexes` preview feature.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">index_algorithm_preview_feature</span>(<span class="ident">index</span>: <span class="ident">IndexWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">index_algorithm_preview_feature</span>(<span class="ident">index</span>: <span class="ident">IndexWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
     <span class="kw">if</span> <span class="ident">ctx</span>.<span class="ident">preview_features</span>.<span class="ident">contains</span>(<span class="ident">PreviewFeature::ExtendedIndexes</span>) {
         <span class="kw">return</span>;
     }
@@ -581,7 +573,7 @@
 }
 
 <span class="doccomment">/// `@@fulltext` index columns should not define `length` argument.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">fulltext_columns_should_not_define_length</span>(<span class="ident">index</span>: <span class="ident">IndexWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">fulltext_columns_should_not_define_length</span>(<span class="ident">index</span>: <span class="ident">IndexWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
     <span class="kw">if</span> <span class="op">!</span><span class="ident">ctx</span>.<span class="ident">preview_features</span>.<span class="ident">contains</span>(<span class="ident">PreviewFeature::FullTextIndex</span>) {
         <span class="kw">return</span>;
     }
@@ -610,7 +602,7 @@
 }
 
 <span class="doccomment">/// Only MongoDB supports sort order in a fulltext index.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">fulltext_column_sort_is_supported</span>(<span class="ident">index</span>: <span class="ident">IndexWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">fulltext_column_sort_is_supported</span>(<span class="ident">index</span>: <span class="ident">IndexWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
     <span class="kw">if</span> <span class="op">!</span><span class="ident">ctx</span>.<span class="ident">preview_features</span>.<span class="ident">contains</span>(<span class="ident">PreviewFeature::FullTextIndex</span>) {
         <span class="kw">return</span>;
     }
@@ -650,7 +642,7 @@
 <span class="doccomment">/// ```ignore</span>
 <span class="doccomment">/// @@fulltext([a(sort: Asc), b, c(sort: Asc), d])</span>
 <span class="doccomment">/// ```</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">fulltext_text_columns_should_be_bundled_together</span>(<span class="ident">index</span>: <span class="ident">IndexWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">fulltext_text_columns_should_be_bundled_together</span>(<span class="ident">index</span>: <span class="ident">IndexWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
     <span class="kw">if</span> <span class="op">!</span><span class="ident">ctx</span>.<span class="ident">preview_features</span>.<span class="ident">contains</span>(<span class="ident">PreviewFeature::FullTextIndex</span>) {
         <span class="kw">return</span>;
     }
@@ -709,7 +701,7 @@
 }
 
 <span class="doccomment">/// The ordering is only possible with `BTree` access method.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">hash_index_must_not_use_sort_param</span>(<span class="ident">index</span>: <span class="ident">IndexWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">hash_index_must_not_use_sort_param</span>(<span class="ident">index</span>: <span class="ident">IndexWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
     <span class="kw">if</span> <span class="op">!</span><span class="ident">ctx</span>.<span class="ident">preview_features</span>.<span class="ident">contains</span>(<span class="ident">PreviewFeature::ExtendedIndexes</span>) {
         <span class="kw">return</span>;
     }
@@ -734,7 +726,7 @@
     }
 }
 
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">has_valid_mapped_name</span>(<span class="ident">index</span>: <span class="ident">IndexWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
+<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">has_valid_mapped_name</span>(<span class="ident">index</span>: <span class="ident">IndexWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
     <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">ast_attribute</span>) <span class="op">=</span> <span class="ident">index</span>.<span class="ident">ast_attribute</span>() {
         <span class="ident">validate_db_name</span>(
             <span class="ident">index</span>.<span class="ident">model</span>().<span class="ident">name</span>(),
@@ -746,7 +738,7 @@
     }
 }
 
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">has_fields</span>(<span class="ident">index</span>: <span class="ident">IndexWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
+<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">has_fields</span>(<span class="ident">index</span>: <span class="ident">IndexWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
     <span class="kw">if</span> <span class="ident">index</span>.<span class="ident">fields</span>().<span class="ident">len</span>() <span class="op">&gt;</span> <span class="number">0</span> {
         <span class="kw">return</span>;
     }

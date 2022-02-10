@@ -274,7 +274,7 @@
 };
 
 <span class="doccomment">/// A relation should have the explicit and back-relation side defined.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">both_sides_are_defined</span>(<span class="ident">relation</span>: <span class="ident">InlineRelationWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">both_sides_are_defined</span>(<span class="ident">relation</span>: <span class="ident">InlineRelationWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
     <span class="kw">if</span> <span class="ident">relation</span>.<span class="ident">back_relation_field</span>().<span class="ident">is_some</span>() {
         <span class="kw">return</span>;
     }
@@ -297,7 +297,7 @@
 }
 
 <span class="doccomment">/// The forward side must define `fields` and `references` in the `@relation` attribute.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">fields_and_references_are_defined</span>(<span class="ident">relation</span>: <span class="ident">InlineRelationWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">fields_and_references_are_defined</span>(<span class="ident">relation</span>: <span class="ident">InlineRelationWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
     <span class="kw">let</span> (<span class="ident">forward</span>, <span class="ident">back</span>) <span class="op">=</span> <span class="kw">match</span> (<span class="ident">relation</span>.<span class="ident">forward_relation_field</span>(), <span class="ident">relation</span>.<span class="ident">back_relation_field</span>()) {
         (<span class="prelude-val">Some</span>(<span class="ident">forward</span>), <span class="prelude-val">Some</span>(<span class="ident">back</span>)) =&gt; (<span class="ident">forward</span>, <span class="ident">back</span>),
         <span class="kw">_</span> =&gt; <span class="kw">return</span>,
@@ -358,7 +358,7 @@
 
 <span class="doccomment">/// `fields` and `references` should only be defined in the forward side of the relation.</span>
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">fields_and_references_defined_on_one_side_only</span>(
-    <span class="ident">relation</span>: <span class="ident">InlineRelationWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
+    <span class="ident">relation</span>: <span class="ident">InlineRelationWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
     <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
 ) {
     <span class="kw">let</span> (<span class="ident">forward</span>, <span class="ident">back</span>) <span class="op">=</span> <span class="kw">match</span> (<span class="ident">relation</span>.<span class="ident">forward_relation_field</span>(), <span class="ident">relation</span>.<span class="ident">back_relation_field</span>()) {
@@ -406,7 +406,7 @@
 }
 
 <span class="doccomment">/// Referential actions must be defined in the forward side.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">referential_actions</span>(<span class="ident">relation</span>: <span class="ident">InlineRelationWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">referential_actions</span>(<span class="ident">relation</span>: <span class="ident">InlineRelationWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
     <span class="kw">let</span> (<span class="ident">forward</span>, <span class="ident">back</span>) <span class="op">=</span> <span class="kw">match</span> (<span class="ident">relation</span>.<span class="ident">forward_relation_field</span>(), <span class="ident">relation</span>.<span class="ident">back_relation_field</span>()) {
         (<span class="prelude-val">Some</span>(<span class="ident">forward</span>), <span class="prelude-val">Some</span>(<span class="ident">back</span>)) =&gt; (<span class="ident">forward</span>, <span class="ident">back</span>),
         <span class="kw">_</span> =&gt; <span class="kw">return</span>,
@@ -453,7 +453,7 @@
 
 <span class="doccomment">/// Validation of some crazy things, such as definining `fields` and `references` on different</span>
 <span class="doccomment">/// sides in the relation.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">fields_references_mixups</span>(<span class="ident">relation</span>: <span class="ident">InlineRelationWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">fields_references_mixups</span>(<span class="ident">relation</span>: <span class="ident">InlineRelationWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
     <span class="kw">let</span> (<span class="ident">forward</span>, <span class="ident">back</span>) <span class="op">=</span> <span class="kw">match</span> (<span class="ident">relation</span>.<span class="ident">forward_relation_field</span>(), <span class="ident">relation</span>.<span class="ident">back_relation_field</span>()) {
         (<span class="prelude-val">Some</span>(<span class="ident">forward</span>), <span class="prelude-val">Some</span>(<span class="ident">back</span>)) <span class="kw">if</span> <span class="ident">ctx</span>.<span class="ident">diagnostics</span>.<span class="ident">errors</span>().<span class="ident">is_empty</span>() =&gt; (<span class="ident">forward</span>, <span class="ident">back</span>),
         <span class="kw">_</span> =&gt; <span class="kw">return</span>,
@@ -493,7 +493,7 @@
 }
 
 <span class="doccomment">/// The back-relation side cannot be required.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">back_relation_arity_is_optional</span>(<span class="ident">relation</span>: <span class="ident">InlineRelationWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">back_relation_arity_is_optional</span>(<span class="ident">relation</span>: <span class="ident">InlineRelationWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
     <span class="kw">let</span> (<span class="ident">forward</span>, <span class="ident">back</span>) <span class="op">=</span> <span class="kw">match</span> (<span class="ident">relation</span>.<span class="ident">forward_relation_field</span>(), <span class="ident">relation</span>.<span class="ident">back_relation_field</span>()) {
         (<span class="prelude-val">Some</span>(<span class="ident">forward</span>), <span class="prelude-val">Some</span>(<span class="ident">back</span>)) <span class="kw">if</span> <span class="ident">ctx</span>.<span class="ident">diagnostics</span>.<span class="ident">errors</span>().<span class="ident">is_empty</span>() =&gt; (<span class="ident">forward</span>, <span class="ident">back</span>),
         <span class="kw">_</span> =&gt; <span class="kw">return</span>,
@@ -513,7 +513,7 @@
     }
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">fields_and_references_on_wrong_side</span>(<span class="ident">relation</span>: <span class="ident">InlineRelationWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">fields_and_references_on_wrong_side</span>(<span class="ident">relation</span>: <span class="ident">InlineRelationWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
     <span class="kw">let</span> (<span class="ident">forward</span>, <span class="ident">back</span>) <span class="op">=</span> <span class="kw">match</span> (<span class="ident">relation</span>.<span class="ident">forward_relation_field</span>(), <span class="ident">relation</span>.<span class="ident">back_relation_field</span>()) {
         (<span class="prelude-val">Some</span>(<span class="ident">forward</span>), <span class="prelude-val">Some</span>(<span class="ident">back</span>)) <span class="kw">if</span> <span class="ident">ctx</span>.<span class="ident">diagnostics</span>.<span class="ident">errors</span>().<span class="ident">is_empty</span>() =&gt; (<span class="ident">forward</span>, <span class="ident">back</span>),
         <span class="kw">_</span> =&gt; <span class="kw">return</span>,

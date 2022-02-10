@@ -116,13 +116,6 @@
 <span id="115">115</span>
 <span id="116">116</span>
 <span id="117">117</span>
-<span id="118">118</span>
-<span id="119">119</span>
-<span id="120">120</span>
-<span id="121">121</span>
-<span id="122">122</span>
-<span id="123">123</span>
-<span id="124">124</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">ast</span>,
     <span class="ident">types</span>::{<span class="ident">IndexAlgorithm</span>, <span class="ident">IndexAttribute</span>},
@@ -132,22 +125,22 @@
 
 <span class="doccomment">/// An index, unique or fulltext attribute.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">IndexWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">IndexWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">model_id</span>: <span class="ident">ast::ModelId</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">index</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;ast</span> <span class="ident">ast::Attribute</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">db</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">ParserDatabase</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">index_attribute</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">IndexAttribute</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">index</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ast::AttributeId</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">db</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">ParserDatabase</span>,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">index_attribute</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">IndexAttribute</span>,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;db</span><span class="op">&gt;</span> <span class="ident">IndexWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
+<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> <span class="ident">IndexWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
     <span class="doccomment">/// The mapped name of the index.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```ignore</span>
     <span class="doccomment">/// @@index([a, b], map: &quot;theName&quot;)</span>
     <span class="doccomment">///                      ^^^^^^^^^</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">mapped_name</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;ast</span> <span class="ident">str</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">index_attribute</span>.<span class="ident">mapped_name</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">mapped_name</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">str</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">index_attribute</span>.<span class="ident">mapped_name</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">id</span><span class="op">|</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">db</span>[<span class="ident">id</span>])
     }
 
     <span class="doccomment">/// The attribute name: `&quot;unique&quot;` for `@@unique`, `&quot;fulltext&quot;` for `@@fultext` and `&quot;index&quot;`</span>
@@ -171,8 +164,8 @@
     <span class="doccomment">/// @@index([a, b], name: &quot;theName&quot;)</span>
     <span class="doccomment">///                      ^^^^^^^^^</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">name</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;ast</span> <span class="ident">str</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">index_attribute</span>.<span class="ident">name</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">name</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">str</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">index_attribute</span>.<span class="ident">name</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">id</span><span class="op">|</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">db</span>[<span class="ident">id</span>])
     }
 
     <span class="doccomment">/// The index algorithm, if a specific one was specified for the index.</span>
@@ -181,16 +174,16 @@
     }
 
     <span class="doccomment">/// The AST node of the index/unique attribute.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ast_attribute</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;ast</span> <span class="ident">ast::Attribute</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">index</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ast_attribute</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">ast::Attribute</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">index</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">id</span><span class="op">|</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">db</span>.<span class="ident">ast</span>[<span class="ident">id</span>])
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">attribute</span>(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">IndexAttribute</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">attribute</span>(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">IndexAttribute</span> {
         <span class="self">self</span>.<span class="ident">index_attribute</span>
     }
 
     <span class="doccomment">/// The scalar fields covered by the index.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">fields</span>(<span class="self">self</span>) -&gt; <span class="kw">impl</span> <span class="ident">ExactSizeIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">ScalarFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;db</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;db</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">fields</span>(<span class="self">self</span>) -&gt; <span class="kw">impl</span> <span class="ident">ExactSizeIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">ScalarFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;db</span> {
         <span class="self">self</span>.<span class="ident">index_attribute</span>
             .<span class="ident">fields</span>
             .<span class="ident">iter</span>()
@@ -203,7 +196,7 @@
     }
 
     <span class="doccomment">/// The scalar fields covered by the index, and their arguments.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">scalar_field_attributes</span>(<span class="self">self</span>) -&gt; <span class="kw">impl</span> <span class="ident">ExactSizeIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">ScalarFieldAttributeWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;db</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;db</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">scalar_field_attributes</span>(<span class="self">self</span>) -&gt; <span class="kw">impl</span> <span class="ident">ExactSizeIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">ScalarFieldAttributeWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;db</span> {
         <span class="self">self</span>.<span class="ident">attribute</span>()
             .<span class="ident">fields</span>
             .<span class="ident">iter</span>()
@@ -214,13 +207,6 @@
                 <span class="ident">db</span>: <span class="self">self</span>.<span class="ident">db</span>,
                 <span class="ident">field_arg_id</span>,
             })
-    }
-
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">contains_exactly_fields</span>(
-        <span class="self">self</span>,
-        <span class="ident">fields</span>: <span class="kw">impl</span> <span class="ident">ExactSizeIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">ScalarFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;db</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">index_attribute</span>.<span class="ident">fields</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="ident">fields</span>.<span class="ident">len</span>() <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">fields</span>().<span class="ident">zip</span>(<span class="ident">fields</span>).<span class="ident">all</span>(<span class="op">|</span>(<span class="ident">a</span>, <span class="ident">b</span>)<span class="op">|</span> <span class="ident">a</span> <span class="op">==</span> <span class="ident">b</span>)
     }
 
     <span class="doccomment">/// Whether the index is defined on a single field (otherwise: on the model).</span>
@@ -239,7 +225,7 @@
     }
 
     <span class="doccomment">/// The model the index is defined on.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">model</span>(<span class="self">self</span>) -&gt; <span class="ident">ModelWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span>, <span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">model</span>(<span class="self">self</span>) -&gt; <span class="ident">ModelWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
         <span class="ident">ModelWalker</span> {
             <span class="ident">model_id</span>: <span class="self">self</span>.<span class="ident">model_id</span>,
             <span class="ident">db</span>: <span class="self">self</span>.<span class="ident">db</span>,
