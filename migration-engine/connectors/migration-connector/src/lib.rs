@@ -2,6 +2,7 @@
 
 //! This crate defines the API exposed by the connectors to the migration engine core. The entry point for this API is the [MigrationConnector](trait.MigrationConnector.html) trait.
 
+mod connector_params;
 mod checksum;
 mod database_migration_step_applier;
 mod destructive_change_checker;
@@ -11,6 +12,7 @@ mod migration_persistence;
 
 pub mod migrations_directory;
 
+pub use connector_params::ConnectorParams;
 pub use database_migration_step_applier::DatabaseMigrationStepApplier;
 pub use destructive_change_checker::{
     DestructiveChangeChecker, DestructiveChangeDiagnostics, MigrationWarning, UnexecutableMigration,

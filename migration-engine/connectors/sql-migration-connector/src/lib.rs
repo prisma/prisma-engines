@@ -16,7 +16,7 @@ mod sql_schema_calculator;
 mod sql_schema_differ;
 
 use connection_wrapper::{connect, Connection};
-use datamodel::{common::preview_features::PreviewFeature, ValidatedSchema};
+use datamodel::ValidatedSchema;
 use enumflags2::BitFlags;
 use flavour::SqlFlavour;
 use migration_connector::{migrations_directory::MigrationDirectory, *};
@@ -29,36 +29,28 @@ use user_facing_errors::KnownError;
 
 /// The top-level SQL migration connector.
 pub struct SqlMigrationConnector {
+    params: ConnectorParams,
     connection: tokio::sync::OnceCell<ConnectorResult<Connection>>,
-    connection_string: String,
     connection_info: ConnectionInfo,
     flavour: Box<dyn SqlFlavour + Send + Sync + 'static>,
-    shadow_database_connection_string: Option<String>,
-    preview_features: BitFlags<PreviewFeature>,
     host: Arc<dyn ConnectorHost>,
 }
 
 impl SqlMigrationConnector {
     /// Construct and initialize the SQL migration connector.
-    pub fn new(
-        connection_string: String,
-        preview_features: BitFlags<PreviewFeature>,
-        shadow_database_connection_string: Option<String>,
-    ) -> ConnectorResult<Self> {
-        let connection_info = ConnectionInfo::from_url(&connection_string).map_err(|err| {
+    pub fn new(params: ConnectorParams) -> ConnectorResult<Self> {
+        let connection_info = ConnectionInfo::from_url(&params.connection_string).map_err(|err| {
             let details = user_facing_errors::quaint::invalid_connection_string_description(&err.to_string());
             KnownError::new(user_facing_errors::common::InvalidConnectionString { details })
         })?;
 
-        let flavour = flavour::from_connection_info(&connection_info, preview_features);
+        let flavour = flavour::from_connection_info(&connection_info, params.preview_features);
 
         Ok(Self {
-            connection_string,
+            params,
             connection_info,
             connection: tokio::sync::OnceCell::new(),
             flavour,
-            shadow_database_connection_string,
-            preview_features,
             host: Arc::new(EmptyHost),
         })
     }
@@ -67,7 +59,7 @@ impl SqlMigrationConnector {
         self.connection
             .get_or_init(|| {
                 Box::pin(async {
-                    let connection = connect(&self.connection_string).await?;
+                    let connection = connect(&self.params.connection_string).await?;
                     self.flavour.ensure_connection_validity(&connection).await?;
                     Ok(connection)
                 })
@@ -83,7 +75,7 @@ impl SqlMigrationConnector {
 
     /// Made public for tests.
     pub async fn describe_schema(&self) -> ConnectorResult<SqlSchema> {
-        self.conn().await?.describe_schema(self.preview_features).await
+        self.conn().await?.describe_schema(self.params.preview_features).await
     }
 
     /// Try to reset the database to an empty state. This should only be used
@@ -98,7 +90,7 @@ impl SqlMigrationConnector {
     async fn best_effort_reset_impl(&self, connection: &Connection) -> ConnectorResult<()> {
         tracing::info!("Attempting best_effort_reset");
 
-        let source_schema = connection.describe_schema(self.preview_features).await?;
+        let source_schema = connection.describe_schema(self.params.preview_features).await?;
         let target_schema = SqlSchema::empty();
         let mut steps = Vec::new();
 
@@ -194,7 +186,7 @@ impl SqlMigrationConnector {
 
     /// Generate a name for a temporary (shadow) database, _if_ there is no user-configured shadow database url.
     fn shadow_database_name(&self) -> Option<String> {
-        if self.shadow_database_connection_string.is_some() {
+        if self.params.shadow_database_connection_string.is_some() {
             return None;
         }
 
@@ -215,10 +207,10 @@ impl SqlMigrationConnector {
                 self.flavour().sql_schema_from_migration_history(migrations, self).await
             }
             DiffTarget::Database(url) => {
-                if *url == self.connection_string {
+                if *url == self.params.connection_string {
                     self.describe_schema().await
                 } else {
-                    connect(url).await?.describe_schema(self.preview_features).await
+                    connect(url).await?.describe_schema(self.params.preview_features).await
                 }
             }
             DiffTarget::Empty => Ok(SqlSchema::empty()),
@@ -242,7 +234,7 @@ impl MigrationConnector for SqlMigrationConnector {
     }
 
     fn connection_string(&self) -> &str {
-        &self.connection_string
+        &self.params.connection_string
     }
 
     async fn ensure_connection_validity(&self) -> ConnectorResult<()> {
@@ -263,11 +255,11 @@ impl MigrationConnector for SqlMigrationConnector {
     }
 
     async fn create_database(&self) -> ConnectorResult<String> {
-        self.flavour.create_database(&self.connection_string).await
+        self.flavour.create_database(&self.params.connection_string).await
     }
 
     async fn db_execute(&self, url: String, script: String) -> ConnectorResult<()> {
-        if url == self.connection_string {
+        if url == self.params.connection_string {
             self.conn().await?.raw_cmd(&script).await?;
         } else {
             connect(&url).await?.raw_cmd(&script).await?;
@@ -322,7 +314,7 @@ impl MigrationConnector for SqlMigrationConnector {
     }
 
     async fn drop_database(&self) -> ConnectorResult<()> {
-        self.flavour.drop_database(&self.connection_string).await
+        self.flavour.drop_database(&self.params.connection_string).await
     }
 
     fn migration_file_extension(&self) -> &'static str {

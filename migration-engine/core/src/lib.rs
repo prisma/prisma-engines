@@ -26,6 +26,7 @@ use datamodel::{
     Datasource,
 };
 use enumflags2::BitFlags;
+use migration_connector::ConnectorParams;
 use mongodb_migration_connector::MongoDbMigrationConnector;
 use sql_migration_connector::SqlMigrationConnector;
 use std::env;
@@ -42,8 +43,13 @@ fn connector_for_connection_string(
 ) -> CoreResult<Box<dyn migration_connector::MigrationConnector>> {
     match connection_string.split(':').next() {
         Some("postgres") | Some("postgresql") => {
-            let url = disable_postgres_statement_cache(&connection_string)?;
-            let connector = SqlMigrationConnector::new(url, preview_features, shadow_database_connection_string)?;
+            let connection_string = disable_postgres_statement_cache(&connection_string)?;
+            let params = ConnectorParams {
+                connection_string,
+                preview_features,
+                shadow_database_connection_string,
+            };
+            let connector = SqlMigrationConnector::new(params)?;
             Ok(Box::new(connector))
         }
         // TODO: `sqlite:` connection strings may not work if we try to connect to them, but they
@@ -51,12 +57,21 @@ fn connector_for_connection_string(
         //
         // Tracking issue: https://github.com/prisma/prisma/issues/11468
         Some("file") | Some("mysql") | Some("sqlserver") | Some("sqlite") => {
-            let connector =
-                SqlMigrationConnector::new(connection_string, preview_features, shadow_database_connection_string)?;
+            let params = ConnectorParams {
+                connection_string,
+                preview_features,
+                shadow_database_connection_string,
+            };
+            let connector = SqlMigrationConnector::new(params)?;
             Ok(Box::new(connector))
         }
         Some("mongodb+srv") | Some("mongodb") => {
-            let connector = MongoDbMigrationConnector::new(connection_string, preview_features);
+            let params = ConnectorParams {
+                connection_string,
+                preview_features,
+                shadow_database_connection_string,
+            };
+            let connector = MongoDbMigrationConnector::new(params);
             Ok(Box::new(connector))
         }
         Some(other) => Err(CoreError::url_parse_error(format!(
@@ -75,14 +90,28 @@ fn schema_to_connector(datamodel: &str) -> CoreResult<Box<dyn migration_connecto
     match source.active_provider.as_str() {
         POSTGRES_SOURCE_NAME => {
             let url = disable_postgres_statement_cache(&url)?;
-            let connector = SqlMigrationConnector::new(url, preview_features, shadow_database_url)?;
+            let params = ConnectorParams {
+                connection_string: url,
+                preview_features,
+                shadow_database_connection_string: shadow_database_url,
+            };
+            let connector = SqlMigrationConnector::new(params)?;
             Ok(Box::new(connector))
         }
         MYSQL_SOURCE_NAME | SQLITE_SOURCE_NAME | MSSQL_SOURCE_NAME => {
-            let connector = SqlMigrationConnector::new(url, preview_features, shadow_database_url)?;
+            let params = ConnectorParams {
+                connection_string: url,
+                preview_features,
+                shadow_database_connection_string: shadow_database_url,
+            };
+            let connector = SqlMigrationConnector::new(params)?;
             Ok(Box::new(connector))
         }
-        MONGODB_SOURCE_NAME => Ok(Box::new(MongoDbMigrationConnector::new(url, preview_features))),
+        MONGODB_SOURCE_NAME => Ok(Box::new(MongoDbMigrationConnector::new(ConnectorParams {
+            connection_string: url,
+            preview_features,
+            shadow_database_connection_string: None,
+        }))),
         provider => Err(CoreError::from_msg(format!(
             "`{}` is not a supported connector.",
             provider

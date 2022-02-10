@@ -4,6 +4,7 @@
 //! multiple migration engines.
 
 use datamodel::common::preview_features::PreviewFeature;
+use migration_core::migration_connector::ConnectorParams;
 use quaint::prelude::ConnectionInfo;
 pub use test_macros::test_connector;
 pub use test_setup::sqlite_test_url;
@@ -48,12 +49,12 @@ impl TestApi {
             let (_, q, cs) = rt.block_on(args.create_postgres_database());
             (q, cs)
         } else if tags.contains(Tags::Vitess) {
-            let conn = SqlMigrationConnector::new(
-                args.database_url().to_owned(),
+            let params = ConnectorParams {
+                connection_string: args.database_url().to_owned(),
                 preview_features,
-                args.shadow_database_url().map(String::from),
-            )
-            .unwrap();
+                shadow_database_connection_string: args.shadow_database_url().map(String::from),
+            };
+            let conn = SqlMigrationConnector::new(params).unwrap();
             rt.block_on(conn.reset()).unwrap();
 
             (
@@ -178,11 +179,15 @@ impl TestApi {
     pub fn new_engine_with_connection_strings(
         &self,
         connection_string: String,
-        shadow_db_connection_string: Option<String>,
+        shadow_database_connection_string: Option<String>,
     ) -> EngineTestApi<'_> {
         let connection_info = ConnectionInfo::from_url(&connection_string).unwrap();
-        let connector =
-            SqlMigrationConnector::new(connection_string, self.preview_features, shadow_db_connection_string).unwrap();
+        let params = ConnectorParams {
+            connection_string,
+            preview_features: self.preview_features,
+            shadow_database_connection_string,
+        };
+        let connector = SqlMigrationConnector::new(params).unwrap();
 
         EngineTestApi {
             connector,

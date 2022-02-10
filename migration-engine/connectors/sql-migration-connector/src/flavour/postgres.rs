@@ -59,7 +59,7 @@ impl PostgresFlavour {
         connector: &SqlMigrationConnector,
         shadow_database_name: Option<String>,
     ) -> ConnectorResult<Connection> {
-        if let Some(shadow_database_connection_string) = &connector.shadow_database_connection_string {
+        if let Some(shadow_database_connection_string) = &connector.params.shadow_database_connection_string {
             let conn = crate::connect(shadow_database_connection_string).await?;
             let shadow_conninfo = conn.connection_info();
             let main_conninfo = &connector.connection_info;

@@ -16,7 +16,8 @@ use datamodel::common::preview_features::PreviewFeature;
 use enumflags2::BitFlags;
 use migration::MongoDbMigration;
 use migration_connector::{
-    ConnectorError, ConnectorHost, ConnectorResult, DiffTarget, EmptyHost, Migration, MigrationConnector,
+    ConnectorError, ConnectorHost, ConnectorParams, ConnectorResult, DiffTarget, EmptyHost, Migration,
+    MigrationConnector,
 };
 use mongodb_schema_describer::MongoSchema;
 use std::sync::Arc;
@@ -31,10 +32,10 @@ pub struct MongoDbMigrationConnector {
 }
 
 impl MongoDbMigrationConnector {
-    pub fn new(connection_string: String, preview_features: BitFlags<PreviewFeature>) -> Self {
+    pub fn new(params: ConnectorParams) -> Self {
         Self {
-            connection_string,
-            preview_features,
+            connection_string: params.connection_string,
+            preview_features: params.preview_features,
             client: OnceCell::new(),
             host: Arc::new(EmptyHost),
         }

@@ -3,14 +3,14 @@ use std::{borrow::Cow, fmt::Debug};
 
 /// Diffable things
 pub enum DiffTarget<'a> {
-    /// A Prisma schema
+    /// A Prisma schema.
     Datamodel(Cow<'a, str>),
     /// A migrations folder. What is diffable is the state of the database schema at the end of the
     /// migrations history.
     Migrations(Cow<'a, [MigrationDirectory]>),
     /// A live database connection string.
     Database(Cow<'a, str>),
-    /// Assume an empty database schema
+    /// Assume an empty database schema.
     Empty,
 }
 
