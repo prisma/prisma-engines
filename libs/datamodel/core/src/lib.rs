@@ -88,6 +88,7 @@ pub use datamodel_connector;
 pub use diagnostics;
 pub use parser_database;
 pub use parser_database::is_reserved_type_name;
+use parser_database::ParserDatabase;
 pub use schema_ast;
 
 use crate::{ast::SchemaAst, common::preview_features::PreviewFeature};
@@ -108,13 +109,13 @@ pub fn parse_schema(schema_str: &str) -> Result<(Configuration, Datamodel), Stri
         .map(|v| v.subject)
 }
 
-pub struct ValidatedSchema<'a> {
+pub struct ValidatedSchema {
     pub configuration: Configuration,
-    pub db: parser_database::ParserDatabase<'a>,
+    pub db: parser_database::ParserDatabase,
     referential_integrity: datamodel_connector::ReferentialIntegrity,
 }
 
-impl<'a> ValidatedSchema<'a> {
+impl ValidatedSchema {
     pub fn referential_integrity(&self) -> datamodel_connector::ReferentialIntegrity {
         self.referential_integrity
     }
@@ -122,11 +123,16 @@ impl<'a> ValidatedSchema<'a> {
 
 /// Parse and validate the whole schema. This function's signature is obviously less than optimal,
 /// let's work towards something simpler.
-pub fn parse_schema_parserdb<'ast>(src: &str, ast: &'ast ast::SchemaAst) -> Result<ValidatedSchema<'ast>, String> {
+pub fn parse_schema_parserdb(src: &str) -> Result<ValidatedSchema, String> {
     let mut diagnostics = Diagnostics::new();
-    let generators = GeneratorLoader::load_generators_from_ast(ast, &mut diagnostics);
+    diagnostics
+        .to_result()
+        .map_err(|err| err.to_pretty_string("schema.prisma", src))?;
+
+    let ast = schema_ast::parser::parse_schema(src, &mut diagnostics);
+    let generators = GeneratorLoader::load_generators_from_ast(&ast, &mut diagnostics);
     let preview_features = preview_features(&generators);
-    let datasources = load_sources(ast, preview_features, &mut diagnostics);
+    let datasources = load_sources(&ast, preview_features, &mut diagnostics);
 
     diagnostics
         .to_result()
@@ -156,9 +162,9 @@ pub fn parse_datamodel(datamodel_string: &str) -> Result<ValidatedDatamodel, dia
     })
 }
 
-fn parse_datamodel_for_formatter(ast: &SchemaAst) -> Result<(Datamodel, Vec<Datasource>), Diagnostics> {
+fn parse_datamodel_for_formatter(ast: SchemaAst) -> Result<(ParserDatabase, Datamodel, Vec<Datasource>), Diagnostics> {
     let mut diagnostics = diagnostics::Diagnostics::new();
-    let datasources = load_sources(ast, Default::default(), &mut diagnostics);
+    let datasources = load_sources(&ast, Default::default(), &mut diagnostics);
     let db = parser_database::ParserDatabase::new(ast, &mut diagnostics);
     diagnostics.to_result()?;
     let (connector, referential_integrity) = datasources
@@ -167,7 +173,7 @@ fn parse_datamodel_for_formatter(ast: &SchemaAst) -> Result<(Datamodel, Vec<Data
         .unwrap_or((&datamodel_connector::EmptyDatamodelConnector, Default::default()));
 
     let datamodel = transform::ast_to_dml::LiftAstToDml::new(&db, connector, referential_integrity).lift();
-    Ok((datamodel, datasources))
+    Ok((db, datamodel, datasources))
 }
 
 fn parse_datamodel_internal(
@@ -182,7 +188,7 @@ fn parse_datamodel_internal(
 
     diagnostics.to_result()?;
 
-    let out = validate(&ast, &datasources, preview_features, diagnostics);
+    let out = validate(ast, &datasources, preview_features, diagnostics);
 
     if !out.diagnostics.errors().is_empty() {
         return Err(out.diagnostics);

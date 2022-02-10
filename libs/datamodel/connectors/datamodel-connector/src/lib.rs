@@ -96,7 +96,7 @@ pub trait Connector: Send + Sync {
     ) {
     }
 
-    fn validate_model(&self, _model: parser_database::walkers::ModelWalker<'_, '_>, _: &mut diagnostics::Diagnostics) {}
+    fn validate_model(&self, _model: parser_database::walkers::ModelWalker<'_>, _: &mut diagnostics::Diagnostics) {}
 
     /// The scopes in which a constraint name should be validated. If empty, doesn't check for name
     /// clashes in the validation phase.

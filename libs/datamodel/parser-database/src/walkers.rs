@@ -28,14 +28,14 @@ use crate::{ast, ParserDatabase};
 
 /// A generic walker. Only walkers intantiated with a concrete ID type (`I`) are useful.
 #[derive(Clone, Copy)]
-pub struct Walker<'ast, 'db, I> {
-    db: &'db crate::ParserDatabase<'ast>,
+pub struct Walker<'db, I> {
+    db: &'db crate::ParserDatabase,
     id: I,
 }
 
-impl<'ast> ParserDatabase<'ast> {
+impl ParserDatabase {
     /// Walk all enums in the schema.
-    pub fn walk_enums(&self) -> impl Iterator<Item = EnumWalker<'ast, '_>> {
+    pub fn walk_enums(&self) -> impl Iterator<Item = EnumWalker<'_>> {
         self.ast()
             .iter_tops()
             .filter_map(|(top_id, _)| top_id.as_enum_id())
@@ -43,7 +43,7 @@ impl<'ast> ParserDatabase<'ast> {
     }
 
     /// Find a model by ID.
-    pub(crate) fn walk_model(&self, model_id: ast::ModelId) -> ModelWalker<'ast, '_> {
+    pub(crate) fn walk_model(&self, model_id: ast::ModelId) -> ModelWalker<'_> {
         ModelWalker {
             model_id,
             db: self,
@@ -52,12 +52,12 @@ impl<'ast> ParserDatabase<'ast> {
     }
 
     /// Find an enum by ID.
-    pub fn walk_enum(&self, enum_id: ast::EnumId) -> EnumWalker<'ast, '_> {
+    pub fn walk_enum(&self, enum_id: ast::EnumId) -> EnumWalker<'_> {
         Walker { db: self, id: enum_id }
     }
 
     /// Walk all the models in the schema.
-    pub fn walk_models(&self) -> impl Iterator<Item = ModelWalker<'ast, '_>> + '_ {
+    pub fn walk_models(&self) -> impl Iterator<Item = ModelWalker<'_>> + '_ {
         self.ast()
             .iter_tops()
             .filter_map(|(top_id, _)| top_id.as_model_id())
@@ -65,12 +65,12 @@ impl<'ast> ParserDatabase<'ast> {
     }
 
     /// Walk a specific composite type by ID.
-    pub fn walk_composite_type(&self, ctid: ast::CompositeTypeId) -> CompositeTypeWalker<'ast, '_> {
+    pub fn walk_composite_type(&self, ctid: ast::CompositeTypeId) -> CompositeTypeWalker<'_> {
         CompositeTypeWalker { ctid, db: self }
     }
 
     /// Walk all the composite types in the schema.
-    pub fn walk_composite_types(&self) -> impl Iterator<Item = CompositeTypeWalker<'ast, '_>> + '_ {
+    pub fn walk_composite_types(&self) -> impl Iterator<Item = CompositeTypeWalker<'_>> + '_ {
         self.ast()
             .iter_tops()
             .filter_map(|(top_id, _)| top_id.as_composite_type_id())
@@ -79,7 +79,7 @@ impl<'ast> ParserDatabase<'ast> {
 
     /// Walk all the relations in the schema. A relation may be defined by one or two fields; in
     /// both cases, it is still a single relation.
-    pub fn walk_relations(&self) -> impl Iterator<Item = RelationWalker<'ast, '_>> + '_ {
+    pub fn walk_relations(&self) -> impl Iterator<Item = RelationWalker<'_>> + '_ {
         self.relations.iter().map(move |relation_id| Walker {
             db: self,
             id: relation_id,
@@ -89,7 +89,7 @@ impl<'ast> ParserDatabase<'ast> {
     /// Iterate all complete relations that are not many to many and are
     /// correctly defined from both sides.
     #[track_caller]
-    pub fn walk_complete_inline_relations(&self) -> impl Iterator<Item = CompleteInlineRelationWalker<'ast, '_>> + '_ {
+    pub fn walk_complete_inline_relations(&self) -> impl Iterator<Item = CompleteInlineRelationWalker<'_>> + '_ {
         self.relations
             .iter_relations()
             .filter(|(_, _, relation)| !relation.is_many_to_many())

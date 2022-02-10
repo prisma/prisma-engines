@@ -1,7 +1,10 @@
 mod attributes;
 
 use self::attributes::AttributesValidationState;
-use crate::{ast, DatamodelError, Diagnostics, ParserDatabase, ScalarFieldType, StringId, ValueValidator};
+use crate::{
+    ast, interner::StringInterner, names::Names, relations::Relations, types::Types, DatamodelError, Diagnostics,
+    ScalarFieldType, StringId, ValueValidator,
+};
 use schema_ast::ast::WithName;
 use std::collections::{HashMap, HashSet};
 
@@ -17,9 +20,13 @@ use std::collections::{HashMap, HashSet};
 /// are not valid, multiple arguments with the same name are not valid, etc.
 ///
 /// See `visit_attributes()`.
-pub(crate) struct Context<'db, 'ast> {
-    pub(super) db: &'db mut ParserDatabase<'ast>,
-    pub(super) diagnostics: &'db mut Diagnostics,
+pub(crate) struct Context<'db> {
+    pub(crate) ast: &'db ast::SchemaAst,
+    pub(crate) interner: &'db mut StringInterner,
+    pub(crate) names: &'db mut Names,
+    pub(crate) types: &'db mut Types,
+    pub(crate) relations: &'db mut Relations,
+    pub(crate) diagnostics: &'db mut Diagnostics,
     attributes: AttributesValidationState, // state machine for attribute validation
 
     // @map'ed names indexes. These are not in the db because they are only used for validation.
@@ -30,10 +37,21 @@ pub(crate) struct Context<'db, 'ast> {
     pub(super) mapped_enum_value_names: HashMap<(ast::EnumId, StringId), u32>,
 }
 
-impl<'db, 'ast> Context<'db, 'ast> {
-    pub(super) fn new(db: &'db mut ParserDatabase<'ast>, diagnostics: &'db mut Diagnostics) -> Self {
+impl<'db> Context<'db> {
+    pub(super) fn new(
+        ast: &'db ast::SchemaAst,
+        interner: &'db mut StringInterner,
+        names: &'db mut Names,
+        types: &'db mut Types,
+        relations: &'db mut Relations,
+        diagnostics: &'db mut Diagnostics,
+    ) -> Self {
         Context {
-            db,
+            ast,
+            interner,
+            names,
+            types,
+            relations,
             diagnostics,
             attributes: AttributesValidationState::default(),
 
@@ -59,9 +77,9 @@ impl<'db, 'ast> Context<'db, 'ast> {
     /// Return the attribute currently being validated. Panics if the context is not in the right
     /// state.
     #[track_caller]
-    pub(crate) fn current_attribute(&self) -> &'ast ast::Attribute {
+    pub(crate) fn current_attribute(&self) -> &'db ast::Attribute {
         let id = self.attributes.attribute.unwrap();
-        &self.db.ast[id]
+        &self.ast[id]
     }
 
     /// Discard arguments without validation.
@@ -92,8 +110,8 @@ impl<'db, 'ast> Context<'db, 'ast> {
     ) {
         self.visit_attributes((model_id, field_id).into());
         while let ScalarFieldType::Alias(alias_id) = scalar_field_type {
-            self.attributes.extend_attributes(alias_id.into(), self.db.ast);
-            scalar_field_type = self.db.types.type_aliases[&alias_id];
+            self.attributes.extend_attributes(alias_id.into(), self.ast);
+            scalar_field_type = self.types.type_aliases[&alias_id];
         }
     }
 
@@ -118,7 +136,7 @@ impl<'db, 'ast> Context<'db, 'ast> {
 
         self.attributes.attributes.clear();
         self.attributes.unused_attributes.clear();
-        self.attributes.extend_attributes(ast_attributes, self.db.ast);
+        self.attributes.extend_attributes(ast_attributes, self.ast);
     }
 
     /// Look for an optional attribute with a name of the form
@@ -129,9 +147,9 @@ impl<'db, 'ast> Context<'db, 'ast> {
     /// arguments to other attributes: everywhere else, attributes are named,
     /// with a default that can be first, but with native types, arguments are
     /// purely positional.
-    pub(crate) fn visit_datasource_scoped(&mut self) -> Option<(&'ast str, &'ast str, &'ast ast::Attribute)> {
+    pub(crate) fn visit_datasource_scoped(&mut self) -> Option<(StringId, StringId, ast::AttributeId)> {
         let attrs =
-            iter_attributes(&self.attributes.attributes, self.db.ast).filter(|(_, attr)| attr.name.name.contains('.'));
+            iter_attributes(&self.attributes.attributes, self.ast).filter(|(_, attr)| attr.name.name.contains('.'));
         let mut native_type_attr = None;
         let diagnostics = &mut self.diagnostics;
 
@@ -141,18 +159,21 @@ impl<'db, 'ast> Context<'db, 'ast> {
 
             match attr.name.name.split_once('.') {
                 None => unreachable!(),
-                Some((ds, attr_name)) => {
-                    if native_type_attr.replace((ds, attr, attr_name)).is_some() {
-                        diagnostics.push_error(DatamodelError::new_duplicate_attribute_error(ds, attr.span));
+                Some((datasource_name, attr_name)) => {
+                    let ds = self.interner.intern(datasource_name);
+                    let attr_name = self.interner.intern(attr_name);
+                    if native_type_attr.replace((ds, attr_idx, attr_name)).is_some() {
+                        diagnostics.push_error(DatamodelError::new_duplicate_attribute_error(
+                            datasource_name,
+                            attr.span,
+                        ));
                     }
                 }
             }
         }
 
-        let (ds, attr, attr_name) = match native_type_attr {
-            Some(attr) => attr,
-            None => return None, // early return if absent: it's optional
-        };
+        // early return if absent: it's optional
+        let (ds, attr, attr_name) = native_type_attr?;
 
         Some((ds, attr_name, attr))
     }
@@ -161,7 +182,7 @@ impl<'db, 'ast> Context<'db, 'ast> {
     /// is defined.
     #[must_use]
     pub(crate) fn visit_optional_single_attr(&mut self, name: &'static str) -> bool {
-        let mut attrs = iter_attributes(&self.attributes.attributes, self.db.ast).filter(|(_, a)| a.name.name == name);
+        let mut attrs = iter_attributes(&self.attributes.attributes, self.ast).filter(|(_, a)| a.name.name == name);
         let (first_idx, first) = match attrs.next() {
             Some(first) => first,
             None => return false,
@@ -170,7 +191,7 @@ impl<'db, 'ast> Context<'db, 'ast> {
 
         if attrs.next().is_some() {
             for (idx, attr) in
-                iter_attributes(&self.attributes.attributes, self.db.ast).filter(|(_, a)| a.name.name == name)
+                iter_attributes(&self.attributes.attributes, self.ast).filter(|(_, a)| a.name.name == name)
             {
                 diagnostics.push_error(DatamodelError::new_duplicate_attribute_error(
                     &attr.name.name,
@@ -194,8 +215,7 @@ impl<'db, 'ast> Context<'db, 'ast> {
         let mut has_valid_attribute = false;
 
         while !has_valid_attribute {
-            let first_attr = self
-                .iter_attributes()
+            let first_attr = iter_attributes(&self.attributes.attributes, self.ast)
                 .filter(|(_, attr)| attr.name.name == name)
                 .find(|(attr_id, _)| self.attributes.unused_attributes.contains(attr_id));
             let (attr_id, attr) = if let Some(first_attr) = first_attr {
@@ -214,15 +234,18 @@ impl<'db, 'ast> Context<'db, 'ast> {
     /// first unnamed argument.
     ///
     /// Use this to implement unnamed argument behavior.
-    pub(crate) fn visit_default_arg(&mut self, name: &'static str) -> Result<ValueValidator<'ast>, DatamodelError> {
-        let name_s = self.db.interner.intern(name);
+    pub(crate) fn visit_default_arg_with_idx(
+        &mut self,
+        name: &'static str,
+    ) -> Result<(usize, ValueValidator<'db>), DatamodelError> {
+        let name_s = self.interner.intern(name);
         match (
             self.attributes.args.remove(&Some(name_s)),
             self.attributes.args.remove(&None),
         ) {
             (Some(arg_idx), None) | (None, Some(arg_idx)) => {
                 let arg = self.arg_at(arg_idx);
-                Ok(ValueValidator::new(&arg.value))
+                Ok((arg_idx, ValueValidator::new(&arg.value)))
             }
             (Some(arg_idx), Some(_)) => {
                 let arg = self.arg_at(arg_idx);
@@ -235,9 +258,17 @@ impl<'db, 'ast> Context<'db, 'ast> {
         }
     }
 
+    /// Gets the argument with the given name in the current attribute, or if it is not found, the
+    /// first unnamed argument.
+    ///
+    /// Use this to implement unnamed argument behavior.
+    pub(crate) fn visit_default_arg(&mut self, name: &'static str) -> Result<ValueValidator<'db>, DatamodelError> {
+        Ok(self.visit_default_arg_with_idx(name)?.1)
+    }
+
     /// Visit an optional argument in the current attribute.
-    pub(crate) fn visit_optional_arg(&mut self, name: &'static str) -> Option<ValueValidator<'ast>> {
-        let arg_name = self.db.interner.intern(name);
+    pub(crate) fn visit_optional_arg(&mut self, name: &'static str) -> Option<ValueValidator<'db>> {
+        let arg_name = self.interner.intern(name);
         let idx = self.attributes.args.remove(&Some(arg_name))?;
         Some(ValueValidator::new(
             &self.current_attribute().arguments.arguments[idx].value,
@@ -248,7 +279,7 @@ impl<'db, 'ast> Context<'db, 'ast> {
     /// otherwise.
     pub(crate) fn validate_visited_arguments(&mut self) {
         let attr = if let Some(attrid) = self.attributes.attribute {
-            &self.db.ast[attrid]
+            &self.ast[attrid]
         } else {
             panic!("State error: missing attribute in validate_visited_arguments.")
         };
@@ -274,7 +305,7 @@ impl<'db, 'ast> Context<'db, 'ast> {
 
         let diagnostics = &mut self.diagnostics;
         for attribute_id in &self.attributes.unused_attributes {
-            let attribute = &self.db.ast[*attribute_id];
+            let attribute = &self.ast[*attribute_id];
             diagnostics.push_error(DatamodelError::new_attribute_not_known_error(
                 &attribute.name.name,
                 attribute.name.span,
@@ -286,22 +317,19 @@ impl<'db, 'ast> Context<'db, 'ast> {
 
     // Private methods start here.
 
-    fn arg_at(&self, idx: usize) -> &'ast ast::Argument {
+    fn arg_at(&self, idx: usize) -> &'db ast::Argument {
         &self.current_attribute().arguments.arguments[idx]
     }
 
-    // Implementation detail. Used for arguments validation.
-    fn iter_attributes(&self) -> impl Iterator<Item = (ast::AttributeId, &'ast ast::Attribute)> + '_ {
-        self.attributes
-            .attributes
-            .iter()
-            .flat_map(move |container| self.db.ast[*container].iter().enumerate().map(|a| (a, *container)))
-            .map(|((idx, attr), container)| (ast::AttributeId::new_in_container(container, idx), attr))
+    /// Find a specific field in a specific model.
+    pub(crate) fn find_model_field(&self, model_id: ast::ModelId, field_name: &str) -> Option<ast::FieldId> {
+        let name = self.interner.lookup(field_name)?;
+        self.names.model_fields.get(&(model_id, name)).cloned()
     }
 
     /// Starts validating the arguments for an attribute, checking for duplicate arguments in the
     /// process. Returns whether the attribute is valid enough to be usable.
-    fn set_attribute(&mut self, attribute_id: ast::AttributeId, attribute: &'ast ast::Attribute) -> bool {
+    fn set_attribute(&mut self, attribute_id: ast::AttributeId, attribute: &'db ast::Attribute) -> bool {
         if self.attributes.attribute.is_some() || !self.attributes.args.is_empty() {
             panic!("State error: we cannot start validating new arguments before `validate_visited_arguments()` or `discard_arguments()` has been called.\n{:#?}", self.attributes);
         }
@@ -350,7 +378,7 @@ impl<'db, 'ast> Context<'db, 'ast> {
         let mut unnamed_arguments = Vec::new();
 
         for (arg_idx, arg) in arguments.arguments.iter().enumerate() {
-            let arg_name = arg.name.as_ref().map(|name| self.db.interner.intern(&name.name));
+            let arg_name = arg.name.as_ref().map(|name| self.interner.intern(&name.name));
             if let Some(existing_argument) = self.attributes.args.insert(arg_name, arg_idx) {
                 if arg.is_unnamed() {
                     if unnamed_arguments.is_empty() {
@@ -391,14 +419,10 @@ fn iter_attributes<'a, 'ast: 'a>(
         .map(|((idx, attr), container)| (ast::AttributeId::new_in_container(container, idx), attr))
 }
 
-// Make sure we don't drop context while still visiting attributes by mistake.
-impl Drop for Context<'_, '_> {
-    fn drop(&mut self) {
-        debug_assert!(
-            self.attributes.args.is_empty()
-                && self.attributes.attribute.is_none()
-                && self.attributes.attributes.is_empty()
-                && self.attributes.unused_attributes.is_empty()
-        );
+impl std::ops::Index<StringId> for Context<'_> {
+    type Output = str;
+
+    fn index(&self, index: StringId) -> &Self::Output {
+        self.interner.get(index).unwrap()
     }
 }

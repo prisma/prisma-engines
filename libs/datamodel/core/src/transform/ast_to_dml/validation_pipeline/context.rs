@@ -7,7 +7,7 @@ use enumflags2::BitFlags;
 /// all relevant lifetimes. No data escapes for validations, so the context only need to be valid
 /// for the duration of validations.
 pub(crate) struct Context<'a> {
-    pub(super) db: &'a ParserDatabase<'a>,
+    pub(super) db: &'a ParserDatabase,
     pub(super) datasource: Option<&'a Datasource>,
     pub(super) preview_features: BitFlags<PreviewFeature>,
     pub(super) connector: &'static dyn Connector,

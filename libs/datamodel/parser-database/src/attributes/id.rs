@@ -1,14 +1,14 @@
 use super::FieldResolutionError;
 use crate::{
-    ast::{self, WithName, WithSpan},
+    ast::{self, WithName},
     attributes::resolve_field_array_with_args,
     context::Context,
     types::{FieldWithArgs, IdAttribute, ModelAttributes, SortOrder},
-    DatamodelError,
+    DatamodelError, StringId,
 };
 
 /// @@id on models
-pub(super) fn model<'ast>(model_data: &mut ModelAttributes<'ast>, model_id: ast::ModelId, ctx: &mut Context<'_, 'ast>) {
+pub(super) fn model(model_data: &mut ModelAttributes, model_id: ast::ModelId, ctx: &mut Context<'_>) {
     let attr = ctx.current_attribute();
     let fields = match ctx.visit_default_arg("fields") {
         Ok(value) => value,
@@ -28,25 +28,25 @@ pub(super) fn model<'ast>(model_data: &mut ModelAttributes<'ast>, model_id: ast:
                         "The multi field id declaration refers to the unknown fields {}.",
                         unresolvable_fields.join(", "),
                     ),
-                    ctx.db.ast[model_id].name(),
+                    ctx.ast[model_id].name(),
                     fields.span(),
                 ));
             }
 
             if !relation_fields.is_empty() {
-                ctx.push_error(DatamodelError::new_model_validation_error(&format!("The id definition refers to the relation fields {}. ID definitions must reference only scalar fields.", relation_fields.iter().map(|(f, _)| f.name()).collect::<Vec<_>>().join(", ")), ctx.db.ast[model_id].name(), attr.span));
+                ctx.push_error(DatamodelError::new_model_validation_error(&format!("The id definition refers to the relation fields {}. ID definitions must reference only scalar fields.", relation_fields.iter().map(|(f, _)| f.name()).collect::<Vec<_>>().join(", ")), ctx.ast[model_id].name(), attr.span));
             }
 
             return;
         }
     };
 
-    let ast_model = &ctx.db.ast[model_id];
+    let ast_model = &ctx.ast[model_id];
 
     // ID attribute fields must reference only required fields.
     let fields_that_are_not_required: Vec<&str> = resolved_fields
         .iter()
-        .map(|field| &ctx.db.ast[model_id][field.field_id])
+        .map(|field| &ctx.ast[model_id][field.field_id])
         .filter(|field| !field.arity.is_required())
         .map(|field| field.name())
         .collect();
@@ -83,17 +83,17 @@ pub(super) fn model<'ast>(model_data: &mut ModelAttributes<'ast>, model_id: ast:
 
     model_data.primary_key = Some(IdAttribute {
         name,
-        source_attribute: attr,
+        source_attribute: ctx.current_attribute_id(),
         mapped_name,
         fields: resolved_fields,
         source_field: None,
     });
 }
-pub(super) fn field<'ast>(
-    ast_model: &'ast ast::Model,
+pub(super) fn field<'db>(
+    ast_model: &'db ast::Model,
     field_id: ast::FieldId,
-    model_attributes: &mut ModelAttributes<'ast>,
-    ctx: &mut Context<'_, 'ast>,
+    model_attributes: &mut ModelAttributes,
+    ctx: &mut Context<'db>,
 ) {
     match model_attributes.primary_key {
         Some(_) => ctx.push_error(DatamodelError::new_model_validation_error(
@@ -133,7 +133,7 @@ pub(super) fn field<'ast>(
             model_attributes.primary_key = Some(IdAttribute {
                 name: None,
                 mapped_name,
-                source_attribute: ctx.current_attribute(),
+                source_attribute: ctx.current_attribute_id(),
                 fields: vec![FieldWithArgs {
                     field_id,
                     sort_order,
@@ -147,8 +147,8 @@ pub(super) fn field<'ast>(
 
 pub(super) fn validate_id_field_arities(
     model_id: ast::ModelId,
-    model_attributes: &ModelAttributes<'_>,
-    ctx: &mut Context<'_, '_>,
+    model_attributes: &ModelAttributes,
+    ctx: &mut Context<'_>,
 ) {
     if model_attributes.is_ignored {
         return;
@@ -161,7 +161,7 @@ pub(super) fn validate_id_field_arities(
     };
 
     let ast_field = if let Some(field_id) = pk.source_field {
-        &ctx.db.ast[model_id][field_id]
+        &ctx.ast[model_id][field_id]
     } else {
         return;
     };
@@ -170,18 +170,18 @@ pub(super) fn validate_id_field_arities(
         ctx.push_error(DatamodelError::new_attribute_validation_error(
             "Fields that are marked as id must be required.",
             "id",
-            *pk.source_attribute.span(),
+            ctx.ast[pk.source_attribute].span,
         ))
     }
 }
 
-fn primary_key_mapped_name<'ast>(ctx: &mut Context<'_, 'ast>) -> Option<&'ast str> {
+fn primary_key_mapped_name(ctx: &mut Context<'_>) -> Option<StringId> {
     let mapped_name = match ctx.visit_optional_arg("map").map(|name| name.as_str()) {
         Some(Ok("")) => {
             ctx.push_attribute_validation_error("The `map` argument cannot be an empty string.");
             None
         }
-        Some(Ok(name)) => Some(name),
+        Some(Ok(name)) => Some(ctx.interner.intern(name)),
         Some(Err(err)) => {
             ctx.push_error(err);
             None

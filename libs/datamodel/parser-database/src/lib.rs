@@ -73,34 +73,35 @@ use names::Names;
 /// to the AST contained in ParserDatabase, that we call by convention `'ast`.
 /// Apart from that, everything should be owned or locally borrowed, to keep
 /// lifetime management simple.
-pub struct ParserDatabase<'ast> {
-    ast: &'ast ast::SchemaAst,
+pub struct ParserDatabase {
+    ast: ast::SchemaAst,
     interner: interner::StringInterner,
-    names: Names,
-    types: Types<'ast>,
+    _names: Names,
+    types: Types,
     relations: Relations,
 }
 
-impl<'ast> ParserDatabase<'ast> {
+impl ParserDatabase {
     /// See the docs on [ParserDatabase](/struct.ParserDatabase.html).
-    pub fn new(ast: &'ast ast::SchemaAst, diagnostics: &mut Diagnostics) -> Self {
-        let mut db = ParserDatabase {
-            ast,
-            interner: interner::StringInterner::default(),
-            names: Names::default(),
-            types: Types::default(),
-            relations: Relations::default(),
-        };
-
-        let mut ctx = Context::new(&mut db, diagnostics);
+    pub fn new(ast: ast::SchemaAst, diagnostics: &mut Diagnostics) -> Self {
+        let mut interner = Default::default();
+        let mut names = Default::default();
+        let mut types = Default::default();
+        let mut relations = Default::default();
+        let mut ctx = Context::new(&ast, &mut interner, &mut names, &mut types, &mut relations, diagnostics);
 
         // First pass: resolve names.
         names::resolve_names(&mut ctx);
 
         // Return early on name resolution errors.
         if ctx.diagnostics.has_errors() {
-            drop(ctx);
-            return db;
+            return ParserDatabase {
+                ast,
+                interner,
+                _names: names,
+                types,
+                relations,
+            };
         }
 
         // Second pass: resolve top-level items and field types.
@@ -108,8 +109,13 @@ impl<'ast> ParserDatabase<'ast> {
 
         // Return early on type resolution errors.
         if ctx.diagnostics.has_errors() {
-            drop(ctx);
-            return db;
+            return ParserDatabase {
+                ast,
+                interner,
+                _names: names,
+                types,
+                relations,
+            };
         }
 
         // Third pass: validate model and field attributes. All these
@@ -123,9 +129,13 @@ impl<'ast> ParserDatabase<'ast> {
         // Fifth step: infer implicit indices
         indexes::infer_implicit_indexes(&mut ctx);
 
-        drop(ctx);
-
-        db
+        ParserDatabase {
+            ast,
+            interner,
+            _names: names,
+            types,
+            relations,
+        }
     }
 
     /// The fully resolved (non alias) scalar field type of an alias. .
@@ -134,24 +144,18 @@ impl<'ast> ParserDatabase<'ast> {
     }
 
     /// The parsed AST.
-    pub fn ast(&self) -> &'ast ast::SchemaAst {
-        self.ast
-    }
-
-    /// Find a specific field in a specific model.
-    fn find_model_field(&self, model_id: ast::ModelId, field_name: &str) -> Option<ast::FieldId> {
-        let name = self.interner.lookup(field_name)?;
-        self.names.model_fields.get(&(model_id, name)).cloned()
+    pub fn ast(&self) -> &ast::SchemaAst {
+        &self.ast
     }
 }
 
-impl std::fmt::Debug for ParserDatabase<'_> {
+impl std::fmt::Debug for ParserDatabase {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.write_str("ParserDatabase { ... }")
     }
 }
 
-impl std::ops::Index<StringId> for ParserDatabase<'_> {
+impl std::ops::Index<StringId> for ParserDatabase {
     type Output = str;
 
     fn index(&self, index: StringId) -> &Self::Output {
