@@ -30,7 +30,6 @@ use user_facing_errors::KnownError;
 pub struct SqlMigrationConnector {
     params: ConnectorParams,
     connection: tokio::sync::OnceCell<ConnectorResult<Connection>>,
-    connection_info: ConnectionInfo,
     flavour: Box<dyn SqlFlavour + Send + Sync + 'static>,
     host: Arc<dyn ConnectorHost>,
 }
@@ -47,7 +46,6 @@ impl SqlMigrationConnector {
 
         Ok(Self {
             params,
-            connection_info,
             connection: tokio::sync::OnceCell::new(),
             flavour,
             host: Arc::new(EmptyHost),
@@ -201,7 +199,7 @@ impl MigrationConnector for SqlMigrationConnector {
     }
 
     fn connector_type(&self) -> &'static str {
-        self.connection_info.sql_family().as_str()
+        self.flavour.connector_type()
     }
 
     async fn acquire_lock(&self) -> ConnectorResult<()> {

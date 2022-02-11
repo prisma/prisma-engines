@@ -62,6 +62,9 @@ pub(crate) trait SqlFlavour:
         None
     }
 
+    /// See MigrationConnector::connector_type()
+    fn connector_type(&self) -> &'static str;
+
     /// Create a database for the given URL on the server, if applicable.
     async fn create_database(&self, database_url: &str) -> ConnectorResult<String>;
 
@@ -114,8 +117,8 @@ pub(crate) trait SqlFlavour:
 }
 
 // Utility function shared by multiple flavours to compare shadow database and main connection.
-fn validate_connection_infos_do_not_match((previous, next): (&ConnectionInfo, &ConnectionInfo)) -> ConnectorResult<()> {
-    if previous.host() == next.host() && previous.dbname() == next.dbname() && previous.port() == next.port() {
+fn validate_connection_infos_do_not_match(previous: &str, next: &str) -> ConnectorResult<()> {
+    if previous == next {
         Err(ConnectorError::from_msg("The shadow database you configured appears to be the same as the main database. Please specify another shadow database.".into()))
     } else {
         Ok(())

@@ -26,6 +26,10 @@ impl SqlFlavour for SqliteFlavour {
         Ok(())
     }
 
+    fn connector_type(&self) -> &'static str {
+        "postgresql"
+    }
+
     async fn run_query_script(&self, sql: &str, connection: &Connection) -> ConnectorResult<()> {
         Ok(connection.raw_cmd(sql).await?)
     }

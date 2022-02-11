@@ -61,10 +61,10 @@ impl MssqlFlavour {
         if let Some(shadow_database_connection_string) = &connector.params.shadow_database_connection_string {
             let conn = crate::connect(shadow_database_connection_string).await?;
 
-            let shadow_conninfo = conn.connection_info();
-            let main_conninfo = &connector.connection_info;
-
-            super::validate_connection_infos_do_not_match((shadow_conninfo, main_conninfo))?;
+            super::validate_connection_infos_do_not_match(
+                shadow_database_connection_string,
+                &connector.params.connection_string,
+            )?;
 
             if self.reset(&conn).await.is_err() {
                 connector.best_effort_reset(&conn).await?;
@@ -137,6 +137,10 @@ impl SqlFlavour for MssqlFlavour {
 
     fn preview_features(&self) -> BitFlags<PreviewFeature> {
         self.preview_features
+    }
+
+    fn connector_type(&self) -> &'static str {
+        "sqlserver"
     }
 
     async fn create_database(&self, jdbc_string: &str) -> ConnectorResult<String> {

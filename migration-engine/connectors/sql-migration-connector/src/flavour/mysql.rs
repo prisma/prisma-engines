@@ -79,9 +79,11 @@ impl MysqlFlavour {
         if let Some(shadow_database_connection_string) = &connector.params.shadow_database_connection_string {
             let conn = crate::connect(shadow_database_connection_string).await?;
             let shadow_conninfo = conn.connection_info();
-            let main_conninfo = &connector.connection_info;
 
-            super::validate_connection_infos_do_not_match((shadow_conninfo, main_conninfo))?;
+            super::validate_connection_infos_do_not_match(
+                shadow_database_connection_string,
+                &connector.params.connection_string,
+            )?;
 
             tracing::info!(
                 "Connecting to user-provided shadow database at {}.{:?}",
@@ -140,6 +142,10 @@ impl SqlFlavour for MysqlFlavour {
         // https://dev.mysql.com/doc/refman/8.0/en/locking-functions.html
         let query = format!("SELECT GET_LOCK('prisma_migrate', {})", ADVISORY_LOCK_TIMEOUT.as_secs());
         Ok(connection.raw_cmd(&query).await?)
+    }
+
+    fn connector_type(&self) -> &'static str {
+        "mysql"
     }
 
     fn datamodel_connector(&self) -> &'static dyn datamodel::datamodel_connector::Connector {

@@ -15,7 +15,8 @@ impl MigrationPersistence for SqlMigrationConnector {
     }
 
     async fn initialize(&self) -> ConnectorResult<()> {
-        let schema = self.describe_schema().await?;
+        let conn = self.conn().await?;
+        let schema = conn.describe_schema(self.params.preview_features).await?;
 
         if schema
             .tables
@@ -32,7 +33,7 @@ impl MigrationPersistence for SqlMigrationConnector {
         {
             return Err(ConnectorError::user_facing(
                 user_facing_errors::migration_engine::DatabaseSchemaNotEmpty {
-                    database_name: self.connection_info.database_location(),
+                    database_name: conn.connection_info().database_location(),
                 },
             ));
         }

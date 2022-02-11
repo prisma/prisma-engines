@@ -62,9 +62,11 @@ impl PostgresFlavour {
         if let Some(shadow_database_connection_string) = &connector.params.shadow_database_connection_string {
             let conn = crate::connect(shadow_database_connection_string).await?;
             let shadow_conninfo = conn.connection_info();
-            let main_conninfo = &connector.connection_info;
 
-            super::validate_connection_infos_do_not_match((shadow_conninfo, main_conninfo))?;
+            super::validate_connection_infos_do_not_match(
+                shadow_database_connection_string,
+                &connector.params.connection_string,
+            )?;
 
             tracing::info!(
                 "Connecting to user-provided shadow database at {}.{:?}",
@@ -139,6 +141,10 @@ impl SqlFlavour for PostgresFlavour {
         })??;
 
         Ok(())
+    }
+
+    fn connector_type(&self) -> &'static str {
+        "postgresql"
     }
 
     fn datamodel_connector(&self) -> &'static dyn datamodel::datamodel_connector::Connector {
