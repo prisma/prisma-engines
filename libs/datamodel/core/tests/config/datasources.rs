@@ -94,6 +94,29 @@ fn serialize_builtin_sources_to_dmmf() {
     expect.assert_eq(&render_schema_json(schema));
 }
 
+#[test]
+fn datasource_should_not_allow_arbitrary_parameters() {
+    let schema = indoc! {r#"
+        datasource ds {
+          provider = "mysql"
+          url = "mysql://localhost"
+          foo = "bar"
+        }
+    "#};
+
+    let expect = expect![[r#"
+        [1;91merror[0m: [1mProperty not known: "foo".[0m
+          [1;94m-->[0m  [4mschema.prisma:4[0m
+        [1;94m   | [0m
+        [1;94m 3 | [0m  url = "mysql://localhost"
+        [1;94m 4 | [0m  [1;91mfoo = "bar"[0m
+        [1;94m 5 | [0m}
+        [1;94m   | [0m
+    "#]];
+
+    expect.assert_eq(&datamodel::parse_schema(schema).map(drop).unwrap_err());
+}
+
 fn render_schema_json(schema: &str) -> String {
     let config = parse_configuration(schema);
     datamodel::json::mcf::render_sources_to_json(&config.datasources)
