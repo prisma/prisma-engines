@@ -68,7 +68,7 @@ pub(super) fn visit_model_field_default(
                 r#type = ctx.types.type_aliases[&alias_id];
                 continue;
             }
-            ScalarFieldType::Unsupported => match value.value {
+            ScalarFieldType::Unsupported(_) => match value.value {
                 ast::Expression::Function(funcname, funcargs, _) if funcname == FN_DBGENERATED => {
                     validate_dbgenerated_args(&funcargs.arguments, accept, ctx);
                 }
@@ -137,7 +137,7 @@ pub(super) fn visit_composite_field_default(
         ScalarFieldType::BuiltInScalar(scalar_type) => {
             validate_composite_builtin_scalar_type_default(scalar_type, value.value, accept, ctx)
         }
-        ScalarFieldType::Unsupported => {
+        ScalarFieldType::Unsupported(_) => {
             ctx.push_attribute_validation_error("Composite field of type `Unsupported` cannot have default values.")
         }
         ScalarFieldType::Alias(_) => unreachable!(),

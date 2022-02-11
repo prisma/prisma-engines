@@ -150,17 +150,17 @@ pub(crate) fn referencing_with_an_array_field_of_correct_type(
 
         let referenced = field.referenced_fields().and_then(|mut r| r.next());
 
-        let (fields, references) = match (referencing, referenced) {
+        let (referencing, referenced) = match (referencing, referenced) {
             (Some(fields), Some(references)) => (fields, references),
             _ => continue,
         };
 
-        let types_match = fields.scalar_field_type() == references.scalar_field_type();
-        let references_is_singular = !references.ast_field().arity.is_list();
+        let types_match = referencing.scalar_field_type() == referenced.scalar_field_type();
+        let references_a_singular_field = !referenced.ast_field().arity.is_list();
 
-        let raw_types_match = fields.raw_native_type().map(|r| r.1) == references.raw_native_type().map(|r| r.1);
+        let raw_types_match = referencing.raw_native_type().map(|r| r.1) == referenced.raw_native_type().map(|r| r.1);
 
-        if fields.ast_field().arity.is_list() && types_match && raw_types_match && references_is_singular {
+        if referencing.ast_field().arity.is_list() && types_match && raw_types_match && references_a_singular_field {
             continue;
         }
 
@@ -178,6 +178,13 @@ pub(crate) fn validate_no_referential_actions(
     relation: TwoWayEmbeddedManyToManyRelationWalker<'_>,
     ctx: &mut Context<'_>,
 ) {
+    if !ctx
+        .connector
+        .has_capability(ConnectorCapability::TwoWayEmbeddedManyToManyRelation)
+    {
+        return;
+    }
+
     let referential_action_spans = [relation.field_a(), relation.field_b()].into_iter().flat_map(|field| {
         field
             .explicit_on_delete_span()

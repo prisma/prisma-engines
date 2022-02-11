@@ -312,7 +312,7 @@ pub(super) fn validate_unsupported_field_type(field: ScalarFieldWalker<'_>, ctx:
     });
 
     let connector = source.active_connector;
-    let (unsupported_lit, _) = if let ScalarFieldType::Unsupported = field.scalar_field_type() {
+    let (unsupported_lit, _) = if let ScalarFieldType::Unsupported(_) = field.scalar_field_type() {
         field.ast_field().field_type.as_unsupported().unwrap()
     } else {
         return;

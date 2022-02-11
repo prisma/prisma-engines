@@ -194,7 +194,7 @@ fn visit_scalar_field_attributes<'db>(
 
     // @ignore
     if ctx.visit_optional_single_attr("ignore") {
-        if matches!(scalar_field_data.r#type, ScalarFieldType::Unsupported) {
+        if matches!(scalar_field_data.r#type, ScalarFieldType::Unsupported(_)) {
             ctx.push_attribute_validation_error("Fields of type `Unsupported` cannot take an `@ignore` attribute. They are already treated as ignored by the client due to their type.");
         } else {
             scalar_field_data.is_ignored = true;

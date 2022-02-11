@@ -468,7 +468,7 @@ impl<'a> LiftAstToDml<'a> {
                 let enum_name = &self.db.ast()[*enum_id].name.name;
                 dml::FieldType::Enum(enum_name.to_owned())
             }
-            db::ScalarFieldType::Unsupported => {
+            db::ScalarFieldType::Unsupported(_) => {
                 dml::FieldType::Unsupported(ast_field.field_type.as_unsupported().unwrap().0.to_owned())
             }
             db::ScalarFieldType::Alias(top_id) => {
@@ -514,7 +514,7 @@ impl<'a> LiftAstToDml<'a> {
 
                 CompositeTypeFieldType::Enum(enum_name.to_owned())
             }
-            db::ScalarFieldType::Unsupported => {
+            db::ScalarFieldType::Unsupported(_) => {
                 let field = composite_type_field
                     .ast_field()
                     .field_type
