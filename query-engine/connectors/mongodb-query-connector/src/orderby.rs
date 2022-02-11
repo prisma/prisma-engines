@@ -3,12 +3,18 @@ use std::iter;
 use crate::join::JoinStage;
 use itertools::Itertools;
 use mongodb::bson::{doc, Document};
-use prisma_models::{OrderBy, OrderByHop, SortOrder};
+use prisma_models::{OrderBy, OrderByHop, OrderByToManyAggregation, SortOrder};
 
 #[derive(Debug)]
 pub(crate) struct OrderByData {
+    /// All collection join stages required to make this orderBy's data available for sorting.
     pub(crate) join: Option<JoinStage>,
+
+    /// The prefix that leads to the joined model we're trying to compare values on.
+    /// This can be multiple hops over relations, but never over composites.
     pub(crate) prefix: Option<OrderByPrefix>,
+
+    /// The base order object from the query core this data is based on.
     pub(crate) order_by: OrderBy,
 }
 
@@ -23,11 +29,7 @@ impl OrderByData {
 
     pub(crate) fn compute(order_by: OrderBy, index: usize) -> Self {
         // Determine if we need to compute join stages. Composite paths do not count as join - they're on the same document.
-        if order_by
-            .path()
-            .iter()
-            .all(|path| matches!(path, OrderByHop::Composite(_)))
-        {
+        if order_by.relation_path().is_empty() {
             Self {
                 join: None,
                 prefix: None,
@@ -48,7 +50,7 @@ impl OrderByData {
             // in the left hand side here (JoinStage<A, JoinStage<B, JoinStage<C>>>).
             stages.reverse();
 
-            let mut final_stage = stages
+            let mut folded_stages = stages
                 .into_iter()
                 .fold1(|right, mut left| {
                     left.push_nested(right);
@@ -56,10 +58,10 @@ impl OrderByData {
                 })
                 .unwrap();
 
-            final_stage.set_alias(prefix.first().unwrap().to_string());
+            folded_stages.set_alias(prefix.first().unwrap().to_string());
 
             Self {
-                join: Some(final_stage),
+                join: Some(folded_stages),
                 prefix: Some(prefix),
                 order_by,
             }
@@ -71,6 +73,7 @@ impl OrderByData {
     /// Composites can't have relations to other models (yet), so this means that it either starts with relation hops
     /// and ends in a scalar (e.g. order by: model A -> B -> C.field), or it starts with relations and ends in composites
     /// (e.g. order by: model A -> B -> C.composite.field) or it's without relations all together.
+    ///
     /// The join, and with that the prefix, only cares about the path to the object we joined to (above it would be A -> B -> C),
     /// The path on the object (e.g. `composite.field`) is handled as a scalar later.
     fn compute_join_prefix(index: usize, order_by: &OrderBy) -> OrderByPrefix {
@@ -98,6 +101,8 @@ impl OrderByData {
             let first = prefix.first().unwrap().to_string();
 
             (first.clone(), first)
+        } else if let Some(composite_path) = self.composite_path() {
+            (composite_path.clone(), composite_path)
         } else {
             // TODO: Order by relevance won't work here
             let right = self
@@ -128,21 +133,26 @@ impl OrderByData {
     /// Computes the full query path that would be required to traverse from the top-most
     /// document all the way to the scalar to order through all hops.
     pub(crate) fn full_reference_path(&self, use_bindings: bool) -> String {
-        if let Some(ref prefix) = self.prefix {
+        if matches!(
+            self.order_by,
+            OrderBy::ScalarAggregation(_) | OrderBy::ToManyAggregation(_)
+        ) {
             // Order by aggregates are always referenced by their join prefix and not a specific field name.
-            // since they are performed on relations
-            if matches!(self.order_by, OrderBy::Aggregation(_)) {
-                prefix.to_string()
-            } else {
-                iter::once(prefix.to_string())
-                    .chain(self.composite_suffix())
-                    .chain(iter::once(self.scalar_field_name()))
-                    .join(".")
-            }
+            self.prefix
+                .as_ref()
+                .map(ToString::to_string)
+                .into_iter()
+                .chain(self.composite_path())
+                .join(".")
+        } else if let Some(ref prefix) = self.prefix {
+            iter::once(prefix.to_string())
+                .chain(self.composite_path())
+                .chain(iter::once(self.scalar_field_name()))
+                .join(".")
         } else if use_bindings {
             self.binding_names().0
         } else {
-            self.composite_suffix()
+            self.composite_path()
                 .into_iter()
                 .chain(iter::once(self.scalar_field_name()))
                 .join(".")
@@ -159,10 +169,9 @@ impl OrderByData {
     /// - `document`.<relations>.scalar`
     /// - `document.<relations>.<composites>.scalar`
     ///
-    /// This function gives us the `composites` part of the above path, and it's always a suffix to the `<relations>` segment,
-    /// (even if it doesn't exist).
-    fn composite_suffix(&self) -> Option<String> {
-        // Note that relations and composites are never mixed, so it's fine to just throw out relations during mapping and keep composites.
+    /// This function gives us the `composites` part of the above path.
+    fn composite_path(&self) -> Option<String> {
+        // Note that relations and composites are never mixed currently, so it's fine to just throw out relations during mapping and keep composites.
         let segments: Vec<_> = self
             .order_by
             .path()
@@ -235,8 +244,10 @@ impl OrderByBuilder {
         let mut joins = vec![];
 
         for data in self.order_bys.into_iter() {
-            let field = if is_group_by {
-                if let OrderBy::Aggregation(order_by_aggr) = &data.order_by {
+            let is_to_many_aggregation = matches!(&data.order_by, OrderBy::ToManyAggregation(_));
+            let field_name = if is_group_by {
+                // Can only be scalar aggregations for groupBy, ToMany aggregations are not supported yet.
+                if let OrderBy::ScalarAggregation(order_by_aggr) = &data.order_by {
                     let prefix = match order_by_aggr.sort_aggregation {
                         prisma_models::SortAggregation::Count => "count",
                         prisma_models::SortAggregation::Avg => "avg",
@@ -252,32 +263,41 @@ impl OrderByBuilder {
                     // we need to refer to the object.
                     format!("_id.{}", data.scalar_field_name())
                 }
-            } else if matches!(&data.order_by, OrderBy::Aggregation(_)) && data.order_by.has_middle_to_one_path() {
-                // Since Order by aggregate with middle to-one path will be unwinded,
+            } else if is_to_many_aggregation {
+                dbg!("using bindings");
+                // Since Order by to-many aggregate with middle to-one path will be unwinded,
                 // we need to refer to it with its top-level join alias
                 data.binding_names().0
             } else {
+                dbg!("using full ref path");
                 data.full_reference_path(false)
             };
 
             // Unwind order by aggregate to-one middle joins into the top level join
             // to prevent nested join result which break the stages that come after
             // See `unwind_aggregate_joins` for more explanation
-            if let OrderBy::Aggregation(order_by_aggregate) = &data.order_by {
+            if let OrderBy::ToManyAggregation(order_by_aggregate) = &data.order_by {
                 if !order_by_aggregate.path.is_empty() {
                     match order_by_aggregate.sort_aggregation {
                         prisma_models::SortAggregation::Count => {
-                            if data.order_by.has_middle_to_one_path() {
-                                order_aggregate_proj_doc.extend(unwind_aggregate_joins(
-                                    field.clone().as_str(),
-                                    order_by_aggregate,
-                                    &data,
-                                ));
-                            }
+                            // if data.order_by.has_middle_to_one_relation_path() {
+                            order_aggregate_proj_doc.extend(unwind_aggregate_joins(
+                                field_name.clone().as_str(),
+                                order_by_aggregate,
+                                &data,
+                            ));
+                            // }
 
-                            order_aggregate_proj_doc.push(
-                                doc! { "$addFields": { field.clone(): { "$size": format!("${}", field.clone()) } } },
-                            );
+                            // Bandaid: > 1 check is to prevent bindings that repeat the same again, like `$field.field`.
+                            let if_null_binding = if is_to_many_aggregation && data.order_by.path().len() > 1 {
+                                // iter::once(field_name.clone()).chain(data.composite_path()).join(".")
+                                data.full_reference_path(false)
+                            } else {
+                                field_name.clone()
+                            };
+
+                            order_aggregate_proj_doc
+                                .push(doc! { "$addFields": { field_name.clone(): { "$size": { "$ifNull": [format!("${}", if_null_binding), []] } } } });
                         }
                         _ => unimplemented!("Order by aggregate only supports COUNT"),
                     }
@@ -286,10 +306,10 @@ impl OrderByBuilder {
 
             // Mongo: -1 -> DESC, 1 -> ASC
             match (data.sort_order(), self.reverse) {
-                (SortOrder::Ascending, true) => order_doc.insert(field, -1),
-                (SortOrder::Descending, true) => order_doc.insert(field, 1),
-                (SortOrder::Ascending, false) => order_doc.insert(field, 1),
-                (SortOrder::Descending, false) => order_doc.insert(field, -1),
+                (SortOrder::Ascending, true) => order_doc.insert(field_name, -1),
+                (SortOrder::Descending, true) => order_doc.insert(field_name, 1),
+                (SortOrder::Ascending, false) => order_doc.insert(field_name, 1),
+                (SortOrder::Descending, false) => order_doc.insert(field_name, -1),
             };
 
             joins.extend(data.join);
@@ -299,8 +319,11 @@ impl OrderByBuilder {
     }
 }
 
-/// In order to enable computing aggregation on nested joins,
-/// we unwind & replace the top-level join by the nested to-one joins so that we can apply a $size operation.
+/// In order to enable computing aggregation on nested joins, we unwind & replace the top-level
+/// join by the nested to-one joins so that we can apply a $size operation.
+///
+/// Note: In theory, we do not need to unwind composites, they are already present as single object (to-one) or array (to-many).
+/// Note: This is not necessary for `ScalarAggregations`. Todo [Dom] Why? This is such a mess that it's hard to reason about ANYTHING here.
 ///
 /// Let's consider these relations:
 /// (one or many) A to-one B to-one C to-many D
@@ -312,33 +335,35 @@ impl OrderByBuilder {
 /// 4. { $addFields: { orderby_AToB: "$orderby_AToB.CToD" } } -> [1, 2, 3]
 fn unwind_aggregate_joins(
     join_name: &str,
-    order_by_aggregate: &prisma_models::OrderByAggregation,
+    order_by_aggregate: &OrderByToManyAggregation,
     data: &OrderByData,
 ) -> Vec<Document> {
     order_by_aggregate
         .path
         .iter()
         .enumerate()
-        .filter_map(|(i, hop)| {
-            match hop {
-                // Todo: This may not work for composites yet, I'm unsure if we need to unwind to-ones too.
-                OrderByHop::Composite(_) => None,
-                OrderByHop::Relation(rf) if rf.is_list() => None,
-                OrderByHop::Relation(_) => {
-                    // Prefix parts are mapped 1-1 with order by path.
-                    // We can safely access (i + 1) here since the last path cannot be a to-one relation for an order by aggregate.
-                    let next_part_name = data.prefix.as_ref().unwrap().parts.get(i + 1).unwrap();
+        .filter_map(|(i, hop)| match hop {
+            OrderByHop::Composite(cf) if cf.is_list() => None,
+            OrderByHop::Relation(rf) if rf.is_list() => None,
+            OrderByHop::Relation(_) | OrderByHop::Composite(_) => {
+                let mut additional_stages = vec![];
 
-                    Some(vec![
-                        doc! {
-                            "$unwind": {
+                match data.prefix.as_ref().and_then(|prefix| prefix.parts.get(i + 1)) {
+                    Some(next_part) => {
+                        additional_stages.push(doc! {
+                            "$unwind": { // TODO this unwind needs to be there, always. FFS
                                 "path": format!("${}", join_name),
                                 "preserveNullAndEmptyArrays": true
                             }
-                        },
-                        doc! { "$addFields": { join_name: format!("${}.{}", join_name, next_part_name) } },
-                    ])
+                        });
+
+                        additional_stages
+                            .push(doc! { "$addFields": { join_name: format!("${}.{}", join_name, next_part) } });
+                    }
+                    None => (),
                 }
+
+                Some(additional_stages)
             }
         })
         .flatten()

@@ -74,8 +74,7 @@ impl QueryArguments {
         self.cursor.is_some()
             && self.order_by.iter().any(|o| match o {
                 OrderBy::Scalar(o) => !o.field.is_required(),
-                OrderBy::Aggregation(_) => false,
-                OrderBy::Relevance(_) => false,
+                _ => false,
             })
     }
 
@@ -115,8 +114,7 @@ impl QueryArguments {
             .iter()
             .filter_map(|o| match o {
                 OrderBy::Scalar(o) => Some(o),
-                OrderBy::Aggregation(_) => None,
-                OrderBy::Relevance(_) => None,
+                _ => None,
             })
             .collect();
 
@@ -164,8 +162,7 @@ impl QueryArguments {
     pub fn has_unbatchable_ordering(&self) -> bool {
         self.order_by.iter().any(|o| match o {
             OrderBy::Scalar(_) => false,
-            OrderBy::Aggregation(_) => true,
-            OrderBy::Relevance(_) => true,
+            _ => true,
         })
     }
 

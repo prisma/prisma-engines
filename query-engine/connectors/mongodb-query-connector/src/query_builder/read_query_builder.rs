@@ -267,8 +267,8 @@ impl MongoReadQueryBuilder {
 
         let mut unwinds: Vec<Document> = vec![];
 
-        for nested_stage in joins {
-            let (join, unwind) = nested_stage.build();
+        for join_stage in joins {
+            let (join, unwind) = join_stage.build();
 
             if let Some(u) = unwind {
                 unwinds.push(u);
