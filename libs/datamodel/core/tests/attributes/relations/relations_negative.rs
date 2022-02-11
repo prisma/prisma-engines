@@ -927,29 +927,3 @@ fn a_typoed_relation_should_fail_gracefully() {
 
     expect.assert_eq(&datamodel::parse_schema(dml).map(drop).unwrap_err());
 }
-
-//
-// #[test]
-// fn having_the_map_argument_on_the_wrong_side_should_error() {
-//     let dml = with_named_constraints(
-//         r#"
-//      model User {
-//          id Int    @id
-//          posts   Post[] @relation("Test", map: "Other")
-//      }
-//
-//      model Post {
-//          post_id Int    @id
-//          user_id Int
-//          user    User   @relation("Test", fields:[post_id], references: [id], map: "IfYou")
-//      }
-//      "#,
-//     );
-//
-//     let errors = parse_error(&dml);
-//     errors.assert_is(DatamodelError::new_model_validation_error(
-//         "The map argument should only be given on the side of a relation that also has the fields and references properties.",
-//         "User",
-//         Span::new(389, 561),
-//     ));
-// }

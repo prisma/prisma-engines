@@ -36,6 +36,8 @@ enum Command {
     ValidateDatamodel(ValidateDatamodel),
     /// Clear the data and DDL of the given database.
     ResetDatabase(ResetDatabase),
+    /// Clear the data and DDL of the given database.
+    CreateDatabase(CreateDatabase),
     /// Create a new migration to the given directory.
     CreateMigration(CreateMigration),
     /// Apply all unapplied migrations from the given directory.
@@ -146,6 +148,12 @@ struct ResetDatabase {
 }
 
 #[derive(StructOpt, Debug)]
+struct CreateDatabase {
+    /// Path to the prisma data model.
+    schema_path: String,
+}
+
+#[derive(StructOpt, Debug)]
 struct CreateMigration {
     /// The filesystem path of the migrations directory to use
     migrations_path: String,
@@ -219,13 +227,25 @@ async fn main() -> anyhow::Result<()> {
             let mut datamodel = String::new();
             file.read_to_string(&mut datamodel).unwrap();
 
-            datamodel::parse_datamodel(&datamodel).unwrap();
+            if let Err(e) = datamodel::parse_datamodel(&datamodel) {
+                let pretty = e.to_pretty_string("schema.prisma", &datamodel);
+                println!("{pretty}");
+            };
         }
         Command::ResetDatabase(cmd) => {
             let schema = read_datamodel_from_file(&cmd.schema_path).context("Error reading the schema from file")?;
             let api = migration_core::migration_api(Some(schema), None)?;
 
             api.reset().await?;
+        }
+        Command::CreateDatabase(cmd) => {
+            let schema = read_datamodel_from_file(&cmd.schema_path).context("Error reading the schema from file")?;
+            let api = migration_core::migration_api(Some(schema.clone()), None)?;
+
+            api.create_database(CreateDatabaseParams {
+                datasource: DatasourceParam::SchemaString(SchemaContainer { schema }),
+            })
+            .await?;
         }
         Command::CreateMigration(cmd) => {
             let prisma_schema =

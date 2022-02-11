@@ -17,16 +17,16 @@ pub struct Reformatter<'a> {
 
 impl<'a> Reformatter<'a> {
     pub fn new(input: &'a str) -> Self {
-        let info = crate::parse_schema_ast(input)
-            .and_then(|ast| crate::parse_datamodel_for_formatter(&ast).map(|datamodel| (ast, datamodel)));
+        let info = crate::parse_schema_ast(input).and_then(crate::parse_datamodel_for_formatter);
         match info {
-            Ok((schema_ast, (datamodel, mut datasources))) => {
+            Ok((db, datamodel, mut datasources)) => {
+                let schema_ast = db.ast();
                 let datasource = datasources.pop();
-                let missing_fields = Self::find_all_missing_fields(&schema_ast, &datamodel, datasource.as_ref());
+                let missing_fields = Self::find_all_missing_fields(schema_ast, &datamodel, datasource.as_ref());
                 let missing_field_attributes =
-                    Self::find_all_missing_attributes(&schema_ast, &datamodel, datasource.as_ref());
+                    Self::find_all_missing_attributes(schema_ast, &datamodel, datasource.as_ref());
                 let missing_relation_attribute_args =
-                    Self::find_all_missing_relation_attribute_args(&schema_ast, &datamodel, datasource.as_ref());
+                    Self::find_all_missing_relation_attribute_args(schema_ast, &datamodel, datasource.as_ref());
 
                 Reformatter {
                     input,

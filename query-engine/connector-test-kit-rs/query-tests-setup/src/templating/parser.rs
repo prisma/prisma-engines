@@ -20,6 +20,7 @@ pub fn parse(fragment: &str) -> TemplatingResult<DatamodelFragment> {
 }
 
 // Todo: Error handling is a mess.
+#[track_caller]
 fn parse_fragment(input: &str) -> IResult<&str, DatamodelFragment> {
     let (input, _) = tag("#")(input)?;
     let (input, fragment_ident) = take_until("(")(input)?;
@@ -27,8 +28,11 @@ fn parse_fragment(input: &str) -> IResult<&str, DatamodelFragment> {
     // Produces the args string, e.g. "id, Int, @id"
     let (_, args) = unwrap_parenthesis(input)?;
     let (input, parsed_args) = many0(parse_fragment_argument)(args)?;
-    let fragment = DatamodelFragment::parse(fragment_ident, parsed_args)
-        .unwrap_or_else(|_| panic!("Invalid fragment definition: {}", fragment_ident));
+
+    let fragment = match DatamodelFragment::parse(fragment_ident, parsed_args) {
+        Ok(fragment) => fragment,
+        Err(err) => panic!("Invalid fragment definition '{fragment_ident}': {err}"),
+    };
 
     Ok((input, fragment))
 }
@@ -154,7 +158,7 @@ mod parser_tests {
     #[test]
     // Valid m2m fragment
     fn basic_m2m_fragment_parsing() {
-        let fragment = r#"#m2m(posts, Post[], String, some_name)"#;
+        let fragment = r#"#m2m(posts, Post[], id, String, some_name)"#;
         let fragment = parse_fragment(fragment);
 
         assert_eq!(
@@ -164,6 +168,7 @@ mod parser_tests {
                 DatamodelFragment::M2m(M2mFragment {
                     field_name: String::from("posts"),
                     field_type: String::from("Post[]"),
+                    opposing_name: String::from("id"),
                     opposing_type: String::from("String"),
                     relation_name: Some(String::from("some_name")),
                 })

@@ -57,7 +57,7 @@ pub(crate) trait SqlFlavour:
 
     fn check_database_version_compatibility(
         &self,
-        _datamodel: &ValidatedSchema<'_>,
+        _datamodel: &ValidatedSchema,
     ) -> Option<user_facing_errors::common::DatabaseVersionIncompatibility> {
         None
     }

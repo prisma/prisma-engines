@@ -17,12 +17,15 @@ The TypeScript CLI in [prisma/prisma](https://github.com/prisma/prisma)
 interacts with the binary compiled from the [cli](./cli) crate. Some commands
 are exposed through the CLI directly, like `create-database`, but most of them
 through the JSON-RPC API, which is the default command if you just run the
-`migration-engine` binary. These two sets of commands are separated because you
-need a valid database connection to the database referenced in the Prisma schema
-to start a migration engine instance, but we do not have that in commands like
-`migration-engine cli create-database`. The reason why we have a JSON-RPC API in
-the first place is so the TypeScript CLI can issue multiple commands on the same
-connection, get results back and act on them.
+`migration-engine` binary. These two sets of commands are separated because
+previously, you needed a valid database connection to the database referenced
+in the Prisma schema to start a migration engine instance, but we did not have
+that requirement in commands like `migration-engine cli create-database`. This
+is legacy, as the JSON-RPC API now connects lazily.
+
+The reason why we have a JSON-RPC API in the first place is so the TypeScript
+CLI can issue multiple commands on the same connection, get results back and
+act on them.
 
 Logging and crash reporting happens through JSON logs on the Migration Engine's
 stderr. Every line contains a single JSON object conforming to the following
@@ -37,8 +40,6 @@ interface StdErrLine {
 
 interface LogFields {
   message: string;
-  /// Hint to the CLI to log this line.
-  migrate_action?: "log";
 
   /// Only for ERROR level messages
   is_panic?: boolean;

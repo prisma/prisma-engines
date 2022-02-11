@@ -12,50 +12,50 @@ use std::{
 
 /// A relation field on a model in the schema.
 #[derive(Copy, Clone, Debug)]
-pub struct RelationFieldWalker<'ast, 'db> {
+pub struct RelationFieldWalker<'db> {
     pub(crate) model_id: ast::ModelId,
     pub(crate) field_id: ast::FieldId,
-    pub(crate) db: &'db ParserDatabase<'ast>,
-    pub(crate) relation_field: &'db RelationField<'ast>,
+    pub(crate) db: &'db ParserDatabase,
+    pub(crate) relation_field: &'db RelationField,
 }
 
-impl<'ast, 'db> PartialEq for RelationFieldWalker<'ast, 'db> {
+impl<'db> PartialEq for RelationFieldWalker<'db> {
     fn eq(&self, other: &Self) -> bool {
         self.model_id == other.model_id && self.field_id == other.field_id
     }
 }
 
-impl<'ast, 'db> Eq for RelationFieldWalker<'ast, 'db> {}
+impl<'db> Eq for RelationFieldWalker<'db> {}
 
-impl<'ast, 'db> Hash for RelationFieldWalker<'ast, 'db> {
+impl<'db> Hash for RelationFieldWalker<'db> {
     fn hash<H: Hasher>(&self, state: &mut H) {
         self.model_id.hash(state);
         self.field_id.hash(state);
     }
 }
 
-impl<'ast, 'db> RelationFieldWalker<'ast, 'db> {
+impl<'db> RelationFieldWalker<'db> {
     /// The ID of the AST node of the field.
     pub fn field_id(self) -> ast::FieldId {
         self.field_id
     }
 
     /// The foreign key name of the relation (`@relation(map: ...)`).
-    pub fn mapped_name(self) -> Option<&'ast str> {
-        self.attributes().mapped_name
+    pub fn mapped_name(self) -> Option<&'db str> {
+        self.attributes().mapped_name.map(|string_id| &self.db[string_id])
     }
 
     /// The field name.
-    pub fn name(self) -> &'ast str {
+    pub fn name(self) -> &'db str {
         self.ast_field().name()
     }
 
     /// The AST node of the field.
-    pub fn ast_field(self) -> &'ast ast::Field {
+    pub fn ast_field(self) -> &'db ast::Field {
         &self.db.ast[self.model_id][self.field_id]
     }
 
-    pub(crate) fn attributes(self) -> &'db RelationField<'ast> {
+    pub(crate) fn attributes(self) -> &'db RelationField {
         self.relation_field
     }
 
@@ -80,8 +80,8 @@ impl<'ast, 'db> RelationFieldWalker<'ast, 'db> {
     }
 
     /// The relation name explicitly written in the schema source.
-    pub fn explicit_relation_name(self) -> Option<&'ast str> {
-        self.relation_field.name
+    pub fn explicit_relation_name(self) -> Option<&'db str> {
+        self.relation_field.name.map(|string_id| &self.db[string_id])
     }
 
     /// Is there an `@ignore` attribute on the field?
@@ -95,7 +95,7 @@ impl<'ast, 'db> RelationFieldWalker<'ast, 'db> {
     }
 
     /// The model containing the field.
-    pub fn model(self) -> ModelWalker<'ast, 'db> {
+    pub fn model(self) -> ModelWalker<'db> {
         ModelWalker {
             model_id: self.model_id,
             db: self.db,
@@ -104,16 +104,17 @@ impl<'ast, 'db> RelationFieldWalker<'ast, 'db> {
     }
 
     /// The `@relation` attribute in the field AST.
-    pub fn relation_attribute(self) -> Option<&'ast ast::Attribute> {
-        self.attributes().relation_attribute
+    pub fn relation_attribute(self) -> Option<&'db ast::Attribute> {
+        self.attributes().relation_attribute.map(|id| &self.db.ast[id])
     }
 
-    pub(crate) fn references_model(self, other: ast::ModelId) -> bool {
+    /// Does the relation field reference the passed in model?
+    pub fn references_model(self, other: ast::ModelId) -> bool {
         self.relation_field.referenced_model == other
     }
 
     /// The model referenced by the relation.
-    pub fn related_model(self) -> ModelWalker<'ast, 'db> {
+    pub fn related_model(self) -> ModelWalker<'db> {
         let model_id = self.relation_field.referenced_model;
 
         ModelWalker {
@@ -124,7 +125,7 @@ impl<'ast, 'db> RelationFieldWalker<'ast, 'db> {
     }
 
     /// The fields in the `@relation(references: ...)` argument.
-    pub fn referenced_fields(self) -> Option<impl ExactSizeIterator<Item = ScalarFieldWalker<'ast, 'db>> + 'db> {
+    pub fn referenced_fields(self) -> Option<impl ExactSizeIterator<Item = ScalarFieldWalker<'db>> + 'db> {
         self.attributes().references.as_ref().map(|references| {
             references
                 .iter()
@@ -133,7 +134,7 @@ impl<'ast, 'db> RelationFieldWalker<'ast, 'db> {
     }
 
     /// The relation this field is part of.
-    pub fn relation(self) -> RelationWalker<'ast, 'db> {
+    pub fn relation(self) -> RelationWalker<'db> {
         let model = self.model();
         let mut relations = model.relations_from().chain(model.relations_to());
         relations.find(|r| r.has_field(self.model_id, self.field_id)).unwrap()
@@ -141,7 +142,7 @@ impl<'ast, 'db> RelationFieldWalker<'ast, 'db> {
 
     /// The name of the relation. Either uses the `name` (or default) argument,
     /// or generates an implicit name.
-    pub fn relation_name(self) -> RelationName<'ast> {
+    pub fn relation_name(self) -> RelationName<'db> {
         self.explicit_relation_name()
             .map(RelationName::Explicit)
             .unwrap_or_else(|| RelationName::generated(self.model().name(), self.related_model().name()))
@@ -179,12 +180,12 @@ impl<'ast, 'db> RelationFieldWalker<'ast, 'db> {
     }
 
     /// The fields in the `fields: [...]` argument in the forward relation field.
-    pub fn referencing_fields(self) -> Option<impl ExactSizeIterator<Item = ScalarFieldWalker<'ast, 'db>>> {
+    pub fn referencing_fields(self) -> Option<impl ExactSizeIterator<Item = ScalarFieldWalker<'db>>> {
         self.fields()
     }
 
     /// The fields in the `fields: [...]` argument in the forward relation field.
-    pub fn fields(self) -> Option<impl ExactSizeIterator<Item = ScalarFieldWalker<'ast, 'db>>> {
+    pub fn fields(self) -> Option<impl ExactSizeIterator<Item = ScalarFieldWalker<'db>>> {
         let model_id = self.model_id;
         let attributes = self.attributes();
         attributes.fields.as_ref().map(move |fields| {
@@ -200,14 +201,14 @@ impl<'ast, 'db> RelationFieldWalker<'ast, 'db> {
 
 /// The relation name.
 #[derive(Debug, Clone)]
-pub enum RelationName<'ast> {
+pub enum RelationName<'db> {
     /// A relation name specified in the AST.
-    Explicit(&'ast str),
+    Explicit(&'db str),
     /// An inferred relation name.
     Generated(String),
 }
 
-impl<'ast> PartialEq for RelationName<'ast> {
+impl<'db> PartialEq for RelationName<'db> {
     fn eq(&self, other: &Self) -> bool {
         match (self, other) {
             (Self::Explicit(l0), Self::Explicit(r0)) => l0 == r0,
@@ -218,9 +219,9 @@ impl<'ast> PartialEq for RelationName<'ast> {
     }
 }
 
-impl<'ast> Eq for RelationName<'ast> {}
+impl<'db> Eq for RelationName<'db> {}
 
-impl<'ast> PartialOrd for RelationName<'ast> {
+impl<'db> PartialOrd for RelationName<'db> {
     fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
         match (self, other) {
             (Self::Explicit(l0), Self::Explicit(r0)) => l0.partial_cmp(r0),
@@ -231,7 +232,7 @@ impl<'ast> PartialOrd for RelationName<'ast> {
     }
 }
 
-impl<'ast> Ord for RelationName<'ast> {
+impl<'db> Ord for RelationName<'db> {
     fn cmp(&self, other: &Self) -> std::cmp::Ordering {
         match (self, other) {
             (Self::Explicit(l0), Self::Explicit(r0)) => l0.cmp(r0),
@@ -242,7 +243,7 @@ impl<'ast> Ord for RelationName<'ast> {
     }
 }
 
-impl<'ast> std::hash::Hash for RelationName<'ast> {
+impl<'db> std::hash::Hash for RelationName<'db> {
     fn hash<H: Hasher>(&self, state: &mut H) {
         match self {
             RelationName::Explicit(s) => s.hash(state),
@@ -251,7 +252,7 @@ impl<'ast> std::hash::Hash for RelationName<'ast> {
     }
 }
 
-impl<'ast> RelationName<'ast> {
+impl<'db> RelationName<'db> {
     pub(crate) fn generated(model_a: &str, model_b: &str) -> Self {
         if model_a < model_b {
             Self::Generated(format!("{}To{}", model_a, model_b))
@@ -261,7 +262,7 @@ impl<'ast> RelationName<'ast> {
     }
 }
 
-impl<'ast> fmt::Display for RelationName<'ast> {
+impl<'db> fmt::Display for RelationName<'db> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             RelationName::Explicit(s) => f.write_str(s),
@@ -270,7 +271,7 @@ impl<'ast> fmt::Display for RelationName<'ast> {
     }
 }
 
-impl<'ast> AsRef<str> for RelationName<'ast> {
+impl<'db> AsRef<str> for RelationName<'db> {
     fn as_ref(&self) -> &str {
         match self {
             RelationName::Explicit(s) => s,
@@ -279,8 +280,8 @@ impl<'ast> AsRef<str> for RelationName<'ast> {
     }
 }
 
-impl<'ast> From<RelationName<'ast>> for Cow<'ast, str> {
-    fn from(name: RelationName<'ast>) -> Self {
+impl<'db> From<RelationName<'db>> for Cow<'db, str> {
+    fn from(name: RelationName<'db>) -> Self {
         match name {
             RelationName::Explicit(name) => Cow::from(name),
             RelationName::Generated(name) => Cow::from(name),

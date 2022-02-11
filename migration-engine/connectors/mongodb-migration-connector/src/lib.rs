@@ -54,11 +54,8 @@ impl MongoDbMigrationConnector {
     async fn mongodb_schema_from_diff_target(&self, target: DiffTarget<'_>) -> ConnectorResult<MongoSchema> {
         match target {
             DiffTarget::Datamodel(schema) => {
-                let ast = datamodel::parse_schema_ast(&schema).map_err(|err| {
-                    ConnectorError::new_schema_parser_error(err.to_pretty_string("schema.prisma", &schema))
-                })?;
                 let validated_schema =
-                    datamodel::parse_schema_parserdb(&schema, &ast).map_err(ConnectorError::new_schema_parser_error)?;
+                    datamodel::parse_schema_parserdb(&schema).map_err(ConnectorError::new_schema_parser_error)?;
                 Ok(schema_calculator::calculate(&validated_schema))
             }
             DiffTarget::Database(url) => {
@@ -90,9 +87,9 @@ impl MigrationConnector for MongoDbMigrationConnector {
     }
 
     async fn create_database(&self) -> ConnectorResult<String> {
-        Err(ConnectorError::from_msg(
-            "create_database() is not supported on mongodb: databases are created automatically when used.".to_owned(),
-        ))
+        let name = self.client().await?.db_name();
+        tracing::warn!("MongoDB database will be created on first use.");
+        Ok(name.into())
     }
 
     async fn db_execute(&self, _url: String, _script: String) -> ConnectorResult<()> {

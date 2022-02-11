@@ -355,7 +355,7 @@ mod delete_mutation_relations {
             r#"
             model Parent {
                 #id(id, Int, @id)
-                #m2m(childrenOpt, Child[], Int)
+                #m2m(childrenOpt, Child[], id, Int)
 
                 p            String     @unique
                 stepChildOpt StepChild?
@@ -363,7 +363,7 @@ mod delete_mutation_relations {
 
                model Child {
                 #id(id, Int, @id)
-                #m2m(parentsOpt, Parent[], Int)
+                #m2m(parentsOpt, Parent[], id, Int)
 
                 c          String @unique
                }
@@ -384,7 +384,7 @@ mod delete_mutation_relations {
         let schema = indoc! {
             r#"model Parent {
                 #id(id, Int, @id)
-                #m2m(childrenOpt, Child[], Int)
+                #m2m(childrenOpt, Child[], id, Int)
 
                 p            String     @unique
                 stepChildId  Int?
@@ -393,7 +393,7 @@ mod delete_mutation_relations {
 
                model Child {
                 #id(id, Int, @id)
-                #m2m(parentsOpt, Parent[], Int)
+                #m2m(parentsOpt, Parent[], id, Int)
 
                 c          String   @unique
                }

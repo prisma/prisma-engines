@@ -2,6 +2,11 @@ use datamodel::{parse_schema, parse_schema_ast};
 use expect_test::expect;
 use indoc::indoc;
 
+use crate::{
+    common::{CompositeTypeAsserts, DatamodelAsserts},
+    with_header, Provider,
+};
+
 #[test]
 fn composite_types_are_parsed_without_error() {
     let datamodel = r#"
@@ -9,7 +14,7 @@ fn composite_types_are_parsed_without_error() {
             provider = "mongodb"
             url = "mongo+srv:/...."
         }
-    
+
         generator client {
           provider        = "prisma-client-js"
           previewFeatures = ["mongoDb"]
@@ -92,8 +97,8 @@ fn composite_types_are_parsed_without_error() {
                         name: Identifier {
                             name: "client",
                             span: Span {
-                                start: 126,
-                                end: 132,
+                                start: 122,
+                                end: 128,
                             },
                         },
                         properties: [
@@ -101,28 +106,28 @@ fn composite_types_are_parsed_without_error() {
                                 name: Identifier {
                                     name: "provider",
                                     span: Span {
-                                        start: 145,
-                                        end: 153,
+                                        start: 141,
+                                        end: 149,
                                     },
                                 },
                                 value: StringValue(
                                     "prisma-client-js",
                                     Span {
-                                        start: 163,
-                                        end: 181,
+                                        start: 159,
+                                        end: 177,
                                     },
                                 ),
                                 span: Span {
-                                    start: 145,
-                                    end: 182,
+                                    start: 141,
+                                    end: 178,
                                 },
                             },
                             ConfigBlockProperty {
                                 name: Identifier {
                                     name: "previewFeatures",
                                     span: Span {
-                                        start: 192,
-                                        end: 207,
+                                        start: 188,
+                                        end: 203,
                                     },
                                 },
                                 value: Array(
@@ -130,26 +135,26 @@ fn composite_types_are_parsed_without_error() {
                                         StringValue(
                                             "mongoDb",
                                             Span {
-                                                start: 211,
-                                                end: 220,
+                                                start: 207,
+                                                end: 216,
                                             },
                                         ),
                                     ],
                                     Span {
-                                        start: 210,
-                                        end: 221,
+                                        start: 206,
+                                        end: 217,
                                     },
                                 ),
                                 span: Span {
-                                    start: 192,
-                                    end: 222,
+                                    start: 188,
+                                    end: 218,
                                 },
                             },
                         ],
                         documentation: None,
                         span: Span {
-                            start: 116,
-                            end: 231,
+                            start: 112,
+                            end: 227,
                         },
                     },
                 ),
@@ -158,8 +163,8 @@ fn composite_types_are_parsed_without_error() {
                         name: Identifier {
                             name: "Address",
                             span: Span {
-                                start: 246,
-                                end: 253,
+                                start: 242,
+                                end: 249,
                             },
                         },
                         fields: [
@@ -168,24 +173,24 @@ fn composite_types_are_parsed_without_error() {
                                     Identifier {
                                         name: "String",
                                         span: Span {
-                                            start: 273,
-                                            end: 279,
+                                            start: 269,
+                                            end: 275,
                                         },
                                     },
                                 ),
                                 name: Identifier {
                                     name: "name",
                                     span: Span {
-                                        start: 268,
-                                        end: 272,
+                                        start: 264,
+                                        end: 268,
                                     },
                                 },
                                 arity: Optional,
                                 attributes: [],
                                 documentation: None,
                                 span: Span {
-                                    start: 268,
-                                    end: 281,
+                                    start: 264,
+                                    end: 277,
                                 },
                                 is_commented_out: false,
                             },
@@ -194,16 +199,16 @@ fn composite_types_are_parsed_without_error() {
                                     Identifier {
                                         name: "String",
                                         span: Span {
-                                            start: 300,
-                                            end: 306,
+                                            start: 296,
+                                            end: 302,
                                         },
                                     },
                                 ),
                                 name: Identifier {
                                     name: "street",
                                     span: Span {
-                                        start: 293,
-                                        end: 299,
+                                        start: 289,
+                                        end: 295,
                                     },
                                 },
                                 arity: Required,
@@ -212,8 +217,8 @@ fn composite_types_are_parsed_without_error() {
                                         name: Identifier {
                                             name: "db.ObjectId",
                                             span: Span {
-                                                start: 308,
-                                                end: 319,
+                                                start: 304,
+                                                end: 315,
                                             },
                                         },
                                         arguments: ArgumentsList {
@@ -222,23 +227,23 @@ fn composite_types_are_parsed_without_error() {
                                             trailing_comma: None,
                                         },
                                         span: Span {
-                                            start: 308,
-                                            end: 319,
+                                            start: 304,
+                                            end: 315,
                                         },
                                     },
                                 ],
                                 documentation: None,
                                 span: Span {
-                                    start: 293,
-                                    end: 320,
+                                    start: 289,
+                                    end: 316,
                                 },
                                 is_commented_out: false,
                             },
                         ],
                         documentation: None,
                         span: Span {
-                            start: 241,
-                            end: 329,
+                            start: 237,
+                            end: 325,
                         },
                     },
                 ),
@@ -247,8 +252,8 @@ fn composite_types_are_parsed_without_error() {
                         name: Identifier {
                             name: "User",
                             span: Span {
-                                start: 345,
-                                end: 349,
+                                start: 341,
+                                end: 345,
                             },
                         },
                         fields: [
@@ -257,16 +262,16 @@ fn composite_types_are_parsed_without_error() {
                                     Identifier {
                                         name: "String",
                                         span: Span {
-                                            start: 368,
-                                            end: 374,
+                                            start: 364,
+                                            end: 370,
                                         },
                                     },
                                 ),
                                 name: Identifier {
                                     name: "id",
                                     span: Span {
-                                        start: 364,
-                                        end: 366,
+                                        start: 360,
+                                        end: 362,
                                     },
                                 },
                                 arity: Required,
@@ -275,8 +280,8 @@ fn composite_types_are_parsed_without_error() {
                                         name: Identifier {
                                             name: "id",
                                             span: Span {
-                                                start: 376,
-                                                end: 378,
+                                                start: 372,
+                                                end: 374,
                                             },
                                         },
                                         arguments: ArgumentsList {
@@ -285,16 +290,16 @@ fn composite_types_are_parsed_without_error() {
                                             trailing_comma: None,
                                         },
                                         span: Span {
-                                            start: 376,
-                                            end: 378,
+                                            start: 372,
+                                            end: 374,
                                         },
                                     },
                                     Attribute {
                                         name: Identifier {
                                             name: "default",
                                             span: Span {
-                                                start: 380,
-                                                end: 387,
+                                                start: 376,
+                                                end: 383,
                                             },
                                         },
                                         arguments: ArgumentsList {
@@ -309,13 +314,13 @@ fn composite_types_are_parsed_without_error() {
                                                             trailing_comma: None,
                                                         },
                                                         Span {
-                                                            start: 388,
-                                                            end: 394,
+                                                            start: 384,
+                                                            end: 390,
                                                         },
                                                     ),
                                                     span: Span {
-                                                        start: 388,
-                                                        end: 394,
+                                                        start: 384,
+                                                        end: 390,
                                                     },
                                                 },
                                             ],
@@ -323,16 +328,16 @@ fn composite_types_are_parsed_without_error() {
                                             trailing_comma: None,
                                         },
                                         span: Span {
-                                            start: 380,
-                                            end: 395,
+                                            start: 376,
+                                            end: 391,
                                         },
                                     },
                                     Attribute {
                                         name: Identifier {
                                             name: "map",
                                             span: Span {
-                                                start: 397,
-                                                end: 400,
+                                                start: 393,
+                                                end: 396,
                                             },
                                         },
                                         arguments: ArgumentsList {
@@ -342,13 +347,13 @@ fn composite_types_are_parsed_without_error() {
                                                     value: StringValue(
                                                         "_id",
                                                         Span {
-                                                            start: 401,
-                                                            end: 406,
+                                                            start: 397,
+                                                            end: 402,
                                                         },
                                                     ),
                                                     span: Span {
-                                                        start: 401,
-                                                        end: 406,
+                                                        start: 397,
+                                                        end: 402,
                                                     },
                                                 },
                                             ],
@@ -356,16 +361,16 @@ fn composite_types_are_parsed_without_error() {
                                             trailing_comma: None,
                                         },
                                         span: Span {
-                                            start: 397,
-                                            end: 407,
+                                            start: 393,
+                                            end: 403,
                                         },
                                     },
                                     Attribute {
                                         name: Identifier {
                                             name: "db.ObjectId",
                                             span: Span {
-                                                start: 409,
-                                                end: 420,
+                                                start: 405,
+                                                end: 416,
                                             },
                                         },
                                         arguments: ArgumentsList {
@@ -374,15 +379,15 @@ fn composite_types_are_parsed_without_error() {
                                             trailing_comma: None,
                                         },
                                         span: Span {
-                                            start: 409,
-                                            end: 420,
+                                            start: 405,
+                                            end: 416,
                                         },
                                     },
                                 ],
                                 documentation: None,
                                 span: Span {
-                                    start: 364,
-                                    end: 421,
+                                    start: 360,
+                                    end: 417,
                                 },
                                 is_commented_out: false,
                             },
@@ -391,24 +396,24 @@ fn composite_types_are_parsed_without_error() {
                                     Identifier {
                                         name: "Address",
                                         span: Span {
-                                            start: 441,
-                                            end: 448,
+                                            start: 437,
+                                            end: 444,
                                         },
                                     },
                                 ),
                                 name: Identifier {
                                     name: "address",
                                     span: Span {
-                                        start: 433,
-                                        end: 440,
+                                        start: 429,
+                                        end: 436,
                                     },
                                 },
                                 arity: Optional,
                                 attributes: [],
                                 documentation: None,
                                 span: Span {
-                                    start: 433,
-                                    end: 450,
+                                    start: 429,
+                                    end: 446,
                                 },
                                 is_commented_out: false,
                             },
@@ -416,8 +421,8 @@ fn composite_types_are_parsed_without_error() {
                         attributes: [],
                         documentation: None,
                         span: Span {
-                            start: 339,
-                            end: 459,
+                            start: 335,
+                            end: 455,
                         },
                         commented_out: false,
                     },
@@ -516,6 +521,7 @@ fn composite_types_are_parsed_without_error() {
                             database_name: None,
                             documentation: None,
                             default_value: None,
+                            is_commented_out: false,
                         },
                         CompositeTypeField {
                             name: "street",
@@ -536,6 +542,7 @@ fn composite_types_are_parsed_without_error() {
                             database_name: None,
                             documentation: None,
                             default_value: None,
+                            is_commented_out: false,
                         },
                     ],
                 },
@@ -545,6 +552,32 @@ fn composite_types_are_parsed_without_error() {
 
     expected_ast.assert_debug_eq(&found);
     expected_datamodel.assert_debug_eq(&datamodel);
+}
+
+#[test]
+fn composite_types_must_have_at_least_one_visible_field() {
+    let schema = indoc! {r#"
+        type Address {
+          // name String?
+        }
+    "#};
+
+    let datamodel = with_header(schema, Provider::Mongo, &["mongoDb"]);
+
+    let expected = expect![[r#"
+        [1;91merror[0m: [1mError validating: A type must have at least one field defined.[0m
+          [1;94m-->[0m  [4mschema.prisma:11[0m
+        [1;94m   | [0m
+        [1;94m10 | [0m
+        [1;94m11 | [0m[1;91mtype Address {[0m
+        [1;94m12 | [0m  // name String?
+        [1;94m13 | [0m}
+        [1;94m   | [0m
+    "#]];
+
+    let error = datamodel::parse_schema(&datamodel).map(drop).unwrap_err();
+
+    expected.assert_eq(&error);
 }
 
 #[test]
@@ -728,4 +761,20 @@ fn cycles_broken_with_an_optional_are_allowed() {
     "#};
 
     assert!(parse_schema(datamodel).is_ok());
+}
+
+#[test]
+fn unsupported_should_work() {
+    let schema = indoc! {r#"
+        type A {
+          field Unsupported("Unknown")
+        }
+    "#};
+
+    let dml = with_header(schema, crate::Provider::Mongo, &["mongoDb"]);
+    let (_, datamodel) = parse_schema(&dml).unwrap();
+
+    datamodel
+        .assert_has_composite_type("A")
+        .assert_has_unsupported_field("field");
 }

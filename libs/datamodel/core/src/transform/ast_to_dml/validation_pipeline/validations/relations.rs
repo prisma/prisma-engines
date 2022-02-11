@@ -35,7 +35,7 @@ const STATE_ERROR: &str = "Failed lookup of model, field or optional property du
 /// Validates per database that we do not use a name that is already in use.
 pub(super) fn has_a_unique_constraint_name(
     names: &super::Names<'_>,
-    relation: InlineRelationWalker<'_, '_>,
+    relation: InlineRelationWalker<'_>,
     ctx: &mut Context<'_>,
 ) {
     let name = relation.constraint_name(ctx.connector);
@@ -69,7 +69,7 @@ pub(super) fn has_a_unique_constraint_name(
 }
 
 /// Required relational fields should point to required scalar fields.
-pub(super) fn field_arity(relation: InlineRelationWalker<'_, '_>, ctx: &mut Context<'_>) {
+pub(super) fn field_arity(relation: InlineRelationWalker<'_>, ctx: &mut Context<'_>) {
     let forward_relation_field = if let Some(f) = relation.forward_relation_field() {
         f
     } else {
@@ -107,7 +107,7 @@ pub(super) fn field_arity(relation: InlineRelationWalker<'_, '_>, ctx: &mut Cont
 }
 
 /// The `fields` and `references` arguments should hold the same number of fields.
-pub(super) fn same_length_in_referencing_and_referenced(relation: InlineRelationWalker<'_, '_>, ctx: &mut Context<'_>) {
+pub(super) fn same_length_in_referencing_and_referenced(relation: InlineRelationWalker<'_>, ctx: &mut Context<'_>) {
     let relation_field = if let Some(forward) = relation.forward_relation_field() {
         forward
     } else {
@@ -126,7 +126,7 @@ pub(super) fn same_length_in_referencing_and_referenced(relation: InlineRelation
 }
 
 /// Some connectors expect us to refer only unique fields from the foreign key.
-pub(super) fn references_unique_fields(relation: InlineRelationWalker<'_, '_>, ctx: &mut Context<'_>) {
+pub(super) fn references_unique_fields(relation: InlineRelationWalker<'_>, ctx: &mut Context<'_>) {
     let relation_field = if let Some(rf) = relation.forward_relation_field() {
         rf
     } else {
@@ -165,7 +165,7 @@ pub(super) fn references_unique_fields(relation: InlineRelationWalker<'_, '_>, c
 }
 
 /// Some connectors want the fields and references in the same order.
-pub(super) fn referencing_fields_in_correct_order(relation: InlineRelationWalker<'_, '_>, ctx: &mut Context<'_>) {
+pub(super) fn referencing_fields_in_correct_order(relation: InlineRelationWalker<'_>, ctx: &mut Context<'_>) {
     let relation_field = if let Some(rf) = relation.forward_relation_field() {
         rf
     } else {
@@ -227,7 +227,7 @@ pub(super) fn referencing_fields_in_correct_order(relation: InlineRelationWalker
 /// We count them from forward-relations, e.g. from the side that defines the
 /// foreign key. Many to many relations we skip. The user must set one of the
 /// relation links to NoAction for both referential actions.
-pub(super) fn cycles<'ast, 'db>(relation: CompleteInlineRelationWalker<'ast, 'db>, ctx: &mut Context<'_>) {
+pub(super) fn cycles(relation: CompleteInlineRelationWalker<'_>, ctx: &mut Context<'_>) {
     if !ctx
         .connector
         .has_capability(ConnectorCapability::ReferenceCycleDetection)
@@ -308,7 +308,7 @@ pub(super) fn cycles<'ast, 'db>(relation: CompleteInlineRelationWalker<'ast, 'db
 ///
 /// The user must set one of these relations to use NoAction for onUpdate and
 /// onDelete.
-pub(super) fn multiple_cascading_paths(relation: CompleteInlineRelationWalker<'_, '_>, ctx: &mut Context<'_>) {
+pub(super) fn multiple_cascading_paths(relation: CompleteInlineRelationWalker<'_>, ctx: &mut Context<'_>) {
     if !ctx
         .connector
         .has_capability(ConnectorCapability::ReferenceCycleDetection)
@@ -317,7 +317,7 @@ pub(super) fn multiple_cascading_paths(relation: CompleteInlineRelationWalker<'_
         return;
     }
 
-    let triggers_modifications = |relation: &CompleteInlineRelationWalker<'_, '_>| {
+    let triggers_modifications = |relation: &CompleteInlineRelationWalker<'_>| {
         relation
             .on_delete(ctx.connector, ctx.referential_integrity)
             .triggers_modification()
@@ -346,7 +346,7 @@ pub(super) fn multiple_cascading_paths(relation: CompleteInlineRelationWalker<'_
             (
                 relation,
                 Rc::new(VisitedRelation::root(relation)),
-                HashSet::<RelationFieldWalker<'_, '_>>::new(),
+                HashSet::<RelationFieldWalker<'_>>::new(),
             )
         })
         .collect();
@@ -454,7 +454,7 @@ pub(super) fn multiple_cascading_paths(relation: CompleteInlineRelationWalker<'_
 }
 
 fn cascade_error_with_default_values(
-    relation: CompleteInlineRelationWalker<'_, '_>,
+    relation: CompleteInlineRelationWalker<'_>,
     connector: &dyn Connector,
     referential_integrity: ReferentialIntegrity,
     msg: &str,
@@ -498,7 +498,7 @@ fn cascade_error_with_default_values(
 }
 
 /// The types of the referencing and referenced scalar fields in a relation must be compatible.
-pub(super) fn referencing_scalar_field_types(relation: InlineRelationWalker<'_, '_>, ctx: &mut Context<'_>) {
+pub(super) fn referencing_scalar_field_types(relation: InlineRelationWalker<'_>, ctx: &mut Context<'_>) {
     // see https://github.com/prisma/prisma/issues/10105
     if ctx
         .datasource
@@ -530,12 +530,12 @@ pub(super) fn referencing_scalar_field_types(relation: InlineRelationWalker<'_, 
         }
     }
 
-    fn field_types_match(referencing: ScalarFieldType, referenced: ScalarFieldType, db: &ParserDatabase<'_>) -> bool {
+    fn field_types_match(referencing: ScalarFieldType, referenced: ScalarFieldType, db: &ParserDatabase) -> bool {
         match (referencing, referenced) {
             (ScalarFieldType::CompositeType(a), ScalarFieldType::CompositeType(b)) if a == b => true,
             (ScalarFieldType::Enum(a), ScalarFieldType::Enum(b)) if a == b => true,
             (ScalarFieldType::BuiltInScalar(a), ScalarFieldType::BuiltInScalar(b)) if a == b => true,
-            (ScalarFieldType::Unsupported, ScalarFieldType::Unsupported) => true,
+            (ScalarFieldType::Unsupported(a), ScalarFieldType::Unsupported(b)) if a == b => true,
             (ScalarFieldType::Alias(a), b) => {
                 let a_type = db.alias_scalar_field_type(&a);
                 field_types_match(*a_type, b, db)

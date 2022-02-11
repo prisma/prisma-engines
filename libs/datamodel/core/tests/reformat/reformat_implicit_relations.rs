@@ -1264,3 +1264,53 @@ fn issue_10118() {
     "#]];
     expected.assert_eq(&result);
 }
+
+#[test]
+fn embedded_relations_should_not_add_anything_in_reformat() {
+    let schema = indoc! {r#"
+        datasource db {
+          provider = "mongodb"
+          url = "mongodb://"
+        }
+
+        generator js {
+          provider = "prisma-client-js"
+          previewFeatures = ["mongoDb"]
+        }
+
+        model A {
+          id   String   @id @map("_id") @default(auto()) @db.ObjectId
+          bIds String[] @db.ObjectId
+          bs   B[]      @relation(fields: [bIds])
+        }
+
+        model B {
+          id   String   @id @map("_id") @default(auto()) @db.ObjectId
+        }
+    "#};
+
+    let expected = expect![[r#"
+        datasource db {
+          provider = "mongodb"
+          url      = "mongodb://"
+        }
+
+        generator js {
+          provider        = "prisma-client-js"
+          previewFeatures = ["mongoDb"]
+        }
+
+        model A {
+          id   String   @id @default(auto()) @map("_id") @db.ObjectId
+          bIds String[] @db.ObjectId
+          bs   B[]      @relation(fields: [bIds])
+        }
+
+        model B {
+          id String @id @default(auto()) @map("_id") @db.ObjectId
+        }
+    "#]];
+
+    let result = Reformatter::new(schema).reformat_to_string();
+    expected.assert_eq(&result);
+}

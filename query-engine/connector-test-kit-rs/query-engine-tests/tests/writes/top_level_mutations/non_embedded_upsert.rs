@@ -30,20 +30,20 @@ mod non_embedded_upsert {
             r#"model List{
               #id(id, Int, @id)
               uList String? @unique
-              #m2m(todoes, Todo[], Int)
+              #m2m(todoes, Todo[], id, Int)
            }
 
            model Todo{
               #id(id, Int, @id)
               uTodo String? @unique
-              #m2m(lists, List[], Int)
-              #m2m(tags, Tag[], Int)
+              #m2m(lists, List[], id, Int)
+              #m2m(tags, Tag[], id, Int)
            }
 
            model Tag{
               #id(id, Int, @id)
               uTag String @unique
-              #m2m(todoes, Todo[], Int)
+              #m2m(todoes, Todo[], id, Int)
            }"#
         };
 

@@ -1,4 +1,4 @@
-use crate::common::*;
+use crate::{common::*, with_header};
 
 #[test]
 fn fail_on_duplicate_models() {
@@ -363,7 +363,7 @@ fn fail_on_duplicate_composite_type_field_with_map() {
     "#};
 
     let expectation = expect![[r#"
-        [1;91merror[0m: [1mField "otherName" is already defined on model "User".[0m
+        [1;91merror[0m: [1mField "otherName" is already defined on composite type "User".[0m
           [1;94m-->[0m  [4mschema.prisma:13[0m
         [1;94m   | [0m
         [1;94m12 | [0m    firstName String
@@ -373,6 +373,23 @@ fn fail_on_duplicate_composite_type_field_with_map() {
     "#]];
 
     expectation.assert_eq(&parse_and_render_error(dml));
+}
+
+#[test]
+fn mapped_names_should_not_cause_collisions_with_names() {
+    let schema = indoc! {r#"
+        type TestData {
+          id  String @map("_id")
+          id_ String @map("id")
+        }
+    "#};
+
+    let dml = with_header(schema, crate::Provider::Mongo, &["mongoDb"]);
+    let (_, datamodel) = datamodel::parse_schema(&dml).unwrap();
+    let r#type = datamodel.assert_has_composite_type("TestData");
+
+    r#type.assert_has_scalar_field("id");
+    r#type.assert_has_scalar_field("id_");
 }
 
 #[test]
@@ -395,7 +412,7 @@ fn fail_on_duplicate_mapped_composite_type_field() {
     "#};
 
     let expectation = expect![[r#"
-        [1;91merror[0m: [1mField "otherName" is already defined on model "User".[0m
+        [1;91merror[0m: [1mField "firstName" is already defined on composite type "User".[0m
           [1;94m-->[0m  [4mschema.prisma:13[0m
         [1;94m   | [0m
         [1;94m12 | [0m    primaryName String @map("firstName")

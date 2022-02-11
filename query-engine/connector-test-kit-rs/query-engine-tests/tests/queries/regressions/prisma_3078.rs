@@ -80,8 +80,8 @@ mod prisma_3078 {
             r#"model User {
             #id(id, Int, @id)
             name       String?
-            #m2m(field_b, User[], Int, UserfriendOf)
-            #m2m(field_a, User[], Int, UserfriendOf)
+            #m2m(field_b, User[], id, Int, UserfriendOf)
+            #m2m(field_a, User[], id, Int, UserfriendOf)
             field_aId  Int?
           }"#
         };
@@ -96,8 +96,8 @@ mod prisma_3078 {
             r#"model User {
               #id(id, Int, @id)
               name       String?
-              #m2m(field_b, User[], Int, UserfriendOf)
-              #m2m(field_z, User[], Int, UserfriendOf)
+              #m2m(field_b, User[], id, Int, UserfriendOf)
+              #m2m(field_z, User[], id, Int, UserfriendOf)
               field_zId  Int?
             }"#
         };

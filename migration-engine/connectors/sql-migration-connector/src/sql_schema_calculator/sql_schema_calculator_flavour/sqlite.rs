@@ -8,7 +8,7 @@ impl SqlSchemaCalculatorFlavour for SqliteFlavour {
     }
 
     // Integer primary keys on SQLite are automatically assigned the rowid, which means they are automatically autoincrementing.
-    fn field_is_implicit_autoincrement_primary_key(&self, field: ScalarFieldWalker<'_, '_>) -> bool {
+    fn field_is_implicit_autoincrement_primary_key(&self, field: ScalarFieldWalker<'_>) -> bool {
         field
             .model()
             .primary_key()

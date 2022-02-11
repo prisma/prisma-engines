@@ -232,7 +232,7 @@ impl SqlFlavour for MysqlFlavour {
 
     fn check_database_version_compatibility(
         &self,
-        datamodel: &ValidatedSchema<'_>,
+        datamodel: &ValidatedSchema,
     ) -> Option<user_facing_errors::common::DatabaseVersionIncompatibility> {
         if self.is_mysql_5_6() {
             let mut errors = Vec::new();
@@ -460,7 +460,7 @@ pub(crate) enum Circumstances {
     IsVitess,
 }
 
-fn check_datamodel_for_mysql_5_6(datamodel: &ValidatedSchema<'_>, errors: &mut Vec<String>) {
+fn check_datamodel_for_mysql_5_6(datamodel: &ValidatedSchema, errors: &mut Vec<String>) {
     datamodel
         .db
         .walk_models()

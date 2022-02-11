@@ -63,7 +63,7 @@ pub async fn create_record(
     conn: &dyn QueryExt,
     sql_family: &SqlFamily,
     model: &ModelRef,
-    args: WriteArgs,
+    mut args: WriteArgs,
     trace_id: Option<String>,
 ) -> crate::Result<SelectionResult> {
     let pk = model.primary_identifier();
@@ -78,7 +78,6 @@ pub async fn create_record(
 
     let args = match returned_id {
         Some(ref pk) if *sql_family == SqlFamily::Mysql => {
-            let mut args = args.clone();
             for (field, value) in pk.pairs.iter() {
                 let field = DatasourceFieldName(field.db_name().into());
                 let value = WriteOperation::scalar_set(value.clone());

@@ -17,8 +17,7 @@ pub(crate) async fn mongo_setup(schema: &str, url: &str) -> ConnectorResult<()> 
         .await
         .unwrap();
 
-    let ast = datamodel::parse_schema_ast(schema).unwrap();
-    let parsed_schema = datamodel::parse_schema_parserdb(schema, &ast).unwrap();
+    let parsed_schema = datamodel::parse_schema_parserdb(schema).unwrap();
 
     for model in parsed_schema.db.walk_models() {
         client

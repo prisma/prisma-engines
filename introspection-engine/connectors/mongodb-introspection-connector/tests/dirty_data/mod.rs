@@ -1,5 +1,6 @@
 use crate::test_api::*;
 use mongodb::bson::{doc, Bson, DateTime, Timestamp};
+use serde_json::json;
 
 #[test]
 fn explicit_id_field() {
@@ -24,11 +25,36 @@ fn explicit_id_field() {
 }
 
 #[test]
+fn mixed_id_types() {
+    let res = introspect(|db| async move {
+        db.collection("A")
+            .insert_many(
+                vec![doc! { "_id": 12345 }, doc! { "_id": "foo" }, doc! { "foo": false }],
+                None,
+            )
+            .await
+            .unwrap();
+
+        Ok(())
+    });
+
+    let expected = expect![[r#"
+        model A {
+          /// Multiple data types found: String: 33.3%, ObjectId: 33.3%, Int32: 33.3% out of 3 sampled entries
+          id  Int      @id @map("_id")
+          foo Boolean?
+        }
+    "#]];
+
+    expected.assert_eq(res.datamodel());
+}
+
+#[test]
 fn mixing_types() {
     let res = introspect(|db| async move {
         db.create_collection("A", None).await?;
         let collection = db.collection("A");
-        let docs = vec![doc! {"first": "Musti"}, doc! {"first": 1}, doc! {"first": null}];
+        let docs = vec![doc! {"first": "Musti"}, doc! {"first": 1i32}, doc! {"first": null}];
 
         collection.insert_many(docs, None).await.unwrap();
 
@@ -46,6 +72,12 @@ fn mixing_types() {
     expected.assert_eq(res.datamodel());
 
     res.assert_warning("The following fields had data stored in multiple types. The most common type was chosen. If loading data with a type that does not match the one in the data model, the client will crash. Please see the issue: https://github.com/prisma/prisma/issues/9654");
+
+    res.assert_warning_affected(&json!([{
+        "model": "A",
+        "field": "first",
+        "tpe": "Int32",
+    }]));
 }
 
 #[test]
@@ -74,6 +106,12 @@ fn mixing_types_with_the_same_base_type() {
     "#]];
 
     expected.assert_eq(res.datamodel());
+
+    res.assert_warning_affected(&json!([{
+        "model": "A",
+        "field": "first",
+        "tpe": "Timestamp",
+    }]));
 }
 
 #[test]
@@ -97,4 +135,10 @@ fn the_most_common_type_wins() {
     "#]];
 
     expected.assert_eq(res.datamodel());
+
+    res.assert_warning_affected(&json!([{
+        "model": "A",
+        "field": "first",
+        "tpe": "String",
+    }]));
 }

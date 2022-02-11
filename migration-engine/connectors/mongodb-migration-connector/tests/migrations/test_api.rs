@@ -162,8 +162,7 @@ pub(crate) fn test_scenario(scenario_name: &str) {
 
     // let state: State = serde_json::from_str(state).unwrap();
     RT.block_on(async move {
-        let ast = datamodel::parse_schema_ast(&schema).unwrap();
-        let parsed_schema = datamodel::parse_schema_parserdb(&schema, &ast).unwrap();
+        let parsed_schema = datamodel::parse_schema_parserdb(&schema).unwrap();
         let (db_name, connector) = new_connector(parsed_schema.configuration.preview_features());
         let client = client().await;
         let db = client.database(&db_name);

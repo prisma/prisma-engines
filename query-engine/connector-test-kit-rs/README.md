@@ -219,8 +219,8 @@ Schemas that are used for tests that are supposed to run for all connectors must
 For this reason, schemas have template strings of the form `#name(args)` embedded in them. Connectors decide how to render schemas (see `query-tests-setup/src/datamodel_rendering` for details). Currently two templates are available:
 - `#id(field_name, field_type, directives ...)` - For defining an ID field on a model.
     - `#id(pid, Int, @id, @map("_pid"))`
-- `#m2m(field_name, field_type, opposing_type, opt_relation_name)` - For defining a many-to-many relation between two models.
-    - Example: `#m2m(posts, Post[], String, "name")`
+- `#m2m(field_name, field_type, opposing_field_name, opposing_type, opt_relation_name)` - For defining a many-to-many relation between two models.
+    - Example: `#m2m(posts, Post[], id, String, "name")`
 
 All SQL connectors render these with a standard `SqlDatamodelRenderer`, Mongo uses its own `MongoDbSchemaRenderer`.
 

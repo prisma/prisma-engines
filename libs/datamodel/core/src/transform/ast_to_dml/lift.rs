@@ -12,14 +12,14 @@ use std::collections::HashMap;
 /// When lifting, the AST is converted to the Datamodel data structure, and
 /// additional semantics are attached.
 pub(crate) struct LiftAstToDml<'a> {
-    db: &'a db::ParserDatabase<'a>,
+    db: &'a db::ParserDatabase,
     connector: &'static dyn Connector,
     referential_integrity: ReferentialIntegrity,
 }
 
 impl<'a> LiftAstToDml<'a> {
     pub(crate) fn new(
-        db: &'a db::ParserDatabase<'a>,
+        db: &'a db::ParserDatabase,
         connector: &'static dyn Connector,
         referential_integrity: ReferentialIntegrity,
     ) -> LiftAstToDml<'a> {
@@ -71,7 +71,7 @@ impl<'a> LiftAstToDml<'a> {
     ) {
         let active_connector = self.connector;
         let referential_integrity = self.referential_integrity;
-        let common_dml_fields = |field: &mut dml::RelationField, relation_field: RelationFieldWalker<'_, '_>| {
+        let common_dml_fields = |field: &mut dml::RelationField, relation_field: RelationFieldWalker<'_>| {
             let ast_field = relation_field.ast_field();
             field.relation_info.on_delete = relation_field
                 .explicit_on_delete()
@@ -94,9 +94,28 @@ impl<'a> LiftAstToDml<'a> {
                 RefinedRelationWalker::Inline(relation) => {
                     // Forward field
                     {
+                        // If we have an array field we detect as a
+                        // back-relation, but it has fields defined, we expect
+                        // it to be the other side of a embedded 2-way m:n
+                        // relation, and we don't want to mess around with the
+                        // data model here at all.
+                        //
+                        // Please kill this with fire when we introduce code
+                        // actions for relations.
+                        if relation
+                            .back_relation_field()
+                            .filter(|rf| rf.ast_field().arity.is_list())
+                            .and_then(|rf| rf.fields())
+                            .is_some()
+                        {
+                            continue;
+                        }
+
                         let relation_info = dml::RelationInfo::new(relation.referenced_model().name());
                         let model = schema.find_model_mut(relation.referencing_model().name());
-                        let mut inferred_scalar_fields = Vec::new(); // reformatted/virtual/inferred extra scalar fields for reformatted relations.
+
+                        // reformatted/virtual/inferred extra scalar fields for reformatted relations.
+                        let mut inferred_scalar_fields = Vec::new();
 
                         let mut relation_field = if let Some(relation_field) = relation.forward_relation_field() {
                             // Construct a relation field in the DML for an existing relation field in the source.
@@ -237,11 +256,45 @@ impl<'a> LiftAstToDml<'a> {
                         );
                     }
                 }
+                RefinedRelationWalker::TwoWayEmbeddedManyToMany(relation) => {
+                    for relation_field in [relation.field_a(), relation.field_b()] {
+                        let ast_field = relation_field.ast_field();
+                        let arity = self.lift_field_arity(&ast_field.arity);
+                        let relation_info = dml::RelationInfo::new(relation_field.related_model().name());
+                        let referential_arity = self.lift_field_arity(&relation_field.referential_arity());
+
+                        let mut field =
+                            dml::RelationField::new(relation_field.name(), arity, referential_arity, relation_info);
+
+                        common_dml_fields(&mut field, relation_field);
+
+                        field.relation_info.references = relation_field
+                            .referenced_fields()
+                            .into_iter()
+                            .flatten()
+                            .map(|f| f.name().to_owned())
+                            .collect();
+
+                        field.relation_info.fields = relation_field
+                            .fields()
+                            .into_iter()
+                            .flatten()
+                            .map(|f| f.name().to_owned())
+                            .collect();
+
+                        let model = schema.find_model_mut(relation_field.model().name());
+                        model.add_field(dml::Field::RelationField(field));
+                        field_ids_for_sorting.insert(
+                            (relation_field.model().name(), relation_field.name()),
+                            relation_field.field_id(),
+                        );
+                    }
+                }
             }
         }
     }
 
-    fn lift_composite_type(&self, walker: CompositeTypeWalker<'_, '_>) -> CompositeType {
+    fn lift_composite_type(&self, walker: CompositeTypeWalker<'_>) -> CompositeType {
         let mut fields = Vec::new();
 
         for field in walker.fields() {
@@ -255,6 +308,7 @@ impl<'a> LiftAstToDml<'a> {
                     kind: dml_default_kind(value, field.r#type().as_builtin_scalar()),
                     db_name: None,
                 }),
+                is_commented_out: field.ast_field().is_commented_out,
             };
 
             fields.push(field);
@@ -269,7 +323,7 @@ impl<'a> LiftAstToDml<'a> {
     /// Internal: Validates a model AST node and lifts it to a DML model.
     fn lift_model(
         &self,
-        walker: ModelWalker<'a, '_>,
+        walker: ModelWalker<'a>,
         field_ids_for_sorting: &mut HashMap<(&'a str, &'a str), ast::FieldId>,
     ) -> dml::Model {
         let ast_model = walker.ast_model();
@@ -372,7 +426,7 @@ impl<'a> LiftAstToDml<'a> {
     }
 
     /// Internal: Validates an enum AST node.
-    fn lift_enum(&self, r#enum: EnumWalker<'_, '_>) -> dml::Enum {
+    fn lift_enum(&self, r#enum: EnumWalker<'_>) -> dml::Enum {
         let mut en = dml::Enum::new(r#enum.name(), vec![]);
 
         for value in r#enum.values() {
@@ -385,7 +439,7 @@ impl<'a> LiftAstToDml<'a> {
     }
 
     /// Internal: Lifts an enum value AST node.
-    fn lift_enum_value(&self, value: EnumValueWalker<'_, '_>) -> dml::EnumValue {
+    fn lift_enum_value(&self, value: EnumValueWalker<'_>) -> dml::EnumValue {
         let mut enum_value = dml::EnumValue::new(value.name());
         enum_value.documentation = value.documentation().map(String::from);
         enum_value.database_name = value.mapped_name().map(String::from);
@@ -405,7 +459,7 @@ impl<'a> LiftAstToDml<'a> {
         &self,
         ast_field: &ast::Field,
         scalar_field_type: &db::ScalarFieldType,
-        scalar_field: ScalarFieldWalker<'_, '_>,
+        scalar_field: ScalarFieldWalker<'_>,
     ) -> dml::FieldType {
         match scalar_field_type {
             db::ScalarFieldType::CompositeType(_) => {
@@ -415,7 +469,7 @@ impl<'a> LiftAstToDml<'a> {
                 let enum_name = &self.db.ast()[*enum_id].name.name;
                 dml::FieldType::Enum(enum_name.to_owned())
             }
-            db::ScalarFieldType::Unsupported => {
+            db::ScalarFieldType::Unsupported(_) => {
                 dml::FieldType::Unsupported(ast_field.field_type.as_unsupported().unwrap().0.to_owned())
             }
             db::ScalarFieldType::Alias(top_id) => {
@@ -438,7 +492,7 @@ impl<'a> LiftAstToDml<'a> {
 
     fn lift_composite_type_field_type(
         &self,
-        composite_type_field: CompositeTypeFieldWalker<'_, '_>,
+        composite_type_field: CompositeTypeFieldWalker<'_>,
         scalar_field_type: &db::ScalarFieldType,
     ) -> CompositeTypeFieldType {
         match scalar_field_type {
@@ -461,7 +515,18 @@ impl<'a> LiftAstToDml<'a> {
 
                 CompositeTypeFieldType::Enum(enum_name.to_owned())
             }
-            db::ScalarFieldType::Alias(_) | db::ScalarFieldType::Unsupported => {
+            db::ScalarFieldType::Unsupported(_) => {
+                let field = composite_type_field
+                    .ast_field()
+                    .field_type
+                    .as_unsupported()
+                    .unwrap()
+                    .0
+                    .to_owned();
+
+                CompositeTypeFieldType::Unsupported(field)
+            }
+            db::ScalarFieldType::Alias(_) => {
                 unreachable!()
             }
         }

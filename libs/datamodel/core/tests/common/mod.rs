@@ -67,6 +67,7 @@ pub(crate) trait CompositeTypeAsserts {
     fn assert_has_scalar_field(&self, t: &str) -> &dml::CompositeTypeField;
     fn assert_has_enum_field(&self, t: &str) -> &dml::CompositeTypeField;
     fn assert_has_composite_type_field(&self, t: &str) -> &dml::CompositeTypeField;
+    fn assert_has_unsupported_field(&self, t: &str) -> &dml::CompositeTypeField;
 }
 
 pub(crate) trait EnumAsserts {
@@ -378,6 +379,12 @@ impl CompositeTypeAsserts for dml::CompositeType {
 
     fn assert_has_composite_type_field(&self, t: &str) -> &dml::CompositeTypeField {
         self.composite_type_fields()
+            .find(|field| field.name == t)
+            .unwrap_or_else(|| panic!("Field {} not found", t))
+    }
+
+    fn assert_has_unsupported_field(&self, t: &str) -> &dml::CompositeTypeField {
+        self.unsupported_fields()
             .find(|field| field.name == t)
             .unwrap_or_else(|| panic!("Field {} not found", t))
     }

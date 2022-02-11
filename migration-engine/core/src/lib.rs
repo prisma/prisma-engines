@@ -15,6 +15,7 @@ mod state;
 pub use self::{api::GenericApi, core_error::*, rpc::rpc_api};
 pub use migration_connector;
 
+use datamodel::ValidatedSchema;
 use datamodel::{
     common::{
         preview_features::PreviewFeature,
@@ -24,20 +25,14 @@ use datamodel::{
     },
     Datasource,
 };
-use datamodel::{schema_ast::ast::SchemaAst, ValidatedSchema};
 use enumflags2::BitFlags;
 use mongodb_migration_connector::MongoDbMigrationConnector;
 use sql_migration_connector::SqlMigrationConnector;
 use std::env;
 use user_facing_errors::{common::InvalidConnectionString, KnownError};
 
-fn parse_ast(schema: &str) -> CoreResult<SchemaAst> {
-    datamodel::parse_schema_ast(schema)
-        .map_err(|err| CoreError::new_schema_parser_error(err.to_pretty_string("schema.prisma", schema)))
-}
-
-fn parse_schema<'ast>(schema: &str, ast: &'ast SchemaAst) -> CoreResult<ValidatedSchema<'ast>> {
-    datamodel::parse_schema_parserdb(schema, ast).map_err(CoreError::new_schema_parser_error)
+fn parse_schema(schema: &str) -> CoreResult<ValidatedSchema> {
+    datamodel::parse_schema_parserdb(schema).map_err(CoreError::new_schema_parser_error)
 }
 
 fn connector_for_connection_string(

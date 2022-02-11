@@ -313,13 +313,13 @@ mod many_relation {
             r#"
             model Post {
                 #id(id, String, @id, @default(cuid()))
-                #m2m(authors, AUser[], String)
+                #m2m(authors, AUser[], id, String)
                 title   String  @unique
             }
 
             model AUser {
                 #id(id, String, @id, @default(cuid()))
-                #m2m(posts, Post[], String)
+                #m2m(posts, Post[], id, String)
                 name  String @unique
             }
             "#

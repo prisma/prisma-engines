@@ -11,8 +11,8 @@ mod self_rel_no_back_rel {
               #id(id, String, @id)
               identifier Int? @unique
 
-              #m2m(related, Post[], String, RelatedPosts)
-              #m2m(parents, Post[], String, RelatedPosts)
+              #m2m(related, Post[], id, String, RelatedPosts)
+              #m2m(parents, Post[], id, String, RelatedPosts)
             }"#
         };
 

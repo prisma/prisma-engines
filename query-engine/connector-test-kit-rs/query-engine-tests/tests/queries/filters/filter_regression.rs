@@ -159,13 +159,13 @@ mod fr_m_to_n {
             model Location {
                 #id(id, Int, @id)
                 name String?
-                #m2m(companies, Company[], Int)
+                #m2m(companies, Company[], id, Int)
             }
 
             model Company {
                 #id(id, Int, @id)
                 name String?
-                #m2m(locations, Location[], Int)
+                #m2m(locations, Location[], id, Int)
             }
         "};
 

@@ -12,12 +12,12 @@ mod connect_or_create {
         let schema = indoc! {
             r#"model ModelA {
               #id(id, String, @id, @default(cuid()))
-              #m2m(manyB, ModelB[], String)
+              #m2m(manyB, ModelB[], id, String)
             }
 
             model ModelB {
               #id(id, String, @id, @default(cuid()))
-              #m2m(manyA, ModelA[], String)
+              #m2m(manyA, ModelA[], id, String)
             }"#
         };
 

@@ -4,7 +4,7 @@ use datamodel::{datamodel_connector::ScalarType, parser_database::walkers::*, Va
 use sql_schema_describer as sql;
 
 impl SqlSchemaCalculatorFlavour for MysqlFlavour {
-    fn calculate_enums(&self, datamodel: &ValidatedSchema<'_>) -> Vec<sql::Enum> {
+    fn calculate_enums(&self, datamodel: &ValidatedSchema) -> Vec<sql::Enum> {
         // This is a lower bound for the size of the generated enums (we assume
         // each enum is used at least once).
         let mut enums = Vec::new();
@@ -35,7 +35,7 @@ impl SqlSchemaCalculatorFlavour for MysqlFlavour {
         sql_datamodel_connector::MYSQL.default_native_type_for_scalar_type(scalar_type)
     }
 
-    fn enum_column_type(&self, field: ScalarFieldWalker<'_, '_>, _db_name: &str) -> sql::ColumnType {
+    fn enum_column_type(&self, field: ScalarFieldWalker<'_>, _db_name: &str) -> sql::ColumnType {
         let arity = super::super::column_arity(field.ast_field().arity);
 
         sql::ColumnType::pure(

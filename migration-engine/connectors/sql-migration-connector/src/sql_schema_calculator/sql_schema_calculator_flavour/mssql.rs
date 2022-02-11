@@ -7,7 +7,7 @@ use datamodel::{
 use sql_schema_describer::ForeignKeyAction;
 
 impl SqlSchemaCalculatorFlavour for MssqlFlavour {
-    fn default_constraint_name(&self, default_value: DefaultValueWalker<'_, '_>) -> Option<String> {
+    fn default_constraint_name(&self, default_value: DefaultValueWalker<'_>) -> Option<String> {
         Some(default_value.constraint_name(self.datamodel_connector()).into_owned())
     }
 
@@ -15,7 +15,7 @@ impl SqlSchemaCalculatorFlavour for MssqlFlavour {
         sql_datamodel_connector::MSSQL.default_native_type_for_scalar_type(scalar_type)
     }
 
-    fn m2m_foreign_key_action(&self, model_a: ModelWalker<'_, '_>, model_b: ModelWalker<'_, '_>) -> ForeignKeyAction {
+    fn m2m_foreign_key_action(&self, model_a: ModelWalker<'_>, model_b: ModelWalker<'_>) -> ForeignKeyAction {
         // MSSQL will crash when creating a cyclic cascade
         if model_a.name() == model_b.name() {
             ForeignKeyAction::NoAction
