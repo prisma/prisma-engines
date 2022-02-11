@@ -71,30 +71,6 @@ impl OrderBy {
         }
     }
 
-    // /// Returns only relation hops from the orderBy path.
-    // pub fn relation_path(&self) -> Vec<OrderByHop> {
-    //     self.path()
-    //         .into_iter()
-    //         .filter(|hop| matches!(hop, OrderByHop::Relation(_)))
-    //         .collect()
-    // }
-
-    // pub fn has_middle_to_one_relation_path(&self) -> bool {
-    //     let path = self.path();
-    //     let len = path.len();
-
-    //     if len < 2 {
-    //         false
-    //     } else {
-    //         path.get(len - 2)
-    //             .map(|hop| match hop {
-    //                 OrderByHop::Relation(rf) => !rf.is_list(),
-    //                 OrderByHop::Composite(_) => unreachable!("Found non-relation hop in relation-only list."),
-    //             })
-    //             .unwrap_or(false)
-    //     }
-    // }
-
     pub fn scalar(field: ScalarFieldRef, path: Vec<OrderByHop>, sort_order: SortOrder) -> Self {
         Self::Scalar(OrderByScalar {
             field,

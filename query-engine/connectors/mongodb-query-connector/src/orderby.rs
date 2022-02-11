@@ -10,8 +10,8 @@ pub(crate) struct OrderByData {
     /// All collection join stages required to make this orderBy's data available for sorting.
     pub(crate) join: Option<JoinStage>,
 
-    /// The prefix that leads to the joined model we're trying to compare values on.
-    /// This can be multiple hops over relations, but never over composites.
+    /// The path prefix of the scalar or aggregate we're ordering by.
+    /// Can be multiple hops over relations and composites.
     pub(crate) prefix: Option<OrderByPrefix>,
 
     /// The base order object from the query core this data is based on.
@@ -42,7 +42,7 @@ impl OrderByData {
             let mut stages = order_by
                 .path()
                 .unwrap() // Safe because relation hops always have a path.
-                .into_iter()
+                .iter()
                 .filter_map(|hop| match hop {
                     OrderByHop::Relation(rf) => Some(JoinStage::new(rf.clone())),
                     OrderByHop::Composite(_) => None, // We don't need to join if we're looking at composites - they're already present on the document.
@@ -71,14 +71,6 @@ impl OrderByData {
         }
     }
 
-    /// Prefixes are join-only, meaning that composites are ignored.
-    /// In theory, the path for orderBy allows for mixing relations and composites, in practice that's not possible:
-    /// Composites can't have relations to other models (yet), so this means that it either starts with relation hops
-    /// and ends in a scalar (e.g. order by: model A -> B -> C.field), or it starts with relations and ends in composites
-    /// (e.g. order by: model A -> B -> C.composite.field) or it's without relations all together.
-    ///
-    /// The join, and with that the prefix, only cares about the path to the object we joined to (above it would be A -> B -> C),
-    /// The path on the object (e.g. `composite.field`) is handled as a scalar later.
     fn compute_prefix(index: usize, order_by: &OrderBy) -> Option<OrderByPrefix> {
         match order_by.path() {
             Some(path) => {
@@ -99,13 +91,12 @@ impl OrderByData {
 
                         None
                     } else if !path.is_empty() {
-                        // Composites!
+                        // Case for composite-only path.
                         Some(format!("orderby_{}_{}", parts[0], index))
                     } else {
                         None
                     };
 
-                    // let composite_only = !requires_alias && !path.is_empty();
                     Some(OrderByPrefix::new(parts, clone_to))
                 }
             }
@@ -159,57 +150,32 @@ impl OrderByData {
             // Order by aggregates are always referenced by their join prefix and not a specific field name.
             self.prefix.as_ref().unwrap().to_string()
         } else if let Some(ref prefix) = self.prefix {
-            dbg!(prefix);
             iter::once(prefix.to_string())
                 .chain(iter::once(self.scalar_field_name()))
                 .join(".")
         } else if use_bindings {
-            dbg!(self.binding_names().0)
+            self.binding_names().0
         } else {
-            dbg!(self
-                .prefix
+            self.prefix
                 .as_ref()
                 .into_iter()
                 .map(ToString::to_string)
                 .chain(iter::once(self.scalar_field_name()))
-                .join("."))
+                .join(".")
         }
     }
 
     pub(crate) fn sort_order(&self) -> SortOrder {
         self.order_by.sort_order()
     }
-
-    // /// Currently, composites can't have relations, meaning that a path to an orderBy can only have the form of:
-    // /// - `document.scalar` (no relations and composites)
-    // /// - `document.<composites>.scalar`
-    // /// - `document`.<relations>.scalar`
-    // /// - `document.<relations>.<composites>.scalar`
-    // ///
-    // /// This function gives us the `composites` part of the above path.
-    // fn composite_path(&self) -> Option<String> {
-    //     // Note that relations and composites are never mixed currently, so it's fine to just throw out relations during mapping and keep composites.
-    //     let segments: Vec<_> = self
-    //         .order_by
-    //         .path()
-    //         .into_iter()
-    //         .filter_map(|hop| match hop {
-    //             OrderByHop::Relation(_) => None,
-    //             OrderByHop::Composite(cf) => Some(cf.db_name().to_string()),
-    //         })
-    //         .collect();
-
-    //     if segments.is_empty() {
-    //         None
-    //     } else {
-    //         Some(segments.join("."))
-    //     }
-    // }
 }
 
 #[derive(Debug)]
 pub(crate) struct OrderByPrefix {
-    ///
+    /// Instructs the query to clone the target (e.g. a scalar field) to the given clone alias instead of
+    /// folding the field piece by piece as the joins do. Only used for composite-only cases,
+    /// e.g. count number of `model.to_one_com.to_many_com`, where we would override the composite on the document,
+    /// leaving us without means to also query it for other purposes (like orderBy count + read the composite).
     clone_to: Option<String>,
 
     /// Parts of the path, stringified.
@@ -285,12 +251,10 @@ impl OrderByBuilder {
                     format!("_id.{}", data.scalar_field_name())
                 }
             } else if is_to_many_aggregation {
-                dbg!("using bindings");
                 // Since Order by to-many aggregate with middle to-one path will be unwinded,
                 // we need to refer to it with its top-level join alias
                 data.binding_names().0
             } else {
-                dbg!("using full ref path");
                 data.full_reference_path(false)
             };
 
@@ -303,23 +267,13 @@ impl OrderByBuilder {
                         prisma_models::SortAggregation::Count => {
                             if let Some(clone_to) = data.prefix.as_ref().and_then(|x| x.clone_to.clone()) {
                                 order_aggregate_proj_doc.push(doc! { "$addFields": { clone_to.clone(): { "$size": { "$ifNull": [format!("${}", data.full_reference_path(false)), []] } } } });
-                                field_name = clone_to; // just a hack right now
+                                field_name = clone_to; // Todo: Just a hack right now, this whole function needs love.
                             } else {
-                                // if data.order_by.has_middle_to_one_relation_path() {
                                 order_aggregate_proj_doc.extend(unwind_aggregate_joins(
                                     field_name.clone().as_str(),
                                     order_by_aggregate,
                                     &data,
                                 ));
-                                // }
-
-                                // // Bandaid: > 1 check is to prevent bindings that repeat the same again, like `$field.field`.
-                                // let if_null_binding = if is_to_many_aggregation && data.order_by.path().len() > 1 {
-                                //     // iter::once(field_name.clone()).chain(data.composite_path()).join(".")
-                                //     data.full_reference_path(false)
-                                // } else {
-                                //     field_name.clone()
-                                // };
 
                                 order_aggregate_proj_doc.push(doc! { "$addFields": { field_name.clone(): { "$size": { "$ifNull": [format!("${}", field_name), []] } } } });
                             }
@@ -347,8 +301,8 @@ impl OrderByBuilder {
 /// In order to enable computing aggregation on nested joins, we unwind & replace the top-level
 /// join by the nested to-one joins so that we can apply a $size operation.
 ///
-/// Note: In theory, we do not need to unwind composites, they are already present as single object (to-one) or array (to-many).
-/// Note: This is not necessary for `ScalarAggregations`. Todo [Dom] Why? This is such a mess that it's hard to reason about ANYTHING here.
+/// Note: In theory, we do not need to unwind composites, they are already present as single object (to-one) or array (to-many), but we do it anyways here.
+/// Note: This is not necessary for `ScalarAggregations`. Todo [Dom] Why? It's not entirely clear...
 ///
 /// Let's consider these relations:
 /// (one or many) A to-one B to-one C to-many D
@@ -373,19 +327,16 @@ fn unwind_aggregate_joins(
             OrderByHop::Relation(_) | OrderByHop::Composite(_) => {
                 let mut additional_stages = vec![];
 
-                match data.prefix.as_ref().and_then(|prefix| prefix.parts.get(i + 1)) {
-                    Some(next_part) => {
-                        additional_stages.push(doc! {
-                            "$unwind": { // TODO this unwind needs to be there, always. FFS
-                                "path": format!("${}", join_name),
-                                "preserveNullAndEmptyArrays": true
-                            }
-                        });
+                if let Some(next_part) = data.prefix.as_ref().and_then(|prefix| prefix.parts.get(i + 1)) {
+                    additional_stages.push(doc! {
+                        "$unwind": {
+                            "path": format!("${}", join_name),
+                            "preserveNullAndEmptyArrays": true
+                        }
+                    });
 
-                        additional_stages
-                            .push(doc! { "$addFields": { join_name: format!("${}.{}", join_name, next_part) } });
-                    }
-                    None => (),
+                    additional_stages
+                        .push(doc! { "$addFields": { join_name: format!("${}.{}", join_name, next_part) } });
                 }
 
                 Some(additional_stages)
