@@ -227,7 +227,10 @@ async fn main() -> anyhow::Result<()> {
             let mut datamodel = String::new();
             file.read_to_string(&mut datamodel).unwrap();
 
-            datamodel::parse_datamodel(&datamodel).unwrap();
+            if let Err(e) = datamodel::parse_datamodel(&datamodel) {
+                let pretty = e.to_pretty_string("schema.prisma", &datamodel);
+                println!("{pretty}");
+            };
         }
         Command::ResetDatabase(cmd) => {
             let schema = read_datamodel_from_file(&cmd.schema_path).context("Error reading the schema from file")?;
