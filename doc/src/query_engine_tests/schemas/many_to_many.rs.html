@@ -47,12 +47,12 @@
         <span class="string">r#&quot;
         model ModelA {
             #id(id, String, @id)
-            #m2m(manyB, ModelB[], String)
+            #m2m(manyB, ModelB[], id, String)
           }
 
           model ModelB {
             #id(id, String, @id)
-            #m2m(manyA, ModelA[], String)
+            #m2m(manyA, ModelA[], id, String)
           }
         &quot;#</span>
     };
@@ -68,13 +68,13 @@
             #id(id, Int, @id)
             title   String
             content String @default(&quot;Wip&quot;)
-            #m2m(categories, Category[], Int)
+            #m2m(categories, Category[], id, Int)
         }
 
         model Category {
             #id(id, Int, @id)
             name String
-            #m2m(posts, Post[], Int)
+            #m2m(posts, Post[], id, Int)
         }
         &quot;#</span>
     };

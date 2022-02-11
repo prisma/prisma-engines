@@ -478,8 +478,8 @@
     <span class="ident">child_ref_to_parent</span>: <span class="kw-2">&amp;</span><span class="ident">RelationReference</span>,
 ) -&gt; (<span class="ident">String</span>, <span class="ident">String</span>) {
     <span class="kw">if</span> <span class="ident">parent</span>.<span class="ident">is_list</span>() <span class="op">&amp;&amp;</span> <span class="ident">child</span>.<span class="ident">is_list</span>() {
-        <span class="kw">let</span> <span class="ident">rendered_parent</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;#m2m({}, {}, String)&quot;</span>, <span class="ident">parent</span>.<span class="ident">field_name</span>(), <span class="ident">parent</span>.<span class="ident">type_name</span>());
-        <span class="kw">let</span> <span class="ident">rendered_child</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;#m2m({}, {}, String)&quot;</span>, <span class="ident">child</span>.<span class="ident">field_name</span>(), <span class="ident">child</span>.<span class="ident">type_name</span>());
+        <span class="kw">let</span> <span class="ident">rendered_parent</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;#m2m({}, {}, id, String)&quot;</span>, <span class="ident">parent</span>.<span class="ident">field_name</span>(), <span class="ident">parent</span>.<span class="ident">type_name</span>());
+        <span class="kw">let</span> <span class="ident">rendered_child</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;#m2m({}, {}, id, String)&quot;</span>, <span class="ident">child</span>.<span class="ident">field_name</span>(), <span class="ident">child</span>.<span class="ident">type_name</span>(),);
 
         (<span class="ident">rendered_parent</span>, <span class="ident">rendered_child</span>)
     } <span class="kw">else</span> {

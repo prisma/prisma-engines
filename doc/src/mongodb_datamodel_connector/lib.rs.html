@@ -231,6 +231,7 @@
 <span id="230">230</span>
 <span id="231">231</span>
 <span id="232">232</span>
+<span id="233">233</span>
 </pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">mongodb_types</span>;
 
 <span class="kw">use</span> <span class="ident">datamodel_connector</span>::{
@@ -259,6 +260,7 @@
     <span class="ident">ConnectorCapability::SortOrderInFullTextIndex</span>,
     <span class="ident">ConnectorCapability::MongoDbQueryRaw</span>,
     <span class="ident">ConnectorCapability::DefaultValueAuto</span>,
+    <span class="ident">ConnectorCapability::TwoWayEmbeddedManyToManyRelation</span>,
 ];
 
 <span class="kw">type</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">ConnectorError</span><span class="op">&gt;</span>;

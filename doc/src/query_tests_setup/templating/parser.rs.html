@@ -180,6 +180,11 @@
 <span id="179">179</span>
 <span id="180">180</span>
 <span id="181">181</span>
+<span id="182">182</span>
+<span id="183">183</span>
+<span id="184">184</span>
+<span id="185">185</span>
+<span id="186">186</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident">nom</span>::{
     <span class="ident">branch::alt</span>,
@@ -202,6 +207,7 @@
 }
 
 <span class="comment">// Todo: Error handling is a mess.</span>
+<span class="attribute">#[<span class="ident">track_caller</span>]</span>
 <span class="kw">fn</span> <span class="ident">parse_fragment</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">IResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">DatamodelFragment</span><span class="op">&gt;</span> {
     <span class="kw">let</span> (<span class="ident">input</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="ident">tag</span>(<span class="string">&quot;#&quot;</span>)(<span class="ident">input</span>)<span class="question-mark">?</span>;
     <span class="kw">let</span> (<span class="ident">input</span>, <span class="ident">fragment_ident</span>) <span class="op">=</span> <span class="ident">take_until</span>(<span class="string">&quot;(&quot;</span>)(<span class="ident">input</span>)<span class="question-mark">?</span>;
@@ -209,8 +215,11 @@
     <span class="comment">// Produces the args string, e.g. &quot;id, Int, @id&quot;</span>
     <span class="kw">let</span> (<span class="kw">_</span>, <span class="ident">args</span>) <span class="op">=</span> <span class="ident">unwrap_parenthesis</span>(<span class="ident">input</span>)<span class="question-mark">?</span>;
     <span class="kw">let</span> (<span class="ident">input</span>, <span class="ident">parsed_args</span>) <span class="op">=</span> <span class="ident">many0</span>(<span class="ident">parse_fragment_argument</span>)(<span class="ident">args</span>)<span class="question-mark">?</span>;
-    <span class="kw">let</span> <span class="ident">fragment</span> <span class="op">=</span> <span class="ident">DatamodelFragment::parse</span>(<span class="ident">fragment_ident</span>, <span class="ident">parsed_args</span>)
-        .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="macro">panic!</span>(<span class="string">&quot;Invalid fragment definition: {}&quot;</span>, <span class="ident">fragment_ident</span>));
+
+    <span class="kw">let</span> <span class="ident">fragment</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">DatamodelFragment::parse</span>(<span class="ident">fragment_ident</span>, <span class="ident">parsed_args</span>) {
+        <span class="prelude-val">Ok</span>(<span class="ident">fragment</span>) =&gt; <span class="ident">fragment</span>,
+        <span class="prelude-val">Err</span>(<span class="ident">err</span>) =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Invalid fragment definition &#39;{fragment_ident}&#39;: {err}&quot;</span>),
+    };
 
     <span class="prelude-val">Ok</span>((<span class="ident">input</span>, <span class="ident">fragment</span>))
 }
@@ -336,7 +345,7 @@
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="comment">// Valid m2m fragment</span>
     <span class="kw">fn</span> <span class="ident">basic_m2m_fragment_parsing</span>() {
-        <span class="kw">let</span> <span class="ident">fragment</span> <span class="op">=</span> <span class="string">r#&quot;#m2m(posts, Post[], String, some_name)&quot;#</span>;
+        <span class="kw">let</span> <span class="ident">fragment</span> <span class="op">=</span> <span class="string">r#&quot;#m2m(posts, Post[], id, String, some_name)&quot;#</span>;
         <span class="kw">let</span> <span class="ident">fragment</span> <span class="op">=</span> <span class="ident">parse_fragment</span>(<span class="ident">fragment</span>);
 
         <span class="macro">assert_eq!</span>(
@@ -346,6 +355,7 @@
                 <span class="ident">DatamodelFragment::M2m</span>(<span class="ident">M2mFragment</span> {
                     <span class="ident">field_name</span>: <span class="ident">String::from</span>(<span class="string">&quot;posts&quot;</span>),
                     <span class="ident">field_type</span>: <span class="ident">String::from</span>(<span class="string">&quot;Post[]&quot;</span>),
+                    <span class="ident">opposing_name</span>: <span class="ident">String::from</span>(<span class="string">&quot;id&quot;</span>),
                     <span class="ident">opposing_type</span>: <span class="ident">String::from</span>(<span class="string">&quot;String&quot;</span>),
                     <span class="ident">relation_name</span>: <span class="prelude-val">Some</span>(<span class="ident">String::from</span>(<span class="string">&quot;some_name&quot;</span>)),
                 })

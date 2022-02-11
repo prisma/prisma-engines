@@ -181,6 +181,12 @@
 <span id="180">180</span>
 <span id="181">181</span>
 <span id="182">182</span>
+<span id="183">183</span>
+<span id="184">184</span>
+<span id="185">185</span>
+<span id="186">186</span>
+<span id="187">187</span>
+<span id="188">188</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident">itertools::Itertools</span>;
 <span class="kw">use</span> <span class="ident">std::fmt::Display</span>;
@@ -322,7 +328,7 @@
     }
 }
 
-<span class="doccomment">/// M2m field definition, e.g. `#m2m(posts, Post[], String, &quot;name&quot;)`</span>
+<span class="doccomment">/// M2m field definition, e.g. `#m2m(posts, Post[], id, String, &quot;name&quot;)`</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">M2mFragment</span> {
     <span class="doccomment">/// Field name of the m2m field.</span>
@@ -330,6 +336,9 @@
 
     <span class="doccomment">/// Field type of the m2m field.</span>
     <span class="kw">pub</span> <span class="ident">field_type</span>: <span class="ident">String</span>,
+
+    <span class="doccomment">/// Name of the referenced field</span>
+    <span class="kw">pub</span> <span class="ident">opposing_name</span>: <span class="ident">String</span>,
 
     <span class="doccomment">/// Type of the opposing ID.</span>
     <span class="doccomment">/// Required info for some connectors to render.</span>
@@ -341,23 +350,26 @@
 }
 
 <span class="kw">impl</span> <span class="ident">M2mFragment</span> {
+    <span class="attribute">#[<span class="ident">track_caller</span>]</span>
     <span class="kw">fn</span> <span class="ident">from_args</span>(<span class="ident">args</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">FragmentArgument</span><span class="op">&gt;</span>) -&gt; <span class="ident">TemplatingResult</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="ident">args</span>.<span class="ident">len</span>() <span class="op">&lt;</span> <span class="number">3</span> {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">TemplatingError::num_args</span>(<span class="string">&quot;m2m&quot;</span>, <span class="number">3</span>, <span class="ident">args</span>.<span class="ident">len</span>()));
+        <span class="kw">if</span> <span class="ident">args</span>.<span class="ident">len</span>() <span class="op">&lt;</span> <span class="number">4</span> {
+            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">TemplatingError::num_args</span>(<span class="string">&quot;m2m&quot;</span>, <span class="number">4</span>, <span class="ident">args</span>.<span class="ident">len</span>()));
         }
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">args</span> <span class="op">=</span> <span class="ident">args</span>.<span class="ident">into_iter</span>();
         <span class="kw">let</span> (<span class="ident">field_name</span>, <span class="ident">field_type</span>) <span class="op">=</span> <span class="ident">args</span>.<span class="ident">next_tuple</span>().<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">opposing_type</span> <span class="op">=</span> <span class="ident">args</span>.<span class="ident">next</span>().<span class="ident">unwrap</span>();
+        <span class="kw">let</span> (<span class="ident">opposing_name</span>, <span class="ident">opposing_type</span>) <span class="op">=</span> <span class="ident">args</span>.<span class="ident">next_tuple</span>().<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">relation_name</span> <span class="op">=</span> <span class="ident">args</span>.<span class="ident">next</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">v</span>.<span class="ident">into_value_string</span>().<span class="ident">unwrap</span>());
 
         <span class="kw">let</span> <span class="ident">field_name</span> <span class="op">=</span> <span class="ident">field_name</span>.<span class="ident">into_value_string</span>()<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">field_type</span> <span class="op">=</span> <span class="ident">field_type</span>.<span class="ident">into_value_string</span>()<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">opposing_name</span> <span class="op">=</span> <span class="ident">opposing_name</span>.<span class="ident">into_value_string</span>()<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">opposing_type</span> <span class="op">=</span> <span class="ident">opposing_type</span>.<span class="ident">into_value_string</span>()<span class="question-mark">?</span>;
 
         <span class="prelude-val">Ok</span>(<span class="self">Self</span> {
             <span class="ident">field_name</span>,
             <span class="ident">field_type</span>,
+            <span class="ident">opposing_name</span>,
             <span class="ident">opposing_type</span>,
             <span class="ident">relation_name</span>,
         })

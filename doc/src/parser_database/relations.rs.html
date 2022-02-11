@@ -430,6 +430,30 @@
 <span id="429">429</span>
 <span id="430">430</span>
 <span id="431">431</span>
+<span id="432">432</span>
+<span id="433">433</span>
+<span id="434">434</span>
+<span id="435">435</span>
+<span id="436">436</span>
+<span id="437">437</span>
+<span id="438">438</span>
+<span id="439">439</span>
+<span id="440">440</span>
+<span id="441">441</span>
+<span id="442">442</span>
+<span id="443">443</span>
+<span id="444">444</span>
+<span id="445">445</span>
+<span id="446">446</span>
+<span id="447">447</span>
+<span id="448">448</span>
+<span id="449">449</span>
+<span id="450">450</span>
+<span id="451">451</span>
+<span id="452">452</span>
+<span id="453">453</span>
+<span id="454">454</span>
+<span id="455">455</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">ast</span>,
     <span class="ident">interner::StringId</span>,
@@ -561,6 +585,10 @@
         <span class="ident">field_a</span>: <span class="ident">ast::FieldId</span>,
         <span class="ident">field_b</span>: <span class="ident">ast::FieldId</span>,
     },
+    <span class="ident">TwoWayEmbeddedManyToMany</span> {
+        <span class="ident">field_a</span>: <span class="ident">ast::FieldId</span>,
+        <span class="ident">field_b</span>: <span class="ident">ast::FieldId</span>,
+    },
     <span class="ident">OneToOne</span>(<span class="ident">OneToOneRelationFields</span>),
     <span class="ident">OneToMany</span>(<span class="ident">OneToManyRelationFields</span>),
 }
@@ -569,6 +597,7 @@
     <span class="kw">fn</span> <span class="ident">fields</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (<span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ast::FieldId</span><span class="op">&gt;</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ast::FieldId</span><span class="op">&gt;</span>) {
         <span class="kw">match</span> <span class="self">self</span> {
             <span class="ident">RelationAttributes::ImplicitManyToMany</span> { <span class="ident">field_a</span>, <span class="ident">field_b</span> }
+            <span class="op">|</span> <span class="ident">RelationAttributes::TwoWayEmbeddedManyToMany</span> { <span class="ident">field_a</span>, <span class="ident">field_b</span> }
             <span class="op">|</span> <span class="ident">RelationAttributes::OneToOne</span>(<span class="ident">OneToOneRelationFields::Both</span>(<span class="ident">field_a</span>, <span class="ident">field_b</span>))
             <span class="op">|</span> <span class="ident">RelationAttributes::OneToMany</span>(<span class="ident">OneToManyRelationFields::Both</span>(<span class="ident">field_a</span>, <span class="ident">field_b</span>)) =&gt; {
                 (<span class="prelude-val">Some</span>(<span class="kw-2">*</span><span class="ident">field_a</span>), <span class="prelude-val">Some</span>(<span class="kw-2">*</span><span class="ident">field_b</span>))
@@ -598,19 +627,24 @@
         }
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">is_many_to_many</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">is_implicit_many_to_many</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="macro">matches!</span>(<span class="self">self</span>.<span class="ident">attributes</span>, <span class="ident">RelationAttributes::ImplicitManyToMany</span> { .. })
     }
 
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">as_complete_fields</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">ast::FieldId</span>, <span class="ident">ast::FieldId</span>)<span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">attributes</span> {
             <span class="ident">RelationAttributes::ImplicitManyToMany</span> { <span class="ident">field_a</span>, <span class="ident">field_b</span> } =&gt; <span class="prelude-val">Some</span>((<span class="kw-2">*</span><span class="ident">field_a</span>, <span class="kw-2">*</span><span class="ident">field_b</span>)),
+            <span class="ident">RelationAttributes::TwoWayEmbeddedManyToMany</span> { <span class="ident">field_a</span>, <span class="ident">field_b</span> } =&gt; <span class="prelude-val">Some</span>((<span class="kw-2">*</span><span class="ident">field_a</span>, <span class="kw-2">*</span><span class="ident">field_b</span>)),
             <span class="ident">RelationAttributes::OneToOne</span>(<span class="ident">OneToOneRelationFields::Both</span>(<span class="ident">field_a</span>, <span class="ident">field_b</span>)) =&gt; <span class="prelude-val">Some</span>((<span class="kw-2">*</span><span class="ident">field_a</span>, <span class="kw-2">*</span><span class="ident">field_b</span>)),
             <span class="ident">RelationAttributes::OneToMany</span>(<span class="ident">OneToManyRelationFields::Both</span>(<span class="ident">field_a</span>, <span class="ident">field_b</span>)) =&gt; {
                 <span class="prelude-val">Some</span>((<span class="kw-2">*</span><span class="ident">field_a</span>, <span class="kw-2">*</span><span class="ident">field_b</span>))
             }
             <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
         }
+    }
+
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">is_two_way_embedded_many_to_many</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+        <span class="macro">matches!</span>(<span class="self">self</span>.<span class="ident">attributes</span>, <span class="ident">RelationAttributes::TwoWayEmbeddedManyToMany</span> { .. })
     }
 }
 
@@ -621,6 +655,7 @@
     <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">ast_field</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">ast::Field</span>,
     <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">field_id</span>: <span class="ident">ast::FieldId</span>,
     <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">is_self_relation</span>: <span class="ident">bool</span>,
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">is_two_way_embedded_many_to_many_relation</span>: <span class="ident">bool</span>,
     <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">relation_field</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">RelationField</span>,
     <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">opposite_model</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">ast::Model</span>,
     <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">opposite_relation_field</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">ast::FieldId</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">ast::Field</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">RelationField</span>)<span class="op">&gt;</span>,
@@ -648,6 +683,11 @@
         .<span class="ident">find</span>(<span class="op">|</span>(<span class="kw">_</span>, <span class="ident">opposite_relation_field</span>)<span class="op">|</span> <span class="ident">opposite_relation_field</span>.<span class="ident">name</span> <span class="op">==</span> <span class="ident">relation_field</span>.<span class="ident">name</span>)
         .<span class="ident">map</span>(<span class="op">|</span>((<span class="ident">opp_model_id</span>, <span class="ident">opp_field_id</span>), <span class="ident">opp_rf</span>)<span class="op">|</span> (<span class="kw-2">*</span><span class="ident">opp_field_id</span>, <span class="kw-2">&amp;</span><span class="ident">ast</span>[<span class="kw-2">*</span><span class="ident">opp_model_id</span>][<span class="kw-2">*</span><span class="ident">opp_field_id</span>], <span class="ident">opp_rf</span>));
 
+    <span class="kw">let</span> <span class="ident">is_two_way_embedded_many_to_many_relation</span> <span class="op">=</span> <span class="kw">match</span> (<span class="ident">relation_field</span>, <span class="ident">opposite_relation_field</span>) {
+        (<span class="ident">left</span>, <span class="prelude-val">Some</span>((<span class="kw">_</span>, <span class="kw">_</span>, <span class="ident">right</span>))) =&gt; <span class="ident">left</span>.<span class="ident">fields</span>.<span class="ident">is_some</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">right</span>.<span class="ident">fields</span>.<span class="ident">is_some</span>(),
+        <span class="kw">_</span> =&gt; <span class="bool-val">false</span>,
+    };
+
     <span class="ident">RelationEvidence</span> {
         <span class="ident">ast_model</span>,
         <span class="ident">model_id</span>: <span class="kw-2">*</span><span class="ident">model_id</span>,
@@ -657,6 +697,7 @@
         <span class="ident">opposite_model</span>,
         <span class="ident">is_self_relation</span>,
         <span class="ident">opposite_relation_field</span>,
+        <span class="ident">is_two_way_embedded_many_to_many_relation</span>,
     }
 }
 
@@ -682,9 +723,16 @@
                 <span class="kw">return</span>;
             }
 
-            <span class="ident">RelationAttributes::ImplicitManyToMany</span> {
-                <span class="ident">field_a</span>: <span class="ident">evidence</span>.<span class="ident">field_id</span>,
-                <span class="ident">field_b</span>: <span class="ident">opp_field_id</span>,
+            <span class="kw">if</span> <span class="ident">evidence</span>.<span class="ident">is_two_way_embedded_many_to_many_relation</span> {
+                <span class="ident">RelationAttributes::TwoWayEmbeddedManyToMany</span> {
+                    <span class="ident">field_a</span>: <span class="ident">evidence</span>.<span class="ident">field_id</span>,
+                    <span class="ident">field_b</span>: <span class="ident">opp_field_id</span>,
+                }
+            } <span class="kw">else</span> {
+                <span class="ident">RelationAttributes::ImplicitManyToMany</span> {
+                    <span class="ident">field_a</span>: <span class="ident">evidence</span>.<span class="ident">field_id</span>,
+                    <span class="ident">field_b</span>: <span class="ident">opp_field_id</span>,
+                }
             }
         }
 

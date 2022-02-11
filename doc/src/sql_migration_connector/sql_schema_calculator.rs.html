@@ -674,7 +674,7 @@
         <span class="ident">ScalarFieldType::Enum</span>(<span class="ident">enum_id</span>) =&gt; <span class="ident">column_for_model_enum_scalar_field</span>(<span class="ident">field</span>, <span class="ident">enum_id</span>, <span class="ident">ctx</span>),
         <span class="ident">ScalarFieldType::CompositeType</span>(<span class="kw">_</span>) =&gt; <span class="ident">column_for_builtin_scalar_type</span>(<span class="ident">field</span>, <span class="ident">ScalarType::Json</span>, <span class="ident">ctx</span>),
         <span class="ident">ScalarFieldType::BuiltInScalar</span>(<span class="ident">scalar_type</span>) =&gt; <span class="ident">column_for_builtin_scalar_type</span>(<span class="ident">field</span>, <span class="ident">scalar_type</span>, <span class="ident">ctx</span>),
-        <span class="ident">ScalarFieldType::Unsupported</span> =&gt; <span class="ident">column_for_model_unsupported_scalar_field</span>(<span class="ident">field</span>, <span class="ident">ctx</span>),
+        <span class="ident">ScalarFieldType::Unsupported</span>(<span class="kw">_</span>) =&gt; <span class="ident">column_for_model_unsupported_scalar_field</span>(<span class="ident">field</span>, <span class="ident">ctx</span>),
         <span class="ident">ScalarFieldType::Alias</span>(<span class="kw">_</span>) =&gt; <span class="macro">unreachable!</span>(),
     }
 }

@@ -159,6 +159,19 @@
 <span id="158">158</span>
 <span id="159">159</span>
 <span id="160">160</span>
+<span id="161">161</span>
+<span id="162">162</span>
+<span id="163">163</span>
+<span id="164">164</span>
+<span id="165">165</span>
+<span id="166">166</span>
+<span id="167">167</span>
+<span id="168">168</span>
+<span id="169">169</span>
+<span id="170">170</span>
+<span id="171">171</span>
+<span id="172">172</span>
+<span id="173">173</span>
 </pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">autoincrement</span>;
 <span class="kw">mod</span> <span class="ident">composite_types</span>;
 <span class="kw">mod</span> <span class="ident">constraint_namespace</span>;
@@ -313,8 +326,21 @@
                 }
             }
             <span class="ident">RefinedRelationWalker::ImplicitManyToMany</span>(<span class="ident">relation</span>) =&gt; {
-                <span class="ident">relations::many_to_many::validate_singular_id</span>(<span class="ident">relation</span>, <span class="ident">ctx</span>);
-                <span class="ident">relations::many_to_many::validate_no_referential_actions</span>(<span class="ident">relation</span>, <span class="ident">ctx</span>);
+                <span class="kw">use</span> <span class="ident">relations::many_to_many::implicit</span>;
+
+                <span class="ident">implicit::supports_implicit_relations</span>(<span class="ident">relation</span>, <span class="ident">ctx</span>);
+                <span class="ident">implicit::validate_singular_id</span>(<span class="ident">relation</span>, <span class="ident">ctx</span>);
+                <span class="ident">implicit::validate_no_referential_actions</span>(<span class="ident">relation</span>, <span class="ident">ctx</span>);
+            }
+            <span class="ident">RefinedRelationWalker::TwoWayEmbeddedManyToMany</span>(<span class="ident">relation</span>) =&gt; {
+                <span class="kw">use</span> <span class="ident">relations::many_to_many::embedded</span>;
+
+                <span class="ident">embedded::supports_embedded_relations</span>(<span class="ident">relation</span>, <span class="ident">ctx</span>);
+                <span class="ident">embedded::defines_references_on_both_sides</span>(<span class="ident">relation</span>, <span class="ident">ctx</span>);
+                <span class="ident">embedded::defines_fields_on_both_sides</span>(<span class="ident">relation</span>, <span class="ident">ctx</span>);
+                <span class="ident">embedded::references_id_from_both_sides</span>(<span class="ident">relation</span>, <span class="ident">ctx</span>);
+                <span class="ident">embedded::referencing_with_an_array_field_of_correct_type</span>(<span class="ident">relation</span>, <span class="ident">ctx</span>);
+                <span class="ident">embedded::validate_no_referential_actions</span>(<span class="ident">relation</span>, <span class="ident">ctx</span>);
             }
         }
     }
