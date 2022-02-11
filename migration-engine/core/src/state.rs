@@ -4,10 +4,10 @@
 //! for commands like createDatabase and diff.
 
 use crate::{api::GenericApi, commands, json_rpc::types::*, CoreResult};
-use enumflags2::BitFlag;
+use enumflags2::BitFlags;
 use migration_connector::{ConnectorError, ConnectorHost, MigrationConnector};
 use std::{collections::HashMap, future::Future, path::Path, pin::Pin, sync::Arc};
-use tokio::sync::Mutex;
+use tokio::sync::{mpsc::Sender, Mutex};
 use tracing_futures::Instrument;
 
 /// The container for the state of the migration engine. It can contain one or more connectors.
@@ -20,8 +20,18 @@ pub(crate) struct EngineState {
     // - a full schema
     //
     // To a MigrationConnector.
-    connectors: Mutex<HashMap<String, Box<dyn MigrationConnector>>>,
+    connectors: Mutex<HashMap<String, Sender<ErasedConnectorRequest>>>,
 }
+
+type ConnectorRequest<O> = Box<
+    dyn for<'c> FnOnce(&'c mut dyn MigrationConnector) -> Pin<Box<dyn Future<Output = CoreResult<O>> + Send + 'c>>
+        + Send,
+>;
+type ErasedConnectorRequest = Box<
+    dyn for<'c> FnOnce(&'c mut dyn MigrationConnector) -> Pin<Box<dyn Future<Output = ()> + Send + 'c>>
+        + Send
+        + 'static,
+>;
 
 impl EngineState {
     pub(crate) fn new(initial_datamodel: Option<String>, host: Option<Arc<dyn ConnectorHost>>) -> Self {
@@ -32,58 +42,100 @@ impl EngineState {
         }
     }
 
-    async fn with_connector_from_schema_path<O>(
+    async fn with_connector_from_schema_path<O: Send + 'static>(
         &self,
         path: &str,
-        f: impl for<'c> FnOnce(&'c dyn MigrationConnector) -> Pin<Box<dyn Future<Output = CoreResult<O>> + Send + 'c>>,
+        f: ConnectorRequest<O>,
     ) -> CoreResult<O> {
         let schema = std::fs::read_to_string(path)
             .map_err(|err| ConnectorError::from_source(err, "Falied to read Prisma schema."))?;
         self.with_connector_for_schema(&schema, f).await
     }
 
-    async fn with_connector_for_schema<O>(
+    async fn with_connector_for_schema<O: Send + 'static>(
         &self,
         schema: &str,
-        f: impl for<'c> FnOnce(&'c dyn MigrationConnector) -> Pin<Box<dyn Future<Output = CoreResult<O>> + Send + 'c>>,
+        f: ConnectorRequest<O>,
     ) -> CoreResult<O> {
-        let mut connectors = self.connectors.lock().await;
+        let (response_sender, response_receiver) = tokio::sync::oneshot::channel::<CoreResult<O>>();
+        let erased: ErasedConnectorRequest = Box::new(move |connector| {
+            Box::pin(async move {
+                let output = f(connector).await;
+                response_sender
+                    .send(output)
+                    .map_err(|_| ())
+                    .expect("failed to send back response in migration-engine state");
+            })
+        });
 
+        let mut connectors = self.connectors.lock().await;
         match connectors.get(schema) {
-            Some(connector) => f(connector.as_ref()).await,
+            Some(request_sender) => match request_sender.send(erased).await {
+                Ok(()) => (),
+                Err(_) => return Err(ConnectorError::from_msg("tokio mpsc send error".to_owned())),
+            },
             None => {
                 let mut connector = crate::schema_to_connector(schema)?;
                 connector.set_host(self.host.clone());
-                let output = f(connector.as_ref()).await?;
-                connectors.insert(schema.to_owned(), connector);
-                Ok(output)
+                let (erased_sender, mut erased_receiver) = tokio::sync::mpsc::channel::<ErasedConnectorRequest>(12);
+                tokio::spawn(async move {
+                    while let Some(req) = erased_receiver.recv().await {
+                        req(connector.as_mut()).await;
+                    }
+                });
+                match erased_sender.send(erased).await {
+                    Ok(()) => (),
+                    Err(_) => return Err(ConnectorError::from_msg("erased sender send error".to_owned())),
+                };
+                connectors.insert(schema.to_owned(), erased_sender);
             }
         }
+
+        response_receiver.await.expect("receiver boomed")
     }
 
-    async fn with_connector_for_url<O>(
-        &self,
-        url: String,
-        f: impl for<'c> FnOnce(&'c dyn MigrationConnector) -> Pin<Box<dyn Future<Output = CoreResult<O>> + Send + 'c>>,
-    ) -> CoreResult<O> {
+    async fn with_connector_for_url<O: Send + 'static>(&self, url: String, f: ConnectorRequest<O>) -> CoreResult<O> {
+        let (response_sender, response_receiver) = tokio::sync::oneshot::channel::<CoreResult<O>>();
+        let erased: ErasedConnectorRequest = Box::new(move |connector| {
+            Box::pin(async move {
+                let output = f(connector).await;
+                response_sender
+                    .send(output)
+                    .map_err(|_| ())
+                    .expect("failed to send back response in migration-engine state");
+            })
+        });
+
         let mut connectors = self.connectors.lock().await;
-
         match connectors.get(&url) {
-            Some(connector) => f(connector.as_ref()).await,
+            Some(request_sender) => match request_sender.send(erased).await {
+                Ok(()) => (),
+                Err(_) => return Err(ConnectorError::from_msg("tokio mpsc send error".to_owned())),
+            },
             None => {
-                let mut connector = crate::connector_for_connection_string(url.clone(), None, BitFlag::empty())?;
+                let mut connector = crate::connector_for_connection_string(url.clone(), None, BitFlags::default())?;
                 connector.set_host(self.host.clone());
-                let output = f(connector.as_ref()).await?;
-                connectors.insert(url, connector);
-                Ok(output)
+                let (erased_sender, mut erased_receiver) = tokio::sync::mpsc::channel::<ErasedConnectorRequest>(12);
+                tokio::spawn(async move {
+                    while let Some(req) = erased_receiver.recv().await {
+                        req(connector.as_mut()).await;
+                    }
+                });
+                match erased_sender.send(erased).await {
+                    Ok(()) => (),
+                    Err(_) => return Err(ConnectorError::from_msg("erased sender send error".to_owned())),
+                };
+                connectors.insert(url, erased_sender);
             }
         }
+
+        response_receiver.await.expect("receiver boomed")
     }
 
-    async fn with_connector_from_datasource_param<O>(
+    async fn with_connector_from_datasource_param<O: Send + 'static>(
         &self,
         param: &DatasourceParam,
-        f: impl for<'c> FnOnce(&'c dyn MigrationConnector) -> Pin<Box<dyn Future<Output = CoreResult<O>> + Send + 'c>>,
+        f: ConnectorRequest<O>,
     ) -> CoreResult<O> {
         match param {
             DatasourceParam::ConnectionString(UrlContainer { url }) => {
@@ -96,12 +148,9 @@ impl EngineState {
         }
     }
 
-    async fn with_default_connector<O>(
-        &self,
-        f: impl for<'c> FnOnce(&'c dyn MigrationConnector) -> Pin<Box<dyn Future<Output = CoreResult<O>> + Send + 'c>>,
-    ) -> CoreResult<O>
+    async fn with_default_connector<O: Send + 'static>(&self, f: ConnectorRequest<O>) -> CoreResult<O>
     where
-        O: Sized + 'static,
+        O: Sized + Send + 'static,
     {
         let schema = if let Some(initial_datamodel) = &self.initial_datamodel {
             initial_datamodel
@@ -116,35 +165,39 @@ impl EngineState {
 #[async_trait::async_trait]
 impl GenericApi for EngineState {
     async fn version(&self) -> CoreResult<String> {
-        self.with_default_connector(move |connector| connector.version()).await
+        self.with_default_connector(Box::new(|connector| connector.version()))
+            .await
     }
 
     async fn apply_migrations(&self, input: ApplyMigrationsInput) -> CoreResult<ApplyMigrationsOutput> {
-        self.with_default_connector(move |connector| {
+        self.with_default_connector(Box::new(move |connector| {
             Box::pin(commands::apply_migrations(input, connector).instrument(tracing::info_span!("ApplyMigrations")))
-        })
+        }))
         .await
     }
 
     async fn create_database(&self, params: CreateDatabaseParams) -> CoreResult<CreateDatabaseResult> {
-        self.with_connector_from_datasource_param(&params.datasource, |connector| {
-            Box::pin(async move {
-                let database_name = MigrationConnector::create_database(connector).await?;
-                Ok(CreateDatabaseResult { database_name })
-            })
-        })
+        self.with_connector_from_datasource_param(
+            &params.datasource,
+            Box::new(|connector| {
+                Box::pin(async move {
+                    let database_name = MigrationConnector::create_database(connector).await?;
+                    Ok(CreateDatabaseResult { database_name })
+                })
+            }),
+        )
         .await
     }
 
     async fn create_migration(&self, input: CreateMigrationInput) -> CoreResult<CreateMigrationOutput> {
-        self.with_default_connector(move |connector| {
+        self.with_default_connector(Box::new(move |connector| {
             let span = tracing::info_span!(
                 "CreateMigration",
                 migration_name = input.migration_name.as_str(),
                 draft = input.draft,
             );
             Box::pin(commands::create_migration(input, connector).instrument(span))
-        })
+        }))
         .await
     }
 
@@ -165,8 +218,11 @@ impl GenericApi for EngineState {
             }
         };
 
-        self.with_connector_for_url(url.clone(), move |connector| connector.db_execute(url, params.script))
-            .await
+        self.with_connector_for_url(
+            url.clone(),
+            Box::new(move |connector| connector.db_execute(url, params.script)),
+        )
+        .await
     }
 
     async fn debug_panic(&self) -> CoreResult<()> {
@@ -174,9 +230,9 @@ impl GenericApi for EngineState {
     }
 
     async fn dev_diagnostic(&self, input: DevDiagnosticInput) -> CoreResult<DevDiagnosticOutput> {
-        self.with_default_connector(|connector| {
+        self.with_default_connector(Box::new(|connector| {
             Box::pin(commands::dev_diagnostic(input, connector).instrument(tracing::info_span!("DevDiagnostic")))
-        })
+        }))
         .await
     }
 
@@ -185,7 +241,7 @@ impl GenericApi for EngineState {
     }
 
     async fn drop_database(&self, url: String) -> CoreResult<()> {
-        self.with_connector_for_url(url, |connector| MigrationConnector::drop_database(connector))
+        self.with_connector_for_url(url, Box::new(|connector| MigrationConnector::drop_database(connector)))
             .await
     }
 
@@ -193,12 +249,12 @@ impl GenericApi for EngineState {
         &self,
         input: commands::DiagnoseMigrationHistoryInput,
     ) -> CoreResult<commands::DiagnoseMigrationHistoryOutput> {
-        self.with_default_connector(|connector| {
+        self.with_default_connector(Box::new(|connector| {
             Box::pin(
                 commands::diagnose_migration_history(input, connector)
                     .instrument(tracing::info_span!("DiagnoseMigrationHistory")),
             )
-        })
+        }))
         .await
     }
 
@@ -206,19 +262,22 @@ impl GenericApi for EngineState {
         &self,
         params: EnsureConnectionValidityParams,
     ) -> CoreResult<EnsureConnectionValidityResult> {
-        self.with_connector_from_datasource_param(&params.datasource, |connector| {
-            Box::pin(async move {
-                MigrationConnector::ensure_connection_validity(connector).await?;
-                Ok(EnsureConnectionValidityResult {})
-            })
-        })
+        self.with_connector_from_datasource_param(
+            &params.datasource,
+            Box::new(|connector| {
+                Box::pin(async move {
+                    MigrationConnector::ensure_connection_validity(connector).await?;
+                    Ok(EnsureConnectionValidityResult {})
+                })
+            }),
+        )
         .await
     }
 
     async fn evaluate_data_loss(&self, input: EvaluateDataLossInput) -> CoreResult<EvaluateDataLossOutput> {
-        self.with_default_connector(|connector| {
+        self.with_default_connector(Box::new(|connector| {
             Box::pin(commands::evaluate_data_loss(input, connector).instrument(tracing::info_span!("EvaluateDataLoss")))
-        })
+        }))
         .await
     }
 
@@ -238,10 +297,10 @@ impl GenericApi for EngineState {
     }
 
     async fn mark_migration_applied(&self, input: MarkMigrationAppliedInput) -> CoreResult<MarkMigrationAppliedOutput> {
-        self.with_default_connector(move |connector| {
+        self.with_default_connector(Box::new(move |connector| {
             let span = tracing::info_span!("MarkMigrationApplied", migration_name = input.migration_name.as_str());
             Box::pin(commands::mark_migration_applied(input, connector).instrument(span))
-        })
+        }))
         .await
     }
 
@@ -249,30 +308,30 @@ impl GenericApi for EngineState {
         &self,
         input: MarkMigrationRolledBackInput,
     ) -> CoreResult<MarkMigrationRolledBackOutput> {
-        self.with_default_connector(move |connector| {
+        self.with_default_connector(Box::new(move |connector| {
             let span = tracing::info_span!(
                 "MarkMigrationRolledBack",
                 migration_name = input.migration_name.as_str()
             );
             Box::pin(commands::mark_migration_rolled_back(input, connector).instrument(span))
-        })
+        }))
         .await
     }
 
     async fn reset(&self) -> CoreResult<()> {
         tracing::debug!("Resetting the database.");
 
-        self.with_default_connector(move |connector| {
+        self.with_default_connector(Box::new(move |connector| {
             Box::pin(MigrationConnector::reset(connector).instrument(tracing::info_span!("Reset")))
-        })
+        }))
         .await?;
         Ok(())
     }
 
     async fn schema_push(&self, input: SchemaPushInput) -> CoreResult<SchemaPushOutput> {
-        self.with_default_connector(move |connector| {
+        self.with_default_connector(Box::new(move |connector| {
             Box::pin(commands::schema_push(input, connector).instrument(tracing::info_span!("SchemaPush")))
-        })
+        }))
         .await
     }
 }
