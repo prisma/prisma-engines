@@ -160,10 +160,7 @@ impl QueryArguments {
     }
 
     pub fn has_unbatchable_ordering(&self) -> bool {
-        self.order_by.iter().any(|o| match o {
-            OrderBy::Scalar(_) => false,
-            _ => true,
-        })
+        self.order_by.iter().any(|o| !matches!(o, OrderBy::Scalar(_)))
     }
 
     pub fn has_unbatchable_filters(&self) -> bool {

@@ -86,15 +86,15 @@ mod to_one {
     #[rustfmt::skip]
     async fn create_test_data(runner: &Runner) -> TestResult<()> {
         // All data set (except model and last hop to prevent endless circles).
-        create_row(runner, r#"{ id: 1, a: { a_1: "1_a_1", a_2: 1 }, b: { b_field: "1_b_field", c: { c_field: "1_c_field" } } }"#,).await?;
-        create_row(runner, r#"{ id: 2, a: { a_1: "2_a_1", a_2: 2 }, b: { b_field: "2_b_field", c: { c_field: "2_c_field" } } }"#,).await?;
-        create_row(runner, r#"{ id: 3, a: { a_1: "3_a_1", a_2: 3 }, b: { b_field: "3_b_field", c: { c_field: "3_c_field" } } }"#).await?;
+        create_row(runner, r#"{ id: 1, a: { a_1: "1_a_1", a_2: 1, b: { c:{} } }, b: { b_field: "1_b_field", c: { c_field: "1_c_field" } } }"#,).await?;
+        create_row(runner, r#"{ id: 2, a: { a_1: "2_a_1", a_2: 2, b: { c:{} } }, b: { b_field: "2_b_field", c: { c_field: "2_c_field" } } }"#,).await?;
+        create_row(runner, r#"{ id: 3, a: { a_1: "3_a_1", a_2: 3, b: { c:{} } }, b: { b_field: "3_b_field", c: { c_field: "3_c_field" } } }"#).await?;
 
         // All optional data is explicitly null.
-        create_row(runner, r#"{ id: 4, a: { a_1: "4_a_1", a_2: null }, b: null }"#).await?;
+        create_row(runner, r#"{ id: 4, a: { a_1: "4_a_1", a_2: null, b: { c:{} } }, b: null }"#).await?;
 
         // All optional data is not set.
-        create_row(runner, r#"{ id: 5, a: { a_1: "5_a_1" } }"#).await?;
+        create_row(runner, r#"{ id: 5, a: { a_1: "5_a_1", b: { c:{} } } }"#).await?;
 
         Ok(())
     }
@@ -102,11 +102,11 @@ mod to_one {
     /// Test data for ordering by multiple requires some duplicates in the first ordering keys to be useful.
     #[rustfmt::skip]
     async fn create_multi_order_test_data(runner: &Runner) -> TestResult<()> {
-        create_row(runner, r#"{ id: 1, a: { a_1: "a1", a_2: 1 }, b: { b_field: "b1", c: { c_field: "1_c_field" } } }"#,).await?;
-        create_row(runner, r#"{ id: 2, a: { a_1: "a1", a_2: 2 }, b: { b_field: "b2", c: { c_field: "2_c_field" } } }"#,).await?;
-        create_row(runner, r#"{ id: 3, a: { a_1: "a2", a_2: 2 }, b: { b_field: "b2", c: { c_field: "3_c_field" } } }"#).await?;
-        create_row(runner, r#"{ id: 4, a: { a_1: "a3", a_2: null }, b: null }"#).await?;
-        create_row(runner, r#"{ id: 5, a: { a_1: "a4" } }"#).await?;
+        create_row(runner, r#"{ id: 1, a: { a_1: "a1", a_2: 1, b: { c:{} } }, b: { b_field: "b1", c: { c_field: "1_c_field" } } }"#,).await?;
+        create_row(runner, r#"{ id: 2, a: { a_1: "a1", a_2: 2, b: { c:{} } }, b: { b_field: "b2", c: { c_field: "2_c_field" } } }"#,).await?;
+        create_row(runner, r#"{ id: 3, a: { a_1: "a2", a_2: 2, b: { c:{} } }, b: { b_field: "b2", c: { c_field: "3_c_field" } } }"#).await?;
+        create_row(runner, r#"{ id: 4, a: { a_1: "a3", a_2: null, b: { c:{} } }, b: null }"#).await?;
+        create_row(runner, r#"{ id: 5, a: { a_1: "a4", b: { c:{} } } }"#).await?;
 
         Ok(())
     }
@@ -148,7 +148,7 @@ mod to_many {
     }
 
     /// Order a model based on to-many reached over to-one composite hops.
-    /// This test also catches that to-many composites stay queryable together an aggregate order by.
+    /// This test also catches that to-many composites stay queryable together with aggregate order by.
     #[connector_test]
     async fn model_basic_to_many_ordering_multiple_hops(runner: Runner) -> TestResult<()> {
         create_test_data(&runner).await?;
