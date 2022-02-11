@@ -3,7 +3,6 @@ use crate::{
     sql_renderer::IteratorJoin,
     SqlFlavour, SqlMigrationConnector,
 };
-use datamodel::common::preview_features::PreviewFeature;
 use enumflags2::BitFlags;
 use indoc::indoc;
 use migration_connector::{migrations_directory::MigrationDirectory, ConnectorError, ConnectorResult};
@@ -24,7 +23,6 @@ const ADVISORY_LOCK_TIMEOUT: std::time::Duration = std::time::Duration::from_sec
 
 pub(crate) struct PostgresFlavour {
     url: PostgresUrl,
-    preview_features: BitFlags<PreviewFeature>,
     /// See the [Circumstances] enum.
     circumstances: AtomicU8,
 }
@@ -36,10 +34,9 @@ impl std::fmt::Debug for PostgresFlavour {
 }
 
 impl PostgresFlavour {
-    pub fn new(url: PostgresUrl, preview_features: BitFlags<PreviewFeature>) -> Self {
+    pub fn new(url: PostgresUrl) -> Self {
         Self {
             url,
-            preview_features,
             circumstances: Default::default(),
         }
     }
@@ -362,10 +359,6 @@ impl SqlFlavour for PostgresFlavour {
         Ok(())
     }
 
-    fn preview_features(&self) -> BitFlags<PreviewFeature> {
-        self.preview_features
-    }
-
     #[tracing::instrument(skip(self, migrations, connector))]
     async fn sql_schema_from_migration_history(
         &self,
@@ -403,7 +396,7 @@ impl SqlFlavour for PostgresFlavour {
 
                 // The connection to the shadow database is dropped at the end of
                 // the block.
-                shadow_database.describe_schema(self.preview_features).await
+                shadow_database.describe_schema(connector.params.preview_features).await
             }
         })()
         .await;
@@ -477,7 +470,7 @@ mod tests {
     fn debug_impl_does_not_leak_connection_info() {
         let url = "postgresql://myname:mypassword@myserver:8765/mydbname";
 
-        let flavour = PostgresFlavour::new(PostgresUrl::new(url.parse().unwrap()).unwrap(), BitFlags::empty());
+        let flavour = PostgresFlavour::new(PostgresUrl::new(url.parse().unwrap()).unwrap());
         let debugged = format!("{:?}", flavour);
 
         let words = &["myname", "mypassword", "myserver", "8765", "mydbname"];

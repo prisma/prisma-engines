@@ -3,8 +3,6 @@ use crate::{
     SqlFlavour, SqlMigrationConnector,
 };
 use connection_string::JdbcString;
-use datamodel::common::preview_features::PreviewFeature;
-use enumflags2::BitFlags;
 use indoc::formatdoc;
 use migration_connector::{migrations_directory::MigrationDirectory, ConnectorError, ConnectorResult};
 use quaint::{connector::MssqlUrl, prelude::Table};
@@ -13,7 +11,6 @@ use std::str::FromStr;
 
 pub(crate) struct MssqlFlavour {
     url: MssqlUrl,
-    preview_features: BitFlags<PreviewFeature>,
 }
 
 impl std::fmt::Debug for MssqlFlavour {
@@ -23,8 +20,8 @@ impl std::fmt::Debug for MssqlFlavour {
 }
 
 impl MssqlFlavour {
-    pub fn new(url: MssqlUrl, preview_features: BitFlags<PreviewFeature>) -> Self {
-        Self { url, preview_features }
+    pub fn new(url: MssqlUrl) -> Self {
+        Self { url }
     }
 
     fn is_running_on_azure_sql(&self) -> bool {
@@ -133,10 +130,6 @@ impl SqlFlavour for MssqlFlavour {
 
     fn migrations_table(&self) -> Table<'_> {
         (self.schema_name(), self.migrations_table_name()).into()
-    }
-
-    fn preview_features(&self) -> BitFlags<PreviewFeature> {
-        self.preview_features
     }
 
     fn connector_type(&self) -> &'static str {
@@ -383,7 +376,7 @@ impl SqlFlavour for MssqlFlavour {
                         })?;
                 }
 
-                temp_database.describe_schema(self.preview_features).await
+                temp_database.describe_schema(connector.params.preview_features).await
             })()
             .await
         };
@@ -405,7 +398,7 @@ mod tests {
     fn debug_impl_does_not_leak_connection_info() {
         let url = "sqlserver://myserver:8765;database=master;schema=mydbname;user=SA;password=<mypassword>;trustServerCertificate=true;socket_timeout=60;isolationLevel=READ UNCOMMITTED";
 
-        let flavour = MssqlFlavour::new(MssqlUrl::new(url).unwrap(), BitFlags::empty());
+        let flavour = MssqlFlavour::new(MssqlUrl::new(url).unwrap());
         let debugged = format!("{:?}", flavour);
 
         let words = &["myname", "mypassword", "myserver", "8765", "mydbname"];

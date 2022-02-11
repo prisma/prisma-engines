@@ -17,27 +17,22 @@ use crate::{
     sql_renderer::SqlRenderer, sql_schema_calculator::SqlSchemaCalculatorFlavour,
     sql_schema_differ::SqlSchemaDifferFlavour, SqlMigrationConnector,
 };
-use datamodel::{common::preview_features::PreviewFeature, ValidatedSchema};
-use enumflags2::BitFlags;
+use datamodel::ValidatedSchema;
 use migration_connector::{migrations_directory::MigrationDirectory, ConnectorError, ConnectorResult};
 use quaint::prelude::{ConnectionInfo, Table};
 use sql_schema_describer::SqlSchema;
 use std::fmt::Debug;
 use user_facing_errors::migration_engine::ApplyMigrationError;
 
-pub(crate) fn from_connection_info(
-    connection_info: &ConnectionInfo,
-    preview_features: BitFlags<PreviewFeature>,
-) -> Box<dyn SqlFlavour + Send + Sync + 'static> {
+pub(crate) fn from_connection_info(connection_info: &ConnectionInfo) -> Box<dyn SqlFlavour + Send + Sync + 'static> {
     match connection_info {
-        ConnectionInfo::Mysql(url) => Box::new(MysqlFlavour::new(url.clone(), preview_features)),
-        ConnectionInfo::Postgres(url) => Box::new(PostgresFlavour::new(url.clone(), preview_features)),
+        ConnectionInfo::Mysql(url) => Box::new(MysqlFlavour::new(url.clone())),
+        ConnectionInfo::Postgres(url) => Box::new(PostgresFlavour::new(url.clone())),
         ConnectionInfo::Sqlite { file_path, db_name } => Box::new(SqliteFlavour {
             file_path: file_path.clone(),
             attached_name: db_name.clone(),
-            preview_features,
         }),
-        ConnectionInfo::Mssql(url) => Box::new(MssqlFlavour::new(url.clone(), preview_features)),
+        ConnectionInfo::Mssql(url) => Box::new(MssqlFlavour::new(url.clone())),
         ConnectionInfo::InMemorySqlite { .. } => unreachable!("SqlFlavour for in-memory SQLite"),
     }
 }
@@ -101,9 +96,6 @@ pub(crate) trait SqlFlavour:
 
     /// Runs a single SQL script.
     async fn run_query_script(&self, sql: &str, connection: &Connection) -> ConnectorResult<()>;
-
-    /// The preview features in use.
-    fn preview_features(&self) -> BitFlags<PreviewFeature>;
 
     /// Table to store applied migrations, the name part.
     fn migrations_table_name(&self) -> &'static str {

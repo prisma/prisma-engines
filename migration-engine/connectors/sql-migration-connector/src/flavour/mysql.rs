@@ -4,7 +4,7 @@ use crate::{
     error::SystemDatabase,
     SqlMigrationConnector,
 };
-use datamodel::{common::preview_features::PreviewFeature, parser_database::ScalarType, ValidatedSchema};
+use datamodel::{parser_database::ScalarType, ValidatedSchema};
 use enumflags2::BitFlags;
 use indoc::indoc;
 use migration_connector::{migrations_directory::MigrationDirectory, ConnectorError, ConnectorResult};
@@ -29,7 +29,6 @@ pub(crate) struct MysqlFlavour {
     url: MysqlUrl,
     /// See the [Circumstances] enum.
     circumstances: AtomicU8,
-    preview_features: BitFlags<PreviewFeature>,
 }
 
 impl std::fmt::Debug for MysqlFlavour {
@@ -39,11 +38,10 @@ impl std::fmt::Debug for MysqlFlavour {
 }
 
 impl MysqlFlavour {
-    pub(crate) fn new(url: MysqlUrl, preview_features: BitFlags<PreviewFeature>) -> Self {
+    pub(crate) fn new(url: MysqlUrl) -> Self {
         MysqlFlavour {
             url,
             circumstances: Default::default(),
-            preview_features,
         }
     }
 
@@ -392,10 +390,6 @@ impl SqlFlavour for MysqlFlavour {
         Ok(())
     }
 
-    fn preview_features(&self) -> BitFlags<PreviewFeature> {
-        self.preview_features
-    }
-
     fn scan_migration_script(&self, script: &str) {
         for capture in QUALIFIED_NAME_RE
             .captures_iter(script)
@@ -443,7 +437,7 @@ impl SqlFlavour for MysqlFlavour {
                     })?;
             }
 
-            temp_database.describe_schema(self.preview_features).await
+            temp_database.describe_schema(connector.params.preview_features).await
         })()
         .await;
 
@@ -494,7 +488,7 @@ mod tests {
     fn debug_impl_does_not_leak_connection_info() {
         let url = "mysql://myname:mypassword@myserver:8765/mydbname";
 
-        let flavour = MysqlFlavour::new(MysqlUrl::new(url.parse().unwrap()).unwrap(), BitFlags::empty()); // unwrap this
+        let flavour = MysqlFlavour::new(MysqlUrl::new(url.parse().unwrap()).unwrap()); // unwrap this
         let debugged = format!("{:?}", flavour);
 
         let words = &["myname", "mypassword", "myserver", "8765", "mydbname"];

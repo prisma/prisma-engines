@@ -42,7 +42,7 @@ impl SqlMigrationConnector {
             KnownError::new(user_facing_errors::common::InvalidConnectionString { details })
         })?;
 
-        let flavour = flavour::from_connection_info(&connection_info, params.preview_features);
+        let flavour = flavour::from_connection_info(&connection_info);
 
         Ok(Self {
             params,

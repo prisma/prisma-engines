@@ -3,8 +3,6 @@ use crate::{
     flavour::SqlFlavour,
     SqlMigrationConnector,
 };
-use datamodel::common::preview_features::PreviewFeature;
-use enumflags2::BitFlags;
 use indoc::indoc;
 use migration_connector::{migrations_directory::MigrationDirectory, ConnectorError, ConnectorResult};
 use quaint::prelude::ConnectionInfo;
@@ -15,7 +13,6 @@ use std::path::Path;
 pub(crate) struct SqliteFlavour {
     pub(super) file_path: String,
     pub(super) attached_name: String,
-    pub(super) preview_features: BitFlags<PreviewFeature>,
 }
 
 #[async_trait::async_trait]
@@ -27,7 +24,7 @@ impl SqlFlavour for SqliteFlavour {
     }
 
     fn connector_type(&self) -> &'static str {
-        "postgresql"
+        "sqlite"
     }
 
     async fn run_query_script(&self, sql: &str, connection: &Connection) -> ConnectorResult<()> {
@@ -122,11 +119,11 @@ impl SqlFlavour for SqliteFlavour {
         Ok(())
     }
 
-    #[tracing::instrument(skip(self, migrations, _connector))]
+    #[tracing::instrument(skip(self, migrations, connector))]
     async fn sql_schema_from_migration_history(
         &self,
         migrations: &[MigrationDirectory],
-        _connector: &SqlMigrationConnector,
+        connector: &SqlMigrationConnector,
     ) -> ConnectorResult<SqlSchema> {
         tracing::debug!("Applying migrations to temporary in-memory SQLite database.");
         let quaint = quaint::single::Quaint::new_in_memory().map_err(|err| {
@@ -155,12 +152,8 @@ impl SqlFlavour for SqliteFlavour {
                 })?;
         }
 
-        let sql_schema = conn.describe_schema(self.preview_features).await?;
+        let sql_schema = conn.describe_schema(connector.params.preview_features).await?;
 
         Ok(sql_schema)
-    }
-
-    fn preview_features(&self) -> BitFlags<PreviewFeature> {
-        self.preview_features
     }
 }
