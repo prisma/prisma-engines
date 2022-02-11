@@ -15,11 +15,12 @@ impl DatabaseMigrationStepApplier for MongoDbMigrationConnector {
         let db = self.client().await?.database();
 
         if !self.migration_is_empty(migration) {
-            tracing::info!(
-                migrate_action = "log",
-                "Applying the following changes:\n\n{}",
-                self.migration_summary(migration)
-            );
+            self.host
+                .print(&format!(
+                    "Applying the following changes:\n\n{}\n",
+                    self.migration_summary(migration)
+                ))
+                .await?;
         }
 
         let migration: &MongoDbMigration = migration.downcast_ref();
