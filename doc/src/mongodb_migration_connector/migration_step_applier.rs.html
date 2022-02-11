@@ -80,6 +80,7 @@
 <span id="79">79</span>
 <span id="80">80</span>
 <span id="81">81</span>
+<span id="82">82</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">client_wrapper::mongo_error_to_connector_error</span>,
     <span class="ident">migration</span>::{<span class="ident">MongoDbMigration</span>, <span class="ident">MongoDbMigrationStep</span>},
@@ -97,11 +98,12 @@
         <span class="kw">let</span> <span class="ident">db</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">client</span>().<span class="kw">await</span><span class="question-mark">?</span>.<span class="ident">database</span>();
 
         <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">migration_is_empty</span>(<span class="ident">migration</span>) {
-            <span class="macro">tracing::info!</span>(
-                <span class="ident">migrate_action</span> <span class="op">=</span> <span class="string">&quot;log&quot;</span>,
-                <span class="string">&quot;Applying the following changes:\n\n{}&quot;</span>,
-                <span class="self">self</span>.<span class="ident">migration_summary</span>(<span class="ident">migration</span>)
-            );
+            <span class="self">self</span>.<span class="ident">host</span>
+                .<span class="ident">print</span>(<span class="kw-2">&amp;</span><span class="macro">format!</span>(
+                    <span class="string">&quot;Applying the following changes:\n\n{}\n&quot;</span>,
+                    <span class="self">self</span>.<span class="ident">migration_summary</span>(<span class="ident">migration</span>)
+                ))
+                .<span class="kw">await</span><span class="question-mark">?</span>;
         }
 
         <span class="kw">let</span> <span class="ident">migration</span>: <span class="kw-2">&amp;</span><span class="ident">MongoDbMigration</span> <span class="op">=</span> <span class="ident">migration</span>.<span class="ident">downcast_ref</span>();

@@ -296,7 +296,7 @@
     <span class="attribute">#[<span class="ident">tracing::instrument</span>(<span class="ident">skip</span>(<span class="self">self</span>, <span class="ident">script</span>))]</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">apply_script</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">migration_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">script</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">host</span>
-            .<span class="ident">print</span>(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;Applying migration `{}`&quot;</span>, <span class="ident">migration_name</span>))
+            .<span class="ident">print</span>(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;Applying migration `{}`\n&quot;</span>, <span class="ident">migration_name</span>))
             .<span class="kw">await</span><span class="question-mark">?</span>;
         <span class="self">self</span>.<span class="ident">flavour</span>.<span class="ident">scan_migration_script</span>(<span class="ident">script</span>);
         <span class="kw">let</span> <span class="ident">conn</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">conn</span>().<span class="kw">await</span><span class="question-mark">?</span>;
