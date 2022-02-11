@@ -127,10 +127,7 @@ impl<'a> ValueValidator<'a> {
                 Some(("Asc", _)) => Ok(Some(SortOrder::Asc)),
                 Some(("Desc", _)) => Ok(Some(SortOrder::Desc)),
                 None => Ok(None),
-                _ => Err(DatamodelError::ParserError {
-                    expected_str: "Asc, Desc".to_owned(),
-                    span: arg.span,
-                }),
+                _ => Err(DatamodelError::new_parser_error("Asc, Desc".to_owned(), arg.span)),
             })
             .transpose()?
             .flatten();
@@ -139,14 +136,10 @@ impl<'a> ValueValidator<'a> {
             .iter()
             .find(|arg| arg.name.as_ref().map(|n| n.name.as_str()) == Some("length"))
             .map(|arg| match &arg.value {
-                Expression::NumericValue(s, _) => s.parse::<u32>().map_err(|_| DatamodelError::ParserError {
-                    expected_str: "valid integer".to_string(),
-                    span: arg.span,
-                }),
-                _ => Err(DatamodelError::ParserError {
-                    expected_str: "valid integer".to_string(),
-                    span: arg.span,
-                }),
+                Expression::NumericValue(s, _) => s
+                    .parse::<u32>()
+                    .map_err(|_| DatamodelError::new_parser_error("valid integer".to_owned(), arg.span)),
+                _ => Err(DatamodelError::new_parser_error("valid integer".to_owned(), arg.span)),
             })
             .transpose()?;
 
@@ -164,11 +157,11 @@ impl<'a> ValueValidator<'a> {
             s => {
                 let message = format!("Invalid referential action: `{}`", s);
 
-                Err(DatamodelError::AttributeValidationError {
-                    message,
-                    attribute_name: String::from("relation"),
-                    span: self.span(),
-                })
+                Err(DatamodelError::new_attribute_validation_error(
+                    &message,
+                    "relation",
+                    self.span(),
+                ))
             }
         }
     }
