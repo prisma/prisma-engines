@@ -148,18 +148,19 @@ mod to_many {
     }
 
     /// Order a model based on to-many reached over to-one composite hops.
+    /// This test also catches that to-many composites stay queryable together an aggregate order by.
     #[connector_test]
     async fn model_basic_to_many_ordering_multiple_hops(runner: Runner) -> TestResult<()> {
         create_test_data(&runner).await?;
 
         insta::assert_snapshot!(
-            run_query!(runner, r#"{ findManyTestModel(orderBy: { to_one_b: { b_to_many_cs: { _count: asc }} }) { id } }"#),
-            @r###"{"data":{"findManyTestModel":[{"id":3},{"id":4},{"id":2},{"id":1}]}}"###
+            run_query!(runner, r#"{ findManyTestModel(orderBy: { to_one_b: { b_to_many_cs: { _count: asc }} }) { id to_one_b { b_field } } }"#),
+            @r###"{"data":{"findManyTestModel":[{"id":3,"to_one_b":{"b_field":10}},{"id":4,"to_one_b":null},{"id":2,"to_one_b":{"b_field":10}},{"id":1,"to_one_b":{"b_field":10}}]}}"###
         );
 
         insta::assert_snapshot!(
-            run_query!(runner, r#"{ findManyTestModel(orderBy: { to_one_b: { b_to_many_cs: { _count: desc }} }) { id } }"#),
-            @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2},{"id":3},{"id":4}]}}"###
+            run_query!(runner, r#"{ findManyTestModel(orderBy: { to_one_b: { b_to_many_cs: { _count: desc }} }) { id to_one_b { b_field } } }"#),
+            @r###"{"data":{"findManyTestModel":[{"id":1,"to_one_b":{"b_field":10}},{"id":2,"to_one_b":{"b_field":10}},{"id":3,"to_one_b":{"b_field":10}},{"id":4,"to_one_b":null}]}}"###
         );
 
         Ok(())

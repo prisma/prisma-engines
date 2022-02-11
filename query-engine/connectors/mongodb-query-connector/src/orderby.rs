@@ -28,18 +28,21 @@ impl OrderByData {
     }
 
     pub(crate) fn compute(order_by: OrderBy, index: usize) -> Self {
-        // Determine if we need to compute join stages. Composite paths do not count as join - they're on the same document.
-        if order_by.relation_path().is_empty() {
+        let prefix = Self::compute_prefix(index, &order_by);
+
+        // Determine if we need to compute join stages.
+        if !order_by.contains_relation_hops() {
             Self {
                 join: None,
-                prefix: None,
+                prefix,
                 order_by,
             }
         } else {
-            let prefix = Self::compute_join_prefix(index, &order_by);
+            let prefix = prefix.unwrap(); // Safe because relation hops always produce a prefix.
             let mut stages = order_by
                 .path()
-                .iter()
+                .unwrap() // Safe because relation hops always have a path.
+                .into_iter()
                 .filter_map(|hop| match hop {
                     OrderByHop::Relation(rf) => Some(JoinStage::new(rf.clone())),
                     OrderByHop::Composite(_) => None, // We don't need to join if we're looking at composites - they're already present on the document.
@@ -76,20 +79,38 @@ impl OrderByData {
     ///
     /// The join, and with that the prefix, only cares about the path to the object we joined to (above it would be A -> B -> C),
     /// The path on the object (e.g. `composite.field`) is handled as a scalar later.
-    fn compute_join_prefix(index: usize, order_by: &OrderBy) -> OrderByPrefix {
-        let mut parts = order_by
-            .path()
-            .iter()
-            .filter_map(|hop| match hop {
-                OrderByHop::Relation(rf) => Some(rf.relation().name.clone()),
-                OrderByHop::Composite(_) => None,
-            })
-            .collect_vec();
+    fn compute_prefix(index: usize, order_by: &OrderBy) -> Option<OrderByPrefix> {
+        match order_by.path() {
+            Some(path) => {
+                let mut parts = path
+                    .iter()
+                    .map(|hop| match hop {
+                        OrderByHop::Relation(rf) => rf.relation().name.clone(),
+                        OrderByHop::Composite(cf) => cf.db_name().to_owned(),
+                    })
+                    .collect_vec();
 
-        let alias = format!("orderby_{}_{}", parts[0], index);
-        parts[0] = alias;
+                if parts.is_empty() {
+                    None
+                } else {
+                    let clone_to = if order_by.contains_relation_hops() {
+                        let alias = format!("orderby_{}_{}", parts[0], index);
+                        parts[0] = alias;
 
-        OrderByPrefix::new(parts)
+                        None
+                    } else if !path.is_empty() {
+                        // Composites!
+                        Some(format!("orderby_{}_{}", parts[0], index))
+                    } else {
+                        None
+                    };
+
+                    // let composite_only = !requires_alias && !path.is_empty();
+                    Some(OrderByPrefix::new(parts, clone_to))
+                }
+            }
+            None => None,
+        }
     }
 
     /// The Mongo binding name of this orderBy, required for cursor conditions.
@@ -101,8 +122,6 @@ impl OrderByData {
             let first = prefix.first().unwrap().to_string();
 
             (first.clone(), first)
-        } else if let Some(composite_path) = self.composite_path() {
-            (composite_path.clone(), composite_path)
         } else {
             // TODO: Order by relevance won't work here
             let right = self
@@ -138,24 +157,22 @@ impl OrderByData {
             OrderBy::ScalarAggregation(_) | OrderBy::ToManyAggregation(_)
         ) {
             // Order by aggregates are always referenced by their join prefix and not a specific field name.
-            self.prefix
-                .as_ref()
-                .map(ToString::to_string)
-                .into_iter()
-                .chain(self.composite_path())
-                .join(".")
+            self.prefix.as_ref().unwrap().to_string()
         } else if let Some(ref prefix) = self.prefix {
+            dbg!(prefix);
             iter::once(prefix.to_string())
-                .chain(self.composite_path())
                 .chain(iter::once(self.scalar_field_name()))
                 .join(".")
         } else if use_bindings {
-            self.binding_names().0
+            dbg!(self.binding_names().0)
         } else {
-            self.composite_path()
+            dbg!(self
+                .prefix
+                .as_ref()
                 .into_iter()
+                .map(ToString::to_string)
                 .chain(iter::once(self.scalar_field_name()))
-                .join(".")
+                .join("."))
         }
     }
 
@@ -163,35 +180,39 @@ impl OrderByData {
         self.order_by.sort_order()
     }
 
-    /// Currently, composites can't have relations, meaning that a path to an orderBy can only have the form of:
-    /// - `document.scalar` (no relations and composites)
-    /// - `document.<composites>.scalar`
-    /// - `document`.<relations>.scalar`
-    /// - `document.<relations>.<composites>.scalar`
-    ///
-    /// This function gives us the `composites` part of the above path.
-    fn composite_path(&self) -> Option<String> {
-        // Note that relations and composites are never mixed currently, so it's fine to just throw out relations during mapping and keep composites.
-        let segments: Vec<_> = self
-            .order_by
-            .path()
-            .into_iter()
-            .filter_map(|hop| match hop {
-                OrderByHop::Relation(_) => None,
-                OrderByHop::Composite(cf) => Some(cf.db_name().to_string()),
-            })
-            .collect();
+    // /// Currently, composites can't have relations, meaning that a path to an orderBy can only have the form of:
+    // /// - `document.scalar` (no relations and composites)
+    // /// - `document.<composites>.scalar`
+    // /// - `document`.<relations>.scalar`
+    // /// - `document.<relations>.<composites>.scalar`
+    // ///
+    // /// This function gives us the `composites` part of the above path.
+    // fn composite_path(&self) -> Option<String> {
+    //     // Note that relations and composites are never mixed currently, so it's fine to just throw out relations during mapping and keep composites.
+    //     let segments: Vec<_> = self
+    //         .order_by
+    //         .path()
+    //         .into_iter()
+    //         .filter_map(|hop| match hop {
+    //             OrderByHop::Relation(_) => None,
+    //             OrderByHop::Composite(cf) => Some(cf.db_name().to_string()),
+    //         })
+    //         .collect();
 
-        if segments.is_empty() {
-            None
-        } else {
-            Some(segments.join("."))
-        }
-    }
+    //     if segments.is_empty() {
+    //         None
+    //     } else {
+    //         Some(segments.join("."))
+    //     }
+    // }
 }
 
 #[derive(Debug)]
 pub(crate) struct OrderByPrefix {
+    ///
+    clone_to: Option<String>,
+
+    /// Parts of the path, stringified.
     parts: Vec<String>,
 }
 
@@ -202,8 +223,8 @@ impl ToString for OrderByPrefix {
 }
 
 impl OrderByPrefix {
-    pub(crate) fn new(parts: Vec<String>) -> Self {
-        Self { parts }
+    pub(crate) fn new(parts: Vec<String>, clone_to: Option<String>) -> Self {
+        Self { parts, clone_to }
     }
 
     pub(crate) fn first(&self) -> Option<&String> {
@@ -245,7 +266,7 @@ impl OrderByBuilder {
 
         for data in self.order_bys.into_iter() {
             let is_to_many_aggregation = matches!(&data.order_by, OrderBy::ToManyAggregation(_));
-            let field_name = if is_group_by {
+            let mut field_name = if is_group_by {
                 // Can only be scalar aggregations for groupBy, ToMany aggregations are not supported yet.
                 if let OrderBy::ScalarAggregation(order_by_aggr) = &data.order_by {
                     let prefix = match order_by_aggr.sort_aggregation {
@@ -280,24 +301,28 @@ impl OrderByBuilder {
                 if !order_by_aggregate.path.is_empty() {
                     match order_by_aggregate.sort_aggregation {
                         prisma_models::SortAggregation::Count => {
-                            // if data.order_by.has_middle_to_one_relation_path() {
-                            order_aggregate_proj_doc.extend(unwind_aggregate_joins(
-                                field_name.clone().as_str(),
-                                order_by_aggregate,
-                                &data,
-                            ));
-                            // }
-
-                            // Bandaid: > 1 check is to prevent bindings that repeat the same again, like `$field.field`.
-                            let if_null_binding = if is_to_many_aggregation && data.order_by.path().len() > 1 {
-                                // iter::once(field_name.clone()).chain(data.composite_path()).join(".")
-                                data.full_reference_path(false)
+                            if let Some(clone_to) = data.prefix.as_ref().and_then(|x| x.clone_to.clone()) {
+                                order_aggregate_proj_doc.push(doc! { "$addFields": { clone_to.clone(): { "$size": { "$ifNull": [format!("${}", data.full_reference_path(false)), []] } } } });
+                                field_name = clone_to; // just a hack right now
                             } else {
-                                field_name.clone()
-                            };
+                                // if data.order_by.has_middle_to_one_relation_path() {
+                                order_aggregate_proj_doc.extend(unwind_aggregate_joins(
+                                    field_name.clone().as_str(),
+                                    order_by_aggregate,
+                                    &data,
+                                ));
+                                // }
 
-                            order_aggregate_proj_doc
-                                .push(doc! { "$addFields": { field_name.clone(): { "$size": { "$ifNull": [format!("${}", if_null_binding), []] } } } });
+                                // // Bandaid: > 1 check is to prevent bindings that repeat the same again, like `$field.field`.
+                                // let if_null_binding = if is_to_many_aggregation && data.order_by.path().len() > 1 {
+                                //     // iter::once(field_name.clone()).chain(data.composite_path()).join(".")
+                                //     data.full_reference_path(false)
+                                // } else {
+                                //     field_name.clone()
+                                // };
+
+                                order_aggregate_proj_doc.push(doc! { "$addFields": { field_name.clone(): { "$size": { "$ifNull": [format!("${}", field_name), []] } } } });
+                            }
                         }
                         _ => unimplemented!("Order by aggregate only supports COUNT"),
                     }
