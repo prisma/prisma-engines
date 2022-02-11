@@ -324,7 +324,7 @@ mod delete_many_rels {
             r#"
             model Parent {
                 #id(id, Int, @id)
-                #m2m(childrenOpt, Child[], Int)
+                #m2m(childrenOpt, Child[], id, Int)
 
                 p            String     @unique
                 stepChildId  Int?
@@ -333,7 +333,7 @@ mod delete_many_rels {
 
             model Child {
                 #id(id, Int, @id)
-                #m2m(parentsOpt, Parent[], Int)
+                #m2m(parentsOpt, Parent[], id, Int)
 
                 c          String @unique
             }

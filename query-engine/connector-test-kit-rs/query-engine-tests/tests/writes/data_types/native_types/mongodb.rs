@@ -63,8 +63,8 @@ mod mongodb {
                 id  String  @id @default(auto()) @map("_id") @test.ObjectId
                 gql String?
 
-                b_ids String[]
-                bs    B[]      @relation(fields: [b_ids])
+                b_ids String[] @test.ObjectId
+                bs    B[]      @relation(fields: [b_ids], references: [id])
             }
 
             model B {
@@ -72,7 +72,7 @@ mod mongodb {
                 gql String?
 
                 a_ids String[] @test.ObjectId
-                as    A[]      @relation(fields: [a_ids])
+                as    A[]      @relation(fields: [a_ids], references: [id])
             }"#
         };
 

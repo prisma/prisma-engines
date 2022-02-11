@@ -535,7 +535,7 @@ pub(super) fn referencing_scalar_field_types(relation: InlineRelationWalker<'_>,
             (ScalarFieldType::CompositeType(a), ScalarFieldType::CompositeType(b)) if a == b => true,
             (ScalarFieldType::Enum(a), ScalarFieldType::Enum(b)) if a == b => true,
             (ScalarFieldType::BuiltInScalar(a), ScalarFieldType::BuiltInScalar(b)) if a == b => true,
-            (ScalarFieldType::Unsupported, ScalarFieldType::Unsupported) => true,
+            (ScalarFieldType::Unsupported(a), ScalarFieldType::Unsupported(b)) if a == b => true,
             (ScalarFieldType::Alias(a), b) => {
                 let a_type = db.alias_scalar_field_type(&a);
                 field_types_match(*a_type, b, db)

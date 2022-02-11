@@ -26,6 +26,7 @@ const CAPABILITIES: &[ConnectorCapability] = &[
     ConnectorCapability::SortOrderInFullTextIndex,
     ConnectorCapability::MongoDbQueryRaw,
     ConnectorCapability::DefaultValueAuto,
+    ConnectorCapability::TwoWayEmbeddedManyToManyRelation,
 ];
 
 type Result<T> = std::result::Result<T, ConnectorError>;

@@ -245,7 +245,7 @@ fn column_for_scalar_field(field: ScalarFieldWalker<'_>, ctx: &mut Context<'_>) 
         ScalarFieldType::Enum(enum_id) => column_for_model_enum_scalar_field(field, enum_id, ctx),
         ScalarFieldType::CompositeType(_) => column_for_builtin_scalar_type(field, ScalarType::Json, ctx),
         ScalarFieldType::BuiltInScalar(scalar_type) => column_for_builtin_scalar_type(field, scalar_type, ctx),
-        ScalarFieldType::Unsupported => column_for_model_unsupported_scalar_field(field, ctx),
+        ScalarFieldType::Unsupported(_) => column_for_model_unsupported_scalar_field(field, ctx),
         ScalarFieldType::Alias(_) => unreachable!(),
     }
 }

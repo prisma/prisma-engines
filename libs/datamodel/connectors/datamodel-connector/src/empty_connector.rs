@@ -22,6 +22,7 @@ impl Connector for EmptyDatamodelConnector {
             ConnectorCapability::CompoundIds,
             ConnectorCapability::Enums,
             ConnectorCapability::Json,
+            ConnectorCapability::ImplicitManyToManyRelation,
         ]
     }
 

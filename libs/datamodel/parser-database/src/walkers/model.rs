@@ -265,6 +265,7 @@ impl<'db> ModelWalker<'db> {
         self.relations_from().filter_map(|relation| match relation.refine() {
             super::RefinedRelationWalker::Inline(relation) => Some(relation),
             super::RefinedRelationWalker::ImplicitManyToMany(_) => None,
+            super::RefinedRelationWalker::TwoWayEmbeddedManyToMany(_) => None,
         })
     }
 

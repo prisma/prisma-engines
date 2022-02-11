@@ -13,12 +13,12 @@ mod prisma_933_spec {
             r#"model Buyer {
                 #id(buyer_id, Int, @id)
                 name     String?
-                #m2m(sales, Sale[], Int)
+                #m2m(sales, Sale[], sale_id, Int)
               }
 
               model Sale {
                 #id(sale_id, Int, @id)
-                #m2m(buyers, Buyer[], Int)
+                #m2m(buyers, Buyer[], buyer_id, Int)
               }"#
         };
 

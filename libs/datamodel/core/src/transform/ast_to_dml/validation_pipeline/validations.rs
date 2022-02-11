@@ -152,8 +152,21 @@ pub(super) fn validate(ctx: &mut Context<'_>) {
                 }
             }
             RefinedRelationWalker::ImplicitManyToMany(relation) => {
-                relations::many_to_many::validate_singular_id(relation, ctx);
-                relations::many_to_many::validate_no_referential_actions(relation, ctx);
+                use relations::many_to_many::implicit;
+
+                implicit::supports_implicit_relations(relation, ctx);
+                implicit::validate_singular_id(relation, ctx);
+                implicit::validate_no_referential_actions(relation, ctx);
+            }
+            RefinedRelationWalker::TwoWayEmbeddedManyToMany(relation) => {
+                use relations::many_to_many::embedded;
+
+                embedded::supports_embedded_relations(relation, ctx);
+                embedded::defines_references_on_both_sides(relation, ctx);
+                embedded::defines_fields_on_both_sides(relation, ctx);
+                embedded::references_id_from_both_sides(relation, ctx);
+                embedded::referencing_with_an_array_field_of_correct_type(relation, ctx);
+                embedded::validate_no_referential_actions(relation, ctx);
             }
         }
     }

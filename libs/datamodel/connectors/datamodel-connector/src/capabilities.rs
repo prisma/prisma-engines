@@ -52,6 +52,8 @@ capabilities!(
     RelationFieldsInArbitraryOrder,
     CompositeTypes,
     DefaultValueAuto,
+    TwoWayEmbeddedManyToManyRelation,
+    ImplicitManyToManyRelation,
     //Start of ME/IE only capabilities
     AutoIncrementAllowedOnNonId,
     AutoIncrementMultipleAllowed,

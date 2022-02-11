@@ -61,6 +61,11 @@ impl<'db> ScalarFieldWalker<'db> {
         self.default_value().map(|dv| dv.is_autoincrement()).unwrap_or(false)
     }
 
+    /// Does the field define a primary key by its own.
+    pub fn is_single_pk(self) -> bool {
+        self.model().field_is_single_pk(self.field_id)
+    }
+
     /// Is there an `@ignore` attribute on the field?
     pub fn is_ignored(self) -> bool {
         self.attributes().is_ignored

@@ -15,6 +15,7 @@ const CAPABILITIES: &[ConnectorCapability] = &[
     ConnectorCapability::SqlQueryRaw,
     ConnectorCapability::RelationFieldsInArbitraryOrder,
     ConnectorCapability::UpdateableId,
+    ConnectorCapability::ImplicitManyToManyRelation,
 ];
 
 pub struct SqliteDatamodelConnector;

@@ -100,6 +100,7 @@ const CAPABILITIES: &[ConnectorCapability] = &[
     ConnectorCapability::UpdateableId,
     ConnectorCapability::WritableAutoincField,
     ConnectorCapability::UsingHashIndex,
+    ConnectorCapability::ImplicitManyToManyRelation,
 ];
 
 pub struct PostgresDatamodelConnector;

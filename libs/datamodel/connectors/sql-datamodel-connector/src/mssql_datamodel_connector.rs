@@ -94,6 +94,7 @@ const CAPABILITIES: &[ConnectorCapability] = &[
     ConnectorCapability::ReferenceCycleDetection,
     ConnectorCapability::UpdateableId,
     ConnectorCapability::PrimaryKeySortOrderDefinition,
+    ConnectorCapability::ImplicitManyToManyRelation,
 ];
 
 pub struct MsSqlDatamodelConnector;

@@ -227,8 +227,8 @@ fn render_relation_fields(
     child_ref_to_parent: &RelationReference,
 ) -> (String, String) {
     if parent.is_list() && child.is_list() {
-        let rendered_parent = format!("#m2m({}, {}, String)", parent.field_name(), parent.type_name());
-        let rendered_child = format!("#m2m({}, {}, String)", child.field_name(), child.type_name());
+        let rendered_parent = format!("#m2m({}, {}, id, String)", parent.field_name(), parent.type_name());
+        let rendered_child = format!("#m2m({}, {}, id, String)", child.field_name(), child.type_name(),);
 
         (rendered_parent, rendered_child)
     } else {

@@ -94,9 +94,28 @@ impl<'a> LiftAstToDml<'a> {
                 RefinedRelationWalker::Inline(relation) => {
                     // Forward field
                     {
+                        // If we have an array field we detect as a
+                        // back-relation, but it has fields defined, we expect
+                        // it to be the other side of a embedded 2-way m:n
+                        // relation, and we don't want to mess around with the
+                        // data model here at all.
+                        //
+                        // Please kill this with fire when we introduce code
+                        // actions for relations.
+                        if relation
+                            .back_relation_field()
+                            .filter(|rf| rf.ast_field().arity.is_list())
+                            .and_then(|rf| rf.fields())
+                            .is_some()
+                        {
+                            continue;
+                        }
+
                         let relation_info = dml::RelationInfo::new(relation.referenced_model().name());
                         let model = schema.find_model_mut(relation.referencing_model().name());
-                        let mut inferred_scalar_fields = Vec::new(); // reformatted/virtual/inferred extra scalar fields for reformatted relations.
+
+                        // reformatted/virtual/inferred extra scalar fields for reformatted relations.
+                        let mut inferred_scalar_fields = Vec::new();
 
                         let mut relation_field = if let Some(relation_field) = relation.forward_relation_field() {
                             // Construct a relation field in the DML for an existing relation field in the source.
@@ -221,6 +240,40 @@ impl<'a> LiftAstToDml<'a> {
                         let primary_key = relation_field.related_model().primary_key().unwrap();
                         field.relation_info.references =
                             primary_key.fields().map(|field| field.name().to_owned()).collect();
+
+                        field.relation_info.fields = relation_field
+                            .fields()
+                            .into_iter()
+                            .flatten()
+                            .map(|f| f.name().to_owned())
+                            .collect();
+
+                        let model = schema.find_model_mut(relation_field.model().name());
+                        model.add_field(dml::Field::RelationField(field));
+                        field_ids_for_sorting.insert(
+                            (relation_field.model().name(), relation_field.name()),
+                            relation_field.field_id(),
+                        );
+                    }
+                }
+                RefinedRelationWalker::TwoWayEmbeddedManyToMany(relation) => {
+                    for relation_field in [relation.field_a(), relation.field_b()] {
+                        let ast_field = relation_field.ast_field();
+                        let arity = self.lift_field_arity(&ast_field.arity);
+                        let relation_info = dml::RelationInfo::new(relation_field.related_model().name());
+                        let referential_arity = self.lift_field_arity(&relation_field.referential_arity());
+
+                        let mut field =
+                            dml::RelationField::new(relation_field.name(), arity, referential_arity, relation_info);
+
+                        common_dml_fields(&mut field, relation_field);
+
+                        field.relation_info.references = relation_field
+                            .referenced_fields()
+                            .into_iter()
+                            .flatten()
+                            .map(|f| f.name().to_owned())
+                            .collect();
 
                         field.relation_info.fields = relation_field
                             .fields()
@@ -415,7 +468,7 @@ impl<'a> LiftAstToDml<'a> {
                 let enum_name = &self.db.ast()[*enum_id].name.name;
                 dml::FieldType::Enum(enum_name.to_owned())
             }
-            db::ScalarFieldType::Unsupported => {
+            db::ScalarFieldType::Unsupported(_) => {
                 dml::FieldType::Unsupported(ast_field.field_type.as_unsupported().unwrap().0.to_owned())
             }
             db::ScalarFieldType::Alias(top_id) => {
@@ -461,7 +514,7 @@ impl<'a> LiftAstToDml<'a> {
 
                 CompositeTypeFieldType::Enum(enum_name.to_owned())
             }
-            db::ScalarFieldType::Unsupported => {
+            db::ScalarFieldType::Unsupported(_) => {
                 let field = composite_type_field
                     .ast_field()
                     .field_type

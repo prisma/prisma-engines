@@ -71,8 +71,19 @@ enum FieldType {
     Scalar(ScalarFieldType),
 }
 
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct UnsupportedType {
+    name: StringId,
+}
+
+impl UnsupportedType {
+    pub(crate) fn new(name: StringId) -> Self {
+        Self { name }
+    }
+}
+
 /// The type of a scalar field, parsed and categorized.
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq)]
 pub enum ScalarFieldType {
     /// A composite type
     CompositeType(ast::CompositeTypeId),
@@ -83,7 +94,7 @@ pub enum ScalarFieldType {
     /// A type alias
     Alias(ast::AliasId),
     /// An `Unsupported("...")` type
-    Unsupported,
+    Unsupported(UnsupportedType),
 }
 
 impl ScalarFieldType {
@@ -418,7 +429,10 @@ fn visit_type_alias<'db>(alias_id: ast::AliasId, alias: &'db ast::Field, ctx: &m
 fn field_type<'db>(field: &'db ast::Field, ctx: &mut Context<'db>) -> Result<FieldType, &'db str> {
     let supported = match &field.field_type {
         ast::FieldType::Supported(ident) => &ident.name,
-        ast::FieldType::Unsupported(_, _) => return Ok(FieldType::Scalar(ScalarFieldType::Unsupported)),
+        ast::FieldType::Unsupported(name, _) => {
+            let unsupported = UnsupportedType::new(ctx.interner.intern(name));
+            return Ok(FieldType::Scalar(ScalarFieldType::Unsupported(unsupported)));
+        }
     };
     let supported_string_id = ctx.interner.intern(supported);
 

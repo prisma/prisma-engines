@@ -129,6 +129,10 @@ pub(super) enum RelationAttributes {
         field_a: ast::FieldId,
         field_b: ast::FieldId,
     },
+    TwoWayEmbeddedManyToMany {
+        field_a: ast::FieldId,
+        field_b: ast::FieldId,
+    },
     OneToOne(OneToOneRelationFields),
     OneToMany(OneToManyRelationFields),
 }
@@ -137,6 +141,7 @@ impl RelationAttributes {
     fn fields(&self) -> (Option<ast::FieldId>, Option<ast::FieldId>) {
         match self {
             RelationAttributes::ImplicitManyToMany { field_a, field_b }
+            | RelationAttributes::TwoWayEmbeddedManyToMany { field_a, field_b }
             | RelationAttributes::OneToOne(OneToOneRelationFields::Both(field_a, field_b))
             | RelationAttributes::OneToMany(OneToManyRelationFields::Both(field_a, field_b)) => {
                 (Some(*field_a), Some(*field_b))
@@ -166,19 +171,24 @@ impl Relation {
         }
     }
 
-    pub(crate) fn is_many_to_many(&self) -> bool {
+    pub(crate) fn is_implicit_many_to_many(&self) -> bool {
         matches!(self.attributes, RelationAttributes::ImplicitManyToMany { .. })
     }
 
     pub(crate) fn as_complete_fields(&self) -> Option<(ast::FieldId, ast::FieldId)> {
         match &self.attributes {
             RelationAttributes::ImplicitManyToMany { field_a, field_b } => Some((*field_a, *field_b)),
+            RelationAttributes::TwoWayEmbeddedManyToMany { field_a, field_b } => Some((*field_a, *field_b)),
             RelationAttributes::OneToOne(OneToOneRelationFields::Both(field_a, field_b)) => Some((*field_a, *field_b)),
             RelationAttributes::OneToMany(OneToManyRelationFields::Both(field_a, field_b)) => {
                 Some((*field_a, *field_b))
             }
             _ => None,
         }
+    }
+
+    pub(crate) fn is_two_way_embedded_many_to_many(&self) -> bool {
+        matches!(self.attributes, RelationAttributes::TwoWayEmbeddedManyToMany { .. })
     }
 }
 
@@ -189,6 +199,7 @@ pub(super) struct RelationEvidence<'db> {
     pub(super) ast_field: &'db ast::Field,
     pub(super) field_id: ast::FieldId,
     pub(super) is_self_relation: bool,
+    pub(super) is_two_way_embedded_many_to_many_relation: bool,
     pub(super) relation_field: &'db RelationField,
     pub(super) opposite_model: &'db ast::Model,
     pub(super) opposite_relation_field: Option<(ast::FieldId, &'db ast::Field, &'db RelationField)>,
@@ -216,6 +227,11 @@ pub(super) fn relation_evidence<'db>(
         .find(|(_, opposite_relation_field)| opposite_relation_field.name == relation_field.name)
         .map(|((opp_model_id, opp_field_id), opp_rf)| (*opp_field_id, &ast[*opp_model_id][*opp_field_id], opp_rf));
 
+    let is_two_way_embedded_many_to_many_relation = match (relation_field, opposite_relation_field) {
+        (left, Some((_, _, right))) => left.fields.is_some() || right.fields.is_some(),
+        _ => false,
+    };
+
     RelationEvidence {
         ast_model,
         model_id: *model_id,
@@ -225,6 +241,7 @@ pub(super) fn relation_evidence<'db>(
         opposite_model,
         is_self_relation,
         opposite_relation_field,
+        is_two_way_embedded_many_to_many_relation,
     }
 }
 
@@ -250,9 +267,16 @@ pub(super) fn ingest_relation<'db>(evidence: RelationEvidence<'db>, relations: &
                 return;
             }
 
-            RelationAttributes::ImplicitManyToMany {
-                field_a: evidence.field_id,
-                field_b: opp_field_id,
+            if evidence.is_two_way_embedded_many_to_many_relation {
+                RelationAttributes::TwoWayEmbeddedManyToMany {
+                    field_a: evidence.field_id,
+                    field_b: opp_field_id,
+                }
+            } else {
+                RelationAttributes::ImplicitManyToMany {
+                    field_a: evidence.field_id,
+                    field_b: opp_field_id,
+                }
             }
         }
 
