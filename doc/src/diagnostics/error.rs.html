@@ -509,6 +509,17 @@
 <span id="508">508</span>
 <span id="509">509</span>
 <span id="510">510</span>
+<span id="511">511</span>
+<span id="512">512</span>
+<span id="513">513</span>
+<span id="514">514</span>
+<span id="515">515</span>
+<span id="516">516</span>
+<span id="517">517</span>
+<span id="518">518</span>
+<span id="519">519</span>
+<span id="520">520</span>
+<span id="521">521</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::helper::pretty_print</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::Span</span>;
 <span class="kw">use</span> <span class="ident">thiserror::Error</span>;
@@ -578,6 +589,9 @@
 
   <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Function not known: \&quot;{}\&quot;.&quot;</span>, <span class="ident">function_name</span>)]</span>
   <span class="ident">FunctionNotKnownError</span> { <span class="ident">function_name</span>: <span class="ident">String</span>, <span class="ident">span</span>: <span class="ident">Span</span> },
+
+  <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Property not known: \&quot;{}\&quot;.&quot;</span>, <span class="ident">property_name</span>)]</span>
+  <span class="ident">PropertyNotKnownError</span> { <span class="ident">property_name</span>: <span class="ident">String</span>, <span class="ident">span</span>: <span class="ident">Span</span> },
 
   <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Datasource provider not known: \&quot;{}\&quot;.&quot;</span>, <span class="ident">provider</span>)]</span>
   <span class="ident">DatasourceProviderNotKnownError</span> { <span class="ident">provider</span>: <span class="ident">String</span>, <span class="ident">span</span>: <span class="ident">Span</span> },
@@ -920,6 +934,13 @@
         }
     }
 
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_property_not_known_error</span>(<span class="ident">property_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">span</span>: <span class="ident">Span</span>) -&gt; <span class="ident">DatamodelError</span> {
+        <span class="ident">DatamodelError::PropertyNotKnownError</span> {
+            <span class="ident">property_name</span>: <span class="ident">String::from</span>(<span class="ident">property_name</span>),
+            <span class="ident">span</span>,
+        }
+    }
+
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_function_not_known_error</span>(<span class="ident">function_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">span</span>: <span class="ident">Span</span>) -&gt; <span class="ident">DatamodelError</span> {
         <span class="ident">DatamodelError::FunctionNotKnownError</span> {
             <span class="ident">function_name</span>: <span class="ident">String::from</span>(<span class="ident">function_name</span>),
@@ -979,6 +1000,7 @@
             <span class="ident">DatamodelError::AttributeNotKnownError</span> { <span class="ident">span</span>, .. } =&gt; <span class="kw-2">*</span><span class="ident">span</span>,
             <span class="ident">DatamodelError::ReservedScalarTypeError</span> { <span class="ident">span</span>, .. } =&gt; <span class="kw-2">*</span><span class="ident">span</span>,
             <span class="ident">DatamodelError::FunctionNotKnownError</span> { <span class="ident">span</span>, .. } =&gt; <span class="kw-2">*</span><span class="ident">span</span>,
+            <span class="ident">DatamodelError::PropertyNotKnownError</span> { <span class="ident">span</span>, .. } =&gt; <span class="kw-2">*</span><span class="ident">span</span>,
             <span class="ident">DatamodelError::DatasourceProviderNotKnownError</span> { <span class="ident">span</span>, .. } =&gt; <span class="kw-2">*</span><span class="ident">span</span>,
             <span class="ident">DatamodelError::LiteralParseError</span> { <span class="ident">span</span>, .. } =&gt; <span class="kw-2">*</span><span class="ident">span</span>,
             <span class="ident">DatamodelError::TypeNotFoundError</span> { <span class="ident">span</span>, .. } =&gt; <span class="kw-2">*</span><span class="ident">span</span>,
