@@ -13,24 +13,17 @@ mod create {
             createOneTestModel(
               data: {
                 id: 1
-                a: { set: { a_1: "a1", a_2: null, b: { b_field: "b_field", a: [] } } }
-                c: { set: [] }
+                to_many_as: { set: { a_1: "a1", a_2: null } }
               }
             ) {
-              a {
+              to_many_as {
                 a_1
                 a_2
-                b {
-                  b_field
-                  a {
-                      a_1
-                  }
-                }
               }
             }
           }
           "#),
-          @r###"{"data":{"createOneTestModel":{"a":[{"a_1":"a1","a_2":null,"b":[{"b_field":"b_field","a":[]}]}]}}}"###
+          @r###"{"data":{"createOneTestModel":{"to_many_as":[{"a_1":"a1","a_2":null}]}}}"###
         );
 
         // Full: set + list wrapper
@@ -39,24 +32,17 @@ mod create {
             createOneTestModel(
               data: {
                 id: 2
-                a: { set: [{ a_1: "a1", a_2: null, b: { b_field: "b_field", a: [] } }] }
-                c: { set: [] }
+                to_many_as: { set: [{ a_1: "a1", a_2: null }] }
               }
             ) {
-              a {
+              to_many_as {
                 a_1
                 a_2
-                b {
-                  b_field
-                  a {
-                      a_1
-                  }
-                }
               }
             }
           }
         "#),
-          @r###"{"data":{"createOneTestModel":{"a":[{"a_1":"a1","a_2":null,"b":[{"b_field":"b_field","a":[]}]}]}}}"###
+          @r###"{"data":{"createOneTestModel":{"to_many_as":[{"a_1":"a1","a_2":null}]}}}"###
         );
 
         // Many items at once
@@ -65,43 +51,32 @@ mod create {
                   createOneTestModel(
                     data: {
                       id: 3
-                      a: {
+                      to_many_as: {
                         set: [
                           {
-                            a_1: "a1"
-                            a_2: 2
-                            b: [
-                                { b_field: "b_field", a: [] },
-                                { b_field: "b_field", a: [] }
-                            ]
+                            a_1: "1"
+                            a_2: 1
                           },
                           {
-                            a_1: "a1"
+                            a_1: "2"
                             a_2: 2
-                            b: [
-                                { b_field: "b_field", a: [] },
-                                { b_field: "b_field", a: [] }
-                            ]
+                          },
+                          {
+                            a_1: "3"
+                            a_2: 3
                           }
                         ]
                       }
-                      c: { set: [] }
                     }
                   ) {
-                    a {
+                    to_many_as {
                       a_1
                       a_2
-                      b {
-                        b_field
-                        a {
-                            a_1
-                        }
-                      }
                     }
                   }
                 }
               "#),
-          @r###"{"data":{"createOneTestModel":{"a":[{"a_1":"a1","a_2":2,"b":[{"b_field":"b_field","a":[]},{"b_field":"b_field","a":[]}]},{"a_1":"a1","a_2":2,"b":[{"b_field":"b_field","a":[]},{"b_field":"b_field","a":[]}]}]}}}"###
+          @r###"{"data":{"createOneTestModel":{"to_many_as":[{"a_1":"1","a_2":1},{"a_1":"2","a_2":2},{"a_1":"3","a_2":3}]}}}"###
         );
 
         Ok(())
@@ -116,24 +91,24 @@ mod create {
               createOneTestModel(
                 data: {
                   id: 1
-                  a: { a_1: "a1", a_2: null, b: { b_field: "b_field", a: [] } }
-                  c: []
+                  to_many_as: { a_1: "a1", a_2: null }
+                  to_one_b: { b_to_many_cs: { c_field: 15 } }
                 }
               ) {
-                a {
+                to_many_as {
                   a_1
                   a_2
-                  b {
-                    b_field
-                    a {
-                        a_1
-                    }
+                }
+                to_one_b {
+                  b_field
+                  b_to_many_cs {
+                    c_field
                   }
                 }
               }
             }
             "#),
-          @r###"{"data":{"createOneTestModel":{"a":[{"a_1":"a1","a_2":null,"b":[{"b_field":"b_field","a":[]}]}]}}}"###
+          @r###"{"data":{"createOneTestModel":{"to_many_as":[{"a_1":"a1","a_2":null}],"to_one_b":{"b_field":10,"b_to_many_cs":[{"c_field":15}]}}}}"###
         );
 
         // Shorthand with explicit list wrapper.
@@ -142,67 +117,65 @@ mod create {
               createOneTestModel(
                 data: {
                   id: 2
-                  a: [{ a_1: "a1", a_2: null, b: { b_field: "b_field", a: [] } }]
-                  c: []
+                  to_many_as: [{ a_1: "a1", a_2: null }]
+                  to_one_b: { b_to_many_cs: [{ c_field: 15 }] }
                 }
               ) {
-                a {
+                to_many_as {
                   a_1
                   a_2
-                  b {
-                    b_field
-                    a {
-                        a_1
-                    }
+                }
+                to_one_b {
+                  b_field
+                  b_to_many_cs {
+                    c_field
                   }
                 }
               }
             }
-          "#),
-          @r###"{"data":{"createOneTestModel":{"a":[{"a_1":"a1","a_2":null,"b":[{"b_field":"b_field","a":[]}]}]}}}"###
+            "#),
+          @r###"{"data":{"createOneTestModel":{"to_many_as":[{"a_1":"a1","a_2":null}],"to_one_b":{"b_field":10,"b_to_many_cs":[{"c_field":15}]}}}}"###
         );
 
         // Many items at once
         insta::assert_snapshot!(
           run_query!(runner, r#"mutation {
-                    createOneTestModel(
-                      data: {
-                        id: 3
-                        a: [
-                            {
-                              a_1: "a1"
-                              a_2: 2
-                              b: [
-                                  { b_field: "b_field", a: [] },
-                                  { b_field: "b_field", a: [] }
-                              ]
-                            },
-                            {
-                              a_1: "a1"
-                              a_2: 2
-                              b: [
-                                  { b_field: "b_field", a: [] },
-                                  { b_field: "b_field", a: [] }
-                              ]
-                            }
-                          ]
-                        c: []
+              createOneTestModel(
+                data: {
+                  id: 3
+                  to_many_as: [
+                      {
+                        a_1: "a1"
+                        a_2: 1
+                      },
+                      {
+                        a_1: "a2"
+                        a_2: 2
                       }
-                    ) {
-                      a {
-                        a_1
-                        a_2
-                        b {
-                          b_field
-                          a {
-                              a_1
-                          }
-                        }
-                      }
-                    }
+                    ]
+                  to_one_b: {
+                    b_to_many_cs: [
+                      { c_field: 1 },
+                      { c_field: 2 },
+                      { c_field: 3 },
+                      { c_field: 4 },
+                    ]
                   }
-                "#),
-          @r###"{"data":{"createOneTestModel":{"a":[{"a_1":"a1","a_2":2,"b":[{"b_field":"b_field","a":[]},{"b_field":"b_field","a":[]}]},{"a_1":"a1","a_2":2,"b":[{"b_field":"b_field","a":[]},{"b_field":"b_field","a":[]}]}]}}}"###
+                }
+              ) {
+                to_many_as {
+                  a_1
+                  a_2
+                }
+                to_one_b {
+                  b_to_many_cs {
+                    c_field
+                  }
+                }
+              }
+            }
+          "#),
+          @r###"{"data":{"createOneTestModel":{"to_many_as":[{"a_1":"a1","a_2":1},{"a_1":"a2","a_2":2}],"to_one_b":{"b_to_many_cs":[{"c_field":1},{"c_field":2},{"c_field":3},{"c_field":4}]}}}}"###
         );
 
         Ok(())
@@ -216,22 +189,21 @@ mod create {
             createOneTestModel(
               data: {
                 id: 1
-                a: { set: { a_1: "a1", a_2: null, b: [{ b_field: "b1" }] } }
-                c: [{ c_field: "c1" }]
+                to_many_as: { set: { a_1: "a1", a_2: null } }
+                to_one_b: { b_field: 5 }
               }
             ) {
-              a {
+              to_many_as {
                 a_1
                 a_2
-                b { b_field }
               }
-              c {
-                c_field
+              to_one_b {
+                b_field
               }
             }
           }
           "#),
-          @r###"{"data":{"createOneTestModel":{"a":[{"a_1":"a1","a_2":null,"b":[{"b_field":"b1"}]}],"c":[{"c_field":"c1"}]}}}"###
+          @r###"{"data":{"createOneTestModel":{"to_many_as":[{"a_1":"a1","a_2":null}],"to_one_b":{"b_field":5}}}}"###
         );
 
         Ok(())
@@ -245,22 +217,19 @@ mod create {
               createOneTestModel(
                 data: {
                   id: 1
-                  a: { set: [{
+                  to_many_as: { set: [{
                     a_2: null,
-                    b: [{}]
                   }] }
-                  c: { set: [] }
                 }
               ) {
-                a {
+                to_many_as {
                   a_1
                   a_2
-                  b { b_field }
                 }
               }
             }
             "#),
-          @r###"{"data":{"createOneTestModel":{"a":[{"a_1":"a_1 default","a_2":null,"b":[{"b_field":"b_field default"}]}]}}}"###
+          @r###"{"data":{"createOneTestModel":{"to_many_as":[{"a_1":"a_1 default","a_2":null}]}}}"###
         );
 
         // Using single-object shorthand syntax
@@ -269,22 +238,19 @@ mod create {
               createOneTestModel(
                 data: {
                   id: 2
-                  a: { set: [{
+                  to_many_as: { set: {
                     a_2: null,
-                    b: {}
-                  }] }
-                  c: { set: [] }
+                  } }
                 }
               ) {
-                a {
+                to_many_as {
                   a_1
                   a_2
-                  b { b_field }
                 }
               }
             }
             "#),
-          @r###"{"data":{"createOneTestModel":{"a":[{"a_1":"a_1 default","a_2":null,"b":[{"b_field":"b_field default"}]}]}}}"###
+          @r###"{"data":{"createOneTestModel":{"to_many_as":[{"a_1":"a_1 default","a_2":null}]}}}"###
         );
 
         Ok(())
@@ -298,22 +264,25 @@ mod create {
             createOneTestModel(
               data: {
                 id: 1
-                a: [{
+                to_many_as: [{
                   a_2: null,
-                  b: [{}]
                 }]
-                c: []
+                to_one_b: { b_to_many_cs: [{}] }
               }
             ) {
-              a {
+              to_many_as {
                 a_1
                 a_2
-                b { b_field }
+              }
+              to_one_b {
+                b_to_many_cs {
+                  c_field
+                }
               }
             }
           }
         "#),
-          @r###"{"data":{"createOneTestModel":{"a":[{"a_1":"a_1 default","a_2":null,"b":[{"b_field":"b_field default"}]}]}}}"###
+          @r###"{"data":{"createOneTestModel":{"to_many_as":[{"a_1":"a_1 default","a_2":null}],"to_one_b":{"b_to_many_cs":[{"c_field":10}]}}}}"###
         );
 
         // Using single-object shorthand syntax
@@ -322,22 +291,25 @@ mod create {
             createOneTestModel(
               data: {
                 id: 2
-                a: [{
+                to_many_as: [{
                   a_2: null,
-                  b: {}
                 }]
-                c: []
+                to_one_b: { b_to_many_cs: {} }
               }
             ) {
-              a {
+              to_many_as {
                 a_1
                 a_2
-                b { b_field }
+              }
+              to_one_b {
+                b_to_many_cs {
+                  c_field
+                }
               }
             }
           }
         "#),
-          @r###"{"data":{"createOneTestModel":{"a":[{"a_1":"a_1 default","a_2":null,"b":[{"b_field":"b_field default"}]}]}}}"###
+          @r###"{"data":{"createOneTestModel":{"to_many_as":[{"a_1":"a_1 default","a_2":null}],"to_one_b":{"b_to_many_cs":[{"c_field":10}]}}}}"###
         );
 
         Ok(())
@@ -349,12 +321,12 @@ mod create {
         insta::assert_snapshot!(
           run_query!(runner, r#"mutation {
           createOneTestModel(data: { id: 1 }) {
-            a { a_1 }
-            c { c_field }
+            to_many_as { a_1 }
+            to_one_b { b_field }
           }
         }
         "#),
-          @r###"{"data":{"createOneTestModel":{"a":[],"c":[]}}}"###
+          @r###"{"data":{"createOneTestModel":{"to_many_as":[],"to_one_b":null}}}"###
         );
 
         Ok(())
