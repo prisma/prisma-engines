@@ -17,14 +17,13 @@ mod sql_schema_differ;
 
 use connection_wrapper::{connect, Connection};
 use datamodel::ValidatedSchema;
-use enumflags2::BitFlags;
 use flavour::SqlFlavour;
 use migration_connector::{migrations_directory::MigrationDirectory, *};
 use pair::Pair;
 use quaint::prelude::ConnectionInfo;
 use sql_migration::{DropUserDefinedType, DropView, SqlMigration, SqlMigrationStep};
 use sql_schema_describer::{walkers::SqlSchemaExt, ColumnId, SqlSchema, TableId};
-use std::{env, sync::Arc};
+use std::sync::Arc;
 use user_facing_errors::KnownError;
 
 /// The top-level SQL migration connector.
@@ -137,29 +136,6 @@ impl SqlMigrationConnector {
         connection.raw_cmd(&migration).await?;
 
         Ok(())
-    }
-
-    /// For tests.
-    pub fn migration_from_schemas(from: &ValidatedSchema, to: &ValidatedSchema) -> SqlMigration {
-        let connection_info = ConnectionInfo::from_url(
-            &from.configuration.datasources[0]
-                .load_url(|key| env::var(key).ok())
-                .unwrap(),
-        )
-        .unwrap();
-
-        let flavour = flavour::from_connection_info(&connection_info, BitFlags::empty());
-        let from_sql = sql_schema_calculator::calculate_sql_schema(from, flavour.as_ref());
-        let to_sql = sql_schema_calculator::calculate_sql_schema(to, flavour.as_ref());
-
-        let steps = sql_schema_differ::calculate_steps(Pair::new(&from_sql, &to_sql), flavour.as_ref());
-
-        SqlMigration {
-            before: from_sql,
-            after: to_sql,
-            added_columns_with_virtual_defaults: Vec::new(),
-            steps,
-        }
     }
 
     /// For tests
