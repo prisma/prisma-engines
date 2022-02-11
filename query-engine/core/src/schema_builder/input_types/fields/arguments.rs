@@ -154,14 +154,10 @@ pub(crate) fn relation_selection_arguments(
 }
 
 /// Builds "many composite where" arguments for to-many composite selection sets.
-pub(crate) fn composite_selection_arguments(ctx: &mut BuilderContext, cf: &CompositeFieldRef) -> Vec<InputField> {
-    let args = vec![order_by_argument(
-        ctx,
-        &(&cf.typ).into(),
-        &OrderByOptions::new().with_aggregates(),
-    )];
+pub(crate) fn composite_selection_arguments(_ctx: &mut BuilderContext, _cf: &CompositeFieldRef) -> Vec<InputField> {
+    //vec![order_by_argument(ctx, &(&cf.typ).into(), &OrderByOptions::new())]
 
-    args
+    vec![]
 }
 
 // Builds "orderBy" argument.
