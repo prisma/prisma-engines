@@ -75,6 +75,11 @@ struct JsonRpcHost {
 #[async_trait::async_trait]
 impl migration_connector::ConnectorHost for JsonRpcHost {
     async fn print(&self, text: &str) -> migration_connector::ConnectorResult<()> {
+        // Adapter to be removed when https://github.com/prisma/prisma/issues/11761 is closed.
+        assert!(!text.is_empty());
+        assert!(text.ends_with('\n'));
+        let text = &text[..text.len() - 1];
+
         let notification = serde_json::json!({ "content": text });
 
         self.client
