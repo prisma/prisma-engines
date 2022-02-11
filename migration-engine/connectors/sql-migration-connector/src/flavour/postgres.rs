@@ -9,7 +9,10 @@ use indoc::indoc;
 use migration_connector::{migrations_directory::MigrationDirectory, ConnectorError, ConnectorResult};
 use quaint::connector::{tokio_postgres::error::ErrorPosition, PostgresUrl};
 use sql_schema_describer::SqlSchema;
-use std::collections::HashMap;
+use std::{
+    collections::HashMap,
+    sync::atomic::{AtomicU8, Ordering},
+};
 use url::Url;
 use user_facing_errors::{
     common::{DatabaseAccessDenied, DatabaseDoesNotExist},
@@ -22,6 +25,8 @@ const ADVISORY_LOCK_TIMEOUT: std::time::Duration = std::time::Duration::from_sec
 pub(crate) struct PostgresFlavour {
     url: PostgresUrl,
     preview_features: BitFlags<PreviewFeature>,
+    /// See the [Circumstances] enum.
+    circumstances: AtomicU8,
 }
 
 impl std::fmt::Debug for PostgresFlavour {
@@ -32,7 +37,17 @@ impl std::fmt::Debug for PostgresFlavour {
 
 impl PostgresFlavour {
     pub fn new(url: PostgresUrl, preview_features: BitFlags<PreviewFeature>) -> Self {
-        Self { url, preview_features }
+        Self {
+            url,
+            preview_features,
+            circumstances: Default::default(),
+        }
+    }
+
+    pub(crate) fn is_cockroachdb(&self) -> bool {
+        BitFlags::<Circumstances>::from_bits(self.circumstances.load(Ordering::Relaxed))
+            .unwrap_or_default()
+            .contains(Circumstances::IsCockroachDb)
     }
 
     pub(crate) fn schema_name(&self) -> &str {
@@ -94,6 +109,12 @@ impl PostgresFlavour {
 #[async_trait::async_trait]
 impl SqlFlavour for PostgresFlavour {
     async fn acquire_lock(&self, connection: &Connection) -> ConnectorResult<()> {
+        // They are not supporting advisory locking:
+        // https://github.com/cockroachdb/cockroach/issues/13546
+        if connection.is_cockroachdb().await? {
+            return Ok(());
+        }
+
         // https://www.postgresql.org/docs/current/explicit-locking.html#ADVISORY-LOCKS
 
         // 72707369 is a unique number we chose to identify Migrate. It does not
@@ -294,6 +315,14 @@ impl SqlFlavour for PostgresFlavour {
             )
             .await?;
 
+        let mut circumstances = BitFlags::<Circumstances>::default();
+
+        if connection.is_cockroachdb().await? {
+            circumstances |= Circumstances::IsCockroachDb;
+        }
+
+        self.circumstances.store(circumstances.bits(), Ordering::Relaxed);
+
         if let Some(true) = schema_exists_result
             .get(0)
             .and_then(|row| row.at(0).and_then(|value| value.as_bool()))
@@ -425,6 +454,13 @@ async fn create_postgres_admin_conn(mut url: Url) -> ConnectorResult<Connection>
     })??;
 
     Ok(conn)
+}
+
+#[enumflags2::bitflags]
+#[derive(Debug, Clone, Copy, PartialEq)]
+#[repr(u8)]
+pub(crate) enum Circumstances {
+    IsCockroachDb,
 }
 
 #[cfg(test)]

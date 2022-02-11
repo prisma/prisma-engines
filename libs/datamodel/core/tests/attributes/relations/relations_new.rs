@@ -799,7 +799,7 @@ fn must_error_when_non_id_field_is_referenced_in_a_many_to_many() {
     "#;
 
     let expect = expect![[r#"
-        [1;91merror[0m: [1mError validating: Many to many relations must always reference the id field of the related model. Change the argument `references` to use the id field of the related model `Post`. But it is referencing the following fields that are not the id: slug[0m
+        [1;91merror[0m: [1mError validating: Implicit many-to-many relations must always reference the id field of the related model. Change the argument `references` to use the id field of the related model `Post`. But it is referencing the following fields that are not the id: slug[0m
           [1;94m-->[0m  [4mschema.prisma:10[0m
         [1;94m   | [0m
         [1;94m 9 | [0m      id    Int    @id @default(autoincrement())

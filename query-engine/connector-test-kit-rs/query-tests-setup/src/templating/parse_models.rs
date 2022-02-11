@@ -139,7 +139,7 @@ impl FragmentArgument {
     }
 }
 
-/// M2m field definition, e.g. `#m2m(posts, Post[], String, "name")`
+/// M2m field definition, e.g. `#m2m(posts, Post[], id, String, "name")`
 #[derive(Debug, PartialEq)]
 pub struct M2mFragment {
     /// Field name of the m2m field.
@@ -147,6 +147,9 @@ pub struct M2mFragment {
 
     /// Field type of the m2m field.
     pub field_type: String,
+
+    /// Name of the referenced field
+    pub opposing_name: String,
 
     /// Type of the opposing ID.
     /// Required info for some connectors to render.
@@ -158,23 +161,26 @@ pub struct M2mFragment {
 }
 
 impl M2mFragment {
+    #[track_caller]
     fn from_args(args: Vec<FragmentArgument>) -> TemplatingResult<Self> {
-        if args.len() < 3 {
-            return Err(TemplatingError::num_args("m2m", 3, args.len()));
+        if args.len() < 4 {
+            return Err(TemplatingError::num_args("m2m", 4, args.len()));
         }
 
         let mut args = args.into_iter();
         let (field_name, field_type) = args.next_tuple().unwrap();
-        let opposing_type = args.next().unwrap();
+        let (opposing_name, opposing_type) = args.next_tuple().unwrap();
         let relation_name = args.next().map(|v| v.into_value_string().unwrap());
 
         let field_name = field_name.into_value_string()?;
         let field_type = field_type.into_value_string()?;
+        let opposing_name = opposing_name.into_value_string()?;
         let opposing_type = opposing_type.into_value_string()?;
 
         Ok(Self {
             field_name,
             field_type,
+            opposing_name,
             opposing_type,
             relation_name,
         })

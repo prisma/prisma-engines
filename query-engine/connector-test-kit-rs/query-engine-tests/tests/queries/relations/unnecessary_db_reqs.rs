@@ -35,18 +35,18 @@ mod unnecessary_db_reqs {
         let schema = indoc! {
             r#"model Top {
             #id(id, String, @id)
-            #m2m(middle, Middle[], String)
+            #m2m(middle, Middle[], id, String)
           }
 
           model Middle {
             #id(id, String, @id)
-            #m2m(top, Top[], String)
-            #m2m(bottom, Bottom[], String)
+            #m2m(top, Top[], id, String)
+            #m2m(bottom, Bottom[], id, String)
           }
 
           model Bottom {
             #id(id, String, @id)
-            #m2m(middle, Middle[], String)
+            #m2m(middle, Middle[], id, String)
           }"#
         };
 

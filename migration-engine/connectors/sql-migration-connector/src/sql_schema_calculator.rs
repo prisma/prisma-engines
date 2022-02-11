@@ -15,7 +15,7 @@ use datamodel::{
 };
 use sql_schema_describer as sql;
 
-pub(crate) fn calculate_sql_schema(datamodel: &ValidatedSchema<'_>, flavour: &dyn SqlFlavour) -> sql::SqlSchema {
+pub(crate) fn calculate_sql_schema(datamodel: &ValidatedSchema, flavour: &dyn SqlFlavour) -> sql::SqlSchema {
     let mut schema = sql::SqlSchema::empty();
 
     schema.enums = flavour.calculate_enums(datamodel);
@@ -110,7 +110,7 @@ fn push_model_tables(ctx: &mut Context<'_>) {
     }
 }
 
-fn push_inline_relations(model: ModelWalker<'_, '_>, table: &mut sql::Table, ctx: &mut Context<'_>) {
+fn push_inline_relations(model: ModelWalker<'_>, table: &mut sql::Table, ctx: &mut Context<'_>) {
     let relations = model.relations_from().filter_map(|r| r.refine().as_inline());
 
     for relation in relations {
@@ -240,18 +240,18 @@ fn push_relation_tables(ctx: &mut Context<'_>) {
     }
 }
 
-fn column_for_scalar_field(field: ScalarFieldWalker<'_, '_>, ctx: &mut Context<'_>) -> sql::Column {
+fn column_for_scalar_field(field: ScalarFieldWalker<'_>, ctx: &mut Context<'_>) -> sql::Column {
     match field.resolved_scalar_field_type() {
         ScalarFieldType::Enum(enum_id) => column_for_model_enum_scalar_field(field, enum_id, ctx),
         ScalarFieldType::CompositeType(_) => column_for_builtin_scalar_type(field, ScalarType::Json, ctx),
         ScalarFieldType::BuiltInScalar(scalar_type) => column_for_builtin_scalar_type(field, scalar_type, ctx),
-        ScalarFieldType::Unsupported => column_for_model_unsupported_scalar_field(field, ctx),
+        ScalarFieldType::Unsupported(_) => column_for_model_unsupported_scalar_field(field, ctx),
         ScalarFieldType::Alias(_) => unreachable!(),
     }
 }
 
 fn column_for_model_enum_scalar_field(
-    field: ScalarFieldWalker<'_, '_>,
+    field: ScalarFieldWalker<'_>,
     enum_id: ast::EnumId,
     ctx: &mut Context<'_>,
 ) -> sql::Column {
@@ -279,7 +279,7 @@ fn column_for_model_enum_scalar_field(
     }
 }
 
-fn column_for_model_unsupported_scalar_field(field: ScalarFieldWalker<'_, '_>, ctx: &mut Context<'_>) -> sql::Column {
+fn column_for_model_unsupported_scalar_field(field: ScalarFieldWalker<'_>, ctx: &mut Context<'_>) -> sql::Column {
     sql::Column {
         name: field.database_name().to_owned(),
         tpe: ctx.flavour.column_type_for_unsupported_type(
@@ -302,7 +302,7 @@ fn column_for_model_unsupported_scalar_field(field: ScalarFieldWalker<'_, '_>, c
 }
 
 fn column_for_builtin_scalar_type(
-    field: ScalarFieldWalker<'_, '_>,
+    field: ScalarFieldWalker<'_>,
     scalar_type: ScalarType,
     ctx: &mut Context<'_>,
 ) -> sql::Column {
@@ -402,7 +402,7 @@ fn column_arity(arity: FieldArity) -> sql::ColumnArity {
 }
 
 struct Context<'a> {
-    datamodel: &'a ValidatedSchema<'a>,
+    datamodel: &'a ValidatedSchema,
     schema: &'a mut sql::SqlSchema,
     flavour: &'a dyn SqlFlavour,
 }

@@ -41,7 +41,7 @@ impl<'a> DiagnoseMigrationHistory<'a> {
     pub async fn send(self) -> CoreResult<DiagnoseMigrationHistoryAssertions<'a>> {
         let output = self
             .api
-            .diagnose_migration_history(&DiagnoseMigrationHistoryInput {
+            .diagnose_migration_history(DiagnoseMigrationHistoryInput {
                 migrations_directory_path: self.migrations_directory.path().to_str().unwrap().to_owned(),
                 opt_in_to_shadow_database: self.opt_in_to_shadow_database,
             })

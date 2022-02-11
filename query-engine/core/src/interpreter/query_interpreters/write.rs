@@ -4,7 +4,6 @@ use crate::{
     QueryResult,
 };
 use connector::ConnectionLike;
-use prisma_value::PrismaValue;
 
 pub async fn execute(
     tx: &mut dyn ConnectionLike,
@@ -20,27 +19,19 @@ pub async fn execute(
         WriteQuery::DeleteManyRecords(q) => delete_many(tx, q, trace_id).await,
         WriteQuery::ConnectRecords(q) => connect(tx, q).await,
         WriteQuery::DisconnectRecords(q) => disconnect(tx, q, trace_id).await,
-        // TODO: Add trace id to raw
-        WriteQuery::ExecuteRaw(rq) => execute_raw(tx, rq.query, rq.parameters).await,
-        WriteQuery::QueryRaw(rq) => query_raw(tx, rq.query, rq.parameters).await,
+        WriteQuery::ExecuteRaw(q) => execute_raw(tx, q).await,
+        WriteQuery::QueryRaw(q) => query_raw(tx, q).await,
     }
 }
 
-async fn query_raw(
-    tx: &mut dyn ConnectionLike,
-    query: String,
-    parameters: Vec<PrismaValue>,
-) -> InterpretationResult<QueryResult> {
-    let res = tx.query_raw(query, parameters).await?;
+async fn query_raw(tx: &mut dyn ConnectionLike, q: RawQuery) -> InterpretationResult<QueryResult> {
+    let res = tx.query_raw(q.model.as_ref(), q.inputs, q.query_type).await?;
+
     Ok(QueryResult::Json(res))
 }
 
-async fn execute_raw(
-    tx: &mut dyn ConnectionLike,
-    query: String,
-    parameters: Vec<PrismaValue>,
-) -> InterpretationResult<QueryResult> {
-    let res = tx.execute_raw(query, parameters).await?;
+async fn execute_raw(tx: &mut dyn ConnectionLike, q: RawQuery) -> InterpretationResult<QueryResult> {
+    let res = tx.execute_raw(q.inputs).await?;
     let num = serde_json::Value::Number(serde_json::Number::from(res));
 
     Ok(QueryResult::Json(num))

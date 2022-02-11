@@ -3,8 +3,8 @@ mod mongodb_types;
 use datamodel_connector::{
     connector_error::{ConnectorError, ErrorKind},
     parser_database::{ast::Expression, walkers::*},
-    Connector, ConnectorCapability, NativeTypeConstructor, NativeTypeInstance, ReferentialAction, ReferentialIntegrity,
-    ScalarType,
+    Connector, ConnectorCapability, Diagnostics, NativeTypeConstructor, NativeTypeInstance, ReferentialAction,
+    ReferentialIntegrity, ScalarType,
 };
 use enumflags2::BitFlags;
 use mongodb_types::*;
@@ -24,11 +24,85 @@ const CAPABILITIES: &[ConnectorCapability] = &[
     ConnectorCapability::CompositeTypes,
     ConnectorCapability::FullTextIndex,
     ConnectorCapability::SortOrderInFullTextIndex,
+    ConnectorCapability::MongoDbQueryRaw,
+    ConnectorCapability::DefaultValueAuto,
+    ConnectorCapability::TwoWayEmbeddedManyToManyRelation,
 ];
 
 type Result<T> = std::result::Result<T, ConnectorError>;
 
 pub struct MongoDbDatamodelConnector;
+
+impl MongoDbDatamodelConnector {
+    fn validate_auto(field: ScalarFieldWalker<'_>, errors: &mut datamodel_connector::Diagnostics) {
+        if !field.default_value().map(|val| val.is_auto()).unwrap_or(false) {
+            return;
+        }
+
+        let mut bail = || {
+            errors.push_error(datamodel_connector::DatamodelError::ConnectorError {
+                    message: ConnectorError::from_kind(ErrorKind::FieldValidationError {
+                        field: field.name().to_owned(),
+                        message: "MongoDB `@default(auto())` fields must have `ObjectId` native type and use the `@id` attribute.".to_owned(),
+                    })
+                    .to_string(),
+                    span: field.ast_field().span,
+                });
+        };
+
+        let model = field.model();
+        let is_id = model.field_is_single_pk(field.field_id());
+
+        match field.raw_native_type() {
+            None => bail(),
+            Some((_, name, _, _)) if name != "ObjectId" => bail(),
+            _ if !is_id => bail(),
+            _ => (),
+        }
+    }
+
+    fn validate_dbgenerated(field: ScalarFieldWalker<'_>, errors: &mut datamodel_connector::Diagnostics) {
+        if !field.default_value().map(|val| val.is_dbgenerated()).unwrap_or(false) {
+            return;
+        }
+
+        errors.push_error(datamodel_connector::DatamodelError::ConnectorError {
+            message: ConnectorError::from_kind(ErrorKind::FieldValidationError {
+                field: field.name().to_owned(),
+                message: "The `dbgenerated()` function is not allowed with MongoDB. Please use `auto()` instead."
+                    .to_owned(),
+            })
+            .to_string(),
+            span: field.ast_field().span,
+        });
+    }
+
+    fn validate_array_native_type(field: ScalarFieldWalker<'_>, errors: &mut Diagnostics) {
+        let (ds_name, type_name, args, span) = match field.raw_native_type() {
+            Some(nt) => nt,
+            None => return,
+        };
+
+        if type_name != type_names::ARRAY {
+            return;
+        }
+
+        // `db.Array` expects exactly 1 argument, which is validated before this code path.
+        let arg = args.get(0).unwrap();
+
+        errors.push_error(datamodel_connector::DatamodelError::ConnectorError {
+            message: ConnectorError::from_kind(ErrorKind::FieldValidationError {
+                field: field.name().to_owned(),
+                message: format!(
+                    "Native type `{ds_name}.{}` is deprecated. Please use `{ds_name}.{arg}` instead.",
+                    type_names::ARRAY
+                ),
+            })
+            .to_string(),
+            span,
+        });
+    }
+}
 
 impl Connector for MongoDbDatamodelConnector {
     fn name(&self) -> &str {
@@ -47,24 +121,11 @@ impl Connector for MongoDbDatamodelConnector {
         referential_integrity.allowed_referential_actions(BitFlags::empty())
     }
 
-    fn validate_model(&self, model: ModelWalker<'_, '_>, errors: &mut datamodel_connector::Diagnostics) {
+    fn validate_model(&self, model: ModelWalker<'_>, errors: &mut Diagnostics) {
         for field in model.scalar_fields() {
-            if field.raw_native_type().is_none()
-                && field
-                    .default_value()
-                    .map(|val| val.is_dbgenerated())
-                    .unwrap_or_default()
-            {
-                errors.push_error(datamodel_connector::DatamodelError::ConnectorError {
-                    message: ConnectorError::from_kind(ErrorKind::FieldValidationError {
-                        field: field.name().to_owned(),
-                        message: "MongoDB `@default(dbgenerated())` fields must have a native type annotation."
-                            .to_owned(),
-                    })
-                    .to_string(),
-                    span: field.ast_field().span,
-                })
-            }
+            Self::validate_auto(field, errors);
+            Self::validate_dbgenerated(field, errors);
+            Self::validate_array_native_type(field, errors);
         }
 
         let mut push_error = |err: ConnectorError| {

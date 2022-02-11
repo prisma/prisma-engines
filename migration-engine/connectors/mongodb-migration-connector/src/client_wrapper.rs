@@ -63,6 +63,10 @@ impl Client {
             .await
             .map_err(mongo_error_to_connector_error)
     }
+
+    pub(crate) fn db_name(&self) -> &str {
+        &self.db_name
+    }
 }
 
 pub(crate) fn mongo_error_to_connector_error(mongo_error: MongoError) -> ConnectorError {

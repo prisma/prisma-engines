@@ -11,14 +11,14 @@ mod where_and_datetime {
               #id(id, String, @id, @default(cuid()))
               outerString   String
               outerDateTime DateTime @unique
-              #m2m(todos, Todo[], String)
+              #m2m(todos, Todo[], id, String)
            }
 
            model Todo{
               #id(id, String, @id, @default(cuid()))
               innerString   String
               innerDateTime DateTime @unique
-              #m2m(notes, Note[], String)
+              #m2m(notes, Note[], id, String)
            }"#
         };
 

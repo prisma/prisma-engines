@@ -9,6 +9,10 @@ pub(crate) struct MongoDbMigration {
 
 impl MongoDbMigration {
     pub(crate) fn summary(&self) -> String {
+        if self.steps.is_empty() {
+            return "No difference detected.".to_owned();
+        }
+
         let mut out = String::with_capacity(self.steps.len() * 10);
 
         for step in &self.steps {

@@ -51,6 +51,9 @@ capabilities!(
     AutoIncrement,
     RelationFieldsInArbitraryOrder,
     CompositeTypes,
+    DefaultValueAuto,
+    TwoWayEmbeddedManyToManyRelation,
+    ImplicitManyToManyRelation,
     //Start of ME/IE only capabilities
     AutoIncrementAllowedOnNonId,
     AutoIncrementMultipleAllowed,
@@ -78,7 +81,8 @@ capabilities!(
     JsonFilteringAlphanumeric,
     CompoundIds,
     AnyId, // Any (or combination of) uniques and not only id fields can constitute an id for a model.
-    QueryRaw,
+    SqlQueryRaw,
+    MongoDbQueryRaw,
     FullTextSearchWithoutIndex,
     FullTextSearchWithIndex,
     AdvancedJsonNullability, // Database distinguishes between their null type and JSON null.

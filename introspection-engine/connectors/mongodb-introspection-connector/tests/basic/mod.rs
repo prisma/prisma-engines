@@ -11,7 +11,25 @@ fn empty_collection() {
 
     let expected = expect![[r#"
         model A {
-          id String @id @default(dbgenerated()) @map("_id") @db.ObjectId
+          id String @id @default(auto()) @map("_id") @db.ObjectId
+        }
+    "#]];
+
+    expected.assert_eq(res.datamodel());
+}
+
+#[test]
+fn integer_id() {
+    let res = introspect(|db| async move {
+        let collection = db.collection("A");
+        collection.insert_one(doc! { "_id": 12345 }, None).await.unwrap();
+
+        Ok(())
+    });
+
+    let expected = expect![[r#"
+        model A {
+          id Int @id @map("_id")
         }
     "#]];
 
@@ -38,12 +56,12 @@ fn multiple_collections_with_data() {
 
     let expected = expect![[r#"
         model A {
-          id    String @id @default(dbgenerated()) @map("_id") @db.ObjectId
+          id    String @id @default(auto()) @map("_id") @db.ObjectId
           first String
         }
 
         model B {
-          id     String @id @default(dbgenerated()) @map("_id") @db.ObjectId
+          id     String @id @default(auto()) @map("_id") @db.ObjectId
           second String
         }
     "#]];

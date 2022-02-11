@@ -16,7 +16,7 @@ fn a_model_with_reserved_name() {
     let expected = expect![[r#"
         /// This model has been renamed to 'RenamedPrismaClient' during introspection, because the original name 'PrismaClient' is reserved.
         model RenamedPrismaClient {
-          id   String @id @default(dbgenerated()) @map("_id") @db.ObjectId
+          id   String @id @default(auto()) @map("_id") @db.ObjectId
           data Int
 
           @@map("PrismaClient")
@@ -40,7 +40,7 @@ fn reserved_names_case_sensitivity() {
 
     let expected = expect![[r#"
         model prismalclient {
-          id   String @id @default(dbgenerated()) @map("_id") @db.ObjectId
+          id   String @id @default(auto()) @map("_id") @db.ObjectId
           data Int
         }
     "#]];

@@ -25,7 +25,7 @@ fields.script.shape = "string"
 description = "The type of results returned by dbExecute."
 
 [enumShapes.DbExecuteDatasourceType]
-description = "The location of the live database to connect to in dbExecute."
+description = "The location of the live database to connect to."
 variants.schema.description = "Path to the Prisma schema file to take the datasource URL from."
 variants.schema.shape = "SchemaContainer"
 variants.url.description = "The URL of the database to run the command on."

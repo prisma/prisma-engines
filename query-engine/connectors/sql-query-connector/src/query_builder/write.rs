@@ -1,6 +1,6 @@
 use crate::model_extensions::*;
 use crate::sql_trace::SqlTraceComment;
-use connector_interface::{DatasourceFieldName, WriteArgs, WriteExpression};
+use connector_interface::{DatasourceFieldName, ScalarWriteOperation, WriteArgs};
 use itertools::Itertools;
 use prisma_models::*;
 use quaint::ast::*;
@@ -10,13 +10,7 @@ use tracing::Span;
 /// `INSERT` a new record to the database. Resulting an `INSERT` ast and an
 /// optional `RecordProjection` if available from the arguments or model.
 #[tracing::instrument(skip(model, args))]
-pub fn create_record(
-    model: &ModelRef,
-    mut args: WriteArgs,
-    trace_id: Option<String>,
-) -> (Insert<'static>, Option<SelectionResult>) {
-    let return_id = args.as_record_projection(model.primary_identifier().into());
-
+pub fn create_record(model: &ModelRef, mut args: WriteArgs, trace_id: Option<String>) -> Insert<'static> {
     let fields: Vec<_> = model
         .fields()
         .scalar()
@@ -36,13 +30,10 @@ pub fn create_record(
             insert.value(db_name.to_owned(), field.value(value))
         });
 
-    (
-        Insert::from(insert)
-            .returning(ModelProjection::from(model.primary_identifier()).as_columns())
-            .append_trace(&Span::current())
-            .add_trace_id(trace_id),
-        return_id,
-    )
+    Insert::from(insert)
+        .returning(ModelProjection::from(model.primary_identifier()).as_columns())
+        .append_trace(&Span::current())
+        .add_trace_id(trace_id)
 }
 
 /// `INSERT` new records into the database based on the given write arguments,
@@ -68,8 +59,8 @@ pub fn create_records_nonempty(
             for field in affected_fields.iter() {
                 let value = arg.take_field_value(field.db_name());
                 match value {
-                    Some(expr) => {
-                        let value: PrismaValue = expr
+                    Some(write_op) => {
+                        let value: PrismaValue = write_op
                             .try_into()
                             .expect("Create calls can only use PrismaValue write expressions (right now).");
 
@@ -133,10 +124,10 @@ pub fn update_many(
                 .find(|f| f.db_name() == name)
                 .expect("Expected field to be valid");
 
-            let value: Expression = match val {
-                WriteExpression::Field(_) => unimplemented!(),
-                WriteExpression::Value(rhs) => field.value(rhs).into(),
-                WriteExpression::Add(rhs) if field.is_list() => {
+            let value: Expression = match val.try_into_scalar().unwrap() {
+                ScalarWriteOperation::Field(_) => unimplemented!(),
+                ScalarWriteOperation::Set(rhs) => field.value(rhs).into(),
+                ScalarWriteOperation::Add(rhs) if field.is_list() => {
                     let e: Expression = Column::from(name.clone()).into();
                     let vals: Vec<_> = match rhs {
                         PrismaValue::List(vals) => vals.into_iter().map(|val| field.value(val)).collect(),
@@ -146,27 +137,25 @@ pub fn update_many(
                     // Postgres only
                     e.compare_raw("||", Value::array(vals)).into()
                 }
-                WriteExpression::Add(rhs) => {
+                ScalarWriteOperation::Add(rhs) => {
                     let e: Expression<'_> = Column::from(name.clone()).into();
                     e + field.value(rhs).into()
                 }
 
-                WriteExpression::Substract(rhs) => {
+                ScalarWriteOperation::Substract(rhs) => {
                     let e: Expression<'_> = Column::from(name.clone()).into();
                     e - field.value(rhs).into()
                 }
 
-                WriteExpression::Multiply(rhs) => {
+                ScalarWriteOperation::Multiply(rhs) => {
                     let e: Expression<'_> = Column::from(name.clone()).into();
                     e * field.value(rhs).into()
                 }
 
-                WriteExpression::Divide(rhs) => {
+                ScalarWriteOperation::Divide(rhs) => {
                     let e: Expression<'_> = Column::from(name.clone()).into();
                     e / field.value(rhs).into()
                 }
-
-                WriteExpression::CompositeWrite(_) => unreachable!("SQL Connectors do not support composite writes."),
             };
 
             acc.set(name, value)

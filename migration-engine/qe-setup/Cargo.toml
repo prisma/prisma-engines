@@ -5,12 +5,14 @@ edition = "2021"
 
 [dependencies]
 datamodel = { path = "../../libs/datamodel/core" }
-migration-core = { path = "../core", features = ["sql"] }
+migration-core = { path = "../core" }
 
+async-trait = "0.1.52"
+connection-string = "*"
 enumflags2 = "*"
 mongodb = "2.1.0"
+tempfile = "3.3.0"
 url = "2"
-connection-string = "*"
 
 [dependencies.quaint]
 git = "https://github.com/prisma/quaint"

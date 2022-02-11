@@ -24,6 +24,9 @@ pub struct CompositeTypeField {
 
     /// The default value of this field
     pub default_value: Option<DefaultValue>,
+
+    /// Should we comment this field out.
+    pub is_commented_out: bool,
 }
 
 impl CompositeType {
@@ -46,6 +49,13 @@ impl CompositeType {
         self.fields
             .iter()
             .filter(|f| matches!(f.r#type, CompositeTypeFieldType::CompositeType(_)))
+    }
+
+    /// Gets an iterator over all unsupported fields.
+    pub fn unsupported_fields(&self) -> impl Iterator<Item = &CompositeTypeField> {
+        self.fields
+            .iter()
+            .filter(|f| matches!(f.r#type, CompositeTypeFieldType::Unsupported(_)))
     }
 }
 
@@ -72,6 +82,14 @@ impl CompositeTypeFieldType {
     pub fn as_scalar(&self) -> Option<(&ScalarType, &Option<String>, &Option<NativeTypeInstance>)> {
         if let Self::Scalar(typ, alias, native_type) = self {
             Some((typ, alias, native_type))
+        } else {
+            None
+        }
+    }
+
+    pub fn as_native_type(&self) -> Option<(&ScalarType, &NativeTypeInstance)> {
+        if let Self::Scalar(typ, _, Some(native_type)) = self {
+            Some((typ, native_type))
         } else {
             None
         }

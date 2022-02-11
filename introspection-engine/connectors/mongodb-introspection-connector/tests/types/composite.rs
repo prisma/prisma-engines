@@ -1,6 +1,8 @@
 use crate::test_api::*;
+use crate::types::ObjectId;
 use introspection_connector::CompositeTypeDepth;
 use mongodb::bson::{doc, Bson};
+use serde_json::json;
 
 #[test]
 fn singular() {
@@ -23,7 +25,7 @@ fn singular() {
         }
 
         model Cat {
-          id      String     @id @default(dbgenerated()) @map("_id") @db.ObjectId
+          id      String     @id @default(auto()) @map("_id") @db.ObjectId
           address CatAddress
           name    String
         }
@@ -36,7 +38,7 @@ fn singular() {
 fn dirty_data() {
     let res = introspect(|db| async move {
         let docs = vec![
-            doc! { "name": "Musti", "address": { "street": "Meowstrasse", "number": 123 }},
+            doc! { "name": "Musti", "address": { "street": "Meowstrasse", "number": 123i32 }},
             doc! { "name": "Naukio", "address": { "street": "Meowstrasse", "number": "123" }},
             doc! { "name": "Bob", "address": { "street": "Kantstrasse", "number": "123" }},
         ];
@@ -54,13 +56,19 @@ fn dirty_data() {
         }
 
         model Cat {
-          id      String     @id @default(dbgenerated()) @map("_id") @db.ObjectId
+          id      String     @id @default(auto()) @map("_id") @db.ObjectId
           address CatAddress
           name    String
         }
     "#]];
 
     expected.assert_eq(res.datamodel());
+
+    res.assert_warning_affected(&json!([{
+        "compositeType": "CatAddress",
+        "field": "number",
+        "tpe": "String",
+    }]));
 }
 
 #[test]
@@ -84,7 +92,7 @@ fn array() {
         }
 
         model Blog {
-          id    String      @id @default(dbgenerated()) @map("_id") @db.ObjectId
+          id    String      @id @default(auto()) @map("_id") @db.ObjectId
           posts BlogPosts[]
           title String
         }
@@ -108,7 +116,7 @@ fn deep_array() {
 
     let expected = expect![[r#"
         model Blog {
-          id    String @id @default(dbgenerated()) @map("_id") @db.ObjectId
+          id    String @id @default(auto()) @map("_id") @db.ObjectId
           posts Json[]
           title String
         }
@@ -147,7 +155,7 @@ fn nullability() {
         }
 
         model Model {
-          id     String       @id @default(dbgenerated()) @map("_id") @db.ObjectId
+          id     String       @id @default(auto()) @map("_id") @db.ObjectId
           first  ModelFirst
           second ModelSecond?
           third  ModelThird?
@@ -176,7 +184,7 @@ fn unsupported() {
         }
 
         model FrontendEngineerWritesBackendCode {
-          id       String                                @id @default(dbgenerated()) @map("_id") @db.ObjectId
+          id       String                                @id @default(auto()) @map("_id") @db.ObjectId
           data     FrontendEngineerWritesBackendCodeData
           dataType String
         }
@@ -200,7 +208,7 @@ fn underscores_in_names() {
         }
 
         model Cat {
-          id           String         @id @default(dbgenerated()) @map("_id") @db.ObjectId
+          id           String         @id @default(auto()) @map("_id") @db.ObjectId
           home_address CatHomeAddress
           name         String
         }
@@ -219,7 +227,7 @@ fn depth_none() {
 
     let expected = expect![[r#"
         model Cat {
-          id           String @id @default(dbgenerated()) @map("_id") @db.ObjectId
+          id           String @id @default(auto()) @map("_id") @db.ObjectId
           home_address Json
           name         String
         }
@@ -238,7 +246,7 @@ fn depth_none_level_1_array() {
 
     let expected = expect![[r#"
         model Cat {
-          id           String @id @default(dbgenerated()) @map("_id") @db.ObjectId
+          id           String @id @default(auto()) @map("_id") @db.ObjectId
           home_address Json[]
           name         String
         }
@@ -262,7 +270,7 @@ fn depth_1_level_1() {
         }
 
         model Cat {
-          id           String         @id @default(dbgenerated()) @map("_id") @db.ObjectId
+          id           String         @id @default(auto()) @map("_id") @db.ObjectId
           home_address CatHomeAddress
           name         String
         }
@@ -289,7 +297,7 @@ fn depth_1_level_2() {
         }
 
         model Cat {
-          id           String         @id @default(dbgenerated()) @map("_id") @db.ObjectId
+          id           String         @id @default(auto()) @map("_id") @db.ObjectId
           home_address CatHomeAddress
           name         String
         }
@@ -316,7 +324,7 @@ fn depth_1_level_2_array() {
         }
 
         model Cat {
-          id           String           @id @default(dbgenerated()) @map("_id") @db.ObjectId
+          id           String           @id @default(auto()) @map("_id") @db.ObjectId
           home_address CatHomeAddress[]
           name         String
         }
@@ -347,7 +355,7 @@ fn depth_2_level_2_array() {
         }
 
         model Cat {
-          id           String           @id @default(dbgenerated()) @map("_id") @db.ObjectId
+          id           String           @id @default(auto()) @map("_id") @db.ObjectId
           home_address CatHomeAddress[]
           name         String
         }
@@ -375,16 +383,74 @@ fn name_clashes() {
         }
 
         model Cat {
-          id      String      @id @default(dbgenerated()) @map("_id") @db.ObjectId
+          id      String      @id @default(auto()) @map("_id") @db.ObjectId
           address CatAddress_
           name    String
         }
 
         model CatAddress {
-          id     String  @id @default(dbgenerated()) @map("_id") @db.ObjectId
+          id     String  @id @default(auto()) @map("_id") @db.ObjectId
           knock  Boolean
           number Int
           street String
+        }
+    "#]];
+
+    expected.assert_eq(res.datamodel());
+}
+
+#[test]
+fn non_id_object_ids() {
+    let res = introspect(|db| async move {
+        let docs = vec![
+            doc! { "non_id_object_id": Bson::ObjectId(ObjectId::new()), "data": {"non_id_object_id": Bson::ObjectId(ObjectId::new())}},
+        ];
+
+        db.collection("Test").insert_many(docs, None).await?;
+
+        Ok(())
+    });
+
+    let expected = expect![[r#"
+        type TestData {
+          non_id_object_id String @db.ObjectId
+        }
+
+        model Test {
+          id               String   @id @default(auto()) @map("_id") @db.ObjectId
+          data             TestData
+          non_id_object_id String   @db.ObjectId
+        }
+    "#]];
+
+    expected.assert_eq(res.datamodel());
+}
+
+#[test]
+fn fields_named_id_in_composite() {
+    let res = introspect(|db| async move {
+        let docs = vec![doc! {"id": "test","data": {"id": "test"}, "data2": {"_id": "test", "id": "test"}}];
+
+        db.collection("Test").insert_many(docs, None).await?;
+
+        Ok(())
+    });
+
+    let expected = expect![[r#"
+        type TestData {
+          id String
+        }
+
+        type TestData2 {
+          id  String @map("_id")
+          id_ String @map("id")
+        }
+
+        model Test {
+          id    String    @id @default(auto()) @map("_id") @db.ObjectId
+          data  TestData
+          data2 TestData2
+          id_   String    @map("id")
         }
     "#]];
 

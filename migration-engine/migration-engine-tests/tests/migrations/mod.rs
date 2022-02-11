@@ -11,6 +11,7 @@ mod foreign_keys;
 mod id;
 mod indexes;
 mod json;
+mod jsonrpc;
 mod mariadb;
 mod mark_migration_applied_tests;
 mod mark_migration_rolled_back_tests;

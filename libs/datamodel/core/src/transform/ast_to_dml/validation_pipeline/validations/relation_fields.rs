@@ -14,18 +14,18 @@ use std::fmt;
 
 use super::{database_name::validate_db_name, names::Names};
 
-struct Fields<'ast, 'db> {
-    fields: &'ast [ast::FieldId],
-    model: ModelWalker<'ast, 'db>,
+struct Fields<'db> {
+    fields: &'db [ast::FieldId],
+    model: ModelWalker<'db>,
 }
 
-impl<'ast, 'db> Fields<'ast, 'db> {
-    fn new(fields: &'ast [ast::FieldId], model: ModelWalker<'ast, 'db>) -> Self {
+impl<'db> Fields<'db> {
+    fn new(fields: &'db [ast::FieldId], model: ModelWalker<'db>) -> Self {
         Self { fields, model }
     }
 }
 
-impl<'ast, 'db> fmt::Display for Fields<'ast, 'db> {
+impl<'db> fmt::Display for Fields<'db> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let mut fields = self
             .fields
@@ -55,7 +55,7 @@ impl<'ast, 'db> fmt::Display for Fields<'ast, 'db> {
     }
 }
 
-pub(super) fn ambiguity(field: RelationFieldWalker<'_, '_>, names: &Names<'_>) -> Result<(), DatamodelError> {
+pub(super) fn ambiguity(field: RelationFieldWalker<'_>, names: &Names<'_>) -> Result<(), DatamodelError> {
     let model = field.model();
     let related_model = field.related_model();
 
@@ -119,7 +119,7 @@ pub(super) fn ambiguity(field: RelationFieldWalker<'_, '_>, names: &Names<'_>) -
 }
 
 /// Validates if the related model for the relation is ignored.
-pub(super) fn ignored_related_model(field: RelationFieldWalker<'_, '_>, ctx: &mut Context<'_>) {
+pub(super) fn ignored_related_model(field: RelationFieldWalker<'_>, ctx: &mut Context<'_>) {
     let related_model = field.related_model();
     let model = field.model();
 
@@ -140,7 +140,7 @@ pub(super) fn ignored_related_model(field: RelationFieldWalker<'_, '_>, ctx: &mu
 }
 
 /// Does the connector support the given referential actions.
-pub(super) fn referential_actions(field: RelationFieldWalker<'_, '_>, ctx: &mut Context<'_>) {
+pub(super) fn referential_actions(field: RelationFieldWalker<'_>, ctx: &mut Context<'_>) {
     let connector = ctx.connector;
     let referential_integrity = ctx.referential_integrity;
     let msg = |action: ReferentialAction| {
@@ -186,7 +186,7 @@ pub(super) fn referential_actions(field: RelationFieldWalker<'_, '_>, ctx: &mut 
     }
 }
 
-pub(super) fn map(field: RelationFieldWalker<'_, '_>, ctx: &mut Context<'_>) {
+pub(super) fn map(field: RelationFieldWalker<'_>, ctx: &mut Context<'_>) {
     if field.mapped_name().is_none() {
         return;
     }

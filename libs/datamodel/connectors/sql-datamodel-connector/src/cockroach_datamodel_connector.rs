@@ -81,11 +81,12 @@ const CAPABILITIES: &[ConnectorCapability] = &[
     ConnectorCapability::JsonFilteringArrayPath,
     ConnectorCapability::NamedPrimaryKeys,
     ConnectorCapability::NamedForeignKeys,
-    ConnectorCapability::QueryRaw,
+    ConnectorCapability::SqlQueryRaw,
     ConnectorCapability::RelationFieldsInArbitraryOrder,
     ConnectorCapability::ScalarLists,
     ConnectorCapability::UpdateableId,
     ConnectorCapability::WritableAutoincField,
+    ConnectorCapability::ImplicitManyToManyRelation,
 ];
 
 const SCALAR_TYPE_DEFAULTS: &[(ScalarType, CockroachType)] = &[
@@ -210,7 +211,7 @@ impl Connector for CockroachDatamodelConnector {
         }
     }
 
-    fn validate_model(&self, _model: parser_database::walkers::ModelWalker<'_, '_>, _diagnostics: &mut Diagnostics) {}
+    fn validate_model(&self, _model: parser_database::walkers::ModelWalker<'_>, _diagnostics: &mut Diagnostics) {}
 
     fn constraint_violation_scopes(&self) -> &'static [ConstraintScope] {
         CONSTRAINT_SCOPES

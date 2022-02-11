@@ -1,17 +1,12 @@
 use crate::{
     ast::{self, WithName},
-    context::{Arguments, Context},
+    context::Context,
     types::{CompositeTypeField, ModelAttributes, ScalarField},
-    DatamodelError,
+    DatamodelError, StringId,
 };
 
-pub(super) fn model<'ast>(
-    model_attributes: &mut ModelAttributes<'ast>,
-    model_id: ast::ModelId,
-    args: &mut Arguments<'ast>,
-    ctx: &mut Context<'ast>,
-) {
-    let mapped_name = match visit_map_attribute(args, ctx) {
+pub(super) fn model(model_attributes: &mut ModelAttributes, model_id: ast::ModelId, ctx: &mut Context<'_>) {
+    let mapped_name = match visit_map_attribute(ctx) {
         Some(name) => name,
         None => return,
     };
@@ -19,34 +14,33 @@ pub(super) fn model<'ast>(
     model_attributes.mapped_name = Some(mapped_name);
 
     if let Some(existing_model_id) = ctx.mapped_model_names.insert(mapped_name, model_id) {
-        let existing_model_name = ctx.db.ast[existing_model_id].name();
+        let existing_model_name = ctx.ast[existing_model_id].name();
         ctx.push_error(DatamodelError::new_duplicate_model_database_name_error(
-            mapped_name.to_owned(),
+            ctx[mapped_name].to_owned(),
             existing_model_name.to_owned(),
-            ctx.db.ast[model_id].span,
+            ctx.ast[model_id].span,
         ));
     }
 
-    if let Some(existing_model_id) = ctx.db.names.tops.get(mapped_name).and_then(|id| id.as_model_id()) {
-        let existing_model_name = ctx.db.ast[existing_model_id].name();
+    if let Some(existing_model_id) = ctx.names.tops.get(&mapped_name).and_then(|id| id.as_model_id()) {
+        let existing_model_name = ctx.ast[existing_model_id].name();
         ctx.push_error(DatamodelError::new_duplicate_model_database_name_error(
-            mapped_name.to_owned(),
+            ctx[mapped_name].to_owned(),
             existing_model_name.to_owned(),
-            args.span(),
+            ctx.current_attribute().span,
         ));
     }
 }
 
-pub(super) fn scalar_field<'ast>(
+pub(super) fn scalar_field(
     ast_model: &ast::Model,
     ast_field: &ast::Field,
     model_id: ast::ModelId,
     field_id: ast::FieldId,
-    scalar_field_data: &mut ScalarField<'ast>,
-    map_args: &mut Arguments<'ast>,
-    ctx: &mut Context<'ast>,
+    scalar_field_data: &mut ScalarField,
+    ctx: &mut Context<'_>,
 ) {
-    let mapped_name = match visit_map_attribute(map_args, ctx) {
+    let mapped_name = match visit_map_attribute(ctx) {
         Some(name) => name,
         None => return,
     };
@@ -65,14 +59,13 @@ pub(super) fn scalar_field<'ast>(
         ));
     }
 
-    if let Some(field_id) = ctx.db.names.model_fields.get(&(model_id, mapped_name)) {
+    if let Some(field_id) = ctx.names.model_fields.get(&(model_id, mapped_name)) {
         // @map only conflicts with _scalar_ fields
-        if !ctx.db.types.scalar_fields.contains_key(&(model_id, *field_id)) {
+        if !ctx.types.scalar_fields.contains_key(&(model_id, *field_id)) {
             return;
         }
 
         match ctx
-            .db
             .types
             .scalar_fields
             .get(&(model_id, *field_id))
@@ -88,36 +81,43 @@ pub(super) fn scalar_field<'ast>(
     }
 }
 
-pub(super) fn composite_type_field<'ast>(
-    ct: &'ast ast::CompositeType,
-    ast_field: &'ast ast::Field,
+pub(super) fn composite_type_field(
+    ct: &ast::CompositeType,
+    ast_field: &ast::Field,
     ctid: ast::CompositeTypeId,
     field_id: ast::FieldId,
-    field: &mut CompositeTypeField<'ast>,
-    map_args: &mut Arguments<'ast>,
-    ctx: &mut Context<'ast>,
+    field: &mut CompositeTypeField,
+    ctx: &mut Context<'_>,
 ) {
-    let mapped_name = match visit_map_attribute(map_args, ctx) {
+    let mapped_name_id = match visit_map_attribute(ctx) {
         Some(name) => name,
         None => return,
     };
 
-    field.mapped_name = Some(mapped_name);
+    field.mapped_name = Some(mapped_name_id);
 
     if ctx
         .mapped_composite_type_names
-        .insert((ctid, mapped_name), field_id)
+        .insert((ctid, mapped_name_id), field_id)
         .is_some()
     {
-        ctx.push_error(DatamodelError::new_duplicate_field_error(
+        ctx.push_error(DatamodelError::new_composite_type_duplicate_field_error(
             &ct.name.name,
-            &ast_field.name.name,
+            &ctx[mapped_name_id],
             ast_field.span,
         ));
     }
 
-    if ctx.db.names.composite_type_fields.contains_key(&(ctid, mapped_name)) {
-        ctx.push_error(DatamodelError::new_duplicate_field_error(
+    if let Some(f) = ctx.names.composite_type_fields.get(&(ctid, mapped_name_id)) {
+        let other_field = &ctx.types.composite_type_fields[&(ctid, *f)];
+
+        // We check mapped name collisions above. In this part, if the other
+        // field has a mapped name, they cannot collide.
+        if other_field.mapped_name.is_some() {
+            return;
+        }
+
+        ctx.push_error(DatamodelError::new_composite_type_duplicate_field_error(
             &ct.name.name,
             &ast_field.name.name,
             ast_field.span,
@@ -125,11 +125,11 @@ pub(super) fn composite_type_field<'ast>(
     }
 }
 
-pub(super) fn visit_map_attribute<'ast>(map_args: &mut Arguments<'ast>, ctx: &mut Context<'ast>) -> Option<&'ast str> {
-    match map_args.default_arg("name").map(|value| value.as_str()) {
-        Ok(Ok(name)) => return Some(name),
+pub(super) fn visit_map_attribute(ctx: &mut Context<'_>) -> Option<StringId> {
+    match ctx.visit_default_arg("name").map(|value| value.as_str()) {
+        Ok(Ok(name)) => return Some(ctx.interner.intern(name)),
         Err(err) => ctx.push_error(err), // not flattened for error handing legacy reasons
-        Ok(Err(err)) => ctx.push_error(map_args.new_attribute_validation_error(&err.to_string())),
+        Ok(Err(err)) => ctx.push_attribute_validation_error(&err.to_string()),
     };
 
     None

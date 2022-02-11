@@ -7,14 +7,14 @@ use crate::{
 /// Describes any unique criteria in a model. Can either be a primary
 /// key, or a unique index.
 #[derive(Copy, Clone)]
-pub struct UniqueCriteriaWalker<'ast, 'db> {
+pub struct UniqueCriteriaWalker<'db> {
     pub(crate) model_id: ast::ModelId,
     pub(crate) fields: &'db [FieldWithArgs],
-    pub(crate) db: &'db ParserDatabase<'ast>,
+    pub(crate) db: &'db ParserDatabase,
 }
 
-impl<'ast, 'db> UniqueCriteriaWalker<'ast, 'db> {
-    pub fn fields(self) -> impl ExactSizeIterator<Item = ScalarFieldWalker<'ast, 'db>> + 'db {
+impl<'db> UniqueCriteriaWalker<'db> {
+    pub fn fields(self) -> impl ExactSizeIterator<Item = ScalarFieldWalker<'db>> + 'db {
         self.fields.iter().map(move |field| ScalarFieldWalker {
             model_id: self.model_id,
             field_id: field.field_id,

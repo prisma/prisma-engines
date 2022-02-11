@@ -7,16 +7,16 @@ use crate::{
 
 /// An `@(@)id` attribute in the schema.
 #[derive(Copy, Clone)]
-pub struct PrimaryKeyWalker<'ast, 'db> {
+pub struct PrimaryKeyWalker<'db> {
     pub(crate) model_id: ast::ModelId,
-    pub(crate) attribute: &'db IdAttribute<'ast>,
-    pub(crate) db: &'db ParserDatabase<'ast>,
+    pub(crate) attribute: &'db IdAttribute,
+    pub(crate) db: &'db ParserDatabase,
 }
 
-impl<'ast, 'db> PrimaryKeyWalker<'ast, 'db> {
+impl<'ast, 'db> PrimaryKeyWalker<'db> {
     /// The `@(@)id` AST node.
-    pub fn ast_attribute(self) -> &'ast ast::Attribute {
-        self.attribute.source_attribute
+    pub fn ast_attribute(self) -> &'db ast::Attribute {
+        &self.db.ast[self.attribute.source_attribute]
     }
 
     /// The mapped name of the id.
@@ -25,8 +25,8 @@ impl<'ast, 'db> PrimaryKeyWalker<'ast, 'db> {
     /// @@id([a, b], map: "theName")
     ///                   ^^^^^^^^^
     /// ```
-    pub fn mapped_name(self) -> Option<&'ast str> {
-        self.attribute.mapped_name
+    pub fn mapped_name(self) -> Option<&'db str> {
+        self.attribute.mapped_name.map(|id| &self.db[id])
     }
 
     /// Is this an `@id` on a specific field, rather than on the model?
@@ -35,7 +35,7 @@ impl<'ast, 'db> PrimaryKeyWalker<'ast, 'db> {
     }
 
     /// The model the id is deined on.
-    pub fn model(self) -> ModelWalker<'ast, 'db> {
+    pub fn model(self) -> ModelWalker<'db> {
         ModelWalker {
             db: self.db,
             model_attributes: &self.db.types.model_attributes[&self.model_id],
@@ -49,12 +49,12 @@ impl<'ast, 'db> PrimaryKeyWalker<'ast, 'db> {
     /// @@id([a, b], name: "theName")
     ///                    ^^^^^^^^^
     /// ```
-    pub fn name(self) -> Option<&'ast str> {
-        self.attribute.name
+    pub fn name(self) -> Option<&'db str> {
+        self.attribute.name.map(|id| &self.db[id])
     }
 
     /// The scalar fields constrained by the id.
-    pub fn fields(self) -> impl ExactSizeIterator<Item = ScalarFieldWalker<'ast, 'db>> + 'db {
+    pub fn fields(self) -> impl ExactSizeIterator<Item = ScalarFieldWalker<'db>> + 'db {
         self.attribute.fields.iter().map(move |field| ScalarFieldWalker {
             model_id: self.model_id,
             field_id: field.field_id,
@@ -64,7 +64,7 @@ impl<'ast, 'db> PrimaryKeyWalker<'ast, 'db> {
     }
 
     /// The scalar fields covered by the id, and their arguments.
-    pub fn scalar_field_attributes(self) -> impl ExactSizeIterator<Item = ScalarFieldAttributeWalker<'ast, 'db>> + 'db {
+    pub fn scalar_field_attributes(self) -> impl ExactSizeIterator<Item = ScalarFieldAttributeWalker<'db>> + 'db {
         self.attribute
             .fields
             .iter()
@@ -84,7 +84,7 @@ impl<'ast, 'db> PrimaryKeyWalker<'ast, 'db> {
     }
 
     /// Do the constrained fields match exactly these?
-    pub fn contains_exactly_fields(self, fields: impl ExactSizeIterator<Item = ScalarFieldWalker<'ast, 'db>>) -> bool {
+    pub fn contains_exactly_fields(self, fields: impl ExactSizeIterator<Item = ScalarFieldWalker<'db>>) -> bool {
         self.attribute.fields.len() == fields.len() && self.fields().zip(fields).all(|(a, b)| a == b)
     }
 }

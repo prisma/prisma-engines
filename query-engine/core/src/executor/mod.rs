@@ -5,15 +5,15 @@
 //!
 //! What the executor module DOES NOT DO:
 //! - Define low level execution of queries. This is considered an implementation detail of the modules used by the executors.
-mod interactive_tx;
+mod execute_operation;
 mod interpreting_executor;
 mod loader;
 mod pipeline;
 
-pub use interactive_tx::*;
+pub use execute_operation::*;
 pub use loader::*;
 
-use crate::{query_document::Operation, response_ir::ResponseData, schema::QuerySchemaRef};
+use crate::{query_document::Operation, response_ir::ResponseData, schema::QuerySchemaRef, TxId};
 use async_trait::async_trait;
 use connector::Connector;
 
@@ -55,7 +55,12 @@ pub trait TransactionManager {
     /// Expected to throw an error if no transaction could be opened for `max_acquisition_millis` milliseconds.
     /// The new transaction must only live for `valid_for_millis` milliseconds before it automatically rolls back.
     /// This rollback mechanism is an implementation detail of the trait implementer.
-    async fn start_tx(&self, max_acquisition_millis: u64, valid_for_millis: u64) -> crate::Result<TxId>;
+    async fn start_tx(
+        &self,
+        query_schema: QuerySchemaRef,
+        max_acquisition_millis: u64,
+        valid_for_millis: u64,
+    ) -> crate::Result<TxId>;
 
     /// Commits a transaction.
     async fn commit_tx(&self, tx_id: TxId) -> crate::Result<()>;

@@ -12,14 +12,14 @@ mod rel_filter_ordering {
               title String
               score Int
 
-              #m2m(labels, Label[], Int)
+              #m2m(labels, Label[], id, Int)
             }
 
             model Label {
               #id(id, Int, @id)
               text String @unique
 
-              #m2m(blogs, Blog[], Int)
+              #m2m(blogs, Blog[], id, Int)
             }"#
         };
 

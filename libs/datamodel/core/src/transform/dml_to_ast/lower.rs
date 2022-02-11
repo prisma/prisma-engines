@@ -96,29 +96,37 @@ impl<'a> LowerDmlToAst<'a> {
         let mut fields: Vec<ast::Field> = Vec::new();
 
         for field in r#type.fields.iter() {
+            let mut attributes = field
+                .database_name
+                .as_ref()
+                .map(|db_name| {
+                    vec![ast::Attribute::new(
+                        "map",
+                        vec![ast::Argument::new_unnamed(ast::Expression::StringValue(
+                            String::from(db_name),
+                            ast::Span::empty(),
+                        ))],
+                    )]
+                })
+                .unwrap_or_else(Vec::new);
+
+            let native_type = field.r#type.as_native_type();
+
+            if let (Some((scalar_type, native_type)), Some(datasource)) = (native_type, self.datasource) {
+                self.lower_native_type_attribute(scalar_type, native_type, &mut attributes, datasource);
+            }
+
             fields.push(ast::Field {
                 field_type: self.lower_composite_field_type(&field.r#type),
                 name: ast::Identifier::new(&field.name),
                 arity: self.lower_field_arity(&field.arity),
-                attributes: field
-                    .database_name
-                    .as_ref()
-                    .map(|db_name| {
-                        vec![ast::Attribute::new(
-                            "map",
-                            vec![ast::Argument::new_unnamed(ast::Expression::StringValue(
-                                String::from(db_name),
-                                ast::Span::empty(),
-                            ))],
-                        )]
-                    })
-                    .unwrap_or_else(Vec::new),
+                attributes,
                 documentation: field
                     .documentation
                     .as_ref()
                     .map(|text| ast::Comment { text: text.to_owned() }),
                 span: ast::Span::empty(),
-                is_commented_out: false,
+                is_commented_out: field.is_commented_out,
             });
         }
 

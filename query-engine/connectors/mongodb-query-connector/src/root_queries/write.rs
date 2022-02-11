@@ -3,6 +3,7 @@ use crate::{
     filter::{convert_filter, MongoFilter},
     output_meta,
     query_builder::MongoReadQueryBuilder,
+    root_queries::raw::{MongoCommand, MongoOperation},
     IntoBson,
 };
 use connector_interface::*;
@@ -13,7 +14,8 @@ use mongodb::{
     ClientSession, Collection, Database,
 };
 use prisma_models::{ModelRef, PrismaValue, SelectionResult};
-use std::convert::TryInto;
+use std::{collections::HashMap, convert::TryInto};
+use update_utils::{IntoUpdateDocumentExtension, IntoUpdateOperationExtension};
 
 /// Create a single record to the database resulting in a
 /// `RecordProjection` as an identifier pointing to the just-created document.
@@ -112,7 +114,7 @@ pub async fn update_records<'conn>(
     session: &mut ClientSession,
     model: &ModelRef,
     record_filter: RecordFilter,
-    args: WriteArgs,
+    mut args: WriteArgs,
 ) -> crate::Result<Vec<SelectionResult>> {
     let coll = database.collection::<Document>(model.db_name());
 
@@ -139,86 +141,23 @@ pub async fn update_records<'conn>(
     }
 
     let filter = doc! { id_field.db_name(): { "$in": ids.clone() } };
-    let fields = model.fields().scalar();
+    let fields: Vec<_> = model
+        .fields()
+        .all
+        .iter()
+        .filter_map(|field| {
+            args.take_field_value(field.db_name())
+                .map(|write_op| (field.clone(), write_op))
+        })
+        .collect();
+
     let mut update_docs: Vec<Document> = vec![];
 
-    for (field_name, write_expr) in args.args {
-        let DatasourceFieldName(name) = field_name;
+    for (field, write_op) in fields {
+        let field_path = FieldPath::new_from_segment(&field);
+        let update_ops = write_op.into_update_ops(&field, field_path)?.into_update_docs()?;
 
-        // Todo: This is inefficient.
-        let field = fields.iter().find(|f| f.db_name() == name).unwrap();
-        let field_name = field.db_name();
-        let dollar_field_name = format!("${}", field.db_name());
-
-        let doc = match write_expr {
-            WriteExpression::Add(rhs) if field.is_list() => match rhs {
-                PrismaValue::List(vals) => {
-                    let vals = vals
-                        .into_iter()
-                        .map(|val| (field, val).into_bson())
-                        .collect::<crate::Result<Vec<_>>>()?
-                        .into_iter()
-                        .map(|bson| {
-                            // Strip the list from the BSON values. [Todo] This is unfortunately necessary right now due to how the
-                            // conversion is set up with native types, we should clean that up at some point (move from traits to fns?).
-                            if let Bson::Array(mut inner) = bson {
-                                inner.pop().unwrap()
-                            } else {
-                                bson
-                            }
-                        })
-                        .collect();
-
-                    let bson_array = Bson::Array(vals);
-
-                    doc! {
-                        "$set": { field_name: {
-                            "$ifNull": [
-                                { "$concatArrays": [dollar_field_name, bson_array.clone()] },
-                                bson_array
-                            ]
-                        } }
-                    }
-                }
-                val => {
-                    let bson_val = match (field, val).into_bson()? {
-                        bson @ Bson::Array(_) => bson,
-                        bson => Bson::Array(vec![bson]),
-                    };
-
-                    doc! {
-                        "$set": {
-                            field_name: {
-                                "$ifNull": [
-                                    { "$concatArrays": [dollar_field_name, bson_val.clone()] },
-                                    bson_val
-                                ]
-                            }
-                        }
-                    }
-                }
-            },
-            WriteExpression::CompositeWrite(_) => unimplemented!(),
-            // We use $literal to enable the set of empty object, which is otherwise considered a syntax error
-            WriteExpression::Value(rhs) => doc! {
-                "$set": { field_name: { "$literal": (field, rhs).into_bson()? } }
-            },
-            WriteExpression::Add(rhs) => doc! {
-                "$set": { field_name: { "$add": [dollar_field_name, (field, rhs).into_bson()?] } }
-            },
-            WriteExpression::Substract(rhs) => doc! {
-                "$set": { field_name: { "$subtract": [dollar_field_name, (field, rhs).into_bson()?] } }
-            },
-            WriteExpression::Multiply(rhs) => doc! {
-                "$set": { field_name: { "$multiply": [dollar_field_name, (field, rhs).into_bson()?] } }
-            },
-            WriteExpression::Divide(rhs) => doc! {
-                "$set": { field_name: { "$divide": [dollar_field_name, (field, rhs).into_bson()?] } }
-            },
-            WriteExpression::Field(_) => unimplemented!(),
-        };
-
-        update_docs.push(doc);
+        update_docs.extend(update_ops);
     }
 
     if !update_docs.is_empty() {
@@ -389,4 +328,60 @@ pub async fn m2m_disconnect<'conn>(
         .await?;
 
     Ok(())
+}
+
+/// Execute raw is not implemented on MongoDB
+pub async fn execute_raw<'conn>(
+    _database: &Database,
+    _session: &mut ClientSession,
+    _inputs: HashMap<String, PrismaValue>,
+) -> crate::Result<usize> {
+    unimplemented!()
+}
+
+/// Execute a plain MongoDB query, returning the answer as a JSON `Value`.
+#[tracing::instrument(skip(database, session, model, inputs, query_type))]
+pub async fn query_raw<'conn>(
+    database: &Database,
+    session: &mut ClientSession,
+    model: Option<&ModelRef>,
+    inputs: HashMap<String, PrismaValue>,
+    query_type: Option<String>,
+) -> crate::Result<serde_json::Value> {
+    let mongo_command = MongoCommand::from_raw_query(model, inputs, query_type)?;
+
+    let json_result = match mongo_command {
+        MongoCommand::Raw { cmd } => {
+            let mut result = database.run_command_with_session(cmd, None, session).await?;
+
+            // Removes unnecessary properties from raw response
+            // See https://docs.mongodb.com/v5.0/reference/method/db.runCommand
+            result.remove("operationTime");
+            result.remove("$clusterTime");
+            result.remove("opTime");
+            result.remove("electionId");
+
+            let json_result: serde_json::Value = Bson::Document(result).into();
+
+            json_result
+        }
+        MongoCommand::Handled { collection, operation } => {
+            let coll = database.collection::<Document>(collection.as_str());
+
+            match operation {
+                MongoOperation::Find(filter, options) => {
+                    let cursor = coll.find_with_session(filter, options, session).await?;
+
+                    raw::cursor_to_json(cursor, session).await?
+                }
+                MongoOperation::Aggregate(pipeline, options) => {
+                    let cursor = coll.aggregate_with_session(pipeline, options, session).await?;
+
+                    raw::cursor_to_json(cursor, session).await?
+                }
+            }
+        }
+    };
+
+    Ok(json_result)
 }

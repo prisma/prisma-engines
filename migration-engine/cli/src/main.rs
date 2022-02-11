@@ -3,10 +3,9 @@
 mod commands;
 mod logger;
 
-use std::sync::Arc;
-
-use crate::logger::log_error_and_exit;
+use migration_connector::ConnectorError;
 use migration_core::rpc_api;
+use std::sync::Arc;
 use structopt::StructOpt;
 
 /// When no subcommand is specified, the migration engine will default to starting as a JSON-RPC
@@ -36,13 +35,7 @@ async fn main() {
     let input = MigrationEngineCli::from_args();
 
     match input.cli_subcommand {
-        None => {
-            if let Some(datamodel_location) = input.datamodel.as_ref() {
-                start_engine(datamodel_location).await
-            } else {
-                panic!("Missing --datamodel");
-            }
-        }
+        None => start_engine(input.datamodel.as_deref()).await,
         Some(SubCommand::Cli(cli_command)) => {
             tracing::info!(git_hash = env!("GIT_HASH"), "Starting migration engine CLI");
             cli_command.run().await;
@@ -75,30 +68,43 @@ fn set_panic_hook() {
     }));
 }
 
-struct JsonRpcHost;
+struct JsonRpcHost {
+    client: json_rpc_stdio::Client,
+}
 
 #[async_trait::async_trait]
 impl migration_connector::ConnectorHost for JsonRpcHost {
     async fn print(&self, text: &str) -> migration_connector::ConnectorResult<()> {
-        tracing::info!(migrate_action = "log", "{}", text);
-        Ok(())
+        // Adapter to be removed when https://github.com/prisma/prisma/issues/11761 is closed.
+        assert!(!text.is_empty());
+        assert!(text.ends_with('\n'));
+        let text = &text[..text.len() - 1];
+
+        let notification = serde_json::json!({ "content": text });
+
+        self.client
+            .notify("print".to_owned(), notification)
+            .await
+            .map_err(|err| ConnectorError::from_source(err, "JSON-RPC error"))
     }
 }
 
-async fn start_engine(datamodel_location: &str) {
+async fn start_engine(datamodel_location: Option<&str>) {
     use std::io::Read as _;
 
     tracing::info!(git_hash = env!("GIT_HASH"), "Starting migration engine RPC server",);
-    let mut file = std::fs::File::open(datamodel_location).expect("error opening datamodel file");
 
-    let mut datamodel = String::new();
-    file.read_to_string(&mut datamodel).unwrap();
+    let datamodel = datamodel_location.map(|location| {
+        let mut file = std::fs::File::open(location).expect("error opening datamodel file");
+        let mut datamodel = String::new();
+        file.read_to_string(&mut datamodel).unwrap();
+        datamodel
+    });
 
-    match rpc_api(&datamodel, Arc::new(JsonRpcHost)).await {
-        // Block the thread and handle IO in async until EOF.
-        Ok(api) => json_rpc_stdio::run(&api).await.unwrap(),
-        Err(err) => {
-            log_error_and_exit(err);
-        }
-    }
+    let (client, adapter) = json_rpc_stdio::new_client();
+    let host = JsonRpcHost { client };
+
+    let api = rpc_api(datamodel, Arc::new(host));
+    // Block the thread and handle IO in async until EOF.
+    json_rpc_stdio::run_with_client(&api, adapter).await.unwrap();
 }

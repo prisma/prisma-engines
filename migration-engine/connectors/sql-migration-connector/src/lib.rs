@@ -141,14 +141,14 @@ impl SqlMigrationConnector {
             return Ok(());
         }
 
-        let migration = self.render_script(&Migration::new(migration), &DestructiveChangeDiagnostics::default());
+        let migration = self.render_script(&Migration::new(migration), &DestructiveChangeDiagnostics::default())?;
         connection.raw_cmd(&migration).await?;
 
         Ok(())
     }
 
     /// For tests.
-    pub fn migration_from_schemas(from: &ValidatedSchema<'_>, to: &ValidatedSchema<'_>) -> SqlMigration {
+    pub fn migration_from_schemas(from: &ValidatedSchema, to: &ValidatedSchema) -> SqlMigration {
         let connection_info = ConnectionInfo::from_url(
             &from.configuration.datasources[0]
                 .load_url(|key| env::var(key).ok())
@@ -204,11 +204,8 @@ impl SqlMigrationConnector {
     async fn sql_schema_from_diff_target(&self, target: &DiffTarget<'_>) -> ConnectorResult<SqlSchema> {
         match target {
             DiffTarget::Datamodel(schema) => {
-                let ast = datamodel::parse_schema_ast(schema).map_err(|err| {
-                    ConnectorError::new_schema_parser_error(err.to_pretty_string("schema.prisma", schema))
-                })?;
                 let schema =
-                    datamodel::parse_schema_parserdb(schema, &ast).map_err(ConnectorError::new_schema_parser_error)?;
+                    datamodel::parse_schema_parserdb(schema).map_err(ConnectorError::new_schema_parser_error)?;
                 Ok(sql_schema_calculator::calculate_sql_schema(
                     &schema,
                     self.flavour.as_ref(),
@@ -269,11 +266,11 @@ impl MigrationConnector for SqlMigrationConnector {
         self.flavour.create_database(&self.connection_string).await
     }
 
-    async fn db_execute(&self, url: &str, script: &str) -> ConnectorResult<()> {
+    async fn db_execute(&self, url: String, script: String) -> ConnectorResult<()> {
         if url == self.connection_string {
-            self.conn().await?.raw_cmd(script).await?;
+            self.conn().await?.raw_cmd(&script).await?;
         } else {
-            connect(url).await?.raw_cmd(script).await?;
+            connect(&url).await?.raw_cmd(&script).await?;
         };
         Ok(())
     }
@@ -287,10 +284,7 @@ impl MigrationConnector for SqlMigrationConnector {
 
         let added_columns_with_virtual_defaults: Vec<(TableId, ColumnId)> =
             if let Some(next_datamodel) = to.as_datamodel() {
-                let ast = datamodel::parse_schema_ast(next_datamodel).map_err(|err| {
-                    ConnectorError::new_schema_parser_error(err.to_pretty_string("schema.prisma", next_datamodel))
-                })?;
-                let schema = datamodel::parse_schema_parserdb(next_datamodel, &ast)
+                let schema = datamodel::parse_schema_parserdb(next_datamodel)
                     .map_err(ConnectorError::new_schema_parser_error)?;
                 walk_added_columns(&steps)
                     .map(|(table_index, column_index)| {
@@ -356,7 +350,7 @@ impl MigrationConnector for SqlMigrationConnector {
     /// the specific database version being used.
     fn check_database_version_compatibility(
         &self,
-        datamodel: &ValidatedSchema<'_>,
+        datamodel: &ValidatedSchema,
     ) -> Option<user_facing_errors::common::DatabaseVersionIncompatibility> {
         self.flavour.check_database_version_compatibility(datamodel)
     }

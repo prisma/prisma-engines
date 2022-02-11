@@ -4,7 +4,7 @@ use user_facing_errors::migration_engine::{CannotRollBackSucceededMigration, Can
 
 /// Mark a migration as rolled back.
 pub(crate) async fn mark_migration_rolled_back(
-    input: &MarkMigrationRolledBackInput,
+    input: MarkMigrationRolledBackInput,
     connector: &dyn MigrationConnector,
 ) -> CoreResult<MarkMigrationRolledBackOutput> {
     let persistence = connector.migration_persistence();

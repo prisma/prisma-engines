@@ -28,8 +28,8 @@ mod self_relation_filters {
                 stepdaughters Human[] @relation(name: "Cuckoo")
                 bandmembers   Human[] @relation(name: "Team")
 
-                #m2m(fans, Human[], String, Admirers)
-                #m2m(rockstars, Human[], String, Admirers)
+                #m2m(fans, Human[], id, String, Admirers)
+                #m2m(rockstars, Human[], id, String, Admirers)
             }
 
             model Song{

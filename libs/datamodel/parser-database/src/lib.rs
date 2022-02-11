@@ -30,6 +30,7 @@ pub mod walkers;
 mod attributes;
 mod context;
 mod indexes;
+mod interner;
 mod names;
 mod relations;
 mod types;
@@ -41,7 +42,7 @@ pub use schema_ast::ast;
 pub use types::{IndexAlgorithm, IndexType, ScalarFieldType, ScalarType, SortOrder};
 pub use value_validator::{ValueListValidator, ValueValidator};
 
-use self::{context::Context, relations::Relations, types::Types};
+use self::{context::Context, interner::StringId, relations::Relations, types::Types};
 use diagnostics::{DatamodelError, Diagnostics};
 use names::Names;
 
@@ -72,39 +73,49 @@ use names::Names;
 /// to the AST contained in ParserDatabase, that we call by convention `'ast`.
 /// Apart from that, everything should be owned or locally borrowed, to keep
 /// lifetime management simple.
-pub struct ParserDatabase<'ast> {
-    ast: &'ast ast::SchemaAst,
-    names: Names<'ast>,
-    types: Types<'ast>,
-    relations: Relations<'ast>,
+pub struct ParserDatabase {
+    ast: ast::SchemaAst,
+    interner: interner::StringInterner,
+    _names: Names,
+    types: Types,
+    relations: Relations,
 }
 
-impl<'ast> ParserDatabase<'ast> {
+impl ParserDatabase {
     /// See the docs on [ParserDatabase](/struct.ParserDatabase.html).
-    pub fn new(ast: &'ast ast::SchemaAst, diagnostics: Diagnostics) -> (Self, Diagnostics) {
-        let db = ParserDatabase {
-            ast,
-            names: Names::default(),
-            types: Types::default(),
-            relations: Relations::default(),
-        };
-
-        let mut ctx = Context::new(db, diagnostics);
+    pub fn new(ast: ast::SchemaAst, diagnostics: &mut Diagnostics) -> Self {
+        let mut interner = Default::default();
+        let mut names = Default::default();
+        let mut types = Default::default();
+        let mut relations = Default::default();
+        let mut ctx = Context::new(&ast, &mut interner, &mut names, &mut types, &mut relations, diagnostics);
 
         // First pass: resolve names.
         names::resolve_names(&mut ctx);
 
         // Return early on name resolution errors.
-        if ctx.has_errors() {
-            return ctx.finish();
+        if ctx.diagnostics.has_errors() {
+            return ParserDatabase {
+                ast,
+                interner,
+                _names: names,
+                types,
+                relations,
+            };
         }
 
         // Second pass: resolve top-level items and field types.
         types::resolve_types(&mut ctx);
 
         // Return early on type resolution errors.
-        if ctx.has_errors() {
-            return ctx.finish();
+        if ctx.diagnostics.has_errors() {
+            return ParserDatabase {
+                ast,
+                interner,
+                _names: names,
+                types,
+                relations,
+            };
         }
 
         // Third pass: validate model and field attributes. All these
@@ -118,7 +129,13 @@ impl<'ast> ParserDatabase<'ast> {
         // Fifth step: infer implicit indices
         indexes::infer_implicit_indexes(&mut ctx);
 
-        ctx.finish()
+        ParserDatabase {
+            ast,
+            interner,
+            _names: names,
+            types,
+            relations,
+        }
     }
 
     /// The fully resolved (non alias) scalar field type of an alias. .
@@ -127,18 +144,21 @@ impl<'ast> ParserDatabase<'ast> {
     }
 
     /// The parsed AST.
-    pub fn ast(&self) -> &'ast ast::SchemaAst {
-        self.ast
-    }
-
-    /// Find a specific field in a specific model.
-    fn find_model_field(&self, model_id: ast::ModelId, field_name: &str) -> Option<ast::FieldId> {
-        self.names.model_fields.get(&(model_id, field_name)).cloned()
+    pub fn ast(&self) -> &ast::SchemaAst {
+        &self.ast
     }
 }
 
-impl std::fmt::Debug for ParserDatabase<'_> {
+impl std::fmt::Debug for ParserDatabase {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.write_str("ParserDatabase { ... }")
+    }
+}
+
+impl std::ops::Index<StringId> for ParserDatabase {
+    type Output = str;
+
+    fn index(&self, index: StringId) -> &Self::Output {
+        self.interner.get(index).unwrap()
     }
 }

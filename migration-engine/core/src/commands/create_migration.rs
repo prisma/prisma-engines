@@ -5,7 +5,7 @@ use user_facing_errors::migration_engine::MigrationNameTooLong;
 
 /// Create a new migration.
 pub async fn create_migration(
-    input: &CreateMigrationInput,
+    input: CreateMigrationInput,
     connector: &dyn MigrationConnector,
 ) -> CoreResult<CreateMigrationOutput> {
     let applier = connector.database_migration_step_applier();
@@ -39,7 +39,7 @@ pub async fn create_migration(
 
     let destructive_change_diagnostics = checker.pure_check(&migration);
 
-    let migration_script = applier.render_script(&migration, &destructive_change_diagnostics);
+    let migration_script = applier.render_script(&migration, &destructive_change_diagnostics)?;
 
     // Write the migration script to a file.
     let directory = create_migration_directory(Path::new(&input.migrations_directory_path), &input.migration_name)

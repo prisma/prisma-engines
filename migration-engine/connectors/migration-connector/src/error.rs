@@ -86,6 +86,16 @@ impl ConnectorError {
     }
 
     /// Build a generic unknown error from a source error, with some additional context.
+    pub fn from_source_with_context<E: StdError + Send + Sync + 'static>(source: E, context: Box<str>) -> Self {
+        ConnectorError(Box::new(ConnectorErrorImpl {
+            user_facing_error: None,
+            message: Some(context),
+            source: Some(Arc::new(source)),
+            context: SpanTrace::capture(),
+        }))
+    }
+
+    /// Build a generic unknown error from a source error, with some additional context.
     pub fn from_source<E: StdError + Send + Sync + 'static>(source: E, context: &'static str) -> Self {
         ConnectorError(Box::new(ConnectorErrorImpl {
             user_facing_error: None,

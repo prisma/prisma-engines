@@ -655,7 +655,7 @@ fn default_on_composite_type_field_errors() {
 }
 
 #[test]
-fn must_error_on_dbgenerated_default_on_non_native_type_on_mongodb() {
+fn must_error_on_auto_default_on_non_native_type_on_mongodb() {
     let schema = r#"
         datasource db {
             provider = "mongodb"
@@ -669,18 +669,296 @@ fn must_error_on_dbgenerated_default_on_non_native_type_on_mongodb() {
 
         model User {
             id Int @id @map("_id")
-            nickname String @default(dbgenerated())
+            nickname String @default(auto())
         }
     "#;
 
     let error = datamodel::parse_schema(schema).map(drop).unwrap_err();
 
     let expected = expect![[r#"
-        [1;91merror[0m: [1mError validating field 'nickname': MongoDB `@default(dbgenerated())` fields must have a native type annotation.[0m
+        [1;91merror[0m: [1mError validating field 'nickname': MongoDB `@default(auto())` fields must have `ObjectId` native type and use the `@id` attribute.[0m
           [1;94m-->[0m  [4mschema.prisma:14[0m
         [1;94m   | [0m
         [1;94m13 | [0m            id Int @id @map("_id")
-        [1;94m14 | [0m            [1;91mnickname String @default(dbgenerated())[0m
+        [1;94m14 | [0m            [1;91mnickname String @default(auto())[0m
+        [1;94m15 | [0m        }
+        [1;94m   | [0m
+    "#]];
+
+    expected.assert_eq(&error)
+}
+
+#[test]
+fn must_error_on_auto_default_on_non_object_id_on_mongodb() {
+    let schema = r#"
+        datasource db {
+            provider = "mongodb"
+            url = "mongodb://"
+        }
+
+        generator client {
+            provider = "prisma-client-js"
+            previewFeatures = ["mongoDb"]
+        }
+
+        model User {
+            id Int @id @map("_id") @default(auto()) @db.Int
+            nickname String
+        }
+    "#;
+
+    let error = datamodel::parse_schema(schema).map(drop).unwrap_err();
+
+    let expected = expect![[r#"
+        [1;91merror[0m: [1mError validating field 'id': MongoDB `@default(auto())` fields must have `ObjectId` native type and use the `@id` attribute.[0m
+          [1;94m-->[0m  [4mschema.prisma:13[0m
+        [1;94m   | [0m
+        [1;94m12 | [0m        model User {
+        [1;94m13 | [0m            [1;91mid Int @id @map("_id") @default(auto()) @db.Int[0m
+        [1;94m14 | [0m            nickname String
+        [1;94m   | [0m
+    "#]];
+
+    expected.assert_eq(&error)
+}
+
+#[test]
+fn must_error_on_auto_default_on_mongodb_composite() {
+    let schema = r#"
+        datasource db {
+            provider = "mongodb"
+            url = "mongodb://"
+        }
+
+        generator client {
+            provider = "prisma-client-js"
+            previewFeatures = ["mongoDb"]
+        }
+
+        model User {
+            id   String @id @map("_id") @default(auto()) @db.ObjectId
+            meow Meow
+        }
+
+        type Meow {
+            id String @default(auto()) @db.ObjectId
+        }
+    "#;
+
+    let error = datamodel::parse_schema(schema).map(drop).unwrap_err();
+
+    let expected = expect![[r#"
+        [1;91merror[0m: [1mError parsing attribute "@default": The function `auto()` is not supported on composite fields.[0m
+          [1;94m-->[0m  [4mschema.prisma:18[0m
+        [1;94m   | [0m
+        [1;94m17 | [0m        type Meow {
+        [1;94m18 | [0m            id String @[1;91mdefault(auto())[0m @db.ObjectId
+        [1;94m   | [0m
+    "#]];
+
+    expected.assert_eq(&error)
+}
+
+#[test]
+fn must_error_on_dbgenerated_default_on_mongodb() {
+    let schema = r#"
+        datasource db {
+            provider = "mongodb"
+            url = "mongodb://"
+        }
+
+        generator client {
+            provider = "prisma-client-js"
+            previewFeatures = ["mongoDb"]
+        }
+
+        model User {
+            id String @id @map("_id") @default(dbgenerated()) @db.ObjectId
+        }
+    "#;
+
+    let error = datamodel::parse_schema(schema).map(drop).unwrap_err();
+
+    let expected = expect![[r#"
+        [1;91merror[0m: [1mError validating field 'id': The `dbgenerated()` function is not allowed with MongoDB. Please use `auto()` instead.[0m
+          [1;94m-->[0m  [4mschema.prisma:13[0m
+        [1;94m   | [0m
+        [1;94m12 | [0m        model User {
+        [1;94m13 | [0m            [1;91mid String @id @map("_id") @default(dbgenerated()) @db.ObjectId[0m
+        [1;94m14 | [0m        }
+        [1;94m   | [0m
+    "#]];
+
+    expected.assert_eq(&error)
+}
+
+#[test]
+fn must_error_with_auto_params_on_mongodb() {
+    let schema = r#"
+        datasource db {
+            provider = "mongodb"
+            url = "mongodb://"
+        }
+
+        generator client {
+            provider = "prisma-client-js"
+            previewFeatures = ["mongoDb"]
+        }
+
+        model User {
+            id String @id @map("_id") @default(auto("meow")) @db.ObjectId
+        }
+    "#;
+
+    let error = datamodel::parse_schema(schema).map(drop).unwrap_err();
+
+    let expected = expect![[r#"
+        [1;91merror[0m: [1mError parsing attribute "@default": `auto()` takes no arguments[0m
+          [1;94m-->[0m  [4mschema.prisma:13[0m
+        [1;94m   | [0m
+        [1;94m12 | [0m        model User {
+        [1;94m13 | [0m            id String @id @map("_id") @[1;91mdefault(auto("meow"))[0m @db.ObjectId
+        [1;94m   | [0m
+    "#]];
+
+    expected.assert_eq(&error)
+}
+
+#[test]
+fn must_error_if_using_auto_with_postgres() {
+    let schema = r#"
+        datasource db {
+            provider = "postgres"
+            url = "postgres://"
+        }
+
+        model User {
+            id String @id @default(auto())
+        }
+    "#;
+
+    let error = datamodel::parse_schema(schema).map(drop).unwrap_err();
+
+    let expected = expect![[r#"
+        [1;91merror[0m: [1mError parsing attribute "@default": The current connector does not support the `auto()` function.[0m
+          [1;94m-->[0m  [4mschema.prisma:8[0m
+        [1;94m   | [0m
+        [1;94m 7 | [0m        model User {
+        [1;94m 8 | [0m            id String @id @default([1;91mauto()[0m)
+        [1;94m   | [0m
+    "#]];
+
+    expected.assert_eq(&error)
+}
+
+#[test]
+fn must_error_if_using_auto_with_mysql() {
+    let schema = r#"
+        datasource db {
+            provider = "mysql"
+            url = "mysql://"
+        }
+
+        model User {
+            id String @id @default(auto())
+        }
+    "#;
+
+    let error = datamodel::parse_schema(schema).map(drop).unwrap_err();
+
+    let expected = expect![[r#"
+        [1;91merror[0m: [1mError parsing attribute "@default": The current connector does not support the `auto()` function.[0m
+          [1;94m-->[0m  [4mschema.prisma:8[0m
+        [1;94m   | [0m
+        [1;94m 7 | [0m        model User {
+        [1;94m 8 | [0m            id String @id @default([1;91mauto()[0m)
+        [1;94m   | [0m
+    "#]];
+
+    expected.assert_eq(&error)
+}
+
+#[test]
+fn must_error_if_using_auto_with_sql_server() {
+    let schema = r#"
+        datasource db {
+            provider = "sqlserver"
+            url = "sqlserver://"
+        }
+
+        model User {
+            id String @id @default(auto())
+        }
+    "#;
+
+    let error = datamodel::parse_schema(schema).map(drop).unwrap_err();
+
+    let expected = expect![[r#"
+        [1;91merror[0m: [1mError parsing attribute "@default": The current connector does not support the `auto()` function.[0m
+          [1;94m-->[0m  [4mschema.prisma:8[0m
+        [1;94m   | [0m
+        [1;94m 7 | [0m        model User {
+        [1;94m 8 | [0m            id String @id @default([1;91mauto()[0m)
+        [1;94m   | [0m
+    "#]];
+
+    expected.assert_eq(&error)
+}
+
+#[test]
+fn must_error_if_using_auto_with_sqlite() {
+    let schema = r#"
+        datasource db {
+            provider = "sqlite"
+            url = "file:dev.db"
+        }
+
+        model User {
+            id String @id @default(auto())
+        }
+    "#;
+
+    let error = datamodel::parse_schema(schema).map(drop).unwrap_err();
+
+    let expected = expect![[r#"
+        [1;91merror[0m: [1mError parsing attribute "@default": The current connector does not support the `auto()` function.[0m
+          [1;94m-->[0m  [4mschema.prisma:8[0m
+        [1;94m   | [0m
+        [1;94m 7 | [0m        model User {
+        [1;94m 8 | [0m            id String @id @default([1;91mauto()[0m)
+        [1;94m   | [0m
+    "#]];
+
+    expected.assert_eq(&error)
+}
+
+#[test]
+fn must_error_on_auto_default_on_non_id_on_mongodb() {
+    let schema = r#"
+        datasource db {
+            provider = "mongodb"
+            url = "mongodb://"
+        }
+
+        generator client {
+            provider = "prisma-client-js"
+            previewFeatures = ["mongoDb"]
+        }
+
+        model User {
+            id Int @id @map("_id")
+            nickname String @default(auto()) @db.ObjectId
+        }
+    "#;
+
+    let error = datamodel::parse_schema(schema).map(drop).unwrap_err();
+
+    let expected = expect![[r#"
+        [1;91merror[0m: [1mError validating field 'nickname': MongoDB `@default(auto())` fields must have `ObjectId` native type and use the `@id` attribute.[0m
+          [1;94m-->[0m  [4mschema.prisma:14[0m
+        [1;94m   | [0m
+        [1;94m13 | [0m            id Int @id @map("_id")
+        [1;94m14 | [0m            [1;91mnickname String @default(auto()) @db.ObjectId[0m
         [1;94m15 | [0m        }
         [1;94m   | [0m
     "#]];

@@ -19,7 +19,7 @@ impl<'a> MarkMigrationRolledBack<'a> {
     fn send_impl(self) -> CoreResult<MarkMigrationRolledBackAssertion<'a>> {
         let output = self
             .rt
-            .block_on(self.api.mark_migration_rolled_back(&MarkMigrationRolledBackInput {
+            .block_on(self.api.mark_migration_rolled_back(MarkMigrationRolledBackInput {
                 migration_name: self.migration_name,
             }))?;
 

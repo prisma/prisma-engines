@@ -5,6 +5,7 @@ on:
   push:
     branches:
       - main
+      
 jobs:
   generate-cargo-docs:
     name: "Generate cargo docs for the workspace"

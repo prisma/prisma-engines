@@ -5,7 +5,7 @@ use crate::{
 };
 
 /// A relation should have the explicit and back-relation side defined.
-pub(crate) fn both_sides_are_defined(relation: InlineRelationWalker<'_, '_>, ctx: &mut Context<'_>) {
+pub(crate) fn both_sides_are_defined(relation: InlineRelationWalker<'_>, ctx: &mut Context<'_>) {
     if relation.back_relation_field().is_some() {
         return;
     }
@@ -28,7 +28,7 @@ pub(crate) fn both_sides_are_defined(relation: InlineRelationWalker<'_, '_>, ctx
 }
 
 /// The forward side must define `fields` and `references` in the `@relation` attribute.
-pub(crate) fn fields_and_references_are_defined(relation: InlineRelationWalker<'_, '_>, ctx: &mut Context<'_>) {
+pub(crate) fn fields_and_references_are_defined(relation: InlineRelationWalker<'_>, ctx: &mut Context<'_>) {
     let (forward, back) = match (relation.forward_relation_field(), relation.back_relation_field()) {
         (Some(forward), Some(back)) => (forward, back),
         _ => return,
@@ -89,7 +89,7 @@ pub(crate) fn fields_and_references_are_defined(relation: InlineRelationWalker<'
 
 /// `fields` and `references` should only be defined in the forward side of the relation.
 pub(crate) fn fields_and_references_defined_on_one_side_only(
-    relation: InlineRelationWalker<'_, '_>,
+    relation: InlineRelationWalker<'_>,
     ctx: &mut Context<'_>,
 ) {
     let (forward, back) = match (relation.forward_relation_field(), relation.back_relation_field()) {
@@ -137,7 +137,7 @@ pub(crate) fn fields_and_references_defined_on_one_side_only(
 }
 
 /// Referential actions must be defined in the forward side.
-pub(crate) fn referential_actions(relation: InlineRelationWalker<'_, '_>, ctx: &mut Context<'_>) {
+pub(crate) fn referential_actions(relation: InlineRelationWalker<'_>, ctx: &mut Context<'_>) {
     let (forward, back) = match (relation.forward_relation_field(), relation.back_relation_field()) {
         (Some(forward), Some(back)) => (forward, back),
         _ => return,
@@ -184,7 +184,7 @@ pub(crate) fn referential_actions(relation: InlineRelationWalker<'_, '_>, ctx: &
 
 /// Validation of some crazy things, such as definining `fields` and `references` on different
 /// sides in the relation.
-pub(crate) fn fields_references_mixups(relation: InlineRelationWalker<'_, '_>, ctx: &mut Context<'_>) {
+pub(crate) fn fields_references_mixups(relation: InlineRelationWalker<'_>, ctx: &mut Context<'_>) {
     let (forward, back) = match (relation.forward_relation_field(), relation.back_relation_field()) {
         (Some(forward), Some(back)) if ctx.diagnostics.errors().is_empty() => (forward, back),
         _ => return,
@@ -224,7 +224,7 @@ pub(crate) fn fields_references_mixups(relation: InlineRelationWalker<'_, '_>, c
 }
 
 /// The back-relation side cannot be required.
-pub(crate) fn back_relation_arity_is_optional(relation: InlineRelationWalker<'_, '_>, ctx: &mut Context<'_>) {
+pub(crate) fn back_relation_arity_is_optional(relation: InlineRelationWalker<'_>, ctx: &mut Context<'_>) {
     let (forward, back) = match (relation.forward_relation_field(), relation.back_relation_field()) {
         (Some(forward), Some(back)) if ctx.diagnostics.errors().is_empty() => (forward, back),
         _ => return,
@@ -244,7 +244,7 @@ pub(crate) fn back_relation_arity_is_optional(relation: InlineRelationWalker<'_,
     }
 }
 
-pub(crate) fn fields_and_references_on_wrong_side(relation: InlineRelationWalker<'_, '_>, ctx: &mut Context<'_>) {
+pub(crate) fn fields_and_references_on_wrong_side(relation: InlineRelationWalker<'_>, ctx: &mut Context<'_>) {
     let (forward, back) = match (relation.forward_relation_field(), relation.back_relation_field()) {
         (Some(forward), Some(back)) if ctx.diagnostics.errors().is_empty() => (forward, back),
         _ => return,

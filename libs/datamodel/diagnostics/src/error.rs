@@ -68,6 +68,9 @@ pub enum DatamodelError {
   #[error("Function not known: \"{}\".", function_name)]
   FunctionNotKnownError { function_name: String, span: Span },
 
+  #[error("Property not known: \"{}\".", property_name)]
+  PropertyNotKnownError { property_name: String, span: Span },
+
   #[error("Datasource provider not known: \"{}\".", provider)]
   DatasourceProviderNotKnownError { provider: String, span: Span },
 
@@ -409,6 +412,13 @@ impl DatamodelError {
         }
     }
 
+    pub fn new_property_not_known_error(property_name: &str, span: Span) -> DatamodelError {
+        DatamodelError::PropertyNotKnownError {
+            property_name: String::from(property_name),
+            span,
+        }
+    }
+
     pub fn new_function_not_known_error(function_name: &str, span: Span) -> DatamodelError {
         DatamodelError::FunctionNotKnownError {
             function_name: String::from(function_name),
@@ -468,6 +478,7 @@ impl DatamodelError {
             DatamodelError::AttributeNotKnownError { span, .. } => *span,
             DatamodelError::ReservedScalarTypeError { span, .. } => *span,
             DatamodelError::FunctionNotKnownError { span, .. } => *span,
+            DatamodelError::PropertyNotKnownError { span, .. } => *span,
             DatamodelError::DatasourceProviderNotKnownError { span, .. } => *span,
             DatamodelError::LiteralParseError { span, .. } => *span,
             DatamodelError::TypeNotFoundError { span, .. } => *span,

@@ -2,7 +2,7 @@
 use super::FilteredQuery;
 use connector::{filter::Filter, DatasourceFieldName, RecordFilter, WriteArgs};
 use prisma_models::prelude::*;
-use std::sync::Arc;
+use std::{collections::HashMap, sync::Arc};
 
 #[derive(Debug, Clone)]
 pub enum WriteQuery {
@@ -31,7 +31,10 @@ impl WriteQuery {
         };
 
         for (selected_field, value) in result {
-            args.insert(DatasourceFieldName(selected_field.db_name().to_owned()), value)
+            args.insert(
+                DatasourceFieldName(selected_field.db_name().to_owned()),
+                (&selected_field, value),
+            )
         }
 
         args.update_datetimes(model);
@@ -112,8 +115,8 @@ impl std::fmt::Display for WriteQuery {
             Self::DeleteManyRecords(q) => write!(f, "DeleteManyRecords: {}", q.model.name),
             Self::ConnectRecords(_) => write!(f, "ConnectRecords"),
             Self::DisconnectRecords(_) => write!(f, "DisconnectRecords"),
-            Self::ExecuteRaw(r) => write!(f, "ExecuteRaw: {} ({:?})", r.query, r.parameters),
-            Self::QueryRaw(r) => write!(f, "QueryRaw: {} ({:?})", r.query, r.parameters),
+            Self::ExecuteRaw(r) => write!(f, "ExecuteRaw: {:?}", r.inputs),
+            Self::QueryRaw(r) => write!(f, "QueryRaw: {:?}", r.inputs),
         }
     }
 }
@@ -136,7 +139,10 @@ impl CreateManyRecords {
     pub fn inject_result_into_all(&mut self, result: SelectionResult) {
         for (selected_field, value) in result {
             for args in self.args.iter_mut() {
-                args.insert(DatasourceFieldName(selected_field.db_name().to_owned()), value.clone())
+                args.insert(
+                    DatasourceFieldName(selected_field.db_name().to_owned()),
+                    (&selected_field, value.clone()),
+                )
             }
         }
     }
@@ -184,8 +190,12 @@ pub struct DisconnectRecords {
 
 #[derive(Debug, Clone)]
 pub struct RawQuery {
-    pub query: String,
-    pub parameters: Vec<PrismaValue>,
+    /// Model associated with the raw query, if one is necessary
+    pub model: Option<ModelRef>,
+    /// Map of query arguments and their values
+    pub inputs: HashMap<String, PrismaValue>,
+    /// Hint as to what kind of query is being executed
+    pub query_type: Option<String>,
 }
 
 impl FilteredQuery for UpdateRecord {

@@ -5,9 +5,8 @@ mod diagnose_migration_history;
 use anyhow::Context;
 use colored::Colorize;
 use introspection_connector::CompositeTypeDepth;
-use migration_connector::{DestructiveChangeDiagnostics, DiffTarget};
 use migration_core::json_rpc::types::*;
-use std::{fmt, fs::File, io::Read, str::FromStr};
+use std::{fmt, fs::File, io::Read, str::FromStr, sync::Arc};
 use structopt::*;
 
 #[derive(Debug, StructOpt)]
@@ -31,12 +30,14 @@ enum Command {
     SchemaPush(SchemaPush),
     /// DiagnoseMigrationHistory wrapper
     DiagnoseMigrationHistory(DiagnoseMigrationHistory),
-    /// Output the difference between the data model and the database.
+    /// Counterpart to the CLI migrate diff.
     MigrateDiff(MigrateDiff),
     /// Validate the given data model.
     ValidateDatamodel(ValidateDatamodel),
     /// Clear the data and DDL of the given database.
     ResetDatabase(ResetDatabase),
+    /// Clear the data and DDL of the given database.
+    CreateDatabase(CreateDatabase),
     /// Create a new migration to the given directory.
     CreateMigration(CreateMigration),
     /// Apply all unapplied migrations from the given directory.
@@ -107,12 +108,31 @@ impl fmt::Display for DiffOutputType {
 }
 
 #[derive(StructOpt, Debug)]
+#[allow(dead_code)]
 struct MigrateDiff {
-    /// Path to the prisma data model.
-    schema_path: String,
-    /// `summary` for list of changes, `ddl` for database statements.
-    #[structopt(default_value, long = "output-type", short = "t")]
-    output_type: DiffOutputType,
+    #[structopt(long = "from-schema-datamodel")]
+    from_schema_datamodel: Option<String>,
+    #[structopt(long = "to-schema-datamodel")]
+    to_schema_datamodel: Option<String>,
+
+    #[structopt(long = "from-schema-datasource")]
+    from_schema_datasource: Option<String>,
+    #[structopt(long = "to-schema-datasource")]
+    to_schema_datasource: Option<String>,
+
+    #[structopt(long = "from-url")]
+    from_url: Option<String>,
+    #[structopt(long = "to-url")]
+    to_url: Option<String>,
+
+    #[structopt(long = "from-empty")]
+    from_empty: bool,
+    #[structopt(long = "to-empty")]
+    to_empty: bool,
+
+    /// Output SQL (default: false). Otherwise will produce a summary.
+    #[structopt(long)]
+    script: bool,
 }
 
 #[derive(StructOpt, Debug)]
@@ -123,6 +143,12 @@ struct ValidateDatamodel {
 
 #[derive(StructOpt, Debug)]
 struct ResetDatabase {
+    /// Path to the prisma data model.
+    schema_path: String,
+}
+
+#[derive(StructOpt, Debug)]
+struct CreateDatabase {
     /// Path to the prisma data model.
     schema_path: String,
 }
@@ -201,19 +227,31 @@ async fn main() -> anyhow::Result<()> {
             let mut datamodel = String::new();
             file.read_to_string(&mut datamodel).unwrap();
 
-            datamodel::parse_datamodel(&datamodel).unwrap();
+            if let Err(e) = datamodel::parse_datamodel(&datamodel) {
+                let pretty = e.to_pretty_string("schema.prisma", &datamodel);
+                println!("{pretty}");
+            };
         }
         Command::ResetDatabase(cmd) => {
             let schema = read_datamodel_from_file(&cmd.schema_path).context("Error reading the schema from file")?;
-            let api = migration_core::migration_api(&schema)?;
+            let api = migration_core::migration_api(Some(schema), None)?;
 
             api.reset().await?;
+        }
+        Command::CreateDatabase(cmd) => {
+            let schema = read_datamodel_from_file(&cmd.schema_path).context("Error reading the schema from file")?;
+            let api = migration_core::migration_api(Some(schema.clone()), None)?;
+
+            api.create_database(CreateDatabaseParams {
+                datasource: DatasourceParam::SchemaString(SchemaContainer { schema }),
+            })
+            .await?;
         }
         Command::CreateMigration(cmd) => {
             let prisma_schema =
                 read_datamodel_from_file(&cmd.schema_path).context("Error reading the schema from file")?;
 
-            let api = migration_core::migration_api(&prisma_schema)?;
+            let api = migration_core::migration_api(Some(prisma_schema.clone()), None)?;
 
             let input = CreateMigrationInput {
                 migrations_directory_path: cmd.migrations_path,
@@ -222,14 +260,14 @@ async fn main() -> anyhow::Result<()> {
                 draft: true,
             };
 
-            api.create_migration(&input).await?;
+            api.create_migration(input).await?;
         }
         Command::ApplyMigrations(cmd) => {
             let prisma_schema =
                 read_datamodel_from_file(&cmd.schema_path).context("Error reading the schema from file")?;
 
-            let api = migration_core::migration_api(&prisma_schema)?;
-            api.apply_migrations(&cmd.into()).await?;
+            let api = migration_core::migration_api(Some(prisma_schema), None)?;
+            api.apply_migrations(cmd.into()).await?;
         }
     }
 
@@ -326,10 +364,10 @@ async fn generate_dmmf(cmd: &DmmfCommand) -> anyhow::Result<()> {
 
 async fn schema_push(cmd: &SchemaPush) -> anyhow::Result<()> {
     let schema = read_datamodel_from_file(&cmd.schema_path).context("Error reading the schema from file")?;
-    let api = migration_core::migration_api(&schema)?;
+    let api = migration_core::migration_api(Some(schema.clone()), None)?;
 
     let response = api
-        .schema_push(&SchemaPushInput {
+        .schema_push(SchemaPushInput {
             schema,
             force: cmd.force,
         })
@@ -375,43 +413,41 @@ async fn schema_push(cmd: &SchemaPush) -> anyhow::Result<()> {
     Ok(())
 }
 
-async fn migrate_diff(cmd: &MigrateDiff) -> anyhow::Result<()> {
-    let datamodel = read_datamodel_from_file(&cmd.schema_path).context("Error reading the schema from file")?;
-    let api = migration_core::migration_api(&datamodel)?;
+struct DiffHost;
 
-    let ast = datamodel::parse_schema_ast(&datamodel).unwrap();
-    let parsed_schema = datamodel::parse_schema_parserdb(&datamodel, &ast).unwrap();
-
-    let migration = api
-        .connector()
-        .diff(
-            DiffTarget::Database(
-                parsed_schema.configuration.datasources[0]
-                    .load_url(|v| std::env::var(v).ok())
-                    .unwrap()
-                    .into(),
-            ),
-            DiffTarget::Datamodel(datamodel.into()),
-        )
-        .await?;
-
-    match cmd.output_type {
-        DiffOutputType::Summary => {
-            let summary = api.connector().migration_summary(&migration);
-
-            if !summary.is_empty() {
-                println!("{}", summary);
-            }
-        }
-        DiffOutputType::Ddl => {
-            let applier = api.connector().database_migration_step_applier();
-            let ddl = applier.render_script(&migration, &DestructiveChangeDiagnostics::default());
-
-            if !ddl.is_empty() {
-                println!("{}", ddl);
-            }
-        }
+#[async_trait::async_trait]
+impl migration_connector::ConnectorHost for DiffHost {
+    async fn print(&self, s: &str) -> migration_core::CoreResult<()> {
+        print!("{}", s);
+        Ok(())
     }
+}
+
+async fn migrate_diff(cmd: &MigrateDiff) -> anyhow::Result<()> {
+    use migration_core::json_rpc::types::*;
+
+    let api = migration_core::migration_api(None, Some(Arc::new(DiffHost)))?;
+    let to = if let Some(to_schema_datamodel) = &cmd.to_schema_datamodel {
+        DiffTarget::SchemaDatamodel(SchemaContainer {
+            schema: to_schema_datamodel.clone(),
+        })
+    } else {
+        todo!("can't handle {:?} yet", cmd)
+    };
+    let from = if let Some(url) = &cmd.from_url {
+        DiffTarget::Url(UrlContainer { url: url.clone() })
+    } else {
+        todo!("can't handle {:?} yet", cmd)
+    };
+
+    let input = DiffParams {
+        from,
+        script: cmd.script,
+        shadow_database_url: None, // TODO
+        to,
+    };
+
+    api.diff(input).await?;
 
     Ok(())
 }

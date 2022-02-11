@@ -18,10 +18,6 @@ pub mod args {
     pub const BY: &str = "by";
     pub const HAVING: &str = "having";
 
-    // raw specific args
-    pub const QUERY: &str = "query";
-    pub const PARAMETERS: &str = "parameters";
-
     pub const DISTINCT: &str = "distinct";
 
     // createMany-specific args
@@ -44,6 +40,7 @@ pub mod operations {
 
     // scalar lists and composites
     pub const PUSH: &str = "push";
+    pub const UNSET: &str = "unset";
 
     // numbers
     pub const INCREMENT: &str = "increment";

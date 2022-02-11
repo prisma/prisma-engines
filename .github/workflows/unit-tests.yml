@@ -4,6 +4,13 @@ on:
     branches:
       - main
   pull_request:
+    paths-ignore:
+      - '.buildkite/**'
+      - '*.md'
+      - 'LICENSE'
+      - 'CODEOWNERS'
+      - 'renovate.json'
+      
 jobs:
   test:
     name: Workspace unit tests
@@ -26,7 +33,7 @@ jobs:
             ~/.cargo/registry
             ~/.cargo/git
             target
-          key: datamodel-cache
+          key: datamodel-cache-v2
 
       - run: |
             cargo test --workspace \

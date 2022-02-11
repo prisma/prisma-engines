@@ -59,7 +59,10 @@ impl RunnerInterface for DirectRunner {
     }
 
     async fn start_tx(&self, max_acquisition_millis: u64, valid_for_millis: u64) -> TestResult<TxId> {
-        let id = self.executor.start_tx(max_acquisition_millis, valid_for_millis).await?;
+        let id = self
+            .executor
+            .start_tx(self.query_schema.clone(), max_acquisition_millis, valid_for_millis)
+            .await?;
         Ok(id)
     }
 

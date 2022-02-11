@@ -581,6 +581,7 @@ impl WithName for CompositeField {
     fn name(&self) -> &String {
         &self.name
     }
+
     fn set_name(&mut self, name: &str) {
         self.name = String::from(name)
     }

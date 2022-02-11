@@ -62,13 +62,13 @@ impl DatasourceLoader {
         diagnostics: &mut Diagnostics,
     ) -> Option<Datasource> {
         let source_name = &ast_source.name.name;
-        let args: HashMap<_, _> = ast_source
+        let mut args: HashMap<_, _> = ast_source
             .properties
             .iter()
             .map(|arg| (arg.name.name.as_str(), (arg.span, ValueValidator::new(&arg.value))))
             .collect();
 
-        let (_, provider_arg) = match args.get("provider") {
+        let (_, provider_arg) = match args.remove("provider") {
             Some(provider) => provider,
             None => {
                 diagnostics.push_error(DatamodelError::new_source_argument_not_found_error(
@@ -108,7 +108,7 @@ impl DatasourceLoader {
             Some((provider, _)) => provider,
         };
 
-        let (_, url_arg) = match args.get(URL_KEY) {
+        let (_, url_arg) = match args.remove(URL_KEY) {
             Some(url_arg) => url_arg,
             None => {
                 diagnostics.push_error(DatamodelError::new_source_argument_not_found_error(
@@ -128,7 +128,7 @@ impl DatasourceLoader {
             }
         };
 
-        let shadow_database_url_arg = args.get(SHADOW_DATABASE_URL_KEY);
+        let shadow_database_url_arg = args.remove(SHADOW_DATABASE_URL_KEY);
 
         let shadow_database_url: Option<(StringFromEnvVar, Span)> =
             if let Some((_, shadow_database_url_arg)) = shadow_database_url_arg.as_ref() {
@@ -201,6 +201,13 @@ impl DatasourceLoader {
 
                 diagnostics.push_error(error);
             }
+        }
+
+        // we handle these elsewhere
+        let _ = args.remove("previewFeatures");
+        let _ = args.remove("referentialIntegrity");
+        for (name, (span, _)) in args.into_iter() {
+            diagnostics.push_error(DatamodelError::new_property_not_known_error(name, span));
         }
 
         Some(Datasource {

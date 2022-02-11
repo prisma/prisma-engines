@@ -4,6 +4,13 @@ on:
     branches:
       - main
   pull_request:
+    paths-ignore:
+      - '.buildkite/**'
+      - '*.md'
+      - 'LICENSE'
+      - 'CODEOWNERS'
+      - 'renovate.json'
+
 jobs:
   test-mongodb-introspection-and-migration-connector:
     name: "Test ${{ matrix.database.name }} on Linux"
@@ -191,9 +198,8 @@ jobs:
       fail-fast: false
       matrix:
         db:
-          # # https://github.com/prisma/prisma-engines/pull/2610
-          # - name: mysql
-          #   url: "mysql://root@localhost:3306?connect_timeout=20&socket_timeout=60"
+          - name: mysql
+            url: "mysql://root@localhost:3306?connect_timeout=20&socket_timeout=60"
           - name: mariadb
             url: "mysql://root@localhost:3306?connect_timeout=20&socket_timeout=60"
         rust:
@@ -212,13 +218,13 @@ jobs:
         with:
           toolchain: ${{matrix.rust}}
 
-      # - uses: actions/cache@v2
-      #   with:
-      #     path: |
-      #       ~/.cargo/registry
-      #       ~/.cargo/git
-      #       target
-      #     key: ${{ runner.os }}-cargo-${{ matrix.rust }}-${{ hashFiles('**/Cargo.lock') }}
+      - uses: actions/cache@v2
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: ${{ runner.os }}-cargo-${{ matrix.rust }}-${{ hashFiles('**/Cargo.lock') }}
 
       - uses: MinoruSekine/setup-scoop@main
 

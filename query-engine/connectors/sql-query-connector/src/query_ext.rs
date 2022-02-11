@@ -5,6 +5,7 @@ use crate::{
 use async_trait::async_trait;
 use connector_interface::{filter::Filter, RecordFilter};
 use futures::future::FutureExt;
+use itertools::Itertools;
 use opentelemetry::trace::TraceFlags;
 use prisma_models::*;
 use quaint::{
@@ -15,7 +16,7 @@ use quaint::{
 use tracing_futures::Instrument;
 
 use serde_json::{Map, Value};
-use std::panic::AssertUnwindSafe;
+use std::{collections::HashMap, panic::AssertUnwindSafe};
 
 use crate::sql_trace::trace_parent_to_string;
 
@@ -68,14 +69,18 @@ pub trait QueryExt: Queryable + Send + Sync {
 
     /// Execute a singular SQL query in the database, returning an arbitrary
     /// JSON `Value` as a result.
-    #[tracing::instrument(skip(self, q, params))]
+    #[tracing::instrument(skip(self, inputs))]
     async fn raw_json<'a>(
         &'a self,
-        q: String,
-        params: Vec<PrismaValue>,
+        mut inputs: HashMap<String, PrismaValue>,
     ) -> std::result::Result<Value, crate::error::RawError> {
-        let params: Vec<_> = params.into_iter().map(convert_lossy).collect();
-        let result_set = AssertUnwindSafe(self.query_raw(&q, &params)).catch_unwind().await??;
+        // Unwrapping query & params is safe since it's already passed the query parsing stage
+        let query = inputs.remove("query").unwrap().into_string().unwrap();
+        let params = inputs.remove("parameters").unwrap().into_list().unwrap();
+        let params = params.into_iter().map(convert_lossy).collect_vec();
+        let result_set = AssertUnwindSafe(self.query_raw(&query, &params))
+            .catch_unwind()
+            .await??;
 
         // `query_raw` does not return column names in `ResultSet` when a call to a stored procedure is done
         let columns: Vec<String> = result_set.columns().iter().map(ToString::to_string).collect();
@@ -98,14 +103,18 @@ pub trait QueryExt: Queryable + Send + Sync {
 
     /// Execute a singular SQL query in the database, returning the number of
     /// affected rows.
-    #[tracing::instrument(skip(self, q, params))]
+    #[tracing::instrument(skip(self, inputs))]
     async fn raw_count<'a>(
         &'a self,
-        q: String,
-        params: Vec<PrismaValue>,
+        mut inputs: HashMap<String, PrismaValue>,
     ) -> std::result::Result<usize, crate::error::RawError> {
-        let params: Vec<_> = params.into_iter().map(convert_lossy).collect();
-        let changes = AssertUnwindSafe(self.execute_raw(&q, &params)).catch_unwind().await??;
+        // Unwrapping query & params is safe since it's already passed the query parsing stage
+        let query = inputs.remove("query").unwrap().into_string().unwrap();
+        let params = inputs.remove("parameters").unwrap().into_list().unwrap();
+        let params = params.into_iter().map(convert_lossy).collect_vec();
+        let changes = AssertUnwindSafe(self.execute_raw(&query, &params))
+            .catch_unwind()
+            .await??;
 
         Ok(changes as usize)
     }
