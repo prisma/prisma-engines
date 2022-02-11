@@ -166,8 +166,7 @@ fn orderby_field_mapper(field: &ModelField, ctx: &mut BuilderContext, options: &
         }
 
         ModelField::Composite(cf) => {
-            let composite_order_object_type =
-                order_by_object_type(ctx, &(&cf.typ).into(), &OrderByOptions::new().with_aggregates());
+            let composite_order_object_type = order_by_object_type(ctx, &(&cf.typ).into(), &OrderByOptions::new());
 
             Some(input_field(cf.name.clone(), InputType::object(composite_order_object_type), None).optional())
         }

@@ -72,7 +72,7 @@ impl OrderByData {
     }
 
     fn compute_prefix(index: usize, order_by: &OrderBy) -> Option<OrderByPrefix> {
-        match order_by.path() {
+        match dbg!(order_by.path()) {
             Some(path) => {
                 let mut parts = path
                     .iter()
