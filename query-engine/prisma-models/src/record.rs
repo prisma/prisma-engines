@@ -71,8 +71,9 @@ impl ManyRecords {
                         SortOrder::Descending => b.values[index].cmp(&a.values[index]),
                     }
                 }
-                OrderBy::Aggregation(_) => todo!(),
-                OrderBy::Relevance(_) => todo!(),
+                OrderBy::ScalarAggregation(_) => unimplemented!(),
+                OrderBy::ToManyAggregation(_) => unimplemented!(),
+                OrderBy::Relevance(_) => unimplemented!(),
             });
 
             orderings

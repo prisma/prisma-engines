@@ -348,10 +348,8 @@ fn order_definitions(
         .zip(order_by_defs.iter())
         .map(|((index, order_by), order_by_def)| match order_by {
             OrderBy::Scalar(order_by) => cursor_order_def_scalar(order_by, order_by_def, index),
-            OrderBy::Aggregation(order_by) if order_by.is_scalar_aggregation() => {
-                cursor_order_def_aggregation_scalar(order_by, order_by_def, index)
-            }
-            OrderBy::Aggregation(order_by) => cursor_order_def_aggregation_rel(order_by, order_by_def, index),
+            OrderBy::ScalarAggregation(order_by) => cursor_order_def_aggregation_scalar(order_by, order_by_def, index),
+            OrderBy::ToManyAggregation(order_by) => cursor_order_def_aggregation_rel(order_by, order_by_def, index),
             OrderBy::Relevance(order_by) => cursor_order_def_relevance(order_by, order_by_def, index),
         })
         .collect_vec()
@@ -391,11 +389,12 @@ fn cursor_order_def_scalar(
 
 /// Build a CursorOrderDefinition for an order by aggregation scalar
 fn cursor_order_def_aggregation_scalar(
-    order_by: &OrderByAggregation,
+    order_by: &OrderByScalarAggregation,
     order_by_def: &OrderByDefinition,
     index: usize,
 ) -> CursorOrderDefinition {
-    let field = order_by.field.as_ref().unwrap();
+    let field = &order_by.field;
+
     // Selected fields needs to be aliased in case there are two order bys on two different tables, pointing to a field of the same name.
     // eg: orderBy: [{ id: asc }, { b: { id: asc } }]
     // Without these aliases, selecting from the <ORDER_TABLE_ALIAS> cmp table would result in ambiguous field name
@@ -408,6 +407,7 @@ fn cursor_order_def_aggregation_scalar(
     );
 
     let coalesce_exprs: Vec<Expression> = vec![order_by_def.order_column.clone(), Value::integer(0).into()];
+
     // We coalesce the order column to 0 when it's compared to the cmp table since the aggregations joins
     // might return NULL on relations that have no connected records
     let order_column: Expression = coalesce(coalesce_exprs).into();
@@ -424,7 +424,7 @@ fn cursor_order_def_aggregation_scalar(
 
 /// Build a CursorOrderDefinition for an order by aggregation on relations
 fn cursor_order_def_aggregation_rel(
-    order_by: &OrderByAggregation,
+    order_by: &OrderByToManyAggregation,
     order_by_def: &OrderByDefinition,
     index: usize,
 ) -> CursorOrderDefinition {

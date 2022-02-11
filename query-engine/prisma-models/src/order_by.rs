@@ -31,7 +31,8 @@ pub enum SortAggregation {
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum OrderBy {
     Scalar(OrderByScalar),
-    Aggregation(OrderByAggregation),
+    ScalarAggregation(OrderByScalarAggregation),
+    ToManyAggregation(OrderByToManyAggregation),
     Relevance(OrderByRelevance),
 }
 
@@ -39,7 +40,8 @@ impl OrderBy {
     pub fn path(&self) -> Vec<OrderByHop> {
         match self {
             OrderBy::Scalar(o) => o.path.clone(),
-            OrderBy::Aggregation(o) => o.path.clone(),
+            OrderBy::ScalarAggregation(o) => o.path.clone(),
+            OrderBy::ToManyAggregation(o) => o.path.clone(),
             OrderBy::Relevance(_) => vec![],
         }
     }
@@ -47,7 +49,8 @@ impl OrderBy {
     pub fn sort_order(&self) -> SortOrder {
         match self {
             OrderBy::Scalar(o) => o.sort_order,
-            OrderBy::Aggregation(o) => o.sort_order,
+            OrderBy::ScalarAggregation(o) => o.sort_order,
+            OrderBy::ToManyAggregation(o) => o.sort_order,
             OrderBy::Relevance(o) => o.sort_order,
         }
     }
@@ -55,12 +58,21 @@ impl OrderBy {
     pub fn field(&self) -> Option<ScalarFieldRef> {
         match self {
             OrderBy::Scalar(o) => Some(o.field.clone()),
-            OrderBy::Aggregation(o) => o.field.clone(),
+            OrderBy::ScalarAggregation(o) => Some(o.field.clone()),
+            OrderBy::ToManyAggregation(_) => None,
             OrderBy::Relevance(_) => None,
         }
     }
 
-    pub fn has_middle_to_one_path(&self) -> bool {
+    /// Returns only relation hops from the orderBy path.
+    pub fn relation_path(&self) -> Vec<OrderByHop> {
+        self.path()
+            .into_iter()
+            .filter(|hop| matches!(hop, OrderByHop::Relation(_)))
+            .collect()
+    }
+
+    pub fn has_middle_to_one_relation_path(&self) -> bool {
         let path = self.path();
         let len = path.len();
 
@@ -70,7 +82,7 @@ impl OrderBy {
             path.get(len - 2)
                 .map(|hop| match hop {
                     OrderByHop::Relation(rf) => !rf.is_list(),
-                    OrderByHop::Composite(cf) => !cf.is_list(),
+                    OrderByHop::Composite(_) => unreachable!("Found non-relation hop in relation-only list."),
                 })
                 .unwrap_or(false)
         }
@@ -84,14 +96,26 @@ impl OrderBy {
         })
     }
 
-    pub fn aggregation(
-        field: Option<ScalarFieldRef>,
+    pub fn scalar_aggregation(
+        field: ScalarFieldRef,
         path: Vec<OrderByHop>,
         sort_order: SortOrder,
         sort_aggregation: SortAggregation,
     ) -> Self {
-        Self::Aggregation(OrderByAggregation {
+        Self::ScalarAggregation(OrderByScalarAggregation {
             field,
+            path,
+            sort_order,
+            sort_aggregation,
+        })
+    }
+
+    pub fn to_many_aggregation(
+        path: Vec<OrderByHop>,
+        sort_order: SortOrder,
+        sort_aggregation: SortAggregation,
+    ) -> Self {
+        Self::ToManyAggregation(OrderByToManyAggregation {
             path,
             sort_order,
             sort_aggregation,
@@ -155,38 +179,18 @@ pub struct OrderByScalar {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct OrderByAggregation {
-    pub field: Option<ScalarFieldRef>,
+pub struct OrderByScalarAggregation {
+    pub field: ScalarFieldRef,
     pub path: Vec<OrderByHop>,
     pub sort_order: SortOrder,
     pub sort_aggregation: SortAggregation,
 }
 
-impl OrderByAggregation {
-    // pub fn field(&self) -> ScalarFieldRef {
-    //     match &self.field {
-    //         Some(sf) => sf.clone(),
-    //         // TODO: This is a hack that should be removed once MongoDB is refactored too
-    //         None => self.id_field_from_relation(),
-    //     }
-    // }
-
-    // fn id_field_from_relation(&self) -> ScalarFieldRef {
-    //     let ids: Vec<_> = self
-    //         .path
-    //         .last()
-    //         .unwrap()
-    //         .related_model()
-    //         .primary_identifier()
-    //         .as_scalar_fields()
-    //         .expect("Primary identifier contains non-scalar fields.");
-
-    //     ids.into_iter().next().unwrap()
-    // }
-
-    pub fn is_scalar_aggregation(&self) -> bool {
-        self.field.is_some() && self.path.is_empty()
-    }
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct OrderByToManyAggregation {
+    pub path: Vec<OrderByHop>,
+    pub sort_order: SortOrder,
+    pub sort_aggregation: SortAggregation,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]

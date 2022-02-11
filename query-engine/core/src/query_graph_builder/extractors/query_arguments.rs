@@ -122,7 +122,7 @@ fn process_order_object(
                         .expect("To-many relation orderBy must be an aggregation ordering.");
 
                     let sort_order = extract_sort_order(inner_field_value)?;
-                    Ok(Some(OrderBy::aggregation(None, path, sort_order, sort_aggregation)))
+                    Ok(Some(OrderBy::to_many_aggregation(path, sort_order, sort_aggregation)))
                 }
 
                 Field::Relation(rf) => {
@@ -137,8 +137,8 @@ fn process_order_object(
 
                     if let Some(sort_aggr) = parent_sort_aggregation {
                         // If the parent is a sort aggregation then this scalar is part of that one.
-                        Ok(Some(OrderBy::aggregation(
-                            Some(sf.clone()),
+                        Ok(Some(OrderBy::scalar_aggregation(
+                            sf.clone(),
                             vec![],
                             sort_order,
                             sort_aggr,
@@ -158,7 +158,7 @@ fn process_order_object(
                         .expect("To-many composite orderBy must be an aggregation ordering.");
 
                     let sort_order = extract_sort_order(inner_field_value)?;
-                    Ok(Some(OrderBy::aggregation(None, path, sort_order, sort_aggregation)))
+                    Ok(Some(OrderBy::to_many_aggregation(path, sort_order, sort_aggregation)))
                 }
 
                 Field::Composite(cf) => {
