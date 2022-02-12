@@ -166,6 +166,49 @@ mod to_many {
         Ok(())
     }
 
+    /// Order a model based on many orderings, including composites.
+    #[connector_test]
+    async fn model_basic_ordering_multiple(runner: Runner) -> TestResult<()> {
+        create_test_data(&runner).await?;
+
+        // Additional row to make multi-ordering useful.
+        create_row(
+            &runner,
+            r#"{
+                id: 5,
+                to_many_as: [
+                    { a_1: "10", a_2: 50 },
+                    { a_1: "20", a_2: 20 },
+                ],
+                to_one_b: {
+                    b_to_many_cs: [
+                        { c_field: 10, c_to_many_as: [{ a_1: "10", a_2: 10 }, { a_1: "20", a_2: 20 }] },
+                        { c_field: 20, c_to_many_as: [{ a_1: "30", a_2: 30 }, { a_1: "40", a_2: 40 }] },
+                    ]
+                }
+            }"#,
+        )
+        .await?;
+
+        insta::assert_snapshot!(
+            run_query!(runner, r#"{ findManyTestModel(orderBy: [
+                { to_one_b: { b_to_many_cs: { _count: asc }} },
+                { to_many_as: { _count: desc } }
+            ]) { id }}"#),
+            @r###"{"data":{"findManyTestModel":[{"id":3},{"id":4},{"id":2},{"id":5},{"id":1}]}}"###
+        );
+
+        insta::assert_snapshot!(
+            run_query!(runner, r#"{ findManyTestModel(orderBy: [
+                { to_one_b: { b_to_many_cs: { _count: desc }} },
+                { to_many_as: { _count: asc } }
+            ]) { id }}"#),
+            @r###"{"data":{"findManyTestModel":[{"id":1},{"id":5},{"id":2},{"id":3},{"id":4}]}}"###
+        );
+
+        Ok(())
+    }
+
     async fn create_test_data(runner: &Runner) -> TestResult<()> {
         create_row(
             runner,
@@ -270,43 +313,34 @@ mod mixed {
         schema.to_owned()
     }
 
-    // a_to_many_bs: [
-    //     { b_field: 50, b_to_one_c: { c_field: "c_field_1" } },
-    //     { b_field: 5, b_to_one_c: { c_field: "c_field_2" } }
-    // ]
-    // to_many_com: [
-    //     { b_field: 100, b_to_one_c: { c_field: "c_field_3" } },
-    //     { b_field: 10, b_to_one_c: { c_field: "c_field_1" } }
-    // ]
-
     async fn over_to_one_relation_test_data(runner: &Runner) -> TestResult<()> {
         create_row(
             runner,
-            r#"{ id: 1, to_one_rel: { create: { id: 1, to_one_a: { a_1: "2", a_2: 1 }, to_many_bs: [ {}, {}, {} ] }}}"#,
+            r#"{ id: 1, to_one_rel: { create: { id: 1, to_one_a: { a_1: "2", a_2: 1, a_to_many_bs: [ {}, {} ] }, to_many_bs: [ {}, {}, {} ] }}}"#,
         )
         .await?;
 
         create_row(
             runner,
-            r#"{ id: 2, to_one_rel: { create: { id: 2, to_one_a: { a_1: "1", a_2: 2 }, to_many_bs: [] }}}"#,
+            r#"{ id: 2, to_one_rel: { create: { id: 2, to_one_a: { a_1: "1", a_2: 2, a_to_many_bs: [ {} ] }, to_many_bs: [] }}}"#,
         )
         .await?;
 
         create_row(
             runner,
-            r#"{ id: 3, to_one_rel: { create: { id: 3, to_one_a: { a_1: "2", a_2: 5 }, to_many_bs: [ {}, {} ] }}}"#,
+            r#"{ id: 3, to_one_rel: { create: { id: 3, to_one_a: { a_1: "2", a_2: 5, a_to_many_bs: [ {}, {}, {} ] }, to_many_bs: [ {}, {} ] }}}"#,
         )
         .await?;
 
         create_row(
             runner,
-            r#"{ id: 4, to_one_rel: { create: { id: 4, to_one_a: { a_1: "2", a_2: null }, to_many_bs: [ {}, {}, {}, {} ] }}}"#,
+            r#"{ id: 4, to_one_rel: { create: { id: 4, to_one_a: { a_1: "2", a_2: null, a_to_many_bs: [] }, to_many_bs: [ {}, {}, {}, {} ] }}}"#,
         )
         .await?;
 
         create_row(
             runner,
-            r#"{ id: 5, to_one_rel: { create: { id: 5, to_one_a: { a_1: "2" }}}}"#,
+            r#"{ id: 5, to_one_rel: { create: { id: 5, to_one_a: { a_1: "2", a_to_many_bs: [ {} ] }}}}"#,
         )
         .await?;
 
@@ -375,6 +409,24 @@ mod mixed {
         insta::assert_snapshot!(
             run_query!(runner, r#"{ findManyTestModel(orderBy: { to_one_rel: { to_many_bs: { _count: asc } } }) { id } }"#),
             @r###"{"data":{"findManyTestModel":[{"id":2},{"id":5},{"id":6},{"id":7},{"id":3},{"id":1},{"id":4}]}}"###
+        );
+
+        Ok(())
+    }
+
+    /// Order a model based on composite aggregation over a relation and one additional composite hop.
+    #[connector_test(schema(over_to_one_relation))]
+    async fn composite_aggr_over_rel_composite_ordering(runner: Runner) -> TestResult<()> {
+        over_to_one_relation_test_data(&runner).await?;
+
+        insta::assert_snapshot!(
+            run_query!(runner, r#"{ findManyTestModel(orderBy: { to_one_rel: { to_one_a: { a_to_many_bs: { _count: asc } } } }) { id } }"#),
+            @r###"{"data":{"findManyTestModel":[{"id":4},{"id":6},{"id":7},{"id":2},{"id":5},{"id":1},{"id":3}]}}"###
+        );
+
+        insta::assert_snapshot!(
+            run_query!(runner, r#"{ findManyTestModel(orderBy: { to_one_rel: { to_one_a: { a_to_many_bs: { _count: desc } } } }) { id } }"#),
+            @r###"{"data":{"findManyTestModel":[{"id":3},{"id":1},{"id":2},{"id":5},{"id":4},{"id":6},{"id":7}]}}"###
         );
 
         Ok(())
