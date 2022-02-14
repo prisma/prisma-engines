@@ -69,7 +69,7 @@ pub(crate) fn supports_implicit_relations(relation: ImplicitManyToManyRelationWa
         .map(|r| r.ast_field().span);
 
     let msg = format!(
-        "Implicit many-to-many relations are not supported on {}. https://pris.ly/d/many-to-many-relations",
+        "Implicit many-to-many relations are not supported on {}. Please use the syntax defined in https://pris.ly/d/document-database-many-to-many",
         ctx.connector.name()
     );
 
