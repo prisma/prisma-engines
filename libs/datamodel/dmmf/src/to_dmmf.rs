@@ -1,7 +1,9 @@
-use super::{Datamodel, Enum, EnumValue, Field, Function, Model, UniqueIndex};
-use crate::{dml, json::dmmf::PrimaryKey, FieldType, Ignorable, ScalarType};
-use ::dml::{prisma_value, PrismaValue};
+use crate::{Datamodel, Enum, EnumValue, Field, Function, Model, PrimaryKey, UniqueIndex};
 use bigdecimal::ToPrimitive;
+use datamodel::{
+    dml::{self, FieldType, Ignorable, ScalarType},
+    PrismaValue,
+};
 
 pub fn render_to_dmmf(schema: &dml::Datamodel) -> String {
     let dmmf = schema_to_dmmf(schema);
@@ -154,7 +156,7 @@ fn prisma_value_to_serde(value: &PrismaValue) -> serde_json::Value {
         PrismaValue::Json(val) => serde_json::Value::String(val.to_string()),
         PrismaValue::Xml(val) => serde_json::Value::String(val.to_string()),
         PrismaValue::List(value_vec) => serde_json::Value::Array(value_vec.iter().map(prisma_value_to_serde).collect()),
-        PrismaValue::Bytes(b) => serde_json::Value::String(prisma_value::encode_bytes(b)),
+        PrismaValue::Bytes(b) => serde_json::Value::String(datamodel::prisma_value::encode_bytes(b)),
         PrismaValue::Object(pairs) => {
             let mut map = serde_json::Map::with_capacity(pairs.len());
             pairs.iter().for_each(|(key, value)| {
