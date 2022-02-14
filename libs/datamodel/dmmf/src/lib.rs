@@ -90,7 +90,9 @@ pub struct EnumValue {
 }
 
 #[derive(Debug, serde::Serialize, serde::Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct Datamodel {
     pub enums: Vec<Enum>,
     pub models: Vec<Model>,
+    pub types: Vec<Model>, // composite types
 }
