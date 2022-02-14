@@ -14,11 +14,15 @@ fn basic_create_migration_works(api: TestApi) {
 
     let dir = api.create_migrations_directory();
 
+    let is_postgres = api.is_postgres();
+    let is_mysql = api.is_mysql();
+    let is_sqlite = api.is_sqlite();
+    let is_mssql = api.is_mssql();
     api.create_migration("create-cats", &dm, &dir)
         .send_sync()
         .assert_migration_directories_count(1)
-        .assert_migration("create-cats", |migration| {
-            let expected_script = if api.is_postgres() {
+        .assert_migration("create-cats", move |migration| {
+            let expected_script = if is_postgres {
                 indoc! {
                     r#"
                         -- CreateTable
@@ -30,7 +34,7 @@ fn basic_create_migration_works(api: TestApi) {
                         );
                     "#
                 }
-            } else if api.is_mysql() {
+            } else if is_mysql {
                 indoc! {
                     r#"
                         -- CreateTable
@@ -42,7 +46,7 @@ fn basic_create_migration_works(api: TestApi) {
                         ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
                         "#
                 }
-            } else if api.is_sqlite() {
+            } else if is_sqlite {
                 indoc! {
                     r#"
                         -- CreateTable
@@ -52,7 +56,7 @@ fn basic_create_migration_works(api: TestApi) {
                         );
                         "#
                 }
-            } else if api.is_mssql() {
+            } else if is_mssql {
                 indoc! {
                     r#"
                         BEGIN TRY
@@ -119,11 +123,15 @@ fn creating_a_second_migration_should_have_the_previous_sql_schema_as_baseline(a
     "#,
     );
 
+    let is_postgres = api.is_postgres();
+    let is_mysql = api.is_mysql();
+    let is_sqlite = api.is_sqlite();
+    let is_mssql = api.is_mssql();
     api.create_migration("create-dogs", &dm2, &dir)
         .send_sync()
         .assert_migration_directories_count(2)
         .assert_migration("create-dogs", |migration| {
-            let expected_script = if api.is_postgres()
+            let expected_script = if is_postgres
                 {
                     indoc! {
                         r#"
@@ -137,7 +145,7 @@ fn creating_a_second_migration_should_have_the_previous_sql_schema_as_baseline(a
                         "#
                     }
                 }
-                else if api.is_mysql() {
+                else if is_mysql {
                     indoc! {
                         r#"
                         -- CreateTable
@@ -150,7 +158,7 @@ fn creating_a_second_migration_should_have_the_previous_sql_schema_as_baseline(a
                         "#
                     }
                 }
-                else if api.is_sqlite() {
+                else if is_sqlite {
                     indoc! {
                         r#"
                         -- CreateTable
@@ -161,7 +169,7 @@ fn creating_a_second_migration_should_have_the_previous_sql_schema_as_baseline(a
                         "#
                     }
                 }
-                else if api.is_mssql() {
+                else if is_mssql {
                     indoc! {
                         r#"
                         BEGIN TRY
@@ -331,11 +339,13 @@ fn create_enum_step_only_rendered_when_needed(api: TestApi) {
 
     let dir = api.create_migrations_directory();
 
+    let is_postgres = api.is_postgres();
+    let is_mysql = api.is_mysql();
     api.create_migration("create-cats", &dm, &dir)
         .send_sync()
         .assert_migration_directories_count(1)
         .assert_migration("create-cats", |migration| {
-            let expected_script = if api.is_postgres() {
+            let expected_script = if is_postgres {
                 indoc! {
                     r#"
                         -- CreateEnum
@@ -350,7 +360,7 @@ fn create_enum_step_only_rendered_when_needed(api: TestApi) {
                         );
                     "#
                 }
-            } else if api.is_mysql() {
+            } else if is_mysql {
                 indoc! {
                     r#"
                         -- CreateTable
@@ -395,8 +405,7 @@ fn create_enum_renders_correctly(api: TestApi) {
         .send_sync()
         .assert_migration_directories_count(1)
         .assert_migration("create-cats", |migration| {
-            let expected_script = if api.is_postgres() {
-                indoc! {
+            let expected_script = indoc! {
                     r#"
                         -- CreateEnum
                         CREATE TYPE "Mood" AS ENUM ('HUNGRY', 'SLEEPY');
@@ -409,9 +418,6 @@ fn create_enum_renders_correctly(api: TestApi) {
                             CONSTRAINT "Cat_pkey" PRIMARY KEY ("id")
                         );
                     "#
-                }
-            } else {
-                unreachable!()
             };
 
             migration.assert_contents(expected_script)
@@ -438,9 +444,8 @@ fn unsupported_type_renders_correctly(api: TestApi) {
         .send_sync()
         .assert_migration_directories_count(1)
         .assert_migration("create-cats", |migration| {
-            let expected_script = if api.is_postgres() {
-                indoc! {
-                    r#"
+            let expected_script = indoc! {
+                r#"
                         -- CreateTable
                         CREATE TABLE "Cat" (
                             "id" INTEGER NOT NULL,
@@ -449,9 +454,6 @@ fn unsupported_type_renders_correctly(api: TestApi) {
                             CONSTRAINT "Cat_pkey" PRIMARY KEY ("id")
                         );
                         "#
-                }
-            } else {
-                unreachable!()
             };
 
             migration.assert_contents(expected_script)
@@ -479,11 +481,12 @@ fn no_additional_unique_created(api: TestApi) {
 
     let dir = api.create_migrations_directory();
 
+    let is_postgres = api.is_postgres();
     api.create_migration("create-cats", dm, &dir)
         .send_sync()
         .assert_migration_directories_count(1)
         .assert_migration("create-cats", |migration| {
-            let expected_script = if api.is_postgres() {
+            let expected_script = if is_postgres {
 
                     indoc! {
                         r#"
@@ -539,11 +542,15 @@ fn create_constraint_name_tests_w_implicit_names(api: TestApi) {
 
     let dir = api.create_migrations_directory();
 
+    let is_mssql = api.is_mssql();
+    let is_postgres = api.is_postgres();
+    let is_mysql = api.is_mysql();
+    let is_sqlite = api.is_sqlite();
     api.create_migration("setup", &dm, &dir)
         .send_sync()
         .assert_migration_directories_count(1)
         .assert_migration("setup", |migration| {
-            let expected_script = if api.is_mssql() {
+            let expected_script = if is_mssql {
                 indoc! {
                      r#"
                      BEGIN TRY
@@ -592,7 +599,7 @@ fn create_constraint_name_tests_w_implicit_names(api: TestApi) {
                      END CATCH
                  "#
                  }
-            } else if api.is_postgres() {
+            } else if is_postgres {
                 indoc! {
                      r#"
                      -- CreateTable
@@ -630,7 +637,7 @@ fn create_constraint_name_tests_w_implicit_names(api: TestApi) {
                      ALTER TABLE "B" ADD CONSTRAINT "B_aId_fkey" FOREIGN KEY ("aId") REFERENCES "A"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
                  "#
                  }
-            } else if api.is_mysql(){
+            } else if is_mysql {
                 indoc! {
                      r#"
                  -- CreateTable
@@ -660,7 +667,7 @@ fn create_constraint_name_tests_w_implicit_names(api: TestApi) {
                  ALTER TABLE `B` ADD CONSTRAINT `B_aId_fkey` FOREIGN KEY (`aId`) REFERENCES `A`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
                  "#
                  }
-            }else if api.is_sqlite(){
+            }else if is_sqlite {
                 indoc!{r#"
                  -- CreateTable
                  CREATE TABLE "A" (
@@ -729,11 +736,15 @@ fn create_constraint_name_tests_w_explicit_names(api: TestApi) {
 
     let dir = api.create_migrations_directory();
 
+    let is_mssql = api.is_mssql();
+    let is_mysql = api.is_mysql();
+    let is_sqlite = api.is_sqlite();
+    let is_postgres = api.is_postgres();
     api.create_migration("setup", &dm, &dir)
         .send_sync()
         .assert_migration_directories_count(1)
-        .assert_migration("setup", |migration| {
-            let expected_script = if api.is_mssql() {
+        .assert_migration("setup", move |migration| {
+            let expected_script = if is_mssql {
                 indoc! {
                      r#"
                      BEGIN TRY
@@ -783,7 +794,7 @@ fn create_constraint_name_tests_w_explicit_names(api: TestApi) {
                      END CATCH
                  "#
                  }
-            } else if api.is_postgres() {
+            } else if is_postgres {
                 indoc! {
                      r#"
                      -- CreateTable
@@ -824,7 +835,7 @@ fn create_constraint_name_tests_w_explicit_names(api: TestApi) {
                      ALTER TABLE "B" ADD CONSTRAINT "ForeignKey" FOREIGN KEY ("aId") REFERENCES "A"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
                  "#
                  }
-            } else if api.is_mysql(){
+            } else if is_mysql{
                 indoc! {
                      r#"
                  -- CreateTable
@@ -855,7 +866,7 @@ fn create_constraint_name_tests_w_explicit_names(api: TestApi) {
                  ALTER TABLE `B` ADD CONSTRAINT `ForeignKey` FOREIGN KEY (`aId`) REFERENCES `A`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
                  "#
                  }
-            }else if api.is_sqlite(){
+            }else if is_sqlite {
                 indoc!{r#"
                  -- CreateTable
                  CREATE TABLE "A" (
@@ -959,11 +970,18 @@ fn alter_constraint_name(api: TestApi) {
         }
     ));
 
+    let is_mssql = api.is_mssql();
+    let is_mysql = api.is_mysql();
+    let is_postgres = api.is_postgres();
+    let is_cockroach = api.is_cockroach();
+    let is_mysql_5_6 = api.is_mysql_5_6();
+    let is_mariadb = api.is_mariadb();
+    let is_sqlite = api.is_sqlite();
     api.create_migration("custom", &custom_dm, &dir)
         .send_sync()
         .assert_migration_directories_count(2)
-        .assert_migration("custom", |migration| {
-            let expected_script = if api.is_mssql() {
+        .assert_migration("custom",move |migration| {
+            let expected_script = if is_mssql {
                 indoc! {
                      r#"
                     BEGIN TRY
@@ -1005,7 +1023,7 @@ fn alter_constraint_name(api: TestApi) {
                     END CATCH
                  "#
                  }
-            } else if api.is_cockroach() {
+            } else if is_cockroach {
                 indoc! {r#"
                     -- AlterTable
                     ALTER TABLE "A" RENAME CONSTRAINT "A_pkey" TO "CustomId";
@@ -1028,7 +1046,7 @@ fn alter_constraint_name(api: TestApi) {
                     -- RenameIndex
                     ALTER INDEX "B_a_b_idx" RENAME TO "AnotherCustomIndex";
                 "#}
-            } else if api.is_postgres() {
+            } else if is_postgres {
                 indoc! {
                      r#"
                 -- AlterTable
@@ -1053,7 +1071,7 @@ fn alter_constraint_name(api: TestApi) {
                 ALTER INDEX "B_a_b_idx" RENAME TO "AnotherCustomIndex";
                 "#
               }
-            } else if api.is_mysql_5_6() || api.is_mariadb(){
+            } else if is_mysql_5_6 || is_mariadb{
                 indoc! {
                      r#"
                  -- DropForeignKey
@@ -1080,7 +1098,7 @@ fn alter_constraint_name(api: TestApi) {
                  "#
                  }
             }
-            else if api.is_mysql(){
+            else if is_mysql{
                 indoc! {
                      r#"
                  -- DropForeignKey
@@ -1102,7 +1120,7 @@ fn alter_constraint_name(api: TestApi) {
                  ALTER TABLE `B` RENAME INDEX `B_a_b_idx` TO `AnotherCustomIndex`;
                  "#
                  }
-            }else if api.is_sqlite(){
+            }else if is_sqlite{
                 indoc!{r#"
                  -- RedefineIndex
                  DROP INDEX "A_a_b_key";

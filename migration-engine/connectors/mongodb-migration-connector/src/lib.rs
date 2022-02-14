@@ -16,11 +16,11 @@ use datamodel::common::preview_features::PreviewFeature;
 use enumflags2::BitFlags;
 use migration::MongoDbMigration;
 use migration_connector::{
-    BoxFuture, ConnectorError, ConnectorHost, ConnectorParams, ConnectorResult, DestructiveChangeDiagnostics,
-    DiffTarget, EmptyHost, Migration, MigrationConnector,
+    BoxFuture, ConnectorError, ConnectorHost, ConnectorParams, ConnectorResult, DatabaseSchema,
+    DestructiveChangeDiagnostics, DiffTarget, EmptyHost, Migration, MigrationConnector,
 };
 use mongodb_schema_describer::MongoSchema;
-use std::sync::Arc;
+use std::{future, sync::Arc};
 use tokio::sync::OnceCell;
 
 /// The top-level MongoDB migration connector.
@@ -56,17 +56,10 @@ impl MongoDbMigrationConnector {
         match target {
             DiffTarget::Datamodel(schema) => {
                 let validated_schema =
-                    datamodel::parse_schema_parserdb(&schema).map_err(ConnectorError::new_schema_parser_error)?;
+                    datamodel::parse_schema_parserdb(schema).map_err(ConnectorError::new_schema_parser_error)?;
                 Ok(schema_calculator::calculate(&validated_schema))
             }
-            DiffTarget::Database(url) => {
-                if self.connection_string == url {
-                    self.client().await?.describe().await
-                } else {
-                    let client = Client::connect(&url, self.preview_features).await?;
-                    client.describe().await
-                }
-            }
+            DiffTarget::Database => self.client().await?.describe().await,
             DiffTarget::Migrations(_) => Err(unsupported_command_error()),
             DiffTarget::Empty => Ok(MongoSchema::default()),
         }
@@ -75,54 +68,70 @@ impl MongoDbMigrationConnector {
 
 #[async_trait::async_trait]
 impl MigrationConnector for MongoDbMigrationConnector {
-    fn connection_string(&self) -> &str {
-        &self.connection_string
+    fn connection_string(&self) -> Option<&str> {
+        Some(&self.connection_string)
+    }
+
+    fn database_schema_from_diff_target<'a>(
+        &'a mut self,
+        diff_target: DiffTarget<'a>,
+    ) -> BoxFuture<'a, ConnectorResult<DatabaseSchema>> {
+        Box::pin(async {
+            let schema = self.mongodb_schema_from_diff_target(diff_target).await?;
+            Ok(DatabaseSchema::new(schema))
+        })
     }
 
     fn host(&self) -> &Arc<dyn ConnectorHost> {
         &self.host
     }
 
-    fn apply_migration<'a>(&'a self, migration: &'a Migration) -> BoxFuture<'a, ConnectorResult<u32>> {
-        Box::pin(self.apply_migration(migration))
+    fn apply_migration<'a>(&'a mut self, migration: &'a Migration) -> BoxFuture<'a, ConnectorResult<u32>> {
+        Box::pin(self.apply_migration_impl(migration))
     }
 
-    fn apply_script(&self, _migration_name: &str, _script: &str) -> BoxFuture<ConnectorResult<()>> {
-        Box::pin(std::future::ready(Err(crate::unsupported_command_error())))
+    fn apply_script(&mut self, _migration_name: &str, _script: &str) -> BoxFuture<ConnectorResult<()>> {
+        Box::pin(future::ready(Err(crate::unsupported_command_error())))
     }
 
     fn connector_type(&self) -> &'static str {
         "mongodb"
     }
 
-    async fn create_database(&self) -> ConnectorResult<String> {
-        let name = self.client().await?.db_name();
-        tracing::warn!("MongoDB database will be created on first use.");
-        Ok(name.into())
+    fn create_database(&mut self) -> BoxFuture<'_, ConnectorResult<String>> {
+        Box::pin(async {
+            let name = self.client().await?.db_name();
+            tracing::warn!("MongoDB database will be created on first use.");
+            Ok(name.into())
+        })
     }
 
-    async fn db_execute(&self, _url: String, _script: String) -> ConnectorResult<()> {
+    async fn db_execute(&mut self, _script: String) -> ConnectorResult<()> {
         Err(ConnectorError::from_msg(
             "dbExecute is not supported on MongoDB".to_owned(),
         ))
     }
 
-    async fn ensure_connection_validity(&self) -> ConnectorResult<()> {
+    fn empty_database_schema(&self) -> DatabaseSchema {
+        DatabaseSchema::new(MongoSchema::default())
+    }
+
+    async fn ensure_connection_validity(&mut self) -> ConnectorResult<()> {
         Ok(())
     }
 
-    async fn version(&self) -> migration_connector::ConnectorResult<String> {
-        Ok("4 or 5".to_owned())
+    fn version(&mut self) -> BoxFuture<'_, migration_connector::ConnectorResult<String>> {
+        Box::pin(future::ready(Ok("4 or 5".to_owned())))
     }
 
-    async fn diff(&self, from: DiffTarget<'_>, to: DiffTarget<'_>) -> ConnectorResult<Migration> {
-        let from = self.mongodb_schema_from_diff_target(from).await?;
-        let to = self.mongodb_schema_from_diff_target(to).await?;
+    fn diff(&self, from: DatabaseSchema, to: DatabaseSchema) -> ConnectorResult<Migration> {
+        let from: Box<MongoSchema> = from.downcast();
+        let to: Box<MongoSchema> = to.downcast();
         Ok(Migration::new(differ::diff(from, to)))
     }
 
-    async fn drop_database(&self) -> ConnectorResult<()> {
-        self.client().await?.drop_database().await
+    fn drop_database(&mut self) -> BoxFuture<'_, ConnectorResult<()>> {
+        Box::pin(async { self.client().await?.drop_database().await })
     }
 
     fn migration_file_extension(&self) -> &'static str {
@@ -137,20 +146,20 @@ impl MigrationConnector for MongoDbMigrationConnector {
         migration.downcast_ref::<MongoDbMigration>().summary()
     }
 
-    async fn reset(&self) -> migration_connector::ConnectorResult<()> {
-        self.client().await?.drop_database().await
+    fn reset(&mut self) -> BoxFuture<'_, migration_connector::ConnectorResult<()>> {
+        Box::pin(async { self.client().await?.drop_database().await })
     }
 
-    fn migration_persistence(&self) -> &dyn migration_connector::MigrationPersistence {
+    fn migration_persistence(&mut self) -> &mut dyn migration_connector::MigrationPersistence {
         self
     }
 
-    fn destructive_change_checker(&self) -> &dyn migration_connector::DestructiveChangeChecker {
+    fn destructive_change_checker(&mut self) -> &mut dyn migration_connector::DestructiveChangeChecker {
         self
     }
 
-    async fn acquire_lock(&self) -> ConnectorResult<()> {
-        Ok(())
+    fn acquire_lock(&mut self) -> BoxFuture<'_, ConnectorResult<()>> {
+        Box::pin(future::ready(Ok(())))
     }
 
     fn render_script(
@@ -163,12 +172,18 @@ impl MigrationConnector for MongoDbMigrationConnector {
         ))
     }
 
+    fn set_params(&mut self, params: ConnectorParams) -> ConnectorResult<()> {
+        self.connection_string = params.connection_string;
+        self.preview_features = params.preview_features;
+        Ok(())
+    }
+
     fn set_host(&mut self, host: Arc<dyn migration_connector::ConnectorHost>) {
         self.host = host;
     }
 
     async fn validate_migrations(
-        &self,
+        &mut self,
         _migrations: &[migration_connector::migrations_directory::MigrationDirectory],
     ) -> migration_connector::ConnectorResult<()> {
         Ok(())

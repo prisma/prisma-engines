@@ -24,7 +24,7 @@ fn database_access_denied_must_return_a_proper_error_in_rpc(api: TestApi) {
         url,
     );
 
-    let error = api.block_on(connection_error(dm));
+    let error = tok(connection_error(dm));
     let json_error = serde_json::to_string_pretty(&error.to_user_facing()).unwrap();
 
     let expected = expect![[r#"

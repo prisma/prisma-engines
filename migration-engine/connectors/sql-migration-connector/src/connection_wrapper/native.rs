@@ -1,6 +1,4 @@
 use super::{SqlError, SqlResult};
-use datamodel::common::preview_features::PreviewFeature;
-use enumflags2::BitFlags;
 use migration_connector::{ConnectorError, ConnectorResult};
 use quaint::{
     connector::{Mysql, MysqlUrl, PostgreSql, PostgresUrl},
@@ -8,11 +6,8 @@ use quaint::{
     prelude::{ConnectionInfo, Query, Queryable, ResultSet},
     single::Quaint,
 };
-use sql_schema_describer::{
-    postgres::Circumstances, DescriberErrorKind, IndexType, SqlSchema, SqlSchemaDescriberBackend,
-};
 use std::sync::Arc;
-use user_facing_errors::{introspection_engine::DatabaseSchemaInconsistent, KnownError};
+use user_facing_errors::KnownError;
 
 pub(crate) async fn connect(connection_string: &str) -> ConnectorResult<Connection> {
     let connection_info = ConnectionInfo::from_url(connection_string).map_err(|err| {
@@ -67,10 +62,16 @@ fn sql_error(quaint_error: QuaintError, connection_info: &ConnectionInfo) -> Sql
 /// An internal helper for the SQL connector. It wraps a `Quaint` struct and
 /// exposes a similar API, with additional error handling to return
 /// `ConnectorResult`s.
-#[derive(Clone, Debug)]
+#[derive(Clone)]
 pub(crate) struct Connection(ConnectionInner, ConnectionInfo);
 
-#[derive(Clone, Debug)]
+impl std::fmt::Debug for Connection {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str("<CONNECTION>") // we do not want to leak secrets
+    }
+}
+
+#[derive(Clone)]
 enum ConnectionInner {
     Postgres(Arc<(quaint::connector::PostgreSql, PostgresUrl)>),
     Mysql(Arc<(quaint::connector::Mysql, MysqlUrl)>),
@@ -101,17 +102,7 @@ impl Connection {
         &self.1
     }
 
-    pub(crate) async fn is_cockroachdb(&self) -> ConnectorResult<bool> {
-        let res = self
-            .version()
-            .await?
-            .map(|v| v.contains("CockroachDB"))
-            .unwrap_or(false);
-
-        Ok(res)
-    }
-
-    fn queryable(&self) -> &dyn Queryable {
+    pub(crate) fn queryable(&self) -> &dyn Queryable {
         match &self.0 {
             ConnectionInner::Postgres(pg) => &pg.0,
             ConnectionInner::Mysql(my) => &my.0,
@@ -119,79 +110,6 @@ impl Connection {
         }
     }
 
-    pub(crate) async fn describe_schema(
-        &self,
-        preview_features: BitFlags<PreviewFeature>,
-    ) -> ConnectorResult<SqlSchema> {
-        let connection_info = self.connection_info();
-        let mut schema = match connection_info {
-            ConnectionInfo::Postgres(_) => {
-                let mut circumstances = BitFlags::empty();
-
-                if self.is_cockroachdb().await? {
-                    circumstances |= Circumstances::Cockroach;
-                }
-
-                sql_schema_describer::postgres::SqlSchemaDescriber::new(self.queryable(), circumstances)
-                    .describe(connection_info.schema_name())
-                    .await
-                    .map_err(|err| match err.into_kind() {
-                        DescriberErrorKind::QuaintError(err) => quaint_error_to_connector_error(err, connection_info),
-                        e @ DescriberErrorKind::CrossSchemaReference { .. } => {
-                            let err = KnownError::new(DatabaseSchemaInconsistent {
-                                explanation: format!("{}", e),
-                            });
-
-                            ConnectorError::from(err)
-                        }
-                    })?
-            }
-            ConnectionInfo::Mysql(_) => sql_schema_describer::mysql::SqlSchemaDescriber::new(self.queryable())
-                .describe(connection_info.schema_name())
-                .await
-                .map_err(|err| match err.into_kind() {
-                    DescriberErrorKind::QuaintError(err) => quaint_error_to_connector_error(err, connection_info),
-                    DescriberErrorKind::CrossSchemaReference { .. } => {
-                        unreachable!("No schemas on MySQL")
-                    }
-                })?,
-            ConnectionInfo::Mssql(_) => sql_schema_describer::mssql::SqlSchemaDescriber::new(self.queryable())
-                .describe(connection_info.schema_name())
-                .await
-                .map_err(|err| match err.into_kind() {
-                    DescriberErrorKind::QuaintError(err) => quaint_error_to_connector_error(err, connection_info),
-                    e @ DescriberErrorKind::CrossSchemaReference { .. } => {
-                        let err = KnownError::new(DatabaseSchemaInconsistent {
-                            explanation: e.to_string(),
-                        });
-
-                        ConnectorError::from(err)
-                    }
-                })?,
-            ConnectionInfo::Sqlite { .. } | ConnectionInfo::InMemorySqlite { .. } => {
-                sql_schema_describer::sqlite::SqlSchemaDescriber::new(self.queryable())
-                    .describe(connection_info.schema_name())
-                    .await
-                    .map_err(|err| match err.into_kind() {
-                        DescriberErrorKind::QuaintError(err) => quaint_error_to_connector_error(err, connection_info),
-                        DescriberErrorKind::CrossSchemaReference { .. } => {
-                            unreachable!("No schemas on SQLite")
-                        }
-                    })?
-            }
-        };
-
-        // Remove this when the feature is GA
-        if !preview_features.contains(PreviewFeature::ExtendedIndexes) {
-            filter_extended_index_capabilities(&mut schema);
-        }
-
-        if !preview_features.contains(PreviewFeature::FullTextIndex) {
-            filter_fulltext_capabilities(&mut schema);
-        }
-
-        Ok(schema)
-    }
     pub(crate) async fn query(&self, query: impl Into<Query<'_>>) -> SqlResult<ResultSet> {
         self.queryable()
             .query(query.into())
@@ -223,58 +141,14 @@ impl Connection {
     pub(crate) fn unwrap_postgres(&self) -> &(PostgreSql, PostgresUrl) {
         match &self.0 {
             ConnectionInner::Postgres(inner) => inner,
-            other => panic!("{:?} in Connection::unwrap_postgres()", other),
+            _ => panic!("unexpected data in Connection::unwrap_postgres()"),
         }
     }
 
     pub(crate) fn unwrap_mysql(&self) -> &(Mysql, MysqlUrl) {
         match &self.0 {
             ConnectionInner::Mysql(inner) => &**inner,
-            other => panic!("{:?} in Connection::unwrap_mysql()", other),
+            _ => panic!("unexpected data in Connection::unwrap_mysql()"),
         }
-    }
-}
-
-fn filter_fulltext_capabilities(schema: &mut SqlSchema) {
-    let indices = schema
-        .iter_tables_mut()
-        .flat_map(|(_, t)| t.indices.iter_mut().filter(|i| i.is_fulltext()));
-
-    for index in indices {
-        index.tpe = IndexType::Normal;
-    }
-}
-
-fn filter_extended_index_capabilities(schema: &mut SqlSchema) {
-    for (_, table) in schema.iter_tables_mut() {
-        if let Some(ref mut pk) = &mut table.primary_key {
-            for col in pk.columns.iter_mut() {
-                col.length = None;
-                col.sort_order = None;
-            }
-        }
-
-        let mut kept_indexes = Vec::new();
-
-        while let Some(mut index) = table.indices.pop() {
-            let mut remove_index = false;
-
-            for col in index.columns.iter_mut() {
-                if col.length.is_some() {
-                    remove_index = true;
-                }
-
-                col.sort_order = None;
-            }
-
-            index.algorithm = None;
-
-            if !remove_index {
-                kept_indexes.push(index);
-            }
-        }
-
-        kept_indexes.reverse();
-        table.indices = kept_indexes;
     }
 }

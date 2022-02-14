@@ -3,16 +3,16 @@ use crate::{
     json_rpc::types::{DiffParams, DiffResult, DiffTarget, PathContainer, SchemaContainer, UrlContainer},
 };
 use enumflags2::BitFlags;
-use migration_connector::{ConnectorError, ConnectorHost, DiffTarget as McDiff, MigrationConnector};
+use migration_connector::{
+    ConnectorError, ConnectorHost, ConnectorParams, DatabaseSchema, DiffTarget as McDiff, MigrationConnector,
+};
 use std::{path::Path, sync::Arc};
 
-pub(crate) async fn diff(params: DiffParams, host: Arc<dyn ConnectorHost>) -> CoreResult<DiffResult> {
-    let mut from =
-        json_rpc_diff_target_to_migration_connector_diff_target(&params.from, params.shadow_database_url.as_deref())?;
-    let mut to =
-        json_rpc_diff_target_to_migration_connector_diff_target(&params.to, params.shadow_database_url.as_deref())?;
+pub async fn diff(params: DiffParams, host: Arc<dyn ConnectorHost>) -> CoreResult<DiffResult> {
+    let mut from = json_rpc_diff_target_to_connector(&params.from, params.shadow_database_url.as_deref()).await?;
+    let mut to = json_rpc_diff_target_to_connector(&params.to, params.shadow_database_url.as_deref()).await?;
 
-    for connector in [from.connector.as_mut(), to.connector.as_mut()].into_iter().flatten() {
+    for (connector, _) in [from.as_mut(), to.as_mut()].into_iter().flatten() {
         connector.set_host(host.clone());
     }
 
@@ -21,13 +21,24 @@ pub(crate) async fn diff(params: DiffParams, host: Arc<dyn ConnectorHost>) -> Co
     //
     // TODO: make sure the shadow_database_url param is _always_ taken into account.
     // TODO: make sure the connectors are the same in from and to.
-    let connector = from
-        .connector
-        .as_ref()
-        .or_else(|| to.connector.as_ref())
-        .ok_or_else(|| ConnectorError::from_msg("Could not determine the connector to use for diffing.".to_owned()))?;
+    let (connector, from, to) = match (from, to) {
+        (Some((connector, from)), Some((_, to))) => (connector, from, to),
+        (Some((connector, from)), None) => {
+            let to = connector.empty_database_schema();
+            (connector, from, to)
+        }
+        (None, Some((connector, to))) => {
+            let from = connector.empty_database_schema();
+            (connector, from, to)
+        }
+        (None, None) => {
+            return Err(ConnectorError::from_msg(
+                "Could not determine the connector to use for diffing.".to_owned(),
+            ))
+        }
+    };
 
-    let migration: migration_connector::Migration = connector.diff(from.target, to.target).await?;
+    let migration = connector.diff(from, to)?;
 
     if params.script {
         let mut script_string = connector.render_script(&migration, &Default::default())?;
@@ -46,17 +57,11 @@ pub(crate) async fn diff(params: DiffParams, host: Arc<dyn ConnectorHost>) -> Co
     Ok(DiffResult { exit_code: 0 })
 }
 
-struct RefinedDiffTarget {
-    target: McDiff<'static>,
-    /// `None` in case the target is Empty.
-    connector: Option<Box<dyn MigrationConnector>>,
-}
-
-// -> CoreResult<(DiffTarget, Option<connector>)> ?
-fn json_rpc_diff_target_to_migration_connector_diff_target(
+// `None` in case the target is empty
+async fn json_rpc_diff_target_to_connector(
     target: &DiffTarget,
     shadow_database_url: Option<&str>,
-) -> CoreResult<RefinedDiffTarget> {
+) -> CoreResult<Option<(Box<dyn MigrationConnector>, DatabaseSchema)>> {
     let read_prisma_schema_from_path = |schema_path: &str| -> CoreResult<String> {
         std::fs::read_to_string(schema_path).map_err(|err| {
             ConnectorError::from_source_with_context(
@@ -67,78 +72,52 @@ fn json_rpc_diff_target_to_migration_connector_diff_target(
     };
 
     match target {
-        DiffTarget::Empty => Ok(RefinedDiffTarget {
-            target: McDiff::Empty,
-            connector: None,
-        }),
+        DiffTarget::Empty => Ok(None),
         DiffTarget::SchemaDatasource(SchemaContainer { schema }) => {
             let schema_contents = read_prisma_schema_from_path(schema)?;
-            let (_, url, _, _) = crate::parse_configuration(&schema_contents)?;
-            let api = crate::schema_to_connector(&schema_contents)?;
-            Ok(RefinedDiffTarget {
-                connector: Some(api),
-                target: McDiff::Database(url.into()),
-            })
+            let mut connector = crate::schema_to_connector(&schema_contents)?;
+            let schema = connector.database_schema_from_diff_target(McDiff::Database).await?;
+            Ok(Some((connector, schema)))
         }
         DiffTarget::SchemaDatamodel(SchemaContainer { schema }) => {
             let schema_contents = read_prisma_schema_from_path(schema)?;
-            Ok(RefinedDiffTarget {
-                connector: Some(crate::schema_to_connector_unchecked(&schema_contents)?),
-                target: McDiff::Datamodel(schema_contents.into()),
-            })
+            let mut connector = crate::schema_to_connector_unchecked(&schema_contents)?;
+            let schema = connector
+                .database_schema_from_diff_target(McDiff::Datamodel(&schema_contents))
+                .await?;
+            Ok(Some((connector, schema)))
         }
         DiffTarget::Url(UrlContainer { url }) => {
-            let connector = crate::connector_for_connection_string(url.clone(), None, BitFlags::empty())?;
-            Ok(RefinedDiffTarget {
-                connector: Some(connector),
-                target: McDiff::Database(url.to_owned().into()),
-            })
+            let mut connector = crate::connector_for_connection_string(url.clone(), None, BitFlags::empty())?;
+            let schema = connector.database_schema_from_diff_target(McDiff::Database).await?;
+            Ok(Some((connector, schema)))
         }
         DiffTarget::Migrations(PathContainer { path }) => {
             let provider = migration_connector::migrations_directory::read_provider_from_lock_file(path);
-            let connector = match (provider, shadow_database_url) {
-                (Some(provider), Some(_)) => {
-                    let maybe_shadow_database_url = shadow_database_url
-                        .map(|sdurl| format!("shadowDatabaseUrl = \"{sdurl}\"", sdurl = sdurl.replace('\\', "\\\\")))
-                        .unwrap_or_else(String::new);
-
-                    Some(crate::schema_to_connector(&format!(
-                        r#"
-                            datasource db {{
-                                provider = "{provider}"
-                                url = "{url}"
-                                {maybe_shadow_database_url}
-                            }}
-                       "#,
-                        url = provider_to_dummy_url(&provider)
-                    ))?)
+            match (provider, shadow_database_url) {
+                (Some(provider), Some(shadow_database_url)) => {
+                    let mut connector = crate::connector_for_provider(&provider)?;
+                    let params = ConnectorParams {
+                        connection_string: shadow_database_url.to_owned(),
+                        preview_features: BitFlags::empty(), // TODO: where could we get the preview features from, here?
+                        shadow_database_connection_string: Some(shadow_database_url.to_owned()),
+                    };
+                    connector.set_params(params)?;
+                    let directories = migration_connector::migrations_directory::list_migrations(Path::new(path))?;
+                    let schema = connector
+                        .database_schema_from_diff_target(McDiff::Migrations(&directories))
+                        .await?;
+                    Ok(Some((connector, schema)))
                 }
-                (provider, None) if provider.as_deref() != Some("sqlite") => {
-                    return Err(ConnectorError::from_msg(
-                        "You must pass the --shadow-database-url if you want to diff a migrations directory."
-                            .to_owned(),
-                    ))
-                }
-                (None, _) => return Err(ConnectorError::from_msg(
+                (provider, None) if provider.as_deref() != Some("sqlite") => Err(ConnectorError::from_msg(
+                    "You must pass the --shadow-database-url if you want to diff a migrations directory.".to_owned(),
+                )),
+                (None, _) => Err(ConnectorError::from_msg(
                     "Could not determine the connector from the migrations directory (missing migrations_lock.toml)."
                         .to_owned(),
                 )),
                 _ => unreachable!("no provider, no shadow database url for migrations target"),
-            };
-            let directories = migration_connector::migrations_directory::list_migrations(Path::new(path))?;
-            Ok(RefinedDiffTarget {
-                connector,
-                target: McDiff::Migrations(directories.into()),
-            })
+            }
         }
-    }
-}
-
-fn provider_to_dummy_url(provider: &str) -> &'static str {
-    match provider {
-        "postgresql" | "postgres" | "cockroachdb" => "postgresql://example.com/",
-        "mysql" => "mysql://example.com/",
-        "sqlserver" => "sqlserver://",
-        _ => "<unknown provider>",
     }
 }

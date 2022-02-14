@@ -46,7 +46,9 @@ fn empty_schemas() {
             url = env("TEST_DATABASE_URL")
         }
         "#,
-        expect![[r#"No difference detected."#]],
+        expect![[r#"
+            No difference detected.
+        "#]],
     )
 }
 
@@ -284,7 +286,7 @@ fn deletions_column() {
         "#,
         r#"
         datasource db {
-            provider = "sqlite"
+            provider = "mysql"
             url = "mysql://localhost/testdb"
         }
 

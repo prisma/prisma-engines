@@ -9,7 +9,7 @@ use crate::{ConnectorResult, Migration};
 #[async_trait::async_trait]
 pub trait DestructiveChangeChecker: Send + Sync {
     /// Check destructive changes resulting of applying the provided migration.
-    async fn check(&self, migration: &Migration) -> ConnectorResult<DestructiveChangeDiagnostics>;
+    async fn check(&mut self, migration: &Migration) -> ConnectorResult<DestructiveChangeDiagnostics>;
 
     /// Check the migration for destructive or unexecutable steps
     /// without performing any IO.

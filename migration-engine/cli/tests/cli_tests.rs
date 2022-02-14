@@ -1,7 +1,8 @@
 use connection_string::JdbcString;
+use migration_core::json_rpc::types::{DbExecuteDatasourceType, DbExecuteParams, UrlContainer};
 use std::process::{Command, Output};
 use test_macros::test_connector;
-use test_setup::{BitFlags, Tags, TestApiArgs};
+use test_setup::{runtime::run_with_thread_local_runtime as tok, BitFlags, Tags, TestApiArgs};
 use url::Url;
 use user_facing_errors::{common::DatabaseDoesNotExist, UserFacingError};
 
@@ -15,15 +16,14 @@ impl TestApi {
     }
 
     fn connection_string(&self) -> String {
-        let rt = test_setup::runtime::test_tokio_runtime();
         let args = &self.args;
 
         if args.tags().contains(Tags::Postgres) {
-            rt.block_on(args.create_postgres_database()).2
+            tok(args.create_postgres_database()).2
         } else if args.tags().contains(Tags::Mysql) {
-            rt.block_on(args.create_mysql_database()).1
+            tok(args.create_mysql_database()).1
         } else if args.tags().contains(Tags::Mssql) {
-            rt.block_on(args.create_mssql_database()).1
+            tok(args.create_mssql_database()).1
         } else if args.tags().contains(Tags::Sqlite) {
             args.database_url().to_owned()
         } else {

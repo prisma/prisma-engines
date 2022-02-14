@@ -61,7 +61,10 @@ impl<'a> AlterTableConstructor<'a> {
                 TableChange::AddPrimaryKey => {
                     self.add_primary_key();
                 }
-                TableChange::AddColumn { column_id } => {
+                TableChange::AddColumn {
+                    column_id,
+                    has_virtual_default: _,
+                } => {
                     self.add_column(*column_id);
                 }
                 TableChange::DropColumn { column_id } => {

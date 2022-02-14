@@ -2,9 +2,9 @@ use crate::migration::{MongoDbMigration, MongoDbMigrationStep};
 use mongodb_schema_describer::{CollectionId, IndexField, IndexId, IndexWalker, MongoSchema};
 use std::collections::BTreeMap;
 
-pub(crate) fn diff(previous: MongoSchema, next: MongoSchema) -> MongoDbMigration {
+pub(crate) fn diff(previous: Box<MongoSchema>, next: Box<MongoSchema>) -> MongoDbMigration {
     let mut steps = Vec::new();
-    let db = DifferDatabase::new(&previous, &next);
+    let db = DifferDatabase::new(previous.as_ref(), next.as_ref());
 
     for collection_id in db.created_collections() {
         steps.push(MongoDbMigrationStep::CreateCollection(collection_id));

@@ -46,7 +46,8 @@ impl TestApi {
                 preview_features,
                 shadow_database_connection_string: None,
             };
-            let me = SqlMigrationConnector::new(params).unwrap();
+            let mut me = SqlMigrationConnector::new_mysql();
+            me.set_params(params).unwrap();
 
             me.reset().await.unwrap();
 

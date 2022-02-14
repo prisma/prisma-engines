@@ -3,7 +3,7 @@ use migration_connector::{ConnectorResult, DestructiveChangeChecker, Destructive
 
 #[async_trait::async_trait]
 impl DestructiveChangeChecker for MongoDbMigrationConnector {
-    async fn check(&self, _database_migration: &Migration) -> ConnectorResult<DestructiveChangeDiagnostics> {
+    async fn check(&mut self, _database_migration: &Migration) -> ConnectorResult<DestructiveChangeDiagnostics> {
         Ok(DestructiveChangeDiagnostics::new())
     }
 

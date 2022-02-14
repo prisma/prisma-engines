@@ -168,19 +168,21 @@ pub(crate) fn test_scenario(scenario_name: &str) {
 
     RT.block_on(async move {
         let parsed_schema = datamodel::parse_schema_parserdb(&schema).unwrap();
-        let (db_name, connector) = new_connector(parsed_schema.configuration.preview_features());
+        let (db_name, mut connector) = new_connector(parsed_schema.configuration.preview_features());
         let client = client().await;
         let db = client.database(&db_name);
         db.drop(None).await.unwrap();
         apply_state(&db, state).await;
 
-        let migration = connector
-            .diff(
-                DiffTarget::Database(connector.connection_string().into()),
-                DiffTarget::Datamodel((&schema).into()),
-            )
+        let from = connector
+            .database_schema_from_diff_target(DiffTarget::Database, None)
             .await
             .unwrap();
+        let to = connector
+            .database_schema_from_diff_target(DiffTarget::Datamodel(&schema), None)
+            .await
+            .unwrap();
+        let migration = connector.diff(from, to).unwrap();
 
         connector.apply_migration(&migration).await.unwrap();
 
@@ -214,13 +216,15 @@ Snapshot comparison failed. Run the test again with UPDATE_EXPECT=1 in the envir
         }
 
         // Check that the migration is idempotent.
-        let migration = connector
-            .diff(
-                DiffTarget::Database(connector.connection_string().into()),
-                DiffTarget::Datamodel((&schema).into()),
-            )
+        let from = connector
+            .database_schema_from_diff_target(DiffTarget::Database, None)
             .await
             .unwrap();
+        let to = connector
+            .database_schema_from_diff_target(DiffTarget::Datamodel(&schema), None)
+            .await
+            .unwrap();
+        let migration = connector.diff(from, to).unwrap();
 
         assert!(
             connector.migration_is_empty(&migration),

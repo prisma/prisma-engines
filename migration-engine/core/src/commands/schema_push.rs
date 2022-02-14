@@ -3,25 +3,26 @@ use migration_connector::{ConnectorError, DiffTarget, MigrationConnector};
 
 /// Command to bring the local database in sync with the prisma schema, without
 /// interacting with the migrations directory nor the migrations table.
-pub(crate) async fn schema_push(
+pub async fn schema_push(
     input: SchemaPushInput,
-    connector: &dyn MigrationConnector,
+    connector: &mut dyn MigrationConnector,
 ) -> CoreResult<SchemaPushOutput> {
     let datamodel = parse_schema(&input.schema)?;
-    let checker = connector.destructive_change_checker();
 
     if let Some(err) = connector.check_database_version_compatibility(&datamodel) {
         return Err(ConnectorError::user_facing(err));
     };
 
-    let database_migration = connector
-        .diff(
-            DiffTarget::Database(connector.connection_string().into()),
-            DiffTarget::Datamodel((&input.schema).into()),
-        )
+    let from = connector.database_schema_from_diff_target(DiffTarget::Database).await?;
+    let to = connector
+        .database_schema_from_diff_target(DiffTarget::Datamodel(&input.schema))
         .await?;
+    let database_migration = connector.diff(from, to)?;
 
-    let checks = checker.check(&database_migration).await?;
+    let checks = connector
+        .destructive_change_checker()
+        .check(&database_migration)
+        .await?;
 
     let executed_steps = match (checks.unexecutable_migrations.len(), checks.warnings.len(), input.force) {
         (unexecutable, _, _) if unexecutable > 0 => {

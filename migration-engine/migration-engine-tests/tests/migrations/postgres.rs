@@ -397,10 +397,7 @@ fn foreign_key_renaming_to_default_works(api: TestApi) {
         }
     "#;
 
-    let migration = api.connector_diff(
-        DiffTarget::Database(api.connection_string().into()),
-        DiffTarget::Datamodel(target_schema.into()),
-    );
+    let migration = api.connector_diff(DiffTarget::Database, DiffTarget::Datamodel(target_schema.into()));
     let expected = expect![[r#"
         -- RenameForeignKey
         ALTER TABLE "Dog" RENAME CONSTRAINT "favouriteFood" TO "Dog_favourite_food_id_fkey";

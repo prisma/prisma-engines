@@ -7,7 +7,7 @@ use migration_connector::{ConnectorResult, Migration, MigrationConnector};
 use mongodb::bson::{self, Bson, Document};
 
 impl MongoDbMigrationConnector {
-    pub(crate) async fn apply_migration(&self, migration: &Migration) -> ConnectorResult<u32> {
+    pub(crate) async fn apply_migration_impl(&self, migration: &Migration) -> ConnectorResult<u32> {
         let db = self.client().await?.database();
 
         if !self.migration_is_empty(migration) {

@@ -3,19 +3,21 @@ use migration_connector::MigrationConnector;
 use user_facing_errors::migration_engine::{CannotRollBackSucceededMigration, CannotRollBackUnappliedMigration};
 
 /// Mark a migration as rolled back.
-pub(crate) async fn mark_migration_rolled_back(
+pub async fn mark_migration_rolled_back(
     input: MarkMigrationRolledBackInput,
-    connector: &dyn MigrationConnector,
+    connector: &mut dyn MigrationConnector,
 ) -> CoreResult<MarkMigrationRolledBackOutput> {
-    let persistence = connector.migration_persistence();
-
     connector.acquire_lock().await?;
 
-    let all_migrations = persistence.list_migrations().await?.map_err(|_err| {
-        CoreError::from_msg(
-            "Invariant violation: called markMigrationRolledBack on a database without migrations table.".into(),
-        )
-    })?;
+    let all_migrations = connector
+        .migration_persistence()
+        .list_migrations()
+        .await?
+        .map_err(|_err| {
+            CoreError::from_msg(
+                "Invariant violation: called markMigrationRolledBack on a database without migrations table.".into(),
+            )
+        })?;
 
     let relevant_migrations: Vec<_> = all_migrations
         .into_iter()
@@ -47,7 +49,10 @@ pub(crate) async fn mark_migration_rolled_back(
             migration_name = migration.migration_name.as_str(),
             "Marking migration as rolled back."
         );
-        persistence.mark_migration_rolled_back_by_id(&migration.id).await?;
+        connector
+            .migration_persistence()
+            .mark_migration_rolled_back_by_id(&migration.id)
+            .await?;
     }
 
     Ok(MarkMigrationRolledBackOutput {})

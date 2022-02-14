@@ -63,12 +63,10 @@ impl DiagnoseMigrationHistoryOutput {
 /// Read the contents of the migrations directory and the migrations table, and
 /// returns their relative statuses. At this stage, the migration engine only
 /// reads, it does not write to the dev database nor the migrations directory.
-pub(crate) async fn diagnose_migration_history(
+pub async fn diagnose_migration_history(
     input: DiagnoseMigrationHistoryInput,
-    connector: &dyn MigrationConnector,
+    connector: &mut dyn MigrationConnector,
 ) -> CoreResult<DiagnoseMigrationHistoryOutput> {
-    let migration_persistence = connector.migration_persistence();
-
     tracing::debug!("Diagnosing migration history");
 
     error_on_changed_provider(&input.migrations_directory_path, connector.connector_type())?;
@@ -76,10 +74,11 @@ pub(crate) async fn diagnose_migration_history(
     // Load the migrations.
     let migrations_from_filesystem = list_migrations(Path::new(&input.migrations_directory_path))?;
 
-    let (migrations_from_database, has_migrations_table) = match migration_persistence.list_migrations().await? {
-        Ok(migrations) => (migrations, true),
-        Err(PersistenceNotInitializedError {}) => (vec![], false),
-    };
+    let (migrations_from_database, has_migrations_table) =
+        match connector.migration_persistence().list_migrations().await? {
+            Ok(migrations) => (migrations, true),
+            Err(PersistenceNotInitializedError {}) => (vec![], false),
+        };
 
     let mut diagnostics = Diagnostics::new(&migrations_from_filesystem);
 
@@ -130,12 +129,12 @@ pub(crate) async fn diagnose_migration_history(
 
     let (drift, error_in_unapplied_migration) = {
         if input.opt_in_to_shadow_database {
-            let drift = match connector
-                .diff(
-                    DiffTarget::Migrations((&applied_migrations).into()),
-                    DiffTarget::Database(connector.connection_string().into()),
-                )
-                .await
+            let from = connector
+                .database_schema_from_diff_target(DiffTarget::Migrations(&applied_migrations))
+                .await;
+            let to = connector.database_schema_from_diff_target(DiffTarget::Database).await;
+            let drift = match from
+                .and_then(|from| to.and_then(|to| connector.diff(from, to)))
                 .map(|mig| {
                     if connector.migration_is_empty(&mig) {
                         None

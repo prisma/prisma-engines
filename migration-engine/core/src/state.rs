@@ -220,7 +220,7 @@ impl GenericApi for EngineState {
 
         self.with_connector_for_url(
             url.clone(),
-            Box::new(move |connector| connector.db_execute(url, params.script)),
+            Box::new(move |connector| connector.db_execute(params.script)),
         )
         .await
     }
