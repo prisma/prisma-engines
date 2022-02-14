@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;expect-test-1.1.0&#x2F;src&#x2F;lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><script defer src="../../main.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;expect-test-1.2.2&#x2F;src&#x2F;lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><script defer src="../../main.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script>
     <noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../expect_test/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
@@ -583,6 +583,208 @@
 <span id="582">582</span>
 <span id="583">583</span>
 <span id="584">584</span>
+<span id="585">585</span>
+<span id="586">586</span>
+<span id="587">587</span>
+<span id="588">588</span>
+<span id="589">589</span>
+<span id="590">590</span>
+<span id="591">591</span>
+<span id="592">592</span>
+<span id="593">593</span>
+<span id="594">594</span>
+<span id="595">595</span>
+<span id="596">596</span>
+<span id="597">597</span>
+<span id="598">598</span>
+<span id="599">599</span>
+<span id="600">600</span>
+<span id="601">601</span>
+<span id="602">602</span>
+<span id="603">603</span>
+<span id="604">604</span>
+<span id="605">605</span>
+<span id="606">606</span>
+<span id="607">607</span>
+<span id="608">608</span>
+<span id="609">609</span>
+<span id="610">610</span>
+<span id="611">611</span>
+<span id="612">612</span>
+<span id="613">613</span>
+<span id="614">614</span>
+<span id="615">615</span>
+<span id="616">616</span>
+<span id="617">617</span>
+<span id="618">618</span>
+<span id="619">619</span>
+<span id="620">620</span>
+<span id="621">621</span>
+<span id="622">622</span>
+<span id="623">623</span>
+<span id="624">624</span>
+<span id="625">625</span>
+<span id="626">626</span>
+<span id="627">627</span>
+<span id="628">628</span>
+<span id="629">629</span>
+<span id="630">630</span>
+<span id="631">631</span>
+<span id="632">632</span>
+<span id="633">633</span>
+<span id="634">634</span>
+<span id="635">635</span>
+<span id="636">636</span>
+<span id="637">637</span>
+<span id="638">638</span>
+<span id="639">639</span>
+<span id="640">640</span>
+<span id="641">641</span>
+<span id="642">642</span>
+<span id="643">643</span>
+<span id="644">644</span>
+<span id="645">645</span>
+<span id="646">646</span>
+<span id="647">647</span>
+<span id="648">648</span>
+<span id="649">649</span>
+<span id="650">650</span>
+<span id="651">651</span>
+<span id="652">652</span>
+<span id="653">653</span>
+<span id="654">654</span>
+<span id="655">655</span>
+<span id="656">656</span>
+<span id="657">657</span>
+<span id="658">658</span>
+<span id="659">659</span>
+<span id="660">660</span>
+<span id="661">661</span>
+<span id="662">662</span>
+<span id="663">663</span>
+<span id="664">664</span>
+<span id="665">665</span>
+<span id="666">666</span>
+<span id="667">667</span>
+<span id="668">668</span>
+<span id="669">669</span>
+<span id="670">670</span>
+<span id="671">671</span>
+<span id="672">672</span>
+<span id="673">673</span>
+<span id="674">674</span>
+<span id="675">675</span>
+<span id="676">676</span>
+<span id="677">677</span>
+<span id="678">678</span>
+<span id="679">679</span>
+<span id="680">680</span>
+<span id="681">681</span>
+<span id="682">682</span>
+<span id="683">683</span>
+<span id="684">684</span>
+<span id="685">685</span>
+<span id="686">686</span>
+<span id="687">687</span>
+<span id="688">688</span>
+<span id="689">689</span>
+<span id="690">690</span>
+<span id="691">691</span>
+<span id="692">692</span>
+<span id="693">693</span>
+<span id="694">694</span>
+<span id="695">695</span>
+<span id="696">696</span>
+<span id="697">697</span>
+<span id="698">698</span>
+<span id="699">699</span>
+<span id="700">700</span>
+<span id="701">701</span>
+<span id="702">702</span>
+<span id="703">703</span>
+<span id="704">704</span>
+<span id="705">705</span>
+<span id="706">706</span>
+<span id="707">707</span>
+<span id="708">708</span>
+<span id="709">709</span>
+<span id="710">710</span>
+<span id="711">711</span>
+<span id="712">712</span>
+<span id="713">713</span>
+<span id="714">714</span>
+<span id="715">715</span>
+<span id="716">716</span>
+<span id="717">717</span>
+<span id="718">718</span>
+<span id="719">719</span>
+<span id="720">720</span>
+<span id="721">721</span>
+<span id="722">722</span>
+<span id="723">723</span>
+<span id="724">724</span>
+<span id="725">725</span>
+<span id="726">726</span>
+<span id="727">727</span>
+<span id="728">728</span>
+<span id="729">729</span>
+<span id="730">730</span>
+<span id="731">731</span>
+<span id="732">732</span>
+<span id="733">733</span>
+<span id="734">734</span>
+<span id="735">735</span>
+<span id="736">736</span>
+<span id="737">737</span>
+<span id="738">738</span>
+<span id="739">739</span>
+<span id="740">740</span>
+<span id="741">741</span>
+<span id="742">742</span>
+<span id="743">743</span>
+<span id="744">744</span>
+<span id="745">745</span>
+<span id="746">746</span>
+<span id="747">747</span>
+<span id="748">748</span>
+<span id="749">749</span>
+<span id="750">750</span>
+<span id="751">751</span>
+<span id="752">752</span>
+<span id="753">753</span>
+<span id="754">754</span>
+<span id="755">755</span>
+<span id="756">756</span>
+<span id="757">757</span>
+<span id="758">758</span>
+<span id="759">759</span>
+<span id="760">760</span>
+<span id="761">761</span>
+<span id="762">762</span>
+<span id="763">763</span>
+<span id="764">764</span>
+<span id="765">765</span>
+<span id="766">766</span>
+<span id="767">767</span>
+<span id="768">768</span>
+<span id="769">769</span>
+<span id="770">770</span>
+<span id="771">771</span>
+<span id="772">772</span>
+<span id="773">773</span>
+<span id="774">774</span>
+<span id="775">775</span>
+<span id="776">776</span>
+<span id="777">777</span>
+<span id="778">778</span>
+<span id="779">779</span>
+<span id="780">780</span>
+<span id="781">781</span>
+<span id="782">782</span>
+<span id="783">783</span>
+<span id="784">784</span>
+<span id="785">785</span>
+<span id="786">786</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Minimalistic snapshot testing for Rust.</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! # Introduction</span>
@@ -625,8 +827,8 @@
 <span class="doccomment">//!</span>
 <span class="doccomment">//! `expect!` returns an instance of `Expect` struct, which holds position</span>
 <span class="doccomment">//! information and a string literal. Use `Expect::assert_eq` for string</span>
-<span class="doccomment">//! comparison. Use `Expect::assert_debug_eq` for verbose debug comparison. Note that</span>
-<span class="doccomment">//! leading indentation is automatically removed.</span>
+<span class="doccomment">//! comparison. Use `Expect::assert_debug_eq` for verbose debug comparison. Note</span>
+<span class="doccomment">//! that leading indentation is automatically removed.</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! ```</span>
 <span class="doccomment">//! use expect_test::expect;</span>
@@ -650,8 +852,8 @@
 <span class="doccomment">//! quickly update all the tests by running the test suite with `UPDATE_EXPECT`</span>
 <span class="doccomment">//! environmental variable set.</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! If the expected data is too verbose to include inline, you can store it in an</span>
-<span class="doccomment">//! external file using the `expect_file!` macro:</span>
+<span class="doccomment">//! If the expected data is too verbose to include inline, you can store it in</span>
+<span class="doccomment">//! an external file using the `expect_file!` macro:</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! ```no_run</span>
 <span class="doccomment">//! use expect_test::expect_file;</span>
@@ -665,8 +867,8 @@
 <span class="doccomment">//!</span>
 <span class="doccomment">//! # Suggested Workflows</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! I like to use data-driven tests with `expect_test`. I usually define a single</span>
-<span class="doccomment">//! driver function `check` and then call it from individual tests:</span>
+<span class="doccomment">//! I like to use data-driven tests with `expect_test`. I usually define a</span>
+<span class="doccomment">//! single driver function `check` and then call it from individual tests:</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! ```</span>
 <span class="doccomment">//! use expect_test::{expect, Expect};</span>
@@ -715,11 +917,15 @@
 <span class="doccomment">//!</span>
 <span class="doccomment">//! # Maintenance status</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! The main customer of this library is rust-analyzer. The library is expected</span>
-<span class="doccomment">//! to be relatively stable, but, if the need arises, it could be significantly</span>
-<span class="doccomment">//! reworked to fit rust-analyzer better.</span>
+<span class="doccomment">//! The main customer of this library is rust-analyzer. The library is  stable,</span>
+<span class="doccomment">//! it is planned to not release any major versions past 1.0.</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! MSRV: latest stable.</span>
+<span class="doccomment">//! ## Minimal Supported Rust Version</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! This crate&#39;s minimum supported `rustc` version is `1.45.0`. MSRV is updated</span>
+<span class="doccomment">//! conservatively, supporting roughly 10 minor versions of `rustc`. MSRV bump</span>
+<span class="doccomment">//! is not considered semver breaking, but will require at least minor version</span>
+<span class="doccomment">//! bump.</span>
 <span class="kw">use</span> <span class="ident">std</span>::{
     <span class="ident">collections::HashMap</span>,
     <span class="ident">env</span>, <span class="ident">fmt</span>, <span class="ident">fs</span>, <span class="ident">mem</span>,
@@ -729,7 +935,7 @@
     <span class="ident">sync::Mutex</span>,
 };
 
-<span class="kw">use</span> <span class="ident">once_cell::sync::Lazy</span>;
+<span class="kw">use</span> <span class="ident">once_cell::sync</span>::{<span class="ident">Lazy</span>, <span class="ident">OnceCell</span>};
 
 <span class="kw">const</span> <span class="ident">HELP</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;
 You can update all `expect![[]]` tests by running:
@@ -762,6 +968,7 @@ To update a single test, place the cursor on `expect` token and use `run` featur
             <span class="ident">column</span>: <span class="macro">column!</span>(),
         },
         <span class="ident">data</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">data</span>,
+        <span class="ident">indent</span>: <span class="bool-val">true</span>,
     }};
     [[]] =&gt; { <span class="macro-nonterminal">$</span><span class="macro">crate::expect!</span>[[<span class="string">&quot;&quot;</span>]] };
 }
@@ -787,6 +994,8 @@ To update a single test, place the cursor on `expect` token and use `run` featur
     <span class="kw">pub</span> <span class="ident">position</span>: <span class="ident">Position</span>,
     <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
     <span class="kw">pub</span> <span class="ident">data</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>,
+    <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
+    <span class="kw">pub</span> <span class="ident">indent</span>: <span class="ident">bool</span>,
 }
 
 <span class="doccomment">/// Self-updating file.</span>
@@ -829,6 +1038,10 @@ To update a single test, place the cursor on `expect` token and use `run` featur
         <span class="kw">let</span> <span class="ident">actual</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;{:#?}\n&quot;</span>, <span class="ident">actual</span>);
         <span class="self">self</span>.<span class="ident">assert_eq</span>(<span class="kw-2">&amp;</span><span class="ident">actual</span>)
     }
+    <span class="doccomment">/// If `true` (default), in-place update will indent the string literal.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">indent</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">yes</span>: <span class="ident">bool</span>) {
+        <span class="self">self</span>.<span class="ident">indent</span> <span class="op">=</span> <span class="ident">yes</span>;
+    }
 
     <span class="kw">fn</span> <span class="ident">trimmed</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">String</span> {
         <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">data</span>.<span class="ident">contains</span>(<span class="string">&#39;\n&#39;</span>) {
@@ -852,11 +1065,92 @@ To update a single test, place the cursor on `expect` token and use `run` featur
             <span class="ident">line_start</span> <span class="op">+</span><span class="op">=</span> <span class="ident">line</span>.<span class="ident">len</span>();
         }
         <span class="kw">let</span> (<span class="ident">literal_start</span>, <span class="ident">line_indent</span>) <span class="op">=</span> <span class="ident">target_line</span>.<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">literal_length</span> <span class="op">=</span>
-            <span class="ident">file</span>[<span class="ident">literal_start</span>..].<span class="ident">find</span>(<span class="string">&quot;]]&quot;</span>).<span class="ident">expect</span>(<span class="string">&quot;Couldn&#39;t find matching `]]` for `expect![[`.&quot;</span>);
-        <span class="kw">let</span> <span class="ident">literal_range</span> <span class="op">=</span> <span class="ident">literal_start</span>..<span class="ident">literal_start</span> <span class="op">+</span> <span class="ident">literal_length</span>;
+
+        <span class="kw">let</span> <span class="ident">lit_to_eof</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">file</span>[<span class="ident">literal_start</span>..];
+        <span class="kw">let</span> <span class="ident">lit_to_eof_trimmed</span> <span class="op">=</span> <span class="ident">lit_to_eof</span>.<span class="ident">trim_start</span>();
+
+        <span class="kw">let</span> <span class="ident">literal_start</span> <span class="op">=</span> <span class="ident">literal_start</span> <span class="op">+</span> (<span class="ident">lit_to_eof</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="ident">lit_to_eof_trimmed</span>.<span class="ident">len</span>());
+
+        <span class="kw">let</span> <span class="ident">literal_len</span> <span class="op">=</span>
+            <span class="ident">locate_end</span>(<span class="ident">lit_to_eof_trimmed</span>).<span class="ident">expect</span>(<span class="string">&quot;Couldn&#39;t find matching `]]` for `expect![[`.&quot;</span>);
+        <span class="kw">let</span> <span class="ident">literal_range</span> <span class="op">=</span> <span class="ident">literal_start</span>..<span class="ident">literal_start</span> <span class="op">+</span> <span class="ident">literal_len</span>;
         <span class="ident">Location</span> { <span class="ident">line_indent</span>, <span class="ident">literal_range</span> }
     }
+}
+
+<span class="kw">fn</span> <span class="ident">locate_end</span>(<span class="ident">lit_to_eof</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
+    <span class="macro">assert!</span>(<span class="ident">lit_to_eof</span>.<span class="ident">chars</span>().<span class="ident">next</span>().<span class="ident">map_or</span>(<span class="bool-val">true</span>, <span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="op">!</span><span class="ident">c</span>.<span class="ident">is_whitespace</span>()));
+
+    <span class="kw">if</span> <span class="ident">lit_to_eof</span>.<span class="ident">starts_with</span>(<span class="string">&quot;]]&quot;</span>) {
+        <span class="comment">// expect![[ ]]</span>
+        <span class="prelude-val">Some</span>(<span class="number">0</span>)
+    } <span class="kw">else</span> {
+        <span class="comment">// expect![[&quot;foo&quot;]]</span>
+        <span class="ident">find_str_lit_len</span>(<span class="ident">lit_to_eof</span>)
+    }
+}
+
+<span class="doccomment">/// Parses a string literal, returning the byte index of its last character</span>
+<span class="doccomment">/// (either a quote or a hash).</span>
+<span class="kw">fn</span> <span class="ident">find_str_lit_len</span>(<span class="ident">str_lit_to_eof</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
+    <span class="kw">use</span> <span class="ident">StrLitKind</span>::<span class="kw-2">*</span>;
+    <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
+    <span class="kw">enum</span> <span class="ident">StrLitKind</span> {
+        <span class="ident">Normal</span>,
+        <span class="ident">Raw</span>(<span class="ident">usize</span>),
+    }
+
+    <span class="kw">fn</span> <span class="ident">try_find_n_hashes</span>(
+        <span class="ident">s</span>: <span class="kw-2">&amp;mut</span> <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">char</span><span class="op">&gt;</span>,
+        <span class="ident">desired_hashes</span>: <span class="ident">usize</span>,
+    ) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">usize</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">char</span><span class="op">&gt;</span>)<span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">n</span> <span class="op">=</span> <span class="number">0</span>;
+        <span class="kw">loop</span> {
+            <span class="kw">match</span> <span class="ident">s</span>.<span class="ident">next</span>()<span class="question-mark">?</span> {
+                <span class="string">&#39;#&#39;</span> =&gt; <span class="ident">n</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>,
+                <span class="ident">c</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Some</span>((<span class="ident">n</span>, <span class="prelude-val">Some</span>(<span class="ident">c</span>))),
+            }
+
+            <span class="kw">if</span> <span class="ident">n</span> <span class="op">==</span> <span class="ident">desired_hashes</span> {
+                <span class="kw">return</span> <span class="prelude-val">Some</span>((<span class="ident">n</span>, <span class="prelude-val">None</span>));
+            }
+        }
+    }
+
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">s</span> <span class="op">=</span> <span class="ident">str_lit_to_eof</span>.<span class="ident">chars</span>();
+    <span class="kw">let</span> <span class="ident">kind</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">s</span>.<span class="ident">next</span>()<span class="question-mark">?</span> {
+        <span class="string">&#39;&quot;&#39;</span> =&gt; <span class="ident">Normal</span>,
+        <span class="string">&#39;r&#39;</span> =&gt; {
+            <span class="kw">let</span> (<span class="ident">n</span>, <span class="ident">c</span>) <span class="op">=</span> <span class="ident">try_find_n_hashes</span>(<span class="kw-2">&amp;mut</span> <span class="ident">s</span>, <span class="ident">usize::MAX</span>)<span class="question-mark">?</span>;
+            <span class="kw">if</span> <span class="ident">c</span> <span class="op">!</span><span class="op">=</span> <span class="prelude-val">Some</span>(<span class="string">&#39;&quot;&#39;</span>) {
+                <span class="kw">return</span> <span class="prelude-val">None</span>;
+            }
+            <span class="ident">Raw</span>(<span class="ident">n</span>)
+        }
+        <span class="kw">_</span> =&gt; <span class="kw">return</span> <span class="prelude-val">None</span>,
+    };
+
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">oldc</span> <span class="op">=</span> <span class="prelude-val">None</span>;
+    <span class="kw">loop</span> {
+        <span class="kw">let</span> <span class="ident">c</span> <span class="op">=</span> <span class="ident">oldc</span>.<span class="ident">take</span>().<span class="ident">or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">next</span>())<span class="question-mark">?</span>;
+        <span class="kw">match</span> (<span class="ident">c</span>, <span class="ident">kind</span>) {
+            (<span class="string">&#39;\\&#39;</span>, <span class="ident">Normal</span>) =&gt; {
+                <span class="kw">let</span> <span class="ident">_escaped</span> <span class="op">=</span> <span class="ident">s</span>.<span class="ident">next</span>()<span class="question-mark">?</span>;
+            }
+            (<span class="string">&#39;&quot;&#39;</span>, <span class="ident">Normal</span>) =&gt; <span class="kw">break</span>,
+            (<span class="string">&#39;&quot;&#39;</span>, <span class="ident">Raw</span>(<span class="number">0</span>)) =&gt; <span class="kw">break</span>,
+            (<span class="string">&#39;&quot;&#39;</span>, <span class="ident">Raw</span>(<span class="ident">n</span>)) =&gt; {
+                <span class="kw">let</span> (<span class="ident">seen</span>, <span class="ident">c</span>) <span class="op">=</span> <span class="ident">try_find_n_hashes</span>(<span class="kw-2">&amp;mut</span> <span class="ident">s</span>, <span class="ident">n</span>)<span class="question-mark">?</span>;
+                <span class="kw">if</span> <span class="ident">seen</span> <span class="op">==</span> <span class="ident">n</span> {
+                    <span class="kw">break</span>;
+                }
+                <span class="ident">oldc</span> <span class="op">=</span> <span class="ident">c</span>;
+            }
+            <span class="kw">_</span> =&gt; {}
+        }
+    }
+
+    <span class="prelude-val">Some</span>(<span class="ident">str_lit_to_eof</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="ident">s</span>.<span class="ident">as_str</span>().<span class="ident">len</span>())
 }
 
 <span class="kw">impl</span> <span class="ident">ExpectFile</span> {
@@ -880,8 +1174,12 @@ To update a single test, place the cursor on `expect` token and use `run` featur
         <span class="ident">fs::write</span>(<span class="self">self</span>.<span class="ident">abs_path</span>(), <span class="ident">contents</span>).<span class="ident">unwrap</span>()
     }
     <span class="kw">fn</span> <span class="ident">abs_path</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">PathBuf</span> {
-        <span class="kw">let</span> <span class="ident">dir</span> <span class="op">=</span> <span class="ident">Path::new</span>(<span class="self">self</span>.<span class="ident">position</span>).<span class="ident">parent</span>().<span class="ident">unwrap</span>();
-        <span class="ident">WORKSPACE_ROOT</span>.<span class="ident">join</span>(<span class="ident">dir</span>).<span class="ident">join</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">path</span>)
+        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">path</span>.<span class="ident">is_absolute</span>() {
+            <span class="self">self</span>.<span class="ident">path</span>.<span class="ident">to_owned</span>()
+        } <span class="kw">else</span> {
+            <span class="kw">let</span> <span class="ident">dir</span> <span class="op">=</span> <span class="ident">Path::new</span>(<span class="self">self</span>.<span class="ident">position</span>).<span class="ident">parent</span>().<span class="ident">unwrap</span>();
+            <span class="ident">to_abs_ws_path</span>(<span class="kw-2">&amp;</span><span class="ident">dir</span>.<span class="ident">join</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">path</span>))
+        }
     }
 }
 
@@ -959,14 +1257,15 @@ To update a single test, place the cursor on `expect` token and use `run` featur
 
 <span class="kw">impl</span> <span class="ident">FileRuntime</span> {
     <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">expect</span>: <span class="kw-2">&amp;</span><span class="ident">Expect</span>) -&gt; <span class="ident">FileRuntime</span> {
-        <span class="kw">let</span> <span class="ident">path</span> <span class="op">=</span> <span class="ident">WORKSPACE_ROOT</span>.<span class="ident">join</span>(<span class="ident">expect</span>.<span class="ident">position</span>.<span class="ident">file</span>);
+        <span class="kw">let</span> <span class="ident">path</span> <span class="op">=</span> <span class="ident">to_abs_ws_path</span>(<span class="ident">Path::new</span>(<span class="ident">expect</span>.<span class="ident">position</span>.<span class="ident">file</span>));
         <span class="kw">let</span> <span class="ident">original_text</span> <span class="op">=</span> <span class="ident">fs::read_to_string</span>(<span class="kw-2">&amp;</span><span class="ident">path</span>).<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">patchwork</span> <span class="op">=</span> <span class="ident">Patchwork::new</span>(<span class="ident">original_text</span>.<span class="ident">clone</span>());
         <span class="ident">FileRuntime</span> { <span class="ident">path</span>, <span class="ident">original_text</span>, <span class="ident">patchwork</span> }
     }
     <span class="kw">fn</span> <span class="ident">update</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">expect</span>: <span class="kw-2">&amp;</span><span class="ident">Expect</span>, <span class="ident">actual</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) {
         <span class="kw">let</span> <span class="ident">loc</span> <span class="op">=</span> <span class="ident">expect</span>.<span class="ident">locate</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">original_text</span>);
-        <span class="kw">let</span> <span class="ident">patch</span> <span class="op">=</span> <span class="ident">format_patch</span>(<span class="ident">loc</span>.<span class="ident">line_indent</span>.<span class="ident">clone</span>(), <span class="ident">actual</span>);
+        <span class="kw">let</span> <span class="ident">desired_indent</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">expect</span>.<span class="ident">indent</span> { <span class="prelude-val">Some</span>(<span class="ident">loc</span>.<span class="ident">line_indent</span>) } <span class="kw">else</span> { <span class="prelude-val">None</span> };
+        <span class="kw">let</span> <span class="ident">patch</span> <span class="op">=</span> <span class="ident">format_patch</span>(<span class="ident">desired_indent</span>, <span class="ident">actual</span>);
         <span class="self">self</span>.<span class="ident">patchwork</span>.<span class="ident">patch</span>(<span class="ident">loc</span>.<span class="ident">literal_range</span>, <span class="kw-2">&amp;</span><span class="ident">patch</span>);
         <span class="ident">fs::write</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">path</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">patchwork</span>.<span class="ident">text</span>).<span class="ident">unwrap</span>()
     }
@@ -1008,7 +1307,7 @@ To update a single test, place the cursor on `expect` token and use `run` featur
     }
 }
 
-<span class="kw">fn</span> <span class="ident">format_patch</span>(<span class="ident">line_indent</span>: <span class="ident">usize</span>, <span class="ident">patch</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">String</span> {
+<span class="kw">fn</span> <span class="ident">format_patch</span>(<span class="ident">desired_indent</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>, <span class="ident">patch</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">String</span> {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">max_hashes</span> <span class="op">=</span> <span class="number">0</span>;
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cur_hashes</span> <span class="op">=</span> <span class="number">0</span>;
     <span class="kw">for</span> <span class="ident">byte</span> <span class="kw">in</span> <span class="ident">patch</span>.<span class="ident">bytes</span>() {
@@ -1020,7 +1319,7 @@ To update a single test, place the cursor on `expect` token and use `run` featur
         <span class="ident">max_hashes</span> <span class="op">=</span> <span class="ident">max_hashes</span>.<span class="ident">max</span>(<span class="ident">cur_hashes</span>);
     }
     <span class="kw">let</span> <span class="ident">hashes</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="string">&quot;#&quot;</span>.<span class="ident">repeat</span>(<span class="ident">max_hashes</span> <span class="op">+</span> <span class="number">1</span>);
-    <span class="kw">let</span> <span class="ident">indent</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="string">&quot; &quot;</span>.<span class="ident">repeat</span>(<span class="ident">line_indent</span>);
+    <span class="kw">let</span> <span class="ident">indent</span> <span class="op">=</span> <span class="ident">desired_indent</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">it</span><span class="op">|</span> <span class="string">&quot; &quot;</span>.<span class="ident">repeat</span>(<span class="ident">it</span>));
     <span class="kw">let</span> <span class="ident">is_multiline</span> <span class="op">=</span> <span class="ident">patch</span>.<span class="ident">contains</span>(<span class="string">&#39;\n&#39;</span>);
 
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> <span class="ident">String::new</span>();
@@ -1033,30 +1332,49 @@ To update a single test, place the cursor on `expect` token and use `run` featur
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">final_newline</span> <span class="op">=</span> <span class="bool-val">false</span>;
     <span class="kw">for</span> <span class="ident">line</span> <span class="kw">in</span> <span class="ident">lines_with_ends</span>(<span class="ident">patch</span>) {
         <span class="kw">if</span> <span class="ident">is_multiline</span> <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">line</span>.<span class="ident">trim</span>().<span class="ident">is_empty</span>() {
-            <span class="ident">buf</span>.<span class="ident">push_str</span>(<span class="ident">indent</span>);
-            <span class="ident">buf</span>.<span class="ident">push_str</span>(<span class="string">&quot;    &quot;</span>);
+            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">indent</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">indent</span> {
+                <span class="ident">buf</span>.<span class="ident">push_str</span>(<span class="ident">indent</span>);
+                <span class="ident">buf</span>.<span class="ident">push_str</span>(<span class="string">&quot;    &quot;</span>);
+            }
         }
         <span class="ident">buf</span>.<span class="ident">push_str</span>(<span class="ident">line</span>);
         <span class="ident">final_newline</span> <span class="op">=</span> <span class="ident">line</span>.<span class="ident">ends_with</span>(<span class="string">&#39;\n&#39;</span>);
     }
     <span class="kw">if</span> <span class="ident">final_newline</span> {
-        <span class="ident">buf</span>.<span class="ident">push_str</span>(<span class="ident">indent</span>);
+        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">indent</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">indent</span> {
+            <span class="ident">buf</span>.<span class="ident">push_str</span>(<span class="ident">indent</span>);
+        }
     }
     <span class="ident">buf</span>.<span class="ident">push</span>(<span class="string">&#39;&quot;&#39;</span>);
     <span class="ident">buf</span>.<span class="ident">push_str</span>(<span class="ident">hashes</span>);
     <span class="ident">buf</span>
 }
 
-<span class="kw">static</span> <span class="ident">WORKSPACE_ROOT</span>: <span class="ident">Lazy</span><span class="op">&lt;</span><span class="ident">PathBuf</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Lazy::new</span>(<span class="op">|</span><span class="op">|</span> {
-    <span class="kw">let</span> <span class="ident">my_manifest</span> <span class="op">=</span> <span class="ident">env::var</span>(<span class="string">&quot;CARGO_MANIFEST_DIR&quot;</span>).<span class="ident">unwrap</span>();
-    <span class="comment">// Heuristic, see https://github.com/rust-lang/cargo/issues/3946</span>
-    <span class="ident">Path::new</span>(<span class="kw-2">&amp;</span><span class="ident">my_manifest</span>)
-        .<span class="ident">ancestors</span>()
-        .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">it</span><span class="op">|</span> <span class="ident">it</span>.<span class="ident">join</span>(<span class="string">&quot;Cargo.toml&quot;</span>).<span class="ident">exists</span>())
-        .<span class="ident">last</span>()
-        .<span class="ident">unwrap</span>()
-        .<span class="ident">to_path_buf</span>()
-});
+<span class="kw">fn</span> <span class="ident">to_abs_ws_path</span>(<span class="ident">path</span>: <span class="kw-2">&amp;</span><span class="ident">Path</span>) -&gt; <span class="ident">PathBuf</span> {
+    <span class="kw">if</span> <span class="ident">path</span>.<span class="ident">is_absolute</span>() {
+        <span class="kw">return</span> <span class="ident">path</span>.<span class="ident">to_owned</span>();
+    }
+
+    <span class="kw">static</span> <span class="ident">WORKSPACE_ROOT</span>: <span class="ident">OnceCell</span><span class="op">&lt;</span><span class="ident">PathBuf</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">OnceCell::new</span>();
+    <span class="ident">WORKSPACE_ROOT</span>
+        .<span class="ident">get_or_try_init</span>(<span class="op">|</span><span class="op">|</span> {
+            <span class="kw">let</span> <span class="ident">my_manifest</span> <span class="op">=</span> <span class="ident">env::var</span>(<span class="string">&quot;CARGO_MANIFEST_DIR&quot;</span>)<span class="question-mark">?</span>;
+
+            <span class="comment">// Heuristic, see https://github.com/rust-lang/cargo/issues/3946</span>
+            <span class="kw">let</span> <span class="ident">workspace_root</span> <span class="op">=</span> <span class="ident">Path::new</span>(<span class="kw-2">&amp;</span><span class="ident">my_manifest</span>)
+                .<span class="ident">ancestors</span>()
+                .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">it</span><span class="op">|</span> <span class="ident">it</span>.<span class="ident">join</span>(<span class="string">&quot;Cargo.toml&quot;</span>).<span class="ident">exists</span>())
+                .<span class="ident">last</span>()
+                .<span class="ident">unwrap</span>()
+                .<span class="ident">to_path_buf</span>();
+
+            <span class="prelude-val">Ok</span>(<span class="ident">workspace_root</span>)
+        })
+        .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="kw">_</span>: <span class="ident">env::VarError</span><span class="op">|</span> {
+            <span class="macro">panic!</span>(<span class="string">&quot;No CARGO_MANIFEST_DIR env var and the path is relative: {}&quot;</span>, <span class="ident">path</span>.<span class="ident">display</span>())
+        })
+        .<span class="ident">join</span>(<span class="ident">path</span>)
+}
 
 <span class="kw">fn</span> <span class="ident">trim_indent</span>(<span class="kw-2">mut</span> <span class="ident">text</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">String</span> {
     <span class="kw">if</span> <span class="ident">text</span>.<span class="ident">starts_with</span>(<span class="string">&#39;\n&#39;</span>) {
@@ -1122,7 +1440,15 @@ To update a single test, place the cursor on `expect` token and use `run` featur
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">test_format_patch</span>() {
-        <span class="kw">let</span> <span class="ident">patch</span> <span class="op">=</span> <span class="ident">format_patch</span>(<span class="number">0</span>, <span class="string">&quot;hello\nworld\n&quot;</span>);
+        <span class="kw">let</span> <span class="ident">patch</span> <span class="op">=</span> <span class="ident">format_patch</span>(<span class="prelude-val">None</span>, <span class="string">&quot;hello\nworld\n&quot;</span>);
+        <span class="macro">expect!</span>[[<span class="string">r##&quot;
+            r#&quot;
+            hello
+            world
+            &quot;#&quot;##</span>]]
+        .<span class="ident">assert_eq</span>(<span class="kw-2">&amp;</span><span class="ident">patch</span>);
+
+        <span class="kw">let</span> <span class="ident">patch</span> <span class="op">=</span> <span class="ident">format_patch</span>(<span class="prelude-val">Some</span>(<span class="number">0</span>), <span class="string">&quot;hello\nworld\n&quot;</span>);
         <span class="macro">expect!</span>[[<span class="string">r##&quot;
             r#&quot;
                 hello
@@ -1130,7 +1456,7 @@ To update a single test, place the cursor on `expect` token and use `run` featur
             &quot;#&quot;##</span>]]
         .<span class="ident">assert_eq</span>(<span class="kw-2">&amp;</span><span class="ident">patch</span>);
 
-        <span class="kw">let</span> <span class="ident">patch</span> <span class="op">=</span> <span class="ident">format_patch</span>(<span class="number">4</span>, <span class="string">&quot;single line&quot;</span>);
+        <span class="kw">let</span> <span class="ident">patch</span> <span class="op">=</span> <span class="ident">format_patch</span>(<span class="prelude-val">Some</span>(<span class="number">4</span>), <span class="string">&quot;single line&quot;</span>);
         <span class="macro">expect!</span>[[<span class="string">r##&quot;r#&quot;single line&quot;#&quot;##</span>]].<span class="ident">assert_eq</span>(<span class="kw-2">&amp;</span><span class="ident">patch</span>);
     }
 
@@ -1165,6 +1491,84 @@ To update a single test, place the cursor on `expect` token and use `run` featur
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">test_expect_file</span>() {
         <span class="macro">expect_file!</span>[<span class="string">&quot;./lib.rs&quot;</span>].<span class="ident">assert_eq</span>(<span class="macro">include_str!</span>(<span class="string">&quot;./lib.rs&quot;</span>))
+    }
+
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">smoke_test_indent</span>() {
+        <span class="kw">fn</span> <span class="ident">check_indented</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="kw-2">mut</span> <span class="ident">expect</span>: <span class="ident">Expect</span>) {
+            <span class="ident">expect</span>.<span class="ident">indent</span>(<span class="bool-val">true</span>);
+            <span class="ident">expect</span>.<span class="ident">assert_eq</span>(<span class="ident">input</span>);
+        }
+        <span class="kw">fn</span> <span class="ident">check_not_indented</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="kw-2">mut</span> <span class="ident">expect</span>: <span class="ident">Expect</span>) {
+            <span class="ident">expect</span>.<span class="ident">indent</span>(<span class="bool-val">false</span>);
+            <span class="ident">expect</span>.<span class="ident">assert_eq</span>(<span class="ident">input</span>);
+        }
+
+        <span class="ident">check_indented</span>(
+            <span class="string">&quot;\
+line1
+  line2
+&quot;</span>,
+            <span class="macro">expect!</span>[[<span class="string">r#&quot;
+                line1
+                  line2
+            &quot;#</span>]],
+        );
+
+        <span class="ident">check_not_indented</span>(
+            <span class="string">&quot;\
+line1
+  line2
+&quot;</span>,
+            <span class="macro">expect!</span>[[<span class="string">r#&quot;
+line1
+  line2
+&quot;#</span>]],
+        );
+    }
+
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">test_locate</span>() {
+        <span class="macro">macro_rules!</span> <span class="ident">check_locate</span> {
+            ($( [[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">s</span>:<span class="ident">literal</span>]] ),<span class="op">*</span> $(,)<span class="question-mark">?</span>) =&gt; {$({
+                <span class="kw">let</span> <span class="ident">lit</span> <span class="op">=</span> <span class="macro">stringify!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">s</span>);
+                <span class="kw">let</span> <span class="ident">with_trailer</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;{} \t]]\n&quot;</span>, <span class="ident">lit</span>);
+                <span class="macro">assert_eq!</span>(<span class="ident">locate_end</span>(<span class="kw-2">&amp;</span><span class="ident">with_trailer</span>), <span class="prelude-val">Some</span>(<span class="ident">lit</span>.<span class="ident">len</span>()));
+            })<span class="kw-2">*</span>};
+        }
+
+        <span class="comment">// Check that we handle string literals containing &quot;]]&quot; correctly.</span>
+        <span class="macro">check_locate!</span>(
+            [[<span class="string">r#&quot;{ arr: [[1, 2], [3, 4]], other: &quot;foo&quot; } &quot;#</span>]],
+            [[<span class="string">&quot;]]&quot;</span>]],
+            [[<span class="string">&quot;\&quot;]]&quot;</span>]],
+            [[<span class="string">r#&quot;&quot;]]&quot;#</span>]],
+        );
+
+        <span class="comment">// Check `expect![[  ]]` as well.</span>
+        <span class="macro">assert_eq!</span>(<span class="ident">locate_end</span>(<span class="string">&quot;]]&quot;</span>), <span class="prelude-val">Some</span>(<span class="number">0</span>));
+    }
+
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">test_find_str_lit_len</span>() {
+        <span class="macro">macro_rules!</span> <span class="ident">check_str_lit_len</span> {
+            ($( <span class="macro-nonterminal">$</span><span class="macro-nonterminal">s</span>:<span class="ident">literal</span> ),<span class="op">*</span> $(,)<span class="question-mark">?</span>) =&gt; {$({
+                <span class="kw">let</span> <span class="ident">lit</span> <span class="op">=</span> <span class="macro">stringify!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">s</span>);
+                <span class="macro">assert_eq!</span>(<span class="ident">find_str_lit_len</span>(<span class="ident">lit</span>), <span class="prelude-val">Some</span>(<span class="ident">lit</span>.<span class="ident">len</span>()));
+            })<span class="kw-2">*</span>}
+        }
+
+        <span class="macro">check_str_lit_len!</span>[
+            <span class="string">r##&quot;foa\&quot;&quot;#&quot;##</span>,
+            <span class="string">r##&quot;
+
+                asdf][]]&quot;&quot;&quot;&quot;#
+            &quot;##</span>,
+            <span class="string">&quot;&quot;</span>,
+            <span class="string">&quot;\&quot;&quot;</span>,
+            <span class="string">&quot;\&quot;\&quot;&quot;</span>,
+            <span class="string">&quot;#\&quot;#\&quot;#&quot;</span>,
+        ];
     }
 }
 </code></pre></div>

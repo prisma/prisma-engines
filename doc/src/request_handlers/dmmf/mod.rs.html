@@ -191,7 +191,7 @@
 
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">render_dmmf</span>(<span class="ident">dml</span>: <span class="kw-2">&amp;</span><span class="ident">datamodel::Datamodel</span>, <span class="ident">query_schema</span>: <span class="ident">QuerySchemaRef</span>) -&gt; <span class="ident">DataModelMetaFormat</span> {
     <span class="kw">let</span> (<span class="ident">schema</span>, <span class="ident">mappings</span>) <span class="op">=</span> <span class="ident">DmmfQuerySchemaRenderer::render</span>(<span class="ident">query_schema</span>);
-    <span class="kw">let</span> <span class="ident">datamodel_json</span> <span class="op">=</span> <span class="ident">datamodel::json::dmmf::render_to_dmmf_value</span>(<span class="kw-2">&amp;</span><span class="ident">dml</span>);
+    <span class="kw">let</span> <span class="ident">datamodel_json</span> <span class="op">=</span> <span class="ident">dmmf_crate::render_to_dmmf_value</span>(<span class="kw-2">&amp;</span><span class="ident">dml</span>);
 
     <span class="ident">DataModelMetaFormat</span> {
         <span class="ident">data_model</span>: <span class="ident">datamodel_json</span>,
