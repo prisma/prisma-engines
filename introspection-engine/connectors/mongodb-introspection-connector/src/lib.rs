@@ -123,7 +123,7 @@ impl IntrospectionConnector for MongoDbIntrospectionConnector {
     ) -> ConnectorResult<IntrospectionResult> {
         if !ctx.preview_features.contains(PreviewFeature::MongoDb) {
             let mut error = ConnectorError::from_kind(ErrorKind::PreviewFeatureNotEnabled(
-                "MongoDB introspection connector (experimental feature, needs to be enabled)",
+                "MongoDB Introspection connector is a Preview feature and needs the `mongoDb` Preview feature flag. See https://www.prisma.io/docs/concepts/database-connectors/mongodb",
             ));
 
             error.user_facing_error = Some(KnownError::new(UnsupportedFeatureError {

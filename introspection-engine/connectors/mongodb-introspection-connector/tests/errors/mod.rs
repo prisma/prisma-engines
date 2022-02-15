@@ -62,9 +62,9 @@ fn using_without_preview_feature_enabled() {
     let expected = expect![[r#"
         {
           "is_panic": false,
-          "message": "Preview feature not enabled: MongoDB introspection connector (experimental feature, needs to be enabled)",
+          "message": "Preview feature not enabled: MongoDB Introspection connector is a Preview feature and needs the `mongoDb` Preview feature flag. See https://www.prisma.io/docs/concepts/database-connectors/mongodb",
           "meta": {
-            "message": "Preview feature not enabled: MongoDB introspection connector (experimental feature, needs to be enabled)"
+            "message": "Preview feature not enabled: MongoDB Introspection connector is a Preview feature and needs the `mongoDb` Preview feature flag. See https://www.prisma.io/docs/concepts/database-connectors/mongodb"
           },
           "error_code": "P1019"
         }"#]];

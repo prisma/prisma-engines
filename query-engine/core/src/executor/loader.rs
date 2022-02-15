@@ -41,7 +41,7 @@ pub async fn load(
         MONGODB_SOURCE_NAME => {
             if !features.contains(&PreviewFeature::MongoDb) {
                 let error = CoreError::UnsupportedFeatureError(
-                    "MongoDB query connector (experimental feature, needs to be enabled)".into(),
+                    "MongoDB Query connector is a Preview feature and needs the `mongoDb` Preview feature flag. See https://www.prisma.io/docs/concepts/database-connectors/mongodb".into(),
                 );
 
                 return Err(error);
