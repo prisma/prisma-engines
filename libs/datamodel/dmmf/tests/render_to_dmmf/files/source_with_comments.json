@@ -29,13 +29,16 @@
           "type": "String",
           "hasDefaultValue": false,
           "isGenerated": false,
-          "isUpdatedAt": false
+          "isUpdatedAt": false,
+          "documentation": "Name of the author."
         }
       ],
       "isGenerated": false,
+      "documentation": "My author model.",
       "primaryKey": null,
       "uniqueFields": [],
       "uniqueIndexes": []
     }
-  ]
+  ],
+  "types": []
 }

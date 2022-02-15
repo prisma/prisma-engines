@@ -2,7 +2,7 @@
   "enums": [],
   "models": [
     {
-      "name": "User",
+      "name": "Author",
       "dbName": null,
       "fields": [
         {
@@ -14,30 +14,20 @@
           "isId": true,
           "isReadOnly": false,
           "type": "Int",
-          "hasDefaultValue": true,
-          "default": {
-            "name": "autoincrement",
-            "args": []
-          },
+          "hasDefaultValue": false,
           "isGenerated": false,
           "isUpdatedAt": false
         },
         {
-          "name": "ip",
+          "name": "name",
           "kind": "scalar",
           "isList": false,
-          "isRequired": true,
-          "isUnique": true,
+          "isRequired": false,
+          "isUnique": false,
           "isId": false,
           "isReadOnly": false,
-          "type": "Int",
-          "hasDefaultValue": true,
-          "default": {
-            "name": "dbgenerated",
-            "args": [
-              "sqrt(4)"
-            ]
-          },
+          "type": "String",
+          "hasDefaultValue": false,
           "isGenerated": false,
           "isUpdatedAt": false
         }
@@ -47,5 +37,6 @@
       "uniqueFields": [],
       "uniqueIndexes": []
     }
-  ]
+  ],
+  "types": []
 }

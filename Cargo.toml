@@ -31,6 +31,7 @@ members = [
   "libs/datamodel/diagnostics",
   "libs/datamodel/parser-database",
   "libs/datamodel/schema-ast",
+  "libs/datamodel/dmmf",
   "libs/json-rpc-stdio",
   "libs/native-types",
   "libs/prisma-inflector",
