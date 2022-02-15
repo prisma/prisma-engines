@@ -65,6 +65,7 @@ fn set_panic_hook() {
             location,
             message
         );
+        std::process::exit(101);
     }));
 }
 
