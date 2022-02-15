@@ -70,6 +70,10 @@ impl FieldType {
         self.scalar_type().map(|st| st.is_string()).unwrap_or(false)
     }
 
+    pub fn is_composite(&self) -> bool {
+        matches!(self, Self::CompositeType(_))
+    }
+
     pub fn is_enum(&self, name: &str) -> bool {
         matches!(self, Self::Enum(this) if this == name)
     }

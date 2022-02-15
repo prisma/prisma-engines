@@ -6,8 +6,9 @@ pub(crate) use name::Name;
 use super::{field_type::FieldType, CompositeTypeDepth};
 use convert_case::{Case, Casing};
 use datamodel::{
-    CompositeType, CompositeTypeField, Datamodel, DefaultValue, Field, IndexDefinition, IndexField, IndexType, Model,
-    PrimaryKeyDefinition, PrimaryKeyField, ScalarField, SortOrder, ValueGenerator, WithDatabaseName,
+    CompositeType, CompositeTypeField, CompositeTypeFieldType, Datamodel, DefaultValue, Field, IndexDefinition,
+    IndexField, IndexType, Model, PrimaryKeyDefinition, PrimaryKeyField, ScalarField, ScalarType, SortOrder,
+    ValueGenerator, WithDatabaseName,
 };
 use introspection_connector::Warning;
 use mongodb::bson::{Bson, Document};
@@ -16,7 +17,7 @@ use regex::Regex;
 use std::{
     borrow::Cow,
     cmp::Ordering,
-    collections::{BTreeMap, HashMap},
+    collections::{BTreeMap, HashMap, HashSet, VecDeque},
     fmt,
 };
 
@@ -508,7 +509,84 @@ fn populate_fields(
         warnings.push(crate::warnings::fields_with_unknown_types(&unknown_types));
     }
 
+    filter_out_empty_types(&mut models, &mut types, warnings);
+
     (models, types)
+}
+
+/// From the resulting data model, remove all types with no fields and change
+/// the field types to Json.
+fn filter_out_empty_types(
+    models: &mut BTreeMap<String, Model>,
+    types: &mut BTreeMap<String, CompositeType>,
+    warnings: &mut Vec<Warning>,
+) {
+    let mut fields_with_an_empty_type = Vec::new();
+
+    let empty_types: HashSet<String> = types
+        .iter()
+        .filter_map(|(name, r#type)| {
+            if r#type.fields.is_empty() {
+                Some(name.clone())
+            } else {
+                None
+            }
+        })
+        .collect();
+
+    static DOCS: &str = "Nested objects had no data in the sample dataset to introspect a nested type.";
+
+    // 1. remove all types that have no fields.
+    types.retain(|_, v| !v.fields.is_empty());
+
+    // 2. change all fields in models that point to a non-existing type to Json.
+    for (model_name, model) in models.iter_mut() {
+        let mut keep = VecDeque::with_capacity(model.fields.len());
+
+        while let Some(mut field) = model.fields.pop() {
+            if let Field::ScalarField(sf) = &mut field {
+                match &sf.field_type {
+                    datamodel::FieldType::CompositeType(ct) if !types.contains_key(ct) => {
+                        fields_with_an_empty_type.push((Name::Model(model_name.clone()), sf.name.clone()));
+                        sf.field_type = datamodel::FieldType::Scalar(datamodel::ScalarType::Json, None, None);
+                        sf.documentation = Some(DOCS.to_owned());
+                    }
+                    _ => (),
+                }
+            };
+
+            keep.push_front(field);
+        }
+
+        model.fields = keep.into();
+    }
+
+    // 3. change all fields in types that point to a non-existing type to Json.
+    for (type_name, r#type) in types.iter_mut() {
+        let mut keep = VecDeque::with_capacity(r#type.fields.len());
+
+        while let Some(mut field) = r#type.fields.pop() {
+            match &field.r#type {
+                CompositeTypeFieldType::CompositeType(name) if empty_types.contains(name) => {
+                    fields_with_an_empty_type.push((Name::CompositeType(type_name.clone()), field.name.clone()));
+                    field.r#type = CompositeTypeFieldType::Scalar(ScalarType::Json, None, None);
+                    field.documentation = Some(DOCS.to_owned());
+                }
+                _ => (),
+            }
+
+            keep.push_front(field);
+        }
+
+        r#type.fields = keep.into();
+    }
+
+    // 4. add warnings in the end to reduce spam
+    if !fields_with_an_empty_type.is_empty() {
+        warnings.push(crate::warnings::fields_pointing_to_an_empty_type(
+            &fields_with_an_empty_type,
+        ));
+    }
 }
 
 fn add_indices_to_models(models: &mut BTreeMap<String, Model>, indices: &mut BTreeMap<String, Vec<IndexWalker<'_>>>) {

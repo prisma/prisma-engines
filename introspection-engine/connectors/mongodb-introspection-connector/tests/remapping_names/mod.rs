@@ -105,7 +105,7 @@ fn remapping_composite_fields_with_numbers() {
     res.assert_warning("These enum values were commented out because their names are currently not supported by Prisma. Please provide valid ones that match [a-zA-Z][a-zA-Z0-9_]* using the `@map` attribute.");
 
     res.assert_warning_affected(&json!([{
-        "type": "OuterInner",
+        "compositeType": "OuterInner",
         "field": "1",
     }]));
 }

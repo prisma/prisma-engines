@@ -43,6 +43,12 @@ impl TestResult {
     }
 
     #[track_caller]
+    pub fn assert_no_warnings(&self) {
+        dbg!(&self.warnings);
+        assert!(self.warnings.is_empty())
+    }
+
+    #[track_caller]
     pub fn assert_warning_affected(&self, affected: &serde_json::Value) {
         dbg!(&self.warnings);
         assert!(&self.warnings[0].affected == affected);
