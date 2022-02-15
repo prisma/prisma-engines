@@ -65,7 +65,6 @@ fn using_without_preview_feature_enabled() {
           "message": "Preview feature not enabled: MongoDB Introspection connector is a Preview feature and needs the `mongoDb` Preview feature flag. See https://www.prisma.io/docs/concepts/database-connectors/mongodb",
           "meta": {
             "message": "Preview feature not enabled: MongoDB Introspection connector is a Preview feature and needs the `mongoDb` Preview feature flag. See https://www.prisma.io/docs/concepts/database-connectors/mongodb"
-
           },
           "error_code": "P1019"
         }"#]];
