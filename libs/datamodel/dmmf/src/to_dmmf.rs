@@ -1,7 +1,7 @@
 use crate::{Datamodel, Enum, EnumValue, Field, Function, Model, PrimaryKey, UniqueIndex};
 use bigdecimal::ToPrimitive;
 use datamodel::{
-    dml::{self, FieldType, Ignorable, ScalarType},
+    dml::{self, CompositeTypeFieldType, FieldType, Ignorable, ScalarType},
     PrismaValue,
 };
 
@@ -19,6 +19,7 @@ fn schema_to_dmmf(schema: &dml::Datamodel) -> Datamodel {
     let mut datamodel = Datamodel {
         models: vec![],
         enums: vec![],
+        types: Vec::with_capacity(schema.composite_types.len()),
     };
 
     for enum_model in schema.enums() {
@@ -27,6 +28,10 @@ fn schema_to_dmmf(schema: &dml::Datamodel) -> Datamodel {
 
     for model in schema.models().filter(|model| !model.is_ignored) {
         datamodel.models.push(model_to_dmmf(model));
+    }
+
+    for ct in schema.composite_types() {
+        datamodel.types.push(composite_type_to_dmmf(ct))
     }
 
     datamodel
@@ -51,6 +56,57 @@ fn enum_value_to_dmmf(en: &dml::EnumValue) -> EnumValue {
     EnumValue {
         name: en.name.clone(),
         db_name: en.database_name.clone(),
+    }
+}
+
+fn composite_type_to_dmmf(ct: &dml::CompositeType) -> Model {
+    Model {
+        name: ct.name.clone(),
+        db_name: None,
+        fields: ct
+            .fields
+            .iter()
+            .filter(|field| !matches!(&field.r#type, CompositeTypeFieldType::Unsupported(_)))
+            .map(composite_type_field_to_dmmf)
+            .collect(),
+        is_generated: None,
+        documentation: None,
+        primary_key: None,
+        unique_fields: Vec::new(),
+        unique_indexes: Vec::new(),
+    }
+}
+
+fn composite_type_field_to_dmmf(field: &dml::CompositeTypeField) -> Field {
+    Field {
+        name: field.name.clone(),
+        kind: match field.r#type {
+            CompositeTypeFieldType::CompositeType(_) => String::from("object"),
+            CompositeTypeFieldType::Enum(_) => String::from("enum"),
+            CompositeTypeFieldType::Scalar(_, _, _) => String::from("scalar"),
+            CompositeTypeFieldType::Unsupported(_) => String::from("unsupported"),
+        },
+        is_required: field.arity == dml::FieldArity::Required || field.arity == dml::FieldArity::List,
+        is_list: field.arity == dml::FieldArity::List,
+        is_id: false,
+        is_read_only: false,
+        has_default_value: field.default_value.is_some(),
+        default: default_value_to_serde(&field.default_value),
+        is_unique: false,
+        relation_name: None,
+        relation_from_fields: None,
+        relation_to_fields: None,
+        relation_on_delete: None,
+        field_type: match &field.r#type {
+            CompositeTypeFieldType::CompositeType(t) => t.clone(),
+            CompositeTypeFieldType::Enum(t) => t.clone(),
+            CompositeTypeFieldType::Unsupported(t) => t.clone(),
+            CompositeTypeFieldType::Scalar(t, _, _) => type_to_string(t),
+        },
+
+        is_generated: None,
+        is_updated_at: None,
+        documentation: None,
     }
 }
 
