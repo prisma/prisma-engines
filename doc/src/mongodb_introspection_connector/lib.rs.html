@@ -264,7 +264,7 @@
     ) -&gt; <span class="ident">ConnectorResult</span><span class="op">&lt;</span><span class="ident">IntrospectionResult</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="op">!</span><span class="ident">ctx</span>.<span class="ident">preview_features</span>.<span class="ident">contains</span>(<span class="ident">PreviewFeature::MongoDb</span>) {
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">error</span> <span class="op">=</span> <span class="ident">ConnectorError::from_kind</span>(<span class="ident">ErrorKind::PreviewFeatureNotEnabled</span>(
-                <span class="string">&quot;MongoDB introspection connector (experimental feature, needs to be enabled)&quot;</span>,
+                <span class="string">&quot;MongoDB Introspection connector is a Preview feature and needs the `mongoDb` Preview feature flag. See https://www.prisma.io/docs/concepts/database-connectors/mongodb&quot;</span>,
             ));
 
             <span class="ident">error</span>.<span class="ident">user_facing_error</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">KnownError::new</span>(<span class="ident">UnsupportedFeatureError</span> {
