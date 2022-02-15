@@ -49,7 +49,7 @@ impl MongoDbIntrospectionConnector {
             }
         })?;
 
-        let connection = Client::with_uri_str(connection_string)
+        let connection = mongodb_client::create(connection_string)
             .await
             .map_err(|err| error::map_connection_errors(err, &url))?;
 

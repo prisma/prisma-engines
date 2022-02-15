@@ -1,10 +1,7 @@
 use datamodel::common::preview_features::PreviewFeature;
 use enumflags2::BitFlags;
 use migration_connector::{ConnectorError, ConnectorResult};
-use mongodb::{
-    error::Error as MongoError,
-    options::{ClientOptions, WriteConcern},
-};
+use mongodb::{error::Error as MongoError, options::WriteConcern};
 use mongodb_schema_describer::MongoSchema;
 use url::Url;
 
@@ -20,11 +17,9 @@ impl Client {
         let url = Url::parse(connection_str).map_err(ConnectorError::url_parse_error)?;
         let db_name = url.path().trim_start_matches('/').to_string();
 
-        let client_options = ClientOptions::parse(connection_str)
+        let inner = mongodb_client::create(connection_str)
             .await
             .map_err(mongo_error_to_connector_error)?;
-
-        let inner = mongodb::Client::with_options(client_options).map_err(mongo_error_to_connector_error)?;
 
         Ok(Client {
             inner,

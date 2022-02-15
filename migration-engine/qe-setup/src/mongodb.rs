@@ -4,8 +4,7 @@ use url::Url;
 pub(crate) async fn mongo_setup(schema: &str, url: &str) -> ConnectorResult<()> {
     let url = Url::parse(url).map_err(ConnectorError::url_parse_error).unwrap();
     let db_name = url.path().trim_start_matches('/').to_string();
-    let client_options = mongodb::options::ClientOptions::parse(url).await.unwrap();
-    let client = mongodb::Client::with_options(client_options).unwrap();
+    let client = mongodb_client::create(url).await.unwrap();
 
     client
         .database(&db_name)

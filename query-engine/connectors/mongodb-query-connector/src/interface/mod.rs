@@ -11,7 +11,7 @@ use connector_interface::{
 };
 use datamodel::Datasource;
 use futures::Future;
-use mongodb::{options::ClientOptions, Client};
+use mongodb::Client;
 use prisma_models::prelude::*;
 use url::Url;
 
@@ -37,14 +37,9 @@ impl MongoDb {
         })?;
 
         let database = url.path().trim_start_matches('/').to_string();
-        let client_options = ClientOptions::parse(database_str).await.map_err(|_err| {
-            ConnectorError::from_kind(ErrorKind::InvalidDatabaseUrl {
-                details: "Invalid MongoDB connection string".to_owned(),
-                url: database_str.to_owned(),
-            })
-        })?;
 
-        let client = Client::with_options(client_options)
+        let client = mongodb_client::create(&url)
+            .await
             .map_err(|err| ConnectorError::from_kind(ErrorKind::ConnectionError(err.into())))?;
 
         Ok(Self { client, database })
