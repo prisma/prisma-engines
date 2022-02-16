@@ -105,8 +105,8 @@ pub struct ClientAdapter {
 #[derive(Serialize, Deserialize)]
 #[serde(untagged)]
 enum Message {
-    Request(Request),
     Response(jsonrpc_core::Output),
+    Request(Request),
 }
 
 /// Start doing JSON-RPC over stdio. The future will only return once stdin is closed or another
@@ -125,56 +125,64 @@ pub async fn run(request_handler: &IoHandler) -> std::io::Result<()> {
 async fn run_with_io(
     handler: &IoHandler,
     input: impl AsyncRead + Unpin,
-    output: impl AsyncWrite + Unpin,
+    output: impl AsyncWrite + Send + Unpin + 'static,
     mut client_adapter: ClientAdapter,
 ) -> std::io::Result<()> {
     let input = tokio::io::BufReader::new(input);
     let mut input_lines = input.lines();
     let mut output = tokio::io::BufWriter::new(output);
     let mut in_flight: HashMap<jsonrpc_core::Id, oneshot::Sender<_>> = HashMap::new();
+    let (mut stdout_sender, mut stdout_receiver) = mpsc::channel::<Vec<u8>>(30);
+
+    // Spawn stdout in its own task to queue writes.
+    tokio::spawn(async move {
+        while let Some(line) = stdout_receiver.recv().await {
+            output.write_all(&line).await.unwrap();
+            output.write_all(b"\n").await.unwrap();
+            output.flush().await.unwrap();
+        }
+    });
 
     loop {
         tokio::select! {
-            next_line = input_lines.next_line() => { handle_stdin_next_line(next_line, &mut output, handler, &mut in_flight).await? }
+            next_line = input_lines.next_line() => {
+                handle_stdin_next_line(next_line, stdout_sender.clone(), handler, &mut in_flight).await?;
+            }
             next_request = client_adapter.request_receiver.recv() => {
-                handle_next_client_request(next_request, &mut output, &mut in_flight).await?
+                handle_next_client_request(next_request, &mut stdout_sender, &mut in_flight).await?;
             }
             next_notification = client_adapter.notification_receiver.recv() => {
-                handle_next_client_notification(next_notification, &mut output).await?
+                handle_next_client_notification(next_notification, &mut stdout_sender).await?;
             }
         }
     }
 }
 
-async fn handle_next_client_request<T: AsyncWrite + Unpin>(
+async fn handle_next_client_request(
     next_request: Option<(jsonrpc_core::MethodCall, oneshot::Sender<jsonrpc_core::Output>)>,
-    output: &mut tokio::io::BufWriter<T>,
+    stdout_sender: &mut mpsc::Sender<Vec<u8>>,
     in_flight: &mut HashMap<jsonrpc_core::Id, oneshot::Sender<jsonrpc_core::Output>>,
 ) -> io::Result<()> {
     let (next_request, channel) = next_request.unwrap();
     in_flight.insert(next_request.id.clone(), channel);
     let request_json = serde_json::to_vec(&next_request)?;
-    output.write_all(&request_json).await?;
-    output.write_all(b"\n").await?;
-    output.flush().await?;
+    stdout_sender.send(request_json).await.unwrap();
     Ok(())
 }
 
-async fn handle_next_client_notification<T: AsyncWrite + Unpin>(
+async fn handle_next_client_notification(
     next_notification: Option<Notification>,
-    output: &mut tokio::io::BufWriter<T>,
+    stdout_sender: &mut mpsc::Sender<Vec<u8>>,
 ) -> io::Result<()> {
     let next_notification = next_notification.unwrap();
     let request_json = serde_json::to_vec(&next_notification)?;
-    output.write_all(&request_json).await?;
-    output.write_all(b"\n").await?;
-    output.flush().await?;
+    stdout_sender.send(request_json).await.unwrap();
     Ok(())
 }
 
-async fn handle_stdin_next_line<T: AsyncWrite + Unpin>(
+async fn handle_stdin_next_line(
     next_line: io::Result<Option<String>>,
-    output: &mut tokio::io::BufWriter<T>,
+    stdout_sender: mpsc::Sender<Vec<u8>>,
     handler: &IoHandler,
     in_flight: &mut HashMap<jsonrpc_core::Id, oneshot::Sender<jsonrpc_core::Output>>,
 ) -> io::Result<()> {
@@ -186,10 +194,11 @@ async fn handle_stdin_next_line<T: AsyncWrite + Unpin>(
 
     match serde_json::from_str::<Message>(&next_line)? {
         Message::Request(request) => {
-            let response = handle_request(handler, request).await;
-            output.write_all(response.as_bytes()).await?;
-            output.write_all(b"\n").await?;
-            output.flush().await?;
+            let handler = handler.clone();
+            tokio::spawn(async move {
+                let response = handle_request(&handler, request).await;
+                stdout_sender.send(response.into_bytes()).await.unwrap();
+            });
         }
         Message::Response(response) => {
             if let Some(chan) = in_flight.remove(response.id()) {
