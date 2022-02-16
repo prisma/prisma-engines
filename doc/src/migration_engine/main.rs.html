@@ -109,6 +109,9 @@
 <span id="108">108</span>
 <span id="109">109</span>
 <span id="110">110</span>
+<span id="111">111</span>
+<span id="112">112</span>
+<span id="113">113</span>
 </pre><pre class="rust"><code><span class="attribute">#![<span class="ident">deny</span>(<span class="ident">rust_2018_idioms</span>, <span class="ident">unsafe_code</span>)]</span>
 
 <span class="kw">mod</span> <span class="ident">commands</span>;
@@ -176,6 +179,7 @@
             <span class="ident">location</span>,
             <span class="ident">message</span>
         );
+        <span class="ident">std::process::exit</span>(<span class="number">101</span>);
     }));
 }
 
@@ -193,10 +197,12 @@
 
         <span class="kw">let</span> <span class="ident">notification</span> <span class="op">=</span> <span class="macro">serde_json::json!</span>({ <span class="string">&quot;content&quot;</span>: <span class="ident">text</span> });
 
-        <span class="self">self</span>.<span class="ident">client</span>
-            .<span class="ident">notify</span>(<span class="string">&quot;print&quot;</span>.<span class="ident">to_owned</span>(), <span class="ident">notification</span>)
+        <span class="kw">let</span> <span class="kw">_</span>: <span class="ident">std::collections::HashMap</span><span class="op">&lt;</span>(), ()<span class="op">&gt;</span> <span class="op">=</span> <span class="self">self</span>
+            .<span class="ident">client</span>
+            .<span class="ident">call</span>(<span class="string">&quot;print&quot;</span>.<span class="ident">to_owned</span>(), <span class="ident">notification</span>)
             .<span class="kw">await</span>
-            .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">err</span><span class="op">|</span> <span class="ident">ConnectorError::from_source</span>(<span class="ident">err</span>, <span class="string">&quot;JSON-RPC error&quot;</span>))
+            .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">err</span><span class="op">|</span> <span class="ident">ConnectorError::from_source</span>(<span class="ident">err</span>, <span class="string">&quot;JSON-RPC error&quot;</span>))<span class="question-mark">?</span>;
+        <span class="prelude-val">Ok</span>(())
     }
 }
 
