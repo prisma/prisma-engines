@@ -6,8 +6,9 @@ pub(crate) use name::Name;
 use super::{field_type::FieldType, CompositeTypeDepth};
 use convert_case::{Case, Casing};
 use datamodel::{
-    CompositeType, CompositeTypeField, Datamodel, DefaultValue, Field, IndexDefinition, IndexField, IndexType, Model,
-    PrimaryKeyDefinition, PrimaryKeyField, ScalarField, SortOrder, ValueGenerator, WithDatabaseName,
+    CompositeType, CompositeTypeField, CompositeTypeFieldType, Datamodel, DefaultValue, Field, IndexDefinition,
+    IndexField, IndexType, Model, PrimaryKeyDefinition, PrimaryKeyField, ScalarField, ScalarType, SortOrder,
+    ValueGenerator, WithDatabaseName,
 };
 use introspection_connector::Warning;
 use mongodb::bson::{Bson, Document};
@@ -16,7 +17,7 @@ use regex::Regex;
 use std::{
     borrow::Cow,
     cmp::Ordering,
-    collections::{BTreeMap, HashMap},
+    collections::{BTreeMap, HashMap, HashSet},
     fmt,
 };
 
@@ -24,6 +25,7 @@ pub(super) const SAMPLE_SIZE: i32 = 1000;
 
 static RESERVED_NAMES: &[&str] = &["PrismaClient"];
 static COMMENTED_OUT_FIELD: &str = "This field was commented out because of an invalid name. Please provide a valid one that matches [a-zA-Z][a-zA-Z0-9_]*";
+static EMPTY_TYPE_DETECTED: &str = "Nested objects had no data in the sample dataset to introspect a nested type.";
 
 /// Statistical data from a MongoDB database for determining a Prisma data
 /// model.
@@ -508,7 +510,64 @@ fn populate_fields(
         warnings.push(crate::warnings::fields_with_unknown_types(&unknown_types));
     }
 
+    filter_out_empty_types(&mut models, &mut types, warnings);
+
     (models, types)
+}
+
+/// From the resulting data model, remove all types with no fields and change
+/// the field types to Json.
+fn filter_out_empty_types(
+    models: &mut BTreeMap<String, Model>,
+    types: &mut BTreeMap<String, CompositeType>,
+    warnings: &mut Vec<Warning>,
+) {
+    let mut fields_with_an_empty_type = Vec::new();
+
+    // 1. remove all types that have no fields.
+    let empty_types: HashSet<_> = types
+        .iter()
+        .filter(|(_, r#type)| r#type.fields.is_empty())
+        .map(|(name, _)| name.to_owned())
+        .collect();
+
+    // https://github.com/rust-lang/rust/issues/70530
+    types.retain(|_, r#type| !r#type.fields.is_empty());
+
+    // 2. change all fields in models that point to a non-existing type to Json.
+    for (model_name, model) in models.iter_mut() {
+        for field in model.fields.iter_mut().filter_map(|f| f.as_scalar_field_mut()) {
+            match &field.field_type {
+                datamodel::FieldType::CompositeType(ct) if empty_types.contains(ct) => {
+                    fields_with_an_empty_type.push((Name::Model(model_name.clone()), field.name.clone()));
+                    field.field_type = datamodel::FieldType::Scalar(datamodel::ScalarType::Json, None, None);
+                    field.documentation = Some(EMPTY_TYPE_DETECTED.to_owned());
+                }
+                _ => (),
+            }
+        }
+    }
+
+    // 3. change all fields in types that point to a non-existing type to Json.
+    for (type_name, r#type) in types.iter_mut() {
+        for field in r#type.fields.iter_mut() {
+            match &field.r#type {
+                CompositeTypeFieldType::CompositeType(name) if empty_types.contains(name) => {
+                    fields_with_an_empty_type.push((Name::CompositeType(type_name.clone()), field.name.clone()));
+                    field.r#type = CompositeTypeFieldType::Scalar(ScalarType::Json, None, None);
+                    field.documentation = Some(EMPTY_TYPE_DETECTED.to_owned());
+                }
+                _ => (),
+            }
+        }
+    }
+
+    // 4. add warnings in the end to reduce spam
+    if !fields_with_an_empty_type.is_empty() {
+        warnings.push(crate::warnings::fields_pointing_to_an_empty_type(
+            &fields_with_an_empty_type,
+        ));
+    }
 }
 
 fn add_indices_to_models(models: &mut BTreeMap<String, Model>, indices: &mut BTreeMap<String, Vec<IndexWalker<'_>>>) {

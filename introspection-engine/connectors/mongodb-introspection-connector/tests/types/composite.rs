@@ -456,3 +456,83 @@ fn fields_named_id_in_composite() {
 
     expected.assert_eq(res.datamodel());
 }
+
+#[test]
+fn do_not_create_empty_types() {
+    let res = introspect(|db| async move {
+        let docs = vec![doc! { "data": {} }, doc! {}];
+
+        db.collection("Test").insert_many(docs, None).await?;
+
+        Ok(())
+    });
+
+    let expected = expect![[r#"
+        model Test {
+          id   String @id @default(auto()) @map("_id") @db.ObjectId
+          /// Nested objects had no data in the sample dataset to introspect a nested type.
+          data Json?
+        }
+    "#]];
+
+    expected.assert_eq(res.datamodel());
+    res.assert_warning("The following fields point to nested objects without any data.");
+
+    res.assert_warning_affected(&json!([{
+        "model": "Test",
+        "field": "data",
+    }]));
+}
+
+#[test]
+fn do_not_create_empty_types_in_types() {
+    let res = introspect(|db| async move {
+        let docs = vec![doc! { "tost": { "data": {} } }];
+
+        db.collection("Test").insert_many(docs, None).await?;
+
+        Ok(())
+    });
+
+    let expected = expect![[r#"
+        type TestTost {
+          /// Nested objects had no data in the sample dataset to introspect a nested type.
+          data Json
+        }
+
+        model Test {
+          id   String   @id @default(auto()) @map("_id") @db.ObjectId
+          tost TestTost
+        }
+    "#]];
+
+    expected.assert_eq(res.datamodel());
+    res.assert_warning("The following fields point to nested objects without any data.");
+
+    res.assert_warning_affected(&json!([{
+        "compositeType": "TestTost",
+        "field": "data",
+    }]));
+}
+
+#[test]
+fn no_empty_type_warnings_when_depth_is_reached() {
+    let depth = CompositeTypeDepth::None;
+    let res = introspect_depth(depth, |db| async move {
+        let docs = vec![doc! { "data": {} }, doc! {}];
+
+        db.collection("Test").insert_many(docs, None).await?;
+
+        Ok(())
+    });
+
+    let expected = expect![[r#"
+        model Test {
+          id   String @id @default(auto()) @map("_id") @db.ObjectId
+          data Json?
+        }
+    "#]];
+
+    expected.assert_eq(res.datamodel());
+    res.assert_no_warnings();
+}

@@ -65,7 +65,7 @@ pub(crate) fn fields_with_empty_names(fields_with_empty_names: &[(Name, String)]
                     "field": field
                 }),
                 Name::CompositeType(name) => json!({
-                    "type": name,
+                    "compositeType": name,
                     "field": field
                 }),
             })
@@ -99,6 +99,30 @@ pub(crate) fn fields_with_unknown_types(unknown_types: &[(Name, String)]) -> War
     Warning {
         code: 103,
         message: "Could not determine the types for the following fields.".into(),
+        affected,
+    }
+}
+
+pub(crate) fn fields_pointing_to_an_empty_type(fields_with_an_empty_type: &[(Name, String)]) -> Warning {
+    let affected = serde_json::Value::Array({
+        fields_with_an_empty_type
+            .iter()
+            .map(|(container, field)| match container {
+                Name::Model(name) => json!({
+                    "model": name,
+                    "field": field
+                }),
+                Name::CompositeType(name) => json!({
+                    "compositeType": name,
+                    "field": field
+                }),
+            })
+            .collect()
+    });
+
+    Warning {
+        code: 102,
+        message: "The following fields point to nested objects without any data.".into(),
         affected,
     }
 }
