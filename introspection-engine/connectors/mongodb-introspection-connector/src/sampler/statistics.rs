@@ -17,7 +17,7 @@ use regex::Regex;
 use std::{
     borrow::Cow,
     cmp::Ordering,
-    collections::{BTreeMap, HashMap, HashSet, VecDeque},
+    collections::{BTreeMap, HashMap, HashSet},
     fmt,
 };
 
@@ -25,6 +25,7 @@ pub(super) const SAMPLE_SIZE: i32 = 1000;
 
 static RESERVED_NAMES: &[&str] = &["PrismaClient"];
 static COMMENTED_OUT_FIELD: &str = "This field was commented out because of an invalid name. Please provide a valid one that matches [a-zA-Z][a-zA-Z0-9_]*";
+static EMPTY_TYPE_DETECTED: &str = "Nested objects had no data in the sample dataset to introspect a nested type.";
 
 /// Statistical data from a MongoDB database for determining a Prisma data
 /// model.
@@ -523,62 +524,42 @@ fn filter_out_empty_types(
 ) {
     let mut fields_with_an_empty_type = Vec::new();
 
-    let empty_types: HashSet<String> = types
+    // 1. remove all types that have no fields.
+    let empty_types: HashSet<_> = types
         .iter()
-        .filter_map(|(name, r#type)| {
-            if r#type.fields.is_empty() {
-                Some(name.clone())
-            } else {
-                None
-            }
-        })
+        .filter(|(_, r#type)| r#type.fields.is_empty())
+        .map(|(name, _)| name.to_owned())
         .collect();
 
-    static DOCS: &str = "Nested objects had no data in the sample dataset to introspect a nested type.";
-
-    // 1. remove all types that have no fields.
-    types.retain(|_, v| !v.fields.is_empty());
+    // https://github.com/rust-lang/rust/issues/70530
+    types.retain(|_, r#type| !r#type.fields.is_empty());
 
     // 2. change all fields in models that point to a non-existing type to Json.
     for (model_name, model) in models.iter_mut() {
-        let mut keep = VecDeque::with_capacity(model.fields.len());
-
-        while let Some(mut field) = model.fields.pop() {
-            if let Field::ScalarField(sf) = &mut field {
-                match &sf.field_type {
-                    datamodel::FieldType::CompositeType(ct) if !types.contains_key(ct) => {
-                        fields_with_an_empty_type.push((Name::Model(model_name.clone()), sf.name.clone()));
-                        sf.field_type = datamodel::FieldType::Scalar(datamodel::ScalarType::Json, None, None);
-                        sf.documentation = Some(DOCS.to_owned());
-                    }
-                    _ => (),
+        for field in model.fields.iter_mut().filter_map(|f| f.as_scalar_field_mut()) {
+            match &field.field_type {
+                datamodel::FieldType::CompositeType(ct) if empty_types.contains(ct) => {
+                    fields_with_an_empty_type.push((Name::Model(model_name.clone()), field.name.clone()));
+                    field.field_type = datamodel::FieldType::Scalar(datamodel::ScalarType::Json, None, None);
+                    field.documentation = Some(EMPTY_TYPE_DETECTED.to_owned());
                 }
-            };
-
-            keep.push_front(field);
+                _ => (),
+            }
         }
-
-        model.fields = keep.into();
     }
 
     // 3. change all fields in types that point to a non-existing type to Json.
     for (type_name, r#type) in types.iter_mut() {
-        let mut keep = VecDeque::with_capacity(r#type.fields.len());
-
-        while let Some(mut field) = r#type.fields.pop() {
+        for field in r#type.fields.iter_mut() {
             match &field.r#type {
                 CompositeTypeFieldType::CompositeType(name) if empty_types.contains(name) => {
                     fields_with_an_empty_type.push((Name::CompositeType(type_name.clone()), field.name.clone()));
                     field.r#type = CompositeTypeFieldType::Scalar(ScalarType::Json, None, None);
-                    field.documentation = Some(DOCS.to_owned());
+                    field.documentation = Some(EMPTY_TYPE_DETECTED.to_owned());
                 }
                 _ => (),
             }
-
-            keep.push_front(field);
         }
-
-        r#type.fields = keep.into();
     }
 
     // 4. add warnings in the end to reduce spam

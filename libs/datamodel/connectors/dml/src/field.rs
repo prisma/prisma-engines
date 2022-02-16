@@ -123,6 +123,13 @@ impl Field {
         }
     }
 
+    pub fn as_scalar_field_mut(&mut self) -> Option<&mut ScalarField> {
+        match self {
+            Field::ScalarField(sf) => Some(sf),
+            _ => None,
+        }
+    }
+
     pub fn is_relation(&self) -> bool {
         matches!(self, Field::RelationField(_))
     }
