@@ -367,6 +367,7 @@ fn populate_fields(
         .collect();
 
     let mut unsupported = Vec::new();
+    let mut unknown_types = Vec::new();
     let mut undecided_types = Vec::new();
     let mut fields_with_empty_names = Vec::new();
 
@@ -375,10 +376,11 @@ fn populate_fields(
         let field_count = sampler.counter;
 
         let percentages = sampler.percentages();
+        let most_common_type = percentages.find_most_common();
 
-        let field_type = match percentages.find_most_common() {
+        let field_type = match &most_common_type {
             Some(field_type) => field_type.to_owned(),
-            None => FieldType::Unsupported("Unknown"),
+            None => FieldType::Json,
         };
 
         if let FieldType::Unsupported(r#type) = field_type {
@@ -405,6 +407,23 @@ fn populate_fields(
         } else {
             None
         };
+
+        if most_common_type.is_none() {
+            static UNKNOWN_FIELD: &str =
+                "Could not determine type: the field only had null or empty values in the sample set.";
+
+            match &mut documentation {
+                Some(docs) => {
+                    docs.push('\n');
+                    docs.push_str(UNKNOWN_FIELD);
+                }
+                None => {
+                    documentation = Some(UNKNOWN_FIELD.to_owned());
+                }
+            }
+
+            unknown_types.push((container.clone(), field_name.to_string()));
+        }
 
         let (name, database_name, is_commented_out) = match sanitize_string(&field_name) {
             Some(sanitized) if sanitized.is_empty() => {
@@ -483,6 +502,10 @@ fn populate_fields(
 
     if !fields_with_empty_names.is_empty() {
         warnings.push(crate::warnings::fields_with_empty_names(&fields_with_empty_names));
+    }
+
+    if !unknown_types.is_empty() {
+        warnings.push(crate::warnings::fields_with_unknown_types(&unknown_types));
     }
 
     (models, types)

@@ -78,3 +78,27 @@ pub(crate) fn fields_with_empty_names(fields_with_empty_names: &[(Name, String)]
         affected,
     }
 }
+
+pub(crate) fn fields_with_unknown_types(unknown_types: &[(Name, String)]) -> Warning {
+    let affected = serde_json::Value::Array({
+        unknown_types
+            .iter()
+            .map(|(name, field)| match name {
+                Name::Model(name) => json!({
+                    "model": name,
+                    "field": field,
+                }),
+                Name::CompositeType(name) => json!({
+                    "compositeType": name,
+                    "field": field,
+                }),
+            })
+            .collect()
+    });
+
+    Warning {
+        code: 103,
+        message: "Could not determine the types for the following fields.".into(),
+        affected,
+    }
+}
