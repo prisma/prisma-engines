@@ -190,7 +190,7 @@
             }
         })<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">connection</span> <span class="op">=</span> <span class="ident">Client::with_uri_str</span>(<span class="ident">connection_string</span>)
+        <span class="kw">let</span> <span class="ident">connection</span> <span class="op">=</span> <span class="ident">mongodb_client::create</span>(<span class="ident">connection_string</span>)
             .<span class="kw">await</span>
             .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">err</span><span class="op">|</span> <span class="ident">error::map_connection_errors</span>(<span class="ident">err</span>, <span class="kw-2">&amp;</span><span class="ident">url</span>))<span class="question-mark">?</span>;
 

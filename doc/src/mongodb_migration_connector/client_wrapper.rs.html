@@ -68,18 +68,10 @@
 <span id="67">67</span>
 <span id="68">68</span>
 <span id="69">69</span>
-<span id="70">70</span>
-<span id="71">71</span>
-<span id="72">72</span>
-<span id="73">73</span>
-<span id="74">74</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">datamodel::common::preview_features::PreviewFeature</span>;
 <span class="kw">use</span> <span class="ident">enumflags2::BitFlags</span>;
 <span class="kw">use</span> <span class="ident">migration_connector</span>::{<span class="ident">ConnectorError</span>, <span class="ident">ConnectorResult</span>};
-<span class="kw">use</span> <span class="ident">mongodb</span>::{
-    <span class="ident">error::Error</span> <span class="kw">as</span> <span class="ident">MongoError</span>,
-    <span class="ident">options</span>::{<span class="ident">ClientOptions</span>, <span class="ident">WriteConcern</span>},
-};
+<span class="kw">use</span> <span class="ident">mongodb</span>::{<span class="ident">error::Error</span> <span class="kw">as</span> <span class="ident">MongoError</span>, <span class="ident">options::WriteConcern</span>};
 <span class="kw">use</span> <span class="ident">mongodb_schema_describer::MongoSchema</span>;
 <span class="kw">use</span> <span class="ident">url::Url</span>;
 
@@ -95,11 +87,9 @@
         <span class="kw">let</span> <span class="ident">url</span> <span class="op">=</span> <span class="ident">Url::parse</span>(<span class="ident">connection_str</span>).<span class="ident">map_err</span>(<span class="ident">ConnectorError::url_parse_error</span>)<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">db_name</span> <span class="op">=</span> <span class="ident">url</span>.<span class="ident">path</span>().<span class="ident">trim_start_matches</span>(<span class="string">&#39;/&#39;</span>).<span class="ident">to_string</span>();
 
-        <span class="kw">let</span> <span class="ident">client_options</span> <span class="op">=</span> <span class="ident">ClientOptions::parse</span>(<span class="ident">connection_str</span>)
+        <span class="kw">let</span> <span class="ident">inner</span> <span class="op">=</span> <span class="ident">mongodb_client::create</span>(<span class="ident">connection_str</span>)
             .<span class="kw">await</span>
             .<span class="ident">map_err</span>(<span class="ident">mongo_error_to_connector_error</span>)<span class="question-mark">?</span>;
-
-        <span class="kw">let</span> <span class="ident">inner</span> <span class="op">=</span> <span class="ident">mongodb::Client::with_options</span>(<span class="ident">client_options</span>).<span class="ident">map_err</span>(<span class="ident">mongo_error_to_connector_error</span>)<span class="question-mark">?</span>;
 
         <span class="prelude-val">Ok</span>(<span class="ident">Client</span> {
             <span class="ident">inner</span>,

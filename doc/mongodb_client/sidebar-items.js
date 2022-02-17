@@ -1,0 +1,1 @@
+initSidebarItems({"fn":[["create","A wrapper to create a new MongoDB client. Please remove me when we do not need special setup anymore for this."]]});
