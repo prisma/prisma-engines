@@ -55,9 +55,9 @@ pub(crate) fn undecided_field_type(affected: &[(Name, String, String)]) -> Warni
     }
 }
 
-pub(crate) fn fields_with_empty_names(fields_with_empty_names: &[(Name, String)]) -> Warning {
+pub(crate) fn fields_pointing_to_an_empty_type(fields_with_an_empty_type: &[(Name, String)]) -> Warning {
     let affected = serde_json::Value::Array({
-        fields_with_empty_names
+        fields_with_an_empty_type
             .iter()
             .map(|(container, field)| match container {
                 Name::Model(name) => json!({
@@ -73,8 +73,8 @@ pub(crate) fn fields_with_empty_names(fields_with_empty_names: &[(Name, String)]
     });
 
     Warning {
-        code: 4,
-        message: "These enum values were commented out because their names are currently not supported by Prisma. Please provide valid ones that match [a-zA-Z][a-zA-Z0-9_]* using the `@map` attribute.".into(),
+        code: 102,
+        message: "The following fields point to nested objects without any data.".into(),
         affected,
     }
 }
@@ -103,9 +103,9 @@ pub(crate) fn fields_with_unknown_types(unknown_types: &[(Name, String)]) -> War
     }
 }
 
-pub(crate) fn fields_pointing_to_an_empty_type(fields_with_an_empty_type: &[(Name, String)]) -> Warning {
+pub(crate) fn fields_with_empty_names(fields_with_empty_names: &[(Name, String)]) -> Warning {
     let affected = serde_json::Value::Array({
-        fields_with_an_empty_type
+        fields_with_empty_names
             .iter()
             .map(|(container, field)| match container {
                 Name::Model(name) => json!({
@@ -121,8 +121,8 @@ pub(crate) fn fields_pointing_to_an_empty_type(fields_with_an_empty_type: &[(Nam
     });
 
     Warning {
-        code: 102,
-        message: "The following fields point to nested objects without any data.".into(),
+        code: 104,
+        message: "These enum values were commented out because their names are currently not supported by Prisma. Please provide valid ones that match [a-zA-Z][a-zA-Z0-9_]* using the `@map` attribute.".into(),
         affected,
     }
 }

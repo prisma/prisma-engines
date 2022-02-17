@@ -476,6 +476,8 @@ fn do_not_create_empty_types() {
     "#]];
 
     expected.assert_eq(res.datamodel());
+
+    res.assert_warning_code(102);
     res.assert_warning("The following fields point to nested objects without any data.");
 
     res.assert_warning_affected(&json!([{
@@ -507,6 +509,7 @@ fn do_not_create_empty_types_in_types() {
     "#]];
 
     expected.assert_eq(res.datamodel());
+    res.assert_warning_code(102);
     res.assert_warning("The following fields point to nested objects without any data.");
 
     res.assert_warning_affected(&json!([{

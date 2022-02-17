@@ -102,6 +102,8 @@ fn remapping_composite_fields_with_numbers() {
 
     expected.assert_eq(res.datamodel());
 
+    res.assert_warning_code(104);
+
     res.assert_warning("These enum values were commented out because their names are currently not supported by Prisma. Please provide valid ones that match [a-zA-Z][a-zA-Z0-9_]* using the `@map` attribute.");
 
     res.assert_warning_affected(&json!([{
@@ -134,6 +136,8 @@ fn remapping_model_fields_with_numbers() {
     "#]];
 
     expected.assert_eq(res.datamodel());
+
+    res.assert_warning_code(104);
 
     res.assert_warning("These enum values were commented out because their names are currently not supported by Prisma. Please provide valid ones that match [a-zA-Z][a-zA-Z0-9_]* using the `@map` attribute.");
 

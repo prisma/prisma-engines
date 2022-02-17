@@ -739,6 +739,7 @@ fn unsupported_types_in_an_index() {
 
     expected.assert_eq(res.datamodel());
 
+    res.assert_warning_code(3);
     res.assert_warning(
         "These fields are not supported by the Prisma Client, because Prisma currently does not support their types.",
     );
