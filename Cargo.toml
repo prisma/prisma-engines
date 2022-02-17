@@ -39,6 +39,7 @@ members = [
   "libs/sql-ddl",
   "libs/sql-schema-describer",
   "libs/mongodb-schema-describer",
+  "libs/mongodb-client",
   "libs/test-cli",
   "libs/user-facing-errors",
 ]

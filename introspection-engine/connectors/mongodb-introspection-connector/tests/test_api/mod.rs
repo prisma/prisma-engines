@@ -113,7 +113,7 @@ where
     };
 
     RT.block_on(async move {
-        let client = Client::with_uri_str(&connection_string).await.unwrap();
+        let client = mongodb_client::create(&connection_string).await.unwrap();
         let database = client.database(&database_name);
         let connector = MongoDbIntrospectionConnector::new(&connection_string).await.unwrap();
 

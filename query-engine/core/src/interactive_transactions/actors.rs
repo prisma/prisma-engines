@@ -361,14 +361,12 @@ pub fn spawn_client_list_clear_actor(
     clients: Arc<RwLock<HashMap<TxId, ITXClient>>>,
     mut rx: Receiver<TxId>,
 ) -> JoinHandle<()> {
-    let handle = tokio::task::spawn(async move {
+    tokio::task::spawn(async move {
         loop {
             if let Some(id) = rx.recv().await {
                 trace!("removing {} from client list", id);
                 clients.write().await.remove(&id);
             }
         }
-    });
-
-    handle
+    })
 }

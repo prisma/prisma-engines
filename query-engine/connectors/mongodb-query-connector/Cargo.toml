@@ -27,6 +27,9 @@ path = "../../prisma-models"
 [dependencies.native-types]
 path = "../../../libs/native-types"
 
+[dependencies.mongodb-client]
+path = "../../../libs/mongodb-client"
+
 [dependencies.connector-interface]
 package = "query-connector"
 path = "../query-connector"

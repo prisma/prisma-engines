@@ -33,7 +33,7 @@ async fn client() -> &'static mongodb::Client {
     static CLIENT: OnceCell<mongodb::Client> = OnceCell::const_new();
 
     CLIENT
-        .get_or_init(|| async move { mongodb::Client::with_uri_str(CONN_STR.as_str()).await.unwrap() })
+        .get_or_init(|| async move { mongodb_client::create(CONN_STR.as_str()).await.unwrap() })
         .await
 }
 

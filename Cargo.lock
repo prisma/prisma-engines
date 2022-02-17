@@ -1901,6 +1901,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "mongodb-client"
+version = "0.1.0"
+dependencies = [
+ "mongodb",
+]
+
+[[package]]
 name = "mongodb-datamodel-connector"
 version = "0.1.0"
 dependencies = [
@@ -1925,6 +1932,7 @@ dependencies = [
  "indoc",
  "introspection-connector",
  "mongodb",
+ "mongodb-client",
  "mongodb-datamodel-connector",
  "mongodb-schema-describer",
  "names",
@@ -1949,6 +1957,7 @@ dependencies = [
  "futures",
  "migration-connector",
  "mongodb",
+ "mongodb-client",
  "mongodb-datamodel-connector",
  "mongodb-schema-describer",
  "once_cell",
@@ -1972,6 +1981,7 @@ dependencies = [
  "futures",
  "itertools",
  "mongodb",
+ "mongodb-client",
  "native-types",
  "prisma-models",
  "prisma-value",
@@ -2796,6 +2806,7 @@ dependencies = [
  "enumflags2",
  "migration-core",
  "mongodb",
+ "mongodb-client",
  "quaint",
  "tempfile",
  "url",
