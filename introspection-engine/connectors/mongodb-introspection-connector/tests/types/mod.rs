@@ -417,6 +417,7 @@ fn empty_arrays() {
     "#]];
 
     expected.assert_eq(res.datamodel());
+    res.assert_warning_code(103);
     res.assert_warning("Could not determine the types for the following fields.");
 
     res.assert_warning_affected(&json!([{
@@ -445,6 +446,7 @@ fn unknown_types() {
     "#]];
 
     expected.assert_eq(res.datamodel());
+    res.assert_warning_code(103);
     res.assert_warning("Could not determine the types for the following fields.");
 
     res.assert_warning_affected(&json!([{

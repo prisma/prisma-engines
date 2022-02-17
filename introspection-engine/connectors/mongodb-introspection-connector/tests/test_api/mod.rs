@@ -37,6 +37,12 @@ impl TestResult {
     }
 
     #[track_caller]
+    pub fn assert_warning_code(&self, code: i16) {
+        dbg!(&self.warnings);
+        assert!(self.warnings.iter().any(|w| w.code == code))
+    }
+
+    #[track_caller]
     pub fn assert_warning(&self, warning: &str) {
         dbg!(&self.warnings);
         assert!(self.warnings.iter().any(|w| w.message == warning))

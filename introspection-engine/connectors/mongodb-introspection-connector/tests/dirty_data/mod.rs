@@ -71,6 +71,7 @@ fn mixing_types() {
 
     expected.assert_eq(res.datamodel());
 
+    res.assert_warning_code(101);
     res.assert_warning("The following fields had data stored in multiple types. The most common type was chosen. If loading data with a type that does not match the one in the data model, the client will crash. Please see the issue: https://github.com/prisma/prisma/issues/9654");
 
     res.assert_warning_affected(&json!([{
