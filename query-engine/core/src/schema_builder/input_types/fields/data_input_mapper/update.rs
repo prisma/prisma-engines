@@ -289,7 +289,9 @@ fn composite_set_update_input_field(ctx: &mut BuilderContext, cf: &CompositeFiel
         input_types.push(InputType::list(set_object_type));
     }
 
-    input_field(operations::SET, input_types, None).optional()
+    input_field(operations::SET, input_types, None)
+        .optional()
+        .nullable_if(!cf.is_required())
 }
 
 // Builds an `push` input field. Should only be used in the envelope type.

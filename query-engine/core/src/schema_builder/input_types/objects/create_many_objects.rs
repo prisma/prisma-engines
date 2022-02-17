@@ -55,18 +55,22 @@ fn filter_create_many_fields(
     // 2) Only allow writing autoincrement fields if the connector supports it.
     model
         .fields()
-        .scalar()
-        .into_iter()
-        .filter(|sf| {
-            if linking_fields.contains(sf) {
-                false
-            } else if sf.is_autoincrement {
-                ctx.capabilities
-                    .contains(ConnectorCapability::CreateManyWriteableAutoIncId)
-            } else {
-                true
+        .all
+        .iter()
+        .filter(|field| match field {
+            ModelField::Scalar(sf) => {
+                if linking_fields.contains(sf) {
+                    false
+                } else if sf.is_autoincrement {
+                    ctx.capabilities
+                        .contains(ConnectorCapability::CreateManyWriteableAutoIncId)
+                } else {
+                    true
+                }
             }
+            ModelField::Composite(_) => true,
+            _ => false,
         })
-        .map(Into::into)
+        .map(Clone::clone)
         .collect()
 }
