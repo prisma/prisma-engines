@@ -18,7 +18,7 @@ fn test_dmmf_rendering() {
         println!("TESTING: {}", test_case);
         let datamodel_string = load_from_file(format!("{}.prisma", test_case).as_str());
         let dml = parse(&datamodel_string);
-        let dmmf_string = datamodel::json::dmmf::render_to_dmmf(&dml);
+        let dmmf_string = dmmf::render_to_dmmf(&dml);
         assert_eq_json(
             &dmmf_string,
             &load_from_file(format!("{}.json", test_case).as_str()),
@@ -27,6 +27,7 @@ fn test_dmmf_rendering() {
     }
 }
 
+#[track_caller]
 fn assert_eq_json(a: &str, b: &str, msg: &str) {
     let json_a: serde_json::Value = serde_json::from_str(a).expect("The String a was not valid JSON.");
     let json_b: serde_json::Value = serde_json::from_str(b).expect("The String b was not valid JSON.");

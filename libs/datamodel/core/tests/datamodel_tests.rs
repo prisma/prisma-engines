@@ -10,7 +10,6 @@ mod config;
 mod functions;
 mod parsing;
 mod reformat;
-mod render_to_dmmf;
 mod renderer;
 mod types;
 

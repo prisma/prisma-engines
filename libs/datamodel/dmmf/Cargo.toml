@@ -1,0 +1,15 @@
+[package]
+name = "dmmf"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+bigdecimal = "0.2.0"
+datamodel = { path = "../core" }
+serde = { version = "1.0.136", features = ["derive"] }
+serde_json = "1.0.78"
+
+[dev-dependencies]
+expect-test = "1.2.2"
+indoc = "1.0.3"
+pretty_assertions = "0.6.1"

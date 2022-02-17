@@ -71,13 +71,12 @@ pub(crate) fn where_object_type(ctx: &mut BuilderContext, model: &ModelRef) -> I
         .optional(),
     ];
 
-    fields.extend(
-        model
-            .fields()
-            .all
-            .iter()
-            .map(|f| input_fields::filter_input_field(ctx, f, false)),
-    );
+    let input_fields = model.fields().all.iter().filter_map(|f| match f {
+        ModelField::Composite(_) => None,
+        f => Some(input_fields::filter_input_field(ctx, f, false)),
+    });
+
+    fields.extend(input_fields);
 
     input_object.set_fields(fields);
     weak_ref
