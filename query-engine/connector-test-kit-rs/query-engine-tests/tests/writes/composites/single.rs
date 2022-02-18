@@ -237,7 +237,7 @@ mod create {
             }
           }"#,
           2009,
-          "Mutation.createOneTestModel.data.TestModelUncheckedCreateInput.b.BCreateEnvelopeInput`: Expected exactly one field to be present, got 0."
+          "Mutation.createOneTestModel.data.TestModelUncheckedCreateInput.b.BNullableCreateEnvelopeInput`: Expected exactly one field to be present, got 0."
         );
 
         // Missing required field without default failure on field `B.c`
