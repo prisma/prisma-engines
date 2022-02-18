@@ -243,4 +243,39 @@ mod edge_cases {
 
         Ok(())
     }
+
+    #[connector_test]
+    async fn non_nullable_list_set(runner: Runner) -> TestResult<()> {
+        assert_error!(
+            runner,
+            r#"mutation {
+              createOneSameComposite(data: {
+                id: 1,
+                to_one: { field: "foo" }
+                to_many: null
+              }) {
+                id
+              }
+            }"#,
+            2009,
+            "`Mutation.createOneSameComposite.data.SameCompositeCreateInput.to_many`: A value is required but not set."
+        );
+
+        assert_error!(
+            runner,
+            r#"mutation {
+              createOneSameComposite(data: {
+                id: 1,
+                to_one: { field: "foo" }
+                to_many: { set: null }
+              }) {
+                id
+              }
+            }"#,
+            2009,
+            "`Mutation.createOneSameComposite.data.SameCompositeCreateInput.to_many.CompositeListCreateEnvelopeInput.set`: A value is required but not set."
+        );
+
+        Ok(())
+    }
 }

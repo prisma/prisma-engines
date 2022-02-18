@@ -68,7 +68,13 @@ pub async fn create_records<'conn>(
 ) -> crate::Result<usize> {
     let coll = database.collection::<Document>(model.db_name());
     let num_records = args.len();
-    let fields = model.fields().scalar();
+    let fields: Vec<_> = model
+        .fields()
+        .all
+        .iter()
+        .filter(|field| matches!(field, Field::Scalar(_) | Field::Composite(_)))
+        .map(Clone::clone)
+        .collect();
 
     let docs = args
         .into_iter()

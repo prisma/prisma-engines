@@ -136,7 +136,7 @@ impl DataInputFieldMapper for CreateDataInputFieldMapper {
         }
 
         input_field(cf.name.clone(), input_types, None)
-            .nullable_if(!cf.is_required())
+            .nullable_if(!cf.is_required() && !cf.is_list())
             .optional_if(!cf.is_required())
     }
 }
@@ -172,8 +172,8 @@ fn composite_create_envelope_object_type(ctx: &mut BuilderContext, cf: &Composit
     }
 
     let set_field = input_field("set", input_types, None)
-        .nullable_if(!cf.is_required())
-        .optional_if(!cf.is_required());
+        .nullable_if(!cf.is_required() && !cf.is_list())
+        .optional();
 
     input_object.set_fields(vec![set_field]);
 
