@@ -117,7 +117,7 @@ fn deep_array() {
     let expected = expect![[r#"
         model Blog {
           id    String @id @default(auto()) @map("_id") @db.ObjectId
-          posts Json[]
+          posts Json
           title String
         }
     "#]];
