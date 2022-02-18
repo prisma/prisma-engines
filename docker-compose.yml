@@ -103,7 +103,7 @@ services:
       - databases
 
   mysql-5-6:
-    image: mysql:5.6.50
+    image: mysql:5.7.37
     command: mysqld
     restart: always
     environment:
@@ -117,7 +117,7 @@ services:
     tmpfs: /var/lib/mysql
 
   mysql-5-7:
-    image: mysql:5.7.32
+    image: mysql:5.7.37
     command: mysqld
     restart: always
     environment:
