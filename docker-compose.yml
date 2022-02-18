@@ -237,7 +237,7 @@ services:
       - databases
 
   mongo42:
-    image: prismagraphql/mongo-single-replica:4.2.17-bionic
+    image: prismagraphql/mongo-single-replica:4.4.3-bionic
     restart: always
     environment:
       MONGO_INITDB_ROOT_USERNAME: "prisma"
