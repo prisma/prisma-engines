@@ -1,7 +1,7 @@
 use datamodel::common::preview_features::PreviewFeature;
 use enumflags2::BitFlags;
 use introspection_connector::{CompositeTypeDepth, IntrospectionConnector, IntrospectionContext, Warning};
-use mongodb::{Client, Database};
+use mongodb::Database;
 use mongodb_introspection_connector::MongoDbIntrospectionConnector;
 use names::Generator;
 use once_cell::sync::Lazy;

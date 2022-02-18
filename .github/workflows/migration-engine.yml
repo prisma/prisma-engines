@@ -18,7 +18,9 @@ jobs:
       fail-fast: false
       matrix:
         database:
-          - name: "mongodb4"
+          - name: "mongodb42"
+            url: "mongodb://prisma:prisma@localhost:27016/?authSource=admin&retryWrites=true"
+          - name: "mongodb44"
             url: "mongodb://prisma:prisma@localhost:27017/?authSource=admin&retryWrites=true"
           - name: "mongodb5"
             url: "mongodb://prisma:prisma@localhost:27018/?authSource=admin&retryWrites=true"

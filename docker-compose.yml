@@ -261,8 +261,20 @@ services:
     networks:
       - databases
 
-  mongo4-single:
-    image: mongo:4
+  mongo42-single:
+    image: mongo:4.2
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: "prisma"
+      MONGO_INITDB_ROOT_PASSWORD: "prisma"
+      INIT_WAIT_SEC: $INIT_WAIT_SEC
+    ports:
+      - "27016:27017"
+    networks:
+      - databases
+
+  mongo44-single:
+    image: mongo:4.4
     restart: always
     environment:
       MONGO_INITDB_ROOT_USERNAME: "prisma"
