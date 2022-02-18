@@ -1,5 +1,4 @@
 use super::*;
-use crate::constants::args::*;
 use datamodel_connector::ConnectorCapability;
 use input_types::fields::{arguments, input_fields};
 use prisma_models::{dml, PrismaValue};

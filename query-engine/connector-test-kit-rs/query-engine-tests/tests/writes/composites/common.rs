@@ -324,4 +324,51 @@ mod edge_cases {
 
         Ok(())
     }
+
+    fn schema_override_issue() -> String {
+        indoc! { r#"
+          model CommentRequiredProp {
+            #id(id, Int, @id)
+            country String?
+            content CommentContent
+          }
+
+          model CommentOptionalProp {
+            #id(id, Int, @id)
+
+            country String?
+            content CommentContent?
+          }
+
+          type CommentContent {
+            time    DateTime @default(now())
+            text    String
+            upvotes CommentContentUpvotes[]
+          }
+
+          type CommentContentUpvotes {
+            vote   Boolean
+            userId String
+          }
+      "# }
+        .to_string()
+    }
+
+    #[connector_test(schema(schema_override_issue))]
+    async fn schema_override_regression(runner: Runner) -> TestResult<()> {
+        insta::assert_snapshot!(
+          run_query!(runner, r#"mutation {
+            upsertOneCommentOptionalProp(
+              where: { id: 99 }
+              create: { id: 1, country: "de", content: { set: null } }
+              update: {}
+            ) {
+              id
+            }
+          }"#),
+          @r###"{"data":{"upsertOneCommentOptionalProp":{"id":1}}}"###
+        );
+
+        Ok(())
+    }
 }

@@ -215,9 +215,10 @@ fn composite_update_envelope_object_type(ctx: &mut BuilderContext, cf: &Composit
     } else {
         ""
     };
-    let name = format!("{}{}UpdateEnvelopeInput", cf.typ.name, arity);
 
+    let name = format!("{}{}UpdateEnvelopeInput", cf.typ.name, arity);
     let ident = Identifier::new(name, PRISMA_NAMESPACE);
+
     return_cached_input!(ctx, &ident);
 
     let mut input_object = init_input_object_type(ident.clone());
