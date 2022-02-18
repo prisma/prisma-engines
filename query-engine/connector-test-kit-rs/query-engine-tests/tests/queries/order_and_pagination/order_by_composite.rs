@@ -291,6 +291,119 @@ mod to_many {
         Ok(())
     }
 
+    /// Query with cursor: Order a model by a single to-many composite.
+    #[connector_test]
+    async fn cursored_ordering_base(runner: Runner) -> TestResult<()> {
+        create_test_data(&runner).await?;
+
+        insta::assert_snapshot!(
+            run_query!(runner, r#"{ findManyTestModel(cursor: { id: 2 }, orderBy: { to_many_as: { _count: asc } }) { id } }"#),
+            @r###"{"data":{"findManyTestModel":[{"id":2}]}}"###
+        );
+
+        insta::assert_snapshot!(
+            run_query!(runner, r#"{ findManyTestModel(cursor: { id: 2 }, orderBy: { to_many_as: { _count: desc } }) { id } }"#),
+            @r###"{"data":{"findManyTestModel":[{"id":2},{"id":1},{"id":3},{"id":4}]}}"###
+        );
+
+        Ok(())
+    }
+
+    /// Query with cursor: Order a model by a single to-many composite over a to-one composite.
+    #[connector_test]
+    async fn cursored_ordering_over_to_one(runner: Runner) -> TestResult<()> {
+        create_test_data(&runner).await?;
+
+        insta::assert_snapshot!(
+            run_query!(runner, r#"{ findManyTestModel(cursor: { id: 2 }, orderBy: { to_one_b: { b_to_many_cs: { _count: asc }} }) { id } }"#),
+            @r###"{"data":{"findManyTestModel":[{"id":2}]}}"###
+        );
+
+        insta::assert_snapshot!(
+            run_query!(runner, r#"{ findManyTestModel(cursor: { id: 2 }, orderBy: { to_one_b: { b_to_many_cs: { _count: desc }} }) { id } }"#),
+            @r###"{"data":{"findManyTestModel":[{"id":2},{"id":3},{"id":4}]}}"###
+        );
+
+        Ok(())
+    }
+
+    /// Order a model based on many orderings, including composites.
+    #[connector_test]
+    async fn model_cursored_ordering_multiple(runner: Runner) -> TestResult<()> {
+        create_test_data(&runner).await?;
+
+        // Additional row to make multi-ordering useful.
+        create_row(
+            &runner,
+            r#"{
+                id: 5,
+                to_many_as: [
+                    { a_1: "10", a_2: 50 },
+                    { a_1: "20", a_2: 20 },
+                ],
+                to_one_b: {
+                    b_to_many_cs: [
+                        { c_field: 10, c_to_many_as: [{ a_1: "10", a_2: 10 }, { a_1: "20", a_2: 20 }] },
+                        { c_field: 20, c_to_many_as: [{ a_1: "30", a_2: 30 }, { a_1: "40", a_2: 40 }] },
+                    ]
+                }
+            }"#,
+        )
+        .await?;
+
+        insta::assert_snapshot!(
+            run_query!(runner, r#"{ findManyTestModel(
+                cursor: { id: 4 }
+                orderBy: [
+                    { to_one_b: { b_to_many_cs: { _count: asc }} },
+                    { to_many_as: { _count: desc } }
+                ]) { id }}"#),
+            @r###"{"data":{"findManyTestModel":[{"id":4},{"id":2},{"id":5},{"id":1}]}}"###
+        );
+
+        insta::assert_snapshot!(
+            run_query!(runner, r#"{ findManyTestModel(
+                cursor: { id: 4 }
+                orderBy: [
+                    { to_one_b: { b_to_many_cs: { _count: desc }} },
+                    { to_many_as: { _count: asc } }
+                ]) { id }}"#),
+            @r###"{"data":{"findManyTestModel":[{"id":4}]}}"###
+        );
+
+        Ok(())
+    }
+
+    /// Query with cursor: Order a model by multiple to-one composites.
+    #[connector_test]
+    async fn multi_order_cursor(runner: Runner) -> TestResult<()> {
+        // create_multi_order_test_data(&runner).await?;
+
+        // insta::assert_snapshot!(
+        //     run_query!(runner, r#"
+        //     { findManyTestModel(
+        //         cursor: { id: 3 }
+        //         orderBy: [
+        //             { a: { a_1: asc } },
+        //             { a: { a_2: desc } }
+        //         ]) { id } }"#),
+        //     @r###"{"data":{"findManyTestModel":[{"id":3},{"id":4},{"id":5}]}}"###
+        // );
+
+        // insta::assert_snapshot!(
+        //     run_query!(runner, r#"
+        //     { findManyTestModel(
+        //         cursor: { id: 1 }
+        //         orderBy: [
+        //             { b: { b_field: asc } },
+        //             { a: { a_1: desc } }
+        //         ]) { id } }"#),
+        //     @r###"{"data":{"findManyTestModel":[{"id":1},{"id":3},{"id":2}]}}"###
+        // );
+
+        Ok(())
+    }
+
     async fn create_test_data(runner: &Runner) -> TestResult<()> {
         create_row(
             runner,
