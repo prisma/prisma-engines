@@ -144,6 +144,7 @@ impl DataInputFieldMapper for UpdateDataInputFieldMapper {
     fn map_composite(&self, ctx: &mut BuilderContext, cf: &CompositeFieldRef) -> InputField {
         // Shorthand object (equivalent to the "set" operation).
         let shorthand_type = InputType::Object(create::composite_create_object_type(ctx, cf));
+
         // Operation envelope object.
         let envelope_type = InputType::Object(composite_update_envelope_object_type(ctx, cf));
 
@@ -154,7 +155,7 @@ impl DataInputFieldMapper for UpdateDataInputFieldMapper {
         }
 
         input_field(cf.name.clone(), input_types, None)
-            .nullable_if(cf.is_optional())
+            .nullable_if(cf.is_optional() && !cf.is_list())
             .optional()
     }
 }
@@ -290,8 +291,8 @@ fn composite_set_update_input_field(ctx: &mut BuilderContext, cf: &CompositeFiel
     }
 
     input_field(operations::SET, input_types, None)
+        .nullable_if(!cf.is_required() && !cf.is_list())
         .optional()
-        .nullable_if(!cf.is_required())
 }
 
 // Builds an `push` input field. Should only be used in the envelope type.

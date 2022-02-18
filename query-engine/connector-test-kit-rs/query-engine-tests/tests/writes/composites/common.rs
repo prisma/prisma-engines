@@ -241,6 +241,17 @@ mod edge_cases {
           @r###"{"data":{"createOneSameComposite":{"to_one":{"field":"foo"},"to_many":[{"field":"foo1"},{"field":"foo2"}]}}}"###
         );
 
+        insta::assert_snapshot!(
+          run_query!(runner, r#"mutation {
+            updateOneSameComposite(where: { id: 1 }, data: {
+              to_many: { set: [{ field: "updated" }] }
+            }) {
+              to_many { field }
+            }
+          }"#),
+          @r###"{"data":{"updateOneSameComposite":{"to_many":[{"field":"updated"}]}}}"###
+        );
+
         Ok(())
     }
 
@@ -274,6 +285,41 @@ mod edge_cases {
             }"#,
             2009,
             "`Mutation.createOneSameComposite.data.SameCompositeCreateInput.to_many.CompositeListCreateEnvelopeInput.set`: A value is required but not set."
+        );
+
+        Ok(())
+    }
+
+    #[connector_test]
+    async fn non_nullable_update(runner: Runner) -> TestResult<()> {
+        assert_error!(
+            runner,
+            r#"mutation {
+              updateOneSameComposite(
+                where: { id: 1 }
+                data: {
+                  to_many: null
+                }) {
+                  id
+              }
+            }"#,
+            2009,
+            "`Mutation.updateOneSameComposite.data.SameCompositeUpdateInput.to_many`: A value is required but not set."
+        );
+
+        assert_error!(
+            runner,
+            r#"mutation {
+              updateOneSameComposite(
+                where: { id: 1 }
+                data: {
+                  to_many: { set: null }
+                }) {
+                  id
+              }
+            }"#,
+            2009,
+            "`Mutation.updateOneSameComposite.data.SameCompositeUpdateInput.to_many.CompositeListUpdateEnvelopeInput.set`: A value is required but not set."
         );
 
         Ok(())
