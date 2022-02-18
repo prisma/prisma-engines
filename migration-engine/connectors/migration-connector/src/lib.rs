@@ -177,10 +177,13 @@ pub trait MigrationConnector: Send + Sync + 'static {
     /// See [DestructiveChangeChecker](trait.DestructiveChangeChecker.html).
     fn destructive_change_checker(&mut self) -> &mut dyn DestructiveChangeChecker;
 
-    /// Read a schema for diffing.
+    /// Read a schema for diffing. The shadow database connection string is strictly optional, you
+    /// don't need to pass it if a shadow database url was passed in params, or if it can be
+    /// inferred from context, or if it isn't necessary for the task at hand.
     fn database_schema_from_diff_target<'a>(
         &'a mut self,
         target: DiffTarget<'a>,
+        shadow_database_connection_string: Option<String>,
     ) -> BoxFuture<'a, ConnectorResult<DatabaseSchema>>;
 
     /// If possible, check that the passed in migrations apply cleanly.

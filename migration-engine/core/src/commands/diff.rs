@@ -3,9 +3,7 @@ use crate::{
     json_rpc::types::{DiffParams, DiffResult, DiffTarget, PathContainer, SchemaContainer, UrlContainer},
 };
 use enumflags2::BitFlags;
-use migration_connector::{
-    ConnectorError, ConnectorHost, ConnectorParams, DatabaseSchema, DiffTarget as McDiff, MigrationConnector,
-};
+use migration_connector::{ConnectorError, ConnectorHost, DatabaseSchema, DiffTarget as McDiff, MigrationConnector};
 use std::{path::Path, sync::Arc};
 
 pub async fn diff(params: DiffParams, host: Arc<dyn ConnectorHost>) -> CoreResult<DiffResult> {
@@ -76,20 +74,24 @@ async fn json_rpc_diff_target_to_connector(
         DiffTarget::SchemaDatasource(SchemaContainer { schema }) => {
             let schema_contents = read_prisma_schema_from_path(schema)?;
             let mut connector = crate::schema_to_connector(&schema_contents)?;
-            let schema = connector.database_schema_from_diff_target(McDiff::Database).await?;
+            let schema = connector
+                .database_schema_from_diff_target(McDiff::Database, None)
+                .await?;
             Ok(Some((connector, schema)))
         }
         DiffTarget::SchemaDatamodel(SchemaContainer { schema }) => {
             let schema_contents = read_prisma_schema_from_path(schema)?;
             let mut connector = crate::schema_to_connector_unchecked(&schema_contents)?;
             let schema = connector
-                .database_schema_from_diff_target(McDiff::Datamodel(&schema_contents))
+                .database_schema_from_diff_target(McDiff::Datamodel(&schema_contents), None)
                 .await?;
             Ok(Some((connector, schema)))
         }
         DiffTarget::Url(UrlContainer { url }) => {
             let mut connector = crate::connector_for_connection_string(url.clone(), None, BitFlags::empty())?;
-            let schema = connector.database_schema_from_diff_target(McDiff::Database).await?;
+            let schema = connector
+                .database_schema_from_diff_target(McDiff::Database, None)
+                .await?;
             Ok(Some((connector, schema)))
         }
         DiffTarget::Migrations(PathContainer { path }) => {
@@ -97,15 +99,12 @@ async fn json_rpc_diff_target_to_connector(
             match (provider, shadow_database_url) {
                 (Some(provider), Some(shadow_database_url)) => {
                     let mut connector = crate::connector_for_provider(&provider)?;
-                    let params = ConnectorParams {
-                        connection_string: shadow_database_url.to_owned(),
-                        preview_features: BitFlags::empty(), // TODO: where could we get the preview features from, here?
-                        shadow_database_connection_string: Some(shadow_database_url.to_owned()),
-                    };
-                    connector.set_params(params)?;
                     let directories = migration_connector::migrations_directory::list_migrations(Path::new(path))?;
                     let schema = connector
-                        .database_schema_from_diff_target(McDiff::Migrations(&directories))
+                        .database_schema_from_diff_target(
+                            McDiff::Migrations(&directories),
+                            Some(shadow_database_url.to_owned()),
+                        )
                         .await?;
                     Ok(Some((connector, schema)))
                 }

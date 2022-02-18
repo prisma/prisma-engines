@@ -200,6 +200,7 @@ impl SqlFlavour for SqliteFlavour {
     fn sql_schema_from_migration_history<'a>(
         &'a mut self,
         migrations: &'a [MigrationDirectory],
+        _shadow_database_connection_string: Option<String>,
     ) -> BoxFuture<'_, ConnectorResult<SqlSchema>> {
         Box::pin(async move {
             tracing::debug!("Applying migrations to temporary in-memory SQLite database.");

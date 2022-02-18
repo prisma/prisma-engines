@@ -65,39 +65,6 @@ impl SqlMigrationConnector {
         }
     }
 
-    //     /// Construct and initialize the SQL migration connector.
-    //     pub fn new(params: ConnectorParams) -> ConnectorResult<Self> {
-    //         let connection_info = ConnectionInfo::from_url(&params.connection_string).map_err(|err| {
-    //             let details = user_facing_errors::quaint::invalid_connection_string_description(&err.to_string());
-    //             KnownError::new(user_facing_errors::common::InvalidConnectionString { details })
-    //         })?;
-
-    //         let flavour = flavour::from_connection_info(&connection_info);
-
-    //         Ok(Self {
-    //             params,
-    //             connection: tokio::sync::OnceCell::new(),
-    //             flavour,
-    //             host: Arc::new(EmptyHost),
-    //         })
-    //     }
-
-    // async fn conn(&self) -> ConnectorResult<&Connection> {
-    //     self.flavour.connection().await?;
-
-    //     // self.connection
-    //     //     .get_or_init(|| {
-    //     //         Box::pin(async {
-    //     //             let connection = connect(&self.params.connection_string).await?;
-    //     //             self.flavour.ensure_connection_validity().await?;
-    //     //             Ok(connection)
-    //     //         })
-    //     //     })
-    //     //     .await
-    //     //     .as_ref()
-    //     //     .map_err(|err| err.clone())
-    // }
-
     fn flavour(&self) -> &(dyn SqlFlavour + Send + Sync) {
         self.flavour.as_ref()
     }
@@ -134,7 +101,11 @@ impl SqlMigrationConnector {
         self.flavour.set_params(params)
     }
 
-    async fn db_schema_from_diff_target(&mut self, target: &DiffTarget<'_>) -> ConnectorResult<SqlDatabaseSchema> {
+    async fn db_schema_from_diff_target(
+        &mut self,
+        target: &DiffTarget<'_>,
+        shadow_database_connection_string: Option<String>,
+    ) -> ConnectorResult<SqlDatabaseSchema> {
         match target {
             DiffTarget::Datamodel(schema) => {
                 let schema =
@@ -146,7 +117,7 @@ impl SqlMigrationConnector {
             }
             DiffTarget::Migrations(migrations) => self
                 .flavour
-                .sql_schema_from_migration_history(migrations)
+                .sql_schema_from_migration_history(migrations, shadow_database_connection_string)
                 .await
                 .map(From::from),
             DiffTarget::Database => self.flavour.describe_schema().await.map(From::from),
@@ -213,8 +184,13 @@ impl MigrationConnector for SqlMigrationConnector {
     fn database_schema_from_diff_target<'a>(
         &'a mut self,
         diff_target: DiffTarget<'a>,
+        shadow_database_connection_string: Option<String>,
     ) -> BoxFuture<'a, ConnectorResult<DatabaseSchema>> {
-        Box::pin(async move { self.db_schema_from_diff_target(&diff_target).await.map(From::from) })
+        Box::pin(async move {
+            self.db_schema_from_diff_target(&diff_target, shadow_database_connection_string)
+                .await
+                .map(From::from)
+        })
     }
 
     async fn db_execute(&mut self, script: String) -> ConnectorResult<()> {
@@ -222,46 +198,13 @@ impl MigrationConnector for SqlMigrationConnector {
     }
 
     fn diff(&self, from: DatabaseSchema, to: DatabaseSchema) -> ConnectorResult<Migration> {
-        let previous_schema = SqlDatabaseSchema::from_erased(from);
-        let next_schema = SqlDatabaseSchema::from_erased(to);
-
-        let steps =
-            sql_schema_differ::calculate_steps(Pair::new(&previous_schema, &next_schema), self.flavour.as_ref());
-
-        // let added_columns_with_virtual_defaults: Vec<(TableId, ColumnId)> =
-        //     if let Some(next_datamodel) = to.as_datamodel() {
-        //         let schema = datamodel::parse_schema_parserdb(next_datamodel)
-        //             .map_err(ConnectorError::new_schema_parser_error)?;
-        //         walk_added_columns(&steps)
-        //             .map(|(table_index, column_index)| {
-        //                 let table = next_schema.table_walker_at(table_index);
-        //                 let column = table.column_at(column_index);
-
-        //                 (table, column)
-        //             })
-        //             .filter(|(table, column)| {
-        //                 schema
-        //                     .db
-        //                     .walk_models()
-        //                     .find(|model| model.database_name() == table.name())
-        //                     .and_then(|model| model.scalar_fields().find(|sf| sf.name() == column.name()))
-        //                     .filter(|field| {
-        //                         field
-        //                             .default_value()
-        //                             .map(|default| default.is_uuid() || default.is_cuid())
-        //                             .unwrap_or(false)
-        //                     })
-        //                     .is_some()
-        //             })
-        //             .map(move |(table, column)| (table.table_id(), column.column_id()))
-        //             .collect()
-        //     } else {
-        //         Vec::new()
-        //     };
+        let previous = SqlDatabaseSchema::from_erased(from);
+        let next = SqlDatabaseSchema::from_erased(to);
+        let steps = sql_schema_differ::calculate_steps(Pair::new(&previous, &next), self.flavour.as_ref());
 
         Ok(Migration::new(SqlMigration {
-            before: previous_schema.describer_schema,
-            after: next_schema.describer_schema,
+            before: previous.describer_schema,
+            after: next.describer_schema,
             steps,
         }))
     }
@@ -319,31 +262,14 @@ impl MigrationConnector for SqlMigrationConnector {
 
     #[tracing::instrument(skip(self, migrations))]
     async fn validate_migrations(&mut self, migrations: &[MigrationDirectory]) -> ConnectorResult<()> {
-        self.flavour.sql_schema_from_migration_history(migrations).await?;
+        self.flavour.sql_schema_from_migration_history(migrations, None).await?;
 
         Ok(())
     }
 }
 
-enum ShadowDatabaseConfig<'a> {
-    UserProvidedConnectionString(&'a str),
-    GeneratedName(String),
-}
-
-impl ShadowDatabaseConfig<'_> {
-    fn new_generated_name() -> ShadowDatabaseConfig<'static> {
-        ShadowDatabaseConfig::GeneratedName(format!("prisma_migrate_shadow_db_{}", uuid::Uuid::new_v4()))
-    }
-}
-
-impl<'a> From<&'a ConnectorParams> for ShadowDatabaseConfig<'a> {
-    fn from(params: &'a ConnectorParams) -> Self {
-        params
-            .shadow_database_connection_string
-            .as_ref()
-            .map(|s| ShadowDatabaseConfig::UserProvidedConnectionString(s))
-            .unwrap_or_else(|| ShadowDatabaseConfig::new_generated_name())
-    }
+fn new_shadow_database_name() -> String {
+    format!("prisma_migrate_shadow_db_{}", uuid::Uuid::new_v4())
 }
 
 /// Try to reset the database to an empty state. This should only be used

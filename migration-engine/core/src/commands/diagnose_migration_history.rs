@@ -130,9 +130,11 @@ pub async fn diagnose_migration_history(
     let (drift, error_in_unapplied_migration) = {
         if input.opt_in_to_shadow_database {
             let from = connector
-                .database_schema_from_diff_target(DiffTarget::Migrations(&applied_migrations))
+                .database_schema_from_diff_target(DiffTarget::Migrations(&applied_migrations), None)
                 .await;
-            let to = connector.database_schema_from_diff_target(DiffTarget::Database).await;
+            let to = connector
+                .database_schema_from_diff_target(DiffTarget::Database, None)
+                .await;
             let drift = match from
                 .and_then(|from| to.and_then(|to| connector.diff(from, to)))
                 .map(|mig| {

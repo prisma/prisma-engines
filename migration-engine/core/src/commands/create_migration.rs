@@ -21,10 +21,10 @@ pub async fn create_migration(
     let previous_migrations = list_migrations(Path::new(&input.migrations_directory_path))?;
 
     let from = connector
-        .database_schema_from_diff_target(DiffTarget::Migrations(&previous_migrations))
+        .database_schema_from_diff_target(DiffTarget::Migrations(&previous_migrations), None)
         .await?;
     let to = connector
-        .database_schema_from_diff_target(DiffTarget::Datamodel(&input.prisma_schema))
+        .database_schema_from_diff_target(DiffTarget::Datamodel(&input.prisma_schema), None)
         .await?;
     let migration = connector.diff(from, to)?;
 

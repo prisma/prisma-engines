@@ -15,10 +15,10 @@ pub async fn evaluate_data_loss(
     let migrations_from_directory = list_migrations(input.migrations_directory_path.as_ref())?;
 
     let from = connector
-        .database_schema_from_diff_target(DiffTarget::Migrations(&migrations_from_directory))
+        .database_schema_from_diff_target(DiffTarget::Migrations(&migrations_from_directory), None)
         .await?;
     let to = connector
-        .database_schema_from_diff_target(DiffTarget::Datamodel(&input.prisma_schema))
+        .database_schema_from_diff_target(DiffTarget::Datamodel(&input.prisma_schema), None)
         .await?;
     let migration = connector.diff(from, to)?;
 

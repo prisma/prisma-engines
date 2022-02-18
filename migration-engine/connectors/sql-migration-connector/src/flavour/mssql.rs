@@ -1,7 +1,9 @@
+mod shadow_db;
+
 use crate::{
     connection_wrapper::{connect, quaint_error_to_connector_error, Connection},
     flavour::normalize_sql_schema,
-    ShadowDatabaseConfig, SqlFlavour,
+    SqlFlavour,
 };
 use connection_string::JdbcString;
 use indoc::formatdoc;
@@ -44,7 +46,7 @@ impl std::fmt::Debug for MssqlFlavour {
 
 impl MssqlFlavour {
     pub(crate) fn schema_name(&self) -> &str {
-        self.state.get_unwrapped_params().url.schema()
+        self.state.params().map(|p| p.url.schema()).unwrap_or("dbo")
     }
 
     /// Get the url as a JDBC string, extract the database name, and re-encode the string.
@@ -363,54 +365,101 @@ impl SqlFlavour for MssqlFlavour {
     fn sql_schema_from_migration_history<'a>(
         &'a mut self,
         migrations: &'a [MigrationDirectory],
+        shadow_database_connection_string: Option<String>,
     ) -> BoxFuture<'a, ConnectorResult<SqlSchema>> {
-        with_connection(&mut self.state, move |params, main_connection| async move {
-            let shadow_db_config: ShadowDatabaseConfig<'_> = From::from(&params.connector_params);
+        let shadow_database_connection_string = shadow_database_connection_string.or_else(|| {
+            self.state
+                .params()
+                .and_then(|p| p.connector_params.shadow_database_connection_string.clone())
+        });
+        let mut shadow_database = MssqlFlavour::default();
 
-            // We must create the connection in a block, closing it before dropping
-            // the database.
-            let sql_schema_result =
-                {
-                    // We go through the whole process without early return, then clean up
-                    // the shadow database, and only then return the result. This avoids
-                    // leaving shadow databases behind in case of e.g. faulty
-                    // migrations.
+        if let Some(shadow_database_connection_string) = shadow_database_connection_string {
+            Box::pin(async move {
+                if let Some(params) = self.state.params() {
+                    super::validate_connection_infos_do_not_match(
+                        &shadow_database_connection_string,
+                        &params.connector_params.connection_string,
+                    )?;
+                }
 
-                    let mut shadow_db = shadow_database_connection(&shadow_db_config, params, main_connection).await?;
-
-                    if params.url.schema() != "dbo" {
-                        let create_schema = format!("CREATE SCHEMA [{schema}]", schema = params.url.schema());
-                        shadow_db.raw_cmd(&create_schema).await?;
-                    }
-
-                    (|| async move {
-                        for migration in migrations {
-                            let script = migration.read_migration_script()?;
-
-                            tracing::debug!(
-                                "Applying migration `{}` to shadow database.",
-                                migration.migration_name()
-                            );
-
-                            shadow_db.raw_cmd(&script).await.map_err(ConnectorError::from).map_err(
-                                |connector_error| {
-                                    connector_error
-                                        .into_migration_does_not_apply_cleanly(migration.migration_name().to_owned())
-                                },
-                            )?;
-                        }
-
-                        shadow_db.describe_schema().await
-                    })()
-                    .await
+                let shadow_db_params = ConnectorParams {
+                    connection_string: shadow_database_connection_string,
+                    preview_features: self
+                        .state
+                        .params()
+                        .map(|cp| cp.connector_params.preview_features)
+                        .unwrap_or_default(),
+                    shadow_database_connection_string: None,
                 };
+                shadow_database.set_params(shadow_db_params)?;
+                shadow_database.ensure_connection_validity().await?;
 
-            if let ShadowDatabaseConfig::GeneratedName(shadow_database_name) = shadow_db_config {
+                if shadow_database.reset().await.is_err() {
+                    crate::best_effort_reset(&mut shadow_database).await?;
+                }
+
+                match self.state.params().map(|p| p.url.schema()) {
+                    Some("dbo") | None => (),
+                    Some(other) => {
+                        let create_schema = format!("CREATE SCHEMA [{schema}]", schema = other);
+                        shadow_database.raw_cmd(&create_schema).await?;
+                    }
+                }
+
+                shadow_db::do_the_thing(migrations, shadow_database).await
+            })
+        } else {
+            with_connection(&mut self.state, move |params, main_connection| async move {
+                let shadow_database_name = crate::new_shadow_database_name();
+                // See https://github.com/prisma/prisma/issues/6371 for the rationale on
+                // this conditional.
+                if params.is_running_on_azure_sql() {
+                    return Err(ConnectorError::user_facing(
+                        user_facing_errors::migration_engine::AzureMssqlShadowDb,
+                    ));
+                }
+
+                let create_database = format!("CREATE DATABASE [{}]", shadow_database_name);
+
+                main_connection
+                    .raw_cmd(&create_database)
+                    .await
+                    .map_err(ConnectorError::from)
+                    .map_err(|err| err.into_shadow_db_creation_error())?;
+
+                let connection_string = format!("jdbc:{}", params.connector_params.connection_string);
+                let mut jdbc_string: JdbcString = connection_string.parse().unwrap();
+                jdbc_string
+                    .properties_mut()
+                    .insert("database".into(), shadow_database_name.to_owned());
+                let host = jdbc_string.server_name();
+
+                let jdbc_string = jdbc_string.to_string();
+
+                tracing::debug!("Connecting to shadow database at {}", host.unwrap_or("localhost"));
+
+                let shadow_db_params = ConnectorParams {
+                    connection_string: jdbc_string,
+                    preview_features: params.connector_params.preview_features,
+                    shadow_database_connection_string: None,
+                };
+                shadow_database.set_params(shadow_db_params)?;
+
+                if params.url.schema() != "dbo" {
+                    let create_schema = format!("CREATE SCHEMA [{schema}]", schema = params.url.schema());
+                    shadow_database.raw_cmd(&create_schema).await?;
+                }
+
+                // We go through the whole process without early return, then clean up
+                // the shadow database, and only then return the result. This avoids
+                // leaving shadow databases behind in case of e.g. faulty
+                // migrations.
+                let ret = shadow_db::do_the_thing(migrations, shadow_database).await;
                 clean_up_shadow_database(&shadow_database_name, main_connection).await?;
-            }
-
-            sql_schema_result
-        })
+                ret
+            })
+        }
     }
 
     fn version(&mut self) -> BoxFuture<'_, ConnectorResult<Option<String>>> {
@@ -460,74 +509,6 @@ mod tests {
 
         for word in words {
             assert!(!debugged.contains(word));
-        }
-    }
-}
-
-async fn shadow_database_connection(
-    shadow_db_config: &ShadowDatabaseConfig<'_>,
-    params: &Params,
-    connection: &Connection,
-) -> ConnectorResult<MssqlFlavour> {
-    let mut shadow_db = MssqlFlavour::default();
-
-    match shadow_db_config {
-        crate::ShadowDatabaseConfig::UserProvidedConnectionString(shadow_database_connection_string) => {
-            let shadow_db_params = ConnectorParams {
-                connection_string: (*shadow_database_connection_string).to_owned(),
-                preview_features: params.connector_params.preview_features,
-                shadow_database_connection_string: None,
-            };
-            shadow_db.set_params(shadow_db_params)?;
-            shadow_db.ensure_connection_validity().await?;
-
-            super::validate_connection_infos_do_not_match(
-                shadow_database_connection_string,
-                &params.connector_params.connection_string,
-            )?;
-
-            if shadow_db.reset().await.is_err() {
-                crate::best_effort_reset(&mut shadow_db).await?;
-            }
-
-            Ok(shadow_db)
-        }
-        crate::ShadowDatabaseConfig::GeneratedName(database_name) => {
-            // See https://github.com/prisma/prisma/issues/6371 for the rationale on
-            // this conditional.
-            if params.is_running_on_azure_sql() {
-                return Err(ConnectorError::user_facing(
-                    user_facing_errors::migration_engine::AzureMssqlShadowDb,
-                ));
-            }
-
-            let create_database = format!("CREATE DATABASE [{}]", database_name);
-
-            connection
-                .raw_cmd(&create_database)
-                .await
-                .map_err(ConnectorError::from)
-                .map_err(|err| err.into_shadow_db_creation_error())?;
-
-            let connection_string = format!("jdbc:{}", params.connector_params.connection_string);
-            let mut jdbc_string: JdbcString = connection_string.parse().unwrap();
-            jdbc_string
-                .properties_mut()
-                .insert("database".into(), database_name.into());
-            let host = jdbc_string.server_name();
-
-            let jdbc_string = jdbc_string.to_string();
-
-            tracing::debug!("Connecting to shadow database at {}", host.unwrap_or("localhost"));
-
-            let shadow_db_params = ConnectorParams {
-                connection_string: jdbc_string,
-                preview_features: params.connector_params.preview_features,
-                shadow_database_connection_string: None,
-            };
-            shadow_db.set_params(shadow_db_params)?;
-
-            Ok(shadow_db)
         }
     }
 }

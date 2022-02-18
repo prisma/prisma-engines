@@ -13,9 +13,11 @@ pub async fn schema_push(
         return Err(ConnectorError::user_facing(err));
     };
 
-    let from = connector.database_schema_from_diff_target(DiffTarget::Database).await?;
+    let from = connector
+        .database_schema_from_diff_target(DiffTarget::Database, None)
+        .await?;
     let to = connector
-        .database_schema_from_diff_target(DiffTarget::Datamodel(&input.schema))
+        .database_schema_from_diff_target(DiffTarget::Datamodel(&input.schema), None)
         .await?;
     let database_migration = connector.diff(from, to)?;
 

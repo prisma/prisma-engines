@@ -1,8 +1,9 @@
+mod shadow_db;
+
 use crate::{
     connection_wrapper::{connect, quaint_error_to_connector_error, Connection},
     error::SystemDatabase,
     flavour::{normalize_sql_schema, SqlFlavour},
-    ShadowDatabaseConfig,
 };
 use datamodel::{parser_database::ScalarType, ValidatedSchema};
 use enumflags2::BitFlags;
@@ -358,44 +359,78 @@ impl SqlFlavour for MysqlFlavour {
     fn sql_schema_from_migration_history<'a>(
         &'a mut self,
         migrations: &'a [MigrationDirectory],
+        shadow_database_connection_string: Option<String>,
     ) -> BoxFuture<'a, ConnectorResult<SqlSchema>> {
-        with_connection(&mut self.state, move |params, _circumstances, conn| async move {
-            let (mut shadow_db, database_name_to_clean_up) = shadow_database_connection(params, conn).await?;
+        let shadow_database_connection_string = shadow_database_connection_string.or_else(|| {
+            self.state
+                .params()
+                .and_then(|p| p.connector_params.shadow_database_connection_string.clone())
+        });
+        let mut shadow_database = MysqlFlavour::default();
 
-            // We go through the whole process without early return, then clean up
-            // the shadow database, and only then return the result. This avoids
-            // leaving shadow databases behind in case of e.g. faulty migrations.
-
-            let sql_schema_result = (|| async move {
-                for migration in migrations {
-                    let script = migration.read_migration_script()?;
-
-                    tracing::debug!(
-                        "Applying migration `{}` to shadow database.",
-                        migration.migration_name()
-                    );
-
-                    scan_migration_script_impl(&script);
-
-                    shadow_db
-                        .apply_migration_script(migration.migration_name(), &script)
-                        .await
-                        .map_err(|connector_error| {
-                            connector_error.into_migration_does_not_apply_cleanly(migration.migration_name().to_owned())
-                        })?;
+        match shadow_database_connection_string {
+            Some(shadow_database_connection_string) => Box::pin(async move {
+                if let Some(params) = self.state.params() {
+                    super::validate_connection_infos_do_not_match(
+                        &shadow_database_connection_string,
+                        &params.connector_params.connection_string,
+                    )?;
                 }
 
-                shadow_db.describe_schema().await
-            })()
-            .await;
+                let shadow_db_params = ConnectorParams {
+                    connection_string: shadow_database_connection_string.to_owned(),
+                    preview_features: self
+                        .state
+                        .params()
+                        .map(|p| p.connector_params.preview_features)
+                        .unwrap_or_default(),
+                    shadow_database_connection_string: None,
+                };
 
-            if let Some(database_name) = database_name_to_clean_up {
-                let drop_database = format!("DROP DATABASE IF EXISTS `{}`", database_name);
-                conn.raw_cmd(&drop_database).await?;
+                shadow_database.set_params(shadow_db_params)?;
+                shadow_database.ensure_connection_validity().await?;
+
+                tracing::info!("Connecting to user-provided shadow database.");
+                if shadow_database.reset().await.is_err() {
+                    crate::best_effort_reset(&mut shadow_database).await?;
+                }
+
+                shadow_db::do_the_thing(migrations, shadow_database).await
+            }),
+            None => {
+                with_connection(&mut self.state, move |params, _circumstances, conn| async move {
+                    let shadow_database_name = crate::new_shadow_database_name();
+
+                    let create_database = format!("CREATE DATABASE `{}`", shadow_database_name);
+                    conn.raw_cmd(&create_database)
+                        .await
+                        .map_err(ConnectorError::from)
+                        .map_err(|err| err.into_shadow_db_creation_error())?;
+
+                    let mut shadow_database_url = params.url.url().clone();
+                    shadow_database_url.set_path(&format!("/{}", shadow_database_name));
+                    let params = ConnectorParams {
+                        connection_string: shadow_database_url.to_string(),
+                        preview_features: params.connector_params.preview_features,
+                        shadow_database_connection_string: None,
+                    };
+
+                    let host = shadow_database_url.host();
+                    tracing::debug!("Connecting to shadow database at {:?}/{}", host, shadow_database_name);
+                    shadow_database.set_params(params)?;
+
+                    // We go through the whole process without early return, then clean up
+                    // the shadow database, and only then return the result. This avoids
+                    // leaving shadow databases behind in case of e.g. faulty migrations.
+                    let ret = shadow_db::do_the_thing(migrations, shadow_database).await;
+
+                    let drop_database = format!("DROP DATABASE IF EXISTS `{}`", shadow_database_name);
+                    conn.raw_cmd(&drop_database).await?;
+
+                    ret
+                })
             }
-
-            sql_schema_result
-        })
+        }
     }
 
     fn version(&mut self) -> BoxFuture<'_, ConnectorResult<Option<String>>> {
@@ -546,62 +581,6 @@ where
                 .await?;
             with_connection(state, f).await
         }),
-    }
-}
-
-async fn shadow_database_connection(
-    params: &Params,
-    conn: &Connection,
-) -> ConnectorResult<(MysqlFlavour, Option<String>)> {
-    let shadow_database_config = (&params.connector_params).into();
-    let mut shadow_db = MysqlFlavour::default();
-    match shadow_database_config {
-        ShadowDatabaseConfig::UserProvidedConnectionString(shadow_database_connection_string) => {
-            super::validate_connection_infos_do_not_match(
-                shadow_database_connection_string,
-                &params.connector_params.connection_string,
-            )?;
-
-            let shadow_db_params = ConnectorParams {
-                connection_string: shadow_database_connection_string.to_owned(),
-                shadow_database_connection_string: None,
-                preview_features: params.connector_params.preview_features,
-            };
-
-            shadow_db.set_params(shadow_db_params)?;
-
-            tracing::info!("Connecting to user-provided shadow database.");
-
-            if shadow_db.reset().await.is_err() {
-                crate::best_effort_reset_impl(&mut shadow_db).await?;
-            }
-
-            Ok((shadow_db, None))
-        }
-        ShadowDatabaseConfig::GeneratedName(database_name) => {
-            let create_database = format!("CREATE DATABASE `{}`", database_name);
-
-            conn.raw_cmd(&create_database)
-                .await
-                .map_err(ConnectorError::from)
-                .map_err(|err| err.into_shadow_db_creation_error())?;
-
-            let mut shadow_database_url = params.url.url().clone();
-            shadow_database_url.set_path(&format!("/{}", database_name));
-
-            let params = ConnectorParams {
-                connection_string: shadow_database_url.to_string(),
-                preview_features: params.connector_params.preview_features,
-                shadow_database_connection_string: None,
-            };
-
-            let host = shadow_database_url.host();
-            tracing::debug!("Connecting to shadow database at {:?}/{}", host, database_name);
-
-            shadow_db.set_params(params)?;
-
-            Ok((shadow_db, Some(database_name)))
-        }
     }
 }
 

@@ -167,10 +167,12 @@ pub(crate) trait SqlFlavour:
     fn scan_migration_script(&self, _script: &str) {}
 
     /// Apply the given migration history to a shadow database, and return
-    /// the final introspected SQL schema.
+    /// the final introspected SQL schema. The third parameter is an optional shadow database url
+    /// in case there is one at this point of the command, but not earlier in set_params().
     fn sql_schema_from_migration_history<'a>(
         &'a mut self,
         migrations: &'a [MigrationDirectory],
+        shadow_database_url: Option<String>,
     ) -> BoxFuture<'a, ConnectorResult<SqlSchema>>;
 
     /// Runs a single SQL script.
