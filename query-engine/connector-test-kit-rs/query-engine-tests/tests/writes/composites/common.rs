@@ -203,3 +203,44 @@ mod common {
         Ok(())
     }
 }
+
+/// Schema constellations that came up during integrations that
+/// we want to work but aren't covered, or which caused issues in the past.
+#[test_suite(schema(schema), only(MongoDb))]
+mod edge_cases {
+    fn schema() -> String {
+        indoc! { r#"
+          model SameComposite {
+            #id(id, Int, @id)
+            to_one  Composite
+            to_many Composite[]
+          }
+
+          type Composite {
+            field String
+          }
+      "# }
+        .to_string()
+    }
+
+    /// Same composite used as to-one and to-many at the same time.
+    /// Caused incorrect schema caching in the past, which didn't allow the to-many to use array-set.
+    #[connector_test]
+    async fn same_composite(runner: Runner) -> TestResult<()> {
+        insta::assert_snapshot!(
+          run_query!(runner, r#"mutation {
+            createOneSameComposite(data: {
+              id: 1,
+              to_one: { field: "foo" }
+              to_many: { set: [{ field: "foo1" }, { field: "foo2" }] }
+            }) {
+              to_one { field }
+              to_many { field }
+            }
+          }"#),
+          @r###"{"data":{"createOneSameComposite":{"to_one":{"field":"foo"},"to_many":[{"field":"foo1"},{"field":"foo2"}]}}}"###
+        );
+
+        Ok(())
+    }
+}

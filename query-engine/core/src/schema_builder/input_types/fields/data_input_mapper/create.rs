@@ -150,7 +150,8 @@ impl DataInputFieldMapper for CreateDataInputFieldMapper {
 /// }
 /// ```
 fn composite_create_envelope_object_type(ctx: &mut BuilderContext, cf: &CompositeFieldRef) -> InputObjectTypeWeakRef {
-    let name = format!("{}CreateEnvelopeInput", cf.typ.name);
+    let list_part = if cf.is_list() { "List" } else { "" };
+    let name = format!("{}{}CreateEnvelopeInput", cf.typ.name, list_part);
 
     let ident = Identifier::new(name, PRISMA_NAMESPACE);
     return_cached_input!(ctx, &ident);
