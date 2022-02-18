@@ -16,20 +16,24 @@
 <span id="15">15</span>
 <span id="16">16</span>
 <span id="17">17</span>
+<span id="18">18</span>
+<span id="19">19</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">mongodb</span>::{
     <span class="ident">error::Result</span>,
-    <span class="ident">options</span>::{<span class="ident">ClientOptions</span>, <span class="ident">ResolverConfig</span>},
+    <span class="ident">options</span>::{<span class="ident">ClientOptions</span>, <span class="ident">DriverInfo</span>, <span class="ident">ResolverConfig</span>},
     <span class="ident">Client</span>,
 };
 
 <span class="doccomment">/// A wrapper to create a new MongoDB client. Please remove me when we do not</span>
 <span class="doccomment">/// need special setup anymore for this.</span>
 <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">create</span>(<span class="ident">connection_string</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Client</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">options</span> <span class="op">=</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;windows&quot;</span>) {
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">options</span> <span class="op">=</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;windows&quot;</span>) {
         <span class="ident">ClientOptions::parse_with_resolver_config</span>(<span class="ident">connection_string</span>, <span class="ident">ResolverConfig::cloudflare</span>()).<span class="kw">await</span><span class="question-mark">?</span>
     } <span class="kw">else</span> {
         <span class="ident">ClientOptions::parse</span>(<span class="ident">connection_string</span>).<span class="kw">await</span><span class="question-mark">?</span>
     };
+
+    <span class="ident">options</span>.<span class="ident">driver_info</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">DriverInfo::builder</span>().<span class="ident">name</span>(<span class="string">&quot;Prisma&quot;</span>).<span class="ident">build</span>());
 
     <span class="ident">Client::with_options</span>(<span class="ident">options</span>)
 }
