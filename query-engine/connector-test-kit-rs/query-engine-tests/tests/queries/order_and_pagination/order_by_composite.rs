@@ -83,6 +83,88 @@ mod to_one {
         Ok(())
     }
 
+    /// Query with cursor: Order a model by single to-one composites, different hop configurations.
+    #[connector_test]
+    async fn cursored_ordering(runner: Runner) -> TestResult<()> {
+        create_multi_order_test_data(&runner).await?;
+
+        // Single-hop, ASC (nulls first)
+        insta::assert_snapshot!(
+            run_query!(runner, r#"{ findManyTestModel(cursor: { id: 3 }, orderBy: { a: { a_2: asc } }) { id } }"#),
+            @r###"{"data":{"findManyTestModel":[{"id":3}]}}"###
+        );
+
+        insta::assert_snapshot!(
+            run_query!(runner, r#"{ findManyTestModel(cursor: { id: 1 }, orderBy: { a: { a_2: asc } }) { id } }"#),
+            @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2},{"id":3}]}}"###
+        );
+
+        // Single-hop, DESC (nulls first)
+        insta::assert_snapshot!(
+            run_query!(runner, r#"{ findManyTestModel(cursor: { id: 3 }, orderBy: { a: { a_2: desc } }) { id } }"#),
+            @r###"{"data":{"findManyTestModel":[{"id":3},{"id":1},{"id":4},{"id":5}]}}"###
+        );
+
+        insta::assert_snapshot!(
+            run_query!(runner, r#"{ findManyTestModel(cursor: { id: 1 }, orderBy: { a: { a_2: desc } }) { id } }"#),
+            @r###"{"data":{"findManyTestModel":[{"id":1},{"id":4},{"id":5}]}}"###
+        );
+
+        // Multi-hop, ASC (nulls first)
+        insta::assert_snapshot!(
+            run_query!(runner, r#"{ findManyTestModel(cursor: { id: 3 }, orderBy: { b: { c: { c_field: asc }} }) { id } }"#),
+            @r###"{"data":{"findManyTestModel":[{"id":3}]}}"###
+        );
+
+        insta::assert_snapshot!(
+            run_query!(runner, r#"{ findManyTestModel(cursor: { id: 1 }, orderBy: { b: { c: { c_field: asc }} }) { id } }"#),
+            @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2},{"id":3}]}}"###
+        );
+
+        // Multi-hop, ASC (nulls last)
+        insta::assert_snapshot!(
+            run_query!(runner, r#"{ findManyTestModel(cursor: { id: 3 }, orderBy: { b: { c: { c_field: desc }} }) { id } }"#),
+            @r###"{"data":{"findManyTestModel":[{"id":3},{"id":2},{"id":1},{"id":4},{"id":5}]}}"###
+        );
+
+        insta::assert_snapshot!(
+            run_query!(runner, r#"{ findManyTestModel(cursor: { id: 1 }, orderBy: { b: { c: { c_field: desc }} }) { id } }"#),
+            @r###"{"data":{"findManyTestModel":[{"id":1},{"id":4},{"id":5}]}}"###
+        );
+
+        Ok(())
+    }
+
+    /// Query with cursor: Order a model by multiple to-one composites.
+    #[connector_test]
+    async fn multi_order_cursor(runner: Runner) -> TestResult<()> {
+        create_multi_order_test_data(&runner).await?;
+
+        insta::assert_snapshot!(
+            run_query!(runner, r#"
+            { findManyTestModel(
+                cursor: { id: 3 }
+                orderBy: [
+                    { a: { a_1: asc } },
+                    { a: { a_2: desc } }
+                ]) { id } }"#),
+            @r###"{"data":{"findManyTestModel":[{"id":3},{"id":4},{"id":5}]}}"###
+        );
+
+        insta::assert_snapshot!(
+            run_query!(runner, r#"
+            { findManyTestModel(
+                cursor: { id: 1 }
+                orderBy: [
+                    { b: { b_field: asc } },
+                    { a: { a_1: desc } }
+                ]) { id } }"#),
+            @r###"{"data":{"findManyTestModel":[{"id":1},{"id":3},{"id":2}]}}"###
+        );
+
+        Ok(())
+    }
+
     #[rustfmt::skip]
     async fn create_test_data(runner: &Runner) -> TestResult<()> {
         // All data set (except model and last hop to prevent endless circles).
