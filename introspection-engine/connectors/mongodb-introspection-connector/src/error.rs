@@ -1,5 +1,5 @@
 use introspection_connector::ConnectorError;
-use url::Url;
+use mongodb_client::MongoConnectionString;
 use user_facing_errors::{
     common::{DatabaseNotReachable, IncorrectDatabaseCredentials},
     KnownError,
@@ -49,31 +49,33 @@ impl From<Error> for ConnectorError {
     }
 }
 
-pub(super) fn map_connection_errors(err: mongodb::error::Error, url: &Url) -> ConnectorError {
+pub(super) fn map_connection_errors(err: mongodb::error::Error, conn_info: &MongoConnectionString) -> ConnectorError {
     match *err.kind {
         mongodb::error::ErrorKind::Authentication { .. } => {
             let known = KnownError::new(IncorrectDatabaseCredentials {
-                database_user: url.username().into(),
-                database_host: url.host_str().unwrap_or("(not available)").into(),
+                database_user: conn_info.user.to_owned().unwrap_or_default(),
+                database_host: conn_info.host_strings().join(","),
             });
 
             ConnectorError {
                 user_facing_error: Some(known),
                 kind: introspection_connector::ErrorKind::AuthenticationFailed {
-                    user: url.username().into(),
+                    user: conn_info.user.to_owned().unwrap_or_default(),
                 },
             }
         }
         mongodb::error::ErrorKind::DnsResolve { .. } => {
+            let host_port = conn_info.hosts.first().cloned();
+
             let known = KnownError::new(DatabaseNotReachable {
-                database_host: url.host_str().unwrap_or("(not available)").into(),
-                database_port: url.port().unwrap_or(27019),
+                database_host: host_port.as_ref().map(|hp| hp.0.to_owned()).unwrap_or_default(),
+                database_port: host_port.as_ref().and_then(|hp| hp.1).unwrap_or(27019),
             });
 
             ConnectorError {
                 user_facing_error: Some(known),
                 kind: introspection_connector::ErrorKind::ConnectionError {
-                    host: url.host_str().unwrap_or("(not available)").into(),
+                    host: host_port.map(|hp| hp.0).unwrap_or_default(),
                     cause: err.into(),
                 },
             }
