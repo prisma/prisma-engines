@@ -65,10 +65,14 @@ jobs:
           # - name: mongodb44
           #   url: "mongodb://prisma:prisma@localhost:27017/?authSource=admin&retryWrites=true"
           - name: mongodb5
-            url: "mongodb://localhost:27017/?authSource=admin&retryWrites=true"
+            url: "mongodb://localhost:C2y6yDjf5%2FR%2Bob0N8A7Cgv30VRDJIWEHLM%2B4QDU5DE2nQ9nDuVTqobD4b8mGGyPMbIZnqyMsEcaGQy67XIw%2FJw%3D%3D@localhost:10255/foo?ssl=true&retryWrites=false"
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v2
+
+      - uses: janpio/cosmos-emulator-github-action@main
+        with:
+          parameter_string: "-EnableMongoDb 4.0"
 
       # - name: "Start ${{ matrix.database.name }}"
       #   run: make start-${{ matrix.database.name }}-single
