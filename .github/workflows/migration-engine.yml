@@ -65,7 +65,7 @@ jobs:
           # - name: mongodb44
           #   url: "mongodb://prisma:prisma@localhost:27017/?authSource=admin&retryWrites=true"
           - name: mongodb5
-            url: "mongodb://prisma:prisma@localhost:27018/?authSource=admin&retryWrites=true"
+            url: "mongodb://prisma:prisma@localhost:27017/?authSource=admin&retryWrites=true"
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v2
