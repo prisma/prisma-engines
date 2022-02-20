@@ -70,8 +70,8 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: "Start ${{ matrix.database.name }}"
-        run: make start-${{ matrix.database.name }}-single
+      # - name: "Start ${{ matrix.database.name }}"
+      #   run: make start-${{ matrix.database.name }}-single
 
       - uses: actions-rs/toolchain@v1
         with:
