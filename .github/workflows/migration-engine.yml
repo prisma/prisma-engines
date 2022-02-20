@@ -72,7 +72,7 @@ jobs:
 
       - uses: janpio/cosmos-emulator-github-action@main
         with:
-          parameter_string: "-EnableMongoDb 4.0"
+          parameter_string: "-Timeout 300 -EnableMongoDb 4.0"
 
       # - name: "Start ${{ matrix.database.name }}"
       #   run: make start-${{ matrix.database.name }}-single
