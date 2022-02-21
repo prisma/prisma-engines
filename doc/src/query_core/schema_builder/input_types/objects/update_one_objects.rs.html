@@ -337,74 +337,10 @@
 <span id="336">336</span>
 <span id="337">337</span>
 <span id="338">338</span>
-<span id="339">339</span>
-<span id="340">340</span>
-<span id="341">341</span>
-<span id="342">342</span>
-<span id="343">343</span>
-<span id="344">344</span>
-<span id="345">345</span>
-<span id="346">346</span>
-<span id="347">347</span>
-<span id="348">348</span>
-<span id="349">349</span>
-<span id="350">350</span>
-<span id="351">351</span>
-<span id="352">352</span>
-<span id="353">353</span>
-<span id="354">354</span>
-<span id="355">355</span>
-<span id="356">356</span>
-<span id="357">357</span>
-<span id="358">358</span>
-<span id="359">359</span>
-<span id="360">360</span>
-<span id="361">361</span>
-<span id="362">362</span>
-<span id="363">363</span>
-<span id="364">364</span>
-<span id="365">365</span>
-<span id="366">366</span>
-<span id="367">367</span>
-<span id="368">368</span>
-<span id="369">369</span>
-<span id="370">370</span>
-<span id="371">371</span>
-<span id="372">372</span>
-<span id="373">373</span>
-<span id="374">374</span>
-<span id="375">375</span>
-<span id="376">376</span>
-<span id="377">377</span>
-<span id="378">378</span>
-<span id="379">379</span>
-<span id="380">380</span>
-<span id="381">381</span>
-<span id="382">382</span>
-<span id="383">383</span>
-<span id="384">384</span>
-<span id="385">385</span>
-<span id="386">386</span>
-<span id="387">387</span>
-<span id="388">388</span>
-<span id="389">389</span>
-<span id="390">390</span>
-<span id="391">391</span>
-<span id="392">392</span>
-<span id="393">393</span>
-<span id="394">394</span>
-<span id="395">395</span>
-<span id="396">396</span>
-<span id="397">397</span>
-<span id="398">398</span>
-<span id="399">399</span>
-<span id="400">400</span>
-<span id="401">401</span>
-<span id="402">402</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident">constants</span>::{<span class="ident">args</span>, <span class="ident">operations</span>};
+</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">super</span>::fields::data_input_mapper</span>::<span class="kw-2">*</span>;
+<span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
+<span class="kw">use</span> <span class="ident">constants::args</span>;
 <span class="kw">use</span> <span class="ident">datamodel_connector::ConnectorCapability</span>;
-<span class="kw">use</span> <span class="ident">prisma_models::dml::DefaultValue</span>;
 
 <span class="attribute">#[<span class="ident">tracing::instrument</span>(<span class="ident">skip</span>(<span class="ident">ctx</span>, <span class="ident">model</span>, <span class="ident">parent_field</span>))]</span>
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">update_one_input_types</span>(
@@ -441,14 +377,11 @@
     <span class="kw">let</span> <span class="ident">input_object</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">init_input_object_type</span>(<span class="ident">ident</span>.<span class="ident">clone</span>()));
     <span class="ident">ctx</span>.<span class="ident">cache_input_type</span>(<span class="ident">ident</span>, <span class="ident">input_object</span>.<span class="ident">clone</span>());
 
-    <span class="comment">// Compute input fields for scalar fields.</span>
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">fields</span> <span class="op">=</span> <span class="ident">scalar_input_fields_for_checked_update</span>(<span class="ident">ctx</span>, <span class="ident">model</span>);
+    <span class="kw">let</span> <span class="ident">filtered_fields</span> <span class="op">=</span> <span class="ident">filter_checked_update_fields</span>(<span class="ident">ctx</span>, <span class="ident">model</span>, <span class="ident">parent_field</span>);
+    <span class="kw">let</span> <span class="ident">field_mapper</span> <span class="op">=</span> <span class="ident">UpdateDataInputFieldMapper::new_checked</span>();
+    <span class="kw">let</span> <span class="ident">input_fields</span> <span class="op">=</span> <span class="ident">field_mapper</span>.<span class="ident">map_all</span>(<span class="ident">ctx</span>, <span class="kw-2">&amp;</span><span class="ident">filtered_fields</span>);
 
-    <span class="comment">// Compute input fields for relational fields.</span>
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">relational_fields</span> <span class="op">=</span> <span class="ident">relation_input_fields_for_checked_update_one</span>(<span class="ident">ctx</span>, <span class="ident">model</span>, <span class="ident">parent_field</span>);
-    <span class="ident">fields</span>.<span class="ident">append</span>(<span class="kw-2">&amp;mut</span> <span class="ident">relational_fields</span>);
-
-    <span class="ident">input_object</span>.<span class="ident">set_fields</span>(<span class="ident">fields</span>);
+    <span class="ident">input_object</span>.<span class="ident">set_fields</span>(<span class="ident">input_fields</span>);
     <span class="ident">Arc::downgrade</span>(<span class="kw-2">&amp;</span><span class="ident">input_object</span>)
 }
 
@@ -474,38 +407,67 @@
     <span class="kw">let</span> <span class="ident">input_object</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">init_input_object_type</span>(<span class="ident">ident</span>.<span class="ident">clone</span>()));
     <span class="ident">ctx</span>.<span class="ident">cache_input_type</span>(<span class="ident">ident</span>, <span class="ident">input_object</span>.<span class="ident">clone</span>());
 
-    <span class="comment">// Compute input fields for scalar fields.</span>
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">fields</span> <span class="op">=</span> <span class="ident">scalar_input_fields_for_unchecked_update</span>(<span class="ident">ctx</span>, <span class="ident">model</span>, <span class="ident">parent_field</span>);
+    <span class="kw">let</span> <span class="ident">filtered_fields</span> <span class="op">=</span> <span class="ident">filter_unchecked_update_fields</span>(<span class="ident">ctx</span>, <span class="ident">model</span>, <span class="ident">parent_field</span>);
+    <span class="kw">let</span> <span class="ident">field_mapper</span> <span class="op">=</span> <span class="ident">UpdateDataInputFieldMapper::new_unchecked</span>();
+    <span class="kw">let</span> <span class="ident">input_fields</span> <span class="op">=</span> <span class="ident">field_mapper</span>.<span class="ident">map_all</span>(<span class="ident">ctx</span>, <span class="kw-2">&amp;</span><span class="ident">filtered_fields</span>);
 
-    <span class="comment">// Compute input fields for relational fields.</span>
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">relational_fields</span> <span class="op">=</span> <span class="ident">relation_input_fields_for_unchecked_update_one</span>(<span class="ident">ctx</span>, <span class="ident">model</span>, <span class="ident">parent_field</span>);
-    <span class="ident">fields</span>.<span class="ident">append</span>(<span class="kw-2">&amp;mut</span> <span class="ident">relational_fields</span>);
-
-    <span class="ident">input_object</span>.<span class="ident">set_fields</span>(<span class="ident">fields</span>);
+    <span class="ident">input_object</span>.<span class="ident">set_fields</span>(<span class="ident">input_fields</span>);
     <span class="ident">Arc::downgrade</span>(<span class="kw-2">&amp;</span><span class="ident">input_object</span>)
 }
 
-<span class="attribute">#[<span class="ident">tracing::instrument</span>(<span class="ident">skip</span>(<span class="ident">ctx</span>, <span class="ident">model</span>))]</span>
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">scalar_input_fields_for_checked_update</span>(<span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BuilderContext</span>, <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">InputField</span><span class="op">&gt;</span> {
-    <span class="ident">input_fields::scalar_input_fields</span>(
-        <span class="ident">ctx</span>,
-        <span class="ident">model</span>
-            .<span class="ident">fields</span>()
-            .<span class="ident">scalar_writable</span>()
-            .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">sf</span><span class="op">|</span> <span class="ident">field_should_be_kept_for_checked_update_input_type</span>(<span class="ident">ctx</span>, <span class="ident">sf</span>))
-            .<span class="ident">collect</span>(),
-        <span class="op">|</span><span class="ident">ctx</span>, <span class="ident">f</span>: <span class="ident">ScalarFieldRef</span>, <span class="ident">default</span><span class="op">|</span> <span class="ident">non_list_scalar_update_field_mapper</span>(<span class="ident">ctx</span>, <span class="kw-2">&amp;</span><span class="ident">f</span>, <span class="ident">default</span>),
-        <span class="op">|</span><span class="ident">ctx</span>, <span class="ident">f</span>, <span class="kw">_</span><span class="op">|</span> <span class="ident">input_fields::scalar_list_input_field_mapper</span>(<span class="ident">ctx</span>, <span class="ident">model</span>.<span class="ident">name</span>.<span class="ident">clone</span>(), <span class="string">&quot;Update&quot;</span>, <span class="ident">f</span>, <span class="bool-val">false</span>),
-        <span class="bool-val">false</span>,
-    )
+<span class="doccomment">/// Filters the given model&#39;s fields down to the allowed ones for checked update.</span>
+<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">filter_checked_update_fields</span>(
+    <span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="ident">BuilderContext</span>,
+    <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>,
+    <span class="ident">parent_field</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">RelationFieldRef</span><span class="op">&gt;</span>,
+) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ModelField</span><span class="op">&gt;</span> {
+    <span class="ident">model</span>
+        .<span class="ident">fields</span>()
+        .<span class="ident">all</span>
+        .<span class="ident">iter</span>()
+        .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">field</span><span class="op">|</span> {
+            <span class="kw">match</span> <span class="ident">field</span> {
+                <span class="ident">ModelField::Scalar</span>(<span class="ident">sf</span>) =&gt; {
+                    <span class="comment">// We forbid updating auto-increment integer unique fields as this can create problems with the</span>
+                    <span class="comment">// underlying sequences (checked inputs only).</span>
+                    <span class="kw">let</span> <span class="ident">is_not_autoinc</span> <span class="op">=</span> <span class="op">!</span><span class="ident">sf</span>.<span class="ident">is_auto_generated_int_id</span>
+                        <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="macro">matches!</span>(
+                            (<span class="kw-2">&amp;</span><span class="ident">sf</span>.<span class="ident">type_identifier</span>, <span class="ident">sf</span>.<span class="ident">unique</span>(), <span class="ident">sf</span>.<span class="ident">is_autoincrement</span>),
+                            (<span class="ident">TypeIdentifier::Int</span>, <span class="bool-val">true</span>, <span class="bool-val">true</span>)
+                        );
+
+                    <span class="kw">let</span> <span class="ident">model_id</span> <span class="op">=</span> <span class="ident">sf</span>.<span class="ident">container</span>.<span class="ident">as_model</span>().<span class="ident">unwrap</span>().<span class="ident">primary_identifier</span>();
+                    <span class="kw">let</span> <span class="ident">is_not_disallowed_id</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">model_id</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">sf</span>.<span class="ident">name</span>) {
+                        <span class="comment">// Is part of the id, connector must allow updating ID fields.</span>
+                        <span class="ident">ctx</span>.<span class="ident">capabilities</span>.<span class="ident">contains</span>(<span class="ident">ConnectorCapability::UpdateableId</span>)
+                    } <span class="kw">else</span> {
+                        <span class="bool-val">true</span>
+                    };
+
+                    <span class="op">!</span><span class="ident">sf</span>.<span class="ident">is_read_only</span>() <span class="op">&amp;&amp;</span> <span class="ident">is_not_autoinc</span> <span class="op">&amp;&amp;</span> <span class="ident">is_not_disallowed_id</span>
+                }
+
+                <span class="comment">// If the relation field `rf` is the one that was traversed to by the parent relation field `parent_field`,</span>
+                <span class="comment">// then exclude it for checked inputs - this prevents endless nested type circles that are useless to offer as API.</span>
+                <span class="ident">ModelField::Relation</span>(<span class="ident">rf</span>) =&gt; {
+                    <span class="kw">let</span> <span class="ident">field_was_traversed_to</span> <span class="op">=</span> <span class="ident">parent_field</span>.<span class="ident">filter</span>(<span class="op">|</span><span class="ident">pf</span><span class="op">|</span> <span class="ident">pf</span>.<span class="ident">related_field</span>().<span class="ident">name</span> <span class="op">==</span> <span class="ident">rf</span>.<span class="ident">name</span>).<span class="ident">is_some</span>();
+                    <span class="op">!</span><span class="ident">field_was_traversed_to</span>
+                }
+
+                <span class="comment">// Always keep composites</span>
+                <span class="ident">ModelField::Composite</span>(<span class="kw">_</span>) =&gt; <span class="bool-val">true</span>,
+            }
+        })
+        .<span class="ident">map</span>(<span class="ident">Clone::clone</span>)
+        .<span class="ident">collect</span>()
 }
 
-<span class="attribute">#[<span class="ident">tracing::instrument</span>(<span class="ident">skip</span>(<span class="ident">ctx</span>, <span class="ident">model</span>, <span class="ident">parent_field</span>))]</span>
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">scalar_input_fields_for_unchecked_update</span>(
+<span class="doccomment">/// Filters the given model&#39;s fields down to the allowed ones for unchecked update.</span>
+<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">filter_unchecked_update_fields</span>(
     <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BuilderContext</span>,
     <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>,
     <span class="ident">parent_field</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">RelationFieldRef</span><span class="op">&gt;</span>,
-) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">InputField</span><span class="op">&gt;</span> {
+) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ModelField</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">linking_fields</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">parent_field</span>) <span class="op">=</span> <span class="ident">parent_field</span> {
         <span class="kw">let</span> <span class="ident">child_field</span> <span class="op">=</span> <span class="ident">parent_field</span>.<span class="ident">related_field</span>();
         <span class="kw">if</span> <span class="ident">child_field</span>.<span class="ident">is_inlined_on_enclosing_model</span>() {
@@ -521,115 +483,45 @@
     };
 
     <span class="kw">let</span> <span class="ident">id_fields</span> <span class="op">=</span> <span class="ident">model</span>.<span class="ident">fields</span>().<span class="ident">id</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">pk</span><span class="op">|</span> <span class="ident">pk</span>.<span class="ident">fields</span>());
-    <span class="kw">let</span> <span class="ident">scalar_fields</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ScalarFieldRef</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">model</span>
+    <span class="ident">model</span>
         .<span class="ident">fields</span>()
-        .<span class="ident">scalar</span>()
-        .<span class="ident">into_iter</span>()
-        .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">sf</span><span class="op">|</span> <span class="op">!</span><span class="ident">linking_fields</span>.<span class="ident">contains</span>(<span class="ident">sf</span>))
-        .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">sf</span><span class="op">|</span> {
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">id_fields</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">id_fields</span> {
-                <span class="comment">// Exclude @@id or @id fields if not updatable</span>
-                <span class="kw">if</span> <span class="ident">id_fields</span>.<span class="ident">contains</span>(<span class="ident">sf</span>) {
-                    <span class="ident">ctx</span>.<span class="ident">capabilities</span>.<span class="ident">contains</span>(<span class="ident">ConnectorCapability::UpdateableId</span>)
-                } <span class="kw">else</span> {
-                    <span class="bool-val">true</span>
-                }
-            } <span class="kw">else</span> {
-                <span class="bool-val">true</span>
+        .<span class="ident">all</span>
+        .<span class="ident">iter</span>()
+        .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">field</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">field</span> {
+            <span class="comment">// 1) In principle, all scalars are writable for unchecked inputs. However, it still doesn&#39;t make any sense to be able to write the scalars that</span>
+            <span class="comment">// link the model to the parent record in case of a nested unchecked create, as this would introduce complexities we don&#39;t want to deal with right now.</span>
+            <span class="comment">// 2) Exclude @@id or @id fields if not updatable</span>
+            <span class="ident">ModelField::Scalar</span>(<span class="ident">sf</span>) =&gt; {
+                <span class="op">!</span><span class="ident">linking_fields</span>.<span class="ident">contains</span>(<span class="ident">sf</span>)
+                    <span class="op">&amp;&amp;</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">id_fields</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">id_fields</span> {
+                        <span class="comment">// Exclude @@id or @id fields if not updatable</span>
+                        <span class="kw">if</span> <span class="ident">id_fields</span>.<span class="ident">contains</span>(<span class="ident">sf</span>) {
+                            <span class="ident">ctx</span>.<span class="ident">capabilities</span>.<span class="ident">contains</span>(<span class="ident">ConnectorCapability::UpdateableId</span>)
+                        } <span class="kw">else</span> {
+                            <span class="bool-val">true</span>
+                        }
+                    } <span class="kw">else</span> {
+                        <span class="bool-val">true</span>
+                    }
             }
+
+            <span class="comment">// If the relation field `rf` is the one that was traversed to by the parent relation field `parent_field`,</span>
+            <span class="comment">// then exclude it for checked inputs - this prevents endless nested type circles that are useless to offer as API.</span>
+            <span class="comment">//</span>
+            <span class="comment">// Additionally, only relations that point to other models and are NOT inlined on the currently in scope model are allowed in the unchecked input, because if they are</span>
+            <span class="comment">// inlined, they are written only as scalars for unchecked, not via the relation API (`connect`, nested `create`, etc.).</span>
+            <span class="ident">ModelField::Relation</span>(<span class="ident">rf</span>) =&gt; {
+                <span class="kw">let</span> <span class="ident">is_not_inlined</span> <span class="op">=</span> <span class="op">!</span><span class="ident">rf</span>.<span class="ident">is_inlined_on_enclosing_model</span>();
+                <span class="kw">let</span> <span class="ident">field_was_not_traversed_to</span> <span class="op">=</span> <span class="ident">parent_field</span>.<span class="ident">filter</span>(<span class="op">|</span><span class="ident">pf</span><span class="op">|</span> <span class="ident">pf</span>.<span class="ident">related_field</span>().<span class="ident">name</span> <span class="op">==</span> <span class="ident">rf</span>.<span class="ident">name</span>).<span class="ident">is_none</span>();
+
+                <span class="ident">field_was_not_traversed_to</span> <span class="op">&amp;&amp;</span> <span class="ident">is_not_inlined</span>
+            }
+
+            <span class="comment">// Always keep composites</span>
+            <span class="ident">ModelField::Composite</span>(<span class="kw">_</span>) =&gt; <span class="bool-val">true</span>,
         })
-        .<span class="ident">collect</span>();
-
-    <span class="ident">input_fields::scalar_input_fields</span>(
-        <span class="ident">ctx</span>,
-        <span class="ident">scalar_fields</span>,
-        <span class="op">|</span><span class="ident">ctx</span>, <span class="ident">f</span>: <span class="ident">ScalarFieldRef</span>, <span class="ident">default</span><span class="op">|</span> <span class="ident">non_list_scalar_update_field_mapper</span>(<span class="ident">ctx</span>, <span class="kw-2">&amp;</span><span class="ident">f</span>, <span class="ident">default</span>),
-        <span class="op">|</span><span class="ident">ctx</span>, <span class="ident">f</span>, <span class="kw">_</span><span class="op">|</span> <span class="ident">input_fields::scalar_list_input_field_mapper</span>(<span class="ident">ctx</span>, <span class="ident">model</span>.<span class="ident">name</span>.<span class="ident">clone</span>(), <span class="string">&quot;Update&quot;</span>, <span class="ident">f</span>, <span class="bool-val">false</span>),
-        <span class="bool-val">false</span>,
-    )
-}
-
-<span class="attribute">#[<span class="ident">tracing::instrument</span>(<span class="ident">skip</span>(<span class="ident">ctx</span>, <span class="ident">field</span>, <span class="ident">default</span>))]</span>
-<span class="kw">fn</span> <span class="ident">non_list_scalar_update_field_mapper</span>(
-    <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BuilderContext</span>,
-    <span class="ident">field</span>: <span class="kw-2">&amp;</span><span class="ident">ScalarFieldRef</span>,
-    <span class="ident">default</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">DefaultValue</span><span class="op">&gt;</span>,
-) -&gt; <span class="ident">InputField</span> {
-    <span class="kw">let</span> <span class="ident">base_update_type</span> <span class="op">=</span> <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">field</span>.<span class="ident">type_identifier</span> {
-        <span class="ident">TypeIdentifier::Float</span> =&gt; <span class="ident">InputType::object</span>(<span class="ident">operations_object_type</span>(<span class="ident">ctx</span>, <span class="string">&quot;Float&quot;</span>, <span class="ident">field</span>, <span class="bool-val">true</span>)),
-        <span class="ident">TypeIdentifier::Decimal</span> =&gt; <span class="ident">InputType::object</span>(<span class="ident">operations_object_type</span>(<span class="ident">ctx</span>, <span class="string">&quot;Decimal&quot;</span>, <span class="ident">field</span>, <span class="bool-val">true</span>)),
-        <span class="ident">TypeIdentifier::Int</span> =&gt; <span class="ident">InputType::object</span>(<span class="ident">operations_object_type</span>(<span class="ident">ctx</span>, <span class="string">&quot;Int&quot;</span>, <span class="ident">field</span>, <span class="bool-val">true</span>)),
-        <span class="ident">TypeIdentifier::BigInt</span> =&gt; <span class="ident">InputType::object</span>(<span class="ident">operations_object_type</span>(<span class="ident">ctx</span>, <span class="string">&quot;BigInt&quot;</span>, <span class="ident">field</span>, <span class="bool-val">true</span>)),
-        <span class="ident">TypeIdentifier::String</span> =&gt; <span class="ident">InputType::object</span>(<span class="ident">operations_object_type</span>(<span class="ident">ctx</span>, <span class="string">&quot;String&quot;</span>, <span class="ident">field</span>, <span class="bool-val">false</span>)),
-        <span class="ident">TypeIdentifier::Boolean</span> =&gt; <span class="ident">InputType::object</span>(<span class="ident">operations_object_type</span>(<span class="ident">ctx</span>, <span class="string">&quot;Bool&quot;</span>, <span class="ident">field</span>, <span class="bool-val">false</span>)),
-        <span class="ident">TypeIdentifier::Enum</span>(<span class="ident">e</span>) =&gt; <span class="ident">InputType::object</span>(<span class="ident">operations_object_type</span>(<span class="ident">ctx</span>, <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;Enum{}&quot;</span>, <span class="ident">e</span>), <span class="ident">field</span>, <span class="bool-val">false</span>)),
-        <span class="ident">TypeIdentifier::Json</span> =&gt; <span class="ident">map_scalar_input_type_for_field</span>(<span class="ident">ctx</span>, <span class="ident">field</span>),
-        <span class="ident">TypeIdentifier::DateTime</span> =&gt; <span class="ident">InputType::object</span>(<span class="ident">operations_object_type</span>(<span class="ident">ctx</span>, <span class="string">&quot;DateTime&quot;</span>, <span class="ident">field</span>, <span class="bool-val">false</span>)),
-        <span class="ident">TypeIdentifier::UUID</span> =&gt; <span class="ident">InputType::object</span>(<span class="ident">operations_object_type</span>(<span class="ident">ctx</span>, <span class="string">&quot;Uuid&quot;</span>, <span class="ident">field</span>, <span class="bool-val">false</span>)),
-        <span class="ident">TypeIdentifier::Xml</span> =&gt; <span class="ident">InputType::object</span>(<span class="ident">operations_object_type</span>(<span class="ident">ctx</span>, <span class="string">&quot;Xml&quot;</span>, <span class="ident">field</span>, <span class="bool-val">false</span>)),
-        <span class="ident">TypeIdentifier::Bytes</span> =&gt; <span class="ident">InputType::object</span>(<span class="ident">operations_object_type</span>(<span class="ident">ctx</span>, <span class="string">&quot;Bytes&quot;</span>, <span class="ident">field</span>, <span class="bool-val">false</span>)),
-        <span class="ident">TypeIdentifier::Unsupported</span> =&gt; <span class="macro">unreachable!</span>(<span class="string">&quot;No unsupported field should reach that path&quot;</span>),
-    };
-
-    <span class="kw">let</span> <span class="ident">has_adv_json</span> <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">has_capability</span>(<span class="ident">ConnectorCapability::AdvancedJsonNullability</span>);
-    <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">field</span>.<span class="ident">type_identifier</span> {
-        <span class="ident">TypeIdentifier::Json</span> <span class="kw">if</span> <span class="ident">has_adv_json</span> =&gt; {
-            <span class="kw">let</span> <span class="ident">enum_type</span> <span class="op">=</span> <span class="ident">json_null_input_enum</span>(<span class="op">!</span><span class="ident">field</span>.<span class="ident">is_required</span>());
-            <span class="kw">let</span> <span class="ident">input_field</span> <span class="op">=</span> <span class="ident">input_field</span>(
-                <span class="ident">field</span>.<span class="ident">name</span>.<span class="ident">clone</span>(),
-                <span class="macro">vec!</span>[<span class="ident">InputType::Enum</span>(<span class="ident">enum_type</span>), <span class="ident">base_update_type</span>],
-                <span class="ident">default</span>,
-            );
-
-            <span class="ident">input_field</span>.<span class="ident">optional</span>()
-        }
-
-        <span class="kw">_</span> =&gt; {
-            <span class="kw">let</span> <span class="ident">types</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="ident">map_scalar_input_type_for_field</span>(<span class="ident">ctx</span>, <span class="ident">field</span>), <span class="ident">base_update_type</span>];
-
-            <span class="kw">let</span> <span class="ident">input_field</span> <span class="op">=</span> <span class="ident">input_field</span>(<span class="ident">field</span>.<span class="ident">name</span>.<span class="ident">clone</span>(), <span class="ident">types</span>, <span class="ident">default</span>);
-            <span class="ident">input_field</span>.<span class="ident">optional</span>().<span class="ident">nullable_if</span>(<span class="op">!</span><span class="ident">field</span>.<span class="ident">is_required</span>())
-        }
-    }
-}
-
-<span class="attribute">#[<span class="ident">tracing::instrument</span>(<span class="ident">skip</span>(<span class="ident">ctx</span>, <span class="ident">prefix</span>, <span class="ident">field</span>, <span class="ident">with_number_operators</span>))]</span>
-<span class="kw">fn</span> <span class="ident">operations_object_type</span>(
-    <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BuilderContext</span>,
-    <span class="ident">prefix</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-    <span class="ident">field</span>: <span class="kw-2">&amp;</span><span class="ident">ScalarFieldRef</span>,
-    <span class="ident">with_number_operators</span>: <span class="ident">bool</span>,
-) -&gt; <span class="ident">InputObjectTypeWeakRef</span> {
-    <span class="comment">// Nullability is important for the `set` operation, so we need to</span>
-    <span class="comment">// construct and cache different objects to reflect that.</span>
-    <span class="kw">let</span> <span class="ident">nullable</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">field</span>.<span class="ident">is_required</span>() { <span class="string">&quot;&quot;</span> } <span class="kw">else</span> { <span class="string">&quot;Nullable&quot;</span> };
-    <span class="kw">let</span> <span class="ident">ident</span> <span class="op">=</span> <span class="ident">Identifier::new</span>(
-        <span class="macro">format!</span>(<span class="string">&quot;{}{}FieldUpdateOperationsInput&quot;</span>, <span class="ident">nullable</span>, <span class="ident">prefix</span>),
-        <span class="ident">PRISMA_NAMESPACE</span>,
-    );
-    <span class="macro">return_cached_input!</span>(<span class="ident">ctx</span>, <span class="kw-2">&amp;</span><span class="ident">ident</span>);
-
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">obj</span> <span class="op">=</span> <span class="ident">init_input_object_type</span>(<span class="ident">ident</span>.<span class="ident">clone</span>());
-    <span class="ident">obj</span>.<span class="ident">require_exactly_one_field</span>();
-
-    <span class="kw">let</span> <span class="ident">obj</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">obj</span>);
-    <span class="ident">ctx</span>.<span class="ident">cache_input_type</span>(<span class="ident">ident</span>, <span class="ident">obj</span>.<span class="ident">clone</span>());
-
-    <span class="kw">let</span> <span class="ident">typ</span> <span class="op">=</span> <span class="ident">map_scalar_input_type_for_field</span>(<span class="ident">ctx</span>, <span class="ident">field</span>);
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">fields</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="ident">input_field</span>(<span class="ident">operations::SET</span>, <span class="ident">typ</span>.<span class="ident">clone</span>(), <span class="prelude-val">None</span>)
-        .<span class="ident">optional</span>()
-        .<span class="ident">nullable_if</span>(<span class="op">!</span><span class="ident">field</span>.<span class="ident">is_required</span>())];
-
-    <span class="kw">if</span> <span class="ident">with_number_operators</span> {
-        <span class="ident">fields</span>.<span class="ident">push</span>(<span class="ident">input_field</span>(<span class="ident">operations::INCREMENT</span>, <span class="ident">typ</span>.<span class="ident">clone</span>(), <span class="prelude-val">None</span>).<span class="ident">optional</span>());
-        <span class="ident">fields</span>.<span class="ident">push</span>(<span class="ident">input_field</span>(<span class="ident">operations::DECREMENT</span>, <span class="ident">typ</span>.<span class="ident">clone</span>(), <span class="prelude-val">None</span>).<span class="ident">optional</span>());
-        <span class="ident">fields</span>.<span class="ident">push</span>(<span class="ident">input_field</span>(<span class="ident">operations::MULTIPLY</span>, <span class="ident">typ</span>.<span class="ident">clone</span>(), <span class="prelude-val">None</span>).<span class="ident">optional</span>());
-        <span class="ident">fields</span>.<span class="ident">push</span>(<span class="ident">input_field</span>(<span class="ident">operations::DIVIDE</span>, <span class="ident">typ</span>, <span class="prelude-val">None</span>).<span class="ident">optional</span>());
-    }
-
-    <span class="ident">obj</span>.<span class="ident">set_fields</span>(<span class="ident">fields</span>);
-
-    <span class="ident">Arc::downgrade</span>(<span class="kw-2">&amp;</span><span class="ident">obj</span>)
+        .<span class="ident">map</span>(<span class="ident">Clone::clone</span>)
+        .<span class="ident">collect</span>()
 }
 
 <span class="doccomment">/// For update input types only. Compute input fields for checked relational fields.</span>
@@ -782,26 +674,6 @@
 
     <span class="ident">input_object</span>.<span class="ident">set_fields</span>(<span class="ident">fields</span>);
     <span class="ident">Arc::downgrade</span>(<span class="kw-2">&amp;</span><span class="ident">input_object</span>)
-}
-
-<span class="kw">fn</span> <span class="ident">field_should_be_kept_for_checked_update_input_type</span>(<span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="ident">BuilderContext</span>, <span class="ident">field</span>: <span class="kw-2">&amp;</span><span class="ident">ScalarFieldRef</span>) -&gt; <span class="ident">bool</span> {
-    <span class="comment">// We forbid updating auto-increment integer unique fields as this can create problems with the</span>
-    <span class="comment">// underlying sequences (checked inputs only).</span>
-    <span class="kw">let</span> <span class="ident">is_not_autoinc</span> <span class="op">=</span> <span class="op">!</span><span class="ident">field</span>.<span class="ident">is_auto_generated_int_id</span>
-        <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="macro">matches!</span>(
-            (<span class="kw-2">&amp;</span><span class="ident">field</span>.<span class="ident">type_identifier</span>, <span class="ident">field</span>.<span class="ident">unique</span>(), <span class="ident">field</span>.<span class="ident">is_autoincrement</span>),
-            (<span class="ident">TypeIdentifier::Int</span>, <span class="bool-val">true</span>, <span class="bool-val">true</span>)
-        );
-
-    <span class="kw">let</span> <span class="ident">model_id</span> <span class="op">=</span> <span class="ident">field</span>.<span class="ident">container</span>.<span class="ident">as_model</span>().<span class="ident">unwrap</span>().<span class="ident">primary_identifier</span>();
-    <span class="kw">let</span> <span class="ident">is_not_disallowed_id</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">model_id</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">field</span>.<span class="ident">name</span>) {
-        <span class="comment">// Is part of the id, connector must allow updating ID fields.</span>
-        <span class="ident">ctx</span>.<span class="ident">capabilities</span>.<span class="ident">contains</span>(<span class="ident">ConnectorCapability::UpdateableId</span>)
-    } <span class="kw">else</span> {
-        <span class="bool-val">true</span>
-    };
-
-    <span class="ident">is_not_autoinc</span> <span class="op">&amp;&amp;</span> <span class="ident">is_not_disallowed_id</span>
 }
 </code></pre></div>
 </section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../../../" data-current-crate="query_core" data-search-index-js="../../../../../search-index.js" data-search-js="../../../../../search.js"></div>

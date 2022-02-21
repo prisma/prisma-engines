@@ -234,7 +234,7 @@
 <span id="233">233</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::model_extensions</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::sql_trace::SqlTraceComment</span>;
-<span class="kw">use</span> <span class="ident">connector_interface</span>::{<span class="ident">DatasourceFieldName</span>, <span class="ident">WriteArgs</span>, <span class="ident">WriteExpression</span>};
+<span class="kw">use</span> <span class="ident">connector_interface</span>::{<span class="ident">DatasourceFieldName</span>, <span class="ident">ScalarWriteOperation</span>, <span class="ident">WriteArgs</span>};
 <span class="kw">use</span> <span class="ident">itertools::Itertools</span>;
 <span class="kw">use</span> <span class="ident">prisma_models</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident">quaint::ast</span>::<span class="kw-2">*</span>;
@@ -293,8 +293,8 @@
             <span class="kw">for</span> <span class="ident">field</span> <span class="kw">in</span> <span class="ident">affected_fields</span>.<span class="ident">iter</span>() {
                 <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="ident">arg</span>.<span class="ident">take_field_value</span>(<span class="ident">field</span>.<span class="ident">db_name</span>());
                 <span class="kw">match</span> <span class="ident">value</span> {
-                    <span class="prelude-val">Some</span>(<span class="ident">expr</span>) =&gt; {
-                        <span class="kw">let</span> <span class="ident">value</span>: <span class="ident">PrismaValue</span> <span class="op">=</span> <span class="ident">expr</span>
+                    <span class="prelude-val">Some</span>(<span class="ident">write_op</span>) =&gt; {
+                        <span class="kw">let</span> <span class="ident">value</span>: <span class="ident">PrismaValue</span> <span class="op">=</span> <span class="ident">write_op</span>
                             .<span class="ident">try_into</span>()
                             .<span class="ident">expect</span>(<span class="string">&quot;Create calls can only use PrismaValue write expressions (right now).&quot;</span>);
 
@@ -358,10 +358,10 @@
                 .<span class="ident">find</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">db_name</span>() <span class="op">==</span> <span class="ident">name</span>)
                 .<span class="ident">expect</span>(<span class="string">&quot;Expected field to be valid&quot;</span>);
 
-            <span class="kw">let</span> <span class="ident">value</span>: <span class="ident">Expression</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">val</span> {
-                <span class="ident">WriteExpression::Field</span>(<span class="kw">_</span>) =&gt; <span class="macro">unimplemented!</span>(),
-                <span class="ident">WriteExpression::Value</span>(<span class="ident">rhs</span>) =&gt; <span class="ident">field</span>.<span class="ident">value</span>(<span class="ident">rhs</span>).<span class="ident">into</span>(),
-                <span class="ident">WriteExpression::Add</span>(<span class="ident">rhs</span>) <span class="kw">if</span> <span class="ident">field</span>.<span class="ident">is_list</span>() =&gt; {
+            <span class="kw">let</span> <span class="ident">value</span>: <span class="ident">Expression</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">val</span>.<span class="ident">try_into_scalar</span>().<span class="ident">unwrap</span>() {
+                <span class="ident">ScalarWriteOperation::Field</span>(<span class="kw">_</span>) =&gt; <span class="macro">unimplemented!</span>(),
+                <span class="ident">ScalarWriteOperation::Set</span>(<span class="ident">rhs</span>) =&gt; <span class="ident">field</span>.<span class="ident">value</span>(<span class="ident">rhs</span>).<span class="ident">into</span>(),
+                <span class="ident">ScalarWriteOperation::Add</span>(<span class="ident">rhs</span>) <span class="kw">if</span> <span class="ident">field</span>.<span class="ident">is_list</span>() =&gt; {
                     <span class="kw">let</span> <span class="ident">e</span>: <span class="ident">Expression</span> <span class="op">=</span> <span class="ident">Column::from</span>(<span class="ident">name</span>.<span class="ident">clone</span>()).<span class="ident">into</span>();
                     <span class="kw">let</span> <span class="ident">vals</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">rhs</span> {
                         <span class="ident">PrismaValue::List</span>(<span class="ident">vals</span>) =&gt; <span class="ident">vals</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">val</span><span class="op">|</span> <span class="ident">field</span>.<span class="ident">value</span>(<span class="ident">val</span>)).<span class="ident">collect</span>(),
@@ -371,22 +371,22 @@
                     <span class="comment">// Postgres only</span>
                     <span class="ident">e</span>.<span class="ident">compare_raw</span>(<span class="string">&quot;||&quot;</span>, <span class="ident">Value::array</span>(<span class="ident">vals</span>)).<span class="ident">into</span>()
                 }
-                <span class="ident">WriteExpression::Add</span>(<span class="ident">rhs</span>) =&gt; {
+                <span class="ident">ScalarWriteOperation::Add</span>(<span class="ident">rhs</span>) =&gt; {
                     <span class="kw">let</span> <span class="ident">e</span>: <span class="ident">Expression</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Column::from</span>(<span class="ident">name</span>.<span class="ident">clone</span>()).<span class="ident">into</span>();
                     <span class="ident">e</span> <span class="op">+</span> <span class="ident">field</span>.<span class="ident">value</span>(<span class="ident">rhs</span>).<span class="ident">into</span>()
                 }
 
-                <span class="ident">WriteExpression::Substract</span>(<span class="ident">rhs</span>) =&gt; {
+                <span class="ident">ScalarWriteOperation::Substract</span>(<span class="ident">rhs</span>) =&gt; {
                     <span class="kw">let</span> <span class="ident">e</span>: <span class="ident">Expression</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Column::from</span>(<span class="ident">name</span>.<span class="ident">clone</span>()).<span class="ident">into</span>();
                     <span class="ident">e</span> <span class="op">-</span> <span class="ident">field</span>.<span class="ident">value</span>(<span class="ident">rhs</span>).<span class="ident">into</span>()
                 }
 
-                <span class="ident">WriteExpression::Multiply</span>(<span class="ident">rhs</span>) =&gt; {
+                <span class="ident">ScalarWriteOperation::Multiply</span>(<span class="ident">rhs</span>) =&gt; {
                     <span class="kw">let</span> <span class="ident">e</span>: <span class="ident">Expression</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Column::from</span>(<span class="ident">name</span>.<span class="ident">clone</span>()).<span class="ident">into</span>();
                     <span class="ident">e</span> <span class="op">*</span> <span class="ident">field</span>.<span class="ident">value</span>(<span class="ident">rhs</span>).<span class="ident">into</span>()
                 }
 
-                <span class="ident">WriteExpression::Divide</span>(<span class="ident">rhs</span>) =&gt; {
+                <span class="ident">ScalarWriteOperation::Divide</span>(<span class="ident">rhs</span>) =&gt; {
                     <span class="kw">let</span> <span class="ident">e</span>: <span class="ident">Expression</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Column::from</span>(<span class="ident">name</span>.<span class="ident">clone</span>()).<span class="ident">into</span>();
                     <span class="ident">e</span> <span class="op">/</span> <span class="ident">field</span>.<span class="ident">value</span>(<span class="ident">rhs</span>).<span class="ident">into</span>()
                 }

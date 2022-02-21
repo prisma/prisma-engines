@@ -385,7 +385,7 @@
         <span class="ident">preview_features</span>.<span class="ident">clone</span>(),
     );
 
-    <span class="ident">output_types::output_objects::initialize_model_object_type_cache</span>(<span class="kw-2">&amp;mut</span> <span class="ident">ctx</span>);
+    <span class="ident">output_types::objects::initialize_caches</span>(<span class="kw-2">&amp;mut</span> <span class="ident">ctx</span>);
 
     <span class="kw">let</span> (<span class="ident">query_type</span>, <span class="ident">query_object_ref</span>) <span class="op">=</span> <span class="ident">output_types::query_type::build</span>(<span class="kw-2">&amp;mut</span> <span class="ident">ctx</span>);
     <span class="kw">let</span> (<span class="ident">mutation_type</span>, <span class="ident">mutation_object_ref</span>) <span class="op">=</span> <span class="ident">output_types::mutation_type::build</span>(<span class="kw-2">&amp;mut</span> <span class="ident">ctx</span>);

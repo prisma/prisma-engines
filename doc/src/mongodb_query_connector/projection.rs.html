@@ -15,20 +15,50 @@
 <span id="14">14</span>
 <span id="15">15</span>
 <span id="16">16</span>
+<span id="17">17</span>
+<span id="18">18</span>
+<span id="19">19</span>
+<span id="20">20</span>
+<span id="21">21</span>
+<span id="22">22</span>
+<span id="23">23</span>
+<span id="24">24</span>
+<span id="25">25</span>
+<span id="26">26</span>
+<span id="27">27</span>
+<span id="28">28</span>
+<span id="29">29</span>
+<span id="30">30</span>
+<span id="31">31</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::IntoBson</span>;
 <span class="kw">use</span> <span class="ident">mongodb::bson</span>::{<span class="ident">Bson</span>, <span class="ident">Document</span>};
-<span class="kw">use</span> <span class="ident">prisma_models::ModelProjection</span>;
+<span class="kw">use</span> <span class="ident">prisma_models</span>::{<span class="ident">FieldSelection</span>, <span class="ident">SelectedField</span>};
 
 <span class="doccomment">/// Used as projection document for Mongo queries.</span>
-<span class="kw">impl</span> <span class="ident">IntoBson</span> <span class="kw">for</span> <span class="ident">ModelProjection</span> {
+<span class="kw">impl</span> <span class="ident">IntoBson</span> <span class="kw">for</span> <span class="ident">FieldSelection</span> {
     <span class="kw">fn</span> <span class="ident">into_bson</span>(<span class="self">self</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">Bson</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">doc</span> <span class="op">=</span> <span class="ident">Document::new</span>();
-
-        <span class="kw">for</span> <span class="ident">field</span> <span class="kw">in</span> <span class="self">self</span>.<span class="ident">scalar_fields</span>() {
-            <span class="ident">doc</span>.<span class="ident">insert</span>(<span class="ident">field</span>.<span class="ident">db_name</span>(), <span class="ident">Bson::Int32</span>(<span class="number">1</span>));
-        }
+        <span class="ident">path_prefixed_selection</span>(<span class="kw-2">&amp;mut</span> <span class="ident">doc</span>, <span class="macro">vec!</span>[], <span class="self">self</span>.<span class="ident">into_inner</span>());
 
         <span class="prelude-val">Ok</span>(<span class="ident">doc</span>.<span class="ident">into</span>())
+    }
+}
+
+<span class="kw">fn</span> <span class="ident">path_prefixed_selection</span>(<span class="ident">doc</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Document</span>, <span class="ident">parent_paths</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>, <span class="ident">selections</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">SelectedField</span><span class="op">&gt;</span>) {
+    <span class="kw">for</span> <span class="ident">field</span> <span class="kw">in</span> <span class="ident">selections</span> {
+        <span class="kw">match</span> <span class="ident">field</span> {
+            <span class="ident">prisma_models::SelectedField::Scalar</span>(<span class="ident">sf</span>) =&gt; {
+                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">parent_paths</span> <span class="op">=</span> <span class="ident">parent_paths</span>.<span class="ident">clone</span>();
+                <span class="ident">parent_paths</span>.<span class="ident">push</span>(<span class="ident">sf</span>.<span class="ident">db_name</span>().<span class="ident">to_owned</span>());
+                <span class="ident">doc</span>.<span class="ident">insert</span>(<span class="ident">parent_paths</span>.<span class="ident">join</span>(<span class="string">&quot;.&quot;</span>), <span class="ident">Bson::Int32</span>(<span class="number">1</span>));
+            }
+
+            <span class="ident">prisma_models::SelectedField::Composite</span>(<span class="ident">cs</span>) =&gt; {
+                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">parent_paths</span> <span class="op">=</span> <span class="ident">parent_paths</span>.<span class="ident">clone</span>();
+                <span class="ident">parent_paths</span>.<span class="ident">push</span>(<span class="ident">cs</span>.<span class="ident">field</span>.<span class="ident">db_name</span>().<span class="ident">to_owned</span>());
+                <span class="ident">path_prefixed_selection</span>(<span class="ident">doc</span>, <span class="ident">parent_paths</span>, <span class="ident">cs</span>.<span class="ident">selections</span>);
+            }
+        }
     }
 }
 </code></pre></div>

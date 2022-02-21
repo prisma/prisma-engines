@@ -123,12 +123,6 @@
 <span id="122">122</span>
 <span id="123">123</span>
 <span id="124">124</span>
-<span id="125">125</span>
-<span id="126">126</span>
-<span id="127">127</span>
-<span id="128">128</span>
-<span id="129">129</span>
-<span id="130">130</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">parent_container::ParentContainer</span>, <span class="ident">prelude</span>::<span class="kw-2">*</span>, <span class="ident">InternalEnum</span>};
 <span class="kw">use</span> <span class="ident">datamodel</span>::{<span class="ident">DefaultValue</span>, <span class="ident">FieldArity</span>, <span class="ident">NativeTypeInstance</span>};
 <span class="kw">use</span> <span class="ident">once_cell::sync::OnceCell</span>;
@@ -160,16 +154,6 @@
 }
 
 <span class="kw">impl</span> <span class="ident">ScalarField</span> {
-    <span class="comment">// pub fn container(&amp;self) -&gt; &amp;ParentContainer {</span>
-    <span class="comment">//     &amp;self.container</span>
-    <span class="comment">// }</span>
-
-    <span class="comment">// pub fn model(&amp;self) -&gt; ModelRef {</span>
-    <span class="comment">//     self.model</span>
-    <span class="comment">//         .upgrade()</span>
-    <span class="comment">//         .expect(&quot;Model does not exist anymore. Parent model got deleted without deleting the child.&quot;)</span>
-    <span class="comment">// }</span>
-
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">internal_data_model</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">InternalDataModelRef</span> {
         <span class="self">self</span>.<span class="ident">container</span>.<span class="ident">internal_data_model</span>()
     }
@@ -204,6 +188,10 @@
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_numeric</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">type_identifier</span>.<span class="ident">is_numeric</span>()
+    }
+
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">container</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">ParentContainer</span> {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">container</span>
     }
 }
 

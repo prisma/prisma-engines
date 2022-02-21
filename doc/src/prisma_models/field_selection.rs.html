@@ -318,6 +318,10 @@
 <span id="317">317</span>
 <span id="318">318</span>
 <span id="319">319</span>
+<span id="320">320</span>
+<span id="321">321</span>
+<span id="322">322</span>
+<span id="323">323</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::fmt::Display</span>;
 
 <span class="kw">use</span> <span class="kw">crate</span>::{
@@ -335,6 +339,10 @@
 <span class="kw">impl</span> <span class="ident">FieldSelection</span> {
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">selections</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">SelectedField</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> { <span class="ident">selections</span> }
+    }
+
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_inner</span>(<span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">SelectedField</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">selections</span>
     }
 
     <span class="doccomment">/// Returns `true` if self contains (at least) all fields specified in `other`. `false` otherwise.</span>

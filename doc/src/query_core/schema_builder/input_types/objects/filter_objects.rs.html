@@ -171,7 +171,6 @@
 <span id="170">170</span>
 <span id="171">171</span>
 <span id="172">172</span>
-<span id="173">173</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident">constants::filters</span>;
 <span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
@@ -245,13 +244,12 @@
         .<span class="ident">optional</span>(),
     ];
 
-    <span class="ident">fields</span>.<span class="ident">extend</span>(
-        <span class="ident">model</span>
-            .<span class="ident">fields</span>()
-            .<span class="ident">all</span>
-            .<span class="ident">iter</span>()
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">input_fields::filter_input_field</span>(<span class="ident">ctx</span>, <span class="ident">f</span>, <span class="bool-val">false</span>)),
-    );
+    <span class="kw">let</span> <span class="ident">input_fields</span> <span class="op">=</span> <span class="ident">model</span>.<span class="ident">fields</span>().<span class="ident">all</span>.<span class="ident">iter</span>().<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">f</span> {
+        <span class="ident">ModelField::Composite</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
+        <span class="ident">f</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">input_fields::filter_input_field</span>(<span class="ident">ctx</span>, <span class="ident">f</span>, <span class="bool-val">false</span>)),
+    });
+
+    <span class="ident">fields</span>.<span class="ident">extend</span>(<span class="ident">input_fields</span>);
 
     <span class="ident">input_object</span>.<span class="ident">set_fields</span>(<span class="ident">fields</span>);
     <span class="ident">weak_ref</span>

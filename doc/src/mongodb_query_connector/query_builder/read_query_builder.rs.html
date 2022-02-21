@@ -634,7 +634,7 @@
     <span class="ident">options</span>::{<span class="ident">AggregateOptions</span>, <span class="ident">FindOptions</span>},
     <span class="ident">ClientSession</span>, <span class="ident">Collection</span>,
 };
-<span class="kw">use</span> <span class="ident">prisma_models</span>::{<span class="ident">ModelProjection</span>, <span class="ident">ModelRef</span>, <span class="ident">ScalarFieldRef</span>};
+<span class="kw">use</span> <span class="ident">prisma_models</span>::{<span class="ident">FieldSelection</span>, <span class="ident">ModelRef</span>, <span class="ident">ScalarFieldRef</span>};
 <span class="kw">use</span> <span class="ident">std::convert::TryFrom</span>;
 
 <span class="doccomment">/// Ergonomics wrapper for query execution and logging.</span>
@@ -1028,8 +1028,8 @@
         <span class="ident">outer_stages</span>
     }
 
-    <span class="doccomment">/// Adds a final projection onto the fields specified by the `ModelProjection`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_model_projection</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">selected_fields</span>: <span class="ident">ModelProjection</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+    <span class="doccomment">/// Adds a final projection onto the fields specified by the `FieldSelection`.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_model_projection</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">selected_fields</span>: <span class="ident">FieldSelection</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">projection</span> <span class="op">=</span> <span class="ident">selected_fields</span>.<span class="ident">into_bson</span>()<span class="question-mark">?</span>.<span class="ident">into_document</span>()<span class="question-mark">?</span>;
         <span class="self">self</span>.<span class="ident">projection</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">projection</span>);
 

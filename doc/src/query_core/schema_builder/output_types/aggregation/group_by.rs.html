@@ -107,9 +107,13 @@
 <span id="106">106</span>
 <span id="107">107</span>
 <span id="108">108</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::constants::aggregations</span>::<span class="kw-2">*</span>;
-
-<span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
+<span id="109">109</span>
+<span id="110">110</span>
+<span id="111">111</span>
+<span id="112">112</span>
+<span id="113">113</span>
+</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::constants::aggregations</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident">std::convert::identity</span>;
 
 <span class="doccomment">/// Builds group by aggregation object type for given model (e.g. GroupByUserOutputType).</span>
@@ -167,7 +171,7 @@
             <span class="ident">UNDERSCORE_SUM</span>,
             <span class="kw-2">&amp;</span><span class="ident">model</span>,
             <span class="ident">numeric_fields</span>,
-            <span class="ident">map_scalar_output_type_for_field</span>,
+            <span class="ident">field::map_scalar_output_type_for_field</span>,
             <span class="ident">identity</span>,
             <span class="bool-val">false</span>,
         ),
@@ -180,7 +184,7 @@
             <span class="ident">UNDERSCORE_MIN</span>,
             <span class="kw-2">&amp;</span><span class="ident">model</span>,
             <span class="ident">non_list_nor_json_fields</span>.<span class="ident">clone</span>(),
-            <span class="ident">map_scalar_output_type_for_field</span>,
+            <span class="ident">field::map_scalar_output_type_for_field</span>,
             <span class="ident">identity</span>,
             <span class="bool-val">false</span>,
         ),
@@ -193,7 +197,7 @@
             <span class="ident">UNDERSCORE_MAX</span>,
             <span class="kw-2">&amp;</span><span class="ident">model</span>,
             <span class="ident">non_list_nor_json_fields</span>,
-            <span class="ident">map_scalar_output_type_for_field</span>,
+            <span class="ident">field::map_scalar_output_type_for_field</span>,
             <span class="ident">identity</span>,
             <span class="bool-val">false</span>,
         ),
@@ -211,7 +215,13 @@
     <span class="ident">fields</span>
         .<span class="ident">into_iter</span>()
         .<span class="ident">map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> {
-            <span class="ident">field</span>(<span class="ident">f</span>.<span class="ident">name</span>.<span class="ident">clone</span>(), <span class="macro">vec!</span>[], <span class="ident">map_scalar_output_type_for_field</span>(<span class="ident">ctx</span>, <span class="kw-2">&amp;</span><span class="ident">f</span>), <span class="prelude-val">None</span>).<span class="ident">nullable_if</span>(<span class="op">!</span><span class="ident">f</span>.<span class="ident">is_required</span>())
+            <span class="ident">field</span>(
+                <span class="ident">f</span>.<span class="ident">name</span>.<span class="ident">clone</span>(),
+                <span class="macro">vec!</span>[],
+                <span class="ident">field::map_scalar_output_type_for_field</span>(<span class="ident">ctx</span>, <span class="kw-2">&amp;</span><span class="ident">f</span>),
+                <span class="prelude-val">None</span>,
+            )
+            .<span class="ident">nullable_if</span>(<span class="op">!</span><span class="ident">f</span>.<span class="ident">is_required</span>())
         })
         .<span class="ident">collect</span>()
 }

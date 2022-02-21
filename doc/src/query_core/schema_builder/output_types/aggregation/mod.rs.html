@@ -97,9 +97,7 @@
 <span id="96">96</span>
 <span id="97">97</span>
 <span id="98">98</span>
-<span id="99">99</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">super</span>::output_objects::map_scalar_output_type_for_field</span>;
-<span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
+</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident">prisma_models::ScalarFieldRef</span>;
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod</span> <span class="ident">group_by</span>;
@@ -109,7 +107,7 @@
     <span class="kw">match</span> <span class="ident">field</span>.<span class="ident">type_identifier</span> {
         <span class="ident">TypeIdentifier::Int</span> <span class="op">|</span> <span class="ident">TypeIdentifier::BigInt</span> <span class="op">|</span> <span class="ident">TypeIdentifier::Float</span> =&gt; <span class="ident">OutputType::float</span>(),
         <span class="ident">TypeIdentifier::Decimal</span> =&gt; <span class="ident">OutputType::decimal</span>(),
-        <span class="kw">_</span> =&gt; <span class="ident">map_scalar_output_type_for_field</span>(<span class="ident">ctx</span>, <span class="ident">field</span>),
+        <span class="kw">_</span> =&gt; <span class="ident">field::map_scalar_output_type_for_field</span>(<span class="ident">ctx</span>, <span class="ident">field</span>),
     }
 }
 

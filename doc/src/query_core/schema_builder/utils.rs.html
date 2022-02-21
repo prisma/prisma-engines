@@ -145,6 +145,7 @@
 <span id="144">144</span>
 <span id="145">145</span>
 <span id="146">146</span>
+<span id="147">147</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::EnumType</span>;
 <span class="kw">use</span> <span class="ident">once_cell::sync::OnceCell</span>;
@@ -174,6 +175,7 @@
         <span class="ident">identifier</span>: <span class="ident">ident</span>,
         <span class="ident">constraints</span>: <span class="ident">InputObjectTypeConstraints::default</span>(),
         <span class="ident">fields</span>: <span class="ident">OnceCell::new</span>(),
+        <span class="ident">tag</span>: <span class="prelude-val">None</span>,
     }
 }
 

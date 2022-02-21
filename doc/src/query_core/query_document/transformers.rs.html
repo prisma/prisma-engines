@@ -259,6 +259,12 @@
 <span id="258">258</span>
 <span id="259">259</span>
 <span id="260">260</span>
+<span id="261">261</span>
+<span id="262">262</span>
+<span id="263">263</span>
+<span id="264">264</span>
+<span id="265">265</span>
+<span id="266">266</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Transformations for the parsed query document tree.</span>
 <span class="doccomment">//! As the schema validation guarantees the presence, type conformity, etc. of incoming documents,</span>
 <span class="doccomment">//! consumers of the parsed query document want to directly unwrap and access the incoming data,</span>
@@ -282,6 +288,12 @@
                 .<span class="ident">map</span>(<span class="op">|</span><span class="ident">val</span><span class="op">|</span> <span class="ident">val</span>.<span class="ident">try_into</span>())
                 .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">QueryParserResult</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">PrismaValue</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>()
                 .<span class="ident">map</span>(<span class="ident">PrismaValue::List</span>),
+
+            <span class="ident">ParsedInputValue::Map</span>(<span class="ident">map</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">PrismaValue::Object</span>(
+                <span class="ident">map</span>.<span class="ident">into_iter</span>()
+                    .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">k</span>, <span class="ident">v</span>)<span class="op">|</span> <span class="prelude-val">Ok</span>((<span class="ident">k</span>, <span class="ident">v</span>.<span class="ident">try_into</span>()<span class="question-mark">?</span>)))
+                    .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">QueryParserResult</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>()<span class="question-mark">?</span>,
+            )),
 
             <span class="ident">v</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">QueryParserError</span> {
                 <span class="ident">path</span>: <span class="ident">QueryPath::default</span>(),
