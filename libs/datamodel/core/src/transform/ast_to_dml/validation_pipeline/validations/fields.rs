@@ -216,10 +216,10 @@ pub(super) fn validate_native_type_arguments(field: ScalarFieldWalker<'_>, ctx: 
                 .validate_native_type_arguments(&native_type, &scalar_type, &mut errors);
 
             for error in errors {
-                ctx.push_error(DatamodelError::ConnectorError {
-                    message: error.to_string(),
-                    span: field.ast_field().span,
-                });
+                ctx.push_error(DatamodelError::new_connector_error(
+                    &error.to_string(),
+                    field.ast_field().span,
+                ));
             }
         }
         Err(connector_error) => {

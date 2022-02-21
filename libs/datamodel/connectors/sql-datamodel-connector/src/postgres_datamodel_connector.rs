@@ -229,10 +229,10 @@ impl Connector for PostgresDatamodelConnector {
 
     fn validate_model(&self, model: ModelWalker<'_>, errors: &mut Diagnostics) {
         let mut push_error = |err: ConnectorError| {
-            errors.push_error(datamodel_connector::DatamodelError::ConnectorError {
-                message: err.to_string(),
-                span: model.ast_model().span,
-            });
+            errors.push_error(datamodel_connector::DatamodelError::new_connector_error(
+                &err.to_string(),
+                model.ast_model().span,
+            ));
         };
 
         for index in model.indexes() {

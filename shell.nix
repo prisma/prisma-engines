@@ -23,5 +23,7 @@ mkShell {
     llvmPackages.libclang
     kerberos
     protobuf
+
+    rust-bin.stable.latest.default
   ];
 }
