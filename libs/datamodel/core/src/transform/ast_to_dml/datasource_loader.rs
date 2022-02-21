@@ -136,10 +136,6 @@ impl DatasourceLoader {
                     Ok(shadow_database_url) => Some(shadow_database_url)
                         .filter(|s| !s.as_literal().map(|lit| lit.is_empty()).unwrap_or(false))
                         .map(|url| (url, shadow_database_url_arg.span())),
-
-                    // We intentionally ignore the shadow database URL if it is defined in an env var that is missing.
-                    Err(DatamodelError::EnvironmentFunctionalEvaluationError { .. }) => None,
-
                     Err(err) => {
                         diagnostics.push_error(err);
                         None

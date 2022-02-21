@@ -18,7 +18,6 @@ thiserror = "1.0"
 tokio = "1.0"
 tracing = "0.1"
 tracing-futures = "0.2"
-url = "2.1.1"
 uuid = "0.8"
 indexmap = "1.7"
 
@@ -27,6 +26,9 @@ path = "../../prisma-models"
 
 [dependencies.native-types]
 path = "../../../libs/native-types"
+
+[dependencies.mongodb-client]
+path = "../../../libs/mongodb-client"
 
 [dependencies.connector-interface]
 package = "query-connector"

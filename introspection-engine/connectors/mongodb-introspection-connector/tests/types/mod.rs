@@ -2,6 +2,7 @@ mod composite;
 
 use crate::test_api::*;
 use mongodb::bson::{doc, oid::ObjectId, Binary, Bson, DateTime, Decimal128, Timestamp};
+use serde_json::json;
 
 #[test]
 fn string() {
@@ -394,6 +395,31 @@ fn array() {
 }
 
 #[test]
+fn deep_array() {
+    let res = introspect(|db| async move {
+        db.create_collection("A", None).await?;
+        let collection = db.collection("A");
+
+        let docs = vec![doc! {
+            "first": Bson::Array(vec![Bson::Array(vec![Bson::Int32(1)])]),
+        }];
+
+        collection.insert_many(docs, None).await.unwrap();
+
+        Ok(())
+    });
+
+    let expected = expect![[r#"
+        model A {
+          id    String @id @default(auto()) @map("_id") @db.ObjectId
+          first Json
+        }
+    "#]];
+
+    expected.assert_eq(res.datamodel());
+}
+
+#[test]
 fn empty_arrays() {
     let res = introspect(|db| async move {
         db.create_collection("A", None).await?;
@@ -409,10 +435,47 @@ fn empty_arrays() {
 
     let expected = expect![[r#"
         model A {
-          id   String                  @id @default(auto()) @map("_id") @db.ObjectId
-          data Unsupported("Unknown")?
+          id   String @id @default(auto()) @map("_id") @db.ObjectId
+          /// Could not determine type: the field only had null or empty values in the sample set.
+          data Json?
         }
     "#]];
 
     expected.assert_eq(res.datamodel());
+    res.assert_warning_code(103);
+    res.assert_warning("Could not determine the types for the following fields.");
+
+    res.assert_warning_affected(&json!([{
+        "model": "A",
+        "field": "data",
+    }]));
+}
+
+#[test]
+fn unknown_types() {
+    let res = introspect(|db| async move {
+        db.create_collection("A", None).await?;
+        let collection = db.collection("A");
+
+        collection.insert_one(doc! { "data": Bson::Null }, None).await.unwrap();
+
+        Ok(())
+    });
+
+    let expected = expect![[r#"
+        model A {
+          id   String @id @default(auto()) @map("_id") @db.ObjectId
+          /// Could not determine type: the field only had null or empty values in the sample set.
+          data Json?
+        }
+    "#]];
+
+    expected.assert_eq(res.datamodel());
+    res.assert_warning_code(103);
+    res.assert_warning("Could not determine the types for the following fields.");
+
+    res.assert_warning_affected(&json!([{
+        "model": "A",
+        "field": "data",
+    }]));
 }

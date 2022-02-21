@@ -33,7 +33,7 @@ async fn client() -> &'static mongodb::Client {
     static CLIENT: OnceCell<mongodb::Client> = OnceCell::const_new();
 
     CLIENT
-        .get_or_init(|| async move { mongodb::Client::with_uri_str(CONN_STR.as_str()).await.unwrap() })
+        .get_or_init(|| async move { mongodb_client::create(CONN_STR.as_str()).await.unwrap() })
         .await
 }
 
@@ -154,13 +154,16 @@ pub(crate) fn test_scenario(scenario_name: &str) {
         State { collections }
     };
 
-    let expected_result = {
+    let mut expected_result = {
         path.clear();
         write!(path, "{}/{}/result", SCENARIOS_PATH, scenario_name).unwrap();
         std::fs::read_to_string(&path).unwrap()
     };
 
-    // let state: State = serde_json::from_str(state).unwrap();
+    if cfg!(target_os = "windows") {
+        expected_result.retain(|c| c != '\r');
+    }
+
     RT.block_on(async move {
         let parsed_schema = datamodel::parse_schema_parserdb(&schema).unwrap();
         let (db_name, connector) = new_connector(parsed_schema.configuration.preview_features());

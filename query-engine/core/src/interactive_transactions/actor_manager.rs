@@ -32,6 +32,12 @@ impl Drop for TransactionActorManager {
     }
 }
 
+impl Default for TransactionActorManager {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl TransactionActorManager {
     pub fn new() -> Self {
         let clients: Arc<RwLock<HashMap<TxId, ITXClient>>> = Arc::new(RwLock::new(HashMap::new()));

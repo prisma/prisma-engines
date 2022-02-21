@@ -6,8 +6,9 @@ pub(crate) use name::Name;
 use super::{field_type::FieldType, CompositeTypeDepth};
 use convert_case::{Case, Casing};
 use datamodel::{
-    CompositeType, CompositeTypeField, Datamodel, DefaultValue, Field, IndexDefinition, IndexField, IndexType, Model,
-    PrimaryKeyDefinition, PrimaryKeyField, ScalarField, SortOrder, ValueGenerator, WithDatabaseName,
+    CompositeType, CompositeTypeField, CompositeTypeFieldType, Datamodel, DefaultValue, Field, IndexDefinition,
+    IndexField, IndexType, Model, PrimaryKeyDefinition, PrimaryKeyField, ScalarField, ScalarType, SortOrder,
+    ValueGenerator, WithDatabaseName,
 };
 use introspection_connector::Warning;
 use mongodb::bson::{Bson, Document};
@@ -16,7 +17,7 @@ use regex::Regex;
 use std::{
     borrow::Cow,
     cmp::Ordering,
-    collections::{BTreeMap, HashMap},
+    collections::{BTreeMap, HashMap, HashSet},
     fmt,
 };
 
@@ -24,6 +25,7 @@ pub(super) const SAMPLE_SIZE: i32 = 1000;
 
 static RESERVED_NAMES: &[&str] = &["PrismaClient"];
 static COMMENTED_OUT_FIELD: &str = "This field was commented out because of an invalid name. Please provide a valid one that matches [a-zA-Z][a-zA-Z0-9_]*";
+static EMPTY_TYPE_DETECTED: &str = "Nested objects had no data in the sample dataset to introspect a nested type.";
 
 /// Statistical data from a MongoDB database for determining a Prisma data
 /// model.
@@ -193,12 +195,9 @@ impl<'a> Statistics<'a> {
 
             match FieldType::from_bson(val, compound_name) {
                 // We cannot have arrays of arrays, so multi-dimensional arrays
-                // are introspected as `Json[]`.
-                Some(_) if found_composite && array_layers > 1 => {
-                    let counter = sampler
-                        .types
-                        .entry(FieldType::Array(Box::new(FieldType::Json)))
-                        .or_default();
+                // are introspected as `Json`.
+                Some(_) if array_layers > 1 => {
+                    let counter = sampler.types.entry(FieldType::Json).or_default();
                     *counter += 1;
                 }
                 // Counting the types.
@@ -367,6 +366,7 @@ fn populate_fields(
         .collect();
 
     let mut unsupported = Vec::new();
+    let mut unknown_types = Vec::new();
     let mut undecided_types = Vec::new();
     let mut fields_with_empty_names = Vec::new();
 
@@ -375,10 +375,11 @@ fn populate_fields(
         let field_count = sampler.counter;
 
         let percentages = sampler.percentages();
+        let most_common_type = percentages.find_most_common();
 
-        let field_type = match percentages.find_most_common() {
+        let field_type = match &most_common_type {
             Some(field_type) => field_type.to_owned(),
-            None => FieldType::Unsupported("Unknown"),
+            None => FieldType::Json,
         };
 
         if let FieldType::Unsupported(r#type) = field_type {
@@ -405,6 +406,23 @@ fn populate_fields(
         } else {
             None
         };
+
+        if most_common_type.is_none() {
+            static UNKNOWN_FIELD: &str =
+                "Could not determine type: the field only had null or empty values in the sample set.";
+
+            match &mut documentation {
+                Some(docs) => {
+                    docs.push('\n');
+                    docs.push_str(UNKNOWN_FIELD);
+                }
+                None => {
+                    documentation = Some(UNKNOWN_FIELD.to_owned());
+                }
+            }
+
+            unknown_types.push((container.clone(), field_name.to_string()));
+        }
 
         let (name, database_name, is_commented_out) = match sanitize_string(&field_name) {
             Some(sanitized) if sanitized.is_empty() => {
@@ -485,7 +503,68 @@ fn populate_fields(
         warnings.push(crate::warnings::fields_with_empty_names(&fields_with_empty_names));
     }
 
+    if !unknown_types.is_empty() {
+        warnings.push(crate::warnings::fields_with_unknown_types(&unknown_types));
+    }
+
+    filter_out_empty_types(&mut models, &mut types, warnings);
+
     (models, types)
+}
+
+/// From the resulting data model, remove all types with no fields and change
+/// the field types to Json.
+fn filter_out_empty_types(
+    models: &mut BTreeMap<String, Model>,
+    types: &mut BTreeMap<String, CompositeType>,
+    warnings: &mut Vec<Warning>,
+) {
+    let mut fields_with_an_empty_type = Vec::new();
+
+    // 1. remove all types that have no fields.
+    let empty_types: HashSet<_> = types
+        .iter()
+        .filter(|(_, r#type)| r#type.fields.is_empty())
+        .map(|(name, _)| name.to_owned())
+        .collect();
+
+    // https://github.com/rust-lang/rust/issues/70530
+    types.retain(|_, r#type| !r#type.fields.is_empty());
+
+    // 2. change all fields in models that point to a non-existing type to Json.
+    for (model_name, model) in models.iter_mut() {
+        for field in model.fields.iter_mut().filter_map(|f| f.as_scalar_field_mut()) {
+            match &field.field_type {
+                datamodel::FieldType::CompositeType(ct) if empty_types.contains(ct) => {
+                    fields_with_an_empty_type.push((Name::Model(model_name.clone()), field.name.clone()));
+                    field.field_type = datamodel::FieldType::Scalar(datamodel::ScalarType::Json, None, None);
+                    field.documentation = Some(EMPTY_TYPE_DETECTED.to_owned());
+                }
+                _ => (),
+            }
+        }
+    }
+
+    // 3. change all fields in types that point to a non-existing type to Json.
+    for (type_name, r#type) in types.iter_mut() {
+        for field in r#type.fields.iter_mut() {
+            match &field.r#type {
+                CompositeTypeFieldType::CompositeType(name) if empty_types.contains(name) => {
+                    fields_with_an_empty_type.push((Name::CompositeType(type_name.clone()), field.name.clone()));
+                    field.r#type = CompositeTypeFieldType::Scalar(ScalarType::Json, None, None);
+                    field.documentation = Some(EMPTY_TYPE_DETECTED.to_owned());
+                }
+                _ => (),
+            }
+        }
+    }
+
+    // 4. add warnings in the end to reduce spam
+    if !fields_with_an_empty_type.is_empty() {
+        warnings.push(crate::warnings::fields_pointing_to_an_empty_type(
+            &fields_with_an_empty_type,
+        ));
+    }
 }
 
 fn add_indices_to_models(models: &mut BTreeMap<String, Model>, indices: &mut BTreeMap<String, Vec<IndexWalker<'_>>>) {

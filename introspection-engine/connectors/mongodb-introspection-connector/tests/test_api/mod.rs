@@ -1,7 +1,7 @@
 use datamodel::common::preview_features::PreviewFeature;
 use enumflags2::BitFlags;
 use introspection_connector::{CompositeTypeDepth, IntrospectionConnector, IntrospectionContext, Warning};
-use mongodb::{Client, Database};
+use mongodb::Database;
 use mongodb_introspection_connector::MongoDbIntrospectionConnector;
 use names::Generator;
 use once_cell::sync::Lazy;
@@ -37,9 +37,21 @@ impl TestResult {
     }
 
     #[track_caller]
+    pub fn assert_warning_code(&self, code: i16) {
+        dbg!(&self.warnings);
+        assert!(self.warnings.iter().any(|w| w.code == code))
+    }
+
+    #[track_caller]
     pub fn assert_warning(&self, warning: &str) {
         dbg!(&self.warnings);
         assert!(self.warnings.iter().any(|w| w.message == warning))
+    }
+
+    #[track_caller]
+    pub fn assert_no_warnings(&self) {
+        dbg!(&self.warnings);
+        assert!(self.warnings.is_empty())
     }
 
     #[track_caller]
@@ -101,7 +113,7 @@ where
     };
 
     RT.block_on(async move {
-        let client = Client::with_uri_str(&connection_string).await.unwrap();
+        let client = mongodb_client::create(&connection_string).await.unwrap();
         let database = client.database(&database_name);
         let connector = MongoDbIntrospectionConnector::new(&connection_string).await.unwrap();
 
