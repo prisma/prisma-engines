@@ -10,7 +10,7 @@ pub async fn get_single_record<'conn>(
     session: &mut ClientSession,
     model: &ModelRef,
     filter: &Filter,
-    selected_fields: &ModelProjection,
+    selected_fields: &FieldSelection,
     aggregation_selections: &[RelAggregationSelection],
 ) -> crate::Result<Option<SingleRecord>> {
     let coll = database.collection(model.db_name());
@@ -49,7 +49,7 @@ pub async fn get_many_records<'conn>(
     session: &mut ClientSession,
     model: &ModelRef,
     query_arguments: QueryArguments,
-    selected_fields: &ModelProjection,
+    selected_fields: &FieldSelection,
     aggregation_selections: &[RelAggregationSelection],
 ) -> crate::Result<ManyRecords> {
     let coll = database.collection(model.db_name());
@@ -96,11 +96,7 @@ pub async fn get_related_m2m_record_ids<'conn>(
 
     let model = from_field.model();
     let coll = database.collection(model.db_name());
-
-    let id_field = ModelProjection::from(model.primary_identifier())
-        .scalar_fields()
-        .next()
-        .unwrap();
+    let id_field = pick_singular_id(&model);
     let ids = from_record_ids
         .iter()
         .map(|p| (&id_field, p.values().next().unwrap()).into_bson())
@@ -110,23 +106,16 @@ pub async fn get_related_m2m_record_ids<'conn>(
 
     // Scalar field name where the relation ids list is on `model`.
     let relation_ids_field_name = from_field.relation_info.fields.get(0).unwrap();
-
     let find_options = FindOptions::builder()
         .projection(doc! { id_field.db_name(): 1, relation_ids_field_name: 1 })
         .build();
 
     let cursor = coll.find_with_session(filter, Some(find_options), session).await?;
-
     let docs = vacuum_cursor(cursor, session).await?;
-
-    let parent_id_meta = output_meta::from_field(&id_field);
+    let parent_id_meta = output_meta::from_scalar_field(&id_field);
     let id_holder_field = model.fields().find_from_scalar(relation_ids_field_name).unwrap();
-    let related_ids_holder_meta = output_meta::from_field(&id_holder_field);
-
-    let child_id_field = ModelProjection::from(from_field.related_model().primary_identifier())
-        .scalar_fields()
-        .next()
-        .unwrap();
+    let related_ids_holder_meta = output_meta::from_scalar_field(&id_holder_field);
+    let child_id_field = pick_singular_id(&from_field.related_model());
 
     let mut id_pairs = vec![];
     for mut doc in docs {

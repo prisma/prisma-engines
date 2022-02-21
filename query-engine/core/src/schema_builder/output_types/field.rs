@@ -1,88 +1,22 @@
 use super::*;
-use std::convert::identity;
-
-use crate::constants::{aggregations::*, output_fields::*};
-use prisma_models::ScalarFieldRef;
-
-/// Initializes model output object type cache on the context.
-/// This is a critical first step to ensure that all model output object types are present
-/// and that subsequent schema computation has a base to rely on.
-/// Called only once at the very beginning of schema building.
-#[tracing::instrument(skip(ctx))]
-pub(crate) fn initialize_model_object_type_cache(ctx: &mut BuilderContext) {
-    // Compute initial cache. No fields are computed because we first
-    // need all models to be present, then we can compute fields in a second pass.
-    ctx.internal_data_model
-        .models()
-        .to_owned()
-        .into_iter()
-        .for_each(|model| {
-            let ident = Identifier::new(model.name.clone(), MODEL_NAMESPACE);
-            ctx.cache_output_type(ident.clone(), Arc::new(ObjectType::new(ident, Some(model.clone()))));
-        });
-
-    // Compute fields on all cached object types.
-    ctx.internal_data_model
-        .models()
-        .to_owned()
-        .into_iter()
-        .for_each(|model| {
-            let obj: ObjectTypeWeakRef = output_objects::map_model_object_type(ctx, &model);
-            let mut fields = compute_model_object_type_fields(ctx, &model);
-
-            // Add _count field. Only include to-many fields.
-            let relation_fields = model.fields().relation().into_iter().filter(|f| f.is_list()).collect();
-
-            append_opt(
-                &mut fields,
-                aggregation_relation_field(
-                    ctx,
-                    UNDERSCORE_COUNT,
-                    &model,
-                    relation_fields,
-                    |_, _| OutputType::int(),
-                    identity,
-                ),
-            );
-
-            obj.into_arc().set_fields(fields);
-        });
-}
-
-/// Computes model output type fields.
-/// Important: This requires that the cache has already been initialized.
-fn compute_model_object_type_fields(ctx: &mut BuilderContext, model: &ModelRef) -> Vec<OutputField> {
-    model
-        .fields()
-        .all
-        .iter()
-        .map(|f| output_objects::map_field(ctx, f))
-        .collect()
-}
-
-/// Returns an output object type for the given model.
-/// Relies on the output type cache being initalized.
-pub(crate) fn map_model_object_type(ctx: &mut BuilderContext, model: &ModelRef) -> ObjectTypeWeakRef {
-    let ident = Identifier::new(model.name.clone(), MODEL_NAMESPACE);
-    ctx.get_output_type(&ident)
-        .expect("Invariant violation: Initialized output object type for each model.")
-}
+use input_types::fields::arguments;
+use prisma_models::{CompositeFieldRef, ScalarFieldRef};
 
 pub(crate) fn map_field(ctx: &mut BuilderContext, model_field: &ModelField) -> OutputField {
     field(
         model_field.name(),
         arguments::many_records_field_arguments(ctx, &model_field),
-        map_output_type(ctx, &model_field),
+        map_field_output_type(ctx, &model_field),
         None,
     )
     .nullable_if(!model_field.is_required())
 }
 
-pub(crate) fn map_output_type(ctx: &mut BuilderContext, model_field: &ModelField) -> OutputType {
+pub(crate) fn map_field_output_type(ctx: &mut BuilderContext, model_field: &ModelField) -> OutputType {
     match model_field {
         ModelField::Scalar(sf) => map_scalar_output_type_for_field(ctx, sf),
         ModelField::Relation(rf) => map_relation_output_type(ctx, rf),
-        ModelField::Composite(_) => OutputType::Scalar(ScalarType::Null), // [Composites] todo
+        ModelField::Composite(cf) => map_composite_field_output_type(ctx, cf),
     }
 }
 
@@ -115,7 +49,7 @@ pub(crate) fn map_scalar_output_type(ctx: &mut BuilderContext, typ: &TypeIdentif
 }
 
 pub(crate) fn map_relation_output_type(ctx: &mut BuilderContext, rf: &RelationFieldRef) -> OutputType {
-    let related_model_obj = OutputType::object(map_model_object_type(ctx, &rf.related_model()));
+    let related_model_obj = OutputType::object(objects::model::map_type(ctx, &rf.related_model()));
 
     if rf.is_list() {
         OutputType::list(related_model_obj)
@@ -133,18 +67,15 @@ fn map_enum_type(ctx: &mut BuilderContext, enum_name: &str) -> EnumType {
     e.into()
 }
 
-pub(crate) fn affected_records_object_type(ctx: &mut BuilderContext) -> ObjectTypeWeakRef {
-    let ident = Identifier::new("AffectedRowsOutput".to_owned(), PRISMA_NAMESPACE);
-    return_cached_output!(ctx, &ident);
+fn map_composite_field_output_type(ctx: &mut BuilderContext, cf: &CompositeFieldRef) -> OutputType {
+    let obj = objects::composite::map_type(ctx, &cf.typ);
+    let typ = OutputType::Object(obj);
 
-    let object_type = Arc::new(object_type(
-        ident.clone(),
-        vec![field(AFFECTED_COUNT, vec![], OutputType::int(), None)],
-        None,
-    ));
-
-    ctx.cache_output_type(ident, object_type.clone());
-    Arc::downgrade(&object_type)
+    if cf.is_list() {
+        OutputType::list(typ)
+    } else {
+        typ
+    }
 }
 
 /// Returns an aggregation field with given name if the passed fields contains any fields.

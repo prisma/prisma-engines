@@ -231,6 +231,13 @@ impl PrismaValue {
     pub fn new_datetime(datetime: &str) -> PrismaValue {
         PrismaValue::DateTime(DateTime::parse_from_rfc3339(datetime).unwrap())
     }
+
+    pub fn as_boolean(&self) -> Option<&bool> {
+        match self {
+            PrismaValue::Boolean(bool) => Some(bool),
+            _ => None,
+        }
+    }
 }
 
 impl fmt::Display for PrismaValue {

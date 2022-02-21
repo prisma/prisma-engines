@@ -1,3 +1,4 @@
+use super::fields::data_input_mapper::*;
 use super::*;
 use constants::args;
 
@@ -23,10 +24,18 @@ pub(crate) fn checked_update_many_input_type(ctx: &mut BuilderContext, model: &M
     let ident = Identifier::new(format!("{}UpdateManyMutationInput", model.name), PRISMA_NAMESPACE);
     return_cached_input!(ctx, &ident);
 
-    let input_fields = update_one_objects::scalar_input_fields_for_checked_update(ctx, model);
-    let input_object = Arc::new(input_object_type(ident.clone(), input_fields));
-
+    let input_object = Arc::new(init_input_object_type(ident.clone()));
     ctx.cache_input_type(ident, input_object.clone());
+
+    let filtered_fields: Vec<_> = update_one_objects::filter_checked_update_fields(ctx, model, None)
+        .into_iter()
+        .filter(|field| matches!(field, ModelField::Scalar(_) | ModelField::Composite(_)))
+        .collect();
+
+    let field_mapper = UpdateDataInputFieldMapper::new_checked();
+    let input_fields = field_mapper.map_all(ctx, &filtered_fields);
+
+    input_object.set_fields(input_fields);
     Arc::downgrade(&input_object)
 }
 
@@ -49,10 +58,18 @@ pub(crate) fn unchecked_update_many_input_type(
     let ident = Identifier::new(name, PRISMA_NAMESPACE);
     return_cached_input!(ctx, &ident);
 
-    let input_fields = update_one_objects::scalar_input_fields_for_unchecked_update(ctx, model, parent_field);
-    let input_object = Arc::new(input_object_type(ident.clone(), input_fields));
-
+    let input_object = Arc::new(init_input_object_type(ident.clone()));
     ctx.cache_input_type(ident, input_object.clone());
+
+    let filtered_fields: Vec<_> = update_one_objects::filter_unchecked_update_fields(ctx, model, parent_field)
+        .into_iter()
+        .filter(|field| matches!(field, ModelField::Scalar(_) | ModelField::Composite(_)))
+        .collect();
+
+    let field_mapper = UpdateDataInputFieldMapper::new_unchecked();
+    let input_fields = field_mapper.map_all(ctx, &filtered_fields);
+
+    input_object.set_fields(input_fields);
     Arc::downgrade(&input_object)
 }
 

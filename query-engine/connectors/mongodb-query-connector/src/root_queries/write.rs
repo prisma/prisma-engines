@@ -15,6 +15,7 @@ use mongodb::{
 };
 use prisma_models::{ModelRef, PrismaValue, SelectionResult};
 use std::{collections::HashMap, convert::TryInto};
+use update_utils::{IntoUpdateDocumentExtension, IntoUpdateOperationExtension};
 
 /// Create a single record to the database resulting in a
 /// `RecordProjection` as an identifier pointing to the just-created document.
@@ -25,28 +26,21 @@ pub async fn create_record<'conn>(
     mut args: WriteArgs,
 ) -> crate::Result<SelectionResult> {
     let coll = database.collection::<Document>(model.db_name());
-
-    // Mongo only allows a singular ID.
-    let mut id_fields = ModelProjection::from(model.primary_identifier())
-        .scalar_fields()
-        .collect::<Vec<_>>();
-
-    assert!(id_fields.len() == 1);
-
-    let id_field = id_fields.pop().unwrap();
+    let id_field = pick_singular_id(model);
 
     // Fields to write to the document.
     // Todo: Do we need to write null for everything? There's something with nulls and exists that might impact
     //       query capability (e.g. query for field: null may need to check for exist as well?)
     let fields: Vec<_> = model
         .fields()
-        .scalar()
-        .into_iter()
+        .all
+        .iter()
         .filter(|field| args.has_arg_for(field.db_name()))
+        .map(Clone::clone)
         .collect();
 
     let mut doc = Document::new();
-    let id_meta = output_meta::from_field(&id_field);
+    let id_meta = output_meta::from_scalar_field(&id_field);
 
     for field in fields {
         let db_name = field.db_name();
@@ -74,7 +68,13 @@ pub async fn create_records<'conn>(
 ) -> crate::Result<usize> {
     let coll = database.collection::<Document>(model.db_name());
     let num_records = args.len();
-    let fields = model.fields().scalar();
+    let fields: Vec<_> = model
+        .fields()
+        .all
+        .iter()
+        .filter(|field| matches!(field, Field::Scalar(_) | Field::Composite(_)))
+        .map(Clone::clone)
+        .collect();
 
     let docs = args
         .into_iter()
@@ -120,7 +120,7 @@ pub async fn update_records<'conn>(
     session: &mut ClientSession,
     model: &ModelRef,
     record_filter: RecordFilter,
-    args: WriteArgs,
+    mut args: WriteArgs,
 ) -> crate::Result<Vec<SelectionResult>> {
     let coll = database.collection::<Document>(model.db_name());
 
@@ -130,12 +130,8 @@ pub async fn update_records<'conn>(
     //
     // Mongo can only have singular IDs (always `_id`), hence the unwraps. Since IDs are immutable, we also don't
     // need to merge back id changes into the result set as with SQL.
-    let id_field = ModelProjection::from(model.primary_identifier())
-        .scalar_fields()
-        .next()
-        .unwrap();
-
-    let id_meta = output_meta::from_field(&id_field);
+    let id_field = pick_singular_id(model);
+    let id_meta = output_meta::from_scalar_field(&id_field);
     let ids: Vec<Bson> = if let Some(selectors) = record_filter.selectors {
         selectors
             .into_iter()
@@ -151,85 +147,23 @@ pub async fn update_records<'conn>(
     }
 
     let filter = doc! { id_field.db_name(): { "$in": ids.clone() } };
-    let fields = model.fields().scalar();
+    let fields: Vec<_> = model
+        .fields()
+        .all
+        .iter()
+        .filter_map(|field| {
+            args.take_field_value(field.db_name())
+                .map(|write_op| (field.clone(), write_op))
+        })
+        .collect();
+
     let mut update_docs: Vec<Document> = vec![];
 
-    for (field_name, write_expr) in args.args {
-        let DatasourceFieldName(name) = field_name;
+    for (field, write_op) in fields {
+        let field_path = FieldPath::new_from_segment(&field);
+        let update_ops = write_op.into_update_ops(&field, field_path)?.into_update_docs()?;
 
-        // Todo: This is inefficient.
-        let field = fields.iter().find(|f| f.db_name() == name).unwrap();
-        let field_name = field.db_name();
-        let dollar_field_name = format!("${}", field.db_name());
-
-        let doc = match write_expr {
-            WriteExpression::Add(rhs) if field.is_list() => match rhs {
-                PrismaValue::List(vals) => {
-                    let vals = vals
-                        .into_iter()
-                        .map(|val| (field, val).into_bson())
-                        .collect::<crate::Result<Vec<_>>>()?
-                        .into_iter()
-                        .map(|bson| {
-                            // Strip the list from the BSON values. [Todo] This is unfortunately necessary right now due to how the
-                            // conversion is set up with native types, we should clean that up at some point (move from traits to fns?).
-                            if let Bson::Array(mut inner) = bson {
-                                inner.pop().unwrap()
-                            } else {
-                                bson
-                            }
-                        })
-                        .collect();
-
-                    let bson_array = Bson::Array(vals);
-
-                    doc! {
-                        "$set": { field_name: {
-                            "$ifNull": [
-                                { "$concatArrays": [dollar_field_name, bson_array.clone()] },
-                                bson_array
-                            ]
-                        } }
-                    }
-                }
-                val => {
-                    let bson_val = match (field, val).into_bson()? {
-                        bson @ Bson::Array(_) => bson,
-                        bson => Bson::Array(vec![bson]),
-                    };
-
-                    doc! {
-                        "$set": {
-                            field_name: {
-                                "$ifNull": [
-                                    { "$concatArrays": [dollar_field_name, bson_val.clone()] },
-                                    bson_val
-                                ]
-                            }
-                        }
-                    }
-                }
-            },
-            // We use $literal to enable the set of empty object, which is otherwise considered a syntax error
-            WriteExpression::Value(rhs) => doc! {
-                "$set": { field_name: { "$literal": (field, rhs).into_bson()? } }
-            },
-            WriteExpression::Add(rhs) => doc! {
-                "$set": { field_name: { "$add": [dollar_field_name, (field, rhs).into_bson()?] } }
-            },
-            WriteExpression::Substract(rhs) => doc! {
-                "$set": { field_name: { "$subtract": [dollar_field_name, (field, rhs).into_bson()?] } }
-            },
-            WriteExpression::Multiply(rhs) => doc! {
-                "$set": { field_name: { "$multiply": [dollar_field_name, (field, rhs).into_bson()?] } }
-            },
-            WriteExpression::Divide(rhs) => doc! {
-                "$set": { field_name: { "$divide": [dollar_field_name, (field, rhs).into_bson()?] } }
-            },
-            WriteExpression::Field(_) => unimplemented!(),
-        };
-
-        update_docs.push(doc);
+        update_docs.extend(update_ops);
     }
 
     if !update_docs.is_empty() {
@@ -257,10 +191,7 @@ pub async fn delete_records<'conn>(
     record_filter: RecordFilter,
 ) -> crate::Result<usize> {
     let coll = database.collection::<Document>(model.db_name());
-    let id_field = ModelProjection::from(model.primary_identifier())
-        .scalar_fields()
-        .next()
-        .unwrap();
+    let id_field = pick_singular_id(model);
 
     let ids = if let Some(selectors) = record_filter.selectors {
         selectors
@@ -301,7 +232,7 @@ async fn find_ids(
         builder.query = Some(filter);
     };
 
-    let builder = builder.with_model_projection(id_field.into())?;
+    let builder = builder.with_model_projection(id_field)?;
     let query = builder.build()?;
     let docs = query.execute(collection, session).await?;
     let ids = docs.into_iter().map(|mut doc| doc.remove("_id").unwrap()).collect();
@@ -325,10 +256,7 @@ pub async fn m2m_connect<'conn>(
     let child_coll = database.collection::<Document>(child_model.db_name());
 
     let parent_id = parent_id.values().next().unwrap();
-    let parent_id_field = ModelProjection::from(parent_model.primary_identifier())
-        .scalar_fields()
-        .next()
-        .unwrap();
+    let parent_id_field = pick_singular_id(&parent_model);
 
     let parent_ids_scalar_field_name = field.relation_info.fields.get(0).unwrap();
     let parent_id = (&parent_id_field, parent_id).into_bson()?;
@@ -375,10 +303,7 @@ pub async fn m2m_disconnect<'conn>(
     let child_coll = database.collection::<Document>(child_model.db_name());
 
     let parent_id = parent_id.values().next().unwrap();
-    let parent_id_field = ModelProjection::from(parent_model.primary_identifier())
-        .scalar_fields()
-        .next()
-        .unwrap();
+    let parent_id_field = pick_singular_id(&parent_model);
 
     let parent_ids_scalar_field_name = field.relation_info.fields.get(0).unwrap();
     let parent_id = (&parent_id_field, parent_id).into_bson()?;

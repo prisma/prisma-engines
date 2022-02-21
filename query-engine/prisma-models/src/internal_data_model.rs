@@ -30,6 +30,10 @@ impl InternalDataModel {
         self.models.get().unwrap()
     }
 
+    pub fn composite_types(&self) -> &[CompositeTypeRef] {
+        self.composite_types.get().unwrap()
+    }
+
     pub fn models_cloned(&self) -> Vec<ModelRef> {
         self.models.get().unwrap().iter().map(Arc::clone).collect()
     }

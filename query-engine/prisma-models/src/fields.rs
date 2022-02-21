@@ -2,10 +2,7 @@ use crate::pk::PrimaryKey;
 use crate::*;
 use itertools::Itertools;
 use once_cell::sync::OnceCell;
-use std::{
-    collections::BTreeSet,
-    sync::{Arc, Weak},
-};
+use std::{collections::BTreeSet, sync::Arc};
 
 #[derive(Debug, Clone)]
 pub struct Fields {
@@ -13,6 +10,7 @@ pub struct Fields {
     primary_key: Option<PrimaryKey>,
     scalar: OnceCell<Vec<ScalarFieldWeak>>,
     relation: OnceCell<Vec<RelationFieldWeak>>,
+    composite: OnceCell<Vec<CompositeFieldWeak>>,
     model: ModelWeakRef,
     // created_at: OnceCell<Option<ScalarFieldRef>>,
     updated_at: OnceCell<Option<ScalarFieldRef>>,
@@ -25,7 +23,7 @@ impl Fields {
             primary_key,
             scalar: OnceCell::new(),
             relation: OnceCell::new(),
-            // created_at: OnceCell::new(),
+            composite: OnceCell::new(),
             updated_at: OnceCell::new(),
             model,
         }
@@ -79,16 +77,6 @@ impl Fields {
         }
     }
 
-    // Todo / WIP: Doesn't seem to exist anymore.
-    // pub fn created_at(&self) -> &Option<ScalarFieldRef> {
-    //     self.created_at.get_or_init(|| {
-    //         self.scalar_weak()
-    //             .iter()
-    //             .map(|sf| sf.upgrade().unwrap())
-    //             .find(|sf| sf.is_created_at())
-    //     })
-    // }
-
     pub fn updated_at(&self) -> &Option<ScalarFieldRef> {
         self.updated_at.get_or_init(|| {
             self.scalar_weak()
@@ -116,13 +104,23 @@ impl Fields {
             .as_slice()
     }
 
-    pub fn relation(&self) -> Vec<Arc<RelationField>> {
+    pub fn relation(&self) -> Vec<RelationFieldRef> {
         self.relation_weak().iter().map(|f| f.upgrade().unwrap()).collect()
     }
 
-    fn relation_weak(&self) -> &[Weak<RelationField>] {
+    fn relation_weak(&self) -> &[RelationFieldWeak] {
         self.relation
             .get_or_init(|| self.all.iter().fold(Vec::new(), Self::relation_filter))
+            .as_slice()
+    }
+
+    pub fn composite(&self) -> Vec<CompositeFieldRef> {
+        self.composite_weak().iter().map(|f| f.upgrade().unwrap()).collect()
+    }
+
+    fn composite_weak(&self) -> &[CompositeFieldWeak] {
+        self.composite
+            .get_or_init(|| self.all.iter().fold(Vec::new(), Self::composite_filter))
             .as_slice()
     }
 
@@ -138,7 +136,7 @@ impl Fields {
             .collect()
     }
 
-    pub fn find_many_from_relation(&self, names: &BTreeSet<String>) -> Vec<Arc<RelationField>> {
+    pub fn find_many_from_relation(&self, names: &BTreeSet<String>) -> Vec<RelationFieldRef> {
         self.relation_weak()
             .iter()
             .filter(|field| names.contains(&field.upgrade().unwrap().name))
@@ -146,12 +144,23 @@ impl Fields {
             .collect()
     }
 
-    pub fn find_from_all(&self, name: &str) -> crate::Result<&Field> {
+    pub fn find_from_all(&self, prisma_name: &str) -> crate::Result<&Field> {
         self.all
             .iter()
-            .find(|field| field.name() == name)
+            .find(|field| field.name() == prisma_name)
             .ok_or_else(|| DomainError::FieldNotFound {
-                name: name.to_string(),
+                name: prisma_name.to_string(),
+                container_name: self.model().name.clone(),
+                container_type: "model",
+            })
+    }
+
+    pub fn find_from_all_by_db_name(&self, db_name: &str) -> crate::Result<&Field> {
+        self.all
+            .iter()
+            .find(|field| field.db_name() == db_name)
+            .ok_or_else(|| DomainError::FieldNotFound {
+                name: db_name.to_string(),
                 container_name: self.model().name.clone(),
                 container_type: "model",
             })
@@ -173,7 +182,7 @@ impl Fields {
         self.model.upgrade().unwrap()
     }
 
-    pub fn find_from_relation_fields(&self, name: &str) -> crate::Result<Arc<RelationField>> {
+    pub fn find_from_relation_fields(&self, name: &str) -> crate::Result<RelationFieldRef> {
         self.relation_weak()
             .iter()
             .map(|field| field.upgrade().unwrap())
@@ -184,7 +193,7 @@ impl Fields {
             })
     }
 
-    pub fn find_from_relation(&self, name: &str, side: RelationSide) -> crate::Result<Arc<RelationField>> {
+    pub fn find_from_relation(&self, name: &str, side: RelationSide) -> crate::Result<RelationFieldRef> {
         self.relation_weak()
             .iter()
             .map(|field| field.upgrade().unwrap())
@@ -203,9 +212,17 @@ impl Fields {
         acc
     }
 
-    fn relation_filter(mut acc: Vec<Weak<RelationField>>, field: &Field) -> Vec<Weak<RelationField>> {
+    fn relation_filter(mut acc: Vec<RelationFieldWeak>, field: &Field) -> Vec<RelationFieldWeak> {
         if let Field::Relation(relation_field) = field {
             acc.push(Arc::downgrade(relation_field));
+        };
+
+        acc
+    }
+
+    fn composite_filter(mut acc: Vec<CompositeFieldWeak>, field: &Field) -> Vec<CompositeFieldWeak> {
+        if let Field::Composite(composite_field) = field {
+            acc.push(Arc::downgrade(composite_field));
         };
 
         acc

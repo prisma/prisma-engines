@@ -31,7 +31,7 @@ mod prisma_8389 {
             &["data", "findManyTestModel"]
         );
 
-        assert_eq!(res.is_array(), true);
+        assert!(res.is_array());
 
         let res = res.as_array().unwrap();
 

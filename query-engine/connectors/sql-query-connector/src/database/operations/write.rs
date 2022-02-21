@@ -80,7 +80,7 @@ pub async fn create_record(
         Some(ref pk) if *sql_family == SqlFamily::Mysql => {
             for (field, value) in pk.pairs.iter() {
                 let field = DatasourceFieldName(field.db_name().into());
-                let value = WriteExpression::from(value.clone());
+                let value = WriteOperation::scalar_set(value.clone());
                 args.insert(field, value)
             }
             args

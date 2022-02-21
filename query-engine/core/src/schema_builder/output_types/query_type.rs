@@ -1,4 +1,5 @@
 use super::*;
+use input_types::fields::arguments;
 
 /// Builds the root `Query` type.
 #[tracing::instrument(name = "build_query_type", skip(ctx))]
@@ -42,7 +43,7 @@ fn find_unique_field(ctx: &mut BuilderContext, model: &ModelRef) -> Option<Outpu
         field(
             field_name,
             vec![arg],
-            OutputType::object(output_objects::map_model_object_type(ctx, &model)),
+            OutputType::object(objects::model::map_type(ctx, &model)),
             Some(QueryInfo {
                 model: Some(Arc::clone(&model)),
                 tag: QueryTag::FindUnique,
@@ -60,7 +61,7 @@ fn find_first_field(ctx: &mut BuilderContext, model: &ModelRef) -> OutputField {
     field(
         field_name,
         args,
-        OutputType::object(output_objects::map_model_object_type(ctx, &model)),
+        OutputType::object(objects::model::map_type(ctx, &model)),
         Some(QueryInfo {
             model: Some(Arc::clone(&model)),
             tag: QueryTag::FindFirst,
@@ -73,7 +74,7 @@ fn find_first_field(ctx: &mut BuilderContext, model: &ModelRef) -> OutputField {
 fn all_items_field(ctx: &mut BuilderContext, model: &ModelRef) -> OutputField {
     let args = arguments::many_records_arguments(ctx, &model, true);
     let field_name = ctx.pluralize_internal(camel_case(pluralize(&model.name)), format!("findMany{}", model.name));
-    let object_type = output_objects::map_model_object_type(ctx, &model);
+    let object_type = objects::model::map_type(ctx, &model);
 
     field(
         field_name,
