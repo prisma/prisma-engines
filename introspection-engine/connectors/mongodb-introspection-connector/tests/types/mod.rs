@@ -395,6 +395,31 @@ fn array() {
 }
 
 #[test]
+fn deep_array() {
+    let res = introspect(|db| async move {
+        db.create_collection("A", None).await?;
+        let collection = db.collection("A");
+
+        let docs = vec![doc! {
+            "first": Bson::Array(vec![Bson::Array(vec![Bson::Int32(1)])]),
+        }];
+
+        collection.insert_many(docs, None).await.unwrap();
+
+        Ok(())
+    });
+
+    let expected = expect![[r#"
+        model A {
+          id    String @id @default(auto()) @map("_id") @db.ObjectId
+          first Json
+        }
+    "#]];
+
+    expected.assert_eq(res.datamodel());
+}
+
+#[test]
 fn empty_arrays() {
     let res = introspect(|db| async move {
         db.create_collection("A", None).await?;

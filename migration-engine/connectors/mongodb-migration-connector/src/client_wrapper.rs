@@ -2,8 +2,8 @@ use datamodel::common::preview_features::PreviewFeature;
 use enumflags2::BitFlags;
 use migration_connector::{ConnectorError, ConnectorResult};
 use mongodb::{error::Error as MongoError, options::WriteConcern};
+use mongodb_client::MongoConnectionString;
 use mongodb_schema_describer::MongoSchema;
-use url::Url;
 
 /// Abstraction over a mongodb connection (exposed for tests).
 pub struct Client {
@@ -14,16 +14,18 @@ pub struct Client {
 
 impl Client {
     pub async fn connect(connection_str: &str, preview_features: BitFlags<PreviewFeature>) -> ConnectorResult<Client> {
-        let url = Url::parse(connection_str).map_err(ConnectorError::url_parse_error)?;
-        let db_name = url.path().trim_start_matches('/').to_string();
+        let MongoConnectionString { database, .. } = connection_str.parse().map_err(ConnectorError::url_parse_error)?;
 
         let inner = mongodb_client::create(connection_str)
             .await
-            .map_err(mongo_error_to_connector_error)?;
+            .map_err(|e| match &e.kind {
+                mongodb_client::ErrorKind::InvalidArgument { .. } => ConnectorError::url_parse_error(e),
+                mongodb_client::ErrorKind::Other(e) => mongo_error_to_connector_error(e.clone()),
+            })?;
 
         Ok(Client {
             inner,
-            db_name,
+            db_name: database,
             preview_features,
         })
     }
