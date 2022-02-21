@@ -2889,6 +2889,7 @@ dependencies = [
  "im",
  "indexmap",
  "itertools",
+ "mongodb-client",
  "mongodb-query-connector",
  "once_cell",
  "petgraph 0.4.13",
