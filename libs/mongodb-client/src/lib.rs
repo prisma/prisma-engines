@@ -5,7 +5,6 @@ pub use error::*;
 use std::str::FromStr;
 
 use mongodb::{
-    error::Result,
     options::{ClientOptions, DriverInfo, ResolverConfig},
     Client,
 };
@@ -13,7 +12,7 @@ use mongodb::{
 /// A wrapper to create a new MongoDB client. Please remove me when we do not
 /// need special setup anymore for this.
 pub async fn create(connection_string: impl AsRef<str>) -> Result<Client, Error> {
-    let options = if cfg!(target_os = "windows") {
+    let mut options = if cfg!(target_os = "windows") {
         ClientOptions::parse_with_resolver_config(connection_string, ResolverConfig::cloudflare()).await?
     } else {
         ClientOptions::parse(connection_string).await?
@@ -24,7 +23,7 @@ pub async fn create(connection_string: impl AsRef<str>) -> Result<Client, Error>
     Ok(Client::with_options(options)?)
 }
 
-/// The parts we need taken from `mongodb` private functions. Please remove me
+/// The parts we need taken from `mongodb` private functions. Please remove everything after me
 /// when they make these apis public.
 pub struct MongoConnectionString {
     pub user: Option<String>,

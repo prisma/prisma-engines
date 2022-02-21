@@ -1,3 +1,5 @@
+//! Remove this module when mongo opens up their connection string parsing.
+
 use thiserror::Error;
 
 #[derive(Error, Debug, Clone)]
