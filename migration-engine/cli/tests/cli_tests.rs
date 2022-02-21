@@ -1,10 +1,22 @@
 use connection_string::JdbcString;
-use migration_core::json_rpc::types::{DbExecuteDatasourceType, DbExecuteParams, UrlContainer};
 use std::process::{Command, Output};
 use test_macros::test_connector;
-use test_setup::{runtime::run_with_thread_local_runtime as tok, BitFlags, Tags, TestApiArgs};
+use test_setup::{BitFlags, Tags, TestApiArgs};
 use url::Url;
 use user_facing_errors::{common::DatabaseDoesNotExist, UserFacingError};
+
+fn migration_engine_bin_path() -> &'static str {
+    env!("CARGO_BIN_EXE_migration-engine")
+}
+
+fn run(args: &[&str]) -> Output {
+    Command::new(migration_engine_bin_path())
+        .arg("cli")
+        .args(args)
+        .env("RUST_LOG", "INFO")
+        .output()
+        .unwrap()
+}
 
 struct TestApi {
     args: TestApiArgs,
@@ -17,13 +29,14 @@ impl TestApi {
 
     fn connection_string(&self) -> String {
         let args = &self.args;
+        let rt = test_setup::runtime::test_tokio_runtime();
 
         if args.tags().contains(Tags::Postgres) {
-            tok(args.create_postgres_database()).2
+            rt.block_on(args.create_postgres_database()).2
         } else if args.tags().contains(Tags::Mysql) {
-            tok(args.create_mysql_database()).1
+            rt.block_on(args.create_mysql_database()).1
         } else if args.tags().contains(Tags::Mssql) {
-            tok(args.create_mssql_database()).1
+            rt.block_on(args.create_mssql_database()).1
         } else if args.tags().contains(Tags::Sqlite) {
             args.database_url().to_owned()
         } else {
@@ -32,16 +45,7 @@ impl TestApi {
     }
 
     fn run(&self, args: &[&str]) -> Output {
-        Command::new(self.migration_engine_bin_path())
-            .arg("cli")
-            .args(args)
-            .env("RUST_LOG", "INFO")
-            .output()
-            .unwrap()
-    }
-
-    fn migration_engine_bin_path(&self) -> &'static str {
-        env!("CARGO_BIN_EXE_migration-engine")
+        run(args)
     }
 }
 
@@ -124,9 +128,10 @@ fn test_connecting_with_a_working_mssql_connection_string(api: TestApi) {
 fn test_create_database(api: TestApi) {
     let connection_string = api.connection_string();
     let output = api.run(&["--datasource", &connection_string, "drop-database"]);
-    assert!(output.status.success());
+    assert!(output.status.success(), "{:#?}", output);
 
     let output = api.run(&["--datasource", &connection_string, "create-database"]);
+    dbg!(&output);
     assert!(output.status.success());
     let stderr = String::from_utf8_lossy(&output.stderr);
     assert!(stderr.contains("Database 'test_create_database\' was successfully created."));
@@ -194,11 +199,11 @@ fn test_drop_sqlite_database(api: TestApi) {
 #[test_connector(tags(Postgres, Mysql))]
 fn test_drop_database(api: TestApi) {
     let connection_string = api.connection_string();
-    let output = api.run(&["--datasource", &connection_string, "drop-database"]);
-    println!("{}", String::from_utf8_lossy(&output.stderr));
-    assert!(output.status.success());
+    drop(api);
+    let output = run(&["--datasource", &connection_string, "drop-database"]);
+    assert!(output.status.success(), "{:#?}", output);
 
-    let output = api.run(&["--datasource", &connection_string, "can-connect-to-database"]);
+    let output = run(&["--datasource", &connection_string, "can-connect-to-database"]);
     assert_eq!(output.status.code(), Some(1));
 
     let stderr = String::from_utf8_lossy(&output.stderr);
@@ -271,7 +276,7 @@ fn tls_errors_must_be_mapped_in_the_cli(api: TestApi) {
 }
 
 #[test_connector(tags(Postgres))]
-fn basic_jsonrpc_roundtrip_works(api: TestApi) {
+fn basic_jsonrpc_roundtrip_works(_api: TestApi) {
     use std::io::{BufRead, BufReader, Write as _};
     let tmpdir = tempfile::tempdir().unwrap();
     let tmpfile = tmpdir.path().join("datamodel");
@@ -283,7 +288,7 @@ fn basic_jsonrpc_roundtrip_works(api: TestApi) {
     "#;
     std::fs::create_dir_all(&tmpdir).unwrap();
     std::fs::write(&tmpfile, datamodel).unwrap();
-    let mut process = Command::new(api.migration_engine_bin_path())
+    let mut process = Command::new(migration_engine_bin_path())
         .arg("--datamodel")
         .arg(&tmpfile)
         .env("RUST_LOG", "INFO")

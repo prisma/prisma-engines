@@ -201,7 +201,8 @@ fn migrations_should_not_reapply_modified_migrations(api: TestApi) {
         .write(true)
         .open(initial_path)
         .unwrap();
-    file.write_all(b"/* this is just a harmless comment */\n").unwrap();
+    file.write_all(b"-- this is just a harmless comment\nSELECT 1;")
+        .unwrap();
 
     let dm2 = api.datamodel_with_provider(
         r#"

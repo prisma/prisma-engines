@@ -121,7 +121,7 @@ fn schema_to_connector_unchecked(schema: &str) -> CoreResult<Box<dyn migration_c
 
     let mut connector = connector_for_provider(source.active_provider.as_str())?;
 
-    if let Some(connection_string) = source.load_url(|key| env::var(key).ok()).ok() {
+    if let Ok(connection_string) = source.load_url(|key| env::var(key).ok()) {
         connector.set_params(ConnectorParams {
             connection_string,
             preview_features,

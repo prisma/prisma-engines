@@ -350,7 +350,7 @@ fn dev_diagnostic_can_detect_edited_migrations(api: TestApi) {
         .append(true)
         .open(initial_path)
         .unwrap();
-    file.write_all(b"/* test */").unwrap();
+    file.write_all(b"-- test\nSELECT 1;").unwrap();
 
     let DevDiagnosticOutput { action } = api.dev_diagnostic(&directory).send().into_output();
 
