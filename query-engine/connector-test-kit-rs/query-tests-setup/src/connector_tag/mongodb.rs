@@ -21,6 +21,10 @@ impl ConnectorTagInterface for MongoDbConnectorTag {
 
     fn connection_string(&self, database: &str, is_ci: bool) -> String {
         match self.version {
+            Some(MongoDbVersion::V4_0) if is_ci => format!(
+                "mongodb://prisma:prisma@test-db-mongodb-4-0:27015/{}?authSource=admin&retryWrites=true",
+                database
+            ),
             Some(MongoDbVersion::V4_2) if is_ci => format!(
                 "mongodb://prisma:prisma@test-db-mongodb-4-2:27016/{}?authSource=admin&retryWrites=true",
                 database
@@ -51,6 +55,10 @@ impl ConnectorTagInterface for MongoDbConnectorTag {
                     database
                 )
             }
+            Some(MongoDbVersion::V4_0) => format!(
+                "mongodb://prisma:prisma@127.0.0.1:27016/{}?authSource=admin&retryWrites=true",
+                database
+            ),
             None => unreachable!("A versioned connector must have a concrete version to run."),
         }
     }
@@ -75,6 +83,7 @@ impl ConnectorTagInterface for MongoDbConnectorTag {
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum MongoDbVersion {
+    V4_0,
     V4_2,
     V4_4,
     V5,
@@ -131,6 +140,7 @@ impl TryFrom<&str> for MongoDbVersion {
 
     fn try_from(s: &str) -> Result<Self, Self::Error> {
         let version = match s {
+            "4.0" => Self::V4_0,
             "4.4" => Self::V4_4,
             "4.2" => Self::V4_2,
             "5" => Self::V5,
@@ -144,6 +154,7 @@ impl TryFrom<&str> for MongoDbVersion {
 impl ToString for MongoDbVersion {
     fn to_string(&self) -> String {
         match self {
+            MongoDbVersion::V4_0 => "4.0",
             MongoDbVersion::V4_4 => "4.4",
             &MongoDbVersion::V4_2 => "4.2",
             MongoDbVersion::V5 => "5",

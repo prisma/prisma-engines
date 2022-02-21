@@ -142,13 +142,11 @@ start-mongodb42-single:
 start-mongodb44-single:
 	docker-compose -f docker-compose.yml up -d --remove-orphans mongo44-single
 
-start-mongodb4-single: start-mongodb44-single
-
 start-mongodb5-single:
 	docker-compose -f docker-compose.yml up -d --remove-orphans mongo5-single
 
 start-mongodb_4_2:
-	docker-compose -f docker-compose.yml up -d --remove-orphans mongo42
+	docker-compose -f docker-compose.yml up -d --remove-orphans mongo40
 
 start-mongodb_4_4:
 	docker-compose -f docker-compose.yml up -d --remove-orphans mongo44
