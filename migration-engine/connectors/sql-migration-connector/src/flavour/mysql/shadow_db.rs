@@ -2,7 +2,7 @@ use crate::flavour::*;
 use migration_connector::{migrations_directory::MigrationDirectory, ConnectorResult};
 use sql_schema_describer::SqlSchema;
 
-pub(super) async fn do_the_thing(
+pub(super) async fn sql_schema_from_migrations_history(
     migrations: &[MigrationDirectory],
     mut shadow_db: MysqlFlavour,
 ) -> ConnectorResult<SqlSchema> {

@@ -77,7 +77,6 @@ impl ConnectorHost for EmptyHost {
 
 /// The top-level trait for connectors. This is the abstraction the migration engine core relies on to
 /// interface with different database backends.
-#[async_trait::async_trait]
 pub trait MigrationConnector: Send + Sync + 'static {
     // Setup methods
 
@@ -111,7 +110,7 @@ pub trait MigrationConnector: Send + Sync + 'static {
     fn create_database(&mut self) -> BoxFuture<'_, ConnectorResult<String>>;
 
     /// Send a command to the database directly.
-    async fn db_execute(&mut self, script: String) -> ConnectorResult<()>;
+    fn db_execute(&mut self, script: String) -> BoxFuture<'_, ConnectorResult<()>>;
 
     /// Create a migration by comparing two database schemas. See
     /// [DiffTarget](/enum.DiffTarget.html) for possible inputs.
@@ -126,7 +125,7 @@ pub trait MigrationConnector: Send + Sync + 'static {
     /// Make sure the connection to the database is established and valid.
     /// Connectors can choose to connect lazily, but this method should force
     /// them to connect.
-    async fn ensure_connection_validity(&mut self) -> ConnectorResult<()>;
+    fn ensure_connection_validity(&mut self) -> BoxFuture<'_, ConnectorResult<()>>;
 
     /// Return the ConnectorHost passed with set_host.
     fn host(&self) -> &Arc<dyn ConnectorHost>;
@@ -187,5 +186,8 @@ pub trait MigrationConnector: Send + Sync + 'static {
     ) -> BoxFuture<'a, ConnectorResult<DatabaseSchema>>;
 
     /// If possible, check that the passed in migrations apply cleanly.
-    async fn validate_migrations(&mut self, _migrations: &[MigrationDirectory]) -> ConnectorResult<()>;
+    fn validate_migrations<'a>(
+        &'a mut self,
+        _migrations: &'a [MigrationDirectory],
+    ) -> BoxFuture<'a, ConnectorResult<()>>;
 }

@@ -407,7 +407,7 @@ impl SqlFlavour for MssqlFlavour {
                     }
                 }
 
-                shadow_db::do_the_thing(migrations, shadow_database).await
+                shadow_db::sql_schema_from_migrations_history(migrations, shadow_database).await
             })
         } else {
             with_connection(&mut self.state, move |params, main_connection| async move {
@@ -455,7 +455,7 @@ impl SqlFlavour for MssqlFlavour {
                 // the shadow database, and only then return the result. This avoids
                 // leaving shadow databases behind in case of e.g. faulty
                 // migrations.
-                let ret = shadow_db::do_the_thing(migrations, shadow_database).await;
+                let ret = shadow_db::sql_schema_from_migrations_history(migrations, shadow_database).await;
                 clean_up_shadow_database(&shadow_database_name, main_connection).await?;
                 ret
             })

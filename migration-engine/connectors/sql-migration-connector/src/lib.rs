@@ -160,8 +160,8 @@ impl MigrationConnector for SqlMigrationConnector {
         SqlDatabaseSchema::default().into()
     }
 
-    async fn ensure_connection_validity(&mut self) -> ConnectorResult<()> {
-        self.flavour.ensure_connection_validity().await
+    fn ensure_connection_validity(&mut self) -> BoxFuture<'_, ConnectorResult<()>> {
+        self.flavour.ensure_connection_validity()
     }
 
     fn host(&self) -> &Arc<dyn ConnectorHost> {
@@ -193,8 +193,8 @@ impl MigrationConnector for SqlMigrationConnector {
         })
     }
 
-    async fn db_execute(&mut self, script: String) -> ConnectorResult<()> {
-        self.flavour.raw_cmd(&script).await
+    fn db_execute(&mut self, script: String) -> BoxFuture<'_, ConnectorResult<()>> {
+        Box::pin(async move { self.flavour.raw_cmd(&script).await })
     }
 
     fn diff(&self, from: DatabaseSchema, to: DatabaseSchema) -> ConnectorResult<Migration> {
@@ -261,10 +261,14 @@ impl MigrationConnector for SqlMigrationConnector {
     }
 
     #[tracing::instrument(skip(self, migrations))]
-    async fn validate_migrations(&mut self, migrations: &[MigrationDirectory]) -> ConnectorResult<()> {
-        self.flavour.sql_schema_from_migration_history(migrations, None).await?;
-
-        Ok(())
+    fn validate_migrations<'a>(
+        &'a mut self,
+        migrations: &'a [MigrationDirectory],
+    ) -> BoxFuture<'a, ConnectorResult<()>> {
+        Box::pin(async move {
+            self.flavour.sql_schema_from_migration_history(migrations, None).await?;
+            Ok(())
+        })
     }
 }
 

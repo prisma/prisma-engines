@@ -395,7 +395,7 @@ impl SqlFlavour for MysqlFlavour {
                     crate::best_effort_reset(&mut shadow_database).await?;
                 }
 
-                shadow_db::do_the_thing(migrations, shadow_database).await
+                shadow_db::sql_schema_from_migrations_history(migrations, shadow_database).await
             }),
             None => {
                 with_connection(&mut self.state, move |params, _circumstances, conn| async move {
@@ -422,7 +422,7 @@ impl SqlFlavour for MysqlFlavour {
                     // We go through the whole process without early return, then clean up
                     // the shadow database, and only then return the result. This avoids
                     // leaving shadow databases behind in case of e.g. faulty migrations.
-                    let ret = shadow_db::do_the_thing(migrations, shadow_database).await;
+                    let ret = shadow_db::sql_schema_from_migrations_history(migrations, shadow_database).await;
 
                     let drop_database = format!("DROP DATABASE IF EXISTS `{}`", shadow_database_name);
                     conn.raw_cmd(&drop_database).await?;

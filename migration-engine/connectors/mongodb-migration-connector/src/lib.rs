@@ -15,10 +15,7 @@ use client_wrapper::Client;
 use datamodel::common::preview_features::PreviewFeature;
 use enumflags2::BitFlags;
 use migration::MongoDbMigration;
-use migration_connector::{
-    BoxFuture, ConnectorError, ConnectorHost, ConnectorParams, ConnectorResult, DatabaseSchema,
-    DestructiveChangeDiagnostics, DiffTarget, EmptyHost, Migration, MigrationConnector,
-};
+use migration_connector::{migrations_directory::MigrationDirectory, *};
 use mongodb_schema_describer::MongoSchema;
 use std::{future, sync::Arc};
 use tokio::sync::OnceCell;
@@ -66,7 +63,6 @@ impl MongoDbMigrationConnector {
     }
 }
 
-#[async_trait::async_trait]
 impl MigrationConnector for MongoDbMigrationConnector {
     fn connection_string(&self) -> Option<&str> {
         Some(&self.connection_string)
@@ -107,18 +103,18 @@ impl MigrationConnector for MongoDbMigrationConnector {
         })
     }
 
-    async fn db_execute(&mut self, _script: String) -> ConnectorResult<()> {
-        Err(ConnectorError::from_msg(
+    fn db_execute(&mut self, _script: String) -> BoxFuture<'_, ConnectorResult<()>> {
+        Box::pin(future::ready(Err(ConnectorError::from_msg(
             "dbExecute is not supported on MongoDB".to_owned(),
-        ))
+        ))))
     }
 
     fn empty_database_schema(&self) -> DatabaseSchema {
         DatabaseSchema::new(MongoSchema::default())
     }
 
-    async fn ensure_connection_validity(&mut self) -> ConnectorResult<()> {
-        Ok(())
+    fn ensure_connection_validity(&mut self) -> BoxFuture<'_, ConnectorResult<()>> {
+        Box::pin(future::ready(Ok(())))
     }
 
     fn version(&mut self) -> BoxFuture<'_, migration_connector::ConnectorResult<String>> {
@@ -183,11 +179,11 @@ impl MigrationConnector for MongoDbMigrationConnector {
         self.host = host;
     }
 
-    async fn validate_migrations(
-        &mut self,
-        _migrations: &[migration_connector::migrations_directory::MigrationDirectory],
-    ) -> migration_connector::ConnectorResult<()> {
-        Ok(())
+    fn validate_migrations<'a>(
+        &'a mut self,
+        _migrations: &'a [MigrationDirectory],
+    ) -> BoxFuture<'a, ConnectorResult<()>> {
+        Box::pin(future::ready(Ok(())))
     }
 }
 
