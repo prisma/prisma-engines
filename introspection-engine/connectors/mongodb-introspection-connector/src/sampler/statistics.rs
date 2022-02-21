@@ -195,12 +195,9 @@ impl<'a> Statistics<'a> {
 
             match FieldType::from_bson(val, compound_name) {
                 // We cannot have arrays of arrays, so multi-dimensional arrays
-                // are introspected as `Json[]`.
-                Some(_) if found_composite && array_layers > 1 => {
-                    let counter = sampler
-                        .types
-                        .entry(FieldType::Array(Box::new(FieldType::Json)))
-                        .or_default();
+                // are introspected as `Json`.
+                Some(_) if array_layers > 1 => {
+                    let counter = sampler.types.entry(FieldType::Json).or_default();
                     *counter += 1;
                 }
                 // Counting the types.
