@@ -200,13 +200,6 @@
 <span id="199">199</span>
 <span id="200">200</span>
 <span id="201">201</span>
-<span id="202">202</span>
-<span id="203">203</span>
-<span id="204">204</span>
-<span id="205">205</span>
-<span id="206">206</span>
-<span id="207">207</span>
-<span id="208">208</span>
 </pre><pre class="rust"><code><span class="doccomment">//! See [ValueValidator](./struct.ValueValidator.html).</span>
 
 <span class="kw">use</span> <span class="kw">crate</span>::{
@@ -336,10 +329,7 @@
                 <span class="prelude-val">Some</span>((<span class="string">&quot;Asc&quot;</span>, <span class="kw">_</span>)) =&gt; <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">SortOrder::Asc</span>)),
                 <span class="prelude-val">Some</span>((<span class="string">&quot;Desc&quot;</span>, <span class="kw">_</span>)) =&gt; <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">SortOrder::Desc</span>)),
                 <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>),
-                <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">DatamodelError::ParserError</span> {
-                    <span class="ident">expected_str</span>: <span class="string">&quot;Asc, Desc&quot;</span>.<span class="ident">to_owned</span>(),
-                    <span class="ident">span</span>: <span class="ident">arg</span>.<span class="ident">span</span>,
-                }),
+                <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">DatamodelError::new_parser_error</span>(<span class="string">&quot;Asc, Desc&quot;</span>.<span class="ident">to_owned</span>(), <span class="ident">arg</span>.<span class="ident">span</span>)),
             })
             .<span class="ident">transpose</span>()<span class="question-mark">?</span>
             .<span class="ident">flatten</span>();
@@ -348,14 +338,10 @@
             .<span class="ident">iter</span>()
             .<span class="ident">find</span>(<span class="op">|</span><span class="ident">arg</span><span class="op">|</span> <span class="ident">arg</span>.<span class="ident">name</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">n</span><span class="op">|</span> <span class="ident">n</span>.<span class="ident">name</span>.<span class="ident">as_str</span>()) <span class="op">==</span> <span class="prelude-val">Some</span>(<span class="string">&quot;length&quot;</span>))
             .<span class="ident">map</span>(<span class="op">|</span><span class="ident">arg</span><span class="op">|</span> <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">arg</span>.<span class="ident">value</span> {
-                <span class="ident">Expression::NumericValue</span>(<span class="ident">s</span>, <span class="kw">_</span>) =&gt; <span class="ident">s</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>().<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">DatamodelError::ParserError</span> {
-                    <span class="ident">expected_str</span>: <span class="string">&quot;valid integer&quot;</span>.<span class="ident">to_string</span>(),
-                    <span class="ident">span</span>: <span class="ident">arg</span>.<span class="ident">span</span>,
-                }),
-                <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">DatamodelError::ParserError</span> {
-                    <span class="ident">expected_str</span>: <span class="string">&quot;valid integer&quot;</span>.<span class="ident">to_string</span>(),
-                    <span class="ident">span</span>: <span class="ident">arg</span>.<span class="ident">span</span>,
-                }),
+                <span class="ident">Expression::NumericValue</span>(<span class="ident">s</span>, <span class="kw">_</span>) =&gt; <span class="ident">s</span>
+                    .<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>()
+                    .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">DatamodelError::new_parser_error</span>(<span class="string">&quot;valid integer&quot;</span>.<span class="ident">to_owned</span>(), <span class="ident">arg</span>.<span class="ident">span</span>)),
+                <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">DatamodelError::new_parser_error</span>(<span class="string">&quot;valid integer&quot;</span>.<span class="ident">to_owned</span>(), <span class="ident">arg</span>.<span class="ident">span</span>)),
             })
             .<span class="ident">transpose</span>()<span class="question-mark">?</span>;
 
@@ -373,11 +359,11 @@
             <span class="ident">s</span> =&gt; {
                 <span class="kw">let</span> <span class="ident">message</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;Invalid referential action: `{}`&quot;</span>, <span class="ident">s</span>);
 
-                <span class="prelude-val">Err</span>(<span class="ident">DatamodelError::AttributeValidationError</span> {
-                    <span class="ident">message</span>,
-                    <span class="ident">attribute_name</span>: <span class="ident">String::from</span>(<span class="string">&quot;relation&quot;</span>),
-                    <span class="ident">span</span>: <span class="self">self</span>.<span class="ident">span</span>(),
-                })
+                <span class="prelude-val">Err</span>(<span class="ident">DatamodelError::new_attribute_validation_error</span>(
+                    <span class="kw-2">&amp;</span><span class="ident">message</span>,
+                    <span class="string">&quot;relation&quot;</span>,
+                    <span class="self">self</span>.<span class="ident">span</span>(),
+                ))
             }
         }
     }

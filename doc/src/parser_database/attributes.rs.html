@@ -923,10 +923,6 @@
 <span id="922">922</span>
 <span id="923">923</span>
 <span id="924">924</span>
-<span id="925">925</span>
-<span id="926">926</span>
-<span id="927">927</span>
-<span id="928">928</span>
 </pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">default</span>;
 <span class="kw">mod</span> <span class="ident">id</span>;
 <span class="kw">mod</span> <span class="ident">map</span>;
@@ -1513,11 +1509,7 @@
                         <span class="ident">unresolvable_fields</span>.<span class="ident">join</span>(<span class="string">&quot;, &quot;</span>),
                     );
                     <span class="kw">let</span> <span class="ident">model_name</span> <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">ast</span>[<span class="ident">model_id</span>].<span class="ident">name</span>();
-                    <span class="ident">DatamodelError::ModelValidationError</span> {
-                        <span class="ident">message</span>: <span class="ident">String::from</span>(<span class="ident">message</span>),
-                        <span class="ident">model_name</span>: <span class="ident">String::from</span>(<span class="ident">model_name</span>),
-                        <span class="ident">span</span>: <span class="ident">current_attribute</span>.<span class="ident">span</span>,
-                    }
+                    <span class="ident">DatamodelError::new_model_validation_error</span>(<span class="ident">message</span>, <span class="ident">model_name</span>, <span class="ident">current_attribute</span>.<span class="ident">span</span>)
                 });
             }
 

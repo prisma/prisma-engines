@@ -287,10 +287,6 @@
 <span id="286">286</span>
 <span id="287">287</span>
 <span id="288">288</span>
-<span id="289">289</span>
-<span id="290">290</span>
-<span id="291">291</span>
-<span id="292">292</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::{
     <span class="ident"><span class="kw">super</span>::helpers</span>::{<span class="ident">ValueListValidator</span>, <span class="ident">ValueValidator</span>},
     <span class="ident">builtin_datasource_providers</span>::{
@@ -429,10 +425,6 @@
                     <span class="prelude-val">Ok</span>(<span class="ident">shadow_database_url</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">shadow_database_url</span>)
                         .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="op">!</span><span class="ident">s</span>.<span class="ident">as_literal</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">lit</span><span class="op">|</span> <span class="ident">lit</span>.<span class="ident">is_empty</span>()).<span class="ident">unwrap_or</span>(<span class="bool-val">false</span>))
                         .<span class="ident">map</span>(<span class="op">|</span><span class="ident">url</span><span class="op">|</span> (<span class="ident">url</span>, <span class="ident">shadow_database_url_arg</span>.<span class="ident">span</span>())),
-
-                    <span class="comment">// We intentionally ignore the shadow database URL if it is defined in an env var that is missing.</span>
-                    <span class="prelude-val">Err</span>(<span class="ident">DatamodelError::EnvironmentFunctionalEvaluationError</span> { .. }) =&gt; <span class="prelude-val">None</span>,
-
                     <span class="prelude-val">Err</span>(<span class="ident">err</span>) =&gt; {
                         <span class="ident">diagnostics</span>.<span class="ident">push_error</span>(<span class="ident">err</span>);
                         <span class="prelude-val">None</span>
