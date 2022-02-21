@@ -111,16 +111,25 @@ fn schema_to_connector_unchecked(schema: &str) -> CoreResult<Box<dyn migration_c
     let config = datamodel::parse_configuration(schema)
         .map(|validated_config| validated_config.subject)
         .map_err(|err| CoreError::new_schema_parser_error(err.to_pretty_string("schema.prisma", schema)))?;
-    // TODO: it would make sense to gather preview features here
-    // let preview_features = config.preview_features();
 
+    let preview_features = config.preview_features();
     let source = config
         .datasources
         .into_iter()
         .next()
         .ok_or_else(|| CoreError::from_msg("There is no datasource in the schema.".into()))?;
 
-    connector_for_provider(source.active_provider.as_str())
+    let mut connector = connector_for_provider(source.active_provider.as_str())?;
+
+    if let Some(connection_string) = source.load_url(|key| env::var(key).ok()).ok() {
+        connector.set_params(ConnectorParams {
+            connection_string,
+            preview_features,
+            shadow_database_connection_string: source.load_shadow_database_url().ok().flatten(),
+        })?;
+    }
+
+    Ok(connector)
 }
 
 /// Go from a schema to a connector
