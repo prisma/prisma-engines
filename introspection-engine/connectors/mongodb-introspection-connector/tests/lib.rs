@@ -6,4 +6,5 @@ mod errors;
 mod index;
 mod model_renames;
 mod remapping_names;
+mod rpc;
 mod types;
