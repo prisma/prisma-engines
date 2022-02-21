@@ -7,3 +7,8 @@ edition = "2021"
 
 [dependencies]
 mongodb = "2.1.0"
+
+# Remove these when mongo opens up their connection string parsing
+percent-encoding = "2.0.0"
+thiserror = "1"
+once_cell = "1"

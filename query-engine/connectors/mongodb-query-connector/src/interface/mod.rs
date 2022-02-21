@@ -13,7 +13,6 @@ use datamodel::Datasource;
 use futures::Future;
 use mongodb::Client;
 use prisma_models::prelude::*;
-use url::Url;
 
 use crate::error::MongoError;
 
@@ -28,19 +27,22 @@ pub struct MongoDb {
 
 impl MongoDb {
     pub async fn new(_source: &Datasource, url: &str) -> connector_interface::Result<Self> {
-        let database_str = url;
-        let url = Url::parse(database_str).map_err(|_err| {
-            ConnectorError::from_kind(ErrorKind::InvalidDatabaseUrl {
-                details: "Unable to parse URL.".to_owned(),
-                url: url.to_owned(),
-            })
+        let client = mongodb_client::create(&url).await.map_err(|err| {
+            let kind = match err.kind {
+                mongodb_client::ErrorKind::InvalidArgument { .. } => ErrorKind::InvalidDatabaseUrl {
+                    details: "Unable to parse URL.".to_owned(),
+                    url: url.to_owned(),
+                },
+                mongodb_client::ErrorKind::Other(err) => ErrorKind::ConnectionError(err.into()),
+            };
+
+            ConnectorError::from_kind(kind)
         })?;
 
-        let database = url.path().trim_start_matches('/').to_string();
-
-        let client = mongodb_client::create(&url)
-            .await
-            .map_err(|err| ConnectorError::from_kind(ErrorKind::ConnectionError(err.into())))?;
+        let database = client
+            .default_database()
+            .map(|d| d.name().to_owned())
+            .unwrap_or_default();
 
         Ok(Self { client, database })
     }

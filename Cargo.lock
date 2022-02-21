@@ -1905,6 +1905,9 @@ name = "mongodb-client"
 version = "0.1.0"
 dependencies = [
  "mongodb",
+ "once_cell",
+ "percent-encoding",
+ "thiserror",
 ]
 
 [[package]]
@@ -1994,7 +1997,6 @@ dependencies = [
  "tokio",
  "tracing",
  "tracing-futures",
- "url",
  "user-facing-errors",
  "uuid",
 ]
