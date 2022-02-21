@@ -3,7 +3,7 @@ use super::*;
 use crate::constants::json_null;
 use constants::{aggregations, filters};
 use datamodel_connector::ConnectorCapability;
-use prisma_models::{dml::DefaultValue, PrismaValue};
+use prisma_models::{dml::DefaultValue, CompositeFieldRef, PrismaValue};
 
 /// Builds filter types for the given model field.
 #[tracing::instrument(skip(ctx, field, include_aggregates))]
@@ -24,9 +24,15 @@ pub(crate) fn get_field_filter_types(
             ]
         }
 
-        ModelField::Composite(cf) if cf.is_list() => vec![InputType::int()],
+        ModelField::Composite(cf) if cf.is_list() => vec![
+            InputType::object(to_many_composite_filter_object(ctx, cf)),
+            InputType::list(to_one_composite_filter_shorthand_types(ctx, cf)),
+        ],
 
-        ModelField::Composite(_cf) => vec![InputType::int()], // [Composites] todo
+        ModelField::Composite(cf) => vec![
+            InputType::object(to_one_composite_filter_object(ctx, cf)),
+            to_one_composite_filter_shorthand_types(ctx, cf),
+        ],
 
         ModelField::Scalar(sf) if field.is_list() => vec![InputType::object(scalar_list_filter_type(ctx, sf))],
 
@@ -50,7 +56,6 @@ pub(crate) fn get_field_filter_types(
 }
 
 /// Builds shorthand relation equality (`is`) filter for to-one: `where: { relation_field: { ... } }` (no `is` in between).
-/// If the field is also not required, null is also added as possible type.
 #[tracing::instrument(skip(ctx, rf))]
 fn to_one_relation_filter_shorthand_types(ctx: &mut BuilderContext, rf: &RelationFieldRef) -> InputType {
     let related_model = rf.related_model();
@@ -101,6 +106,67 @@ fn to_one_relation_filter_object(ctx: &mut BuilderContext, rf: &RelationFieldRef
         input_field(filters::IS_NOT, InputType::object(related_input_type), None)
             .optional()
             .nullable_if(!rf.is_required()),
+    ];
+
+    object.set_fields(fields);
+    Arc::downgrade(&object)
+}
+
+/// Builds shorthand composite equality (`equals`) filter for to-one: `where: { composite_field: { ... } }` (no `equals` in between).
+fn to_one_composite_filter_shorthand_types(ctx: &mut BuilderContext, cf: &CompositeFieldRef) -> InputType {
+    let equality_object_type = filter_objects::composite_equality_object(ctx, cf);
+
+    InputType::object(equality_object_type)
+}
+
+#[tracing::instrument(skip(ctx, cf))]
+fn to_one_composite_filter_object(ctx: &mut BuilderContext, cf: &CompositeFieldRef) -> InputObjectTypeWeakRef {
+    let ident = Identifier::new(format!("{}CompositeFilter", capitalize(&cf.typ.name)), PRISMA_NAMESPACE);
+    return_cached_input!(ctx, &ident);
+
+    let object = Arc::new(init_input_object_type(ident.clone()));
+    ctx.cache_input_type(ident, object.clone());
+
+    let composite_where_object = filter_objects::where_object_type(ctx, &cf.typ);
+    let composite_equals_object = filter_objects::composite_equality_object(ctx, cf);
+
+    let fields = vec![
+        input_field(filters::EQUALS, InputType::object(composite_equals_object), None)
+            .optional()
+            .nullable_if(!cf.is_required()),
+        input_field(filters::IS, InputType::object(composite_where_object.clone()), None)
+            .optional()
+            .nullable_if(!cf.is_required()),
+        input_field(filters::IS_NOT, InputType::object(composite_where_object), None)
+            .optional()
+            .nullable_if(!cf.is_required()),
+    ];
+
+    object.set_fields(fields);
+    Arc::downgrade(&object)
+}
+
+#[tracing::instrument(skip(ctx, cf))]
+fn to_many_composite_filter_object(ctx: &mut BuilderContext, cf: &CompositeFieldRef) -> InputObjectTypeWeakRef {
+    let ident = Identifier::new(format!("{}CompositeFilter", capitalize(&cf.typ.name)), PRISMA_NAMESPACE);
+    return_cached_input!(ctx, &ident);
+
+    let object = Arc::new(init_input_object_type(ident.clone()));
+    ctx.cache_input_type(ident, object.clone());
+
+    let composite_where_object = filter_objects::where_object_type(ctx, &cf.typ);
+    let composite_equals_object = filter_objects::composite_equality_object(ctx, cf);
+
+    let fields = vec![
+        input_field(filters::EQUALS, InputType::object(composite_equals_object), None)
+            .optional()
+            .nullable_if(!cf.is_required()),
+        input_field(filters::IS, InputType::object(composite_where_object.clone()), None)
+            .optional()
+            .nullable_if(!cf.is_required()),
+        input_field(filters::IS_NOT, InputType::object(composite_where_object), None)
+            .optional()
+            .nullable_if(!cf.is_required()),
     ];
 
     object.set_fields(fields);
