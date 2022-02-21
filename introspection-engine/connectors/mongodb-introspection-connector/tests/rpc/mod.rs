@@ -28,7 +28,5 @@ fn mongo_database_version() {
         Ok(())
     });
 
-    let expected = expect![[r#"4.4.12.0"#]];
-
-    expected.assert_eq(&res);
+    assert!(res.contains("4.4.") || res.contains("5.0") || res.contains("4.2"))
 }
