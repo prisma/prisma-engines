@@ -327,7 +327,7 @@ mod to_many {
         Ok(())
     }
 
-    /// Order a model based on many orderings, including composites.
+    /// Query with cursor: Order a model by multiple to-one composites.
     #[connector_test]
     async fn model_cursored_ordering_multiple(runner: Runner) -> TestResult<()> {
         create_test_data(&runner).await?;
@@ -370,36 +370,6 @@ mod to_many {
                 ]) { id }}"#),
             @r###"{"data":{"findManyTestModel":[{"id":4}]}}"###
         );
-
-        Ok(())
-    }
-
-    /// Query with cursor: Order a model by multiple to-one composites.
-    #[connector_test]
-    async fn multi_order_cursor(runner: Runner) -> TestResult<()> {
-        // create_multi_order_test_data(&runner).await?;
-
-        // insta::assert_snapshot!(
-        //     run_query!(runner, r#"
-        //     { findManyTestModel(
-        //         cursor: { id: 3 }
-        //         orderBy: [
-        //             { a: { a_1: asc } },
-        //             { a: { a_2: desc } }
-        //         ]) { id } }"#),
-        //     @r###"{"data":{"findManyTestModel":[{"id":3},{"id":4},{"id":5}]}}"###
-        // );
-
-        // insta::assert_snapshot!(
-        //     run_query!(runner, r#"
-        //     { findManyTestModel(
-        //         cursor: { id: 1 }
-        //         orderBy: [
-        //             { b: { b_field: asc } },
-        //             { a: { a_1: desc } }
-        //         ]) { id } }"#),
-        //     @r###"{"data":{"findManyTestModel":[{"id":1},{"id":3},{"id":2}]}}"###
-        // );
 
         Ok(())
     }
@@ -591,6 +561,56 @@ mod mixed {
         Ok(())
     }
 
+    /// Order a model based on composites over a relationm using a cursor.
+    #[connector_test(schema(over_to_one_relation))]
+    async fn cursored_composite_over_rel_ordering(runner: Runner) -> TestResult<()> {
+        over_to_one_relation_test_data(&runner).await?;
+
+        // Single orderBy ASC.
+        // - Cursor on 2
+        // Result is:
+        // - Null relations first: (6, 7) skipped .
+        // - Rows with data next ASC: (2, 1, 3, 4, 5)
+        insta::assert_snapshot!(
+            run_query!(runner, r#"{ findManyTestModel(cursor: { id: 2 }, orderBy: { to_one_rel: { to_one_a: { a_1: asc } } }) { id } }"#),
+            @r###"{"data":{"findManyTestModel":[{"id":2},{"id":1},{"id":3},{"id":4},{"id":5}]}}"###
+        );
+
+        // Single orderBy DESC.
+        // - cursor on 2
+        // Result is:
+        // - Rows with data first ASC: (1, 3, 4, 5, 2) skipped until 2 is hit.
+        // - Null relations next: (6, 7)
+        insta::assert_snapshot!(
+            run_query!(runner, r#"{ findManyTestModel(cursor: { id: 2 }, orderBy: { to_one_rel: { to_one_a: { a_1: desc } } }) { id } }"#),
+            @r###"{"data":{"findManyTestModel":[{"id":2},{"id":6},{"id":7}]}}"###
+        );
+
+        // Single orderBy over nullable ASC.
+        // - Cursor on 6
+        // Result is:
+        // - Null values first: (4, 5) skipped.
+        // - Null relations next: (6, 7)
+        // - Rows with data next ASC: (1, 2, 3)
+        insta::assert_snapshot!(
+            run_query!(runner, r#"{ findManyTestModel(cursor: { id: 6 }, orderBy: { to_one_rel: { to_one_a: { a_2: asc } } }) { id } }"#),
+            @r###"{"data":{"findManyTestModel":[{"id":6},{"id":7},{"id":1},{"id":2},{"id":3}]}}"###
+        );
+
+        // Single orderBy over nullable DESC.
+        // - Cursor on 6
+        // Result is:
+        // - Rows with data first DESC: (3, 2, 1) skipped.
+        // - Null relations next: (6, 7)
+        // - Null values next: (4, 5)
+        insta::assert_snapshot!(
+            run_query!(runner, r#"{ findManyTestModel(cursor: { id: 6 }, orderBy: { to_one_rel: { to_one_a: { a_2: desc } } }) { id } }"#),
+            @r###"{"data":{"findManyTestModel":[{"id":6},{"id":7}]}}"###
+        );
+
+        Ok(())
+    }
+
     /// Order a model based on composite aggregation over a relation.
     #[connector_test(schema(over_to_one_relation))]
     async fn composite_aggr_over_rel_ordering(runner: Runner) -> TestResult<()> {
@@ -749,6 +769,48 @@ mod mixed {
               }
             "#),
             @r###"{"data":{"findManyTestModel":[{"id":1,"to_many_rel":[{"id":3,"to_one_a":{"a_1":"2"}},{"id":1,"to_one_a":{"a_1":"1"}},{"id":2,"to_one_a":{"a_1":"1"}}]},{"id":2,"to_many_rel":[{"id":5,"to_one_a":{"a_1":"3"}},{"id":4,"to_one_a":{"a_1":"2"}},{"id":6,"to_one_a":{"a_1":"1"}}]},{"id":3,"to_many_rel":[]},{"id":4,"to_many_rel":[{"id":7,"to_one_a":null},{"id":8,"to_one_a":null}]}]}}"###
+        );
+
+        Ok(())
+    }
+
+    #[connector_test(schema(over_to_many_relation))]
+    // Order a related model on a to-one composite, cursor on one relation.
+    async fn cursored_order_related_by_to_one_composite(runner: Runner) -> TestResult<()> {
+        over_to_many_relation_test_data(&runner).await?;
+
+        insta::assert_snapshot!(
+            run_query!(runner, r#"
+              {
+                findManyTestModel {
+                  id
+                  to_many_rel(cursor: { id: 2 }, orderBy: { to_one_a: { a_1: asc } }) {
+                    id
+                    to_one_a {
+                      a_1
+                    }
+                  }
+                }
+              }
+            "#),
+            @r###"{"data":{"findManyTestModel":[{"id":1,"to_many_rel":[{"id":2,"to_one_a":{"a_1":"1"}},{"id":3,"to_one_a":{"a_1":"2"}}]},{"id":2,"to_many_rel":[]},{"id":3,"to_many_rel":[]},{"id":4,"to_many_rel":[]}]}}"###
+        );
+
+        insta::assert_snapshot!(
+            run_query!(runner, r#"
+              {
+                findManyTestModel {
+                  id
+                  to_many_rel(cursor: { id: 2 }, orderBy: { to_one_a: { a_1: desc } }) {
+                    id
+                    to_one_a {
+                      a_1
+                    }
+                  }
+                }
+              }
+            "#),
+            @r###"{"data":{"findManyTestModel":[{"id":1,"to_many_rel":[{"id":2,"to_one_a":{"a_1":"1"}}]},{"id":2,"to_many_rel":[]},{"id":3,"to_many_rel":[]},{"id":4,"to_many_rel":[]}]}}"###
         );
 
         Ok(())
