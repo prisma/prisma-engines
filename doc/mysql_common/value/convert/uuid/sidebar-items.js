@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["UuidIr","Intermediate result of a Value-to-Uuid conversion."]]});

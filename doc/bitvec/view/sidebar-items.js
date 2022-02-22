@@ -1,1 +1,1 @@
-initSidebarItems({"trait":[["AsBits","Views a region as an immutable bit-slice only."],["AsBitsMut","Views a region as a mutable bit-slice."],["BitView","Views a type that can store bits as a bit-slice."]]});
+initSidebarItems({"trait":[["AsBits","Views a region as an immutable `BitSlice` only."],["AsBitsMut","Views a region as a mutable `BitSlice`."],["BitView","Creates a `BitSlice` view over some type that supports it."],["BitViewSized","Helper for size awareness on `Sized` storage regions."]]});

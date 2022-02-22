@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;bitvec-0.19.6&#x2F;src&#x2F;access.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>access.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><script defer src="../../main.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;bitvec-0.22.3&#x2F;src&#x2F;access.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>access.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><script defer src="../../main.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script>
     <noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../bitvec/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
@@ -369,86 +369,64 @@
 <span id="368">368</span>
 <span id="369">369</span>
 <span id="370">370</span>
-<span id="371">371</span>
-<span id="372">372</span>
-<span id="373">373</span>
-<span id="374">374</span>
-<span id="375">375</span>
-<span id="376">376</span>
-<span id="377">377</span>
-<span id="378">378</span>
-<span id="379">379</span>
-<span id="380">380</span>
-<span id="381">381</span>
-<span id="382">382</span>
-<span id="383">383</span>
-<span id="384">384</span>
-<span id="385">385</span>
-<span id="386">386</span>
-<span id="387">387</span>
-</pre><pre class="rust"><code><span class="doccomment">/*! Memory access control.
+</pre><pre class="rust"><code><span class="doccomment">/*! Memory access guards.
 
-`bitvec` allows a program to produce handles over memory that do not logically
-alias, but may alias in hardware. This module provides a unified interface for
-memory accesses that can be specialized to handle aliased and unaliased access
-events.
+[`bitvec`] allows a program to produce handles over memory that do not logically
+alias their bits, but may alias in hardware. This module provides a unified
+interface for memory accesses that can be specialized to handle aliased and
+unaliased access events.
 
-The `BitAccess` trait provides capabilities to access bits in memory elements
+The [`BitAccess`] trait provides capabilities to access bits in memory elements
 through shared references, and its implementations are responsible for
 coördinating synchronization and contention as needed.
+
+The [`BitSafe`] trait abstracts over wrappers to the [`Cell`] and [atomic] types
+that forbid writing through their references, even when other references to the
+same location may write.
+
+[`BitAccess`]: crate::access::BitAccess
+[`BitSafe`]: crate::access::BitSafe
+[`Cell`]: core::cell::Cell
+[`bitvec`]: crate
 !*/</span>
+
+<span class="kw">use</span> <span class="ident">core::sync::atomic</span>;
+
+<span class="kw">use</span> <span class="ident">funty::IsInteger</span>;
+<span class="kw">use</span> <span class="ident">radium::Radium</span>;
 
 <span class="kw">use</span> <span class="kw">crate</span>::{
 	<span class="ident">index</span>::{
 		<span class="ident">BitIdx</span>,
 		<span class="ident">BitMask</span>,
-		<span class="ident">BitRegister</span>,
 	},
+	<span class="ident">mem::BitRegister</span>,
 	<span class="ident">order::BitOrder</span>,
 };
 
-<span class="kw">use</span> <span class="ident">core</span>::{
-	<span class="ident">fmt::Debug</span>,
-	<span class="ident">sync::atomic::Ordering</span>,
-};
+<span class="doccomment">/** Abstracts over the instructions used when accessing a memory location.
 
-<span class="kw">use</span> <span class="ident">radium::Radium</span>;
-
-<span class="doccomment">/** Access interface to memory locations.
-
-This trait abstracts over the specific instructions used to perform accesses to
-memory locations, so that use sites elsewhere in the crate can select their
-required behavior without changing the interface.
+This trait provides functions to manipulate bits in a referent memory register
+through the appropriate access instructions, so that use sites elsewhere in the
+crate can select their required behavior without changing their interface.
 
 This is automatically implemented for all types that permit shared/mutable
-memory access to register types through the `radium` crate. Its use is
-constrained in the `store` module.
+memory access to memory registers through the [`radium`] crate. Its use is
+constrained in the [`store`] module.
+
+This trait is only ever used by [`bitvec`] internals, and is never exposed
+outside the crate. It must be marked as public so that it can be used as an
+associated item in [`BitStore`], even though it is never made accessible.
+
+[`BitStore`]: crate::store::BitStore
+[`bitvec`]: crate
+[`radium`]: radium
+[`store`]: crate::store
 **/</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">BitAccess</span>: <span class="ident">Debug</span> <span class="op">+</span> <span class="ident">Radium</span> <span class="op">+</span> <span class="ident">Sized</span>
+<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">BitAccess</span>: <span class="ident">Radium</span>
 <span class="kw">where</span> <span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">Radium</span><span class="op">&gt;</span><span class="ident">::Item</span>: <span class="ident">BitRegister</span>
 {
-	<span class="doccomment">/// Sets one bit in a memory element to `0`.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// # Type Parameters</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// - `O`: A bit ordering.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// # Parameters</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// - `&amp;self`</span>
-	<span class="doccomment">/// - `index`: The semantic index of the bit in `*self` to be erased.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// # Effects</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// The memory element at `*self` has the bit corresponding to `index` set</span>
-	<span class="doccomment">/// to `0`, and all other bits are unchanged.</span>
-	<span class="attribute">#[<span class="ident">inline</span>]</span>
-	<span class="kw">fn</span> <span class="ident">clear_bit</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">index</span>: <span class="ident">BitIdx</span><span class="op">&lt;</span><span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">Radium</span><span class="op">&gt;</span><span class="ident">::Item</span><span class="op">&gt;</span>)
-	<span class="kw">where</span> <span class="ident">O</span>: <span class="ident">BitOrder</span> {
-		<span class="self">self</span>.<span class="ident">fetch_and</span>(<span class="op">!</span><span class="ident">index</span>.<span class="ident">select</span>::<span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>().<span class="ident">value</span>(), <span class="ident">Ordering::Relaxed</span>);
-	}
-
-	<span class="doccomment">/// Set any number of bits in a memory element to `0`.</span>
+	<span class="doccomment">/// Clears any number of bits in a memory register to `0`.</span>
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// The mask provided to this method must be constructed from indices that</span>
 	<span class="doccomment">/// are valid in the caller’s context. As the mask is already computed by</span>
@@ -457,88 +435,26 @@ constrained in the `store` module.
 	<span class="doccomment">/// # Parameters</span>
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// - `&amp;self`</span>
-	<span class="doccomment">/// - `mask`: A mask of any number of bits. This is a selection mask of bits</span>
-	<span class="doccomment">///   to modify.</span>
+	<span class="doccomment">/// - `mask`: A mask of any number of bits. This is a selection mask: all</span>
+	<span class="doccomment">///   bits in the mask that are set to `1` will be modified in the element</span>
+	<span class="doccomment">///   at `*self`.</span>
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// # Effects</span>
 	<span class="doccomment">///</span>
-	<span class="doccomment">/// All bits in `*self` that are selected (set to `1`) in `mask` will be set</span>
-	<span class="doccomment">/// to `0`, and all bits in `*self` that are not selected (set to `0`) in</span>
-	<span class="doccomment">/// `mask` will be unchanged.</span>
+	<span class="doccomment">/// All bits in `*self` that are selected (set to `1` in the `mask`) will be</span>
+	<span class="doccomment">/// cleared. All bits in `*self` that are not selected (cleared to `0` in</span>
+	<span class="doccomment">/// the `mask`) are unchanged.</span>
 	<span class="doccomment">///</span>
-	<span class="doccomment">/// Do not invert the mask prior to calling this function in order to save</span>
-	<span class="doccomment">/// the unselected bits and erase the selected bits. `BitMask` is a</span>
+	<span class="doccomment">/// Do not invert the `mask` prior to calling this function in order to save</span>
+	<span class="doccomment">/// the unselected bits and clear the selected bits. [`BitMask`] is a</span>
 	<span class="doccomment">/// selection type, not a bitwise-operation argument.</span>
-	<span class="attribute">#[<span class="ident">inline</span>]</span>
-	<span class="kw">fn</span> <span class="ident">clear_bits</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">mask</span>: <span class="ident">BitMask</span><span class="op">&lt;</span><span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">Radium</span><span class="op">&gt;</span><span class="ident">::Item</span><span class="op">&gt;</span>) {
-		<span class="self">self</span>.<span class="ident">fetch_and</span>(<span class="op">!</span><span class="ident">mask</span>.<span class="ident">value</span>(), <span class="ident">Ordering::Relaxed</span>);
+	<span class="doccomment">///</span>
+	<span class="doccomment">/// [`BitMask`]: crate::index::BitMask</span>
+	<span class="kw">fn</span> <span class="ident">clear_bits</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">mask</span>: <span class="ident">BitMask</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span>) {
+		<span class="self">self</span>.<span class="ident">fetch_and</span>(<span class="op">!</span><span class="ident">mask</span>.<span class="ident">into_inner</span>(), <span class="ident">atomic::Ordering::Relaxed</span>);
 	}
 
-	<span class="doccomment">/// Sets one bit in a memory element to `1`.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// # Type Parameters</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// - `O`: A bit ordering.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// # Parameters</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// - `&amp;self`</span>
-	<span class="doccomment">/// - `index`: The semantic index of the bit in `*self` to be written.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// # Effects</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// The memory element at `*self` has the bit corresponding to `index` set</span>
-	<span class="doccomment">/// to `1`, and all other bits are unchanged.</span>
-	<span class="attribute">#[<span class="ident">inline</span>]</span>
-	<span class="kw">fn</span> <span class="ident">set_bit</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">index</span>: <span class="ident">BitIdx</span><span class="op">&lt;</span><span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">Radium</span><span class="op">&gt;</span><span class="ident">::Item</span><span class="op">&gt;</span>)
-	<span class="kw">where</span> <span class="ident">O</span>: <span class="ident">BitOrder</span> {
-		<span class="self">self</span>.<span class="ident">fetch_or</span>(<span class="ident">index</span>.<span class="ident">select</span>::<span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>().<span class="ident">value</span>(), <span class="ident">Ordering::Relaxed</span>);
-	}
-
-	<span class="doccomment">/// Sets any number of bits in a memory element to `1`.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// The mask provided to this method must be constructed from indices that</span>
-	<span class="doccomment">/// are valid in the caller’s context. As the mask is already computed by</span>
-	<span class="doccomment">/// the caller, this does not need to take an ordering type parameter.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// # Parameters</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// - `&amp;self`</span>
-	<span class="doccomment">/// - `mask`: A mask of any number of bits. This is a selection mask of bits</span>
-	<span class="doccomment">///   to modify.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// # Effects</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// All bits in `*self` that are selected (set to `1`) in `mask` will be set</span>
-	<span class="doccomment">/// to `1`, and all bits in `*self` that are not selected (set to `0`) in</span>
-	<span class="doccomment">/// `mask` will be unchanged.</span>
-	<span class="attribute">#[<span class="ident">inline</span>]</span>
-	<span class="kw">fn</span> <span class="ident">set_bits</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">mask</span>: <span class="ident">BitMask</span><span class="op">&lt;</span><span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">Radium</span><span class="op">&gt;</span><span class="ident">::Item</span><span class="op">&gt;</span>) {
-		<span class="self">self</span>.<span class="ident">fetch_or</span>(<span class="ident">mask</span>.<span class="ident">value</span>(), <span class="ident">Ordering::Relaxed</span>);
-	}
-
-	<span class="doccomment">/// Inverts the value of one bit in a memory element.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// # Type Parameters</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// - `O`: A bit ordering.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// # Parameters</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// - `&amp;self`</span>
-	<span class="doccomment">/// - `index`: The semantic index of the bit in `*self` to be inverted.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// # Effects</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// The memory element at `*self` has the bit corresponding to `index` set</span>
-	<span class="doccomment">/// to the opposite of its current value. All other bits are unchanged.</span>
-	<span class="attribute">#[<span class="ident">inline</span>]</span>
-	<span class="kw">fn</span> <span class="ident">invert_bit</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">index</span>: <span class="ident">BitIdx</span><span class="op">&lt;</span><span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">Radium</span><span class="op">&gt;</span><span class="ident">::Item</span><span class="op">&gt;</span>)
-	<span class="kw">where</span> <span class="ident">O</span>: <span class="ident">BitOrder</span> {
-		<span class="self">self</span>.<span class="ident">fetch_xor</span>(<span class="ident">index</span>.<span class="ident">select</span>::<span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>().<span class="ident">value</span>(), <span class="ident">Ordering::Relaxed</span>);
-	}
-
-	<span class="doccomment">/// Invert any number of bits in a memory element.</span>
+	<span class="doccomment">/// Sets any number of bits in a memory register to `1`.</span>
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// The mask provided to this method must be constructed from indices that</span>
 	<span class="doccomment">/// are valid in the caller’s context. As the mask is already computed by</span>
@@ -547,73 +463,42 @@ constrained in the `store` module.
 	<span class="doccomment">/// # Parameters</span>
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// - `&amp;self`</span>
-	<span class="doccomment">/// - `mask`: A mask of any number of bits. This is a selection mask of bits</span>
-	<span class="doccomment">///   to modify.</span>
+	<span class="doccomment">/// - `mask`: A mask of any number of bits. This is a selection mask: all</span>
+	<span class="doccomment">///   bits in the mask that are set to `1` will be modified in the element</span>
+	<span class="doccomment">///   at `*self`.</span>
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// # Effects</span>
 	<span class="doccomment">///</span>
-	<span class="doccomment">/// All bits in `*self` that are selected (set to `1`) in `mask` will be set</span>
-	<span class="doccomment">/// to the opposite of their current value, and all bits in `*self` that are</span>
-	<span class="doccomment">/// not selected (set to `0`) in `mask` will be unchanged.</span>
-	<span class="attribute">#[<span class="ident">inline</span>]</span>
-	<span class="kw">fn</span> <span class="ident">invert_bits</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">mask</span>: <span class="ident">BitMask</span><span class="op">&lt;</span><span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">Radium</span><span class="op">&gt;</span><span class="ident">::Item</span><span class="op">&gt;</span>) {
-		<span class="self">self</span>.<span class="ident">fetch_xor</span>(<span class="ident">mask</span>.<span class="ident">value</span>(), <span class="ident">Ordering::Relaxed</span>);
+	<span class="doccomment">/// All bits in `*self` that are selected (set to `1` in the `mask`) will be</span>
+	<span class="doccomment">/// cleared. All bits in `*self` that are not selected (cleared to `0` in</span>
+	<span class="doccomment">/// the `mask`) are unchanged.</span>
+	<span class="kw">fn</span> <span class="ident">set_bits</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">mask</span>: <span class="ident">BitMask</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span>) {
+		<span class="self">self</span>.<span class="ident">fetch_or</span>(<span class="ident">mask</span>.<span class="ident">into_inner</span>(), <span class="ident">atomic::Ordering::Relaxed</span>);
 	}
 
-	<span class="doccomment">/// Writes a bit to an index within the `self` element.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// # Type Parameters</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// - `O`: A bit ordering.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// # Parameters</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// - `&amp;self`</span>
-	<span class="doccomment">/// - `index`: The semantic index of the bit in `*self` to be written.</span>
-	<span class="doccomment">/// - `value`: The bit value to write into `*self` at `index`.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// # Effects</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// The bit in `*self` at `index` is set to the `value` bit.</span>
-	<span class="attribute">#[<span class="ident">inline</span>]</span>
-	<span class="kw">fn</span> <span class="ident">write_bit</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">index</span>: <span class="ident">BitIdx</span><span class="op">&lt;</span><span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">Radium</span><span class="op">&gt;</span><span class="ident">::Item</span><span class="op">&gt;</span>, <span class="ident">value</span>: <span class="ident">bool</span>)
-	<span class="kw">where</span> <span class="ident">O</span>: <span class="ident">BitOrder</span> {
-		<span class="kw">if</span> <span class="ident">value</span> {
-			<span class="self">self</span>.<span class="ident">set_bit</span>::<span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>(<span class="ident">index</span>);
-		}
-		<span class="kw">else</span> {
-			<span class="self">self</span>.<span class="ident">clear_bit</span>::<span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>(<span class="ident">index</span>);
-		}
-	}
-
-	<span class="doccomment">/// Writes a bit value to any number of bits within the `self` element.</span>
+	<span class="doccomment">/// Inverts any number of bits in a memory register.</span>
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// The mask provided to this method must be constructed from indices that</span>
 	<span class="doccomment">/// are valid in the caller’s context. As the mask is already computed by</span>
-	<span class="doccomment">/// the caller, this does not need to take an ordering type parameter.</span>
+	<span class="doccomment">/// the caller, this does not take an ordering type parameter.</span>
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// # Parameters</span>
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// - `&amp;self`</span>
-	<span class="doccomment">/// - `mask`: A mask of any number of bits. This is a selection mask of bits</span>
-	<span class="doccomment">///   to modify.</span>
+	<span class="doccomment">/// - `mask`: A mask of any number of bits. This is a selection mask: all</span>
+	<span class="doccomment">///   bits in the mask that are set to `1` will be modified in the element</span>
+	<span class="doccomment">///   at `*self`.</span>
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// # Effects</span>
 	<span class="doccomment">///</span>
-	<span class="doccomment">/// All bits in `*self` that are selected (set to `1`) in `mask` will be set</span>
-	<span class="doccomment">/// to `value`, and all bits in `*self` that are not selected (set to `0`)</span>
-	<span class="doccomment">/// in `mask` will be unchanged.</span>
-	<span class="attribute">#[<span class="ident">inline</span>]</span>
-	<span class="kw">fn</span> <span class="ident">write_bits</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">mask</span>: <span class="ident">BitMask</span><span class="op">&lt;</span><span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">Radium</span><span class="op">&gt;</span><span class="ident">::Item</span><span class="op">&gt;</span>, <span class="ident">value</span>: <span class="ident">bool</span>) {
-		<span class="kw">if</span> <span class="ident">value</span> {
-			<span class="self">self</span>.<span class="ident">set_bits</span>(<span class="ident">mask</span>);
-		}
-		<span class="kw">else</span> {
-			<span class="self">self</span>.<span class="ident">clear_bits</span>(<span class="ident">mask</span>);
-		}
+	<span class="doccomment">/// All bits in `*self` that are selected (set to `1` in the `mask`) will be</span>
+	<span class="doccomment">/// inverted. All bits in `*self` that are not selected (cleared to `0` in</span>
+	<span class="doccomment">/// the `mask`) are unchanged.</span>
+	<span class="kw">fn</span> <span class="ident">invert_bits</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">mask</span>: <span class="ident">BitMask</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span>) {
+		<span class="self">self</span>.<span class="ident">fetch_xor</span>(<span class="ident">mask</span>.<span class="ident">into_inner</span>(), <span class="ident">atomic::Ordering::Relaxed</span>);
 	}
 
-	<span class="doccomment">/// Gets the function that writes `value` to an index.</span>
+	<span class="doccomment">/// Writes a value to one bit in a memory register.</span>
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// # Type Parameters</span>
 	<span class="doccomment">///</span>
@@ -621,23 +506,32 @@ constrained in the `store` module.
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// # Parameters</span>
 	<span class="doccomment">///</span>
-	<span class="doccomment">/// - `value`: The bit that will be directly written by the returned</span>
-	<span class="doccomment">///   function.</span>
+	<span class="doccomment">/// - `&amp;self`</span>
+	<span class="doccomment">/// - `index`: The semantic index of the bit in `*self` to write.</span>
+	<span class="doccomment">/// - `value`: The bit value to write into `*self` at `index`.</span>
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// # Returns</span>
 	<span class="doccomment">///</span>
-	<span class="doccomment">/// A function which, when applied to a reference and an index, will write</span>
-	<span class="doccomment">/// `value` into memory. If `value` is `false`, then this produces</span>
-	<span class="doccomment">/// [`clear_bit`]; if it is `true`, then this produces [`set_bit`].</span>
+	<span class="doccomment">/// The bit previously stored in `*self` at `index`. As these operations are</span>
+	<span class="doccomment">/// required to load the `*self` value from memory in order to work, the</span>
+	<span class="doccomment">/// previous value can be retained to reduce spurious loads elsewhere in the</span>
+	<span class="doccomment">/// crate.</span>
 	<span class="doccomment">///</span>
-	<span class="doccomment">/// [`clear_bit`]: #method.clear_bit</span>
-	<span class="doccomment">/// [`set_bit`]: #method.set_bit</span>
-	<span class="attribute">#[<span class="ident">inline</span>]</span>
-	<span class="kw">fn</span> <span class="ident">get_writer</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>(
-		<span class="ident">value</span>: <span class="ident">bool</span>,
-	) -&gt; <span class="kw">for</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="kw">fn</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">Self</span>, <span class="ident">BitIdx</span><span class="op">&lt;</span><span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">Radium</span><span class="op">&gt;</span><span class="ident">::Item</span><span class="op">&gt;</span>)
+	<span class="doccomment">/// # Effects</span>
+	<span class="doccomment">///</span>
+	<span class="doccomment">/// The memory register at address `self` has the bit corresponding to the</span>
+	<span class="doccomment">/// `index` cursor under the `O` order written with the new `value`, and all</span>
+	<span class="doccomment">/// other bits are unchanged.</span>
+	<span class="kw">fn</span> <span class="ident">write_bit</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">index</span>: <span class="ident">BitIdx</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span>, <span class="ident">value</span>: <span class="ident">bool</span>) -&gt; <span class="ident">bool</span>
 	<span class="kw">where</span> <span class="ident">O</span>: <span class="ident">BitOrder</span> {
-		[<span class="ident"><span class="self">Self</span>::clear_bit</span>::<span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>, <span class="ident"><span class="self">Self</span>::set_bit</span>::<span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>][<span class="ident">value</span> <span class="kw">as</span> <span class="ident">usize</span>]
+		<span class="kw">let</span> <span class="ident">select</span> <span class="op">=</span> <span class="ident">index</span>.<span class="ident">select</span>::<span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>().<span class="ident">into_inner</span>();
+		<span class="ident">select</span>
+			<span class="op">&amp;</span> <span class="kw">if</span> <span class="ident">value</span> {
+				<span class="self">self</span>.<span class="ident">fetch_or</span>(<span class="ident">select</span>, <span class="ident">atomic::Ordering::Relaxed</span>)
+			}
+			<span class="kw">else</span> {
+				<span class="self">self</span>.<span class="ident">fetch_and</span>(<span class="op">!</span><span class="ident">select</span>, <span class="ident">atomic::Ordering::Relaxed</span>)
+			} <span class="op">!</span><span class="op">=</span> <span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span><span class="ident">::ZERO</span>
 	}
 
 	<span class="doccomment">/// Gets the function that writes `value` into all bits under a mask.</span>
@@ -653,47 +547,117 @@ constrained in the `store` module.
 	<span class="doccomment">/// `value` into memory. If `value` is `false`, then this produces</span>
 	<span class="doccomment">/// [`clear_bits`]; if it is `true`, then this produces [`set_bits`].</span>
 	<span class="doccomment">///</span>
-	<span class="doccomment">/// [`clear_bits`]: #method.clear_bits</span>
-	<span class="doccomment">/// [`set_bits`]: #method.set_bits</span>
-	<span class="attribute">#[<span class="ident">inline</span>]</span>
-	<span class="kw">fn</span> <span class="ident">get_writers</span>(
-		<span class="ident">value</span>: <span class="ident">bool</span>,
-	) -&gt; <span class="kw">for</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="kw">fn</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">Self</span>, <span class="ident">BitMask</span><span class="op">&lt;</span><span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">Radium</span><span class="op">&gt;</span><span class="ident">::Item</span><span class="op">&gt;</span>) {
-		[<span class="ident"><span class="self">Self</span>::clear_bits</span>, <span class="ident"><span class="self">Self</span>::set_bits</span>][<span class="ident">value</span> <span class="kw">as</span> <span class="ident">usize</span>]
-	}
-
-	<span class="doccomment">/// Unconditionally writes a value into a memory location.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// # Parameters</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// - `&amp;self`</span>
-	<span class="doccomment">/// - `value`: The new value to write into `*self`.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// # Effects</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// The current value at `*self` is replaced with `value`.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// # Safety</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// The calling context must either have write permissions to the entire</span>
-	<span class="doccomment">/// memory element at `*self`, or construct a `value` that does not modify</span>
-	<span class="doccomment">/// the bits of `*self` that the caller does not currently own.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// As this directly permits the modification of memory outside the logical</span>
-	<span class="doccomment">/// ownership of the caller, this method risks behavior that violates the</span>
-	<span class="doccomment">/// Rust memory model, even if it may not be technically undefined.</span>
-	<span class="attribute">#[<span class="ident">inline</span>]</span>
-	<span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">store_value</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">Radium</span><span class="op">&gt;</span><span class="ident">::Item</span>) {
-		<span class="self">self</span>.<span class="ident">store</span>(<span class="ident">value</span>, <span class="ident">Ordering::Relaxed</span>)
+	<span class="doccomment">/// [`clear_bits`]: Self::clear_bits</span>
+	<span class="doccomment">/// [`set_bits`]: Self::set_bits</span>
+	<span class="kw">fn</span> <span class="ident">get_writers</span>(<span class="ident">value</span>: <span class="ident">bool</span>) -&gt; <span class="kw">for</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="kw">fn</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">Self</span>, <span class="ident">BitMask</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span>) {
+		<span class="kw">if</span> <span class="ident">value</span> {
+			<span class="ident"><span class="self">Self</span>::set_bits</span>
+		}
+		<span class="kw">else</span> {
+			<span class="ident"><span class="self">Self</span>::clear_bits</span>
+		}
 	}
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span> <span class="ident">BitAccess</span> <span class="kw">for</span> <span class="ident">A</span>
 <span class="kw">where</span>
-	<span class="ident">A</span>: <span class="ident">Debug</span> <span class="op">+</span> <span class="ident">Radium</span>,
-	<span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">Radium</span><span class="op">&gt;</span><span class="ident">::Item</span>: <span class="ident">BitRegister</span>,
+	<span class="ident">A</span>: <span class="ident">Radium</span>,
+	<span class="ident">A::Item</span>: <span class="ident">BitRegister</span>,
 {
 }
+
+<span class="doccomment">/** Restricts memory modification to only exclusive references.
+
+The shared-mutability types do not permit locking their references to prevent
+writing through them when inappropriate. Implementors of this trait are able to
+view aliased memory and handle other references writing to it, even though they
+themselves may be forbidden from doing so.
+**/</span>
+<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">BitSafe</span> {
+	<span class="doccomment">/// The register type being guarded against shared mutation.</span>
+	<span class="doccomment">///</span>
+	<span class="doccomment">/// This is only present as an extra proof that the type graph all uses the</span>
+	<span class="doccomment">/// same underlying integers.</span>
+	<span class="kw">type</span> <span class="ident">Mem</span>: <span class="ident">BitRegister</span>;
+
+	<span class="doccomment">/// The accessor type being prevented from mutating while shared.</span>
+	<span class="doccomment">///</span>
+	<span class="doccomment">/// This is exposed as an associated type so that `BitStore` can name it</span>
+	<span class="doccomment">/// without having to re-select it based on crate configuration.</span>
+	<span class="kw">type</span> <span class="ident">Rad</span>: <span class="ident">Radium</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::Mem</span><span class="op">&gt;</span>;
+
+	<span class="doccomment">/// Reads the value out of memory only if a shared reference to the location</span>
+	<span class="doccomment">/// can be produced.</span>
+	<span class="kw">fn</span> <span class="ident">load</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::Mem</span>;
+
+	<span class="doccomment">/// Writes a value into memory only if an exclusive reference to the</span>
+	<span class="doccomment">/// location can be produced.</span>
+	<span class="kw">fn</span> <span class="ident">store</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">value</span>: <span class="ident"><span class="self">Self</span>::Mem</span>);
+}
+
+<span class="macro">macro_rules!</span> <span class="ident">safe</span> {
+	($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>:<span class="ident">ident</span> =&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">w</span>:<span class="ident">ident</span> =&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">r</span>:<span class="ident">path</span>),<span class="op">+</span> $(,)<span class="question-mark">?</span>) =&gt; { $(
+		<span class="doccomment">/// A wrapper over a shared-mutable type that forbids writing to the</span>
+		<span class="doccomment">/// location through its own reference. Other references to the location</span>
+		<span class="doccomment">/// may still write to it, and reads from this reference will be aware</span>
+		<span class="doccomment">/// of this possibility.</span>
+		<span class="doccomment">///</span>
+		<span class="doccomment">/// This is necessary in order to enforce [`bitvec`]’s memory model,</span>
+		<span class="doccomment">/// which disallows shared mutation to individual bits. [`BitSlice`]s</span>
+		<span class="doccomment">/// may produce memory views that use this type in order to ensure that</span>
+		<span class="doccomment">/// handles that lack write permission to an area may not write to it,</span>
+		<span class="doccomment">/// even if other handles may.</span>
+		<span class="doccomment">///</span>
+		<span class="doccomment">/// Under the `&quot;atomic&quot;` feature, this uses [`radium`]’s best-effort</span>
+		<span class="doccomment">/// atomic alias; when this feature is disabled, then it uses a [`Cell`]</span>
+		<span class="doccomment">/// directly.</span>
+		<span class="doccomment">///</span>
+		<span class="doccomment">/// [`BitSlice`]: crate::slice::BitSlice</span>
+		<span class="doccomment">/// [`Cell`]: core::cell::Cell</span>
+		<span class="doccomment">/// [`radium`]: radium::types</span>
+		<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
+		<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">transparent</span>)]</span>
+		<span class="kw">pub</span> <span class="kw">struct</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">w</span> {
+			<span class="ident">inner</span>: <span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">BitSafe</span><span class="op">&gt;</span><span class="ident">::Rad</span>,
+		}
+
+		<span class="kw">impl</span> <span class="ident">BitSafe</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">w</span> {
+			<span class="kw">type</span> <span class="ident">Mem</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>;
+
+			<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;atomic&quot;</span>)]</span>
+			<span class="kw">type</span> <span class="ident">Rad</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">r</span>;
+
+			<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;atomic&quot;</span>))]</span>
+			<span class="kw">type</span> <span class="ident">Rad</span> <span class="op">=</span> <span class="ident">core::cell::Cell</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span><span class="op">&gt;</span>;
+
+			<span class="kw">fn</span> <span class="ident">load</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span> {
+				<span class="ident">radium::Radium::load</span>(
+					<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">inner</span>,
+					<span class="ident">core::sync::atomic::Ordering::Relaxed</span>,
+				)
+			}
+
+			<span class="kw">fn</span> <span class="ident">store</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">value</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>) {
+				<span class="ident">radium::Radium::store</span>(
+					<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">inner</span>,
+					<span class="ident">value</span>,
+					<span class="ident">core::sync::atomic::Ordering::Relaxed</span>,
+				)
+			}
+		}
+	)<span class="op">+</span> };
+}
+
+<span class="macro">safe!</span> {
+	<span class="ident">u8</span> =&gt; <span class="ident">BitSafeU8</span> =&gt; <span class="ident">radium::types::RadiumU8</span>,
+	<span class="ident">u16</span> =&gt; <span class="ident">BitSafeU16</span> =&gt; <span class="ident">radium::types::RadiumU16</span>,
+	<span class="ident">u32</span> =&gt; <span class="ident">BitSafeU32</span> =&gt; <span class="ident">radium::types::RadiumU32</span>,
+}
+
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">target_pointer_width</span> <span class="op">=</span> <span class="string">&quot;64&quot;</span>)]</span>
+<span class="macro">safe!</span>(<span class="ident">u64</span> =&gt; <span class="ident">BitSafeU64</span> =&gt; <span class="ident">radium::types::RadiumU64</span>);
+
+<span class="macro">safe!</span>(<span class="ident">usize</span> =&gt; <span class="ident">BitSafeUsize</span> =&gt; <span class="ident">radium::types::RadiumUsize</span>);
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
 <span class="kw">mod</span> <span class="ident">tests</span> {
@@ -704,64 +668,38 @@ constrained in the `store` module.
 	<span class="kw">fn</span> <span class="ident">touch_memory</span>() {
 		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">data</span> <span class="op">=</span> <span class="number">0u8</span>;
 		<span class="kw">let</span> <span class="ident">bits</span> <span class="op">=</span> <span class="ident">data</span>.<span class="ident">view_bits_mut</span>::<span class="op">&lt;</span><span class="ident">LocalBits</span><span class="op">&gt;</span>();
-		<span class="kw">let</span> <span class="ident">accessor</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="kw-2">&amp;</span><span class="kw-2">*</span>(<span class="ident">bits</span>.<span class="ident">bitptr</span>().<span class="ident">pointer</span>().<span class="ident">to_access</span>()) };
-
-		<span class="ident">BitAccess::set_bit</span>::<span class="op">&lt;</span><span class="ident">Lsb0</span><span class="op">&gt;</span>(<span class="ident">accessor</span>, <span class="ident">BitIdx::ZERO</span>);
-		<span class="macro">assert_eq!</span>(<span class="ident">accessor</span>.<span class="ident">get</span>(), <span class="number">1</span>);
+		<span class="kw">let</span> <span class="ident">accessor</span> <span class="op">=</span> <span class="kw">unsafe</span> {
+			<span class="kw-2">&amp;</span><span class="kw-2">*</span>(<span class="ident">bits</span>
+				.<span class="ident">as_bitspan</span>()
+				.<span class="ident">address</span>()
+				.<span class="ident">cast</span>::<span class="op">&lt;</span><span class="op">&lt;</span><span class="ident">u8</span> <span class="kw">as</span> <span class="ident">BitStore</span><span class="op">&gt;</span><span class="ident">::Access</span><span class="op">&gt;</span>())
+			.<span class="ident">to_const</span>()
+		};
+		<span class="kw">let</span> <span class="ident">aliased</span> <span class="op">=</span> <span class="kw">unsafe</span> {
+			<span class="kw-2">&amp;</span><span class="kw-2">*</span>(<span class="ident">bits</span>.<span class="ident">as_bitspan</span>().<span class="ident">address</span>().<span class="ident">to_const</span>()
+				<span class="kw">as</span> <span class="kw-2">*const</span> <span class="op">&lt;</span><span class="ident">u8</span> <span class="kw">as</span> <span class="ident">BitStore</span><span class="op">&gt;</span><span class="ident">::Alias</span>)
+		};
 
 		<span class="ident">BitAccess::set_bits</span>(<span class="ident">accessor</span>, <span class="ident">BitMask::ALL</span>);
 		<span class="macro">assert_eq!</span>(<span class="ident">accessor</span>.<span class="ident">get</span>(), <span class="op">!</span><span class="number">0</span>);
 
-		<span class="ident">BitAccess::clear_bit</span>::<span class="op">&lt;</span><span class="ident">Lsb0</span><span class="op">&gt;</span>(<span class="ident">accessor</span>, <span class="ident">BitIdx::ZERO</span>);
-		<span class="macro">assert_eq!</span>(<span class="ident">accessor</span>.<span class="ident">get</span>(), <span class="op">!</span><span class="number">1</span>);
-
 		<span class="ident">BitAccess::clear_bits</span>(<span class="ident">accessor</span>, <span class="ident">BitMask::ALL</span>);
 		<span class="macro">assert_eq!</span>(<span class="ident">accessor</span>.<span class="ident">get</span>(), <span class="number">0</span>);
 
-		<span class="ident">BitAccess::invert_bit</span>::<span class="op">&lt;</span><span class="ident">Lsb0</span><span class="op">&gt;</span>(<span class="ident">accessor</span>, <span class="ident">BitIdx::ZERO</span>);
-		<span class="macro">assert_eq!</span>(<span class="ident">accessor</span>.<span class="ident">get</span>(), <span class="number">1</span>);
 		<span class="ident">BitAccess::invert_bits</span>(<span class="ident">accessor</span>, <span class="ident">BitMask::ALL</span>);
-		<span class="macro">assert_eq!</span>(<span class="ident">accessor</span>.<span class="ident">get</span>(), <span class="op">!</span><span class="number">1</span>);
+		<span class="macro">assert_eq!</span>(<span class="ident">accessor</span>.<span class="ident">get</span>(), <span class="op">!</span><span class="number">0</span>);
 
-		<span class="macro">assert!</span>(<span class="op">!</span><span class="ident">BitStore::get_bit</span>::<span class="op">&lt;</span><span class="ident">Lsb0</span><span class="op">&gt;</span>(<span class="ident">accessor</span>, <span class="ident">BitIdx::ZERO</span>));
-		<span class="macro">assert_eq!</span>(<span class="ident">accessor</span>.<span class="ident">get</span>(), <span class="op">!</span><span class="number">1</span>);
+		<span class="macro">assert!</span>(<span class="ident">BitStore::get_bit</span>::<span class="op">&lt;</span><span class="ident">Lsb0</span><span class="op">&gt;</span>(<span class="ident">aliased</span>, <span class="ident">BitIdx::ZERO</span>));
+		<span class="macro">assert_eq!</span>(<span class="ident">accessor</span>.<span class="ident">get</span>(), <span class="op">!</span><span class="number">0</span>);
 
 		<span class="ident">BitAccess::write_bit</span>::<span class="op">&lt;</span><span class="ident">Lsb0</span><span class="op">&gt;</span>(<span class="ident">accessor</span>, <span class="ident">BitIdx::new</span>(<span class="number">1</span>).<span class="ident">unwrap</span>(), <span class="bool-val">false</span>);
-		<span class="macro">assert_eq!</span>(<span class="ident">accessor</span>.<span class="ident">get</span>(), <span class="op">!</span><span class="number">3</span>);
-
-		<span class="ident">BitAccess::write_bits</span>(<span class="ident">accessor</span>, <span class="ident">BitMask::ALL</span>, <span class="bool-val">true</span>);
-		<span class="macro">assert_eq!</span>(<span class="ident">accessor</span>.<span class="ident">get</span>(), <span class="op">!</span><span class="number">0</span>);
-		<span class="ident">BitAccess::write_bits</span>(<span class="ident">accessor</span>, <span class="ident">Lsb0::mask</span>(<span class="ident">BitIdx::new</span>(<span class="number">2</span>), <span class="prelude-val">None</span>), <span class="bool-val">false</span>);
-		<span class="macro">assert_eq!</span>(
-			<span class="ident">BitStore::get_bits</span>(<span class="ident">accessor</span>, <span class="ident">Lsb0::mask</span>(<span class="ident">BitIdx::new</span>(<span class="number">2</span>), <span class="prelude-val">None</span>)),
-			<span class="number">0</span>
-		);
-		<span class="macro">assert_eq!</span>(<span class="ident">accessor</span>.<span class="ident">get</span>(), <span class="number">3</span>);
-
-		<span class="ident">BitAccess::get_writer</span>::<span class="op">&lt;</span><span class="ident">Lsb0</span><span class="op">&gt;</span>(<span class="bool-val">false</span>)(<span class="ident">accessor</span>, <span class="ident">BitIdx::ZERO</span>);
-		<span class="macro">assert_eq!</span>(<span class="ident">accessor</span>.<span class="ident">get</span>(), <span class="number">2</span>);
-
-		<span class="kw">unsafe</span> {
-			<span class="ident">BitAccess::store_value</span>(<span class="ident">accessor</span>, <span class="op">!</span><span class="number">1</span>);
-		}
-		<span class="macro">assert_eq!</span>(<span class="ident">accessor</span>.<span class="ident">get</span>(), <span class="op">!</span><span class="number">1</span>);
+		<span class="macro">assert_eq!</span>(<span class="ident">accessor</span>.<span class="ident">get</span>(), <span class="op">!</span><span class="number">2</span>);
 	}
 
 	<span class="attribute">#[<span class="ident">test</span>]</span>
 	<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">miri</span>))]</span>
 	<span class="kw">fn</span> <span class="ident">sanity_check_prefetch</span>() {
 		<span class="kw">use</span> <span class="ident">core::cell::Cell</span>;
-
-		<span class="macro">assert_eq!</span>(
-			<span class="op">&lt;</span><span class="ident">Cell</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> <span class="kw">as</span> <span class="ident">BitAccess</span><span class="op">&gt;</span><span class="ident">::get_writer</span>::<span class="op">&lt;</span><span class="ident">Msb0</span><span class="op">&gt;</span>(<span class="bool-val">false</span>) <span class="kw">as</span> <span class="kw-2">*const</span> (),
-			<span class="op">&lt;</span><span class="ident">Cell</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> <span class="kw">as</span> <span class="ident">BitAccess</span><span class="op">&gt;</span><span class="ident">::clear_bit</span>::<span class="op">&lt;</span><span class="ident">Msb0</span><span class="op">&gt;</span> <span class="kw">as</span> <span class="kw-2">*const</span> ()
-		);
-
-		<span class="macro">assert_eq!</span>(
-			<span class="op">&lt;</span><span class="ident">Cell</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> <span class="kw">as</span> <span class="ident">BitAccess</span><span class="op">&gt;</span><span class="ident">::get_writer</span>::<span class="op">&lt;</span><span class="ident">Msb0</span><span class="op">&gt;</span>(<span class="bool-val">true</span>) <span class="kw">as</span> <span class="kw-2">*const</span> (),
-			<span class="op">&lt;</span><span class="ident">Cell</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> <span class="kw">as</span> <span class="ident">BitAccess</span><span class="op">&gt;</span><span class="ident">::set_bit</span>::<span class="op">&lt;</span><span class="ident">Msb0</span><span class="op">&gt;</span> <span class="kw">as</span> <span class="kw-2">*const</span> ()
-		);
-
 		<span class="macro">assert_eq!</span>(
 			<span class="op">&lt;</span><span class="ident">Cell</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> <span class="kw">as</span> <span class="ident">BitAccess</span><span class="op">&gt;</span><span class="ident">::get_writers</span>(<span class="bool-val">false</span>) <span class="kw">as</span> <span class="kw-2">*const</span> (),
 			<span class="op">&lt;</span><span class="ident">Cell</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> <span class="kw">as</span> <span class="ident">BitAccess</span><span class="op">&gt;</span><span class="ident">::clear_bits</span> <span class="kw">as</span> <span class="kw-2">*const</span> ()
@@ -771,6 +709,34 @@ constrained in the `store` module.
 			<span class="op">&lt;</span><span class="ident">Cell</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> <span class="kw">as</span> <span class="ident">BitAccess</span><span class="op">&gt;</span><span class="ident">::get_writers</span>(<span class="bool-val">true</span>) <span class="kw">as</span> <span class="kw-2">*const</span> (),
 			<span class="op">&lt;</span><span class="ident">Cell</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> <span class="kw">as</span> <span class="ident">BitAccess</span><span class="op">&gt;</span><span class="ident">::set_bits</span> <span class="kw">as</span> <span class="kw-2">*const</span> ()
 		);
+	}
+
+	<span class="attribute">#[<span class="ident">test</span>]</span>
+	<span class="kw">fn</span> <span class="ident">safe_wrappers</span>() {
+		<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::BitSafe</span>;
+
+		<span class="kw">let</span> <span class="ident">bits</span> <span class="op">=</span> <span class="macro">bits!</span>[<span class="kw-2">mut</span> <span class="ident">Msb0</span>, <span class="ident">u8</span>; <span class="number">0</span>; <span class="number">24</span>];
+		<span class="kw">let</span> (<span class="ident">l</span>, <span class="ident">c</span>): (<span class="kw-2">&amp;mut</span> <span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">Msb0</span>, <span class="ident">BitSafeU8</span><span class="op">&gt;</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="ident">bits</span>.<span class="ident">split_at_mut</span>(<span class="number">4</span>);
+		<span class="kw">let</span> (<span class="ident">c</span>, <span class="kw">_</span>): (<span class="kw-2">&amp;mut</span> <span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">Msb0</span>, <span class="ident">BitSafeU8</span><span class="op">&gt;</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="ident">c</span>.<span class="ident">split_at_mut</span>(<span class="number">16</span>);
+
+		<span class="comment">//  Get a write-capable shared reference to the base address,</span>
+		<span class="kw">let</span> <span class="ident">l_redge</span>: <span class="kw-2">&amp;</span><span class="op">&lt;</span><span class="ident">BitSafeU8</span> <span class="kw">as</span> <span class="ident">BitSafe</span><span class="op">&gt;</span><span class="ident">::Rad</span> <span class="op">=</span>
+			<span class="ident">l</span>.<span class="ident">domain_mut</span>().<span class="ident">region</span>().<span class="ident">unwrap</span>().<span class="number">2</span>.<span class="ident">unwrap</span>().<span class="number">0</span>;
+		<span class="comment">//  and a write-incapable shared reference to the same base address.</span>
+		<span class="kw">let</span> <span class="ident">c_ledge</span>: <span class="kw-2">&amp;</span><span class="ident">BitSafeU8</span> <span class="op">=</span> <span class="ident">c</span>.<span class="ident">domain</span>().<span class="ident">region</span>().<span class="ident">unwrap</span>().<span class="number">0</span>.<span class="ident">unwrap</span>().<span class="number">1</span>;
+
+		<span class="comment">//  The split location means that the two subdomains share a location.</span>
+		<span class="macro">assert_eq!</span>(
+			<span class="ident">l_redge</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="kw">_</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="ident">u8</span>,
+			<span class="ident">c_ledge</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="kw">_</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="ident">u8</span>,
+		);
+
+		<span class="comment">//  The center reference can only read,</span>
+		<span class="macro">assert_eq!</span>(<span class="ident">c_ledge</span>.<span class="ident">load</span>(), <span class="number">0</span>);
+		<span class="comment">//  while the left reference can write,</span>
+		<span class="ident">l_redge</span>.<span class="ident">set_bits</span>(<span class="ident">BitMask::new</span>(<span class="number">6</span>));
+		<span class="comment">//  and be observed by the center.</span>
+		<span class="macro">assert_eq!</span>(<span class="ident">c_ledge</span>.<span class="ident">load</span>(), <span class="number">6</span>);
 	}
 }
 </code></pre></div>

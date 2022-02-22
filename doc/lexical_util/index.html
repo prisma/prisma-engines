@@ -1,0 +1,54 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Shared utilities for lexical conversion routines."><meta name="keywords" content="rust, rustlang, rust-lang, lexical_util"><title>lexical_util - Rust</title><link rel="stylesheet" type="text/css" href="../normalize.css"><link rel="stylesheet" type="text/css" href="../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../ayu.css" disabled ><script id="default-settings" ></script><script src="../storage.js"></script><script src="../crates.js"></script><script defer src="../main.js"></script>
+    <noscript><link rel="stylesheet" href="../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../favicon.svg"><style type="text/css">#crate-search{background-image:url("../down-arrow.svg");}</style></head><body class="rustdoc mod crate"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../lexical_util/index.html'><div class='logo-container rust-logo'><img src='../rust-logo.png' alt='logo'></div></a><h2 class="location">Crate lexical_util</h2><div class="block version"><div class="narrow-helper"></div><p>Version 0.8.1</p></div><div class="sidebar-elems"><a id="all-types" href="all.html"><p>See all lexical_util's items</p></a><div class="block items"><ul><li><a href="#modules">Modules</a></li><li><a href="#macros">Macros</a></li></ul></div><div id="sidebar-vars" data-name="lexical_util" data-ty="mod" data-relpath=""></div><script defer src="sidebar-items.js"></script></div></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../wheel.svg"></a></div></form></nav><section id="main" class="content"><h1 class="fqn"><span class="in-band">Crate <a class="mod" href="#">lexical_util</a><button id="copy-path" onclick="copy_path(this)" title="Copy item path to clipboard"><img src="../clipboard.svg" width="19" height="18" alt="Copy item path"></button></span><span class="out-of-band"><span id="render-detail"><a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class="inner">&#x2212;</span>]</a></span><a class="srclink" href="../src/lexical_util/lib.rs.html#1-68" title="goto source code">[src]</a></span></h1><details class="rustdoc-toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>Shared utilities for lexical conversion routines.</p>
+<p>These are not meant to be used publicly for any numeric
+conversion routines, but provide optimized math routines,
+format packed struct definitions, and custom iterators
+for all workspaces.</p>
+<h2 id="features" class="section-header"><a href="#features">Features</a></h2>
+<ul>
+<li><code>std</code> - Use the standard library.</li>
+<li><code>power-of-two</code> - Add support for parsing power-of-two integer strings.</li>
+<li><code>radix</code> - Add support for strings of any radix.</li>
+<li><code>write-integers</code> - Add support for writing integers.</li>
+<li><code>write-floats</code> - Add support for writing floats.</li>
+<li><code>parse-integers</code> - Add support for parsing integers.</li>
+<li><code>parse-floats</code> - Add support for parsing floats.</li>
+<li><code>compact</code> - Reduce code size at the cost of performance.</li>
+</ul>
+<h2 id="note" class="section-header"><a href="#note">Note</a></h2>
+<p>None of this is considered a public API: any of the implementation
+details may change release-to-release without major or minor version
+changes. Use internal implementation details at your own risk.</p>
+<p>lexical-util mainly exists as an implementation detail for
+lexical-core, although its API is stable. If you would like to use
+a high-level API that writes to and parses from <code>String</code> and <code>&amp;str</code>,
+respectively, please look at <a href="https://crates.io/crates/lexical">lexical</a>
+instead. If you would like an API that supports multiple numeric
+conversions, please look at <a href="https://crates.io/crates/lexical-core">lexical-core</a>
+instead.</p>
+<h2 id="version-support" class="section-header"><a href="#version-support">Version Support</a></h2>
+<p>The minimum, standard, required version is 1.51.0, for const generic
+support. Older versions of lexical support older Rust versions.</p>
+</div></details><h2 id="modules" class="small-section-header"><a href="#modules">Modules</a></h2>
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="mod" href="algorithm/index.html" title="lexical_util::algorithm mod">algorithm</a></div><div class="item-right docblock-short"><p>Simple, shared algorithms for slices and iterators.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="mod" href="ascii/index.html" title="lexical_util::ascii mod">ascii</a></div><div class="item-right docblock-short"><p>Utilities for working with ASCII characters.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="mod" href="assert/index.html" title="lexical_util::assert mod">assert</a></div><div class="item-right docblock-short"><p>Debugging assertions to check a radix is valid.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="mod" href="constants/index.html" title="lexical_util::constants mod">constants</a></div><div class="item-right docblock-short"><p>Pre-defined constants for numeric types.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="mod" href="digit/index.html" title="lexical_util::digit mod">digit</a></div><div class="item-right docblock-short"><p>Utilities to process digits.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="mod" href="div128/index.html" title="lexical_util::div128 mod">div128</a></div><div class="item-right docblock-short"><p>Optimized division algorithms for u128.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="mod" href="error/index.html" title="lexical_util::error mod">error</a></div><div class="item-right docblock-short"><p>Error type for numeric parsing functions.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="mod" href="extended_float/index.html" title="lexical_util::extended_float mod">extended_float</a></div><div class="item-right docblock-short"><p>Extended precision floating-point type.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="mod" href="format/index.html" title="lexical_util::format mod">format</a></div><div class="item-right docblock-short"><p>Public API for the number format packed struct.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="mod" href="iterator/index.html" title="lexical_util::iterator mod">iterator</a></div><div class="item-right docblock-short"><p>Specialized iterator traits.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="mod" href="mul/index.html" title="lexical_util::mul mod">mul</a></div><div class="item-right docblock-short"><p>Fast multiplication routines.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="mod" href="num/index.html" title="lexical_util::num mod">num</a></div><div class="item-right docblock-short"><p>Utilities for Rust numbers.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="mod" href="options/index.html" title="lexical_util::options mod">options</a></div><div class="item-right docblock-short"><p>Shared traits for the options API.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="mod" href="result/index.html" title="lexical_util::result mod">result</a></div><div class="item-right docblock-short"><p>Result type for numeric parsing functions.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="mod" href="step/index.html" title="lexical_util::step mod">step</a></div><div class="item-right docblock-short"><p>The maximum digits that can be held in a u64 for a given radix without overflow.</p>
+</div></div></div><h2 id="macros" class="small-section-header"><a href="#macros">Macros</a></h2>
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="macro" href="macro.from_lexical.html" title="lexical_util::from_lexical macro">from_lexical</a></div><div class="item-right docblock-short"><p>Define FromLexical trait.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="macro" href="macro.from_lexical_with_options.html" title="lexical_util::from_lexical_with_options macro">from_lexical_with_options</a></div><div class="item-right docblock-short"><p>Define FromLexicalWithOptions trait.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="macro" href="macro.to_lexical.html" title="lexical_util::to_lexical macro">to_lexical</a></div><div class="item-right docblock-short"><p>Define ToLexical trait.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="macro" href="macro.to_lexical_with_options.html" title="lexical_util::to_lexical_with_options macro">to_lexical_with_options</a></div><div class="item-right docblock-short"><p>Define ToLexicalWithOptions trait.</p>
+</div></div></div></section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../" data-current-crate="lexical_util" data-search-index-js="../search-index.js" data-search-js="../search.js"></div>
+</body></html>

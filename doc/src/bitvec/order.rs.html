@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;bitvec-0.19.6&#x2F;src&#x2F;order.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>order.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><script defer src="../../main.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;bitvec-0.22.3&#x2F;src&#x2F;order.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>order.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><script defer src="../../main.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script>
     <noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../bitvec/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
@@ -561,54 +561,95 @@
 <span id="560">560</span>
 <span id="561">561</span>
 <span id="562">562</span>
+<span id="563">563</span>
+<span id="564">564</span>
+<span id="565">565</span>
+<span id="566">566</span>
+<span id="567">567</span>
+<span id="568">568</span>
+<span id="569">569</span>
+<span id="570">570</span>
+<span id="571">571</span>
+<span id="572">572</span>
+<span id="573">573</span>
+<span id="574">574</span>
+<span id="575">575</span>
+<span id="576">576</span>
+<span id="577">577</span>
+<span id="578">578</span>
+<span id="579">579</span>
+<span id="580">580</span>
+<span id="581">581</span>
+<span id="582">582</span>
+<span id="583">583</span>
+<span id="584">584</span>
+<span id="585">585</span>
+<span id="586">586</span>
+<span id="587">587</span>
+<span id="588">588</span>
+<span id="589">589</span>
+<span id="590">590</span>
+<span id="591">591</span>
+<span id="592">592</span>
+<span id="593">593</span>
+<span id="594">594</span>
 </pre><pre class="rust"><code><span class="doccomment">/*! Ordering of bits within register elements.
 
-`bitvec` structures are parametric over any ordering of bits within a register.
-The `BitOrder` trait maps a cursor position (indicated by the `BitIdx` type) to an
-electrical position (indicated by the `BitPos` type) within that element, and
-also defines the order of traversal over a register.
+[`bitvec`] data structures are parametric over any ordering of bits within a
+register type. The [`BitOrder`] trait translates a cursor position (indicated by
+the [`BitIdx`] type) to an electrical position (indicated by the [`BitPos`]
+type) within that register, thereby defining the order of traversal over a
+register.
 
-The only requirement on implementors of `BitOrder` is that the transform function
-from cursor (`BitIdx`) to position (`BitPos`) is *total* (every integer in the
-domain `0 .. T::BITS` is used) and *unique* (each cursor maps to one and only
-one position, and each position is mapped by one and only one cursor).
-Contiguity is not required.
+Implementors of [`BitOrder`] are required to satisfy a set of requirements on
+their transform function, and must have identical behavior to the
+default-provided trait functions if they choose to override them for
+performance. These can all be proven by use of the [`verify`] or
+[`verify_for_type`] functions in the implementor’s test suite.
 
-`BitOrder` is a stateless trait, and implementors should be zero-sized types.
+[`BitOrder`] is a stateless trait, and implementors should be zero-sized types.
+
+[`BitIdx`]: crate::index::BitIdx
+[`BitOrder`]: crate::order::BitOrder
+[`BitPos`]: crate::index::BitPos
+[`bitvec`]: crate
+[`verify`]: crate::order::verify
+[`verify_for_type`]: crate::order::verify_for_type
 !*/</span>
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::index</span>::{
-	<span class="ident">BitIdx</span>,
-	<span class="ident">BitMask</span>,
-	<span class="ident">BitPos</span>,
-	<span class="ident">BitRegister</span>,
-	<span class="ident">BitSel</span>,
-	<span class="ident">BitTail</span>,
+<span class="kw">use</span> <span class="kw">crate</span>::{
+	<span class="ident">index</span>::{
+		<span class="ident">BitEnd</span>,
+		<span class="ident">BitIdx</span>,
+		<span class="ident">BitMask</span>,
+		<span class="ident">BitPos</span>,
+		<span class="ident">BitSel</span>,
+	},
+	<span class="ident">mem::BitRegister</span>,
 };
 
 <span class="doccomment">/** An ordering over a register.
 
 # Usage
 
-`bitvec` structures store and operate on semantic counts, not bit positions. The
-`BitOrder::at` function takes a semantic ordering, `BitIdx`, and produces an
-electrical position, `BitPos`.
+[`bitvec`] structures store and operate on semantic index counters, not
+electrical bit positions. The [`BitOrder::at`] function takes a semantic
+ordering, [`BitIdx`], and produces a corresponding electrical position,
+[`BitPos`].
 
 # Safety
 
 If your implementation violates any of the requirements on these functions, then
-the program will become incorrect and have unspecified behavior. The best-case
-scenario is that operations relying on your implementation will crash the
+the program will become incorrect, and have unspecified behavior. The best-case
+outcome is that operations relying on your implementation will crash the
 program; the worst-case is that memory access will silently become corrupt.
 
-You are responsible for adhering to the requirements of these functions. In the
-future, a verification function may be provided for your test suite; however, it
-is not yet possible to verify your implementation at compile-time.
+You are responsible for adhering to the requirements of these functions. There
+are verification functions that you can use in your test suite; however, it is
+not yet possible to prove correctness at compile-time.
 
-This is an `unsafe trait` to implement, because you are responsible for
-upholding the state requirements. The types you manipulate have `unsafe fn`
-constructors, because they require you to maintain correct and consistent
-processes in order for the rest of the library to use them.
+This is an `unsafe trait` to implement because you are responsible for upholding
+the stated requirements.
 
 The implementations of `BitOrder` are trusted to drive safe code, and once data
 leaves a `BitOrder` implementation, it is considered safe to use as the basis
@@ -616,46 +657,55 @@ for interaction with memory.
 
 # Verification
 
-Rust currently lacks Zig’s compile-time computation capability. This means that
-`bitvec` cannot fail a compile if it detects that a `BitOrder` implementation is
-invalid and breaks the stated requirements. `bitvec` does offer a function,
-[`verify`], which ensures the correctness of an implementation. When Rust gains
-the capability to run this function in generic `const` contexts, `bitvec` will
-use it to prevent at compile-time the construction of data structures that use
-incorrect ordering implementations.
+The [`verify`] and [`verify_for_type`] functions are available for your test
+suites. They ensure that a `BitOrder` implementation satisfies the requirements
+when invoked for a given register type.
 
-The verifier function panics when it detects invalid behavior, with an error
-message intended to clearly indicate the broken requirement.
+# Examples
 
-```rust
-use bitvec::{
-  index::{BitIdx, BitPos, BitRegister},
-  order::{self, BitOrder},
-};
-# use bitvec::{index::*, order::Lsb0};
-
-pub struct Custom;
-unsafe impl BitOrder for Custom {
-  fn at&lt;R: BitRegister&gt;(idx: BitIdx&lt;R&gt;) -&gt; BitPos&lt;R&gt; {
-  // impl
-  # return Lsb0::at::&lt;R&gt;(idx);
-  }
-}
-
-#[test]
-#[cfg(test)]
-fn prove_custom() {
-  order::verify::&lt;Custom&gt;();
-}
-```
-
-[`verify`]: fn.verify.html
+Implementations are not required to remain contiguous over a register. This
+example swizzles the high and low halves of each byte, but any translation is
+valid as long as it satisfies the strict one-to-one requirement of
+index-to-position.
 **/</span>
-<span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">trait</span> <span class="ident">BitOrder</span> {
+<span class="doccomment">///</span>
+<span class="doccomment">/// ```rust</span>
+<span class="doccomment">/// use bitvec::{</span>
+<span class="doccomment">///   prelude::BitOrder,</span>
+<span class="doccomment">///   // Additional symbols:</span>
+<span class="doccomment">///   index::{BitIdx, BitPos},</span>
+<span class="doccomment">///   mem::BitRegister,</span>
+<span class="doccomment">/// };</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// pub struct HiLo;</span>
+<span class="doccomment">/// unsafe impl BitOrder for HiLo {</span>
+<span class="doccomment">///   fn at&lt;R: BitRegister&gt;(idx: BitIdx&lt;R&gt;) -&gt; BitPos&lt;R&gt; {</span>
+<span class="doccomment">///     BitPos::new(idx.into_inner() ^ 4).unwrap()</span>
+<span class="doccomment">///   }</span>
+<span class="doccomment">/// }</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// #[test]</span>
+<span class="doccomment">/// #[cfg(test)]</span>
+<span class="doccomment">/// fn prove_hilo() {</span>
+<span class="doccomment">///   bitvec::order::verify::&lt;HiLo&gt;();</span>
+<span class="doccomment">/// }</span>
+<span class="doccomment">/// ```</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// [`BitIdx`]: crate::index::BitIdx</span>
+<span class="doccomment">/// [`BitOrder::at`]: Self::at</span>
+<span class="doccomment">/// [`BitPos`]: crate::index::BitPos</span>
+<span class="doccomment">/// [`bitvec`]: crate</span>
+<span class="doccomment">/// [`verify`]: crate::order::verify</span>
+<span class="doccomment">/// [`verify_for_type`]: crate::order::verify_for_type</span>
+<span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">trait</span> <span class="ident">BitOrder</span>: <span class="lifetime">&#39;static</span> {
 	<span class="doccomment">/// Converts a semantic bit index into an electrical bit position.</span>
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// This function is the basis of the trait, and must adhere to a number of</span>
-	<span class="doccomment">/// requirements in order for an implementation to be considered correct.</span>
+	<span class="doccomment">/// requirements in order for an implementation to be correct.</span>
+	<span class="doccomment">///</span>
+	<span class="doccomment">/// # Type Parameters</span>
+	<span class="doccomment">///</span>
+	<span class="doccomment">/// - `R`: The register type that the index and position govern.</span>
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// # Parameters</span>
 	<span class="doccomment">///</span>
@@ -663,66 +713,71 @@ fn prove_custom() {
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// # Returns</span>
 	<span class="doccomment">///</span>
-	<span class="doccomment">/// The electrical position of the indexed bit within a register `R`. See</span>
-	<span class="doccomment">/// the `BitPos` documentation for what electrical positions are considered</span>
-	<span class="doccomment">/// to mean.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// # Type Parameters</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// - `R`: The register type which the index and position describe.</span>
+	<span class="doccomment">/// The electrical position of the indexed bit within the register `R`. See</span>
+	<span class="doccomment">/// the [`BitPos`] documentation for what electrical positions are</span>
+	<span class="doccomment">/// considered to mean.</span>
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// # Requirements</span>
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// This function must satisfy the following requirements for all possible</span>
-	<span class="doccomment">/// input and output values for all possible type parameters:</span>
+	<span class="doccomment">/// input and output values, for all possible `R` type parameters:</span>
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// ## Totality</span>
 	<span class="doccomment">///</span>
-	<span class="doccomment">/// This function must be able to accept every input in the `BitIdx&lt;R&gt;`</span>
-	<span class="doccomment">/// value range, and produce a corresponding `BitPos&lt;R&gt;`. It must not abort</span>
-	<span class="doccomment">/// the program or return an invalid `BitPos&lt;R&gt;` for any input value in the</span>
-	<span class="doccomment">/// `BitIdx&lt;R&gt;` range.</span>
+	<span class="doccomment">/// This function must be able to accept every input in the range</span>
+	<span class="doccomment">/// [`BitIdx::ZERO`] to [`BitIdx::LAST`], and produce a value in the same</span>
+	<span class="doccomment">/// range as a [`BitPos`].</span>
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// ## Bijection</span>
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// There must be an exactly one-to-one correspondence between input value</span>
-	<span class="doccomment">/// and output value. No input index may select from a set of more than one</span>
-	<span class="doccomment">/// output position, and no output position may be produced by more than one</span>
-	<span class="doccomment">/// input index.</span>
+	<span class="doccomment">/// and output value. No input index may choose its output from a set of</span>
+	<span class="doccomment">/// more than one position, and no output position may be produced by more</span>
+	<span class="doccomment">/// than one input index.</span>
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// ## Purity</span>
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// The translation from index to position must be consistent for the</span>
-	<span class="doccomment">/// lifetime of the program. This function *may* refer to global state, but</span>
-	<span class="doccomment">/// that state **must** be immutable for the program lifetime, and must not</span>
-	<span class="doccomment">/// be used to violate the totality or bijection requirements.</span>
+	<span class="doccomment">/// lifetime of *at least* all data structures in the program. This function</span>
+	<span class="doccomment">/// *may* refer to global state, but that state **must** be immutable while</span>
+	<span class="doccomment">/// any [`bitvec`] data structures exist, and must not be used to violate</span>
+	<span class="doccomment">/// the totality or bijection requirements.</span>
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// ## Output Validity</span>
 	<span class="doccomment">///</span>
-	<span class="doccomment">/// The produced `BitPos&lt;R&gt;` must be within the valid range of that type.</span>
-	<span class="doccomment">/// Call sites of this function will not take any steps to constrain the</span>
-	<span class="doccomment">/// output value. If you use `unsafe` code to produce an invalid</span>
-	<span class="doccomment">/// `BitPos&lt;R&gt;`, the program is permanently incorrect, and will likely</span>
-	<span class="doccomment">/// crash.</span>
+	<span class="doccomment">/// The produced [`BitPos`] must be within the valid range of that type.</span>
+	<span class="doccomment">/// Call sites of this function will not take any steps to constrain or</span>
+	<span class="doccomment">/// check the return value. If you use `unsafe` code to produce an invalid</span>
+	<span class="doccomment">/// `BitPos`, the program is incorrect, and will likely crash.</span>
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// # Usage</span>
 	<span class="doccomment">///</span>
-	<span class="doccomment">/// This function will only ever be called with input values in the valid</span>
-	<span class="doccomment">/// `BitIdx&lt;R&gt;` range. Implementors are not required to consider any values</span>
+	<span class="doccomment">/// This function is only ever called with input values in the valid</span>
+	<span class="doccomment">/// [`BitIdx`] range. Implementors are not required to consider any values</span>
 	<span class="doccomment">/// outside this range in their function body.</span>
+	<span class="doccomment">///</span>
+	<span class="doccomment">/// [`BitIdx`]: crate::index::BitIdx</span>
+	<span class="doccomment">/// [`BitIdx::LAST`]: crate::index::BitIdx::LAST</span>
+	<span class="doccomment">/// [`BitIdx::ZERO`]: crate::index::BitIdx::ZERO</span>
+	<span class="doccomment">/// [`BitPos`]: crate::index::BitPos</span>
+	<span class="doccomment">/// [`bitvec`]: crate</span>
 	<span class="kw">fn</span> <span class="ident">at</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>(<span class="ident">index</span>: <span class="ident">BitIdx</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>) -&gt; <span class="ident">BitPos</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>
 	<span class="kw">where</span> <span class="ident">R</span>: <span class="ident">BitRegister</span>;
 
 	<span class="doccomment">/// Converts a semantic bit index into a one-hot selector mask.</span>
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// This is an optional function; a default implementation is provided for</span>
-	<span class="doccomment">/// you.</span>
+	<span class="doccomment">/// you. If you choose to override it, your implementation **must** retain</span>
+	<span class="doccomment">/// the behavior of the default implementation.</span>
 	<span class="doccomment">///</span>
-	<span class="doccomment">/// The default implementation of this function calls `Self::at` to produce</span>
-	<span class="doccomment">/// an electrical position, then turns that into a selector mask by setting</span>
-	<span class="doccomment">/// the `n`th bit more significant than the least significant bit of the</span>
-	<span class="doccomment">/// element. `BitOrder` implementations may choose to provide a faster mask</span>
-	<span class="doccomment">/// production here, but they must satisfy the requirements listed below.</span>
+	<span class="doccomment">/// The default implementation calls [`Self::at`] to convert the index into</span>
+	<span class="doccomment">/// a position, then turns that position into a selector mask with the</span>
+	<span class="doccomment">/// expression `1 &lt;&lt; pos`. `BitOrder` implementations may choose to provide</span>
+	<span class="doccomment">/// a faster mask production here, as long as they match this behavior.</span>
+	<span class="doccomment">///</span>
+	<span class="doccomment">/// # Type Parameters</span>
+	<span class="doccomment">///</span>
+	<span class="doccomment">/// - `R`: The register type that the index and selector govern.</span>
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// # Parameters</span>
 	<span class="doccomment">///</span>
@@ -732,31 +787,34 @@ fn prove_custom() {
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// A one-hot selector mask for the bit indicated by the index value.</span>
 	<span class="doccomment">///</span>
-	<span class="doccomment">/// # Type Parameters</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// - `R`: The storage type for which the mask will be calculated. The mask</span>
-	<span class="doccomment">///   must also be this type, as it will be applied to a register of `R` in</span>
-	<span class="doccomment">///   order to set, clear, or test a single bit.</span>
-	<span class="doccomment">///</span>
 	<span class="doccomment">/// # Requirements</span>
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// A one-hot encoding means that there is exactly one bit set in the</span>
-	<span class="doccomment">/// produced value. It must be equivalent to `1 &lt;&lt; Self::at::&lt;R&gt;(place)`.</span>
+	<span class="doccomment">/// produced value. It must be equivalent to `1 &lt;&lt; Self::at::&lt;R&gt;(index)`.</span>
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// As with `at`, this function must produce a unique mapping from each</span>
-	<span class="doccomment">/// legal index in the `R` domain to a one-hot value of `R`.</span>
+	<span class="doccomment">/// legal index in the [`BitIdx`] domain to a one-hot value of `R`.</span>
+	<span class="doccomment">///</span>
+	<span class="doccomment">/// [`BitIdx`]: crate::index::BitIdx</span>
+	<span class="doccomment">/// [`Self::at`]: Self::at</span>
 	<span class="attribute">#[<span class="ident">inline</span>]</span>
+	<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">tarpaulin_include</span>))]</span>
+
 	<span class="kw">fn</span> <span class="ident">select</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>(<span class="ident">index</span>: <span class="ident">BitIdx</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>) -&gt; <span class="ident">BitSel</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>
 	<span class="kw">where</span> <span class="ident">R</span>: <span class="ident">BitRegister</span> {
 		<span class="ident"><span class="self">Self</span>::at</span>::<span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>(<span class="ident">index</span>).<span class="ident">select</span>()
 	}
 
-	<span class="doccomment">/// Constructs a multi-bit selector mask for batch operations on a single</span>
+	<span class="doccomment">/// Constructs a multiple-bit selector mask for batched operations on a</span>
 	<span class="doccomment">/// register `R`.</span>
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// The default implementation of this function traverses the index range,</span>
-	<span class="doccomment">/// converting each index into a single-bit selector with `Self::select` and</span>
-	<span class="doccomment">/// accumulating into a combined register value.</span>
+	<span class="doccomment">/// converting each index into a single-bit selector with [`Self::select`]</span>
+	<span class="doccomment">/// and accumulating into a combined register value.</span>
+	<span class="doccomment">///</span>
+	<span class="doccomment">/// # Type Parameters</span>
+	<span class="doccomment">///</span>
+	<span class="doccomment">/// - `R`: The register type for which the mask is built.</span>
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// # Parameters</span>
 	<span class="doccomment">///</span>
@@ -768,40 +826,81 @@ fn prove_custom() {
 	<span class="doccomment">/// A bit-mask with all bits corresponding to the input index range set high</span>
 	<span class="doccomment">/// and all others set low.</span>
 	<span class="doccomment">///</span>
-	<span class="doccomment">/// # Type Parameters</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// - `R`: The storage type for which the mask will be calculated. The mask</span>
-	<span class="doccomment">///   must also be this type, as it will be applied to a register of `R` in</span>
-	<span class="doccomment">///   order to set, clear, or test all the selected bits.</span>
-	<span class="doccomment">///</span>
 	<span class="doccomment">/// # Requirements</span>
 	<span class="doccomment">///</span>
-	<span class="doccomment">/// This function must always be equivalent to</span>
+	<span class="doccomment">/// This function must always be equivalent to this expression:</span>
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// ```rust,ignore</span>
 	<span class="doccomment">/// (from .. upto)</span>
-	<span class="doccomment">///   .map(1 &lt;&lt; Self::at::&lt;R&gt;)</span>
+	<span class="doccomment">///   .map(Self::select::&lt;R&gt;)</span>
 	<span class="doccomment">///   .fold(0, |mask, sel| mask | sel)</span>
 	<span class="doccomment">/// ```</span>
-	<span class="attribute">#[<span class="ident">inline</span>]</span>
+	<span class="doccomment">///</span>
+	<span class="doccomment">/// [`Self::select`]: Self::select</span>
 	<span class="kw">fn</span> <span class="ident">mask</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>(
 		<span class="ident">from</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">BitIdx</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-		<span class="ident">upto</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">BitTail</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+		<span class="ident">upto</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">BitEnd</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
 	) -&gt; <span class="ident">BitMask</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>
 	<span class="kw">where</span>
 		<span class="ident">R</span>: <span class="ident">BitRegister</span>,
 	{
 		<span class="kw">let</span> (<span class="ident">from</span>, <span class="ident">upto</span>) <span class="op">=</span> <span class="kw">match</span> (<span class="ident">from</span>.<span class="ident">into</span>(), <span class="ident">upto</span>.<span class="ident">into</span>()) {
 			(<span class="prelude-val">None</span>, <span class="prelude-val">None</span>) =&gt; <span class="kw">return</span> <span class="ident">BitMask::ALL</span>,
-			(<span class="prelude-val">Some</span>(<span class="ident">from</span>), <span class="prelude-val">None</span>) =&gt; (<span class="ident">from</span>, <span class="ident">BitTail</span>::<span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span><span class="ident">::END</span>),
-			(<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="ident">upto</span>)) =&gt; (<span class="ident">BitIdx</span>::<span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span><span class="ident">::ZERO</span>, <span class="ident">upto</span>),
+			(<span class="prelude-val">Some</span>(<span class="ident">from</span>), <span class="prelude-val">None</span>) =&gt; (<span class="ident">from</span>, <span class="ident">BitEnd::LAST</span>),
+			(<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="ident">upto</span>)) =&gt; (<span class="ident">BitIdx::ZERO</span>, <span class="ident">upto</span>),
 			(<span class="prelude-val">Some</span>(<span class="ident">from</span>), <span class="prelude-val">Some</span>(<span class="ident">upto</span>)) =&gt; (<span class="ident">from</span>, <span class="ident">upto</span>),
 		};
-		<span class="ident">BitIdx</span>::<span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span><span class="ident">::range</span>(<span class="ident">from</span>, <span class="ident">upto</span>).<span class="ident">map</span>(<span class="ident"><span class="self">Self</span>::select</span>::<span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>).<span class="ident">sum</span>()
+		<span class="ident">from</span>.<span class="ident">range</span>(<span class="ident">upto</span>).<span class="ident">map</span>(<span class="ident"><span class="self">Self</span>::select</span>::<span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>).<span class="ident">sum</span>()
 	}
 }
 
-<span class="doccomment">/// Traverses a register from `MSbit` to `LSbit`.</span>
+<span class="doccomment">/// Traverses a register from the least significant bit to the most significant.</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">Default</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">Ord</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>)]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Lsb0</span>;
+
+<span class="kw">unsafe</span> <span class="kw">impl</span> <span class="ident">BitOrder</span> <span class="kw">for</span> <span class="ident">Lsb0</span> {
+	<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">not</span>(<span class="ident">tarpaulin_include</span>), <span class="ident">inline</span>(<span class="ident">always</span>))]</span>
+	<span class="kw">fn</span> <span class="ident">at</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>(<span class="ident">index</span>: <span class="ident">BitIdx</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>) -&gt; <span class="ident">BitPos</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>
+	<span class="kw">where</span> <span class="ident">R</span>: <span class="ident">BitRegister</span> {
+		<span class="kw">unsafe</span> { <span class="ident">BitPos::new_unchecked</span>(<span class="ident">index</span>.<span class="ident">into_inner</span>()) }
+	}
+
+	<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">not</span>(<span class="ident">tarpaulin_include</span>), <span class="ident">inline</span>(<span class="ident">always</span>))]</span>
+	<span class="kw">fn</span> <span class="ident">select</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>(<span class="ident">index</span>: <span class="ident">BitIdx</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>) -&gt; <span class="ident">BitSel</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>
+	<span class="kw">where</span> <span class="ident">R</span>: <span class="ident">BitRegister</span> {
+		<span class="kw">unsafe</span> { <span class="ident">BitSel::new_unchecked</span>(<span class="ident">R::ONE</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="ident">index</span>.<span class="ident">into_inner</span>()) }
+	}
+
+	<span class="attribute">#[<span class="ident">inline</span>]</span>
+	<span class="kw">fn</span> <span class="ident">mask</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>(
+		<span class="ident">from</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">BitIdx</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+		<span class="ident">upto</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">BitEnd</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+	) -&gt; <span class="ident">BitMask</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>
+	<span class="kw">where</span>
+		<span class="ident">R</span>: <span class="ident">BitRegister</span>,
+	{
+		<span class="kw">let</span> <span class="ident">from</span> <span class="op">=</span> <span class="ident">from</span>.<span class="ident">into</span>().<span class="ident">unwrap_or</span>(<span class="ident">BitIdx::ZERO</span>).<span class="ident">into_inner</span>();
+		<span class="kw">let</span> <span class="ident">upto</span> <span class="op">=</span> <span class="ident">upto</span>.<span class="ident">into</span>().<span class="ident">unwrap_or</span>(<span class="ident">BitEnd::LAST</span>).<span class="ident">into_inner</span>();
+		<span class="macro">debug_assert!</span>(
+			<span class="ident">from</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">upto</span>,
+			<span class="string">&quot;Ranges must run from low index ({}) to high ({})&quot;</span>,
+			<span class="ident">from</span>,
+			<span class="ident">upto</span>
+		);
+		<span class="kw">let</span> <span class="ident">ct</span> <span class="op">=</span> <span class="ident">upto</span> <span class="op">-</span> <span class="ident">from</span>;
+		<span class="kw">if</span> <span class="ident">ct</span> <span class="op">==</span> <span class="ident">R::BITS</span> <span class="kw">as</span> <span class="ident">u8</span> {
+			<span class="kw">return</span> <span class="ident">BitMask::ALL</span>;
+		}
+		<span class="comment">//  1. Set all bits in the mask high</span>
+		<span class="comment">//  2. Shift left by the number of bits in the mask. The mask bits are</span>
+		<span class="comment">//     at LSedge and low.</span>
+		<span class="comment">//  3. Invert. The mask bits are at LSedge and high; all else are low.</span>
+		<span class="comment">//  4. Shift left by the `from` distance from LSedge.</span>
+		<span class="ident">BitMask::new</span>(<span class="op">!</span>(<span class="ident">R::ALL</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="ident">ct</span>) <span class="op">&lt;</span><span class="op">&lt;</span> <span class="ident">from</span>)
+	}
+}
+
+<span class="doccomment">/// Traverses a register from the most significant bit to the least significant.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">Default</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">Ord</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Msb0</span>;
 
@@ -809,100 +908,68 @@ fn prove_custom() {
 	<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">not</span>(<span class="ident">tarpaulin_include</span>), <span class="ident">inline</span>(<span class="ident">always</span>))]</span>
 	<span class="kw">fn</span> <span class="ident">at</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>(<span class="ident">index</span>: <span class="ident">BitIdx</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>) -&gt; <span class="ident">BitPos</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>
 	<span class="kw">where</span> <span class="ident">R</span>: <span class="ident">BitRegister</span> {
-		<span class="kw">unsafe</span> { <span class="ident">BitPos::new_unchecked</span>(<span class="ident">R::MASK</span> <span class="op">-</span> <span class="ident">index</span>.<span class="ident">value</span>()) }
+		<span class="kw">unsafe</span> { <span class="ident">BitPos::new_unchecked</span>(<span class="ident">R::MASK</span> <span class="op">-</span> <span class="ident">index</span>.<span class="ident">into_inner</span>()) }
 	}
 
 	<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">not</span>(<span class="ident">tarpaulin_include</span>), <span class="ident">inline</span>(<span class="ident">always</span>))]</span>
 	<span class="kw">fn</span> <span class="ident">select</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>(<span class="ident">index</span>: <span class="ident">BitIdx</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>) -&gt; <span class="ident">BitSel</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>
 	<span class="kw">where</span> <span class="ident">R</span>: <span class="ident">BitRegister</span> {
-		<span class="comment">/* Set the MSbit, then shift it down. The left expr is const-folded.
-		Note: this is not equivalent to `1 &lt;&lt; (mask - index)`, because that
-		requires a runtime subtraction, but the expression below is only a
-		single right-shift.
+		<span class="comment">/* Shift the MSbit down by the index count. This is not equivalent to
+		the expression `1 &lt;&lt; (mask - index)`, because that lowers to a
+		subtraction followed by a rshift, while this lowers to a single rshift.
 		*/</span>
-		<span class="kw">unsafe</span> { <span class="ident">BitSel::new_unchecked</span>((<span class="ident">R::ONE</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="ident">R::MASK</span>) <span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">index</span>.<span class="ident">value</span>()) }
+		<span class="kw">let</span> <span class="ident">msbit</span>: <span class="ident">R</span> <span class="op">=</span> <span class="ident">R::ONE</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="ident">R::MASK</span>;
+		<span class="kw">unsafe</span> { <span class="ident">BitSel::new_unchecked</span>(<span class="ident">msbit</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">index</span>.<span class="ident">into_inner</span>()) }
 	}
 
 	<span class="attribute">#[<span class="ident">inline</span>]</span>
 	<span class="kw">fn</span> <span class="ident">mask</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>(
 		<span class="ident">from</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">BitIdx</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-		<span class="ident">upto</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">BitTail</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+		<span class="ident">upto</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">BitEnd</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
 	) -&gt; <span class="ident">BitMask</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>
 	<span class="kw">where</span>
 		<span class="ident">R</span>: <span class="ident">BitRegister</span>,
 	{
-		<span class="kw">let</span> <span class="ident">from</span> <span class="op">=</span> <span class="ident">from</span>.<span class="ident">into</span>().<span class="ident">unwrap_or</span>(<span class="ident">BitIdx::ZERO</span>).<span class="ident">value</span>();
-		<span class="kw">let</span> <span class="ident">upto</span> <span class="op">=</span> <span class="ident">upto</span>.<span class="ident">into</span>().<span class="ident">unwrap_or</span>(<span class="ident">BitTail::END</span>).<span class="ident">value</span>();
-		<span class="macro">debug_assert!</span>(<span class="ident">upto</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">from</span>, <span class="string">&quot;Ranges must run from low index to high&quot;</span>);
+		<span class="kw">let</span> <span class="ident">from</span> <span class="op">=</span> <span class="ident">from</span>.<span class="ident">into</span>().<span class="ident">unwrap_or</span>(<span class="ident">BitIdx::ZERO</span>).<span class="ident">into_inner</span>();
+		<span class="kw">let</span> <span class="ident">upto</span> <span class="op">=</span> <span class="ident">upto</span>.<span class="ident">into</span>().<span class="ident">unwrap_or</span>(<span class="ident">BitEnd::LAST</span>).<span class="ident">into_inner</span>();
+		<span class="macro">debug_assert!</span>(
+			<span class="ident">from</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">upto</span>,
+			<span class="string">&quot;Ranges must run from low index ({}) to high ({})&quot;</span>,
+			<span class="ident">from</span>,
+			<span class="ident">upto</span>
+		);
 		<span class="kw">let</span> <span class="ident">ct</span> <span class="op">=</span> <span class="ident">upto</span> <span class="op">-</span> <span class="ident">from</span>;
-		<span class="kw">if</span> <span class="ident">ct</span> <span class="op">==</span> <span class="ident">R::BITS</span> {
+		<span class="kw">if</span> <span class="ident">ct</span> <span class="op">==</span> <span class="ident">R::BITS</span> <span class="kw">as</span> <span class="ident">u8</span> {
 			<span class="kw">return</span> <span class="ident">BitMask::ALL</span>;
 		}
-		<span class="comment">//  1. Set all bits high.</span>
-		<span class="comment">//  2. Shift right by the number of bits in the mask. These are now low.</span>
-		<span class="comment">//  3. Invert. The mask bits (at MSedge) are high; the rest are low.</span>
-		<span class="comment">//  4. Shift right by the distance from MSedge.</span>
-		<span class="kw">unsafe</span> { <span class="ident">BitMask::new</span>(<span class="op">!</span>(<span class="ident">R::ALL</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">ct</span>) <span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">from</span>) }
+		<span class="comment">//  1. Set all bits in the mask high.</span>
+		<span class="comment">//  2. Shift right by the number of bits in the mask. The mask bits are</span>
+		<span class="comment">// at MSedge and low.  3. Invert. The mask bits are at MSedge and high;</span>
+		<span class="comment">// all else are low.  4. Shift right by the `from` distance from MSedge.</span>
+		<span class="ident">BitMask::new</span>(<span class="op">!</span>(<span class="ident">R::ALL</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">ct</span>) <span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">from</span>)
 	}
 }
-
-<span class="doccomment">/// Traverses a register from `LSbit` to `MSbit`.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">Default</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">Ord</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Lsb0</span>;
-
-<span class="kw">unsafe</span> <span class="kw">impl</span> <span class="ident">BitOrder</span> <span class="kw">for</span> <span class="ident">Lsb0</span> {
-	<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">not</span>(<span class="ident">tarpaulin</span>), <span class="ident">inline</span>(<span class="ident">always</span>))]</span>
-	<span class="kw">fn</span> <span class="ident">at</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>(<span class="ident">index</span>: <span class="ident">BitIdx</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>) -&gt; <span class="ident">BitPos</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>
-	<span class="kw">where</span> <span class="ident">R</span>: <span class="ident">BitRegister</span> {
-		<span class="kw">unsafe</span> { <span class="ident">BitPos::new_unchecked</span>(<span class="ident">index</span>.<span class="ident">value</span>()) }
-	}
-
-	<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">not</span>(<span class="ident">tarpaulin</span>), <span class="ident">inline</span>(<span class="ident">always</span>))]</span>
-	<span class="kw">fn</span> <span class="ident">select</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>(<span class="ident">index</span>: <span class="ident">BitIdx</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>) -&gt; <span class="ident">BitSel</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>
-	<span class="kw">where</span> <span class="ident">R</span>: <span class="ident">BitRegister</span> {
-		<span class="kw">unsafe</span> { <span class="ident">BitSel::new_unchecked</span>(<span class="ident">R::ONE</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="ident">index</span>.<span class="ident">value</span>()) }
-	}
-
-	<span class="attribute">#[<span class="ident">inline</span>]</span>
-	<span class="kw">fn</span> <span class="ident">mask</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>(
-		<span class="ident">from</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">BitIdx</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-		<span class="ident">upto</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">BitTail</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-	) -&gt; <span class="ident">BitMask</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>
-	<span class="kw">where</span>
-		<span class="ident">R</span>: <span class="ident">BitRegister</span>,
-	{
-		<span class="kw">let</span> <span class="ident">from</span> <span class="op">=</span> <span class="ident">from</span>.<span class="ident">into</span>().<span class="ident">unwrap_or</span>(<span class="ident">BitIdx::ZERO</span>).<span class="ident">value</span>();
-		<span class="kw">let</span> <span class="ident">upto</span> <span class="op">=</span> <span class="ident">upto</span>.<span class="ident">into</span>().<span class="ident">unwrap_or</span>(<span class="ident">BitTail::END</span>).<span class="ident">value</span>();
-		<span class="macro">debug_assert!</span>(<span class="ident">upto</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">from</span>, <span class="string">&quot;Ranges must run from low index to high&quot;</span>);
-		<span class="kw">let</span> <span class="ident">ct</span> <span class="op">=</span> <span class="ident">upto</span> <span class="op">-</span> <span class="ident">from</span>;
-		<span class="kw">if</span> <span class="ident">ct</span> <span class="op">==</span> <span class="ident">R::BITS</span> {
-			<span class="kw">return</span> <span class="ident">BitMask::ALL</span>;
-		}
-		<span class="comment">//  1. Set all bits high.</span>
-		<span class="comment">//  2. Shift left by the number of bits in the mask. These are now low.</span>
-		<span class="comment">//  3. Invert. The mask bits at LSedge are high; the rest are low.</span>
-		<span class="comment">//  4. Shift left by the distance from LSedge.</span>
-		<span class="kw">unsafe</span> { <span class="ident">BitMask::new</span>(<span class="op">!</span>(<span class="ident">R::ALL</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="ident">ct</span>) <span class="op">&lt;</span><span class="op">&lt;</span> <span class="ident">from</span>) }
-	}
-}
-
-<span class="doccomment">/** A default bit ordering.
-
-Typically, your platform’s C compiler uses most-significant-bit-first ordering
-for bitfields. The Msb0 bit ordering and big-endian byte ordering are otherwise
-completely unrelated.
-**/</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">target_endian</span> <span class="op">=</span> <span class="string">&quot;big&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">LocalBits</span> <span class="op">=</span> <span class="ident">Msb0</span>;
 
 <span class="doccomment">/** A default bit ordering.
 
 Typically, your platform’s C compiler uses least-significant-bit-first ordering
-for bitfields. The Lsb0 bit ordering and little-endian byte ordering are
+for bitfields. The [`Lsb0`] bit ordering and little-endian byte ordering are
 otherwise completely unrelated.
+
+[`Lsb0`]: crate::order::Lsb0
 **/</span>
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">target_endian</span> <span class="op">=</span> <span class="string">&quot;little&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">LocalBits</span> <span class="op">=</span> <span class="ident">Lsb0</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::Lsb0</span> <span class="kw">as</span> <span class="ident">LocalBits</span>;
+<span class="doccomment">/** A default bit ordering.
+
+Typically, your platform’s C compiler uses most-significant-bit-first ordering
+for bitfields. The [`Msb0`] bit ordering and big-endian byte ordering are
+otherwise completely unrelated.
+
+[`Msb0`]: crate::order::Msb0
+**/</span>
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">target_endian</span> <span class="op">=</span> <span class="string">&quot;big&quot;</span>)]</span>
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::Msb0</span> <span class="kw">as</span> <span class="ident">LocalBits</span>;
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">any</span>(<span class="ident">target_endian</span> <span class="op">=</span> <span class="string">&quot;big&quot;</span>, <span class="ident">target_endian</span> <span class="op">=</span> <span class="string">&quot;little&quot;</span>)))]</span>
 <span class="macro">compile_fail!</span>(<span class="macro">concat!</span>(
@@ -910,15 +977,15 @@ otherwise completely unrelated.
 	<span class="macro">env!</span>(<span class="ident">CARGO_PKG_REPOSITORY</span>)
 ));
 
-<span class="doccomment">/** Verifies a `BitOrder` implementation’s adherence to the stated rules.
+<span class="doccomment">/** Verifies a [`BitOrder`] implementation’s adherence to the stated rules.
 
-This function checks some `BitOrder` implementation’s behavior on each of the
-`BitRegister` types it must handle, and reports any violation of the rules that
-it detects.
+This function checks some [`BitOrder`] implementation’s behavior on each of the
+[`BitRegister`] types it must handle, and reports any violation of the rules
+that it detects.
 
 # Type Parameters
 
-- `O`: The `BitOrder` implementation to test.
+- `O`: The [`BitOrder`] implementation to test.
 
 # Parameters
 
@@ -927,10 +994,13 @@ it detects.
 
 # Panics
 
-This panics if it detects any violation of the `BitOrder` implementation rules
+This panics if it detects any violation of the [`BitOrder`] implementation rules
 for `O`.
+
+[`BitOrder`]: crate::order::BitOrder
+[`BitRegister`]: crate::mem::BitRegister
 **/</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
+<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">never</span>)]</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">verify</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>(<span class="ident">verbose</span>: <span class="ident">bool</span>)
 <span class="kw">where</span> <span class="ident">O</span>: <span class="ident">BitOrder</span> {
 	<span class="ident">verify_for_type</span>::<span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">u8</span><span class="op">&gt;</span>(<span class="ident">verbose</span>);
@@ -942,19 +1012,19 @@ for `O`.
 	<span class="ident">verify_for_type</span>::<span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">u64</span><span class="op">&gt;</span>(<span class="ident">verbose</span>);
 }
 
-<span class="doccomment">/** Verifies a `BitOrder` implementation’s adherence to the stated rules, for
+<span class="doccomment">/** Verifies a [`BitOrder`] implementation’s adherence to the stated rules, for
 one register type.
 
-This function checks some `BitOrder` implementation against only one of the
-`BitRegister` types that it will encounter. This is useful if you are
+This function checks some [`BitOrder`] implementation against only one of the
+[`BitRegister`] types that it will encounter. This is useful if you are
 implementing an ordering that only needs to be concerned with a subset of the
 types, and you know that you will never use it with the types it does not
 support.
 
 # Type Parameters
 
-- `O`: The `BitOrder` implementation to test.
-- `R`: The `BitRegister` type for which to test `O`.
+- `O`: The [`BitOrder`] implementation to test.
+- `R`: The [`BitRegister`] type for which to test `O`.
 
 # Parameters
 
@@ -963,10 +1033,13 @@ support.
 
 # Panics
 
-This panics if it detects any violation of the `BitOrder` implementation rules
+This panics if it detects any violation of the [`BitOrder`] implementation rules
 for the combination of input types and index values.
+
+[`BitOrder`]: crate::order::BitOrder
+[`BitRegister`]: crate::mem::BitRegister
 **/</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
+<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">never</span>)]</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">verify_for_type</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">R</span><span class="op">&gt;</span>(<span class="ident">verbose</span>: <span class="ident">bool</span>)
 <span class="kw">where</span>
 	<span class="ident">O</span>: <span class="ident">BitOrder</span>,
@@ -978,7 +1051,7 @@ for the combination of input types and index values.
 	<span class="kw">let</span> <span class="ident">oname</span> <span class="op">=</span> <span class="ident">type_name</span>::<span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>();
 	<span class="kw">let</span> <span class="ident">mname</span> <span class="op">=</span> <span class="ident">type_name</span>::<span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>();
 
-	<span class="kw">for</span> <span class="ident">n</span> <span class="kw">in</span> <span class="number">0</span> .. <span class="ident">R::BITS</span> {
+	<span class="kw">for</span> <span class="ident">n</span> <span class="kw">in</span> <span class="number">0</span> .. <span class="ident">R::BITS</span> <span class="kw">as</span> <span class="ident">u8</span> {
 		<span class="comment">//  Wrap the counter as an index.</span>
 		<span class="kw">let</span> <span class="ident">idx</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">BitIdx</span>::<span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span><span class="ident">::new_unchecked</span>(<span class="ident">n</span>) };
 
@@ -991,19 +1064,19 @@ for the combination of input types and index values.
 				<span class="ident">oname</span>,
 				<span class="ident">mname</span>,
 				<span class="ident">n</span>,
-				<span class="ident">pos</span>.<span class="ident">value</span>(),
+				<span class="ident">pos</span>.<span class="ident">into_inner</span>(),
 			);
 		}
 
 		<span class="comment">//  If the computed position exceeds the valid range, fail.</span>
 		<span class="macro">assert!</span>(
-			<span class="ident">pos</span>.<span class="ident">value</span>() <span class="op">&lt;</span> <span class="ident">R::BITS</span>,
+			<span class="ident">pos</span>.<span class="ident">into_inner</span>() <span class="op">&lt;</span> <span class="ident">R::BITS</span> <span class="kw">as</span> <span class="ident">u8</span>,
 			<span class="string">&quot;Error when verifying the implementation of `BitOrder` for `{}`: \
 			 Index {} produces a bit position ({}) that exceeds the type width \
 			 {}&quot;</span>,
 			<span class="ident">oname</span>,
 			<span class="ident">n</span>,
-			<span class="ident">pos</span>.<span class="ident">value</span>(),
+			<span class="ident">pos</span>.<span class="ident">into_inner</span>(),
 			<span class="ident">R::BITS</span>,
 		);
 
@@ -1019,7 +1092,7 @@ for the combination of input types and index values.
 
 		<span class="comment">//  If the selector bit is not one-hot, fail.</span>
 		<span class="macro">assert_eq!</span>(
-			<span class="ident">sel</span>.<span class="ident">value</span>().<span class="ident">count_ones</span>(),
+			<span class="ident">sel</span>.<span class="ident">into_inner</span>().<span class="ident">count_ones</span>(),
 			<span class="number">1</span>,
 			<span class="string">&quot;Error when verifying the implementation of `BitOrder` for `{}`: \
 			 Index {} produces a bit selector ({:b}) that is not a one-hot mask&quot;</span>,
@@ -1041,7 +1114,7 @@ for the combination of input types and index values.
 			<span class="ident">oname</span>,
 			<span class="ident">n</span>,
 			<span class="ident">sel</span>,
-			<span class="ident">pos</span>.<span class="ident">value</span>(),
+			<span class="ident">pos</span>.<span class="ident">into_inner</span>(),
 			<span class="ident">shl</span>,
 		);
 
@@ -1054,7 +1127,7 @@ for the combination of input types and index values.
 			 produced by a prior index&quot;</span>,
 			<span class="ident">oname</span>,
 			<span class="ident">n</span>,
-			<span class="ident">pos</span>.<span class="ident">value</span>(),
+			<span class="ident">pos</span>.<span class="ident">into_inner</span>(),
 		);
 		<span class="ident">accum</span>.<span class="ident">insert</span>(<span class="ident">sel</span>);
 		<span class="kw">if</span> <span class="ident">verbose</span> {
@@ -1080,11 +1153,12 @@ for the combination of input types and index values.
 
 	<span class="comment">//  Check that `O::mask` is correct for all range combinations.</span>
 	<span class="kw">for</span> <span class="ident">from</span> <span class="kw">in</span> <span class="ident">BitIdx</span>::<span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span><span class="ident">::range_all</span>() {
-		<span class="kw">for</span> <span class="ident">upto</span> <span class="kw">in</span> <span class="ident">BitTail</span>::<span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span><span class="ident">::range_from</span>(<span class="ident">from</span>) {
+		<span class="kw">for</span> <span class="ident">upto</span> <span class="kw">in</span> <span class="ident">BitEnd</span>::<span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span><span class="ident">::range_from</span>(<span class="ident">from</span>) {
 			<span class="kw">let</span> <span class="ident">mask</span> <span class="op">=</span> <span class="ident">O::mask</span>(<span class="ident">from</span>, <span class="ident">upto</span>);
-			<span class="kw">let</span> <span class="ident">check</span> <span class="op">=</span> <span class="ident">BitIdx</span>::<span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span><span class="ident">::range</span>(<span class="ident">from</span>, <span class="ident">upto</span>)
-				.<span class="ident">map</span>(<span class="ident">O::at</span>::<span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>)
-				.<span class="ident">map</span>(<span class="ident">BitPos</span>::<span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span><span class="ident">::select</span>)
+			<span class="kw">let</span> <span class="ident">check</span> <span class="op">=</span> <span class="ident">from</span>
+				.<span class="ident">range</span>(<span class="ident">upto</span>)
+				.<span class="ident">map</span>(<span class="ident">O::at</span>)
+				.<span class="ident">map</span>(<span class="ident">BitPos::select</span>)
 				.<span class="ident">sum</span>::<span class="op">&lt;</span><span class="ident">BitMask</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span><span class="op">&gt;</span>();
 			<span class="macro">assert_eq!</span>(
 				<span class="ident">mask</span>,
@@ -1111,16 +1185,6 @@ for the combination of input types and index values.
 	<span class="kw">fn</span> <span class="ident">verify_impls</span>() {
 		<span class="ident">verify</span>::<span class="op">&lt;</span><span class="ident">Lsb0</span><span class="op">&gt;</span>(<span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;testing&quot;</span>));
 		<span class="ident">verify</span>::<span class="op">&lt;</span><span class="ident">Msb0</span><span class="op">&gt;</span>(<span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;testing&quot;</span>));
-
-		<span class="kw">struct</span> <span class="ident">DefaultImpl</span>;
-		<span class="kw">unsafe</span> <span class="kw">impl</span> <span class="ident">BitOrder</span> <span class="kw">for</span> <span class="ident">DefaultImpl</span> {
-			<span class="kw">fn</span> <span class="ident">at</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>(<span class="ident">index</span>: <span class="ident">BitIdx</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>) -&gt; <span class="ident">BitPos</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>
-			<span class="kw">where</span> <span class="ident">R</span>: <span class="ident">BitRegister</span> {
-				<span class="kw">unsafe</span> { <span class="ident">BitPos::new_unchecked</span>(<span class="ident">index</span>.<span class="ident">value</span>()) }
-			}
-		}
-
-		<span class="ident">verify</span>::<span class="op">&lt;</span><span class="ident">DefaultImpl</span><span class="op">&gt;</span>(<span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;testing&quot;</span>));
 	}
 }
 </code></pre></div>

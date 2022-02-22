@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;mysql_common-0.26.0&#x2F;src&#x2F;proto&#x2F;sync_framed.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>sync_framed.rs - source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><script defer src="../../../main.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;mysql_common-0.28.2&#x2F;src&#x2F;proto&#x2F;sync_framed.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>sync_framed.rs - source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><script defer src="../../../main.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script>
     <noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../mysql_common/index.html'><div class='logo-container rust-logo'><img src='../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
@@ -202,6 +202,152 @@
 <span id="201">201</span>
 <span id="202">202</span>
 <span id="203">203</span>
+<span id="204">204</span>
+<span id="205">205</span>
+<span id="206">206</span>
+<span id="207">207</span>
+<span id="208">208</span>
+<span id="209">209</span>
+<span id="210">210</span>
+<span id="211">211</span>
+<span id="212">212</span>
+<span id="213">213</span>
+<span id="214">214</span>
+<span id="215">215</span>
+<span id="216">216</span>
+<span id="217">217</span>
+<span id="218">218</span>
+<span id="219">219</span>
+<span id="220">220</span>
+<span id="221">221</span>
+<span id="222">222</span>
+<span id="223">223</span>
+<span id="224">224</span>
+<span id="225">225</span>
+<span id="226">226</span>
+<span id="227">227</span>
+<span id="228">228</span>
+<span id="229">229</span>
+<span id="230">230</span>
+<span id="231">231</span>
+<span id="232">232</span>
+<span id="233">233</span>
+<span id="234">234</span>
+<span id="235">235</span>
+<span id="236">236</span>
+<span id="237">237</span>
+<span id="238">238</span>
+<span id="239">239</span>
+<span id="240">240</span>
+<span id="241">241</span>
+<span id="242">242</span>
+<span id="243">243</span>
+<span id="244">244</span>
+<span id="245">245</span>
+<span id="246">246</span>
+<span id="247">247</span>
+<span id="248">248</span>
+<span id="249">249</span>
+<span id="250">250</span>
+<span id="251">251</span>
+<span id="252">252</span>
+<span id="253">253</span>
+<span id="254">254</span>
+<span id="255">255</span>
+<span id="256">256</span>
+<span id="257">257</span>
+<span id="258">258</span>
+<span id="259">259</span>
+<span id="260">260</span>
+<span id="261">261</span>
+<span id="262">262</span>
+<span id="263">263</span>
+<span id="264">264</span>
+<span id="265">265</span>
+<span id="266">266</span>
+<span id="267">267</span>
+<span id="268">268</span>
+<span id="269">269</span>
+<span id="270">270</span>
+<span id="271">271</span>
+<span id="272">272</span>
+<span id="273">273</span>
+<span id="274">274</span>
+<span id="275">275</span>
+<span id="276">276</span>
+<span id="277">277</span>
+<span id="278">278</span>
+<span id="279">279</span>
+<span id="280">280</span>
+<span id="281">281</span>
+<span id="282">282</span>
+<span id="283">283</span>
+<span id="284">284</span>
+<span id="285">285</span>
+<span id="286">286</span>
+<span id="287">287</span>
+<span id="288">288</span>
+<span id="289">289</span>
+<span id="290">290</span>
+<span id="291">291</span>
+<span id="292">292</span>
+<span id="293">293</span>
+<span id="294">294</span>
+<span id="295">295</span>
+<span id="296">296</span>
+<span id="297">297</span>
+<span id="298">298</span>
+<span id="299">299</span>
+<span id="300">300</span>
+<span id="301">301</span>
+<span id="302">302</span>
+<span id="303">303</span>
+<span id="304">304</span>
+<span id="305">305</span>
+<span id="306">306</span>
+<span id="307">307</span>
+<span id="308">308</span>
+<span id="309">309</span>
+<span id="310">310</span>
+<span id="311">311</span>
+<span id="312">312</span>
+<span id="313">313</span>
+<span id="314">314</span>
+<span id="315">315</span>
+<span id="316">316</span>
+<span id="317">317</span>
+<span id="318">318</span>
+<span id="319">319</span>
+<span id="320">320</span>
+<span id="321">321</span>
+<span id="322">322</span>
+<span id="323">323</span>
+<span id="324">324</span>
+<span id="325">325</span>
+<span id="326">326</span>
+<span id="327">327</span>
+<span id="328">328</span>
+<span id="329">329</span>
+<span id="330">330</span>
+<span id="331">331</span>
+<span id="332">332</span>
+<span id="333">333</span>
+<span id="334">334</span>
+<span id="335">335</span>
+<span id="336">336</span>
+<span id="337">337</span>
+<span id="338">338</span>
+<span id="339">339</span>
+<span id="340">340</span>
+<span id="341">341</span>
+<span id="342">342</span>
+<span id="343">343</span>
+<span id="344">344</span>
+<span id="345">345</span>
+<span id="346">346</span>
+<span id="347">347</span>
+<span id="348">348</span>
+<span id="349">349</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright (c) 2017 Anatoly Ikorsky</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0</span>
@@ -210,7 +356,7 @@
 <span class="comment">// option. All files in the project carrying such notice may not be copied,</span>
 <span class="comment">// modified, or distributed except according to those terms.</span>
 
-<span class="kw">use</span> <span class="ident">bytes</span>::{<span class="ident">BufMut</span>, <span class="ident">BytesMut</span>};
+<span class="kw">use</span> <span class="ident">bytes</span>::{<span class="ident">Buf</span>, <span class="ident">BufMut</span>, <span class="ident">BytesMut</span>};
 
 <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">constants::DEFAULT_MAX_ALLOWED_PACKET</span>,
@@ -258,7 +404,7 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">MySyncFramed</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Creates new instance with given `stream`.</span>
+    <span class="doccomment">/// Creates new instance with the given `stream`.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">stream</span>: <span class="ident">T</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">MySyncFramed</span> {
             <span class="ident">eof</span>: <span class="bool-val">false</span>,
@@ -311,7 +457,7 @@
     <span class="ident">T</span>: <span class="ident">Write</span>,
 {
     <span class="doccomment">/// Will write packets into the stream. Stream may not be flushed.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">write</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">item</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">PacketCodecError</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">write</span><span class="op">&lt;</span><span class="ident">U</span>: <span class="ident">Buf</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">item</span>: <span class="kw-2">&amp;mut</span> <span class="ident">U</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">PacketCodecError</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">codec</span>.<span class="ident">encode</span>(<span class="ident">item</span>, <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">out_buf</span>)<span class="question-mark">?</span>;
         <span class="macro">with_interrupt!</span>(<span class="self">self</span>.<span class="ident">stream</span>.<span class="ident">write_all</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="self">self</span>.<span class="ident">out_buf</span>))<span class="question-mark">?</span>;
         <span class="self">self</span>.<span class="ident">out_buf</span>.<span class="ident">clear</span>();
@@ -325,46 +471,48 @@
     }
 
     <span class="doccomment">/// Will send packets into the stream. Stream will be flushed.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">send</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">item</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">PacketCodecError</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">send</span><span class="op">&lt;</span><span class="ident">U</span>: <span class="ident">Buf</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">item</span>: <span class="kw-2">&amp;mut</span> <span class="ident">U</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">PacketCodecError</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">write</span>(<span class="ident">item</span>)<span class="question-mark">?</span>;
         <span class="self">self</span>.<span class="ident">flush</span>()
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Iterator</span> <span class="kw">for</span> <span class="ident">MySyncFramed</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">MySyncFramed</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">T</span>: <span class="ident">Read</span>,
 {
-    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>, <span class="ident">PacketCodecError</span><span class="op">&gt;</span>;
-
-    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
+    <span class="doccomment">/// Returns `true` if `dst` contains the next packet.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// `false` means, that the `dst` is empty and the stream is at eof.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">next_packet</span><span class="op">&lt;</span><span class="ident">U</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">dst</span>: <span class="kw-2">&amp;mut</span> <span class="ident">U</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">bool</span>, <span class="ident">PacketCodecError</span><span class="op">&gt;</span>
+    <span class="kw">where</span>
+        <span class="ident">U</span>: <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span>,
+        <span class="ident">U</span>: <span class="ident">BufMut</span>,
+    {
         <span class="kw">loop</span> {
             <span class="kw">if</span> <span class="self">self</span>.<span class="ident">eof</span> {
-                <span class="kw">return</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">codec</span>.<span class="ident">decode</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">in_buf</span>).<span class="ident">transpose</span>() {
-                    <span class="prelude-val">Some</span>(<span class="ident">frame</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">frame</span>),
-                    <span class="prelude-val">None</span> =&gt; {
+                <span class="kw">return</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">codec</span>.<span class="ident">decode</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">in_buf</span>, <span class="ident">dst</span>)<span class="question-mark">?</span> {
+                    <span class="bool-val">true</span> =&gt; <span class="prelude-val">Ok</span>(<span class="bool-val">true</span>),
+                    <span class="bool-val">false</span> =&gt; {
                         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">in_buf</span>.<span class="ident">is_empty</span>() {
-                            <span class="prelude-val">None</span>
+                            <span class="prelude-val">Ok</span>(<span class="bool-val">false</span>)
                         } <span class="kw">else</span> {
-                            <span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(<span class="ident">Error::new</span>(<span class="ident">Other</span>, <span class="string">&quot;bytes remaining on stream&quot;</span>).<span class="ident">into</span>()))
+                            <span class="prelude-val">Err</span>(<span class="ident">Error::new</span>(<span class="ident">Other</span>, <span class="string">&quot;bytes remaining on stream&quot;</span>).<span class="ident">into</span>())
                         }
                     }
                 };
             } <span class="kw">else</span> {
-                <span class="kw">match</span> <span class="self">self</span>.<span class="ident">codec</span>.<span class="ident">decode</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">in_buf</span>).<span class="ident">transpose</span>() {
-                    <span class="prelude-val">Some</span>(<span class="ident">item</span>) =&gt; <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">item</span>),
-                    <span class="prelude-val">None</span> =&gt; <span class="kw">unsafe</span> {
+                <span class="kw">match</span> <span class="self">self</span>.<span class="ident">codec</span>.<span class="ident">decode</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">in_buf</span>, <span class="ident">dst</span>)<span class="question-mark">?</span> {
+                    <span class="bool-val">true</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="bool-val">true</span>),
+                    <span class="bool-val">false</span> =&gt; <span class="kw">unsafe</span> {
                         <span class="self">self</span>.<span class="ident">in_buf</span>.<span class="ident">reserve</span>(<span class="number">1</span>);
                         <span class="kw">match</span> <span class="macro">with_interrupt!</span>(<span class="self">self</span>.<span class="ident">stream</span>.<span class="ident">read</span>(<span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="ident">slice_from_raw_parts_mut</span>(
                             <span class="self">self</span>.<span class="ident">in_buf</span>.<span class="ident">chunk_mut</span>().<span class="ident">as_mut_ptr</span>(),
                             <span class="self">self</span>.<span class="ident">in_buf</span>.<span class="ident">chunk_mut</span>().<span class="ident">len</span>()
                         ))) {
                             <span class="prelude-val">Ok</span>(<span class="number">0</span>) =&gt; <span class="self">self</span>.<span class="ident">eof</span> <span class="op">=</span> <span class="bool-val">true</span>,
-                            <span class="prelude-val">Ok</span>(<span class="ident">x</span>) =&gt; {
-                                <span class="self">self</span>.<span class="ident">in_buf</span>.<span class="ident">advance_mut</span>(<span class="ident">x</span>);
-                                <span class="kw">continue</span>;
-                            }
-                            <span class="prelude-val">Err</span>(<span class="ident">err</span>) =&gt; <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(<span class="ident">From::from</span>(<span class="ident">err</span>))),
+                            <span class="prelude-val">Ok</span>(<span class="ident">x</span>) =&gt; <span class="self">self</span>.<span class="ident">in_buf</span>.<span class="ident">advance_mut</span>(<span class="ident">x</span>),
+                            <span class="prelude-val">Err</span>(<span class="ident">err</span>) =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">From::from</span>(<span class="ident">err</span>)),
                         }
                     },
                 }
@@ -383,17 +531,24 @@
         {
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">framed</span> <span class="op">=</span> <span class="ident">MySyncFramed::new</span>(<span class="kw-2">&amp;mut</span> <span class="ident">buf</span>);
             <span class="ident">framed</span>.<span class="ident">codec_mut</span>().<span class="ident">max_allowed_packet</span> <span class="op">=</span> <span class="ident">MAX_PAYLOAD_LEN</span>;
-            <span class="ident">framed</span>.<span class="ident">send</span>(<span class="macro">vec!</span>[<span class="number">0_u8</span>; <span class="number">0</span>]).<span class="ident">unwrap</span>();
-            <span class="ident">framed</span>.<span class="ident">send</span>(<span class="macro">vec!</span>[<span class="number">0_u8</span>; <span class="number">1</span>]).<span class="ident">unwrap</span>();
-            <span class="ident">framed</span>.<span class="ident">send</span>(<span class="macro">vec!</span>[<span class="number">0_u8</span>; <span class="ident">MAX_PAYLOAD_LEN</span>]).<span class="ident">unwrap</span>();
+            <span class="ident">framed</span>.<span class="ident">send</span>(<span class="kw-2">&amp;mut</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="macro">vec!</span>[<span class="number">0_u8</span>; <span class="number">0</span>]).<span class="ident">unwrap</span>();
+            <span class="ident">framed</span>.<span class="ident">send</span>(<span class="kw-2">&amp;mut</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="macro">vec!</span>[<span class="number">0_u8</span>; <span class="number">1</span>]).<span class="ident">unwrap</span>();
+            <span class="ident">framed</span>.<span class="ident">send</span>(<span class="kw-2">&amp;mut</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="macro">vec!</span>[<span class="number">0_u8</span>; <span class="ident">MAX_PAYLOAD_LEN</span>]).<span class="ident">unwrap</span>();
         }
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">buf</span>[..];
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">framed</span> <span class="op">=</span> <span class="ident">MySyncFramed::new</span>(<span class="kw-2">&amp;mut</span> <span class="ident">buf</span>);
         <span class="ident">framed</span>.<span class="ident">codec_mut</span>().<span class="ident">max_allowed_packet</span> <span class="op">=</span> <span class="ident">MAX_PAYLOAD_LEN</span>;
-        <span class="macro">assert_eq!</span>(<span class="ident">framed</span>.<span class="ident">next</span>().<span class="ident">unwrap</span>().<span class="ident">unwrap</span>(), <span class="macro">vec!</span>[<span class="number">0_u8</span>; <span class="number">0</span>]);
-        <span class="macro">assert_eq!</span>(<span class="ident">framed</span>.<span class="ident">next</span>().<span class="ident">unwrap</span>().<span class="ident">unwrap</span>(), <span class="macro">vec!</span>[<span class="number">0_u8</span>; <span class="number">1</span>]);
-        <span class="macro">assert_eq!</span>(<span class="ident">framed</span>.<span class="ident">next</span>().<span class="ident">unwrap</span>().<span class="ident">unwrap</span>(), <span class="macro">vec!</span>[<span class="number">0_u8</span>; <span class="ident">MAX_PAYLOAD_LEN</span>]);
-        <span class="macro">assert!</span>(<span class="ident">framed</span>.<span class="ident">next</span>().<span class="ident">is_none</span>());
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">dst</span> <span class="op">=</span> <span class="macro">vec!</span>[];
+        <span class="macro">assert!</span>(<span class="ident">framed</span>.<span class="ident">next_packet</span>(<span class="kw-2">&amp;mut</span> <span class="ident">dst</span>).<span class="ident">unwrap</span>());
+        <span class="macro">assert_eq!</span>(<span class="ident">dst</span>, <span class="macro">vec!</span>[<span class="number">0_u8</span>; <span class="number">0</span>]);
+        <span class="ident">dst</span>.<span class="ident">clear</span>();
+        <span class="macro">assert!</span>(<span class="ident">framed</span>.<span class="ident">next_packet</span>(<span class="kw-2">&amp;mut</span> <span class="ident">dst</span>).<span class="ident">unwrap</span>());
+        <span class="macro">assert_eq!</span>(<span class="ident">dst</span>, <span class="macro">vec!</span>[<span class="number">0_u8</span>; <span class="number">1</span>]);
+        <span class="ident">dst</span>.<span class="ident">clear</span>();
+        <span class="macro">assert!</span>(<span class="ident">framed</span>.<span class="ident">next_packet</span>(<span class="kw-2">&amp;mut</span> <span class="ident">dst</span>).<span class="ident">unwrap</span>());
+        <span class="macro">assert_eq!</span>(<span class="ident">dst</span>, <span class="macro">vec!</span>[<span class="number">0_u8</span>; <span class="ident">MAX_PAYLOAD_LEN</span>]);
+        <span class="ident">dst</span>.<span class="ident">clear</span>();
+        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">framed</span>.<span class="ident">next_packet</span>(<span class="kw-2">&amp;mut</span> <span class="ident">dst</span>).<span class="ident">unwrap</span>());
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
@@ -401,8 +556,145 @@
     <span class="kw">fn</span> <span class="ident">incomplete_packet</span>() {
         <span class="kw">let</span> <span class="ident">buf</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="number">2</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>];
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">buf</span>[..];
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">dst</span> <span class="op">=</span> <span class="macro">vec!</span>[];
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">framed</span> <span class="op">=</span> <span class="ident">MySyncFramed::new</span>(<span class="kw-2">&amp;mut</span> <span class="ident">buf</span>);
-        <span class="ident">framed</span>.<span class="ident">next</span>().<span class="ident">unwrap</span>().<span class="ident">unwrap</span>();
+        <span class="ident">framed</span>.<span class="ident">next_packet</span>(<span class="kw-2">&amp;mut</span> <span class="ident">dst</span>).<span class="ident">unwrap</span>();
+    }
+}
+
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;nightly&quot;</span>)]</span>
+<span class="kw">mod</span> <span class="ident">bench</span> {
+    <span class="kw">use</span> <span class="ident">std::io</span>;
+
+    <span class="kw">use</span> <span class="ident">bytes::BytesMut</span>;
+
+    <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::MySyncFramed</span>;
+    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::constants::MAX_PAYLOAD_LEN</span>;
+
+    <span class="kw">struct</span> <span class="ident">Null</span>;
+
+    <span class="kw">impl</span> <span class="ident">io::Write</span> <span class="kw">for</span> <span class="ident">Null</span> {
+        <span class="kw">fn</span> <span class="ident">write</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">x</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Ok</span>(<span class="ident">x</span>.<span class="ident">len</span>())
+        }
+        <span class="kw">fn</span> <span class="ident">flush</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+            <span class="prelude-val">Ok</span>(())
+        }
+    }
+
+    <span class="kw">struct</span> <span class="ident">Loop</span> {
+        <span class="ident">buf</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>,
+        <span class="ident">pos</span>: <span class="ident">usize</span>,
+    }
+
+    <span class="kw">impl</span> <span class="ident">io::Read</span> <span class="kw">for</span> <span class="ident">Loop</span> {
+        <span class="kw">fn</span> <span class="ident">read</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">x</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">u8</span>]) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
+            <span class="kw">let</span> <span class="ident">count</span> <span class="op">=</span> <span class="ident">std::cmp::min</span>(<span class="ident">x</span>.<span class="ident">len</span>(), <span class="self">self</span>.<span class="ident">buf</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="self">self</span>.<span class="ident">pos</span>);
+            <span class="ident">x</span>[..<span class="ident">count</span>].<span class="ident">copy_from_slice</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">buf</span>[<span class="self">self</span>.<span class="ident">pos</span>..(<span class="self">self</span>.<span class="ident">pos</span> <span class="op">+</span> <span class="ident">count</span>)]);
+            <span class="self">self</span>.<span class="ident">pos</span> <span class="op">=</span> (<span class="self">self</span>.<span class="ident">pos</span> <span class="op">+</span> <span class="ident">count</span>) <span class="op">%</span> <span class="self">self</span>.<span class="ident">buf</span>.<span class="ident">len</span>();
+            <span class="prelude-val">Ok</span>(<span class="ident">count</span>)
+        }
+    }
+
+    <span class="attribute">#[<span class="ident">bench</span>]</span>
+    <span class="kw">fn</span> <span class="ident">write_small</span>(<span class="ident">bencher</span>: <span class="kw-2">&amp;mut</span> <span class="ident">test::Bencher</span>) {
+        <span class="kw">const</span> <span class="ident">SIZE</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">512</span>;
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">framed</span> <span class="op">=</span> <span class="ident">MySyncFramed::new</span>(<span class="ident">Null</span>);
+        <span class="ident">framed</span>.<span class="ident">codec_mut</span>().<span class="ident">max_allowed_packet</span> <span class="op">=</span> <span class="number">1024</span> <span class="op">*</span> <span class="number">1024</span> <span class="op">*</span> <span class="number">32</span>;
+
+        <span class="kw">let</span> <span class="ident">buf</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="number">0</span>; <span class="ident">SIZE</span>];
+
+        <span class="ident">bencher</span>.<span class="ident">bytes</span> <span class="op">=</span> (<span class="ident">SIZE</span> <span class="op">+</span> <span class="number">4</span> <span class="op">+</span> (<span class="ident">SIZE</span> <span class="op">/</span> <span class="ident">MAX_PAYLOAD_LEN</span> <span class="op">*</span> <span class="number">4</span>)) <span class="kw">as</span> <span class="ident">u64</span>;
+        <span class="ident">bencher</span>.<span class="ident">iter</span>(<span class="op">|</span><span class="op">|</span> {
+            <span class="ident">framed</span>.<span class="ident">send</span>(<span class="kw-2">&amp;mut</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">buf</span>).<span class="ident">unwrap</span>();
+        });
+    }
+
+    <span class="attribute">#[<span class="ident">bench</span>]</span>
+    <span class="kw">fn</span> <span class="ident">write_med</span>(<span class="ident">bencher</span>: <span class="kw-2">&amp;mut</span> <span class="ident">test::Bencher</span>) {
+        <span class="kw">const</span> <span class="ident">SIZE</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">1024</span> <span class="op">*</span> <span class="number">1024</span>;
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">framed</span> <span class="op">=</span> <span class="ident">MySyncFramed::new</span>(<span class="ident">Null</span>);
+        <span class="ident">framed</span>.<span class="ident">codec_mut</span>().<span class="ident">max_allowed_packet</span> <span class="op">=</span> <span class="number">1024</span> <span class="op">*</span> <span class="number">1024</span> <span class="op">*</span> <span class="number">32</span>;
+
+        <span class="kw">let</span> <span class="ident">buf</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="number">0</span>; <span class="ident">SIZE</span>];
+
+        <span class="ident">bencher</span>.<span class="ident">bytes</span> <span class="op">=</span> (<span class="ident">SIZE</span> <span class="op">+</span> <span class="number">4</span> <span class="op">+</span> (<span class="ident">SIZE</span> <span class="op">/</span> <span class="ident">MAX_PAYLOAD_LEN</span> <span class="op">*</span> <span class="number">4</span>)) <span class="kw">as</span> <span class="ident">u64</span>;
+        <span class="ident">bencher</span>.<span class="ident">iter</span>(<span class="op">|</span><span class="op">|</span> {
+            <span class="ident">framed</span>.<span class="ident">send</span>(<span class="kw-2">&amp;mut</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">buf</span>).<span class="ident">unwrap</span>();
+        });
+    }
+
+    <span class="attribute">#[<span class="ident">bench</span>]</span>
+    <span class="kw">fn</span> <span class="ident">write_large</span>(<span class="ident">bencher</span>: <span class="kw-2">&amp;mut</span> <span class="ident">test::Bencher</span>) {
+        <span class="kw">const</span> <span class="ident">SIZE</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">1024</span> <span class="op">*</span> <span class="number">1024</span> <span class="op">*</span> <span class="number">64</span>;
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">framed</span> <span class="op">=</span> <span class="ident">MySyncFramed::new</span>(<span class="ident">Null</span>);
+        <span class="ident">framed</span>.<span class="ident">codec_mut</span>().<span class="ident">max_allowed_packet</span> <span class="op">=</span> <span class="number">1024</span> <span class="op">*</span> <span class="number">1024</span> <span class="op">*</span> <span class="number">64</span>;
+
+        <span class="kw">let</span> <span class="ident">buf</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="number">0</span>; <span class="ident">SIZE</span>];
+
+        <span class="ident">bencher</span>.<span class="ident">bytes</span> <span class="op">=</span> (<span class="ident">SIZE</span> <span class="op">+</span> <span class="number">4</span> <span class="op">+</span> (<span class="ident">SIZE</span> <span class="op">/</span> <span class="ident">MAX_PAYLOAD_LEN</span> <span class="op">*</span> <span class="number">4</span>)) <span class="kw">as</span> <span class="ident">u64</span>;
+        <span class="ident">bencher</span>.<span class="ident">iter</span>(<span class="op">|</span><span class="op">|</span> {
+            <span class="ident">framed</span>.<span class="ident">send</span>(<span class="kw-2">&amp;mut</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">buf</span>).<span class="ident">unwrap</span>();
+        });
+    }
+
+    <span class="attribute">#[<span class="ident">bench</span>]</span>
+    <span class="kw">fn</span> <span class="ident">read_small</span>(<span class="ident">bencher</span>: <span class="kw-2">&amp;mut</span> <span class="ident">test::Bencher</span>) {
+        <span class="kw">const</span> <span class="ident">SIZE</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">512</span>;
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> <span class="macro">vec!</span>[];
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">framed</span> <span class="op">=</span> <span class="ident">MySyncFramed::new</span>(<span class="kw-2">&amp;mut</span> <span class="ident">buf</span>);
+
+        <span class="ident">framed</span>.<span class="ident">send</span>(<span class="kw-2">&amp;mut</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="macro">vec!</span>[<span class="number">0</span>; <span class="ident">SIZE</span>]).<span class="ident">unwrap</span>();
+
+        <span class="ident">bencher</span>.<span class="ident">bytes</span> <span class="op">=</span> <span class="ident">buf</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u64</span>;
+        <span class="kw">let</span> <span class="ident">input</span> <span class="op">=</span> <span class="ident">Loop</span> { <span class="ident">buf</span>, <span class="ident">pos</span>: <span class="number">0</span> };
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">framed</span> <span class="op">=</span> <span class="ident">MySyncFramed::new</span>(<span class="ident">input</span>);
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> <span class="ident">BytesMut::new</span>();
+        <span class="ident">bencher</span>.<span class="ident">iter</span>(<span class="op">|</span><span class="op">|</span> {
+            <span class="ident">framed</span>.<span class="ident">codec_mut</span>().<span class="ident">reset_seq_id</span>();
+            <span class="macro">assert!</span>(<span class="ident">framed</span>.<span class="ident">next_packet</span>(<span class="kw-2">&amp;mut</span> <span class="ident">buf</span>).<span class="ident">unwrap</span>());
+            <span class="ident">buf</span>.<span class="ident">clear</span>();
+        });
+    }
+
+    <span class="attribute">#[<span class="ident">bench</span>]</span>
+    <span class="kw">fn</span> <span class="ident">read_med</span>(<span class="ident">bencher</span>: <span class="kw-2">&amp;mut</span> <span class="ident">test::Bencher</span>) {
+        <span class="kw">const</span> <span class="ident">SIZE</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">1024</span> <span class="op">*</span> <span class="number">1024</span>;
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> <span class="macro">vec!</span>[];
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">framed</span> <span class="op">=</span> <span class="ident">MySyncFramed::new</span>(<span class="kw-2">&amp;mut</span> <span class="ident">buf</span>);
+
+        <span class="ident">framed</span>.<span class="ident">send</span>(<span class="kw-2">&amp;mut</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="macro">vec!</span>[<span class="number">0</span>; <span class="ident">SIZE</span>]).<span class="ident">unwrap</span>();
+
+        <span class="ident">bencher</span>.<span class="ident">bytes</span> <span class="op">=</span> <span class="ident">buf</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u64</span>;
+        <span class="kw">let</span> <span class="ident">input</span> <span class="op">=</span> <span class="ident">Loop</span> { <span class="ident">buf</span>, <span class="ident">pos</span>: <span class="number">0</span> };
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">framed</span> <span class="op">=</span> <span class="ident">MySyncFramed::new</span>(<span class="ident">input</span>);
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> <span class="ident">BytesMut::new</span>();
+        <span class="ident">bencher</span>.<span class="ident">iter</span>(<span class="op">|</span><span class="op">|</span> {
+            <span class="ident">framed</span>.<span class="ident">codec_mut</span>().<span class="ident">reset_seq_id</span>();
+            <span class="macro">assert!</span>(<span class="ident">framed</span>.<span class="ident">next_packet</span>(<span class="kw-2">&amp;mut</span> <span class="ident">buf</span>).<span class="ident">unwrap</span>());
+            <span class="ident">buf</span>.<span class="ident">clear</span>();
+        });
+    }
+
+    <span class="attribute">#[<span class="ident">bench</span>]</span>
+    <span class="kw">fn</span> <span class="ident">read_large</span>(<span class="ident">bencher</span>: <span class="kw-2">&amp;mut</span> <span class="ident">test::Bencher</span>) {
+        <span class="kw">const</span> <span class="ident">SIZE</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">1024</span> <span class="op">*</span> <span class="number">1024</span> <span class="op">*</span> <span class="number">32</span>;
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> <span class="macro">vec!</span>[];
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">framed</span> <span class="op">=</span> <span class="ident">MySyncFramed::new</span>(<span class="kw-2">&amp;mut</span> <span class="ident">buf</span>);
+        <span class="ident">framed</span>.<span class="ident">codec_mut</span>().<span class="ident">max_allowed_packet</span> <span class="op">=</span> <span class="number">1024</span> <span class="op">*</span> <span class="number">1024</span> <span class="op">*</span> <span class="number">32</span>;
+
+        <span class="ident">framed</span>.<span class="ident">send</span>(<span class="kw-2">&amp;mut</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="macro">vec!</span>[<span class="number">0</span>; <span class="ident">SIZE</span>]).<span class="ident">unwrap</span>();
+
+        <span class="ident">bencher</span>.<span class="ident">bytes</span> <span class="op">=</span> <span class="ident">buf</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u64</span>;
+        <span class="kw">let</span> <span class="ident">input</span> <span class="op">=</span> <span class="ident">Loop</span> { <span class="ident">buf</span>, <span class="ident">pos</span>: <span class="number">0</span> };
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">framed</span> <span class="op">=</span> <span class="ident">MySyncFramed::new</span>(<span class="ident">input</span>);
+        <span class="ident">framed</span>.<span class="ident">codec_mut</span>().<span class="ident">max_allowed_packet</span> <span class="op">=</span> <span class="number">1024</span> <span class="op">*</span> <span class="number">1024</span> <span class="op">*</span> <span class="number">32</span>;
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> <span class="ident">BytesMut::new</span>();
+        <span class="ident">bencher</span>.<span class="ident">iter</span>(<span class="op">|</span><span class="op">|</span> {
+            <span class="ident">framed</span>.<span class="ident">codec_mut</span>().<span class="ident">reset_seq_id</span>();
+            <span class="macro">assert!</span>(<span class="ident">framed</span>.<span class="ident">next_packet</span>(<span class="kw-2">&amp;mut</span> <span class="ident">buf</span>).<span class="ident">unwrap</span>());
+            <span class="ident">buf</span>.<span class="ident">clear</span>();
+        });
     }
 }
 </code></pre></div>

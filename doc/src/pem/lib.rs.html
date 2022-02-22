@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;pem-0.8.3&#x2F;src&#x2F;lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><script defer src="../../main.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;pem-1.0.2&#x2F;src&#x2F;lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><script defer src="../../main.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script>
     <noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../pem/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
@@ -615,21 +615,6 @@
 <span id="614">614</span>
 <span id="615">615</span>
 <span id="616">616</span>
-<span id="617">617</span>
-<span id="618">618</span>
-<span id="619">619</span>
-<span id="620">620</span>
-<span id="621">621</span>
-<span id="622">622</span>
-<span id="623">623</span>
-<span id="624">624</span>
-<span id="625">625</span>
-<span id="626">626</span>
-<span id="627">627</span>
-<span id="628">628</span>
-<span id="629">629</span>
-<span id="630">630</span>
-<span id="631">631</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright 2016-2017 Jonathan Creekmore</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the MIT license &lt;LICENSE.md or</span>
@@ -716,7 +701,7 @@
 <span class="doccomment">//! -----END CERTIFICATE-----</span>
 <span class="doccomment">//! &quot;;</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//!  let pems = parse_many(SAMPLE);</span>
+<span class="doccomment">//!  let pems = parse_many(SAMPLE).unwrap();</span>
 <span class="doccomment">//!  assert_eq!(pems.len(), 2);</span>
 <span class="doccomment">//!  assert_eq!(pems[0].tag, &quot;INTERMEDIATE CERT&quot;);</span>
 <span class="doccomment">//!  assert_eq!(pems[1].tag, &quot;CERTIFICATE&quot;);</span>
@@ -736,21 +721,14 @@
 )]</span>
 
 <span class="kw">mod</span> <span class="ident">errors</span>;
+<span class="kw">mod</span> <span class="ident">parser</span>;
+<span class="kw">use</span> <span class="ident">parser</span>::{<span class="ident">parse_captures</span>, <span class="ident">parse_captures_iter</span>, <span class="ident">Captures</span>};
 
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::errors</span>::{<span class="ident">PemError</span>, <span class="prelude-ty">Result</span>};
-<span class="kw">use</span> <span class="ident">once_cell::sync::Lazy</span>;
-<span class="kw">use</span> <span class="ident">regex::bytes</span>::{<span class="ident">Captures</span>, <span class="ident">Regex</span>};
 <span class="kw">use</span> <span class="ident">std::str</span>;
-
-<span class="kw">const</span> <span class="ident">REGEX_STR</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span>
-    <span class="string">r&quot;(?s)-----BEGIN (?P&lt;begin&gt;.*?)-----[ \t\n\r]*(?P&lt;data&gt;.*?)-----END (?P&lt;end&gt;.*?)-----[ \t\n\r]*&quot;</span>;
 
 <span class="doccomment">/// The line length for PEM encoding</span>
 <span class="kw">const</span> <span class="ident">LINE_WRAP</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">64</span>;
-
-<span class="kw">static</span> <span class="ident">ASCII_ARMOR</span>: <span class="ident">Lazy</span><span class="op">&lt;</span><span class="ident">Regex</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Lazy::new</span>(<span class="op">|</span><span class="op">|</span> {
-    <span class="ident">Regex::new</span>(<span class="ident">REGEX_STR</span>).<span class="ident">unwrap</span>()
-});
 
 <span class="doccomment">/// Enum describing line endings</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
@@ -784,21 +762,13 @@
         }
 
         <span class="comment">// Verify that the begin section exists</span>
-        <span class="kw">let</span> <span class="ident">tag</span> <span class="op">=</span> <span class="ident">as_utf8</span>(
-            <span class="ident">caps</span>.<span class="ident">name</span>(<span class="string">&quot;begin&quot;</span>)
-                .<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">PemError::MissingBeginTag</span>)<span class="question-mark">?</span>
-                .<span class="ident">as_bytes</span>(),
-        )<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">tag</span> <span class="op">=</span> <span class="ident">as_utf8</span>(<span class="ident">caps</span>.<span class="ident">begin</span>)<span class="question-mark">?</span>;
         <span class="kw">if</span> <span class="ident">tag</span>.<span class="ident">is_empty</span>() {
             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">PemError::MissingBeginTag</span>);
         }
 
         <span class="comment">// as well as the end section</span>
-        <span class="kw">let</span> <span class="ident">tag_end</span> <span class="op">=</span> <span class="ident">as_utf8</span>(
-            <span class="ident">caps</span>.<span class="ident">name</span>(<span class="string">&quot;end&quot;</span>)
-                .<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">PemError::MissingEndTag</span>)<span class="question-mark">?</span>
-                .<span class="ident">as_bytes</span>(),
-        )<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">tag_end</span> <span class="op">=</span> <span class="ident">as_utf8</span>(<span class="ident">caps</span>.<span class="ident">end</span>)<span class="question-mark">?</span>;
         <span class="kw">if</span> <span class="ident">tag_end</span>.<span class="ident">is_empty</span>() {
             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">PemError::MissingEndTag</span>);
         }
@@ -809,11 +779,7 @@
         }
 
         <span class="comment">// If they did, then we can grab the data section</span>
-        <span class="kw">let</span> <span class="ident">raw_data</span> <span class="op">=</span> <span class="ident">as_utf8</span>(
-            <span class="ident">caps</span>.<span class="ident">name</span>(<span class="string">&quot;data&quot;</span>)
-                .<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">PemError::MissingData</span>)<span class="question-mark">?</span>
-                .<span class="ident">as_bytes</span>(),
-        )<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">raw_data</span> <span class="op">=</span> <span class="ident">as_utf8</span>(<span class="ident">caps</span>.<span class="ident">data</span>)<span class="question-mark">?</span>;
 
         <span class="comment">// We need to get rid of newlines for base64::decode</span>
         <span class="comment">// As base64 requires an AsRef&lt;[u8]&gt;, this must involve a copy</span>
@@ -874,8 +840,7 @@
 <span class="doccomment">///  assert_eq!(pem.tag, &quot;RSA PRIVATE KEY&quot;);</span>
 <span class="doccomment">/// ```</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse</span><span class="op">&lt;</span><span class="ident">B</span>: <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">input</span>: <span class="ident">B</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Pem</span><span class="op">&gt;</span> {
-    <span class="ident">ASCII_ARMOR</span>
-        .<span class="ident">captures</span>(<span class="kw-2">&amp;</span><span class="ident">input</span>.<span class="ident">as_ref</span>())
+    <span class="ident">parse_captures</span>(<span class="kw-2">&amp;</span><span class="ident">input</span>.<span class="ident">as_ref</span>())
         .<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">PemError::MalformedFraming</span>)
         .<span class="ident">and_then</span>(<span class="ident">Pem::new_from_captures</span>)
 }
@@ -910,7 +875,7 @@
 <span class="doccomment">/// &quot;;</span>
 <span class="doccomment">/// let SAMPLE_BYTES: Vec&lt;u8&gt; = SAMPLE.into();</span>
 <span class="doccomment">///</span>
-<span class="doccomment">///  let pems = parse_many(SAMPLE_BYTES);</span>
+<span class="doccomment">///  let pems = parse_many(SAMPLE_BYTES).unwrap();</span>
 <span class="doccomment">///  assert_eq!(pems.len(), 2);</span>
 <span class="doccomment">///  assert_eq!(pems[0].tag, &quot;INTERMEDIATE CERT&quot;);</span>
 <span class="doccomment">///  assert_eq!(pems[1].tag, &quot;CERTIFICATE&quot;);</span>
@@ -944,16 +909,15 @@
 <span class="doccomment">/// &quot;;</span>
 <span class="doccomment">///  let SAMPLE_STRING: Vec&lt;u8&gt; = SAMPLE.into();</span>
 <span class="doccomment">///</span>
-<span class="doccomment">///  let pems = parse_many(SAMPLE_STRING);</span>
+<span class="doccomment">///  let pems = parse_many(SAMPLE_STRING).unwrap();</span>
 <span class="doccomment">///  assert_eq!(pems.len(), 2);</span>
 <span class="doccomment">///  assert_eq!(pems[0].tag, &quot;INTERMEDIATE CERT&quot;);</span>
 <span class="doccomment">///  assert_eq!(pems[1].tag, &quot;CERTIFICATE&quot;);</span>
 <span class="doccomment">/// ```</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse_many</span><span class="op">&lt;</span><span class="ident">B</span>: <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">input</span>: <span class="ident">B</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Pem</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse_many</span><span class="op">&lt;</span><span class="ident">B</span>: <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">input</span>: <span class="ident">B</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Pem</span><span class="op">&gt;</span><span class="op">&gt;</span> {
     <span class="comment">// Each time our regex matches a PEM section, we need to decode it.</span>
-    <span class="ident">ASCII_ARMOR</span>
-        .<span class="ident">captures_iter</span>(<span class="kw-2">&amp;</span><span class="ident">input</span>.<span class="ident">as_ref</span>())
-        .<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">caps</span><span class="op">|</span> <span class="ident">Pem::new_from_captures</span>(<span class="ident">caps</span>).<span class="ident">ok</span>())
+    <span class="ident">parse_captures_iter</span>(<span class="kw-2">&amp;</span><span class="ident">input</span>.<span class="ident">as_ref</span>())
+        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">caps</span><span class="op">|</span> <span class="ident">Pem::new_from_captures</span>(<span class="ident">caps</span>))
         .<span class="ident">collect</span>()
 }
 
@@ -1194,10 +1158,16 @@ RzHX0lkJl9Stshd/7Gbt65/QYq+v+xvAeT0CoyIg
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">test_parse_many_works</span>() {
-        <span class="kw">let</span> <span class="ident">pems</span> <span class="op">=</span> <span class="ident">parse_many</span>(<span class="ident">SAMPLE_CRLF</span>);
+        <span class="kw">let</span> <span class="ident">pems</span> <span class="op">=</span> <span class="ident">parse_many</span>(<span class="ident">SAMPLE_CRLF</span>).<span class="ident">unwrap</span>();
         <span class="macro">assert_eq!</span>(<span class="ident">pems</span>.<span class="ident">len</span>(), <span class="number">2</span>);
         <span class="macro">assert_eq!</span>(<span class="ident">pems</span>[<span class="number">0</span>].<span class="ident">tag</span>, <span class="string">&quot;RSA PRIVATE KEY&quot;</span>);
         <span class="macro">assert_eq!</span>(<span class="ident">pems</span>[<span class="number">1</span>].<span class="ident">tag</span>, <span class="string">&quot;RSA PUBLIC KEY&quot;</span>);
+    }
+
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">test_parse_many_errors_on_invalid_section</span>() {
+        <span class="kw">let</span> <span class="ident">input</span> <span class="op">=</span> <span class="ident">SAMPLE_LF</span>.<span class="ident">to_owned</span>() <span class="op">+</span> <span class="string">&quot;-----BEGIN -----\n-----END -----&quot;</span>;
+        <span class="macro">assert_eq!</span>(<span class="ident">parse_many</span>(<span class="kw-2">&amp;</span><span class="ident">input</span>), <span class="prelude-val">Err</span>(<span class="ident">PemError::MissingBeginTag</span>));
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
@@ -1228,7 +1198,7 @@ RzHX0lkJl9Stshd/7Gbt65/QYq+v+xvAeT0CoyIg
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">test_encode_many</span>() {
-        <span class="kw">let</span> <span class="ident">pems</span> <span class="op">=</span> <span class="ident">parse_many</span>(<span class="ident">SAMPLE_CRLF</span>);
+        <span class="kw">let</span> <span class="ident">pems</span> <span class="op">=</span> <span class="ident">parse_many</span>(<span class="ident">SAMPLE_CRLF</span>).<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">encoded</span> <span class="op">=</span> <span class="ident">encode_many</span>(<span class="kw-2">&amp;</span><span class="ident">pems</span>);
 
         <span class="macro">assert_eq!</span>(<span class="ident">SAMPLE_CRLF</span>, <span class="ident">encoded</span>);
@@ -1252,7 +1222,7 @@ RzHX0lkJl9Stshd/7Gbt65/QYq+v+xvAeT0CoyIg
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">test_encode_many_config</span>() {
-        <span class="kw">let</span> <span class="ident">pems</span> <span class="op">=</span> <span class="ident">parse_many</span>(<span class="ident">SAMPLE_LF</span>);
+        <span class="kw">let</span> <span class="ident">pems</span> <span class="op">=</span> <span class="ident">parse_many</span>(<span class="ident">SAMPLE_LF</span>).<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">config</span> <span class="op">=</span> <span class="ident">EncodeConfig</span> {
             <span class="ident">line_ending</span>: <span class="ident">LineEnding::LF</span>,
         };

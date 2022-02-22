@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;mio-0.7.13&#x2F;src&#x2F;net&#x2F;tcp&#x2F;stream.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>stream.rs - source</title><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../../../storage.js"></script><script src="../../../../crates.js"></script><script defer src="../../../../main.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;mio-0.8.0&#x2F;src&#x2F;net&#x2F;tcp&#x2F;stream.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>stream.rs - source</title><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../../../storage.js"></script><script src="../../../../crates.js"></script><script defer src="../../../../main.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script>
     <noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../../mio/index.html'><div class='logo-container rust-logo'><img src='../../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
@@ -304,6 +304,35 @@
 <span id="303">303</span>
 <span id="304">304</span>
 <span id="305">305</span>
+<span id="306">306</span>
+<span id="307">307</span>
+<span id="308">308</span>
+<span id="309">309</span>
+<span id="310">310</span>
+<span id="311">311</span>
+<span id="312">312</span>
+<span id="313">313</span>
+<span id="314">314</span>
+<span id="315">315</span>
+<span id="316">316</span>
+<span id="317">317</span>
+<span id="318">318</span>
+<span id="319">319</span>
+<span id="320">320</span>
+<span id="321">321</span>
+<span id="322">322</span>
+<span id="323">323</span>
+<span id="324">324</span>
+<span id="325">325</span>
+<span id="326">326</span>
+<span id="327">327</span>
+<span id="328">328</span>
+<span id="329">329</span>
+<span id="330">330</span>
+<span id="331">331</span>
+<span id="332">332</span>
+<span id="333">333</span>
+<span id="334">334</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::fmt</span>;
 <span class="kw">use</span> <span class="ident">std::io</span>::{<span class="self">self</span>, <span class="ident">IoSlice</span>, <span class="ident">IoSliceMut</span>, <span class="ident">Read</span>, <span class="ident">Write</span>};
 <span class="kw">use</span> <span class="ident">std::net</span>::{<span class="self">self</span>, <span class="ident">Shutdown</span>, <span class="ident">SocketAddr</span>};
@@ -313,7 +342,7 @@
 <span class="kw">use</span> <span class="ident">std::os::windows::io</span>::{<span class="ident">AsRawSocket</span>, <span class="ident">FromRawSocket</span>, <span class="ident">IntoRawSocket</span>, <span class="ident">RawSocket</span>};
 
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::io_source::IoSource</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::net::TcpSocket</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::sys::tcp</span>::{<span class="ident">connect</span>, <span class="ident">new_for_addr</span>};
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">event</span>, <span class="ident">Interest</span>, <span class="ident">Registry</span>, <span class="ident">Token</span>};
 
 <span class="doccomment">/// A non-blocking TCP stream between a local socket and a remote socket.</span>
@@ -355,9 +384,38 @@
 <span class="kw">impl</span> <span class="ident">TcpStream</span> {
     <span class="doccomment">/// Create a new TCP stream and issue a non-blocking connect to the</span>
     <span class="doccomment">/// specified address.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Notes</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// The returned `TcpStream` may not be connected (and thus usable), unlike</span>
+    <span class="doccomment">/// the API found in `std::net::TcpStream`. Because Mio issues a</span>
+    <span class="doccomment">/// *non-blocking* connect it will not block the thread and instead return</span>
+    <span class="doccomment">/// an unconnected `TcpStream`.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Ensuring the returned stream is connected is surprisingly complex when</span>
+    <span class="doccomment">/// considering cross-platform support. Doing this properly should follow</span>
+    <span class="doccomment">/// the steps below, an example implementation can be found</span>
+    <span class="doccomment">/// [here](https://github.com/Thomasdezeeuw/heph/blob/0c4f1ab3eaf08bea1d65776528bfd6114c9f8374/src/net/tcp/stream.rs#L560-L622).</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">///  1. Call `TcpStream::connect`</span>
+    <span class="doccomment">///  2. Register the returned stream with at least [read interest].</span>
+    <span class="doccomment">///  3. Wait for a (readable) event.</span>
+    <span class="doccomment">///  4. Check `TcpStream::peer_addr`. If it returns `libc::EINPROGRESS` or</span>
+    <span class="doccomment">///     `ErrorKind::NotConnected` it means the stream is not yet connected,</span>
+    <span class="doccomment">///     go back to step 3. If it returns an address it means the stream is</span>
+    <span class="doccomment">///     connected, go to step 5. If another error is returned something</span>
+    <span class="doccomment">///     whent wrong.</span>
+    <span class="doccomment">///  5. Now the stream can be used.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [read interest]: Interest::READABLE</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">connect</span>(<span class="ident">addr</span>: <span class="ident">SocketAddr</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">TcpStream</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">socket</span> <span class="op">=</span> <span class="ident">TcpSocket::new_for_addr</span>(<span class="ident">addr</span>)<span class="question-mark">?</span>;
-        <span class="ident">socket</span>.<span class="ident">connect</span>(<span class="ident">addr</span>)
+        <span class="kw">let</span> <span class="ident">socket</span> <span class="op">=</span> <span class="ident">new_for_addr</span>(<span class="ident">addr</span>)<span class="question-mark">?</span>;
+        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">unix</span>)]</span>
+        <span class="kw">let</span> <span class="ident">stream</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">TcpStream::from_raw_fd</span>(<span class="ident">socket</span>) };
+        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">windows</span>)]</span>
+        <span class="kw">let</span> <span class="ident">stream</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">TcpStream::from_raw_socket</span>(<span class="ident">socket</span> <span class="kw">as</span> <span class="kw">_</span>) };
+        <span class="ident">connect</span>(<span class="kw-2">&amp;</span><span class="ident">stream</span>.<span class="ident">inner</span>, <span class="ident">addr</span>)<span class="question-mark">?</span>;
+        <span class="prelude-val">Ok</span>(<span class="ident">stream</span>)
     }
 
     <span class="doccomment">/// Creates a new `TcpStream` from a standard `net::TcpStream`.</span>
@@ -409,7 +467,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// On Windows make sure the stream is connected before calling this method,</span>
     <span class="doccomment">/// by receiving an (writable) event. Trying to set `nodelay` on an</span>
-    <span class="doccomment">/// unconnected `TcpStream` is undefined behavior.</span>
+    <span class="doccomment">/// unconnected `TcpStream` is unspecified behavior.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_nodelay</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">nodelay</span>: <span class="ident">bool</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">set_nodelay</span>(<span class="ident">nodelay</span>)
     }
@@ -424,7 +482,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// On Windows make sure the stream is connected before calling this method,</span>
     <span class="doccomment">/// by receiving an (writable) event. Trying to get `nodelay` on an</span>
-    <span class="doccomment">/// unconnected `TcpStream` is undefined behavior.</span>
+    <span class="doccomment">/// unconnected `TcpStream` is unspecified behavior.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">nodelay</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">nodelay</span>()
     }
@@ -438,7 +496,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// On Windows make sure the stream is connected before calling this method,</span>
     <span class="doccomment">/// by receiving an (writable) event. Trying to set `ttl` on an</span>
-    <span class="doccomment">/// unconnected `TcpStream` is undefined behavior.</span>
+    <span class="doccomment">/// unconnected `TcpStream` is unspecified behavior.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_ttl</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">ttl</span>: <span class="ident">u32</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">set_ttl</span>(<span class="ident">ttl</span>)
     }
@@ -451,7 +509,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// On Windows make sure the stream is connected before calling this method,</span>
     <span class="doccomment">/// by receiving an (writable) event. Trying to get `ttl` on an</span>
-    <span class="doccomment">/// unconnected `TcpStream` is undefined behavior.</span>
+    <span class="doccomment">/// unconnected `TcpStream` is unspecified behavior.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [link]: #method.set_ttl</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ttl</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span> {

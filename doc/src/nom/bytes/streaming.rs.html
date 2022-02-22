@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;nom-6.2.1&#x2F;src&#x2F;bytes&#x2F;streaming.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>streaming.rs - source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><script defer src="../../../main.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;nom-7.1.0&#x2F;src&#x2F;bytes&#x2F;streaming.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>streaming.rs - source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><script defer src="../../../main.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script>
     <noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../nom/index.html'><div class='logo-container rust-logo'><img src='../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
@@ -699,21 +699,6 @@
 <span id="698">698</span>
 <span id="699">699</span>
 <span id="700">700</span>
-<span id="701">701</span>
-<span id="702">702</span>
-<span id="703">703</span>
-<span id="704">704</span>
-<span id="705">705</span>
-<span id="706">706</span>
-<span id="707">707</span>
-<span id="708">708</span>
-<span id="709">709</span>
-<span id="710">710</span>
-<span id="711">711</span>
-<span id="712">712</span>
-<span id="713">713</span>
-<span id="714">714</span>
-<span id="715">715</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Parsers recognizing bytes streams, streaming version</span>
 
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::error::ErrorKind</span>;
@@ -732,7 +717,6 @@
 <span class="doccomment">/// the input that matches the argument.</span>
 <span class="doccomment">/// # Example</span>
 <span class="doccomment">/// ```rust</span>
-<span class="doccomment">/// # #[macro_use] extern crate nom;</span>
 <span class="doccomment">/// # use nom::{Err, error::{Error, ErrorKind}, Needed, IResult};</span>
 <span class="doccomment">/// use nom::bytes::streaming::tag;</span>
 <span class="doccomment">///</span>
@@ -774,7 +758,6 @@
 <span class="doccomment">/// the input that matches the argument with no regard to case.</span>
 <span class="doccomment">/// # Example</span>
 <span class="doccomment">/// ```rust</span>
-<span class="doccomment">/// # #[macro_use] extern crate nom;</span>
 <span class="doccomment">/// # use nom::{Err, error::{Error, ErrorKind}, Needed, IResult};</span>
 <span class="doccomment">/// use nom::bytes::streaming::tag_no_case;</span>
 <span class="doccomment">///</span>
@@ -820,7 +803,6 @@
 <span class="doccomment">/// It will return a `Err::Incomplete(Needed::new(1))` if the pattern wasn&#39;t met.</span>
 <span class="doccomment">/// # Example</span>
 <span class="doccomment">/// ```rust</span>
-<span class="doccomment">/// # #[macro_use] extern crate nom;</span>
 <span class="doccomment">/// # use nom::{Err, error::ErrorKind, Needed, IResult};</span>
 <span class="doccomment">/// use nom::bytes::streaming::is_not;</span>
 <span class="doccomment">///</span>
@@ -856,7 +838,6 @@
 <span class="doccomment">/// or if the pattern reaches the end of the input.</span>
 <span class="doccomment">/// # Example</span>
 <span class="doccomment">/// ```rust</span>
-<span class="doccomment">/// # #[macro_use] extern crate nom;</span>
 <span class="doccomment">/// # use nom::{Err, error::ErrorKind, Needed, IResult};</span>
 <span class="doccomment">/// use nom::bytes::streaming::is_a;</span>
 <span class="doccomment">///</span>
@@ -892,7 +873,6 @@
 <span class="doccomment">/// *Streaming version* will return a `Err::Incomplete(Needed::new(1))` if the pattern reaches the end of the input.</span>
 <span class="doccomment">/// # Example</span>
 <span class="doccomment">/// ```rust</span>
-<span class="doccomment">/// # #[macro_use] extern crate nom;</span>
 <span class="doccomment">/// # use nom::{Err, error::ErrorKind, Needed, IResult};</span>
 <span class="doccomment">/// use nom::bytes::streaming::take_while;</span>
 <span class="doccomment">/// use nom::character::is_alphabetic;</span>
@@ -928,7 +908,6 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// # Example</span>
 <span class="doccomment">/// ```rust</span>
-<span class="doccomment">/// # #[macro_use] extern crate nom;</span>
 <span class="doccomment">/// # use nom::{Err, error::{Error, ErrorKind}, Needed, IResult};</span>
 <span class="doccomment">/// use nom::bytes::streaming::take_while1;</span>
 <span class="doccomment">/// use nom::character::is_alphabetic;</span>
@@ -965,7 +944,6 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// # Example</span>
 <span class="doccomment">/// ```rust</span>
-<span class="doccomment">/// # #[macro_use] extern crate nom;</span>
 <span class="doccomment">/// # use nom::{Err, error::{Error, ErrorKind}, Needed, IResult};</span>
 <span class="doccomment">/// use nom::bytes::streaming::take_while_m_n;</span>
 <span class="doccomment">/// use nom::character::is_alphabetic;</span>
@@ -1051,7 +1029,6 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// # Example</span>
 <span class="doccomment">/// ```rust</span>
-<span class="doccomment">/// # #[macro_use] extern crate nom;</span>
 <span class="doccomment">/// # use nom::{Err, error::ErrorKind, Needed, IResult};</span>
 <span class="doccomment">/// use nom::bytes::streaming::take_till;</span>
 <span class="doccomment">///</span>
@@ -1084,7 +1061,6 @@
 <span class="doccomment">/// end of input or if there was not match.</span>
 <span class="doccomment">/// # Example</span>
 <span class="doccomment">/// ```rust</span>
-<span class="doccomment">/// # #[macro_use] extern crate nom;</span>
 <span class="doccomment">/// # use nom::{Err, error::{Error, ErrorKind}, Needed, IResult};</span>
 <span class="doccomment">/// use nom::bytes::streaming::take_till1;</span>
 <span class="doccomment">///</span>
@@ -1122,7 +1098,6 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// # Example</span>
 <span class="doccomment">/// ```rust</span>
-<span class="doccomment">/// # #[macro_use] extern crate nom;</span>
 <span class="doccomment">/// # use nom::{Err, error::ErrorKind, Needed, IResult};</span>
 <span class="doccomment">/// use nom::bytes::streaming::take;</span>
 <span class="doccomment">///</span>
@@ -1157,7 +1132,6 @@
 <span class="doccomment">/// contain the pattern or if the input is smaller than the pattern.</span>
 <span class="doccomment">/// # Example</span>
 <span class="doccomment">/// ```rust</span>
-<span class="doccomment">/// # #[macro_use] extern crate nom;</span>
 <span class="doccomment">/// # use nom::{Err, error::ErrorKind, Needed, IResult};</span>
 <span class="doccomment">/// use nom::bytes::streaming::take_until;</span>
 <span class="doccomment">///</span>
@@ -1188,6 +1162,47 @@
   }
 }
 
+<span class="doccomment">/// Returns the non empty input slice up to the first occurrence of the pattern.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// It doesn&#39;t consume the pattern.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// # Streaming Specific</span>
+<span class="doccomment">/// *Streaming version* will return a `Err::Incomplete(Needed::new(N))` if the input doesn&#39;t</span>
+<span class="doccomment">/// contain the pattern or if the input is smaller than the pattern.</span>
+<span class="doccomment">/// # Example</span>
+<span class="doccomment">/// ```rust</span>
+<span class="doccomment">/// # use nom::{Err, error::{Error, ErrorKind}, Needed, IResult};</span>
+<span class="doccomment">/// use nom::bytes::streaming::take_until1;</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// fn until_eof(s: &amp;str) -&gt; IResult&lt;&amp;str, &amp;str&gt; {</span>
+<span class="doccomment">///   take_until1(&quot;eof&quot;)(s)</span>
+<span class="doccomment">/// }</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// assert_eq!(until_eof(&quot;hello, worldeof&quot;), Ok((&quot;eof&quot;, &quot;hello, world&quot;)));</span>
+<span class="doccomment">/// assert_eq!(until_eof(&quot;hello, world&quot;), Err(Err::Incomplete(Needed::Unknown)));</span>
+<span class="doccomment">/// assert_eq!(until_eof(&quot;hello, worldeo&quot;), Err(Err::Incomplete(Needed::Unknown)));</span>
+<span class="doccomment">/// assert_eq!(until_eof(&quot;1eof2eof&quot;), Ok((&quot;eof2eof&quot;, &quot;1&quot;)));</span>
+<span class="doccomment">/// assert_eq!(until_eof(&quot;eof&quot;),  Err(Err::Error(Error::new(&quot;eof&quot;, ErrorKind::TakeUntil))));</span>
+<span class="doccomment">/// ```</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">take_until1</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">Input</span>, <span class="ident">Error</span>: <span class="ident">ParseError</span><span class="op">&lt;</span><span class="ident">Input</span><span class="op">&gt;</span><span class="op">&gt;</span>(
+  <span class="ident">tag</span>: <span class="ident">T</span>,
+) -&gt; <span class="kw">impl</span> <span class="ident">Fn</span>(<span class="ident">Input</span>) -&gt; <span class="ident">IResult</span><span class="op">&lt;</span><span class="ident">Input</span>, <span class="ident">Input</span>, <span class="ident">Error</span><span class="op">&gt;</span>
+<span class="kw">where</span>
+  <span class="ident">Input</span>: <span class="ident">InputTake</span> <span class="op">+</span> <span class="ident">InputLength</span> <span class="op">+</span> <span class="ident">FindSubstring</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
+  <span class="ident">T</span>: <span class="ident">Clone</span>,
+{
+  <span class="kw">move</span> <span class="op">|</span><span class="ident">i</span>: <span class="ident">Input</span><span class="op">|</span> {
+    <span class="kw">let</span> <span class="ident">t</span> <span class="op">=</span> <span class="ident">tag</span>.<span class="ident">clone</span>();
+
+    <span class="kw">let</span> <span class="ident">res</span>: <span class="ident">IResult</span><span class="op">&lt;</span><span class="kw">_</span>, <span class="kw">_</span>, <span class="ident">Error</span><span class="op">&gt;</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">i</span>.<span class="ident">find_substring</span>(<span class="ident">t</span>) {
+      <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">Err::Incomplete</span>(<span class="ident">Needed::Unknown</span>)),
+      <span class="prelude-val">Some</span>(<span class="number">0</span>) =&gt; <span class="prelude-val">Err</span>(<span class="ident">Err::Error</span>(<span class="ident">Error::from_error_kind</span>(<span class="ident">i</span>, <span class="ident">ErrorKind::TakeUntil</span>))),
+      <span class="prelude-val">Some</span>(<span class="ident">index</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">i</span>.<span class="ident">take_split</span>(<span class="ident">index</span>)),
+    };
+    <span class="ident">res</span>
+  }
+}
+
 <span class="doccomment">/// Matches a byte string with escaped characters.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// * The first argument matches the normal characters (it must not accept the control character)</span>
@@ -1195,7 +1210,6 @@
 <span class="doccomment">/// * The third argument matches the escaped characters</span>
 <span class="doccomment">/// # Example</span>
 <span class="doccomment">/// ```</span>
-<span class="doccomment">/// # #[macro_use] extern crate nom;</span>
 <span class="doccomment">/// # use nom::{Err, error::ErrorKind, Needed, IResult};</span>
 <span class="doccomment">/// # use nom::character::complete::digit1;</span>
 <span class="doccomment">/// use nom::bytes::streaming::escaped;</span>
@@ -1233,10 +1247,15 @@
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">i</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">clone</span>();
 
     <span class="kw">while</span> <span class="ident">i</span>.<span class="ident">input_len</span>() <span class="op">&gt;</span> <span class="number">0</span> {
+      <span class="kw">let</span> <span class="ident">current_len</span> <span class="op">=</span> <span class="ident">i</span>.<span class="ident">input_len</span>();
+
       <span class="kw">match</span> <span class="ident">normal</span>.<span class="ident">parse</span>(<span class="ident">i</span>.<span class="ident">clone</span>()) {
         <span class="prelude-val">Ok</span>((<span class="ident">i2</span>, <span class="kw">_</span>)) =&gt; {
           <span class="kw">if</span> <span class="ident">i2</span>.<span class="ident">input_len</span>() <span class="op">==</span> <span class="number">0</span> {
             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Err::Incomplete</span>(<span class="ident">Needed::Unknown</span>));
+          } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">i2</span>.<span class="ident">input_len</span>() <span class="op">==</span> <span class="ident">current_len</span> {
+            <span class="kw">let</span> <span class="ident">index</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">offset</span>(<span class="kw-2">&amp;</span><span class="ident">i2</span>);
+            <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">input</span>.<span class="ident">take_split</span>(<span class="ident">index</span>));
           } <span class="kw">else</span> {
             <span class="ident">i</span> <span class="op">=</span> <span class="ident">i2</span>;
           }
@@ -1274,29 +1293,6 @@
   }
 }
 
-<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">escapedc</span><span class="op">&lt;</span><span class="ident">Input</span>, <span class="ident">Error</span>, <span class="ident">F</span>, <span class="ident">G</span>, <span class="ident">O1</span>, <span class="ident">O2</span><span class="op">&gt;</span>(
-  <span class="ident">i</span>: <span class="ident">Input</span>,
-  <span class="ident">normal</span>: <span class="ident">F</span>,
-  <span class="ident">control_char</span>: <span class="ident">char</span>,
-  <span class="ident">escapable</span>: <span class="ident">G</span>,
-) -&gt; <span class="ident">IResult</span><span class="op">&lt;</span><span class="ident">Input</span>, <span class="ident">Input</span>, <span class="ident">Error</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-  <span class="ident">Input</span>: <span class="ident">Clone</span>
-    <span class="op">+</span> <span class="ident"><span class="kw">crate</span>::traits::Offset</span>
-    <span class="op">+</span> <span class="ident">InputLength</span>
-    <span class="op">+</span> <span class="ident">InputTake</span>
-    <span class="op">+</span> <span class="ident">InputTakeAtPosition</span>
-    <span class="op">+</span> <span class="ident">Slice</span><span class="op">&lt;</span><span class="ident">RangeFrom</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span><span class="op">&gt;</span>
-    <span class="op">+</span> <span class="ident">InputIter</span>,
-  <span class="op">&lt;</span><span class="ident">Input</span> <span class="kw">as</span> <span class="ident">InputIter</span><span class="op">&gt;</span><span class="ident">::Item</span>: <span class="ident"><span class="kw">crate</span>::traits::AsChar</span>,
-  <span class="ident">F</span>: <span class="ident">Fn</span>(<span class="ident">Input</span>) -&gt; <span class="ident">IResult</span><span class="op">&lt;</span><span class="ident">Input</span>, <span class="ident">O1</span>, <span class="ident">Error</span><span class="op">&gt;</span>,
-  <span class="ident">G</span>: <span class="ident">Fn</span>(<span class="ident">Input</span>) -&gt; <span class="ident">IResult</span><span class="op">&lt;</span><span class="ident">Input</span>, <span class="ident">O2</span>, <span class="ident">Error</span><span class="op">&gt;</span>,
-  <span class="ident">Error</span>: <span class="ident">ParseError</span><span class="op">&lt;</span><span class="ident">Input</span><span class="op">&gt;</span>,
-{
-  <span class="ident">escaped</span>(<span class="ident">normal</span>, <span class="ident">control_char</span>, <span class="ident">escapable</span>)(<span class="ident">i</span>)
-}
-
 <span class="doccomment">/// Matches a byte string with escaped characters.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// * The first argument matches the normal characters (it must not match the control character)</span>
@@ -1306,7 +1302,6 @@
 <span class="doccomment">/// As an example, the chain `abc\tdef` could be `abc    def` (it also consumes the control character)</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// ```</span>
-<span class="doccomment">/// # #[macro_use] extern crate nom;</span>
 <span class="doccomment">/// # use nom::{Err, error::ErrorKind, Needed, IResult};</span>
 <span class="doccomment">/// # use std::str::from_utf8;</span>
 <span class="doccomment">/// use nom::bytes::streaming::{escaped_transform, tag};</span>
@@ -1321,7 +1316,7 @@
 <span class="doccomment">///     alt((</span>
 <span class="doccomment">///       value(&quot;\\&quot;, tag(&quot;\\&quot;)),</span>
 <span class="doccomment">///       value(&quot;\&quot;&quot;, tag(&quot;\&quot;&quot;)),</span>
-<span class="doccomment">///       value(&quot;n&quot;, tag(&quot;\n&quot;)),</span>
+<span class="doccomment">///       value(&quot;\n&quot;, tag(&quot;n&quot;)),</span>
 <span class="doccomment">///     ))</span>
 <span class="doccomment">///   )(input)</span>
 <span class="doccomment">/// }</span>
@@ -1360,12 +1355,15 @@
     <span class="kw">let</span> <span class="ident">i</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">clone</span>();
 
     <span class="kw">while</span> <span class="ident">index</span> <span class="op">&lt;</span> <span class="ident">i</span>.<span class="ident">input_len</span>() {
+      <span class="kw">let</span> <span class="ident">current_len</span> <span class="op">=</span> <span class="ident">i</span>.<span class="ident">input_len</span>();
       <span class="kw">let</span> <span class="ident">remainder</span> <span class="op">=</span> <span class="ident">i</span>.<span class="ident">slice</span>(<span class="ident">index</span>..);
       <span class="kw">match</span> <span class="ident">normal</span>.<span class="ident">parse</span>(<span class="ident">remainder</span>.<span class="ident">clone</span>()) {
         <span class="prelude-val">Ok</span>((<span class="ident">i2</span>, <span class="ident">o</span>)) =&gt; {
           <span class="ident">o</span>.<span class="ident">extend_into</span>(<span class="kw-2">&amp;mut</span> <span class="ident">res</span>);
           <span class="kw">if</span> <span class="ident">i2</span>.<span class="ident">input_len</span>() <span class="op">==</span> <span class="number">0</span> {
             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Err::Incomplete</span>(<span class="ident">Needed::Unknown</span>));
+          } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">i2</span>.<span class="ident">input_len</span>() <span class="op">==</span> <span class="ident">current_len</span> {
+            <span class="kw">return</span> <span class="prelude-val">Ok</span>((<span class="ident">remainder</span>, <span class="ident">res</span>));
           } <span class="kw">else</span> {
             <span class="ident">index</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">offset</span>(<span class="kw-2">&amp;</span><span class="ident">i2</span>);
           }
@@ -1400,34 +1398,6 @@
     }
     <span class="prelude-val">Err</span>(<span class="ident">Err::Incomplete</span>(<span class="ident">Needed::Unknown</span>))
   }
-}
-
-<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;alloc&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;docsrs&quot;</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;alloc&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">escaped_transformc</span><span class="op">&lt;</span><span class="ident">Input</span>, <span class="ident">Error</span>, <span class="ident">F</span>, <span class="ident">G</span>, <span class="ident">O1</span>, <span class="ident">O2</span>, <span class="ident">ExtendItem</span>, <span class="ident">Output</span><span class="op">&gt;</span>(
-  <span class="ident">i</span>: <span class="ident">Input</span>,
-  <span class="ident">normal</span>: <span class="ident">F</span>,
-  <span class="ident">control_char</span>: <span class="ident">char</span>,
-  <span class="ident">transform</span>: <span class="ident">G</span>,
-) -&gt; <span class="ident">IResult</span><span class="op">&lt;</span><span class="ident">Input</span>, <span class="ident">Output</span>, <span class="ident">Error</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-  <span class="ident">Input</span>: <span class="ident">Clone</span>
-    <span class="op">+</span> <span class="ident"><span class="kw">crate</span>::traits::Offset</span>
-    <span class="op">+</span> <span class="ident">InputLength</span>
-    <span class="op">+</span> <span class="ident">InputTake</span>
-    <span class="op">+</span> <span class="ident">InputTakeAtPosition</span>
-    <span class="op">+</span> <span class="ident">Slice</span><span class="op">&lt;</span><span class="ident">RangeFrom</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span><span class="op">&gt;</span>
-    <span class="op">+</span> <span class="ident">InputIter</span>,
-  <span class="ident">Input</span>: <span class="ident"><span class="kw">crate</span>::traits::ExtendInto</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">ExtendItem</span>, <span class="ident">Extender</span> <span class="op">=</span> <span class="ident">Output</span><span class="op">&gt;</span>,
-  <span class="ident">O1</span>: <span class="ident"><span class="kw">crate</span>::traits::ExtendInto</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">ExtendItem</span>, <span class="ident">Extender</span> <span class="op">=</span> <span class="ident">Output</span><span class="op">&gt;</span>,
-  <span class="ident">O2</span>: <span class="ident"><span class="kw">crate</span>::traits::ExtendInto</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">ExtendItem</span>, <span class="ident">Extender</span> <span class="op">=</span> <span class="ident">Output</span><span class="op">&gt;</span>,
-  <span class="op">&lt;</span><span class="ident">Input</span> <span class="kw">as</span> <span class="ident">InputIter</span><span class="op">&gt;</span><span class="ident">::Item</span>: <span class="ident"><span class="kw">crate</span>::traits::AsChar</span>,
-  <span class="ident">F</span>: <span class="ident">Fn</span>(<span class="ident">Input</span>) -&gt; <span class="ident">IResult</span><span class="op">&lt;</span><span class="ident">Input</span>, <span class="ident">O1</span>, <span class="ident">Error</span><span class="op">&gt;</span>,
-  <span class="ident">G</span>: <span class="ident">Fn</span>(<span class="ident">Input</span>) -&gt; <span class="ident">IResult</span><span class="op">&lt;</span><span class="ident">Input</span>, <span class="ident">O2</span>, <span class="ident">Error</span><span class="op">&gt;</span>,
-  <span class="ident">Error</span>: <span class="ident">ParseError</span><span class="op">&lt;</span><span class="ident">Input</span><span class="op">&gt;</span>,
-{
-  <span class="ident">escaped_transform</span>(<span class="ident">normal</span>, <span class="ident">control_char</span>, <span class="ident">transform</span>)(<span class="ident">i</span>)
 }
 </code></pre></div>
 </section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="nom" data-search-index-js="../../../search-index.js" data-search-js="../../../search.js"></div>

@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["Saturating","Provides intentionally-saturating arithmetic on `T`."]]});

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;bitvec-0.19.6&#x2F;src&#x2F;domain.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>domain.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><script defer src="../../main.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;bitvec-0.22.3&#x2F;src&#x2F;domain.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>domain.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><script defer src="../../main.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script>
     <noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../bitvec/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
@@ -733,33 +733,65 @@
 <span id="732">732</span>
 <span id="733">733</span>
 <span id="734">734</span>
-</pre><pre class="rust"><code><span class="doccomment">/*! Representation of the `BitSlice` region memory model
+<span id="735">735</span>
+<span id="736">736</span>
+<span id="737">737</span>
+<span id="738">738</span>
+<span id="739">739</span>
+<span id="740">740</span>
+<span id="741">741</span>
+<span id="742">742</span>
+<span id="743">743</span>
+<span id="744">744</span>
+<span id="745">745</span>
+<span id="746">746</span>
+<span id="747">747</span>
+<span id="748">748</span>
+<span id="749">749</span>
+<span id="750">750</span>
+<span id="751">751</span>
+<span id="752">752</span>
+<span id="753">753</span>
+<span id="754">754</span>
+<span id="755">755</span>
+<span id="756">756</span>
+<span id="757">757</span>
+<span id="758">758</span>
+<span id="759">759</span>
+<span id="760">760</span>
+<span id="761">761</span>
+<span id="762">762</span>
+<span id="763">763</span>
+<span id="764">764</span>
+<span id="765">765</span>
+<span id="766">766</span>
+<span id="767">767</span>
+<span id="768">768</span>
+<span id="769">769</span>
+<span id="770">770</span>
+<span id="771">771</span>
+<span id="772">772</span>
+<span id="773">773</span>
+<span id="774">774</span>
+</pre><pre class="rust"><code><span class="doccomment">/*! Representations of the [`BitSlice`] region memory model.
 
-This module allows any `BitSlice` region to be decomposed into domains with
-more detailed aliasing information.
+This module allows any [`BitSlice`] region to be decomposed into domains that
+restricts [`T::Alias`] markers to only the edge elements that may require them.
 
-Specifically, any particular `BitSlice` region is one of:
+Specifically, any given [`BitSlice`] region is one of:
 
 - touches only interior indices of one element
 - touches at least one edge index of any number of elements (including zero)
 
-In the latter case, any elements *completely* spanned by the slice handle are
-known to not have any other write-capable views to them, and in the case of an
-`&amp;mut BitSlice` handle specifically, no other views at all. As such, the domain
-view of this memory is able to remove the aliasing marker type and permit direct
-memory access for the duration of its existence.
-!*/</span>
+In the latter case, any elements *completely* spanned by the [`BitSlice`] handle
+are known to not have any other write-capable handles to them, and in the case
+of an `&amp;mut BitSlice` handle specifically, no other views at all. As such, the
+domain view of this memory is able to remove the aliasing marker type and permit
+direct memory access to the underlying buffer for the duration of its existence.
 
-<span class="kw">use</span> <span class="kw">crate</span>::{
-	<span class="ident">index</span>::{
-		<span class="ident">BitIdx</span>,
-		<span class="ident">BitTail</span>,
-	},
-	<span class="ident">mem::BitMemory</span>,
-	<span class="ident">order::BitOrder</span>,
-	<span class="ident">slice::BitSlice</span>,
-	<span class="ident">store::BitStore</span>,
-};
+[`BitSlice`]: crate::slice::BitSlice
+[`T::Alias`]: crate::store::BitStore::Alias
+!*/</span>
 
 <span class="kw">use</span> <span class="ident">core</span>::{
 	<span class="ident">fmt</span>::{
@@ -774,31 +806,47 @@ memory access for the duration of its existence.
 	<span class="ident">slice</span>,
 };
 
+<span class="kw">use</span> <span class="ident">funty::IsNumber</span>;
 <span class="kw">use</span> <span class="ident">tap</span>::{
 	<span class="ident">pipe::Pipe</span>,
 	<span class="ident">tap::Tap</span>,
 };
-
 <span class="kw">use</span> <span class="ident">wyz::fmt::FmtForward</span>;
+
+<span class="kw">use</span> <span class="kw">crate</span>::{
+	<span class="ident">index</span>::{
+		<span class="ident">BitEnd</span>,
+		<span class="ident">BitIdx</span>,
+	},
+	<span class="ident">order::BitOrder</span>,
+	<span class="ident">slice::BitSlice</span>,
+	<span class="ident">store::BitStore</span>,
+};
 
 <span class="macro">macro_rules!</span> <span class="ident">bit_domain</span> {
 	(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>:<span class="ident">ident</span> $(=&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">m</span>:<span class="ident">ident</span>)<span class="question-mark">?</span> $(@ <span class="macro-nonterminal">$</span><span class="macro-nonterminal">a</span>:<span class="ident">ident</span>)<span class="question-mark">?</span>) =&gt; {
 		<span class="doccomment">/// Granular representation of the memory region containing a</span>
-		<span class="doccomment">/// `BitSlice`.</span>
+		<span class="doccomment">/// [`BitSlice`].</span>
 		<span class="doccomment">///</span>
-		<span class="doccomment">/// `BitSlice` regions can be described in terms of edge and center</span>
-		<span class="doccomment">/// elements, where the edge elements retain the aliasing status of the</span>
-		<span class="doccomment">/// source `BitSlice` handle, and the center elements are known to be</span>
-		<span class="doccomment">/// completely unaliased by any other view. This property allows any</span>
-		<span class="doccomment">/// `BitSlice` handle to be decomposed into smaller regions, and safely</span>
-		<span class="doccomment">/// remove any aliasing markers from the subregion of memory that no</span>
-		<span class="doccomment">/// longer requires them for correct access.</span>
+		<span class="doccomment">/// [`BitSlice`] regions can be described in terms of edge and center</span>
+		<span class="doccomment">/// partitions, where the edge partitions must retain the aliasing</span>
+		<span class="doccomment">/// status of the source `BitSlice` handle, and the center partition is</span>
+		<span class="doccomment">/// known to be completely unaliased by any other view. This property</span>
+		<span class="doccomment">/// allows any `BitSlice` handle to be decomposed into smaller regions,</span>
+		<span class="doccomment">/// and safely remove any aliasing markers from the center partition</span>
+		<span class="doccomment">/// that no longer requires such safeguarding.</span>
 		<span class="doccomment">///</span>
 		<span class="doccomment">/// This enum acts like the `.split*` methods in that it only subdivides</span>
-		<span class="doccomment">/// the source `BitSlice` into smaller `BitSlices`, and makes</span>
-		<span class="doccomment">/// appropriate modifications to the aliasing markers. It does not</span>
-		<span class="doccomment">/// provide references to the underlying memory elements. If you need</span>
-		<span class="doccomment">/// such access directly, use the [`Domain`] or [`DomainMut`] enums.</span>
+		<span class="doccomment">/// the source [`BitSlice`] into smaller `BitSlice`s, and makes</span>
+		<span class="doccomment">/// appropriate modifications to the aliasing markers.</span>
+		<span class="doccomment">///</span>
+		<span class="doccomment">/// It does not add any aliasing markers: if the slice is marked as</span>
+		<span class="doccomment">/// aliased, then the edge partitions will retain that marker, and if it</span>
+		<span class="doccomment">/// is not, then the edge partitions do not need it.</span>
+		<span class="doccomment">///</span>
+		<span class="doccomment">/// This does not provide references to the underlying memory buffer. If</span>
+		<span class="doccomment">/// you need such direct access, use the [`Domain`] or [`DomainMut`]</span>
+		<span class="doccomment">/// enums.</span>
 		<span class="doccomment">///</span>
 		<span class="doccomment">/// # Lifetimes</span>
 		<span class="doccomment">///</span>
@@ -806,47 +854,59 @@ memory access for the duration of its existence.
 		<span class="doccomment">///</span>
 		<span class="doccomment">/// # Type Parameters</span>
 		<span class="doccomment">///</span>
-		<span class="doccomment">/// - `O`: The ordering type of the source `BitSlice` handle.</span>
-		<span class="doccomment">/// - `T`: The element type of the source `BitSlice` handle, including</span>
-		<span class="doccomment">///   aliasing markers.</span>
+		<span class="doccomment">/// - `O`: The ordering type of the source [`BitSlice`] handle.</span>
+		<span class="doccomment">/// - `T`: The register type of the source [`BitSlice`] handle,</span>
+		<span class="doccomment">///   including any aliasing markers.</span>
 		<span class="doccomment">///</span>
 		<span class="doccomment">/// # Aliasing Awareness</span>
 		<span class="doccomment">///</span>
 		<span class="doccomment">/// This enum does not grant access to memory outside the scope of the</span>
-		<span class="doccomment">/// original `&amp;BitSlice` handle, and so does not need to modfiy any</span>
+		<span class="doccomment">/// original [`BitSlice`] handle, and so does not need to modfiy any</span>
 		<span class="doccomment">/// aliasing conditions.</span>
 		<span class="doccomment">///</span>
-		<span class="doccomment">/// [`Domain`]: enum.Domain.html</span>
-		<span class="doccomment">/// [`DomainMut`]: enum.DomainMut.html</span>
+		<span class="doccomment">/// [`BitSlice`]: crate::slice::BitSlice</span>
+		<span class="doccomment">/// [`Domain`]: crate::domain::Domain</span>
+		<span class="doccomment">/// [`DomainMut`]: crate::domain::DomainMut</span>
 		<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
 		<span class="kw">pub</span> <span class="kw">enum</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span> <span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span>
 		<span class="kw">where</span>
 			<span class="ident">O</span>: <span class="ident">BitOrder</span>,
-			<span class="ident">T</span>: <span class="lifetime">&#39;a</span> <span class="op">+</span> <span class="ident">BitStore</span>
+			<span class="ident">T</span>: <span class="ident">BitStore</span>,
 		{
-			<span class="doccomment">/// Indicates that a `BitSlice` is contained entirely in the</span>
-			<span class="doccomment">/// interior indices of a single memory element.</span>
+			<span class="doccomment">/// Indicates that a [`BitSlice`] is contained entirely in the</span>
+			<span class="doccomment">/// interior indices of a single memory register.</span>
+			<span class="doccomment">///</span>
+			<span class="doccomment">/// [`BitSlice`]: crate::slice::BitSlice</span>
 			<span class="ident">Enclave</span> {
-				<span class="doccomment">/// The start index of the `BitSlice`.</span>
+				<span class="doccomment">/// The start index of the [`BitSlice`].</span>
 				<span class="doccomment">///</span>
 				<span class="doccomment">/// This is not likely to be useful information, but is retained</span>
 				<span class="doccomment">/// for structural similarity with the rest of the module.</span>
+				<span class="doccomment">///</span>
+				<span class="doccomment">/// [`BitSlice`]: crate::slice::BitSlice</span>
 				<span class="ident">head</span>: <span class="ident">BitIdx</span><span class="op">&lt;</span><span class="ident">T::Mem</span><span class="op">&gt;</span>,
-				<span class="doccomment">/// The original `BitSlice` used to create this bit-domain view.</span>
+				<span class="doccomment">/// The original [`BitSlice`] used to create this bit-domain</span>
+				<span class="doccomment">/// view.</span>
+				<span class="doccomment">///</span>
+				<span class="doccomment">/// [`BitSlice`]: crate::slice::BitSlice</span>
 				<span class="ident">body</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">m</span>)<span class="question-mark">?</span> <span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span>,
-				<span class="doccomment">/// The end index of the `BitSlice`.</span>
+				<span class="doccomment">/// The end index of the [`BitSlice`].</span>
 				<span class="doccomment">///</span>
 				<span class="doccomment">/// This is not likely to be useful information, but is retained</span>
 				<span class="doccomment">/// for structural similarity with the rest of the module.</span>
-				<span class="ident">tail</span>: <span class="ident">BitTail</span><span class="op">&lt;</span><span class="ident">T::Mem</span><span class="op">&gt;</span>,
+				<span class="doccomment">///</span>
+				<span class="doccomment">/// [`BitSlice`]: crate::slice::BitSlice</span>
+				<span class="ident">tail</span>: <span class="ident">BitEnd</span><span class="op">&lt;</span><span class="ident">T::Mem</span><span class="op">&gt;</span>,
 			},
-			<span class="doccomment">/// Indicates that a `BitSlice` region touches at least one edge</span>
+			<span class="doccomment">/// Indicates that a [`BitSlice`] region touches at least one edge</span>
 			<span class="doccomment">/// index of any number of elements.</span>
 			<span class="doccomment">///</span>
-			<span class="doccomment">/// This contains two bitslices representing the partially-occupied</span>
-			<span class="doccomment">/// edge elements, with their original aliasing marker, and one</span>
-			<span class="doccomment">/// bitslice representing the fully-occupied interior elements,</span>
-			<span class="doccomment">/// marked as unaliased.</span>
+			<span class="doccomment">/// This contains two [`BitSlice`]s representing the</span>
+			<span class="doccomment">/// partially-occupied edge elements, with their original aliasing</span>
+			<span class="doccomment">/// marker, and one `BitSlice` representing the fully-occupied</span>
+			<span class="doccomment">/// interior elements, marked as unaliased.</span>
+			<span class="doccomment">///</span>
+			<span class="doccomment">/// [`BitSlice`]: crate::slice::BitSlice</span>
 			<span class="ident">Region</span> {
 				<span class="doccomment">/// Any bits that partially-fill the base element of the slice</span>
 				<span class="doccomment">/// region.</span>
@@ -854,15 +914,17 @@ memory access for the duration of its existence.
 				<span class="doccomment">/// This does not modify its aliasing status, as it will already</span>
 				<span class="doccomment">/// be appropriately marked before constructing this view.</span>
 				<span class="ident">head</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">m</span>)<span class="question-mark">?</span> <span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span>,
-				<span class="doccomment">/// Any bits inside elements that the source bitslice completely</span>
-				<span class="doccomment">/// covers.</span>
+				<span class="doccomment">/// Any bits inside elements that the source [`BitSlice`]</span>
+				<span class="doccomment">/// completely covers.</span>
 				<span class="doccomment">///</span>
 				<span class="doccomment">/// This is marked as unaliased, because it is statically</span>
 				<span class="doccomment">/// impossible for any other handle to have write access to the</span>
-				<span class="doccomment">/// region it covers. As such, a bitslice that was marked as</span>
+				<span class="doccomment">/// region it covers. As such, a [`BitSlice`] that was marked as</span>
 				<span class="doccomment">/// entirely aliased, but contains interior unaliased elements,</span>
 				<span class="doccomment">/// can safely remove its aliasing protections.</span>
-				<span class="ident">body</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">m</span>)<span class="question-mark">?</span> <span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">T::Mem</span><span class="op">&gt;</span>,
+				<span class="doccomment">///</span>
+				<span class="doccomment">/// [`BitSlice`]: crate::slice::BitSlice</span>
+				<span class="ident">body</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">m</span>)<span class="question-mark">?</span> <span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">T::Unalias</span><span class="op">&gt;</span>,
 				<span class="doccomment">/// Any bits that partially fill the last element of the slice</span>
 				<span class="doccomment">/// region.</span>
 				<span class="doccomment">///</span>
@@ -875,7 +937,7 @@ memory access for the duration of its existence.
 		<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span> <span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span>
 		<span class="kw">where</span>
 			<span class="ident">O</span>: <span class="ident">BitOrder</span>,
-			<span class="ident">T</span>: <span class="lifetime">&#39;a</span> <span class="op">+</span> <span class="ident">BitStore</span>,
+			<span class="ident">T</span>: <span class="ident">BitStore</span>,
 		{
 			<span class="doccomment">/// Attempts to view the domain as an enclave variant.</span>
 			<span class="doccomment">///</span>
@@ -888,12 +950,12 @@ memory access for the duration of its existence.
 			<span class="doccomment">/// If `self` is the [`Enclave`] variant, this returns `Some` of the</span>
 			<span class="doccomment">/// enclave fields, as a tuple. Otherwise, it returns `None`.</span>
 			<span class="doccomment">///</span>
-			<span class="doccomment">/// [`Enclave`]: #variant.Enclave</span>
+			<span class="doccomment">/// [`Enclave`]: Self::Enclave</span>
 			<span class="attribute">#[<span class="ident">inline</span>]</span>
 			<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">enclave</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>(
 				<span class="ident">BitIdx</span><span class="op">&lt;</span><span class="ident">T::Mem</span><span class="op">&gt;</span>,
 				<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">m</span>)<span class="question-mark">?</span> <span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span>,
-				<span class="ident">BitTail</span><span class="op">&lt;</span><span class="ident">T::Mem</span><span class="op">&gt;</span>,
+				<span class="ident">BitEnd</span><span class="op">&lt;</span><span class="ident">T::Mem</span><span class="op">&gt;</span>,
 			)<span class="op">&gt;</span> {
 				<span class="kw">if</span> <span class="kw">let</span> <span class="ident"><span class="self">Self</span>::Enclave</span> { <span class="ident">head</span>, <span class="ident">body</span>, <span class="ident">tail</span> } <span class="op">=</span> <span class="self">self</span> {
 					<span class="prelude-val">Some</span>((<span class="ident">head</span>, <span class="ident">body</span>, <span class="ident">tail</span>))
@@ -914,11 +976,11 @@ memory access for the duration of its existence.
 			<span class="doccomment">/// If `self` is the [`Region`] variant, this returns `Some` of the</span>
 			<span class="doccomment">/// region fields, as a tuple. Otherwise, it returns `None`.</span>
 			<span class="doccomment">///</span>
-			<span class="doccomment">/// [`Region`]: #variant.Region</span>
+			<span class="doccomment">/// [`Region`]: Self::Region</span>
 			<span class="attribute">#[<span class="ident">inline</span>]</span>
 			<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">region</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>(
 				<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">m</span>)<span class="question-mark">?</span> <span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span>,
-				<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">m</span>)<span class="question-mark">?</span> <span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">T::Mem</span><span class="op">&gt;</span>,
+				<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">m</span>)<span class="question-mark">?</span> <span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">T::Unalias</span><span class="op">&gt;</span>,
 				<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">m</span>)<span class="question-mark">?</span> <span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span>,
 			)<span class="op">&gt;</span> {
 				<span class="kw">if</span> <span class="kw">let</span> <span class="ident"><span class="self">Self</span>::Region</span> { <span class="ident">head</span>, <span class="ident">body</span>, <span class="ident">tail</span> } <span class="op">=</span> <span class="self">self</span> {
@@ -929,23 +991,26 @@ memory access for the duration of its existence.
 				}
 			}
 
-			<span class="doccomment">/// Constructs a bit-domain view from a bitslice.</span>
+			<span class="doccomment">/// Constructs a bit-domain view from a [`BitSlice`].</span>
 			<span class="doccomment">///</span>
 			<span class="doccomment">/// # Parameters</span>
 			<span class="doccomment">///</span>
-			<span class="doccomment">/// - `slice`: The source bitslice for which the view is constructed</span>
+			<span class="doccomment">/// - `slice`: The source [`BitSlice`] for which the view is</span>
+			<span class="doccomment">///   constructed.</span>
 			<span class="doccomment">///</span>
 			<span class="doccomment">/// # Returns</span>
 			<span class="doccomment">///</span>
 			<span class="doccomment">/// A bit-domain view over the source slice.</span>
+			<span class="doccomment">///</span>
+			<span class="doccomment">/// [`BitSlice`]: crate::slice::BitSlice</span>
 			<span class="attribute">#[<span class="ident">inline</span>]</span>
 			<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">slice</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">m</span>)<span class="question-mark">?</span> <span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-				<span class="kw">let</span> <span class="ident">bitptr</span> <span class="op">=</span> <span class="ident">slice</span>.<span class="ident">bitptr</span>();
-				<span class="kw">let</span> <span class="ident">h</span> <span class="op">=</span> <span class="ident">bitptr</span>.<span class="ident">head</span>();
-				<span class="kw">let</span> (<span class="ident">e</span>, <span class="ident">t</span>) <span class="op">=</span> <span class="ident">h</span>.<span class="ident">span</span>(<span class="ident">bitptr</span>.<span class="ident">len</span>());
-				<span class="kw">let</span> <span class="ident">w</span> <span class="op">=</span> <span class="ident">T::Mem::BITS</span>;
+				<span class="kw">let</span> <span class="ident">bitspan</span> <span class="op">=</span> <span class="ident">slice</span>.<span class="ident">as_bitspan</span>();
+				<span class="kw">let</span> <span class="ident">h</span> <span class="op">=</span> <span class="ident">bitspan</span>.<span class="ident">head</span>();
+				<span class="kw">let</span> (<span class="ident">e</span>, <span class="ident">t</span>) <span class="op">=</span> <span class="ident">h</span>.<span class="ident">span</span>(<span class="ident">bitspan</span>.<span class="ident">len</span>());
+				<span class="kw">let</span> <span class="ident">w</span> <span class="op">=</span> <span class="ident">T::Mem::BITS</span> <span class="kw">as</span> <span class="ident">u8</span>;
 
-				<span class="kw">match</span> (<span class="ident">h</span>.<span class="ident">value</span>(), <span class="ident">e</span>, <span class="ident">t</span>.<span class="ident">value</span>()) {
+				<span class="kw">match</span> (<span class="ident">h</span>.<span class="ident">into_inner</span>(), <span class="ident">e</span>, <span class="ident">t</span>.<span class="ident">into_inner</span>()) {
 					(<span class="kw">_</span>, <span class="number">0</span>, <span class="kw">_</span>) =&gt; <span class="ident"><span class="self">Self</span>::empty</span>(),
 					(<span class="number">0</span>, <span class="kw">_</span>, <span class="ident">t</span>) <span class="kw">if</span> <span class="ident">t</span> <span class="op">==</span> <span class="ident">w</span> =&gt; <span class="ident"><span class="self">Self</span>::spanning</span>(<span class="ident">slice</span>),
 					(<span class="kw">_</span>, <span class="kw">_</span>, <span class="ident">t</span>) <span class="kw">if</span> <span class="ident">t</span> <span class="op">==</span> <span class="ident">w</span> =&gt; <span class="ident"><span class="self">Self</span>::partial_head</span>(<span class="ident">slice</span>, <span class="ident">h</span>),
@@ -955,7 +1020,7 @@ memory access for the duration of its existence.
 				}
 			}
 
-			<span class="attribute">#[<span class="ident">inline</span>]</span>
+			<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">not</span>(<span class="ident">tarpaulin_include</span>), <span class="ident">inline</span>(<span class="ident">always</span>))]</span>
 			<span class="kw">fn</span> <span class="ident">empty</span>() -&gt; <span class="self">Self</span> {
 				<span class="ident"><span class="self">Self</span>::Region</span> {
 					<span class="ident">head</span>: <span class="ident">Default::default</span>(),
@@ -968,15 +1033,15 @@ memory access for the duration of its existence.
 			<span class="kw">fn</span> <span class="ident">major</span>(
 				<span class="ident">slice</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">m</span>)<span class="question-mark">?</span> <span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span>,
 				<span class="ident">head</span>: <span class="ident">BitIdx</span><span class="op">&lt;</span><span class="ident">T::Mem</span><span class="op">&gt;</span>,
-				<span class="ident">tail</span>: <span class="ident">BitTail</span><span class="op">&lt;</span><span class="ident">T::Mem</span><span class="op">&gt;</span>,
+				<span class="ident">tail</span>: <span class="ident">BitEnd</span><span class="op">&lt;</span><span class="ident">T::Mem</span><span class="op">&gt;</span>,
 			) -&gt; <span class="self">Self</span> {
 				<span class="kw">let</span> (<span class="ident">head</span>, <span class="ident">rest</span>) <span class="op">=</span> <span class="macro">bit_domain!</span>(<span class="ident">split</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">m</span>)<span class="question-mark">?</span>
 					<span class="ident">slice</span>,
-					(<span class="ident">T::Mem::BITS</span> <span class="op">-</span> <span class="ident">head</span>.<span class="ident">value</span>()) <span class="kw">as</span> <span class="ident">usize</span>,
+					(<span class="ident">T::Mem::BITS</span> <span class="kw">as</span> <span class="ident">u8</span> <span class="op">-</span> <span class="ident">head</span>.<span class="ident">into_inner</span>()) <span class="kw">as</span> <span class="ident">usize</span>,
 				);
 				<span class="kw">let</span> (<span class="ident">body</span>, <span class="ident">tail</span>) <span class="op">=</span> <span class="macro">bit_domain!</span>(<span class="ident">split</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">m</span>)<span class="question-mark">?</span>
 					<span class="ident">rest</span>,
-					<span class="ident">rest</span>.<span class="ident">len</span>() <span class="op">-</span> (<span class="ident">tail</span>.<span class="ident">value</span>() <span class="kw">as</span> <span class="ident">usize</span>),
+					<span class="ident">rest</span>.<span class="ident">len</span>() <span class="op">-</span> (<span class="ident">tail</span>.<span class="ident">into_inner</span>() <span class="kw">as</span> <span class="ident">usize</span>),
 				);
 				<span class="ident"><span class="self">Self</span>::Region</span> {
 					<span class="ident">head</span>: <span class="macro">bit_domain!</span>(<span class="ident">retype</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">m</span>)<span class="question-mark">?</span> <span class="ident">head</span>),
@@ -989,7 +1054,7 @@ memory access for the duration of its existence.
 			<span class="kw">fn</span> <span class="ident">minor</span>(
 				<span class="ident">slice</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">m</span>)<span class="question-mark">?</span> <span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span>,
 				<span class="ident">head</span>: <span class="ident">BitIdx</span><span class="op">&lt;</span><span class="ident">T::Mem</span><span class="op">&gt;</span>,
-				<span class="ident">tail</span>: <span class="ident">BitTail</span><span class="op">&lt;</span><span class="ident">T::Mem</span><span class="op">&gt;</span>,
+				<span class="ident">tail</span>: <span class="ident">BitEnd</span><span class="op">&lt;</span><span class="ident">T::Mem</span><span class="op">&gt;</span>,
 			) -&gt; <span class="self">Self</span> {
 				<span class="ident"><span class="self">Self</span>::Enclave</span> {
 					<span class="ident">head</span>,
@@ -1005,7 +1070,7 @@ memory access for the duration of its existence.
 			) -&gt; <span class="self">Self</span> {
 				<span class="kw">let</span> (<span class="ident">head</span>, <span class="ident">rest</span>) <span class="op">=</span> <span class="macro">bit_domain!</span>(<span class="ident">split</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">m</span>)<span class="question-mark">?</span>
 					<span class="ident">slice</span>,
-					(<span class="ident">T::Mem::BITS</span> <span class="op">-</span> <span class="ident">head</span>.<span class="ident">value</span>()) <span class="kw">as</span> <span class="ident">usize</span>,
+					(<span class="ident">T::Mem::BITS</span> <span class="kw">as</span> <span class="ident">u8</span> <span class="op">-</span> <span class="ident">head</span>.<span class="ident">into_inner</span>()) <span class="kw">as</span> <span class="ident">usize</span>,
 				);
 				<span class="kw">let</span> (<span class="ident">head</span>, <span class="ident">body</span>) <span class="op">=</span> (
 					<span class="macro">bit_domain!</span>(<span class="ident">retype</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">m</span>)<span class="question-mark">?</span> <span class="ident">head</span>),
@@ -1027,11 +1092,11 @@ memory access for the duration of its existence.
 				constructor function to jump into.
 				*/</span>
 				<span class="ident">_head</span>: <span class="ident">BitIdx</span><span class="op">&lt;</span><span class="ident">T::Mem</span><span class="op">&gt;</span>,
-				<span class="ident">tail</span>: <span class="ident">BitTail</span><span class="op">&lt;</span><span class="ident">T::Mem</span><span class="op">&gt;</span>,
+				<span class="ident">tail</span>: <span class="ident">BitEnd</span><span class="op">&lt;</span><span class="ident">T::Mem</span><span class="op">&gt;</span>,
 			) -&gt; <span class="self">Self</span> {
 				<span class="kw">let</span> (<span class="ident">rest</span>, <span class="ident">tail</span>) <span class="op">=</span> <span class="macro">bit_domain!</span>(<span class="ident">split</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">m</span>)<span class="question-mark">?</span>
 					<span class="ident">slice</span>,
-					<span class="ident">slice</span>.<span class="ident">len</span>() <span class="op">-</span> (<span class="ident">tail</span>.<span class="ident">value</span>() <span class="kw">as</span> <span class="ident">usize</span>),
+					<span class="ident">slice</span>.<span class="ident">len</span>() <span class="op">-</span> (<span class="ident">tail</span>.<span class="ident">into_inner</span>() <span class="kw">as</span> <span class="ident">usize</span>),
 				);
 				<span class="kw">let</span> (<span class="ident">body</span>, <span class="ident">tail</span>) <span class="op">=</span> (
 					<span class="macro">bit_domain!</span>(<span class="ident">retype</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">m</span>)<span class="question-mark">?</span> <span class="ident">rest</span>),
@@ -1044,7 +1109,7 @@ memory access for the duration of its existence.
 				}
 			}
 
-			<span class="attribute">#[<span class="ident">inline</span>]</span>
+			<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">not</span>(<span class="ident">tarpaulin_include</span>), <span class="ident">inline</span>(<span class="ident">always</span>))]</span>
 			<span class="kw">fn</span> <span class="ident">spanning</span>(<span class="ident">slice</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">m</span>)<span class="question-mark">?</span> <span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
 				<span class="ident"><span class="self">Self</span>::Region</span> {
 					<span class="ident">head</span>: <span class="ident">Default::default</span>(),
@@ -1095,21 +1160,21 @@ memory access for the duration of its existence.
 <span class="macro">macro_rules!</span> <span class="ident">domain</span> {
 	(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>:<span class="ident">ident</span> $(=&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">m</span>:<span class="ident">ident</span> @ <span class="macro-nonterminal">$</span><span class="macro-nonterminal">a</span>:<span class="ident">ident</span>)<span class="question-mark">?</span>) =&gt; {
 		<span class="doccomment">/// Granular representation of the memory region containing a</span>
-		<span class="doccomment">/// `BitSlice`.</span>
+		<span class="doccomment">/// [`BitSlice`].</span>
 		<span class="doccomment">///</span>
-		<span class="doccomment">/// `BitSlice` regions can be described in terms of edge and center</span>
-		<span class="doccomment">/// elements, where the edge elements retain the aliasing status of the</span>
-		<span class="doccomment">/// source `BitSlice` handle, and the center elements are known to be</span>
-		<span class="doccomment">/// completely unaliased by any other view. This property allows any</span>
-		<span class="doccomment">/// `BitSlice` handle to be decomposed into smaller regions, and safely</span>
-		<span class="doccomment">/// remove any aliasing markers from the subregion of memory that no</span>
-		<span class="doccomment">/// longer requires them for correct access.</span>
+		<span class="doccomment">/// [`BitSlice`] regions can be described in terms of edge and center</span>
+		<span class="doccomment">/// partitions, where the edge partitions must retain the aliasing</span>
+		<span class="doccomment">/// status of the source `BitSlice` handle, and the center partition is</span>
+		<span class="doccomment">/// known to be completely unaliased by any other view. This property</span>
+		<span class="doccomment">/// allows any `BitSlice` handle to be decomposed into smaller regions,</span>
+		<span class="doccomment">/// and safely remove any aliasing markers from the center partition</span>
+		<span class="doccomment">/// that no longer requires such safeguarding.</span>
 		<span class="doccomment">///</span>
-		<span class="doccomment">/// This enum splits the element region backing a `BitSlice` into</span>
-		<span class="doccomment">/// maybe-aliased and known-unaliased subslices. If you do not need to</span>
-		<span class="doccomment">/// work directly with the memory elements, and only need to firmly</span>
-		<span class="doccomment">/// specify the aliasing status of a `BitSlice`, see the [`BitDomain`]</span>
-		<span class="doccomment">/// and [`BitDomainMut`] enums.</span>
+		<span class="doccomment">/// This enum splits the underlying element slice `[T]` into the</span>
+		<span class="doccomment">/// maybe-aliased edge elements and known-unaliased center elements. If</span>
+		<span class="doccomment">/// you do not need to work with the memory elements directly, and only</span>
+		<span class="doccomment">/// need to firmly specify the access behavior of the [`BitSlice`]</span>
+		<span class="doccomment">/// handle, use the [`BitDomain`] and [`BitDomainMut`] enums.</span>
 		<span class="doccomment">///</span>
 		<span class="doccomment">/// # Lifetimes</span>
 		<span class="doccomment">///</span>
@@ -1117,72 +1182,89 @@ memory access for the duration of its existence.
 		<span class="doccomment">///</span>
 		<span class="doccomment">/// # Type Parameters</span>
 		<span class="doccomment">///</span>
-		<span class="doccomment">/// - `T`: The element type of the source `BitSlice` handle, including</span>
-		<span class="doccomment">///   aliasing markers.</span>
+		<span class="doccomment">/// - `T`: The register type of the source [`BitSlice`] handle,</span>
+		<span class="doccomment">///   including any aliasing markers.</span>
 		<span class="doccomment">///</span>
-		<span class="doccomment">/// [`BitDomain`]: enum.BitDomain.html</span>
-		<span class="doccomment">/// [`BitDomainMut`]: enum.BitDomainMut.html</span>
+		<span class="doccomment">/// # Mutability</span>
+		<span class="doccomment">///</span>
+		<span class="doccomment">/// The immutable view produces [`T::Alias`] references, which permit</span>
+		<span class="doccomment">/// foreign writes to the referent location but disallow writes through</span>
+		<span class="doccomment">/// itself. The mutable view produces [`T::Access`] references, because</span>
+		<span class="doccomment">/// `&amp;mut _` references can only ever be produced when no other aliasing</span>
+		<span class="doccomment">/// handle exists. The write permissions must be weakened from</span>
+		<span class="doccomment">/// `&amp;mut T::Alias` to `&amp;T::Access` in order to satisfy the Rust memory</span>
+		<span class="doccomment">/// rules.</span>
+		<span class="doccomment">///</span>
+		<span class="doccomment">/// The edge references do not forbid modifying bits outside of the</span>
+		<span class="doccomment">/// source [`BitSlice`] domain, and writes out of bounds will be</span>
+		<span class="doccomment">/// correctly handled by any other handles capable of viewing those</span>
+		<span class="doccomment">/// elements. Doing so is still *incorrect*, though defined, and you are</span>
+		<span class="doccomment">/// responsible for writing only within bounds when using `DomainMut`.</span>
+		<span class="doccomment">///</span>
+		<span class="doccomment">/// [`BitDomain`]: crate::domain::BitDomain</span>
+		<span class="doccomment">/// [`BitDomainMut`]: crate::domain::BitDomainMut</span>
+		<span class="doccomment">/// [`BitSlice`]: crate::slice::BitSlice</span>
+		<span class="doccomment">/// [`T::Access`]: crate::store::BitStore::Access</span>
+		<span class="doccomment">/// [`T::Alias`]: crate::store::BitStore::Alias</span>
 		<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
 		<span class="kw">pub</span> <span class="kw">enum</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span> <span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span>
 		<span class="kw">where</span>
-			<span class="ident">T</span>: <span class="lifetime">&#39;a</span> <span class="op">+</span> <span class="ident">BitStore</span>,
+			<span class="ident">T</span>: <span class="ident">BitStore</span>,
 		{
-			<span class="doccomment">/// Indicates that a `BitSlice` is contained entirely in the</span>
+			<span class="doccomment">/// Indicates that a [`BitSlice`] is contained entirely in the</span>
 			<span class="doccomment">/// interior indices of a single memory element.</span>
+			<span class="doccomment">///</span>
+			<span class="doccomment">/// [`BitSlice`]: crate::slice::BitSlice</span>
 			<span class="ident">Enclave</span> {
-				<span class="doccomment">/// The start index of the `BitSlice`.</span>
+				<span class="doccomment">/// The start index of the [`BitSlice`].</span>
+				<span class="doccomment">///</span>
+				<span class="doccomment">/// [`BitSlice`]: crate::slice::BitSlice</span>
 				<span class="ident">head</span>: <span class="ident">BitIdx</span><span class="op">&lt;</span><span class="ident">T::Mem</span><span class="op">&gt;</span>,
-				<span class="doccomment">/// An aliased view of the element containing the `BitSlice`.</span>
+				<span class="doccomment">/// An aliased view of the element containing the [`BitSlice`].</span>
 				<span class="doccomment">///</span>
 				<span class="doccomment">/// This is necessary even on immutable views, because other</span>
 				<span class="doccomment">/// views to the referent element may be permitted to modify it.</span>
+				<span class="doccomment">///</span>
+				<span class="doccomment">/// [`BitSlice`]: crate::slice::BitSlice</span>
 				<span class="ident">elem</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">T</span> $(::<span class="macro-nonterminal">$</span><span class="macro-nonterminal">a</span>)<span class="question-mark">?</span>,
-				<span class="doccomment">/// The end index of the `BitSlice`.</span>
-				<span class="ident">tail</span>: <span class="ident">BitTail</span><span class="op">&lt;</span><span class="ident">T::Mem</span><span class="op">&gt;</span>,
+				<span class="doccomment">/// The end index of the [`BitSlice`].</span>
+				<span class="doccomment">///</span>
+				<span class="doccomment">/// [`BitSlice`]: crate::slice::BitSlice</span>
+				<span class="ident">tail</span>: <span class="ident">BitEnd</span><span class="op">&lt;</span><span class="ident">T::Mem</span><span class="op">&gt;</span>,
 			},
-			<span class="doccomment">/// Indicates that a `BitSlice` region touches at least one edge</span>
+			<span class="doccomment">/// Indicates that a [`BitSlice`] region touches at least one edge</span>
 			<span class="doccomment">/// index of any number of elements.</span>
 			<span class="doccomment">///</span>
 			<span class="doccomment">/// This contains two optional references to the aliased edges, and</span>
 			<span class="doccomment">/// one reference to the unaliased middle. Each can be queried and</span>
 			<span class="doccomment">/// used individually.</span>
+			<span class="doccomment">///</span>
+			<span class="doccomment">/// [`BitSlice`]: crate::slice::BitSlice</span>
 			<span class="ident">Region</span> {
-				<span class="doccomment">/// If the `BitSlice` started in the interior of its first</span>
+				<span class="doccomment">/// If the [`BitSlice`] started in the interior of its first</span>
 				<span class="doccomment">/// element, this contains the starting index and the base</span>
 				<span class="doccomment">/// address.</span>
+				<span class="doccomment">///</span>
+				<span class="doccomment">/// [`BitSlice`]: crate::slice::BitSlice</span>
 				<span class="ident">head</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">BitIdx</span><span class="op">&lt;</span><span class="ident">T::Mem</span><span class="op">&gt;</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">T</span> $(::<span class="macro-nonterminal">$</span><span class="macro-nonterminal">a</span>)<span class="question-mark">?</span>)<span class="op">&gt;</span>,
 				<span class="doccomment">/// All fully-spanned, unaliased, elements.</span>
 				<span class="doccomment">///</span>
 				<span class="doccomment">/// This is marked as bare memory without any access</span>
 				<span class="doccomment">/// protections, because it is statically impossible for any</span>
 				<span class="doccomment">/// other handle to have write access to the region it covers.</span>
-				<span class="doccomment">/// As such, a bitslice that was marked as entirely aliased, but</span>
-				<span class="doccomment">/// contains interior unaliased elements, can safely remove its</span>
-				<span class="doccomment">/// aliasing protections.</span>
-				<span class="doccomment">///</span>
-				<span class="doccomment">/// # Safety Exception</span>
-				<span class="doccomment">///</span>
-				<span class="doccomment">/// `&amp;BitSlice&lt;O, T::Alias&gt;` references have access to a</span>
-				<span class="doccomment">/// `.set_aliased` method, which represents the only means in</span>
-				<span class="doccomment">/// `bitvec` of writing to memory without an exclusive `&amp;mut `</span>
-				<span class="doccomment">/// reference.</span>
-				<span class="doccomment">///</span>
-				<span class="doccomment">/// Construction of two such shared, aliasing, references over</span>
-				<span class="doccomment">/// the same data, then construction of a domain view over one</span>
-				<span class="doccomment">/// of them and simultaneous writing through the other to</span>
-				<span class="doccomment">/// interior elements marked as unaliased, will cause the domain</span>
-				<span class="doccomment">/// view to be undefined behavior. Do not combine domain views</span>
-				<span class="doccomment">/// and `.set_aliased` calls.</span>
-				<span class="ident">body</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">m</span>)<span class="question-mark">?</span> [<span class="ident">T::Mem</span>],
+				<span class="doccomment">/// As such, a [`BitSlice`] that was marked as entirely aliased,</span>
+				<span class="doccomment">/// but contains interior unaliased elements, can safely remove</span>
+				<span class="doccomment">/// its aliasing protections.</span>
+				<span class="ident">body</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">m</span>)<span class="question-mark">?</span> [<span class="ident">T::Unalias</span>],
 				<span class="doccomment">/// If the `BitSlice` ended in the interior of its last element,</span>
 				<span class="doccomment">/// this contains the ending index and the last address.</span>
-				<span class="ident">tail</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">T</span> $(::<span class="macro-nonterminal">$</span><span class="macro-nonterminal">a</span>)<span class="question-mark">?</span>, <span class="ident">BitTail</span><span class="op">&lt;</span><span class="ident">T::Mem</span><span class="op">&gt;</span>)<span class="op">&gt;</span>,
+				<span class="ident">tail</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">T</span> $(::<span class="macro-nonterminal">$</span><span class="macro-nonterminal">a</span>)<span class="question-mark">?</span>, <span class="ident">BitEnd</span><span class="op">&lt;</span><span class="ident">T::Mem</span><span class="op">&gt;</span>)<span class="op">&gt;</span>,
 			}
 		}
 
 		<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span> <span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span>
 		<span class="kw">where</span>
-			<span class="ident">T</span>: <span class="lifetime">&#39;a</span> <span class="op">+</span> <span class="ident">BitStore</span>,
+			<span class="ident">T</span>: <span class="ident">BitStore</span>,
 		{
 			<span class="doccomment">/// Attempts to view the domain as an enclave variant.</span>
 			<span class="doccomment">///</span>
@@ -1195,12 +1277,12 @@ memory access for the duration of its existence.
 			<span class="doccomment">/// If `self` is the [`Enclave`] variant, this returns `Some` of the</span>
 			<span class="doccomment">/// enclave fields, as a tuple. Otherwise, it returns `None`.</span>
 			<span class="doccomment">///</span>
-			<span class="doccomment">/// [`Enclave`]: #variant.Enclave</span>
+			<span class="doccomment">/// [`Enclave`]: Self::Enclave</span>
 			<span class="attribute">#[<span class="ident">inline</span>]</span>
 			<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">enclave</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>(
 				<span class="ident">BitIdx</span><span class="op">&lt;</span><span class="ident">T::Mem</span><span class="op">&gt;</span>,
 				<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">T</span> $(::<span class="macro-nonterminal">$</span><span class="macro-nonterminal">a</span>)<span class="question-mark">?</span>,
-				<span class="ident">BitTail</span><span class="op">&lt;</span><span class="ident">T::Mem</span><span class="op">&gt;</span>,
+				<span class="ident">BitEnd</span><span class="op">&lt;</span><span class="ident">T::Mem</span><span class="op">&gt;</span>,
 			)<span class="op">&gt;</span> {
 				<span class="kw">if</span> <span class="kw">let</span> <span class="ident"><span class="self">Self</span>::Enclave</span> { <span class="ident">head</span>, <span class="ident">elem</span>, <span class="ident">tail</span> } <span class="op">=</span> <span class="self">self</span> {
 					<span class="prelude-val">Some</span>((<span class="ident">head</span>, <span class="ident">elem</span>, <span class="ident">tail</span>))
@@ -1220,12 +1302,12 @@ memory access for the duration of its existence.
 			<span class="doccomment">/// If `self` is the [`Region`] variant, this returns `Some` of the</span>
 			<span class="doccomment">/// region fields, as a tuple. Otherwise, it returns `None`.</span>
 			<span class="doccomment">///</span>
-			<span class="doccomment">/// [`Region`]: #variant.Region</span>
+			<span class="doccomment">/// [`Region`]: Self::Region</span>
 			<span class="attribute">#[<span class="ident">inline</span>]</span>
 			<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">region</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>(
 				<span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">BitIdx</span><span class="op">&lt;</span><span class="ident">T::Mem</span><span class="op">&gt;</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">T</span> $(::<span class="macro-nonterminal">$</span><span class="macro-nonterminal">a</span>)<span class="question-mark">?</span>)<span class="op">&gt;</span>,
-				<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">m</span>)<span class="question-mark">?</span> [<span class="ident">T::Mem</span>],
-				<span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">T</span> $(::<span class="macro-nonterminal">$</span><span class="macro-nonterminal">a</span>)<span class="question-mark">?</span>, <span class="ident">BitTail</span><span class="op">&lt;</span><span class="ident">T::Mem</span><span class="op">&gt;</span>)<span class="op">&gt;</span>,
+				<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">m</span>)<span class="question-mark">?</span> [<span class="ident">T::Unalias</span>],
+				<span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">T</span> $(::<span class="macro-nonterminal">$</span><span class="macro-nonterminal">a</span>)<span class="question-mark">?</span>, <span class="ident">BitEnd</span><span class="op">&lt;</span><span class="ident">T::Mem</span><span class="op">&gt;</span>)<span class="op">&gt;</span>,
 			)<span class="op">&gt;</span> {
 				<span class="kw">if</span> <span class="kw">let</span> <span class="ident"><span class="self">Self</span>::Region</span> { <span class="ident">head</span>, <span class="ident">body</span>, <span class="ident">tail</span> } <span class="op">=</span> <span class="self">self</span> {
 					<span class="prelude-val">Some</span>((<span class="ident">head</span>,<span class="ident">body</span>,<span class="ident">tail</span>))
@@ -1238,13 +1320,13 @@ memory access for the duration of its existence.
 			<span class="attribute">#[<span class="ident">inline</span>]</span>
 			<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>(<span class="ident">slice</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">m</span>)<span class="question-mark">?</span> <span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span>
 			<span class="kw">where</span> <span class="ident">O</span>: <span class="ident">BitOrder</span> {
-				<span class="kw">let</span> <span class="ident">bitptr</span> <span class="op">=</span> <span class="ident">slice</span>.<span class="ident">bitptr</span>();
-				<span class="kw">let</span> <span class="ident">head</span> <span class="op">=</span> <span class="ident">bitptr</span>.<span class="ident">head</span>();
-				<span class="kw">let</span> <span class="ident">elts</span> <span class="op">=</span> <span class="ident">bitptr</span>.<span class="ident">elements</span>();
-				<span class="kw">let</span> <span class="ident">tail</span> <span class="op">=</span> <span class="ident">bitptr</span>.<span class="ident">tail</span>();
-				<span class="kw">let</span> <span class="ident">bits</span> <span class="op">=</span> <span class="ident">T::Mem::BITS</span>;
-				<span class="kw">let</span> <span class="ident">base</span> <span class="op">=</span> <span class="ident">bitptr</span>.<span class="ident">pointer</span>().<span class="ident">to_const</span>() <span class="kw">as</span> <span class="kw-2">*const</span> <span class="kw">_</span>;
-				<span class="kw">match</span> (<span class="ident">head</span>.<span class="ident">value</span>(), <span class="ident">elts</span>, <span class="ident">tail</span>.<span class="ident">value</span>()) {
+				<span class="kw">let</span> <span class="ident">bitspan</span> <span class="op">=</span> <span class="ident">slice</span>.<span class="ident">as_bitspan</span>();
+				<span class="kw">let</span> <span class="ident">head</span> <span class="op">=</span> <span class="ident">bitspan</span>.<span class="ident">head</span>();
+				<span class="kw">let</span> <span class="ident">elts</span> <span class="op">=</span> <span class="ident">bitspan</span>.<span class="ident">elements</span>();
+				<span class="kw">let</span> <span class="ident">tail</span> <span class="op">=</span> <span class="ident">bitspan</span>.<span class="ident">tail</span>();
+				<span class="kw">let</span> <span class="ident">bits</span> <span class="op">=</span> <span class="ident">T::Mem::BITS</span> <span class="kw">as</span> <span class="ident">u8</span>;
+				<span class="kw">let</span> <span class="ident">base</span> <span class="op">=</span> <span class="ident">bitspan</span>.<span class="ident">address</span>().<span class="ident">to_const</span>() <span class="kw">as</span> <span class="kw-2">*const</span> <span class="kw">_</span>;
+				<span class="kw">match</span> (<span class="ident">head</span>.<span class="ident">into_inner</span>(), <span class="ident">elts</span>, <span class="ident">tail</span>.<span class="ident">into_inner</span>()) {
 					(<span class="kw">_</span>, <span class="number">0</span>, <span class="kw">_</span>) =&gt; <span class="ident"><span class="self">Self</span>::empty</span>(),
 					(<span class="number">0</span>, <span class="kw">_</span>, <span class="ident">t</span>) <span class="kw">if</span> <span class="ident">t</span> <span class="op">==</span> <span class="ident">bits</span> =&gt; <span class="ident"><span class="self">Self</span>::spanning</span>(<span class="ident">base</span>, <span class="ident">elts</span>),
 					(<span class="kw">_</span>, <span class="kw">_</span>, <span class="ident">t</span>) <span class="kw">if</span> <span class="ident">t</span> <span class="op">==</span> <span class="ident">bits</span> =&gt; <span class="ident"><span class="self">Self</span>::partial_head</span>(<span class="ident">base</span>, <span class="ident">elts</span>, <span class="ident">head</span>),
@@ -1254,7 +1336,7 @@ memory access for the duration of its existence.
 				}
 			}
 
-			<span class="attribute">#[<span class="ident">inline</span>]</span>
+			<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">not</span>(<span class="ident">tarpaulin_include</span>), <span class="ident">inline</span>(<span class="ident">always</span>))]</span>
 			<span class="kw">fn</span> <span class="ident">empty</span>() -&gt; <span class="self">Self</span> {
 				<span class="ident"><span class="self">Self</span>::Region</span> {
 					<span class="ident">head</span>: <span class="prelude-val">None</span>,
@@ -1268,7 +1350,7 @@ memory access for the duration of its existence.
 				<span class="ident">base</span>: <span class="kw-2">*const</span> <span class="ident">T</span> $(::<span class="macro-nonterminal">$</span><span class="macro-nonterminal">a</span>)<span class="question-mark">?</span>,
 				<span class="ident">elts</span>: <span class="ident">usize</span>,
 				<span class="ident">head</span>: <span class="ident">BitIdx</span><span class="op">&lt;</span><span class="ident">T::Mem</span><span class="op">&gt;</span>,
-				<span class="ident">tail</span>: <span class="ident">BitTail</span><span class="op">&lt;</span><span class="ident">T::Mem</span><span class="op">&gt;</span>,
+				<span class="ident">tail</span>: <span class="ident">BitEnd</span><span class="op">&lt;</span><span class="ident">T::Mem</span><span class="op">&gt;</span>,
 			) -&gt; <span class="self">Self</span> {
 				<span class="kw">let</span> <span class="ident">h</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">base</span> };
 				<span class="kw">let</span> <span class="ident">t</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">base</span>.<span class="ident">add</span>(<span class="ident">elts</span> <span class="op">-</span> <span class="number">1</span>) };
@@ -1284,7 +1366,7 @@ memory access for the duration of its existence.
 			<span class="kw">fn</span> <span class="ident">minor</span>(
 				<span class="ident">addr</span>: <span class="kw-2">*const</span> <span class="ident">T</span> $(::<span class="macro-nonterminal">$</span><span class="macro-nonterminal">a</span>)<span class="question-mark">?</span>,
 				<span class="ident">head</span>: <span class="ident">BitIdx</span><span class="op">&lt;</span><span class="ident">T::Mem</span><span class="op">&gt;</span>,
-				<span class="ident">tail</span>: <span class="ident">BitTail</span><span class="op">&lt;</span><span class="ident">T::Mem</span><span class="op">&gt;</span>,
+				<span class="ident">tail</span>: <span class="ident">BitEnd</span><span class="op">&lt;</span><span class="ident">T::Mem</span><span class="op">&gt;</span>,
 			) -&gt; <span class="self">Self</span> {
 				<span class="ident"><span class="self">Self</span>::Enclave</span> {
 					<span class="ident">head</span>,
@@ -1312,7 +1394,7 @@ memory access for the duration of its existence.
 			<span class="kw">fn</span> <span class="ident">partial_tail</span>(
 				<span class="ident">base</span>: <span class="kw-2">*const</span> <span class="ident">T</span> $(::<span class="macro-nonterminal">$</span><span class="macro-nonterminal">a</span>)<span class="question-mark">?</span>,
 				<span class="ident">elts</span>: <span class="ident">usize</span>,
-				<span class="ident">tail</span>: <span class="ident">BitTail</span><span class="op">&lt;</span><span class="ident">T::Mem</span><span class="op">&gt;</span>,
+				<span class="ident">tail</span>: <span class="ident">BitEnd</span><span class="op">&lt;</span><span class="ident">T::Mem</span><span class="op">&gt;</span>,
 			) -&gt; <span class="self">Self</span> {
 				<span class="kw">let</span> <span class="ident">t</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">base</span>.<span class="ident">add</span>(<span class="ident">elts</span> <span class="op">-</span> <span class="number">1</span>) };
 				<span class="kw">let</span> <span class="ident">body</span> <span class="op">=</span> <span class="macro">domain!</span>(<span class="ident">slice</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">m</span>)<span class="question-mark">?</span> <span class="ident">base</span>, <span class="ident">elts</span> <span class="op">-</span> <span class="number">1</span>);
@@ -1323,7 +1405,7 @@ memory access for the duration of its existence.
 				}
 			}
 
-			<span class="attribute">#[<span class="ident">inline</span>]</span>
+			<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">not</span>(<span class="ident">tarpaulin_include</span>), <span class="ident">inline</span>(<span class="ident">always</span>))]</span>
 			<span class="kw">fn</span> <span class="ident">spanning</span>(<span class="ident">base</span>: <span class="kw-2">*const</span> <span class="ident">T</span> $(::<span class="macro-nonterminal">$</span><span class="macro-nonterminal">a</span>)<span class="question-mark">?</span>, <span class="ident">elts</span>: <span class="ident">usize</span>) -&gt; <span class="self">Self</span> {
 				<span class="ident"><span class="self">Self</span>::Region</span> {
 					<span class="ident">head</span>: <span class="prelude-val">None</span>,
@@ -1343,7 +1425,7 @@ memory access for the duration of its existence.
 }
 
 <span class="macro">domain!</span>(<span class="ident">Domain</span>);
-<span class="macro">domain!</span>(<span class="ident">DomainMut</span> =&gt; <span class="kw-2">mut</span> @ <span class="ident">Alias</span>);
+<span class="macro">domain!</span>(<span class="ident">DomainMut</span> =&gt; <span class="kw-2">mut</span> @ <span class="ident">Access</span>);
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">tarpaulin_include</span>))]</span>
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Clone</span> <span class="kw">for</span> <span class="ident">Domain</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">T</span><span class="op">&gt;</span>
@@ -1356,11 +1438,10 @@ memory access for the duration of its existence.
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Iterator</span> <span class="kw">for</span> <span class="ident">Domain</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span>
-<span class="kw">where</span> <span class="ident">T</span>: <span class="lifetime">&#39;a</span> <span class="op">+</span> <span class="ident">BitStore</span>
+<span class="kw">where</span> <span class="ident">T</span>: <span class="ident">BitStore</span>
 {
 	<span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident">T::Mem</span>;
 
-	<span class="attribute">#[<span class="ident">inline</span>]</span>
 	<span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
 		<span class="kw">match</span> <span class="self">self</span> {
 			<span class="ident"><span class="self">Self</span>::Enclave</span> { <span class="ident">elem</span>, .. } =&gt; {
@@ -1372,7 +1453,7 @@ memory access for the duration of its existence.
 				}
 				<span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>((<span class="ident">elem</span>, <span class="ident">rest</span>)) <span class="op">=</span> <span class="ident">body</span>.<span class="ident">split_first</span>() {
 					<span class="kw-2">*</span><span class="ident">body</span> <span class="op">=</span> <span class="ident">rest</span>;
-					<span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="kw-2">*</span><span class="ident">elem</span>);
+					<span class="kw">return</span> <span class="ident">elem</span>.<span class="ident">load_value</span>().<span class="ident">into</span>();
 				}
 				<span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>((<span class="ident">elem</span>, <span class="kw">_</span>)) <span class="op">=</span> <span class="kw-2">*</span><span class="ident">tail</span> {
 					<span class="kw">return</span> <span class="ident">elem</span>.<span class="ident">load_value</span>().<span class="ident">pipe</span>(<span class="prelude-val">Some</span>).<span class="ident">tap</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="kw-2">*</span><span class="ident">tail</span> <span class="op">=</span> <span class="prelude-val">None</span>);
@@ -1384,9 +1465,8 @@ memory access for the duration of its existence.
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">DoubleEndedIterator</span> <span class="kw">for</span> <span class="ident">Domain</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span>
-<span class="kw">where</span> <span class="ident">T</span>: <span class="lifetime">&#39;a</span> <span class="op">+</span> <span class="ident">BitStore</span>
+<span class="kw">where</span> <span class="ident">T</span>: <span class="ident">BitStore</span>
 {
-	<span class="attribute">#[<span class="ident">inline</span>]</span>
 	<span class="kw">fn</span> <span class="ident">next_back</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
 		<span class="kw">match</span> <span class="self">self</span> {
 			<span class="ident"><span class="self">Self</span>::Enclave</span> { <span class="ident">elem</span>, .. } =&gt; {
@@ -1398,7 +1478,7 @@ memory access for the duration of its existence.
 				}
 				<span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>((<span class="ident">elem</span>, <span class="ident">rest</span>)) <span class="op">=</span> <span class="ident">body</span>.<span class="ident">split_last</span>() {
 					<span class="kw-2">*</span><span class="ident">body</span> <span class="op">=</span> <span class="ident">rest</span>;
-					<span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="kw-2">*</span><span class="ident">elem</span>);
+					<span class="kw">return</span> <span class="ident">elem</span>.<span class="ident">load_value</span>().<span class="ident">into</span>();
 				}
 				<span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>((<span class="kw">_</span>, <span class="ident">elem</span>)) <span class="op">=</span> <span class="kw-2">*</span><span class="ident">head</span> {
 					<span class="kw">return</span> <span class="ident">elem</span>.<span class="ident">load_value</span>().<span class="ident">pipe</span>(<span class="prelude-val">Some</span>).<span class="ident">tap</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="kw-2">*</span><span class="ident">head</span> <span class="op">=</span> <span class="prelude-val">None</span>);

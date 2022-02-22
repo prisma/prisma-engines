@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;nom-6.2.1&#x2F;src&#x2F;traits.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>traits.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><script defer src="../../main.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;nom-7.1.0&#x2F;src&#x2F;traits.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>traits.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><script defer src="../../main.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script>
     <noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../nom/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">   1</span>
 <span id="2">   2</span>
 <span id="3">   3</span>
@@ -1424,239 +1424,6 @@
 <span id="1423">1423</span>
 <span id="1424">1424</span>
 <span id="1425">1425</span>
-<span id="1426">1426</span>
-<span id="1427">1427</span>
-<span id="1428">1428</span>
-<span id="1429">1429</span>
-<span id="1430">1430</span>
-<span id="1431">1431</span>
-<span id="1432">1432</span>
-<span id="1433">1433</span>
-<span id="1434">1434</span>
-<span id="1435">1435</span>
-<span id="1436">1436</span>
-<span id="1437">1437</span>
-<span id="1438">1438</span>
-<span id="1439">1439</span>
-<span id="1440">1440</span>
-<span id="1441">1441</span>
-<span id="1442">1442</span>
-<span id="1443">1443</span>
-<span id="1444">1444</span>
-<span id="1445">1445</span>
-<span id="1446">1446</span>
-<span id="1447">1447</span>
-<span id="1448">1448</span>
-<span id="1449">1449</span>
-<span id="1450">1450</span>
-<span id="1451">1451</span>
-<span id="1452">1452</span>
-<span id="1453">1453</span>
-<span id="1454">1454</span>
-<span id="1455">1455</span>
-<span id="1456">1456</span>
-<span id="1457">1457</span>
-<span id="1458">1458</span>
-<span id="1459">1459</span>
-<span id="1460">1460</span>
-<span id="1461">1461</span>
-<span id="1462">1462</span>
-<span id="1463">1463</span>
-<span id="1464">1464</span>
-<span id="1465">1465</span>
-<span id="1466">1466</span>
-<span id="1467">1467</span>
-<span id="1468">1468</span>
-<span id="1469">1469</span>
-<span id="1470">1470</span>
-<span id="1471">1471</span>
-<span id="1472">1472</span>
-<span id="1473">1473</span>
-<span id="1474">1474</span>
-<span id="1475">1475</span>
-<span id="1476">1476</span>
-<span id="1477">1477</span>
-<span id="1478">1478</span>
-<span id="1479">1479</span>
-<span id="1480">1480</span>
-<span id="1481">1481</span>
-<span id="1482">1482</span>
-<span id="1483">1483</span>
-<span id="1484">1484</span>
-<span id="1485">1485</span>
-<span id="1486">1486</span>
-<span id="1487">1487</span>
-<span id="1488">1488</span>
-<span id="1489">1489</span>
-<span id="1490">1490</span>
-<span id="1491">1491</span>
-<span id="1492">1492</span>
-<span id="1493">1493</span>
-<span id="1494">1494</span>
-<span id="1495">1495</span>
-<span id="1496">1496</span>
-<span id="1497">1497</span>
-<span id="1498">1498</span>
-<span id="1499">1499</span>
-<span id="1500">1500</span>
-<span id="1501">1501</span>
-<span id="1502">1502</span>
-<span id="1503">1503</span>
-<span id="1504">1504</span>
-<span id="1505">1505</span>
-<span id="1506">1506</span>
-<span id="1507">1507</span>
-<span id="1508">1508</span>
-<span id="1509">1509</span>
-<span id="1510">1510</span>
-<span id="1511">1511</span>
-<span id="1512">1512</span>
-<span id="1513">1513</span>
-<span id="1514">1514</span>
-<span id="1515">1515</span>
-<span id="1516">1516</span>
-<span id="1517">1517</span>
-<span id="1518">1518</span>
-<span id="1519">1519</span>
-<span id="1520">1520</span>
-<span id="1521">1521</span>
-<span id="1522">1522</span>
-<span id="1523">1523</span>
-<span id="1524">1524</span>
-<span id="1525">1525</span>
-<span id="1526">1526</span>
-<span id="1527">1527</span>
-<span id="1528">1528</span>
-<span id="1529">1529</span>
-<span id="1530">1530</span>
-<span id="1531">1531</span>
-<span id="1532">1532</span>
-<span id="1533">1533</span>
-<span id="1534">1534</span>
-<span id="1535">1535</span>
-<span id="1536">1536</span>
-<span id="1537">1537</span>
-<span id="1538">1538</span>
-<span id="1539">1539</span>
-<span id="1540">1540</span>
-<span id="1541">1541</span>
-<span id="1542">1542</span>
-<span id="1543">1543</span>
-<span id="1544">1544</span>
-<span id="1545">1545</span>
-<span id="1546">1546</span>
-<span id="1547">1547</span>
-<span id="1548">1548</span>
-<span id="1549">1549</span>
-<span id="1550">1550</span>
-<span id="1551">1551</span>
-<span id="1552">1552</span>
-<span id="1553">1553</span>
-<span id="1554">1554</span>
-<span id="1555">1555</span>
-<span id="1556">1556</span>
-<span id="1557">1557</span>
-<span id="1558">1558</span>
-<span id="1559">1559</span>
-<span id="1560">1560</span>
-<span id="1561">1561</span>
-<span id="1562">1562</span>
-<span id="1563">1563</span>
-<span id="1564">1564</span>
-<span id="1565">1565</span>
-<span id="1566">1566</span>
-<span id="1567">1567</span>
-<span id="1568">1568</span>
-<span id="1569">1569</span>
-<span id="1570">1570</span>
-<span id="1571">1571</span>
-<span id="1572">1572</span>
-<span id="1573">1573</span>
-<span id="1574">1574</span>
-<span id="1575">1575</span>
-<span id="1576">1576</span>
-<span id="1577">1577</span>
-<span id="1578">1578</span>
-<span id="1579">1579</span>
-<span id="1580">1580</span>
-<span id="1581">1581</span>
-<span id="1582">1582</span>
-<span id="1583">1583</span>
-<span id="1584">1584</span>
-<span id="1585">1585</span>
-<span id="1586">1586</span>
-<span id="1587">1587</span>
-<span id="1588">1588</span>
-<span id="1589">1589</span>
-<span id="1590">1590</span>
-<span id="1591">1591</span>
-<span id="1592">1592</span>
-<span id="1593">1593</span>
-<span id="1594">1594</span>
-<span id="1595">1595</span>
-<span id="1596">1596</span>
-<span id="1597">1597</span>
-<span id="1598">1598</span>
-<span id="1599">1599</span>
-<span id="1600">1600</span>
-<span id="1601">1601</span>
-<span id="1602">1602</span>
-<span id="1603">1603</span>
-<span id="1604">1604</span>
-<span id="1605">1605</span>
-<span id="1606">1606</span>
-<span id="1607">1607</span>
-<span id="1608">1608</span>
-<span id="1609">1609</span>
-<span id="1610">1610</span>
-<span id="1611">1611</span>
-<span id="1612">1612</span>
-<span id="1613">1613</span>
-<span id="1614">1614</span>
-<span id="1615">1615</span>
-<span id="1616">1616</span>
-<span id="1617">1617</span>
-<span id="1618">1618</span>
-<span id="1619">1619</span>
-<span id="1620">1620</span>
-<span id="1621">1621</span>
-<span id="1622">1622</span>
-<span id="1623">1623</span>
-<span id="1624">1624</span>
-<span id="1625">1625</span>
-<span id="1626">1626</span>
-<span id="1627">1627</span>
-<span id="1628">1628</span>
-<span id="1629">1629</span>
-<span id="1630">1630</span>
-<span id="1631">1631</span>
-<span id="1632">1632</span>
-<span id="1633">1633</span>
-<span id="1634">1634</span>
-<span id="1635">1635</span>
-<span id="1636">1636</span>
-<span id="1637">1637</span>
-<span id="1638">1638</span>
-<span id="1639">1639</span>
-<span id="1640">1640</span>
-<span id="1641">1641</span>
-<span id="1642">1642</span>
-<span id="1643">1643</span>
-<span id="1644">1644</span>
-<span id="1645">1645</span>
-<span id="1646">1646</span>
-<span id="1647">1647</span>
-<span id="1648">1648</span>
-<span id="1649">1649</span>
-<span id="1650">1650</span>
-<span id="1651">1651</span>
-<span id="1652">1652</span>
-<span id="1653">1653</span>
-<span id="1654">1654</span>
-<span id="1655">1655</span>
-<span id="1656">1656</span>
-<span id="1657">1657</span>
-<span id="1658">1658</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Traits input types have to implement to work with nom combinators</span>
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::error</span>::{<span class="ident">ErrorKind</span>, <span class="ident">ParseError</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::internal</span>::{<span class="prelude-val">Err</span>, <span class="ident">IResult</span>, <span class="ident">Needed</span>};
@@ -1672,9 +1439,6 @@
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::lib::std::string::String</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;alloc&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::lib::std::vec::Vec</span>;
-
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;bitvec&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">bitvec::prelude</span>::<span class="kw-2">*</span>;
 
 <span class="doccomment">/// Abstract method to calculate the input length</span>
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">InputLength</span> {
@@ -1703,18 +1467,6 @@
     <span class="comment">//println!(&quot;bit input length for ({:?}, {}):&quot;, self.0, self.1);</span>
     <span class="comment">//println!(&quot;-&gt; {}&quot;, self.0.len() * 8 - self.1);</span>
     <span class="self">self</span>.<span class="number">0</span>.<span class="ident">len</span>() <span class="op">*</span> <span class="number">8</span> <span class="op">-</span> <span class="self">self</span>.<span class="number">1</span>
-  }
-}
-
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;bitvec&quot;</span>)]</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">InputLength</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-  <span class="ident">O</span>: <span class="ident">BitOrder</span>,
-  <span class="ident">T</span>: <span class="lifetime">&#39;a</span> <span class="op">+</span> <span class="ident">BitStore</span>,
-{
-  <span class="attribute">#[<span class="ident">inline</span>]</span>
-  <span class="kw">fn</span> <span class="ident">input_len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
-    <span class="self">self</span>.<span class="ident">len</span>()
   }
 }
 
@@ -1760,30 +1512,6 @@
   }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;bitvec&quot;</span>)]</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Offset</span> <span class="kw">for</span> <span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-  <span class="ident">O</span>: <span class="ident">BitOrder</span>,
-  <span class="ident">T</span>: <span class="ident">BitStore</span>,
-{
-  <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-  <span class="kw">fn</span> <span class="ident">offset</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">second</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="ident">usize</span> {
-    <span class="ident">second</span>.<span class="ident">offset_from</span>(<span class="self">self</span>) <span class="kw">as</span> <span class="ident">usize</span>
-  }
-}
-
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;bitvec&quot;</span>)]</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Offset</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-  <span class="ident">O</span>: <span class="ident">BitOrder</span>,
-  <span class="ident">T</span>: <span class="lifetime">&#39;a</span> <span class="op">+</span> <span class="ident">BitStore</span>,
-{
-  <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-  <span class="kw">fn</span> <span class="ident">offset</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">second</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="ident">usize</span> {
-    <span class="ident">second</span>.<span class="ident">offset_from</span>(<span class="self">self</span>) <span class="kw">as</span> <span class="ident">usize</span>
-  }
-}
-
 <span class="doccomment">/// Helper trait for types that can be viewed as a byte slice</span>
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">AsBytes</span> {
   <span class="doccomment">/// Casts the input type to a byte slice</span>
@@ -1818,28 +1546,6 @@
   }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;bitvec&quot;</span>)]</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">O</span><span class="op">&gt;</span> <span class="ident">AsBytes</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">u8</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-  <span class="ident">O</span>: <span class="ident">BitOrder</span>,
-{
-  <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-  <span class="kw">fn</span> <span class="ident">as_bytes</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
-    <span class="self">self</span>.<span class="ident">as_slice</span>()
-  }
-}
-
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;bitvec&quot;</span>)]</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span> <span class="ident">AsBytes</span> <span class="kw">for</span> <span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">u8</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-  <span class="ident">O</span>: <span class="ident">BitOrder</span>,
-{
-  <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-  <span class="kw">fn</span> <span class="ident">as_bytes</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
-    <span class="self">self</span>.<span class="ident">as_slice</span>()
-  }
-}
-
 <span class="macro">macro_rules!</span> <span class="ident">as_bytes_array_impls</span> {
   ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">N</span>:<span class="ident">expr</span>)<span class="op">+</span>) =&gt; {
     $(
@@ -1854,24 +1560,6 @@
         <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
         <span class="kw">fn</span> <span class="ident">as_bytes</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
           <span class="self">self</span>
-        }
-      }
-
-      <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;bitvec&quot;</span>)]</span>
-      <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">O</span><span class="op">&gt;</span> <span class="ident">AsBytes</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">BitArray</span><span class="op">&lt;</span><span class="ident">O</span>, [<span class="ident">u8</span>; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">N</span>]<span class="op">&gt;</span>
-      <span class="kw">where</span> <span class="ident">O</span>: <span class="ident">BitOrder</span> {
-        <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-        <span class="kw">fn</span> <span class="ident">as_bytes</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
-          <span class="self">self</span>.<span class="ident">as_slice</span>()
-        }
-      }
-
-      <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;bitvec&quot;</span>)]</span>
-      <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span> <span class="ident">AsBytes</span> <span class="kw">for</span> <span class="ident">BitArray</span><span class="op">&lt;</span><span class="ident">O</span>, [<span class="ident">u8</span>; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">N</span>]<span class="op">&gt;</span>
-      <span class="kw">where</span> <span class="ident">O</span>: <span class="ident">BitOrder</span> {
-        <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-        <span class="kw">fn</span> <span class="ident">as_bytes</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
-          <span class="self">self</span>.<span class="ident">as_slice</span>()
         }
       }
     )<span class="op">+</span>
@@ -2160,63 +1848,8 @@
   <span class="comment">// return byte index</span>
   <span class="attribute">#[<span class="ident">inline</span>]</span>
   <span class="kw">fn</span> <span class="ident">take_split</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">count</span>: <span class="ident">usize</span>) -&gt; (<span class="self">Self</span>, <span class="self">Self</span>) {
-    (<span class="kw-2">&amp;</span><span class="self">self</span>[<span class="ident">count</span>..], <span class="kw-2">&amp;</span><span class="self">self</span>[..<span class="ident">count</span>])
-  }
-}
-
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;bitvec&quot;</span>)]</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">InputIter</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-  <span class="ident">O</span>: <span class="ident">BitOrder</span>,
-  <span class="ident">T</span>: <span class="lifetime">&#39;a</span> <span class="op">+</span> <span class="ident">BitStore</span>,
-{
-  <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident">bool</span>;
-  <span class="kw">type</span> <span class="ident">Iter</span> <span class="op">=</span> <span class="ident">Enumerate</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::IterElem</span><span class="op">&gt;</span>;
-  <span class="kw">type</span> <span class="ident">IterElem</span> <span class="op">=</span> <span class="ident">Copied</span><span class="op">&lt;</span><span class="ident">bitvec::slice::Iter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>;
-
-  <span class="attribute">#[<span class="ident">inline</span>]</span>
-  <span class="kw">fn</span> <span class="ident">iter_indices</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::Iter</span> {
-    <span class="self">self</span>.<span class="ident">iter_elements</span>().<span class="ident">enumerate</span>()
-  }
-
-  <span class="attribute">#[<span class="ident">inline</span>]</span>
-  <span class="kw">fn</span> <span class="ident">iter_elements</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::IterElem</span> {
-    <span class="self">self</span>.<span class="ident">iter</span>().<span class="ident">copied</span>()
-  }
-
-  <span class="attribute">#[<span class="ident">inline</span>]</span>
-  <span class="kw">fn</span> <span class="ident">position</span><span class="op">&lt;</span><span class="ident">P</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">predicate</span>: <span class="ident">P</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>
-  <span class="kw">where</span>
-    <span class="ident">P</span>: <span class="ident">Fn</span>(<span class="ident"><span class="self">Self</span>::Item</span>) -&gt; <span class="ident">bool</span>,
-  {
-    <span class="self">self</span>.<span class="ident">iter_elements</span>().<span class="ident">position</span>(<span class="ident">predicate</span>)
-  }
-
-  <span class="attribute">#[<span class="ident">inline</span>]</span>
-  <span class="kw">fn</span> <span class="ident">slice_index</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">count</span>: <span class="ident">usize</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">usize</span>, <span class="ident">Needed</span><span class="op">&gt;</span> {
-    <span class="kw">if</span> <span class="self">self</span>.<span class="ident">len</span>() <span class="op">&gt;</span><span class="op">=</span> <span class="ident">count</span> {
-      <span class="prelude-val">Ok</span>(<span class="ident">count</span>)
-    } <span class="kw">else</span> {
-      <span class="prelude-val">Err</span>(<span class="ident">Needed::new</span>(<span class="ident">count</span> <span class="op">-</span> <span class="self">self</span>.<span class="ident">len</span>()))
-    }
-  }
-}
-
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;bitvec&quot;</span>)]</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">InputTake</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-  <span class="ident">O</span>: <span class="ident">BitOrder</span>,
-  <span class="ident">T</span>: <span class="lifetime">&#39;a</span> <span class="op">+</span> <span class="ident">BitStore</span>,
-{
-  <span class="attribute">#[<span class="ident">inline</span>]</span>
-  <span class="kw">fn</span> <span class="ident">take</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">count</span>: <span class="ident">usize</span>) -&gt; <span class="self">Self</span> {
-    <span class="kw-2">&amp;</span><span class="self">self</span>[..<span class="ident">count</span>]
-  }
-
-  <span class="attribute">#[<span class="ident">inline</span>]</span>
-  <span class="kw">fn</span> <span class="ident">take_split</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">count</span>: <span class="ident">usize</span>) -&gt; (<span class="self">Self</span>, <span class="self">Self</span>) {
-    <span class="kw">let</span> (<span class="ident">a</span>, <span class="ident">b</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">split_at</span>(<span class="ident">count</span>);
-    (<span class="ident">b</span>, <span class="ident">a</span>)
+    <span class="kw">let</span> (<span class="ident">prefix</span>, <span class="ident">suffix</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">split_at</span>(<span class="ident">count</span>);
+    (<span class="ident">suffix</span>, <span class="ident">prefix</span>)
   }
 }
 
@@ -2359,8 +1992,8 @@
   <span class="kw">where</span>
     <span class="ident">P</span>: <span class="ident">Fn</span>(<span class="ident"><span class="self">Self</span>::Item</span>) -&gt; <span class="ident">bool</span>,
   {
-    <span class="kw">match</span> (<span class="number">0</span>..<span class="self">self</span>.<span class="ident">len</span>()).<span class="ident">find</span>(<span class="op">|</span><span class="ident">b</span><span class="op">|</span> <span class="ident">predicate</span>(<span class="self">self</span>[<span class="kw-2">*</span><span class="ident">b</span>])) {
-      <span class="prelude-val">Some</span>(<span class="ident">i</span>) =&gt; <span class="prelude-val">Ok</span>((<span class="kw-2">&amp;</span><span class="self">self</span>[<span class="ident">i</span>..], <span class="kw-2">&amp;</span><span class="self">self</span>[..<span class="ident">i</span>])),
+    <span class="kw">match</span> <span class="self">self</span>.<span class="ident">iter</span>().<span class="ident">position</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">predicate</span>(<span class="kw-2">*</span><span class="ident">c</span>)) {
+      <span class="prelude-val">Some</span>(<span class="ident">i</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">take_split</span>(<span class="ident">i</span>)),
       <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">Err::Incomplete</span>(<span class="ident">Needed::new</span>(<span class="number">1</span>))),
     }
   }
@@ -2373,9 +2006,9 @@
   <span class="kw">where</span>
     <span class="ident">P</span>: <span class="ident">Fn</span>(<span class="ident"><span class="self">Self</span>::Item</span>) -&gt; <span class="ident">bool</span>,
   {
-    <span class="kw">match</span> (<span class="number">0</span>..<span class="self">self</span>.<span class="ident">len</span>()).<span class="ident">find</span>(<span class="op">|</span><span class="ident">b</span><span class="op">|</span> <span class="ident">predicate</span>(<span class="self">self</span>[<span class="kw-2">*</span><span class="ident">b</span>])) {
+    <span class="kw">match</span> <span class="self">self</span>.<span class="ident">iter</span>().<span class="ident">position</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">predicate</span>(<span class="kw-2">*</span><span class="ident">c</span>)) {
       <span class="prelude-val">Some</span>(<span class="number">0</span>) =&gt; <span class="prelude-val">Err</span>(<span class="ident">Err::Error</span>(<span class="ident">E::from_error_kind</span>(<span class="self">self</span>, <span class="ident">e</span>))),
-      <span class="prelude-val">Some</span>(<span class="ident">i</span>) =&gt; <span class="prelude-val">Ok</span>((<span class="kw-2">&amp;</span><span class="self">self</span>[<span class="ident">i</span>..], <span class="kw-2">&amp;</span><span class="self">self</span>[..<span class="ident">i</span>])),
+      <span class="prelude-val">Some</span>(<span class="ident">i</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">take_split</span>(<span class="ident">i</span>)),
       <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">Err::Incomplete</span>(<span class="ident">Needed::new</span>(<span class="number">1</span>))),
     }
   }
@@ -2387,8 +2020,8 @@
   <span class="kw">where</span>
     <span class="ident">P</span>: <span class="ident">Fn</span>(<span class="ident"><span class="self">Self</span>::Item</span>) -&gt; <span class="ident">bool</span>,
   {
-    <span class="kw">match</span> (<span class="number">0</span>..<span class="self">self</span>.<span class="ident">len</span>()).<span class="ident">find</span>(<span class="op">|</span><span class="ident">b</span><span class="op">|</span> <span class="ident">predicate</span>(<span class="self">self</span>[<span class="kw-2">*</span><span class="ident">b</span>])) {
-      <span class="prelude-val">Some</span>(<span class="ident">i</span>) =&gt; <span class="prelude-val">Ok</span>((<span class="kw-2">&amp;</span><span class="self">self</span>[<span class="ident">i</span>..], <span class="kw-2">&amp;</span><span class="self">self</span>[..<span class="ident">i</span>])),
+    <span class="kw">match</span> <span class="self">self</span>.<span class="ident">iter</span>().<span class="ident">position</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">predicate</span>(<span class="kw-2">*</span><span class="ident">c</span>)) {
+      <span class="prelude-val">Some</span>(<span class="ident">i</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">take_split</span>(<span class="ident">i</span>)),
       <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">take_split</span>(<span class="self">self</span>.<span class="ident">input_len</span>())),
     }
   }
@@ -2401,9 +2034,9 @@
   <span class="kw">where</span>
     <span class="ident">P</span>: <span class="ident">Fn</span>(<span class="ident"><span class="self">Self</span>::Item</span>) -&gt; <span class="ident">bool</span>,
   {
-    <span class="kw">match</span> (<span class="number">0</span>..<span class="self">self</span>.<span class="ident">len</span>()).<span class="ident">find</span>(<span class="op">|</span><span class="ident">b</span><span class="op">|</span> <span class="ident">predicate</span>(<span class="self">self</span>[<span class="kw-2">*</span><span class="ident">b</span>])) {
+    <span class="kw">match</span> <span class="self">self</span>.<span class="ident">iter</span>().<span class="ident">position</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">predicate</span>(<span class="kw-2">*</span><span class="ident">c</span>)) {
       <span class="prelude-val">Some</span>(<span class="number">0</span>) =&gt; <span class="prelude-val">Err</span>(<span class="ident">Err::Error</span>(<span class="ident">E::from_error_kind</span>(<span class="self">self</span>, <span class="ident">e</span>))),
-      <span class="prelude-val">Some</span>(<span class="ident">i</span>) =&gt; <span class="prelude-val">Ok</span>((<span class="kw-2">&amp;</span><span class="self">self</span>[<span class="ident">i</span>..], <span class="kw-2">&amp;</span><span class="self">self</span>[..<span class="ident">i</span>])),
+      <span class="prelude-val">Some</span>(<span class="ident">i</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">take_split</span>(<span class="ident">i</span>)),
       <span class="prelude-val">None</span> =&gt; {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_empty</span>() {
           <span class="prelude-val">Err</span>(<span class="ident">Err::Error</span>(<span class="ident">E::from_error_kind</span>(<span class="self">self</span>, <span class="ident">e</span>)))
@@ -2423,7 +2056,8 @@
     <span class="ident">P</span>: <span class="ident">Fn</span>(<span class="ident"><span class="self">Self</span>::Item</span>) -&gt; <span class="ident">bool</span>,
   {
     <span class="kw">match</span> <span class="self">self</span>.<span class="ident">find</span>(<span class="ident">predicate</span>) {
-      <span class="prelude-val">Some</span>(<span class="ident">i</span>) =&gt; <span class="prelude-val">Ok</span>((<span class="kw-2">&amp;</span><span class="self">self</span>[<span class="ident">i</span>..], <span class="kw-2">&amp;</span><span class="self">self</span>[..<span class="ident">i</span>])),
+      <span class="comment">// find() returns a byte index that is already in the slice at a char boundary</span>
+      <span class="prelude-val">Some</span>(<span class="ident">i</span>) =&gt; <span class="kw">unsafe</span> { <span class="prelude-val">Ok</span>((<span class="self">self</span>.<span class="ident">get_unchecked</span>(<span class="ident">i</span>..), <span class="self">self</span>.<span class="ident">get_unchecked</span>(..<span class="ident">i</span>))) },
       <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">Err::Incomplete</span>(<span class="ident">Needed::new</span>(<span class="number">1</span>))),
     }
   }
@@ -2438,7 +2072,8 @@
   {
     <span class="kw">match</span> <span class="self">self</span>.<span class="ident">find</span>(<span class="ident">predicate</span>) {
       <span class="prelude-val">Some</span>(<span class="number">0</span>) =&gt; <span class="prelude-val">Err</span>(<span class="ident">Err::Error</span>(<span class="ident">E::from_error_kind</span>(<span class="self">self</span>, <span class="ident">e</span>))),
-      <span class="prelude-val">Some</span>(<span class="ident">i</span>) =&gt; <span class="prelude-val">Ok</span>((<span class="kw-2">&amp;</span><span class="self">self</span>[<span class="ident">i</span>..], <span class="kw-2">&amp;</span><span class="self">self</span>[..<span class="ident">i</span>])),
+      <span class="comment">// find() returns a byte index that is already in the slice at a char boundary</span>
+      <span class="prelude-val">Some</span>(<span class="ident">i</span>) =&gt; <span class="kw">unsafe</span> { <span class="prelude-val">Ok</span>((<span class="self">self</span>.<span class="ident">get_unchecked</span>(<span class="ident">i</span>..), <span class="self">self</span>.<span class="ident">get_unchecked</span>(..<span class="ident">i</span>))) },
       <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">Err::Incomplete</span>(<span class="ident">Needed::new</span>(<span class="number">1</span>))),
     }
   }
@@ -2451,8 +2086,15 @@
     <span class="ident">P</span>: <span class="ident">Fn</span>(<span class="ident"><span class="self">Self</span>::Item</span>) -&gt; <span class="ident">bool</span>,
   {
     <span class="kw">match</span> <span class="self">self</span>.<span class="ident">find</span>(<span class="ident">predicate</span>) {
-      <span class="prelude-val">Some</span>(<span class="ident">i</span>) =&gt; <span class="prelude-val">Ok</span>((<span class="kw-2">&amp;</span><span class="self">self</span>[<span class="ident">i</span>..], <span class="kw-2">&amp;</span><span class="self">self</span>[..<span class="ident">i</span>])),
-      <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">take_split</span>(<span class="self">self</span>.<span class="ident">input_len</span>())),
+      <span class="comment">// find() returns a byte index that is already in the slice at a char boundary</span>
+      <span class="prelude-val">Some</span>(<span class="ident">i</span>) =&gt; <span class="kw">unsafe</span> { <span class="prelude-val">Ok</span>((<span class="self">self</span>.<span class="ident">get_unchecked</span>(<span class="ident">i</span>..), <span class="self">self</span>.<span class="ident">get_unchecked</span>(..<span class="ident">i</span>))) },
+      <span class="comment">// the end of slice is a char boundary</span>
+      <span class="prelude-val">None</span> =&gt; <span class="kw">unsafe</span> {
+        <span class="prelude-val">Ok</span>((
+          <span class="self">self</span>.<span class="ident">get_unchecked</span>(<span class="self">self</span>.<span class="ident">len</span>()..),
+          <span class="self">self</span>.<span class="ident">get_unchecked</span>(..<span class="self">self</span>.<span class="ident">len</span>()),
+        ))
+      },
     }
   }
 
@@ -2466,91 +2108,26 @@
   {
     <span class="kw">match</span> <span class="self">self</span>.<span class="ident">find</span>(<span class="ident">predicate</span>) {
       <span class="prelude-val">Some</span>(<span class="number">0</span>) =&gt; <span class="prelude-val">Err</span>(<span class="ident">Err::Error</span>(<span class="ident">E::from_error_kind</span>(<span class="self">self</span>, <span class="ident">e</span>))),
-      <span class="prelude-val">Some</span>(<span class="ident">i</span>) =&gt; <span class="prelude-val">Ok</span>((<span class="kw-2">&amp;</span><span class="self">self</span>[<span class="ident">i</span>..], <span class="kw-2">&amp;</span><span class="self">self</span>[..<span class="ident">i</span>])),
+      <span class="comment">// find() returns a byte index that is already in the slice at a char boundary</span>
+      <span class="prelude-val">Some</span>(<span class="ident">i</span>) =&gt; <span class="kw">unsafe</span> { <span class="prelude-val">Ok</span>((<span class="self">self</span>.<span class="ident">get_unchecked</span>(<span class="ident">i</span>..), <span class="self">self</span>.<span class="ident">get_unchecked</span>(..<span class="ident">i</span>))) },
       <span class="prelude-val">None</span> =&gt; {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_empty</span>() {
           <span class="prelude-val">Err</span>(<span class="ident">Err::Error</span>(<span class="ident">E::from_error_kind</span>(<span class="self">self</span>, <span class="ident">e</span>)))
         } <span class="kw">else</span> {
-          <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">take_split</span>(<span class="self">self</span>.<span class="ident">input_len</span>()))
+          <span class="comment">// the end of slice is a char boundary</span>
+          <span class="kw">unsafe</span> {
+            <span class="prelude-val">Ok</span>((
+              <span class="self">self</span>.<span class="ident">get_unchecked</span>(<span class="self">self</span>.<span class="ident">len</span>()..),
+              <span class="self">self</span>.<span class="ident">get_unchecked</span>(..<span class="self">self</span>.<span class="ident">len</span>()),
+            ))
+          }
         }
       }
     }
   }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;bitvec&quot;</span>)]</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">InputTakeAtPosition</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-  <span class="ident">O</span>: <span class="ident">BitOrder</span>,
-  <span class="ident">T</span>: <span class="lifetime">&#39;a</span> <span class="op">+</span> <span class="ident">BitStore</span>,
-{
-  <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident">bool</span>;
-
-  <span class="kw">fn</span> <span class="ident">split_at_position</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">E</span>: <span class="ident">ParseError</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">predicate</span>: <span class="ident">P</span>) -&gt; <span class="ident">IResult</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="self">Self</span>, <span class="ident">E</span><span class="op">&gt;</span>
-  <span class="kw">where</span>
-    <span class="ident">P</span>: <span class="ident">Fn</span>(<span class="ident"><span class="self">Self</span>::Item</span>) -&gt; <span class="ident">bool</span>,
-  {
-    <span class="self">self</span>
-      .<span class="ident">iter</span>()
-      .<span class="ident">copied</span>()
-      .<span class="ident">position</span>(<span class="ident">predicate</span>)
-      .<span class="ident">map</span>(<span class="op">|</span><span class="ident">i</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">split_at</span>(<span class="ident">i</span>))
-      .<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">Err::Incomplete</span>(<span class="ident">Needed::new</span>(<span class="number">1</span>)))
-  }
-
-  <span class="kw">fn</span> <span class="ident">split_at_position1</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">E</span>: <span class="ident">ParseError</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span><span class="op">&gt;</span>(
-    <span class="kw-2">&amp;</span><span class="self">self</span>,
-    <span class="ident">predicate</span>: <span class="ident">P</span>,
-    <span class="ident">e</span>: <span class="ident">ErrorKind</span>,
-  ) -&gt; <span class="ident">IResult</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="self">Self</span>, <span class="ident">E</span><span class="op">&gt;</span>
-  <span class="kw">where</span>
-    <span class="ident">P</span>: <span class="ident">Fn</span>(<span class="ident"><span class="self">Self</span>::Item</span>) -&gt; <span class="ident">bool</span>,
-  {
-    <span class="kw">match</span> <span class="self">self</span>.<span class="ident">iter</span>().<span class="ident">copied</span>().<span class="ident">position</span>(<span class="ident">predicate</span>) {
-      <span class="prelude-val">Some</span>(<span class="number">0</span>) =&gt; <span class="prelude-val">Err</span>(<span class="ident">Err::Error</span>(<span class="ident">E::from_error_kind</span>(<span class="self">self</span>, <span class="ident">e</span>))),
-      <span class="prelude-val">Some</span>(<span class="ident">i</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">split_at</span>(<span class="ident">i</span>)),
-      <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">Err::Incomplete</span>(<span class="ident">Needed::new</span>(<span class="number">1</span>))),
-    }
-  }
-
-  <span class="kw">fn</span> <span class="ident">split_at_position_complete</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">E</span>: <span class="ident">ParseError</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span><span class="op">&gt;</span>(
-    <span class="kw-2">&amp;</span><span class="self">self</span>,
-    <span class="ident">predicate</span>: <span class="ident">P</span>,
-  ) -&gt; <span class="ident">IResult</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="self">Self</span>, <span class="ident">E</span><span class="op">&gt;</span>
-  <span class="kw">where</span>
-    <span class="ident">P</span>: <span class="ident">Fn</span>(<span class="ident"><span class="self">Self</span>::Item</span>) -&gt; <span class="ident">bool</span>,
-  {
-    <span class="self">self</span>
-      .<span class="ident">iter</span>()
-      .<span class="ident">position</span>(<span class="op">|</span><span class="ident">b</span><span class="op">|</span> <span class="ident">predicate</span>(<span class="kw-2">*</span><span class="ident">b</span>))
-      .<span class="ident">map</span>(<span class="op">|</span><span class="ident">i</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">split_at</span>(<span class="ident">i</span>))
-      .<span class="ident">or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="prelude-val">Some</span>((<span class="self">self</span>, <span class="ident"><span class="self">Self</span>::default</span>())))
-      .<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="macro">unreachable!</span>())
-  }
-
-  <span class="kw">fn</span> <span class="ident">split_at_position1_complete</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">E</span>: <span class="ident">ParseError</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span><span class="op">&gt;</span>(
-    <span class="kw-2">&amp;</span><span class="self">self</span>,
-    <span class="ident">predicate</span>: <span class="ident">P</span>,
-    <span class="ident">e</span>: <span class="ident">ErrorKind</span>,
-  ) -&gt; <span class="ident">IResult</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="self">Self</span>, <span class="ident">E</span><span class="op">&gt;</span>
-  <span class="kw">where</span>
-    <span class="ident">P</span>: <span class="ident">Fn</span>(<span class="ident"><span class="self">Self</span>::Item</span>) -&gt; <span class="ident">bool</span>,
-  {
-    <span class="kw">match</span> <span class="self">self</span>.<span class="ident">iter</span>().<span class="ident">copied</span>().<span class="ident">position</span>(<span class="ident">predicate</span>) {
-      <span class="prelude-val">Some</span>(<span class="number">0</span>) =&gt; <span class="prelude-val">Err</span>(<span class="ident">Err::Error</span>(<span class="ident">E::from_error_kind</span>(<span class="self">self</span>, <span class="ident">e</span>))),
-      <span class="prelude-val">Some</span>(<span class="ident">i</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">split_at</span>(<span class="ident">i</span>)),
-      <span class="prelude-val">None</span> =&gt; {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_empty</span>() {
-          <span class="prelude-val">Err</span>(<span class="ident">Err::Error</span>(<span class="ident">E::from_error_kind</span>(<span class="self">self</span>, <span class="ident">e</span>)))
-        } <span class="kw">else</span> {
-          <span class="prelude-val">Ok</span>((<span class="self">self</span>, <span class="ident"><span class="self">Self</span>::default</span>()))
-        }
-      }
-    }
-  }
-}
-
-<span class="doccomment">/// Indicates wether a comparison was successful, an error, or</span>
+<span class="doccomment">/// Indicates whether a comparison was successful, an error, or</span>
 <span class="doccomment">/// if more data was needed</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">CompareResult</span> {
@@ -2710,31 +2287,14 @@
   }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;bitvec&quot;</span>)]</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>, <span class="ident">O1</span>, <span class="ident">O2</span>, <span class="ident">T1</span>, <span class="ident">T2</span><span class="op">&gt;</span> <span class="ident">Compare</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;b</span> <span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">O2</span>, <span class="ident">T2</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">O1</span>, <span class="ident">T1</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-  <span class="ident">O1</span>: <span class="ident">BitOrder</span>,
-  <span class="ident">O2</span>: <span class="ident">BitOrder</span>,
-  <span class="ident">T1</span>: <span class="lifetime">&#39;a</span> <span class="op">+</span> <span class="ident">BitStore</span>,
-  <span class="ident">T2</span>: <span class="lifetime">&#39;a</span> <span class="op">+</span> <span class="ident">BitStore</span>,
-{
-  <span class="attribute">#[<span class="ident">inline</span>]</span>
-  <span class="kw">fn</span> <span class="ident">compare</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;b</span> <span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">O2</span>, <span class="ident">T2</span><span class="op">&gt;</span>) -&gt; <span class="ident">CompareResult</span> {
-    <span class="kw">match</span> <span class="self">self</span>.<span class="ident">iter</span>().<span class="ident">zip</span>(<span class="ident">other</span>.<span class="ident">iter</span>()).<span class="ident">position</span>(<span class="op">|</span>(<span class="ident">a</span>, <span class="ident">b</span>)<span class="op">|</span> <span class="ident">a</span> <span class="op">!</span><span class="op">=</span> <span class="ident">b</span>) {
-      <span class="prelude-val">Some</span>(<span class="kw">_</span>) =&gt; <span class="ident">CompareResult::Error</span>,
-      <span class="prelude-val">None</span> =&gt; {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">len</span>() <span class="op">&gt;</span><span class="op">=</span> <span class="ident">other</span>.<span class="ident">len</span>() {
-          <span class="ident">CompareResult::Ok</span>
-        } <span class="kw">else</span> {
-          <span class="ident">CompareResult::Incomplete</span>
-        }
-      }
-    }
-  }
-
+<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span><span class="op">&gt;</span> <span class="ident">Compare</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;b</span> [<span class="ident">u8</span>]<span class="op">&gt;</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span> {
   <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-  <span class="kw">fn</span> <span class="ident">compare_no_case</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;b</span> <span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">O2</span>, <span class="ident">T2</span><span class="op">&gt;</span>) -&gt; <span class="ident">CompareResult</span> {
-    <span class="self">self</span>.<span class="ident">compare</span>(<span class="ident">other</span>)
+  <span class="kw">fn</span> <span class="ident">compare</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">t</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;b</span> [<span class="ident">u8</span>]) -&gt; <span class="ident">CompareResult</span> {
+    <span class="ident">AsBytes::as_bytes</span>(<span class="self">self</span>).<span class="ident">compare</span>(<span class="ident">t</span>)
+  }
+  <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
+  <span class="kw">fn</span> <span class="ident">compare_no_case</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">t</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;b</span> [<span class="ident">u8</span>]) -&gt; <span class="ident">CompareResult</span> {
+    <span class="ident">AsBytes::as_bytes</span>(<span class="self">self</span>).<span class="ident">compare_no_case</span>(<span class="ident">t</span>)
   }
 }
 
@@ -2777,28 +2337,6 @@
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">FindToken</span><span class="op">&lt;</span><span class="ident">char</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span> {
   <span class="kw">fn</span> <span class="ident">find_token</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">token</span>: <span class="ident">char</span>) -&gt; <span class="ident">bool</span> {
     <span class="self">self</span>.<span class="ident">chars</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">i</span><span class="op">|</span> <span class="ident">i</span> <span class="op">==</span> <span class="ident">token</span>)
-  }
-}
-
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;bitvec&quot;</span>)]</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">FindToken</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-  <span class="ident">O</span>: <span class="ident">BitOrder</span>,
-  <span class="ident">T</span>: <span class="lifetime">&#39;a</span> <span class="op">+</span> <span class="ident">BitStore</span>,
-{
-  <span class="kw">fn</span> <span class="ident">find_token</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">token</span>: <span class="ident">bool</span>) -&gt; <span class="ident">bool</span> {
-    <span class="self">self</span>.<span class="ident">iter</span>().<span class="ident">copied</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">i</span><span class="op">|</span> <span class="ident">i</span> <span class="op">==</span> <span class="ident">token</span>)
-  }
-}
-
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;bitvec&quot;</span>)]</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">FindToken</span><span class="op">&lt;</span>(<span class="ident">usize</span>, <span class="ident">bool</span>)<span class="op">&gt;</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-  <span class="ident">O</span>: <span class="ident">BitOrder</span>,
-  <span class="ident">T</span>: <span class="lifetime">&#39;a</span> <span class="op">+</span> <span class="ident">BitStore</span>,
-{
-  <span class="kw">fn</span> <span class="ident">find_token</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">token</span>: (<span class="ident">usize</span>, <span class="ident">bool</span>)) -&gt; <span class="ident">bool</span> {
-    <span class="self">self</span>.<span class="ident">iter</span>().<span class="ident">copied</span>().<span class="ident">enumerate</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">i</span><span class="op">|</span> <span class="ident">i</span> <span class="op">==</span> <span class="ident">token</span>)
   }
 }
 
@@ -2855,29 +2393,6 @@
   }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;bitvec&quot;</span>)]</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>, <span class="ident">O1</span>, <span class="ident">O2</span>, <span class="ident">T1</span>, <span class="ident">T2</span><span class="op">&gt;</span> <span class="ident">FindSubstring</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;b</span> <span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">O2</span>, <span class="ident">T2</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">O1</span>, <span class="ident">T1</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-  <span class="ident">O1</span>: <span class="ident">BitOrder</span>,
-  <span class="ident">O2</span>: <span class="ident">BitOrder</span>,
-  <span class="ident">T1</span>: <span class="lifetime">&#39;a</span> <span class="op">+</span> <span class="ident">BitStore</span>,
-  <span class="ident">T2</span>: <span class="lifetime">&#39;b</span> <span class="op">+</span> <span class="ident">BitStore</span>,
-{
-  <span class="kw">fn</span> <span class="ident">find_substring</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">substr</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;b</span> <span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">O2</span>, <span class="ident">T2</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
-    <span class="kw">if</span> <span class="ident">substr</span>.<span class="ident">len</span>() <span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">len</span>() {
-      <span class="kw">return</span> <span class="prelude-val">None</span>;
-    }
-
-    <span class="kw">if</span> <span class="ident">substr</span>.<span class="ident">is_empty</span>() {
-      <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="number">0</span>);
-    }
-
-    <span class="self">self</span>
-      .<span class="ident">windows</span>(<span class="ident">substr</span>.<span class="ident">len</span>())
-      .<span class="ident">position</span>(<span class="op">|</span><span class="ident">window</span><span class="op">|</span> <span class="ident">window</span> <span class="op">==</span> <span class="ident">substr</span>)
-  }
-}
-
 <span class="doccomment">/// Used to integrate `str`&#39;s `parse()` method</span>
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">ParseTo</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span> {
   <span class="doccomment">/// Succeeds if `parse()` succeeded. The byte slice implementation</span>
@@ -2916,15 +2431,6 @@
 }
 
 <span class="macro">macro_rules!</span> <span class="ident">slice_range_impl</span> {
-  ( <span class="ident">BitSlice</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ty</span>:<span class="ident">ty</span> ) =&gt; {
-    <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Slice</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">ty</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-      <span class="ident">O</span>: <span class="ident">BitOrder</span>,
-      <span class="ident">T</span>: <span class="ident">BitStore</span>,
-    {
-      <span class="macro">impl_fn_slice!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">ty</span>);
-    }
-  };
   ( [ <span class="macro-nonterminal">$</span><span class="macro-nonterminal">for_type</span>:<span class="ident">ident</span> ], <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ty</span>:<span class="ident">ty</span> ) =&gt; {
     <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">for_type</span><span class="op">&gt;</span> <span class="ident">Slice</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">ty</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="macro-nonterminal">$</span><span class="macro-nonterminal">for_type</span>] {
       <span class="macro">impl_fn_slice!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">ty</span>);
@@ -2938,12 +2444,6 @@
 }
 
 <span class="macro">macro_rules!</span> <span class="ident">slice_ranges_impl</span> {
-  ( <span class="ident">BitSlice</span> ) =&gt; {
-    <span class="macro">slice_range_impl!</span> {<span class="ident">BitSlice</span>, <span class="ident">Range</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>}
-    <span class="macro">slice_range_impl!</span> {<span class="ident">BitSlice</span>, <span class="ident">RangeTo</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>}
-    <span class="macro">slice_range_impl!</span> {<span class="ident">BitSlice</span>, <span class="ident">RangeFrom</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>}
-    <span class="macro">slice_range_impl!</span> {<span class="ident">BitSlice</span>, <span class="ident">RangeFull</span>}
-  };
   ( [ <span class="macro-nonterminal">$</span><span class="macro-nonterminal">for_type</span>:<span class="ident">ident</span> ] ) =&gt; {
     <span class="macro">slice_range_impl!</span> {[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">for_type</span>], <span class="ident">Range</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>}
     <span class="macro">slice_range_impl!</span> {[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">for_type</span>], <span class="ident">RangeTo</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>}
@@ -2960,9 +2460,6 @@
 
 <span class="macro">slice_ranges_impl!</span> {<span class="ident">str</span>}
 <span class="macro">slice_ranges_impl!</span> {[<span class="ident">T</span>]}
-
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;bitvec&quot;</span>)]</span>
-<span class="macro">slice_ranges_impl!</span> {<span class="ident">BitSlice</span>}
 
 <span class="macro">macro_rules!</span> <span class="ident">array_impls</span> {
   ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">N</span>:<span class="ident">expr</span>)<span class="op">+</span>) =&gt; {
@@ -3142,46 +2639,6 @@
   }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;alloc&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;bitvec&quot;</span>))]</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">ExtendInto</span> <span class="kw">for</span> <span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-  <span class="ident">O</span>: <span class="ident">BitOrder</span>,
-  <span class="ident">T</span>: <span class="ident">BitStore</span>,
-{
-  <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident">bool</span>;
-  <span class="kw">type</span> <span class="ident">Extender</span> <span class="op">=</span> <span class="ident">BitVec</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span>;
-
-  <span class="attribute">#[<span class="ident">inline</span>]</span>
-  <span class="kw">fn</span> <span class="ident">new_builder</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">BitVec</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="ident">BitVec::new</span>()
-  }
-
-  <span class="attribute">#[<span class="ident">inline</span>]</span>
-  <span class="kw">fn</span> <span class="ident">extend_into</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">acc</span>: <span class="kw-2">&amp;mut</span> <span class="ident"><span class="self">Self</span>::Extender</span>) {
-    <span class="ident">acc</span>.<span class="ident">extend</span>(<span class="self">self</span>.<span class="ident">iter</span>());
-  }
-}
-
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;alloc&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;bitvec&quot;</span>))]</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">ExtendInto</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-  <span class="ident">O</span>: <span class="ident">BitOrder</span>,
-  <span class="ident">T</span>: <span class="lifetime">&#39;a</span> <span class="op">+</span> <span class="ident">BitStore</span>,
-{
-  <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident">bool</span>;
-  <span class="kw">type</span> <span class="ident">Extender</span> <span class="op">=</span> <span class="ident">BitVec</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span>;
-
-  <span class="attribute">#[<span class="ident">inline</span>]</span>
-  <span class="kw">fn</span> <span class="ident">new_builder</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">BitVec</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="ident">BitVec::new</span>()
-  }
-
-  <span class="attribute">#[<span class="ident">inline</span>]</span>
-  <span class="kw">fn</span> <span class="ident">extend_into</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">acc</span>: <span class="kw-2">&amp;mut</span> <span class="ident"><span class="self">Self</span>::Extender</span>) {
-    <span class="ident">acc</span>.<span class="ident">extend</span>(<span class="self">self</span>.<span class="ident">iter</span>());
-  }
-}
-
 <span class="doccomment">/// Helper trait to convert numbers to usize.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// By default, usize implements `From&lt;u8&gt;` and `From&lt;u16&gt;` but not</span>
@@ -3284,6 +2741,83 @@
     <span class="ident">error::VerboseError</span> {
       <span class="ident">errors</span>: <span class="self">self</span>.<span class="ident">errors</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">i</span>, <span class="ident">e</span>)<span class="op">|</span> ((<span class="ident">i</span>, <span class="number">0</span>), <span class="ident">e</span>)).<span class="ident">collect</span>(),
     }
+  }
+}
+
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span>
+<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;docsrs&quot;</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)))]</span>
+<span class="doccomment">/// Helper trait to show a byte slice as a hex dump</span>
+<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">HexDisplay</span> {
+  <span class="doccomment">/// Converts the value of `self` to a hex dump, returning the owned</span>
+  <span class="doccomment">/// `String`.</span>
+  <span class="kw">fn</span> <span class="ident">to_hex</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">chunk_size</span>: <span class="ident">usize</span>) -&gt; <span class="ident">String</span>;
+
+  <span class="doccomment">/// Converts the value of `self` to a hex dump beginning at `from` address, returning the owned</span>
+  <span class="doccomment">/// `String`.</span>
+  <span class="kw">fn</span> <span class="ident">to_hex_from</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">chunk_size</span>: <span class="ident">usize</span>, <span class="ident">from</span>: <span class="ident">usize</span>) -&gt; <span class="ident">String</span>;
+}
+
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span>
+<span class="kw">static</span> <span class="ident">CHARS</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] <span class="op">=</span> <span class="string">b&quot;0123456789abcdef&quot;</span>;
+
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span>
+<span class="kw">impl</span> <span class="ident">HexDisplay</span> <span class="kw">for</span> [<span class="ident">u8</span>] {
+  <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unused_variables</span>)]</span>
+  <span class="kw">fn</span> <span class="ident">to_hex</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">chunk_size</span>: <span class="ident">usize</span>) -&gt; <span class="ident">String</span> {
+    <span class="self">self</span>.<span class="ident">to_hex_from</span>(<span class="ident">chunk_size</span>, <span class="number">0</span>)
+  }
+
+  <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unused_variables</span>)]</span>
+  <span class="kw">fn</span> <span class="ident">to_hex_from</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">chunk_size</span>: <span class="ident">usize</span>, <span class="ident">from</span>: <span class="ident">usize</span>) -&gt; <span class="ident">String</span> {
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">v</span> <span class="op">=</span> <span class="ident">Vec::with_capacity</span>(<span class="self">self</span>.<span class="ident">len</span>() <span class="op">*</span> <span class="number">3</span>);
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">i</span> <span class="op">=</span> <span class="ident">from</span>;
+    <span class="kw">for</span> <span class="ident">chunk</span> <span class="kw">in</span> <span class="self">self</span>.<span class="ident">chunks</span>(<span class="ident">chunk_size</span>) {
+      <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;{:08x}&quot;</span>, <span class="ident">i</span>);
+      <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="ident">ch</span> <span class="kw">in</span> <span class="ident">s</span>.<span class="ident">as_bytes</span>().<span class="ident">iter</span>() {
+        <span class="ident">v</span>.<span class="ident">push</span>(<span class="ident">ch</span>);
+      }
+      <span class="ident">v</span>.<span class="ident">push</span>(<span class="string">b&#39;\t&#39;</span>);
+
+      <span class="ident">i</span> <span class="op">+</span><span class="op">=</span> <span class="ident">chunk_size</span>;
+
+      <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="ident">byte</span> <span class="kw">in</span> <span class="ident">chunk</span> {
+        <span class="ident">v</span>.<span class="ident">push</span>(<span class="ident">CHARS</span>[(<span class="ident">byte</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">4</span>) <span class="kw">as</span> <span class="ident">usize</span>]);
+        <span class="ident">v</span>.<span class="ident">push</span>(<span class="ident">CHARS</span>[(<span class="ident">byte</span> <span class="op">&amp;</span> <span class="number">0xf</span>) <span class="kw">as</span> <span class="ident">usize</span>]);
+        <span class="ident">v</span>.<span class="ident">push</span>(<span class="string">b&#39; &#39;</span>);
+      }
+      <span class="kw">if</span> <span class="ident">chunk_size</span> <span class="op">&gt;</span> <span class="ident">chunk</span>.<span class="ident">len</span>() {
+        <span class="kw">for</span> <span class="ident">j</span> <span class="kw">in</span> <span class="number">0</span>..(<span class="ident">chunk_size</span> <span class="op">-</span> <span class="ident">chunk</span>.<span class="ident">len</span>()) {
+          <span class="ident">v</span>.<span class="ident">push</span>(<span class="string">b&#39; &#39;</span>);
+          <span class="ident">v</span>.<span class="ident">push</span>(<span class="string">b&#39; &#39;</span>);
+          <span class="ident">v</span>.<span class="ident">push</span>(<span class="string">b&#39; &#39;</span>);
+        }
+      }
+      <span class="ident">v</span>.<span class="ident">push</span>(<span class="string">b&#39;\t&#39;</span>);
+
+      <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="ident">byte</span> <span class="kw">in</span> <span class="ident">chunk</span> {
+        <span class="kw">if</span> (<span class="ident">byte</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">32</span> <span class="op">&amp;&amp;</span> <span class="ident">byte</span> <span class="op">&lt;</span><span class="op">=</span> <span class="number">126</span>) <span class="op">|</span><span class="op">|</span> <span class="ident">byte</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">128</span> {
+          <span class="ident">v</span>.<span class="ident">push</span>(<span class="ident">byte</span>);
+        } <span class="kw">else</span> {
+          <span class="ident">v</span>.<span class="ident">push</span>(<span class="string">b&#39;.&#39;</span>);
+        }
+      }
+      <span class="ident">v</span>.<span class="ident">push</span>(<span class="string">b&#39;\n&#39;</span>);
+    }
+
+    <span class="ident">String::from_utf8_lossy</span>(<span class="kw-2">&amp;</span><span class="ident">v</span>[..]).<span class="ident">into_owned</span>()
+  }
+}
+
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span>
+<span class="kw">impl</span> <span class="ident">HexDisplay</span> <span class="kw">for</span> <span class="ident">str</span> {
+  <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unused_variables</span>)]</span>
+  <span class="kw">fn</span> <span class="ident">to_hex</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">chunk_size</span>: <span class="ident">usize</span>) -&gt; <span class="ident">String</span> {
+    <span class="self">self</span>.<span class="ident">to_hex_from</span>(<span class="ident">chunk_size</span>, <span class="number">0</span>)
+  }
+
+  <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unused_variables</span>)]</span>
+  <span class="kw">fn</span> <span class="ident">to_hex_from</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">chunk_size</span>: <span class="ident">usize</span>, <span class="ident">from</span>: <span class="ident">usize</span>) -&gt; <span class="ident">String</span> {
+    <span class="self">self</span>.<span class="ident">as_bytes</span>().<span class="ident">to_hex_from</span>(<span class="ident">chunk_size</span>, <span class="ident">from</span>)
   }
 }
 

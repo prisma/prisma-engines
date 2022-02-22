@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;mysql_common-0.26.0&#x2F;src&#x2F;lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><script defer src="../../main.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;mysql_common-0.28.2&#x2F;src&#x2F;lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><script defer src="../../main.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script>
     <noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../mysql_common/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
@@ -257,6 +257,32 @@
 <span id="256">256</span>
 <span id="257">257</span>
 <span id="258">258</span>
+<span id="259">259</span>
+<span id="260">260</span>
+<span id="261">261</span>
+<span id="262">262</span>
+<span id="263">263</span>
+<span id="264">264</span>
+<span id="265">265</span>
+<span id="266">266</span>
+<span id="267">267</span>
+<span id="268">268</span>
+<span id="269">269</span>
+<span id="270">270</span>
+<span id="271">271</span>
+<span id="272">272</span>
+<span id="273">273</span>
+<span id="274">274</span>
+<span id="275">275</span>
+<span id="276">276</span>
+<span id="277">277</span>
+<span id="278">278</span>
+<span id="279">279</span>
+<span id="280">280</span>
+<span id="281">281</span>
+<span id="282">282</span>
+<span id="283">283</span>
+<span id="284">284</span>
 </pre><pre class="rust"><code><span class="comment">// Copyright (c) 2017 Anatoly Ikorsky</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0</span>
@@ -269,11 +295,11 @@
 <span class="doccomment">//!</span>
 <span class="doccomment">//! This crate:</span>
 <span class="doccomment">//! * defines basic MySql constants;</span>
-<span class="doccomment">//! * implements necessary functionality for MySql `cached_sha2_password` and</span>
-<span class="doccomment">//!   `mysql_native_password` authentication plugins;</span>
+<span class="doccomment">//! * implements necessary functionality for MySql `cached_sha2_password`,</span>
+<span class="doccomment">//!   `mysql_native_password` and legacy authentication plugins;</span>
 <span class="doccomment">//! * implements helper traits for MySql protocol IO;</span>
 <span class="doccomment">//! * implements support of named parameters for prepared statements;</span>
-<span class="doccomment">//! * implements parsers for a subset of MySql protocol packets;</span>
+<span class="doccomment">//! * implements parsers for a subset of MySql protocol packets (including binlog packets);</span>
 <span class="doccomment">//! * defines rust representation of MySql protocol value and row;</span>
 <span class="doccomment">//! * implements conversion between MySql values and rust types, between MySql rows and tuples</span>
 <span class="doccomment">//!   of rust types.</span>
@@ -285,47 +311,99 @@
 <span class="doccomment">//! (see `Value` struct) and not to MySql column types. Please see [MySql documentation][1] for</span>
 <span class="doccomment">//! column and protocol type correspondence:</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! | Type                            | Notes                                                     |</span>
-<span class="doccomment">//! | ------------------------------- | -------------------------------------------------------   |</span>
-<span class="doccomment">//! | `{i,u}8..{i,u}128`, `{i,u}size` | MySql int/uint will be converted, bytes will be parsed.&lt;br&gt;⚠️ Note that range of `{i,u}128` is greater than supported by MySql integer types but it&#39;ll be serialized anyway (as decimal bytes string). |</span>
-<span class="doccomment">//! | `f32`                           | MySql float will be converted to `f32`, bytes will be parsed as `f32`.&lt;br&gt;⚠️ MySql double won&#39;t be converted to `f32` to avoid precision loss (see #17) |</span>
-<span class="doccomment">//! | `f64`                           | MySql float and double will be converted to `f64`, bytes will be parsed as `f64`. |</span>
-<span class="doccomment">//! | `bool`                          | MySql int {`0`, `1`} or bytes {`&quot;0x30&quot;`, `&quot;0x31&quot;`}        |</span>
-<span class="doccomment">//! | `Vec&lt;u8&gt;`                       | MySql bytes                                               |</span>
-<span class="doccomment">//! | `String`                        | MySql bytes parsed as utf8                                |</span>
-<span class="doccomment">//! | `Duration` (`std` and `time`)   | MySql time or bytes parsed as MySql time string           |</span>
-<span class="doccomment">//! | `time::PrimitiveDateTime`       | MySql date or bytes parsed as MySql date string           |</span>
-<span class="doccomment">//! | `time::Date`                    | MySql date or bytes parsed as MySql date string           |</span>
-<span class="doccomment">//! | `time::Time`                    | MySql date or bytes parsed as MySql date string           |</span>
-<span class="doccomment">//! | `chrono::NaiveTime`             | MySql date or bytes parsed as MySql date string           |</span>
-<span class="doccomment">//! | `chrono::NaiveDate`             | MySql date or bytes parsed as MySql date string           |</span>
-<span class="doccomment">//! | `chrono::NaiveDateTime`         | MySql date or bytes parsed as MySql date string           |</span>
-<span class="doccomment">//! | `uuid::Uuid`                    | MySql bytes parsed using `Uuid::from_slice`               |</span>
-<span class="doccomment">//! | `serde_json::Value`             | MySql bytes parsed using `serde_json::from_str`           |</span>
+<span class="doccomment">//! | Type                                 | Notes                                                     |</span>
+<span class="doccomment">//! | ------------------------------------ | -------------------------------------------------------   |</span>
+<span class="doccomment">//! | `{i,u}8..{i,u}128`, `{i,u}size`      | MySql int/uint will be converted, bytes will be parsed.&lt;br&gt;⚠️ Note that range of `{i,u}128` is greater than supported by MySql integer types but it&#39;ll be serialized anyway (as decimal bytes string). |</span>
+<span class="doccomment">//! | `f32`                                | MySql float will be converted to `f32`, bytes will be parsed as `f32`.&lt;br&gt;⚠️ MySql double won&#39;t be converted to `f32` to avoid precision loss (see #17) |</span>
+<span class="doccomment">//! | `f64`                                | MySql float and double will be converted to `f64`, bytes will be parsed as `f64`. |</span>
+<span class="doccomment">//! | `bool`                               | MySql int {`0`, `1`} or bytes {`&quot;0x30&quot;`, `&quot;0x31&quot;`}        |</span>
+<span class="doccomment">//! | `Vec&lt;u8&gt;`                            | MySql bytes                                               |</span>
+<span class="doccomment">//! | `String`                             | MySql bytes parsed as utf8                                |</span>
+<span class="doccomment">//! | `Duration` (`std` and `time`)        | MySql time or bytes parsed as MySql time string           |</span>
+<span class="doccomment">//! | [`time::PrimitiveDateTime`] (v0.2.x) | MySql date time or bytes parsed as MySql date time string (⚠️ lossy! microseconds are ignored)           |</span>
+<span class="doccomment">//! | [`time::Date`] (v0.2.x)              | MySql date or bytes parsed as MySql date string (⚠️ lossy! microseconds are ignored)           |</span>
+<span class="doccomment">//! | [`time::Time`] (v0.2.x)              | MySql time or bytes parsed as MySql time string (⚠️ lossy! microseconds are ignored)           |</span>
+<span class="doccomment">//! | [`time::Duration`] (v0.2.x)          | MySql time or bytes parsed as MySql time string           |</span>
+<span class="doccomment">//! | [`time::PrimitiveDateTime`] (v0.3.x) | MySql date time or bytes parsed as MySql date time string (⚠️ lossy! microseconds are ignored)           |</span>
+<span class="doccomment">//! | [`time::Date`] (v0.3.x)              | MySql date or bytes parsed as MySql date string (⚠️ lossy! microseconds are ignored)           |</span>
+<span class="doccomment">//! | [`time::Time`] (v0.3.x)              | MySql time or bytes parsed as MySql time string (⚠️ lossy! microseconds are ignored)           |</span>
+<span class="doccomment">//! | [`time::Duration`] (v0.3.x)          | MySql time or bytes parsed as MySql time string           |</span>
+<span class="doccomment">//! | [`chrono::NaiveTime`]                | MySql date or bytes parsed as MySql date string           |</span>
+<span class="doccomment">//! | [`chrono::NaiveDate`]                | MySql date or bytes parsed as MySql date string           |</span>
+<span class="doccomment">//! | [`chrono::NaiveDateTime`]            | MySql date or bytes parsed as MySql date string           |</span>
+<span class="doccomment">//! | [`uuid::Uuid`]                       | MySql bytes parsed using `Uuid::from_slice`               |</span>
+<span class="doccomment">//! | [`serde_json::Value`]                | MySql bytes parsed using `serde_json::from_str`           |</span>
 <span class="doccomment">//! | `mysql_common::Deserialized&lt;T : DeserializeOwned&gt;` | MySql bytes parsed using `serde_json::from_str` |</span>
-<span class="doccomment">//! | `Option&lt;T: FromValue&gt;`          | Must be used for nullable columns to avoid errors         |</span>
-<span class="doccomment">//! | `decimal::Decimal`              | MySql int, uint or bytes parsed using `Decimal::from_str`.&lt;br&gt;⚠️ Note that this type doesn&#39;t support full range of MySql `DECIMAL` type. |</span>
-<span class="doccomment">//! | `bigdecimal::BigDecimal`        | MySql int, uint, floats or bytes parsed using `BigDecimal::parse_bytes`.&lt;br&gt;⚠️ Note that range of this type is greater than supported by MySql `DECIMAL` type but it&#39;ll be serialized anyway. |</span>
-<span class="doccomment">//! | `num_bigint::{BigInt, BigUint}` | MySql int, uint or bytes parsed using `_::parse_bytes`.&lt;br&gt;⚠️ Note that range of this type is greater than supported by MySql integer types but it&#39;ll be serialized anyway (as decimal bytes string). |</span>
+<span class="doccomment">//! | `Option&lt;T: FromValue&gt;`               | Must be used for nullable columns to avoid errors         |</span>
+<span class="doccomment">//! | [`decimal::Decimal`]                 | MySql int, uint or bytes parsed using `Decimal::from_str`.&lt;br&gt;⚠️ Note that this type doesn&#39;t support full range of MySql `DECIMAL` type. |</span>
+<span class="doccomment">//! | [`bigdecimal::BigDecimal`] (v0.2.x)  | MySql int, uint, floats or bytes parsed using `BigDecimal::parse_bytes`.&lt;br&gt;⚠️ Note that range of this type is greater than supported by MySql `DECIMAL` type but it&#39;ll be serialized anyway. |</span>
+<span class="doccomment">//! | [`bigdecimal::BigDecimal`] (v0.3.x)  | MySql int, uint, floats or bytes parsed using `BigDecimal::parse_bytes`.&lt;br&gt;⚠️ Note that range of this type is greater than supported by MySql `DECIMAL` type but it&#39;ll be serialized anyway. |</span>
+<span class="doccomment">//! | `num_bigint::{BigInt, BigUint}`      | MySql int, uint or bytes parsed using `_::parse_bytes`.&lt;br&gt;⚠️ Note that range of this type is greater than supported by MySql integer types but it&#39;ll be serialized anyway (as decimal bytes string). |</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! Also crate provides from-row convertion for the following list of types (see `FromRow` trait):</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! | Type                                            | Notes                                             |</span>
+<span class="doccomment">//! | ----------------------------------------------- | ------------------------------------------------- |</span>
+<span class="doccomment">//! | `Row`                                           | Trivial conversion for `Row` itself.              |</span>
+<span class="doccomment">//! | `T: FromValue`                                  | For rows with a single column.                    |</span>
+<span class="doccomment">//! | `(T1: FromValue [, ..., T12: FromValue])`       | Row to a tuple of arity 1-12.                     |</span>
+<span class="doccomment">//! | [`frunk::Hlist!`] types                         | Usefull to overcome tuple arity limitation        |</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! ### Crate features</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! | Feature        | Description                                 | Default |</span>
+<span class="doccomment">//! | -------------- | ------------------------------------------- | ------- |</span>
+<span class="doccomment">//! | `bigdecimal`   | Enables `bigdecimal` v0.2.x types support   | 🔴      |</span>
+<span class="doccomment">//! | `bigdecimal03` | Enables `bigdecimal` v0.3.x types support   | 🟢      |</span>
+<span class="doccomment">//! | `chrono`       | Enables `chrono` types support              | 🔴      |</span>
+<span class="doccomment">//! | `rust_decimal` | Enables `rust_decimal` types support        | 🟢      |</span>
+<span class="doccomment">//! | `time`         | Enables `time` v0.2.x types support         | 🔴      |</span>
+<span class="doccomment">//! | `time03`       | Enables `time` v0.3.x types support         | 🟢      |</span>
+<span class="doccomment">//! | `uuid`         | Enables `Uuid` type support                 | 🟢      |</span>
+<span class="doccomment">//! | `frunk`        | Enables `FromRow` for `frunk::Hlist!` types | 🟢      |</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! [1]: https://dev.mysql.com/doc/internals/en/binary-protocol-value.html</span>
 <span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;nightly&quot;</span>, <span class="ident">feature</span>(<span class="ident">test</span>, <span class="ident">const_fn</span>))]</span>
 
-<span class="attribute">#[<span class="ident">macro_use</span>]</span>
-<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">bitflags</span>;
-<span class="attribute">#[<span class="ident">macro_use</span>]</span>
-<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">lazy_static</span>;
+<span class="comment">// The `test` feature is required to compile tests.</span>
+<span class="comment">// It&#39;ll bind test binaries to an official C++ impl of MySql decimals (see build.rs)</span>
+<span class="comment">// The idea is to test our rust impl agaist C++ impl.</span>
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;test&quot;</span>), <span class="ident">test</span>))]</span>
+<span class="macro">compile_error!</span>(<span class="string">&quot;Please invoke `cargo test` with `--features test` flags&quot;</span>);
+
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;nightly&quot;</span>)]</span>
 <span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">test</span>;
 
+<span class="attribute">#[<span class="ident">macro_use</span>]</span>
+<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">bitflags_ext</span>;
+
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;bigdecimal&quot;</span>)]</span>
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">bigdecimal</span>;
+
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;bigdecimal03&quot;</span>)]</span>
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">bigdecimal03</span>;
+
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;chrono&quot;</span>)]</span>
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">chrono</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">num_bigint</span>;
+
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;frunk&quot;</span>)]</span>
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">frunk</span>;
+
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rust_decimal&quot;</span>)]</span>
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">rust_decimal</span>;
+
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;time&quot;</span>)]</span>
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">time</span>;
+
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;time03&quot;</span>)]</span>
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">time03</span>;
+
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;uuid&quot;</span>)]</span>
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">uuid</span>;
+
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">num_bigint</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">serde</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">serde_json</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">time</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">uuid</span>;
 
 <span class="doccomment">/// This macro is a convenient way to pass named parameters to a statement.</span>
 <span class="doccomment">///</span>
@@ -395,34 +473,6 @@
     }
 }
 
-<span class="doccomment">/// Non panicking Slice::split_at</span>
-<span class="macro">macro_rules!</span> <span class="ident">split_at_or_err</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">reader</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">at</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">msg</span>:<span class="ident">expr</span>) =&gt; {
-        <span class="kw">if</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">reader</span>.<span class="ident">len</span>() <span class="op">&gt;</span><span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">at</span> {
-            <span class="prelude-val">Ok</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">reader</span>.<span class="ident">split_at</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">at</span>))
-        } <span class="kw">else</span> {
-            <span class="prelude-val">Err</span>(<span class="ident">io::Error::new</span>(<span class="ident">io::ErrorKind::UnexpectedEof</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">msg</span>))
-        }
-    };
-}
-
-<span class="doccomment">/// Reads MySql&#39;s length-encoded string</span>
-<span class="attribute">#[<span class="ident">macro_export</span>]</span>
-<span class="macro">macro_rules!</span> <span class="ident">read_lenenc_str</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">reader</span>:<span class="ident">expr</span>) =&gt; {{
-        <span class="kw">let</span> <span class="ident">reader</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">reader</span>;
-        <span class="ident">reader</span>.<span class="ident">read_lenenc_int</span>().<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">len</span><span class="op">|</span> {
-            <span class="kw">let</span> (<span class="ident">value</span>, <span class="ident">rest</span>) <span class="op">=</span> <span class="macro">split_at_or_err!</span>(
-                <span class="ident">reader</span>,
-                <span class="ident">len</span> <span class="kw">as</span> <span class="ident">usize</span>,
-                <span class="string">&quot;EOF while reading length-encoded string&quot;</span>
-            )<span class="question-mark">?</span>;
-            <span class="kw-2">*</span><span class="ident">reader</span> <span class="op">=</span> <span class="ident">rest</span>;
-            <span class="prelude-val">Ok</span>(<span class="ident">value</span>)
-        })
-    }};
-}
-
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">constants</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">crypto</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">io</span>;
@@ -435,6 +485,8 @@
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">row</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">scramble</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">value</span>;
+
+<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">binlog</span>;
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
 <span class="attribute">#[<span class="ident">test</span>]</span>

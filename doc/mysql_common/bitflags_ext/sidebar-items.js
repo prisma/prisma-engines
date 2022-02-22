@@ -1,0 +1,1 @@
+initSidebarItems({"trait":[["Bitflags","Trait for types generated using `bitflags::bitflags!` macro."]]});

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;bitvec-0.19.6&#x2F;src&#x2F;array&#x2F;traits.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>traits.rs - source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><script defer src="../../../main.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;bitvec-0.22.3&#x2F;src&#x2F;array&#x2F;traits.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>traits.rs - source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><script defer src="../../../main.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script>
     <noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../bitvec/index.html'><div class='logo-container rust-logo'><img src='../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
@@ -440,16 +440,93 @@
 <span id="439">439</span>
 <span id="440">440</span>
 <span id="441">441</span>
-</pre><pre class="rust"><code><span class="doccomment">//! Trait implementations on `BitArray`.</span>
-
-<span class="kw">use</span> <span class="kw">crate</span>::{
-	<span class="ident">array::BitArray</span>,
-	<span class="ident">index::BitIdx</span>,
-	<span class="ident">order::BitOrder</span>,
-	<span class="ident">slice::BitSlice</span>,
-	<span class="ident">store::BitStore</span>,
-	<span class="ident">view::BitView</span>,
-};
+<span id="442">442</span>
+<span id="443">443</span>
+<span id="444">444</span>
+<span id="445">445</span>
+<span id="446">446</span>
+<span id="447">447</span>
+<span id="448">448</span>
+<span id="449">449</span>
+<span id="450">450</span>
+<span id="451">451</span>
+<span id="452">452</span>
+<span id="453">453</span>
+<span id="454">454</span>
+<span id="455">455</span>
+<span id="456">456</span>
+<span id="457">457</span>
+<span id="458">458</span>
+<span id="459">459</span>
+<span id="460">460</span>
+<span id="461">461</span>
+<span id="462">462</span>
+<span id="463">463</span>
+<span id="464">464</span>
+<span id="465">465</span>
+<span id="466">466</span>
+<span id="467">467</span>
+<span id="468">468</span>
+<span id="469">469</span>
+<span id="470">470</span>
+<span id="471">471</span>
+<span id="472">472</span>
+<span id="473">473</span>
+<span id="474">474</span>
+<span id="475">475</span>
+<span id="476">476</span>
+<span id="477">477</span>
+<span id="478">478</span>
+<span id="479">479</span>
+<span id="480">480</span>
+<span id="481">481</span>
+<span id="482">482</span>
+<span id="483">483</span>
+<span id="484">484</span>
+<span id="485">485</span>
+<span id="486">486</span>
+<span id="487">487</span>
+<span id="488">488</span>
+<span id="489">489</span>
+<span id="490">490</span>
+<span id="491">491</span>
+<span id="492">492</span>
+<span id="493">493</span>
+<span id="494">494</span>
+<span id="495">495</span>
+<span id="496">496</span>
+<span id="497">497</span>
+<span id="498">498</span>
+<span id="499">499</span>
+<span id="500">500</span>
+<span id="501">501</span>
+<span id="502">502</span>
+<span id="503">503</span>
+<span id="504">504</span>
+<span id="505">505</span>
+<span id="506">506</span>
+<span id="507">507</span>
+<span id="508">508</span>
+<span id="509">509</span>
+<span id="510">510</span>
+<span id="511">511</span>
+<span id="512">512</span>
+<span id="513">513</span>
+<span id="514">514</span>
+<span id="515">515</span>
+<span id="516">516</span>
+<span id="517">517</span>
+<span id="518">518</span>
+<span id="519">519</span>
+<span id="520">520</span>
+<span id="521">521</span>
+<span id="522">522</span>
+<span id="523">523</span>
+<span id="524">524</span>
+<span id="525">525</span>
+<span id="526">526</span>
+<span id="527">527</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Non-operator trait implementations.</span>
 
 <span class="kw">use</span> <span class="ident">core</span>::{
 	<span class="ident">borrow</span>::{
@@ -474,11 +551,25 @@
 	},
 };
 
+<span class="kw">use</span> <span class="ident">funty::IsNumber</span>;
+
+<span class="kw">use</span> <span class="kw">super</span>::{
+	<span class="ident">BitArray</span>,
+	<span class="ident">IntoIter</span>,
+};
+<span class="kw">use</span> <span class="kw">crate</span>::{
+	<span class="ident">index::BitIdx</span>,
+	<span class="ident">order::BitOrder</span>,
+	<span class="ident">slice::BitSlice</span>,
+	<span class="ident">store::BitStore</span>,
+	<span class="ident">view::BitViewSized</span>,
+};
+
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">tarpaulin_include</span>))]</span>
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">V</span><span class="op">&gt;</span> <span class="ident">Borrow</span><span class="op">&lt;</span><span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">V::Store</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">BitArray</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">V</span><span class="op">&gt;</span>
 <span class="kw">where</span>
 	<span class="ident">O</span>: <span class="ident">BitOrder</span>,
-	<span class="ident">V</span>: <span class="ident">BitView</span> <span class="op">+</span> <span class="ident">Sized</span>,
+	<span class="ident">V</span>: <span class="ident">BitViewSized</span>,
 {
 	<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
 	<span class="kw">fn</span> <span class="ident">borrow</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">V::Store</span><span class="op">&gt;</span> {
@@ -490,7 +581,7 @@
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">V</span><span class="op">&gt;</span> <span class="ident">BorrowMut</span><span class="op">&lt;</span><span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">V::Store</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">BitArray</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">V</span><span class="op">&gt;</span>
 <span class="kw">where</span>
 	<span class="ident">O</span>: <span class="ident">BitOrder</span>,
-	<span class="ident">V</span>: <span class="ident">BitView</span> <span class="op">+</span> <span class="ident">Sized</span>,
+	<span class="ident">V</span>: <span class="ident">BitViewSized</span>,
 {
 	<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
 	<span class="kw">fn</span> <span class="ident">borrow_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">V::Store</span><span class="op">&gt;</span> {
@@ -498,18 +589,34 @@
 	}
 }
 
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">V</span><span class="op">&gt;</span> <span class="ident">Clone</span> <span class="kw">for</span> <span class="ident">BitArray</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">V</span><span class="op">&gt;</span>
+<span class="kw">where</span>
+	<span class="ident">O</span>: <span class="ident">BitOrder</span>,
+	<span class="ident">V</span>: <span class="ident">BitViewSized</span>,
+{
+	<span class="attribute">#[<span class="ident">inline</span>]</span>
+	<span class="kw">fn</span> <span class="ident">clone</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self</span> {
+		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">out</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::zeroed</span>();
+		<span class="kw">for</span> (<span class="ident">dst</span>, <span class="ident">src</span>) <span class="kw">in</span>
+			<span class="ident">out</span>.<span class="ident">as_mut_raw_slice</span>().<span class="ident">iter_mut</span>().<span class="ident">zip</span>(<span class="self">self</span>.<span class="ident">as_raw_slice</span>())
+		{
+			<span class="ident">dst</span>.<span class="ident">store_value</span>(<span class="ident">src</span>.<span class="ident">load_value</span>());
+		}
+		<span class="ident">out</span>
+	}
+}
+
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">V</span><span class="op">&gt;</span> <span class="ident">Eq</span> <span class="kw">for</span> <span class="ident">BitArray</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">V</span><span class="op">&gt;</span>
 <span class="kw">where</span>
 	<span class="ident">O</span>: <span class="ident">BitOrder</span>,
-	<span class="ident">V</span>: <span class="ident">BitView</span> <span class="op">+</span> <span class="ident">Sized</span>,
+	<span class="ident">V</span>: <span class="ident">BitViewSized</span>,
 {
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">tarpaulin_include</span>))]</span>
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">V</span><span class="op">&gt;</span> <span class="ident">Ord</span> <span class="kw">for</span> <span class="ident">BitArray</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">V</span><span class="op">&gt;</span>
 <span class="kw">where</span>
 	<span class="ident">O</span>: <span class="ident">BitOrder</span>,
-	<span class="ident">V</span>: <span class="ident">BitView</span> <span class="op">+</span> <span class="ident">Sized</span>,
+	<span class="ident">V</span>: <span class="ident">BitViewSized</span>,
 {
 	<span class="attribute">#[<span class="ident">inline</span>]</span>
 	<span class="kw">fn</span> <span class="ident">cmp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="ident">cmp::Ordering</span> {
@@ -517,24 +624,23 @@
 	}
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">tarpaulin_include</span>))]</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">V</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">PartialEq</span><span class="op">&lt;</span><span class="ident">BitArray</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">V</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span>
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">O1</span>, <span class="ident">O2</span>, <span class="ident">V</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">PartialEq</span><span class="op">&lt;</span><span class="ident">BitArray</span><span class="op">&lt;</span><span class="ident">O2</span>, <span class="ident">V</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">O1</span>, <span class="ident">T</span><span class="op">&gt;</span>
 <span class="kw">where</span>
-	<span class="ident">O</span>: <span class="ident">BitOrder</span>,
-	<span class="ident">V</span>: <span class="ident">BitView</span> <span class="op">+</span> <span class="ident">Sized</span>,
+	<span class="ident">O1</span>: <span class="ident">BitOrder</span>,
+	<span class="ident">O2</span>: <span class="ident">BitOrder</span>,
+	<span class="ident">V</span>: <span class="ident">BitViewSized</span>,
 	<span class="ident">T</span>: <span class="ident">BitStore</span>,
 {
 	<span class="attribute">#[<span class="ident">inline</span>]</span>
-	<span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">BitArray</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">V</span><span class="op">&gt;</span>) -&gt; <span class="ident">bool</span> {
+	<span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">BitArray</span><span class="op">&lt;</span><span class="ident">O2</span>, <span class="ident">V</span><span class="op">&gt;</span>) -&gt; <span class="ident">bool</span> {
 		<span class="self">self</span> <span class="op">==</span> <span class="ident">other</span>.<span class="ident">as_bitslice</span>()
 	}
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">tarpaulin_include</span>))]</span>
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">V</span>, <span class="ident">Rhs</span><span class="op">&gt;</span> <span class="ident">PartialEq</span><span class="op">&lt;</span><span class="ident">Rhs</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">BitArray</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">V</span><span class="op">&gt;</span>
 <span class="kw">where</span>
 	<span class="ident">O</span>: <span class="ident">BitOrder</span>,
-	<span class="ident">V</span>: <span class="ident">BitView</span> <span class="op">+</span> <span class="ident">Sized</span>,
+	<span class="ident">V</span>: <span class="ident">BitViewSized</span>,
 	<span class="ident">Rhs</span>: <span class="question-mark">?</span><span class="ident">Sized</span>,
 	<span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">V::Store</span><span class="op">&gt;</span>: <span class="ident">PartialEq</span><span class="op">&lt;</span><span class="ident">Rhs</span><span class="op">&gt;</span>,
 {
@@ -544,11 +650,10 @@
 	}
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">tarpaulin_include</span>))]</span>
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">V</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">PartialOrd</span><span class="op">&lt;</span><span class="ident">BitArray</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">V</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span>
 <span class="kw">where</span>
 	<span class="ident">O</span>: <span class="ident">BitOrder</span>,
-	<span class="ident">V</span>: <span class="ident">BitView</span> <span class="op">+</span> <span class="ident">Sized</span>,
+	<span class="ident">V</span>: <span class="ident">BitViewSized</span>,
 	<span class="ident">T</span>: <span class="ident">BitStore</span>,
 {
 	<span class="attribute">#[<span class="ident">inline</span>]</span>
@@ -557,11 +662,10 @@
 	}
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">tarpaulin_include</span>))]</span>
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">V</span>, <span class="ident">Rhs</span><span class="op">&gt;</span> <span class="ident">PartialOrd</span><span class="op">&lt;</span><span class="ident">Rhs</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">BitArray</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">V</span><span class="op">&gt;</span>
 <span class="kw">where</span>
 	<span class="ident">O</span>: <span class="ident">BitOrder</span>,
-	<span class="ident">V</span>: <span class="ident">BitView</span> <span class="op">+</span> <span class="ident">Sized</span>,
+	<span class="ident">V</span>: <span class="ident">BitViewSized</span>,
 	<span class="ident">Rhs</span>: <span class="question-mark">?</span><span class="ident">Sized</span>,
 	<span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">V::Store</span><span class="op">&gt;</span>: <span class="ident">PartialOrd</span><span class="op">&lt;</span><span class="ident">Rhs</span><span class="op">&gt;</span>,
 {
@@ -575,7 +679,7 @@
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">V</span><span class="op">&gt;</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">V::Store</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">BitArray</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">V</span><span class="op">&gt;</span>
 <span class="kw">where</span>
 	<span class="ident">O</span>: <span class="ident">BitOrder</span>,
-	<span class="ident">V</span>: <span class="ident">BitView</span> <span class="op">+</span> <span class="ident">Sized</span>,
+	<span class="ident">V</span>: <span class="ident">BitViewSized</span>,
 {
 	<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
 	<span class="kw">fn</span> <span class="ident">as_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">V::Store</span><span class="op">&gt;</span> {
@@ -587,7 +691,7 @@
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">V</span><span class="op">&gt;</span> <span class="ident">AsMut</span><span class="op">&lt;</span><span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">V::Store</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">BitArray</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">V</span><span class="op">&gt;</span>
 <span class="kw">where</span>
 	<span class="ident">O</span>: <span class="ident">BitOrder</span>,
-	<span class="ident">V</span>: <span class="ident">BitView</span> <span class="op">+</span> <span class="ident">Sized</span>,
+	<span class="ident">V</span>: <span class="ident">BitViewSized</span>,
 {
 	<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
 	<span class="kw">fn</span> <span class="ident">as_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">V::Store</span><span class="op">&gt;</span> {
@@ -599,7 +703,7 @@
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">V</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">V</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">BitArray</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">V</span><span class="op">&gt;</span>
 <span class="kw">where</span>
 	<span class="ident">O</span>: <span class="ident">BitOrder</span>,
-	<span class="ident">V</span>: <span class="ident">BitView</span> <span class="op">+</span> <span class="ident">Sized</span>,
+	<span class="ident">V</span>: <span class="ident">BitViewSized</span>,
 {
 	<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
 	<span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">data</span>: <span class="ident">V</span>) -&gt; <span class="self">Self</span> {
@@ -607,61 +711,124 @@
 	}
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">O1</span>, <span class="ident">O2</span>, <span class="ident">T</span>, <span class="ident">V</span><span class="op">&gt;</span> <span class="ident">TryFrom</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;_</span> <span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">O2</span>, <span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">BitArray</span><span class="op">&lt;</span><span class="ident">O1</span>, <span class="ident">V</span><span class="op">&gt;</span>
+<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">TryFrom</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">BitArray</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span>
 <span class="kw">where</span>
-	<span class="ident">O1</span>: <span class="ident">BitOrder</span>,
-	<span class="ident">O2</span>: <span class="ident">BitOrder</span>,
+	<span class="ident">O</span>: <span class="ident">BitOrder</span>,
 	<span class="ident">T</span>: <span class="ident">BitStore</span>,
-	<span class="ident">V</span>: <span class="ident">BitView</span> <span class="op">+</span> <span class="ident">Sized</span>,
 {
-	<span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">TryFromBitSliceError</span>;
+	<span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">TryFromBitSliceError</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span>;
 
 	<span class="attribute">#[<span class="ident">inline</span>]</span>
-	<span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">src</span>: <span class="kw-2">&amp;</span><span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">O2</span>, <span class="ident">T</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
-		<span class="kw">if</span> <span class="ident">src</span>.<span class="ident">len</span>() <span class="op">!</span><span class="op">=</span> <span class="ident">V::const_bits</span>() {
-			<span class="kw">return</span> <span class="ident"><span class="self">Self</span>::Error::err</span>();
+	<span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">src</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
+		<span class="kw">if</span> <span class="ident">src</span>.<span class="ident">len</span>() <span class="op">!</span><span class="op">=</span> <span class="op">&lt;</span><span class="ident">T::Mem</span> <span class="kw">as</span> <span class="ident">IsNumber</span><span class="op">&gt;</span><span class="ident">::BITS</span> <span class="kw">as</span> <span class="ident">usize</span> {
+			<span class="kw">return</span> <span class="ident"><span class="self">Self</span>::Error::err</span>(<span class="ident">src</span>);
 		}
 		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">out</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::zeroed</span>();
-		<span class="ident">out</span>.<span class="ident">clone_from_bitslice</span>(<span class="ident">src</span>);
+		<span class="ident">out</span>.<span class="ident">copy_from_bitslice</span>(<span class="ident">src</span>);
 		<span class="prelude-val">Ok</span>(<span class="ident">out</span>)
 	}
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">O</span>, <span class="ident">V</span><span class="op">&gt;</span> <span class="ident">TryFrom</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">V::Store</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">BitArray</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">V</span><span class="op">&gt;</span>
+<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">O</span>, <span class="ident">T</span>, <span class="kw">const</span> <span class="ident">N</span>: <span class="ident">usize</span><span class="op">&gt;</span> <span class="ident">TryFrom</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>
+	<span class="kw">for</span> <span class="ident">BitArray</span><span class="op">&lt;</span><span class="ident">O</span>, [<span class="ident">T</span>; <span class="ident">N</span>]<span class="op">&gt;</span>
 <span class="kw">where</span>
 	<span class="ident">O</span>: <span class="ident">BitOrder</span>,
-	<span class="ident">V</span>: <span class="ident">BitView</span> <span class="op">+</span> <span class="ident">Sized</span>,
+	<span class="ident">T</span>: <span class="ident">BitStore</span>,
 {
-	<span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">TryFromBitSliceError</span>;
+	<span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">TryFromBitSliceError</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span>;
 
 	<span class="attribute">#[<span class="ident">inline</span>]</span>
-	<span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">src</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">V::Store</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
-		<span class="kw">let</span> <span class="ident">bitptr</span> <span class="op">=</span> <span class="ident">src</span>.<span class="ident">bitptr</span>();
-		<span class="comment">//  This pointer cast can only happen if the slice is exactly as long as</span>
-		<span class="comment">//  the array, and is aligned to the front of the element.</span>
-		<span class="kw">if</span> <span class="ident">src</span>.<span class="ident">len</span>() <span class="op">!</span><span class="op">=</span> <span class="ident">V::const_bits</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">bitptr</span>.<span class="ident">head</span>() <span class="op">!</span><span class="op">=</span> <span class="ident">BitIdx::ZERO</span> {
-			<span class="kw">return</span> <span class="ident"><span class="self">Self</span>::Error::err</span>();
+	<span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">src</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
+		<span class="kw">if</span> <span class="ident">src</span>.<span class="ident">len</span>() <span class="op">!</span><span class="op">=</span> <span class="op">&lt;</span><span class="ident">T::Mem</span> <span class="kw">as</span> <span class="ident">IsNumber</span><span class="op">&gt;</span><span class="ident">::BITS</span> <span class="kw">as</span> <span class="ident">usize</span> <span class="op">*</span> <span class="ident">N</span> {
+			<span class="kw">return</span> <span class="ident"><span class="self">Self</span>::Error::err</span>(<span class="ident">src</span>);
 		}
-		<span class="prelude-val">Ok</span>(<span class="kw">unsafe</span> { <span class="kw-2">&amp;</span><span class="kw-2">*</span>(<span class="ident">bitptr</span>.<span class="ident">pointer</span>().<span class="ident">to_const</span>() <span class="kw">as</span> <span class="kw-2">*const</span> <span class="ident">BitArray</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">V</span><span class="op">&gt;</span>) })
+		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">out</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::zeroed</span>();
+		<span class="ident">out</span>.<span class="ident">copy_from_bitslice</span>(<span class="ident">src</span>);
+		<span class="prelude-val">Ok</span>(<span class="ident">out</span>)
 	}
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">O</span>, <span class="ident">V</span><span class="op">&gt;</span> <span class="ident">TryFrom</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">V::Store</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">BitArray</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">V</span><span class="op">&gt;</span>
+<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">TryFrom</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">BitArray</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span>
 <span class="kw">where</span>
 	<span class="ident">O</span>: <span class="ident">BitOrder</span>,
-	<span class="ident">V</span>: <span class="ident">BitView</span> <span class="op">+</span> <span class="ident">Sized</span>,
+	<span class="ident">T</span>: <span class="ident">BitStore</span>,
 {
-	<span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">TryFromBitSliceError</span>;
+	<span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">TryFromBitSliceError</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span>;
 
 	<span class="attribute">#[<span class="ident">inline</span>]</span>
-	<span class="kw">fn</span> <span class="ident">try_from</span>(
-		<span class="ident">src</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">V::Store</span><span class="op">&gt;</span>,
-	) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
-		<span class="kw">let</span> <span class="ident">bitptr</span> <span class="op">=</span> <span class="ident">src</span>.<span class="ident">bitptr</span>();
-		<span class="kw">if</span> <span class="ident">src</span>.<span class="ident">len</span>() <span class="op">!</span><span class="op">=</span> <span class="ident">V::const_bits</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">bitptr</span>.<span class="ident">head</span>() <span class="op">!</span><span class="op">=</span> <span class="ident">BitIdx::ZERO</span> {
-			<span class="kw">return</span> <span class="ident"><span class="self">Self</span>::Error::err</span>();
+	<span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">src</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
+		<span class="kw">let</span> <span class="ident">bitspan</span> <span class="op">=</span> <span class="ident">src</span>.<span class="ident">as_bitspan</span>();
+		<span class="comment">//  This pointer cast can only happen if the slice is exactly as long as</span>
+		<span class="comment">//  the array, and is aligned to the front of the element.</span>
+		<span class="kw">if</span> <span class="ident">src</span>.<span class="ident">len</span>() <span class="op">!</span><span class="op">=</span> <span class="op">&lt;</span><span class="ident">T::Mem</span> <span class="kw">as</span> <span class="ident">IsNumber</span><span class="op">&gt;</span><span class="ident">::BITS</span> <span class="kw">as</span> <span class="ident">usize</span>
+			<span class="op">|</span><span class="op">|</span> <span class="ident">bitspan</span>.<span class="ident">head</span>() <span class="op">!</span><span class="op">=</span> <span class="ident">BitIdx::ZERO</span>
+		{
+			<span class="kw">return</span> <span class="ident"><span class="self">Self</span>::Error::err</span>(<span class="ident">src</span>);
 		}
-		<span class="prelude-val">Ok</span>(<span class="kw">unsafe</span> { <span class="kw-2">&amp;mut</span> <span class="kw-2">*</span>(<span class="ident">bitptr</span>.<span class="ident">pointer</span>().<span class="ident">to_mut</span>() <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="ident">BitArray</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">V</span><span class="op">&gt;</span>) })
+		<span class="prelude-val">Ok</span>(<span class="kw">unsafe</span> { <span class="kw-2">&amp;</span><span class="kw-2">*</span>(<span class="ident">bitspan</span>.<span class="ident">address</span>().<span class="ident">to_const</span>() <span class="kw">as</span> <span class="kw-2">*const</span> <span class="ident">BitArray</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span>) })
+	}
+}
+
+<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">O</span>, <span class="ident">T</span>, <span class="kw">const</span> <span class="ident">N</span>: <span class="ident">usize</span><span class="op">&gt;</span> <span class="ident">TryFrom</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>
+	<span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">BitArray</span><span class="op">&lt;</span><span class="ident">O</span>, [<span class="ident">T</span>; <span class="ident">N</span>]<span class="op">&gt;</span>
+<span class="kw">where</span>
+	<span class="ident">O</span>: <span class="ident">BitOrder</span>,
+	<span class="ident">T</span>: <span class="ident">BitStore</span>,
+{
+	<span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">TryFromBitSliceError</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span>;
+
+	<span class="attribute">#[<span class="ident">inline</span>]</span>
+	<span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">src</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
+		<span class="kw">let</span> <span class="ident">bitspan</span> <span class="op">=</span> <span class="ident">src</span>.<span class="ident">as_bitspan</span>();
+		<span class="kw">if</span> <span class="ident">src</span>.<span class="ident">len</span>() <span class="op">!</span><span class="op">=</span> <span class="op">&lt;</span><span class="ident">T::Mem</span> <span class="kw">as</span> <span class="ident">IsNumber</span><span class="op">&gt;</span><span class="ident">::BITS</span> <span class="kw">as</span> <span class="ident">usize</span> <span class="op">*</span> <span class="ident">N</span>
+			<span class="op">|</span><span class="op">|</span> <span class="ident">bitspan</span>.<span class="ident">head</span>() <span class="op">!</span><span class="op">=</span> <span class="ident">BitIdx::ZERO</span>
+		{
+			<span class="kw">return</span> <span class="ident"><span class="self">Self</span>::Error::err</span>(<span class="ident">src</span>);
+		}
+		<span class="prelude-val">Ok</span>(<span class="kw">unsafe</span> {
+			<span class="kw-2">&amp;</span><span class="kw-2">*</span>(<span class="ident">bitspan</span>.<span class="ident">address</span>().<span class="ident">to_const</span>() <span class="kw">as</span> <span class="kw-2">*const</span> <span class="ident">BitArray</span><span class="op">&lt;</span><span class="ident">O</span>, [<span class="ident">T</span>; <span class="ident">N</span>]<span class="op">&gt;</span>)
+		})
+	}
+}
+
+<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">TryFrom</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">BitArray</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span>
+<span class="kw">where</span>
+	<span class="ident">O</span>: <span class="ident">BitOrder</span>,
+	<span class="ident">T</span>: <span class="ident">BitStore</span>,
+{
+	<span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">TryFromBitSliceError</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span>;
+
+	<span class="attribute">#[<span class="ident">inline</span>]</span>
+	<span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">src</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
+		<span class="kw">let</span> <span class="ident">bitspan</span> <span class="op">=</span> <span class="ident">src</span>.<span class="ident">as_mut_bitspan</span>();
+		<span class="kw">if</span> <span class="ident">src</span>.<span class="ident">len</span>() <span class="op">!</span><span class="op">=</span> <span class="op">&lt;</span><span class="ident">T::Mem</span> <span class="kw">as</span> <span class="ident">IsNumber</span><span class="op">&gt;</span><span class="ident">::BITS</span> <span class="kw">as</span> <span class="ident">usize</span>
+			<span class="op">|</span><span class="op">|</span> <span class="ident">bitspan</span>.<span class="ident">head</span>() <span class="op">!</span><span class="op">=</span> <span class="ident">BitIdx::ZERO</span>
+		{
+			<span class="kw">return</span> <span class="ident"><span class="self">Self</span>::Error::err</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">src</span>);
+		}
+		<span class="prelude-val">Ok</span>(<span class="kw">unsafe</span> { <span class="kw-2">&amp;mut</span> <span class="kw-2">*</span>(<span class="ident">bitspan</span>.<span class="ident">address</span>().<span class="ident">to_mut</span>() <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="ident">BitArray</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span>) })
+	}
+}
+
+<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">O</span>, <span class="ident">T</span>, <span class="kw">const</span> <span class="ident">N</span>: <span class="ident">usize</span><span class="op">&gt;</span> <span class="ident">TryFrom</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>
+	<span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">BitArray</span><span class="op">&lt;</span><span class="ident">O</span>, [<span class="ident">T</span>; <span class="ident">N</span>]<span class="op">&gt;</span>
+<span class="kw">where</span>
+	<span class="ident">O</span>: <span class="ident">BitOrder</span>,
+	<span class="ident">T</span>: <span class="ident">BitStore</span>,
+{
+	<span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">TryFromBitSliceError</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span>;
+
+	<span class="attribute">#[<span class="ident">inline</span>]</span>
+	<span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">src</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
+		<span class="kw">let</span> <span class="ident">bitspan</span> <span class="op">=</span> <span class="ident">src</span>.<span class="ident">as_mut_bitspan</span>();
+		<span class="kw">if</span> <span class="ident">src</span>.<span class="ident">len</span>() <span class="op">!</span><span class="op">=</span> <span class="op">&lt;</span><span class="ident">T::Mem</span> <span class="kw">as</span> <span class="ident">IsNumber</span><span class="op">&gt;</span><span class="ident">::BITS</span> <span class="kw">as</span> <span class="ident">usize</span> <span class="op">*</span> <span class="ident">N</span>
+			<span class="op">|</span><span class="op">|</span> <span class="ident">bitspan</span>.<span class="ident">head</span>() <span class="op">!</span><span class="op">=</span> <span class="ident">BitIdx::ZERO</span>
+		{
+			<span class="kw">return</span> <span class="ident"><span class="self">Self</span>::Error::err</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">src</span>);
+		}
+		<span class="prelude-val">Ok</span>(<span class="kw">unsafe</span> {
+			<span class="kw-2">&amp;mut</span> <span class="kw-2">*</span>(<span class="ident">bitspan</span>.<span class="ident">address</span>().<span class="ident">to_mut</span>() <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="ident">BitArray</span><span class="op">&lt;</span><span class="ident">O</span>, [<span class="ident">T</span>; <span class="ident">N</span>]<span class="op">&gt;</span>)
+		})
 	}
 }
 
@@ -669,7 +836,7 @@
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">V</span><span class="op">&gt;</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">BitArray</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">V</span><span class="op">&gt;</span>
 <span class="kw">where</span>
 	<span class="ident">O</span>: <span class="ident">BitOrder</span>,
-	<span class="ident">V</span>: <span class="ident">BitView</span> <span class="op">+</span> <span class="ident">Sized</span>,
+	<span class="ident">V</span>: <span class="ident">BitViewSized</span>,
 {
 	<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
 	<span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
@@ -681,7 +848,7 @@
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">V</span><span class="op">&gt;</span> <span class="ident">Binary</span> <span class="kw">for</span> <span class="ident">BitArray</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">V</span><span class="op">&gt;</span>
 <span class="kw">where</span>
 	<span class="ident">O</span>: <span class="ident">BitOrder</span>,
-	<span class="ident">V</span>: <span class="ident">BitView</span> <span class="op">+</span> <span class="ident">Sized</span>,
+	<span class="ident">V</span>: <span class="ident">BitViewSized</span>,
 {
 	<span class="attribute">#[<span class="ident">inline</span>]</span>
 	<span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
@@ -692,20 +859,13 @@
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">V</span><span class="op">&gt;</span> <span class="ident">Debug</span> <span class="kw">for</span> <span class="ident">BitArray</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">V</span><span class="op">&gt;</span>
 <span class="kw">where</span>
 	<span class="ident">O</span>: <span class="ident">BitOrder</span>,
-	<span class="ident">V</span>: <span class="ident">BitView</span> <span class="op">+</span> <span class="ident">Sized</span>,
+	<span class="ident">V</span>: <span class="ident">BitViewSized</span>,
 {
 	<span class="attribute">#[<span class="ident">inline</span>]</span>
 	<span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
-		<span class="kw">if</span> <span class="ident">fmt</span>.<span class="ident">alternate</span>() {
-			<span class="self">self</span>.<span class="ident">bitptr</span>().<span class="ident">render</span>(
-				<span class="ident">fmt</span>,
-				<span class="string">&quot;Array&quot;</span>,
-				<span class="prelude-val">Some</span>(<span class="ident">core::any::type_name</span>::<span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>()),
-				<span class="prelude-val">None</span>,
-			)<span class="question-mark">?</span>;
-			<span class="ident">fmt</span>.<span class="ident">write_str</span>(<span class="string">&quot; &quot;</span>)<span class="question-mark">?</span>;
-		}
-		<span class="ident">Binary::fmt</span>(<span class="self">self</span>, <span class="ident">fmt</span>)
+		<span class="self">self</span>.<span class="ident">as_bitspan</span>().<span class="ident">render</span>(<span class="ident">fmt</span>, <span class="string">&quot;Array&quot;</span>, <span class="prelude-val">None</span>)<span class="question-mark">?</span>;
+		<span class="ident">fmt</span>.<span class="ident">write_str</span>(<span class="string">&quot; &quot;</span>)<span class="question-mark">?</span>;
+		<span class="ident">Display::fmt</span>(<span class="self">self</span>, <span class="ident">fmt</span>)
 	}
 }
 
@@ -713,11 +873,11 @@
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">V</span><span class="op">&gt;</span> <span class="ident">Display</span> <span class="kw">for</span> <span class="ident">BitArray</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">V</span><span class="op">&gt;</span>
 <span class="kw">where</span>
 	<span class="ident">O</span>: <span class="ident">BitOrder</span>,
-	<span class="ident">V</span>: <span class="ident">BitView</span> <span class="op">+</span> <span class="ident">Sized</span>,
+	<span class="ident">V</span>: <span class="ident">BitViewSized</span>,
 {
 	<span class="attribute">#[<span class="ident">inline</span>]</span>
 	<span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
-		<span class="ident">Binary::fmt</span>(<span class="self">self</span>.<span class="ident">as_bitslice</span>(), <span class="ident">fmt</span>)
+		<span class="ident">Display::fmt</span>(<span class="self">self</span>.<span class="ident">as_bitslice</span>(), <span class="ident">fmt</span>)
 	}
 }
 
@@ -725,7 +885,7 @@
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">V</span><span class="op">&gt;</span> <span class="ident">LowerHex</span> <span class="kw">for</span> <span class="ident">BitArray</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">V</span><span class="op">&gt;</span>
 <span class="kw">where</span>
 	<span class="ident">O</span>: <span class="ident">BitOrder</span>,
-	<span class="ident">V</span>: <span class="ident">BitView</span> <span class="op">+</span> <span class="ident">Sized</span>,
+	<span class="ident">V</span>: <span class="ident">BitViewSized</span>,
 {
 	<span class="attribute">#[<span class="ident">inline</span>]</span>
 	<span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
@@ -737,7 +897,7 @@
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">V</span><span class="op">&gt;</span> <span class="ident">Octal</span> <span class="kw">for</span> <span class="ident">BitArray</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">V</span><span class="op">&gt;</span>
 <span class="kw">where</span>
 	<span class="ident">O</span>: <span class="ident">BitOrder</span>,
-	<span class="ident">V</span>: <span class="ident">BitView</span> <span class="op">+</span> <span class="ident">Sized</span>,
+	<span class="ident">V</span>: <span class="ident">BitViewSized</span>,
 {
 	<span class="attribute">#[<span class="ident">inline</span>]</span>
 	<span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
@@ -749,7 +909,7 @@
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">V</span><span class="op">&gt;</span> <span class="ident">UpperHex</span> <span class="kw">for</span> <span class="ident">BitArray</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">V</span><span class="op">&gt;</span>
 <span class="kw">where</span>
 	<span class="ident">O</span>: <span class="ident">BitOrder</span>,
-	<span class="ident">V</span>: <span class="ident">BitView</span> <span class="op">+</span> <span class="ident">Sized</span>,
+	<span class="ident">V</span>: <span class="ident">BitViewSized</span>,
 {
 	<span class="attribute">#[<span class="ident">inline</span>]</span>
 	<span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
@@ -761,7 +921,7 @@
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">V</span><span class="op">&gt;</span> <span class="ident">Hash</span> <span class="kw">for</span> <span class="ident">BitArray</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">V</span><span class="op">&gt;</span>
 <span class="kw">where</span>
 	<span class="ident">O</span>: <span class="ident">BitOrder</span>,
-	<span class="ident">V</span>: <span class="ident">BitView</span> <span class="op">+</span> <span class="ident">Sized</span>,
+	<span class="ident">V</span>: <span class="ident">BitViewSized</span>,
 {
 	<span class="attribute">#[<span class="ident">inline</span>]</span>
 	<span class="kw">fn</span> <span class="ident">hash</span><span class="op">&lt;</span><span class="ident">H</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">hasher</span>: <span class="kw-2">&amp;mut</span> <span class="ident">H</span>)
@@ -771,10 +931,25 @@
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">tarpaulin_include</span>))]</span>
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">V</span><span class="op">&gt;</span> <span class="ident">IntoIterator</span> <span class="kw">for</span> <span class="ident">BitArray</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">V</span><span class="op">&gt;</span>
+<span class="kw">where</span>
+	<span class="ident">O</span>: <span class="ident">BitOrder</span>,
+	<span class="ident">V</span>: <span class="ident">BitViewSized</span>,
+{
+	<span class="kw">type</span> <span class="ident">IntoIter</span> <span class="op">=</span> <span class="ident">IntoIter</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">V</span><span class="op">&gt;</span>;
+	<span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident">bool</span>;
+
+	<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
+	<span class="kw">fn</span> <span class="ident">into_iter</span>(<span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::IntoIter</span> {
+		<span class="ident">IntoIter::new</span>(<span class="self">self</span>)
+	}
+}
+
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">tarpaulin_include</span>))]</span>
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">O</span>, <span class="ident">V</span><span class="op">&gt;</span> <span class="ident">IntoIterator</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">BitArray</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">V</span><span class="op">&gt;</span>
 <span class="kw">where</span>
-	<span class="ident">O</span>: <span class="lifetime">&#39;a</span> <span class="op">+</span> <span class="ident">BitOrder</span>,
-	<span class="ident">V</span>: <span class="lifetime">&#39;a</span> <span class="op">+</span> <span class="ident">BitView</span> <span class="op">+</span> <span class="ident">Sized</span>,
+	<span class="ident">O</span>: <span class="ident">BitOrder</span>,
+	<span class="ident">V</span>: <span class="ident">BitViewSized</span>,
 {
 	<span class="kw">type</span> <span class="ident">IntoIter</span> <span class="op">=</span> <span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">V::Store</span><span class="op">&gt;</span> <span class="kw">as</span> <span class="ident">IntoIterator</span><span class="op">&gt;</span><span class="ident">::IntoIter</span>;
 	<span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">V::Store</span><span class="op">&gt;</span> <span class="kw">as</span> <span class="ident">IntoIterator</span><span class="op">&gt;</span><span class="ident">::Item</span>;
@@ -788,8 +963,8 @@
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">tarpaulin_include</span>))]</span>
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">O</span>, <span class="ident">V</span><span class="op">&gt;</span> <span class="ident">IntoIterator</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">BitArray</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">V</span><span class="op">&gt;</span>
 <span class="kw">where</span>
-	<span class="ident">O</span>: <span class="lifetime">&#39;a</span> <span class="op">+</span> <span class="ident">BitOrder</span>,
-	<span class="ident">V</span>: <span class="lifetime">&#39;a</span> <span class="op">+</span> <span class="ident">BitView</span> <span class="op">+</span> <span class="ident">Sized</span>,
+	<span class="ident">O</span>: <span class="ident">BitOrder</span>,
+	<span class="ident">V</span>: <span class="ident">BitViewSized</span>,
 {
 	<span class="kw">type</span> <span class="ident">IntoIter</span> <span class="op">=</span> <span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">V::Store</span><span class="op">&gt;</span> <span class="kw">as</span> <span class="ident">IntoIterator</span><span class="op">&gt;</span><span class="ident">::IntoIter</span>;
 	<span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">V::Store</span><span class="op">&gt;</span> <span class="kw">as</span> <span class="ident">IntoIterator</span><span class="op">&gt;</span><span class="ident">::Item</span>;
@@ -800,86 +975,83 @@
 	}
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">V</span><span class="op">&gt;</span> <span class="ident">Unpin</span> <span class="kw">for</span> <span class="ident">BitArray</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">V</span><span class="op">&gt;</span>
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">V</span><span class="op">&gt;</span> <span class="ident">Copy</span> <span class="kw">for</span> <span class="ident">BitArray</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">V</span><span class="op">&gt;</span>
 <span class="kw">where</span>
 	<span class="ident">O</span>: <span class="ident">BitOrder</span>,
-	<span class="ident">V</span>: <span class="ident">BitView</span> <span class="op">+</span> <span class="ident">Sized</span>,
+	<span class="ident">V</span>: <span class="ident">BitViewSized</span> <span class="op">+</span> <span class="ident">Copy</span>,
 {
 }
 
-<span class="doccomment">/// The error type returned when a conversion from a bitslice to a bitarray</span>
-<span class="doccomment">/// fails.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">TryFromBitSliceError</span>;
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">V</span><span class="op">&gt;</span> <span class="ident">Unpin</span> <span class="kw">for</span> <span class="ident">BitArray</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">V</span><span class="op">&gt;</span>
+<span class="kw">where</span>
+	<span class="ident">O</span>: <span class="ident">BitOrder</span>,
+	<span class="ident">V</span>: <span class="ident">BitViewSized</span>,
+{
+}
+
+<span class="doccomment">/** The error type returned when a conversion from a [`BitSlice`] to a
+[`BitArray`] fails.
+
+[`BitArray`]: crate::array::BitArray
+[`BitSlice`]: crate::slice::BitSlice
+**/</span>
+<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">transparent</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Eq</span>, <span class="ident">Ord</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>)]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">TryFromBitSliceError</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span>
+<span class="kw">where</span>
+	<span class="ident">O</span>: <span class="ident">BitOrder</span>,
+	<span class="ident">T</span>: <span class="ident">BitStore</span>,
+{
+	<span class="ident">inner</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span>,
+}
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">tarpaulin_include</span>))]</span>
-<span class="kw">impl</span> <span class="ident">TryFromBitSliceError</span> {
+<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">TryFromBitSliceError</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span>
+<span class="kw">where</span>
+	<span class="ident">O</span>: <span class="ident">BitOrder</span>,
+	<span class="ident">T</span>: <span class="ident">BitStore</span>,
+{
 	<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-	<span class="kw">fn</span> <span class="ident">err</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="self">Self</span><span class="op">&gt;</span> {
-		<span class="prelude-val">Err</span>(<span class="self">Self</span>)
+	<span class="kw">fn</span> <span class="ident">err</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span>(<span class="ident">inner</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="self">Self</span><span class="op">&gt;</span> {
+		<span class="prelude-val">Err</span>(<span class="self">Self</span> { <span class="ident">inner</span> })
 	}
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">tarpaulin_include</span>))]</span>
-<span class="kw">impl</span> <span class="ident">Display</span> <span class="kw">for</span> <span class="ident">TryFromBitSliceError</span> {
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Debug</span> <span class="kw">for</span> <span class="ident">TryFromBitSliceError</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span>
+<span class="kw">where</span>
+	<span class="ident">O</span>: <span class="ident">BitOrder</span>,
+	<span class="ident">T</span>: <span class="ident">BitStore</span>,
+{
 	<span class="attribute">#[<span class="ident">inline</span>]</span>
 	<span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
-		<span class="ident">fmt</span>.<span class="ident">write_str</span>(<span class="string">&quot;could not convert bitslice to bitarray&quot;</span>)
+		<span class="ident">fmt</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;TryFromBitSliceError&quot;</span>)
+			.<span class="ident">field</span>(<span class="string">&quot;inner&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">inner</span>)
+			.<span class="ident">finish</span>()
+	}
+}
+
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">tarpaulin_include</span>))]</span>
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Display</span> <span class="kw">for</span> <span class="ident">TryFromBitSliceError</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span>
+<span class="kw">where</span>
+	<span class="ident">O</span>: <span class="ident">BitOrder</span>,
+	<span class="ident">T</span>: <span class="ident">BitStore</span>,
+{
+	<span class="attribute">#[<span class="ident">inline</span>]</span>
+	<span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
+		<span class="ident">fmt</span>.<span class="ident">write_fmt</span>(<span class="macro">format_args!</span>(
+			<span class="string">&quot;could not convert bit-slice to bit-array: {:?}&quot;</span>,
+			<span class="self">self</span>.<span class="ident">inner</span>,
+		))
 	}
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span>
-<span class="kw">impl</span> <span class="ident">std::error::Error</span> <span class="kw">for</span> <span class="ident">TryFromBitSliceError</span> {
-}
-
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-	<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::prelude</span>::<span class="kw-2">*</span>;
-	<span class="kw">use</span> <span class="ident">core::convert::TryInto</span>;
-
-	<span class="attribute">#[<span class="ident">test</span>]</span>
-	<span class="kw">fn</span> <span class="ident">convert</span>() {
-		<span class="kw">let</span> <span class="ident">arr</span>: <span class="ident">BitArray</span><span class="op">&lt;</span><span class="ident">Lsb0</span>, <span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="number">2u8</span>.<span class="ident">into</span>();
-		<span class="macro">assert!</span>(<span class="ident">arr</span>.<span class="ident">any</span>());
-
-		<span class="kw">let</span> <span class="ident">bits</span> <span class="op">=</span> <span class="macro">bits!</span>[<span class="number">1</span>; <span class="number">128</span>];
-		<span class="kw">let</span> <span class="ident">arr</span>: <span class="ident">BitArray</span><span class="op">&lt;</span><span class="ident">Msb0</span>, [<span class="ident">u16</span>; <span class="number">8</span>]<span class="op">&gt;</span> <span class="op">=</span> <span class="ident">bits</span>.<span class="ident">try_into</span>().<span class="ident">unwrap</span>();
-		<span class="macro">assert!</span>(<span class="ident">arr</span>.<span class="ident">all</span>());
-
-		<span class="kw">let</span> <span class="ident">bits</span> <span class="op">=</span> <span class="macro">bits!</span>[<span class="ident">Lsb0</span>, <span class="ident">u32</span>; <span class="number">0</span>; <span class="number">64</span>];
-		<span class="kw">let</span> <span class="ident">arr</span>: <span class="kw-2">&amp;</span><span class="ident">BitArray</span><span class="op">&lt;</span><span class="ident">Lsb0</span>, [<span class="ident">u32</span>; <span class="number">2</span>]<span class="op">&gt;</span> <span class="op">=</span> <span class="ident">bits</span>.<span class="ident">try_into</span>().<span class="ident">unwrap</span>();
-		<span class="macro">assert!</span>(<span class="ident">arr</span>.<span class="ident">not_any</span>());
-
-		<span class="kw">let</span> <span class="ident">bits</span> <span class="op">=</span> <span class="macro">bits!</span>[<span class="kw-2">mut</span> <span class="ident">Msb0</span>, <span class="ident">u16</span>; <span class="number">0</span>; <span class="number">64</span>];
-		<span class="kw">let</span> <span class="ident">arr</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BitArray</span><span class="op">&lt;</span><span class="ident">Msb0</span>, [<span class="ident">u16</span>; <span class="number">4</span>]<span class="op">&gt;</span> <span class="op">=</span> <span class="ident">bits</span>.<span class="ident">try_into</span>().<span class="ident">unwrap</span>();
-		<span class="macro">assert!</span>(<span class="ident">arr</span>.<span class="ident">not_any</span>());
-
-		<span class="kw">let</span> <span class="ident">bits</span> <span class="op">=</span> <span class="macro">bits!</span>[<span class="kw-2">mut</span> <span class="number">0</span>; <span class="number">4</span>];
-		<span class="kw">let</span> <span class="ident">bit_arr</span>: <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">BitArray</span><span class="op">&lt;</span><span class="ident">LocalBits</span>, <span class="ident">usize</span><span class="op">&gt;</span>, <span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span>
-			(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">bits</span>).<span class="ident">try_into</span>();
-		<span class="macro">assert!</span>(<span class="ident">bit_arr</span>.<span class="ident">is_err</span>());
-		<span class="kw">let</span> <span class="ident">bit_arr</span>: <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="ident">BitArray</span><span class="op">&lt;</span><span class="ident">LocalBits</span>, <span class="ident">usize</span><span class="op">&gt;</span>, <span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span>
-			<span class="ident">bits</span>.<span class="ident">try_into</span>();
-		<span class="macro">assert!</span>(<span class="ident">bit_arr</span>.<span class="ident">is_err</span>());
-	}
-
-	<span class="attribute">#[<span class="ident">test</span>]</span>
-	<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span>
-	<span class="kw">fn</span> <span class="ident">format</span>() {
-		<span class="kw">let</span> <span class="ident">render</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;{:#?}&quot;</span>, <span class="macro">bitarr!</span>[<span class="ident">Msb0</span>, <span class="ident">u8</span>; <span class="number">0</span>, <span class="number">1</span>, <span class="number">0</span>, <span class="number">0</span>]);
-		<span class="macro">assert!</span>(
-			<span class="ident">render</span>.<span class="ident">starts_with</span>(<span class="string">&quot;BitArray&lt;bitvec::order::Msb0, u8&gt; {&quot;</span>),
-			<span class="string">&quot;{}&quot;</span>,
-			<span class="ident">render</span>
-		);
-		<span class="macro">assert!</span>(
-			<span class="ident">render</span>.<span class="ident">ends_with</span>(
-				<span class="string">&quot;    head: 000,\n    bits: 8,\n} [\n    0b01000000,\n]&quot;</span>
-			),
-			<span class="string">&quot;{}&quot;</span>,
-			<span class="ident">render</span>
-		);
-	}
+<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">std::error::Error</span> <span class="kw">for</span> <span class="ident">TryFromBitSliceError</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span>
+<span class="kw">where</span>
+	<span class="ident">O</span>: <span class="ident">BitOrder</span>,
+	<span class="ident">T</span>: <span class="ident">BitStore</span>,
+{
 }
 </code></pre></div>
 </section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="bitvec" data-search-index-js="../../../search-index.js" data-search-js="../../../search.js"></div>

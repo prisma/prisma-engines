@@ -8,7 +8,7 @@ is alive.</p>
 <p>Only a single <code>Waker</code> can be active per <a href="struct.Poll.html"><code>Poll</code></a>, if multiple threads need
 access to the <code>Waker</code> it can be shared via for example an <code>Arc</code>. What
 happens if multiple <code>Waker</code>s are registered with the same <code>Poll</code> is
-undefined.</p>
+unspecified.</p>
 <h2 id="implementation-notes" class="section-header"><a href="#implementation-notes">Implementation notes</a></h2>
 <p>On platforms that support kqueue this will use the <code>EVFILT_USER</code> event
 filter, see <a href="struct.Poll.html#implementation-notes">implementation notes of <code>Poll</code></a> to see what platforms support

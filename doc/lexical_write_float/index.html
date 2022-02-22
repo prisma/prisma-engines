@@ -1,0 +1,73 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Fast and compact float-to-string conversions."><meta name="keywords" content="rust, rustlang, rust-lang, lexical_write_float"><title>lexical_write_float - Rust</title><link rel="stylesheet" type="text/css" href="../normalize.css"><link rel="stylesheet" type="text/css" href="../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../ayu.css" disabled ><script id="default-settings" ></script><script src="../storage.js"></script><script src="../crates.js"></script><script defer src="../main.js"></script>
+    <noscript><link rel="stylesheet" href="../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../favicon.svg"><style type="text/css">#crate-search{background-image:url("../down-arrow.svg");}</style></head><body class="rustdoc mod crate"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../lexical_write_float/index.html'><div class='logo-container rust-logo'><img src='../rust-logo.png' alt='logo'></div></a><h2 class="location">Crate lexical_write_float</h2><div class="block version"><div class="narrow-helper"></div><p>Version 0.8.2</p></div><div class="sidebar-elems"><a id="all-types" href="all.html"><p>See all lexical_write_float's items</p></a><div class="block items"><ul><li><a href="#modules">Modules</a></li><li><a href="#structs">Structs</a></li><li><a href="#enums">Enums</a></li><li><a href="#constants">Constants</a></li><li><a href="#traits">Traits</a></li></ul></div><div id="sidebar-vars" data-name="lexical_write_float" data-ty="mod" data-relpath=""></div><script defer src="sidebar-items.js"></script></div></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../wheel.svg"></a></div></form></nav><section id="main" class="content"><h1 class="fqn"><span class="in-band">Crate <a class="mod" href="#">lexical_write_float</a><button id="copy-path" onclick="copy_path(this)" title="Copy item path to clipboard"><img src="../clipboard.svg" width="19" height="18" alt="Copy item path"></button></span><span class="out-of-band"><span id="render-detail"><a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class="inner">&#x2212;</span>]</a></span><a class="srclink" href="../src/lexical_write_float/lib.rs.html#1-100" title="goto source code">[src]</a></span></h1><details class="rustdoc-toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>Fast and compact float-to-string conversions.</p>
+<h2 id="features" class="section-header"><a href="#features">Features</a></h2>
+<p>Each float formatter contains extensive formatting control, including
+a maximum number of significant digits written, a minimum number of
+significant digits remaining, the positive and negative exponent break
+points (at what exponent, in scientific-notation, to force scientific
+notation), whether to force or disable scientific notation, and the
+rounding mode for truncated float strings.</p>
+<h2 id="algorithms" class="section-header"><a href="#algorithms">Algorithms</a></h2>
+<p>There’s currently 5 algorithms used, depending on the requirements.</p>
+<ol>
+<li>Compact for decimal strings uses the Grisu algorithm.</li>
+<li>An optimized algorithm based on the Dragonbox algorithm.</li>
+<li>An optimized algorithm for formatting to string with power-of-two radixes.</li>
+<li>An optimized algorithm for hexadecimal floats.</li>
+<li>A fallback algorithm for all other radixes.</li>
+</ol>
+<p>The Grisu algorithm is based on “Printing Floating-Point Numbers Quickly
+and Accurately with Integers”, by Florian Loitsch, available online
+<a href="https://www.cs.tufts.edu/%7Enr/cs257/archive/florian-loitsch/printf.pdf">here</a>.
+The dragonbox algorithm is based on the reference C++ implementation,
+hosted <a href="https://github.com/jk-jeon/dragonbox/">here</a>, and the algorithm
+is described in depth
+<a href="https://github.com/jk-jeon/dragonbox/blob/master/other_files/Dragonbox.pdf">here</a>.
+The radix algorithm is adapted from the V8 codebase, and may be found
+<a href="https://github.com/v8/v8">here</a>.</p>
+<h2 id="features-1" class="section-header"><a href="#features-1">Features</a></h2>
+<ul>
+<li><code>std</code> - Use the standard library.</li>
+<li><code>power-of-two</code> - Add support for wring power-of-two float strings.</li>
+<li><code>radix</code> - Add support for strings of any radix.</li>
+<li><code>compact</code> - Reduce code size at the cost of performance.</li>
+<li><code>safe</code> - Ensure only memory-safe indexing is used.</li>
+</ul>
+<h2 id="note" class="section-header"><a href="#note">Note</a></h2>
+<p>Only documented functionality is considered part of the public API:
+any of the modules, internal functions, or structs may change
+release-to-release without major or minor version changes. Use
+internal implementation details at your own risk.</p>
+<p>lexical-write-float mainly exists as an implementation detail for
+lexical-core, although its API is stable. If you would like to use
+a high-level API that writes to and parses from <code>String</code> and <code>&amp;str</code>,
+respectively, please look at <a href="https://crates.io/crates/lexical">lexical</a>
+instead. If you would like an API that supports multiple numeric
+conversions, please look at <a href="https://crates.io/crates/lexical-core">lexical-core</a>
+instead.</p>
+<h2 id="version-support" class="section-header"><a href="#version-support">Version Support</a></h2>
+<p>The minimum, standard, required version is 1.51.0, for const generic
+support. Older versions of lexical support older Rust versions.</p>
+<h2 id="design" class="section-header"><a href="#design">Design</a></h2>
+<ul>
+<li><a href="https://github.com/Alexhuszagh/rust-lexical/blob/main/lexical-write-float/docs/Algorithm.md">Algorithm Approach</a></li>
+<li><a href="https://github.com/Alexhuszagh/rust-lexical/blob/main/lexical-write-float/docs/Benchmarks.md">Benchmarks</a></li>
+</ul>
+</div></details><h2 id="modules" class="small-section-header"><a href="#modules">Modules</a></h2>
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="mod" href="format/index.html" title="lexical_write_float::format mod">format</a></div><div class="item-right docblock-short"><p>Public API for the number format packed struct.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="mod" href="options/index.html" title="lexical_write_float::options mod">options</a></div><div class="item-right docblock-short"><p>Configuration options for writing floats.</p>
+</div></div></div><h2 id="structs" class="small-section-header"><a href="#structs">Structs</a></h2>
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.NumberFormatBuilder.html" title="lexical_write_float::NumberFormatBuilder struct">NumberFormatBuilder</a></div><div class="item-right docblock-short"><p>Build number format from specifications.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Options.html" title="lexical_write_float::Options struct">Options</a></div><div class="item-right docblock-short"><p>Options to customize writing floats.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.OptionsBuilder.html" title="lexical_write_float::OptionsBuilder struct">OptionsBuilder</a></div><div class="item-right docblock-short"><p>Builder for <code>Options</code>.</p>
+</div></div></div><h2 id="enums" class="small-section-header"><a href="#enums">Enums</a></h2>
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="enum" href="enum.RoundMode.html" title="lexical_write_float::RoundMode enum">RoundMode</a></div><div class="item-right docblock-short"><p>Enumeration for how to round floats with precision control.</p>
+</div></div></div><h2 id="constants" class="small-section-header"><a href="#constants">Constants</a></h2>
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="constant" href="constant.BUFFER_SIZE.html" title="lexical_write_float::BUFFER_SIZE constant">BUFFER_SIZE</a></div><div class="item-right docblock-short"><p>Maximum number of bytes required to serialize any number to string.</p>
+</div></div></div><h2 id="traits" class="small-section-header"><a href="#traits">Traits</a></h2>
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.FormattedSize.html" title="lexical_write_float::FormattedSize trait">FormattedSize</a></div><div class="item-right docblock-short"><p>The size, in bytes, of formatted values.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.ToLexical.html" title="lexical_write_float::ToLexical trait">ToLexical</a></div><div class="item-right docblock-short"><p>Trait for numerical types that can be serialized to bytes.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.ToLexicalWithOptions.html" title="lexical_write_float::ToLexicalWithOptions trait">ToLexicalWithOptions</a></div><div class="item-right docblock-short"><p>Trait for numerical types that can be serialized to bytes with custom options.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.WriteOptions.html" title="lexical_write_float::WriteOptions trait">WriteOptions</a></div><div class="item-right docblock-short"><p>Shared trait for all writer options.</p>
+</div></div></div></section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../" data-current-crate="lexical_write_float" data-search-index-js="../search-index.js" data-search-js="../search.js"></div>
+</body></html>

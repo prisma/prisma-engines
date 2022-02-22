@@ -1,1 +1,1 @@
-initSidebarItems({"trait":[["ReadMysqlExt",""],["WriteMysqlExt",""]]});
+initSidebarItems({"struct":[["InvalidLenghEncodedInteger",""],["ParseBuf",""]],"trait":[["BufMutExt",""],["ReadMysqlExt",""],["WriteMysqlExt",""]]});

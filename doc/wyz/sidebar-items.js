@@ -1,1 +1,1 @@
-initSidebarItems({"mod":[["conv","Directed Type Conversion"],["fmt","Format forwarding"],["pipe","Pipe objects into functions, even those not available for dot-call."],["tap","Object Tapping"]]});
+initSidebarItems({"mod":[["comu","Trait-level `co`nst/`mu`table tracking."],["fmt","Format forwarding"]]});

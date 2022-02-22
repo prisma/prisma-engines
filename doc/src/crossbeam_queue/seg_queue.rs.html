@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;crossbeam-queue-0.2.3&#x2F;src&#x2F;seg_queue.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>seg_queue.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><script defer src="../../main.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;crossbeam-queue-0.3.4&#x2F;src&#x2F;seg_queue.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>seg_queue.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><script defer src="../../main.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script>
     <noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../crossbeam_queue/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
@@ -489,18 +489,70 @@
 <span id="488">488</span>
 <span id="489">489</span>
 <span id="490">490</span>
+<span id="491">491</span>
+<span id="492">492</span>
+<span id="493">493</span>
+<span id="494">494</span>
+<span id="495">495</span>
+<span id="496">496</span>
+<span id="497">497</span>
+<span id="498">498</span>
+<span id="499">499</span>
+<span id="500">500</span>
+<span id="501">501</span>
+<span id="502">502</span>
+<span id="503">503</span>
+<span id="504">504</span>
+<span id="505">505</span>
+<span id="506">506</span>
+<span id="507">507</span>
+<span id="508">508</span>
+<span id="509">509</span>
+<span id="510">510</span>
+<span id="511">511</span>
+<span id="512">512</span>
+<span id="513">513</span>
+<span id="514">514</span>
+<span id="515">515</span>
+<span id="516">516</span>
+<span id="517">517</span>
+<span id="518">518</span>
+<span id="519">519</span>
+<span id="520">520</span>
+<span id="521">521</span>
+<span id="522">522</span>
+<span id="523">523</span>
+<span id="524">524</span>
+<span id="525">525</span>
+<span id="526">526</span>
+<span id="527">527</span>
+<span id="528">528</span>
+<span id="529">529</span>
+<span id="530">530</span>
+<span id="531">531</span>
+<span id="532">532</span>
+<span id="533">533</span>
+<span id="534">534</span>
+<span id="535">535</span>
+<span id="536">536</span>
+<span id="537">537</span>
+<span id="538">538</span>
+<span id="539">539</span>
+<span id="540">540</span>
+<span id="541">541</span>
+<span id="542">542</span>
+<span id="543">543</span>
+<span id="544">544</span>
+<span id="545">545</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">alloc::boxed::Box</span>;
 <span class="kw">use</span> <span class="ident">core::cell::UnsafeCell</span>;
 <span class="kw">use</span> <span class="ident">core::fmt</span>;
 <span class="kw">use</span> <span class="ident">core::marker::PhantomData</span>;
+<span class="kw">use</span> <span class="ident">core::mem::MaybeUninit</span>;
 <span class="kw">use</span> <span class="ident">core::ptr</span>;
 <span class="kw">use</span> <span class="ident">core::sync::atomic</span>::{<span class="self">self</span>, <span class="ident">AtomicPtr</span>, <span class="ident">AtomicUsize</span>, <span class="ident">Ordering</span>};
 
 <span class="kw">use</span> <span class="ident">crossbeam_utils</span>::{<span class="ident">Backoff</span>, <span class="ident">CachePadded</span>};
-
-<span class="kw">use</span> <span class="ident">maybe_uninit::MaybeUninit</span>;
-
-<span class="kw">use</span> <span class="ident">err::PopError</span>;
 
 <span class="comment">// Bits indicating the state of a slot:</span>
 <span class="comment">// * If a value has been written into the slot, `WRITE` is set.</span>
@@ -610,21 +662,21 @@
 <span class="doccomment">/// at a time. However, since segments need to be dynamically allocated as elements get pushed,</span>
 <span class="doccomment">/// this queue is somewhat slower than [`ArrayQueue`].</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// [`ArrayQueue`]: struct.ArrayQueue.html</span>
+<span class="doccomment">/// [`ArrayQueue`]: super::ArrayQueue</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// # Examples</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// ```</span>
-<span class="doccomment">/// use crossbeam_queue::{PopError, SegQueue};</span>
+<span class="doccomment">/// use crossbeam_queue::SegQueue;</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// let q = SegQueue::new();</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// q.push(&#39;a&#39;);</span>
 <span class="doccomment">/// q.push(&#39;b&#39;);</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// assert_eq!(q.pop(), Ok(&#39;a&#39;));</span>
-<span class="doccomment">/// assert_eq!(q.pop(), Ok(&#39;b&#39;));</span>
-<span class="doccomment">/// assert_eq!(q.pop(), Err(PopError));</span>
+<span class="doccomment">/// assert_eq!(q.pop(), Some(&#39;a&#39;));</span>
+<span class="doccomment">/// assert_eq!(q.pop(), Some(&#39;b&#39;));</span>
+<span class="doccomment">/// assert!(q.pop().is_none());</span>
 <span class="doccomment">/// ```</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SegQueue</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
     <span class="doccomment">/// The head of the queue.</span>
@@ -650,7 +702,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// let q = SegQueue::&lt;i32&gt;::new();</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="ident">SegQueue</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="ident">SegQueue</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
         <span class="ident">SegQueue</span> {
             <span class="ident">head</span>: <span class="ident">CachePadded::new</span>(<span class="ident">Position</span> {
                 <span class="ident">block</span>: <span class="ident">AtomicPtr::new</span>(<span class="ident">ptr::null_mut</span>()),
@@ -707,8 +759,8 @@
                 <span class="kw">if</span> <span class="self">self</span>
                     .<span class="ident">tail</span>
                     .<span class="ident">block</span>
-                    .<span class="ident">compare_and_swap</span>(<span class="ident">block</span>, <span class="ident">new</span>, <span class="ident">Ordering::Release</span>)
-                    <span class="op">==</span> <span class="ident">block</span>
+                    .<span class="ident">compare_exchange</span>(<span class="ident">block</span>, <span class="ident">new</span>, <span class="ident">Ordering::Release</span>, <span class="ident">Ordering::Relaxed</span>)
+                    .<span class="ident">is_ok</span>()
                 {
                     <span class="self">self</span>.<span class="ident">head</span>.<span class="ident">block</span>.<span class="ident">store</span>(<span class="ident">new</span>, <span class="ident">Ordering::Release</span>);
                     <span class="ident">block</span> <span class="op">=</span> <span class="ident">new</span>;
@@ -758,20 +810,20 @@
 
     <span class="doccomment">/// Pops an element from the queue.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// If the queue is empty, an error is returned.</span>
+    <span class="doccomment">/// If the queue is empty, `None` is returned.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Examples</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use crossbeam_queue::{PopError, SegQueue};</span>
+    <span class="doccomment">/// use crossbeam_queue::SegQueue;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// let q = SegQueue::new();</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// q.push(10);</span>
-    <span class="doccomment">/// assert_eq!(q.pop(), Ok(10));</span>
-    <span class="doccomment">/// assert_eq!(q.pop(), Err(PopError));</span>
+    <span class="doccomment">/// assert_eq!(q.pop(), Some(10));</span>
+    <span class="doccomment">/// assert!(q.pop().is_none());</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">pop</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">PopError</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">pop</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">backoff</span> <span class="op">=</span> <span class="ident">Backoff::new</span>();
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">head</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">head</span>.<span class="ident">index</span>.<span class="ident">load</span>(<span class="ident">Ordering::Acquire</span>);
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">block</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">head</span>.<span class="ident">block</span>.<span class="ident">load</span>(<span class="ident">Ordering::Acquire</span>);
@@ -796,7 +848,7 @@
 
                 <span class="comment">// If the tail equals the head, that means the queue is empty.</span>
                 <span class="kw">if</span> <span class="ident">head</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">SHIFT</span> <span class="op">==</span> <span class="ident">tail</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">SHIFT</span> {
-                    <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">PopError</span>);
+                    <span class="kw">return</span> <span class="prelude-val">None</span>;
                 }
 
                 <span class="comment">// If head and tail are not in the same block, set `HAS_NEXT` in head.</span>
@@ -847,7 +899,7 @@
                         <span class="ident">Block::destroy</span>(<span class="ident">block</span>, <span class="ident">offset</span> <span class="op">+</span> <span class="number">1</span>);
                     }
 
-                    <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">value</span>);
+                    <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">value</span>);
                 },
                 <span class="prelude-val">Err</span>(<span class="ident">h</span>) =&gt; {
                     <span class="ident">head</span> <span class="op">=</span> <span class="ident">h</span>;
@@ -882,7 +934,7 @@
     <span class="doccomment">/// # Examples</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use crossbeam_queue::{SegQueue, PopError};</span>
+    <span class="doccomment">/// use crossbeam_queue::SegQueue;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// let q = SegQueue::new();</span>
     <span class="doccomment">/// assert_eq!(q.len(), 0);</span>
@@ -905,6 +957,14 @@
                 <span class="ident">tail</span> <span class="op">&amp;=</span> <span class="op">!</span>((<span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="ident">SHIFT</span>) <span class="op">-</span> <span class="number">1</span>);
                 <span class="ident">head</span> <span class="op">&amp;=</span> <span class="op">!</span>((<span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="ident">SHIFT</span>) <span class="op">-</span> <span class="number">1</span>);
 
+                <span class="comment">// Fix up indices if they fall onto block ends.</span>
+                <span class="kw">if</span> (<span class="ident">tail</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">SHIFT</span>) <span class="op">&amp;</span> (<span class="ident">LAP</span> <span class="op">-</span> <span class="number">1</span>) <span class="op">==</span> <span class="ident">LAP</span> <span class="op">-</span> <span class="number">1</span> {
+                    <span class="ident">tail</span> <span class="op">=</span> <span class="ident">tail</span>.<span class="ident">wrapping_add</span>(<span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="ident">SHIFT</span>);
+                }
+                <span class="kw">if</span> (<span class="ident">head</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">SHIFT</span>) <span class="op">&amp;</span> (<span class="ident">LAP</span> <span class="op">-</span> <span class="number">1</span>) <span class="op">==</span> <span class="ident">LAP</span> <span class="op">-</span> <span class="number">1</span> {
+                    <span class="ident">head</span> <span class="op">=</span> <span class="ident">head</span>.<span class="ident">wrapping_add</span>(<span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="ident">SHIFT</span>);
+                }
+
                 <span class="comment">// Rotate indices so that head falls into the first block.</span>
                 <span class="kw">let</span> <span class="ident">lap</span> <span class="op">=</span> (<span class="ident">head</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">SHIFT</span>) <span class="op">/</span> <span class="ident">LAP</span>;
                 <span class="ident">tail</span> <span class="op">=</span> <span class="ident">tail</span>.<span class="ident">wrapping_sub</span>((<span class="ident">lap</span> <span class="op">*</span> <span class="ident">LAP</span>) <span class="op">&lt;</span><span class="op">&lt;</span> <span class="ident">SHIFT</span>);
@@ -913,15 +973,6 @@
                 <span class="comment">// Remove the lower bits.</span>
                 <span class="ident">tail</span> <span class="op">&gt;</span><span class="op">&gt;</span><span class="op">=</span> <span class="ident">SHIFT</span>;
                 <span class="ident">head</span> <span class="op">&gt;</span><span class="op">&gt;</span><span class="op">=</span> <span class="ident">SHIFT</span>;
-
-                <span class="comment">// Fix up indices if they fall onto block ends.</span>
-                <span class="kw">if</span> <span class="ident">head</span> <span class="op">==</span> <span class="ident">BLOCK_CAP</span> {
-                    <span class="ident">head</span> <span class="op">=</span> <span class="number">0</span>;
-                    <span class="ident">tail</span> <span class="op">-</span><span class="op">=</span> <span class="ident">LAP</span>;
-                }
-                <span class="kw">if</span> <span class="ident">tail</span> <span class="op">==</span> <span class="ident">BLOCK_CAP</span> {
-                    <span class="ident">tail</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
-                }
 
                 <span class="comment">// Return the difference minus the number of blocks between tail and head.</span>
                 <span class="kw">return</span> <span class="ident">tail</span> <span class="op">-</span> <span class="ident">head</span> <span class="op">-</span> <span class="ident">tail</span> <span class="op">/</span> <span class="ident">LAP</span>;
@@ -969,7 +1020,7 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">SegQueue</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="ident">f</span>.<span class="ident">pad</span>(<span class="string">&quot;SegQueue { .. }&quot;</span>)
     }
 }
@@ -977,6 +1028,65 @@
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">SegQueue</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
     <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="ident">SegQueue</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
         <span class="ident">SegQueue::new</span>()
+    }
+}
+
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">IntoIterator</span> <span class="kw">for</span> <span class="ident">SegQueue</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
+    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident">T</span>;
+
+    <span class="kw">type</span> <span class="ident">IntoIter</span> <span class="op">=</span> <span class="ident">IntoIter</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>;
+
+    <span class="kw">fn</span> <span class="ident">into_iter</span>(<span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::IntoIter</span> {
+        <span class="ident">IntoIter</span> { <span class="ident">value</span>: <span class="self">self</span> }
+    }
+}
+
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">IntoIter</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
+    <span class="ident">value</span>: <span class="ident">SegQueue</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
+}
+
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Iterator</span> <span class="kw">for</span> <span class="ident">IntoIter</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
+    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident">T</span>;
+
+    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">value</span>;
+        <span class="kw">let</span> <span class="ident">head</span> <span class="op">=</span> <span class="kw-2">*</span><span class="ident">value</span>.<span class="ident">head</span>.<span class="ident">index</span>.<span class="ident">get_mut</span>();
+        <span class="kw">let</span> <span class="ident">tail</span> <span class="op">=</span> <span class="kw-2">*</span><span class="ident">value</span>.<span class="ident">tail</span>.<span class="ident">index</span>.<span class="ident">get_mut</span>();
+        <span class="kw">if</span> <span class="ident">head</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">SHIFT</span> <span class="op">==</span> <span class="ident">tail</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">SHIFT</span> {
+            <span class="prelude-val">None</span>
+        } <span class="kw">else</span> {
+            <span class="kw">let</span> <span class="ident">block</span> <span class="op">=</span> <span class="kw-2">*</span><span class="ident">value</span>.<span class="ident">head</span>.<span class="ident">block</span>.<span class="ident">get_mut</span>();
+            <span class="kw">let</span> <span class="ident">offset</span> <span class="op">=</span> (<span class="ident">head</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">SHIFT</span>) <span class="op">%</span> <span class="ident">LAP</span>;
+
+            <span class="comment">// SAFETY: We have mutable access to this, so we can read without</span>
+            <span class="comment">// worrying about concurrency. Furthermore, we know this is</span>
+            <span class="comment">// initialized because it is the value pointed at by `value.head`</span>
+            <span class="comment">// and this is a non-empty queue.</span>
+            <span class="kw">let</span> <span class="ident">item</span> <span class="op">=</span> <span class="kw">unsafe</span> {
+                <span class="kw">let</span> <span class="ident">slot</span> <span class="op">=</span> (<span class="kw-2">*</span><span class="ident">block</span>).<span class="ident">slots</span>.<span class="ident">get_unchecked</span>(<span class="ident">offset</span>);
+                <span class="kw">let</span> <span class="ident">p</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="ident">slot</span>.<span class="ident">value</span>.<span class="ident">get</span>();
+                <span class="ident">p</span>.<span class="ident">as_mut_ptr</span>().<span class="ident">read</span>()
+            };
+            <span class="kw">if</span> <span class="ident">offset</span> <span class="op">+</span> <span class="number">1</span> <span class="op">==</span> <span class="ident">BLOCK_CAP</span> {
+                <span class="comment">// Deallocate the block and move to the next one.</span>
+                <span class="comment">// SAFETY: The block is initialized because we&#39;ve been reading</span>
+                <span class="comment">// from it this entire time. We can drop it b/c everything has</span>
+                <span class="comment">// been read out of it, so nothing is pointing to it anymore.</span>
+                <span class="kw">unsafe</span> {
+                    <span class="kw">let</span> <span class="ident">next</span> <span class="op">=</span> <span class="kw-2">*</span>(<span class="kw-2">*</span><span class="ident">block</span>).<span class="ident">next</span>.<span class="ident">get_mut</span>();
+                    <span class="ident">drop</span>(<span class="ident">Box::from_raw</span>(<span class="ident">block</span>));
+                    <span class="kw-2">*</span><span class="ident">value</span>.<span class="ident">head</span>.<span class="ident">block</span>.<span class="ident">get_mut</span>() <span class="op">=</span> <span class="ident">next</span>;
+                }
+                <span class="comment">// The last value in a block is empty, so skip it</span>
+                <span class="kw-2">*</span><span class="ident">value</span>.<span class="ident">head</span>.<span class="ident">index</span>.<span class="ident">get_mut</span>() <span class="op">=</span> <span class="ident">head</span>.<span class="ident">wrapping_add</span>(<span class="number">2</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="ident">SHIFT</span>);
+                <span class="comment">// Double-check that we&#39;re pointing to the first item in a block.</span>
+                <span class="macro">debug_assert_eq!</span>((<span class="kw-2">*</span><span class="ident">value</span>.<span class="ident">head</span>.<span class="ident">index</span>.<span class="ident">get_mut</span>() <span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">SHIFT</span>) <span class="op">%</span> <span class="ident">LAP</span>, <span class="number">0</span>);
+            } <span class="kw">else</span> {
+                <span class="kw-2">*</span><span class="ident">value</span>.<span class="ident">head</span>.<span class="ident">index</span>.<span class="ident">get_mut</span>() <span class="op">=</span> <span class="ident">head</span>.<span class="ident">wrapping_add</span>(<span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="ident">SHIFT</span>);
+            }
+            <span class="prelude-val">Some</span>(<span class="ident">item</span>)
+        }
     }
 }
 </code></pre></div>

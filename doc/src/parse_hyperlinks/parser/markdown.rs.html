@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;parse-hyperlinks-0.19.6&#x2F;src&#x2F;parser&#x2F;markdown.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>markdown.rs - source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><script defer src="../../../main.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;parse-hyperlinks-0.23.3&#x2F;src&#x2F;parser&#x2F;markdown.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>markdown.rs - source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><script defer src="../../../main.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script>
     <noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../parse_hyperlinks/index.html'><div class='logo-container rust-logo'><img src='../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
@@ -768,11 +768,48 @@
 <span id="767">767</span>
 <span id="768">768</span>
 <span id="769">769</span>
+<span id="770">770</span>
+<span id="771">771</span>
+<span id="772">772</span>
+<span id="773">773</span>
+<span id="774">774</span>
+<span id="775">775</span>
+<span id="776">776</span>
+<span id="777">777</span>
+<span id="778">778</span>
+<span id="779">779</span>
+<span id="780">780</span>
+<span id="781">781</span>
+<span id="782">782</span>
+<span id="783">783</span>
+<span id="784">784</span>
+<span id="785">785</span>
+<span id="786">786</span>
+<span id="787">787</span>
+<span id="788">788</span>
+<span id="789">789</span>
+<span id="790">790</span>
+<span id="791">791</span>
+<span id="792">792</span>
+<span id="793">793</span>
+<span id="794">794</span>
+<span id="795">795</span>
+<span id="796">796</span>
+<span id="797">797</span>
+<span id="798">798</span>
+<span id="799">799</span>
+<span id="800">800</span>
+<span id="801">801</span>
+<span id="802">802</span>
+<span id="803">803</span>
+<span id="804">804</span>
+<span id="805">805</span>
 </pre><pre class="rust"><code><span class="doccomment">//! This module implements parsers for Markdown hyperlinks.</span>
 <span class="attribute">#![<span class="ident">allow</span>(<span class="ident">dead_code</span>)]</span>
+<span class="attribute">#![<span class="ident">allow</span>(<span class="ident">clippy::type_complexity</span>)]</span>
 
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::parser::parse::LABEL_LEN_MAX</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::parser::Link</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::parser::LABEL_LEN_MAX</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::take_until_unbalanced</span>;
 <span class="kw">use</span> <span class="ident">nom::branch::alt</span>;
 <span class="kw">use</span> <span class="ident">nom::bytes::complete::tag</span>;
@@ -832,26 +869,32 @@
 <span class="doccomment">///   Ok((&quot;\nabc&quot;, (Cow::from(&quot;label&quot;), Cow::from(&quot;destination&quot;), Cow::from(&quot;title&quot;))))</span>
 <span class="doccomment">/// );</span>
 <span class="doccomment">/// ```</span>
-<span class="doccomment">/// CommonMark Spec: A [link reference definition] consists of a [link</span>
-<span class="doccomment">/// label], indented up to three spaces, followed by a colon (`:`), optional</span>
-<span class="doccomment">/// [whitespace] (including up to one [line ending]), a [link destination],</span>
-<span class="doccomment">/// optional [whitespace] (including up to one [line ending]), and an</span>
-<span class="doccomment">/// optional [link title], which if it is present must be separated from the</span>
-<span class="doccomment">/// [link destination] by [whitespace]. No further [non-whitespace</span>
-<span class="doccomment">/// characters] may occur on the line.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// [link reference definition]: https://spec.commonmark.org/0.29/#link-reference-definition</span>
-<span class="doccomment">/// [link label]: https://spec.commonmark.org/0.29/#link-label</span>
-<span class="doccomment">/// [whitespace]: https://spec.commonmark.org/0.29/#whitespace</span>
-<span class="doccomment">/// [line ending]: https://spec.commonmark.org/0.29/#line-ending</span>
-<span class="doccomment">/// [link destination]: https://spec.commonmark.org/0.29/#link-destination</span>
-<span class="doccomment">/// [whitespace]: https://spec.commonmark.org/0.29/#whitespace</span>
-<span class="doccomment">/// [line ending]: https://spec.commonmark.org/0.29/#line-ending</span>
-<span class="doccomment">/// [link title]: https://spec.commonmark.org/0.29/#link-title</span>
-<span class="doccomment">/// [link destination]: https://spec.commonmark.org/0.29/#link-destination</span>
-<span class="doccomment">/// [whitespace]: https://spec.commonmark.org/0.29/#whitespace</span>
-<span class="doccomment">/// [non-whitespace characters]: https://spec.commonmark.org/0.29/#non-whitespace-character</span>
+<span class="doccomment">/// [CommonMark</span>
+<span class="doccomment">/// Spec](https://spec.commonmark.org/0.30/#link-reference-definition)\ A [link</span>
+<span class="doccomment">/// reference</span>
+<span class="doccomment">/// definition](https://spec.commonmark.org/0.30/#link-reference-definition)</span>
+<span class="doccomment">/// consists of a [link label](https://spec.commonmark.org/0.30/#link-label),</span>
+<span class="doccomment">/// optionally preceded by up to three spaces of indentation, followed by a</span>
+<span class="doccomment">/// colon (`:`), optional spaces or tabs (including up to one [line</span>
+<span class="doccomment">/// ending](https://spec.commonmark.org/0.30/#line-ending)), a [link</span>
+<span class="doccomment">/// destination](https://spec.commonmark.org/0.30/#link-destination), optional</span>
+<span class="doccomment">/// spaces or tabs (including up to one [line</span>
+<span class="doccomment">/// ending](https://spec.commonmark.org/0.30/#line-ending)), and an optional</span>
+<span class="doccomment">/// [link title](https://spec.commonmark.org/0.30/#link-title), which if it is</span>
+<span class="doccomment">/// present must be separated from the [link</span>
+<span class="doccomment">/// destination](https://spec.commonmark.org/0.30/#link-destination) by spaces</span>
+<span class="doccomment">/// or tabs. No further character may occur.</span>
 <span class="doccomment">///</span>
+<span class="doccomment">/// A [link reference</span>
+<span class="doccomment">/// definition](https://spec.commonmark.org/0.30/#link-reference-definition)</span>
+<span class="doccomment">/// does not correspond to a structural element of a document. Instead, it</span>
+<span class="doccomment">/// defines a label which can be used in [reference</span>
+<span class="doccomment">/// links](https://spec.commonmark.org/0.30/#reference-link) and reference-style</span>
+<span class="doccomment">/// [images](https://spec.commonmark.org/0.30/#images) elsewhere in the</span>
+<span class="doccomment">/// document. [Link reference</span>
+<span class="doccomment">/// definitions](https://spec.commonmark.org/0.30/#link-reference-definition)</span>
+<span class="doccomment">/// can come either before or after the links that use them.</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">md_label2dest</span>(<span class="ident">i</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">nom::IResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span>, (<span class="ident">Cow</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>, <span class="ident">Cow</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>, <span class="ident">Cow</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>)<span class="op">&gt;</span> {
     <span class="comment">// Consume up to three spaces.</span>
     <span class="kw">let</span> (<span class="ident">i</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="ident">nom::bytes::complete::take_while_m_n</span>(<span class="number">0</span>, <span class="number">3</span>, <span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span> <span class="op">==</span> <span class="string">&#39; &#39;</span>)(<span class="ident">i</span>)<span class="question-mark">?</span>;
@@ -860,7 +903,7 @@
     <span class="kw">let</span> (<span class="ident">i</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="ident">nom::character::complete::char</span>(<span class="string">&#39;:&#39;</span>)(<span class="ident">i</span>)<span class="question-mark">?</span>;
     <span class="comment">// Take spaces.</span>
     <span class="kw">let</span> (<span class="ident">i</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="ident">verify</span>(<span class="ident">nom::character::complete::multispace1</span>, <span class="op">|</span><span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">|</span> {
-        <span class="ident">s</span>.<span class="ident">find</span>(<span class="string">&quot;\n\n&quot;</span>).<span class="ident">is_none</span>()
+        <span class="op">!</span><span class="ident">s</span>.<span class="ident">contains</span>(<span class="string">&quot;\n\n&quot;</span>)
     })(<span class="ident">i</span>)<span class="question-mark">?</span>;
     <span class="comment">// Take destination.</span>
     <span class="kw">let</span> (<span class="ident">i</span>, <span class="ident">link_destination</span>) <span class="op">=</span> <span class="ident">md_link_destination</span>(<span class="ident">i</span>)<span class="question-mark">?</span>;
@@ -875,7 +918,7 @@
     <span class="kw">let</span> (<span class="ident">i</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="ident">nom::character::complete::space0</span>(<span class="ident">i</span>)<span class="question-mark">?</span>;
 
     <span class="comment">// Check if there is newline coming. Do not consume.</span>
-    <span class="kw">if</span> <span class="ident">i</span> <span class="op">!</span><span class="op">=</span> <span class="string">&quot;&quot;</span> {
+    <span class="kw">if</span> <span class="op">!</span><span class="ident">i</span>.<span class="ident">is_empty</span>() {
         <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">nom::character::complete::newline</span>(<span class="ident">i</span>)<span class="question-mark">?</span>;
     }
 
@@ -936,7 +979,7 @@
     ))(<span class="ident">i</span>)<span class="question-mark">?</span>;
 
     <span class="comment">// Check that there is no `[` or `(` following. Do not consume.</span>
-    <span class="kw">if</span> <span class="ident">i</span> <span class="op">!</span><span class="op">=</span> <span class="string">&quot;&quot;</span> {
+    <span class="kw">if</span> <span class="op">!</span><span class="ident">i</span>.<span class="ident">is_empty</span>() {
         <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">nom::character::complete::none_of</span>(<span class="string">&quot;[(&quot;</span>)(<span class="ident">i</span>)<span class="question-mark">?</span>;
     }
 
@@ -989,17 +1032,20 @@
     <span class="ident">nom::combinator::map_parser</span>(<span class="ident">md_parse_link_destination</span>, <span class="ident">md_escaped_str_transform</span>)(<span class="ident">i</span>)
 }
 
-<span class="doccomment">/// A [link destination](https://spec.commonmark.org/0.29/#link-destination)</span>
+<span class="doccomment">/// A [link destination](https://spec.commonmark.org/0.30/#link-destination)</span>
 <span class="doccomment">/// consists of either</span>
-<span class="doccomment">/// - a sequence of zero or more characters between an opening `&lt;` and a</span>
-<span class="doccomment">///   closing `&gt;` that contains no line breaks or unescaped `&lt;` or `&gt;`</span>
-<span class="doccomment">///   characters, or</span>
-<span class="doccomment">/// - a nonempty sequence of characters that does not start with `&lt;`, does not</span>
-<span class="doccomment">///   include ASCII space or control characters, and includes parentheses only if</span>
-<span class="doccomment">///   (a) they are backslash-escaped or (b) they are part of a balanced pair of</span>
-<span class="doccomment">///   unescaped parentheses. (Implementations may impose limits on parentheses</span>
-<span class="doccomment">///   nesting to avoid performance issues, but at least three levels of nesting</span>
-<span class="doccomment">///   should be supported.)</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// * a sequence of zero or more characters between an opening `&lt;` and a</span>
+<span class="doccomment">/// closing `&gt;` that contains no line endings or unescaped `&lt;` or `&gt;`</span>
+<span class="doccomment">/// characters, or</span>
+<span class="doccomment">/// * a nonempty sequence of characters that does not start with `&lt;`, does not</span>
+<span class="doccomment">/// include [ASCII control</span>
+<span class="doccomment">/// characters](https://spec.commonmark.org/0.30/#ascii-control-character) or</span>
+<span class="doccomment">/// [space](https://spec.commonmark.org/0.30/#space) character, and includes</span>
+<span class="doccomment">/// parentheses only if (a) they are backslash-escaped or (b) they are part of a</span>
+<span class="doccomment">/// balanced pair of unescaped parentheses. (Implementations may impose limits</span>
+<span class="doccomment">/// on parentheses nesting to avoid performance issues, but at least three</span>
+<span class="doccomment">/// levels of nesting should be supported.)</span>
 <span class="kw">fn</span> <span class="ident">md_parse_link_destination</span>(<span class="ident">i</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">nom::IResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
     <span class="ident">alt</span>((
         <span class="ident">nom::sequence::delimited</span>(
@@ -1011,10 +1057,11 @@
             ),
             <span class="ident">tag</span>(<span class="string">&quot;&gt;&quot;</span>),
         ),
-        <span class="ident">map_parser</span>(
+        <span class="ident">map</span>(<span class="ident">nom::bytes::complete::tag</span>(<span class="string">&quot;&lt;&gt;&quot;</span>), <span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="string">&quot;&quot;</span>),
+        <span class="ident">alt</span>((
             <span class="ident">nom::bytes::complete::is_not</span>(<span class="string">&quot; \t\r\n&quot;</span>),
-            <span class="ident">all_consuming</span>(<span class="ident">take_until_unbalanced</span>(<span class="string">&#39;(&#39;</span>, <span class="string">&#39;)&#39;</span>)),
-        ),
+            <span class="ident">nom::combinator::success</span>(<span class="string">&quot;&quot;</span>),
+        )),
     ))(<span class="ident">i</span>)
 }
 
@@ -1058,7 +1105,7 @@
 <span class="doccomment">///  line](https://spec.commonmark.org/0.29/#blank-line).</span>
 <span class="kw">fn</span> <span class="ident">md_parse_link_title</span>(<span class="ident">i</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">nom::IResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
     <span class="ident">nom::sequence::preceded</span>(
-        <span class="ident">verify</span>(<span class="ident">multispace1</span>, <span class="op">|</span><span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">find</span>(<span class="string">&quot;\n\n&quot;</span>).<span class="ident">is_none</span>()),
+        <span class="ident">verify</span>(<span class="ident">multispace1</span>, <span class="op">|</span><span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">|</span> <span class="op">!</span><span class="ident">s</span>.<span class="ident">contains</span>(<span class="string">&quot;\n\n&quot;</span>)),
         <span class="ident">verify</span>(
             <span class="ident">alt</span>((
                 <span class="ident">nom::sequence::delimited</span>(<span class="ident">tag</span>(<span class="string">&quot;(&quot;</span>), <span class="ident">take_until_unbalanced</span>(<span class="string">&#39;(&#39;</span>, <span class="string">&#39;)&#39;</span>), <span class="ident">tag</span>(<span class="string">&quot;)&quot;</span>)),
@@ -1081,7 +1128,7 @@
                     <span class="ident">tag</span>(<span class="string">&quot;\&quot;&quot;</span>),
                 ),
             )),
-            <span class="op">|</span><span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">find</span>(<span class="string">&quot;\n\n&quot;</span>).<span class="ident">is_none</span>(),
+            <span class="op">|</span><span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">|</span> <span class="op">!</span><span class="ident">s</span>.<span class="ident">contains</span>(<span class="string">&quot;\n\n&quot;</span>),
         ),
     )(<span class="ident">i</span>)
 }
@@ -1144,6 +1191,29 @@
                 <span class="string">&quot;abc&quot;</span>,
                 (<span class="ident">Cow::from</span>(<span class="string">&quot;text&quot;</span>), <span class="ident">Cow::from</span>(<span class="string">&quot;url&quot;</span>), <span class="ident">Cow::from</span>(<span class="string">&quot;link title&quot;</span>))
             ))
+        );
+        <span class="comment">// [Example 483](https://spec.commonmark.org/0.30/#example-483)</span>
+        <span class="macro">assert_eq!</span>(
+            <span class="ident">md_text2dest</span>(<span class="string">&quot;[](./target.md)abc&quot;</span>),
+            <span class="prelude-val">Ok</span>((
+                <span class="string">&quot;abc&quot;</span>,
+                (<span class="ident">Cow::from</span>(<span class="string">&quot;&quot;</span>), <span class="ident">Cow::from</span>(<span class="string">&quot;./target.md&quot;</span>), <span class="ident">Cow::from</span>(<span class="string">&quot;&quot;</span>))
+            ))
+        );
+        <span class="comment">// [Example 484](https://spec.commonmark.org/0.30/#example-484)</span>
+        <span class="macro">assert_eq!</span>(
+            <span class="ident">md_text2dest</span>(<span class="string">&quot;[link]()abc&quot;</span>),
+            <span class="prelude-val">Ok</span>((<span class="string">&quot;abc&quot;</span>, (<span class="ident">Cow::from</span>(<span class="string">&quot;link&quot;</span>), <span class="ident">Cow::from</span>(<span class="string">&quot;&quot;</span>), <span class="ident">Cow::from</span>(<span class="string">&quot;&quot;</span>))))
+        );
+        <span class="comment">// [Example 485](https://spec.commonmark.org/0.30/#example-485)</span>
+        <span class="macro">assert_eq!</span>(
+            <span class="ident">md_text2dest</span>(<span class="string">&quot;[link](&lt;&gt;)abc&quot;</span>),
+            <span class="prelude-val">Ok</span>((<span class="string">&quot;abc&quot;</span>, (<span class="ident">Cow::from</span>(<span class="string">&quot;link&quot;</span>), <span class="ident">Cow::from</span>(<span class="string">&quot;&quot;</span>), <span class="ident">Cow::from</span>(<span class="string">&quot;&quot;</span>))))
+        );
+        <span class="comment">// [Example 486](https://spec.commonmark.org/0.30/#example-486)</span>
+        <span class="macro">assert_eq!</span>(
+            <span class="ident">md_text2dest</span>(<span class="string">&quot;[]()abc&quot;</span>),
+            <span class="prelude-val">Ok</span>((<span class="string">&quot;abc&quot;</span>, (<span class="ident">Cow::from</span>(<span class="string">&quot;&quot;</span>), <span class="ident">Cow::from</span>(<span class="string">&quot;&quot;</span>), <span class="ident">Cow::from</span>(<span class="string">&quot;&quot;</span>))))
         );
     }
 
@@ -1427,13 +1497,10 @@
             <span class="ident">md_parse_link_destination</span>(<span class="string">r#&quot;&lt;u\&lt;r\&gt;l&gt;abc&quot;#</span>),
             <span class="prelude-val">Ok</span>((<span class="string">&quot;abc&quot;</span>, <span class="string">r#&quot;u\&lt;r\&gt;l&quot;#</span>))
         );
+        <span class="macro">assert_eq!</span>(<span class="ident">md_parse_link_destination</span>(<span class="string">&quot;&lt;url&gt; abc&quot;</span>), <span class="prelude-val">Ok</span>((<span class="string">&quot; abc&quot;</span>, <span class="string">&quot;url&quot;</span>)));
         <span class="macro">assert_eq!</span>(
-            <span class="ident">md_link_destination</span>(<span class="string">&quot;&lt;url&gt; abc&quot;</span>),
-            <span class="prelude-val">Ok</span>((<span class="string">&quot; abc&quot;</span>, <span class="ident">Cow::from</span>(<span class="string">&quot;url&quot;</span>)))
-        );
-        <span class="macro">assert_eq!</span>(
-            <span class="ident">md_link_destination</span>(<span class="string">&quot;&lt;url&gt;\nabc&quot;</span>),
-            <span class="prelude-val">Ok</span>((<span class="string">&quot;\nabc&quot;</span>, <span class="ident">Cow::from</span>(<span class="string">&quot;url&quot;</span>)))
+            <span class="ident">md_parse_link_destination</span>(<span class="string">&quot;&lt;url&gt;\nabc&quot;</span>),
+            <span class="prelude-val">Ok</span>((<span class="string">&quot;\nabc&quot;</span>, <span class="string">&quot;url&quot;</span>))
         );
         <span class="macro">assert_eq!</span>(
             <span class="ident">md_parse_link_destination</span>(<span class="string">&quot;&lt;url 2&gt;abc&quot;</span>),
@@ -1456,6 +1523,11 @@
             <span class="ident">md_parse_link_destination</span>(<span class="string">&quot;ur()l\nabc&quot;</span>),
             <span class="prelude-val">Ok</span>((<span class="string">&quot;\nabc&quot;</span>, <span class="string">&quot;ur()l&quot;</span>))
         );
+        <span class="macro">assert_eq!</span>(<span class="ident">md_parse_link_destination</span>(<span class="string">&quot;&lt;&gt;abc&quot;</span>), <span class="prelude-val">Ok</span>((<span class="string">&quot;abc&quot;</span>, <span class="string">&quot;&quot;</span>)));
+        <span class="macro">assert_eq!</span>(<span class="ident">md_parse_link_destination</span>(<span class="string">&quot;&lt;&gt;\nabc&quot;</span>), <span class="prelude-val">Ok</span>((<span class="string">&quot;\nabc&quot;</span>, <span class="string">&quot;&quot;</span>)));
+        <span class="macro">assert_eq!</span>(<span class="ident">md_parse_link_destination</span>(<span class="string">&quot;url&quot;</span>), <span class="prelude-val">Ok</span>((<span class="string">&quot;&quot;</span>, <span class="string">&quot;url&quot;</span>)));
+        <span class="macro">assert_eq!</span>(<span class="ident">md_parse_link_destination</span>(<span class="string">&quot;&quot;</span>), <span class="prelude-val">Ok</span>((<span class="string">&quot;&quot;</span>, <span class="string">&quot;&quot;</span>)));
+        <span class="macro">assert_eq!</span>(<span class="ident">md_parse_link_destination</span>(<span class="string">&quot;\nabc&quot;</span>), <span class="prelude-val">Ok</span>((<span class="string">&quot;\nabc&quot;</span>, <span class="string">&quot;&quot;</span>)));
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>

@@ -1,0 +1,45 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Tools for concurrent programming."><meta name="keywords" content="rust, rustlang, rust-lang, crossbeam"><title>crossbeam - Rust</title><link rel="stylesheet" type="text/css" href="../normalize.css"><link rel="stylesheet" type="text/css" href="../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../ayu.css" disabled ><script id="default-settings" ></script><script src="../storage.js"></script><script src="../crates.js"></script><script defer src="../main.js"></script>
+    <noscript><link rel="stylesheet" href="../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../favicon.svg"><style type="text/css">#crate-search{background-image:url("../down-arrow.svg");}</style></head><body class="rustdoc mod crate"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../crossbeam/index.html'><div class='logo-container rust-logo'><img src='../rust-logo.png' alt='logo'></div></a><h2 class="location">Crate crossbeam</h2><div class="block version"><div class="narrow-helper"></div><p>Version 0.8.1</p></div><div class="sidebar-elems"><a id="all-types" href="all.html"><p>See all crossbeam's items</p></a><div class="block items"><ul><li><a href="#modules">Modules</a></li><li><a href="#macros">Macros</a></li><li><a href="#functions">Functions</a></li></ul></div><div id="sidebar-vars" data-name="crossbeam" data-ty="mod" data-relpath=""></div><script defer src="sidebar-items.js"></script></div></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../wheel.svg"></a></div></form></nav><section id="main" class="content"><h1 class="fqn"><span class="in-band">Crate <a class="mod" href="#">crossbeam</a><button id="copy-path" onclick="copy_path(this)" title="Copy item path to clipboard"><img src="../clipboard.svg" width="19" height="18" alt="Copy item path"></button></span><span class="out-of-band"><span id="render-detail"><a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class="inner">&#x2212;</span>]</a></span><a class="srclink" href="../src/crossbeam/lib.rs.html#1-96" title="goto source code">[src]</a></span></h1><details class="rustdoc-toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>Tools for concurrent programming.</p>
+<h3 id="atomics" class="section-header"><a href="#atomics">Atomics</a></h3>
+<ul>
+<li><a href="atomic/struct.AtomicCell.html"><code>AtomicCell</code></a>, a thread-safe mutable memory location.</li>
+<li><a href="atomic/trait.AtomicConsume.html"><code>AtomicConsume</code></a>, for reading from primitive atomic types with “consume” ordering.</li>
+</ul>
+<h3 id="data-structures" class="section-header"><a href="#data-structures">Data structures</a></h3>
+<ul>
+<li><a href="deque/index.html" title="deque"><code>deque</code></a>, work-stealing deques for building task schedulers.</li>
+<li><a href="queue/struct.ArrayQueue.html"><code>ArrayQueue</code></a>, a bounded MPMC queue that allocates a fixed-capacity buffer on construction.</li>
+<li><a href="queue/struct.SegQueue.html"><code>SegQueue</code></a>, an unbounded MPMC queue that allocates small buffers, segments, on demand.</li>
+</ul>
+<h3 id="memory-management" class="section-header"><a href="#memory-management">Memory management</a></h3>
+<ul>
+<li><a href="epoch/index.html" title="epoch"><code>epoch</code></a>, an epoch-based garbage collector.</li>
+</ul>
+<h3 id="thread-synchronization" class="section-header"><a href="#thread-synchronization">Thread synchronization</a></h3>
+<ul>
+<li><a href="channel/index.html" title="channel"><code>channel</code></a>, multi-producer multi-consumer channels for message passing.</li>
+<li><a href="sync/struct.Parker.html"><code>Parker</code></a>, a thread parking primitive.</li>
+<li><a href="sync/struct.ShardedLock.html"><code>ShardedLock</code></a>, a sharded reader-writer lock with fast concurrent reads.</li>
+<li><a href="sync/struct.WaitGroup.html"><code>WaitGroup</code></a>, for synchronizing the beginning or end of some computation.</li>
+</ul>
+<h3 id="utilities" class="section-header"><a href="#utilities">Utilities</a></h3>
+<ul>
+<li><a href="utils/struct.Backoff.html"><code>Backoff</code></a>, for exponential backoff in spin loops.</li>
+<li><a href="utils/struct.CachePadded.html"><code>CachePadded</code></a>, for padding and aligning a value to the length of a cache line.</li>
+<li><a href="fn.scope.html" title="scope"><code>scope</code></a>, for spawning threads that borrow local variables from the stack.</li>
+</ul>
+</div></details><h2 id="modules" class="small-section-header"><a href="#modules">Modules</a></h2>
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="mod" href="atomic/index.html" title="crossbeam::atomic mod">atomic</a></div><div class="item-right docblock-short"><p>Atomic types.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="mod" href="channel/index.html" title="crossbeam::channel mod">channel</a></div><div class="item-right docblock-short"><p>Multi-producer multi-consumer channels for message passing.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="mod" href="deque/index.html" title="crossbeam::deque mod">deque</a></div><div class="item-right docblock-short"><p>Concurrent work-stealing deques.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="mod" href="epoch/index.html" title="crossbeam::epoch mod">epoch</a></div><div class="item-right docblock-short"><p>Epoch-based memory reclamation.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="mod" href="queue/index.html" title="crossbeam::queue mod">queue</a></div><div class="item-right docblock-short"><p>Concurrent queues.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="mod" href="sync/index.html" title="crossbeam::sync mod">sync</a></div><div class="item-right docblock-short"><p>Thread synchronization primitives.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="mod" href="thread/index.html" title="crossbeam::thread mod">thread</a></div><div class="item-right docblock-short"><p>Threads that can borrow variables from the stack.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="mod" href="utils/index.html" title="crossbeam::utils mod">utils</a></div><div class="item-right docblock-short"><p>Miscellaneous utilities.</p>
+</div></div></div><h2 id="macros" class="small-section-header"><a href="#macros">Macros</a></h2>
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="macro" href="macro.select.html" title="crossbeam::select macro">select</a></div><div class="item-right docblock-short"><p>Selects from a set of channel operations.</p>
+</div></div></div><h2 id="functions" class="small-section-header"><a href="#functions">Functions</a></h2>
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="fn" href="fn.scope.html" title="crossbeam::scope fn">scope</a></div><div class="item-right docblock-short"><p>Creates a new scope for spawning threads.</p>
+</div></div></div></section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../" data-current-crate="crossbeam" data-search-index-js="../search-index.js" data-search-js="../search.js"></div>
+</body></html>

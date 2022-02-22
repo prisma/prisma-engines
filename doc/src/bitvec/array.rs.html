@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;bitvec-0.19.6&#x2F;src&#x2F;array.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>array.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><script defer src="../../main.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;bitvec-0.22.3&#x2F;src&#x2F;array.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>array.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><script defer src="../../main.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script>
     <noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../bitvec/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
@@ -286,31 +286,28 @@
 <span id="285">285</span>
 <span id="286">286</span>
 <span id="287">287</span>
-<span id="288">288</span>
-<span id="289">289</span>
-<span id="290">290</span>
-<span id="291">291</span>
-<span id="292">292</span>
-<span id="293">293</span>
-<span id="294">294</span>
-<span id="295">295</span>
-<span id="296">296</span>
-<span id="297">297</span>
-<span id="298">298</span>
-</pre><pre class="rust"><code><span class="doccomment">/*! A fixed-size region viewed as individual bits, corresponding to `[bool]`.
+</pre><pre class="rust"><code><span class="doccomment">/*! A statically-allocated, fixed-size, buffer containing a [`BitSlice`] region.
 
 You can read the language’s [array fundamental documentation][std] here.
 
 This module defines the [`BitArray`] immediate type, and its associated support
 code.
 
-`BitArray` has little behavior or properties in its own right. It serves solely
-as a type capable of being used in immediate value position, and delegates to
-`BitSlice` for all actual work.
+[`BitArray`] is equivalent to `[bool; N]`, in its operation and in its
+relationship to the [`BitSlice`] type. It has little behavior or properties in
+its own right, and serves solely as a type capable of being used in immediate
+value position, and delegates to `BitSlice` for all actual work.
 
-[`BitArray`]: struct.BitArray.html
-[std]: https://doc.rust-lang.org/std/primitive.array.html
+[`BitArray`]: crate::array::BitArray
+[`BitSlice`]: crate::slice::BitSlice
+[std]: https://doc.rust-lang.org/stable/std/primitive.array.html
 !*/</span>
+
+<span class="kw">use</span> <span class="ident">core</span>::{
+	<span class="ident">marker::PhantomData</span>,
+	<span class="ident">mem::MaybeUninit</span>,
+	<span class="ident">slice</span>,
+};
 
 <span class="kw">use</span> <span class="kw">crate</span>::{
 	<span class="ident">order</span>::{
@@ -318,14 +315,14 @@ as a type capable of being used in immediate value position, and delegates to
 		<span class="ident">Lsb0</span>,
 	},
 	<span class="ident">slice::BitSlice</span>,
-	<span class="ident">view::BitView</span>,
+	<span class="ident">view::BitViewSized</span>,
 };
 
-<span class="kw">use</span> <span class="ident">core</span>::{
-	<span class="ident">marker::PhantomData</span>,
-	<span class="ident">mem::MaybeUninit</span>,
-	<span class="ident">slice</span>,
-};
+<span class="kw">mod</span> <span class="ident">iter</span>;
+<span class="kw">mod</span> <span class="ident">ops</span>;
+<span class="kw">mod</span> <span class="ident">traits</span>;
+
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::iter::IntoIter</span>;
 
 <span class="comment">/* Note on C++ `std::bitset&lt;N&gt;` compatibility:
 
@@ -359,54 +356,53 @@ numeric type parameters in type-level expressions.
 
 <span class="doccomment">/** An array of individual bits, able to be held by value on the stack.
 
-This type is generic over all `Sized` implementors of the `BitView` trait. Due
-to limitations in the Rust language’s const-generics implementation (it is both
-unstable and incomplete), this must take an array type parameter, rather than a
-bit-count integer parameter, making it inconvenient to use. The [`bitarr!`]
+This type is generic over all [`Sized`] implementors of the [`BitView`] trait.
+Due to limitations in the Rust language’s const-generics implementation (it is
+both unstable and incomplete), this must take an array type parameter directly,
+rather than register type and bit-count integer parameters. This makes it less
+convenient to use than C++’s [`std::bitset&lt;N&gt;`] array type. The [`bitarr!`]
 macro is capable of constructing both values and specific types of `BitArray`,
 and this macro should be preferred for most use.
 
-The advantage of using this wrapper is that it implements `Deref`/`Mut` to
-`BitSlice`, as well as implementing all of `BitSlice`’s traits by forwarding to
-the bit-slice view of its contained data. This allows it to have `BitSlice`
-behavior by itself, without requiring explicit `.as_bitslice()` calls in user
+The advantage of using this wrapper is that it implements [`Deref`]/[`Mut`] to
+[`BitSlice`], as well as implementing all of `BitSlice`s traits by forwarding to
+the `BitSlice` view of its contained data. This allows it to have `BitSlice`
+behavior by itself, without requiring explicit [`.as_bitslice()`] calls in user
 code.
-
-&gt; Note: Not all traits may be implemented for forwarding, as a matter of effort
-&gt; and perceived need. Please file an issue for any additional traits that you
-&gt; need to be forwarded.
 
 # Limitations
 
-This always produces a bit-slice that fully spans its data; you cannot produce,
-for example, an array of twelve bits.
+This does not track start or end indices of its [`BitSlice`] view, and so that
+view will always fully span the buffer. You cannot produce, for example, an
+array of twelve bits.
 
 # Type Parameters
 
-- `O`: The ordering of bits within memory elements.
-- `V`: Some amount of memory which can be used as the basis for a `BitSlice`
-  view. This will usually be an array `[T: BitStore; N]`.
+- `O`: The ordering of bits within memory registers.
+- `V`: Some buffer which can be used as the basis for a [`BitSlice`] view. This
+  will usually be an array of `[T: BitRegister; N]`.
 
 # Examples
 
 This type is useful for marking that some value is always to be used as a
-bit-slice.
-
+[`BitSlice`].
 **/</span>
+<span class="doccomment">///</span>
 <span class="doccomment">/// ```rust</span>
 <span class="doccomment">/// use bitvec::prelude::*;</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// struct HasBitfields {</span>
 <span class="doccomment">///   header: u32,</span>
-<span class="doccomment">///   //  creates a type declaration</span>
-<span class="doccomment">///   fields: bitarr!(for 20, in Msb0, u8),</span>
+<span class="doccomment">///   // creates a type declaration.</span>
+<span class="doccomment">///   fields: BitArr!(for 20, in Msb0, u8),</span>
 <span class="doccomment">/// }</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// impl HasBitfields {</span>
 <span class="doccomment">///   pub fn new() -&gt; Self {</span>
 <span class="doccomment">///     Self {</span>
 <span class="doccomment">///       header: 0,</span>
-<span class="doccomment">///       //  creates a value object. the type paramaters must be repeated.</span>
+<span class="doccomment">///       // creates a value object.</span>
+<span class="doccomment">///       // the type paramaters must be repeated.</span>
 <span class="doccomment">///       fields: bitarr![Msb0, u8; 0; 20],</span>
 <span class="doccomment">///     }</span>
 <span class="doccomment">///   }</span>
@@ -431,19 +427,25 @@ bit-slice.
 # Eventual Obsolescence
 
 When const-generics stabilize, this will be modified to have a signature more
-like `BitArray&lt;O, T: BitStore, const N: usize&gt;([T; elts::&lt;T&gt;(N)]);`, to mirror
-the behavior of ordinary arrays `[T; N]` as they stand today.
+like `BitArray&lt;O, T, const N: usize&gt;([T; elts::&lt;T&gt;(N)]);`, to mirror the
+behavior of ordinary arrays `[T; N]` as they stand today.
 
-[`bitarr!`]: ../../macro.bitarr.html
+[`BitSlice`]: crate::slice::BitSlice
+[`BitView`]: crate::view::BitView
+[`Deref`]: core::ops::Deref
+[`Mut`]: core::ops::DerefMut
+[`Sized`]: core::marker::Sized
+[`bitarr!`]: macro@crate::bitarr
+[`std::bitset&lt;N&gt;`]: https://en.cppreference.com/w/cpp/utility/bitset
+[`.as_bitslice()`]: Self::as_bitslice
 **/</span>
 <span class="attribute">#[<span class="ident">repr</span>(<span class="ident">transparent</span>)]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">BitArray</span><span class="op">&lt;</span><span class="ident">O</span> <span class="op">=</span> <span class="ident">Lsb0</span>, <span class="ident">V</span> <span class="op">=</span> <span class="ident">usize</span><span class="op">&gt;</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">BitArray</span><span class="op">&lt;</span><span class="ident">O</span> <span class="op">=</span> <span class="ident">Lsb0</span>, <span class="ident">V</span> <span class="op">=</span> [<span class="ident">usize</span>; <span class="number">1</span>]<span class="op">&gt;</span>
 <span class="kw">where</span>
 	<span class="ident">O</span>: <span class="ident">BitOrder</span>,
-	<span class="ident">V</span>: <span class="ident">BitView</span> <span class="op">+</span> <span class="ident">Sized</span>,
+	<span class="ident">V</span>: <span class="ident">BitViewSized</span>,
 {
-	<span class="doccomment">/// Bit ordering when viewed as a bitslice.</span>
+	<span class="doccomment">/// The ordering of bits within a storage element `V::Store`.</span>
 	<span class="ident">_ord</span>: <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>,
 	<span class="doccomment">/// The wrapped data store.</span>
 	<span class="ident">data</span>: <span class="ident">V</span>,
@@ -452,11 +454,10 @@ the behavior of ordinary arrays `[T; N]` as they stand today.
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">V</span><span class="op">&gt;</span> <span class="ident">BitArray</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">V</span><span class="op">&gt;</span>
 <span class="kw">where</span>
 	<span class="ident">O</span>: <span class="ident">BitOrder</span>,
-	<span class="ident">V</span>: <span class="ident">BitView</span> <span class="op">+</span> <span class="ident">Sized</span>,
+	<span class="ident">V</span>: <span class="ident">BitViewSized</span>,
 {
-	<span class="doccomment">/// Constructs a new `BitArray` with zeroed memory.</span>
-	<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-	<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">tarpaulin_include</span>))]</span>
+	<span class="doccomment">/// Constructs a new `BitArray` with its memory set to zero.</span>
+	<span class="attribute">#[<span class="ident">inline</span>]</span>
 	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">zeroed</span>() -&gt; <span class="self">Self</span> {
 		<span class="self">Self</span> {
 			<span class="ident">_ord</span>: <span class="ident">PhantomData</span>,
@@ -464,15 +465,18 @@ the behavior of ordinary arrays `[T; N]` as they stand today.
 		}
 	}
 
-	<span class="doccomment">/// Constructs a new `BitArray` from a data store.</span>
+	<span class="doccomment">/// Wraps a buffer in a `BitArray`.</span>
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// # Examples</span>
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// ```rust</span>
 	<span class="doccomment">/// use bitvec::prelude::*;</span>
+	<span class="doccomment">///</span>
+	<span class="doccomment">/// let data = [0u8; 2];</span>
+	<span class="doccomment">/// let bits: BitArray&lt;Msb0, _&gt; = BitArray::new(data);</span>
+	<span class="doccomment">/// assert_eq!(bits.len(), 16);</span>
 	<span class="doccomment">/// ```</span>
-	<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-	<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">tarpaulin_include</span>))]</span>
+	<span class="attribute">#[<span class="ident">inline</span>]</span>
 	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">data</span>: <span class="ident">V</span>) -&gt; <span class="self">Self</span> {
 		<span class="self">Self</span> {
 			<span class="ident">_ord</span>: <span class="ident">PhantomData</span>,
@@ -480,121 +484,95 @@ the behavior of ordinary arrays `[T; N]` as they stand today.
 		}
 	}
 
-	<span class="doccomment">/// Removes the bit-array wrapper, returning the contained data.</span>
+	<span class="doccomment">/// Removes the `BitArray` wrapper, leaving the contained buffer.</span>
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// # Examples</span>
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// ```rust</span>
 	<span class="doccomment">/// use bitvec::prelude::*;</span>
 	<span class="doccomment">///</span>
-	<span class="doccomment">/// let bitarr: BitArray&lt;LocalBits, [usize; 1]&gt; = bitarr![0; 30];</span>
-	<span class="doccomment">/// let native: [usize; 1] = bitarr.unwrap();</span>
+	<span class="doccomment">/// let bitarr = bitarr![Lsb0, usize; 0; 30];</span>
+	<span class="doccomment">/// let native: [usize; 1] = bitarr.into_inner();</span>
 	<span class="doccomment">/// ```</span>
 	<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
 	<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">tarpaulin_include</span>))]</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">unwrap</span>(<span class="self">self</span>) -&gt; <span class="ident">V</span> {
+	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_inner</span>(<span class="self">self</span>) -&gt; <span class="ident">V</span> {
 		<span class="self">self</span>.<span class="ident">data</span>
 	}
 
-	<span class="doccomment">/// Views the array as a bit-slice.</span>
+	<span class="doccomment">/// Views the array as a [`BitSlice`].</span>
+	<span class="doccomment">///</span>
+	<span class="doccomment">/// [`BitSlice`]: crate::slice::BitSlice</span>
 	<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
 	<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">tarpaulin_include</span>))]</span>
 	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_bitslice</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">V::Store</span><span class="op">&gt;</span> {
 		<span class="self">self</span>.<span class="ident">data</span>.<span class="ident">view_bits</span>::<span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>()
 	}
 
-	<span class="doccomment">/// Views the array as a mutable bit-slice.</span>
+	<span class="doccomment">/// Views the array as a mutable [`BitSlice`].</span>
+	<span class="doccomment">///</span>
+	<span class="doccomment">/// [`BitSlice`]: crate::slice::BitSlice</span>
 	<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
 	<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">tarpaulin_include</span>))]</span>
 	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_mut_bitslice</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">V::Store</span><span class="op">&gt;</span> {
 		<span class="self">self</span>.<span class="ident">data</span>.<span class="ident">view_bits_mut</span>::<span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>()
 	}
 
-	<span class="doccomment">/// Views the array as a slice of its underlying elements.</span>
-	<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-	<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">tarpaulin_include</span>))]</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_slice</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">V::Store</span>] {
+	<span class="doccomment">/// Views the array as a slice of its underlying memory registers.</span>
+	<span class="attribute">#[<span class="ident">inline</span>]</span>
+	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_raw_slice</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">V::Store</span>] {
 		<span class="kw">unsafe</span> {
 			<span class="ident">slice::from_raw_parts</span>(
 				<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">data</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="ident">V</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="ident">V::Store</span>,
-				<span class="ident">V::const_elts</span>(),
+				<span class="ident">V::ELTS</span>,
 			)
 		}
 	}
 
-	<span class="doccomment">/// Views the array as a mutable slice of its underlying elements.</span>
-	<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-	<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">tarpaulin_include</span>))]</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_mut_slice</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut</span> [<span class="ident">V::Store</span>] {
+	<span class="doccomment">/// Views the array as a mutable slice of its underlying memory registers.</span>
+	<span class="attribute">#[<span class="ident">inline</span>]</span>
+	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_mut_raw_slice</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut</span> [<span class="ident">V::Store</span>] {
 		<span class="kw">unsafe</span> {
 			<span class="ident">slice::from_raw_parts_mut</span>(
 				<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">data</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="ident">V</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="ident">V::Store</span>,
-				<span class="ident">V::const_elts</span>(),
+				<span class="ident">V::ELTS</span>,
 			)
 		}
 	}
 
-	<span class="doccomment">/// Views the array as a slice of its raw underlying memory type.</span>
+	<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
 	<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
 	<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">tarpaulin_include</span>))]</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_raw_slice</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">V::Mem</span>] {
-		<span class="kw">unsafe</span> {
-			<span class="ident">slice::from_raw_parts</span>(
-				<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">data</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="ident">V</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="ident">V::Mem</span>,
-				<span class="ident">V::const_elts</span>(),
-			)
-		}
+	<span class="attribute">#[<span class="ident">deprecated</span> <span class="op">=</span> <span class="string">&quot;This is renamed to `as_raw_slice`&quot;</span>]</span>
+	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_slice</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">V::Store</span>] {
+		<span class="self">self</span>.<span class="ident">as_raw_slice</span>()
 	}
 
-	<span class="doccomment">/// Views the array as a mutable slice of its raw underlying memory type.</span>
+	<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
 	<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
 	<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">tarpaulin_include</span>))]</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_raw_mut_slice</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut</span> [<span class="ident">V::Mem</span>] {
-		<span class="kw">unsafe</span> {
-			<span class="ident">slice::from_raw_parts_mut</span>(
-				<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">data</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="ident">V</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="ident">V::Mem</span>,
-				<span class="ident">V::const_elts</span>(),
-			)
-		}
+	<span class="attribute">#[<span class="ident">deprecated</span> <span class="op">=</span> <span class="string">&quot;This is renamed to `as_mut_raw_slice`&quot;</span>]</span>
+	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_mut_slice</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut</span> [<span class="ident">V::Store</span>] {
+		<span class="self">self</span>.<span class="ident">as_mut_raw_slice</span>()
+	}
+
+	<span class="doccomment">/// Views the interior buffer.</span>
+	<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
+	<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">tarpaulin_include</span>))]</span>
+	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_buffer</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">V</span> {
+		<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">data</span>
+	}
+
+	<span class="doccomment">/// Mutably views the interior buffer.</span>
+	<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
+	<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">tarpaulin_include</span>))]</span>
+	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_mut_buffer</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">V</span> {
+		<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">data</span>
 	}
 }
-
-<span class="kw">mod</span> <span class="ident">ops</span>;
-<span class="kw">mod</span> <span class="ident">traits</span>;
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-	<span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-	<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::prelude</span>::<span class="kw-2">*</span>;
-
-	<span class="attribute">#[<span class="ident">test</span>]</span>
-	<span class="kw">fn</span> <span class="ident">create_arrays</span>() {
-		<span class="macro">macro_rules!</span> <span class="ident">make</span> {
-			($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">elts</span>:<span class="ident">literal</span>),<span class="op">+</span> $(,)<span class="question-mark">?</span>) =&gt; { $(
-				<span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">BitArray</span>::<span class="op">&lt;</span><span class="ident">LocalBits</span>, [<span class="ident">u8</span>; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">elts</span>]<span class="op">&gt;</span><span class="ident">::zeroed</span>();
-				<span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">BitArray</span>::<span class="op">&lt;</span><span class="ident">LocalBits</span>, [<span class="ident">u16</span>; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">elts</span>]<span class="op">&gt;</span><span class="ident">::zeroed</span>();
-				<span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">BitArray</span>::<span class="op">&lt;</span><span class="ident">LocalBits</span>, [<span class="ident">u32</span>; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">elts</span>]<span class="op">&gt;</span><span class="ident">::zeroed</span>();
-				<span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">BitArray</span>::<span class="op">&lt;</span><span class="ident">LocalBits</span>, [<span class="ident">usize</span>; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">elts</span>]<span class="op">&gt;</span><span class="ident">::zeroed</span>();
-
-				<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">target_pointer_width</span> <span class="op">=</span> <span class="string">&quot;64&quot;</span>)]</span> {
-				<span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">BitArray</span>::<span class="op">&lt;</span><span class="ident">LocalBits</span>, [<span class="ident">u64</span>; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">elts</span>]<span class="op">&gt;</span><span class="ident">::zeroed</span>();
-				}
-			)<span class="op">+</span> };
-		}
-
-		<span class="macro">make!</span>(
-			<span class="number">0</span>, <span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>, <span class="number">6</span>, <span class="number">7</span>, <span class="number">8</span>, <span class="number">9</span>, <span class="number">10</span>, <span class="number">11</span>, <span class="number">12</span>, <span class="number">13</span>, <span class="number">14</span>, <span class="number">15</span>, <span class="number">16</span>, <span class="number">17</span>, <span class="number">18</span>,
-			<span class="number">19</span>, <span class="number">20</span>, <span class="number">21</span>, <span class="number">22</span>, <span class="number">23</span>, <span class="number">24</span>, <span class="number">25</span>, <span class="number">26</span>, <span class="number">27</span>, <span class="number">28</span>, <span class="number">29</span>, <span class="number">30</span>, <span class="number">31</span>, <span class="number">32</span>
-		);
-	}
-
-	<span class="attribute">#[<span class="ident">test</span>]</span>
-	<span class="kw">fn</span> <span class="ident">wrap_unwrap</span>() {
-		<span class="kw">let</span> <span class="ident">data</span>: [<span class="ident">u8</span>; <span class="number">15</span>] <span class="op">=</span> <span class="kw-2">*</span><span class="string">b&quot;Saluton, mondo!&quot;</span>;
-		<span class="kw">let</span> <span class="ident">bits</span> <span class="op">=</span> <span class="ident">BitArray</span>::<span class="op">&lt;</span><span class="ident">LocalBits</span>, <span class="kw">_</span><span class="op">&gt;</span><span class="ident">::new</span>(<span class="ident">data</span>);
-		<span class="macro">assert_eq!</span>(<span class="ident">bits</span>.<span class="ident">unwrap</span>(), <span class="ident">data</span>);
-	}
-}
+<span class="kw">mod</span> <span class="ident">tests</span>;
 </code></pre></div>
 </section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="bitvec" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>
 </body></html>

@@ -1,12 +1,38 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Addressable Bits"><meta name="keywords" content="rust, rustlang, rust-lang, bitvec"><title>bitvec - Rust</title><link rel="stylesheet" type="text/css" href="../normalize.css"><link rel="stylesheet" type="text/css" href="../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../ayu.css" disabled ><script id="default-settings" ></script><script src="../storage.js"></script><script src="../crates.js"></script><script defer src="../main.js"></script>
-    <noscript><link rel="stylesheet" href="../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../favicon.svg"><style type="text/css">#crate-search{background-image:url("../down-arrow.svg");}</style></head><body class="rustdoc mod crate"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../bitvec/index.html'><div class='logo-container rust-logo'><img src='../rust-logo.png' alt='logo'></div></a><h2 class="location">Crate bitvec</h2><div class="block version"><div class="narrow-helper"></div><p>Version 0.19.6</p></div><div class="sidebar-elems"><a id="all-types" href="all.html"><p>See all bitvec's items</p></a><div class="block items"><ul><li><a href="#modules">Modules</a></li><li><a href="#macros">Macros</a></li></ul></div><div id="sidebar-vars" data-name="bitvec" data-ty="mod" data-relpath=""></div><script defer src="sidebar-items.js"></script></div></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../wheel.svg"></a></div></form></nav><section id="main" class="content"><h1 class="fqn"><span class="in-band">Crate <a class="mod" href="#">bitvec</a><button id="copy-path" onclick="copy_path(this)" title="Copy item path to clipboard"><img src="../clipboard.svg" width="19" height="18" alt="Copy item path"></button></span><span class="out-of-band"><span id="render-detail"><a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class="inner">&#x2212;</span>]</a></span><a class="srclink" href="../src/bitvec/lib.rs.html#1-184" title="goto source code">[src]</a></span></h1><details class="rustdoc-toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><h2 id="addressable-bits" class="section-header"><a href="#addressable-bits">Addressable Bits</a></h2>
-<p><code>bitvec</code> is a foundation library for memory compaction techniques that rely on
-viewing memory as bit-addressed rather than byte-addressed.</p>
-<p>The <code>bitvec</code> project is designed to provide a comprehensive set of tools for
-users who need memory compaction, with as low a cost as possible.</p>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="`bitvec` — Addressable Bits"><meta name="keywords" content="rust, rustlang, rust-lang, bitvec"><title>bitvec - Rust</title><link rel="stylesheet" type="text/css" href="../normalize.css"><link rel="stylesheet" type="text/css" href="../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../ayu.css" disabled ><script id="default-settings" ></script><script src="../storage.js"></script><script src="../crates.js"></script><script defer src="../main.js"></script>
+    <noscript><link rel="stylesheet" href="../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../favicon.svg"><style type="text/css">#crate-search{background-image:url("../down-arrow.svg");}</style></head><body class="rustdoc mod crate"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../bitvec/index.html'><div class='logo-container rust-logo'><img src='../rust-logo.png' alt='logo'></div></a><h2 class="location">Crate bitvec</h2><div class="block version"><div class="narrow-helper"></div><p>Version 0.22.3</p></div><div class="sidebar-elems"><a id="all-types" href="all.html"><p>See all bitvec's items</p></a><div class="block items"><ul><li><a href="#modules">Modules</a></li><li><a href="#macros">Macros</a></li></ul></div><div id="sidebar-vars" data-name="bitvec" data-ty="mod" data-relpath=""></div><script defer src="sidebar-items.js"></script></div></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../wheel.svg"></a></div></form></nav><section id="main" class="content"><h1 class="fqn"><span class="in-band">Crate <a class="mod" href="#">bitvec</a><button id="copy-path" onclick="copy_path(this)" title="Copy item path to clipboard"><img src="../clipboard.svg" width="19" height="18" alt="Copy item path"></button></span><span class="out-of-band"><span id="render-detail"><a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class="inner">&#x2212;</span>]</a></span><a class="srclink" href="../src/bitvec/lib.rs.html#1-307" title="goto source code">[src]</a></span></h1><details class="rustdoc-toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><h2 id="bitvec--addressable-bits" class="section-header"><a href="#bitvec--addressable-bits"><code>bitvec</code> — Addressable Bits</a></h2>
+<p><code>bitvec</code> provides the foundation tools needed to implement truly single-bit
+<code>bool</code> collections and arbitrary bit-precision addressing. It builds compact
+collections and performant <a href="https://en.cppreference.com/w/c/language/bit_field">bitfield</a> regions with a high-level, expressive, API
+that compiles down to the simple machine instructions you would expect.</p>
+<h2 id="examples" class="section-header"><a href="#examples">Examples</a></h2>
+<p>The <a href="https://github.com/myrrlyn/bitvec/tree/HEAD/examples"><code>examples/</code></a> directory of the project repository contains some programs
+that showcase different <code>bitvec</code> features and use cases. In addition, each data
+structure’s API documentation contains more focused samples.</p>
+<p>To begin using <code>bitvec</code>, you need only import its <a href="prelude/index.html">prelude</a>. Once in scope,
+<code>bitvec</code> can take over existing memory buffers or create entirely new values:</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">bitvec::prelude</span>::<span class="kw-2">*</span>;
+
+<span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="kw-2">&amp;</span>[<span class="number">0u8</span>, <span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>];
+<span class="kw">let</span> <span class="ident">data_bits</span> <span class="op">=</span> <span class="ident">data</span>.<span class="ident">view_bits</span>::<span class="op">&lt;</span><span class="ident">Msb0</span><span class="op">&gt;</span>();
+
+<span class="kw">let</span> <span class="ident">literal_bits</span> <span class="op">=</span> <span class="macro">bits!</span>[<span class="ident">Lsb0</span>, <span class="ident">u16</span>; <span class="number">1</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>];
+<span class="macro">assert_eq!</span>(<span class="ident">literal_bits</span>.<span class="ident">as_raw_slice</span>()[<span class="number">0</span>], <span class="number">0b1101</span>);
+
+<span class="kw">let</span> <span class="ident">array_bool</span> <span class="op">=</span> <span class="macro">bitarr!</span>[<span class="number">1</span>; <span class="number">40</span>];
+<span class="kw">let</span> <span class="ident">boxed_bool</span> <span class="op">=</span> <span class="macro">bitbox!</span>[<span class="ident">Lsb0</span>, <span class="ident">u32</span>; <span class="number">1</span>; <span class="number">50</span>];
+<span class="kw">let</span> <span class="ident">vec_bool</span> <span class="op">=</span> <span class="macro">bitvec!</span>[<span class="ident">Msb0</span>, <span class="ident">usize</span>; <span class="number">1</span>; <span class="number">60</span>];</code></pre></div>
+<p>The two easiest entry points into <code>bitvec</code> are through the <a href="view/trait.BitView.html"><code>BitView</code></a> trait,
+which provides extension methods on ordinary memory to view it as a
+<a href="slice/struct.BitSlice.html"><code>BitSlice</code></a>, and the <a href="#macros">macro</a> constructors, which convert token strings into
+appropriate buffers at compile time. Each data structure also has its own
+constructor functions that create new buffers or borrow existing values.</p>
+<p>Once in use, <code>bitvec</code>’s types obey all the same patterns and APIs that you have
+come to expect from their analogues in the <a href="https://doc.rust-lang.org/1.58.1/core/index.html"><code>core</code></a>, <a href="https://doc.rust-lang.org/1.58.1/alloc/index.html"><code>alloc</code></a>, and <a href="https://doc.rust-lang.org/1.58.1/std/index.html"><code>std</code></a>
+libraries.</p>
 <h2 id="usage" class="section-header"><a href="#usage">Usage</a></h2>
 <p><code>bitvec</code> provides data structures that specialize the major sequence types in
-the standard library:</p>
+the standard libraries:</p>
 <ul>
 <li><code>[bool]</code> becomes <a href="slice/struct.BitSlice.html"><code>BitSlice</code></a></li>
 <li><code>[bool; N]</code> becomes <a href="array/struct.BitArray.html"><code>BitArray</code></a></li>
@@ -20,103 +46,161 @@ chasing compiler errors from there.</p>
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">io_buf</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
 <span class="ident">io_buf</span>.<span class="ident">extend</span>(<span class="kw-2">&amp;</span>[<span class="number">0x47</span>, <span class="number">0xA5</span>]);
 
-<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">stats</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
-<span class="ident">stats</span>.<span class="ident">extend</span>(<span class="kw-2">&amp;</span>[<span class="bool-val">true</span>, <span class="bool-val">false</span>, <span class="bool-val">true</span>, <span class="bool-val">true</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">true</span>, <span class="bool-val">false</span>]);</code></pre></div>
+<span class="kw">let</span> <span class="ident">stats</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> <span class="op">=</span> <span class="macro">vec!</span>[
+  <span class="bool-val">true</span>, <span class="bool-val">false</span>, <span class="bool-val">true</span>, <span class="bool-val">true</span>,
+  <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">true</span>, <span class="bool-val">false</span>,
+];</code></pre></div>
 <p>would become</p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">bitvec::prelude</span>::<span class="kw-2">*</span>;
 
-<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">io_buf</span> <span class="op">=</span> <span class="macro">bitvec!</span>[<span class="ident">Msb0</span>, <span class="ident">u8</span>; <span class="number">0</span>; <span class="number">16</span>];
+<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">io_buf</span>: <span class="ident">BitVec</span><span class="op">&lt;</span><span class="ident">Msb0</span>, <span class="ident">u8</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">BitVec::new</span>();
+<span class="ident">io_buf</span>.<span class="ident">resize</span>(<span class="number">16</span>, <span class="bool-val">false</span>);
 <span class="ident">io_buf</span>[.. <span class="number">4</span>].<span class="ident">store</span>(<span class="number">4u8</span>);
 <span class="ident">io_buf</span>[<span class="number">4</span> .. <span class="number">8</span>].<span class="ident">store</span>(<span class="number">7u8</span>);
 <span class="ident">io_buf</span>[<span class="number">8</span> .. <span class="number">16</span>].<span class="ident">store</span>(<span class="number">0xA5u8</span>);
 
-<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">stats</span>: <span class="ident">BitVec</span> <span class="op">=</span> <span class="ident">BitVec::new</span>();
-<span class="ident">stats</span>.<span class="ident">extend</span>(<span class="kw-2">&amp;</span>[<span class="bool-val">true</span>, <span class="bool-val">false</span>, <span class="bool-val">true</span>, <span class="bool-val">true</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">true</span>, <span class="bool-val">false</span>]);</code></pre></div>
+<span class="kw">let</span> <span class="ident">stats</span>: <span class="ident">BitVec</span> <span class="op">=</span> <span class="macro">bitvec!</span>[
+  <span class="number">1</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>,
+  <span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">0</span>,
+];</code></pre></div>
+<h3 id="type-arguments" class="section-header"><a href="#type-arguments">Type Arguments</a></h3>
+<p>The <code>bitvec</code> data structures are all generic over two type parameters which
+control how they view and manage the memory they use. These type parameters
+allow users to precisely control the memory layout, value bit-patterns, and
+generated instructions, but most users of the library will not need to be
+generic over them. Instead, you probably either do not care about the details of
+the underlying memory, or you have a specific and fixed layout requirement. In
+either case, you will likely select a specific combination of type arguments and
+use it consistently throughout your project.</p>
+<p>You <em>can</em> write your project to be generic over these type arguments, and this
+is certainly useful when writing code that is not coupled directly to memory,
+increases complexity with little practical gain.</p>
+<p>The default type arguments are chosen for optimal behavior in memory use and
+instruction selection. The unadorned types <a href="array/struct.BitArray.html"><code>BitArray</code></a>, <a href="slice/struct.BitSlice.html"><code>BitSlice</code></a>,
+<a href="boxed/struct.BitBox.html"><code>BitBox</code></a>, and <a href="vec/struct.BitVec.html"><code>BitVec</code></a> can all be used in type-annotation position (<code>let</code>
+bindings, <code>struct</code> fields, and function arguments). Users who need to specify
+their type arguments should prefer to do so in a <code>type</code> alias, and use that
+alias throughout their project instead of the much longer fully-qualified
+<code>bitvec</code> type names:</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">bitvec::prelude</span>::<span class="kw-2">*</span>;
+
+<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">MySlice</span> <span class="op">=</span> <span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">Msb0</span>, <span class="ident">u8</span><span class="op">&gt;</span>;
+<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">MyArray20</span> <span class="op">=</span> <span class="macro">BitArr!</span>(<span class="kw">for</span> <span class="number">20</span>, <span class="kw">in</span> <span class="ident">Msb0</span>, <span class="ident">u8</span>);
+<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">MyVec</span> <span class="op">=</span> <span class="ident">BitVec</span><span class="op">&lt;</span><span class="ident">Msb0</span>, <span class="ident">u8</span><span class="op">&gt;</span>;
+
+<span class="kw">fn</span> <span class="ident">make_buffer</span>() -&gt; <span class="ident">MyVec</span> {
+  <span class="ident">MyVec::new</span>()
+}</code></pre></div>
+<p>In general, you will probably work with <a href="slice/struct.BitSlice.html"><code>BitSlice</code></a> borrows and <a href="vec/struct.BitVec.html"><code>BitVec</code></a>
+owned buffers. The <a href="array/struct.BitArray.html"><code>BitArray</code></a> and <a href="boxed/struct.BitBox.html"><code>BitBox</code></a> types are provided for
+completeness and have their uses, but the additional constraints and frozen size
+render them less commonly useful.</p>
+<h3 id="additional-details" class="section-header"><a href="#additional-details">Additional Details</a></h3>
+<p>As a replacement for <code>bool</code> sequences, you should be able to replace old type
+definition and value construction sites with their corresponding items from this
+project, and the rest of your project should just work with the new types.</p>
+<p>To use <code>bitvec</code> for structural <a href="https://en.cppreference.com/w/c/language/bit_field">bitfields</a> or specialized I/O protocol buffers,
+you should use <a href="array/struct.BitArray.html"><code>BitArray</code></a> or <a href="vec/struct.BitVec.html"><code>BitVec</code></a> to manage your data buffers (for
+compile-time statically-sized and run-time dynamically-sized, respectively), and
+the <a href="field/trait.BitField.html"><code>BitField</code></a> trait to manage transferring values into and out of them.</p>
+<p>The <a href="slice/struct.BitSlice.html"><code>BitSlice</code></a> type contains most of the behavior that interacts with the
+<em>contents</em> of a memory buffer. <a href="vec/struct.BitVec.html"><code>BitVec</code></a> adds behavior that operates on
+allocations, and specializes <a href="slice/struct.BitSlice.html"><code>BitSlice</code></a> behaviors that can take advantage of
+owned buffers.</p>
+<p>The <a href="domain/index.html"><code>domain</code></a> module, whose types are accessed by the <code>.{bit_,}domain{,_mut}</code>
+methods on <a href="slice/struct.BitSlice.html"><code>BitSlice</code></a>, allows users to split their views of memory at aliasing
+boundaries. This removes synchronization guards where <code>bitvec</code> can prove that
+doing so is legal and correct.</p>
+<p>There are many ways to construct a bit-level view of data. The <a href="array/struct.BitArray.html"><code>BitArray</code></a>,
+<a href="boxed/struct.BitBox.html"><code>BitBox</code></a>, and <a href="vec/struct.BitVec.html"><code>BitVec</code></a> types all own a buffer of memory and dereference it
+to <a href="slice/struct.BitSlice.html"><code>BitSlice</code></a> in order to view it. In addition, you can borrow any piece of
+ordinary Rust memory as a <code>BitSlice</code> view by using its borrowing constructor
+functions or the <a href="view/trait.BitView.html"><code>BitView</code></a> trait’s extension methods.</p>
 <h2 id="capabilities" class="section-header"><a href="#capabilities">Capabilities</a></h2>
-<p><code>bitvec</code> stands out from other bit-vector libraries, both in Rust and in other
+<p><code>bitvec</code> stands out from other bit-sequence libraries, both in Rust and in other
 languages, in a few significant ways.</p>
-<p>Unlike other Rust libraries, <code>bitvec</code> stores its information in pointers to
-memory regions, rather than in the region directly. By using its own pointer
-encoding scheme, it can use references <code>&amp;BitSlice</code> and <code>&amp;mut BitSlice</code> to manage
-memory and fit seamlessly into the Rust language rules and API signatures.</p>
-<p>Unlike <em>any</em> other bit-sequence system, <code>bitvec</code> enables users to specify the
-register element type used to store data, and the ordering of bits within those
-elements. This sidesteps the problems found in C <a href="https://en.cppreference.com/w/c/language/bit_field">bitfields</a>, C++
-<a href="https://en.cppreference.com/w/cpp/utility/bitset"><code>std::bitset</code></a>, Python <a href="https://pypi.org/project/bitstring/"><code>bitstring</code></a>, Erlang <a href="https://erlang.org/doc/programming_examples/bit_syntax.html"><code>bitstream</code></a>, and Rust libraries
-such as <a href="https://crates.io/crates/bit-vec"><code>bit-vec</code></a>.</p>
+<p>Unlike other Rust libraries, <code>bitvec</code> stores its region information in
+specially-encoded pointers <em>to</em> memory regions, rather than in the region
+itself. By using its own pointer encoding scheme, <code>bitvec</code> can use references
+(<code>&amp;BitSlice&lt;_, _&gt;</code> and <code>&amp;mut BitSlice&lt;_, _&gt;</code>) to manage memory accesses and fit
+seamlessly into the Rust language rules and API signatures.</p>
+<p>Unlike <em>any</em> other bit-sequence system, <code>bitvec</code> enables users to specify both
+the register element type used to store data and also the ordering of bits
+within each register element. This sidesteps the problems found in C
+<a href="https://en.cppreference.com/w/c/language/bit_field">bitfields</a>, C++ <a href="https://en.cppreference.com/w/cpp/utility/bitset"><code>std::bitset</code></a> and <a href="https://en.cppreference.com/w/cpp/container/vector_bool"><code>std::vector&lt;bool&gt;</code></a>, Python’s
+<a href="https://pypi.org/project/bitstring/"><code>bitstring</code></a>, Erlang’s <a href="https://erlang.org/doc/programming_examples/bit_syntax.html"><code>bitstream</code></a>, and other Rust libraries such as
+<a href="https://crates.io/crates/bit-vec"><code>bit-vec</code></a>.</p>
 <p>By permitting the in-memory layout to be specified by the user, rather than
-within the library, users are able to have the behavior characteristics they
-want without effort or workarounds.</p>
-<p>This works by suppling two type parameters: <code>O: BitOrder</code> specifies the ordering
-of bits within a register element, and <code>T: BitStore</code> specifies which register
-element is used to store bits. <code>T</code> is restricted to be only the unsigned
-integers, and <code>Cell</code> or <code>Atomic</code> variants of them.</p>
+hard-coding it within the library, <code>bitvec</code> enables users to select the behavior
+characteristics they want or need without significant effort on their part.</p>
+<p>This works by supplying two type parameters: an <code>O</code> <a href="order/trait.BitOrder.html"><code>BitOrder</code></a> ordering of
+bits within a register element, and a <code>T</code> <a href="store/trait.BitStore.html"><code>BitStore</code></a> register element used for
+storage and memory description. <code>T</code> is restricted to be only the raw unsigned
+integers, and <a href="access/trait.BitSafe.html"><code>bitvec</code>-provided wrappers</a> over <a href="https://doc.rust-lang.org/1.58.1/core/sync/atomic/index.html">atomic</a> and <a href="https://doc.rust-lang.org/1.58.1/core/cell/struct.Cell.html"><code>Cell</code></a>
+synchronization guards, that fit within processor registers on your target.</p>
+<p>These parameters permit the <code>bitvec</code> type system to track memory access rules
+and bit addressing, thus enabling a nearly seamless use of <a href="slice/struct.BitSlice.html"><code>BitSlice</code></a>s as if
+they were ordinary Rust slices.</p>
 <p><code>bitvec</code> correctly handles memory aliasing by leveraging the type system to mark
-regions that have become subject to concurrency and either force the use of
-atomic memory accesses or forbid simultaneous multiprocessing. You will never
-need to insert your own guards to prevent race conditions, and <a href="slice/struct.BitSlice.html"><code>BitSlice</code></a>
-provides APIs to separate any slice into its aliased and unaliased sub-regions.</p>
-<h2 id="library-structure" class="section-header"><a href="#library-structure">Library Structure</a></h2>
-<p>You should generally import the library prelude, with</p>
+regions that have become subject to shared mutability. This mark can, depending
+on your build settings, either forbid moving such slices across threads, or
+issue lock instructions to the memory bus when accessing memory. You will never
+need to add your own guards to prevent race conditions, and <a href="slice/struct.BitSlice.html"><code>BitSlice</code></a>
+provides interfaces to separate any bit-slice into its aliased and unaliased
+subslices.</p>
+<p>Where possible, <code>bitvec</code> uses its knowledge of bit ordering and memory
+availability to accelerate memory operations from individual bit-by-bit walks to
+batched operations within a register. This is an area of ongoing development,
+and is an implementation detail rather than an aspect of public API.</p>
+<p><code>bitvec</code>’s performance even when working with individual bits is as close to
+ideal as a general-purpose library can be, but the width of processor registers
+means that no amount of performance improvement at the individual bit level can
+compete with instructions operating on 32 or 64 bits at once. If you encounter
+performance bottlenecks, you can escape <code>bitvec</code>’s views to operate on the
+memory directly, or submit an issue for future work on specialized batch
+parallelization.</p>
+<h2 id="project-structure" class="section-header"><a href="#project-structure">Project Structure</a></h2>
+<p>You should generally import the library <a href="prelude/index.html">prelude</a>, with</p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use</span> <span class="ident">bitvec::prelude</span>::<span class="kw-2">*</span>;</code></pre></div>
-<p>The prelude contains all the symbols you will need to make use of the crate.
-Almost all begin with the prefix <code>Bit</code>; only the orderings <code>Lsb0</code> and <code>Msb0</code> do
-not. This will reduce the likelihood of name collisions. See the prelude module
-documentation for more detail on which symbols are imported, and how you can
-more precisely control this.</p>
+<p>The prelude contains the basic symbols you will need to make use of the crate:
+the names of data structures, ordering parameters, useful traits, and
+constructor macros. Almost all symbols begin with the prefix <code>Bit</code>; only the
+orderings <a href="order/struct.Lsb0.html"><code>Lsb0</code></a>, <a href="order/struct.Msb0.html"><code>Msb0</code></a>, and <a href="order/struct.Lsb0.html"><code>LocalBits</code></a> do not. This will reduce the
+likelihood of name collisions.</p>
 <p>Each major component in the library is divided into its own module. This
 includes each data structure and trait, as well as utility objects used for
 implementation. The data structures that mirror the language distribution have
 submodules for each part of their mirroring: <code>api</code> ports inherent methods,
-<code>iter</code> contains iteration logic, <code>ops</code> operator overrides, and <code>traits</code> all
-other trait implementations.The data structure’s own module only contains its
-own definition and its inherent methods that are not ports of the standard
-libraries.</p>
-<h2 id="usage-1" class="section-header"><a href="#usage-1">Usage</a></h2>
-<p>As a replacement for <code>bool</code> data structures, you should be able to replace old
-type definition and value construction sites with their corresponding items from
-this crate, and the rest of your project should just work with the new types.</p>
-<p>To use <code>bitvec</code> for bitfields, use <a href="array/struct.BitArray.html"><code>BitArray</code></a> or <a href="vec/struct.BitVec.html"><code>BitVec</code></a> to manage your data
-buffers (compile-time static and run-time dynamic, respectively), and the
-<a href="field/trait.BitField.html"><code>BitField</code></a> trait to manage transferring values into and out of them.</p>
-<p>The <a href="slice/struct.BitSlice.html"><code>BitSlice</code></a> type contains most of the methods and trait implementations used
-to interact with the <em>contents</em> of a memory buffer. <a href="vec/struct.BitVec.html"><code>BitVec</code></a> adds methods for
-operating on allocations, and specializes <a href="slice/struct.BitSlice.html"><code>BitSlice</code></a> methods that can take
-advantage of owned buffers.</p>
-<p>The <code>domain</code> module, whose types are accessed by the <code>.{bit_,}domain{,_mut}</code>
-methods on <a href="slice/struct.BitSlice.html"><code>BitSlice</code></a>, allows users to split their views of memory on aliasing
-boundaries, removing synchronization where provably safe.</p>
-<p>There are many ways to construct a bit-level view of data. The <a href="array/struct.BitArray.html"><code>BitArray</code></a>,
-<code>BitBox</code>, and <a href="vec/struct.BitVec.html"><code>BitVec</code></a> types are all owning types that contain a buffer of
-memory and dereference to <a href="slice/struct.BitSlice.html"><code>BitSlice</code></a> in order to view it. In addition, you can
-borrow any piece of ordinary Rust memory as a <a href="slice/struct.BitSlice.html"><code>BitSlice</code></a> view using its
-borrowing constructor functions, and the <a href="view/trait.BitView.html"><code>BitView</code></a> trait methods.</p>
-<h2 id="examples" class="section-header"><a href="#examples">Examples</a></h2>
-<p>See the <code>examples/</code> directory of the project repository for detailed examples,
-or the type documentation for introductory samples.</p>
+<code>iter</code> contains iteration logic, <code>ops</code> overrides operator sigils, and <code>traits</code>
+holds all other trait implementations. The data structure’s own module typically
+only contains its own definition and its inherent methods that are not ports of
+the standard libraries.</p>
 <p>!</p>
 </div></details><h2 id="modules" class="small-section-header"><a href="#modules">Modules</a></h2>
-<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="mod" href="array/index.html" title="bitvec::array mod">array</a></div><div class="item-right docblock-short"><p>A fixed-size region viewed as individual bits, corresponding to <code>[bool]</code>.</p>
-</div></div><div class="item-row"><div class="item-left module-item"><a class="mod" href="boxed/index.html" title="bitvec::boxed mod">boxed</a></div><div class="item-right docblock-short"><p>A dynamically-allocated, fixed-size, buffer containing a <code>BitSlice</code> region.</p>
-</div></div><div class="item-row"><div class="item-left module-item"><a class="mod" href="domain/index.html" title="bitvec::domain mod">domain</a></div><div class="item-right docblock-short"><p>Representation of the <code>BitSlice</code> region memory model</p>
-</div></div><div class="item-row"><div class="item-left module-item"><a class="mod" href="field/index.html" title="bitvec::field mod">field</a></div><div class="item-right docblock-short"><p>Parallel bitfield access.</p>
-</div></div><div class="item-row"><div class="item-left module-item"><a class="mod" href="index/index.html" title="bitvec::index mod">index</a></div><div class="item-right docblock-short"><p>Typed metadata of registers.</p>
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="mod" href="access/index.html" title="bitvec::access mod">access</a></div><div class="item-right docblock-short"><p>Memory access guards.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="mod" href="array/index.html" title="bitvec::array mod">array</a></div><div class="item-right docblock-short"><p>A statically-allocated, fixed-size, buffer containing a <a href="slice/struct.BitSlice.html"><code>BitSlice</code></a> region.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="mod" href="boxed/index.html" title="bitvec::boxed mod">boxed</a></div><div class="item-right docblock-short"><p>A dynamically-allocated, fixed-size, buffer containing a <a href="slice/struct.BitSlice.html"><code>BitSlice</code></a>
+region.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="mod" href="domain/index.html" title="bitvec::domain mod">domain</a></div><div class="item-right docblock-short"><p>Representations of the <a href="slice/struct.BitSlice.html"><code>BitSlice</code></a> region memory model.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="mod" href="field/index.html" title="bitvec::field mod">field</a></div><div class="item-right docblock-short"><p>Batched load/store access to bitfields.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="mod" href="index/index.html" title="bitvec::index mod">index</a></div><div class="item-right docblock-short"><p>Well-typed counters and register descriptors.</p>
 </div></div><div class="item-row"><div class="item-left module-item"><a class="mod" href="macros/index.html" title="bitvec::macros mod">macros</a></div><div class="item-right docblock-short"><p>Constructor macros for the crate’s collection types.</p>
-</div></div><div class="item-row"><div class="item-left module-item"><a class="mod" href="mem/index.html" title="bitvec::mem mod">mem</a></div><div class="item-right docblock-short"><p>Descriptions of integer types</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="mod" href="mem/index.html" title="bitvec::mem mod">mem</a></div><div class="item-right docblock-short"><p>Memory element descriptions.</p>
 </div></div><div class="item-row"><div class="item-left module-item"><a class="mod" href="order/index.html" title="bitvec::order mod">order</a></div><div class="item-right docblock-short"><p>Ordering of bits within register elements.</p>
-</div></div><div class="item-row"><div class="item-left module-item"><a class="mod" href="prelude/index.html" title="bitvec::prelude mod">prelude</a></div><div class="item-right docblock-short"><p><code>bitvec</code> symbol export</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="mod" href="prelude/index.html" title="bitvec::prelude mod">prelude</a></div><div class="item-right docblock-short"><p><a href="index.html"><code>bitvec</code></a> symbol export.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="mod" href="ptr/index.html" title="bitvec::ptr mod">ptr</a></div><div class="item-right docblock-short"><p>Mirror of the <a href="https://doc.rust-lang.org/1.58.1/core/ptr/index.html"><code>core::ptr</code></a> module and <code>bitvec</code>-specific pointer structures.</p>
 </div></div><div class="item-row"><div class="item-left module-item"><a class="mod" href="slice/index.html" title="bitvec::slice mod">slice</a></div><div class="item-right docblock-short"><p>A dynamically-sized view into individual bits of a memory region.</p>
 </div></div><div class="item-row"><div class="item-left module-item"><a class="mod" href="store/index.html" title="bitvec::store mod">store</a></div><div class="item-right docblock-short"><p>Memory modeling.</p>
-</div></div><div class="item-row"><div class="item-left module-item"><a class="mod" href="vec/index.html" title="bitvec::vec mod">vec</a></div><div class="item-right docblock-short"><p>A dynamically-allocated buffer containing a <code>BitSlice&lt;O, T&gt;</code> region.</p>
-</div></div><div class="item-row"><div class="item-left module-item"><a class="mod" href="view/index.html" title="bitvec::view mod">view</a></div><div class="item-right docblock-short"><p>View constructors for memory regions.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="mod" href="vec/index.html" title="bitvec::vec mod">vec</a></div><div class="item-right docblock-short"><p>A dynamically-allocated buffer containing a <a href="slice/struct.BitSlice.html"><code>BitSlice</code></a> region.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="mod" href="view/index.html" title="bitvec::view mod">view</a></div><div class="item-right docblock-short"><p><a href="slice/struct.BitSlice.html"><code>BitSlice</code></a> view adapters for memory regions.</p>
 </div></div></div><h2 id="macros" class="small-section-header"><a href="#macros">Macros</a></h2>
-<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="macro" href="macro.bitarr.html" title="bitvec::bitarr macro">bitarr</a></div><div class="item-right docblock-short"><p>Constructs a <code>BitArray</code> wrapper out of a literal array in source code, like
-<code>bits!</code></p>
-</div></div><div class="item-row"><div class="item-left module-item"><a class="macro" href="macro.bitbox.html" title="bitvec::bitbox macro">bitbox</a></div><div class="item-right docblock-short"><p>Constructs a <code>BitBox</code> out of a literal array in source code, like <code>bitvec!</code>.</p>
-</div></div><div class="item-row"><div class="item-left module-item"><a class="macro" href="macro.bits.html" title="bitvec::bits macro">bits</a></div><div class="item-right docblock-short"><p>Constructs a <code>BitSlice</code> handle out of a literal array in source code, like
-<code>vec!</code>.</p>
-</div></div><div class="item-row"><div class="item-left module-item"><a class="macro" href="macro.bitvec.html" title="bitvec::bitvec macro">bitvec</a></div><div class="item-right docblock-short"><p>Constructs a <code>BitVec</code> out of a literal array in source code, like <code>vec!</code>.</p>
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="macro" href="macro.BitArr.html" title="bitvec::BitArr macro">BitArr</a></div><div class="item-right docblock-short"><p>Constructs a type definition for a <a href="array/struct.BitArray.html"><code>BitArray</code></a>.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="macro" href="macro.bitarr.html" title="bitvec::bitarr macro">bitarr</a></div><div class="item-right docblock-short"><p>Constructs a new <a href="array/struct.BitArray.html"><code>BitArray</code></a> from a bit-pattern description.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="macro" href="macro.bitbox.html" title="bitvec::bitbox macro">bitbox</a></div><div class="item-right docblock-short"><p>Constructs a new <a href="boxed/struct.BitBox.html"><code>BitBox</code></a> from a bit-pattern description.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="macro" href="macro.bits.html" title="bitvec::bits macro">bits</a></div><div class="item-right docblock-short"><p>Creates a borrowed <a href="slice/struct.BitSlice.html"><code>BitSlice</code></a> in the local scope.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="macro" href="macro.bitvec.html" title="bitvec::bitvec macro">bitvec</a></div><div class="item-right docblock-short"><p>Constructs a new <a href="vec/struct.BitVec.html"><code>BitVec</code></a> from a bit-pattern description.</p>
 </div></div></div></section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../" data-current-crate="bitvec" data-search-index-js="../search-index.js" data-search-js="../search.js"></div>
 </body></html>

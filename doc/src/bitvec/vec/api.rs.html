@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;bitvec-0.19.6&#x2F;src&#x2F;vec&#x2F;api.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>api.rs - source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><script defer src="../../../main.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;bitvec-0.22.3&#x2F;src&#x2F;vec&#x2F;api.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>api.rs - source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><script defer src="../../../main.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script>
     <noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../bitvec/index.html'><div class='logo-container rust-logo'><img src='../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">   1</span>
 <span id="2">   2</span>
 <span id="3">   3</span>
@@ -1180,149 +1180,115 @@
 <span id="1179">1179</span>
 <span id="1180">1180</span>
 <span id="1181">1181</span>
-<span id="1182">1182</span>
-<span id="1183">1183</span>
-<span id="1184">1184</span>
-<span id="1185">1185</span>
-<span id="1186">1186</span>
-<span id="1187">1187</span>
-<span id="1188">1188</span>
-<span id="1189">1189</span>
-<span id="1190">1190</span>
-<span id="1191">1191</span>
-<span id="1192">1192</span>
-<span id="1193">1193</span>
-<span id="1194">1194</span>
-<span id="1195">1195</span>
-<span id="1196">1196</span>
-<span id="1197">1197</span>
-<span id="1198">1198</span>
-<span id="1199">1199</span>
-<span id="1200">1200</span>
-<span id="1201">1201</span>
-<span id="1202">1202</span>
-<span id="1203">1203</span>
-<span id="1204">1204</span>
-<span id="1205">1205</span>
-<span id="1206">1206</span>
-<span id="1207">1207</span>
-<span id="1208">1208</span>
-<span id="1209">1209</span>
-<span id="1210">1210</span>
-<span id="1211">1211</span>
-<span id="1212">1212</span>
-<span id="1213">1213</span>
-<span id="1214">1214</span>
-<span id="1215">1215</span>
-<span id="1216">1216</span>
-<span id="1217">1217</span>
-<span id="1218">1218</span>
-<span id="1219">1219</span>
-<span id="1220">1220</span>
-<span id="1221">1221</span>
-<span id="1222">1222</span>
-<span id="1223">1223</span>
-<span id="1224">1224</span>
-<span id="1225">1225</span>
-</pre><pre class="rust"><code><span class="doccomment">//! Port of the `Vec&lt;T&gt;` function API.</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Port of the `Vec&lt;T&gt;` inherent API.</span>
 
+<span class="kw">use</span> <span class="ident">alloc::vec::Vec</span>;
+<span class="kw">use</span> <span class="ident">core</span>::{
+	<span class="ident">mem</span>::{
+		<span class="self">self</span>,
+		<span class="ident">ManuallyDrop</span>,
+	},
+	<span class="ident">ops::RangeBounds</span>,
+};
+
+<span class="kw">use</span> <span class="ident">funty::IsNumber</span>;
+<span class="kw">use</span> <span class="ident">tap::pipe::Pipe</span>;
+
+<span class="kw">use</span> <span class="kw">super</span>::{
+	<span class="ident">iter</span>::{
+		<span class="ident">Drain</span>,
+		<span class="ident">Splice</span>,
+	},
+	<span class="ident">BitVec</span>,
+};
 <span class="kw">use</span> <span class="kw">crate</span>::{
-	<span class="ident">mem::BitMemory</span>,
+	<span class="ident">boxed::BitBox</span>,
+	<span class="ident">index::BitEnd</span>,
 	<span class="ident">order::BitOrder</span>,
-	<span class="ident">pointer::BitPtr</span>,
+	<span class="ident">ptr</span>::{
+		<span class="ident">AddressExt</span>,
+		<span class="ident">BitPtr</span>,
+		<span class="ident">BitSpan</span>,
+		<span class="ident">Const</span>,
+		<span class="ident">Mut</span>,
+	},
 	<span class="ident">slice::BitSlice</span>,
 	<span class="ident">store::BitStore</span>,
-	<span class="ident">vec</span>::{
-		<span class="ident">iter</span>::{
-			<span class="ident">Drain</span>,
-			<span class="ident">Splice</span>,
-		},
-		<span class="ident">BitVec</span>,
-	},
 };
 
-<span class="kw">use</span> <span class="ident">alloc</span>::{
-	<span class="ident">borrow::ToOwned</span>,
-	<span class="ident">boxed::Box</span>,
-	<span class="ident">vec::Vec</span>,
-};
-
-<span class="kw">use</span> <span class="ident">core</span>::{
-	<span class="ident">mem</span>,
-	<span class="ident">ops::RangeBounds</span>,
-	<span class="ident">slice</span>,
-};
-
-<span class="kw">use</span> <span class="ident">funty::IsInteger</span>;
-
-<span class="kw">use</span> <span class="ident">tap</span>::{
-	<span class="ident">pipe::Pipe</span>,
-	<span class="ident">tap::Tap</span>,
-};
-
+<span class="doccomment">/// Port of the `Vec&lt;T&gt;` inherent API.</span>
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">BitVec</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span>
 <span class="kw">where</span>
 	<span class="ident">O</span>: <span class="ident">BitOrder</span>,
 	<span class="ident">T</span>: <span class="ident">BitStore</span>,
 {
-	<span class="doccomment">/// Constructs a new, empty `BitVec&lt;O, T&gt;`.</span>
+	<span class="doccomment">/// Constructs a new, empty, `BitVec&lt;O, T&gt;`.</span>
 	<span class="doccomment">///</span>
-	<span class="doccomment">/// The vector will not allocate until bits are pushed into it.</span>
+	<span class="doccomment">/// The bit-vector will not allocate until bits are pushed onto it.</span>
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// # Original</span>
 	<span class="doccomment">///</span>
-	<span class="doccomment">/// [`Vec::new`](https://doc.rust-lang.org/alloc/vec/struct.Vec.html#method.new)</span>
+	<span class="doccomment">/// [`Vec::new`](alloc::vec::Vec::new)</span>
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// # Examples</span>
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// ```rust</span>
 	<span class="doccomment">/// use bitvec::prelude::*;</span>
 	<span class="doccomment">///</span>
-	<span class="doccomment">/// let mut bv = BitVec::&lt;LocalBits, usize&gt;::new();</span>
+	<span class="doccomment">/// let mut bv: BitVec = BitVec::new();</span>
 	<span class="doccomment">/// ```</span>
-	<span class="attribute">#[<span class="ident">inline</span>]</span>
+	<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">not</span>(<span class="ident">tarpaulin_include</span>), <span class="ident">inline</span>(<span class="ident">always</span>))]</span>
 	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
 		<span class="self">Self</span> {
-			<span class="ident">pointer</span>: <span class="ident">BitPtr</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::EMPTY</span>.<span class="ident">to_nonnull</span>(),
+			<span class="ident">bitspan</span>: <span class="ident">BitSpan::EMPTY</span>,
 			<span class="ident">capacity</span>: <span class="number">0</span>,
 		}
 	}
 
-	<span class="doccomment">/// Constructs a new, empty `BitVec&lt;O, T&gt;` with the specified capacity.</span>
+	<span class="doccomment">/// Constructs a new, empty, `BitVec&lt;O, T&gt;` with the specified capacity (in</span>
+	<span class="doccomment">/// bits).</span>
 	<span class="doccomment">///</span>
-	<span class="doccomment">/// The vector will be able to hold at least `capacity` bits without</span>
-	<span class="doccomment">/// reällocating. If `capacity` is 0, the vector will not allocate.</span>
+	<span class="doccomment">/// The bit-vector will be able to hold at least `capacity` bits without</span>
+	<span class="doccomment">/// reällocating. If `capacity` is 0, the bit-vector will not allocate.</span>
 	<span class="doccomment">///</span>
-	<span class="doccomment">/// It is important to note that although the returned vector has the</span>
-	<span class="doccomment">/// *capacity* specified, the vector will have a zero *length*. For an</span>
+	<span class="doccomment">/// It is important to note that although the returned bit-vector has the</span>
+	<span class="doccomment">/// *capacity* specified, the bit-vector will have a zero *length*. For an</span>
 	<span class="doccomment">/// explanation of the difference between length and capacity, see</span>
 	<span class="doccomment">/// *[Capacity and reällocation]*.</span>
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// # Original</span>
 	<span class="doccomment">///</span>
-	<span class="doccomment">/// [`Vec::with_capacity`](https://doc.rust-lang.org/alloc/vec/struct.Vec.html#method.with_capacity)</span>
+	<span class="doccomment">/// [`Vec::with_capacity`](alloc::vec::Vec::with_capacity)</span>
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// # Panics</span>
 	<span class="doccomment">///</span>
-	<span class="doccomment">/// Panics if the requested capacity exceeds the vector’s limits.</span>
+	<span class="doccomment">/// Panics if the requested capacity exceeds the bit-vector’s limits.</span>
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// # Examples</span>
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// ```rust</span>
 	<span class="doccomment">/// use bitvec::prelude::*;</span>
 	<span class="doccomment">///</span>
-	<span class="doccomment">/// let mut bv = BitVec::&lt;LocalBits, usize&gt;::with_capacity(10);</span>
+	<span class="doccomment">/// let mut bv: BitVec = BitVec::with_capacity(128);</span>
 	<span class="doccomment">///</span>
-	<span class="doccomment">/// // The vector contains no items, even though it has capacity for more</span>
+	<span class="doccomment">/// // The bit-vector contains no bits, even</span>
+	<span class="doccomment">/// // though it has the capacity for more.</span>
 	<span class="doccomment">/// assert_eq!(bv.len(), 0);</span>
+	<span class="doccomment">/// assert!(bv.capacity() &gt;= 128);</span>
 	<span class="doccomment">///</span>
-	<span class="doccomment">/// // These are all done without reallocating...</span>
-	<span class="doccomment">/// for i in 0..10 {</span>
-	<span class="doccomment">///   bv.push(true);</span>
+	<span class="doccomment">/// // These are all done</span>
+	<span class="doccomment">/// // without reällocating…</span>
+	<span class="doccomment">/// for i in 0 .. 128 {</span>
+	<span class="doccomment">///   bv.push(i &amp; 0xC0 == i);</span>
 	<span class="doccomment">/// }</span>
+	<span class="doccomment">/// assert_eq!(bv.len(), 128);</span>
+	<span class="doccomment">/// assert!(bv.capacity() &gt;= 128);</span>
 	<span class="doccomment">///</span>
-	<span class="doccomment">/// // ...but this may make the vector reallocate</span>
+	<span class="doccomment">/// // …but this may make the</span>
+	<span class="doccomment">/// // bit-vector reällocate.</span>
 	<span class="doccomment">/// bv.push(false);</span>
+	<span class="doccomment">/// assert_eq!(bv.len(), 129);</span>
+	<span class="doccomment">/// assert!(bv.capacity() &gt;= 129);</span>
 	<span class="doccomment">/// ```</span>
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// [Capacity and reällocation]: #capacity-and-reallocation</span>
@@ -1330,18 +1296,68 @@
 	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_capacity</span>(<span class="ident">capacity</span>: <span class="ident">usize</span>) -&gt; <span class="self">Self</span> {
 		<span class="macro">assert!</span>(
 			<span class="ident">capacity</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">BitSlice</span>::<span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span><span class="ident">::MAX_BITS</span>,
-			<span class="string">&quot;Vector capacity exceeded: {} &gt; {}&quot;</span>,
+			<span class="string">&quot;Bit-Vector capacity exceeded: {} &gt; {}&quot;</span>,
 			<span class="ident">capacity</span>,
-			<span class="ident">BitSlice</span>::<span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span><span class="ident">::MAX_BITS</span>
+			<span class="ident">BitSlice</span>::<span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span><span class="ident">::MAX_BITS</span>,
 		);
-		<span class="kw">let</span> <span class="ident">vec</span> <span class="op">=</span> <span class="ident">capacity</span>
+
+		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">vec</span> <span class="op">=</span> <span class="ident">capacity</span>
 			.<span class="ident">pipe</span>(<span class="ident"><span class="kw">crate</span>::mem::elts</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>)
-			.<span class="ident">pipe</span>(<span class="ident">Vec</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::with_capacity</span>);
-		<span class="kw">let</span> (<span class="ident">ptr</span>, <span class="ident">capacity</span>) <span class="op">=</span> (<span class="ident">vec</span>.<span class="ident">as_ptr</span>(), <span class="ident">vec</span>.<span class="ident">capacity</span>());
-		<span class="ident">mem::forget</span>(<span class="ident">vec</span>);
-		<span class="ident">ptr</span>.<span class="ident">pipe</span>(<span class="ident">BitPtr::uninhabited</span>)
-			.<span class="ident">pipe</span>(<span class="ident">BitPtr::to_nonnull</span>)
-			.<span class="ident">pipe</span>(<span class="op">|</span><span class="ident">pointer</span><span class="op">|</span> <span class="self">Self</span> { <span class="ident">pointer</span>, <span class="ident">capacity</span> })
+			.<span class="ident">pipe</span>(<span class="ident">Vec</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::with_capacity</span>)
+			.<span class="ident">pipe</span>(<span class="ident">ManuallyDrop::new</span>);
+		<span class="kw">let</span> (<span class="ident">addr</span>, <span class="ident">capacity</span>) <span class="op">=</span> (<span class="ident">vec</span>.<span class="ident">as_mut_ptr</span>(), <span class="ident">vec</span>.<span class="ident">capacity</span>());
+		<span class="kw">let</span> <span class="ident">bitspan</span> <span class="op">=</span> <span class="ident">BitSpan::uninhabited</span>(<span class="kw">unsafe</span> { <span class="ident">addr</span>.<span class="ident">force_wrap</span>() });
+		<span class="self">Self</span> { <span class="ident">bitspan</span>, <span class="ident">capacity</span> }
+	}
+
+	<span class="doccomment">/// Decomposes a `BitVec&lt;O, T&gt;` into its raw components.</span>
+	<span class="doccomment">///</span>
+	<span class="doccomment">/// Returns the raw bit-pointer to the underlying data, the length of the</span>
+	<span class="doccomment">/// bit-vector (in bits), and the allocated capacity of the buffer (in</span>
+	<span class="doccomment">/// bits). These are the same arguments in the same order as the arguments</span>
+	<span class="doccomment">/// to [`from_raw_parts`].</span>
+	<span class="doccomment">///</span>
+	<span class="doccomment">/// After calling this function, the caller is responsible for the memory</span>
+	<span class="doccomment">/// previously managed by the `BitVec`. The only way to do this is to</span>
+	<span class="doccomment">/// convert the raw bit-pointer, length, and capacity back into a `BitVec`</span>
+	<span class="doccomment">/// with the [`from_raw_parts`] function, allowing the destructor to perform</span>
+	<span class="doccomment">/// the cleanup.</span>
+	<span class="doccomment">///</span>
+	<span class="doccomment">/// # Original</span>
+	<span class="doccomment">///</span>
+	<span class="doccomment">/// [`Vec::into_raw_parts`](alloc::vec::Vec::into_raw_parts)</span>
+	<span class="doccomment">///</span>
+	<span class="doccomment">/// # API Differences</span>
+	<span class="doccomment">///</span>
+	<span class="doccomment">/// This returns a `BitPtr`, rather than a `*mut T`. If you need the actual</span>
+	<span class="doccomment">/// memory address, [`BitPtr::pointer`] will produce it.</span>
+	<span class="doccomment">///</span>
+	<span class="doccomment">/// # Examples</span>
+	<span class="doccomment">///</span>
+	<span class="doccomment">/// ```rust</span>
+	<span class="doccomment">/// use bitvec::prelude::*;</span>
+	<span class="doccomment">/// use core::cell::Cell;</span>
+	<span class="doccomment">///</span>
+	<span class="doccomment">/// let bv: BitVec = bitvec![0, 1, 0, 0, 1];</span>
+	<span class="doccomment">///</span>
+	<span class="doccomment">/// let (ptr, len, cap) = bv.into_raw_parts();</span>
+	<span class="doccomment">///</span>
+	<span class="doccomment">/// let rebuilt = unsafe {</span>
+	<span class="doccomment">///   // We can now make changes to the components, such</span>
+	<span class="doccomment">///   // as casting the pointer to a compatible type.</span>
+	<span class="doccomment">///   let ptr = ptr.cast::&lt;Cell&lt;usize&gt;&gt;();</span>
+	<span class="doccomment">///   BitVec::from_raw_parts(ptr, len, cap)</span>
+	<span class="doccomment">/// };</span>
+	<span class="doccomment">/// assert_eq!(rebuilt, bits![0, 1, 0, 0, 1]);</span>
+	<span class="doccomment">/// ```</span>
+	<span class="doccomment">///</span>
+	<span class="doccomment">/// [`BitPtr::pointer`]: crate::ptr::BitPtr::pointer</span>
+	<span class="doccomment">/// [`from_raw_parts`]: Self::from_raw_parts</span>
+	<span class="attribute">#[<span class="ident">inline</span>]</span>
+	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_raw_parts</span>(<span class="self">self</span>) -&gt; (<span class="ident">BitPtr</span><span class="op">&lt;</span><span class="ident">Mut</span>, <span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span>, <span class="ident">usize</span>, <span class="ident">usize</span>) {
+		<span class="kw">let</span> (<span class="ident">bitspan</span>, <span class="ident">capacity</span>) <span class="op">=</span> (<span class="self">self</span>.<span class="ident">bitspan</span>, <span class="self">self</span>.<span class="ident">capacity</span>());
+		<span class="ident">mem::forget</span>(<span class="self">self</span>);
+		(<span class="ident">bitspan</span>.<span class="ident">as_bitptr</span>(), <span class="ident">bitspan</span>.<span class="ident">len</span>(), <span class="ident">capacity</span>)
 	}
 
 	<span class="doccomment">/// Creates a `BitVec&lt;O, T&gt;` directly from the raw components of another</span>
@@ -1349,125 +1365,110 @@
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// # Original</span>
 	<span class="doccomment">///</span>
-	<span class="doccomment">/// [`Vec::from_raw_parts`](https://doc.rust-lang.org/alloc/vec/struct.Vec.html#method.from_raw_parts)</span>
+	<span class="doccomment">/// [`Vec::from_raw_parts`](alloc::vec::Vec::from_raw_parts)</span>
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// # API Differences</span>
 	<span class="doccomment">///</span>
-	<span class="doccomment">/// Ordinary vectors decompose into their buffer pointer and element length</span>
-	<span class="doccomment">/// separately; bit vectors must keep these two components bundled into the</span>
-	<span class="doccomment">/// `*BitSlice` region pointer. As such, this only accepts two components;</span>
-	<span class="doccomment">/// the slice pointer and the buffer capacity.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// `Vec` could define its raw parts as `*[T]` and `usize` also, but Rust</span>
-	<span class="doccomment">/// does not make working with raw slice pointers easy.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// # Panics</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// This function panics if `pointer` is the null pointer.</span>
+	<span class="doccomment">/// This takes a `BitPtr`, rather than a `*mut T`. If you only have a</span>
+	<span class="doccomment">/// pointer, you can construct a `BitPtr` to its zeroth bit before calling</span>
+	<span class="doccomment">/// this.</span>
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// # Safety</span>
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// This is highly unsafe, due to the number of invariants that aren’t</span>
 	<span class="doccomment">/// checked:</span>
 	<span class="doccomment">///</span>
-	<span class="doccomment">/// - `pointer` needs to have been previously allocated via `BitVec&lt;O, T&gt;`</span>
-	<span class="doccomment">///   (at least, it’s highly likely to be incorrect if it wasn’t).</span>
-	<span class="doccomment">/// - `T` needs to have the same size and alignment as what `pointer` was</span>
+	<span class="doccomment">/// - `bitptr` needs to have been previously allocated by `BitVec&lt;O, T&gt;`, or</span>
+	<span class="doccomment">///   constructed from a pointer allocated by [`Vec&lt;T&gt;`].</span>
+	<span class="doccomment">/// - `T` needs to have the same size and alignment as what `bitptr` was</span>
 	<span class="doccomment">///   allocated with. (`T` having a less strict alignment is not sufficient;</span>
 	<span class="doccomment">///   the alignment really needs to be equal to satisfy the [`dealloc`]</span>
 	<span class="doccomment">///   requirement that memory must be allocated and deällocated with the</span>
-	<span class="doccomment">///   same layout.)</span>
-	<span class="doccomment">/// - `capacity` needs to be the capacity that the pointer was allocated</span>
-	<span class="doccomment">///   with.</span>
+	<span class="doccomment">///   same layout.) However, you can safely cast between bare integers,</span>
+	<span class="doccomment">///   `BitSafe` integers, `Cell` wrappers, and atomic integers, as long as</span>
+	<span class="doccomment">///   they all have the same width.</span>
+	<span class="doccomment">/// - `length` needs to be less than or equal to capacity.</span>
+	<span class="doccomment">/// - `capacity` needs to be the capacity (in bits) that the bit-pointer was</span>
+	<span class="doccomment">///   allocated with (less any head offset in `bitptr`).</span>
 	<span class="doccomment">///</span>
-	<span class="doccomment">/// In addition to the invariants inherited from `Vec::from_raw_parts`, the</span>
-	<span class="doccomment">/// fact that this function takes a bit-slice pointer adds another one:</span>
+	<span class="doccomment">/// Violating these **will** cause problems. For example, it is **not** safe</span>
+	<span class="doccomment">/// to build a `BitVec&lt;_, u8&gt;` from a pointer to a `u16` sequence and twice</span>
+	<span class="doccomment">/// its original length, because the allocator cares about the alignment,</span>
+	<span class="doccomment">/// and these two types have different alignments. The buffer was allocated</span>
+	<span class="doccomment">/// with alignment 2 (for `u16`), but after turning it into a `BitVec&lt;_,</span>
+	<span class="doccomment">/// u8&gt;`, it’ll be deällocated with alignment 1.</span>
 	<span class="doccomment">///</span>
-	<span class="doccomment">/// - **`pointer` MUST NOT have had its value modified in any way in the**</span>
-	<span class="doccomment">/// **time when it was outside of a `bitvec` container type.**</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// Violating these *will* cause problems like corrupting the allocator’s</span>
-	<span class="doccomment">/// internal data structures. For example it is **not** safe to build a</span>
-	<span class="doccomment">/// `BitVec&lt;_, u8&gt;` from a pointer to a C `char` array with length `size_t`.</span>
-	<span class="doccomment">/// It’s also not safe to build one from a `BitVec&lt;_, u16&gt;` and its length,</span>
-	<span class="doccomment">/// becauset the allocator cares about the alignment, and these two types</span>
-	<span class="doccomment">/// have different alignments. The buffer was allocated with alignment 2</span>
-	<span class="doccomment">/// (for `u16`), but after turning it into a `BitVec&lt;_, u8&gt;`, it’ll be</span>
-	<span class="doccomment">/// deällocated with alignment 1.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// The ownership of `pointer` is effectively transferred to the `BitVec&lt;O,</span>
+	<span class="doccomment">/// The ownership of `bitptr`is effectively transferred to the `BitVec&lt;O,</span>
 	<span class="doccomment">/// T&gt;` which may then deällocate, reällocate, or change the contents of</span>
-	<span class="doccomment">/// memory pointed to by the pointer at will. Ensure that nothing else uses</span>
-	<span class="doccomment">/// the pointer after calling this function.</span>
+	<span class="doccomment">/// memory pointed to by the bit-pointer at will. Ensure that nothing else</span>
+	<span class="doccomment">/// uses the pointer after calling this function.</span>
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// # Examples</span>
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// ```rust</span>
-	<span class="doccomment">/// # extern crate core;</span>
 	<span class="doccomment">/// use bitvec::prelude::*;</span>
-	<span class="doccomment">/// use bitvec as bv;</span>
-	<span class="doccomment">/// use core::mem;</span>
+	<span class="doccomment">/// use bitvec::ptr as bv_ptr;</span>
+	<span class="doccomment">/// use core::mem::ManuallyDrop;</span>
 	<span class="doccomment">///</span>
-	<span class="doccomment">/// let bv = bitvec![0, 1, 0, 1];</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// // Prevent running `bv`’s destructor so we are in complete control</span>
-	<span class="doccomment">/// // of the allocation.</span>
-	<span class="doccomment">/// let mut bv = mem::ManuallyDrop::new(bv);</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// // Pull out the various important pieces of information about `bv`</span>
-	<span class="doccomment">/// let p = bv.as_mut_ptr();</span>
-	<span class="doccomment">/// let e = bv.elements();</span>
+	<span class="doccomment">/// let bv = bitvec![0, 1, 0, 0, 1];</span>
+	<span class="doccomment">/// let mut bv = ManuallyDrop::new(bv);</span>
+	<span class="doccomment">/// let bp = bv.as_mut_bitptr();</span>
+	<span class="doccomment">/// let len = bv.len();</span>
 	<span class="doccomment">/// let cap = bv.capacity();</span>
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// unsafe {</span>
-	<span class="doccomment">///   let bits = bv::slice::from_raw_parts_mut::&lt;LocalBits, _&gt;(p, e);</span>
-	<span class="doccomment">///   let len = bits.len();</span>
+	<span class="doccomment">///   // Overwrite memory with the inverse bits.</span>
+	<span class="doccomment">///   for i in 0 .. len {</span>
+	<span class="doccomment">///     let bp = bp.add(i);</span>
+	<span class="doccomment">///     bv_ptr::write(bp, !bv_ptr::read(bp.immut()));</span>
+	<span class="doccomment">///   }</span>
 	<span class="doccomment">///</span>
-	<span class="doccomment">///   // Overwrite memory with a new pattern</span>
-	<span class="doccomment">///   bits.iter_mut().for_each(|mut b| *b = true);</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">///   // Put everything back together into a BitVec</span>
-	<span class="doccomment">///   let rebuilt = BitVec::from_raw_parts(bits as *mut _, cap);</span>
-	<span class="doccomment">///   assert_eq!(rebuilt.len(), len);</span>
+	<span class="doccomment">///   // Put everything back together into a `BitVec`.</span>
+	<span class="doccomment">///   let rebuilt = BitVec::from_raw_parts(bp, len, cap);</span>
+	<span class="doccomment">///   assert_eq!(rebuilt, bits![1, 0, 1, 1, 0]);</span>
 	<span class="doccomment">/// }</span>
 	<span class="doccomment">/// ```</span>
+	<span class="doccomment">///</span>
+	<span class="doccomment">/// [`Vec&lt;T&gt;`]: alloc::vec::Vec</span>
+	<span class="doccomment">/// [`dealloc`]: alloc::alloc::GlobalAlloc::dealloc</span>
 	<span class="attribute">#[<span class="ident">inline</span>]</span>
 	<span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">from_raw_parts</span>(
-		<span class="ident">pointer</span>: <span class="kw-2">*mut</span> <span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span>,
+		<span class="ident">bitptr</span>: <span class="ident">BitPtr</span><span class="op">&lt;</span><span class="ident">Mut</span>, <span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span>,
+		<span class="ident">length</span>: <span class="ident">usize</span>,
 		<span class="ident">capacity</span>: <span class="ident">usize</span>,
 	) -&gt; <span class="self">Self</span> {
-		<span class="kw">if</span> (<span class="ident">pointer</span> <span class="kw">as</span> <span class="kw-2">*mut</span> [()]).<span class="ident">is_null</span>() {
-			<span class="macro">panic!</span>(<span class="string">&quot;Attempted to reconstruct a `BitVec` from a null pointer&quot;</span>);
+		<span class="self">Self</span> {
+			<span class="ident">bitspan</span>: <span class="ident">bitptr</span>.<span class="ident">span_unchecked</span>(<span class="ident">length</span>),
+			<span class="ident">capacity</span>: <span class="ident"><span class="kw">crate</span>::mem::elts</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(
+				<span class="comment">//  The capacity counts from `head`, not from 0.</span>
+				<span class="ident">capacity</span>.<span class="ident">saturating_add</span>(<span class="ident">bitptr</span>.<span class="ident">head</span>().<span class="ident">into_inner</span>() <span class="kw">as</span> <span class="ident">usize</span>),
+			),
 		}
-		<span class="ident">pointer</span>
-			.<span class="ident">pipe</span>(<span class="ident">BitPtr::from_bitslice_ptr_mut</span>)
-			.<span class="ident">to_nonnull</span>()
-			.<span class="ident">pipe</span>(<span class="op">|</span><span class="ident">pointer</span><span class="op">|</span> <span class="self">Self</span> { <span class="ident">pointer</span>, <span class="ident">capacity</span> })
 	}
 
-	<span class="doccomment">/// Returns the number of bits the vector can hold without reällocating.</span>
+	<span class="doccomment">/// Returns the number of bits the bit-vector can hold without reällocating.</span>
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// # Original</span>
 	<span class="doccomment">///</span>
-	<span class="doccomment">/// [`Vec::capacity`](https://doc.rust-lang.org/alloc/vec/struct.Vec.html#method.capacity)</span>
+	<span class="doccomment">/// [`Vec::capacity`](alloc::vec::Vec::capacity)</span>
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// # Examples</span>
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// ```rust</span>
 	<span class="doccomment">/// use bitvec::prelude::*;</span>
 	<span class="doccomment">///</span>
-	<span class="doccomment">/// let bv: BitVec&lt;LocalBits, usize&gt; = BitVec::with_capacity(100);</span>
+	<span class="doccomment">/// let bv: BitVec = BitVec::with_capacity(100);</span>
 	<span class="doccomment">/// assert!(bv.capacity() &gt;= 100);</span>
 	<span class="doccomment">/// ```</span>
 	<span class="attribute">#[<span class="ident">inline</span>]</span>
 	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">capacity</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
 		<span class="self">self</span>.<span class="ident">capacity</span>
 			.<span class="ident">checked_mul</span>(<span class="ident">T::Mem::BITS</span> <span class="kw">as</span> <span class="ident">usize</span>)
-			.<span class="ident">expect</span>(<span class="string">&quot;Vector capacity exceeded&quot;</span>)
+			.<span class="ident">expect</span>(<span class="string">&quot;Bit-Vector capacity exceeded&quot;</span>)
 			<span class="comment">//  Don’t forget to subtract any dead bits in the front of the base!</span>
 			<span class="comment">//  This has to be saturating, becase a non-zero head on a zero</span>
 			<span class="comment">//  capacity underflows.</span>
-			.<span class="ident">saturating_sub</span>(<span class="self">self</span>.<span class="ident">bitptr</span>().<span class="ident">head</span>().<span class="ident">value</span>() <span class="kw">as</span> <span class="ident">usize</span>)
+			.<span class="ident">saturating_sub</span>(<span class="self">self</span>.<span class="ident">bitspan</span>.<span class="ident">head</span>().<span class="ident">into_inner</span>() <span class="kw">as</span> <span class="ident">usize</span>)
 	}
 
 	<span class="doccomment">/// Reserves capacity for at least `additional` more bits to be inserted in</span>
@@ -1478,11 +1479,11 @@
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// # Original</span>
 	<span class="doccomment">///</span>
-	<span class="doccomment">/// [`Vec::reserve`](https://doc.rust-lang.org/alloc/vec/struct.Vec.html#method.reserve)</span>
+	<span class="doccomment">/// [`Vec::reserve`](alloc::vec::Vec::reserve)</span>
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// # Panics</span>
 	<span class="doccomment">///</span>
-	<span class="doccomment">/// Panics if the new capacity exceeds the vector’s limits.</span>
+	<span class="doccomment">/// Panics if the new capacity exceeds the bit-vector’s limits.</span>
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// # Examples</span>
 	<span class="doccomment">///</span>
@@ -1493,28 +1494,9 @@
 	<span class="doccomment">/// bv.reserve(100);</span>
 	<span class="doccomment">/// assert!(bv.capacity() &gt;= 101);</span>
 	<span class="doccomment">/// ```</span>
-	<span class="attribute">#[<span class="ident">inline</span>]</span>
+	<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">not</span>(<span class="ident">tarpaulin_include</span>), <span class="ident">inline</span>(<span class="ident">always</span>))]</span>
 	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">reserve</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">additional</span>: <span class="ident">usize</span>) {
-		<span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">len</span>();
-		<span class="kw">let</span> <span class="ident">new_len</span> <span class="op">=</span> <span class="ident">len</span>
-			.<span class="ident">checked_add</span>(<span class="ident">additional</span>)
-			.<span class="ident">expect</span>(<span class="string">&quot;Vector capacity exceeded&quot;</span>);
-		<span class="macro">assert!</span>(
-			<span class="ident">new_len</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">BitSlice</span>::<span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span><span class="ident">::MAX_BITS</span>,
-			<span class="string">&quot;Vector capacity exceeded: {} &gt; {}&quot;</span>,
-			<span class="ident">new_len</span>,
-			<span class="ident">BitSlice</span>::<span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span><span class="ident">::MAX_BITS</span>
-		);
-		<span class="kw">let</span> <span class="ident">bitptr</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">bitptr</span>();
-		<span class="kw">let</span> <span class="ident">head</span> <span class="op">=</span> <span class="ident">bitptr</span>.<span class="ident">head</span>();
-		<span class="kw">let</span> <span class="ident">elts</span> <span class="op">=</span> <span class="ident">bitptr</span>.<span class="ident">elements</span>();
-		<span class="comment">//  Only reserve if the request needs new elements.</span>
-		<span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">extra</span>) <span class="op">=</span> <span class="ident">head</span>.<span class="ident">span</span>(<span class="ident">new_len</span>).<span class="number">0</span>.<span class="ident">checked_sub</span>(<span class="ident">elts</span>) {
-			<span class="self">self</span>.<span class="ident">with_vec</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">v</span>.<span class="ident">reserve</span>(<span class="ident">extra</span>));
-			<span class="kw">let</span> <span class="ident">capa</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">capacity</span>();
-			<span class="comment">//  Zero the newly-reserved buffer.</span>
-			<span class="kw">unsafe</span> { <span class="self">self</span>.<span class="ident">get_unchecked_mut</span>(<span class="ident">len</span> .. <span class="ident">capa</span>) }.<span class="ident">set_all</span>(<span class="bool-val">false</span>);
-		}
+		<span class="self">self</span>.<span class="ident">do_reservation</span>(<span class="ident">additional</span>, <span class="ident">Vec</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::reserve</span>);
 	}
 
 	<span class="doccomment">/// Reserves the minimum capacity for exactly `additional` more bits to be</span>
@@ -1528,7 +1510,7 @@
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// # Original</span>
 	<span class="doccomment">///</span>
-	<span class="doccomment">/// [`Vec::reserve_exact`](https://doc.rust-lang.org/alloc/vec/struct.Vec.html#method.reserve_exact)</span>
+	<span class="doccomment">/// [`Vec::reserve_exact`](alloc::vec::Vec::reserve_exact)</span>
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// # Panics</span>
 	<span class="doccomment">///</span>
@@ -1543,115 +1525,65 @@
 	<span class="doccomment">/// bv.reserve_exact(100);</span>
 	<span class="doccomment">/// assert!(bv.capacity() &gt;= 101);</span>
 	<span class="doccomment">/// ```</span>
-	<span class="attribute">#[<span class="ident">inline</span>]</span>
+	<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">not</span>(<span class="ident">tarpaulin_include</span>), <span class="ident">inline</span>(<span class="ident">always</span>))]</span>
 	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">reserve_exact</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">additional</span>: <span class="ident">usize</span>) {
-		<span class="kw">let</span> <span class="ident">new_len</span> <span class="op">=</span> <span class="self">self</span>
-			.<span class="ident">len</span>()
-			.<span class="ident">checked_add</span>(<span class="ident">additional</span>)
-			.<span class="ident">expect</span>(<span class="string">&quot;Vector capacity exceeded&quot;</span>);
-		<span class="macro">assert!</span>(
-			<span class="ident">new_len</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">BitSlice</span>::<span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span><span class="ident">::MAX_BITS</span>,
-			<span class="string">&quot;Vector capacity exceeded: {} &gt; {}&quot;</span>,
-			<span class="ident">new_len</span>,
-			<span class="ident">BitSlice</span>::<span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span><span class="ident">::MAX_BITS</span>
-		);
-		<span class="kw">let</span> <span class="ident">bitptr</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">bitptr</span>();
-		<span class="kw">let</span> <span class="ident">head</span> <span class="op">=</span> <span class="ident">bitptr</span>.<span class="ident">head</span>();
-		<span class="kw">let</span> <span class="ident">elts</span> <span class="op">=</span> <span class="ident">bitptr</span>.<span class="ident">elements</span>();
-		<span class="comment">//  Only reserve if the request needs new elements.</span>
-		<span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">extra</span>) <span class="op">=</span> <span class="ident">head</span>.<span class="ident">span</span>(<span class="ident">new_len</span>).<span class="number">0</span>.<span class="ident">checked_sub</span>(<span class="ident">elts</span>) {
-			<span class="self">self</span>.<span class="ident">with_vec</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">v</span>.<span class="ident">reserve_exact</span>(<span class="ident">extra</span>));
-		}
+		<span class="self">self</span>.<span class="ident">do_reservation</span>(<span class="ident">additional</span>, <span class="ident">Vec</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::reserve_exact</span>);
 	}
 
-	<span class="doccomment">/// Shrinks the capacity of the vector as much as possible.</span>
+	<span class="doccomment">/// Shrinks the capacity of the bit-vector as much as possible.</span>
 	<span class="doccomment">///</span>
-	<span class="doccomment">/// It will drop down as close as possible to the length but the allocator</span>
-	<span class="doccomment">/// may still inform the vector that there is space for a few more bits.</span>
+	<span class="doccomment">/// It will drop down as close as possible to the length, but the allocator</span>
+	<span class="doccomment">/// may still inform the bit-vector that there is space for a few more bits.</span>
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// # Original</span>
 	<span class="doccomment">///</span>
-	<span class="doccomment">/// [`Vec::shrink_to_fit`](https://doc.rust-lang.org/alloc/vec/struct.Vec.html#method.shrink_to_fit)</span>
+	<span class="doccomment">/// [`Vec::shrink_to_fit`](alloc::vec::Vec::shrink_to_fit)</span>
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// # Examples</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// ```rust</span>
-	<span class="doccomment">/// use bitvec::prelude::*;</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// let mut bv = BitVec::&lt;LocalBits, usize&gt;::with_capacity(100);</span>
-	<span class="doccomment">/// bv.extend([false, true, false].iter().copied());</span>
-	<span class="doccomment">/// assert!(bv.capacity() &gt;= 100);</span>
-	<span class="doccomment">/// bv.shrink_to_fit();</span>
-	<span class="doccomment">/// assert!(bv.capacity() &gt;= 3);</span>
-	<span class="doccomment">/// ```</span>
-	<span class="attribute">#[<span class="ident">inline</span>]</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">shrink_to_fit</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-		<span class="self">self</span>.<span class="ident">with_vec</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">v</span>.<span class="ident">shrink_to_fit</span>());
-	}
-
-	<span class="doccomment">/// Converts the vector into [`Box&lt;[T]&gt;`].</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// Note that this will drop any excess capacity.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// # Original</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// [`Vec::into_boxed_slice`](https://doc.rust-lang.org/alloc/vec/struct.Vec.html#method.into_boxed_slice)</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// # Analogue</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// See [`into_boxed_bitslice`] for a `BitVec -&gt; BitBox` transform.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// # Examples</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// ```rust</span>
-	<span class="doccomment">/// use bitvec::prelude::*;</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// let bv = bitvec![0, 1, 0];</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// let slice = bv.into_boxed_slice();</span>
-	<span class="doccomment">/// assert_eq!(slice.len(), 1);</span>
-	<span class="doccomment">/// ```</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// Any excess capacity is removed:</span>
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// ```rust</span>
 	<span class="doccomment">/// use bitvec::prelude::*;</span>
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// let mut bv: BitVec = BitVec::with_capacity(100);</span>
 	<span class="doccomment">/// bv.extend([false, true, false].iter().copied());</span>
-	<span class="doccomment">///</span>
 	<span class="doccomment">/// assert!(bv.capacity() &gt;= 100);</span>
-	<span class="doccomment">/// let slice = bv.into_boxed_slice();</span>
-	<span class="doccomment">/// assert_eq!(slice.into_vec().capacity(), 1);</span>
+	<span class="doccomment">/// bv.shrink_to_fit();</span>
+	<span class="doccomment">/// assert!(bv.capacity() &gt;= 3);</span>
 	<span class="doccomment">/// ```</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// [`Box&lt;[T]&gt;`]: https://doc.rust-lang.org/alloc/boxed/struct.Box.html</span>
-	<span class="doccomment">/// [`into_boxed_bitslice`]: #method.into_boxed_bitslice</span>
-	<span class="attribute">#[<span class="ident">inline</span>]</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_boxed_slice</span>(<span class="self">self</span>) -&gt; <span class="ident">Box</span><span class="op">&lt;</span>[<span class="ident">T</span>]<span class="op">&gt;</span> {
-		<span class="self">self</span>.<span class="ident">into_vec</span>().<span class="ident">into_boxed_slice</span>()
+	<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">not</span>(<span class="ident">tarpaulin_include</span>), <span class="ident">inline</span>(<span class="ident">always</span>))]</span>
+	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">shrink_to_fit</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
+		<span class="self">self</span>.<span class="ident">with_vec</span>(<span class="op">|</span><span class="ident">vec</span><span class="op">|</span> <span class="ident">vec</span>.<span class="ident">shrink_to_fit</span>());
 	}
 
-	<span class="doccomment">/// Shortens the vector, keeping the first `len` bits and dropping the rest.</span>
+	<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
+	<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
+	<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">tarpaulin_include</span>))]</span>
+	<span class="attribute">#[<span class="ident">deprecated</span> <span class="op">=</span> <span class="string">&quot;Prefer `into_boxed_bitslice`&quot;</span>]</span>
+	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_boxed_slice</span>(<span class="self">self</span>) -&gt; <span class="ident">BitBox</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span> {
+		<span class="self">self</span>.<span class="ident">into_boxed_bitslice</span>()
+	}
+
+	<span class="doccomment">/// Shortens the bit-vector, keeping the first `len` bits and dropping the</span>
+	<span class="doccomment">/// rest.</span>
 	<span class="doccomment">///</span>
-	<span class="doccomment">/// If `len` is greater than the vector’s current length, this has no</span>
+	<span class="doccomment">/// If `len` is greater than the bit-vector’s current length, this has no</span>
 	<span class="doccomment">/// effect.</span>
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// The [`drain`] method can emulate `truncate`, but causes the excess bits</span>
 	<span class="doccomment">/// to be returned instead of dropped.</span>
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// Note that this method has no effect on the allocated capacity of the</span>
-	<span class="doccomment">/// vector, **nor does it erase truncated memory**. Bits in the allocated</span>
-	<span class="doccomment">/// memory that are outside of the `.as_bitslice()` view always have</span>
-	<span class="doccomment">/// **unspecified** values, and cannot be relied upon to be zero.</span>
+	<span class="doccomment">/// bit-vector, **nor does it erase truncated memory**. Bits in the</span>
+	<span class="doccomment">/// allocated memory that are outside of the [`as_bitslice`] view always</span>
+	<span class="doccomment">/// have **unspecified** values, and cannot be relied upon to be zero.</span>
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// # Original</span>
 	<span class="doccomment">///</span>
-	<span class="doccomment">/// [`Vec::truncate`](https://doc.rust-lang.org/alloc/vec/struct.Vec.html#method.truncate)</span>
+	<span class="doccomment">/// [`Vec::truncate`](alloc::vec::Vec::truncate)</span>
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// # Examples</span>
 	<span class="doccomment">///</span>
-	<span class="doccomment">/// Truncating a five bit vector to two bits:</span>
+	<span class="doccomment">/// Truncating a five-bit vector to two bits:</span>
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// ```rust</span>
 	<span class="doccomment">/// use bitvec::prelude::*;</span>
@@ -1659,7 +1591,7 @@
 	<span class="doccomment">/// let mut bv = bitvec![1; 5];</span>
 	<span class="doccomment">/// bv.truncate(2);</span>
 	<span class="doccomment">/// assert_eq!(bv.len(), 2);</span>
-	<span class="doccomment">/// assert!(bv.as_slice()[0].count_ones() &gt;= 5);</span>
+	<span class="doccomment">/// assert!(bv.as_raw_slice()[0].count_ones() &gt;= 5);</span>
 	<span class="doccomment">/// ```</span>
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// No truncation occurs when `len` is greater than the vector’s current</span>
@@ -1684,171 +1616,73 @@
 	<span class="doccomment">/// assert!(bv.is_empty());</span>
 	<span class="doccomment">/// ```</span>
 	<span class="doccomment">///</span>
-	<span class="doccomment">/// [`clear`]: #method.clear</span>
-	<span class="doccomment">/// [`drain`]: #method.drain</span>
+	<span class="doccomment">/// [`as_bitslice`]: Self::as_bitslice</span>
+	<span class="doccomment">/// [`clear`]: Self::clear</span>
+	<span class="doccomment">/// [`drain`]: Self::drain</span>
 	<span class="attribute">#[<span class="ident">inline</span>]</span>
 	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">truncate</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">len</span>: <span class="ident">usize</span>) {
 		<span class="kw">if</span> <span class="ident">len</span> <span class="op">&lt;</span> <span class="self">self</span>.<span class="ident">len</span>() {
-			<span class="kw">unsafe</span> { <span class="self">self</span>.<span class="ident">set_len</span>(<span class="ident">len</span>) }
+			<span class="kw">unsafe</span> { <span class="self">self</span>.<span class="ident">set_len_unchecked</span>(<span class="ident">len</span>) }
 		}
 	}
 
-	<span class="doccomment">/// Extracts an element slice containing the entire vector.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// # Original</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// [`Vec::as_slice`](https://doc.rust-lang.org/alloc/vec/struct.Vec.html#method.as_slice)</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// # Analogue</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// See [`as_bitslice`] for a `&amp;BitVec -&gt; &amp;BitSlice` transform.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// # Examples</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// ```rust</span>
-	<span class="doccomment">/// # #[cfg(feature = &quot;std&quot;)] {</span>
-	<span class="doccomment">/// use bitvec::prelude::*;</span>
-	<span class="doccomment">/// use std::io::{self, Write};</span>
-	<span class="doccomment">/// let buffer = bitvec![Msb0, u8; 0, 1, 0, 1, 1, 0, 0, 0];</span>
-	<span class="doccomment">/// io::sink().write(buffer.as_slice()).unwrap();</span>
-	<span class="doccomment">/// # }</span>
-	<span class="doccomment">/// ```</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// [`as_bitslice`]: #method.as_bitslice</span>
-	<span class="attribute">#[<span class="ident">inline</span>]</span>
+	<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
+	<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
 	<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">tarpaulin_include</span>))]</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_slice</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">T</span>] {
-		<span class="kw">let</span> <span class="ident">bitptr</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">bitptr</span>();
-		<span class="kw">let</span> (<span class="ident">base</span>, <span class="ident">elts</span>) <span class="op">=</span> (<span class="ident">bitptr</span>.<span class="ident">pointer</span>().<span class="ident">to_const</span>(), <span class="ident">bitptr</span>.<span class="ident">elements</span>());
-		<span class="kw">unsafe</span> { <span class="ident">slice::from_raw_parts</span>(<span class="ident">base</span>, <span class="ident">elts</span>) }
+	<span class="attribute">#[<span class="ident">deprecated</span> <span class="op">=</span> <span class="string">&quot;Prefer `as_bitslice`, or `as_raw_slice` to view the \
+	                underlying memory&quot;</span>]</span>
+	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_slice</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span> {
+		<span class="self">self</span>.<span class="ident">as_bitslice</span>()
 	}
 
-	<span class="doccomment">/// Extracts a mutable slice of the entire vector.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// # Original</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// [`Vec::as_mut_slice`](https://doc.rust-lang.org/alloc/vec/struct.Vec.html#method.as_mut_slice)</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// # Analogue</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// See [`as_mut_bitslice`] for a `&amp;mut BitVec -&gt; &amp;mut BitSlice` transform.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// # Examples</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// ```rust</span>
-	<span class="doccomment">/// # #[cfg(feature = &quot;std&quot;)] {</span>
-	<span class="doccomment">/// use bitvec::prelude::*;</span>
-	<span class="doccomment">/// use std::io::{self, Read};</span>
-	<span class="doccomment">/// let mut buffer = bitvec![Msb0, u8; 0; 24];</span>
-	<span class="doccomment">/// io::repeat(0b101).read_exact(buffer.as_mut_slice()).unwrap();</span>
-	<span class="doccomment">/// # }</span>
-	<span class="doccomment">/// ```</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// [`as_mut_bitslice`]: #method.as_mut_bitslice</span>
-	<span class="attribute">#[<span class="ident">inline</span>]</span>
+	<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
+	<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
 	<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">tarpaulin_include</span>))]</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_mut_slice</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut</span> [<span class="ident">T</span>] {
-		<span class="kw">let</span> <span class="ident">bitptr</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">bitptr</span>();
-		<span class="kw">let</span> (<span class="ident">base</span>, <span class="ident">elts</span>) <span class="op">=</span> (<span class="ident">bitptr</span>.<span class="ident">pointer</span>().<span class="ident">to_mut</span>(), <span class="ident">bitptr</span>.<span class="ident">elements</span>());
-		<span class="kw">unsafe</span> { <span class="ident">slice::from_raw_parts_mut</span>(<span class="ident">base</span>, <span class="ident">elts</span>) }
+	<span class="attribute">#[<span class="ident">deprecated</span> <span class="op">=</span> <span class="string">&quot;Prefer `as_mut_bitslice`, or `as_mut_raw_slice` to view the \
+	                underlying memory&quot;</span>]</span>
+	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_mut_slice</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span> {
+		<span class="self">self</span>.<span class="ident">as_mut_bitslice</span>()
 	}
 
-	<span class="doccomment">/// Returns a raw pointer to the vector’s buffer.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// The caller must ensure that the vector outlives the pointer this</span>
-	<span class="doccomment">/// function returns, or else it will end up pointing to garbage. Modifying</span>
-	<span class="doccomment">/// the vector may cause its buffer to be reällocated, which would also make</span>
-	<span class="doccomment">/// any pointers to it invalid.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// The caller must also ensure that the memory the pointer</span>
-	<span class="doccomment">/// (non-transitively) points to is never written to (except inside an</span>
-	<span class="doccomment">/// `UnsafeCell`) using this pointer or any pointer derived from it. If you</span>
-	<span class="doccomment">/// need to mutate the contents of the slice, use [`as_mut_ptr`].</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// # Original</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// [`Vec::as_ptr`](https://doc.rust-lang.org/alloc/vec/struct.Vec.html#method.as_ptr)</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// # Analogue</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// See [`as_bitptr`] for a `&amp;BitVec -&gt; *const BitSlice` transform.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// # Examples</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// ```rust</span>
-	<span class="doccomment">/// use bitvec::prelude::*;</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// let bv = bitvec![Lsb0; 0, 1, 0, 1];</span>
-	<span class="doccomment">/// let bv_ptr = bv.as_ptr();</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// unsafe {</span>
-	<span class="doccomment">///   assert_eq!(*bv_ptr, 0b1010);</span>
-	<span class="doccomment">/// }</span>
-	<span class="doccomment">/// ```</span>
-	<span class="attribute">#[<span class="ident">inline</span>]</span>
+	<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
+	<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
 	<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">tarpaulin_include</span>))]</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_ptr</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">*const</span> <span class="ident">T</span> {
-		<span class="self">self</span>.<span class="ident">bitptr</span>().<span class="ident">pointer</span>().<span class="ident">to_const</span>()
+	<span class="attribute">#[<span class="ident">deprecated</span> <span class="op">=</span> <span class="string">&quot;Prefer `as_bitptr`, or `as_raw_ptr` to take the address of \
+	                the underlying memory&quot;</span>]</span>
+	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_ptr</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">BitPtr</span><span class="op">&lt;</span><span class="ident">Const</span>, <span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span> {
+		<span class="self">self</span>.<span class="ident">as_bitptr</span>()
 	}
 
-	<span class="doccomment">/// Returns an unsafe mutable pointer to the vector’s buffer.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// The caller must ensure that the vector outlives the pointer this</span>
-	<span class="doccomment">/// function returns, or else it will end up pointing to garbage. Modifying</span>
-	<span class="doccomment">/// the vector may cause its buffer to be reällocated, which would also make</span>
-	<span class="doccomment">/// any pointers to it invalid.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// # Original</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// [`Vec::as_mut_ptr`](https://doc.rust-lang.org/alloc/vec/struct.Vec.html#method.as_mut_ptr)</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// # Analogue</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// See [`as_mut_bitptr`] for a `&amp;mut BitVec -&gt; *mut BitSlice` transform.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// # Eaxmples</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// ```rust</span>
-	<span class="doccomment">/// use bitvec::prelude::*;</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// let size = 4;</span>
-	<span class="doccomment">/// let mut bv: BitVec&lt;Msb0, usize&gt; = BitVec::with_capacity(size);</span>
-	<span class="doccomment">/// let bv_ptr = bv.as_mut_ptr();</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// unsafe {</span>
-	<span class="doccomment">///   *bv_ptr = !0;</span>
-	<span class="doccomment">///   bv.set_len(size);</span>
-	<span class="doccomment">/// }</span>
-	<span class="doccomment">/// assert_eq!(bv.len(), 4);</span>
-	<span class="doccomment">/// assert!(bv.all());</span>
-	<span class="doccomment">/// ```</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// [`as_mut_bitptr`]: #method.as_mut_bitptr</span>
-	<span class="attribute">#[<span class="ident">inline</span>]</span>
+	<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
+	<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
 	<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">tarpaulin_include</span>))]</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_mut_ptr</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">*mut</span> <span class="ident">T</span> {
-		<span class="self">self</span>.<span class="ident">bitptr</span>().<span class="ident">pointer</span>().<span class="ident">to_mut</span>()
+	<span class="attribute">#[<span class="ident">deprecated</span> <span class="op">=</span> <span class="string">&quot;Prefer `as_mut_bitptr`, or `as_mut_raw_ptr` to take the \
+	                address of the underlying memory&quot;</span>]</span>
+	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_mut_ptr</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">BitPtr</span><span class="op">&lt;</span><span class="ident">Mut</span>, <span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span> {
+		<span class="self">self</span>.<span class="ident">as_mut_bitptr</span>()
 	}
 
-	<span class="doccomment">/// Forces the length of the vector to `new_len`.</span>
+	<span class="doccomment">/// Forces the length of the bit-vector to `new_len`.</span>
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// This is a low-level operation that maintains none of the normal</span>
-	<span class="doccomment">/// invariants of the type. Normally changing the length of a vector is done</span>
-	<span class="doccomment">/// using one of the safe operations instead, such as [`truncate`],</span>
+	<span class="doccomment">/// invariants of the type. Normally changing the length of a bit-vector is</span>
+	<span class="doccomment">/// done using one of the safe operations instead, such as [`truncate`],</span>
 	<span class="doccomment">/// [`resize`], [`extend`], or [`clear`].</span>
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// # Original</span>
 	<span class="doccomment">///</span>
-	<span class="doccomment">/// [`Vec::set_len`](https://doc.rust-lang.org/alloc/vec/struct.Vec.html#method.set_len)</span>
+	<span class="doccomment">/// [`Vec::set_len`](alloc::vec::Vec::set_len)</span>
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// # Safety</span>
 	<span class="doccomment">///</span>
-	<span class="doccomment">/// - `new_len` must be less than or equal to [`capacity()`].</span>
+	<span class="doccomment">/// - `new_len` must be less than or equal to [`self.capacity()`].</span>
+	<span class="doccomment">/// - The memory elements underlying `old_len .. new_len` must be</span>
+	<span class="doccomment">///   initialized.</span>
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// # Examples</span>
 	<span class="doccomment">///</span>
-	<span class="doccomment">/// This method can be useful for situations in which the vector is serving</span>
-	<span class="doccomment">/// as a buffer for other code, particularly over FFI:</span>
+	<span class="doccomment">/// This method can be useful for situations in which the bit-vector is</span>
+	<span class="doccomment">/// serving as a buffer for other code, particularly over FFI:</span>
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// ```rust</span>
 	<span class="doccomment">/// # #![allow(dead_code)]</span>
@@ -1874,53 +1708,48 @@
 	<span class="doccomment">/// // 2. `bits_read` &lt;= the capacity (32_768)</span>
 	<span class="doccomment">/// // which makes `set_len` safe to call.</span>
 	<span class="doccomment">/// unsafe {</span>
-	<span class="doccomment">///   // Make the FFI call...</span>
+	<span class="doccomment">///   // Make the FFI call…</span>
 	<span class="doccomment">///   let status = erl_read_bits(&amp;mut buf, 10, &amp;mut bits_read);</span>
 	<span class="doccomment">///   if status == ERL_OK {</span>
-	<span class="doccomment">///     // ...and update the length to what was read in.</span>
+	<span class="doccomment">///     // …and update the length to what was read in.</span>
 	<span class="doccomment">///     buf.set_len(bits_read);</span>
 	<span class="doccomment">///   }</span>
 	<span class="doccomment">/// }</span>
 	<span class="doccomment">/// # }</span>
 	<span class="doccomment">/// ```</span>
 	<span class="doccomment">///</span>
-	<span class="doccomment">/// [`capacity()`]: #method.capacity</span>
-	<span class="doccomment">/// [`clear`]: #method.clear</span>
-	<span class="doccomment">/// [`extend`]: #method.extend</span>
-	<span class="doccomment">/// [`resize`]: #method.resize</span>
-	<span class="doccomment">/// [`truncate`]: #method.truncate</span>
+	<span class="doccomment">/// [`clear`]: Self::clear</span>
+	<span class="doccomment">/// [`extend`]: Self::extend</span>
+	<span class="doccomment">/// [`resize`]: Self::resize</span>
+	<span class="doccomment">/// [`self.capacity()`]: Self::capacity</span>
+	<span class="doccomment">/// [`truncate`]: Self::truncate</span>
 	<span class="attribute">#[<span class="ident">inline</span>]</span>
 	<span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">set_len</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">new_len</span>: <span class="ident">usize</span>) {
 		<span class="macro">assert!</span>(
-			<span class="ident">new_len</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">BitPtr</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::REGION_MAX_BITS</span>,
-			<span class="string">&quot;Capacity exceeded: {} exceeds maximum length {}&quot;</span>,
+			<span class="ident">new_len</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">BitSlice</span>::<span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span><span class="ident">::MAX_BITS</span>,
+			<span class="string">&quot;Bit-Vector capacity exceeded: {} &gt; {}&quot;</span>,
 			<span class="ident">new_len</span>,
-			<span class="ident">BitPtr</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="ident">::REGION_MAX_BITS</span>,
+			<span class="ident">BitSlice</span>::<span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span><span class="ident">::MAX_BITS</span>,
 		);
 		<span class="kw">let</span> <span class="ident">cap</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">capacity</span>();
 		<span class="macro">assert!</span>(
 			<span class="ident">new_len</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">cap</span>,
-			<span class="string">&quot;Capacity exceeded: {} exceeds allocation size {}&quot;</span>,
+			<span class="string">&quot;Bit-Vector capacity exceeded: {} &gt; {}&quot;</span>,
 			<span class="ident">new_len</span>,
 			<span class="ident">cap</span>,
 		);
-		<span class="self">self</span>.<span class="ident">pointer</span> <span class="op">=</span> <span class="self">self</span>
-			.<span class="ident">pointer</span>
-			.<span class="ident">as_ptr</span>()
-			.<span class="ident">pipe</span>(<span class="ident">BitPtr::from_bitslice_ptr_mut</span>)
-			.<span class="ident">tap_mut</span>(<span class="op">|</span><span class="ident">bp</span><span class="op">|</span> <span class="ident">bp</span>.<span class="ident">set_len</span>(<span class="ident">new_len</span>))
-			.<span class="ident">to_nonnull</span>()
+		<span class="self">self</span>.<span class="ident">set_len_unchecked</span>(<span class="ident">new_len</span>);
 	}
 
-	<span class="doccomment">/// Removes a bit from the vector and returns it.</span>
+	<span class="doccomment">/// Removes a bit from the bit-vector and returns it.</span>
 	<span class="doccomment">///</span>
-	<span class="doccomment">/// The removed bit is replaced by the last bit of the vector.</span>
+	<span class="doccomment">/// The removed bit is replaced by the last bit of the bit-vector.</span>
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// This does not preserve ordering, but is O(1).</span>
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// # Original</span>
 	<span class="doccomment">///</span>
-	<span class="doccomment">/// [`Vec::swap_remove`](https://doc.rust-lang.org/alloc/vec/struct.Vec.html#method.swap_remove)</span>
+	<span class="doccomment">/// [`Vec::swap_remove`](alloc::vec::Vec::swap_remove)</span>
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// # Panics</span>
 	<span class="doccomment">///</span>
@@ -1940,10 +1769,8 @@
 	<span class="doccomment">/// ```</span>
 	<span class="attribute">#[<span class="ident">inline</span>]</span>
 	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">swap_remove</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">index</span>: <span class="ident">usize</span>) -&gt; <span class="ident">bool</span> {
-		<span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">len</span>();
-		<span class="macro">assert!</span>(<span class="ident">index</span> <span class="op">&lt;</span> <span class="ident">len</span>, <span class="string">&quot;Index {} out of bounds: {}&quot;</span>, <span class="ident">index</span>, <span class="ident">len</span>);
-		<span class="kw">let</span> <span class="ident">last</span> <span class="op">=</span> <span class="ident">len</span> <span class="op">-</span> <span class="number">1</span>;
-		<span class="comment">//  TODO(myrrlyn): Implement `BitSlice::xchg`?</span>
+		<span class="self">self</span>.<span class="ident">assert_in_bounds</span>(<span class="ident">index</span>, <span class="number">0</span> .. <span class="self">self</span>.<span class="ident">len</span>());
+		<span class="kw">let</span> <span class="ident">last</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="number">1</span>;
 		<span class="kw">unsafe</span> {
 			<span class="self">self</span>.<span class="ident">swap_unchecked</span>(<span class="ident">index</span>, <span class="ident">last</span>);
 			<span class="self">self</span>.<span class="ident">set_len</span>(<span class="ident">last</span>);
@@ -1951,12 +1778,12 @@
 		}
 	}
 
-	<span class="doccomment">/// Inserts a bit at position `index` within the vector, shifting all bits</span>
-	<span class="doccomment">/// after it to the right.</span>
+	<span class="doccomment">/// Inserts a bit at position `index` within the bit-vector, shifting all</span>
+	<span class="doccomment">/// bits after it to the right.</span>
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// # Original</span>
 	<span class="doccomment">///</span>
-	<span class="doccomment">/// [`Vec::insert`](https://doc.rust-lang.org/alloc/vec/struct.Vec.html#method.insert)</span>
+	<span class="doccomment">/// [`Vec::insert`](alloc::vec::Vec::insert)</span>
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// # Panics</span>
 	<span class="doccomment">///</span>
@@ -1968,25 +1795,24 @@
 	<span class="doccomment">/// use bitvec::prelude::*;</span>
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// let mut bv = bitvec![0; 5];</span>
-	<span class="doccomment">/// bv.insert(4, true);</span>
-	<span class="doccomment">/// assert_eq!(bv, bits![0, 0, 0, 0, 1, 0]);</span>
+	<span class="doccomment">/// bv.insert(5, true);</span>
+	<span class="doccomment">/// assert_eq!(bv, bits![0, 0, 0, 0, 0, 1]);</span>
 	<span class="doccomment">/// bv.insert(2, true);</span>
-	<span class="doccomment">/// assert_eq!(bv, bits![0, 0, 1, 0, 0, 1, 0]);</span>
+	<span class="doccomment">/// assert_eq!(bv, bits![0, 0, 1, 0, 0, 0, 1]);</span>
 	<span class="doccomment">/// ```</span>
 	<span class="attribute">#[<span class="ident">inline</span>]</span>
 	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">insert</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">index</span>: <span class="ident">usize</span>, <span class="ident">value</span>: <span class="ident">bool</span>) {
-		<span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">len</span>();
-		<span class="macro">assert!</span>(<span class="ident">index</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">len</span>, <span class="string">&quot;Index {} out of bounds: {}&quot;</span>, <span class="ident">index</span>, <span class="ident">len</span>);
+		<span class="self">self</span>.<span class="ident">assert_in_bounds</span>(<span class="ident">index</span>, <span class="number">0</span> ..<span class="op">=</span> <span class="self">self</span>.<span class="ident">len</span>());
 		<span class="self">self</span>.<span class="ident">push</span>(<span class="ident">value</span>);
 		<span class="kw">unsafe</span> { <span class="self">self</span>.<span class="ident">get_unchecked_mut</span>(<span class="ident">index</span> ..) }.<span class="ident">rotate_right</span>(<span class="number">1</span>);
 	}
 
-	<span class="doccomment">/// Removes and returns the bit at position `index` within the vector,</span>
+	<span class="doccomment">/// Removes and returns the bit at position `index` within the bit-vector,</span>
 	<span class="doccomment">/// shifting all bits after it to the left.</span>
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// # Original</span>
 	<span class="doccomment">///</span>
-	<span class="doccomment">/// [`Vec::remove`](https://doc.rust-lang.org/alloc/vec/struct.Vec.html#method.remove)</span>
+	<span class="doccomment">/// [`Vec::remove`](alloc::vec::Vec::remove)</span>
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// # Panics</span>
 	<span class="doccomment">///</span>
@@ -2003,9 +1829,8 @@
 	<span class="doccomment">/// ```</span>
 	<span class="attribute">#[<span class="ident">inline</span>]</span>
 	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">remove</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">index</span>: <span class="ident">usize</span>) -&gt; <span class="ident">bool</span> {
-		<span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">len</span>();
-		<span class="macro">assert!</span>(<span class="ident">index</span> <span class="op">&lt;</span> <span class="ident">len</span>, <span class="string">&quot;Index {} out of bounds: {}&quot;</span>, <span class="ident">index</span>, <span class="ident">len</span>);
-		<span class="kw">let</span> <span class="ident">last</span> <span class="op">=</span> <span class="ident">len</span> <span class="op">-</span> <span class="number">1</span>;
+		<span class="self">self</span>.<span class="ident">assert_in_bounds</span>(<span class="ident">index</span>, <span class="number">0</span> .. <span class="self">self</span>.<span class="ident">len</span>());
+		<span class="kw">let</span> <span class="ident">last</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="number">1</span>;
 		<span class="kw">unsafe</span> {
 			<span class="self">self</span>.<span class="ident">get_unchecked_mut</span>(<span class="ident">index</span> ..).<span class="ident">rotate_left</span>(<span class="number">1</span>);
 			<span class="self">self</span>.<span class="ident">set_len</span>(<span class="ident">last</span>);
@@ -2021,11 +1846,11 @@
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// # Original</span>
 	<span class="doccomment">///</span>
-	<span class="doccomment">/// [`Vec::retain`](https://doc.rust-lang.org/alloc/vec/struct.Vec.html#method.retain)</span>
+	<span class="doccomment">/// [`Vec::retain`](alloc::vec::Vec::retain)</span>
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// # API Differences</span>
 	<span class="doccomment">///</span>
-	<span class="doccomment">/// In order to allow more than one bit of information for the split</span>
+	<span class="doccomment">/// In order to allow more than one bit of information for the retention</span>
 	<span class="doccomment">/// decision, the predicate receives the index of each bit, as well as its</span>
 	<span class="doccomment">/// value.</span>
 	<span class="doccomment">///</span>
@@ -2041,10 +1866,25 @@
 	<span class="attribute">#[<span class="ident">inline</span>]</span>
 	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">retain</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">func</span>: <span class="ident">F</span>)
 	<span class="kw">where</span> <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="ident">usize</span>, <span class="kw-2">&amp;</span><span class="ident">bool</span>) -&gt; <span class="ident">bool</span> {
-		<span class="kw">for</span> <span class="ident">n</span> <span class="kw">in</span> (<span class="number">0</span> .. <span class="self">self</span>.<span class="ident">len</span>()).<span class="ident">rev</span>() {
-			<span class="kw">if</span> <span class="op">!</span><span class="ident">func</span>(<span class="ident">n</span>, <span class="kw">unsafe</span> { <span class="self">self</span>.<span class="ident">get_unchecked</span>(<span class="ident">n</span>) }) {
-				<span class="self">self</span>.<span class="ident">remove</span>(<span class="ident">n</span>);
+		<span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">len</span>();
+		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">del</span> <span class="op">=</span> <span class="number">0</span>;
+		<span class="comment">/* Walk the vector, testing each bit and its index. This loop sorts the
+		vector in-place, partitioning it with consecutive retained bits at the
+		front and consecutive discarded bits at the back.
+		*/</span>
+		<span class="kw">for</span> (<span class="ident">idx</span>, <span class="ident">bitptr</span>) <span class="kw">in</span> <span class="self">self</span>.<span class="ident">as_bitslice</span>().<span class="ident">as_bitptr_range</span>().<span class="ident">enumerate</span>() {
+			<span class="comment">//  If the bit/index fails the test, bump the deletion counter.</span>
+			<span class="kw">if</span> <span class="op">!</span><span class="ident">func</span>(<span class="ident">idx</span>, <span class="kw-2">&amp;</span><span class="kw">unsafe</span> { <span class="ident">bitptr</span>.<span class="ident">read</span>() }) {
+				<span class="ident">del</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>
 			}
+			<span class="comment">//  If the test passes, swap the bit with the first failed bit.</span>
+			<span class="kw">else</span> <span class="kw">if</span> <span class="ident">del</span> <span class="op">&gt;</span> <span class="number">0</span> {
+				<span class="self">self</span>.<span class="ident">swap</span>(<span class="ident">idx</span> <span class="op">-</span> <span class="ident">del</span>, <span class="ident">idx</span>);
+			}
+		}
+		<span class="comment">// Drop discarded bits.</span>
+		<span class="kw">if</span> <span class="ident">del</span> <span class="op">&gt;</span> <span class="number">0</span> {
+			<span class="self">self</span>.<span class="ident">truncate</span>(<span class="ident">len</span> <span class="op">-</span> <span class="ident">del</span>);
 		}
 	}
 
@@ -2052,12 +1892,12 @@
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// # Original</span>
 	<span class="doccomment">///</span>
-	<span class="doccomment">/// [`Vec::push`](https://doc.rust-lang.org/alloc/vec/struct.Vec.html#method.push)</span>
+	<span class="doccomment">/// [`Vec::push`](alloc::vec::Vec::push)</span>
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// # Panics</span>
 	<span class="doccomment">///</span>
-	<span class="doccomment">/// Panics if the number of bits in the vector exceeds the maximum vector</span>
-	<span class="doccomment">/// capacity.</span>
+	<span class="doccomment">/// Panics if the number of bits in the bit-vector exceeds the maximum</span>
+	<span class="doccomment">/// bit-vector capacity.</span>
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// # Examples</span>
 	<span class="doccomment">///</span>
@@ -2073,30 +1913,27 @@
 		<span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">len</span>();
 		<span class="macro">assert!</span>(
 			<span class="ident">len</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">BitSlice</span>::<span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span><span class="ident">::MAX_BITS</span>,
-			<span class="string">&quot;Exceeded capacity: {} &gt;= {}&quot;</span>,
+			<span class="string">&quot;Bit-Vector capacity exceeded: {} &gt; {}&quot;</span>,
 			<span class="ident">len</span>,
 			<span class="ident">BitSlice</span>::<span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span><span class="ident">::MAX_BITS</span>,
 		);
-		<span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_empty</span>() <span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">bitptr</span>().<span class="ident">tail</span>().<span class="ident">value</span>() <span class="op">==</span> <span class="ident">T::Mem::BITS</span> {
-			<span class="self">self</span>.<span class="ident">with_vec</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">v</span>.<span class="ident">push</span>(<span class="ident">T::Mem::ZERO</span>));
+		<span class="comment">//  Push a new `T` into the underlying buffer if needed</span>
+		<span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_empty</span>() <span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">bitspan</span>.<span class="ident">tail</span>() <span class="op">==</span> <span class="ident">BitEnd::LAST</span> {
+			<span class="self">self</span>.<span class="ident">with_vec</span>(<span class="op">|</span><span class="ident">vec</span><span class="op">|</span> <span class="ident">vec</span>.<span class="ident">push</span>(<span class="kw">unsafe</span> { <span class="ident">mem::zeroed</span>() }))
 		}
+		<span class="comment">//  Write `value` into the now-safely-allocated `len` slot.</span>
 		<span class="kw">unsafe</span> {
-			<span class="self">self</span>.<span class="ident">pointer</span> <span class="op">=</span> <span class="self">self</span>
-				.<span class="ident">pointer</span>
-				.<span class="ident">as_ptr</span>()
-				.<span class="ident">pipe</span>(<span class="ident">BitPtr::from_bitslice_ptr_mut</span>)
-				.<span class="ident">tap_mut</span>(<span class="op">|</span><span class="ident">bp</span><span class="op">|</span> <span class="ident">bp</span>.<span class="ident">set_len</span>(<span class="ident">len</span> <span class="op">+</span> <span class="number">1</span>))
-				.<span class="ident">to_nonnull</span>();
+			<span class="self">self</span>.<span class="ident">set_len_unchecked</span>(<span class="ident">len</span> <span class="op">+</span> <span class="number">1</span>);
 			<span class="self">self</span>.<span class="ident">set_unchecked</span>(<span class="ident">len</span>, <span class="ident">value</span>);
 		}
 	}
 
-	<span class="doccomment">/// Removes the last bit from a vector and returns it, or [`None`] if it is</span>
-	<span class="doccomment">/// empty.</span>
+	<span class="doccomment">/// Removes the last bit from a bit-vector and returns it, or [`None`] if it</span>
+	<span class="doccomment">/// is empty.</span>
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// # Original</span>
 	<span class="doccomment">///</span>
-	<span class="doccomment">/// [`Vec::pop`](https://doc.rust-lang.org/alloc/vec/struct.Vec.html#method.pop)</span>
+	<span class="doccomment">/// [`Vec::pop`](alloc::vec::Vec::pop)</span>
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// # Examples</span>
 	<span class="doccomment">///</span>
@@ -2105,17 +1942,18 @@
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// let mut bv = bitvec![0, 0, 1];</span>
 	<span class="doccomment">/// assert_eq!(bv.pop(), Some(true));</span>
-	<span class="doccomment">/// assert!(bv.not_any());</span>
+	<span class="doccomment">/// assert_eq!(bv, bits![0, 0]);</span>
 	<span class="doccomment">/// ```</span>
 	<span class="doccomment">///</span>
-	<span class="doccomment">/// [`None`]: https://doc.rust-lang.org/core/option/enum.Option.html#variant.None</span>
+	<span class="doccomment">/// [`None`]: core::option::Option::None</span>
 	<span class="attribute">#[<span class="ident">inline</span>]</span>
 	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">pop</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> {
 		<span class="kw">match</span> <span class="self">self</span>.<span class="ident">len</span>() {
 			<span class="number">0</span> =&gt; <span class="prelude-val">None</span>,
 			<span class="ident">n</span> =&gt; <span class="kw">unsafe</span> {
-				<span class="kw">let</span> <span class="ident">m</span> <span class="op">=</span> <span class="ident">n</span> <span class="op">-</span> <span class="number">1</span>;
-				(<span class="kw-2">*</span><span class="self">self</span>.<span class="ident">get_unchecked</span>(<span class="ident">m</span>)).<span class="ident">tap</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">set_len</span>(<span class="ident">m</span>)).<span class="ident">pipe</span>(<span class="prelude-val">Some</span>)
+				<span class="kw">let</span> <span class="ident">new_len</span> <span class="op">=</span> <span class="ident">n</span> <span class="op">-</span> <span class="number">1</span>;
+				<span class="self">self</span>.<span class="ident">set_len_unchecked</span>(<span class="ident">new_len</span>);
+				<span class="prelude-val">Some</span>(<span class="kw-2">*</span><span class="self">self</span>.<span class="ident">get_unchecked</span>(<span class="ident">new_len</span>))
 			},
 		}
 	}
@@ -2124,19 +1962,24 @@
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// # Original</span>
 	<span class="doccomment">///</span>
-	<span class="doccomment">/// [`Vec::append`](https://doc.rust-lang.org/alloc/vec/struct.Vec.html#method.append)</span>
+	<span class="doccomment">/// [`Vec::append`](alloc::vec::Vec::append)</span>
+	<span class="doccomment">///</span>
+	<span class="doccomment">/// # API Differences</span>
+	<span class="doccomment">///</span>
+	<span class="doccomment">/// This permits `other` to have different type parameters than `self`, and</span>
+	<span class="doccomment">/// does not require that it be of literally `Self`.</span>
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// # Panics</span>
 	<span class="doccomment">///</span>
-	<span class="doccomment">/// Panics if the number of bits overflows the maximum vector capacity.</span>
+	<span class="doccomment">/// Panics if the number of bits overflows the maximum bit-vector capacity.</span>
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// # Examples</span>
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// ```rust</span>
 	<span class="doccomment">/// use bitvec::prelude::*;</span>
 	<span class="doccomment">///</span>
-	<span class="doccomment">/// let mut bv1 = bitvec![0; 10];</span>
-	<span class="doccomment">/// let mut bv2 = bitvec![1; 10];</span>
+	<span class="doccomment">/// let mut bv1 = bitvec![Msb0, u16; 0; 10];</span>
+	<span class="doccomment">/// let mut bv2 = bitvec![Lsb0, u32; 1; 10];</span>
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// bv1.append(&amp;mut bv2);</span>
 	<span class="doccomment">///</span>
@@ -2149,29 +1992,30 @@
 		<span class="ident">O2</span>: <span class="ident">BitOrder</span>,
 		<span class="ident">T2</span>: <span class="ident">BitStore</span>,
 	{
-		<span class="self">self</span>.<span class="ident">extend</span>(<span class="ident">other</span>.<span class="ident">iter</span>().<span class="ident">copied</span>());
+		<span class="kw">let</span> <span class="ident">this_len</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">len</span>();
+		<span class="kw">let</span> <span class="ident">new_len</span> <span class="op">=</span> <span class="ident">this_len</span> <span class="op">+</span> <span class="ident">other</span>.<span class="ident">len</span>();
+		<span class="self">self</span>.<span class="ident">resize</span>(<span class="ident">new_len</span>, <span class="bool-val">false</span>);
+		<span class="kw">unsafe</span> { <span class="self">self</span>.<span class="ident">get_unchecked_mut</span>(<span class="ident">this_len</span> .. <span class="ident">new_len</span>) }
+			.<span class="ident">clone_from_bitslice</span>(<span class="ident">other</span>.<span class="ident">as_bitslice</span>());
 		<span class="ident">other</span>.<span class="ident">clear</span>();
 	}
 
 	<span class="doccomment">/// Creates a draining iterator that removes the specified range in the</span>
-	<span class="doccomment">/// vector and yields the removed items.</span>
+	<span class="doccomment">/// bit-vector and yields the removed bits.</span>
 	<span class="doccomment">///</span>
-	<span class="doccomment">/// Note 1: The bit range is removed even if the iterator is only partially</span>
-	<span class="doccomment">/// consumed or not consumed at all.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// Note 2: It is unspecified how many bits are removed from the vector if</span>
-	<span class="doccomment">/// the `Drain` value is leaked.</span>
+	<span class="doccomment">/// When the iterator **is** dropped, all bits in the range are removed from</span>
+	<span class="doccomment">/// the bit-vector, even if the iterator was not fully consumed. If the</span>
+	<span class="doccomment">/// iterator **is not** dropped (with [`mem::forget`] for example), it is</span>
+	<span class="doccomment">/// unspecified how many bits are removed.</span>
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// # Original</span>
 	<span class="doccomment">///</span>
-	<span class="doccomment">/// [`Vec::drain`](https://doc.rust-lang.org/alloc/vec/struct.Vec.html#method.drain)</span>
+	<span class="doccomment">/// [`Vec::drain`](alloc::vec::Vec::drain)</span>
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// # Panics</span>
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// Panics if the starting point is greater than the end point or if the end</span>
-	<span class="doccomment">/// point is greater than the length of the vector.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// # Examples</span>
+	<span class="doccomment">/// point is greater than the length of the bit-vector.</span>
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// ```rust</span>
 	<span class="doccomment">/// use bitvec::prelude::*;</span>
@@ -2185,6 +2029,8 @@
 	<span class="doccomment">/// bv.drain(..);</span>
 	<span class="doccomment">/// assert_eq!(bv, bits![]);</span>
 	<span class="doccomment">/// ```</span>
+	<span class="doccomment">///</span>
+	<span class="doccomment">/// [`mem::forget`]: core::mem::forget</span>
 	<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
 	<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">tarpaulin_include</span>))]</span>
 	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">drain</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">range</span>: <span class="ident">R</span>) -&gt; <span class="ident">Drain</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span>
@@ -2192,42 +2038,77 @@
 		<span class="ident">Drain::new</span>(<span class="self">self</span>, <span class="ident">range</span>)
 	}
 
-	<span class="doccomment">/// Clears the vector, removing all values.</span>
+	<span class="doccomment">/// Clears the bit-vector, removing all values.</span>
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// Note that this method has no effect on the allocated capacity of the</span>
-	<span class="doccomment">/// vector.</span>
+	<span class="doccomment">/// bit-vector.</span>
+	<span class="doccomment">///</span>
+	<span class="doccomment">/// ```rust</span>
+	<span class="doccomment">/// use bitvec::prelude::*;</span>
+	<span class="doccomment">///</span>
+	<span class="doccomment">/// let mut bv = bitvec![0, 1, 0, 1];</span>
+	<span class="doccomment">/// bv.clear();</span>
+	<span class="doccomment">/// assert!(bv.is_empty());</span>
+	<span class="doccomment">/// ```</span>
+	<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
+	<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">tarpaulin_include</span>))]</span>
+	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">clear</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
+		<span class="self">self</span>.<span class="ident">truncate</span>(<span class="number">0</span>);
+	}
+
+	<span class="doccomment">/// Returns the number of bits in the bit-vector, also referred to as its</span>
+	<span class="doccomment">/// ‘length’.</span>
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// # Original</span>
 	<span class="doccomment">///</span>
-	<span class="doccomment">/// [`Vec::clear`](https://doc.rust-lang.org/alloc/vec/struct.Vec.html#method.clear)</span>
+	<span class="doccomment">/// [`Vec::len`](alloc::vec::Vec::len)</span>
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// # Examples</span>
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// ```rust</span>
 	<span class="doccomment">/// use bitvec::prelude::*;</span>
 	<span class="doccomment">///</span>
-	<span class="doccomment">/// let mut bv = bitvec![0, 1, 0, 1];</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// bv.clear();</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// assert!(bv.is_empty());</span>
+	<span class="doccomment">/// let bv = bitvec![0, 0, 1];</span>
+	<span class="doccomment">/// assert_eq!(bv.len(), 3);</span>
 	<span class="doccomment">/// ```</span>
-	<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">not</span>(<span class="ident">tarpaulin</span>), <span class="ident">inline</span>(<span class="ident">always</span>))]</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">clear</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-		<span class="kw">unsafe</span> {
-			<span class="self">self</span>.<span class="ident">set_len</span>(<span class="number">0</span>);
-		}
+	<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
+	<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">tarpaulin_include</span>))]</span>
+	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
+		<span class="self">self</span>.<span class="ident">bitspan</span>.<span class="ident">len</span>()
+	}
+
+	<span class="doccomment">/// Returns `true` if the bit-vector contains no bits.</span>
+	<span class="doccomment">///</span>
+	<span class="doccomment">/// # Original</span>
+	<span class="doccomment">///</span>
+	<span class="doccomment">/// [`Vec::is_empty`](alloc::vec::Vec::is_empty)</span>
+	<span class="doccomment">///</span>
+	<span class="doccomment">/// # Examples</span>
+	<span class="doccomment">///</span>
+	<span class="doccomment">/// ```rust</span>
+	<span class="doccomment">/// use bitvec::prelude::*;</span>
+	<span class="doccomment">///</span>
+	<span class="doccomment">/// let mut bv: BitVec = BitVec::new();</span>
+	<span class="doccomment">/// assert!(bv.is_empty());</span>
+	<span class="doccomment">///</span>
+	<span class="doccomment">/// bv.push(true);</span>
+	<span class="doccomment">/// assert!(!bv.is_empty());</span>
+	<span class="doccomment">/// ```</span>
+	<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
+	<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">tarpaulin_include</span>))]</span>
+	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_empty</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+		<span class="self">self</span>.<span class="ident">bitspan</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="number">0</span>
 	}
 
 	<span class="doccomment">/// Splits the collection into two at the given index.</span>
 	<span class="doccomment">///</span>
-	<span class="doccomment">/// Returns a newly allocated vector containing the elements in range `[at,</span>
-	<span class="doccomment">/// len)`. After the call, the original vector will be left containing the</span>
-	<span class="doccomment">/// bits `[0, at)` with its previous capacity unchanged.</span>
+	<span class="doccomment">/// Returns a newly allocated bit-vector containing the bits in range `[at,</span>
+	<span class="doccomment">/// len)`. After the call, the original bit-vector will be left containing</span>
+	<span class="doccomment">/// the bits `[0, at)` with its previous capacity unchanged.</span>
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// # Original</span>
 	<span class="doccomment">///</span>
-	<span class="doccomment">/// [`Vec::split_off`](https://doc.rust-lang.org/alloc/vec/struct.Vec.html#method.split_off)</span>
+	<span class="doccomment">/// [`Vec::split_off`](alloc::vec::Vec::split_off)</span>
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// # Panics</span>
 	<span class="doccomment">///</span>
@@ -2244,15 +2125,18 @@
 	<span class="doccomment">/// assert_eq!(bv2, bits![0, 1]);</span>
 	<span class="doccomment">/// ```</span>
 	<span class="attribute">#[<span class="ident">inline</span>]</span>
+	<span class="attribute">#[<span class="ident">must_use</span> <span class="op">=</span> <span class="string">&quot;use `.truncate()` if you don’t need the other half&quot;</span>]</span>
 	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">split_off</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">at</span>: <span class="ident">usize</span>) -&gt; <span class="self">Self</span> {
 		<span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">len</span>();
 		<span class="macro">assert!</span>(<span class="ident">at</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">len</span>, <span class="string">&quot;Index {} out of bounds: {}&quot;</span>, <span class="ident">at</span>, <span class="ident">len</span>);
 		<span class="kw">match</span> <span class="ident">at</span> {
-			<span class="number">0</span> =&gt; <span class="ident">mem::replace</span>(<span class="self">self</span>, <span class="ident"><span class="self">Self</span>::with_capacity</span>(<span class="self">self</span>.<span class="ident">capacity</span>())),
+			<span class="number">0</span> =&gt; <span class="ident">mem::replace</span>(<span class="self">self</span>, <span class="ident"><span class="self">Self</span>::new</span>()),
 			<span class="ident">n</span> <span class="kw">if</span> <span class="ident">n</span> <span class="op">==</span> <span class="ident">len</span> =&gt; <span class="ident"><span class="self">Self</span>::new</span>(),
 			<span class="kw">_</span> =&gt; <span class="kw">unsafe</span> {
 				<span class="self">self</span>.<span class="ident">set_len</span>(<span class="ident">at</span>);
-				<span class="self">self</span>.<span class="ident">get_unchecked</span>(<span class="ident">at</span> .. <span class="ident">len</span>).<span class="ident">to_owned</span>()
+				<span class="self">self</span>.<span class="ident">get_unchecked</span>(<span class="ident">at</span> .. <span class="ident">len</span>)
+					.<span class="ident">to_bitvec</span>()
+					.<span class="ident">pipe</span>(<span class="ident"><span class="self">Self</span>::strip_unalias</span>)
 			},
 		}
 	}
@@ -2264,16 +2148,16 @@
 	<span class="doccomment">/// the closure `func`. The return values from `func` will end up in the</span>
 	<span class="doccomment">/// `BitVec` in the order they have been generated.</span>
 	<span class="doccomment">///</span>
-	<span class="doccomment">/// If `new_len` is less than `len`, the `Vec` is simply truncated.</span>
+	<span class="doccomment">/// If `new_len` is less than `len`, the `BitVec` is simply truncated.</span>
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// This method uses a closure to create new values on every push. If you’d</span>
-	<span class="doccomment">/// rather [`Clone`] a given bit, use [`resize`]. If you want to use the</span>
-	<span class="doccomment">/// [`Default`] trait to generate values, you can pass [`Default::default`]</span>
-	<span class="doccomment">/// as the second argument.</span>
+	<span class="doccomment">/// rather [`Clone`] a given value, use [`resize`]. If you want to use the</span>
+	<span class="doccomment">/// [`Default`] trait to generate values, you can pass</span>
+	<span class="doccomment">/// [`Default::default()`] as the second argument.</span>
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// # Original</span>
 	<span class="doccomment">///</span>
-	<span class="doccomment">/// [`Vec::resize_with`](https://doc.rust-lang.org/alloc/vec/struct.Vec.html#method.resize_with)</span>
+	<span class="doccomment">/// [`Vec::resize_with`](alloc::vec::Vec::resize_with)</span>
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// # Examples</span>
 	<span class="doccomment">///</span>
@@ -2290,25 +2174,54 @@
 	<span class="doccomment">/// assert_eq!(bv, bits![0, 1, 0, 1]);</span>
 	<span class="doccomment">/// ```</span>
 	<span class="doccomment">///</span>
-	<span class="doccomment">/// [`Clone`]: https://doc.rust-lang.org/std/clone/trait.Clone.html</span>
-	<span class="doccomment">/// [`Default`]: https://doc.rust-lang.org/std/default/trait.Default.html</span>
-	<span class="doccomment">/// [`Default::default`]: https://doc.rust-lang.org/std/default/trait.Default.html#tymethod.default</span>
-	<span class="doccomment">/// [`resize`]: #method.resize</span>
+	<span class="doccomment">/// [`Clone`]: core::clone::Clone</span>
+	<span class="doccomment">/// [`Default`]: core::default::Default</span>
+	<span class="doccomment">/// [`Default::default()`]: core::default::Default::default</span>
+	<span class="doccomment">/// [`resize`]: Self::resize</span>
 	<span class="attribute">#[<span class="ident">inline</span>]</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">resize_with</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">new_len</span>: <span class="ident">usize</span>, <span class="kw-2">mut</span> <span class="ident">func</span>: <span class="ident">F</span>)
+	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">resize_with</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">new_len</span>: <span class="ident">usize</span>, <span class="ident">func</span>: <span class="ident">F</span>)
 	<span class="kw">where</span> <span class="ident">F</span>: <span class="ident">FnMut</span>() -&gt; <span class="ident">bool</span> {
 		<span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">len</span>();
 		<span class="kw">if</span> <span class="ident">new_len</span> <span class="op">&gt;</span> <span class="ident">len</span> {
-			<span class="kw">let</span> <span class="ident">ext</span> <span class="op">=</span> <span class="ident">new_len</span> <span class="op">-</span> <span class="ident">len</span>;
-			<span class="self">self</span>.<span class="ident">reserve</span>(<span class="ident">ext</span>);
-			<span class="kw">unsafe</span> {
-				<span class="self">self</span>.<span class="ident">get_unchecked_mut</span>(<span class="ident">len</span> .. <span class="ident">new_len</span>)
-					.<span class="ident">for_each</span>(<span class="op">|</span><span class="kw">_</span>, <span class="kw">_</span><span class="op">|</span> <span class="ident">func</span>());
-			}
+			<span class="self">self</span>.<span class="ident">extend_with</span>(<span class="ident">len</span>, <span class="ident">new_len</span>, <span class="ident">func</span>);
 		}
-		<span class="kw">unsafe</span> {
-			<span class="self">self</span>.<span class="ident">set_len</span>(<span class="ident">new_len</span>);
+		<span class="kw">else</span> {
+			<span class="self">self</span>.<span class="ident">truncate</span>(<span class="ident">new_len</span>);
 		}
+	}
+
+	<span class="doccomment">/// Consumes and leaks the `BitVec`, returning a mutable reference to the</span>
+	<span class="doccomment">/// contents, `&amp;&#39;a mut BitSlice&lt;O, T&gt;`. This lifetime may be chosen to be</span>
+	<span class="doccomment">/// `&#39;static`.</span>
+	<span class="doccomment">///</span>
+	<span class="doccomment">/// This function is similar to the [`leak`] function on [`BitBox`].</span>
+	<span class="doccomment">///</span>
+	<span class="doccomment">/// This function is mainly useful for data that lives for the remainder of</span>
+	<span class="doccomment">/// the program’s life. Dropping the returned reference will cause a memory</span>
+	<span class="doccomment">/// leak.</span>
+	<span class="doccomment">///</span>
+	<span class="doccomment">/// # Original</span>
+	<span class="doccomment">///</span>
+	<span class="doccomment">/// [`Vec::leak`](alloc::vec::Vec::leak)</span>
+	<span class="doccomment">///</span>
+	<span class="doccomment">/// # Examples</span>
+	<span class="doccomment">///</span>
+	<span class="doccomment">/// Simple usage:</span>
+	<span class="doccomment">///</span>
+	<span class="doccomment">/// ```rust</span>
+	<span class="doccomment">/// use bitvec::prelude::*;</span>
+	<span class="doccomment">///</span>
+	<span class="doccomment">/// let x = bitvec![0, 0, 1];</span>
+	<span class="doccomment">/// let static_ref: &amp;&#39;static mut BitSlice = x.leak();</span>
+	<span class="doccomment">/// static_ref.set(0, true);</span>
+	<span class="doccomment">/// assert_eq!(static_ref, bits![1, 0, 1]);</span>
+	<span class="doccomment">/// ```</span>
+	<span class="doccomment">///</span>
+	<span class="doccomment">/// [`BitBox`]: crate::boxed::BitBox</span>
+	<span class="doccomment">/// [`leak`]: crate::boxed::BitBox::leak</span>
+	<span class="attribute">#[<span class="ident">inline</span>]</span>
+	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">leak</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">T</span><span class="op">&gt;</span> {
+		<span class="self">self</span>.<span class="ident">into_boxed_bitslice</span>().<span class="ident">pipe</span>(<span class="ident">BitBox::leak</span>)
 	}
 
 	<span class="doccomment">/// Resizes the `BitVec` in-place so that `len` is equal to `new_len`.</span>
@@ -2322,7 +2235,7 @@
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// # Original</span>
 	<span class="doccomment">///</span>
-	<span class="doccomment">/// [`Vec::resize`](https://doc.rust-lang.org/alloc/vec/struct.Vec.html#method.resize)</span>
+	<span class="doccomment">/// [`Vec::resize`](alloc::vec::Vec::resize)</span>
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// # Examples</span>
 	<span class="doccomment">///</span>
@@ -2338,91 +2251,73 @@
 	<span class="doccomment">/// assert_eq!(bv, bits![1; 2]);</span>
 	<span class="doccomment">/// ```</span>
 	<span class="doccomment">///</span>
-	<span class="doccomment">/// [`resize_with`]: #method.resize_with</span>
+	<span class="doccomment">/// [`resize_with`]: Self::resize_with</span>
 	<span class="attribute">#[<span class="ident">inline</span>]</span>
 	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">resize</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">new_len</span>: <span class="ident">usize</span>, <span class="ident">value</span>: <span class="ident">bool</span>) {
 		<span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">len</span>();
 		<span class="kw">if</span> <span class="ident">new_len</span> <span class="op">&gt;</span> <span class="ident">len</span> {
-			<span class="kw">let</span> <span class="ident">ext</span> <span class="op">=</span> <span class="ident">new_len</span> <span class="op">-</span> <span class="ident">len</span>;
-			<span class="self">self</span>.<span class="ident">reserve</span>(<span class="ident">ext</span>);
-			<span class="comment">/* Initialize all of the newly-allocated memory, not just the bits
-			that will become live. This is a requirement for correctness.
-
-			*Strictly speaking*, only `len .. ⌈new_len / bit_width⌉` needs to be
-			initialized, but computing the correct boundary is probably not
-			sufficiently less effort than just initializing the complete
-			allocation to be worth the instructions. If users complain about
-			performance on this method, revisit this decision, but if they don’t
-			then the naïve solution is fine.
-			*/</span>
-			<span class="kw">let</span> <span class="ident">capa</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">capacity</span>();
-			<span class="kw">unsafe</span> {
-				<span class="self">self</span>.<span class="ident">get_unchecked_mut</span>(<span class="ident">len</span> .. <span class="ident">capa</span>).<span class="ident">set_all</span>(<span class="ident">value</span>);
-			}
+			<span class="self">self</span>.<span class="ident">extend_with</span>(<span class="ident">len</span>, <span class="ident">new_len</span>, <span class="op">|</span><span class="op">|</span> <span class="ident">value</span>);
 		}
-		<span class="kw">unsafe</span> {
-			<span class="self">self</span>.<span class="ident">set_len</span>(<span class="ident">new_len</span>);
+		<span class="kw">else</span> {
+			<span class="self">self</span>.<span class="ident">truncate</span>(<span class="ident">new_len</span>);
 		}
 	}
 
-	<span class="doccomment">/// Clones and appends all `bool`s in a slice to the `BitVec`.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// Iterates over the slice `other`, clones each `bool`, and then appends it</span>
-	<span class="doccomment">/// to the `BitVec`. The `other` slice is traversed in-order.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// Prefer the [`Extend`] implementation; this method is retained only for</span>
-	<span class="doccomment">/// API compatibility, and offers no performance benefit.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// # Original</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// [`Vec::extend_from_slice`](https://doc.rust-lang.org/alloc/vec/struct.Vec.html#method.extend_from_slice)</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// # Analogue</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// See [`extend_from_bitslice`] for the method to append a bit-slice of the</span>
-	<span class="doccomment">/// same type parameters to a bit-vector.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// # Examples</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// ```rust</span>
-	<span class="doccomment">/// use bitvec::prelude::*;</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// let mut bv = bitvec![0];</span>
-	<span class="doccomment">/// bv.extend_from_slice(&amp;[true]);</span>
-	<span class="doccomment">/// assert_eq!(bv, bits![0, 1]);</span>
-	<span class="doccomment">/// ```</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// [`extend`]: #impl-Extend&lt;%26&#39;a bool&gt;</span>
-	<span class="doccomment">/// [`extend_from_bitslice`]: #method.extend_from_bitslice</span>
-	<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">not</span>(<span class="ident">tarpaulin</span>), <span class="ident">inline</span>(<span class="ident">always</span>))]</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">extend_from_slice</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span>[<span class="ident">bool</span>]) {
-		<span class="self">self</span>.<span class="ident">extend</span>(<span class="ident">other</span>)
+	<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
+	<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
+	<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">tarpaulin_include</span>))]</span>
+	<span class="attribute">#[<span class="ident">deprecated</span> <span class="op">=</span> <span class="string">&quot;Prefer `extend_from_bitslice`. If you need to extend from a \
+	                slice of `T` elements, use `extend_from_raw_slice`&quot;</span>]</span>
+	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">extend_from_slice</span><span class="op">&lt;</span><span class="ident">O2</span>, <span class="ident">T2</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">O2</span>, <span class="ident">T2</span><span class="op">&gt;</span>)
+	<span class="kw">where</span>
+		<span class="ident">O2</span>: <span class="ident">BitOrder</span>,
+		<span class="ident">T2</span>: <span class="ident">BitStore</span>,
+	{
+		<span class="self">self</span>.<span class="ident">extend_from_bitslice</span>(<span class="ident">other</span>);
+	}
+
+	<span class="doccomment">/// Resizes the `BitVec` in-place so that `len` is equal to `new_len`.</span>
+	<span class="attribute">#[<span class="ident">inline</span>]</span>
+	<span class="attribute">#[<span class="ident">deprecated</span> <span class="op">=</span> <span class="string">&quot;`Vec::resize_default` is deprecated&quot;</span>]</span>
+	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">resize_default</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">new_len</span>: <span class="ident">usize</span>) {
+		<span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">len</span>();
+		<span class="kw">if</span> <span class="ident">new_len</span> <span class="op">&gt;</span> <span class="ident">len</span> {
+			<span class="self">self</span>.<span class="ident">extend_with</span>(<span class="ident">len</span>, <span class="ident">new_len</span>, <span class="ident">Default::default</span>);
+		}
+		<span class="kw">else</span> {
+			<span class="self">self</span>.<span class="ident">truncate</span>(<span class="ident">new_len</span>);
+		}
 	}
 
 	<span class="doccomment">/// Creates a splicing iterator that replaces the specified range in the</span>
-	<span class="doccomment">/// vector with the given `replace_with` iterator and yields the removed</span>
+	<span class="doccomment">/// bit-vector with the given `replace_with` iterator and yields the removed</span>
 	<span class="doccomment">/// items. `replace_with` does not need to be the same length as `range`.</span>
 	<span class="doccomment">///</span>
-	<span class="doccomment">/// The element range is removed even if the iterator is not consumed until</span>
-	<span class="doccomment">/// the end.</span>
+	<span class="doccomment">/// `range` is removed even if the iterator is not consumed until the end.</span>
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// It is unspecified how many bits are removed from the vector if the</span>
-	<span class="doccomment">/// `Splice` value is leaked.</span>
+	<span class="doccomment">/// [`Splice`] value is leaked.</span>
 	<span class="doccomment">///</span>
-	<span class="doccomment">/// The input iterator `replace_with` is only consumed when the `Splice`</span>
+	<span class="doccomment">/// The input iterator `replace_with` is only consumed when the [`Splice`]</span>
 	<span class="doccomment">/// value is dropped.</span>
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// This is optimal if:</span>
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// - the tail (bits in the vector after `range`) is empty</span>
 	<span class="doccomment">/// - or `replace_with` yields fewer bits than `range`’s length</span>
-	<span class="doccomment">/// - or the lower bound of its `size_hint()` is exact</span>
+	<span class="doccomment">/// - or the lower bound of its [`size_hint`] is exact.</span>
 	<span class="doccomment">///</span>
-	<span class="doccomment">/// Otherwise, a temporary vector is allocated and the tail is moved twice.</span>
+	<span class="doccomment">/// Otherwise, a temporary bit-vector is allocated and the tail is moved</span>
+	<span class="doccomment">/// twice.</span>
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// # Original</span>
 	<span class="doccomment">///</span>
-	<span class="doccomment">/// [`Vec::splice`](https://doc.rust-lang.org/alloc/vec/struct.Vec.html#method.splice)</span>
+	<span class="doccomment">/// [`Vec::splice`](alloc::vec::Vec::splice)</span>
+	<span class="doccomment">///</span>
+	<span class="doccomment">/// # Panics</span>
+	<span class="doccomment">///</span>
+	<span class="doccomment">/// Panics if the starting point is greater than the end point or if the end</span>
+	<span class="doccomment">/// point is greater than the length of the bit-vector.</span>
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// # Examples</span>
 	<span class="doccomment">///</span>
@@ -2431,11 +2326,14 @@
 	<span class="doccomment">///</span>
 	<span class="doccomment">/// let mut bv = bitvec![0, 1, 0];</span>
 	<span class="doccomment">/// let new = bits![1, 0];</span>
-	<span class="doccomment">/// let old: BitVec = bv.splice(.. 2, new.iter().copied()).collect();</span>
+	<span class="doccomment">/// let old: BitVec = bv.splice(.. 2, new.iter().by_val()).collect();</span>
 	<span class="doccomment">/// assert_eq!(bv, bits![1, 0, 0]);</span>
 	<span class="doccomment">/// assert_eq!(old, bits![0, 1]);</span>
 	<span class="doccomment">/// ```</span>
-	<span class="attribute">#[<span class="ident">inline</span>]</span>
+	<span class="doccomment">///</span>
+	<span class="doccomment">/// [`Splice`]: crate::vec::Splice</span>
+	<span class="doccomment">/// [`size_hint`]: core::iter::Iterator::size_hint</span>
+	<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
 	<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">tarpaulin_include</span>))]</span>
 	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">splice</span><span class="op">&lt;</span><span class="ident">R</span>, <span class="ident">I</span><span class="op">&gt;</span>(
 		<span class="kw-2">&amp;mut</span> <span class="self">self</span>,
@@ -2447,6 +2345,20 @@
 		<span class="ident">I</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">bool</span><span class="op">&gt;</span>,
 	{
 		<span class="ident">Splice::new</span>(<span class="self">self</span>.<span class="ident">drain</span>(<span class="ident">range</span>), <span class="ident">replace_with</span>)
+	}
+
+	<span class="kw">fn</span> <span class="ident">extend_with</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">len</span>: <span class="ident">usize</span>, <span class="ident">new_len</span>: <span class="ident">usize</span>, <span class="kw-2">mut</span> <span class="ident">func</span>: <span class="ident">F</span>)
+	<span class="kw">where</span> <span class="ident">F</span>: <span class="ident">FnMut</span>() -&gt; <span class="ident">bool</span> {
+		<span class="self">self</span>.<span class="ident">reserve</span>(<span class="ident">new_len</span> <span class="op">-</span> <span class="ident">len</span>);
+
+		<span class="kw">unsafe</span> {
+			<span class="kw">for</span> <span class="ident">bitptr</span> <span class="kw">in</span>
+				<span class="self">self</span>.<span class="ident">get_unchecked_mut</span>(<span class="ident">len</span> .. <span class="ident">new_len</span>).<span class="ident">as_mut_bitptr_range</span>()
+			{
+				<span class="ident">bitptr</span>.<span class="ident">write</span>(<span class="ident">func</span>());
+			}
+			<span class="self">self</span>.<span class="ident">set_len_unchecked</span>(<span class="ident">new_len</span>);
+		}
 	}
 }
 </code></pre></div>
