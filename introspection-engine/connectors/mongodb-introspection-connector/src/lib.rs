@@ -82,6 +82,14 @@ impl MongoDbIntrospectionConnector {
 
         Ok(schema)
     }
+
+    async fn version(&self) -> ConnectorResult<String> {
+        let version = mongodb_schema_describer::version(&self.connection, &self.database)
+            .await
+            .map_err(crate::Error::from)?;
+
+        Ok(version)
+    }
 }
 
 #[async_trait::async_trait]
@@ -113,11 +121,13 @@ impl IntrospectionConnector for MongoDbIntrospectionConnector {
     }
 
     async fn get_database_description(&self) -> ConnectorResult<String> {
-        Ok(Default::default())
+        let mongo_schema = self.describe(BitFlags::all()).await?;
+        let description = serde_json::to_string_pretty(&mongo_schema).unwrap();
+        Ok(description)
     }
 
     async fn get_database_version(&self) -> ConnectorResult<String> {
-        Ok(Default::default())
+        Ok(self.version().await.unwrap())
     }
 
     async fn introspect(
