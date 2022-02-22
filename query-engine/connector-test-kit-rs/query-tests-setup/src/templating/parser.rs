@@ -7,7 +7,7 @@ use nom::{
     error::{Error as NomError, ErrorKind},
     multi::{many0, separated_list0},
     sequence::delimited,
-    Finish, IResult,
+    IResult,
 };
 use parse_hyperlinks::take_until_unbalanced;
 
