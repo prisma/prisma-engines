@@ -229,31 +229,31 @@
 <span id="228">228</span>
 <span id="229">229</span>
 <span id="230">230</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std</span>::{
+</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">mongodb::bson::Bson</span>;
+<span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
+<span class="kw">use</span> <span class="ident">std</span>::{
     <span class="ident">collections::BTreeMap</span>,
     <span class="ident">fmt</span>::{<span class="self">self</span>, <span class="ident">Debug</span>},
     <span class="ident">ops</span>,
 };
 
-<span class="kw">use</span> <span class="ident">mongodb::bson::Bson</span>;
-
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">CollectionWalker</span>, <span class="ident">IndexWalker</span>};
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">Hash</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">Hash</span>, <span class="ident">Serialize</span>, <span class="ident">Deserialize</span>)]</span>
 <span class="doccomment">/// An id of a collection in the schema.</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CollectionId</span>(<span class="ident">usize</span>);
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">Hash</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">Hash</span>, <span class="ident">Serialize</span>, <span class="ident">Deserialize</span>)]</span>
 <span class="doccomment">/// An id of an index in the schema.</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">IndexId</span>(<span class="ident">usize</span>);
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Serialize</span>, <span class="ident">Deserialize</span>)]</span>
 <span class="doccomment">/// All the information we can fetch per collection.</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CollectionData</span> {
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">name</span>: <span class="ident">String</span>,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">PartialEq</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">PartialEq</span>, <span class="ident">Serialize</span>, <span class="ident">Deserialize</span>)]</span>
 <span class="doccomment">/// The type of an index.</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">IndexType</span> {
     <span class="doccomment">/// Mapped as `@@index`.</span>
@@ -278,7 +278,7 @@
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Serialize</span>, <span class="ident">Deserialize</span>)]</span>
 <span class="doccomment">/// All the information we can scrape per index.</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">IndexData</span> {
     <span class="doccomment">/// The name of the index.</span>
@@ -291,7 +291,7 @@
     <span class="kw">pub</span> <span class="ident">collection_id</span>: <span class="ident">CollectionId</span>,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Default</span>, <span class="ident">Clone</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Default</span>, <span class="ident">Clone</span>, <span class="ident">Serialize</span>, <span class="ident">Deserialize</span>)]</span>
 <span class="doccomment">/// All the possible information we should scrape out from a MongoDB database.</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">MongoSchema</span> {
     <span class="ident">collections</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">CollectionData</span><span class="op">&gt;</span>,
@@ -402,7 +402,7 @@
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">Serialize</span>, <span class="ident">Deserialize</span>)]</span>
 <span class="doccomment">/// A field that is part of an index.</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">IndexField</span> {
     <span class="doccomment">/// The name of the field.</span>
@@ -429,7 +429,7 @@
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">PartialEq</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">PartialEq</span>, <span class="ident">Serialize</span>, <span class="ident">Deserialize</span>)]</span>
 <span class="doccomment">/// Defines the property in the field that is part of an index.</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">IndexFieldProperty</span> {
     <span class="doccomment">/// Defines a full-text index.</span>
