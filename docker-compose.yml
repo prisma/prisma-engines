@@ -157,7 +157,7 @@ services:
     tmpfs: /var/lib/mariadb
 
   vitess-test-5_7:
-    image: vitess/vttestserver:mysql57@sha256:405eac5b3203601f0e20593a2837708ed5fa9d8eceba3dc7d510699149a763ed
+    image: vitess/vttestserver:mysql57@sha256:d0b4eeb5b4f5f195112d72992724bcd3080f94a63f4af47f53e95262741849fa
     restart: always
     ports:
       - 33577:33577
@@ -169,7 +169,7 @@ services:
       FOREIGN_KEY_MODE: "disallow"
 
   vitess-test-8_0:
-    image: vitess/vttestserver:mysql80@sha256:7ba75c840bd9ded9685cc57dece288292558d3522e4b3a48c8d7e85dd9c1fa25
+    image: vitess/vttestserver:mysql80@sha256:02d4e438e503ecf32501e2e25061344dd14f48c2551234d9a2227832c6fac04c
     restart: always
     ports:
       - 33807:33807
@@ -181,7 +181,7 @@ services:
       FOREIGN_KEY_MODE: "disallow"
 
   vitess-shadow-5_7:
-    image: vitess/vttestserver:mysql57@sha256:405eac5b3203601f0e20593a2837708ed5fa9d8eceba3dc7d510699149a763ed
+    image: vitess/vttestserver:mysql57@sha256:d0b4eeb5b4f5f195112d72992724bcd3080f94a63f4af47f53e95262741849fa
     restart: always
     ports:
       - 33578:33577
@@ -193,7 +193,7 @@ services:
       FOREIGN_KEY_MODE: "disallow"
 
   vitess-shadow-8_0:
-    image: vitess/vttestserver:mysql80@sha256:7ba75c840bd9ded9685cc57dece288292558d3522e4b3a48c8d7e85dd9c1fa25
+    image: vitess/vttestserver:mysql80@sha256:02d4e438e503ecf32501e2e25061344dd14f48c2551234d9a2227832c6fac04c
     restart: always
     ports:
       - 33808:33807
