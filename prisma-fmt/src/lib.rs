@@ -1,4 +1,5 @@
 mod actions;
+mod get_config;
 mod lint;
 mod native;
 mod preview;
@@ -61,4 +62,46 @@ pub fn preview_features() -> String {
 
 pub fn referential_actions(schema: String) -> String {
     actions::run(&schema)
+}
+
+/// This is the same command as get_config()
+///
+/// Params is a JSON string with the following shape:
+///
+/// ```ignore
+/// interface GetConfigParams {
+///   prismaSchema: string
+///   ignoreEnvVarErrors?: bool
+///   env?: { [key: string]: string }
+///   datasourceOverrides?: { [key: string]: string }
+/// }
+/// ```
+/// Params example:
+///
+/// ```ignore
+/// {
+///   "prismaSchema": <the prisma schema>,
+///   "env": {
+///     "DBURL": "postgresql://example.com/mydb"
+///   }
+/// }
+/// ```
+///
+/// The response is a JSON string with the following shape:
+///
+/// ```ignore
+/// type GetConfigSuccessResponse = any // same as QE getConfig
+///
+/// interface GetConfigErrorResponse {
+///   error: {
+///     error_code?: string
+///     message: string
+///   }
+/// }
+///
+/// type GetConfigResponse = GetConfigErrorResponse | GetConfigSuccessResponse
+///
+/// ```
+pub fn get_config(get_config_params: String) -> String {
+    get_config::get_config(&get_config_params)
 }
