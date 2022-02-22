@@ -3,8 +3,8 @@ mod mongodb_types;
 use datamodel_connector::{
     connector_error::{ConnectorError, ErrorKind},
     parser_database::{ast::Expression, walkers::*},
-    Connector, ConnectorCapability, Diagnostics, NativeTypeConstructor, NativeTypeInstance, ReferentialAction,
-    ReferentialIntegrity, ScalarType,
+    Connector, ConnectorCapability, DatamodelError, Diagnostics, NativeTypeConstructor, NativeTypeInstance,
+    ReferentialAction, ReferentialIntegrity, ScalarType,
 };
 use enumflags2::BitFlags;
 use mongodb_types::*;
@@ -45,12 +45,8 @@ impl MongoDbDatamodelConnector {
                 message:
                     "MongoDB `@default(auto())` fields must have `ObjectId` native type and use the `@id` attribute."
                         .to_owned(),
-            })
-            .to_string();
-            errors.push_error(datamodel_connector::DatamodelError::new_connector_error(
-                &err,
-                field.ast_field().span,
-            ))
+            });
+            errors.push_error(DatamodelError::new_connector_error(err, field.ast_field().span))
         };
 
         let model = field.model();
@@ -73,12 +69,8 @@ impl MongoDbDatamodelConnector {
             field: field.name().to_owned(),
             message: "The `dbgenerated()` function is not allowed with MongoDB. Please use `auto()` instead."
                 .to_owned(),
-        })
-        .to_string();
-        errors.push_error(datamodel_connector::DatamodelError::new_connector_error(
-            &err,
-            field.ast_field().span,
-        ));
+        });
+        errors.push_error(DatamodelError::new_connector_error(err, field.ast_field().span));
     }
 
     fn validate_array_native_type(field: ScalarFieldWalker<'_>, errors: &mut Diagnostics) {
@@ -94,15 +86,14 @@ impl MongoDbDatamodelConnector {
         // `db.Array` expects exactly 1 argument, which is validated before this code path.
         let arg = args.get(0).unwrap();
 
-        errors.push_error(datamodel_connector::DatamodelError::new_connector_error(
-            &ConnectorError::from_kind(ErrorKind::FieldValidationError {
+        errors.push_error(DatamodelError::new_connector_error(
+            ConnectorError::from_kind(ErrorKind::FieldValidationError {
                 field: field.name().to_owned(),
                 message: format!(
                     "Native type `{ds_name}.{}` is deprecated. Please use `{ds_name}.{arg}` instead.",
                     type_names::ARRAY
                 ),
-            })
-            .to_string(),
+            }),
             span,
         ));
     }
@@ -133,10 +124,7 @@ impl Connector for MongoDbDatamodelConnector {
         }
 
         let mut push_error = |err: ConnectorError| {
-            errors.push_error(datamodel_connector::DatamodelError::new_connector_error(
-                &err.to_string(),
-                model.ast_model().span,
-            ));
+            errors.push_error(DatamodelError::new_connector_error(err, model.ast_model().span));
         };
 
         if let Some(pk) = model.primary_key() {

@@ -72,12 +72,10 @@ pub(crate) fn mongo_type_from_input(name: &str, args: &[String]) -> crate::Resul
         TIMESTAMP => MongoDbType::Timestamp,
         DECIMAL => MongoDbType::Decimal,
         name => {
-            return Err(ConnectorError {
-                kind: ErrorKind::NativeTypeNameUnknown {
-                    connector_name: "MongoDB".to_owned(),
-                    native_type: name.to_owned(),
-                },
-            })
+            return Err(ConnectorError::from_kind(ErrorKind::NativeTypeNameUnknown {
+                connector_name: "MongoDB".to_owned(),
+                native_type: name.to_owned(),
+            }))
         }
     };
 

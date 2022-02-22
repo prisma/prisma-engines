@@ -1,6 +1,5 @@
-use crate::helper::pretty_print;
-use crate::Span;
-use std::fmt;
+use crate::{helper::pretty_print, Span};
+use std::{borrow::Cow, fmt};
 use thiserror::Error;
 
 #[derive(Debug, Error, Clone, PartialEq)]
@@ -108,15 +107,6 @@ enum DatamodelErrorKind {
   #[error("Unexpected token. Expected one of: {}", expected_str)]
   ParserError { expected_str: String, span: Span },
 
-  #[error("{}", message)]
-  LegacyParserError { message: String, span: Span },
-
-  #[error("{}", message)]
-  ConnectorError { message: String, span: Span },
-
-  #[error("{}", message)]
-  FunctionalEvaluationError { message: String, span: Span },
-
   #[error("Environment variable not found: {}.", var_name)]
   EnvironmentFunctionalEvaluationError { var_name: String, span: Span },
 
@@ -143,9 +133,17 @@ enum DatamodelErrorKind {
 
   #[error("Error validating: {}", message)]
   ValidationError { message: String, span: Span },
+
+  #[error("{}", message)]
+  Raw { message: Cow<'static, str>, span: Span },
+
 }
 
 impl DatamodelError {
+    pub fn new(message: Cow<'static, str>, span: Span) -> Self {
+        DatamodelError(DatamodelErrorKind::Raw { message, span })
+    }
+
     pub fn new_literal_parser_error(literal_type: &str, raw_value: &str, span: Span) -> DatamodelError {
         DatamodelErrorKind::LiteralParseError {
             literal_type: String::from(literal_type),
@@ -403,32 +401,20 @@ impl DatamodelError {
         DatamodelErrorKind::ValidationError { message, span }.into()
     }
 
-    pub fn new_legacy_parser_error(message: &str, span: Span) -> DatamodelError {
-        DatamodelErrorKind::LegacyParserError {
-            message: String::from(message),
-            span,
-        }
-        .into()
+    pub fn new_legacy_parser_error(message: impl Into<Cow<'static, str>>, span: Span) -> DatamodelError {
+        Self::new(message.into(), span)
     }
 
-    pub fn new_connector_error(message: &str, span: Span) -> DatamodelError {
-        DatamodelErrorKind::ConnectorError {
-            message: String::from(message),
-            span,
-        }
-        .into()
+    pub fn new_connector_error(err: crate::connector_error::ConnectorError, span: Span) -> DatamodelError {
+        Self::new(Cow::Owned(err.to_string()), span)
     }
 
     pub fn new_parser_error(expected_str: String, span: Span) -> DatamodelError {
         DatamodelErrorKind::ParserError { expected_str, span }.into()
     }
 
-    pub fn new_functional_evaluation_error(message: &str, span: Span) -> DatamodelError {
-        DatamodelErrorKind::FunctionalEvaluationError {
-            message: String::from(message),
-            span,
-        }
-        .into()
+    pub fn new_functional_evaluation_error(message: impl Into<Cow<'static, str>>, span: Span) -> DatamodelError {
+        Self::new(message.into(), span)
     }
 
     pub fn new_environment_functional_evaluation_error(var_name: String, span: Span) -> DatamodelError {
@@ -536,12 +522,10 @@ impl DatamodelError {
             DatamodelErrorKind::TypeNotFoundError { span, .. } => *span,
             DatamodelErrorKind::ScalarTypeNotFoundError { span, .. } => *span,
             DatamodelErrorKind::ParserError { span, .. } => *span,
-            DatamodelErrorKind::FunctionalEvaluationError { span, .. } => *span,
             DatamodelErrorKind::EnvironmentFunctionalEvaluationError { span, .. } => *span,
             DatamodelErrorKind::TypeMismatchError { span, .. } => *span,
             DatamodelErrorKind::ValueParserError { span, .. } => *span,
             DatamodelErrorKind::ValidationError { span, .. } => *span,
-            DatamodelErrorKind::LegacyParserError { span, .. } => *span,
             DatamodelErrorKind::ModelValidationError { span, .. } => *span,
             DatamodelErrorKind::DuplicateAttributeError { span, .. } => *span,
             DatamodelErrorKind::DuplicateConfigKeyError { span, .. } => *span,
@@ -556,7 +540,7 @@ impl DatamodelError {
             DatamodelErrorKind::FieldValidationError { span, .. } => *span,
             DatamodelErrorKind::SourceValidationError { span, .. } => *span,
             DatamodelErrorKind::EnumValidationError { span, .. } => *span,
-            DatamodelErrorKind::ConnectorError { span, .. } => *span,
+            DatamodelErrorKind::Raw { span, .. } => *span,
             DatamodelErrorKind::PreviewFeatureNotKnownError { span, .. } => *span,
             DatamodelErrorKind::ShadowDatabaseUrlIsSameAsMainUrl { span, .. } => *span,
             DatamodelErrorKind::CompositeTypeValidationError { span, .. } => *span,

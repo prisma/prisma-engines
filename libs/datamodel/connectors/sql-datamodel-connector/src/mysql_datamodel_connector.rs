@@ -3,8 +3,8 @@ use datamodel_connector::{
     helper::{args_vec_from_opt, parse_one_opt_u32, parse_one_u32, parse_two_opt_u32},
     parser_database::walkers::ModelWalker,
     walker_ext_traits::*,
-    Connector, ConnectorCapability, ConstraintScope, Diagnostics, NativeTypeConstructor, NativeTypeInstance,
-    ReferentialAction, ReferentialIntegrity, ScalarType,
+    Connector, ConnectorCapability, ConstraintScope, DatamodelError, Diagnostics, NativeTypeConstructor,
+    NativeTypeInstance, ReferentialAction, ReferentialIntegrity, ScalarType,
 };
 use enumflags2::BitFlags;
 use native_types::{
@@ -260,10 +260,7 @@ impl Connector for MySqlDatamodelConnector {
 
     fn validate_model(&self, model: ModelWalker<'_>, errors: &mut Diagnostics) {
         let mut push_error = |err: ConnectorError| {
-            errors.push_error(datamodel_connector::DatamodelError::new_connector_error(
-                &err.to_string(),
-                model.ast_model().span,
-            ));
+            errors.push_error(DatamodelError::new_connector_error(err, model.ast_model().span));
         };
 
         for index in model.indexes() {

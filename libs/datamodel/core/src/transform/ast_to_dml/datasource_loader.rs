@@ -15,7 +15,7 @@ use crate::{
 };
 use datamodel_connector::ReferentialIntegrity;
 use enumflags2::BitFlags;
-use std::{collections::HashMap, convert::TryFrom};
+use std::{borrow::Cow, collections::HashMap, convert::TryFrom};
 
 const PREVIEW_FEATURES_KEY: &str = "previewFeatures";
 const SHADOW_DATABASE_URL_KEY: &str = "shadowDatabaseUrl";
@@ -81,10 +81,8 @@ impl DatasourceLoader {
         };
 
         if provider_arg.is_from_env() {
-            diagnostics.push_error(DatamodelError::new_functional_evaluation_error(
-                &"A datasource must not use the env() function in the provider argument.".to_string(),
-                ast_source.span,
-            ));
+            let msg = Cow::Borrowed("A datasource must not use the env() function in the provider argument.");
+            diagnostics.push_error(DatamodelError::new_functional_evaluation_error(msg, ast_source.span));
             return None;
         }
 
@@ -283,6 +281,6 @@ fn preview_features_guardrail(args: &HashMap<&str, (Span, ValueValidator<'_>)>, 
             }
         }
         let msg = "Preview features are only supported in the generator block. Please move this field to the generator block.";
-        diagnostics.push_error(DatamodelError::new_connector_error(msg, span));
+        diagnostics.push_error(DatamodelError::new(std::borrow::Cow::Borrowed(msg), span));
     }
 }

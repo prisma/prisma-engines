@@ -135,30 +135,23 @@ pub(super) fn validate_native_type_arguments(field: ScalarFieldWalker<'_>, ctx: 
     // Validate that the attribute is scoped with the right datasource name.
     if let Some(datasource) = ctx.datasource {
         if datasource.name != attr_scope {
-            ctx.push_error(DatamodelError::new_connector_error(
-                &ConnectorError::from_kind(ErrorKind::InvalidPrefixForNativeTypes {
-                    given_prefix: attr_scope.to_owned(),
-                    expected_prefix: datasource.name.clone(),
-                    suggestion: [datasource.name.as_str(), type_name].join("."),
-                })
-                .to_string(),
-                span,
-            ));
+            let err = ConnectorError::from_kind(ErrorKind::InvalidPrefixForNativeTypes {
+                given_prefix: attr_scope.to_owned(),
+                expected_prefix: datasource.name.clone(),
+                suggestion: [datasource.name.as_str(), type_name].join("."),
+            });
+            ctx.push_error(DatamodelError::new_connector_error(err, span));
         }
     }
 
     let constructor = if let Some(cons) = ctx.connector.find_native_type_constructor(type_name) {
         cons
     } else {
-        ctx.push_error(DatamodelError::new_connector_error(
-            &ConnectorError::from_kind(ErrorKind::NativeTypeNameUnknown {
-                native_type: type_name.to_owned(),
-                connector_name,
-            })
-            .to_string(),
-            span,
-        ));
-        return;
+        let err = ConnectorError::from_kind(ErrorKind::NativeTypeNameUnknown {
+            native_type: type_name.to_owned(),
+            connector_name,
+        });
+        return ctx.push_error(DatamodelError::new_connector_error(err, span));
     };
 
     let number_of_args = args.len();
@@ -179,12 +172,11 @@ pub(super) fn validate_native_type_arguments(field: ScalarFieldWalker<'_>, ctx: 
         && constructor._number_of_optional_args > 0
     {
         ctx.push_error(DatamodelError::new_connector_error(
-            &ConnectorError::from_kind(ErrorKind::OptionalArgumentCountMismatchError {
+            ConnectorError::from_kind(ErrorKind::OptionalArgumentCountMismatchError {
                 native_type: type_name.to_owned(),
                 optional_count: constructor._number_of_optional_args,
                 given_count: number_of_args,
-            })
-            .to_string(),
+            }),
             span,
         ));
         return;
@@ -193,7 +185,7 @@ pub(super) fn validate_native_type_arguments(field: ScalarFieldWalker<'_>, ctx: 
     // check for compatibility with scalar type
     if !constructor.prisma_types.contains(&scalar_type) {
         ctx.push_error(DatamodelError::new_connector_error(
-            &ConnectorError::from_kind(ErrorKind::IncompatibleNativeType {
+            ConnectorError::from_kind(ErrorKind::IncompatibleNativeType {
                 native_type: type_name.to_owned(),
                 field_type: scalar_type.as_str(),
                 expected_types: constructor
@@ -202,8 +194,7 @@ pub(super) fn validate_native_type_arguments(field: ScalarFieldWalker<'_>, ctx: 
                     .map(|s| s.as_str())
                     .collect::<Vec<_>>()
                     .join(" or "),
-            })
-            .to_string(),
+            }),
             span,
         ));
         return;
@@ -216,14 +207,11 @@ pub(super) fn validate_native_type_arguments(field: ScalarFieldWalker<'_>, ctx: 
                 .validate_native_type_arguments(&native_type, &scalar_type, &mut errors);
 
             for error in errors {
-                ctx.push_error(DatamodelError::new_connector_error(
-                    &error.to_string(),
-                    field.ast_field().span,
-                ));
+                ctx.push_error(DatamodelError::new_connector_error(error, field.ast_field().span));
             }
         }
         Err(connector_error) => {
-            ctx.push_error(DatamodelError::new_connector_error(&connector_error.to_string(), span));
+            ctx.push_error(DatamodelError::new_connector_error(connector_error, span));
         }
     };
 }
