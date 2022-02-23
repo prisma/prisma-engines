@@ -73,6 +73,7 @@ impl CallbackLayer {
     }
 }
 
+// A tracing layer for sending logs to a js callback, layers are composable, subscribers are not.
 impl<S: Subscriber> Layer<S> for CallbackLayer {
     fn on_event(&self, event: &tracing::Event<'_>, _ctx: tracing_subscriber::layer::Context<'_, S>) {
         let mut visitor = JsonVisitor::new(event.metadata().level(), event.metadata().target());
