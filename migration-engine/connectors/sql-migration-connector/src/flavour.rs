@@ -213,6 +213,7 @@ async fn generic_apply_migration_script(migration_name: &str, script: &str, conn
     })
 }
 
+/// Remove all usage of non-enabled preview feature elements from the SqlSchema.
 fn normalize_sql_schema(sql_schema: &mut SqlSchema, preview_features: BitFlags<PreviewFeature>) {
     use sql_schema_describer::IndexType;
 

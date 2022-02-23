@@ -1,7 +1,7 @@
 //! A container to manage 0 or more migration connectors, based on request contents.
 //!
-//! Why: we must be able to use the migration engine without a valid schema or database connection
-//! for commands like createDatabase and diff.
+//! Why this rather than using connectors directly? We must be able to use the migration engine
+//! without a valid schema or database connection for commands like createDatabase and diff.
 
 use crate::{api::GenericApi, commands, json_rpc::types::*, CoreResult};
 use enumflags2::BitFlags;
@@ -10,7 +10,13 @@ use std::{collections::HashMap, future::Future, path::Path, pin::Pin, sync::Arc}
 use tokio::sync::{mpsc::Sender, Mutex};
 use tracing_futures::Instrument;
 
-/// The container for the state of the migration engine. It can contain one or more connectors.
+/// The container for the state of the migration engine. It can contain one or more connectors
+/// corresponding to a database to be reached or that we are already connected to.
+///
+/// The general mechanism is that we match a single url or prisma schema to a single connector in
+/// `connectors`. Each connector has its own async task, and communicates with the core through
+/// channels. That ensures that each connector is handling requests one at a time to avoid
+/// synchronization issues. You can think of it in terms of the actor model.
 pub(crate) struct EngineState {
     initial_datamodel: Option<String>,
     host: Arc<dyn ConnectorHost>,
@@ -19,14 +25,17 @@ pub(crate) struct EngineState {
     // - a connection string / url
     // - a full schema
     //
-    // To a MigrationConnector.
+    // To a channel leading to a spawned MigrationConnector.
     connectors: Mutex<HashMap<String, Sender<ErasedConnectorRequest>>>,
 }
 
+/// A request from the core to a connector, in the form of an async closure.
 type ConnectorRequest<O> = Box<
     dyn for<'c> FnOnce(&'c mut dyn MigrationConnector) -> Pin<Box<dyn Future<Output = CoreResult<O>> + Send + 'c>>
         + Send,
 >;
+
+/// Same as ConnectorRequest, but with the return type erased with a channel.
 type ErasedConnectorRequest = Box<
     dyn for<'c> FnOnce(&'c mut dyn MigrationConnector) -> Pin<Box<dyn Future<Output = ()> + Send + 'c>>
         + Send
