@@ -224,13 +224,25 @@
 <span id="223">223</span>
 <span id="224">224</span>
 <span id="225">225</span>
+<span id="226">226</span>
+<span id="227">227</span>
+<span id="228">228</span>
+<span id="229">229</span>
+<span id="230">230</span>
+<span id="231">231</span>
+<span id="232">232</span>
+<span id="233">233</span>
+<span id="234">234</span>
+<span id="235">235</span>
+<span id="236">236</span>
+<span id="237">237</span>
 </pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">mongodb_types</span>;
 
 <span class="kw">use</span> <span class="ident">datamodel_connector</span>::{
     <span class="ident">connector_error</span>::{<span class="ident">ConnectorError</span>, <span class="ident">ErrorKind</span>},
     <span class="ident">parser_database</span>::{<span class="ident">ast::Expression</span>, <span class="ident">walkers</span>::<span class="kw-2">*</span>},
-    <span class="ident">Connector</span>, <span class="ident">ConnectorCapability</span>, <span class="ident">DatamodelError</span>, <span class="ident">Diagnostics</span>, <span class="ident">NativeTypeConstructor</span>, <span class="ident">NativeTypeInstance</span>,
-    <span class="ident">ReferentialAction</span>, <span class="ident">ReferentialIntegrity</span>, <span class="ident">ScalarType</span>,
+    <span class="ident">Connector</span>, <span class="ident">ConnectorCapability</span>, <span class="ident">Diagnostics</span>, <span class="ident">NativeTypeConstructor</span>, <span class="ident">NativeTypeInstance</span>, <span class="ident">ReferentialAction</span>,
+    <span class="ident">ReferentialIntegrity</span>, <span class="ident">ScalarType</span>,
 };
 <span class="kw">use</span> <span class="ident">enumflags2::BitFlags</span>;
 <span class="kw">use</span> <span class="ident">mongodb_types</span>::<span class="kw-2">*</span>;
@@ -271,8 +283,12 @@
                 <span class="ident">message</span>:
                     <span class="string">&quot;MongoDB `@default(auto())` fields must have `ObjectId` native type and use the `@id` attribute.&quot;</span>
                         .<span class="ident">to_owned</span>(),
-            });
-            <span class="ident">errors</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_connector_error</span>(<span class="ident">err</span>, <span class="ident">field</span>.<span class="ident">ast_field</span>().<span class="ident">span</span>))
+            })
+            .<span class="ident">to_string</span>();
+            <span class="ident">errors</span>.<span class="ident">push_error</span>(<span class="ident">datamodel_connector::DatamodelError::new_connector_error</span>(
+                <span class="kw-2">&amp;</span><span class="ident">err</span>,
+                <span class="ident">field</span>.<span class="ident">ast_field</span>().<span class="ident">span</span>,
+            ))
         };
 
         <span class="kw">let</span> <span class="ident">model</span> <span class="op">=</span> <span class="ident">field</span>.<span class="ident">model</span>();
@@ -295,8 +311,12 @@
             <span class="ident">field</span>: <span class="ident">field</span>.<span class="ident">name</span>().<span class="ident">to_owned</span>(),
             <span class="ident">message</span>: <span class="string">&quot;The `dbgenerated()` function is not allowed with MongoDB. Please use `auto()` instead.&quot;</span>
                 .<span class="ident">to_owned</span>(),
-        });
-        <span class="ident">errors</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_connector_error</span>(<span class="ident">err</span>, <span class="ident">field</span>.<span class="ident">ast_field</span>().<span class="ident">span</span>));
+        })
+        .<span class="ident">to_string</span>();
+        <span class="ident">errors</span>.<span class="ident">push_error</span>(<span class="ident">datamodel_connector::DatamodelError::new_connector_error</span>(
+            <span class="kw-2">&amp;</span><span class="ident">err</span>,
+            <span class="ident">field</span>.<span class="ident">ast_field</span>().<span class="ident">span</span>,
+        ));
     }
 
     <span class="kw">fn</span> <span class="ident">validate_array_native_type</span>(<span class="ident">field</span>: <span class="ident">ScalarFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">errors</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Diagnostics</span>) {
@@ -312,14 +332,15 @@
         <span class="comment">// `db.Array` expects exactly 1 argument, which is validated before this code path.</span>
         <span class="kw">let</span> <span class="ident">arg</span> <span class="op">=</span> <span class="ident">args</span>.<span class="ident">get</span>(<span class="number">0</span>).<span class="ident">unwrap</span>();
 
-        <span class="ident">errors</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_connector_error</span>(
-            <span class="ident">ConnectorError::from_kind</span>(<span class="ident">ErrorKind::FieldValidationError</span> {
+        <span class="ident">errors</span>.<span class="ident">push_error</span>(<span class="ident">datamodel_connector::DatamodelError::new_connector_error</span>(
+            <span class="kw-2">&amp;</span><span class="ident">ConnectorError::from_kind</span>(<span class="ident">ErrorKind::FieldValidationError</span> {
                 <span class="ident">field</span>: <span class="ident">field</span>.<span class="ident">name</span>().<span class="ident">to_owned</span>(),
                 <span class="ident">message</span>: <span class="macro">format!</span>(
                     <span class="string">&quot;Native type `{ds_name}.{}` is deprecated. Please use `{ds_name}.{arg}` instead.&quot;</span>,
                     <span class="ident">type_names::ARRAY</span>
                 ),
-            }),
+            })
+            .<span class="ident">to_string</span>(),
             <span class="ident">span</span>,
         ));
     }
@@ -350,7 +371,10 @@
         }
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">push_error</span> <span class="op">=</span> <span class="op">|</span><span class="ident">err</span>: <span class="ident">ConnectorError</span><span class="op">|</span> {
-            <span class="ident">errors</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_connector_error</span>(<span class="ident">err</span>, <span class="ident">model</span>.<span class="ident">ast_model</span>().<span class="ident">span</span>));
+            <span class="ident">errors</span>.<span class="ident">push_error</span>(<span class="ident">datamodel_connector::DatamodelError::new_connector_error</span>(
+                <span class="kw-2">&amp;</span><span class="ident">err</span>.<span class="ident">to_string</span>(),
+                <span class="ident">model</span>.<span class="ident">ast_model</span>().<span class="ident">span</span>,
+            ));
         };
 
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">pk</span>) <span class="op">=</span> <span class="ident">model</span>.<span class="ident">primary_key</span>() {
