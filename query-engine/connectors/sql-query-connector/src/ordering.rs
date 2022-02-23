@@ -126,6 +126,7 @@ pub fn compute_joins_aggregation(
         .split_last()
         .expect("An order by relation aggregation has to have at least one hop");
 
+    // Unwraps are safe because the SQL connector doesn't yet support any other type of orderBy hop but the relation hop.
     let mut joins = rest_hops
         .iter()
         .map(|hop| compute_one2m_join(base_model, hop.into_relation_hop().unwrap(), join_prefix.as_str()))

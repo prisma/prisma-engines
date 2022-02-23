@@ -51,10 +51,9 @@ impl OrderByData {
 
             // We fold from right to left because the right hand side needs to be always contained
             // in the left hand side here (JoinStage<A, JoinStage<B, JoinStage<C>>>).
-            stages.reverse();
-
             let mut folded_stages = stages
                 .into_iter()
+                .rev()
                 .fold1(|right, mut left| {
                     left.push_nested(right);
                     left
@@ -72,7 +71,7 @@ impl OrderByData {
     }
 
     fn compute_prefix(index: usize, order_by: &OrderBy) -> Option<OrderByPrefix> {
-        match dbg!(order_by.path()) {
+        match order_by.path() {
             Some(path) => {
                 let mut parts = path
                     .iter()
