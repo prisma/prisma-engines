@@ -1,1 +1,1 @@
-initSidebarItems({"struct":[["Rfc3339","The format described in RFC 3339."]]});
+initSidebarItems({"struct":[["Rfc2822","The format described in RFC 2822."],["Rfc3339","The format described in RFC 3339."]]});

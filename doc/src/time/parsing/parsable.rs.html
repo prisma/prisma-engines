@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;time-0.3.5&#x2F;src&#x2F;parsing&#x2F;parsable.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>parsable.rs - source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><script defer src="../../../main.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;time-0.3.7&#x2F;src&#x2F;parsing&#x2F;parsable.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>parsable.rs - source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><script defer src="../../../main.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script>
     <noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="shortcut icon" href="https:&#x2F;&#x2F;avatars0.githubusercontent.com&#x2F;u&#x2F;55999857"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../time/index.html'><div class='logo-container rust-logo'><img src='https:&#x2F;&#x2F;avatars0.githubusercontent.com&#x2F;u&#x2F;55999857' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
@@ -295,22 +295,191 @@
 <span id="294">294</span>
 <span id="295">295</span>
 <span id="296">296</span>
+<span id="297">297</span>
+<span id="298">298</span>
+<span id="299">299</span>
+<span id="300">300</span>
+<span id="301">301</span>
+<span id="302">302</span>
+<span id="303">303</span>
+<span id="304">304</span>
+<span id="305">305</span>
+<span id="306">306</span>
+<span id="307">307</span>
+<span id="308">308</span>
+<span id="309">309</span>
+<span id="310">310</span>
+<span id="311">311</span>
+<span id="312">312</span>
+<span id="313">313</span>
+<span id="314">314</span>
+<span id="315">315</span>
+<span id="316">316</span>
+<span id="317">317</span>
+<span id="318">318</span>
+<span id="319">319</span>
+<span id="320">320</span>
+<span id="321">321</span>
+<span id="322">322</span>
+<span id="323">323</span>
+<span id="324">324</span>
+<span id="325">325</span>
+<span id="326">326</span>
+<span id="327">327</span>
+<span id="328">328</span>
+<span id="329">329</span>
+<span id="330">330</span>
+<span id="331">331</span>
+<span id="332">332</span>
+<span id="333">333</span>
+<span id="334">334</span>
+<span id="335">335</span>
+<span id="336">336</span>
+<span id="337">337</span>
+<span id="338">338</span>
+<span id="339">339</span>
+<span id="340">340</span>
+<span id="341">341</span>
+<span id="342">342</span>
+<span id="343">343</span>
+<span id="344">344</span>
+<span id="345">345</span>
+<span id="346">346</span>
+<span id="347">347</span>
+<span id="348">348</span>
+<span id="349">349</span>
+<span id="350">350</span>
+<span id="351">351</span>
+<span id="352">352</span>
+<span id="353">353</span>
+<span id="354">354</span>
+<span id="355">355</span>
+<span id="356">356</span>
+<span id="357">357</span>
+<span id="358">358</span>
+<span id="359">359</span>
+<span id="360">360</span>
+<span id="361">361</span>
+<span id="362">362</span>
+<span id="363">363</span>
+<span id="364">364</span>
+<span id="365">365</span>
+<span id="366">366</span>
+<span id="367">367</span>
+<span id="368">368</span>
+<span id="369">369</span>
+<span id="370">370</span>
+<span id="371">371</span>
+<span id="372">372</span>
+<span id="373">373</span>
+<span id="374">374</span>
+<span id="375">375</span>
+<span id="376">376</span>
+<span id="377">377</span>
+<span id="378">378</span>
+<span id="379">379</span>
+<span id="380">380</span>
+<span id="381">381</span>
+<span id="382">382</span>
+<span id="383">383</span>
+<span id="384">384</span>
+<span id="385">385</span>
+<span id="386">386</span>
+<span id="387">387</span>
+<span id="388">388</span>
+<span id="389">389</span>
+<span id="390">390</span>
+<span id="391">391</span>
+<span id="392">392</span>
+<span id="393">393</span>
+<span id="394">394</span>
+<span id="395">395</span>
+<span id="396">396</span>
+<span id="397">397</span>
+<span id="398">398</span>
+<span id="399">399</span>
+<span id="400">400</span>
+<span id="401">401</span>
+<span id="402">402</span>
+<span id="403">403</span>
+<span id="404">404</span>
+<span id="405">405</span>
+<span id="406">406</span>
+<span id="407">407</span>
+<span id="408">408</span>
+<span id="409">409</span>
+<span id="410">410</span>
+<span id="411">411</span>
+<span id="412">412</span>
+<span id="413">413</span>
+<span id="414">414</span>
+<span id="415">415</span>
+<span id="416">416</span>
+<span id="417">417</span>
+<span id="418">418</span>
+<span id="419">419</span>
+<span id="420">420</span>
+<span id="421">421</span>
+<span id="422">422</span>
+<span id="423">423</span>
+<span id="424">424</span>
+<span id="425">425</span>
+<span id="426">426</span>
+<span id="427">427</span>
+<span id="428">428</span>
+<span id="429">429</span>
+<span id="430">430</span>
+<span id="431">431</span>
+<span id="432">432</span>
+<span id="433">433</span>
+<span id="434">434</span>
+<span id="435">435</span>
+<span id="436">436</span>
+<span id="437">437</span>
+<span id="438">438</span>
+<span id="439">439</span>
+<span id="440">440</span>
+<span id="441">441</span>
+<span id="442">442</span>
+<span id="443">443</span>
+<span id="444">444</span>
+<span id="445">445</span>
+<span id="446">446</span>
+<span id="447">447</span>
+<span id="448">448</span>
+<span id="449">449</span>
+<span id="450">450</span>
+<span id="451">451</span>
+<span id="452">452</span>
+<span id="453">453</span>
+<span id="454">454</span>
+<span id="455">455</span>
+<span id="456">456</span>
+<span id="457">457</span>
+<span id="458">458</span>
+<span id="459">459</span>
+<span id="460">460</span>
+<span id="461">461</span>
+<span id="462">462</span>
+<span id="463">463</span>
+<span id="464">464</span>
 </pre><pre class="rust"><code><span class="doccomment">//! A trait that can be used to parse an item from an input.</span>
 
 <span class="kw">use</span> <span class="ident">core::convert::TryInto</span>;
 <span class="kw">use</span> <span class="ident">core::ops::Deref</span>;
 
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::error::TryFromParsed</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::format_description::well_known::Rfc3339</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::format_description::well_known</span>::{<span class="ident">Rfc2822</span>, <span class="ident">Rfc3339</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::format_description::FormatItem</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::parsing</span>::{<span class="ident">Parsed</span>, <span class="ident">ParsedItem</span>};
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">error</span>, <span class="ident">Date</span>, <span class="ident">Month</span>, <span class="ident">OffsetDateTime</span>, <span class="ident">PrimitiveDateTime</span>, <span class="ident">Time</span>, <span class="ident">UtcOffset</span>};
+<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">error</span>, <span class="ident">Date</span>, <span class="ident">Month</span>, <span class="ident">OffsetDateTime</span>, <span class="ident">PrimitiveDateTime</span>, <span class="ident">Time</span>, <span class="ident">UtcOffset</span>, <span class="ident">Weekday</span>};
 
 <span class="doccomment">/// A type that can be parsed.</span>
 <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">__time_03_docs</span>, <span class="ident">doc</span>(<span class="ident">notable_trait</span>))]</span>
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Parsable</span>: <span class="ident">sealed::Sealed</span> {}
 <span class="kw">impl</span> <span class="ident">Parsable</span> <span class="kw">for</span> <span class="ident">FormatItem</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {}
 <span class="kw">impl</span> <span class="ident">Parsable</span> <span class="kw">for</span> [<span class="ident">FormatItem</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>] {}
+<span class="kw">impl</span> <span class="ident">Parsable</span> <span class="kw">for</span> <span class="ident">Rfc2822</span> {}
 <span class="kw">impl</span> <span class="ident">Parsable</span> <span class="kw">for</span> <span class="ident">Rfc3339</span> {}
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Deref</span><span class="op">&gt;</span> <span class="ident">Parsable</span> <span class="kw">for</span> <span class="ident">T</span> <span class="kw">where</span> <span class="ident">T::Target</span>: <span class="ident">Parsable</span> {}
 
@@ -409,6 +578,165 @@
 <span class="comment">// endregion custom formats</span>
 
 <span class="comment">// region: well-known formats</span>
+<span class="kw">impl</span> <span class="ident">sealed::Sealed</span> <span class="kw">for</span> <span class="ident">Rfc2822</span> {
+    <span class="kw">fn</span> <span class="ident">parse_into</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        <span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>],
+        <span class="ident">parsed</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Parsed</span>,
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>], <span class="ident">error::Parse</span><span class="op">&gt;</span> {
+        <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::error::ParseFromDescription</span>::{<span class="ident">InvalidComponent</span>, <span class="ident">InvalidLiteral</span>};
+        <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::parsing::combinator::rfc::rfc2822</span>::{<span class="ident">cfws</span>, <span class="ident">fws</span>};
+        <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::parsing::combinator</span>::{
+            <span class="ident">ascii_char</span>, <span class="ident">exactly_n_digits</span>, <span class="ident">first_match</span>, <span class="ident">n_to_m_digits</span>, <span class="ident">opt</span>, <span class="ident">sign</span>,
+        };
+
+        <span class="kw">let</span> <span class="ident">colon</span> <span class="op">=</span> <span class="ident">ascii_char</span>::<span class="op">&lt;</span><span class="string">b&#39;:&#39;</span><span class="op">&gt;</span>;
+        <span class="kw">let</span> <span class="ident">comma</span> <span class="op">=</span> <span class="ident">ascii_char</span>::<span class="op">&lt;</span><span class="string">b&#39;,&#39;</span><span class="op">&gt;</span>;
+
+        <span class="kw">let</span> <span class="ident">input</span> <span class="op">=</span> <span class="ident">opt</span>(<span class="ident">fws</span>)(<span class="ident">input</span>).<span class="ident">into_inner</span>();
+        <span class="kw">let</span> <span class="ident">input</span> <span class="op">=</span> <span class="ident">first_match</span>(
+            [
+                (<span class="kw-2">&amp;</span><span class="string">b&quot;Mon&quot;</span>[..], <span class="ident">Weekday::Monday</span>),
+                (<span class="kw-2">&amp;</span><span class="string">b&quot;Tue&quot;</span>[..], <span class="ident">Weekday::Tuesday</span>),
+                (<span class="kw-2">&amp;</span><span class="string">b&quot;Wed&quot;</span>[..], <span class="ident">Weekday::Wednesday</span>),
+                (<span class="kw-2">&amp;</span><span class="string">b&quot;Thu&quot;</span>[..], <span class="ident">Weekday::Thursday</span>),
+                (<span class="kw-2">&amp;</span><span class="string">b&quot;Fri&quot;</span>[..], <span class="ident">Weekday::Friday</span>),
+                (<span class="kw-2">&amp;</span><span class="string">b&quot;Sat&quot;</span>[..], <span class="ident">Weekday::Saturday</span>),
+                (<span class="kw-2">&amp;</span><span class="string">b&quot;Sun&quot;</span>[..], <span class="ident">Weekday::Sunday</span>),
+            ],
+            <span class="bool-val">false</span>,
+        )(<span class="ident">input</span>)
+        .<span class="ident">ok_or</span>(<span class="ident">InvalidComponent</span>(<span class="string">&quot;weekday&quot;</span>))<span class="question-mark">?</span>
+        .<span class="ident">assign_value_to</span>(<span class="kw-2">&amp;mut</span> <span class="ident">parsed</span>.<span class="ident">weekday</span>);
+        <span class="kw">let</span> <span class="ident">input</span> <span class="op">=</span> <span class="ident">comma</span>(<span class="ident">input</span>).<span class="ident">ok_or</span>(<span class="ident">InvalidLiteral</span>)<span class="question-mark">?</span>.<span class="ident">into_inner</span>();
+        <span class="kw">let</span> <span class="ident">input</span> <span class="op">=</span> <span class="ident">cfws</span>(<span class="ident">input</span>).<span class="ident">ok_or</span>(<span class="ident">InvalidLiteral</span>)<span class="question-mark">?</span>.<span class="ident">into_inner</span>();
+        <span class="kw">let</span> <span class="ident">input</span> <span class="op">=</span> <span class="ident">n_to_m_digits</span>::<span class="op">&lt;</span><span class="kw">_</span>, <span class="number">1</span>, <span class="number">2</span><span class="op">&gt;</span>(<span class="ident">input</span>)
+            .<span class="ident">ok_or</span>(<span class="ident">InvalidComponent</span>(<span class="string">&quot;day&quot;</span>))<span class="question-mark">?</span>
+            .<span class="ident">assign_value_to</span>(<span class="kw-2">&amp;mut</span> <span class="ident">parsed</span>.<span class="ident">day</span>);
+        <span class="kw">let</span> <span class="ident">input</span> <span class="op">=</span> <span class="ident">cfws</span>(<span class="ident">input</span>).<span class="ident">ok_or</span>(<span class="ident">InvalidLiteral</span>)<span class="question-mark">?</span>.<span class="ident">into_inner</span>();
+        <span class="kw">let</span> <span class="ident">input</span> <span class="op">=</span> <span class="ident">first_match</span>(
+            [
+                (<span class="kw-2">&amp;</span><span class="string">b&quot;Jan&quot;</span>[..], <span class="ident">Month::January</span>),
+                (<span class="kw-2">&amp;</span><span class="string">b&quot;Feb&quot;</span>[..], <span class="ident">Month::February</span>),
+                (<span class="kw-2">&amp;</span><span class="string">b&quot;Mar&quot;</span>[..], <span class="ident">Month::March</span>),
+                (<span class="kw-2">&amp;</span><span class="string">b&quot;Apr&quot;</span>[..], <span class="ident">Month::April</span>),
+                (<span class="kw-2">&amp;</span><span class="string">b&quot;May&quot;</span>[..], <span class="ident">Month::May</span>),
+                (<span class="kw-2">&amp;</span><span class="string">b&quot;Jun&quot;</span>[..], <span class="ident">Month::June</span>),
+                (<span class="kw-2">&amp;</span><span class="string">b&quot;Jul&quot;</span>[..], <span class="ident">Month::July</span>),
+                (<span class="kw-2">&amp;</span><span class="string">b&quot;Aug&quot;</span>[..], <span class="ident">Month::August</span>),
+                (<span class="kw-2">&amp;</span><span class="string">b&quot;Sep&quot;</span>[..], <span class="ident">Month::September</span>),
+                (<span class="kw-2">&amp;</span><span class="string">b&quot;Oct&quot;</span>[..], <span class="ident">Month::October</span>),
+                (<span class="kw-2">&amp;</span><span class="string">b&quot;Nov&quot;</span>[..], <span class="ident">Month::November</span>),
+                (<span class="kw-2">&amp;</span><span class="string">b&quot;Dec&quot;</span>[..], <span class="ident">Month::December</span>),
+            ],
+            <span class="bool-val">false</span>,
+        )(<span class="ident">input</span>)
+        .<span class="ident">ok_or</span>(<span class="ident">InvalidComponent</span>(<span class="string">&quot;month&quot;</span>))<span class="question-mark">?</span>
+        .<span class="ident">assign_value_to</span>(<span class="kw-2">&amp;mut</span> <span class="ident">parsed</span>.<span class="ident">month</span>);
+        <span class="kw">let</span> <span class="ident">input</span> <span class="op">=</span> <span class="ident">cfws</span>(<span class="ident">input</span>).<span class="ident">ok_or</span>(<span class="ident">InvalidLiteral</span>)<span class="question-mark">?</span>.<span class="ident">into_inner</span>();
+        <span class="kw">let</span> <span class="ident">input</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">exactly_n_digits</span>::<span class="op">&lt;</span><span class="ident">u32</span>, <span class="number">4</span><span class="op">&gt;</span>(<span class="ident">input</span>) {
+            <span class="prelude-val">Some</span>(<span class="ident">item</span>) =&gt; {
+                <span class="kw">let</span> <span class="ident">input</span> <span class="op">=</span> <span class="ident">item</span>
+                    .<span class="ident">flat_map_res</span>(<span class="op">|</span><span class="ident">year</span><span class="op">|</span> {
+                        <span class="kw">if</span> <span class="ident">year</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">1900</span> {
+                            <span class="prelude-val">Ok</span>(<span class="ident">year</span>)
+                        } <span class="kw">else</span> {
+                            <span class="prelude-val">Err</span>(<span class="ident">InvalidComponent</span>(<span class="string">&quot;year&quot;</span>))
+                        }
+                    })<span class="question-mark">?</span>
+                    .<span class="ident">map</span>(<span class="op">|</span><span class="ident">year</span><span class="op">|</span> <span class="ident">year</span> <span class="kw">as</span> <span class="kw">_</span>)
+                    .<span class="ident">assign_value_to</span>(<span class="kw-2">&amp;mut</span> <span class="ident">parsed</span>.<span class="ident">year</span>);
+                <span class="kw">let</span> <span class="ident">input</span> <span class="op">=</span> <span class="ident">fws</span>(<span class="ident">input</span>).<span class="ident">ok_or</span>(<span class="ident">InvalidLiteral</span>)<span class="question-mark">?</span>.<span class="ident">into_inner</span>();
+                <span class="ident">input</span>
+            }
+            <span class="prelude-val">None</span> =&gt; {
+                <span class="kw">let</span> <span class="ident">input</span> <span class="op">=</span> <span class="ident">exactly_n_digits</span>::<span class="op">&lt;</span><span class="ident">u32</span>, <span class="number">2</span><span class="op">&gt;</span>(<span class="ident">input</span>)
+                    .<span class="ident">ok_or</span>(<span class="ident">InvalidComponent</span>(<span class="string">&quot;year&quot;</span>))<span class="question-mark">?</span>
+                    .<span class="ident">map</span>(<span class="op">|</span><span class="ident">year</span><span class="op">|</span> <span class="kw">if</span> <span class="ident">year</span> <span class="op">&lt;</span> <span class="number">50</span> { <span class="ident">year</span> <span class="op">+</span> <span class="number">2000</span> } <span class="kw">else</span> { <span class="ident">year</span> <span class="op">+</span> <span class="number">1900</span> })
+                    .<span class="ident">map</span>(<span class="op">|</span><span class="ident">year</span><span class="op">|</span> <span class="ident">year</span> <span class="kw">as</span> <span class="kw">_</span>)
+                    .<span class="ident">assign_value_to</span>(<span class="kw-2">&amp;mut</span> <span class="ident">parsed</span>.<span class="ident">year</span>);
+                <span class="kw">let</span> <span class="ident">input</span> <span class="op">=</span> <span class="ident">cfws</span>(<span class="ident">input</span>).<span class="ident">ok_or</span>(<span class="ident">InvalidLiteral</span>)<span class="question-mark">?</span>.<span class="ident">into_inner</span>();
+                <span class="ident">input</span>
+            }
+        };
+
+        <span class="kw">let</span> <span class="ident">input</span> <span class="op">=</span> <span class="ident">exactly_n_digits</span>::<span class="op">&lt;</span><span class="kw">_</span>, <span class="number">2</span><span class="op">&gt;</span>(<span class="ident">input</span>)
+            .<span class="ident">ok_or</span>(<span class="ident">InvalidComponent</span>(<span class="string">&quot;hour&quot;</span>))<span class="question-mark">?</span>
+            .<span class="ident">assign_value_to</span>(<span class="kw-2">&amp;mut</span> <span class="ident">parsed</span>.<span class="ident">hour_24</span>);
+        <span class="kw">let</span> <span class="ident">input</span> <span class="op">=</span> <span class="ident">opt</span>(<span class="ident">cfws</span>)(<span class="ident">input</span>).<span class="ident">into_inner</span>();
+        <span class="kw">let</span> <span class="ident">input</span> <span class="op">=</span> <span class="ident">colon</span>(<span class="ident">input</span>).<span class="ident">ok_or</span>(<span class="ident">InvalidLiteral</span>)<span class="question-mark">?</span>.<span class="ident">into_inner</span>();
+        <span class="kw">let</span> <span class="ident">input</span> <span class="op">=</span> <span class="ident">opt</span>(<span class="ident">cfws</span>)(<span class="ident">input</span>).<span class="ident">into_inner</span>();
+        <span class="kw">let</span> <span class="ident">input</span> <span class="op">=</span> <span class="ident">exactly_n_digits</span>::<span class="op">&lt;</span><span class="kw">_</span>, <span class="number">2</span><span class="op">&gt;</span>(<span class="ident">input</span>)
+            .<span class="ident">ok_or</span>(<span class="ident">InvalidComponent</span>(<span class="string">&quot;minute&quot;</span>))<span class="question-mark">?</span>
+            .<span class="ident">assign_value_to</span>(<span class="kw-2">&amp;mut</span> <span class="ident">parsed</span>.<span class="ident">minute</span>);
+
+        <span class="kw">let</span> <span class="ident">input</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">input</span>) <span class="op">=</span> <span class="ident">colon</span>(<span class="ident">opt</span>(<span class="ident">cfws</span>)(<span class="ident">input</span>).<span class="ident">into_inner</span>()) {
+            <span class="kw">let</span> <span class="ident">input</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">into_inner</span>(); <span class="comment">// discard the colon</span>
+            <span class="kw">let</span> <span class="ident">input</span> <span class="op">=</span> <span class="ident">opt</span>(<span class="ident">cfws</span>)(<span class="ident">input</span>).<span class="ident">into_inner</span>();
+            <span class="kw">let</span> <span class="ident">input</span> <span class="op">=</span> <span class="ident">exactly_n_digits</span>::<span class="op">&lt;</span><span class="kw">_</span>, <span class="number">2</span><span class="op">&gt;</span>(<span class="ident">input</span>)
+                .<span class="ident">ok_or</span>(<span class="ident">InvalidComponent</span>(<span class="string">&quot;second&quot;</span>))<span class="question-mark">?</span>
+                .<span class="ident">assign_value_to</span>(<span class="kw-2">&amp;mut</span> <span class="ident">parsed</span>.<span class="ident">second</span>);
+            <span class="kw">let</span> <span class="ident">input</span> <span class="op">=</span> <span class="ident">cfws</span>(<span class="ident">input</span>).<span class="ident">ok_or</span>(<span class="ident">InvalidLiteral</span>)<span class="question-mark">?</span>.<span class="ident">into_inner</span>();
+            <span class="ident">input</span>
+        } <span class="kw">else</span> {
+            <span class="ident">cfws</span>(<span class="ident">input</span>).<span class="ident">ok_or</span>(<span class="ident">InvalidLiteral</span>)<span class="question-mark">?</span>.<span class="ident">into_inner</span>()
+        };
+
+        <span class="comment">// The RFC explicitly allows leap seconds. We don&#39;t currently support them, so treat it as</span>
+        <span class="comment">// the previous moment.</span>
+        <span class="kw">if</span> <span class="ident">parsed</span>.<span class="ident">second</span> <span class="op">==</span> <span class="prelude-val">Some</span>(<span class="number">60</span>) {
+            <span class="ident">parsed</span>.<span class="ident">second</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="number">59</span>);
+            <span class="ident">parsed</span>.<span class="ident">subsecond</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="number">999_999_999</span>);
+        }
+
+        <span class="kw">let</span> <span class="ident">zone_literal</span> <span class="op">=</span> <span class="ident">first_match</span>(
+            [
+                (<span class="kw-2">&amp;</span><span class="string">b&quot;UT&quot;</span>[..], <span class="number">0</span>),
+                (<span class="kw-2">&amp;</span><span class="string">b&quot;GMT&quot;</span>[..], <span class="number">0</span>),
+                (<span class="kw-2">&amp;</span><span class="string">b&quot;EST&quot;</span>[..], <span class="op">-</span><span class="number">5</span>),
+                (<span class="kw-2">&amp;</span><span class="string">b&quot;EDT&quot;</span>[..], <span class="op">-</span><span class="number">4</span>),
+                (<span class="kw-2">&amp;</span><span class="string">b&quot;CST&quot;</span>[..], <span class="op">-</span><span class="number">6</span>),
+                (<span class="kw-2">&amp;</span><span class="string">b&quot;CDT&quot;</span>[..], <span class="op">-</span><span class="number">5</span>),
+                (<span class="kw-2">&amp;</span><span class="string">b&quot;MST&quot;</span>[..], <span class="op">-</span><span class="number">7</span>),
+                (<span class="kw-2">&amp;</span><span class="string">b&quot;MDT&quot;</span>[..], <span class="op">-</span><span class="number">6</span>),
+                (<span class="kw-2">&amp;</span><span class="string">b&quot;PST&quot;</span>[..], <span class="op">-</span><span class="number">8</span>),
+                (<span class="kw-2">&amp;</span><span class="string">b&quot;PDT&quot;</span>[..], <span class="op">-</span><span class="number">7</span>),
+            ],
+            <span class="bool-val">false</span>,
+        )(<span class="ident">input</span>)
+        .<span class="ident">or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">input</span> {
+            [
+                <span class="string">b&#39;a&#39;</span>..<span class="op">=</span><span class="string">b&#39;i&#39;</span> <span class="op">|</span> <span class="string">b&#39;k&#39;</span>..<span class="op">=</span><span class="string">b&#39;z&#39;</span> <span class="op">|</span> <span class="string">b&#39;A&#39;</span>..<span class="op">=</span><span class="string">b&#39;I&#39;</span> <span class="op">|</span> <span class="string">b&#39;K&#39;</span>..<span class="op">=</span><span class="string">b&#39;Z&#39;</span>,
+                <span class="ident">rest</span> @ ..,
+            ] =&gt; <span class="prelude-val">Some</span>(<span class="ident">ParsedItem</span>(<span class="ident">rest</span>, <span class="number">0</span>)),
+            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+        });
+        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">zone_literal</span>) <span class="op">=</span> <span class="ident">zone_literal</span> {
+            <span class="kw">let</span> <span class="ident">input</span> <span class="op">=</span> <span class="ident">zone_literal</span>.<span class="ident">assign_value_to</span>(<span class="kw-2">&amp;mut</span> <span class="ident">parsed</span>.<span class="ident">offset_hour</span>);
+            <span class="ident">parsed</span>.<span class="ident">offset_minute</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="number">0</span>);
+            <span class="ident">parsed</span>.<span class="ident">offset_second</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="number">0</span>);
+            <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">input</span>);
+        }
+
+        <span class="kw">let</span> <span class="ident">ParsedItem</span>(<span class="ident">input</span>, <span class="ident">offset_sign</span>) <span class="op">=</span> <span class="ident">sign</span>(<span class="ident">input</span>).<span class="ident">ok_or</span>(<span class="ident">InvalidComponent</span>(<span class="string">&quot;offset hour&quot;</span>))<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">input</span> <span class="op">=</span> <span class="ident">exactly_n_digits</span>::<span class="op">&lt;</span><span class="ident">u8</span>, <span class="number">2</span><span class="op">&gt;</span>(<span class="ident">input</span>)
+            .<span class="ident">ok_or</span>(<span class="ident">InvalidComponent</span>(<span class="string">&quot;offset hour&quot;</span>))<span class="question-mark">?</span>
+            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">offset_hour</span><span class="op">|</span> {
+                <span class="kw">if</span> <span class="ident">offset_sign</span> <span class="op">==</span> <span class="string">b&#39;-&#39;</span> {
+                    <span class="op">-</span>(<span class="ident">offset_hour</span> <span class="kw">as</span> <span class="ident">i8</span>)
+                } <span class="kw">else</span> {
+                    <span class="ident">offset_hour</span> <span class="kw">as</span> <span class="kw">_</span>
+                }
+            })
+            .<span class="ident">assign_value_to</span>(<span class="kw-2">&amp;mut</span> <span class="ident">parsed</span>.<span class="ident">offset_hour</span>);
+        <span class="kw">let</span> <span class="ident">input</span> <span class="op">=</span> <span class="ident">exactly_n_digits</span>::<span class="op">&lt;</span><span class="kw">_</span>, <span class="number">2</span><span class="op">&gt;</span>(<span class="ident">input</span>)
+            .<span class="ident">ok_or</span>(<span class="ident">InvalidComponent</span>(<span class="string">&quot;offset minute&quot;</span>))<span class="question-mark">?</span>
+            .<span class="ident">assign_value_to</span>(<span class="kw-2">&amp;mut</span> <span class="ident">parsed</span>.<span class="ident">offset_minute</span>);
+
+        <span class="prelude-val">Ok</span>(<span class="ident">input</span>)
+    }
+}
+
 <span class="kw">impl</span> <span class="ident">sealed::Sealed</span> <span class="kw">for</span> <span class="ident">Rfc3339</span> {
     <span class="kw">fn</span> <span class="ident">parse_into</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
@@ -450,11 +778,6 @@
         <span class="kw">let</span> <span class="ident">input</span> <span class="op">=</span> <span class="ident">colon</span>(<span class="ident">input</span>).<span class="ident">ok_or</span>(<span class="ident">InvalidLiteral</span>)<span class="question-mark">?</span>.<span class="ident">into_inner</span>();
         <span class="kw">let</span> <span class="ident">input</span> <span class="op">=</span> <span class="ident">exactly_n_digits</span>::<span class="op">&lt;</span><span class="kw">_</span>, <span class="number">2</span><span class="op">&gt;</span>(<span class="ident">input</span>)
             .<span class="ident">ok_or</span>(<span class="ident">InvalidComponent</span>(<span class="string">&quot;second&quot;</span>))<span class="question-mark">?</span>
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">second</span><span class="op">|</span>
-                <span class="comment">// The RFC explicitly allows leap seconds. We don&#39;t support them, so treat it</span>
-                <span class="comment">// as the previous second.</span>
-                <span class="kw">if</span> <span class="ident">second</span> <span class="op">==</span> <span class="number">60</span> { <span class="number">59</span> } <span class="kw">else</span> { <span class="ident">second</span> }
-            )
             .<span class="ident">assign_value_to</span>(<span class="kw-2">&amp;mut</span> <span class="ident">parsed</span>.<span class="ident">second</span>);
         <span class="kw">let</span> <span class="ident">input</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">ParsedItem</span>(<span class="ident">input</span>, ())) <span class="op">=</span> <span class="ident">ascii_char</span>::<span class="op">&lt;</span><span class="string">b&#39;.&#39;</span><span class="op">&gt;</span>(<span class="ident">input</span>) {
             <span class="kw">let</span> <span class="ident">ParsedItem</span>(<span class="kw-2">mut</span> <span class="ident">input</span>, <span class="kw-2">mut</span> <span class="ident">value</span>) <span class="op">=</span> <span class="ident">any_digit</span>(<span class="ident">input</span>)
@@ -472,6 +795,13 @@
         } <span class="kw">else</span> {
             <span class="ident">input</span>
         };
+
+        <span class="comment">// The RFC explicitly allows leap seconds. We don&#39;t currently support them, so treat it as</span>
+        <span class="comment">// the previous moment.</span>
+        <span class="kw">if</span> <span class="ident">parsed</span>.<span class="ident">second</span> <span class="op">==</span> <span class="prelude-val">Some</span>(<span class="number">60</span>) {
+            <span class="ident">parsed</span>.<span class="ident">second</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="number">59</span>);
+            <span class="ident">parsed</span>.<span class="ident">subsecond</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="number">999_999_999</span>);
+        }
 
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">ParsedItem</span>(<span class="ident">input</span>, ())) <span class="op">=</span> <span class="ident">ascii_char_ignore_case</span>::<span class="op">&lt;</span><span class="string">b&#39;Z&#39;</span><span class="op">&gt;</span>(<span class="ident">input</span>) {
             <span class="ident">parsed</span>.<span class="ident">offset_hour</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="number">0</span>);
@@ -525,10 +855,9 @@
         <span class="kw">let</span> <span class="ident">ParsedItem</span>(<span class="ident">input</span>, <span class="ident">minute</span>) <span class="op">=</span>
             <span class="ident">exactly_n_digits</span>::<span class="op">&lt;</span><span class="kw">_</span>, <span class="number">2</span><span class="op">&gt;</span>(<span class="ident">input</span>).<span class="ident">ok_or</span>(<span class="ident">InvalidComponent</span>(<span class="string">&quot;minute&quot;</span>))<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">input</span> <span class="op">=</span> <span class="ident">colon</span>(<span class="ident">input</span>).<span class="ident">ok_or</span>(<span class="ident">InvalidLiteral</span>)<span class="question-mark">?</span>.<span class="ident">into_inner</span>();
-        <span class="kw">let</span> <span class="ident">ParsedItem</span>(<span class="ident">input</span>, <span class="ident">second</span>) <span class="op">=</span> <span class="ident">exactly_n_digits</span>::<span class="op">&lt;</span><span class="kw">_</span>, <span class="number">2</span><span class="op">&gt;</span>(<span class="ident">input</span>)
-            .<span class="ident">ok_or</span>(<span class="ident">InvalidComponent</span>(<span class="string">&quot;second&quot;</span>))<span class="question-mark">?</span>
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">seconds</span><span class="op">|</span> <span class="kw">if</span> <span class="ident">seconds</span> <span class="op">==</span> <span class="number">60</span> { <span class="number">59</span> } <span class="kw">else</span> { <span class="ident">seconds</span> });
-        <span class="kw">let</span> <span class="ident">ParsedItem</span>(<span class="ident">input</span>, <span class="ident">nanosecond</span>) <span class="op">=</span>
+        <span class="kw">let</span> <span class="ident">ParsedItem</span>(<span class="ident">input</span>, <span class="kw-2">mut</span> <span class="ident">second</span>) <span class="op">=</span>
+            <span class="ident">exactly_n_digits</span>::<span class="op">&lt;</span><span class="kw">_</span>, <span class="number">2</span><span class="op">&gt;</span>(<span class="ident">input</span>).<span class="ident">ok_or</span>(<span class="ident">InvalidComponent</span>(<span class="string">&quot;second&quot;</span>))<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">ParsedItem</span>(<span class="ident">input</span>, <span class="kw-2">mut</span> <span class="ident">nanosecond</span>) <span class="op">=</span>
             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">ParsedItem</span>(<span class="ident">input</span>, ())) <span class="op">=</span> <span class="ident">ascii_char</span>::<span class="op">&lt;</span><span class="string">b&#39;.&#39;</span><span class="op">&gt;</span>(<span class="ident">input</span>) {
                 <span class="kw">let</span> <span class="ident">ParsedItem</span>(<span class="kw-2">mut</span> <span class="ident">input</span>, <span class="kw-2">mut</span> <span class="ident">value</span>) <span class="op">=</span> <span class="ident">any_digit</span>(<span class="ident">input</span>)
                     .<span class="ident">ok_or</span>(<span class="ident">InvalidComponent</span>(<span class="string">&quot;subsecond&quot;</span>))<span class="question-mark">?</span>
@@ -581,6 +910,13 @@
 
         <span class="kw">if</span> <span class="op">!</span><span class="ident">input</span>.<span class="ident">is_empty</span>() {
             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">error::Parse::UnexpectedTrailingCharacters</span>);
+        }
+
+        <span class="comment">// The RFC explicitly allows leap seconds. We don&#39;t currently support them, so treat it as</span>
+        <span class="comment">// the previous moment.</span>
+        <span class="kw">if</span> <span class="ident">second</span> <span class="op">==</span> <span class="number">60</span> {
+            <span class="ident">second</span> <span class="op">=</span> <span class="number">59</span>;
+            <span class="ident">nanosecond</span> <span class="op">=</span> <span class="number">999_999_999</span>;
         }
 
         <span class="prelude-val">Ok</span>(<span class="ident">Month::from_number</span>(<span class="ident">month</span>)

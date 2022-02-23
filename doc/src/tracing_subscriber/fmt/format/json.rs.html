@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;tracing-subscriber-0.3.2&#x2F;src&#x2F;fmt&#x2F;format&#x2F;json.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>json.rs - source</title><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../../../storage.js"></script><script src="../../../../crates.js"></script><script defer src="../../../../main.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;tracing-subscriber-0.3.9&#x2F;src&#x2F;fmt&#x2F;format&#x2F;json.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>json.rs - source</title><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../../../storage.js"></script><script src="../../../../crates.js"></script><script defer src="../../../../main.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script>
     <noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../../tracing_subscriber/index.html'><div class='logo-container rust-logo'><img src='https:&#x2F;&#x2F;raw.githubusercontent.com&#x2F;tokio-rs&#x2F;tracing&#x2F;master&#x2F;assets&#x2F;logo-type.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
@@ -749,6 +749,144 @@
 <span id="748">748</span>
 <span id="749">749</span>
 <span id="750">750</span>
+<span id="751">751</span>
+<span id="752">752</span>
+<span id="753">753</span>
+<span id="754">754</span>
+<span id="755">755</span>
+<span id="756">756</span>
+<span id="757">757</span>
+<span id="758">758</span>
+<span id="759">759</span>
+<span id="760">760</span>
+<span id="761">761</span>
+<span id="762">762</span>
+<span id="763">763</span>
+<span id="764">764</span>
+<span id="765">765</span>
+<span id="766">766</span>
+<span id="767">767</span>
+<span id="768">768</span>
+<span id="769">769</span>
+<span id="770">770</span>
+<span id="771">771</span>
+<span id="772">772</span>
+<span id="773">773</span>
+<span id="774">774</span>
+<span id="775">775</span>
+<span id="776">776</span>
+<span id="777">777</span>
+<span id="778">778</span>
+<span id="779">779</span>
+<span id="780">780</span>
+<span id="781">781</span>
+<span id="782">782</span>
+<span id="783">783</span>
+<span id="784">784</span>
+<span id="785">785</span>
+<span id="786">786</span>
+<span id="787">787</span>
+<span id="788">788</span>
+<span id="789">789</span>
+<span id="790">790</span>
+<span id="791">791</span>
+<span id="792">792</span>
+<span id="793">793</span>
+<span id="794">794</span>
+<span id="795">795</span>
+<span id="796">796</span>
+<span id="797">797</span>
+<span id="798">798</span>
+<span id="799">799</span>
+<span id="800">800</span>
+<span id="801">801</span>
+<span id="802">802</span>
+<span id="803">803</span>
+<span id="804">804</span>
+<span id="805">805</span>
+<span id="806">806</span>
+<span id="807">807</span>
+<span id="808">808</span>
+<span id="809">809</span>
+<span id="810">810</span>
+<span id="811">811</span>
+<span id="812">812</span>
+<span id="813">813</span>
+<span id="814">814</span>
+<span id="815">815</span>
+<span id="816">816</span>
+<span id="817">817</span>
+<span id="818">818</span>
+<span id="819">819</span>
+<span id="820">820</span>
+<span id="821">821</span>
+<span id="822">822</span>
+<span id="823">823</span>
+<span id="824">824</span>
+<span id="825">825</span>
+<span id="826">826</span>
+<span id="827">827</span>
+<span id="828">828</span>
+<span id="829">829</span>
+<span id="830">830</span>
+<span id="831">831</span>
+<span id="832">832</span>
+<span id="833">833</span>
+<span id="834">834</span>
+<span id="835">835</span>
+<span id="836">836</span>
+<span id="837">837</span>
+<span id="838">838</span>
+<span id="839">839</span>
+<span id="840">840</span>
+<span id="841">841</span>
+<span id="842">842</span>
+<span id="843">843</span>
+<span id="844">844</span>
+<span id="845">845</span>
+<span id="846">846</span>
+<span id="847">847</span>
+<span id="848">848</span>
+<span id="849">849</span>
+<span id="850">850</span>
+<span id="851">851</span>
+<span id="852">852</span>
+<span id="853">853</span>
+<span id="854">854</span>
+<span id="855">855</span>
+<span id="856">856</span>
+<span id="857">857</span>
+<span id="858">858</span>
+<span id="859">859</span>
+<span id="860">860</span>
+<span id="861">861</span>
+<span id="862">862</span>
+<span id="863">863</span>
+<span id="864">864</span>
+<span id="865">865</span>
+<span id="866">866</span>
+<span id="867">867</span>
+<span id="868">868</span>
+<span id="869">869</span>
+<span id="870">870</span>
+<span id="871">871</span>
+<span id="872">872</span>
+<span id="873">873</span>
+<span id="874">874</span>
+<span id="875">875</span>
+<span id="876">876</span>
+<span id="877">877</span>
+<span id="878">878</span>
+<span id="879">879</span>
+<span id="880">880</span>
+<span id="881">881</span>
+<span id="882">882</span>
+<span id="883">883</span>
+<span id="884">884</span>
+<span id="885">885</span>
+<span id="886">886</span>
+<span id="887">887</span>
+<span id="888">888</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">Format</span>, <span class="ident">FormatEvent</span>, <span class="ident">FormatFields</span>, <span class="ident">FormatTime</span>, <span class="ident">Writer</span>};
 <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">field</span>::{<span class="ident">RecordFields</span>, <span class="ident">VisitOutput</span>},
@@ -774,24 +912,41 @@
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tracing-log&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident">tracing_log::NormalizeEvent</span>;
 
-<span class="doccomment">/// Marker for `Format` that indicates that the verbose JSON log format should be used.</span>
+<span class="doccomment">/// Marker for [`Format`] that indicates that the newline-delimited JSON log</span>
+<span class="doccomment">/// format should be used.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// The full format includes fields from all entered spans.</span>
+<span class="doccomment">/// This formatter is intended for production use with systems where structured</span>
+<span class="doccomment">/// logs are consumed as JSON by analysis and viewing tools. The JSON output is</span>
+<span class="doccomment">/// not optimized for human readability; instead, it should be pretty-printed</span>
+<span class="doccomment">/// using external JSON tools such as `jq`, or using a JSON log viewer.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// # Example Output</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// ```json</span>
-<span class="doccomment">/// {</span>
-<span class="doccomment">///     &quot;timestamp&quot;:&quot;Feb 20 11:28:15.096&quot;,</span>
-<span class="doccomment">///     &quot;level&quot;:&quot;INFO&quot;,</span>
-<span class="doccomment">///     &quot;fields&quot;:{&quot;message&quot;:&quot;some message&quot;,&quot;key&quot;:&quot;value&quot;}</span>
-<span class="doccomment">///     &quot;target&quot;:&quot;mycrate&quot;,</span>
-<span class="doccomment">///     &quot;span&quot;:{name&quot;:&quot;leaf&quot;},</span>
-<span class="doccomment">///     &quot;spans&quot;:[{&quot;name&quot;:&quot;root&quot;},{&quot;name&quot;:&quot;leaf&quot;}],</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// ```</span>
+<span class="doccomment">/// &lt;pre&gt;&lt;font color=&quot;#4E9A06&quot;&gt;&lt;b&gt;:;&lt;/b&gt;&lt;/font&gt; &lt;font color=&quot;#4E9A06&quot;&gt;cargo&lt;/font&gt; run --example fmt-json</span>
+<span class="doccomment">/// &lt;font color=&quot;#4E9A06&quot;&gt;&lt;b&gt;    Finished&lt;/b&gt;&lt;/font&gt; dev [unoptimized + debuginfo] target(s) in 0.08s</span>
+<span class="doccomment">/// &lt;font color=&quot;#4E9A06&quot;&gt;&lt;b&gt;     Running&lt;/b&gt;&lt;/font&gt; `target/debug/examples/fmt-json`</span>
+<span class="doccomment">/// {&amp;quot;timestamp&amp;quot;:&amp;quot;2022-02-15T18:47:10.821315Z&amp;quot;,&amp;quot;level&amp;quot;:&amp;quot;INFO&amp;quot;,&amp;quot;fields&amp;quot;:{&amp;quot;message&amp;quot;:&amp;quot;preparing to shave yaks&amp;quot;,&amp;quot;number_of_yaks&amp;quot;:3},&amp;quot;target&amp;quot;:&amp;quot;fmt_json&amp;quot;}</span>
+<span class="doccomment">/// {&amp;quot;timestamp&amp;quot;:&amp;quot;2022-02-15T18:47:10.821422Z&amp;quot;,&amp;quot;level&amp;quot;:&amp;quot;INFO&amp;quot;,&amp;quot;fields&amp;quot;:{&amp;quot;message&amp;quot;:&amp;quot;shaving yaks&amp;quot;},&amp;quot;target&amp;quot;:&amp;quot;fmt_json::yak_shave&amp;quot;,&amp;quot;spans&amp;quot;:[{&amp;quot;yaks&amp;quot;:3,&amp;quot;name&amp;quot;:&amp;quot;shaving_yaks&amp;quot;}]}</span>
+<span class="doccomment">/// {&amp;quot;timestamp&amp;quot;:&amp;quot;2022-02-15T18:47:10.821495Z&amp;quot;,&amp;quot;level&amp;quot;:&amp;quot;TRACE&amp;quot;,&amp;quot;fields&amp;quot;:{&amp;quot;message&amp;quot;:&amp;quot;hello! I&amp;apos;m gonna shave a yak&amp;quot;,&amp;quot;excitement&amp;quot;:&amp;quot;yay!&amp;quot;},&amp;quot;target&amp;quot;:&amp;quot;fmt_json::yak_shave&amp;quot;,&amp;quot;spans&amp;quot;:[{&amp;quot;yaks&amp;quot;:3,&amp;quot;name&amp;quot;:&amp;quot;shaving_yaks&amp;quot;},{&amp;quot;yak&amp;quot;:1,&amp;quot;name&amp;quot;:&amp;quot;shave&amp;quot;}]}</span>
+<span class="doccomment">/// {&amp;quot;timestamp&amp;quot;:&amp;quot;2022-02-15T18:47:10.821546Z&amp;quot;,&amp;quot;level&amp;quot;:&amp;quot;TRACE&amp;quot;,&amp;quot;fields&amp;quot;:{&amp;quot;message&amp;quot;:&amp;quot;yak shaved successfully&amp;quot;},&amp;quot;target&amp;quot;:&amp;quot;fmt_json::yak_shave&amp;quot;,&amp;quot;spans&amp;quot;:[{&amp;quot;yaks&amp;quot;:3,&amp;quot;name&amp;quot;:&amp;quot;shaving_yaks&amp;quot;},{&amp;quot;yak&amp;quot;:1,&amp;quot;name&amp;quot;:&amp;quot;shave&amp;quot;}]}</span>
+<span class="doccomment">/// {&amp;quot;timestamp&amp;quot;:&amp;quot;2022-02-15T18:47:10.821598Z&amp;quot;,&amp;quot;level&amp;quot;:&amp;quot;DEBUG&amp;quot;,&amp;quot;fields&amp;quot;:{&amp;quot;yak&amp;quot;:1,&amp;quot;shaved&amp;quot;:true},&amp;quot;target&amp;quot;:&amp;quot;yak_events&amp;quot;,&amp;quot;spans&amp;quot;:[{&amp;quot;yaks&amp;quot;:3,&amp;quot;name&amp;quot;:&amp;quot;shaving_yaks&amp;quot;}]}</span>
+<span class="doccomment">/// {&amp;quot;timestamp&amp;quot;:&amp;quot;2022-02-15T18:47:10.821637Z&amp;quot;,&amp;quot;level&amp;quot;:&amp;quot;TRACE&amp;quot;,&amp;quot;fields&amp;quot;:{&amp;quot;yaks_shaved&amp;quot;:1},&amp;quot;target&amp;quot;:&amp;quot;fmt_json::yak_shave&amp;quot;,&amp;quot;spans&amp;quot;:[{&amp;quot;yaks&amp;quot;:3,&amp;quot;name&amp;quot;:&amp;quot;shaving_yaks&amp;quot;}]}</span>
+<span class="doccomment">/// {&amp;quot;timestamp&amp;quot;:&amp;quot;2022-02-15T18:47:10.821684Z&amp;quot;,&amp;quot;level&amp;quot;:&amp;quot;TRACE&amp;quot;,&amp;quot;fields&amp;quot;:{&amp;quot;message&amp;quot;:&amp;quot;hello! I&amp;apos;m gonna shave a yak&amp;quot;,&amp;quot;excitement&amp;quot;:&amp;quot;yay!&amp;quot;},&amp;quot;target&amp;quot;:&amp;quot;fmt_json::yak_shave&amp;quot;,&amp;quot;spans&amp;quot;:[{&amp;quot;yaks&amp;quot;:3,&amp;quot;name&amp;quot;:&amp;quot;shaving_yaks&amp;quot;},{&amp;quot;yak&amp;quot;:2,&amp;quot;name&amp;quot;:&amp;quot;shave&amp;quot;}]}</span>
+<span class="doccomment">/// {&amp;quot;timestamp&amp;quot;:&amp;quot;2022-02-15T18:47:10.821727Z&amp;quot;,&amp;quot;level&amp;quot;:&amp;quot;TRACE&amp;quot;,&amp;quot;fields&amp;quot;:{&amp;quot;message&amp;quot;:&amp;quot;yak shaved successfully&amp;quot;},&amp;quot;target&amp;quot;:&amp;quot;fmt_json::yak_shave&amp;quot;,&amp;quot;spans&amp;quot;:[{&amp;quot;yaks&amp;quot;:3,&amp;quot;name&amp;quot;:&amp;quot;shaving_yaks&amp;quot;},{&amp;quot;yak&amp;quot;:2,&amp;quot;name&amp;quot;:&amp;quot;shave&amp;quot;}]}</span>
+<span class="doccomment">/// {&amp;quot;timestamp&amp;quot;:&amp;quot;2022-02-15T18:47:10.821773Z&amp;quot;,&amp;quot;level&amp;quot;:&amp;quot;DEBUG&amp;quot;,&amp;quot;fields&amp;quot;:{&amp;quot;yak&amp;quot;:2,&amp;quot;shaved&amp;quot;:true},&amp;quot;target&amp;quot;:&amp;quot;yak_events&amp;quot;,&amp;quot;spans&amp;quot;:[{&amp;quot;yaks&amp;quot;:3,&amp;quot;name&amp;quot;:&amp;quot;shaving_yaks&amp;quot;}]}</span>
+<span class="doccomment">/// {&amp;quot;timestamp&amp;quot;:&amp;quot;2022-02-15T18:47:10.821806Z&amp;quot;,&amp;quot;level&amp;quot;:&amp;quot;TRACE&amp;quot;,&amp;quot;fields&amp;quot;:{&amp;quot;yaks_shaved&amp;quot;:2},&amp;quot;target&amp;quot;:&amp;quot;fmt_json::yak_shave&amp;quot;,&amp;quot;spans&amp;quot;:[{&amp;quot;yaks&amp;quot;:3,&amp;quot;name&amp;quot;:&amp;quot;shaving_yaks&amp;quot;}]}</span>
+<span class="doccomment">/// {&amp;quot;timestamp&amp;quot;:&amp;quot;2022-02-15T18:47:10.821909Z&amp;quot;,&amp;quot;level&amp;quot;:&amp;quot;TRACE&amp;quot;,&amp;quot;fields&amp;quot;:{&amp;quot;message&amp;quot;:&amp;quot;hello! I&amp;apos;m gonna shave a yak&amp;quot;,&amp;quot;excitement&amp;quot;:&amp;quot;yay!&amp;quot;},&amp;quot;target&amp;quot;:&amp;quot;fmt_json::yak_shave&amp;quot;,&amp;quot;spans&amp;quot;:[{&amp;quot;yaks&amp;quot;:3,&amp;quot;name&amp;quot;:&amp;quot;shaving_yaks&amp;quot;},{&amp;quot;yak&amp;quot;:3,&amp;quot;name&amp;quot;:&amp;quot;shave&amp;quot;}]}</span>
+<span class="doccomment">/// {&amp;quot;timestamp&amp;quot;:&amp;quot;2022-02-15T18:47:10.821956Z&amp;quot;,&amp;quot;level&amp;quot;:&amp;quot;WARN&amp;quot;,&amp;quot;fields&amp;quot;:{&amp;quot;message&amp;quot;:&amp;quot;could not locate yak&amp;quot;},&amp;quot;target&amp;quot;:&amp;quot;fmt_json::yak_shave&amp;quot;,&amp;quot;spans&amp;quot;:[{&amp;quot;yaks&amp;quot;:3,&amp;quot;name&amp;quot;:&amp;quot;shaving_yaks&amp;quot;},{&amp;quot;yak&amp;quot;:3,&amp;quot;name&amp;quot;:&amp;quot;shave&amp;quot;}]}</span>
+<span class="doccomment">/// {&amp;quot;timestamp&amp;quot;:&amp;quot;2022-02-15T18:47:10.822006Z&amp;quot;,&amp;quot;level&amp;quot;:&amp;quot;DEBUG&amp;quot;,&amp;quot;fields&amp;quot;:{&amp;quot;yak&amp;quot;:3,&amp;quot;shaved&amp;quot;:false},&amp;quot;target&amp;quot;:&amp;quot;yak_events&amp;quot;,&amp;quot;spans&amp;quot;:[{&amp;quot;yaks&amp;quot;:3,&amp;quot;name&amp;quot;:&amp;quot;shaving_yaks&amp;quot;}]}</span>
+<span class="doccomment">/// {&amp;quot;timestamp&amp;quot;:&amp;quot;2022-02-15T18:47:10.822041Z&amp;quot;,&amp;quot;level&amp;quot;:&amp;quot;ERROR&amp;quot;,&amp;quot;fields&amp;quot;:{&amp;quot;message&amp;quot;:&amp;quot;failed to shave yak&amp;quot;,&amp;quot;yak&amp;quot;:3,&amp;quot;error&amp;quot;:&amp;quot;missing yak&amp;quot;},&amp;quot;target&amp;quot;:&amp;quot;fmt_json::yak_shave&amp;quot;,&amp;quot;spans&amp;quot;:[{&amp;quot;yaks&amp;quot;:3,&amp;quot;name&amp;quot;:&amp;quot;shaving_yaks&amp;quot;}]}</span>
+<span class="doccomment">/// {&amp;quot;timestamp&amp;quot;:&amp;quot;2022-02-15T18:47:10.822079Z&amp;quot;,&amp;quot;level&amp;quot;:&amp;quot;TRACE&amp;quot;,&amp;quot;fields&amp;quot;:{&amp;quot;yaks_shaved&amp;quot;:2},&amp;quot;target&amp;quot;:&amp;quot;fmt_json::yak_shave&amp;quot;,&amp;quot;spans&amp;quot;:[{&amp;quot;yaks&amp;quot;:3,&amp;quot;name&amp;quot;:&amp;quot;shaving_yaks&amp;quot;}]}</span>
+<span class="doccomment">/// {&amp;quot;timestamp&amp;quot;:&amp;quot;2022-02-15T18:47:10.822117Z&amp;quot;,&amp;quot;level&amp;quot;:&amp;quot;INFO&amp;quot;,&amp;quot;fields&amp;quot;:{&amp;quot;message&amp;quot;:&amp;quot;yak shaving completed&amp;quot;,&amp;quot;all_yaks_shaved&amp;quot;:false},&amp;quot;target&amp;quot;:&amp;quot;fmt_json&amp;quot;}</span>
+<span class="doccomment">/// &lt;/pre&gt;</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// # Options</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// This formatter exposes additional options to configure the structure of the</span>
+<span class="doccomment">/// output JSON objects:</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// - [`Json::flatten_event`] can be used to enable flattening event fields into</span>
 <span class="doccomment">/// the root</span>
@@ -803,9 +958,23 @@
 <span class="doccomment">/// By default, event fields are not flattened, and both current span and span</span>
 <span class="doccomment">/// list are logged.</span>
 <span class="doccomment">///</span>
+<span class="doccomment">/// # Valuable Support</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// Experimental support is available for using the [`valuable`] crate to record</span>
+<span class="doccomment">/// user-defined values as structured JSON. When the [&quot;valuable&quot; unstable</span>
+<span class="doccomment">/// feature][unstable] is enabled, types implementing [`valuable::Valuable`] will</span>
+<span class="doccomment">/// be recorded as structured JSON, rather than</span>
+<span class="doccomment">/// using their [`std::fmt::Debug`] implementations.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// **Note**: This is an experimental feature. [Unstable features][unstable]</span>
+<span class="doccomment">/// must be enabled in order to use `valuable` support.</span>
+<span class="doccomment">///</span>
 <span class="doccomment">/// [`Json::flatten_event`]: #method.flatten_event</span>
 <span class="doccomment">/// [`Json::with_current_span`]: #method.with_current_span</span>
 <span class="doccomment">/// [`Json::with_span_list`]: #method.with_span_list</span>
+<span class="doccomment">/// [`valuable`]: https://crates.io/crates/valuable</span>
+<span class="doccomment">/// [unstable]: crate#unstable-features</span>
+<span class="doccomment">/// [`valuable::Valuable`]: https://docs.rs/valuable/latest/valuable/trait.Valuable.html</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Json</span> {
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">flatten_event</span>: <span class="ident">bool</span>,
@@ -992,6 +1161,18 @@
 
             <span class="kw">if</span> <span class="self">self</span>.<span class="ident">display_target</span> {
                 <span class="ident">serializer</span>.<span class="ident">serialize_entry</span>(<span class="string">&quot;target&quot;</span>, <span class="ident">meta</span>.<span class="ident">target</span>())<span class="question-mark">?</span>;
+            }
+
+            <span class="kw">if</span> <span class="self">self</span>.<span class="ident">display_filename</span> {
+                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">filename</span>) <span class="op">=</span> <span class="ident">meta</span>.<span class="ident">file</span>() {
+                    <span class="ident">serializer</span>.<span class="ident">serialize_entry</span>(<span class="string">&quot;filename&quot;</span>, <span class="ident">filename</span>)<span class="question-mark">?</span>;
+                }
+            }
+
+            <span class="kw">if</span> <span class="self">self</span>.<span class="ident">display_line_number</span> {
+                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">line_number</span>) <span class="op">=</span> <span class="ident">meta</span>.<span class="ident">line</span>() {
+                    <span class="ident">serializer</span>.<span class="ident">serialize_entry</span>(<span class="string">&quot;line_number&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">line_number</span>)<span class="question-mark">?</span>;
+                }
             }
 
             <span class="kw">if</span> <span class="self">self</span>.<span class="ident">format</span>.<span class="ident">display_current_span</span> {
@@ -1186,6 +1367,26 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">field::Visit</span> <span class="kw">for</span> <span class="ident">JsonVisitor</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">tracing_unstable</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;valuable&quot;</span>))]</span>
+    <span class="kw">fn</span> <span class="ident">record_value</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">field</span>: <span class="kw-2">&amp;</span><span class="ident">Field</span>, <span class="ident">value</span>: <span class="ident">valuable_crate::Value</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
+        <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">serde_json::to_value</span>(<span class="ident">valuable_serde::Serializable::new</span>(<span class="ident">value</span>)) {
+            <span class="prelude-val">Ok</span>(<span class="ident">value</span>) =&gt; <span class="ident">value</span>,
+            <span class="prelude-val">Err</span>(<span class="ident">_e</span>) =&gt; {
+                <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">debug_assertions</span>)]</span>
+                <span class="macro">unreachable!</span>(
+                    <span class="string">&quot;`valuable::Valuable` implementations should always serialize \
+                    successfully, but an error occurred: {}&quot;</span>,
+                    <span class="ident">_e</span>,
+                );
+
+                <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">debug_assertions</span>))]</span>
+                <span class="kw">return</span>;
+            }
+        };
+
+        <span class="self">self</span>.<span class="ident">values</span>.<span class="ident">insert</span>(<span class="ident">field</span>.<span class="ident">name</span>(), <span class="ident">value</span>);
+    }
+
     <span class="doccomment">/// Visit a double precision floating point value.</span>
     <span class="kw">fn</span> <span class="ident">record_f64</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">field</span>: <span class="kw-2">&amp;</span><span class="ident">Field</span>, <span class="ident">value</span>: <span class="ident">f64</span>) {
         <span class="self">self</span>.<span class="ident">values</span>
@@ -1239,6 +1440,7 @@
     <span class="kw">use</span> <span class="ident">tracing</span>::{<span class="self">self</span>, <span class="ident">subscriber::with_default</span>};
 
     <span class="kw">use</span> <span class="ident">std::fmt</span>;
+    <span class="kw">use</span> <span class="ident">std::path::Path</span>;
 
     <span class="kw">struct</span> <span class="ident">MockTime</span>;
     <span class="kw">impl</span> <span class="ident">FormatTime</span> <span class="kw">for</span> <span class="ident">MockTime</span> {
@@ -1260,6 +1462,50 @@
             .<span class="ident">with_current_span</span>(<span class="bool-val">true</span>)
             .<span class="ident">with_span_list</span>(<span class="bool-val">true</span>);
         <span class="ident">test_json</span>(<span class="ident">expected</span>, <span class="ident">subscriber</span>, <span class="op">|</span><span class="op">|</span> {
+            <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="macro">tracing::span!</span>(<span class="ident">tracing::Level::INFO</span>, <span class="string">&quot;json_span&quot;</span>, <span class="ident">answer</span> <span class="op">=</span> <span class="number">42</span>, <span class="ident">number</span> <span class="op">=</span> <span class="number">3</span>);
+            <span class="kw">let</span> <span class="ident">_guard</span> <span class="op">=</span> <span class="ident">span</span>.<span class="ident">enter</span>();
+            <span class="macro">tracing::info!</span>(<span class="string">&quot;some json test&quot;</span>);
+        });
+    }
+
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">json_filename</span>() {
+        <span class="kw">let</span> <span class="ident">current_path</span> <span class="op">=</span> <span class="ident">Path::new</span>(<span class="string">&quot;tracing-subscriber&quot;</span>)
+            .<span class="ident">join</span>(<span class="string">&quot;src&quot;</span>)
+            .<span class="ident">join</span>(<span class="string">&quot;fmt&quot;</span>)
+            .<span class="ident">join</span>(<span class="string">&quot;format&quot;</span>)
+            .<span class="ident">join</span>(<span class="string">&quot;json.rs&quot;</span>)
+            .<span class="ident">to_str</span>()
+            .<span class="ident">expect</span>(<span class="string">&quot;path must be valid unicode&quot;</span>)
+            <span class="comment">// escape windows backslashes</span>
+            .<span class="ident">replace</span>(<span class="string">&#39;\\&#39;</span>, <span class="string">&quot;\\\\&quot;</span>);
+        <span class="kw">let</span> <span class="ident">expected</span> <span class="op">=</span>
+            <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;{}{}{}&quot;</span>,
+                    <span class="string">&quot;{\&quot;timestamp\&quot;:\&quot;fake time\&quot;,\&quot;level\&quot;:\&quot;INFO\&quot;,\&quot;span\&quot;:{\&quot;answer\&quot;:42,\&quot;name\&quot;:\&quot;json_span\&quot;,\&quot;number\&quot;:3},\&quot;spans\&quot;:[{\&quot;answer\&quot;:42,\&quot;name\&quot;:\&quot;json_span\&quot;,\&quot;number\&quot;:3}],\&quot;target\&quot;:\&quot;tracing_subscriber::fmt::format::json::test\&quot;,\&quot;filename\&quot;:\&quot;&quot;</span>,
+                    <span class="ident">current_path</span>,
+                    <span class="string">&quot;\&quot;,\&quot;fields\&quot;:{\&quot;message\&quot;:\&quot;some json test\&quot;}}\n&quot;</span>);
+        <span class="kw">let</span> <span class="ident">subscriber</span> <span class="op">=</span> <span class="ident">subscriber</span>()
+            .<span class="ident">flatten_event</span>(<span class="bool-val">false</span>)
+            .<span class="ident">with_current_span</span>(<span class="bool-val">true</span>)
+            .<span class="ident">with_file</span>(<span class="bool-val">true</span>)
+            .<span class="ident">with_span_list</span>(<span class="bool-val">true</span>);
+        <span class="ident">test_json</span>(<span class="ident">expected</span>, <span class="ident">subscriber</span>, <span class="op">|</span><span class="op">|</span> {
+            <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="macro">tracing::span!</span>(<span class="ident">tracing::Level::INFO</span>, <span class="string">&quot;json_span&quot;</span>, <span class="ident">answer</span> <span class="op">=</span> <span class="number">42</span>, <span class="ident">number</span> <span class="op">=</span> <span class="number">3</span>);
+            <span class="kw">let</span> <span class="ident">_guard</span> <span class="op">=</span> <span class="ident">span</span>.<span class="ident">enter</span>();
+            <span class="macro">tracing::info!</span>(<span class="string">&quot;some json test&quot;</span>);
+        });
+    }
+
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">json_line_number</span>() {
+        <span class="kw">let</span> <span class="ident">expected</span> <span class="op">=</span>
+            <span class="string">&quot;{\&quot;timestamp\&quot;:\&quot;fake time\&quot;,\&quot;level\&quot;:\&quot;INFO\&quot;,\&quot;span\&quot;:{\&quot;answer\&quot;:42,\&quot;name\&quot;:\&quot;json_span\&quot;,\&quot;number\&quot;:3},\&quot;spans\&quot;:[{\&quot;answer\&quot;:42,\&quot;name\&quot;:\&quot;json_span\&quot;,\&quot;number\&quot;:3}],\&quot;target\&quot;:\&quot;tracing_subscriber::fmt::format::json::test\&quot;,\&quot;line_number\&quot;:42,\&quot;fields\&quot;:{\&quot;message\&quot;:\&quot;some json test\&quot;}}\n&quot;</span>;
+        <span class="kw">let</span> <span class="ident">subscriber</span> <span class="op">=</span> <span class="ident">subscriber</span>()
+            .<span class="ident">flatten_event</span>(<span class="bool-val">false</span>)
+            .<span class="ident">with_current_span</span>(<span class="bool-val">true</span>)
+            .<span class="ident">with_line_number</span>(<span class="bool-val">true</span>)
+            .<span class="ident">with_span_list</span>(<span class="bool-val">true</span>);
+        <span class="ident">test_json_with_line_number</span>(<span class="ident">expected</span>, <span class="ident">subscriber</span>, <span class="op">|</span><span class="op">|</span> {
             <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="macro">tracing::span!</span>(<span class="ident">tracing::Level::INFO</span>, <span class="string">&quot;json_span&quot;</span>, <span class="ident">answer</span> <span class="op">=</span> <span class="number">42</span>, <span class="ident">number</span> <span class="op">=</span> <span class="number">3</span>);
             <span class="kw">let</span> <span class="ident">_guard</span> <span class="op">=</span> <span class="ident">span</span>.<span class="ident">enter</span>();
             <span class="macro">tracing::info!</span>(<span class="string">&quot;some json test&quot;</span>);
@@ -1497,6 +1743,36 @@
                 .<span class="ident">unwrap</span>(),
             <span class="ident">serde_json::from_str</span>(<span class="ident">actual</span>).<span class="ident">unwrap</span>()
         );
+    }
+
+    <span class="kw">fn</span> <span class="ident">test_json_with_line_number</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(
+        <span class="ident">expected</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
+        <span class="ident">builder</span>: <span class="ident"><span class="kw">crate</span>::fmt::SubscriberBuilder</span><span class="op">&lt;</span><span class="ident">JsonFields</span>, <span class="ident">Format</span><span class="op">&lt;</span><span class="ident">Json</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+        <span class="ident">producer</span>: <span class="kw">impl</span> <span class="ident">FnOnce</span>() -&gt; <span class="ident">T</span>,
+    ) {
+        <span class="kw">let</span> <span class="ident">make_writer</span> <span class="op">=</span> <span class="ident">MockMakeWriter::default</span>();
+        <span class="kw">let</span> <span class="ident">subscriber</span> <span class="op">=</span> <span class="ident">builder</span>
+            .<span class="ident">with_writer</span>(<span class="ident">make_writer</span>.<span class="ident">clone</span>())
+            .<span class="ident">with_timer</span>(<span class="ident">MockTime</span>)
+            .<span class="ident">finish</span>();
+
+        <span class="ident">with_default</span>(<span class="ident">subscriber</span>, <span class="ident">producer</span>);
+
+        <span class="kw">let</span> <span class="ident">buf</span> <span class="op">=</span> <span class="ident">make_writer</span>.<span class="ident">buf</span>();
+        <span class="kw">let</span> <span class="ident">actual</span> <span class="op">=</span> <span class="ident">std::str::from_utf8</span>(<span class="kw-2">&amp;</span><span class="ident">buf</span>[..]).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">expected</span> <span class="op">=</span>
+            <span class="ident">serde_json::from_str</span>::<span class="op">&lt;</span><span class="ident">std::collections::HashMap</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">serde_json::Value</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">expected</span>)
+                .<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">expect_line_number</span> <span class="op">=</span> <span class="ident">expected</span>.<span class="ident">remove</span>(<span class="string">&quot;line_number&quot;</span>).<span class="ident">is_some</span>();
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">actual</span>: <span class="ident">std::collections::HashMap</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">serde_json::Value</span><span class="op">&gt;</span> <span class="op">=</span>
+            <span class="ident">serde_json::from_str</span>(<span class="ident">actual</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">line_number</span> <span class="op">=</span> <span class="ident">actual</span>.<span class="ident">remove</span>(<span class="string">&quot;line_number&quot;</span>);
+        <span class="kw">if</span> <span class="ident">expect_line_number</span> {
+            <span class="macro">assert_eq!</span>(<span class="ident">line_number</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">x</span>.<span class="ident">is_number</span>()), <span class="prelude-val">Some</span>(<span class="bool-val">true</span>));
+        } <span class="kw">else</span> {
+            <span class="macro">assert!</span>(<span class="ident">line_number</span>.<span class="ident">is_none</span>());
+        }
+        <span class="macro">assert_eq!</span>(<span class="ident">actual</span>, <span class="ident">expected</span>);
     }
 }
 </code></pre></div>

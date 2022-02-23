@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;time-0.3.5&#x2F;src&#x2F;offset_date_time.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>offset_date_time.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><script defer src="../../main.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;time-0.3.7&#x2F;src&#x2F;offset_date_time.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>offset_date_time.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><script defer src="../../main.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script>
     <noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="shortcut icon" href="https:&#x2F;&#x2F;avatars0.githubusercontent.com&#x2F;u&#x2F;55999857"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../time/index.html'><div class='logo-container rust-logo'><img src='https:&#x2F;&#x2F;avatars0.githubusercontent.com&#x2F;u&#x2F;55999857' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">   1</span>
 <span id="2">   2</span>
 <span id="3">   3</span>
@@ -1057,6 +1057,75 @@
 <span id="1056">1056</span>
 <span id="1057">1057</span>
 <span id="1058">1058</span>
+<span id="1059">1059</span>
+<span id="1060">1060</span>
+<span id="1061">1061</span>
+<span id="1062">1062</span>
+<span id="1063">1063</span>
+<span id="1064">1064</span>
+<span id="1065">1065</span>
+<span id="1066">1066</span>
+<span id="1067">1067</span>
+<span id="1068">1068</span>
+<span id="1069">1069</span>
+<span id="1070">1070</span>
+<span id="1071">1071</span>
+<span id="1072">1072</span>
+<span id="1073">1073</span>
+<span id="1074">1074</span>
+<span id="1075">1075</span>
+<span id="1076">1076</span>
+<span id="1077">1077</span>
+<span id="1078">1078</span>
+<span id="1079">1079</span>
+<span id="1080">1080</span>
+<span id="1081">1081</span>
+<span id="1082">1082</span>
+<span id="1083">1083</span>
+<span id="1084">1084</span>
+<span id="1085">1085</span>
+<span id="1086">1086</span>
+<span id="1087">1087</span>
+<span id="1088">1088</span>
+<span id="1089">1089</span>
+<span id="1090">1090</span>
+<span id="1091">1091</span>
+<span id="1092">1092</span>
+<span id="1093">1093</span>
+<span id="1094">1094</span>
+<span id="1095">1095</span>
+<span id="1096">1096</span>
+<span id="1097">1097</span>
+<span id="1098">1098</span>
+<span id="1099">1099</span>
+<span id="1100">1100</span>
+<span id="1101">1101</span>
+<span id="1102">1102</span>
+<span id="1103">1103</span>
+<span id="1104">1104</span>
+<span id="1105">1105</span>
+<span id="1106">1106</span>
+<span id="1107">1107</span>
+<span id="1108">1108</span>
+<span id="1109">1109</span>
+<span id="1110">1110</span>
+<span id="1111">1111</span>
+<span id="1112">1112</span>
+<span id="1113">1113</span>
+<span id="1114">1114</span>
+<span id="1115">1115</span>
+<span id="1116">1116</span>
+<span id="1117">1117</span>
+<span id="1118">1118</span>
+<span id="1119">1119</span>
+<span id="1120">1120</span>
+<span id="1121">1121</span>
+<span id="1122">1122</span>
+<span id="1123">1123</span>
+<span id="1124">1124</span>
+<span id="1125">1125</span>
+<span id="1126">1126</span>
+<span id="1127">1127</span>
 </pre><pre class="rust"><code><span class="doccomment">//! The [`OffsetDateTime`] struct and its associated `impl`s.</span>
 
 <span class="kw">use</span> <span class="ident">core::cmp::Ordering</span>;
@@ -1208,7 +1277,7 @@
             <span class="ident">UNIX_EPOCH_JULIAN_DAY</span> <span class="op">+</span> <span class="macro">div_floor!</span>(<span class="ident">timestamp</span>, <span class="number">86_400</span>) <span class="kw">as</span> <span class="ident">i32</span>,
         );
 
-        <span class="kw">let</span> <span class="ident">seconds_within_day</span> <span class="op">=</span> <span class="macro">rem_euclid!</span>(<span class="ident">timestamp</span>, <span class="number">86_400</span>);
+        <span class="kw">let</span> <span class="ident">seconds_within_day</span> <span class="op">=</span> <span class="ident">timestamp</span>.<span class="ident">rem_euclid</span>(<span class="number">86_400</span>);
         <span class="kw">let</span> <span class="ident">time</span> <span class="op">=</span> <span class="ident">Time::__from_hms_nanos_unchecked</span>(
             (<span class="ident">seconds_within_day</span> <span class="op">/</span> <span class="number">3_600</span>) <span class="kw">as</span> <span class="kw">_</span>,
             ((<span class="ident">seconds_within_day</span> <span class="op">%</span> <span class="number">3_600</span>) <span class="op">/</span> <span class="number">60</span>) <span class="kw">as</span> <span class="kw">_</span>,
@@ -1244,7 +1313,7 @@
                 <span class="ident">datetime</span>.<span class="ident">utc_datetime</span>.<span class="ident">hour</span>(),
                 <span class="ident">datetime</span>.<span class="ident">utc_datetime</span>.<span class="ident">minute</span>(),
                 <span class="ident">datetime</span>.<span class="ident">utc_datetime</span>.<span class="ident">second</span>(),
-                <span class="macro">rem_euclid!</span>(<span class="ident">timestamp</span>, <span class="number">1_000_000_000</span>) <span class="kw">as</span> <span class="ident">u32</span>,
+                <span class="ident">timestamp</span>.<span class="ident">rem_euclid</span>(<span class="number">1_000_000_000</span>) <span class="kw">as</span> <span class="ident">u32</span>,
             ))
             .<span class="ident">assume_utc</span>())
     }
@@ -1339,7 +1408,7 @@
         <span class="macro">cascade!</span>(<span class="ident">minute</span> <span class="kw">in</span> <span class="number">0</span>..<span class="number">60</span> =&gt; <span class="ident">hour</span>);
 
         <span class="ident">Time::__from_hms_nanos_unchecked</span>(
-            <span class="macro">rem_euclid!</span>(<span class="ident">hour</span>, <span class="number">24</span>) <span class="kw">as</span> <span class="kw">_</span>,
+            <span class="ident">hour</span>.<span class="ident">rem_euclid</span>(<span class="number">24</span>) <span class="kw">as</span> <span class="kw">_</span>,
             <span class="ident">minute</span> <span class="kw">as</span> <span class="kw">_</span>,
             <span class="ident">second</span> <span class="kw">as</span> <span class="kw">_</span>,
             <span class="self">self</span>.<span class="ident">utc_datetime</span>.<span class="ident">nanosecond</span>(),
@@ -1650,7 +1719,7 @@
 
         <span class="macro">cascade!</span>(<span class="ident">second</span> <span class="kw">in</span> <span class="number">0</span>..<span class="number">60</span> =&gt; <span class="ident">minute</span>);
         <span class="macro">cascade!</span>(<span class="ident">minute</span> <span class="kw">in</span> <span class="number">0</span>..<span class="number">60</span> =&gt; <span class="ident">hour</span>);
-        <span class="macro">rem_euclid!</span>(<span class="ident">hour</span>, <span class="number">24</span>) <span class="kw">as</span> <span class="kw">_</span>
+        <span class="ident">hour</span>.<span class="ident">rem_euclid</span>(<span class="number">24</span>) <span class="kw">as</span> <span class="kw">_</span>
     }
 
     <span class="doccomment">/// Get the minute within the hour in the stored offset.</span>
@@ -1672,7 +1741,7 @@
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">minute</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">utc_datetime</span>.<span class="ident">minute</span>() <span class="kw">as</span> <span class="ident">i8</span> <span class="op">+</span> <span class="self">self</span>.<span class="ident">offset</span>.<span class="ident">minutes_past_hour</span>();
 
         <span class="macro">cascade!</span>(<span class="ident">second</span> <span class="kw">in</span> <span class="number">0</span>..<span class="number">60</span> =&gt; <span class="ident">minute</span>);
-        <span class="macro">rem_euclid!</span>(<span class="ident">minute</span>, <span class="number">60</span>) <span class="kw">as</span> <span class="kw">_</span>
+        <span class="ident">minute</span>.<span class="ident">rem_euclid</span>(<span class="number">60</span>) <span class="kw">as</span> <span class="kw">_</span>
     }
 
     <span class="doccomment">/// Get the second within the minute in the stored offset.</span>
@@ -1691,7 +1760,7 @@
     <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">second</span>(<span class="self">self</span>) -&gt; <span class="ident">u8</span> {
         <span class="kw">let</span> <span class="ident">second</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">utc_datetime</span>.<span class="ident">second</span>() <span class="kw">as</span> <span class="ident">i8</span> <span class="op">+</span> <span class="self">self</span>.<span class="ident">offset</span>.<span class="ident">seconds_past_minute</span>();
-        <span class="macro">rem_euclid!</span>(<span class="ident">second</span>, <span class="number">60</span>) <span class="kw">as</span> <span class="kw">_</span>
+        <span class="ident">second</span>.<span class="ident">rem_euclid</span>(<span class="number">60</span>) <span class="kw">as</span> <span class="kw">_</span>
     }
 
     <span class="comment">// Because a `UtcOffset` is limited in resolution to one second, any subsecond value will not</span>
@@ -1750,15 +1819,15 @@
     <span class="doccomment">/// ```</span>
     <span class="doccomment">/// # use time::{Date, ext::NumericalDuration};</span>
     <span class="doccomment">/// # use time::macros::{datetime, offset};</span>
-    <span class="doccomment">/// let datetime = Date::MIN.midnight().assume_offset(offset!(+10:00));</span>
+    <span class="doccomment">/// let datetime = Date::MIN.midnight().assume_offset(offset!(+10));</span>
     <span class="doccomment">/// assert_eq!(datetime.checked_add((-2).days()), None);</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// let datetime = Date::MAX.midnight().assume_offset(offset!(+10:00));</span>
+    <span class="doccomment">/// let datetime = Date::MAX.midnight().assume_offset(offset!(+10));</span>
     <span class="doccomment">/// assert_eq!(datetime.checked_add(2.days()), None);</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// assert_eq!(</span>
-    <span class="doccomment">///     datetime!(2019 - 11 - 25 15:30 +10:00).checked_add(27.hours()),</span>
-    <span class="doccomment">///     Some(datetime!(2019 - 11 - 26 18:30 +10:00))</span>
+    <span class="doccomment">///     datetime!(2019 - 11 - 25 15:30 +10).checked_add(27.hours()),</span>
+    <span class="doccomment">///     Some(datetime!(2019 - 11 - 26 18:30 +10))</span>
     <span class="doccomment">/// );</span>
     <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">checked_add</span>(<span class="self">self</span>, <span class="ident">duration</span>: <span class="ident">Duration</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
@@ -1771,23 +1840,92 @@
     <span class="doccomment">/// ```</span>
     <span class="doccomment">/// # use time::{Date, ext::NumericalDuration};</span>
     <span class="doccomment">/// # use time::macros::{datetime, offset};</span>
-    <span class="doccomment">/// let datetime = Date::MIN.midnight().assume_offset(offset!(+10:00));</span>
+    <span class="doccomment">/// let datetime = Date::MIN.midnight().assume_offset(offset!(+10));</span>
     <span class="doccomment">/// assert_eq!(datetime.checked_sub(2.days()), None);</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// let datetime = Date::MAX.midnight().assume_offset(offset!(+10:00));</span>
+    <span class="doccomment">/// let datetime = Date::MAX.midnight().assume_offset(offset!(+10));</span>
     <span class="doccomment">/// assert_eq!(datetime.checked_sub((-2).days()), None);</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// assert_eq!(</span>
-    <span class="doccomment">///     datetime!(2019 - 11 - 25 15:30 +10:00).checked_sub(27.hours()),</span>
-    <span class="doccomment">///     Some(datetime!(2019 - 11 - 24 12:30 +10:00))</span>
+    <span class="doccomment">///     datetime!(2019 - 11 - 25 15:30 +10).checked_sub(27.hours()),</span>
+    <span class="doccomment">///     Some(datetime!(2019 - 11 - 24 12:30 +10))</span>
     <span class="doccomment">/// );</span>
     <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">checked_sub</span>(<span class="self">self</span>, <span class="ident">duration</span>: <span class="ident">Duration</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">offset_datetime</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">utc_datetime</span>.<span class="ident">utc_to_offset</span>(<span class="self">self</span>.<span class="ident">offset</span>);
         <span class="prelude-val">Some</span>(<span class="macro">const_try_opt!</span>(<span class="ident">offset_datetime</span>.<span class="ident">checked_sub</span>(<span class="ident">duration</span>)).<span class="ident">assume_offset</span>(<span class="self">self</span>.<span class="ident">offset</span>))
     }
-
     <span class="comment">// endregion: checked arithmetic</span>
+
+    <span class="comment">// region: saturating arithmetic</span>
+    <span class="doccomment">/// Computes `self + duration`, saturating value on overflow.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// # use time::ext::NumericalDuration;</span>
+    <span class="doccomment">/// # use time::macros::datetime;</span>
+    <span class="doccomment">/// assert_eq!(</span>
+    <span class="doccomment">///     datetime!(-999999 - 01 - 01 0:00 +10).saturating_add((-2).days()),</span>
+    <span class="doccomment">///     datetime!(-999999 - 01 - 01 0:00 +10)</span>
+    <span class="doccomment">/// );</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// assert_eq!(</span>
+    <span class="doccomment">///     datetime!(+999999 - 12 - 31 23:59:59.999_999_999 +10).saturating_add(2.days()),</span>
+    <span class="doccomment">///     datetime!(+999999 - 12 - 31 23:59:59.999_999_999 +10)</span>
+    <span class="doccomment">/// );</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// assert_eq!(</span>
+    <span class="doccomment">///     datetime!(2019 - 11 - 25 15:30 +10).saturating_add(27.hours()),</span>
+    <span class="doccomment">///     datetime!(2019 - 11 - 26 18:30 +10)</span>
+    <span class="doccomment">/// );</span>
+    <span class="doccomment">/// ```</span>
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">saturating_add</span>(<span class="self">self</span>, <span class="ident">duration</span>: <span class="ident">Duration</span>) -&gt; <span class="self">Self</span> {
+        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">datetime</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">checked_add</span>(<span class="ident">duration</span>) {
+            <span class="ident">datetime</span>
+        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">duration</span>.<span class="ident">is_negative</span>() {
+            <span class="ident">PrimitiveDateTime::MIN</span>
+                .<span class="ident">assume_utc</span>()
+                .<span class="ident">replace_offset</span>(<span class="self">self</span>.<span class="ident">offset</span>)
+        } <span class="kw">else</span> {
+            <span class="ident">PrimitiveDateTime::MAX</span>
+                .<span class="ident">assume_utc</span>()
+                .<span class="ident">replace_offset</span>(<span class="self">self</span>.<span class="ident">offset</span>)
+        }
+    }
+
+    <span class="doccomment">/// Computes `self - duration`, saturating value on overflow.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// # use time::ext::NumericalDuration;</span>
+    <span class="doccomment">/// # use time::macros::datetime;</span>
+    <span class="doccomment">/// assert_eq!(</span>
+    <span class="doccomment">///     datetime!(-999999 - 01 - 01 0:00 +10).saturating_sub(2.days()),</span>
+    <span class="doccomment">///     datetime!(-999999 - 01 - 01 0:00 +10)</span>
+    <span class="doccomment">/// );</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// assert_eq!(</span>
+    <span class="doccomment">///     datetime!(+999999 - 12 - 31 23:59:59.999_999_999 +10).saturating_sub((-2).days()),</span>
+    <span class="doccomment">///     datetime!(+999999 - 12 - 31 23:59:59.999_999_999 +10)</span>
+    <span class="doccomment">/// );</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// assert_eq!(</span>
+    <span class="doccomment">///     datetime!(2019 - 11 - 25 15:30 +10).saturating_sub(27.hours()),</span>
+    <span class="doccomment">///     datetime!(2019 - 11 - 24 12:30 +10)</span>
+    <span class="doccomment">/// );</span>
+    <span class="doccomment">/// ```</span>
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">saturating_sub</span>(<span class="self">self</span>, <span class="ident">duration</span>: <span class="ident">Duration</span>) -&gt; <span class="self">Self</span> {
+        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">datetime</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">checked_sub</span>(<span class="ident">duration</span>) {
+            <span class="ident">datetime</span>
+        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">duration</span>.<span class="ident">is_negative</span>() {
+            <span class="ident">PrimitiveDateTime::MAX</span>
+                .<span class="ident">assume_utc</span>()
+                .<span class="ident">replace_offset</span>(<span class="self">self</span>.<span class="ident">offset</span>)
+        } <span class="kw">else</span> {
+            <span class="ident">PrimitiveDateTime::MIN</span>
+                .<span class="ident">assume_utc</span>()
+                .<span class="ident">replace_offset</span>(<span class="self">self</span>.<span class="ident">offset</span>)
+        }
+    }
+    <span class="comment">// endregion: saturating arithmetic</span>
 }
 
 <span class="comment">// region: replacement</span>

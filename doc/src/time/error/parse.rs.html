@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;time-0.3.5&#x2F;src&#x2F;error&#x2F;parse.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>parse.rs - source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><script defer src="../../../main.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;time-0.3.7&#x2F;src&#x2F;error&#x2F;parse.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>parse.rs - source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><script defer src="../../../main.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script>
     <noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="shortcut icon" href="https:&#x2F;&#x2F;avatars0.githubusercontent.com&#x2F;u&#x2F;55999857"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../time/index.html'><div class='logo-container rust-logo'><img src='https:&#x2F;&#x2F;avatars0.githubusercontent.com&#x2F;u&#x2F;55999857' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
@@ -104,39 +104,6 @@
 <span id="103">103</span>
 <span id="104">104</span>
 <span id="105">105</span>
-<span id="106">106</span>
-<span id="107">107</span>
-<span id="108">108</span>
-<span id="109">109</span>
-<span id="110">110</span>
-<span id="111">111</span>
-<span id="112">112</span>
-<span id="113">113</span>
-<span id="114">114</span>
-<span id="115">115</span>
-<span id="116">116</span>
-<span id="117">117</span>
-<span id="118">118</span>
-<span id="119">119</span>
-<span id="120">120</span>
-<span id="121">121</span>
-<span id="122">122</span>
-<span id="123">123</span>
-<span id="124">124</span>
-<span id="125">125</span>
-<span id="126">126</span>
-<span id="127">127</span>
-<span id="128">128</span>
-<span id="129">129</span>
-<span id="130">130</span>
-<span id="131">131</span>
-<span id="132">132</span>
-<span id="133">133</span>
-<span id="134">134</span>
-<span id="135">135</span>
-<span id="136">136</span>
-<span id="137">137</span>
-<span id="138">138</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Error that occurred at some stage of parsing</span>
 
 <span class="kw">use</span> <span class="ident">core::convert::TryFrom</span>;
@@ -239,39 +206,6 @@
             <span class="ident"><span class="kw">crate</span>::Error::UnexpectedTrailingCharacters</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::UnexpectedTrailingCharacters</span>),
             <span class="ident"><span class="kw">crate</span>::Error::TryFromParsed</span>(<span class="ident">err</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::TryFromParsed</span>(<span class="ident">err</span>)),
             <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">error::DifferentVariant</span>),
-        }
-    }
-}
-
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde-human-readable&quot;</span>)]</span>
-<span class="kw">impl</span> <span class="ident">Parse</span> {
-    <span class="doccomment">/// Obtain an error type for the deserializer.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">to_invalid_serde_value</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">D</span>: <span class="ident">serde::Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="self">self</span>) -&gt; <span class="ident">D::Error</span> {
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>))]</span>
-        <span class="kw">use</span> <span class="ident">alloc::format</span>;
-
-        <span class="kw">use</span> <span class="ident">serde::de::Error</span>;
-
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident"><span class="self">Self</span>::TryFromParsed</span>(<span class="ident">TryFromParsed::InsufficientInformation</span>) =&gt; <span class="macro">unreachable!</span>(
-                <span class="string">&quot;The deserializing format contains all information needed to construct a `Time`.&quot;</span>
-            ),
-            <span class="ident"><span class="self">Self</span>::TryFromParsed</span>(<span class="ident">TryFromParsed::ComponentRange</span>(<span class="ident">err</span>)) =&gt; {
-                <span class="ident">err</span>.<span class="ident">to_invalid_serde_value</span>::<span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>()
-            }
-            <span class="ident"><span class="self">Self</span>::ParseFromDescription</span>(<span class="ident">ParseFromDescription::InvalidLiteral</span>) =&gt; {
-                <span class="ident">D::Error::invalid_value</span>(<span class="ident">serde::de::Unexpected::Other</span>(<span class="string">&quot;literal&quot;</span>), <span class="kw-2">&amp;</span><span class="string">&quot;valid format&quot;</span>)
-            }
-            <span class="ident"><span class="self">Self</span>::ParseFromDescription</span>(<span class="ident">ParseFromDescription::InvalidComponent</span>(<span class="ident">component</span>)) =&gt; {
-                <span class="ident">D::Error::invalid_value</span>(
-                    <span class="ident">serde::de::Unexpected::Other</span>(<span class="ident">component</span>),
-                    <span class="op">&amp;&amp;</span><span class="kw-2">*</span><span class="macro">format!</span>(<span class="string">&quot;valid {}&quot;</span>, <span class="ident">component</span>),
-                )
-            }
-            <span class="ident"><span class="self">Self</span>::UnexpectedTrailingCharacters</span> =&gt; <span class="ident">D::Error::invalid_value</span>(
-                <span class="ident">serde::de::Unexpected::Other</span>(<span class="string">&quot;literal&quot;</span>),
-                <span class="kw-2">&amp;</span><span class="string">&quot;no extraneous characters&quot;</span>,
-            ),
         }
     }
 }

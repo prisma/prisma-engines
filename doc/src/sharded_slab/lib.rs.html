@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;sharded-slab-0.1.3&#x2F;src&#x2F;lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><script defer src="../../main.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;sharded-slab-0.1.4&#x2F;src&#x2F;lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><script defer src="../../main.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script>
     <noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../sharded_slab/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">   1</span>
 <span id="2">   2</span>
 <span id="3">   3</span>
@@ -1091,10 +1091,6 @@
 <span id="1090">1090</span>
 <span id="1091">1091</span>
 <span id="1092">1092</span>
-<span id="1093">1093</span>
-<span id="1094">1094</span>
-<span id="1095">1095</span>
-<span id="1096">1096</span>
 </pre><pre class="rust"><code><span class="doccomment">//! A lock-free concurrent slab.</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! Slabs provide pre-allocated storage for many instances of a single data</span>
@@ -1133,12 +1129,10 @@
 <span class="doccomment">//! [`Pool`] may be used to reuse a set of existing heap allocations, reducing</span>
 <span class="doccomment">//! allocator load.</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! [`Slab`]: struct.Slab.html</span>
-<span class="doccomment">//! [inserting]: struct.Slab.html#method.insert</span>
-<span class="doccomment">//! [taking]: struct.Slab.html#method.take</span>
-<span class="doccomment">//! [`Pool`]: struct.Pool.html</span>
-<span class="doccomment">//! [create]: struct.Pool.html#method.create</span>
-<span class="doccomment">//! [cleared]: trait.Clear.html</span>
+<span class="doccomment">//! [inserting]: Slab::insert</span>
+<span class="doccomment">//! [taking]: Slab::take</span>
+<span class="doccomment">//! [create]: Pool::create</span>
+<span class="doccomment">//! [cleared]: Clear</span>
 <span class="doccomment">//! [object pool]: https://en.wikipedia.org/wiki/Object_pool_pattern</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! # Examples</span>
@@ -1293,12 +1287,12 @@
 <span class="doccomment">//!</span>
 <span class="doccomment">//! # Implementation Notes</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! See [this page](implementation/index.html) for details on this crate&#39;s design</span>
+<span class="doccomment">//! See [this page](crate::implementation) for details on this crate&#39;s design</span>
 <span class="doccomment">//! and implementation.</span>
 <span class="doccomment">//!</span>
-<span class="attribute">#![<span class="ident">doc</span>(<span class="ident">html_root_url</span> <span class="op">=</span> <span class="string">&quot;https://docs.rs/sharded-slab/0.1.3&quot;</span>)]</span>
-<span class="attribute">#![<span class="ident">warn</span>(<span class="ident">missing_debug_implementations</span>, <span class="ident">missing_docs</span>, <span class="ident">missing_doc_code_examples</span>)]</span>
-
+<span class="attribute">#![<span class="ident">doc</span>(<span class="ident">html_root_url</span> <span class="op">=</span> <span class="string">&quot;https://docs.rs/sharded-slab/0.1.4&quot;</span>)]</span>
+<span class="attribute">#![<span class="ident">warn</span>(<span class="ident">missing_debug_implementations</span>, <span class="ident">missing_docs</span>)]</span>
+<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">warn</span>(<span class="ident">rustdoc::broken_intra_doc_links</span>))]</span>
 <span class="attribute">#[<span class="ident">macro_use</span>]</span>
 <span class="kw">mod</span> <span class="ident">macros</span>;
 
@@ -1327,17 +1321,18 @@
 
 <span class="doccomment">/// A sharded slab.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// See the [crate-level documentation](index.html) for details on using this type.</span>
+<span class="doccomment">/// See the [crate-level documentation](crate) for details on using this type.</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Slab</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">C</span>: <span class="ident">cfg::Config</span> <span class="op">=</span> <span class="ident">DefaultConfig</span><span class="op">&gt;</span> {
     <span class="ident">shards</span>: <span class="ident">shard::Array</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>, <span class="ident">C</span><span class="op">&gt;</span>,
     <span class="ident">_cfg</span>: <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span>,
 }
 
-<span class="doccomment">/// A handle that allows access to an object in a slab.</span>
+<span class="doccomment">/// A handle that allows access to an occupied entry in a [`Slab`].</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// While the guard exists, it indicates to the slab that the item the guard</span>
 <span class="doccomment">/// references is currently being accessed. If the item is removed from the slab</span>
-<span class="doccomment">/// while a guard exists, the removal will be deferred until all guards are dropped.</span>
+<span class="doccomment">/// while a guard exists, the removal will be deferred until all guards are</span>
+<span class="doccomment">/// dropped.</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Entry</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>, <span class="ident">C</span>: <span class="ident">cfg::Config</span> <span class="op">=</span> <span class="ident">DefaultConfig</span><span class="op">&gt;</span> {
     <span class="ident">inner</span>: <span class="ident">page::slot::Guard</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>, <span class="ident">C</span><span class="op">&gt;</span>,
     <span class="ident">value</span>: <span class="ident">ptr::NonNull</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
@@ -1345,7 +1340,7 @@
     <span class="ident">key</span>: <span class="ident">usize</span>,
 }
 
-<span class="doccomment">/// A handle to a vacant entry in a `Slab`.</span>
+<span class="doccomment">/// A handle to a vacant entry in a [`Slab`].</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// `VacantEntry` allows constructing values with the key that they will be</span>
 <span class="doccomment">/// assigned to.</span>
@@ -1374,13 +1369,14 @@
     <span class="ident">_lt</span>: <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> ()<span class="op">&gt;</span>,
 }
 
-<span class="doccomment">/// An owned guard that allows access to an object in a `S.ab`.</span>
+<span class="doccomment">/// An owned reference to an occupied entry in a [`Slab`].</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// While the guard exists, it indicates to the slab that the item the guard references is</span>
-<span class="doccomment">/// currently being accessed. If the item is removed from the slab while the guard exists, the</span>
-<span class="doccomment">/// removal will be deferred until all guards are dropped.</span>
+<span class="doccomment">/// While the guard exists, it indicates to the slab that the item the guard</span>
+<span class="doccomment">/// references is currently being accessed. If the item is removed from the slab</span>
+<span class="doccomment">/// while the guard exists, the  removal will be deferred until all guards are</span>
+<span class="doccomment">/// dropped.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// Unlike [`Entry`], which borrows the slab, an `OwnedEntry` clones the `Arc`</span>
+<span class="doccomment">/// Unlike [`Entry`], which borrows the slab, an `OwnedEntry` clones the [`Arc`]</span>
 <span class="doccomment">/// around the slab. Therefore, it keeps the slab from being dropped until all</span>
 <span class="doccomment">/// such guards have been dropped. This means that an `OwnedEntry` may be held for</span>
 <span class="doccomment">/// an arbitrary lifetime.</span>
@@ -1455,10 +1451,7 @@
 <span class="doccomment">/// ```</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// [`get`]: Slab::get</span>
-<span class="doccomment">/// [`OwnedEntry`]: crate::OwnedEntry</span>
-<span class="doccomment">/// [`Entry`]: crate::Entry</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`Entry`]: crate::Entry</span>
+<span class="doccomment">/// [`Arc`]: std::sync::Arc</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">OwnedEntry</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">C</span> <span class="op">=</span> <span class="ident">DefaultConfig</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">C</span>: <span class="ident">cfg::Config</span>,
@@ -1496,13 +1489,11 @@
     <span class="doccomment">/// parameters. By default, all bits are used; this can be changed by</span>
     <span class="doccomment">/// overriding the [`Config::RESERVED_BITS`][res] constant.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Config`]: trait.Config.html</span>
-    <span class="doccomment">/// [res]: trait.Config.html#associatedconstant.RESERVED_BITS</span>
-    <span class="doccomment">/// [`Slab::insert`]: struct.Slab.html#method.insert</span>
+    <span class="doccomment">/// [res]: crate::Config#RESERVED_BITS</span>
     <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">USED_BITS</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="ident">C::USED_BITS</span>;
 
-    <span class="doccomment">/// Inserts a value into the slab, returning a key that can be used to</span>
-    <span class="doccomment">/// access it.</span>
+    <span class="doccomment">/// Inserts a value into the slab, returning the integer index at which that</span>
+    <span class="doccomment">/// value was inserted. This index can then be used to access the entry.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// If this function returns `None`, then the shard for the current thread</span>
     <span class="doccomment">/// is full and no items can be added until some are removed, or the maximum</span>
@@ -1531,8 +1522,8 @@
     <span class="doccomment">/// Return a handle to a vacant entry allowing for further manipulation.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// This function is useful when creating values that must contain their</span>
-    <span class="doccomment">/// slab key. The returned `VacantEntry` reserves a slot in the slab and is</span>
-    <span class="doccomment">/// able to query the associated key.</span>
+    <span class="doccomment">/// slab index. The returned [`VacantEntry`] reserves a slot in the slab and</span>
+    <span class="doccomment">/// is able to return the index of the entry.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Examples</span>
     <span class="doccomment">///</span>
@@ -1565,8 +1556,8 @@
         })
     }
 
-    <span class="doccomment">/// Remove the value associated with the given key from the slab, returning</span>
-    <span class="doccomment">/// `true` if a value was removed.</span>
+    <span class="doccomment">/// Remove the value at the given index in the slab, returning `true` if a</span>
+    <span class="doccomment">/// value was removed.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Unlike [`take`], this method does _not_ block the current thread until</span>
     <span class="doccomment">/// the value can be removed. Instead, if another thread is currently</span>
@@ -1607,7 +1598,7 @@
     <span class="doccomment">/// thread2.join().unwrap();</span>
     <span class="doccomment">/// assert!(!slab.contains(key));</span>
     <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// [`take`]: #method.take</span>
+    <span class="doccomment">/// [`take`]: Slab::take</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">remove</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">idx</span>: <span class="ident">usize</span>) -&gt; <span class="ident">bool</span> {
         <span class="comment">// The `Drop` impl for `Entry` calls `remove_local` or `remove_remote` based</span>
         <span class="comment">// on where the guard was dropped from. If the dropped guard was the last one, this will</span>
@@ -1676,7 +1667,7 @@
     <span class="doccomment">/// thread2.join().unwrap();</span>
     <span class="doccomment">/// assert!(!slab.contains(key));</span>
     <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// [`remove`]: #method.remove</span>
+    <span class="doccomment">/// [`remove`]: Slab::remove</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">take</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">idx</span>: <span class="ident">usize</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">tid</span> <span class="op">=</span> <span class="ident">C::unpack_tid</span>(<span class="ident">idx</span>);
 
@@ -1721,12 +1712,12 @@
         })
     }
 
-    <span class="doccomment">/// Return an owned reference to the value associated with the given key.</span>
+    <span class="doccomment">/// Return an owned reference to the value at the given index.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// If the slab does not contain a value for the given key, `None` is</span>
     <span class="doccomment">/// returned instead.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Unlike [`get`], which borrows the slab, this method _clones_ the `Arc`</span>
+    <span class="doccomment">/// Unlike [`get`], which borrows the slab, this method _clones_ the [`Arc`]</span>
     <span class="doccomment">/// around the slab. This means that the returned [`OwnedEntry`] can be held</span>
     <span class="doccomment">/// for an arbitrary lifetime. However,  this method requires that the slab</span>
     <span class="doccomment">/// itself be wrapped in an `Arc`.</span>
@@ -1782,7 +1773,7 @@
     <span class="doccomment">/// function_requiring_static(&amp;my_struct);</span>
     <span class="doccomment">/// ```</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// `OwnedEntry`s may be sent between threads:</span>
+    <span class="doccomment">/// [`OwnedEntry`]s may be sent between threads:</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```</span>
     <span class="doccomment">/// # use sharded_slab::Slab;</span>
@@ -1801,8 +1792,7 @@
     <span class="doccomment">/// ```</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`get`]: Slab::get</span>
-    <span class="doccomment">/// [`OwnedEntry`]: crate::OwnedEntry</span>
-    <span class="doccomment">/// [`Entry`]: crate::Entry</span>
+    <span class="doccomment">/// [`Arc`]: std::sync::Arc</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_owned</span>(<span class="self">self</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">key</span>: <span class="ident">usize</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">OwnedEntry</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">tid</span> <span class="op">=</span> <span class="ident">C::unpack_tid</span>(<span class="ident">key</span>);
 
@@ -1938,8 +1928,8 @@
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>, <span class="ident">C</span>: <span class="ident">cfg::Config</span><span class="op">&gt;</span> <span class="ident">VacantEntry</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span> {
     <span class="doccomment">/// Insert a value in the entry.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// To get the key associated with the value, use `key` prior to calling</span>
-    <span class="doccomment">/// `insert`.</span>
+    <span class="doccomment">/// To get the integer index at which this value will be inserted, use</span>
+    <span class="doccomment">/// [`key`] prior to calling `insert`.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Examples</span>
     <span class="doccomment">///</span>
@@ -1958,6 +1948,8 @@
     <span class="doccomment">/// assert_eq!(hello, slab.get(hello).unwrap().0);</span>
     <span class="doccomment">/// assert_eq!(&quot;hello&quot;, slab.get(hello).unwrap().1);</span>
     <span class="doccomment">/// ```</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [`key`]: VacantEntry::key</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">insert</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">val</span>: <span class="ident">T</span>) {
         <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="kw">unsafe</span> {
             <span class="comment">// Safety: this `VacantEntry` only lives as long as the `Slab` it was</span>
@@ -1981,7 +1973,7 @@
         )
     }
 
-    <span class="doccomment">/// Return the key associated with this entry.</span>
+    <span class="doccomment">/// Return the integer index at which this entry will be inserted.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// A value stored in this entry will be associated with this key.</span>
     <span class="doccomment">///</span>

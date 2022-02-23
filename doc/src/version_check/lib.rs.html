@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;version_check-0.9.3&#x2F;src&#x2F;lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><script defer src="../../main.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;version_check-0.9.4&#x2F;src&#x2F;lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><script defer src="../../main.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script>
     <noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../version_check/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
@@ -367,6 +367,131 @@
 <span id="366">366</span>
 <span id="367">367</span>
 <span id="368">368</span>
+<span id="369">369</span>
+<span id="370">370</span>
+<span id="371">371</span>
+<span id="372">372</span>
+<span id="373">373</span>
+<span id="374">374</span>
+<span id="375">375</span>
+<span id="376">376</span>
+<span id="377">377</span>
+<span id="378">378</span>
+<span id="379">379</span>
+<span id="380">380</span>
+<span id="381">381</span>
+<span id="382">382</span>
+<span id="383">383</span>
+<span id="384">384</span>
+<span id="385">385</span>
+<span id="386">386</span>
+<span id="387">387</span>
+<span id="388">388</span>
+<span id="389">389</span>
+<span id="390">390</span>
+<span id="391">391</span>
+<span id="392">392</span>
+<span id="393">393</span>
+<span id="394">394</span>
+<span id="395">395</span>
+<span id="396">396</span>
+<span id="397">397</span>
+<span id="398">398</span>
+<span id="399">399</span>
+<span id="400">400</span>
+<span id="401">401</span>
+<span id="402">402</span>
+<span id="403">403</span>
+<span id="404">404</span>
+<span id="405">405</span>
+<span id="406">406</span>
+<span id="407">407</span>
+<span id="408">408</span>
+<span id="409">409</span>
+<span id="410">410</span>
+<span id="411">411</span>
+<span id="412">412</span>
+<span id="413">413</span>
+<span id="414">414</span>
+<span id="415">415</span>
+<span id="416">416</span>
+<span id="417">417</span>
+<span id="418">418</span>
+<span id="419">419</span>
+<span id="420">420</span>
+<span id="421">421</span>
+<span id="422">422</span>
+<span id="423">423</span>
+<span id="424">424</span>
+<span id="425">425</span>
+<span id="426">426</span>
+<span id="427">427</span>
+<span id="428">428</span>
+<span id="429">429</span>
+<span id="430">430</span>
+<span id="431">431</span>
+<span id="432">432</span>
+<span id="433">433</span>
+<span id="434">434</span>
+<span id="435">435</span>
+<span id="436">436</span>
+<span id="437">437</span>
+<span id="438">438</span>
+<span id="439">439</span>
+<span id="440">440</span>
+<span id="441">441</span>
+<span id="442">442</span>
+<span id="443">443</span>
+<span id="444">444</span>
+<span id="445">445</span>
+<span id="446">446</span>
+<span id="447">447</span>
+<span id="448">448</span>
+<span id="449">449</span>
+<span id="450">450</span>
+<span id="451">451</span>
+<span id="452">452</span>
+<span id="453">453</span>
+<span id="454">454</span>
+<span id="455">455</span>
+<span id="456">456</span>
+<span id="457">457</span>
+<span id="458">458</span>
+<span id="459">459</span>
+<span id="460">460</span>
+<span id="461">461</span>
+<span id="462">462</span>
+<span id="463">463</span>
+<span id="464">464</span>
+<span id="465">465</span>
+<span id="466">466</span>
+<span id="467">467</span>
+<span id="468">468</span>
+<span id="469">469</span>
+<span id="470">470</span>
+<span id="471">471</span>
+<span id="472">472</span>
+<span id="473">473</span>
+<span id="474">474</span>
+<span id="475">475</span>
+<span id="476">476</span>
+<span id="477">477</span>
+<span id="478">478</span>
+<span id="479">479</span>
+<span id="480">480</span>
+<span id="481">481</span>
+<span id="482">482</span>
+<span id="483">483</span>
+<span id="484">484</span>
+<span id="485">485</span>
+<span id="486">486</span>
+<span id="487">487</span>
+<span id="488">488</span>
+<span id="489">489</span>
+<span id="490">490</span>
+<span id="491">491</span>
+<span id="492">492</span>
+<span id="493">493</span>
 </pre><pre class="rust"><code><span class="doccomment">//! This tiny crate checks that the running or installed `rustc` meets some</span>
 <span class="doccomment">//! version requirements. The version is queried by calling the Rust compiler</span>
 <span class="doccomment">//! with `--version`. The path to the compiler is determined first via the</span>
@@ -375,58 +500,68 @@
 <span class="doccomment">//!</span>
 <span class="doccomment">//! # Examples</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! Set a `cfg` flag in `build.rs` if the running compiler was determined to be</span>
-<span class="doccomment">//! at least version `1.13.0`:</span>
+<span class="doccomment">//! * Set a `cfg` flag in `build.rs` if the running compiler was determined to</span>
+<span class="doccomment">//!   be at least version `1.13.0`:</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! ```rust</span>
-<span class="doccomment">//! extern crate version_check as rustc;</span>
+<span class="doccomment">//!   ```rust</span>
+<span class="doccomment">//!   extern crate version_check as rustc;</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! if rustc::is_min_version(&quot;1.13.0&quot;).unwrap_or(false) {</span>
-<span class="doccomment">//!     println!(&quot;cargo:rustc-cfg=question_mark_operator&quot;);</span>
-<span class="doccomment">//! }</span>
-<span class="doccomment">//! ```</span>
+<span class="doccomment">//!   if rustc::is_min_version(&quot;1.13.0&quot;).unwrap_or(false) {</span>
+<span class="doccomment">//!       println!(&quot;cargo:rustc-cfg=question_mark_operator&quot;);</span>
+<span class="doccomment">//!   }</span>
+<span class="doccomment">//!   ```</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! See [`is_max_version`] or [`is_exact_version`] to check if the compiler</span>
-<span class="doccomment">//! is _at most_ or _exactly_ a certain version.</span>
+<span class="doccomment">//!   See [`is_max_version`] or [`is_exact_version`] to check if the compiler</span>
+<span class="doccomment">//!   is _at most_ or _exactly_ a certain version.</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! Check that the running compiler was released on or after `2018-12-18`:</span>
+<span class="doccomment">//! * Check that the running compiler was released on or after `2018-12-18`:</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! ```rust</span>
-<span class="doccomment">//! extern crate version_check as rustc;</span>
+<span class="doccomment">//!   ```rust</span>
+<span class="doccomment">//!   extern crate version_check as rustc;</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! match rustc::is_min_date(&quot;2018-12-18&quot;) {</span>
-<span class="doccomment">//!     Some(true) =&gt; &quot;Yep! It&#39;s recent!&quot;,</span>
-<span class="doccomment">//!     Some(false) =&gt; &quot;No, it&#39;s older.&quot;,</span>
-<span class="doccomment">//!     None =&gt; &quot;Couldn&#39;t determine the rustc version.&quot;</span>
-<span class="doccomment">//! };</span>
-<span class="doccomment">//! ```</span>
+<span class="doccomment">//!   match rustc::is_min_date(&quot;2018-12-18&quot;) {</span>
+<span class="doccomment">//!       Some(true) =&gt; &quot;Yep! It&#39;s recent!&quot;,</span>
+<span class="doccomment">//!       Some(false) =&gt; &quot;No, it&#39;s older.&quot;,</span>
+<span class="doccomment">//!       None =&gt; &quot;Couldn&#39;t determine the rustc version.&quot;</span>
+<span class="doccomment">//!   };</span>
+<span class="doccomment">//!   ```</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! See [`is_max_date`] or [`is_exact_date`] to check if the compiler was</span>
-<span class="doccomment">//! released _prior to_ or _exactly on_ a certain date.</span>
+<span class="doccomment">//!   See [`is_max_date`] or [`is_exact_date`] to check if the compiler was</span>
+<span class="doccomment">//!   released _prior to_ or _exactly on_ a certain date.</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! Check that the running compiler supports feature flags:</span>
+<span class="doccomment">//! * Check that the running compiler supports feature flags:</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! ```rust</span>
-<span class="doccomment">//! extern crate version_check as rustc;</span>
+<span class="doccomment">//!   ```rust</span>
+<span class="doccomment">//!   extern crate version_check as rustc;</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! match rustc::is_feature_flaggable() {</span>
-<span class="doccomment">//!     Some(true) =&gt; &quot;Yes! It&#39;s a dev or nightly release!&quot;,</span>
-<span class="doccomment">//!     Some(false) =&gt; &quot;No, it&#39;s stable or beta.&quot;,</span>
-<span class="doccomment">//!     None =&gt; &quot;Couldn&#39;t determine the rustc version.&quot;</span>
-<span class="doccomment">//! };</span>
-<span class="doccomment">//! ```</span>
+<span class="doccomment">//!   match rustc::is_feature_flaggable() {</span>
+<span class="doccomment">//!       Some(true) =&gt; &quot;Yes! It&#39;s a dev or nightly release!&quot;,</span>
+<span class="doccomment">//!       Some(false) =&gt; &quot;No, it&#39;s stable or beta.&quot;,</span>
+<span class="doccomment">//!       None =&gt; &quot;Couldn&#39;t determine the rustc version.&quot;</span>
+<span class="doccomment">//!   };</span>
+<span class="doccomment">//!   ```</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! Check that the running compiler is on the stable channel:</span>
+<span class="doccomment">//! * Check that the running compiler supports a specific feature:</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! ```rust</span>
-<span class="doccomment">//! extern crate version_check as rustc;</span>
+<span class="doccomment">//!   ```rust</span>
+<span class="doccomment">//!   extern crate version_check as rustc;</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! match rustc::Channel::read() {</span>
-<span class="doccomment">//!     Some(c) if c.is_stable() =&gt; format!(&quot;Yes! It&#39;s stable.&quot;),</span>
-<span class="doccomment">//!     Some(c) =&gt; format!(&quot;No, the channel {} is not stable.&quot;, c),</span>
-<span class="doccomment">//!     None =&gt; format!(&quot;Couldn&#39;t determine the rustc version.&quot;)</span>
-<span class="doccomment">//! };</span>
-<span class="doccomment">//! ```</span>
+<span class="doccomment">//!   if let Some(true) = rustc::supports_feature(&quot;doc_cfg&quot;) {</span>
+<span class="doccomment">//!      println!(&quot;cargo:rustc-cfg=has_doc_cfg&quot;);</span>
+<span class="doccomment">//!   }</span>
+<span class="doccomment">//!   ```</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! * Check that the running compiler is on the stable channel:</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//!   ```rust</span>
+<span class="doccomment">//!   extern crate version_check as rustc;</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//!   match rustc::Channel::read() {</span>
+<span class="doccomment">//!       Some(c) if c.is_stable() =&gt; format!(&quot;Yes! It&#39;s stable.&quot;),</span>
+<span class="doccomment">//!       Some(c) =&gt; format!(&quot;No, the channel {} is not stable.&quot;, c),</span>
+<span class="doccomment">//!       None =&gt; format!(&quot;Couldn&#39;t determine the rustc version.&quot;)</span>
+<span class="doccomment">//!   };</span>
+<span class="doccomment">//!   ```</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! To interact with the version, release date, and release channel as structs,</span>
 <span class="doccomment">//! use [`Version`], [`Date`], and [`Channel`], respectively. The [`triple()`]</span>
@@ -617,22 +752,76 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// In other words, if the channel is either &quot;nightly&quot; or &quot;dev&quot;.</span>
 <span class="doccomment">///</span>
+<span class="doccomment">/// Note that support for specific `rustc` features can be enabled or disabled</span>
+<span class="doccomment">/// via the `allow-features` compiler flag, which this function _does not_</span>
+<span class="doccomment">/// check. That is, this function _does not_ check whether a _specific_ feature</span>
+<span class="doccomment">/// is supported, but instead whether features are supported at all. To check</span>
+<span class="doccomment">/// for support for a specific feature, use [`supports_feature()`].</span>
+<span class="doccomment">///</span>
 <span class="doccomment">/// If the version could not be determined, returns `None`. Otherwise returns</span>
 <span class="doccomment">/// `true` if the running version supports feature flags and `false` otherwise.</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_feature_flaggable</span>() -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> {
     <span class="ident">Channel::read</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">supports_features</span>())
 }
 
+<span class="doccomment">/// Checks whether the running or installed `rustc` supports `feature`.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// Returns _true_ _iff_ [`is_feature_flaggable()`] returns `true` _and_ the</span>
+<span class="doccomment">/// feature is not disabled via exclusion in `allow-features` via `RUSTFLAGS` or</span>
+<span class="doccomment">/// `CARGO_ENCODED_RUSTFLAGS`. If the version could not be determined, returns</span>
+<span class="doccomment">/// `None`.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// # Example</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// ```rust</span>
+<span class="doccomment">/// use version_check as rustc;</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// if let Some(true) = rustc::supports_feature(&quot;doc_cfg&quot;) {</span>
+<span class="doccomment">///    println!(&quot;cargo:rustc-cfg=has_doc_cfg&quot;);</span>
+<span class="doccomment">/// }</span>
+<span class="doccomment">/// ```</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">supports_feature</span>(<span class="ident">feature</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> {
+    <span class="kw">match</span> <span class="ident">is_feature_flaggable</span>() {
+        <span class="prelude-val">Some</span>(<span class="bool-val">true</span>) =&gt; { <span class="comment">/* continue */</span> }
+        <span class="prelude-val">Some</span>(<span class="bool-val">false</span>) =&gt; <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="bool-val">false</span>),
+        <span class="prelude-val">None</span> =&gt; <span class="kw">return</span> <span class="prelude-val">None</span>,
+    }
+
+    <span class="kw">let</span> <span class="ident">env_flags</span> <span class="op">=</span> <span class="ident">env::var_os</span>(<span class="string">&quot;CARGO_ENCODED_RUSTFLAGS&quot;</span>)
+        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">flags</span><span class="op">|</span> (<span class="ident">flags</span>, <span class="string">&#39;\x1f&#39;</span>))
+        .<span class="ident">or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">env::var_os</span>(<span class="string">&quot;RUSTFLAGS&quot;</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">flags</span><span class="op">|</span> (<span class="ident">flags</span>, <span class="string">&#39; &#39;</span>)));
+
+    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>((<span class="ident">flags</span>, <span class="ident">delim</span>)) <span class="op">=</span> <span class="ident">env_flags</span> {
+        <span class="kw">const</span> <span class="ident">ALLOW_FEATURES</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;allow-features=&quot;</span>;
+
+        <span class="kw">let</span> <span class="ident">rustflags</span> <span class="op">=</span> <span class="ident">flags</span>.<span class="ident">to_string_lossy</span>();
+        <span class="kw">let</span> <span class="ident">allow_features</span> <span class="op">=</span> <span class="ident">rustflags</span>.<span class="ident">split</span>(<span class="ident">delim</span>)
+            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">flag</span><span class="op">|</span> <span class="ident">flag</span>.<span class="ident">trim_left_matches</span>(<span class="string">&quot;-Z&quot;</span>).<span class="ident">trim</span>())
+            .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">flag</span><span class="op">|</span> <span class="ident">flag</span>.<span class="ident">starts_with</span>(<span class="ident">ALLOW_FEATURES</span>))
+            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">flag</span><span class="op">|</span> <span class="kw-2">&amp;</span><span class="ident">flag</span>[<span class="ident">ALLOW_FEATURES</span>.<span class="ident">len</span>()..]);
+
+        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">allow_features</span>) <span class="op">=</span> <span class="ident">allow_features</span>.<span class="ident">last</span>() {
+            <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">allow_features</span>.<span class="ident">split</span>(<span class="string">&#39;,&#39;</span>).<span class="ident">any</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">trim</span>() <span class="op">==</span> <span class="ident">feature</span>));
+        }
+    }
+
+    <span class="comment">// If there are no `RUSTFLAGS` or `CARGO_ENCODED_RUSTFLAGS` or they don&#39;t</span>
+    <span class="comment">// contain an `allow-features` flag, assume compiler allows all features.</span>
+    <span class="prelude-val">Some</span>(<span class="bool-val">true</span>)
+}
+
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
 <span class="kw">mod</span> <span class="ident">tests</span> {
+    <span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">env</span>, <span class="ident">fs</span>};
+
     <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::version_and_date_from_rustc_version</span>;
     <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::version_and_date_from_rustc_verbose_version</span>;
 
     <span class="macro">macro_rules!</span> <span class="ident">check_parse</span> {
         (@ <span class="macro-nonterminal">$</span><span class="macro-nonterminal">f</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">s</span>:<span class="ident">expr</span> =&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">v</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">d</span>:<span class="ident">expr</span>) =&gt; ({
-            <span class="kw">if</span> <span class="kw">let</span> (<span class="prelude-val">Some</span>(<span class="ident">v</span>), <span class="ident">d</span>) <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">f</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">s</span>) {
+            <span class="kw">if</span> <span class="kw">let</span> (<span class="prelude-val">Some</span>(<span class="ident">v</span>), <span class="ident">d</span>) <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">f</span>(<span class="kw-2">&amp;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">s</span>) {
                 <span class="kw">let</span> <span class="ident">e_d</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">d</span>.<span class="ident">into</span>();
-                <span class="macro">assert_eq!</span>((<span class="ident">v</span>, <span class="ident">d</span>), (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">v</span>.<span class="ident">into</span>(), <span class="ident">e_d</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">into</span>())));
+                <span class="macro">assert_eq!</span>((<span class="ident">v</span>, <span class="ident">d</span>), (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">v</span>.<span class="ident">to_string</span>(), <span class="ident">e_d</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">into</span>())));
             } <span class="kw">else</span> {
                 <span class="macro">panic!</span>(<span class="string">&quot;{:?} didn&#39;t parse for version testing.&quot;</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">s</span>);
             }
@@ -733,6 +922,67 @@
                 host: x86_64-unknown-linux-gnu\n\
                 release: 1.50.0&quot;</span> =&gt; <span class="string">&quot;1.50.0&quot;</span>, <span class="prelude-val">None</span>,
         };
+    }
+
+    <span class="kw">fn</span> <span class="ident">read_static</span>(<span class="ident">verbose</span>: <span class="ident">bool</span>, <span class="ident">channel</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">minor</span>: <span class="ident">usize</span>) -&gt; <span class="ident">String</span> {
+        <span class="kw">use</span> <span class="ident">std::fs::File</span>;
+        <span class="kw">use</span> <span class="ident">std::path::Path</span>;
+        <span class="kw">use</span> <span class="ident">std::io</span>::{<span class="ident">BufReader</span>, <span class="ident">Read</span>};
+
+        <span class="kw">let</span> <span class="ident">subdir</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">verbose</span> { <span class="string">&quot;verbose&quot;</span> } <span class="kw">else</span> { <span class="string">&quot;terse&quot;</span> };
+        <span class="kw">let</span> <span class="ident">path</span> <span class="op">=</span> <span class="ident">Path::new</span>(<span class="ident">STATIC_PATH</span>)
+            .<span class="ident">join</span>(<span class="ident">channel</span>)
+            .<span class="ident">join</span>(<span class="ident">subdir</span>)
+            .<span class="ident">join</span>(<span class="macro">format!</span>(<span class="string">&quot;rustc-1.{}.0&quot;</span>, <span class="ident">minor</span>));
+
+        <span class="kw">let</span> <span class="ident">file</span> <span class="op">=</span> <span class="ident">File::open</span>(<span class="ident">path</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf_reader</span> <span class="op">=</span> <span class="ident">BufReader::new</span>(<span class="ident">file</span>);
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">contents</span> <span class="op">=</span> <span class="ident">String::new</span>();
+        <span class="ident">buf_reader</span>.<span class="ident">read_to_string</span>(<span class="kw-2">&amp;mut</span> <span class="ident">contents</span>).<span class="ident">unwrap</span>();
+        <span class="ident">contents</span>
+    }
+
+    <span class="kw">static</span> <span class="ident">STATIC_PATH</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="macro">concat!</span>(<span class="macro">env!</span>(<span class="string">&quot;CARGO_MANIFEST_DIR&quot;</span>), <span class="string">&quot;/static&quot;</span>);
+
+    <span class="kw">static</span> <span class="ident">DATES</span>: [<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>; <span class="number">51</span>] <span class="op">=</span> [
+        <span class="string">&quot;2015-05-13&quot;</span>, <span class="string">&quot;2015-06-19&quot;</span>, <span class="string">&quot;2015-08-03&quot;</span>, <span class="string">&quot;2015-09-15&quot;</span>, <span class="string">&quot;2015-10-27&quot;</span>,
+        <span class="string">&quot;2015-12-04&quot;</span>, <span class="string">&quot;2016-01-19&quot;</span>, <span class="string">&quot;2016-02-29&quot;</span>, <span class="string">&quot;2016-04-11&quot;</span>, <span class="string">&quot;2016-05-18&quot;</span>,
+        <span class="string">&quot;2016-07-03&quot;</span>, <span class="string">&quot;2016-08-15&quot;</span>, <span class="string">&quot;2016-09-23&quot;</span>, <span class="string">&quot;2016-11-07&quot;</span>, <span class="string">&quot;2016-12-16&quot;</span>,
+        <span class="string">&quot;2017-01-19&quot;</span>, <span class="string">&quot;2017-03-10&quot;</span>, <span class="string">&quot;2017-04-24&quot;</span>, <span class="string">&quot;2017-06-06&quot;</span>, <span class="string">&quot;2017-07-17&quot;</span>,
+        <span class="string">&quot;2017-08-27&quot;</span>, <span class="string">&quot;2017-10-09&quot;</span>, <span class="string">&quot;2017-11-20&quot;</span>, <span class="string">&quot;2018-01-01&quot;</span>, <span class="string">&quot;2018-02-12&quot;</span>,
+        <span class="string">&quot;2018-03-25&quot;</span>, <span class="string">&quot;2018-05-07&quot;</span>, <span class="string">&quot;2018-06-19&quot;</span>, <span class="string">&quot;2018-07-30&quot;</span>, <span class="string">&quot;2018-09-11&quot;</span>,
+        <span class="string">&quot;2018-10-24&quot;</span>, <span class="string">&quot;2018-12-04&quot;</span>, <span class="string">&quot;2019-01-16&quot;</span>, <span class="string">&quot;2019-02-28&quot;</span>, <span class="string">&quot;2019-04-10&quot;</span>,
+        <span class="string">&quot;2019-05-20&quot;</span>, <span class="string">&quot;2019-07-03&quot;</span>, <span class="string">&quot;2019-08-13&quot;</span>, <span class="string">&quot;2019-09-23&quot;</span>, <span class="string">&quot;2019-11-04&quot;</span>,
+        <span class="string">&quot;2019-12-16&quot;</span>, <span class="string">&quot;2020-01-27&quot;</span>, <span class="string">&quot;2020-03-09&quot;</span>, <span class="string">&quot;2020-04-20&quot;</span>, <span class="string">&quot;2020-06-01&quot;</span>,
+        <span class="string">&quot;2020-07-13&quot;</span>, <span class="string">&quot;2020-08-24&quot;</span>, <span class="string">&quot;2020-10-07&quot;</span>, <span class="string">&quot;2020-11-16&quot;</span>, <span class="string">&quot;2020-12-29&quot;</span>,
+        <span class="string">&quot;2021-02-10&quot;</span>,
+    ];
+
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">test_stable_compatibility</span>() {
+        <span class="kw">if</span> <span class="ident">env::var_os</span>(<span class="string">&quot;FORCE_STATIC&quot;</span>).<span class="ident">is_none</span>() <span class="op">&amp;&amp;</span> <span class="ident">fs::metadata</span>(<span class="ident">STATIC_PATH</span>).<span class="ident">is_err</span>() {
+            <span class="comment">// We exclude `/static` when we package `version_check`, so don&#39;t</span>
+            <span class="comment">// run if static files aren&#39;t present unless we know they should be.</span>
+            <span class="kw">return</span>;
+        }
+
+        <span class="comment">// Ensure we can parse all output from all Linux stable releases.</span>
+        <span class="kw">for</span> <span class="ident">v</span> <span class="kw">in</span> <span class="number">0</span>..<span class="ident">DATES</span>.<span class="ident">len</span>() {
+            <span class="kw">let</span> (<span class="ident">version</span>, <span class="ident">date</span>) <span class="op">=</span> (<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;1.{}.0&quot;</span>, <span class="ident">v</span>), <span class="prelude-val">Some</span>(<span class="ident">DATES</span>[<span class="ident">v</span>]));
+            <span class="macro">check_terse_parse!</span>(<span class="ident">read_static</span>(<span class="bool-val">false</span>, <span class="string">&quot;stable&quot;</span>, <span class="ident">v</span>) =&gt; <span class="ident">version</span>, <span class="ident">date</span>,);
+            <span class="macro">check_verbose_parse!</span>(<span class="ident">read_static</span>(<span class="bool-val">true</span>, <span class="string">&quot;stable&quot;</span>, <span class="ident">v</span>) =&gt; <span class="ident">version</span>, <span class="ident">date</span>,);
+        }
+    }
+
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">test_parse_current</span>() {
+        <span class="kw">let</span> (<span class="ident">version</span>, <span class="ident">channel</span>) <span class="op">=</span> (<span class="ident">::Version::read</span>(), <span class="ident">::Channel::read</span>());
+        <span class="macro">assert!</span>(<span class="ident">version</span>.<span class="ident">is_some</span>());
+        <span class="macro">assert!</span>(<span class="ident">channel</span>.<span class="ident">is_some</span>());
+
+        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">known_channel</span>) <span class="op">=</span> <span class="ident">env::var</span>(<span class="string">&quot;KNOWN_CHANNEL&quot;</span>) {
+            <span class="macro">assert_eq!</span>(<span class="ident">channel</span>, <span class="ident">::Channel::parse</span>(<span class="kw-2">&amp;</span><span class="ident">known_channel</span>));
+        }
     }
 }
 </code></pre></div>

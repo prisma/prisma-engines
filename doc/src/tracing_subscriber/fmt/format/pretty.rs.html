@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;tracing-subscriber-0.3.2&#x2F;src&#x2F;fmt&#x2F;format&#x2F;pretty.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>pretty.rs - source</title><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../../../storage.js"></script><script src="../../../../crates.js"></script><script defer src="../../../../main.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;tracing-subscriber-0.3.9&#x2F;src&#x2F;fmt&#x2F;format&#x2F;pretty.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>pretty.rs - source</title><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../../../storage.js"></script><script src="../../../../crates.js"></script><script defer src="../../../../main.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script>
     <noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../../tracing_subscriber/index.html'><div class='logo-container rust-logo'><img src='https:&#x2F;&#x2F;raw.githubusercontent.com&#x2F;tokio-rs&#x2F;tracing&#x2F;master&#x2F;assets&#x2F;logo-type.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
@@ -391,6 +391,125 @@
 <span id="390">390</span>
 <span id="391">391</span>
 <span id="392">392</span>
+<span id="393">393</span>
+<span id="394">394</span>
+<span id="395">395</span>
+<span id="396">396</span>
+<span id="397">397</span>
+<span id="398">398</span>
+<span id="399">399</span>
+<span id="400">400</span>
+<span id="401">401</span>
+<span id="402">402</span>
+<span id="403">403</span>
+<span id="404">404</span>
+<span id="405">405</span>
+<span id="406">406</span>
+<span id="407">407</span>
+<span id="408">408</span>
+<span id="409">409</span>
+<span id="410">410</span>
+<span id="411">411</span>
+<span id="412">412</span>
+<span id="413">413</span>
+<span id="414">414</span>
+<span id="415">415</span>
+<span id="416">416</span>
+<span id="417">417</span>
+<span id="418">418</span>
+<span id="419">419</span>
+<span id="420">420</span>
+<span id="421">421</span>
+<span id="422">422</span>
+<span id="423">423</span>
+<span id="424">424</span>
+<span id="425">425</span>
+<span id="426">426</span>
+<span id="427">427</span>
+<span id="428">428</span>
+<span id="429">429</span>
+<span id="430">430</span>
+<span id="431">431</span>
+<span id="432">432</span>
+<span id="433">433</span>
+<span id="434">434</span>
+<span id="435">435</span>
+<span id="436">436</span>
+<span id="437">437</span>
+<span id="438">438</span>
+<span id="439">439</span>
+<span id="440">440</span>
+<span id="441">441</span>
+<span id="442">442</span>
+<span id="443">443</span>
+<span id="444">444</span>
+<span id="445">445</span>
+<span id="446">446</span>
+<span id="447">447</span>
+<span id="448">448</span>
+<span id="449">449</span>
+<span id="450">450</span>
+<span id="451">451</span>
+<span id="452">452</span>
+<span id="453">453</span>
+<span id="454">454</span>
+<span id="455">455</span>
+<span id="456">456</span>
+<span id="457">457</span>
+<span id="458">458</span>
+<span id="459">459</span>
+<span id="460">460</span>
+<span id="461">461</span>
+<span id="462">462</span>
+<span id="463">463</span>
+<span id="464">464</span>
+<span id="465">465</span>
+<span id="466">466</span>
+<span id="467">467</span>
+<span id="468">468</span>
+<span id="469">469</span>
+<span id="470">470</span>
+<span id="471">471</span>
+<span id="472">472</span>
+<span id="473">473</span>
+<span id="474">474</span>
+<span id="475">475</span>
+<span id="476">476</span>
+<span id="477">477</span>
+<span id="478">478</span>
+<span id="479">479</span>
+<span id="480">480</span>
+<span id="481">481</span>
+<span id="482">482</span>
+<span id="483">483</span>
+<span id="484">484</span>
+<span id="485">485</span>
+<span id="486">486</span>
+<span id="487">487</span>
+<span id="488">488</span>
+<span id="489">489</span>
+<span id="490">490</span>
+<span id="491">491</span>
+<span id="492">492</span>
+<span id="493">493</span>
+<span id="494">494</span>
+<span id="495">495</span>
+<span id="496">496</span>
+<span id="497">497</span>
+<span id="498">498</span>
+<span id="499">499</span>
+<span id="500">500</span>
+<span id="501">501</span>
+<span id="502">502</span>
+<span id="503">503</span>
+<span id="504">504</span>
+<span id="505">505</span>
+<span id="506">506</span>
+<span id="507">507</span>
+<span id="508">508</span>
+<span id="509">509</span>
+<span id="510">510</span>
+<span id="511">511</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">field</span>::{<span class="ident">VisitFmt</span>, <span class="ident">VisitOutput</span>},
@@ -410,6 +529,84 @@
 <span class="kw">use</span> <span class="ident">ansi_term</span>::{<span class="ident">Colour</span>, <span class="ident">Style</span>};
 
 <span class="doccomment">/// An excessively pretty, human-readable event formatter.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// Unlike the [`Full`], [`Compact`], and [`Json`] formatters, this is a</span>
+<span class="doccomment">/// multi-line output format. Each individual event may output multiple lines of</span>
+<span class="doccomment">/// text.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// # Example Output</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// &lt;pre&gt;&lt;font color=&quot;#4E9A06&quot;&gt;&lt;b&gt;:;&lt;/b&gt;&lt;/font&gt; &lt;font color=&quot;#4E9A06&quot;&gt;cargo&lt;/font&gt; run --example fmt-pretty</span>
+<span class="doccomment">/// &lt;font color=&quot;#4E9A06&quot;&gt;&lt;b&gt;    Finished&lt;/b&gt;&lt;/font&gt; dev [unoptimized + debuginfo] target(s) in 0.08s</span>
+<span class="doccomment">/// &lt;font color=&quot;#4E9A06&quot;&gt;&lt;b&gt;     Running&lt;/b&gt;&lt;/font&gt; `target/debug/examples/fmt-pretty`</span>
+<span class="doccomment">///   2022-02-15T18:44:24.535324Z &lt;font color=&quot;#4E9A06&quot;&gt; INFO&lt;/font&gt; &lt;font color=&quot;#4E9A06&quot;&gt;&lt;b&gt;fmt_pretty&lt;/b&gt;&lt;/font&gt;&lt;font color=&quot;#4E9A06&quot;&gt;: preparing to shave yaks, &lt;/font&gt;&lt;font color=&quot;#4E9A06&quot;&gt;&lt;b&gt;number_of_yaks&lt;/b&gt;&lt;/font&gt;&lt;font color=&quot;#4E9A06&quot;&gt;: 3&lt;/font&gt;</span>
+<span class="doccomment">///     &lt;font color=&quot;#AAAAAA&quot;&gt;&lt;i&gt;at&lt;/i&gt;&lt;/font&gt; examples/examples/fmt-pretty.rs:16 &lt;font color=&quot;#AAAAAA&quot;&gt;&lt;i&gt;on&lt;/i&gt;&lt;/font&gt; main</span>
+<span class="doccomment">///</span>
+<span class="doccomment">///   2022-02-15T18:44:24.535403Z &lt;font color=&quot;#4E9A06&quot;&gt; INFO&lt;/font&gt; &lt;font color=&quot;#4E9A06&quot;&gt;&lt;b&gt;fmt_pretty::yak_shave&lt;/b&gt;&lt;/font&gt;&lt;font color=&quot;#4E9A06&quot;&gt;: shaving yaks&lt;/font&gt;</span>
+<span class="doccomment">///     &lt;font color=&quot;#AAAAAA&quot;&gt;&lt;i&gt;at&lt;/i&gt;&lt;/font&gt; examples/examples/fmt/yak_shave.rs:41 &lt;font color=&quot;#AAAAAA&quot;&gt;&lt;i&gt;on&lt;/i&gt;&lt;/font&gt; main</span>
+<span class="doccomment">///     &lt;font color=&quot;#AAAAAA&quot;&gt;&lt;i&gt;in&lt;/i&gt;&lt;/font&gt; fmt_pretty::yak_shave::&lt;b&gt;shaving_yaks&lt;/b&gt; &lt;font color=&quot;#AAAAAA&quot;&gt;&lt;i&gt;with&lt;/i&gt;&lt;/font&gt; &lt;b&gt;yaks&lt;/b&gt;: 3</span>
+<span class="doccomment">///</span>
+<span class="doccomment">///   2022-02-15T18:44:24.535442Z &lt;font color=&quot;#75507B&quot;&gt;TRACE&lt;/font&gt; &lt;font color=&quot;#75507B&quot;&gt;&lt;b&gt;fmt_pretty::yak_shave&lt;/b&gt;&lt;/font&gt;&lt;font color=&quot;#75507B&quot;&gt;: hello! I&amp;apos;m gonna shave a yak, &lt;/font&gt;&lt;font color=&quot;#75507B&quot;&gt;&lt;b&gt;excitement&lt;/b&gt;&lt;/font&gt;&lt;font color=&quot;#75507B&quot;&gt;: &amp;quot;yay!&amp;quot;&lt;/font&gt;</span>
+<span class="doccomment">///     &lt;font color=&quot;#AAAAAA&quot;&gt;&lt;i&gt;at&lt;/i&gt;&lt;/font&gt; examples/examples/fmt/yak_shave.rs:16 &lt;font color=&quot;#AAAAAA&quot;&gt;&lt;i&gt;on&lt;/i&gt;&lt;/font&gt; main</span>
+<span class="doccomment">///     &lt;font color=&quot;#AAAAAA&quot;&gt;&lt;i&gt;in&lt;/i&gt;&lt;/font&gt; fmt_pretty::yak_shave::&lt;b&gt;shave&lt;/b&gt; &lt;font color=&quot;#AAAAAA&quot;&gt;&lt;i&gt;with&lt;/i&gt;&lt;/font&gt; &lt;b&gt;yak&lt;/b&gt;: 1</span>
+<span class="doccomment">///     &lt;font color=&quot;#AAAAAA&quot;&gt;&lt;i&gt;in&lt;/i&gt;&lt;/font&gt; fmt_pretty::yak_shave::&lt;b&gt;shaving_yaks&lt;/b&gt; &lt;font color=&quot;#AAAAAA&quot;&gt;&lt;i&gt;with&lt;/i&gt;&lt;/font&gt; &lt;b&gt;yaks&lt;/b&gt;: 3</span>
+<span class="doccomment">///</span>
+<span class="doccomment">///   2022-02-15T18:44:24.535469Z &lt;font color=&quot;#75507B&quot;&gt;TRACE&lt;/font&gt; &lt;font color=&quot;#75507B&quot;&gt;&lt;b&gt;fmt_pretty::yak_shave&lt;/b&gt;&lt;/font&gt;&lt;font color=&quot;#75507B&quot;&gt;: yak shaved successfully&lt;/font&gt;</span>
+<span class="doccomment">///     &lt;font color=&quot;#AAAAAA&quot;&gt;&lt;i&gt;at&lt;/i&gt;&lt;/font&gt; examples/examples/fmt/yak_shave.rs:25 &lt;font color=&quot;#AAAAAA&quot;&gt;&lt;i&gt;on&lt;/i&gt;&lt;/font&gt; main</span>
+<span class="doccomment">///     &lt;font color=&quot;#AAAAAA&quot;&gt;&lt;i&gt;in&lt;/i&gt;&lt;/font&gt; fmt_pretty::yak_shave::&lt;b&gt;shave&lt;/b&gt; &lt;font color=&quot;#AAAAAA&quot;&gt;&lt;i&gt;with&lt;/i&gt;&lt;/font&gt; &lt;b&gt;yak&lt;/b&gt;: 1</span>
+<span class="doccomment">///     &lt;font color=&quot;#AAAAAA&quot;&gt;&lt;i&gt;in&lt;/i&gt;&lt;/font&gt; fmt_pretty::yak_shave::&lt;b&gt;shaving_yaks&lt;/b&gt; &lt;font color=&quot;#AAAAAA&quot;&gt;&lt;i&gt;with&lt;/i&gt;&lt;/font&gt; &lt;b&gt;yaks&lt;/b&gt;: 3</span>
+<span class="doccomment">///</span>
+<span class="doccomment">///   2022-02-15T18:44:24.535502Z &lt;font color=&quot;#3465A4&quot;&gt;DEBUG&lt;/font&gt; &lt;font color=&quot;#3465A4&quot;&gt;&lt;b&gt;yak_events&lt;/b&gt;&lt;/font&gt;&lt;font color=&quot;#3465A4&quot;&gt;: &lt;/font&gt;&lt;font color=&quot;#3465A4&quot;&gt;&lt;b&gt;yak&lt;/b&gt;&lt;/font&gt;&lt;font color=&quot;#3465A4&quot;&gt;: 1, &lt;/font&gt;&lt;font color=&quot;#3465A4&quot;&gt;&lt;b&gt;shaved&lt;/b&gt;&lt;/font&gt;&lt;font color=&quot;#3465A4&quot;&gt;: true&lt;/font&gt;</span>
+<span class="doccomment">///     &lt;font color=&quot;#AAAAAA&quot;&gt;&lt;i&gt;at&lt;/i&gt;&lt;/font&gt; examples/examples/fmt/yak_shave.rs:46 &lt;font color=&quot;#AAAAAA&quot;&gt;&lt;i&gt;on&lt;/i&gt;&lt;/font&gt; main</span>
+<span class="doccomment">///     &lt;font color=&quot;#AAAAAA&quot;&gt;&lt;i&gt;in&lt;/i&gt;&lt;/font&gt; fmt_pretty::yak_shave::&lt;b&gt;shaving_yaks&lt;/b&gt; &lt;font color=&quot;#AAAAAA&quot;&gt;&lt;i&gt;with&lt;/i&gt;&lt;/font&gt; &lt;b&gt;yaks&lt;/b&gt;: 3</span>
+<span class="doccomment">///</span>
+<span class="doccomment">///   2022-02-15T18:44:24.535524Z &lt;font color=&quot;#75507B&quot;&gt;TRACE&lt;/font&gt; &lt;font color=&quot;#75507B&quot;&gt;&lt;b&gt;fmt_pretty::yak_shave&lt;/b&gt;&lt;/font&gt;&lt;font color=&quot;#75507B&quot;&gt;: &lt;/font&gt;&lt;font color=&quot;#75507B&quot;&gt;&lt;b&gt;yaks_shaved&lt;/b&gt;&lt;/font&gt;&lt;font color=&quot;#75507B&quot;&gt;: 1&lt;/font&gt;</span>
+<span class="doccomment">///     &lt;font color=&quot;#AAAAAA&quot;&gt;&lt;i&gt;at&lt;/i&gt;&lt;/font&gt; examples/examples/fmt/yak_shave.rs:55 &lt;font color=&quot;#AAAAAA&quot;&gt;&lt;i&gt;on&lt;/i&gt;&lt;/font&gt; main</span>
+<span class="doccomment">///     &lt;font color=&quot;#AAAAAA&quot;&gt;&lt;i&gt;in&lt;/i&gt;&lt;/font&gt; fmt_pretty::yak_shave::&lt;b&gt;shaving_yaks&lt;/b&gt; &lt;font color=&quot;#AAAAAA&quot;&gt;&lt;i&gt;with&lt;/i&gt;&lt;/font&gt; &lt;b&gt;yaks&lt;/b&gt;: 3</span>
+<span class="doccomment">///</span>
+<span class="doccomment">///   2022-02-15T18:44:24.535551Z &lt;font color=&quot;#75507B&quot;&gt;TRACE&lt;/font&gt; &lt;font color=&quot;#75507B&quot;&gt;&lt;b&gt;fmt_pretty::yak_shave&lt;/b&gt;&lt;/font&gt;&lt;font color=&quot;#75507B&quot;&gt;: hello! I&amp;apos;m gonna shave a yak, &lt;/font&gt;&lt;font color=&quot;#75507B&quot;&gt;&lt;b&gt;excitement&lt;/b&gt;&lt;/font&gt;&lt;font color=&quot;#75507B&quot;&gt;: &amp;quot;yay!&amp;quot;&lt;/font&gt;</span>
+<span class="doccomment">///     &lt;font color=&quot;#AAAAAA&quot;&gt;&lt;i&gt;at&lt;/i&gt;&lt;/font&gt; examples/examples/fmt/yak_shave.rs:16 &lt;font color=&quot;#AAAAAA&quot;&gt;&lt;i&gt;on&lt;/i&gt;&lt;/font&gt; main</span>
+<span class="doccomment">///     &lt;font color=&quot;#AAAAAA&quot;&gt;&lt;i&gt;in&lt;/i&gt;&lt;/font&gt; fmt_pretty::yak_shave::&lt;b&gt;shave&lt;/b&gt; &lt;font color=&quot;#AAAAAA&quot;&gt;&lt;i&gt;with&lt;/i&gt;&lt;/font&gt; &lt;b&gt;yak&lt;/b&gt;: 2</span>
+<span class="doccomment">///     &lt;font color=&quot;#AAAAAA&quot;&gt;&lt;i&gt;in&lt;/i&gt;&lt;/font&gt; fmt_pretty::yak_shave::&lt;b&gt;shaving_yaks&lt;/b&gt; &lt;font color=&quot;#AAAAAA&quot;&gt;&lt;i&gt;with&lt;/i&gt;&lt;/font&gt; &lt;b&gt;yaks&lt;/b&gt;: 3</span>
+<span class="doccomment">///</span>
+<span class="doccomment">///   2022-02-15T18:44:24.535573Z &lt;font color=&quot;#75507B&quot;&gt;TRACE&lt;/font&gt; &lt;font color=&quot;#75507B&quot;&gt;&lt;b&gt;fmt_pretty::yak_shave&lt;/b&gt;&lt;/font&gt;&lt;font color=&quot;#75507B&quot;&gt;: yak shaved successfully&lt;/font&gt;</span>
+<span class="doccomment">///     &lt;font color=&quot;#AAAAAA&quot;&gt;&lt;i&gt;at&lt;/i&gt;&lt;/font&gt; examples/examples/fmt/yak_shave.rs:25 &lt;font color=&quot;#AAAAAA&quot;&gt;&lt;i&gt;on&lt;/i&gt;&lt;/font&gt; main</span>
+<span class="doccomment">///     &lt;font color=&quot;#AAAAAA&quot;&gt;&lt;i&gt;in&lt;/i&gt;&lt;/font&gt; fmt_pretty::yak_shave::&lt;b&gt;shave&lt;/b&gt; &lt;font color=&quot;#AAAAAA&quot;&gt;&lt;i&gt;with&lt;/i&gt;&lt;/font&gt; &lt;b&gt;yak&lt;/b&gt;: 2</span>
+<span class="doccomment">///     &lt;font color=&quot;#AAAAAA&quot;&gt;&lt;i&gt;in&lt;/i&gt;&lt;/font&gt; fmt_pretty::yak_shave::&lt;b&gt;shaving_yaks&lt;/b&gt; &lt;font color=&quot;#AAAAAA&quot;&gt;&lt;i&gt;with&lt;/i&gt;&lt;/font&gt; &lt;b&gt;yaks&lt;/b&gt;: 3</span>
+<span class="doccomment">///</span>
+<span class="doccomment">///   2022-02-15T18:44:24.535600Z &lt;font color=&quot;#3465A4&quot;&gt;DEBUG&lt;/font&gt; &lt;font color=&quot;#3465A4&quot;&gt;&lt;b&gt;yak_events&lt;/b&gt;&lt;/font&gt;&lt;font color=&quot;#3465A4&quot;&gt;: &lt;/font&gt;&lt;font color=&quot;#3465A4&quot;&gt;&lt;b&gt;yak&lt;/b&gt;&lt;/font&gt;&lt;font color=&quot;#3465A4&quot;&gt;: 2, &lt;/font&gt;&lt;font color=&quot;#3465A4&quot;&gt;&lt;b&gt;shaved&lt;/b&gt;&lt;/font&gt;&lt;font color=&quot;#3465A4&quot;&gt;: true&lt;/font&gt;</span>
+<span class="doccomment">///     &lt;font color=&quot;#AAAAAA&quot;&gt;&lt;i&gt;at&lt;/i&gt;&lt;/font&gt; examples/examples/fmt/yak_shave.rs:46 &lt;font color=&quot;#AAAAAA&quot;&gt;&lt;i&gt;on&lt;/i&gt;&lt;/font&gt; main</span>
+<span class="doccomment">///     &lt;font color=&quot;#AAAAAA&quot;&gt;&lt;i&gt;in&lt;/i&gt;&lt;/font&gt; fmt_pretty::yak_shave::&lt;b&gt;shaving_yaks&lt;/b&gt; &lt;font color=&quot;#AAAAAA&quot;&gt;&lt;i&gt;with&lt;/i&gt;&lt;/font&gt; &lt;b&gt;yaks&lt;/b&gt;: 3</span>
+<span class="doccomment">///</span>
+<span class="doccomment">///   2022-02-15T18:44:24.535618Z &lt;font color=&quot;#75507B&quot;&gt;TRACE&lt;/font&gt; &lt;font color=&quot;#75507B&quot;&gt;&lt;b&gt;fmt_pretty::yak_shave&lt;/b&gt;&lt;/font&gt;&lt;font color=&quot;#75507B&quot;&gt;: &lt;/font&gt;&lt;font color=&quot;#75507B&quot;&gt;&lt;b&gt;yaks_shaved&lt;/b&gt;&lt;/font&gt;&lt;font color=&quot;#75507B&quot;&gt;: 2&lt;/font&gt;</span>
+<span class="doccomment">///     &lt;font color=&quot;#AAAAAA&quot;&gt;&lt;i&gt;at&lt;/i&gt;&lt;/font&gt; examples/examples/fmt/yak_shave.rs:55 &lt;font color=&quot;#AAAAAA&quot;&gt;&lt;i&gt;on&lt;/i&gt;&lt;/font&gt; main</span>
+<span class="doccomment">///     &lt;font color=&quot;#AAAAAA&quot;&gt;&lt;i&gt;in&lt;/i&gt;&lt;/font&gt; fmt_pretty::yak_shave::&lt;b&gt;shaving_yaks&lt;/b&gt; &lt;font color=&quot;#AAAAAA&quot;&gt;&lt;i&gt;with&lt;/i&gt;&lt;/font&gt; &lt;b&gt;yaks&lt;/b&gt;: 3</span>
+<span class="doccomment">///</span>
+<span class="doccomment">///   2022-02-15T18:44:24.535644Z &lt;font color=&quot;#75507B&quot;&gt;TRACE&lt;/font&gt; &lt;font color=&quot;#75507B&quot;&gt;&lt;b&gt;fmt_pretty::yak_shave&lt;/b&gt;&lt;/font&gt;&lt;font color=&quot;#75507B&quot;&gt;: hello! I&amp;apos;m gonna shave a yak, &lt;/font&gt;&lt;font color=&quot;#75507B&quot;&gt;&lt;b&gt;excitement&lt;/b&gt;&lt;/font&gt;&lt;font color=&quot;#75507B&quot;&gt;: &amp;quot;yay!&amp;quot;&lt;/font&gt;</span>
+<span class="doccomment">///     &lt;font color=&quot;#AAAAAA&quot;&gt;&lt;i&gt;at&lt;/i&gt;&lt;/font&gt; examples/examples/fmt/yak_shave.rs:16 &lt;font color=&quot;#AAAAAA&quot;&gt;&lt;i&gt;on&lt;/i&gt;&lt;/font&gt; main</span>
+<span class="doccomment">///     &lt;font color=&quot;#AAAAAA&quot;&gt;&lt;i&gt;in&lt;/i&gt;&lt;/font&gt; fmt_pretty::yak_shave::&lt;b&gt;shave&lt;/b&gt; &lt;font color=&quot;#AAAAAA&quot;&gt;&lt;i&gt;with&lt;/i&gt;&lt;/font&gt; &lt;b&gt;yak&lt;/b&gt;: 3</span>
+<span class="doccomment">///     &lt;font color=&quot;#AAAAAA&quot;&gt;&lt;i&gt;in&lt;/i&gt;&lt;/font&gt; fmt_pretty::yak_shave::&lt;b&gt;shaving_yaks&lt;/b&gt; &lt;font color=&quot;#AAAAAA&quot;&gt;&lt;i&gt;with&lt;/i&gt;&lt;/font&gt; &lt;b&gt;yaks&lt;/b&gt;: 3</span>
+<span class="doccomment">///</span>
+<span class="doccomment">///   2022-02-15T18:44:24.535670Z &lt;font color=&quot;#C4A000&quot;&gt; WARN&lt;/font&gt; &lt;font color=&quot;#C4A000&quot;&gt;&lt;b&gt;fmt_pretty::yak_shave&lt;/b&gt;&lt;/font&gt;&lt;font color=&quot;#C4A000&quot;&gt;: could not locate yak&lt;/font&gt;</span>
+<span class="doccomment">///     &lt;font color=&quot;#AAAAAA&quot;&gt;&lt;i&gt;at&lt;/i&gt;&lt;/font&gt; examples/examples/fmt/yak_shave.rs:18 &lt;font color=&quot;#AAAAAA&quot;&gt;&lt;i&gt;on&lt;/i&gt;&lt;/font&gt; main</span>
+<span class="doccomment">///     &lt;font color=&quot;#AAAAAA&quot;&gt;&lt;i&gt;in&lt;/i&gt;&lt;/font&gt; fmt_pretty::yak_shave::&lt;b&gt;shave&lt;/b&gt; &lt;font color=&quot;#AAAAAA&quot;&gt;&lt;i&gt;with&lt;/i&gt;&lt;/font&gt; &lt;b&gt;yak&lt;/b&gt;: 3</span>
+<span class="doccomment">///     &lt;font color=&quot;#AAAAAA&quot;&gt;&lt;i&gt;in&lt;/i&gt;&lt;/font&gt; fmt_pretty::yak_shave::&lt;b&gt;shaving_yaks&lt;/b&gt; &lt;font color=&quot;#AAAAAA&quot;&gt;&lt;i&gt;with&lt;/i&gt;&lt;/font&gt; &lt;b&gt;yaks&lt;/b&gt;: 3</span>
+<span class="doccomment">///</span>
+<span class="doccomment">///   2022-02-15T18:44:24.535698Z &lt;font color=&quot;#3465A4&quot;&gt;DEBUG&lt;/font&gt; &lt;font color=&quot;#3465A4&quot;&gt;&lt;b&gt;yak_events&lt;/b&gt;&lt;/font&gt;&lt;font color=&quot;#3465A4&quot;&gt;: &lt;/font&gt;&lt;font color=&quot;#3465A4&quot;&gt;&lt;b&gt;yak&lt;/b&gt;&lt;/font&gt;&lt;font color=&quot;#3465A4&quot;&gt;: 3, &lt;/font&gt;&lt;font color=&quot;#3465A4&quot;&gt;&lt;b&gt;shaved&lt;/b&gt;&lt;/font&gt;&lt;font color=&quot;#3465A4&quot;&gt;: false&lt;/font&gt;</span>
+<span class="doccomment">///     &lt;font color=&quot;#AAAAAA&quot;&gt;&lt;i&gt;at&lt;/i&gt;&lt;/font&gt; examples/examples/fmt/yak_shave.rs:46 &lt;font color=&quot;#AAAAAA&quot;&gt;&lt;i&gt;on&lt;/i&gt;&lt;/font&gt; main</span>
+<span class="doccomment">///     &lt;font color=&quot;#AAAAAA&quot;&gt;&lt;i&gt;in&lt;/i&gt;&lt;/font&gt; fmt_pretty::yak_shave::&lt;b&gt;shaving_yaks&lt;/b&gt; &lt;font color=&quot;#AAAAAA&quot;&gt;&lt;i&gt;with&lt;/i&gt;&lt;/font&gt; &lt;b&gt;yaks&lt;/b&gt;: 3</span>
+<span class="doccomment">///</span>
+<span class="doccomment">///   2022-02-15T18:44:24.535720Z &lt;font color=&quot;#CC0000&quot;&gt;ERROR&lt;/font&gt; &lt;font color=&quot;#CC0000&quot;&gt;&lt;b&gt;fmt_pretty::yak_shave&lt;/b&gt;&lt;/font&gt;&lt;font color=&quot;#CC0000&quot;&gt;: failed to shave yak, &lt;/font&gt;&lt;font color=&quot;#CC0000&quot;&gt;&lt;b&gt;yak&lt;/b&gt;&lt;/font&gt;&lt;font color=&quot;#CC0000&quot;&gt;: 3, &lt;/font&gt;&lt;font color=&quot;#CC0000&quot;&gt;&lt;b&gt;error&lt;/b&gt;&lt;/font&gt;&lt;font color=&quot;#CC0000&quot;&gt;: missing yak, &lt;/font&gt;&lt;font color=&quot;#CC0000&quot;&gt;&lt;b&gt;error.sources&lt;/b&gt;&lt;/font&gt;&lt;font color=&quot;#CC0000&quot;&gt;: [out of space, out of cash]&lt;/font&gt;</span>
+<span class="doccomment">///     &lt;font color=&quot;#AAAAAA&quot;&gt;&lt;i&gt;at&lt;/i&gt;&lt;/font&gt; examples/examples/fmt/yak_shave.rs:51 &lt;font color=&quot;#AAAAAA&quot;&gt;&lt;i&gt;on&lt;/i&gt;&lt;/font&gt; main</span>
+<span class="doccomment">///     &lt;font color=&quot;#AAAAAA&quot;&gt;&lt;i&gt;in&lt;/i&gt;&lt;/font&gt; fmt_pretty::yak_shave::&lt;b&gt;shaving_yaks&lt;/b&gt; &lt;font color=&quot;#AAAAAA&quot;&gt;&lt;i&gt;with&lt;/i&gt;&lt;/font&gt; &lt;b&gt;yaks&lt;/b&gt;: 3</span>
+<span class="doccomment">///</span>
+<span class="doccomment">///   2022-02-15T18:44:24.535742Z &lt;font color=&quot;#75507B&quot;&gt;TRACE&lt;/font&gt; &lt;font color=&quot;#75507B&quot;&gt;&lt;b&gt;fmt_pretty::yak_shave&lt;/b&gt;&lt;/font&gt;&lt;font color=&quot;#75507B&quot;&gt;: &lt;/font&gt;&lt;font color=&quot;#75507B&quot;&gt;&lt;b&gt;yaks_shaved&lt;/b&gt;&lt;/font&gt;&lt;font color=&quot;#75507B&quot;&gt;: 2&lt;/font&gt;</span>
+<span class="doccomment">///     &lt;font color=&quot;#AAAAAA&quot;&gt;&lt;i&gt;at&lt;/i&gt;&lt;/font&gt; examples/examples/fmt/yak_shave.rs:55 &lt;font color=&quot;#AAAAAA&quot;&gt;&lt;i&gt;on&lt;/i&gt;&lt;/font&gt; main</span>
+<span class="doccomment">///     &lt;font color=&quot;#AAAAAA&quot;&gt;&lt;i&gt;in&lt;/i&gt;&lt;/font&gt; fmt_pretty::yak_shave::&lt;b&gt;shaving_yaks&lt;/b&gt; &lt;font color=&quot;#AAAAAA&quot;&gt;&lt;i&gt;with&lt;/i&gt;&lt;/font&gt; &lt;b&gt;yaks&lt;/b&gt;: 3</span>
+<span class="doccomment">///</span>
+<span class="doccomment">///   2022-02-15T18:44:24.535765Z &lt;font color=&quot;#4E9A06&quot;&gt; INFO&lt;/font&gt; &lt;font color=&quot;#4E9A06&quot;&gt;&lt;b&gt;fmt_pretty&lt;/b&gt;&lt;/font&gt;&lt;font color=&quot;#4E9A06&quot;&gt;: yak shaving completed, &lt;/font&gt;&lt;font color=&quot;#4E9A06&quot;&gt;&lt;b&gt;all_yaks_shaved&lt;/b&gt;&lt;/font&gt;&lt;font color=&quot;#4E9A06&quot;&gt;: false&lt;/font&gt;</span>
+<span class="doccomment">///     &lt;font color=&quot;#AAAAAA&quot;&gt;&lt;i&gt;at&lt;/i&gt;&lt;/font&gt; examples/examples/fmt-pretty.rs:19 &lt;font color=&quot;#AAAAAA&quot;&gt;&lt;i&gt;on&lt;/i&gt;&lt;/font&gt; main</span>
+<span class="doccomment">/// &lt;/pre&gt;</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Pretty</span> {
     <span class="ident">display_location</span>: <span class="ident">bool</span>,
@@ -432,7 +629,17 @@
 <span class="doccomment">/// [`MakeVisitor`]: crate::field::MakeVisitor</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">PrettyFields</span> {
-    <span class="ident">ansi</span>: <span class="ident">bool</span>,
+    <span class="doccomment">/// A value to override the provided `Writer`&#39;s ANSI formatting</span>
+    <span class="doccomment">/// configuration.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// If this is `Some`, we override the `Writer`&#39;s ANSI setting. This is</span>
+    <span class="doccomment">/// necessary in order to continue supporting the deprecated</span>
+    <span class="doccomment">/// `PrettyFields::with_ansi` method. If it is `None`, we don&#39;t override the</span>
+    <span class="doccomment">/// ANSI formatting configuration (because the deprecated method was not</span>
+    <span class="doccomment">/// called).</span>
+    <span class="comment">// TODO: when `PrettyFields::with_ansi` is removed, we can get rid</span>
+    <span class="comment">// of this entirely.</span>
+    <span class="ident">ansi</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,
 }
 
 <span class="comment">// === impl Pretty ===</span>
@@ -459,22 +666,15 @@
     <span class="doccomment">/// Sets whether the event&#39;s source code location is displayed.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// This defaults to `true`.</span>
+    <span class="attribute">#[<span class="ident">deprecated</span>(
+        <span class="ident">since</span> <span class="op">=</span> <span class="string">&quot;0.3.6&quot;</span>,
+        <span class="ident">note</span> <span class="op">=</span> <span class="string">&quot;all formatters now support configurable source locations. Use `Format::with_source_location` instead.&quot;</span>
+    )]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_source_location</span>(<span class="self">self</span>, <span class="ident">display_location</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">display_location</span>,
             ..<span class="self">self</span>
         }
-    }
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Format</span><span class="op">&lt;</span><span class="ident">Pretty</span>, <span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Sets whether or not the source code location from which an event</span>
-    <span class="doccomment">/// originated is displayed.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This defaults to `true`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_source_location</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">display_location</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">format</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">format</span>.<span class="ident">with_source_location</span>(<span class="ident">display_location</span>);
-        <span class="self">self</span>
     }
 }
 
@@ -530,12 +730,37 @@
             };
             <span class="macro">write!</span>(
                 <span class="ident">writer</span>,
-                <span class="string">&quot;{}{}{}: &quot;</span>,
+                <span class="string">&quot;{}{}{}:&quot;</span>,
                 <span class="ident">target_style</span>.<span class="ident">prefix</span>(),
                 <span class="ident">meta</span>.<span class="ident">target</span>(),
                 <span class="ident">target_style</span>.<span class="ident">infix</span>(<span class="ident">style</span>)
             )<span class="question-mark">?</span>;
         }
+        <span class="kw">let</span> <span class="ident">line_number</span> <span class="op">=</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">display_line_number</span> {
+            <span class="ident">meta</span>.<span class="ident">line</span>()
+        } <span class="kw">else</span> {
+            <span class="prelude-val">None</span>
+        };
+
+        <span class="comment">// If the file name is disabled, format the line number right after the</span>
+        <span class="comment">// target. Otherwise, if we also display the file, it&#39;ll go on a</span>
+        <span class="comment">// separate line.</span>
+        <span class="kw">if</span> <span class="kw">let</span> (<span class="prelude-val">Some</span>(<span class="ident">line_number</span>), <span class="bool-val">false</span>, <span class="bool-val">true</span>) <span class="op">=</span> (
+            <span class="ident">line_number</span>,
+            <span class="self">self</span>.<span class="ident">display_filename</span>,
+            <span class="self">self</span>.<span class="ident">format</span>.<span class="ident">display_location</span>,
+        ) {
+            <span class="macro">write!</span>(
+                <span class="ident">writer</span>,
+                <span class="string">&quot;{}{}{}:&quot;</span>,
+                <span class="ident">style</span>.<span class="ident">prefix</span>(),
+                <span class="ident">line_number</span>,
+                <span class="ident">style</span>.<span class="ident">infix</span>(<span class="ident">style</span>)
+            )<span class="question-mark">?</span>;
+        }
+
+        <span class="ident">writer</span>.<span class="ident">write_char</span>(<span class="string">&#39; &#39;</span>)<span class="question-mark">?</span>;
+
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">v</span> <span class="op">=</span> <span class="ident">PrettyVisitor::new</span>(<span class="ident">writer</span>.<span class="ident">by_ref</span>(), <span class="bool-val">true</span>).<span class="ident">with_style</span>(<span class="ident">style</span>);
         <span class="ident">event</span>.<span class="ident">record</span>(<span class="kw-2">&amp;mut</span> <span class="ident">v</span>);
         <span class="ident">v</span>.<span class="ident">finish</span>()<span class="question-mark">?</span>;
@@ -547,20 +772,21 @@
             <span class="ident">Style::new</span>()
         };
         <span class="kw">let</span> <span class="ident">thread</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">display_thread_name</span> <span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">display_thread_id</span>;
-        <span class="kw">if</span> <span class="kw">let</span> (<span class="bool-val">true</span>, <span class="prelude-val">Some</span>(<span class="ident">file</span>), <span class="prelude-val">Some</span>(<span class="ident">line</span>)) <span class="op">=</span>
-            (<span class="self">self</span>.<span class="ident">format</span>.<span class="ident">display_location</span>, <span class="ident">meta</span>.<span class="ident">file</span>(), <span class="ident">meta</span>.<span class="ident">line</span>())
-        {
-            <span class="macro">write!</span>(
-                <span class="ident">writer</span>,
-                <span class="string">&quot;    {} {}:{}{}&quot;</span>,
-                <span class="ident">dimmed</span>.<span class="ident">paint</span>(<span class="string">&quot;at&quot;</span>),
-                <span class="ident">file</span>,
-                <span class="ident">line</span>,
-                <span class="ident">dimmed</span>.<span class="ident">paint</span>(<span class="kw">if</span> <span class="ident">thread</span> { <span class="string">&quot; &quot;</span> } <span class="kw">else</span> { <span class="string">&quot;\n&quot;</span> })
-            )<span class="question-mark">?</span>;
+
+        <span class="kw">if</span> <span class="kw">let</span> (<span class="prelude-val">Some</span>(<span class="ident">file</span>), <span class="bool-val">true</span>, <span class="bool-val">true</span>) <span class="op">=</span> (
+            <span class="ident">meta</span>.<span class="ident">file</span>(),
+            <span class="self">self</span>.<span class="ident">format</span>.<span class="ident">display_location</span>,
+            <span class="self">self</span>.<span class="ident">display_filename</span>,
+        ) {
+            <span class="macro">write!</span>(<span class="ident">writer</span>, <span class="string">&quot;    {} {}&quot;</span>, <span class="ident">dimmed</span>.<span class="ident">paint</span>(<span class="string">&quot;at&quot;</span>), <span class="ident">file</span>,)<span class="question-mark">?</span>;
+
+            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">line</span>) <span class="op">=</span> <span class="ident">line_number</span> {
+                <span class="macro">write!</span>(<span class="ident">writer</span>, <span class="string">&quot;:{}&quot;</span>, <span class="ident">line</span>)<span class="question-mark">?</span>;
+            }
+            <span class="ident">writer</span>.<span class="ident">write_char</span>(<span class="kw">if</span> <span class="ident">thread</span> { <span class="string">&#39; &#39;</span> } <span class="kw">else</span> { <span class="string">&#39;\n&#39;</span> })<span class="question-mark">?</span>;
         } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">thread</span> {
             <span class="macro">write!</span>(<span class="ident">writer</span>, <span class="string">&quot;    &quot;</span>)<span class="question-mark">?</span>;
-        }
+        };
 
         <span class="kw">if</span> <span class="ident">thread</span> {
             <span class="macro">write!</span>(<span class="ident">writer</span>, <span class="string">&quot;{} &quot;</span>, <span class="ident">dimmed</span>.<span class="ident">paint</span>(<span class="string">&quot;on&quot;</span>))<span class="question-mark">?</span>;
@@ -569,13 +795,12 @@
                 <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">name</span>) <span class="op">=</span> <span class="ident">thread</span>.<span class="ident">name</span>() {
                     <span class="macro">write!</span>(<span class="ident">writer</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">name</span>)<span class="question-mark">?</span>;
                     <span class="kw">if</span> <span class="self">self</span>.<span class="ident">display_thread_id</span> {
-                        <span class="macro">write!</span>(<span class="ident">writer</span>, <span class="string">&quot; ({:?})&quot;</span>, <span class="ident">thread</span>.<span class="ident">id</span>())<span class="question-mark">?</span>;
+                        <span class="ident">writer</span>.<span class="ident">write_char</span>(<span class="string">&#39; &#39;</span>)<span class="question-mark">?</span>;
                     }
-                } <span class="kw">else</span> <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">display_thread_id</span> {
-                    <span class="macro">write!</span>(<span class="ident">writer</span>, <span class="string">&quot; {:?}&quot;</span>, <span class="ident">thread</span>.<span class="ident">id</span>())<span class="question-mark">?</span>;
                 }
-            } <span class="kw">else</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">display_thread_id</span> {
-                <span class="macro">write!</span>(<span class="ident">writer</span>, <span class="string">&quot; {:?}&quot;</span>, <span class="ident">thread</span>.<span class="ident">id</span>())<span class="question-mark">?</span>;
+            }
+            <span class="kw">if</span> <span class="self">self</span>.<span class="ident">display_thread_id</span> {
+                <span class="macro">write!</span>(<span class="ident">writer</span>, <span class="string">&quot;{:?}&quot;</span>, <span class="ident">thread</span>.<span class="ident">id</span>())<span class="question-mark">?</span>;
             }
             <span class="ident">writer</span>.<span class="ident">write_char</span>(<span class="string">&#39;\n&#39;</span>)<span class="question-mark">?</span>;
         }
@@ -623,7 +848,7 @@
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;writer</span><span class="op">&gt;</span> <span class="ident">FormatFields</span><span class="op">&lt;</span><span class="lifetime">&#39;writer</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Pretty</span> {
     <span class="kw">fn</span> <span class="ident">format_fields</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">RecordFields</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">writer</span>: <span class="ident">Writer</span><span class="op">&lt;</span><span class="lifetime">&#39;writer</span><span class="op">&gt;</span>, <span class="ident">fields</span>: <span class="ident">R</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">v</span> <span class="op">=</span> <span class="ident">PrettyVisitor::new</span>(<span class="ident">writer</span>, <span class="bool-val">false</span>);
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">v</span> <span class="op">=</span> <span class="ident">PrettyVisitor::new</span>(<span class="ident">writer</span>, <span class="bool-val">true</span>);
         <span class="ident">fields</span>.<span class="ident">record</span>(<span class="kw-2">&amp;mut</span> <span class="ident">v</span>);
         <span class="ident">v</span>.<span class="ident">finish</span>()
     }
@@ -652,12 +877,22 @@
 <span class="kw">impl</span> <span class="ident">PrettyFields</span> {
     <span class="doccomment">/// Returns a new default [`PrettyFields`] implementation.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> { <span class="ident">ansi</span>: <span class="bool-val">true</span> }
+        <span class="comment">// By default, don&#39;t override the `Writer`&#39;s ANSI colors</span>
+        <span class="comment">// configuration. We&#39;ll only do this if the user calls the</span>
+        <span class="comment">// deprecated `PrettyFields::with_ansi` method.</span>
+        <span class="self">Self</span> { <span class="ident">ansi</span>: <span class="prelude-val">None</span> }
     }
 
     <span class="doccomment">/// Enable ANSI encoding for formatted fields.</span>
+    <span class="attribute">#[<span class="ident">deprecated</span>(
+        <span class="ident">since</span> <span class="op">=</span> <span class="string">&quot;0.3.3&quot;</span>,
+        <span class="ident">note</span> <span class="op">=</span> <span class="string">&quot;Use `fmt::Subscriber::with_ansi` or `fmt::Layer::with_ansi` instead.&quot;</span>
+    )]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_ansi</span>(<span class="self">self</span>, <span class="ident">ansi</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> { <span class="ident">ansi</span>, ..<span class="self">self</span> }
+        <span class="self">Self</span> {
+            <span class="ident">ansi</span>: <span class="prelude-val">Some</span>(<span class="ident">ansi</span>),
+            ..<span class="self">self</span>
+        }
     }
 }
 
@@ -665,8 +900,11 @@
     <span class="kw">type</span> <span class="ident">Visitor</span> <span class="op">=</span> <span class="ident">PrettyVisitor</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>;
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">make_visitor</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">target</span>: <span class="ident">Writer</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) -&gt; <span class="ident"><span class="self">Self</span>::Visitor</span> {
-        <span class="ident">PrettyVisitor::new</span>(<span class="ident">target</span>.<span class="ident">with_ansi</span>(<span class="self">self</span>.<span class="ident">ansi</span>), <span class="bool-val">true</span>)
+    <span class="kw">fn</span> <span class="ident">make_visitor</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">target</span>: <span class="ident">Writer</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) -&gt; <span class="ident"><span class="self">Self</span>::Visitor</span> {
+        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">ansi</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">ansi</span> {
+            <span class="ident">target</span> <span class="op">=</span> <span class="ident">target</span>.<span class="ident">with_ansi</span>(<span class="ident">ansi</span>);
+        }
+        <span class="ident">PrettyVisitor::new</span>(<span class="ident">target</span>, <span class="bool-val">true</span>)
     }
 }
 

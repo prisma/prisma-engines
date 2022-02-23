@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;tracing-0.1.29&#x2F;src&#x2F;span.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>span.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><script defer src="../../main.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;tracing-0.1.31&#x2F;src&#x2F;span.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>span.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><script defer src="../../main.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script>
     <noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../tracing/index.html'><div class='logo-container rust-logo'><img src='https:&#x2F;&#x2F;raw.githubusercontent.com&#x2F;tokio-rs&#x2F;tracing&#x2F;master&#x2F;assets&#x2F;logo-type.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">   1</span>
 <span id="2">   2</span>
 <span id="3">   3</span>
@@ -1632,15 +1632,6 @@
 <span id="1631">1631</span>
 <span id="1632">1632</span>
 <span id="1633">1633</span>
-<span id="1634">1634</span>
-<span id="1635">1635</span>
-<span id="1636">1636</span>
-<span id="1637">1637</span>
-<span id="1638">1638</span>
-<span id="1639">1639</span>
-<span id="1640">1640</span>
-<span id="1641">1641</span>
-<span id="1642">1642</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Spans represent periods of time in which a program was executing in a</span>
 <span class="doccomment">//! particular context.</span>
 <span class="doccomment">//!</span>
@@ -1718,7 +1709,7 @@
 <span class="doccomment">//! // Dropping the `_enter` guard will exit the span.</span>
 <span class="doccomment">//!```</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! &lt;/div&gt;&lt;div class=&quot;example-wrap&quot; style=&quot;display:inline-block&quot;&gt;&lt;pre class=&quot;compile_fail&quot; style=&quot;white-space:normal;font:inherit;&quot;&gt;</span>
+<span class="doccomment">//! &lt;div class=&quot;example-wrap&quot; style=&quot;display:inline-block&quot;&gt;&lt;pre class=&quot;compile_fail&quot; style=&quot;white-space:normal;font:inherit;&quot;&gt;</span>
 <span class="doccomment">//!     &lt;strong&gt;Warning&lt;/strong&gt;: In asynchronous code that uses async/await syntax,</span>
 <span class="doccomment">//!     &lt;code&gt;Span::enter&lt;/code&gt; may produce incorrect traces if the returned drop</span>
 <span class="doccomment">//!     guard is held across an await point. See</span>
@@ -1779,8 +1770,7 @@
 <span class="doccomment">//! as long as the longest-executing span in its subtree.</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! ```</span>
-<span class="doccomment">//! # #[macro_use] extern crate tracing;</span>
-<span class="doccomment">//! # use tracing::Level;</span>
+<span class="doccomment">//! # use tracing::{Level, span};</span>
 <span class="doccomment">//! // this span is considered the &quot;root&quot; of a new trace tree:</span>
 <span class="doccomment">//! span!(Level::INFO, &quot;root&quot;).in_scope(|| {</span>
 <span class="doccomment">//!     // since we are now inside &quot;root&quot;, this span is considered a child</span>
@@ -1800,8 +1790,7 @@
 <span class="doccomment">//! the `span!` macro. For example:</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! ```rust</span>
-<span class="doccomment">//! # #[macro_use] extern crate tracing;</span>
-<span class="doccomment">//! # use tracing::Level;</span>
+<span class="doccomment">//! # use tracing::{Level, span};</span>
 <span class="doccomment">//! // Create, but do not enter, a span called &quot;foo&quot;.</span>
 <span class="doccomment">//! let foo = span!(Level::INFO, &quot;foo&quot;);</span>
 <span class="doccomment">//!</span>
@@ -1843,8 +1832,6 @@
 <span class="doccomment">//! _closed_. Consider, for example, a future which has an associated</span>
 <span class="doccomment">//! span and enters that span every time it is polled:</span>
 <span class="doccomment">//! ```rust</span>
-<span class="doccomment">//! # extern crate tracing;</span>
-<span class="doccomment">//! # extern crate futures;</span>
 <span class="doccomment">//! # use futures::{Future, Poll, Async};</span>
 <span class="doccomment">//! struct MyFuture {</span>
 <span class="doccomment">//!    // data</span>
@@ -1884,8 +1871,7 @@
 <span class="doccomment">//! that handle &quot;closes&quot; the span, since the capacity to enter it no longer</span>
 <span class="doccomment">//! exists. For example:</span>
 <span class="doccomment">//! ```</span>
-<span class="doccomment">//! # #[macro_use] extern crate tracing;</span>
-<span class="doccomment">//! # use tracing::Level;</span>
+<span class="doccomment">//! # use tracing::{Level, span};</span>
 <span class="doccomment">//! {</span>
 <span class="doccomment">//!     span!(Level::TRACE, &quot;my_span&quot;).in_scope(|| {</span>
 <span class="doccomment">//!         // perform some work in the context of `my_span`...</span>
@@ -1918,8 +1904,7 @@
 <span class="doccomment">//! construct one span and perform the entire loop inside of that span, like:</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! ```rust</span>
-<span class="doccomment">//! # #[macro_use] extern crate tracing;</span>
-<span class="doccomment">//! # use tracing::Level;</span>
+<span class="doccomment">//! # use tracing::{Level, span};</span>
 <span class="doccomment">//! # let n = 1;</span>
 <span class="doccomment">//! let span = span!(Level::TRACE, &quot;my_loop&quot;);</span>
 <span class="doccomment">//! let _enter = span.enter();</span>
@@ -1930,8 +1915,7 @@
 <span class="doccomment">//! ```</span>
 <span class="doccomment">//! Or, should we create a new span for each iteration of the loop, as in:</span>
 <span class="doccomment">//! ```rust</span>
-<span class="doccomment">//! # #[macro_use] extern crate tracing;</span>
-<span class="doccomment">//! # use tracing::Level;</span>
+<span class="doccomment">//! # use tracing::{Level, span};</span>
 <span class="doccomment">//! # let n = 1u64;</span>
 <span class="doccomment">//! for i in 0..n {</span>
 <span class="doccomment">//!     let span = span!(Level::TRACE, &quot;my_loop&quot;, iteration = i);</span>
@@ -2365,8 +2349,7 @@
     <span class="doccomment">/// # Examples</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// #[macro_use] extern crate tracing;</span>
-    <span class="doccomment">/// # use tracing::Level;</span>
+    <span class="doccomment">/// # use tracing::{span, Level};</span>
     <span class="doccomment">/// let span = span!(Level::INFO, &quot;my_span&quot;);</span>
     <span class="doccomment">/// let guard = span.enter();</span>
     <span class="doccomment">///</span>
@@ -2381,7 +2364,7 @@
     <span class="doccomment">/// Guards need not be explicitly dropped:</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// #[macro_use] extern crate tracing;</span>
+    <span class="doccomment">/// # use tracing::trace_span;</span>
     <span class="doccomment">/// fn my_function() -&gt; String {</span>
     <span class="doccomment">///     // enter a span for the duration of this function.</span>
     <span class="doccomment">///     let span = trace_span!(&quot;my_function&quot;);</span>
@@ -2403,7 +2386,7 @@
     <span class="doccomment">/// entered:</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// #[macro_use] extern crate tracing;</span>
+    <span class="doccomment">/// # use tracing::{info, info_span};</span>
     <span class="doccomment">/// let span = info_span!(&quot;my_great_span&quot;);</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// {</span>
@@ -2713,8 +2696,7 @@
     <span class="doccomment">/// # Examples</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # #[macro_use] extern crate tracing;</span>
-    <span class="doccomment">/// # use tracing::Level;</span>
+    <span class="doccomment">/// # use tracing::{trace, span, Level};</span>
     <span class="doccomment">/// let my_span = span!(Level::TRACE, &quot;my_span&quot;);</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// my_span.in_scope(|| {</span>

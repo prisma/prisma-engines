@@ -6,11 +6,11 @@ object is freed when the object is removed from the slab. With a pool, we can in
 this memory for objects being added to the pool in the future, therefore reducing memory
 fragmentation and avoiding additional allocations.</p>
 <p>This type implements a lock-free concurrent pool, indexed by <code>usize</code>s. The items stored in this
-type need to implement <a href="trait.Clear.html"><code>Clear</code></a> and <code>Default</code>.</p>
-<p>The <code>Pool</code> type shares similar semantics to <a href="struct.Slab.html"><code>Slab</code></a> when it comes to sharing across threads
+type need to implement <a href="../trait.Clear.html"><code>Clear</code></a> and <code>Default</code>.</p>
+<p>The <code>Pool</code> type shares similar semantics to <a href="../struct.Slab.html"><code>Slab</code></a> when it comes to sharing across threads
 and storing mutable shared data. The biggest difference is there are no <a href="../struct.Slab.html#method.insert"><code>Slab::insert</code></a> and
 <a href="../struct.Slab.html#method.take"><code>Slab::take</code></a> analouges for the <code>Pool</code> type. Instead new items are added to the pool by using
-the <a href="struct.Pool.html#method.create"><code>Pool::create</code></a> method, and marked for clearing by the <a href="struct.Pool.html#method.clear"><code>Pool::clear</code></a> method.</p>
+the <a href="../struct.Pool.html#method.create"><code>Pool::create</code></a> method, and marked for clearing by the <a href="../struct.Pool.html#method.clear"><code>Pool::clear</code></a> method.</p>
 <h2 id="examples" class="section-header"><a href="#examples">Examples</a></h2>
 <p>Add an entry to the pool, returning an index:</p>
 
@@ -28,7 +28,7 @@ the <a href="struct.Pool.html#method.create"><code>Pool::create</code></a> metho
 
 <span class="ident">drop</span>(<span class="ident">guard</span>); <span class="comment">// release the guard, allowing immutable access.</span>
 <span class="macro">assert_eq!</span>(<span class="ident">pool</span>.<span class="ident">get</span>(<span class="ident">key</span>).<span class="ident">unwrap</span>(), <span class="ident">String::from</span>(<span class="string">&quot;hello world&quot;</span>));</code></pre></div>
-<p>Pool entries can be cleared by calling <a href="struct.Pool.html#method.clear"><code>Pool::clear</code></a>. This marks the entry to
+<p>Pool entries can be cleared by calling <a href="../struct.Pool.html#method.clear"><code>Pool::clear</code></a>. This marks the entry to
 be cleared when the guards referencing to it are dropped.</p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">let</span> <span class="ident">pool</span>: <span class="ident">Pool</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Pool::new</span>();
@@ -41,7 +41,7 @@ be cleared when the guards referencing to it are dropped.</p>
 <span class="comment">// The cleared entry is no longer available in the pool</span>
 <span class="macro">assert!</span>(<span class="ident">pool</span>.<span class="ident">get</span>(<span class="ident">key</span>).<span class="ident">is_none</span>());</code></pre></div>
 <h2 id="configuration" class="section-header"><a href="#configuration">Configuration</a></h2>
-<p>Both <code>Pool</code> and <a href="struct.Slab.html"><code>Slab</code></a> share the same configuration mechanism. See <a href="../index.html#configuration">crate level documentation</a>
+<p>Both <code>Pool</code> and <a href="../struct.Slab.html"><code>Slab</code></a> share the same configuration mechanism. See <a href="../index.html#configuration">crate level documentation</a>
 for more details.</p>
 </div></details><h2 id="implementations" class="small-section-header">Implementations<a href="#implementations" class="anchor"></a></h2><details class="rustdoc-toggle implementors-toggle" open><summary><div id="impl" class="impl has-srclink"><div class="rightside"><a class="srclink" href="../../src/sharded_slab/pool.rs.html#381-398" title="goto source code">[src]</a></div><a href="#impl" class="anchor"></a><h3 class="code-header in-band">impl&lt;T&gt; <a class="struct" href="../struct.Pool.html" title="struct sharded_slab::Pool">Pool</a>&lt;T&gt; <span class="where fmt-newline">where<br>&nbsp;&nbsp;&nbsp;&nbsp;T: <a class="trait" href="../trait.Clear.html" title="trait sharded_slab::Clear">Clear</a> + <a class="trait" href="https://doc.rust-lang.org/1.58.1/core/default/trait.Default.html" title="trait core::default::Default">Default</a>,&nbsp;</span></h3></div></summary><div class="impl-items"><details class="rustdoc-toggle method-toggle" open><summary><div id="method.new" class="method has-srclink"><div class="rightside"><a class="srclink" href="../../src/sharded_slab/pool.rs.html#386-388" title="goto source code">[src]</a></div><a href="#method.new" class="anchor"></a><h4 class="code-header">pub fn <a href="#method.new" class="fnname">new</a>() -&gt; Self</h4></div></summary><div class="docblock"><p>Returns a new <code>Pool</code> with the default configuration parameters.</p>
 </div></details><details class="rustdoc-toggle method-toggle" open><summary><div id="method.new_with_config" class="method has-srclink"><div class="rightside"><a class="srclink" href="../../src/sharded_slab/pool.rs.html#391-397" title="goto source code">[src]</a></div><a href="#method.new_with_config" class="anchor"></a><h4 class="code-header">pub fn <a href="#method.new_with_config" class="fnname">new_with_config</a>&lt;C:&nbsp;<a class="trait" href="../trait.Config.html" title="trait sharded_slab::Config">Config</a>&gt;() -&gt; <a class="struct" href="../struct.Pool.html" title="struct sharded_slab::Pool">Pool</a>&lt;T, C&gt;</h4></div></summary><div class="docblock"><p>Returns a new <code>Pool</code> with the provided configuration parameters.</p>
@@ -52,7 +52,7 @@ for more details.</p>
 <p>This is determined by the <a href="trait.Config.html"><code>Config</code></a> type that configures the pool’s
 parameters. By default, all bits are used; this can be changed by
 overriding the <a href="trait.Config.html#associatedconstant.RESERVED_BITS"><code>Config::RESERVED_BITS</code></a> constant.</p>
-</div></details><details class="rustdoc-toggle method-toggle" open><summary><div id="method.create" class="method has-srclink"><div class="rightside"><a class="srclink" href="../../src/sharded_slab/pool.rs.html#451-464" title="goto source code">[src]</a></div><a href="#method.create" class="anchor"></a><h4 class="code-header">pub fn <a href="#method.create" class="fnname">create</a>(&amp;self) -&gt; <a class="enum" href="https://doc.rust-lang.org/1.58.1/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="struct" href="struct.RefMut.html" title="struct sharded_slab::pool::RefMut">RefMut</a>&lt;'_, T, C&gt;&gt;</h4></div></summary><div class="docblock"><p>Creates a new object in the pool, returning an <a href="pool/struct.RefMut.html"><code>RefMut</code></a> guard that
+</div></details><details class="rustdoc-toggle method-toggle" open><summary><div id="method.create" class="method has-srclink"><div class="rightside"><a class="srclink" href="../../src/sharded_slab/pool.rs.html#451-464" title="goto source code">[src]</a></div><a href="#method.create" class="anchor"></a><h4 class="code-header">pub fn <a href="#method.create" class="fnname">create</a>(&amp;self) -&gt; <a class="enum" href="https://doc.rust-lang.org/1.58.1/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="struct" href="struct.RefMut.html" title="struct sharded_slab::pool::RefMut">RefMut</a>&lt;'_, T, C&gt;&gt;</h4></div></summary><div class="docblock"><p>Creates a new object in the pool, returning an <a href="struct.RefMut.html"><code>RefMut</code></a> guard that
 may be used to mutate the new object.</p>
 <p>If this function returns <code>None</code>, then the shard for the current thread is full and no items
 can be added until some are removed, or the maximum number of shards has been reached.</p>

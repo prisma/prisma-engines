@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;sharded-slab-0.1.3&#x2F;src&#x2F;implementation.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>implementation.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><script defer src="../../main.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;sharded-slab-0.1.4&#x2F;src&#x2F;implementation.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>implementation.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><script defer src="../../main.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script>
     <noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../sharded_slab/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
@@ -128,6 +128,15 @@
 <span id="127">127</span>
 <span id="128">128</span>
 <span id="129">129</span>
+<span id="130">130</span>
+<span id="131">131</span>
+<span id="132">132</span>
+<span id="133">133</span>
+<span id="134">134</span>
+<span id="135">135</span>
+<span id="136">136</span>
+<span id="137">137</span>
+<span id="138">138</span>
 </pre><pre class="rust"><code><span class="comment">// This module exists only to provide a separate page for the implementation</span>
 <span class="comment">// documentation.</span>
 
@@ -157,7 +166,7 @@
 <span class="doccomment">//! When allocations and deallocations can occur concurrently across threads,</span>
 <span class="doccomment">//! they must synchronize accesses to the free list; either by putting the</span>
 <span class="doccomment">//! entire allocator state inside of a lock, or by using atomic operations to</span>
-<span class="doccomment">//! treat the free list as a lock-free structure (such as a Treiber stack). In</span>
+<span class="doccomment">//! treat the free list as a lock-free structure (such as a [Treiber stack]). In</span>
 <span class="doccomment">//! both cases, there is a significant performance cost — even when the free</span>
 <span class="doccomment">//! list is lock-free, it is likely that a noticeable amount of time will be</span>
 <span class="doccomment">//! spent in compare-and-swap loops. Ideally, the global synchronzation point</span>
@@ -187,6 +196,7 @@
 <span class="doccomment">//!</span>
 <span class="doccomment">//! [mimalloc]: https://www.microsoft.com/en-us/research/uploads/prod/2019/06/mimalloc-tr-v1.pdf</span>
 <span class="doccomment">//! [freelist]: https://en.wikipedia.org/wiki/Free_list</span>
+<span class="doccomment">//! [Treiber stack]: https://en.wikipedia.org/wiki/Treiber_stack</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! # Implementation</span>
 <span class="doccomment">//!</span>
@@ -194,6 +204,7 @@
 <span class="doccomment">//! consists of a vector of one or more _pages_ plus associated metadata.</span>
 <span class="doccomment">//! Finally, a page consists of an array of _slots_, head indices for the local</span>
 <span class="doccomment">//! and remote free lists.</span>
+<span class="doccomment">//!</span>
 <span class="doccomment">//! ```text</span>
 <span class="doccomment">//! ┌─────────────┐</span>
 <span class="doccomment">//! │ shard 1     │</span>
@@ -205,7 +216,7 @@
 <span class="doccomment">//! │ shard 3     │    │ local_head──┼──┘     ├────────┤ │</span>
 <span class="doccomment">//! └─────────────┘    │ remote_head─┼──┐     │        │◀┘</span>
 <span class="doccomment">//!       ...          ├─────────────┤  │     │  next──┼─┐</span>
-<span class="doccomment">//! ┌─────────────┐    │   page 3    │  │     ├────────┤ │</span>
+<span class="doccomment">//! ┌─────────────┐    │ page 3      │  │     ├────────┤ │</span>
 <span class="doccomment">//! │ shard n     │    └─────────────┘  │     │XXXXXXXX│ │</span>
 <span class="doccomment">//! └─────────────┘          ...        │     ├────────┤ │</span>
 <span class="doccomment">//!                    ┌─────────────┐  │     │XXXXXXXX│ │</span>
@@ -217,12 +228,14 @@
 <span class="doccomment">//!                                           └────────┘</span>
 <span class="doccomment">//! ```</span>
 <span class="doccomment">//!</span>
+<span class="doccomment">//!</span>
 <span class="doccomment">//! The size of the first page in a shard is always a power of two, and every</span>
 <span class="doccomment">//! subsequent page added after the first is twice as large as the page that</span>
 <span class="doccomment">//! preceeds it.</span>
+<span class="doccomment">//!</span>
 <span class="doccomment">//! ```text</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//!  pg.</span>
+<span class="doccomment">//! pg.</span>
 <span class="doccomment">//! ┌───┐   ┌─┬─┐</span>
 <span class="doccomment">//! │ 0 │───▶ │ │</span>
 <span class="doccomment">//! ├───┤   ├─┼─┼─┬─┐</span>
@@ -233,6 +246,7 @@
 <span class="doccomment">//! │ 3 │───▶ │ │ │ │ │ │ │ │ │ │ │ │ │ │ │ │</span>
 <span class="doccomment">//! └───┘   └─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┘</span>
 <span class="doccomment">//! ```</span>
+<span class="doccomment">//!</span>
 <span class="doccomment">//! When searching for a free slot, the smallest page is searched first, and if</span>
 <span class="doccomment">//! it is full, the search proceeds to the next page until either a free slot is</span>
 <span class="doccomment">//! found or all available pages have been searched. If all available pages have</span>
@@ -249,14 +263,18 @@
 <span class="doccomment">//! subtracting that count from the total number of bits in a word.</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! The formula for determining the page number that contains an offset is thus:</span>
+<span class="doccomment">//!</span>
 <span class="doccomment">//! ```rust,ignore</span>
 <span class="doccomment">//! WIDTH - ((offset + INITIAL_PAGE_SIZE) &gt;&gt; INDEX_SHIFT).leading_zeros()</span>
 <span class="doccomment">//! ```</span>
+<span class="doccomment">//!</span>
 <span class="doccomment">//! where `WIDTH` is the number of bits in a `usize`, and `INDEX_SHIFT` is</span>
+<span class="doccomment">//!</span>
 <span class="doccomment">//! ```rust,ignore</span>
 <span class="doccomment">//! INITIAL_PAGE_SIZE.trailing_zeros() + 1;</span>
-<span class="doccomment">//!```</span>
-<span class="doccomment">//![`MAX_THREADS`]: ../trait.Config.html#associatedconstant.MAX_THREADS</span>
+<span class="doccomment">//! ```</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! [`MAX_THREADS`]: https://docs.rs/sharded-slab/latest/sharded_slab/trait.Config.html#associatedconstant.MAX_THREADS</span>
 </code></pre></div>
 </section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="sharded_slab" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>
 </body></html>
