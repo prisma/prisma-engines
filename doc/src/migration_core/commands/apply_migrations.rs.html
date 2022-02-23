@@ -142,6 +142,10 @@
 <span id="141">141</span>
 <span id="142">142</span>
 <span id="143">143</span>
+<span id="144">144</span>
+<span id="145">145</span>
+<span id="146">146</span>
+<span id="147">147</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">json_rpc::types</span>::<span class="kw-2">*</span>, <span class="ident">CoreError</span>, <span class="ident">CoreResult</span>};
 <span class="kw">use</span> <span class="ident">migration_connector</span>::{
     <span class="ident">migrations_directory</span>::{<span class="ident">error_on_changed_provider</span>, <span class="ident">list_migrations</span>, <span class="ident">MigrationDirectory</span>},
@@ -150,22 +154,21 @@
 <span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">path::Path</span>, <span class="ident">time::Instant</span>};
 <span class="kw">use</span> <span class="ident">user_facing_errors::migration_engine::FoundFailedMigrations</span>;
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">apply_migrations</span>(
+<span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">apply_migrations</span>(
     <span class="ident">input</span>: <span class="ident">ApplyMigrationsInput</span>,
-    <span class="ident">connector</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">MigrationConnector</span>,
+    <span class="ident">connector</span>: <span class="kw-2">&amp;mut</span> <span class="kw">dyn</span> <span class="ident">MigrationConnector</span>,
 ) -&gt; <span class="ident">CoreResult</span><span class="op">&lt;</span><span class="ident">ApplyMigrationsOutput</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">start</span> <span class="op">=</span> <span class="ident">Instant::now</span>();
-    <span class="kw">let</span> <span class="ident">applier</span> <span class="op">=</span> <span class="ident">connector</span>.<span class="ident">database_migration_step_applier</span>();
-    <span class="kw">let</span> <span class="ident">migration_persistence</span> <span class="op">=</span> <span class="ident">connector</span>.<span class="ident">migration_persistence</span>();
 
     <span class="ident">error_on_changed_provider</span>(<span class="kw-2">&amp;</span><span class="ident">input</span>.<span class="ident">migrations_directory_path</span>, <span class="ident">connector</span>.<span class="ident">connector_type</span>())<span class="question-mark">?</span>;
 
     <span class="ident">connector</span>.<span class="ident">acquire_lock</span>().<span class="kw">await</span><span class="question-mark">?</span>;
 
-    <span class="ident">migration_persistence</span>.<span class="ident">initialize</span>().<span class="kw">await</span><span class="question-mark">?</span>;
+    <span class="ident">connector</span>.<span class="ident">migration_persistence</span>().<span class="ident">initialize</span>().<span class="kw">await</span><span class="question-mark">?</span>;
 
     <span class="kw">let</span> <span class="ident">migrations_from_filesystem</span> <span class="op">=</span> <span class="ident">list_migrations</span>(<span class="ident">Path::new</span>(<span class="kw-2">&amp;</span><span class="ident">input</span>.<span class="ident">migrations_directory_path</span>))<span class="question-mark">?</span>;
-    <span class="kw">let</span> <span class="ident">migrations_from_database</span> <span class="op">=</span> <span class="ident">migration_persistence</span>
+    <span class="kw">let</span> <span class="ident">migrations_from_database</span> <span class="op">=</span> <span class="ident">connector</span>
+        .<span class="ident">migration_persistence</span>()
         .<span class="ident">list_migrations</span>()
         .<span class="kw">await</span><span class="question-mark">?</span>
         .<span class="ident">map_err</span>(<span class="ident">PersistenceNotInitializedError::into_connector_error</span>)<span class="question-mark">?</span>;
@@ -208,18 +211,20 @@
             <span class="ident">unapplied_migration</span>.<span class="ident">migration_name</span>()
         );
 
-        <span class="kw">let</span> <span class="ident">migration_id</span> <span class="op">=</span> <span class="ident">migration_persistence</span>
+        <span class="kw">let</span> <span class="ident">migration_id</span> <span class="op">=</span> <span class="ident">connector</span>
+            .<span class="ident">migration_persistence</span>()
             .<span class="ident">record_migration_started</span>(<span class="ident">unapplied_migration</span>.<span class="ident">migration_name</span>(), <span class="kw-2">&amp;</span><span class="ident">script</span>)
             .<span class="kw">await</span><span class="question-mark">?</span>;
 
-        <span class="kw">match</span> <span class="ident">applier</span>
+        <span class="kw">match</span> <span class="ident">connector</span>
             .<span class="ident">apply_script</span>(<span class="ident">unapplied_migration</span>.<span class="ident">migration_name</span>(), <span class="kw-2">&amp;</span><span class="ident">script</span>)
             .<span class="kw">await</span>
         {
             <span class="prelude-val">Ok</span>(()) =&gt; {
                 <span class="macro">tracing::debug!</span>(<span class="string">&quot;Successfully applied the script.&quot;</span>);
-                <span class="ident">migration_persistence</span>.<span class="ident">record_successful_step</span>(<span class="kw-2">&amp;</span><span class="ident">migration_id</span>).<span class="kw">await</span><span class="question-mark">?</span>;
-                <span class="ident">migration_persistence</span>.<span class="ident">record_migration_finished</span>(<span class="kw-2">&amp;</span><span class="ident">migration_id</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+                <span class="kw">let</span> <span class="ident">p</span> <span class="op">=</span> <span class="ident">connector</span>.<span class="ident">migration_persistence</span>();
+                <span class="ident">p</span>.<span class="ident">record_successful_step</span>(<span class="kw-2">&amp;</span><span class="ident">migration_id</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+                <span class="ident">p</span>.<span class="ident">record_migration_finished</span>(<span class="kw-2">&amp;</span><span class="ident">migration_id</span>).<span class="kw">await</span><span class="question-mark">?</span>;
                 <span class="ident">applied_migration_names</span>.<span class="ident">push</span>(<span class="ident">unapplied_migration</span>.<span class="ident">migration_name</span>().<span class="ident">to_owned</span>());
                 <span class="kw">let</span> <span class="ident">migration_duration_ms</span> <span class="op">=</span> <span class="ident">Instant::now</span>().<span class="ident">duration_since</span>(<span class="ident">migration_apply_start</span>).<span class="ident">as_millis</span>() <span class="kw">as</span> <span class="ident">u64</span>;
                 <span class="macro">tracing::info!</span>(
@@ -233,7 +238,10 @@
 
                 <span class="kw">let</span> <span class="ident">logs</span> <span class="op">=</span> <span class="ident">err</span>.<span class="ident">to_string</span>();
 
-                <span class="ident">migration_persistence</span>.<span class="ident">record_failed_step</span>(<span class="kw-2">&amp;</span><span class="ident">migration_id</span>, <span class="kw-2">&amp;</span><span class="ident">logs</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+                <span class="ident">connector</span>
+                    .<span class="ident">migration_persistence</span>()
+                    .<span class="ident">record_failed_step</span>(<span class="kw-2">&amp;</span><span class="ident">migration_id</span>, <span class="kw-2">&amp;</span><span class="ident">logs</span>)
+                    .<span class="kw">await</span><span class="question-mark">?</span>;
 
                 <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">err</span>);
             }

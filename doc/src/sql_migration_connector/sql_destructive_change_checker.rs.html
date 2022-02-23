@@ -322,7 +322,9 @@
     <span class="ident">SqlMigration</span>, <span class="ident">SqlMigrationConnector</span>,
 };
 <span class="kw">use</span> <span class="ident">destructive_check_plan::DestructiveCheckPlan</span>;
-<span class="kw">use</span> <span class="ident">migration_connector</span>::{<span class="ident">ConnectorResult</span>, <span class="ident">DestructiveChangeChecker</span>, <span class="ident">DestructiveChangeDiagnostics</span>, <span class="ident">Migration</span>};
+<span class="kw">use</span> <span class="ident">migration_connector</span>::{
+    <span class="ident">BoxFuture</span>, <span class="ident">ConnectorResult</span>, <span class="ident">DestructiveChangeChecker</span>, <span class="ident">DestructiveChangeDiagnostics</span>, <span class="ident">Migration</span>,
+};
 <span class="kw">use</span> <span class="ident">sql_schema_describer</span>::{
     <span class="ident">walkers</span>::{<span class="ident">ColumnWalker</span>, <span class="ident">SqlSchemaExt</span>},
     <span class="ident">ColumnArity</span>,
@@ -359,9 +361,9 @@
     <span class="kw">fn</span> <span class="ident">check_add_column</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">column</span>: <span class="kw-2">&amp;</span><span class="ident">ColumnWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
+        <span class="ident">has_virtual_default</span>: <span class="ident">bool</span>,
         <span class="ident">plan</span>: <span class="kw-2">&amp;mut</span> <span class="ident">DestructiveCheckPlan</span>,
         <span class="ident">step_index</span>: <span class="ident">usize</span>,
-        <span class="ident">migration</span>: <span class="kw-2">&amp;</span><span class="ident">SqlMigration</span>,
     ) {
         <span class="kw">let</span> <span class="ident">column_is_required_without_default</span> <span class="op">=</span> <span class="ident">column</span>.<span class="ident">arity</span>().<span class="ident">is_required</span>() <span class="op">&amp;&amp;</span> <span class="ident">column</span>.<span class="ident">default</span>().<span class="ident">is_none</span>();
 
@@ -369,14 +371,6 @@
         <span class="kw">if</span> <span class="op">!</span><span class="ident">column_is_required_without_default</span> {
             <span class="kw">return</span>;
         }
-
-        <span class="kw">let</span> <span class="ident">has_virtual_default</span> <span class="op">=</span>
-            <span class="ident">migration</span>
-                .<span class="ident">added_columns_with_virtual_defaults</span>
-                .<span class="ident">iter</span>()
-                .<span class="ident">any</span>(<span class="op">|</span>(<span class="ident">table_idx</span>, <span class="ident">column_idx</span>)<span class="op">|</span> {
-                    <span class="kw-2">*</span><span class="ident">table_idx</span> <span class="op">==</span> <span class="ident">column</span>.<span class="ident">table</span>().<span class="ident">table_id</span>() <span class="op">&amp;&amp;</span> <span class="kw-2">*</span><span class="ident">column_idx</span> <span class="op">==</span> <span class="ident">column</span>.<span class="ident">column_id</span>()
-                });
 
         <span class="kw">let</span> <span class="ident">typed_unexecutable</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">has_virtual_default</span> {
             <span class="ident">UnexecutableStepCheck::AddedRequiredFieldToTableWithPrismaLevelDefault</span> {
@@ -421,10 +415,13 @@
                                 <span class="self">self</span>.<span class="ident">flavour</span>()
                                     .<span class="ident">check_alter_column</span>(<span class="ident">alter_column</span>, <span class="kw-2">&amp;</span><span class="ident">columns</span>, <span class="kw-2">&amp;mut</span> <span class="ident">plan</span>, <span class="ident">step_index</span>)
                             }
-                            <span class="ident">TableChange::AddColumn</span> { <span class="ident">column_id</span> } =&gt; {
+                            <span class="ident">TableChange::AddColumn</span> {
+                                <span class="ident">column_id</span>,
+                                <span class="ident">has_virtual_default</span>,
+                            } =&gt; {
                                 <span class="kw">let</span> <span class="ident">column</span> <span class="op">=</span> <span class="ident">tables</span>.<span class="ident">next</span>().<span class="ident">column_at</span>(<span class="kw-2">*</span><span class="ident">column_id</span>);
 
-                                <span class="self">self</span>.<span class="ident">check_add_column</span>(<span class="kw-2">&amp;</span><span class="ident">column</span>, <span class="kw-2">&amp;mut</span> <span class="ident">plan</span>, <span class="ident">step_index</span>, <span class="ident">migration</span>)
+                                <span class="self">self</span>.<span class="ident">check_add_column</span>(<span class="kw-2">&amp;</span><span class="ident">column</span>, <span class="kw-2">*</span><span class="ident">has_virtual_default</span>, <span class="kw-2">&amp;mut</span> <span class="ident">plan</span>, <span class="ident">step_index</span>)
                             }
                             <span class="ident">TableChange::DropPrimaryKey</span> { .. } =&gt; <span class="ident">plan</span>.<span class="ident">push_warning</span>(
                                 <span class="ident">SqlMigrationWarningCheck::PrimaryKeyChange</span> {
@@ -458,7 +455,10 @@
 
                         <span class="kw">for</span> <span class="ident">added_column_idx</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">redefine_table</span>.<span class="ident">added_columns</span> {
                             <span class="kw">let</span> <span class="ident">column</span> <span class="op">=</span> <span class="ident">tables</span>.<span class="ident">next</span>().<span class="ident">column_at</span>(<span class="kw-2">*</span><span class="ident">added_column_idx</span>);
-                            <span class="self">self</span>.<span class="ident">check_add_column</span>(<span class="kw-2">&amp;</span><span class="ident">column</span>, <span class="kw-2">&amp;mut</span> <span class="ident">plan</span>, <span class="ident">step_index</span>, <span class="ident">migration</span>);
+                            <span class="kw">let</span> <span class="ident">has_virtual_default</span> <span class="op">=</span> <span class="ident">redefine_table</span>
+                                .<span class="ident">added_columns_with_virtual_defaults</span>
+                                .<span class="ident">contains</span>(<span class="ident">added_column_idx</span>);
+                            <span class="self">self</span>.<span class="ident">check_add_column</span>(<span class="kw-2">&amp;</span><span class="ident">column</span>, <span class="ident">has_virtual_default</span>, <span class="kw-2">&amp;mut</span> <span class="ident">plan</span>, <span class="ident">step_index</span>);
                         }
 
                         <span class="kw">for</span> <span class="ident">dropped_column_idx</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">redefine_table</span>.<span class="ident">dropped_columns</span> {
@@ -570,13 +570,13 @@
     }
 }
 
-<span class="attribute">#[<span class="ident">async_trait::async_trait</span>]</span>
 <span class="kw">impl</span> <span class="ident">DestructiveChangeChecker</span> <span class="kw">for</span> <span class="ident">SqlMigrationConnector</span> {
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">check</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">migration</span>: <span class="kw-2">&amp;</span><span class="ident">Migration</span>) -&gt; <span class="ident">ConnectorResult</span><span class="op">&lt;</span><span class="ident">DestructiveChangeDiagnostics</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">check</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
+        <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="self">self</span>,
+        <span class="ident">migration</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Migration</span>,
+    ) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">ConnectorResult</span><span class="op">&lt;</span><span class="ident">DestructiveChangeDiagnostics</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">plan</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">plan</span>(<span class="ident">migration</span>.<span class="ident">downcast_ref</span>());
-        <span class="kw">let</span> <span class="ident">conn</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">conn</span>().<span class="kw">await</span><span class="question-mark">?</span>;
-
-        <span class="ident">plan</span>.<span class="ident">execute</span>(<span class="self">self</span>.<span class="ident">flavour</span>(), <span class="ident">conn</span>).<span class="kw">await</span>
+        <span class="ident">Box::pin</span>(<span class="kw">async</span> <span class="kw">move</span> { <span class="ident">plan</span>.<span class="ident">execute</span>(<span class="self">self</span>.<span class="ident">flavour</span>.<span class="ident">as_mut</span>()).<span class="kw">await</span> })
     }
 
     <span class="kw">fn</span> <span class="ident">pure_check</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">migration</span>: <span class="kw-2">&amp;</span><span class="ident">Migration</span>) -&gt; <span class="ident">DestructiveChangeDiagnostics</span> {

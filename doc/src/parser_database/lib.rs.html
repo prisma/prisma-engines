@@ -155,14 +155,6 @@
 <span id="154">154</span>
 <span id="155">155</span>
 <span id="156">156</span>
-<span id="157">157</span>
-<span id="158">158</span>
-<span id="159">159</span>
-<span id="160">160</span>
-<span id="161">161</span>
-<span id="162">162</span>
-<span id="163">163</span>
-<span id="164">164</span>
 </pre><pre class="rust"><code><span class="attribute">#![<span class="ident">deny</span>(<span class="ident">unsafe_code</span>, <span class="ident">rust_2018_idioms</span>, <span class="ident">missing_docs</span>)]</span>
 
 <span class="doccomment">//! See the docs on [ParserDatabase](./struct.ParserDatabase.html).</span>
@@ -230,14 +222,6 @@
 <span class="doccomment">///   fields.</span>
 <span class="doccomment">/// - Global validations are then performed on the mostly validated schema.</span>
 <span class="doccomment">///   Currently only index name collisions.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ## Lifetimes</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Throughout the ParserDatabase implementation, you will see many lifetime</span>
-<span class="doccomment">/// annotations. The only significant lifetime is the lifetime of the reference</span>
-<span class="doccomment">/// to the AST contained in ParserDatabase, that we call by convention `&#39;ast`.</span>
-<span class="doccomment">/// Apart from that, everything should be owned or locally borrowed, to keep</span>
-<span class="doccomment">/// lifetime management simple.</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ParserDatabase</span> {
     <span class="ident">ast</span>: <span class="ident">ast::SchemaAst</span>,
     <span class="ident">interner</span>: <span class="ident">interner::StringInterner</span>,

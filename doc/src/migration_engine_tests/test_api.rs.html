@@ -390,31 +390,31 @@
 <span id="389">389</span>
 <span id="390">390</span>
 <span id="391">391</span>
-<span id="392">392</span>
-<span id="393">393</span>
-<span id="394">394</span>
 </pre><pre class="rust"><code><span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::assertions</span>::{<span class="ident">MigrationsAssertions</span>, <span class="ident">ResultSetExt</span>, <span class="ident">SchemaAssertion</span>};
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">expect_test::expect</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">migration_core::json_rpc::types</span>::{
     <span class="ident">DbExecuteDatasourceType</span>, <span class="ident">DbExecuteParams</span>, <span class="ident">DiffParams</span>, <span class="ident">DiffResult</span>, <span class="ident">SchemaContainer</span>, <span class="ident">UrlContainer</span>,
 };
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">test_macros::test_connector</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">test_setup</span>::{<span class="ident">BitFlags</span>, <span class="ident">Capabilities</span>, <span class="ident">Tags</span>};
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">test_setup</span>::{<span class="ident">runtime::run_with_thread_local_runtime</span> <span class="kw">as</span> <span class="ident">tok</span>, <span class="ident">BitFlags</span>, <span class="ident">Capabilities</span>, <span class="ident">Tags</span>};
 
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">commands</span>::<span class="kw-2">*</span>, <span class="ident">multi_engine_test_api::TestApi</span> <span class="kw">as</span> <span class="ident">RootTestApi</span>};
 <span class="kw">use</span> <span class="ident">datamodel::common::preview_features::PreviewFeature</span>;
-<span class="kw">use</span> <span class="ident">migration_core::migration_connector</span>::{
-    <span class="ident">ConnectorHost</span>, <span class="ident">ConnectorResult</span>, <span class="ident">DatabaseMigrationStepApplier</span>, <span class="ident">DiffTarget</span>, <span class="ident">MigrationConnector</span>, <span class="ident">MigrationPersistence</span>,
+<span class="kw">use</span> <span class="ident">migration_core</span>::{
+    <span class="ident">commands::diff</span>,
+    <span class="ident">migration_connector</span>::{
+        <span class="ident">BoxFuture</span>, <span class="ident">ConnectorHost</span>, <span class="ident">ConnectorResult</span>, <span class="ident">DiffTarget</span>, <span class="ident">MigrationConnector</span>, <span class="ident">MigrationPersistence</span>,
+    },
 };
 <span class="kw">use</span> <span class="ident">quaint</span>::{
     <span class="ident">prelude</span>::{<span class="ident">ConnectionInfo</span>, <span class="ident">ResultSet</span>},
     <span class="ident">Value</span>,
 };
 <span class="kw">use</span> <span class="ident">sql_migration_connector::SqlMigrationConnector</span>;
+<span class="kw">use</span> <span class="ident">sql_schema_describer::SqlSchema</span>;
 <span class="kw">use</span> <span class="ident">std</span>::{
     <span class="ident">borrow::Cow</span>,
     <span class="ident">fmt</span>::{<span class="ident">Display</span>, <span class="ident">Write</span>},
-    <span class="ident">future::Future</span>,
 };
 <span class="kw">use</span> <span class="ident">tempfile::TempDir</span>;
 <span class="kw">use</span> <span class="ident">test_setup</span>::{<span class="ident">DatasourceBlock</span>, <span class="ident">TestApiArgs</span>};
@@ -424,11 +424,10 @@
     <span class="kw">pub</span> <span class="ident">printed_messages</span>: <span class="ident">std::sync::Mutex</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span>,
 }
 
-<span class="attribute">#[<span class="ident">async_trait::async_trait</span>]</span>
 <span class="kw">impl</span> <span class="ident">ConnectorHost</span> <span class="kw">for</span> <span class="ident">TestConnectorHost</span> {
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">print</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">message</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">print</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">message</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">printed_messages</span>.<span class="ident">lock</span>().<span class="ident">unwrap</span>().<span class="ident">push</span>(<span class="ident">message</span>.<span class="ident">to_owned</span>());
-        <span class="prelude-val">Ok</span>(())
+        <span class="ident">Box::pin</span>(<span class="ident">std::future::ready</span>(<span class="prelude-val">Ok</span>(())))
     }
 }
 
@@ -451,8 +450,8 @@
     }
 
     <span class="doccomment">/// Plan an `applyMigrations` command</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">apply_migrations</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>, <span class="ident">migrations_directory</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">TempDir</span>) -&gt; <span class="ident">ApplyMigrations</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-        <span class="ident">ApplyMigrations::new_sync</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">connector</span>, <span class="ident">migrations_directory</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">root</span>.<span class="ident">rt</span>)
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">apply_migrations</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">migrations_directory</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">TempDir</span>) -&gt; <span class="ident">ApplyMigrations</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
+        <span class="ident">ApplyMigrations::new</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">connector</span>, <span class="ident">migrations_directory</span>)
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">connection_string</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
@@ -463,13 +462,8 @@
         <span class="self">self</span>.<span class="ident">root</span>.<span class="ident">connection_info</span>()
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">db_execute</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">params</span>: <span class="ident">migration_core::json_rpc::types::DbExecuteParams</span>) -&gt; <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">api</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">migration_core::GenericApi</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">connector</span>;
-        <span class="self">self</span>.<span class="ident">block_on</span>(<span class="ident">api</span>.<span class="ident">db_execute</span>(<span class="ident">params</span>))
-    }
-
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ensure_connection_validity</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">block_on</span>(<span class="self">self</span>.<span class="ident">connector</span>.<span class="ident">ensure_connection_validity</span>())
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ensure_connection_validity</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+        <span class="ident">tok</span>(<span class="self">self</span>.<span class="ident">connector</span>.<span class="ident">ensure_connection_validity</span>())
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">schema_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">String</span> {
@@ -478,12 +472,12 @@
 
     <span class="doccomment">/// Plan a `createMigration` command</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">create_migration</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
-        <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>,
+        <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="self">self</span>,
         <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>,
         <span class="ident">schema</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>,
         <span class="ident">migrations_directory</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">TempDir</span>,
     ) -&gt; <span class="ident">CreateMigration</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-        <span class="ident">CreateMigration::new_sync</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">connector</span>, <span class="ident">name</span>, <span class="ident">schema</span>, <span class="ident">migrations_directory</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">root</span>.<span class="ident">rt</span>)
+        <span class="ident">CreateMigration::new</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">connector</span>, <span class="ident">name</span>, <span class="ident">schema</span>, <span class="ident">migrations_directory</span>)
     }
 
     <span class="doccomment">/// Create a temporary directory to serve as a test migrations directory.</span>
@@ -492,28 +486,34 @@
     }
 
     <span class="doccomment">/// Builder and assertions to call the `devDiagnostic` command.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">dev_diagnostic</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>, <span class="ident">migrations_directory</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">TempDir</span>) -&gt; <span class="ident">DevDiagnostic</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-        <span class="ident">DevDiagnostic::new</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">connector</span>, <span class="ident">migrations_directory</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">root</span>.<span class="ident">rt</span>)
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">dev_diagnostic</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">migrations_directory</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">TempDir</span>) -&gt; <span class="ident">DevDiagnostic</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
+        <span class="ident">DevDiagnostic::new</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">connector</span>, <span class="ident">migrations_directory</span>)
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">diagnose_migration_history</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>, <span class="ident">migrations_directory</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">TempDir</span>) -&gt; <span class="ident">DiagnoseMigrationHistory</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-        <span class="ident">DiagnoseMigrationHistory::new_sync</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">connector</span>, <span class="ident">migrations_directory</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">root</span>.<span class="ident">rt</span>)
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">diagnose_migration_history</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
+        <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="self">self</span>,
+        <span class="ident">migrations_directory</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">TempDir</span>,
+    ) -&gt; <span class="ident">DiagnoseMigrationHistory</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
+        <span class="ident">DiagnoseMigrationHistory::new</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">connector</span>, <span class="ident">migrations_directory</span>)
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">diff</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">params</span>: <span class="ident">DiffParams</span>) -&gt; <span class="ident">ConnectorResult</span><span class="op">&lt;</span><span class="ident">DiffResult</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">api</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">migration_core::GenericApi</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">connector</span>;
-        <span class="self">self</span>.<span class="ident">block_on</span>(<span class="ident">api</span>.<span class="ident">diff</span>(<span class="ident">params</span>))
+        <span class="ident">test_setup::runtime::run_with_thread_local_runtime</span>(<span class="ident">diff</span>(<span class="ident">params</span>, <span class="self">self</span>.<span class="ident">connector</span>.<span class="ident">host</span>().<span class="ident">clone</span>()))
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">dump_table</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">table_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">ResultSet</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">dump_table</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">table_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">ResultSet</span> {
         <span class="kw">let</span> <span class="ident">select_star</span> <span class="op">=</span>
             <span class="ident">quaint::ast::Select::from_table</span>(<span class="self">self</span>.<span class="ident">render_table_name</span>(<span class="ident">table_name</span>)).<span class="ident">value</span>(<span class="ident">quaint::ast::asterisk</span>());
 
         <span class="self">self</span>.<span class="ident">query</span>(<span class="ident">select_star</span>.<span class="ident">into</span>())
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">evaluate_data_loss</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>, <span class="ident">migrations_directory</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">TempDir</span>, <span class="ident">schema</span>: <span class="ident">String</span>) -&gt; <span class="ident">EvaluateDataLoss</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-        <span class="ident">EvaluateDataLoss::new</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">connector</span>, <span class="ident">migrations_directory</span>, <span class="ident">schema</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">root</span>.<span class="ident">rt</span>)
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">evaluate_data_loss</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
+        <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="self">self</span>,
+        <span class="ident">migrations_directory</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">TempDir</span>,
+        <span class="ident">schema</span>: <span class="ident">String</span>,
+    ) -&gt; <span class="ident">EvaluateDataLoss</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
+        <span class="ident">EvaluateDataLoss::new</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">connector</span>, <span class="ident">migrations_directory</span>, <span class="ident">schema</span>)
     }
 
     <span class="doccomment">/// Returns true only when testing on MSSQL.</span>
@@ -567,15 +567,18 @@
     }
 
     <span class="doccomment">/// Insert test values</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">insert</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>, <span class="ident">table_name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>) -&gt; <span class="ident">SingleRowInsert</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">insert</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">table_name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>) -&gt; <span class="ident">SingleRowInsert</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
         <span class="ident">SingleRowInsert</span> {
             <span class="ident">insert</span>: <span class="ident">quaint::ast::Insert::single_into</span>(<span class="self">self</span>.<span class="ident">render_table_name</span>(<span class="ident">table_name</span>)),
             <span class="ident">api</span>: <span class="self">self</span>,
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">list_migration_directories</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>, <span class="ident">migrations_directory</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">TempDir</span>) -&gt; <span class="ident">ListMigrationDirectories</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-        <span class="ident">ListMigrationDirectories::new</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">connector</span>, <span class="ident">migrations_directory</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">root</span>.<span class="ident">rt</span>)
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">list_migration_directories</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
+        <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="self">self</span>,
+        <span class="ident">migrations_directory</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">TempDir</span>,
+    ) -&gt; <span class="ident">ListMigrationDirectories</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
+        <span class="ident">ListMigrationDirectories::new</span>(<span class="ident">migrations_directory</span>)
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">lower_cases_table_names</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
@@ -583,38 +586,26 @@
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">mark_migration_applied</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
-        <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>,
+        <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="self">self</span>,
         <span class="ident">migration_name</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
         <span class="ident">migrations_directory</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">TempDir</span>,
     ) -&gt; <span class="ident">MarkMigrationApplied</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-        <span class="ident">MarkMigrationApplied::new</span>(
-            <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">connector</span>,
-            <span class="ident">migration_name</span>.<span class="ident">into</span>(),
-            <span class="ident">migrations_directory</span>,
-            <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">root</span>.<span class="ident">rt</span>,
-        )
+        <span class="ident">MarkMigrationApplied::new</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">connector</span>, <span class="ident">migration_name</span>.<span class="ident">into</span>(), <span class="ident">migrations_directory</span>)
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">mark_migration_rolled_back</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">migration_name</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="ident">MarkMigrationRolledBack</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
-        <span class="ident">MarkMigrationRolledBack::new</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">connector</span>, <span class="ident">migration_name</span>.<span class="ident">into</span>(), <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">root</span>.<span class="ident">rt</span>)
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">mark_migration_rolled_back</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">migration_name</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="ident">MarkMigrationRolledBack</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
+        <span class="ident">MarkMigrationRolledBack::new</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">connector</span>, <span class="ident">migration_name</span>.<span class="ident">into</span>())
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">migration_persistence</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>(<span class="kw">dyn</span> <span class="ident">MigrationPersistence</span> <span class="op">+</span> <span class="lifetime">&#39;a</span>) {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">connector</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">migration_persistence</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut</span> (<span class="kw">dyn</span> <span class="ident">MigrationPersistence</span> <span class="op">+</span> <span class="lifetime">&#39;a</span>) {
+        <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">connector</span>
     }
 
     <span class="doccomment">/// Assert facts about the database schema</span>
     <span class="attribute">#[<span class="ident">track_caller</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">assert_schema</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">SchemaAssertion</span> {
-        <span class="ident">SchemaAssertion::new</span>(
-            <span class="self">self</span>.<span class="ident">root</span>.<span class="ident">block_on</span>(<span class="self">self</span>.<span class="ident">connector</span>.<span class="ident">describe_schema</span>()).<span class="ident">unwrap</span>(),
-            <span class="self">self</span>.<span class="ident">root</span>.<span class="ident">args</span>.<span class="ident">tags</span>(),
-        )
-    }
-
-    <span class="doccomment">/// Block on a future.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">block_on</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">F</span>: <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="ident">O</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="ident">O</span> {
-        <span class="self">self</span>.<span class="ident">root</span>.<span class="ident">block_on</span>(<span class="ident">f</span>)
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">assert_schema</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">SchemaAssertion</span> {
+        <span class="kw">let</span> <span class="ident">schema</span>: <span class="ident">SqlSchema</span> <span class="op">=</span> <span class="ident">tok</span>(<span class="self">self</span>.<span class="ident">connector</span>.<span class="ident">describe_schema</span>()).<span class="ident">unwrap</span>();
+        <span class="ident">SchemaAssertion::new</span>(<span class="ident">schema</span>, <span class="self">self</span>.<span class="ident">root</span>.<span class="ident">args</span>.<span class="ident">tags</span>())
     }
 
     <span class="doccomment">/// Render a valid datasource block, including database URL.</span>
@@ -627,8 +618,10 @@
     }
 
     <span class="doccomment">/// Generate a migration script using `MigrationConnector::diff()`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">connector_diff</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">from</span>: <span class="ident">DiffTarget</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">to</span>: <span class="ident">DiffTarget</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">String</span> {
-        <span class="kw">let</span> <span class="ident">migration</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">block_on</span>(<span class="self">self</span>.<span class="ident">connector</span>.<span class="ident">diff</span>(<span class="ident">from</span>, <span class="ident">to</span>)).<span class="ident">unwrap</span>();
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">connector_diff</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">from</span>: <span class="ident">DiffTarget</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">to</span>: <span class="ident">DiffTarget</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">String</span> {
+        <span class="kw">let</span> <span class="ident">from</span> <span class="op">=</span> <span class="ident">tok</span>(<span class="self">self</span>.<span class="ident">connector</span>.<span class="ident">database_schema_from_diff_target</span>(<span class="ident">from</span>, <span class="prelude-val">None</span>)).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">to</span> <span class="op">=</span> <span class="ident">tok</span>(<span class="self">self</span>.<span class="ident">connector</span>.<span class="ident">database_schema_from_diff_target</span>(<span class="ident">to</span>, <span class="prelude-val">None</span>)).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">migration</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">connector</span>.<span class="ident">diff</span>(<span class="ident">from</span>, <span class="ident">to</span>).<span class="ident">unwrap</span>();
         <span class="self">self</span>.<span class="ident">connector</span>.<span class="ident">render_script</span>(<span class="kw-2">&amp;</span><span class="ident">migration</span>, <span class="kw-2">&amp;</span><span class="ident">Default::default</span>()).<span class="ident">unwrap</span>()
     }
 
@@ -642,44 +635,45 @@
 
     <span class="doccomment">/// Like quaint::Queryable::query()</span>
     <span class="attribute">#[<span class="ident">track_caller</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">query</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">q</span>: <span class="ident">quaint::ast::Query</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">ResultSet</span> {
-        <span class="self">self</span>.<span class="ident">root</span>.<span class="ident">block_on</span>(<span class="self">self</span>.<span class="ident">connector</span>.<span class="ident">query</span>(<span class="ident">q</span>)).<span class="ident">unwrap</span>()
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">query</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">q</span>: <span class="ident">quaint::ast::Query</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">ResultSet</span> {
+        <span class="ident">tok</span>(<span class="self">self</span>.<span class="ident">connector</span>.<span class="ident">query</span>(<span class="ident">q</span>)).<span class="ident">unwrap</span>()
     }
 
     <span class="doccomment">/// Like quaint::Queryable::query_raw()</span>
     <span class="attribute">#[<span class="ident">track_caller</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">query_raw</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">q</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">params</span>: <span class="kw-2">&amp;</span>[<span class="ident">Value</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span>]) -&gt; <span class="ident">ResultSet</span> {
-        <span class="self">self</span>.<span class="ident">root</span>.<span class="ident">block_on</span>(<span class="self">self</span>.<span class="ident">connector</span>.<span class="ident">query_raw</span>(<span class="ident">q</span>, <span class="ident">params</span>)).<span class="ident">unwrap</span>()
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">query_raw</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">q</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">params</span>: <span class="kw-2">&amp;</span>[<span class="ident">Value</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span>]) -&gt; <span class="ident">ResultSet</span> {
+        <span class="ident">tok</span>(<span class="self">self</span>.<span class="ident">connector</span>.<span class="ident">query_raw</span>(<span class="ident">q</span>, <span class="ident">params</span>)).<span class="ident">unwrap</span>()
     }
 
     <span class="doccomment">/// Send a SQL command to the database, and expect it to succeed.</span>
     <span class="attribute">#[<span class="ident">track_caller</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">raw_cmd</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">sql</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) {
-        <span class="self">self</span>.<span class="ident">root</span>.<span class="ident">block_on</span>(<span class="self">self</span>.<span class="ident">connector</span>.<span class="ident">raw_cmd</span>(<span class="ident">sql</span>)).<span class="ident">unwrap</span>()
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">raw_cmd</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">sql</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) {
+        <span class="ident">tok</span>(<span class="self">self</span>.<span class="ident">connector</span>.<span class="ident">raw_cmd</span>(<span class="ident">sql</span>)).<span class="ident">unwrap</span>()
     }
 
     <span class="doccomment">/// Render a table name with the required prefixing for use with quaint query building.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">render_table_name</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>, <span class="ident">table_name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>) -&gt; <span class="ident">quaint::ast::Table</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">render_table_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">table_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">quaint::ast::Table</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">root</span>.<span class="ident">is_sqlite</span>() {
-            <span class="ident">table_name</span>.<span class="ident">into</span>()
+            <span class="ident">table_name</span>.<span class="ident">to_owned</span>().<span class="ident">into</span>()
         } <span class="kw">else</span> {
             (<span class="self">self</span>.<span class="ident">connection_info</span>().<span class="ident">schema_name</span>().<span class="ident">to_owned</span>(), <span class="ident">table_name</span>.<span class="ident">to_owned</span>()).<span class="ident">into</span>()
         }
     }
 
     <span class="doccomment">/// Plan a `reset` command</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">reset</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Reset</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
-        <span class="ident">Reset::new_sync</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">connector</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">root</span>.<span class="ident">rt</span>)
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">reset</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">Reset</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
+        <span class="ident">Reset::new</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">connector</span>)
     }
 
     <span class="doccomment">/// Plan a `schemaPush` command adding the datasource</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">schema_push_w_datasource</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">dm</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="ident">SchemaPush</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
-        <span class="ident">SchemaPush::new</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">connector</span>, <span class="self">self</span>.<span class="ident">datamodel_with_provider</span>(<span class="kw-2">&amp;</span><span class="ident">dm</span>.<span class="ident">into</span>()), <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">root</span>.<span class="ident">rt</span>)
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">schema_push_w_datasource</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">dm</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="ident">SchemaPush</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">schema</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">datamodel_with_provider</span>(<span class="kw-2">&amp;</span><span class="ident">dm</span>.<span class="ident">into</span>());
+        <span class="ident">SchemaPush::new</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">connector</span>, <span class="ident">schema</span>)
     }
 
     <span class="doccomment">/// Plan a `schemaPush` command</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">schema_push</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">dm</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="ident">SchemaPush</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
-        <span class="ident">SchemaPush::new</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">connector</span>, <span class="ident">dm</span>.<span class="ident">into</span>(), <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">root</span>.<span class="ident">rt</span>)
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">schema_push</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">dm</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="ident">SchemaPush</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
+        <span class="ident">SchemaPush::new</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">connector</span>, <span class="ident">dm</span>.<span class="ident">into</span>())
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">tags</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">BitFlags</span><span class="op">&lt;</span><span class="ident">Tags</span><span class="op">&gt;</span> {
@@ -745,7 +739,7 @@
 
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SingleRowInsert</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
     <span class="ident">insert</span>: <span class="ident">quaint::ast::SingleRowInsert</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
-    <span class="ident">api</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">TestApi</span>,
+    <span class="ident">api</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">TestApi</span>,
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">SingleRowInsert</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {

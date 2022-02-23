@@ -323,6 +323,12 @@
 <span id="322">322</span>
 <span id="323">323</span>
 <span id="324">324</span>
+<span id="325">325</span>
+<span id="326">326</span>
+<span id="327">327</span>
+<span id="328">328</span>
+<span id="329">329</span>
+<span id="330">330</span>
 </pre><pre class="rust"><code><span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::TestResult</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">expect_test::expect</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">test_macros::test_connector</span>;
@@ -335,7 +341,7 @@
     <span class="ident">CompositeTypeDepth</span>, <span class="ident">ConnectorResult</span>, <span class="ident">DatabaseMetadata</span>, <span class="ident">IntrospectionConnector</span>, <span class="ident">IntrospectionContext</span>,
     <span class="ident">IntrospectionResult</span>, <span class="ident">Version</span>,
 };
-<span class="kw">use</span> <span class="ident">migration_connector::MigrationConnector</span>;
+<span class="kw">use</span> <span class="ident">migration_connector</span>::{<span class="ident">ConnectorParams</span>, <span class="ident">MigrationConnector</span>};
 <span class="kw">use</span> <span class="ident">quaint</span>::{
     <span class="ident">prelude</span>::{<span class="ident">Queryable</span>, <span class="ident">SqlFamily</span>},
     <span class="ident">single::Quaint</span>,
@@ -366,7 +372,13 @@
             .<span class="ident">collect</span>();
 
         <span class="kw">let</span> (<span class="ident">database</span>, <span class="ident">connection_string</span>): (<span class="ident">Quaint</span>, <span class="ident">String</span>) <span class="op">=</span> <span class="kw">if</span> <span class="ident">tags</span>.<span class="ident">intersects</span>(<span class="ident">Tags::Vitess</span>) {
-            <span class="kw">let</span> <span class="ident">me</span> <span class="op">=</span> <span class="ident">SqlMigrationConnector::new</span>(<span class="ident">connection_string</span>.<span class="ident">to_owned</span>(), <span class="ident">preview_features</span>, <span class="prelude-val">None</span>).<span class="ident">unwrap</span>();
+            <span class="kw">let</span> <span class="ident">params</span> <span class="op">=</span> <span class="ident">ConnectorParams</span> {
+                <span class="ident">connection_string</span>: <span class="ident">connection_string</span>.<span class="ident">to_owned</span>(),
+                <span class="ident">preview_features</span>,
+                <span class="ident">shadow_database_connection_string</span>: <span class="prelude-val">None</span>,
+            };
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">me</span> <span class="op">=</span> <span class="ident">SqlMigrationConnector::new_mysql</span>();
+            <span class="ident">me</span>.<span class="ident">set_params</span>(<span class="ident">params</span>).<span class="ident">unwrap</span>();
 
             <span class="ident">me</span>.<span class="ident">reset</span>().<span class="kw">await</span>.<span class="ident">unwrap</span>();
 

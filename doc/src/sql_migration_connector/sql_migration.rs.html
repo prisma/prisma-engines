@@ -600,28 +600,6 @@
 <span id="599">599</span>
 <span id="600">600</span>
 <span id="601">601</span>
-<span id="602">602</span>
-<span id="603">603</span>
-<span id="604">604</span>
-<span id="605">605</span>
-<span id="606">606</span>
-<span id="607">607</span>
-<span id="608">608</span>
-<span id="609">609</span>
-<span id="610">610</span>
-<span id="611">611</span>
-<span id="612">612</span>
-<span id="613">613</span>
-<span id="614">614</span>
-<span id="615">615</span>
-<span id="616">616</span>
-<span id="617">617</span>
-<span id="618">618</span>
-<span id="619">619</span>
-<span id="620">620</span>
-<span id="621">621</span>
-<span id="622">622</span>
-<span id="623">623</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">pair::Pair</span>,
     <span class="ident">sql_renderer::IteratorJoin</span>,
@@ -638,10 +616,6 @@
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SqlMigration</span> {
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">before</span>: <span class="ident">SqlSchema</span>,
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">after</span>: <span class="ident">SqlSchema</span>,
-    <span class="doccomment">/// (table_id, column_id) for columns with a prisma-level default</span>
-    <span class="doccomment">/// (cuid() or uuid()) in the `after` schema that aren&#39;t present in the</span>
-    <span class="doccomment">/// `before` schema.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">added_columns_with_virtual_defaults</span>: <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">TableId</span>, <span class="ident">ColumnId</span>)<span class="op">&gt;</span>,
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">steps</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">SqlMigrationStep</span><span class="op">&gt;</span>,
 }
 
@@ -879,7 +853,10 @@
 
                     <span class="kw">for</span> <span class="ident">change</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">alter_table</span>.<span class="ident">changes</span> {
                         <span class="kw">match</span> <span class="ident">change</span> {
-                            <span class="ident">TableChange::AddColumn</span> { <span class="ident">column_id</span> } =&gt; {
+                            <span class="ident">TableChange::AddColumn</span> {
+                                <span class="ident">column_id</span>,
+                                <span class="ident">has_virtual_default</span>: <span class="kw">_</span>,
+                            } =&gt; {
                                 <span class="ident">out</span>.<span class="ident">push_str</span>(<span class="string">&quot;  [+] Added column `&quot;</span>);
                                 <span class="ident">out</span>.<span class="ident">push_str</span>(<span class="ident">tables</span>.<span class="ident">next</span>().<span class="ident">column_at</span>(<span class="kw-2">*</span><span class="ident">column_id</span>).<span class="ident">name</span>());
                                 <span class="ident">out</span>.<span class="ident">push_str</span>(<span class="string">&quot;`\n&quot;</span>);
@@ -1107,20 +1084,6 @@
 }
 
 <span class="kw">impl</span> <span class="ident">SqlMigrationStep</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">as_alter_table</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">AlterTable</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">SqlMigrationStep::AlterTable</span>(<span class="ident">alter_table</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">alter_table</span>),
-            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
-        }
-    }
-
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">as_redefine_tables</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span>[<span class="ident">RedefineTable</span>]<span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">SqlMigrationStep::RedefineTables</span>(<span class="ident">redefines</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">redefines</span>),
-            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
-        }
-    }
-
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">description</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
         <span class="kw">match</span> <span class="self">self</span> {
             <span class="ident">SqlMigrationStep::AddForeignKey</span> { .. } =&gt; <span class="string">&quot;AddForeignKey&quot;</span>,
@@ -1153,6 +1116,7 @@
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum</span> <span class="ident">TableChange</span> {
     <span class="ident">AddColumn</span> {
         <span class="ident">column_id</span>: <span class="ident">ColumnId</span>,
+        <span class="ident">has_virtual_default</span>: <span class="ident">bool</span>,
     },
     <span class="ident">AlterColumn</span>(<span class="ident">AlterColumn</span>),
     <span class="ident">DropColumn</span> {
@@ -1166,15 +1130,6 @@
     <span class="ident">DropPrimaryKey</span>,
     <span class="ident">AddPrimaryKey</span>,
     <span class="ident">RenamePrimaryKey</span>,
-}
-
-<span class="kw">impl</span> <span class="ident">TableChange</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">as_add_column</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ColumnId</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">TableChange::AddColumn</span> { <span class="ident">column_id</span> } =&gt; <span class="prelude-val">Some</span>(<span class="kw-2">*</span><span class="ident">column_id</span>),
-            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
-        }
-    }
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>)]</span>
@@ -1240,6 +1195,7 @@
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>)]</span>
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">RedefineTable</span> {
     <span class="kw">pub</span> <span class="ident">added_columns</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ColumnId</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">added_columns_with_virtual_defaults</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ColumnId</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">dropped_columns</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ColumnId</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">dropped_primary_key</span>: <span class="ident">bool</span>,
     <span class="kw">pub</span> <span class="ident">column_pairs</span>: <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">Pair</span><span class="op">&lt;</span><span class="ident">ColumnId</span><span class="op">&gt;</span>, <span class="ident">ColumnChanges</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ColumnTypeChange</span><span class="op">&gt;</span>)<span class="op">&gt;</span>,

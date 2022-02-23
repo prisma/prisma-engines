@@ -65,8 +65,8 @@
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">MongoDbMigration</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">previous</span>: <span class="ident">MongoSchema</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">next</span>: <span class="ident">MongoSchema</span>,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">previous</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">MongoSchema</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">next</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">MongoSchema</span><span class="op">&gt;</span>,
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">steps</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">MongoDbMigrationStep</span><span class="op">&gt;</span>,
 }
 

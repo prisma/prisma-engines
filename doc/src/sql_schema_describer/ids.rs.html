@@ -44,7 +44,7 @@
 <span class="doccomment">/// The identifier for a table in a SqlSchema. Use it with the indexing syntax:</span>
 <span class="doccomment">/// `let table = schema[table_id];`</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">Hash</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">TableId</span>(<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">u32</span>);
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">TableId</span>(<span class="kw">pub</span> <span class="ident">u32</span>);
 
 <span class="kw">impl</span> <span class="ident">Index</span><span class="op">&lt;</span><span class="ident">TableId</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">SqlSchema</span> {
     <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">Table</span>;
@@ -68,7 +68,7 @@
 
 <span class="doccomment">/// The identifier for a column in a SqlSchema.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">Hash</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ColumnId</span>(<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">u32</span>);
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ColumnId</span>(<span class="kw">pub</span> <span class="ident">u32</span>);
 
 <span class="kw">impl</span> <span class="ident">Index</span><span class="op">&lt;</span><span class="ident">ColumnId</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Table</span> {
     <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">Column</span>;

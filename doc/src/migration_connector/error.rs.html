@@ -229,6 +229,17 @@
 <span id="228">228</span>
 <span id="229">229</span>
 <span id="230">230</span>
+<span id="231">231</span>
+<span id="232">232</span>
+<span id="233">233</span>
+<span id="234">234</span>
+<span id="235">235</span>
+<span id="236">236</span>
+<span id="237">237</span>
+<span id="238">238</span>
+<span id="239">239</span>
+<span id="240">240</span>
+<span id="241">241</span>
 </pre><pre class="rust"><code><span class="doccomment">//! The migration connector ConnectorError type.</span>
 
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::migrations_directory</span>::{<span class="ident">ListMigrationsError</span>, <span class="ident">ReadMigrationScriptError</span>};
@@ -382,6 +393,11 @@
         }))
     }
 
+    <span class="doccomment">/// Is this error&#39;s cause the passed in user facing error?</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_user_facing_error</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">UserFacingError</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="ident">error_code</span>() <span class="op">==</span> <span class="prelude-val">Some</span>(<span class="ident">T::ERROR_CODE</span>)
+    }
+
     <span class="doccomment">/// Access the inner `user_facing_error::KnownError`.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">known_error</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">KnownError</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">user_facing_error</span>.<span class="ident">as_ref</span>()
@@ -413,7 +429,7 @@
     <span class="doccomment">/// Construct an UrlParseError.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">url_parse_error</span>(<span class="ident">err</span>: <span class="kw">impl</span> <span class="ident">Display</span>) -&gt; <span class="self">Self</span> {
         <span class="ident"><span class="self">Self</span>::user_facing</span>(<span class="ident">user_facing_errors::common::InvalidConnectionString</span> {
-            <span class="ident">details</span>: <span class="ident">err</span>.<span class="ident">to_string</span>(),
+            <span class="ident">details</span>: <span class="ident">invalid_connection_string_description</span>(<span class="ident">err</span>),
         })
     }
 }
@@ -448,6 +464,12 @@
     <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">err</span>: <span class="ident">ListMigrationsError</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">ConnectorError::from_msg</span>(<span class="ident">err</span>.<span class="ident">to_string</span>())
     }
+}
+
+<span class="kw">fn</span> <span class="ident">invalid_connection_string_description</span>(<span class="ident">error_details</span>: <span class="kw">impl</span> <span class="ident">Display</span>) -&gt; <span class="ident">String</span> {
+    <span class="kw">let</span> <span class="ident">docs</span> <span class="op">=</span> <span class="string">r#&quot;https://www.prisma.io/docs/reference/database-reference/connection-urls&quot;#</span>;
+
+    <span class="macro">format!</span> {<span class="string">r#&quot;{} in database URL. Please refer to the documentation in {} for constructing a correct connection string. In some cases, certain characters must be escaped. Please check the string for any illegal characters.&quot;#</span>, <span class="ident">error_details</span>, <span class="ident">docs</span>}
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>

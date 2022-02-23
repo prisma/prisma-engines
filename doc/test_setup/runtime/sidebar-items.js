@@ -1,1 +1,1 @@
-initSidebarItems({"fn":[["run_with_tokio",""],["test_tokio_runtime",""]]});
+initSidebarItems({"fn":[["run_with_thread_local_runtime",""],["run_with_tokio",""],["test_tokio_runtime",""]]});

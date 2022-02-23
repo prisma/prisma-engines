@@ -72,49 +72,28 @@
 <span id="71">71</span>
 <span id="72">72</span>
 <span id="73">73</span>
-<span id="74">74</span>
-<span id="75">75</span>
-<span id="76">76</span>
-<span id="77">77</span>
-<span id="78">78</span>
-<span id="79">79</span>
-<span id="80">80</span>
-<span id="81">81</span>
-<span id="82">82</span>
-<span id="83">83</span>
-<span id="84">84</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">migration_core</span>::{
-    <span class="ident">commands::DiagnoseMigrationHistoryInput</span>, <span class="ident">commands::DiagnoseMigrationHistoryOutput</span>, <span class="ident">CoreError</span>, <span class="ident">CoreResult</span>,
-    <span class="ident">GenericApi</span>,
+    <span class="ident">commands::DiagnoseMigrationHistoryOutput</span>,
+    <span class="ident">commands</span>::{<span class="ident">diagnose_migration_history</span>, <span class="ident">DiagnoseMigrationHistoryInput</span>},
+    <span class="ident">migration_connector::MigrationConnector</span>,
+    <span class="ident">CoreError</span>, <span class="ident">CoreResult</span>,
 };
 <span class="kw">use</span> <span class="ident">tempfile::TempDir</span>;
 
 <span class="attribute">#[<span class="ident">must_use</span> <span class="op">=</span> <span class="string">&quot;This struct does nothing on its own. See DiagnoseMigrationHistory::send()&quot;</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">DiagnoseMigrationHistory</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="ident">api</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw">dyn</span> <span class="ident">GenericApi</span>,
+    <span class="ident">api</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="kw">dyn</span> <span class="ident">MigrationConnector</span>,
     <span class="ident">migrations_directory</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">TempDir</span>,
     <span class="ident">opt_in_to_shadow_database</span>: <span class="ident">bool</span>,
-    <span class="ident">rt</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">tokio::runtime::Runtime</span><span class="op">&gt;</span>,
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">DiagnoseMigrationHistory</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">api</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw">dyn</span> <span class="ident">GenericApi</span>, <span class="ident">migrations_directory</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">TempDir</span>) -&gt; <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">api</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="kw">dyn</span> <span class="ident">MigrationConnector</span>, <span class="ident">migrations_directory</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">TempDir</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">DiagnoseMigrationHistory</span> {
             <span class="ident">api</span>,
             <span class="ident">migrations_directory</span>,
             <span class="ident">opt_in_to_shadow_database</span>: <span class="bool-val">false</span>,
-            <span class="ident">rt</span>: <span class="prelude-val">None</span>,
         }
-    }
-
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_sync</span>(
-        <span class="ident">api</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw">dyn</span> <span class="ident">GenericApi</span>,
-        <span class="ident">migrations_directory</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">TempDir</span>,
-        <span class="ident">rt</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">tokio::runtime::Runtime</span>,
-    ) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">dmh</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::new</span>(<span class="ident">api</span>, <span class="ident">migrations_directory</span>);
-        <span class="ident">dmh</span>.<span class="ident">rt</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">rt</span>);
-        <span class="ident">dmh</span>
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">opt_in_to_shadow_database</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">opt_in_to_shadow_database</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
@@ -124,35 +103,34 @@
     }
 
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">send</span>(<span class="self">self</span>) -&gt; <span class="ident">CoreResult</span><span class="op">&lt;</span><span class="ident">DiagnoseMigrationHistoryAssertions</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">output</span> <span class="op">=</span> <span class="self">self</span>
-            .<span class="ident">api</span>
-            .<span class="ident">diagnose_migration_history</span>(<span class="ident">DiagnoseMigrationHistoryInput</span> {
+        <span class="kw">let</span> <span class="ident">output</span> <span class="op">=</span> <span class="ident">diagnose_migration_history</span>(
+            <span class="ident">DiagnoseMigrationHistoryInput</span> {
                 <span class="ident">migrations_directory_path</span>: <span class="self">self</span>.<span class="ident">migrations_directory</span>.<span class="ident">path</span>().<span class="ident">to_str</span>().<span class="ident">unwrap</span>().<span class="ident">to_owned</span>(),
                 <span class="ident">opt_in_to_shadow_database</span>: <span class="self">self</span>.<span class="ident">opt_in_to_shadow_database</span>,
-            })
-            .<span class="kw">await</span><span class="question-mark">?</span>;
+            },
+            <span class="self">self</span>.<span class="ident">api</span>,
+        )
+        .<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="prelude-val">Ok</span>(<span class="ident">DiagnoseMigrationHistoryAssertions</span> {
             <span class="ident">output</span>,
-            <span class="ident">_api</span>: <span class="self">self</span>.<span class="ident">api</span>,
             <span class="ident">_migrations_directory</span>: <span class="self">self</span>.<span class="ident">migrations_directory</span>,
         })
     }
 
     <span class="attribute">#[<span class="ident">track_caller</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">send_sync</span>(<span class="self">self</span>) -&gt; <span class="ident">DiagnoseMigrationHistoryAssertions</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">rt</span>.<span class="ident">unwrap</span>().<span class="ident">block_on</span>(<span class="self">self</span>.<span class="ident">send</span>()).<span class="ident">unwrap</span>()
+        <span class="ident">test_setup::runtime::run_with_thread_local_runtime</span>(<span class="self">self</span>.<span class="ident">send</span>()).<span class="ident">unwrap</span>()
     }
 
     <span class="attribute">#[<span class="ident">track_caller</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">send_unwrap_err</span>(<span class="self">self</span>) -&gt; <span class="ident">CoreError</span> {
-        <span class="self">self</span>.<span class="ident">rt</span>.<span class="ident">unwrap</span>().<span class="ident">block_on</span>(<span class="self">self</span>.<span class="ident">send</span>()).<span class="ident">unwrap_err</span>()
+        <span class="ident">test_setup::runtime::run_with_thread_local_runtime</span>(<span class="self">self</span>.<span class="ident">send</span>()).<span class="ident">unwrap_err</span>()
     }
 }
 
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">DiagnoseMigrationHistoryAssertions</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
     <span class="ident">output</span>: <span class="ident">DiagnoseMigrationHistoryOutput</span>,
-    <span class="ident">_api</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw">dyn</span> <span class="ident">GenericApi</span>,
     <span class="ident">_migrations_directory</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">TempDir</span>,
 }
 

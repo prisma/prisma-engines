@@ -68,24 +68,31 @@
 <span id="67">67</span>
 <span id="68">68</span>
 <span id="69">69</span>
+<span id="70">70</span>
+<span id="71">71</span>
+<span id="72">72</span>
+<span id="73">73</span>
+<span id="74">74</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">json_rpc::types</span>::<span class="kw-2">*</span>, <span class="ident">CoreError</span>, <span class="ident">CoreResult</span>};
 <span class="kw">use</span> <span class="ident">migration_connector::MigrationConnector</span>;
 <span class="kw">use</span> <span class="ident">user_facing_errors::migration_engine</span>::{<span class="ident">CannotRollBackSucceededMigration</span>, <span class="ident">CannotRollBackUnappliedMigration</span>};
 
 <span class="doccomment">/// Mark a migration as rolled back.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">mark_migration_rolled_back</span>(
+<span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">mark_migration_rolled_back</span>(
     <span class="ident">input</span>: <span class="ident">MarkMigrationRolledBackInput</span>,
-    <span class="ident">connector</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">MigrationConnector</span>,
+    <span class="ident">connector</span>: <span class="kw-2">&amp;mut</span> <span class="kw">dyn</span> <span class="ident">MigrationConnector</span>,
 ) -&gt; <span class="ident">CoreResult</span><span class="op">&lt;</span><span class="ident">MarkMigrationRolledBackOutput</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">persistence</span> <span class="op">=</span> <span class="ident">connector</span>.<span class="ident">migration_persistence</span>();
-
     <span class="ident">connector</span>.<span class="ident">acquire_lock</span>().<span class="kw">await</span><span class="question-mark">?</span>;
 
-    <span class="kw">let</span> <span class="ident">all_migrations</span> <span class="op">=</span> <span class="ident">persistence</span>.<span class="ident">list_migrations</span>().<span class="kw">await</span><span class="question-mark">?</span>.<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">_err</span><span class="op">|</span> {
-        <span class="ident">CoreError::from_msg</span>(
-            <span class="string">&quot;Invariant violation: called markMigrationRolledBack on a database without migrations table.&quot;</span>.<span class="ident">into</span>(),
-        )
-    })<span class="question-mark">?</span>;
+    <span class="kw">let</span> <span class="ident">all_migrations</span> <span class="op">=</span> <span class="ident">connector</span>
+        .<span class="ident">migration_persistence</span>()
+        .<span class="ident">list_migrations</span>()
+        .<span class="kw">await</span><span class="question-mark">?</span>
+        .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">_err</span><span class="op">|</span> {
+            <span class="ident">CoreError::from_msg</span>(
+                <span class="string">&quot;Invariant violation: called markMigrationRolledBack on a database without migrations table.&quot;</span>.<span class="ident">into</span>(),
+            )
+        })<span class="question-mark">?</span>;
 
     <span class="kw">let</span> <span class="ident">relevant_migrations</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">all_migrations</span>
         .<span class="ident">into_iter</span>()
@@ -117,7 +124,10 @@
             <span class="ident">migration_name</span> <span class="op">=</span> <span class="ident">migration</span>.<span class="ident">migration_name</span>.<span class="ident">as_str</span>(),
             <span class="string">&quot;Marking migration as rolled back.&quot;</span>
         );
-        <span class="ident">persistence</span>.<span class="ident">mark_migration_rolled_back_by_id</span>(<span class="kw-2">&amp;</span><span class="ident">migration</span>.<span class="ident">id</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="ident">connector</span>
+            .<span class="ident">migration_persistence</span>()
+            .<span class="ident">mark_migration_rolled_back_by_id</span>(<span class="kw-2">&amp;</span><span class="ident">migration</span>.<span class="ident">id</span>)
+            .<span class="kw">await</span><span class="question-mark">?</span>;
     }
 
     <span class="prelude-val">Ok</span>(<span class="ident">MarkMigrationRolledBackOutput</span> {})

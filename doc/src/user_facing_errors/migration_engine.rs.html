@@ -284,8 +284,6 @@
 <span id="283">283</span>
 <span id="284">284</span>
 <span id="285">285</span>
-<span id="286">286</span>
-<span id="287">287</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">serde::Serialize</span>;
 <span class="kw">use</span> <span class="ident">user_facing_error_macros</span>::<span class="kw-2">*</span>;
 
@@ -335,11 +333,9 @@
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">UserFacingError</span>, <span class="ident">Serialize</span>)]</span>
 <span class="attribute">#[<span class="ident">user_facing</span>(
     <span class="ident">code</span> <span class="op">=</span> <span class="string">&quot;P3005&quot;</span>,
-    <span class="ident">message</span> <span class="op">=</span> <span class="string">&quot;The database schema for `{database_name}` is not empty. Read more about how to baseline an existing production database: https://pris.ly/d/migrate-baseline&quot;</span>
+    <span class="ident">message</span> <span class="op">=</span> <span class="string">&quot;The database schema is not empty. Read more about how to baseline an existing production database: https://pris.ly/d/migrate-baseline&quot;</span>
 )]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">DatabaseSchemaNotEmpty</span> {
-    <span class="kw">pub</span> <span class="ident">database_name</span>: <span class="ident">String</span>,
-}
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">DatabaseSchemaNotEmpty</span>;
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Serialize</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">MigrationDoesNotApplyCleanly</span> {

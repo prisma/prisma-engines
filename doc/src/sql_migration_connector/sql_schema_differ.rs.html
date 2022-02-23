@@ -477,6 +477,24 @@
 <span id="476">476</span>
 <span id="477">477</span>
 <span id="478">478</span>
+<span id="479">479</span>
+<span id="480">480</span>
+<span id="481">481</span>
+<span id="482">482</span>
+<span id="483">483</span>
+<span id="484">484</span>
+<span id="485">485</span>
+<span id="486">486</span>
+<span id="487">487</span>
+<span id="488">488</span>
+<span id="489">489</span>
+<span id="490">490</span>
+<span id="491">491</span>
+<span id="492">492</span>
+<span id="493">493</span>
+<span id="494">494</span>
+<span id="495">495</span>
+<span id="496">496</span>
 </pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">column</span>;
 <span class="kw">mod</span> <span class="ident">differ_database</span>;
 <span class="kw">mod</span> <span class="ident">enums</span>;
@@ -489,16 +507,17 @@
 
 <span class="kw">use</span> <span class="ident"><span class="self">self</span>::differ_database::DifferDatabase</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::{
+    <span class="ident">database_schema::SqlDatabaseSchema</span>,
     <span class="ident">pair::Pair</span>,
     <span class="ident">sql_migration</span>::{<span class="self">self</span>, <span class="ident">AlterColumn</span>, <span class="ident">AlterTable</span>, <span class="ident">RedefineTable</span>, <span class="ident">SqlMigrationStep</span>, <span class="ident">TableChange</span>},
-    <span class="ident">SqlFlavour</span>, <span class="ident">SqlSchema</span>,
+    <span class="ident">SqlFlavour</span>,
 };
 <span class="kw">use</span> <span class="ident">column::ColumnTypeChange</span>;
 <span class="kw">use</span> <span class="ident">sql_schema_describer</span>::{<span class="ident">walkers::ForeignKeyWalker</span>, <span class="ident">ColumnId</span>, <span class="ident">TableId</span>};
 <span class="kw">use</span> <span class="ident">std::collections::HashSet</span>;
 <span class="kw">use</span> <span class="ident">table::TableDiffer</span>;
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">calculate_steps</span>(<span class="ident">schemas</span>: <span class="ident">Pair</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">SqlSchema</span><span class="op">&gt;</span>, <span class="ident">flavour</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">SqlFlavour</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">SqlMigrationStep</span><span class="op">&gt;</span> {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">calculate_steps</span>(<span class="ident">schemas</span>: <span class="ident">Pair</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">SqlDatabaseSchema</span><span class="op">&gt;</span>, <span class="ident">flavour</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">SqlFlavour</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">SqlMigrationStep</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">db</span> <span class="op">=</span> <span class="ident">DifferDatabase::new</span>(<span class="ident">schemas</span>, <span class="ident">flavour</span>);
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">steps</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">SqlMigrationStep</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
 
@@ -656,6 +675,10 @@
     <span class="kw">for</span> <span class="ident">column</span> <span class="kw">in</span> <span class="ident">differ</span>.<span class="ident">added_columns</span>() {
         <span class="ident">changes</span>.<span class="ident">push</span>(<span class="ident">TableChange::AddColumn</span> {
             <span class="ident">column_id</span>: <span class="ident">column</span>.<span class="ident">column_id</span>(),
+            <span class="ident">has_virtual_default</span>: <span class="ident">next_column_has_virtual_default</span>(
+                (<span class="ident">column</span>.<span class="ident">table</span>().<span class="ident">table_id</span>(), <span class="ident">column</span>.<span class="ident">column_id</span>()),
+                <span class="ident">differ</span>.<span class="ident">db</span>,
+            ),
         })
     }
 }
@@ -860,6 +883,11 @@
                 <span class="ident">table_ids</span>: <span class="ident">differ</span>.<span class="ident">tables</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">t</span><span class="op">|</span> <span class="ident">t</span>.<span class="ident">table_id</span>()),
                 <span class="ident">dropped_primary_key</span>: <span class="ident">dropped_primary_key</span>(<span class="kw-2">&amp;</span><span class="ident">differ</span>).<span class="ident">is_some</span>(),
                 <span class="ident">added_columns</span>: <span class="ident">differ</span>.<span class="ident">added_columns</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">col</span><span class="op">|</span> <span class="ident">col</span>.<span class="ident">column_id</span>()).<span class="ident">collect</span>(),
+                <span class="ident">added_columns_with_virtual_defaults</span>: <span class="ident">differ</span>
+                    .<span class="ident">added_columns</span>()
+                    .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">col</span><span class="op">|</span> <span class="ident">next_column_has_virtual_default</span>((<span class="ident">col</span>.<span class="ident">table</span>().<span class="ident">table_id</span>(), <span class="ident">col</span>.<span class="ident">column_id</span>()), <span class="ident">differ</span>.<span class="ident">db</span>))
+                    .<span class="ident">map</span>(<span class="op">|</span><span class="ident">col</span><span class="op">|</span> <span class="ident">col</span>.<span class="ident">column_id</span>())
+                    .<span class="ident">collect</span>(),
                 <span class="ident">dropped_columns</span>: <span class="ident">differ</span>.<span class="ident">dropped_columns</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">col</span><span class="op">|</span> <span class="ident">col</span>.<span class="ident">column_id</span>()).<span class="ident">collect</span>(),
                 <span class="ident">column_pairs</span>,
             }
@@ -954,6 +982,14 @@
             })
         }
     }
+}
+
+<span class="kw">fn</span> <span class="ident">next_column_has_virtual_default</span>((<span class="ident">table_id</span>, <span class="ident">column_id</span>): (<span class="ident">TableId</span>, <span class="ident">ColumnId</span>), <span class="ident">db</span>: <span class="kw-2">&amp;</span><span class="ident">DifferDatabase</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">bool</span> {
+    <span class="ident">db</span>.<span class="ident">schemas</span>()
+        .<span class="ident">next</span>()
+        .<span class="ident">prisma_level_defaults</span>
+        .<span class="ident">binary_search</span>(<span class="kw-2">&amp;</span>(<span class="ident">table_id</span>.<span class="number">0</span>, <span class="ident">column_id</span>.<span class="number">0</span>))
+        .<span class="ident">is_ok</span>()
 }
 </code></pre></div>
 </section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="sql_migration_connector" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>

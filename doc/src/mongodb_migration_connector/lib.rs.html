@@ -167,6 +167,33 @@
 <span id="166">166</span>
 <span id="167">167</span>
 <span id="168">168</span>
+<span id="169">169</span>
+<span id="170">170</span>
+<span id="171">171</span>
+<span id="172">172</span>
+<span id="173">173</span>
+<span id="174">174</span>
+<span id="175">175</span>
+<span id="176">176</span>
+<span id="177">177</span>
+<span id="178">178</span>
+<span id="179">179</span>
+<span id="180">180</span>
+<span id="181">181</span>
+<span id="182">182</span>
+<span id="183">183</span>
+<span id="184">184</span>
+<span id="185">185</span>
+<span id="186">186</span>
+<span id="187">187</span>
+<span id="188">188</span>
+<span id="189">189</span>
+<span id="190">190</span>
+<span id="191">191</span>
+<span id="192">192</span>
+<span id="193">193</span>
+<span id="194">194</span>
+<span id="195">195</span>
 </pre><pre class="rust"><code><span class="doccomment">//! The MongoDB migration connector.</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! It is intentionally structured after sql-migration-connector and implements the same</span>
@@ -184,11 +211,9 @@
 <span class="kw">use</span> <span class="ident">datamodel::common::preview_features::PreviewFeature</span>;
 <span class="kw">use</span> <span class="ident">enumflags2::BitFlags</span>;
 <span class="kw">use</span> <span class="ident">migration::MongoDbMigration</span>;
-<span class="kw">use</span> <span class="ident">migration_connector</span>::{
-    <span class="ident">ConnectorError</span>, <span class="ident">ConnectorHost</span>, <span class="ident">ConnectorResult</span>, <span class="ident">DiffTarget</span>, <span class="ident">EmptyHost</span>, <span class="ident">Migration</span>, <span class="ident">MigrationConnector</span>,
-};
+<span class="kw">use</span> <span class="ident">migration_connector</span>::{<span class="ident">migrations_directory::MigrationDirectory</span>, <span class="kw-2">*</span>};
 <span class="kw">use</span> <span class="ident">mongodb_schema_describer::MongoSchema</span>;
-<span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
+<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">future</span>, <span class="ident">sync::Arc</span>};
 <span class="kw">use</span> <span class="ident">tokio::sync::OnceCell</span>;
 
 <span class="doccomment">/// The top-level MongoDB migration connector.</span>
@@ -200,10 +225,10 @@
 }
 
 <span class="kw">impl</span> <span class="ident">MongoDbMigrationConnector</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">connection_string</span>: <span class="ident">String</span>, <span class="ident">preview_features</span>: <span class="ident">BitFlags</span><span class="op">&lt;</span><span class="ident">PreviewFeature</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">params</span>: <span class="ident">ConnectorParams</span>) -&gt; <span class="self">Self</span> {
         <span class="self">Self</span> {
-            <span class="ident">connection_string</span>,
-            <span class="ident">preview_features</span>,
+            <span class="ident">connection_string</span>: <span class="ident">params</span>.<span class="ident">connection_string</span>,
+            <span class="ident">preview_features</span>: <span class="ident">params</span>.<span class="ident">preview_features</span>,
             <span class="ident">client</span>: <span class="ident">OnceCell::new</span>(),
             <span class="ident">host</span>: <span class="ident">Arc::new</span>(<span class="ident">EmptyHost</span>),
         }
@@ -224,65 +249,82 @@
         <span class="kw">match</span> <span class="ident">target</span> {
             <span class="ident">DiffTarget::Datamodel</span>(<span class="ident">schema</span>) =&gt; {
                 <span class="kw">let</span> <span class="ident">validated_schema</span> <span class="op">=</span>
-                    <span class="ident">datamodel::parse_schema_parserdb</span>(<span class="kw-2">&amp;</span><span class="ident">schema</span>).<span class="ident">map_err</span>(<span class="ident">ConnectorError::new_schema_parser_error</span>)<span class="question-mark">?</span>;
+                    <span class="ident">datamodel::parse_schema_parserdb</span>(<span class="ident">schema</span>).<span class="ident">map_err</span>(<span class="ident">ConnectorError::new_schema_parser_error</span>)<span class="question-mark">?</span>;
                 <span class="prelude-val">Ok</span>(<span class="ident">schema_calculator::calculate</span>(<span class="kw-2">&amp;</span><span class="ident">validated_schema</span>))
             }
-            <span class="ident">DiffTarget::Database</span>(<span class="ident">url</span>) =&gt; {
-                <span class="kw">if</span> <span class="self">self</span>.<span class="ident">connection_string</span> <span class="op">==</span> <span class="ident">url</span> {
-                    <span class="self">self</span>.<span class="ident">client</span>().<span class="kw">await</span><span class="question-mark">?</span>.<span class="ident">describe</span>().<span class="kw">await</span>
-                } <span class="kw">else</span> {
-                    <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">Client::connect</span>(<span class="kw-2">&amp;</span><span class="ident">url</span>, <span class="self">self</span>.<span class="ident">preview_features</span>).<span class="kw">await</span><span class="question-mark">?</span>;
-                    <span class="ident">client</span>.<span class="ident">describe</span>().<span class="kw">await</span>
-                }
-            }
+            <span class="ident">DiffTarget::Database</span> =&gt; <span class="self">self</span>.<span class="ident">client</span>().<span class="kw">await</span><span class="question-mark">?</span>.<span class="ident">describe</span>().<span class="kw">await</span>,
             <span class="ident">DiffTarget::Migrations</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Err</span>(<span class="ident">unsupported_command_error</span>()),
             <span class="ident">DiffTarget::Empty</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">MongoSchema::default</span>()),
         }
     }
 }
 
-<span class="attribute">#[<span class="ident">async_trait::async_trait</span>]</span>
 <span class="kw">impl</span> <span class="ident">MigrationConnector</span> <span class="kw">for</span> <span class="ident">MongoDbMigrationConnector</span> {
-    <span class="kw">fn</span> <span class="ident">connection_string</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">connection_string</span>
+    <span class="kw">fn</span> <span class="ident">connection_string</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
+        <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">connection_string</span>)
+    }
+
+    <span class="kw">fn</span> <span class="ident">database_schema_from_diff_target</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
+        <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="self">self</span>,
+        <span class="ident">diff_target</span>: <span class="ident">DiffTarget</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
+        <span class="ident">_shadow_database_connection_string</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+    ) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">ConnectorResult</span><span class="op">&lt;</span><span class="ident">DatabaseSchema</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+        <span class="ident">Box::pin</span>(<span class="kw">async</span> {
+            <span class="kw">let</span> <span class="ident">schema</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">mongodb_schema_from_diff_target</span>(<span class="ident">diff_target</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+            <span class="prelude-val">Ok</span>(<span class="ident">DatabaseSchema::new</span>(<span class="ident">schema</span>))
+        })
     }
 
     <span class="kw">fn</span> <span class="ident">host</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">ConnectorHost</span><span class="op">&gt;</span> {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">host</span>
     }
 
+    <span class="kw">fn</span> <span class="ident">apply_migration</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">migration</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Migration</span>) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">ConnectorResult</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+        <span class="ident">Box::pin</span>(<span class="self">self</span>.<span class="ident">apply_migration_impl</span>(<span class="ident">migration</span>))
+    }
+
+    <span class="kw">fn</span> <span class="ident">apply_script</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">_migration_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">_script</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span> {
+        <span class="ident">Box::pin</span>(<span class="ident">future::ready</span>(<span class="prelude-val">Err</span>(<span class="ident"><span class="kw">crate</span>::unsupported_command_error</span>())))
+    }
+
     <span class="kw">fn</span> <span class="ident">connector_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
         <span class="string">&quot;mongodb&quot;</span>
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">create_database</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">ConnectorResult</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">client</span>().<span class="kw">await</span><span class="question-mark">?</span>.<span class="ident">db_name</span>();
-        <span class="macro">tracing::warn!</span>(<span class="string">&quot;MongoDB database will be created on first use.&quot;</span>);
-        <span class="prelude-val">Ok</span>(<span class="ident">name</span>.<span class="ident">into</span>())
+    <span class="kw">fn</span> <span class="ident">create_database</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">ConnectorResult</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+        <span class="ident">Box::pin</span>(<span class="kw">async</span> {
+            <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">client</span>().<span class="kw">await</span><span class="question-mark">?</span>.<span class="ident">db_name</span>();
+            <span class="macro">tracing::warn!</span>(<span class="string">&quot;MongoDB database will be created on first use.&quot;</span>);
+            <span class="prelude-val">Ok</span>(<span class="ident">name</span>.<span class="ident">into</span>())
+        })
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">db_execute</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_url</span>: <span class="ident">String</span>, <span class="ident">_script</span>: <span class="ident">String</span>) -&gt; <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="prelude-val">Err</span>(<span class="ident">ConnectorError::from_msg</span>(
+    <span class="kw">fn</span> <span class="ident">db_execute</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">_script</span>: <span class="ident">String</span>) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span> {
+        <span class="ident">Box::pin</span>(<span class="ident">future::ready</span>(<span class="prelude-val">Err</span>(<span class="ident">ConnectorError::from_msg</span>(
             <span class="string">&quot;dbExecute is not supported on MongoDB&quot;</span>.<span class="ident">to_owned</span>(),
-        ))
+        ))))
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">ensure_connection_validity</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="prelude-val">Ok</span>(())
+    <span class="kw">fn</span> <span class="ident">empty_database_schema</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">DatabaseSchema</span> {
+        <span class="ident">DatabaseSchema::new</span>(<span class="ident">MongoSchema::default</span>())
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">version</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">migration_connector::ConnectorResult</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Ok</span>(<span class="string">&quot;4 or 5&quot;</span>.<span class="ident">to_owned</span>())
+    <span class="kw">fn</span> <span class="ident">ensure_connection_validity</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span> {
+        <span class="ident">Box::pin</span>(<span class="ident">future::ready</span>(<span class="prelude-val">Ok</span>(())))
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">diff</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">from</span>: <span class="ident">DiffTarget</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">to</span>: <span class="ident">DiffTarget</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">ConnectorResult</span><span class="op">&lt;</span><span class="ident">Migration</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">from</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">mongodb_schema_from_diff_target</span>(<span class="ident">from</span>).<span class="kw">await</span><span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">to</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">mongodb_schema_from_diff_target</span>(<span class="ident">to</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+    <span class="kw">fn</span> <span class="ident">version</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">migration_connector::ConnectorResult</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+        <span class="ident">Box::pin</span>(<span class="ident">future::ready</span>(<span class="prelude-val">Ok</span>(<span class="string">&quot;4 or 5&quot;</span>.<span class="ident">to_owned</span>())))
+    }
+
+    <span class="kw">fn</span> <span class="ident">diff</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">from</span>: <span class="ident">DatabaseSchema</span>, <span class="ident">to</span>: <span class="ident">DatabaseSchema</span>) -&gt; <span class="ident">ConnectorResult</span><span class="op">&lt;</span><span class="ident">Migration</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">from</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">MongoSchema</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">from</span>.<span class="ident">downcast</span>();
+        <span class="kw">let</span> <span class="ident">to</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">MongoSchema</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">to</span>.<span class="ident">downcast</span>();
         <span class="prelude-val">Ok</span>(<span class="ident">Migration::new</span>(<span class="ident">differ::diff</span>(<span class="ident">from</span>, <span class="ident">to</span>)))
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">drop_database</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">client</span>().<span class="kw">await</span><span class="question-mark">?</span>.<span class="ident">drop_database</span>().<span class="kw">await</span>
+    <span class="kw">fn</span> <span class="ident">drop_database</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span> {
+        <span class="ident">Box::pin</span>(<span class="kw">async</span> { <span class="self">self</span>.<span class="ident">client</span>().<span class="kw">await</span><span class="question-mark">?</span>.<span class="ident">drop_database</span>().<span class="kw">await</span> })
     }
 
     <span class="kw">fn</span> <span class="ident">migration_file_extension</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
@@ -297,23 +339,35 @@
         <span class="ident">migration</span>.<span class="ident">downcast_ref</span>::<span class="op">&lt;</span><span class="ident">MongoDbMigration</span><span class="op">&gt;</span>().<span class="ident">summary</span>()
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">reset</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">migration_connector::ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">client</span>().<span class="kw">await</span><span class="question-mark">?</span>.<span class="ident">drop_database</span>().<span class="kw">await</span>
+    <span class="kw">fn</span> <span class="ident">reset</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">migration_connector::ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span> {
+        <span class="ident">Box::pin</span>(<span class="kw">async</span> { <span class="self">self</span>.<span class="ident">client</span>().<span class="kw">await</span><span class="question-mark">?</span>.<span class="ident">drop_database</span>().<span class="kw">await</span> })
     }
 
-    <span class="kw">fn</span> <span class="ident">migration_persistence</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">migration_connector::MigrationPersistence</span> {
+    <span class="kw">fn</span> <span class="ident">migration_persistence</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="kw">dyn</span> <span class="ident">migration_connector::MigrationPersistence</span> {
         <span class="self">self</span>
     }
 
-    <span class="kw">fn</span> <span class="ident">database_migration_step_applier</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">migration_connector::DatabaseMigrationStepApplier</span> {
+    <span class="kw">fn</span> <span class="ident">destructive_change_checker</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="kw">dyn</span> <span class="ident">migration_connector::DestructiveChangeChecker</span> {
         <span class="self">self</span>
     }
 
-    <span class="kw">fn</span> <span class="ident">destructive_change_checker</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">migration_connector::DestructiveChangeChecker</span> {
-        <span class="self">self</span>
+    <span class="kw">fn</span> <span class="ident">acquire_lock</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span> {
+        <span class="ident">Box::pin</span>(<span class="ident">future::ready</span>(<span class="prelude-val">Ok</span>(())))
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">acquire_lock</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">render_script</span>(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        <span class="ident">_migration</span>: <span class="kw-2">&amp;</span><span class="ident">Migration</span>,
+        <span class="ident">_diagnostics</span>: <span class="kw-2">&amp;</span><span class="ident">DestructiveChangeDiagnostics</span>,
+    ) -&gt; <span class="ident">ConnectorResult</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
+        <span class="prelude-val">Err</span>(<span class="ident">ConnectorError::from_msg</span>(
+            <span class="string">&quot;Rendering to a script is not supported on MongoDB.&quot;</span>.<span class="ident">to_owned</span>(),
+        ))
+    }
+
+    <span class="kw">fn</span> <span class="ident">set_params</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">params</span>: <span class="ident">ConnectorParams</span>) -&gt; <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">connection_string</span> <span class="op">=</span> <span class="ident">params</span>.<span class="ident">connection_string</span>;
+        <span class="self">self</span>.<span class="ident">preview_features</span> <span class="op">=</span> <span class="ident">params</span>.<span class="ident">preview_features</span>;
         <span class="prelude-val">Ok</span>(())
     }
 
@@ -321,11 +375,11 @@
         <span class="self">self</span>.<span class="ident">host</span> <span class="op">=</span> <span class="ident">host</span>;
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">validate_migrations</span>(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">_migrations</span>: <span class="kw-2">&amp;</span>[<span class="ident">migration_connector::migrations_directory::MigrationDirectory</span>],
-    ) -&gt; <span class="ident">migration_connector::ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="prelude-val">Ok</span>(())
+    <span class="kw">fn</span> <span class="ident">validate_migrations</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
+        <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="self">self</span>,
+        <span class="ident">_migrations</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">MigrationDirectory</span>],
+    ) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span> {
+        <span class="ident">Box::pin</span>(<span class="ident">future::ready</span>(<span class="prelude-val">Ok</span>(())))
     }
 }
 

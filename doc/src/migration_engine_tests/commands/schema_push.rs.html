@@ -155,33 +155,27 @@
 <span id="154">154</span>
 <span id="155">155</span>
 <span id="156">156</span>
-<span id="157">157</span>
-<span id="158">158</span>
-<span id="159">159</span>
-<span id="160">160</span>
-<span id="161">161</span>
-<span id="162">162</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">migration_core</span>::{<span class="ident">json_rpc::types</span>::<span class="kw-2">*</span>, <span class="ident">CoreError</span>, <span class="ident">CoreResult</span>, <span class="ident">GenericApi</span>};
+</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">migration_core</span>::{
+    <span class="ident">commands::schema_push</span>, <span class="ident">json_rpc::types</span>::<span class="kw-2">*</span>, <span class="ident">migration_connector::MigrationConnector</span>, <span class="ident">CoreError</span>, <span class="ident">CoreResult</span>,
+};
 <span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">borrow::Cow</span>, <span class="ident">fmt::Debug</span>};
 <span class="kw">use</span> <span class="ident">tracing_futures::Instrument</span>;
 
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SchemaPush</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="ident">api</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw">dyn</span> <span class="ident">GenericApi</span>,
+    <span class="ident">api</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="kw">dyn</span> <span class="ident">MigrationConnector</span>,
     <span class="ident">schema</span>: <span class="ident">String</span>,
     <span class="ident">force</span>: <span class="ident">bool</span>,
     <span class="doccomment">/// Purely for logging diagnostics.</span>
     <span class="ident">migration_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span><span class="op">&gt;</span>,
-    <span class="ident">rt</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">tokio::runtime::Runtime</span>,
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">SchemaPush</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">api</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw">dyn</span> <span class="ident">GenericApi</span>, <span class="ident">schema</span>: <span class="ident">String</span>, <span class="ident">rt</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">tokio::runtime::Runtime</span>) -&gt; <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">api</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="kw">dyn</span> <span class="ident">MigrationConnector</span>, <span class="ident">schema</span>: <span class="ident">String</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">SchemaPush</span> {
             <span class="ident">api</span>,
             <span class="ident">schema</span>,
             <span class="ident">force</span>: <span class="bool-val">false</span>,
             <span class="ident">migration_id</span>: <span class="prelude-val">None</span>,
-            <span class="ident">rt</span>,
         }
     }
 
@@ -195,28 +189,23 @@
         <span class="self">self</span>
     }
 
-    <span class="kw">fn</span> <span class="ident">send_impl</span>(<span class="self">self</span>) -&gt; <span class="ident">CoreResult</span><span class="op">&lt;</span><span class="ident">SchemaPushAssertion</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">send_impl</span>(<span class="self">self</span>) -&gt; <span class="ident">CoreResult</span><span class="op">&lt;</span><span class="ident">SchemaPushAssertion</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">input</span> <span class="op">=</span> <span class="ident">SchemaPushInput</span> {
             <span class="ident">schema</span>: <span class="self">self</span>.<span class="ident">schema</span>,
             <span class="ident">force</span>: <span class="self">self</span>.<span class="ident">force</span>,
         };
 
-        <span class="kw">let</span> <span class="ident">fut</span> <span class="op">=</span> <span class="self">self</span>
-            .<span class="ident">api</span>
-            .<span class="ident">schema_push</span>(<span class="ident">input</span>)
+        <span class="kw">let</span> <span class="ident">fut</span> <span class="op">=</span> <span class="ident">schema_push</span>(<span class="ident">input</span>, <span class="self">self</span>.<span class="ident">api</span>)
             .<span class="ident">instrument</span>(<span class="macro">tracing::info_span!</span>(<span class="string">&quot;SchemaPush&quot;</span>, <span class="ident">migration_id</span> <span class="op">=</span> <span class="question-mark">?</span><span class="self">self</span>.<span class="ident">migration_id</span>));
 
-        <span class="kw">let</span> <span class="ident">output</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">rt</span>.<span class="ident">block_on</span>(<span class="ident">fut</span>)<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">output</span> <span class="op">=</span> <span class="ident">test_setup::runtime::run_with_thread_local_runtime</span>(<span class="ident">fut</span>)<span class="question-mark">?</span>;
 
-        <span class="prelude-val">Ok</span>(<span class="ident">SchemaPushAssertion</span> {
-            <span class="ident">result</span>: <span class="ident">output</span>,
-            <span class="ident">_api</span>: <span class="self">self</span>.<span class="ident">api</span>,
-        })
+        <span class="prelude-val">Ok</span>(<span class="ident">SchemaPushAssertion</span> { <span class="ident">result</span>: <span class="ident">output</span> })
     }
 
     <span class="doccomment">/// Execute the command and expect it to succeed.</span>
     <span class="attribute">#[<span class="ident">track_caller</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">send</span>(<span class="self">self</span>) -&gt; <span class="ident">SchemaPushAssertion</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">send</span>(<span class="self">self</span>) -&gt; <span class="ident">SchemaPushAssertion</span> {
         <span class="self">self</span>.<span class="ident">send_impl</span>().<span class="ident">unwrap</span>()
     }
 
@@ -227,18 +216,17 @@
     }
 }
 
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SchemaPushAssertion</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SchemaPushAssertion</span> {
     <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">result</span>: <span class="ident">SchemaPushOutput</span>,
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">_api</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw">dyn</span> <span class="ident">GenericApi</span>,
 }
 
-<span class="kw">impl</span> <span class="ident">Debug</span> <span class="kw">for</span> <span class="ident">SchemaPushAssertion</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
+<span class="kw">impl</span> <span class="ident">Debug</span> <span class="kw">for</span> <span class="ident">SchemaPushAssertion</span> {
     <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">std::fmt::Result</span> {
         <span class="self">self</span>.<span class="ident">result</span>.<span class="ident">fmt</span>(<span class="ident">f</span>)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">SchemaPushAssertion</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
+<span class="kw">impl</span> <span class="ident">SchemaPushAssertion</span> {
     <span class="doccomment">/// Asserts that the command produced no warning and no unexecutable migration message.</span>
     <span class="attribute">#[<span class="ident">track_caller</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">assert_green</span>(<span class="self">self</span>) -&gt; <span class="self">Self</span> {

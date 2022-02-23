@@ -36,18 +36,18 @@
 <span id="35">35</span>
 <span id="36">36</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::migrations_directory::MigrationDirectory</span>;
-<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">borrow::Cow</span>, <span class="ident">fmt::Debug</span>};
+<span class="kw">use</span> <span class="ident">std::fmt::Debug</span>;
 
 <span class="doccomment">/// Diffable things</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">DiffTarget</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// A Prisma schema</span>
-    <span class="ident">Datamodel</span>(<span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">str</span><span class="op">&gt;</span>),
+    <span class="doccomment">/// A Prisma schema.</span>
+    <span class="ident">Datamodel</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>),
     <span class="doccomment">/// A migrations folder. What is diffable is the state of the database schema at the end of the</span>
     <span class="doccomment">/// migrations history.</span>
-    <span class="ident">Migrations</span>(<span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, [<span class="ident">MigrationDirectory</span>]<span class="op">&gt;</span>),
+    <span class="ident">Migrations</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">MigrationDirectory</span>]),
     <span class="doccomment">/// A live database connection string.</span>
-    <span class="ident">Database</span>(<span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">str</span><span class="op">&gt;</span>),
-    <span class="doccomment">/// Assume an empty database schema</span>
+    <span class="ident">Database</span>,
+    <span class="doccomment">/// Assume an empty database schema.</span>
     <span class="ident">Empty</span>,
 }
 
@@ -56,7 +56,7 @@
         <span class="kw">match</span> <span class="self">self</span> {
             <span class="ident">DiffTarget::Datamodel</span>(<span class="kw">_</span>) =&gt; <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;DiffTarget::Datamodel&quot;</span>).<span class="ident">finish</span>(),
             <span class="ident">DiffTarget::Migrations</span>(<span class="kw">_</span>) =&gt; <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;DiffTarget::Migrations&quot;</span>).<span class="ident">finish</span>(),
-            <span class="ident">DiffTarget::Database</span>(<span class="kw">_</span>) =&gt; <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;DiffTarget::Database&quot;</span>).<span class="ident">finish</span>(),
+            <span class="ident">DiffTarget::Database</span> =&gt; <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;DiffTarget::Database&quot;</span>).<span class="ident">finish</span>(),
             <span class="ident">DiffTarget::Empty</span> =&gt; <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;DiffTarget::Empty&quot;</span>).<span class="ident">finish</span>(),
         }
     }

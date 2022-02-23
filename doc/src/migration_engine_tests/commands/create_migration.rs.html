@@ -195,47 +195,36 @@
 <span id="194">194</span>
 <span id="195">195</span>
 <span id="196">196</span>
-<span id="197">197</span>
-<span id="198">198</span>
-<span id="199">199</span>
-<span id="200">200</span>
-<span id="201">201</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">migration_core</span>::{<span class="ident">json_rpc::types</span>::<span class="kw-2">*</span>, <span class="ident">CoreError</span>, <span class="ident">CoreResult</span>, <span class="ident">GenericApi</span>};
+</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">migration_core</span>::{
+    <span class="ident">commands::create_migration</span>, <span class="ident">json_rpc::types</span>::<span class="kw-2">*</span>, <span class="ident">migration_connector::MigrationConnector</span>, <span class="ident">CoreError</span>, <span class="ident">CoreResult</span>,
+};
 <span class="kw">use</span> <span class="ident">pretty_assertions::assert_eq</span>;
-<span class="kw">use</span> <span class="ident">std::path::Path</span>;
+<span class="kw">use</span> <span class="ident">std::path</span>::{<span class="ident">Path</span>, <span class="ident">PathBuf</span>};
 <span class="kw">use</span> <span class="ident">tempfile::TempDir</span>;
+<span class="kw">use</span> <span class="ident">test_setup::runtime::run_with_thread_local_runtime</span>;
 
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CreateMigration</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="ident">api</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw">dyn</span> <span class="ident">GenericApi</span>,
+    <span class="ident">api</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="kw">dyn</span> <span class="ident">MigrationConnector</span>,
     <span class="ident">schema</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>,
     <span class="ident">migrations_directory</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">TempDir</span>,
     <span class="ident">draft</span>: <span class="ident">bool</span>,
     <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>,
-    <span class="ident">rt</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">tokio::runtime::Runtime</span><span class="op">&gt;</span>,
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">CreateMigration</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">api</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw">dyn</span> <span class="ident">GenericApi</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>, <span class="ident">schema</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>, <span class="ident">migrations_directory</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">TempDir</span>) -&gt; <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(
+        <span class="ident">api</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="kw">dyn</span> <span class="ident">MigrationConnector</span>,
+        <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>,
+        <span class="ident">schema</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>,
+        <span class="ident">migrations_directory</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">TempDir</span>,
+    ) -&gt; <span class="self">Self</span> {
         <span class="ident">CreateMigration</span> {
             <span class="ident">api</span>,
             <span class="ident">schema</span>,
             <span class="ident">migrations_directory</span>,
             <span class="ident">draft</span>: <span class="bool-val">false</span>,
             <span class="ident">name</span>,
-            <span class="ident">rt</span>: <span class="prelude-val">None</span>,
         }
-    }
-
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_sync</span>(
-        <span class="ident">api</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw">dyn</span> <span class="ident">GenericApi</span>,
-        <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>,
-        <span class="ident">schema</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>,
-        <span class="ident">migrations_directory</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">TempDir</span>,
-        <span class="ident">rt</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">tokio::runtime::Runtime</span>,
-    ) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">initial</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::new</span>(<span class="ident">api</span>, <span class="ident">name</span>, <span class="ident">schema</span>, <span class="ident">migrations_directory</span>);
-        <span class="ident">initial</span>.<span class="ident">rt</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">rt</span>);
-        <span class="ident">initial</span>
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">draft</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">draft</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
@@ -245,37 +234,36 @@
     }
 
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">send</span>(<span class="self">self</span>) -&gt; <span class="ident">CoreResult</span><span class="op">&lt;</span><span class="ident">CreateMigrationAssertion</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">output</span> <span class="op">=</span> <span class="self">self</span>
-            .<span class="ident">api</span>
-            .<span class="ident">create_migration</span>(<span class="ident">CreateMigrationInput</span> {
+        <span class="kw">let</span> <span class="ident">output</span> <span class="op">=</span> <span class="ident">create_migration</span>(
+            <span class="ident">CreateMigrationInput</span> {
                 <span class="ident">migrations_directory_path</span>: <span class="self">self</span>.<span class="ident">migrations_directory</span>.<span class="ident">path</span>().<span class="ident">to_str</span>().<span class="ident">unwrap</span>().<span class="ident">to_owned</span>(),
                 <span class="ident">prisma_schema</span>: <span class="self">self</span>.<span class="ident">schema</span>.<span class="ident">to_owned</span>(),
                 <span class="ident">draft</span>: <span class="self">self</span>.<span class="ident">draft</span>,
                 <span class="ident">migration_name</span>: <span class="self">self</span>.<span class="ident">name</span>.<span class="ident">to_owned</span>(),
-            })
-            .<span class="kw">await</span><span class="question-mark">?</span>;
+            },
+            <span class="self">self</span>.<span class="ident">api</span>,
+        )
+        .<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="prelude-val">Ok</span>(<span class="ident">CreateMigrationAssertion</span> {
             <span class="ident">output</span>,
-            <span class="ident">_api</span>: <span class="self">self</span>.<span class="ident">api</span>,
             <span class="ident">migrations_directory</span>: <span class="self">self</span>.<span class="ident">migrations_directory</span>,
         })
     }
 
     <span class="attribute">#[<span class="ident">track_caller</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">send_sync</span>(<span class="self">self</span>) -&gt; <span class="ident">CreateMigrationAssertion</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">rt</span>.<span class="ident">unwrap</span>().<span class="ident">block_on</span>(<span class="self">self</span>.<span class="ident">send</span>()).<span class="ident">unwrap</span>()
+        <span class="ident">run_with_thread_local_runtime</span>(<span class="self">self</span>.<span class="ident">send</span>()).<span class="ident">unwrap</span>()
     }
 
     <span class="attribute">#[<span class="ident">track_caller</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">send_unwrap_err</span>(<span class="self">self</span>) -&gt; <span class="ident">CoreError</span> {
-        <span class="self">self</span>.<span class="ident">rt</span>.<span class="ident">unwrap</span>().<span class="ident">block_on</span>(<span class="self">self</span>.<span class="ident">send</span>()).<span class="ident">unwrap_err</span>()
+        <span class="ident">run_with_thread_local_runtime</span>(<span class="self">self</span>.<span class="ident">send</span>()).<span class="ident">unwrap_err</span>()
     }
 }
 
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CreateMigrationAssertion</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="ident">output</span>: <span class="ident">CreateMigrationOutput</span>,
-    <span class="ident">_api</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw">dyn</span> <span class="ident">GenericApi</span>,
+    <span class="kw">pub</span> <span class="ident">output</span>: <span class="ident">CreateMigrationOutput</span>,
     <span class="ident">migrations_directory</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">TempDir</span>,
 }
 
@@ -353,6 +341,13 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">output</span>
     }
 
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">migration_script_path</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">PathBuf</span> {
+        <span class="self">self</span>.<span class="ident">migrations_directory</span>
+            .<span class="ident">path</span>()
+            .<span class="ident">join</span>(<span class="self">self</span>.<span class="ident">output</span>.<span class="ident">generated_migration_name</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>())
+            .<span class="ident">join</span>(<span class="string">&quot;migration.sql&quot;</span>)
+    }
+
     <span class="attribute">#[<span class="ident">track_caller</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">modify_migration</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">modify</span>: <span class="ident">F</span>) -&gt; <span class="self">Self</span>
     <span class="kw">where</span>
@@ -360,12 +355,7 @@
     {
         <span class="kw">use</span> <span class="ident">std::io::Write</span> <span class="kw">as</span> <span class="kw">_</span>;
 
-        <span class="kw">let</span> <span class="ident">migration_script_path</span> <span class="op">=</span> <span class="self">self</span>
-            .<span class="ident">migrations_directory</span>
-            .<span class="ident">path</span>()
-            .<span class="ident">join</span>(<span class="self">self</span>.<span class="ident">output</span>.<span class="ident">generated_migration_name</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>())
-            .<span class="ident">join</span>(<span class="string">&quot;migration.sql&quot;</span>);
-
+        <span class="kw">let</span> <span class="ident">migration_script_path</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">migration_script_path</span>();
         <span class="kw">let</span> <span class="ident">new_contents</span> <span class="op">=</span> {
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">contents</span> <span class="op">=</span> <span class="ident">std::fs::read_to_string</span>(<span class="kw-2">&amp;</span><span class="ident">migration_script_path</span>).<span class="ident">expect</span>(<span class="string">&quot;Reading migration script&quot;</span>);
 

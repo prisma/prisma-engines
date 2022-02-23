@@ -412,22 +412,151 @@
 <span id="411">411</span>
 <span id="412">412</span>
 <span id="413">413</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">connection_wrapper</span>::{<span class="ident">connect</span>, <span class="ident">Connection</span>},
-    <span class="ident">SqlFlavour</span>, <span class="ident">SqlMigrationConnector</span>,
+<span id="414">414</span>
+<span id="415">415</span>
+<span id="416">416</span>
+<span id="417">417</span>
+<span id="418">418</span>
+<span id="419">419</span>
+<span id="420">420</span>
+<span id="421">421</span>
+<span id="422">422</span>
+<span id="423">423</span>
+<span id="424">424</span>
+<span id="425">425</span>
+<span id="426">426</span>
+<span id="427">427</span>
+<span id="428">428</span>
+<span id="429">429</span>
+<span id="430">430</span>
+<span id="431">431</span>
+<span id="432">432</span>
+<span id="433">433</span>
+<span id="434">434</span>
+<span id="435">435</span>
+<span id="436">436</span>
+<span id="437">437</span>
+<span id="438">438</span>
+<span id="439">439</span>
+<span id="440">440</span>
+<span id="441">441</span>
+<span id="442">442</span>
+<span id="443">443</span>
+<span id="444">444</span>
+<span id="445">445</span>
+<span id="446">446</span>
+<span id="447">447</span>
+<span id="448">448</span>
+<span id="449">449</span>
+<span id="450">450</span>
+<span id="451">451</span>
+<span id="452">452</span>
+<span id="453">453</span>
+<span id="454">454</span>
+<span id="455">455</span>
+<span id="456">456</span>
+<span id="457">457</span>
+<span id="458">458</span>
+<span id="459">459</span>
+<span id="460">460</span>
+<span id="461">461</span>
+<span id="462">462</span>
+<span id="463">463</span>
+<span id="464">464</span>
+<span id="465">465</span>
+<span id="466">466</span>
+<span id="467">467</span>
+<span id="468">468</span>
+<span id="469">469</span>
+<span id="470">470</span>
+<span id="471">471</span>
+<span id="472">472</span>
+<span id="473">473</span>
+<span id="474">474</span>
+<span id="475">475</span>
+<span id="476">476</span>
+<span id="477">477</span>
+<span id="478">478</span>
+<span id="479">479</span>
+<span id="480">480</span>
+<span id="481">481</span>
+<span id="482">482</span>
+<span id="483">483</span>
+<span id="484">484</span>
+<span id="485">485</span>
+<span id="486">486</span>
+<span id="487">487</span>
+<span id="488">488</span>
+<span id="489">489</span>
+<span id="490">490</span>
+<span id="491">491</span>
+<span id="492">492</span>
+<span id="493">493</span>
+<span id="494">494</span>
+<span id="495">495</span>
+<span id="496">496</span>
+<span id="497">497</span>
+<span id="498">498</span>
+<span id="499">499</span>
+<span id="500">500</span>
+<span id="501">501</span>
+<span id="502">502</span>
+<span id="503">503</span>
+<span id="504">504</span>
+<span id="505">505</span>
+<span id="506">506</span>
+<span id="507">507</span>
+<span id="508">508</span>
+<span id="509">509</span>
+<span id="510">510</span>
+<span id="511">511</span>
+<span id="512">512</span>
+<span id="513">513</span>
+<span id="514">514</span>
+<span id="515">515</span>
+<span id="516">516</span>
+<span id="517">517</span>
+<span id="518">518</span>
+<span id="519">519</span>
+<span id="520">520</span>
+</pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">shadow_db</span>;
+
+<span class="kw">use</span> <span class="kw">crate</span>::{
+    <span class="ident">connection_wrapper</span>::{<span class="ident">connect</span>, <span class="ident">quaint_error_to_connector_error</span>, <span class="ident">Connection</span>},
+    <span class="ident">flavour::normalize_sql_schema</span>,
+    <span class="ident">SqlFlavour</span>,
 };
 <span class="kw">use</span> <span class="ident">connection_string::JdbcString</span>;
-<span class="kw">use</span> <span class="ident">datamodel::common::preview_features::PreviewFeature</span>;
-<span class="kw">use</span> <span class="ident">enumflags2::BitFlags</span>;
 <span class="kw">use</span> <span class="ident">indoc::formatdoc</span>;
-<span class="kw">use</span> <span class="ident">migration_connector</span>::{<span class="ident">migrations_directory::MigrationDirectory</span>, <span class="ident">ConnectorError</span>, <span class="ident">ConnectorResult</span>};
+<span class="kw">use</span> <span class="ident">migration_connector</span>::{
+    <span class="ident">migrations_directory::MigrationDirectory</span>, <span class="ident">BoxFuture</span>, <span class="ident">ConnectorError</span>, <span class="ident">ConnectorParams</span>, <span class="ident">ConnectorResult</span>,
+};
 <span class="kw">use</span> <span class="ident">quaint</span>::{<span class="ident">connector::MssqlUrl</span>, <span class="ident">prelude::Table</span>};
 <span class="kw">use</span> <span class="ident">sql_schema_describer::SqlSchema</span>;
-<span class="kw">use</span> <span class="ident">std::str::FromStr</span>;
+<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">future</span>, <span class="ident">str::FromStr</span>};
+<span class="kw">use</span> <span class="ident">user_facing_errors</span>::{<span class="ident">introspection_engine::DatabaseSchemaInconsistent</span>, <span class="ident">KnownError</span>};
+
+<span class="kw">type</span> <span class="ident">State</span> <span class="op">=</span> <span class="ident"><span class="kw">super</span>::State</span><span class="op">&lt;</span><span class="ident">Params</span>, <span class="ident">Connection</span><span class="op">&gt;</span>;
+
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">Params</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">connector_params</span>: <span class="ident">ConnectorParams</span>,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">url</span>: <span class="ident">MssqlUrl</span>,
+}
+
+<span class="kw">impl</span> <span class="ident">Params</span> {
+    <span class="kw">fn</span> <span class="ident">is_running_on_azure_sql</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="ident">url</span>.<span class="ident">host</span>().<span class="ident">contains</span>(<span class="string">&quot;.database.windows.net&quot;</span>)
+    }
+}
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">MssqlFlavour</span> {
-    <span class="ident">url</span>: <span class="ident">MssqlUrl</span>,
-    <span class="ident">preview_features</span>: <span class="ident">BitFlags</span><span class="op">&lt;</span><span class="ident">PreviewFeature</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">state</span>: <span class="ident">State</span>,
+}
+
+<span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">MssqlFlavour</span> {
+    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
+        <span class="ident">MssqlFlavour</span> { <span class="ident">state</span>: <span class="ident">State::Initial</span> }
+    }
 }
 
 <span class="kw">impl</span> <span class="ident">std::fmt::Debug</span> <span class="kw">for</span> <span class="ident">MssqlFlavour</span> {
@@ -437,16 +566,8 @@
 }
 
 <span class="kw">impl</span> <span class="ident">MssqlFlavour</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">url</span>: <span class="ident">MssqlUrl</span>, <span class="ident">preview_features</span>: <span class="ident">BitFlags</span><span class="op">&lt;</span><span class="ident">PreviewFeature</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> { <span class="ident">url</span>, <span class="ident">preview_features</span> }
-    }
-
-    <span class="kw">fn</span> <span class="ident">is_running_on_azure_sql</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">url</span>.<span class="ident">host</span>().<span class="ident">contains</span>(<span class="string">&quot;.database.windows.net&quot;</span>)
-    }
-
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">schema_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
-        <span class="self">self</span>.<span class="ident">url</span>.<span class="ident">schema</span>()
+        <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">params</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="ident">p</span>.<span class="ident">url</span>.<span class="ident">schema</span>()).<span class="ident">unwrap_or</span>(<span class="string">&quot;dbo&quot;</span>)
     }
 
     <span class="doccomment">/// Get the url as a JDBC string, extract the database name, and re-encode the string.</span>
@@ -458,120 +579,95 @@
         <span class="kw">let</span> <span class="ident">db_name</span> <span class="op">=</span> <span class="ident">params</span>.<span class="ident">remove</span>(<span class="string">&quot;database&quot;</span>).<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">String::from</span>(<span class="string">&quot;master&quot;</span>));
         <span class="prelude-val">Ok</span>((<span class="ident">db_name</span>, <span class="ident">conn</span>.<span class="ident">to_string</span>()))
     }
-
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">clean_up_shadow_database</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">main_connection</span>: <span class="kw-2">&amp;</span><span class="ident">Connection</span>, <span class="ident">database_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">drop_database</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;DROP DATABASE [{}]&quot;</span>, <span class="ident">database</span> <span class="op">=</span> <span class="ident">database_name</span>);
-        <span class="ident">main_connection</span>.<span class="ident">raw_cmd</span>(<span class="kw-2">&amp;</span><span class="ident">drop_database</span>).<span class="kw">await</span><span class="question-mark">?</span>;
-
-        <span class="prelude-val">Ok</span>(())
-    }
-
-    <span class="doccomment">/// Returns a connection, and maybe a database name to clean up.</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">shadow_database_connection</span>(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">connector</span>: <span class="kw-2">&amp;</span><span class="ident">SqlMigrationConnector</span>,
-        <span class="ident">shadow_database_name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident">ConnectorResult</span><span class="op">&lt;</span><span class="ident">Connection</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">shadow_database_connection_string</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">connector</span>.<span class="ident">shadow_database_connection_string</span> {
-            <span class="kw">let</span> <span class="ident">conn</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::connect</span>(<span class="ident">shadow_database_connection_string</span>).<span class="kw">await</span><span class="question-mark">?</span>;
-
-            <span class="kw">let</span> <span class="ident">shadow_conninfo</span> <span class="op">=</span> <span class="ident">conn</span>.<span class="ident">connection_info</span>();
-            <span class="kw">let</span> <span class="ident">main_conninfo</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">connector</span>.<span class="ident">connection_info</span>;
-
-            <span class="ident"><span class="kw">super</span>::validate_connection_infos_do_not_match</span>((<span class="ident">shadow_conninfo</span>, <span class="ident">main_conninfo</span>))<span class="question-mark">?</span>;
-
-            <span class="kw">if</span> <span class="self">self</span>.<span class="ident">reset</span>(<span class="kw-2">&amp;</span><span class="ident">conn</span>).<span class="kw">await</span>.<span class="ident">is_err</span>() {
-                <span class="ident">connector</span>.<span class="ident">best_effort_reset</span>(<span class="kw-2">&amp;</span><span class="ident">conn</span>).<span class="kw">await</span><span class="question-mark">?</span>;
-            }
-
-            <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">conn</span>);
-        }
-
-        <span class="comment">// See https://github.com/prisma/prisma/issues/6371 for the rationale on</span>
-        <span class="comment">// this conditional.</span>
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_running_on_azure_sql</span>() {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ConnectorError::user_facing</span>(
-                <span class="ident">user_facing_errors::migration_engine::AzureMssqlShadowDb</span>,
-            ));
-        }
-
-        <span class="kw">let</span> <span class="ident">database_name</span> <span class="op">=</span> <span class="ident">shadow_database_name</span>.<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">create_database</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;CREATE DATABASE [{}]&quot;</span>, <span class="ident">database_name</span>);
-
-        <span class="ident">connector</span>
-            .<span class="ident">conn</span>()
-            .<span class="kw">await</span><span class="question-mark">?</span>
-            .<span class="ident">raw_cmd</span>(<span class="kw-2">&amp;</span><span class="ident">create_database</span>)
-            .<span class="kw">await</span>
-            .<span class="ident">map_err</span>(<span class="ident">ConnectorError::from</span>)
-            .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">err</span><span class="op">|</span> <span class="ident">err</span>.<span class="ident">into_shadow_db_creation_error</span>())<span class="question-mark">?</span>;
-
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">jdbc_string</span>: <span class="ident">JdbcString</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">url</span>.<span class="ident">connection_string</span>().<span class="ident">parse</span>().<span class="ident">unwrap</span>();
-        <span class="ident">jdbc_string</span>
-            .<span class="ident">properties_mut</span>()
-            .<span class="ident">insert</span>(<span class="string">&quot;database&quot;</span>.<span class="ident">into</span>(), <span class="ident">database_name</span>.<span class="ident">into</span>());
-        <span class="kw">let</span> <span class="ident">host</span> <span class="op">=</span> <span class="ident">jdbc_string</span>.<span class="ident">server_name</span>();
-
-        <span class="kw">let</span> <span class="ident">jdbc_string</span> <span class="op">=</span> <span class="ident">jdbc_string</span>.<span class="ident">to_string</span>();
-
-        <span class="macro">tracing::debug!</span>(<span class="string">&quot;Connecting to shadow database at {}&quot;</span>, <span class="ident">host</span>.<span class="ident">unwrap_or</span>(<span class="string">&quot;localhost&quot;</span>));
-
-        <span class="prelude-val">Ok</span>(<span class="ident"><span class="kw">crate</span>::connect</span>(<span class="kw-2">&amp;</span><span class="ident">jdbc_string</span>).<span class="kw">await</span><span class="question-mark">?</span>)
-    }
 }
 
-<span class="attribute">#[<span class="ident">async_trait::async_trait</span>]</span>
 <span class="kw">impl</span> <span class="ident">SqlFlavour</span> <span class="kw">for</span> <span class="ident">MssqlFlavour</span> {
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">acquire_lock</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">connection</span>: <span class="kw-2">&amp;</span><span class="ident">Connection</span>) -&gt; <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">acquire_lock</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="comment">// see</span>
         <span class="comment">// https://docs.microsoft.com/en-us/sql/relational-databases/system-stored-procedures/sp-getapplock-transact-sql?view=sql-server-ver15</span>
         <span class="comment">// We don&#39;t set an explicit timeout because we want to respect the</span>
         <span class="comment">// server-set default.</span>
-        <span class="prelude-val">Ok</span>(<span class="ident">connection</span>
-            .<span class="ident">raw_cmd</span>(<span class="string">&quot;sp_getapplock @Resource = &#39;prisma_migrate&#39;, @LockMode = &#39;Exclusive&#39;, @LockOwner = &#39;Session&#39;&quot;</span>)
-            .<span class="kw">await</span><span class="question-mark">?</span>)
+        <span class="ident">Box::pin</span>(
+            <span class="self">self</span>.<span class="ident">raw_cmd</span>(<span class="string">&quot;sp_getapplock @Resource = &#39;prisma_migrate&#39;, @LockMode = &#39;Exclusive&#39;, @LockOwner = &#39;Session&#39;&quot;</span>),
+        )
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">apply_migration_script</span>(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">migration_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-        <span class="ident">script</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-        <span class="ident">conn</span>: <span class="kw-2">&amp;</span><span class="ident">Connection</span>,
-    ) -&gt; <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="ident"><span class="kw">super</span>::generic_apply_migration_script</span>(<span class="ident">migration_name</span>, <span class="ident">script</span>, <span class="ident">conn</span>).<span class="kw">await</span>
+    <span class="kw">fn</span> <span class="ident">apply_migration_script</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
+        <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="self">self</span>,
+        <span class="ident">migration_name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>,
+        <span class="ident">script</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>,
+    ) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span> {
+        <span class="ident">with_connection</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">state</span>, <span class="kw">move</span> <span class="op">|</span><span class="kw">_</span>, <span class="ident">connection</span><span class="op">|</span> {
+            <span class="ident"><span class="kw">super</span>::generic_apply_migration_script</span>(<span class="ident">migration_name</span>, <span class="ident">script</span>, <span class="ident">connection</span>)
+        })
     }
 
     <span class="kw">fn</span> <span class="ident">datamodel_connector</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="kw">dyn</span> <span class="ident">datamodel::datamodel_connector::Connector</span> {
         <span class="ident">sql_datamodel_connector::MSSQL</span>
     }
 
-    <span class="kw">fn</span> <span class="ident">migrations_table</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Table</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
-        (<span class="self">self</span>.<span class="ident">schema_name</span>(), <span class="self">self</span>.<span class="ident">migrations_table_name</span>()).<span class="ident">into</span>()
+    <span class="kw">fn</span> <span class="ident">describe_schema</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">ConnectorResult</span><span class="op">&lt;</span><span class="ident">SqlSchema</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+        <span class="kw">use</span> <span class="ident">sql_schema_describer</span>::{<span class="ident">mssql</span> <span class="kw">as</span> <span class="ident">describer</span>, <span class="ident">DescriberErrorKind</span>, <span class="ident">SqlSchemaDescriberBackend</span>};
+        <span class="ident">with_connection</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">state</span>, <span class="op">|</span><span class="ident">params</span>, <span class="ident">connection</span><span class="op">|</span> <span class="kw">async</span> <span class="kw">move</span> {
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">schema</span> <span class="op">=</span> <span class="ident">describer::SqlSchemaDescriber::new</span>(<span class="ident">connection</span>.<span class="ident">queryable</span>())
+                .<span class="ident">describe</span>(<span class="ident">params</span>.<span class="ident">url</span>.<span class="ident">schema</span>())
+                .<span class="kw">await</span>
+                .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">err</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">err</span>.<span class="ident">into_kind</span>() {
+                    <span class="ident">DescriberErrorKind::QuaintError</span>(<span class="ident">err</span>) =&gt; <span class="ident">quaint_error_to_connector_error</span>(
+                        <span class="ident">err</span>,
+                        <span class="kw-2">&amp;</span><span class="ident">quaint::prelude::ConnectionInfo::Mssql</span>(<span class="ident">params</span>.<span class="ident">url</span>.<span class="ident">clone</span>()),
+                    ),
+                    <span class="ident">e</span> @ <span class="ident">DescriberErrorKind::CrossSchemaReference</span> { .. } =&gt; {
+                        <span class="kw">let</span> <span class="ident">err</span> <span class="op">=</span> <span class="ident">KnownError::new</span>(<span class="ident">DatabaseSchemaInconsistent</span> {
+                            <span class="ident">explanation</span>: <span class="ident">e</span>.<span class="ident">to_string</span>(),
+                        });
+
+                        <span class="ident">ConnectorError::from</span>(<span class="ident">err</span>)
+                    }
+                })<span class="question-mark">?</span>;
+
+            <span class="ident">normalize_sql_schema</span>(<span class="kw-2">&amp;mut</span> <span class="ident">schema</span>, <span class="ident">params</span>.<span class="ident">connector_params</span>.<span class="ident">preview_features</span>);
+            <span class="prelude-val">Ok</span>(<span class="ident">schema</span>)
+        })
     }
 
-    <span class="kw">fn</span> <span class="ident">preview_features</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">BitFlags</span><span class="op">&lt;</span><span class="ident">PreviewFeature</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">preview_features</span>
+    <span class="kw">fn</span> <span class="ident">migrations_table</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Table</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span> {
+        (<span class="self">self</span>.<span class="ident">schema_name</span>().<span class="ident">to_owned</span>(), <span class="self">self</span>.<span class="ident">migrations_table_name</span>().<span class="ident">to_owned</span>()).<span class="ident">into</span>()
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">create_database</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">jdbc_string</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">ConnectorResult</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> (<span class="ident">db_name</span>, <span class="ident">master_uri</span>) <span class="op">=</span> <span class="ident"><span class="self">Self</span>::master_url</span>(<span class="ident">jdbc_string</span>)<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">conn</span> <span class="op">=</span> <span class="ident">connect</span>(<span class="kw-2">&amp;</span><span class="ident">master_uri</span>.<span class="ident">to_string</span>()).<span class="kw">await</span><span class="question-mark">?</span>;
+    <span class="kw">fn</span> <span class="ident">connection_string</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">state</span>
+            .<span class="ident">params</span>()
+            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="ident">p</span>.<span class="ident">connector_params</span>.<span class="ident">connection_string</span>.<span class="ident">as_str</span>())
+    }
 
-        <span class="kw">let</span> <span class="ident">query</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;CREATE DATABASE [{}]&quot;</span>, <span class="ident">db_name</span>);
-        <span class="ident">conn</span>.<span class="ident">raw_cmd</span>(<span class="kw-2">&amp;</span><span class="ident">query</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+    <span class="kw">fn</span> <span class="ident">connector_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
+        <span class="string">&quot;sqlserver&quot;</span>
+    }
 
-        <span class="kw">let</span> <span class="ident">conn</span> <span class="op">=</span> <span class="ident">connect</span>(<span class="ident">jdbc_string</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+    <span class="kw">fn</span> <span class="ident">create_database</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">ConnectorResult</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+        <span class="ident">Box::pin</span>(<span class="kw">async</span> {
+            <span class="kw">let</span> <span class="ident">params</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">get_unwrapped_params</span>();
+            <span class="kw">let</span> <span class="ident">connection_string</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">params</span>.<span class="ident">connector_params</span>.<span class="ident">connection_string</span>;
+            <span class="kw">let</span> (<span class="ident">db_name</span>, <span class="ident">master_uri</span>) <span class="op">=</span> <span class="ident"><span class="self">Self</span>::master_url</span>(<span class="ident">connection_string</span>)<span class="question-mark">?</span>;
+            <span class="kw">let</span> <span class="ident">conn</span> <span class="op">=</span> <span class="ident">connect</span>(<span class="kw-2">&amp;</span><span class="ident">master_uri</span>.<span class="ident">to_string</span>()).<span class="kw">await</span><span class="question-mark">?</span>;
 
-        <span class="comment">// dbo is created automatically</span>
-        <span class="kw">if</span> <span class="ident">conn</span>.<span class="ident">connection_info</span>().<span class="ident">schema_name</span>() <span class="op">!</span><span class="op">=</span> <span class="string">&quot;dbo&quot;</span> {
-            <span class="kw">let</span> <span class="ident">query</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;CREATE SCHEMA {}&quot;</span>, <span class="ident">conn</span>.<span class="ident">connection_info</span>().<span class="ident">schema_name</span>(),);
+            <span class="kw">let</span> <span class="ident">query</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;CREATE DATABASE [{}]&quot;</span>, <span class="ident">db_name</span>);
             <span class="ident">conn</span>.<span class="ident">raw_cmd</span>(<span class="kw-2">&amp;</span><span class="ident">query</span>).<span class="kw">await</span><span class="question-mark">?</span>;
-        }
 
-        <span class="prelude-val">Ok</span>(<span class="ident">db_name</span>)
+            <span class="kw">let</span> <span class="ident">conn</span> <span class="op">=</span> <span class="ident">connect</span>(<span class="ident">connection_string</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+
+            <span class="comment">// dbo is created automatically</span>
+            <span class="kw">if</span> <span class="ident">conn</span>.<span class="ident">connection_info</span>().<span class="ident">schema_name</span>() <span class="op">!</span><span class="op">=</span> <span class="string">&quot;dbo&quot;</span> {
+                <span class="kw">let</span> <span class="ident">query</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;CREATE SCHEMA {}&quot;</span>, <span class="ident">conn</span>.<span class="ident">connection_info</span>().<span class="ident">schema_name</span>(),);
+                <span class="ident">conn</span>.<span class="ident">raw_cmd</span>(<span class="kw-2">&amp;</span><span class="ident">query</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+            }
+
+            <span class="prelude-val">Ok</span>(<span class="ident">db_name</span>)
+        })
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">create_migrations_table</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">connection</span>: <span class="kw-2">&amp;</span><span class="ident">Connection</span>) -&gt; <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">create_migrations_table</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">sql</span> <span class="op">=</span> <span class="macro">formatdoc!</span> { <span class="string">r#&quot;
             CREATE TABLE [{}].[{}] (
                 id                      VARCHAR(36) PRIMARY KEY NOT NULL,
@@ -585,225 +681,330 @@
             );
         &quot;#</span>, <span class="self">self</span>.<span class="ident">schema_name</span>(), <span class="self">self</span>.<span class="ident">migrations_table_name</span>()};
 
-        <span class="prelude-val">Ok</span>(<span class="ident">connection</span>.<span class="ident">raw_cmd</span>(<span class="kw-2">&amp;</span><span class="ident">sql</span>).<span class="kw">await</span><span class="question-mark">?</span>)
+        <span class="ident">with_connection</span>(
+            <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">state</span>,
+            <span class="kw">move</span> <span class="op">|</span><span class="kw">_</span>, <span class="ident">conn</span><span class="op">|</span> <span class="kw">async</span> <span class="kw">move</span> { <span class="prelude-val">Ok</span>(<span class="ident">conn</span>.<span class="ident">raw_cmd</span>(<span class="kw-2">&amp;</span><span class="ident">sql</span>).<span class="kw">await</span><span class="question-mark">?</span>) },
+        )
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">drop_database</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">database_url</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        {
-            <span class="kw">let</span> <span class="ident">conn_str</span>: <span class="ident">JdbcString</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;jdbc:{}&quot;</span>, <span class="ident">database_url</span>)
-                .<span class="ident">parse</span>()
-                .<span class="ident">map_err</span>(<span class="ident">ConnectorError::url_parse_error</span>)<span class="question-mark">?</span>;
+    <span class="kw">fn</span> <span class="ident">drop_database</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span> {
+        <span class="ident">Box::pin</span>(<span class="kw">async</span> {
+            <span class="kw">let</span> <span class="ident">params</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">get_unwrapped_params</span>();
+            <span class="kw">let</span> <span class="ident">connection_string</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">params</span>.<span class="ident">connector_params</span>.<span class="ident">connection_string</span>;
+            {
+                <span class="kw">let</span> <span class="ident">conn_str</span>: <span class="ident">JdbcString</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;jdbc:{}&quot;</span>, <span class="ident">connection_string</span>)
+                    .<span class="ident">parse</span>()
+                    .<span class="ident">map_err</span>(<span class="ident">ConnectorError::url_parse_error</span>)<span class="question-mark">?</span>;
 
-            <span class="kw">let</span> <span class="ident">db_name</span> <span class="op">=</span> <span class="ident">conn_str</span>
-                .<span class="ident">properties</span>()
-                .<span class="ident">get</span>(<span class="string">&quot;database&quot;</span>)
-                .<span class="ident">map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">to_owned</span>())
-                .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="string">&quot;master&quot;</span>.<span class="ident">to_owned</span>());
+                <span class="kw">let</span> <span class="ident">db_name</span> <span class="op">=</span> <span class="ident">conn_str</span>
+                    .<span class="ident">properties</span>()
+                    .<span class="ident">get</span>(<span class="string">&quot;database&quot;</span>)
+                    .<span class="ident">map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">to_owned</span>())
+                    .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="string">&quot;master&quot;</span>.<span class="ident">to_owned</span>());
 
-            <span class="macro">assert!</span>(<span class="ident">db_name</span> <span class="op">!</span><span class="op">=</span> <span class="string">&quot;master&quot;</span>, <span class="string">&quot;Cannot drop the `master` database.&quot;</span>);
-        }
-
-        <span class="kw">let</span> (<span class="ident">db_name</span>, <span class="ident">master_uri</span>) <span class="op">=</span> <span class="ident"><span class="self">Self</span>::master_url</span>(<span class="ident">database_url</span>)<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">conn</span> <span class="op">=</span> <span class="ident">connect</span>(<span class="kw-2">&amp;</span><span class="ident">master_uri</span>.<span class="ident">to_string</span>()).<span class="kw">await</span><span class="question-mark">?</span>;
-
-        <span class="kw">let</span> <span class="ident">query</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;DROP DATABASE IF EXISTS [{}]&quot;</span>, <span class="ident">db_name</span>);
-        <span class="ident">conn</span>.<span class="ident">raw_cmd</span>(<span class="kw-2">&amp;</span><span class="ident">query</span>).<span class="kw">await</span><span class="question-mark">?</span>;
-
-        <span class="prelude-val">Ok</span>(())
-    }
-
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">drop_migrations_table</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">connection</span>: <span class="kw-2">&amp;</span><span class="ident">Connection</span>) -&gt; <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="ident">connection</span>
-            .<span class="ident">raw_cmd</span>(<span class="kw-2">&amp;</span><span class="macro">format!</span>(
-                <span class="string">&quot;DROP TABLE [{}].[{}]&quot;</span>,
-                <span class="self">self</span>.<span class="ident">schema_name</span>(),
-                <span class="self">self</span>.<span class="ident">migrations_table_name</span>()
-            ))
-            .<span class="kw">await</span><span class="question-mark">?</span>;
-
-        <span class="prelude-val">Ok</span>(())
-    }
-
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">run_query_script</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">sql</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">connection</span>: <span class="kw-2">&amp;</span><span class="ident">Connection</span>) -&gt; <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="prelude-val">Ok</span>(<span class="ident">connection</span>.<span class="ident">raw_cmd</span>(<span class="ident">sql</span>).<span class="kw">await</span><span class="question-mark">?</span>)
-    }
-
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">reset</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">connection</span>: <span class="kw-2">&amp;</span><span class="ident">Connection</span>) -&gt; <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">schema_name</span> <span class="op">=</span> <span class="ident">connection</span>.<span class="ident">connection_info</span>().<span class="ident">schema_name</span>();
-
-        <span class="kw">let</span> <span class="ident">drop_procedures</span> <span class="op">=</span> <span class="macro">format!</span>(
-            <span class="string">r#&quot;
-            DECLARE @stmt NVARCHAR(max)
-            DECLARE @n CHAR(1)
-
-            SET @n = CHAR(10)
-
-            SELECT @stmt = ISNULL(@stmt + @n, &#39;&#39;) +
-                &#39;DROP PROCEDURE [&#39; + SCHEMA_NAME(schema_id) + &#39;].[&#39; + OBJECT_NAME(object_id) + &#39;]&#39;
-            FROM sys.objects
-            WHERE SCHEMA_NAME(schema_id) = &#39;{0}&#39; AND type = &#39;P&#39;
-
-            EXEC SP_EXECUTESQL @stmt
-            &quot;#</span>,
-            <span class="ident">schema_name</span>
-        );
-
-        <span class="kw">let</span> <span class="ident">drop_shared_defaults</span> <span class="op">=</span> <span class="macro">format!</span>(
-            <span class="string">r#&quot;
-            DECLARE @stmt NVARCHAR(max)
-            DECLARE @n CHAR(1)
-
-            SET @n = CHAR(10)
-
-            SELECT @stmt = ISNULL(@stmt + @n, &#39;&#39;) +
-                &#39;DROP DEFAULT [&#39; + SCHEMA_NAME(schema_id) + &#39;].[&#39; + OBJECT_NAME(object_id) + &#39;]&#39;
-            FROM sys.objects
-            WHERE SCHEMA_NAME(schema_id) = &#39;{0}&#39; AND type = &#39;D&#39; AND parent_object_id = 0
-
-            EXEC SP_EXECUTESQL @stmt
-            &quot;#</span>,
-            <span class="ident">schema_name</span>
-        );
-
-        <span class="kw">let</span> <span class="ident">drop_views</span> <span class="op">=</span> <span class="macro">format!</span>(
-            <span class="string">r#&quot;
-            DECLARE @stmt NVARCHAR(max)
-            DECLARE @n CHAR(1)
-
-            SET @n = CHAR(10)
-
-            SELECT @stmt = ISNULL(@stmt + @n, &#39;&#39;) +
-                &#39;DROP VIEW [&#39; + SCHEMA_NAME(schema_id) + &#39;].[&#39; + name + &#39;]&#39;
-            FROM sys.views
-            WHERE SCHEMA_NAME(schema_id) = &#39;{0}&#39;
-
-            EXEC SP_EXECUTESQL @stmt
-            &quot;#</span>,
-            <span class="ident">schema_name</span>
-        );
-
-        <span class="kw">let</span> <span class="ident">drop_fks</span> <span class="op">=</span> <span class="macro">format!</span>(
-            <span class="string">r#&quot;
-            DECLARE @stmt NVARCHAR(max)
-            DECLARE @n CHAR(1)
-
-            SET @n = CHAR(10)
-
-            SELECT @stmt = ISNULL(@stmt + @n, &#39;&#39;) +
-                &#39;ALTER TABLE [&#39; + SCHEMA_NAME(schema_id) + &#39;].[&#39; + OBJECT_NAME(parent_object_id) + &#39;] DROP CONSTRAINT [&#39; + name + &#39;]&#39;
-            FROM sys.foreign_keys
-            WHERE SCHEMA_NAME(schema_id) = &#39;{0}&#39;
-
-            EXEC SP_EXECUTESQL @stmt
-            &quot;#</span>,
-            <span class="ident">schema_name</span>
-        );
-
-        <span class="kw">let</span> <span class="ident">drop_tables</span> <span class="op">=</span> <span class="macro">format!</span>(
-            <span class="string">r#&quot;
-            DECLARE @stmt NVARCHAR(max)
-            DECLARE @n CHAR(1)
-
-            SET @n = CHAR(10)
-
-            SELECT @stmt = ISNULL(@stmt + @n, &#39;&#39;) +
-                &#39;DROP TABLE [&#39; + SCHEMA_NAME(schema_id) + &#39;].[&#39; + name + &#39;]&#39;
-            FROM sys.tables
-            WHERE SCHEMA_NAME(schema_id) = &#39;{0}&#39;
-
-            EXEC SP_EXECUTESQL @stmt
-            &quot;#</span>,
-            <span class="ident">schema_name</span>
-        );
-
-        <span class="kw">let</span> <span class="ident">drop_types</span> <span class="op">=</span> <span class="macro">format!</span>(
-            <span class="string">r#&quot;
-            DECLARE @stmt NVARCHAR(max)
-            DECLARE @n CHAR(1)
-
-            SET @n = CHAR(10)
-
-            SELECT @stmt = ISNULL(@stmt + @n, &#39;&#39;) +
-                &#39;DROP TYPE [&#39; + SCHEMA_NAME(schema_id) + &#39;].[&#39; + name + &#39;]&#39;
-            FROM sys.types
-            WHERE SCHEMA_NAME(schema_id) = &#39;{0}&#39;
-            AND is_user_defined = 1
-
-            EXEC SP_EXECUTESQL @stmt
-            &quot;#</span>,
-            <span class="ident">schema_name</span>
-        );
-
-        <span class="ident">connection</span>.<span class="ident">raw_cmd</span>(<span class="kw-2">&amp;</span><span class="ident">drop_procedures</span>).<span class="kw">await</span><span class="question-mark">?</span>;
-        <span class="ident">connection</span>.<span class="ident">raw_cmd</span>(<span class="kw-2">&amp;</span><span class="ident">drop_views</span>).<span class="kw">await</span><span class="question-mark">?</span>;
-        <span class="ident">connection</span>.<span class="ident">raw_cmd</span>(<span class="kw-2">&amp;</span><span class="ident">drop_shared_defaults</span>).<span class="kw">await</span><span class="question-mark">?</span>;
-        <span class="ident">connection</span>.<span class="ident">raw_cmd</span>(<span class="kw-2">&amp;</span><span class="ident">drop_fks</span>).<span class="kw">await</span><span class="question-mark">?</span>;
-        <span class="ident">connection</span>.<span class="ident">raw_cmd</span>(<span class="kw-2">&amp;</span><span class="ident">drop_tables</span>).<span class="kw">await</span><span class="question-mark">?</span>;
-        <span class="ident">connection</span>.<span class="ident">raw_cmd</span>(<span class="kw-2">&amp;</span><span class="ident">drop_types</span>).<span class="kw">await</span><span class="question-mark">?</span>;
-
-        <span class="prelude-val">Ok</span>(())
-    }
-
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">ensure_connection_validity</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">connection</span>: <span class="kw-2">&amp;</span><span class="ident">Connection</span>) -&gt; <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="ident">connection</span>.<span class="ident">raw_cmd</span>(<span class="string">&quot;SELECT 1&quot;</span>).<span class="kw">await</span><span class="question-mark">?</span>;
-
-        <span class="prelude-val">Ok</span>(())
-    }
-
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">sql_schema_from_migration_history</span>(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">migrations</span>: <span class="kw-2">&amp;</span>[<span class="ident">MigrationDirectory</span>],
-        <span class="ident">connector</span>: <span class="kw-2">&amp;</span><span class="ident">SqlMigrationConnector</span>,
-    ) -&gt; <span class="ident">ConnectorResult</span><span class="op">&lt;</span><span class="ident">SqlSchema</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">shadow_database_name</span> <span class="op">=</span> <span class="ident">connector</span>.<span class="ident">shadow_database_name</span>();
-
-        <span class="comment">// We must create the connection in a block, closing it before dropping</span>
-        <span class="comment">// the database.</span>
-        <span class="kw">let</span> <span class="ident">sql_schema_result</span> <span class="op">=</span> {
-            <span class="comment">// We go through the whole process without early return, then clean up</span>
-            <span class="comment">// the shadow database, and only then return the result. This avoids</span>
-            <span class="comment">// leaving shadow databases behind in case of e.g. faulty</span>
-            <span class="comment">// migrations.</span>
-
-            <span class="kw">let</span> <span class="ident">temp_database</span> <span class="op">=</span> <span class="self">self</span>
-                .<span class="ident">shadow_database_connection</span>(<span class="ident">connector</span>, <span class="ident">shadow_database_name</span>.<span class="ident">as_deref</span>())
-                .<span class="kw">await</span><span class="question-mark">?</span>;
-
-            <span class="kw">if</span> <span class="self">self</span>.<span class="ident">schema_name</span>() <span class="op">!</span><span class="op">=</span> <span class="string">&quot;dbo&quot;</span> {
-                <span class="kw">let</span> <span class="ident">create_schema</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;CREATE SCHEMA [{schema}]&quot;</span>, <span class="ident">schema</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">schema_name</span>());
-
-                <span class="ident">temp_database</span>.<span class="ident">raw_cmd</span>(<span class="kw-2">&amp;</span><span class="ident">create_schema</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+                <span class="macro">assert!</span>(<span class="ident">db_name</span> <span class="op">!</span><span class="op">=</span> <span class="string">&quot;master&quot;</span>, <span class="string">&quot;Cannot drop the `master` database.&quot;</span>);
             }
 
-            (<span class="op">|</span><span class="op">|</span> <span class="kw">async</span> {
-                <span class="kw">for</span> <span class="ident">migration</span> <span class="kw">in</span> <span class="ident">migrations</span> {
-                    <span class="kw">let</span> <span class="ident">script</span> <span class="op">=</span> <span class="ident">migration</span>.<span class="ident">read_migration_script</span>()<span class="question-mark">?</span>;
+            <span class="kw">let</span> (<span class="ident">db_name</span>, <span class="ident">master_uri</span>) <span class="op">=</span> <span class="ident"><span class="self">Self</span>::master_url</span>(<span class="kw-2">&amp;</span><span class="ident">params</span>.<span class="ident">connector_params</span>.<span class="ident">connection_string</span>)<span class="question-mark">?</span>;
+            <span class="kw">let</span> <span class="ident">conn</span> <span class="op">=</span> <span class="ident">connect</span>(<span class="kw-2">&amp;</span><span class="ident">master_uri</span>.<span class="ident">to_string</span>()).<span class="kw">await</span><span class="question-mark">?</span>;
 
-                    <span class="macro">tracing::debug!</span>(
-                        <span class="string">&quot;Applying migration `{}` to shadow database.&quot;</span>,
-                        <span class="ident">migration</span>.<span class="ident">migration_name</span>()
-                    );
+            <span class="kw">let</span> <span class="ident">query</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;DROP DATABASE IF EXISTS [{}]&quot;</span>, <span class="ident">db_name</span>);
+            <span class="ident">conn</span>.<span class="ident">raw_cmd</span>(<span class="kw-2">&amp;</span><span class="ident">query</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 
-                    <span class="ident">temp_database</span>
-                        .<span class="ident">raw_cmd</span>(<span class="kw-2">&amp;</span><span class="ident">script</span>)
-                        .<span class="kw">await</span>
-                        .<span class="ident">map_err</span>(<span class="ident">ConnectorError::from</span>)
-                        .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">connector_error</span><span class="op">|</span> {
-                            <span class="ident">connector_error</span>.<span class="ident">into_migration_does_not_apply_cleanly</span>(<span class="ident">migration</span>.<span class="ident">migration_name</span>().<span class="ident">to_owned</span>())
-                        })<span class="question-mark">?</span>;
+            <span class="prelude-val">Ok</span>(())
+        })
+    }
+
+    <span class="kw">fn</span> <span class="ident">drop_migrations_table</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">sql</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;DROP TABLE [{}].[{}]&quot;</span>, <span class="self">self</span>.<span class="ident">schema_name</span>(), <span class="self">self</span>.<span class="ident">migrations_table_name</span>());
+        <span class="ident">with_connection</span>(
+            <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">state</span>,
+            <span class="kw">move</span> <span class="op">|</span><span class="kw">_</span>, <span class="ident">conn</span><span class="op">|</span> <span class="kw">async</span> <span class="kw">move</span> { <span class="prelude-val">Ok</span>(<span class="ident">conn</span>.<span class="ident">raw_cmd</span>(<span class="kw-2">&amp;</span><span class="ident">sql</span>).<span class="kw">await</span><span class="question-mark">?</span>) },
+        )
+    }
+
+    <span class="kw">fn</span> <span class="ident">query</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
+        <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="self">self</span>,
+        <span class="ident">query</span>: <span class="ident">quaint::ast::Query</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
+    ) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">ConnectorResult</span><span class="op">&lt;</span><span class="ident">quaint::prelude::ResultSet</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+        <span class="ident">with_connection</span>(
+            <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">state</span>,
+            <span class="kw">move</span> <span class="op">|</span><span class="kw">_</span>, <span class="ident">conn</span><span class="op">|</span> <span class="kw">async</span> <span class="kw">move</span> { <span class="prelude-val">Ok</span>(<span class="ident">conn</span>.<span class="ident">query</span>(<span class="ident">query</span>).<span class="kw">await</span><span class="question-mark">?</span>) },
+        )
+    }
+
+    <span class="kw">fn</span> <span class="ident">query_raw</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
+        <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="self">self</span>,
+        <span class="ident">sql</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>,
+        <span class="ident">params</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">quaint::Value</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>],
+    ) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">ConnectorResult</span><span class="op">&lt;</span><span class="ident">quaint::prelude::ResultSet</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+        <span class="ident">with_connection</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">state</span>, <span class="kw">move</span> <span class="op">|</span><span class="kw">_</span>, <span class="ident">conn</span><span class="op">|</span> <span class="kw">async</span> <span class="kw">move</span> {
+            <span class="prelude-val">Ok</span>(<span class="ident">conn</span>.<span class="ident">query_raw</span>(<span class="ident">sql</span>, <span class="ident">params</span>).<span class="kw">await</span><span class="question-mark">?</span>)
+        })
+    }
+
+    <span class="kw">fn</span> <span class="ident">run_query_script</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">sql</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">raw_cmd</span>(<span class="ident">sql</span>)
+    }
+
+    <span class="kw">fn</span> <span class="ident">reset</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span> {
+        <span class="ident">with_connection</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">state</span>, <span class="kw">move</span> <span class="op">|</span><span class="ident">params</span>, <span class="ident">connection</span><span class="op">|</span> <span class="kw">async</span> <span class="kw">move</span> {
+            <span class="kw">let</span> <span class="ident">schema_name</span> <span class="op">=</span> <span class="ident">params</span>.<span class="ident">url</span>.<span class="ident">schema</span>();
+
+            <span class="kw">let</span> <span class="ident">drop_procedures</span> <span class="op">=</span> <span class="macro">format!</span>(
+                <span class="string">r#&quot;
+                DECLARE @stmt NVARCHAR(max)
+                DECLARE @n CHAR(1)
+
+                SET @n = CHAR(10)
+
+                SELECT @stmt = ISNULL(@stmt + @n, &#39;&#39;) +
+                    &#39;DROP PROCEDURE [&#39; + SCHEMA_NAME(schema_id) + &#39;].[&#39; + OBJECT_NAME(object_id) + &#39;]&#39;
+                FROM sys.objects
+                WHERE SCHEMA_NAME(schema_id) = &#39;{0}&#39; AND type = &#39;P&#39;
+
+                EXEC SP_EXECUTESQL @stmt
+                &quot;#</span>,
+                <span class="ident">schema_name</span>
+            );
+
+            <span class="kw">let</span> <span class="ident">drop_shared_defaults</span> <span class="op">=</span> <span class="macro">format!</span>(
+                <span class="string">r#&quot;
+                DECLARE @stmt NVARCHAR(max)
+                DECLARE @n CHAR(1)
+
+                SET @n = CHAR(10)
+
+                SELECT @stmt = ISNULL(@stmt + @n, &#39;&#39;) +
+                    &#39;DROP DEFAULT [&#39; + SCHEMA_NAME(schema_id) + &#39;].[&#39; + OBJECT_NAME(object_id) + &#39;]&#39;
+                FROM sys.objects
+                WHERE SCHEMA_NAME(schema_id) = &#39;{0}&#39; AND type = &#39;D&#39; AND parent_object_id = 0
+
+                EXEC SP_EXECUTESQL @stmt
+                &quot;#</span>,
+                <span class="ident">schema_name</span>
+            );
+
+            <span class="kw">let</span> <span class="ident">drop_views</span> <span class="op">=</span> <span class="macro">format!</span>(
+                <span class="string">r#&quot;
+                DECLARE @stmt NVARCHAR(max)
+                DECLARE @n CHAR(1)
+
+                SET @n = CHAR(10)
+
+                SELECT @stmt = ISNULL(@stmt + @n, &#39;&#39;) +
+                    &#39;DROP VIEW [&#39; + SCHEMA_NAME(schema_id) + &#39;].[&#39; + name + &#39;]&#39;
+                FROM sys.views
+                WHERE SCHEMA_NAME(schema_id) = &#39;{0}&#39;
+
+                EXEC SP_EXECUTESQL @stmt
+                &quot;#</span>,
+                <span class="ident">schema_name</span>
+            );
+
+            <span class="kw">let</span> <span class="ident">drop_fks</span> <span class="op">=</span> <span class="macro">format!</span>(
+                <span class="string">r#&quot;
+                DECLARE @stmt NVARCHAR(max)
+                DECLARE @n CHAR(1)
+
+                SET @n = CHAR(10)
+
+                SELECT @stmt = ISNULL(@stmt + @n, &#39;&#39;) +
+                    &#39;ALTER TABLE [&#39; + SCHEMA_NAME(schema_id) + &#39;].[&#39; + OBJECT_NAME(parent_object_id) + &#39;] DROP CONSTRAINT [&#39; + name + &#39;]&#39;
+                FROM sys.foreign_keys
+                WHERE SCHEMA_NAME(schema_id) = &#39;{0}&#39;
+
+                EXEC SP_EXECUTESQL @stmt
+                &quot;#</span>,
+                <span class="ident">schema_name</span>
+            );
+
+            <span class="kw">let</span> <span class="ident">drop_tables</span> <span class="op">=</span> <span class="macro">format!</span>(
+                <span class="string">r#&quot;
+                DECLARE @stmt NVARCHAR(max)
+                DECLARE @n CHAR(1)
+
+                SET @n = CHAR(10)
+
+                SELECT @stmt = ISNULL(@stmt + @n, &#39;&#39;) +
+                    &#39;DROP TABLE [&#39; + SCHEMA_NAME(schema_id) + &#39;].[&#39; + name + &#39;]&#39;
+                FROM sys.tables
+                WHERE SCHEMA_NAME(schema_id) = &#39;{0}&#39;
+
+                EXEC SP_EXECUTESQL @stmt
+                &quot;#</span>,
+                <span class="ident">schema_name</span>
+            );
+
+            <span class="kw">let</span> <span class="ident">drop_types</span> <span class="op">=</span> <span class="macro">format!</span>(
+                <span class="string">r#&quot;
+                DECLARE @stmt NVARCHAR(max)
+                DECLARE @n CHAR(1)
+
+                SET @n = CHAR(10)
+
+                SELECT @stmt = ISNULL(@stmt + @n, &#39;&#39;) +
+                    &#39;DROP TYPE [&#39; + SCHEMA_NAME(schema_id) + &#39;].[&#39; + name + &#39;]&#39;
+                FROM sys.types
+                WHERE SCHEMA_NAME(schema_id) = &#39;{0}&#39;
+                AND is_user_defined = 1
+
+                EXEC SP_EXECUTESQL @stmt
+                &quot;#</span>,
+                <span class="ident">schema_name</span>
+            );
+
+            <span class="ident">connection</span>.<span class="ident">raw_cmd</span>(<span class="kw-2">&amp;</span><span class="ident">drop_procedures</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+            <span class="ident">connection</span>.<span class="ident">raw_cmd</span>(<span class="kw-2">&amp;</span><span class="ident">drop_views</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+            <span class="ident">connection</span>.<span class="ident">raw_cmd</span>(<span class="kw-2">&amp;</span><span class="ident">drop_shared_defaults</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+            <span class="ident">connection</span>.<span class="ident">raw_cmd</span>(<span class="kw-2">&amp;</span><span class="ident">drop_fks</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+            <span class="ident">connection</span>.<span class="ident">raw_cmd</span>(<span class="kw-2">&amp;</span><span class="ident">drop_tables</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+            <span class="ident">connection</span>.<span class="ident">raw_cmd</span>(<span class="kw-2">&amp;</span><span class="ident">drop_types</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+
+            <span class="prelude-val">Ok</span>(())
+        })
+    }
+
+    <span class="kw">fn</span> <span class="ident">ensure_connection_validity</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span> {
+        <span class="ident">Box::pin</span>(<span class="self">self</span>.<span class="ident">raw_cmd</span>(<span class="string">&quot;SELECT 1&quot;</span>))
+    }
+
+    <span class="kw">fn</span> <span class="ident">raw_cmd</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">sql</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span> {
+        <span class="ident">with_connection</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">state</span>, <span class="kw">move</span> <span class="op">|</span><span class="kw">_</span>, <span class="ident">connection</span><span class="op">|</span> <span class="kw">async</span> <span class="kw">move</span> {
+            <span class="prelude-val">Ok</span>(<span class="ident">connection</span>.<span class="ident">raw_cmd</span>(<span class="ident">sql</span>).<span class="kw">await</span><span class="question-mark">?</span>)
+        })
+    }
+
+    <span class="kw">fn</span> <span class="ident">set_params</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">connector_params</span>: <span class="ident">ConnectorParams</span>) -&gt; <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">url</span> <span class="op">=</span>
+            <span class="ident">MssqlUrl::new</span>(<span class="kw-2">&amp;</span><span class="ident">connector_params</span>.<span class="ident">connection_string</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">err</span><span class="op">|</span> <span class="ident">ConnectorError::url_parse_error</span>(<span class="ident">err</span>))<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">params</span> <span class="op">=</span> <span class="ident">Params</span> { <span class="ident">connector_params</span>, <span class="ident">url</span> };
+        <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">set_params</span>(<span class="ident">params</span>);
+        <span class="prelude-val">Ok</span>(())
+    }
+
+    <span class="kw">fn</span> <span class="ident">sql_schema_from_migration_history</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
+        <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="self">self</span>,
+        <span class="ident">migrations</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">MigrationDirectory</span>],
+        <span class="ident">shadow_database_connection_string</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+    ) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">ConnectorResult</span><span class="op">&lt;</span><span class="ident">SqlSchema</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">shadow_database_connection_string</span> <span class="op">=</span> <span class="ident">shadow_database_connection_string</span>.<span class="ident">or_else</span>(<span class="op">|</span><span class="op">|</span> {
+            <span class="self">self</span>.<span class="ident">state</span>
+                .<span class="ident">params</span>()
+                .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="ident">p</span>.<span class="ident">connector_params</span>.<span class="ident">shadow_database_connection_string</span>.<span class="ident">clone</span>())
+        });
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">shadow_database</span> <span class="op">=</span> <span class="ident">MssqlFlavour::default</span>();
+
+        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">shadow_database_connection_string</span>) <span class="op">=</span> <span class="ident">shadow_database_connection_string</span> {
+            <span class="ident">Box::pin</span>(<span class="kw">async</span> <span class="kw">move</span> {
+                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">params</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">params</span>() {
+                    <span class="ident"><span class="kw">super</span>::validate_connection_infos_do_not_match</span>(
+                        <span class="kw-2">&amp;</span><span class="ident">shadow_database_connection_string</span>,
+                        <span class="kw-2">&amp;</span><span class="ident">params</span>.<span class="ident">connector_params</span>.<span class="ident">connection_string</span>,
+                    )<span class="question-mark">?</span>;
                 }
 
-                <span class="ident">temp_database</span>.<span class="ident">describe_schema</span>(<span class="self">self</span>.<span class="ident">preview_features</span>).<span class="kw">await</span>
-            })()
-            .<span class="kw">await</span>
-        };
+                <span class="kw">let</span> <span class="ident">shadow_db_params</span> <span class="op">=</span> <span class="ident">ConnectorParams</span> {
+                    <span class="ident">connection_string</span>: <span class="ident">shadow_database_connection_string</span>,
+                    <span class="ident">preview_features</span>: <span class="self">self</span>
+                        .<span class="ident">state</span>
+                        .<span class="ident">params</span>()
+                        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">cp</span><span class="op">|</span> <span class="ident">cp</span>.<span class="ident">connector_params</span>.<span class="ident">preview_features</span>)
+                        .<span class="ident">unwrap_or_default</span>(),
+                    <span class="ident">shadow_database_connection_string</span>: <span class="prelude-val">None</span>,
+                };
+                <span class="ident">shadow_database</span>.<span class="ident">set_params</span>(<span class="ident">shadow_db_params</span>)<span class="question-mark">?</span>;
+                <span class="ident">shadow_database</span>.<span class="ident">ensure_connection_validity</span>().<span class="kw">await</span><span class="question-mark">?</span>;
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">shadow_database_name</span>) <span class="op">=</span> <span class="ident">shadow_database_name</span> {
-            <span class="self">self</span>.<span class="ident">clean_up_shadow_database</span>(<span class="ident">connector</span>.<span class="ident">conn</span>().<span class="kw">await</span><span class="question-mark">?</span>, <span class="kw-2">&amp;</span><span class="ident">shadow_database_name</span>)
-                .<span class="kw">await</span><span class="question-mark">?</span>;
+                <span class="kw">if</span> <span class="ident">shadow_database</span>.<span class="ident">reset</span>().<span class="kw">await</span>.<span class="ident">is_err</span>() {
+                    <span class="ident"><span class="kw">crate</span>::best_effort_reset</span>(<span class="kw-2">&amp;mut</span> <span class="ident">shadow_database</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+                }
+
+                <span class="kw">match</span> <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">params</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="ident">p</span>.<span class="ident">url</span>.<span class="ident">schema</span>()) {
+                    <span class="prelude-val">Some</span>(<span class="string">&quot;dbo&quot;</span>) <span class="op">|</span> <span class="prelude-val">None</span> =&gt; (),
+                    <span class="prelude-val">Some</span>(<span class="ident">other</span>) =&gt; {
+                        <span class="kw">let</span> <span class="ident">create_schema</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;CREATE SCHEMA [{schema}]&quot;</span>, <span class="ident">schema</span> <span class="op">=</span> <span class="ident">other</span>);
+                        <span class="ident">shadow_database</span>.<span class="ident">raw_cmd</span>(<span class="kw-2">&amp;</span><span class="ident">create_schema</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+                    }
+                }
+
+                <span class="ident">shadow_db::sql_schema_from_migrations_history</span>(<span class="ident">migrations</span>, <span class="ident">shadow_database</span>).<span class="kw">await</span>
+            })
+        } <span class="kw">else</span> {
+            <span class="ident">with_connection</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">state</span>, <span class="kw">move</span> <span class="op">|</span><span class="ident">params</span>, <span class="ident">main_connection</span><span class="op">|</span> <span class="kw">async</span> <span class="kw">move</span> {
+                <span class="kw">let</span> <span class="ident">shadow_database_name</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::new_shadow_database_name</span>();
+                <span class="comment">// See https://github.com/prisma/prisma/issues/6371 for the rationale on</span>
+                <span class="comment">// this conditional.</span>
+                <span class="kw">if</span> <span class="ident">params</span>.<span class="ident">is_running_on_azure_sql</span>() {
+                    <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ConnectorError::user_facing</span>(
+                        <span class="ident">user_facing_errors::migration_engine::AzureMssqlShadowDb</span>,
+                    ));
+                }
+
+                <span class="kw">let</span> <span class="ident">create_database</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;CREATE DATABASE [{}]&quot;</span>, <span class="ident">shadow_database_name</span>);
+
+                <span class="ident">main_connection</span>
+                    .<span class="ident">raw_cmd</span>(<span class="kw-2">&amp;</span><span class="ident">create_database</span>)
+                    .<span class="kw">await</span>
+                    .<span class="ident">map_err</span>(<span class="ident">ConnectorError::from</span>)
+                    .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">err</span><span class="op">|</span> <span class="ident">err</span>.<span class="ident">into_shadow_db_creation_error</span>())<span class="question-mark">?</span>;
+
+                <span class="kw">let</span> <span class="ident">connection_string</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;jdbc:{}&quot;</span>, <span class="ident">params</span>.<span class="ident">connector_params</span>.<span class="ident">connection_string</span>);
+                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">jdbc_string</span>: <span class="ident">JdbcString</span> <span class="op">=</span> <span class="ident">connection_string</span>.<span class="ident">parse</span>().<span class="ident">unwrap</span>();
+                <span class="ident">jdbc_string</span>
+                    .<span class="ident">properties_mut</span>()
+                    .<span class="ident">insert</span>(<span class="string">&quot;database&quot;</span>.<span class="ident">into</span>(), <span class="ident">shadow_database_name</span>.<span class="ident">to_owned</span>());
+                <span class="kw">let</span> <span class="ident">host</span> <span class="op">=</span> <span class="ident">jdbc_string</span>.<span class="ident">server_name</span>();
+
+                <span class="kw">let</span> <span class="ident">jdbc_string</span> <span class="op">=</span> <span class="ident">jdbc_string</span>.<span class="ident">to_string</span>();
+
+                <span class="macro">tracing::debug!</span>(<span class="string">&quot;Connecting to shadow database at {}&quot;</span>, <span class="ident">host</span>.<span class="ident">unwrap_or</span>(<span class="string">&quot;localhost&quot;</span>));
+
+                <span class="kw">let</span> <span class="ident">shadow_db_params</span> <span class="op">=</span> <span class="ident">ConnectorParams</span> {
+                    <span class="ident">connection_string</span>: <span class="ident">jdbc_string</span>,
+                    <span class="ident">preview_features</span>: <span class="ident">params</span>.<span class="ident">connector_params</span>.<span class="ident">preview_features</span>,
+                    <span class="ident">shadow_database_connection_string</span>: <span class="prelude-val">None</span>,
+                };
+                <span class="ident">shadow_database</span>.<span class="ident">set_params</span>(<span class="ident">shadow_db_params</span>)<span class="question-mark">?</span>;
+
+                <span class="kw">if</span> <span class="ident">params</span>.<span class="ident">url</span>.<span class="ident">schema</span>() <span class="op">!</span><span class="op">=</span> <span class="string">&quot;dbo&quot;</span> {
+                    <span class="kw">let</span> <span class="ident">create_schema</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;CREATE SCHEMA [{schema}]&quot;</span>, <span class="ident">schema</span> <span class="op">=</span> <span class="ident">params</span>.<span class="ident">url</span>.<span class="ident">schema</span>());
+                    <span class="ident">shadow_database</span>.<span class="ident">raw_cmd</span>(<span class="kw-2">&amp;</span><span class="ident">create_schema</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+                }
+
+                <span class="comment">// We go through the whole process without early return, then clean up</span>
+                <span class="comment">// the shadow database, and only then return the result. This avoids</span>
+                <span class="comment">// leaving shadow databases behind in case of e.g. faulty</span>
+                <span class="comment">// migrations.</span>
+                <span class="kw">let</span> <span class="ident">ret</span> <span class="op">=</span> <span class="ident">shadow_db::sql_schema_from_migrations_history</span>(<span class="ident">migrations</span>, <span class="ident">shadow_database</span>).<span class="kw">await</span>;
+                <span class="ident">clean_up_shadow_database</span>(<span class="kw-2">&amp;</span><span class="ident">shadow_database_name</span>, <span class="ident">main_connection</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+                <span class="ident">ret</span>
+            })
         }
+    }
 
-        <span class="ident">sql_schema_result</span>
+    <span class="kw">fn</span> <span class="ident">version</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">ConnectorResult</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+        <span class="ident">with_connection</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">state</span>, <span class="op">|</span><span class="kw">_</span>, <span class="ident">connection</span><span class="op">|</span> <span class="kw">async</span> {
+            <span class="prelude-val">Ok</span>(<span class="ident">connection</span>.<span class="ident">version</span>().<span class="kw">await</span><span class="question-mark">?</span>)
+        })
+    }
+}
+
+<span class="kw">fn</span> <span class="ident">with_connection</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">O</span>, <span class="ident">F</span>, <span class="ident">C</span><span class="op">&gt;</span>(<span class="ident">state</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">State</span>, <span class="ident">f</span>: <span class="ident">C</span>) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">ConnectorResult</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span><span class="op">&gt;</span>
+<span class="kw">where</span>
+    <span class="ident">O</span>: <span class="lifetime">&#39;a</span>,
+    <span class="ident">F</span>: <span class="ident">future::Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="ident">ConnectorResult</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;a</span>,
+    <span class="ident">C</span>: (<span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">Params</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">Connection</span>) -&gt; <span class="ident">F</span>) <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;a</span>,
+{
+    <span class="kw">match</span> <span class="ident">state</span> {
+        <span class="ident"><span class="kw">super</span>::State::Initial</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;logic error: Initial&quot;</span>),
+        <span class="ident"><span class="kw">super</span>::State::Connected</span>(<span class="ident">p</span>, <span class="ident">c</span>) =&gt; <span class="ident">Box::pin</span>(<span class="ident">f</span>(<span class="ident">p</span>, <span class="ident">c</span>)),
+        <span class="ident">state</span> @ <span class="ident"><span class="kw">super</span>::State::WithParams</span>(<span class="kw">_</span>) =&gt; <span class="ident">Box::pin</span>(<span class="kw">async</span> <span class="kw">move</span> {
+            <span class="ident">state</span>
+                .<span class="ident">try_connect</span>(<span class="op">|</span><span class="ident">params</span><span class="op">|</span> <span class="ident">Box::pin</span>(<span class="ident">connect</span>(<span class="kw-2">&amp;</span><span class="ident">params</span>.<span class="ident">connector_params</span>.<span class="ident">connection_string</span>)))
+                .<span class="kw">await</span><span class="question-mark">?</span>;
+            <span class="ident">with_connection</span>(<span class="ident">state</span>, <span class="ident">f</span>).<span class="kw">await</span>
+        }),
     }
 }
 
@@ -815,7 +1016,14 @@
     <span class="kw">fn</span> <span class="ident">debug_impl_does_not_leak_connection_info</span>() {
         <span class="kw">let</span> <span class="ident">url</span> <span class="op">=</span> <span class="string">&quot;sqlserver://myserver:8765;database=master;schema=mydbname;user=SA;password=&lt;mypassword&gt;;trustServerCertificate=true;socket_timeout=60;isolationLevel=READ UNCOMMITTED&quot;</span>;
 
-        <span class="kw">let</span> <span class="ident">flavour</span> <span class="op">=</span> <span class="ident">MssqlFlavour::new</span>(<span class="ident">MssqlUrl::new</span>(<span class="ident">url</span>).<span class="ident">unwrap</span>(), <span class="ident">BitFlags::empty</span>());
+        <span class="kw">let</span> <span class="ident">params</span> <span class="op">=</span> <span class="ident">ConnectorParams</span> {
+            <span class="ident">connection_string</span>: <span class="ident">url</span>.<span class="ident">to_owned</span>(),
+            <span class="ident">preview_features</span>: <span class="ident">Default::default</span>(),
+            <span class="ident">shadow_database_connection_string</span>: <span class="prelude-val">None</span>,
+        };
+
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">flavour</span> <span class="op">=</span> <span class="ident">MssqlFlavour::default</span>();
+        <span class="ident">flavour</span>.<span class="ident">set_params</span>(<span class="ident">params</span>).<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">debugged</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="ident">flavour</span>);
 
         <span class="kw">let</span> <span class="ident">words</span> <span class="op">=</span> <span class="kw-2">&amp;</span>[<span class="string">&quot;myname&quot;</span>, <span class="string">&quot;mypassword&quot;</span>, <span class="string">&quot;myserver&quot;</span>, <span class="string">&quot;8765&quot;</span>, <span class="string">&quot;mydbname&quot;</span>];
@@ -824,6 +1032,12 @@
             <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">debugged</span>.<span class="ident">contains</span>(<span class="ident">word</span>));
         }
     }
+}
+
+<span class="doccomment">/// Call this on the _main_ database when you are done with a shadow database.</span>
+<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">clean_up_shadow_database</span>(<span class="ident">database_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">connection</span>: <span class="kw-2">&amp;</span><span class="ident">Connection</span>) -&gt; <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">let</span> <span class="ident">drop_database</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;DROP DATABASE [{}]&quot;</span>, <span class="ident">database</span> <span class="op">=</span> <span class="ident">database_name</span>);
+    <span class="prelude-val">Ok</span>(<span class="ident">connection</span>.<span class="ident">raw_cmd</span>(<span class="kw-2">&amp;</span><span class="ident">drop_database</span>).<span class="kw">await</span><span class="question-mark">?</span>)
 }
 </code></pre></div>
 </section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="sql_migration_connector" data-search-index-js="../../../search-index.js" data-search-js="../../../search.js"></div>
