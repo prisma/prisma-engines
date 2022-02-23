@@ -1,10 +1,14 @@
 use crate::MongoDbMigrationConnector;
-use migration_connector::{ConnectorResult, DestructiveChangeChecker, DestructiveChangeDiagnostics, Migration};
+use migration_connector::{
+    BoxFuture, ConnectorResult, DestructiveChangeChecker, DestructiveChangeDiagnostics, Migration,
+};
 
-#[async_trait::async_trait]
 impl DestructiveChangeChecker for MongoDbMigrationConnector {
-    async fn check(&self, _database_migration: &Migration) -> ConnectorResult<DestructiveChangeDiagnostics> {
-        Ok(DestructiveChangeDiagnostics::new())
+    fn check<'a>(
+        &'a mut self,
+        _database_migration: &'a Migration,
+    ) -> BoxFuture<'a, ConnectorResult<DestructiveChangeDiagnostics>> {
+        Box::pin(std::future::ready(Ok(DestructiveChangeDiagnostics::new())))
     }
 
     fn pure_check(&self, _database_migration: &Migration) -> DestructiveChangeDiagnostics {

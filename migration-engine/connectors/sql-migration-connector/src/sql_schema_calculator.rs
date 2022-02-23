@@ -2,7 +2,7 @@ mod sql_schema_calculator_flavour;
 
 pub(super) use sql_schema_calculator_flavour::SqlSchemaCalculatorFlavour;
 
-use crate::flavour::SqlFlavour;
+use crate::{flavour::SqlFlavour, SqlDatabaseSchema};
 use datamodel::{
     datamodel_connector::{walker_ext_traits::*, ReferentialAction, ScalarType},
     dml::PrismaValue,
@@ -15,10 +15,10 @@ use datamodel::{
 };
 use sql_schema_describer as sql;
 
-pub(crate) fn calculate_sql_schema(datamodel: &ValidatedSchema, flavour: &dyn SqlFlavour) -> sql::SqlSchema {
-    let mut schema = sql::SqlSchema::empty();
+pub(crate) fn calculate_sql_schema(datamodel: &ValidatedSchema, flavour: &dyn SqlFlavour) -> SqlDatabaseSchema {
+    let mut schema = SqlDatabaseSchema::default();
 
-    schema.enums = flavour.calculate_enums(datamodel);
+    schema.describer_schema.enums = flavour.calculate_enums(datamodel);
 
     let mut context = Context {
         datamodel,
@@ -34,10 +34,11 @@ pub(crate) fn calculate_sql_schema(datamodel: &ValidatedSchema, flavour: &dyn Sq
 }
 
 fn push_model_tables(ctx: &mut Context<'_>) {
-    for model in ctx.datamodel.db.walk_models() {
+    for (model_idx, model) in ctx.datamodel.db.walk_models().enumerate() {
         let columns = model
             .scalar_fields()
-            .map(|field| column_for_scalar_field(field, ctx))
+            .enumerate()
+            .map(|(field_idx, field)| column_for_scalar_field(field, (model_idx, field_idx), ctx))
             .collect();
 
         let primary_key = model.primary_key().map(|pk| sql::PrimaryKey {
@@ -106,7 +107,7 @@ fn push_model_tables(ctx: &mut Context<'_>) {
             push_inline_relations(model, &mut table, ctx);
         }
 
-        ctx.schema.tables.push(table);
+        ctx.schema.describer_schema.tables.push(table);
     }
 }
 
@@ -215,19 +216,19 @@ fn push_relation_tables(ctx: &mut Context<'_>) {
         let columns = vec![
             sql::Column {
                 name: model_a_column.into(),
-                tpe: column_for_scalar_field(model_a_id, ctx).tpe,
+                tpe: column_for_scalar_field(model_a_id, (0, 0), ctx).tpe,
                 default: None,
                 auto_increment: false,
             },
             sql::Column {
                 name: model_b_column.into(),
-                tpe: column_for_scalar_field(model_b_id, ctx).tpe,
+                tpe: column_for_scalar_field(model_b_id, (0, 0), ctx).tpe,
                 default: None,
                 auto_increment: false,
             },
         ];
 
-        ctx.schema.tables.push(sql::Table {
+        ctx.schema.describer_schema.tables.push(sql::Table {
             name: table_name
                 .chars()
                 .take(datamodel.configuration.max_identifier_length())
@@ -240,11 +241,11 @@ fn push_relation_tables(ctx: &mut Context<'_>) {
     }
 }
 
-fn column_for_scalar_field(field: ScalarFieldWalker<'_>, ctx: &mut Context<'_>) -> sql::Column {
+fn column_for_scalar_field(field: ScalarFieldWalker<'_>, idx: (usize, usize), ctx: &mut Context<'_>) -> sql::Column {
     match field.resolved_scalar_field_type() {
         ScalarFieldType::Enum(enum_id) => column_for_model_enum_scalar_field(field, enum_id, ctx),
-        ScalarFieldType::CompositeType(_) => column_for_builtin_scalar_type(field, ScalarType::Json, ctx),
-        ScalarFieldType::BuiltInScalar(scalar_type) => column_for_builtin_scalar_type(field, scalar_type, ctx),
+        ScalarFieldType::CompositeType(_) => column_for_builtin_scalar_type(field, ScalarType::Json, idx, ctx),
+        ScalarFieldType::BuiltInScalar(scalar_type) => column_for_builtin_scalar_type(field, scalar_type, idx, ctx),
         ScalarFieldType::Unsupported(_) => column_for_model_unsupported_scalar_field(field, ctx),
         ScalarFieldType::Alias(_) => unreachable!(),
     }
@@ -304,6 +305,7 @@ fn column_for_model_unsupported_scalar_field(field: ScalarFieldWalker<'_>, ctx: 
 fn column_for_builtin_scalar_type(
     field: ScalarFieldWalker<'_>,
     scalar_type: ScalarType,
+    idx: (usize, usize),
     ctx: &mut Context<'_>,
 ) -> sql::Column {
     let connector = ctx.flavour.datamodel_connector();
@@ -376,7 +378,11 @@ fn column_for_builtin_scalar_type(
                     ast::Expression::ConstantValue(val, _) => Some(sql::DefaultValue::new(sql::DefaultKind::Value(
                         PrismaValue::Boolean(val.parse().unwrap()),
                     ))),
-                    ast::Expression::Function(_, _, _) => return None, // prisma-generated
+                    ast::Expression::Function(_, _, _) => {
+                        // prisma-generated
+                        ctx.schema.prisma_level_defaults.push((idx.0 as u32, idx.1 as u32));
+                        return None;
+                    }
                     ast::Expression::Array(_, _) => unreachable!("Array defaults are not implemented"),
                 }
             }
@@ -403,7 +409,7 @@ fn column_arity(arity: FieldArity) -> sql::ColumnArity {
 
 struct Context<'a> {
     datamodel: &'a ValidatedSchema,
-    schema: &'a mut sql::SqlSchema,
+    schema: &'a mut SqlDatabaseSchema,
     flavour: &'a dyn SqlFlavour,
 }
 

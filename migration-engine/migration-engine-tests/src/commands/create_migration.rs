@@ -1,39 +1,33 @@
-use migration_core::{json_rpc::types::*, CoreError, CoreResult, GenericApi};
+use migration_core::{
+    commands::create_migration, json_rpc::types::*, migration_connector::MigrationConnector, CoreError, CoreResult,
+};
 use pretty_assertions::assert_eq;
-use std::path::Path;
+use std::path::{Path, PathBuf};
 use tempfile::TempDir;
+use test_setup::runtime::run_with_thread_local_runtime;
 
 pub struct CreateMigration<'a> {
-    api: &'a dyn GenericApi,
+    api: &'a mut dyn MigrationConnector,
     schema: &'a str,
     migrations_directory: &'a TempDir,
     draft: bool,
     name: &'a str,
-    rt: Option<&'a tokio::runtime::Runtime>,
 }
 
 impl<'a> CreateMigration<'a> {
-    pub fn new(api: &'a dyn GenericApi, name: &'a str, schema: &'a str, migrations_directory: &'a TempDir) -> Self {
+    pub fn new(
+        api: &'a mut dyn MigrationConnector,
+        name: &'a str,
+        schema: &'a str,
+        migrations_directory: &'a TempDir,
+    ) -> Self {
         CreateMigration {
             api,
             schema,
             migrations_directory,
             draft: false,
             name,
-            rt: None,
         }
-    }
-
-    pub fn new_sync(
-        api: &'a dyn GenericApi,
-        name: &'a str,
-        schema: &'a str,
-        migrations_directory: &'a TempDir,
-        rt: &'a tokio::runtime::Runtime,
-    ) -> Self {
-        let mut initial = Self::new(api, name, schema, migrations_directory);
-        initial.rt = Some(rt);
-        initial
     }
 
     pub fn draft(mut self, draft: bool) -> Self {
@@ -43,37 +37,36 @@ impl<'a> CreateMigration<'a> {
     }
 
     pub async fn send(self) -> CoreResult<CreateMigrationAssertion<'a>> {
-        let output = self
-            .api
-            .create_migration(CreateMigrationInput {
+        let output = create_migration(
+            CreateMigrationInput {
                 migrations_directory_path: self.migrations_directory.path().to_str().unwrap().to_owned(),
                 prisma_schema: self.schema.to_owned(),
                 draft: self.draft,
                 migration_name: self.name.to_owned(),
-            })
-            .await?;
+            },
+            self.api,
+        )
+        .await?;
 
         Ok(CreateMigrationAssertion {
             output,
-            _api: self.api,
             migrations_directory: self.migrations_directory,
         })
     }
 
     #[track_caller]
     pub fn send_sync(self) -> CreateMigrationAssertion<'a> {
-        self.rt.unwrap().block_on(self.send()).unwrap()
+        run_with_thread_local_runtime(self.send()).unwrap()
     }
 
     #[track_caller]
     pub fn send_unwrap_err(self) -> CoreError {
-        self.rt.unwrap().block_on(self.send()).unwrap_err()
+        run_with_thread_local_runtime(self.send()).unwrap_err()
     }
 }
 
 pub struct CreateMigrationAssertion<'a> {
-    output: CreateMigrationOutput,
-    _api: &'a dyn GenericApi,
+    pub output: CreateMigrationOutput,
     migrations_directory: &'a TempDir,
 }
 
@@ -151,6 +144,13 @@ impl<'a> CreateMigrationAssertion<'a> {
         &self.output
     }
 
+    pub fn migration_script_path(&self) -> PathBuf {
+        self.migrations_directory
+            .path()
+            .join(self.output.generated_migration_name.as_ref().unwrap())
+            .join("migration.sql")
+    }
+
     #[track_caller]
     pub fn modify_migration<F>(self, modify: F) -> Self
     where
@@ -158,12 +158,7 @@ impl<'a> CreateMigrationAssertion<'a> {
     {
         use std::io::Write as _;
 
-        let migration_script_path = self
-            .migrations_directory
-            .path()
-            .join(self.output.generated_migration_name.as_ref().unwrap())
-            .join("migration.sql");
-
+        let migration_script_path = self.migration_script_path();
         let new_contents = {
             let mut contents = std::fs::read_to_string(&migration_script_path).expect("Reading migration script");
 

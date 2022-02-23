@@ -137,9 +137,10 @@ fn evaluate_data_loss_with_past_unapplied_migrations_with_destructive_changes_do
     "#,
     );
 
+    let is_mysql = api.is_mysql();
     api.evaluate_data_loss(&directory, dm2.clone())
         .send()
-        .assert_warnings(&[if api.is_mysql() {
+        .assert_warnings(&[if is_mysql {
         "The values [PLAYFUL] on the enum `Cat_mood` will be removed. If these variants are still used in the database, this will fail."
     } else {
         "The values [PLAYFUL] on the enum `CatMood` will be removed. If these variants are still used in the database, this will fail."
@@ -273,10 +274,11 @@ fn evaluate_data_loss_maps_warnings_to_the_right_steps(api: TestApi) {
         api.normalize_identifier("Cat")
     );
 
+    let is_postgres = api.is_postgres();
     api.evaluate_data_loss(&directory, dm2)
         .send()
-        .assert_warnings_with_indices(&[(warn.into(), if api.is_postgres() { 1 } else { 0 })])
+        .assert_warnings_with_indices(&[(warn.into(), if is_postgres { 1 } else { 0 })])
         .assert_unexecutables_with_indices(&[
-            ("Added the required column `isGoodDog` to the `Dog` table without a default value. There are 1 rows in this table, it is not possible to execute this step.".into(), if api.is_postgres() { 2 } else { 1 }),
+            ("Added the required column `isGoodDog` to the `Dog` table without a default value. There are 1 rows in this table, it is not possible to execute this step.".into(), if is_postgres { 2 } else { 1 }),
         ]);
 }

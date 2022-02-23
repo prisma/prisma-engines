@@ -1,24 +1,24 @@
-use migration_core::{json_rpc::types::*, CoreError, CoreResult, GenericApi};
+use migration_core::{
+    commands::schema_push, json_rpc::types::*, migration_connector::MigrationConnector, CoreError, CoreResult,
+};
 use std::{borrow::Cow, fmt::Debug};
 use tracing_futures::Instrument;
 
 pub struct SchemaPush<'a> {
-    api: &'a dyn GenericApi,
+    api: &'a mut dyn MigrationConnector,
     schema: String,
     force: bool,
     /// Purely for logging diagnostics.
     migration_id: Option<&'a str>,
-    rt: &'a tokio::runtime::Runtime,
 }
 
 impl<'a> SchemaPush<'a> {
-    pub fn new(api: &'a dyn GenericApi, schema: String, rt: &'a tokio::runtime::Runtime) -> Self {
+    pub fn new(api: &'a mut dyn MigrationConnector, schema: String) -> Self {
         SchemaPush {
             api,
             schema,
             force: false,
             migration_id: None,
-            rt,
         }
     }
 
@@ -32,28 +32,23 @@ impl<'a> SchemaPush<'a> {
         self
     }
 
-    fn send_impl(self) -> CoreResult<SchemaPushAssertion<'a>> {
+    fn send_impl(self) -> CoreResult<SchemaPushAssertion> {
         let input = SchemaPushInput {
             schema: self.schema,
             force: self.force,
         };
 
-        let fut = self
-            .api
-            .schema_push(input)
+        let fut = schema_push(input, self.api)
             .instrument(tracing::info_span!("SchemaPush", migration_id = ?self.migration_id));
 
-        let output = self.rt.block_on(fut)?;
+        let output = test_setup::runtime::run_with_thread_local_runtime(fut)?;
 
-        Ok(SchemaPushAssertion {
-            result: output,
-            _api: self.api,
-        })
+        Ok(SchemaPushAssertion { result: output })
     }
 
     /// Execute the command and expect it to succeed.
     #[track_caller]
-    pub fn send(self) -> SchemaPushAssertion<'a> {
+    pub fn send(self) -> SchemaPushAssertion {
         self.send_impl().unwrap()
     }
 
@@ -64,18 +59,17 @@ impl<'a> SchemaPush<'a> {
     }
 }
 
-pub struct SchemaPushAssertion<'a> {
+pub struct SchemaPushAssertion {
     pub(super) result: SchemaPushOutput,
-    pub(super) _api: &'a dyn GenericApi,
 }
 
-impl Debug for SchemaPushAssertion<'_> {
+impl Debug for SchemaPushAssertion {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         self.result.fmt(f)
     }
 }
 
-impl<'a> SchemaPushAssertion<'a> {
+impl SchemaPushAssertion {
     /// Asserts that the command produced no warning and no unexecutable migration message.
     #[track_caller]
     pub fn assert_green(self) -> Self {

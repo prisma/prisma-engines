@@ -133,7 +133,10 @@ impl SqlRenderer for MysqlFlavour {
                         })
                         .join(", ")
                 )),
-                TableChange::AddColumn { column_id } => {
+                TableChange::AddColumn {
+                    column_id,
+                    has_virtual_default: _,
+                } => {
                     let column = tables.next().column_at(*column_id);
                     let col_sql = self.render_column(&column);
 

@@ -1,3 +1,4 @@
+use crate::SqlDatabaseSchema;
 use sql_schema_describer::{
     walkers::{ColumnWalker, EnumWalker, ForeignKeyWalker, IndexWalker, SqlSchemaExt, TableWalker},
     ColumnId, SqlSchema, TableId,
@@ -74,18 +75,34 @@ impl<T> Pair<Option<T>> {
     }
 }
 
-impl<'a> Pair<&'a SqlSchema> {
+impl<'a> Pair<&'a SqlDatabaseSchema> {
     pub(crate) fn enums(&self, enum_indexes: &Pair<usize>) -> Pair<EnumWalker<'a>> {
         Pair::new(
-            self.previous().enum_walker_at(enum_indexes.previous),
+            self.previous.enum_walker_at(enum_indexes.previous),
             self.next.enum_walker_at(enum_indexes.next),
         )
     }
 
     pub(crate) fn tables(&self, table_ids: &Pair<TableId>) -> Pair<TableWalker<'a>> {
         Pair::new(
-            self.previous().table_walker_at(*table_ids.previous()),
-            self.next.table_walker_at(*table_ids.next()),
+            self.previous.table_walker_at(table_ids.previous),
+            self.next.table_walker_at(table_ids.next),
+        )
+    }
+}
+
+impl<'a> Pair<&'a SqlSchema> {
+    pub(crate) fn enums(&self, enum_indexes: &Pair<usize>) -> Pair<EnumWalker<'a>> {
+        Pair::new(
+            self.previous.enum_walker_at(enum_indexes.previous),
+            self.next.enum_walker_at(enum_indexes.next),
+        )
+    }
+
+    pub(crate) fn tables(&self, table_ids: &Pair<TableId>) -> Pair<TableWalker<'a>> {
+        Pair::new(
+            self.previous.table_walker_at(table_ids.previous),
+            self.next.table_walker_at(table_ids.next),
         )
     }
 }
@@ -93,8 +110,8 @@ impl<'a> Pair<&'a SqlSchema> {
 impl<'a> Pair<TableWalker<'a>> {
     pub(crate) fn columns(&self, column_ids: &Pair<ColumnId>) -> Pair<ColumnWalker<'a>> {
         Pair::new(
-            self.previous().column_at(*column_ids.previous()),
-            self.next().column_at(*column_ids.next()),
+            self.previous.column_at(column_ids.previous),
+            self.next.column_at(column_ids.next),
         )
     }
 

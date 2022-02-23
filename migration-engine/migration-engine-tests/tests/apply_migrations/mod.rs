@@ -1,6 +1,7 @@
 use indoc::{formatdoc, indoc};
 use migration_engine_tests::test_api::*;
 use pretty_assertions::assert_eq;
+use std::io::Write;
 use user_facing_errors::{migration_engine::ApplyMigrationError, UserFacingError};
 
 #[test_connector]
@@ -157,10 +158,7 @@ fn migrations_should_fail_when_the_script_is_invalid(api: TestApi) {
         );
     }
 
-    let mut migrations = api
-        .block_on(api.migration_persistence().list_migrations())
-        .unwrap()
-        .unwrap();
+    let mut migrations = tok(api.migration_persistence().list_migrations()).unwrap().unwrap();
 
     assert_eq!(migrations.len(), 2);
 
@@ -191,11 +189,20 @@ fn migrations_should_not_reapply_modified_migrations(api: TestApi) {
 
     let migrations_directory = api.create_migrations_directory();
 
-    let assertions = api.create_migration("initial", &dm1, &migrations_directory).send_sync();
+    let initial_path = api
+        .create_migration("initial", &dm1, &migrations_directory)
+        .send_sync()
+        .migration_script_path();
 
     api.apply_migrations(&migrations_directory).send_sync();
 
-    assertions.modify_migration(|script| *script = format!("/* this is just a harmless comment */\n{}", script));
+    let mut file = std::fs::OpenOptions::new()
+        .append(true)
+        .write(true)
+        .open(initial_path)
+        .unwrap();
+    file.write_all(b"-- this is just a harmless comment\nSELECT 1;")
+        .unwrap();
 
     let dm2 = api.datamodel_with_provider(
         r#"

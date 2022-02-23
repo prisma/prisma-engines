@@ -4,7 +4,7 @@ use std::ops::Index;
 /// The identifier for a table in a SqlSchema. Use it with the indexing syntax:
 /// `let table = schema[table_id];`
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
-pub struct TableId(pub(crate) u32);
+pub struct TableId(pub u32);
 
 impl Index<TableId> for SqlSchema {
     type Output = Table;
@@ -28,7 +28,7 @@ impl Index<EnumId> for SqlSchema {
 
 /// The identifier for a column in a SqlSchema.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
-pub struct ColumnId(pub(crate) u32);
+pub struct ColumnId(pub u32);
 
 impl Index<ColumnId> for Table {
     type Output = Column;

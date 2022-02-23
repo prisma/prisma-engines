@@ -10,7 +10,7 @@ use introspection_connector::{
     CompositeTypeDepth, ConnectorResult, DatabaseMetadata, IntrospectionConnector, IntrospectionContext,
     IntrospectionResult, Version,
 };
-use migration_connector::MigrationConnector;
+use migration_connector::{ConnectorParams, MigrationConnector};
 use quaint::{
     prelude::{Queryable, SqlFamily},
     single::Quaint,
@@ -41,7 +41,13 @@ impl TestApi {
             .collect();
 
         let (database, connection_string): (Quaint, String) = if tags.intersects(Tags::Vitess) {
-            let me = SqlMigrationConnector::new(connection_string.to_owned(), preview_features, None).unwrap();
+            let params = ConnectorParams {
+                connection_string: connection_string.to_owned(),
+                preview_features,
+                shadow_database_connection_string: None,
+            };
+            let mut me = SqlMigrationConnector::new_mysql();
+            me.set_params(params).unwrap();
 
             me.reset().await.unwrap();
 

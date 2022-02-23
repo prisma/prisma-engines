@@ -1,4 +1,5 @@
 use migration_core::{
+    commands::diff,
     json_rpc::types::{DiffTarget, PathContainer},
     migration_connector::MigrationConnector,
 };
@@ -83,8 +84,6 @@ fn diffing_postgres_schemas_when_initialized_on_sqlite(mut api: TestApi) {
 
 #[test_connector(tags(Postgres))]
 fn from_empty_to_migrations_directory(mut api: TestApi) {
-    let host = Arc::new(TestConnectorHost::default());
-    api.connector.set_host(host.clone());
     let base_dir = tempfile::TempDir::new().unwrap();
     let first_migration_directory_path = base_dir.path().join("01firstmigration");
     let first_migration_file_path = first_migration_directory_path.join("migration.sql");
@@ -110,7 +109,8 @@ fn from_empty_to_migrations_directory(mut api: TestApi) {
         shadow_database_url: Some(api.connection_string().to_owned()),
     };
 
-    api.diff(params).unwrap();
+    let host = Arc::new(TestConnectorHost::default());
+    tok(diff(params, host.clone())).unwrap();
 
     let expected_printed_messages = expect![[r#"
         [
@@ -179,7 +179,7 @@ fn from_schema_datamodel_to_url(mut api: TestApi) {
     let schema_path = write_file_to_tmp(&first_schema, &tempdir, "schema.prisma");
     let second_url = format!("file:{}/second_db.sqlite", base_dir_str);
 
-    api.block_on(async {
+    tok(async {
         let q = quaint::single::Quaint::new(&second_url).await.unwrap();
         q.raw_cmd("CREATE TABLE cats ( id INTEGER PRIMARY KEY, meows BOOLEAN DEFAULT true );")
             .await
@@ -216,14 +216,14 @@ fn from_schema_datasource_to_url(mut api: TestApi) {
     let first_url = format!("file:{}/first_db.sqlite", base_dir_str);
     let second_url = format!("file:{}/second_db.sqlite", base_dir_str);
 
-    api.block_on(async {
+    tok(async {
         let q = quaint::single::Quaint::new(&first_url).await.unwrap();
         q.raw_cmd("CREATE TABLE cows ( id INTEGER PRIMARY KEY, moos BOOLEAN DEFAULT true );")
             .await
             .unwrap();
     });
 
-    api.block_on(async {
+    tok(async {
         let q = quaint::single::Quaint::new(&second_url).await.unwrap();
         q.raw_cmd("CREATE TABLE cats ( id INTEGER PRIMARY KEY, meows BOOLEAN DEFAULT true );")
             .await
@@ -270,14 +270,14 @@ fn from_url_to_url(mut api: TestApi) {
     let first_url = format!("file:{}/first_db.sqlite", base_dir_str);
     let second_url = format!("file:{}/second_db.sqlite", base_dir_str);
 
-    api.block_on(async {
+    tok(async {
         let q = quaint::single::Quaint::new(&first_url).await.unwrap();
         q.raw_cmd("CREATE TABLE cows ( id INTEGER PRIMARY KEY, moos BOOLEAN DEFAULT true );")
             .await
             .unwrap();
     });
 
-    api.block_on(async {
+    tok(async {
         let q = quaint::single::Quaint::new(&second_url).await.unwrap();
         q.raw_cmd("CREATE TABLE cats ( id INTEGER PRIMARY KEY, meows BOOLEAN DEFAULT true );")
             .await
@@ -474,6 +474,53 @@ fn with_missing_prisma_schema_should_return_helpful_error() {
     test_with_from_target(DiffTarget::SchemaDatasource(SchemaContainer {
         schema: tmp_path_str.to_owned(),
     }));
+}
+
+#[test]
+fn diffing_two_schema_datamodels_with_missing_datasource_env_vars() {
+    for provider in ["sqlite", "postgresql", "postgres", "mysql", "sqlserver"] {
+        let schema_a = format!(
+            r#"
+            datasource db {{
+                provider = "{provider}"
+                url = env("HELLO_THIS_ENV_VAR_IS_NOT_D3F1N3D")
+            }}
+        "#
+        );
+
+        let schema_b = format!(
+            r#"
+            datasource db {{
+                provider = "{provider}"
+                url = env("THIS_ENV_VAR_DO3S_N0T_EXiST_EITHER")
+            }}
+
+            model Particle {{
+                id Int @id
+            }}
+        "#
+        );
+
+        let tmpdir = tempfile::tempdir().unwrap();
+        let schema_a = write_file_to_tmp(&schema_a, &tmpdir, "schema_a");
+        let schema_b = write_file_to_tmp(&schema_b, &tmpdir, "schema_b");
+
+        let expected = expect![[r#"
+
+            [+] Added tables
+              - Particle
+        "#]];
+        expected.assert_eq(&diff_output(DiffParams {
+            from: DiffTarget::SchemaDatamodel(SchemaContainer {
+                schema: schema_a.to_str().unwrap().to_owned(),
+            }),
+            script: false,
+            shadow_database_url: None,
+            to: DiffTarget::SchemaDatamodel(SchemaContainer {
+                schema: schema_b.to_str().unwrap().to_owned(),
+            }),
+        }))
+    }
 }
 
 // Call diff, and expect it to error. Return the error.

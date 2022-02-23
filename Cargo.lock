@@ -1981,6 +1981,7 @@ dependencies = [
  "async-trait",
  "chrono",
  "datamodel",
+ "enumflags2",
  "sha2 0.9.8",
  "tracing",
  "tracing-error",
@@ -2013,7 +2014,6 @@ dependencies = [
 name = "migration-engine-cli"
 version = "0.1.0"
 dependencies = [
- "async-trait",
  "backtrace",
  "base64 0.13.0",
  "connection-string",

@@ -2,7 +2,7 @@ use super::{
     check::Check, database_inspection_results::DatabaseInspectionResults,
     unexecutable_step_check::UnexecutableStepCheck, warning_check::SqlMigrationWarningCheck,
 };
-use crate::{connection_wrapper::Connection, flavour::SqlFlavour};
+use crate::flavour::SqlFlavour;
 use migration_connector::{
     ConnectorError, ConnectorResult, DestructiveChangeDiagnostics, MigrationWarning, UnexecutableMigration,
 };
@@ -40,22 +40,20 @@ impl DestructiveCheckPlan {
     /// errors.
     ///
     /// For example, dropping a table that has 0 rows can be considered safe.
-    #[tracing::instrument(skip(conn), level = "debug")]
+    #[tracing::instrument(skip(flavour), level = "debug")]
     pub(super) async fn execute(
         &self,
-        flavour: &(dyn SqlFlavour + Send + Sync),
-        conn: &Connection,
+        flavour: &mut (dyn SqlFlavour + Send + Sync),
     ) -> ConnectorResult<DestructiveChangeDiagnostics> {
         let mut results = DatabaseInspectionResults::default();
 
         let inspection = async {
             for (unexecutable, _idx) in &self.unexecutable_migrations {
-                self.inspect_for_check(unexecutable, flavour, &mut results, conn)
-                    .await?;
+                self.inspect_for_check(unexecutable, flavour, &mut results).await?;
             }
 
             for (warning, _idx) in &self.warnings {
-                self.inspect_for_check(warning, flavour, &mut results, conn).await?;
+                self.inspect_for_check(warning, flavour, &mut results).await?;
             }
 
             Ok::<(), ConnectorError>(())
@@ -94,20 +92,19 @@ impl DestructiveCheckPlan {
     pub(super) async fn inspect_for_check(
         &self,
         check: &(dyn Check + Send + Sync + 'static),
-        flavour: &(dyn SqlFlavour + Send + Sync),
+        flavour: &mut (dyn SqlFlavour + Send + Sync),
         results: &mut DatabaseInspectionResults,
-        conn: &Connection,
     ) -> ConnectorResult<()> {
         if let Some(table) = check.needed_table_row_count() {
             if results.get_row_count(table).is_none() {
-                let count = flavour.count_rows_in_table(table, conn).await?;
+                let count = flavour.count_rows_in_table(table).await?;
                 results.set_row_count(table.to_owned(), count)
             }
         }
 
         if let Some((table, column)) = check.needed_column_value_count() {
             if let (_, None) = results.get_row_and_non_null_value_count(table, column) {
-                let count = flavour.count_values_in_column((table, column), conn).await?;
+                let count = flavour.count_values_in_column((table, column)).await?;
                 results.set_value_count(table.to_owned().into(), column.to_owned().into(), count);
             }
         }

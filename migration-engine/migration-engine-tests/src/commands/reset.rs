@@ -1,34 +1,31 @@
-use migration_core::{CoreResult, GenericApi};
+use migration_core::{migration_connector::MigrationConnector, CoreResult};
 
 #[must_use = "This struct does nothing on its own. See Reset::send()"]
 pub struct Reset<'a> {
-    api: &'a dyn GenericApi,
-    rt: Option<&'a tokio::runtime::Runtime>,
+    api: &'a mut dyn MigrationConnector,
 }
 
 impl<'a> Reset<'a> {
-    pub fn new_sync(api: &'a dyn GenericApi, rt: &'a tokio::runtime::Runtime) -> Self {
-        Reset { api, rt: Some(rt) }
+    pub fn new(api: &'a mut dyn MigrationConnector) -> Self {
+        Reset { api }
     }
 
-    pub async fn send(self) -> CoreResult<ResetAssertion<'a>> {
+    pub async fn send(self) -> CoreResult<ResetAssertion> {
         self.api.reset().await?;
 
-        Ok(ResetAssertion { _api: self.api })
+        Ok(ResetAssertion {})
     }
 
     /// Execute the command and expect it to succeed.
     #[track_caller]
-    pub fn send_sync(self) -> ResetAssertion<'a> {
-        self.rt.unwrap().block_on(self.send()).unwrap()
+    pub fn send_sync(self) -> ResetAssertion {
+        test_setup::runtime::run_with_thread_local_runtime(self.send()).unwrap()
     }
 }
 
-pub struct ResetAssertion<'a> {
-    _api: &'a dyn GenericApi,
-}
+pub struct ResetAssertion {}
 
-impl std::fmt::Debug for ResetAssertion<'_> {
+impl std::fmt::Debug for ResetAssertion {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "ResetAssertion {{ .. }}")
     }

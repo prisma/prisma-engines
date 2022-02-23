@@ -65,14 +65,6 @@ use names::Names;
 ///   fields.
 /// - Global validations are then performed on the mostly validated schema.
 ///   Currently only index name collisions.
-///
-/// ## Lifetimes
-///
-/// Throughout the ParserDatabase implementation, you will see many lifetime
-/// annotations. The only significant lifetime is the lifetime of the reference
-/// to the AST contained in ParserDatabase, that we call by convention `'ast`.
-/// Apart from that, everything should be owned or locally borrowed, to keep
-/// lifetime management simple.
 pub struct ParserDatabase {
     ast: ast::SchemaAst,
     interner: interner::StringInterner,

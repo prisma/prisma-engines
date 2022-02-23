@@ -19,7 +19,10 @@ use datamodel::{
     Datasource,
 };
 use enumflags2::BitFlags;
-use migration_core::{json_rpc::types::*, migration_connector::ConnectorResult};
+use migration_core::{
+    json_rpc::types::*,
+    migration_connector::{BoxFuture, ConnectorResult},
+};
 use std::{env, sync::Arc};
 
 fn parse_configuration(datamodel: &str) -> ConnectorResult<(Datasource, String, BitFlags<PreviewFeature>)> {
@@ -107,12 +110,11 @@ struct LoggingHost {
     printed: std::sync::Mutex<Vec<String>>,
 }
 
-#[async_trait::async_trait]
 impl migration_core::migration_connector::ConnectorHost for LoggingHost {
-    async fn print(&self, text: &str) -> ConnectorResult<()> {
+    fn print(&self, text: &str) -> BoxFuture<'_, ConnectorResult<()>> {
         let mut msgs = self.printed.lock().unwrap();
         msgs.push(text.to_owned());
-        Ok(())
+        Box::pin(std::future::ready(Ok(())))
     }
 }
 

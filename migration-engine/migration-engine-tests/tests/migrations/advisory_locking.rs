@@ -1,11 +1,10 @@
-use migration_core::json_rpc::types::*;
 use migration_engine_tests::multi_engine_test_api::*;
 use std::sync::Arc;
 use test_macros::test_connector;
 
 #[test_connector(exclude(CockroachDb))]
-fn advisory_locking_works(api: TestApi) {
-    let first_me = api.new_engine();
+fn advisory_locking_works(mut api: TestApi) {
+    let mut first_me = api.new_engine();
     let migrations_directory = Arc::new(api.create_migrations_directory());
 
     let dm = api.datamodel_with_provider(
@@ -17,21 +16,17 @@ fn advisory_locking_works(api: TestApi) {
     "#,
     );
 
-    let output = api
-        .block_on(first_me.generic_api().create_migration(CreateMigrationInput {
-            migrations_directory_path: migrations_directory.path().to_string_lossy().into(),
-            prisma_schema: dm,
-            migration_name: "01initial".into(),
-            draft: true,
-        }))
-        .unwrap();
+    let output = first_me
+        .create_migration("01initial".into(), &dm, &migrations_directory)
+        .draft(true)
+        .send_sync();
 
-    let migration_name = output.generated_migration_name.expect("generated no migration");
+    let migration_name = output.output.generated_migration_name.expect("generated no migration");
 
-    let second_me = api.new_engine();
-    let third_me = api.new_engine();
+    let mut second_me = api.new_engine();
+    let mut third_me = api.new_engine();
 
-    let (result_1, result_2, result_3) = api.block_on(async {
+    let (result_1, result_2, result_3) = tok(async {
         let migrations_directory_2 = migrations_directory.clone();
         let migrations_directory_3 = migrations_directory.clone();
         tokio::join!(

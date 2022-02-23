@@ -14,10 +14,6 @@ use std::{collections::BTreeSet, fmt::Write as _};
 pub struct SqlMigration {
     pub(crate) before: SqlSchema,
     pub(crate) after: SqlSchema,
-    /// (table_id, column_id) for columns with a prisma-level default
-    /// (cuid() or uuid()) in the `after` schema that aren't present in the
-    /// `before` schema.
-    pub(crate) added_columns_with_virtual_defaults: Vec<(TableId, ColumnId)>,
     pub(crate) steps: Vec<SqlMigrationStep>,
 }
 
@@ -255,7 +251,10 @@ impl SqlMigration {
 
                     for change in &alter_table.changes {
                         match change {
-                            TableChange::AddColumn { column_id } => {
+                            TableChange::AddColumn {
+                                column_id,
+                                has_virtual_default: _,
+                            } => {
                                 out.push_str("  [+] Added column `");
                                 out.push_str(tables.next().column_at(*column_id).name());
                                 out.push_str("`\n");
@@ -483,20 +482,6 @@ pub(crate) enum SqlMigrationStep {
 }
 
 impl SqlMigrationStep {
-    pub(crate) fn as_alter_table(&self) -> Option<&AlterTable> {
-        match self {
-            SqlMigrationStep::AlterTable(alter_table) => Some(alter_table),
-            _ => None,
-        }
-    }
-
-    pub(crate) fn as_redefine_tables(&self) -> Option<&[RedefineTable]> {
-        match self {
-            SqlMigrationStep::RedefineTables(redefines) => Some(redefines),
-            _ => None,
-        }
-    }
-
     pub(crate) fn description(&self) -> &'static str {
         match self {
             SqlMigrationStep::AddForeignKey { .. } => "AddForeignKey",
@@ -529,6 +514,7 @@ pub(crate) struct AlterTable {
 pub(crate) enum TableChange {
     AddColumn {
         column_id: ColumnId,
+        has_virtual_default: bool,
     },
     AlterColumn(AlterColumn),
     DropColumn {
@@ -542,15 +528,6 @@ pub(crate) enum TableChange {
     DropPrimaryKey,
     AddPrimaryKey,
     RenamePrimaryKey,
-}
-
-impl TableChange {
-    pub(crate) fn as_add_column(&self) -> Option<ColumnId> {
-        match self {
-            TableChange::AddColumn { column_id } => Some(*column_id),
-            _ => None,
-        }
-    }
 }
 
 #[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord)]
@@ -616,6 +593,7 @@ impl AlterEnum {
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
 pub(crate) struct RedefineTable {
     pub added_columns: Vec<ColumnId>,
+    pub added_columns_with_virtual_defaults: Vec<ColumnId>,
     pub dropped_columns: Vec<ColumnId>,
     pub dropped_primary_key: bool,
     pub column_pairs: Vec<(Pair<ColumnId>, ColumnChanges, Option<ColumnTypeChange>)>,

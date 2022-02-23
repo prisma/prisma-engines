@@ -3,7 +3,7 @@
 mod commands;
 mod logger;
 
-use migration_connector::ConnectorError;
+use migration_connector::{BoxFuture, ConnectorHost, ConnectorResult};
 use migration_core::rpc_api;
 use std::sync::Arc;
 use structopt::StructOpt;
@@ -73,22 +73,20 @@ struct JsonRpcHost {
     client: json_rpc_stdio::Client,
 }
 
-#[async_trait::async_trait]
-impl migration_connector::ConnectorHost for JsonRpcHost {
-    async fn print(&self, text: &str) -> migration_connector::ConnectorResult<()> {
-        // Adapter to be removed when https://github.com/prisma/prisma/issues/11761 is closed.
-        assert!(!text.is_empty());
-        assert!(text.ends_with('\n'));
-        let text = &text[..text.len() - 1];
+impl ConnectorHost for JsonRpcHost {
+    fn print<'a>(&'a self, text: &'a str) -> BoxFuture<'a, ConnectorResult<()>> {
+        Box::pin(async move {
+            // Adapter to be removed when https://github.com/prisma/prisma/issues/11761 is closed.
+            assert!(!text.is_empty());
+            assert!(text.ends_with('\n'));
+            let text = &text[..text.len() - 1];
 
-        let notification = serde_json::json!({ "content": text });
+            let notification = serde_json::json!({ "content": text });
 
-        let _: std::collections::HashMap<(), ()> = self
-            .client
-            .call("print".to_owned(), notification)
-            .await
-            .map_err(|err| ConnectorError::from_source(err, "JSON-RPC error"))?;
-        Ok(())
+            let _: std::collections::HashMap<(), ()> =
+                self.client.call("print".to_owned(), notification).await.unwrap();
+            Ok(())
+        })
     }
 }
 
