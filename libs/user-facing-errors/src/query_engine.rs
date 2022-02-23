@@ -309,6 +309,6 @@ pub struct MissingFullTextSearchIndex {}
 #[derive(Debug, UserFacingError, Serialize)]
 #[user_facing(
     code = "P2031",
-    message = "MongoDB server needs to be run as a replica set to be able to perform transactions. https://pris.ly/d/mongdb-replica-set"
+    message = "Prisma needs to perform transactions, which requires your MongoDB server to be run as a replica set. https://pris.ly/d/mongodb-replica-set"
 )]
 pub struct MongoReplicaSetRequired {}
