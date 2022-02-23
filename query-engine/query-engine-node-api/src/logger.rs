@@ -1,99 +1,86 @@
-mod channel;
-mod registry;
-mod telemetry;
-mod visitor;
+use core::fmt;
 
-use channel::EventChannel;
-use napi::threadsafe_function::ThreadsafeFunction;
-use opentelemetry::{
-    global,
-    sdk::{propagation::TraceContextPropagator, trace::Config, Resource},
-    KeyValue,
+use napi::threadsafe_function::{ThreadsafeFunction, ThreadsafeFunctionCallMode};
+use serde_json::Value;
+use std::collections::BTreeMap;
+use tracing::{
+    field::{Field, Visit},
+    Level, Subscriber,
 };
+use tracing_subscriber::Layer;
 
-use opentelemetry_otlp::WithExportConfig;
-use registry::EventRegistry;
-use std::future::Future;
-use telemetry::WithTelemetry;
-use tracing_futures::WithSubscriber;
-use tracing_subscriber::{
-    layer::{Layered, SubscriberExt},
-    EnvFilter,
-};
-
-#[derive(Clone)]
-enum Subscriber {
-    Normal(Layered<EventChannel, EventRegistry>),
-    WithTelemetry(WithTelemetry),
+pub struct JsonVisitor<'a> {
+    values: BTreeMap<&'a str, Value>,
 }
 
-/// A logger logging to a bounded channel. When in scope, all log messages from
-/// the scope are stored to the channel, which must be consumed or after some
-/// point, further log lines will just be dropped.
-#[derive(Clone)]
-pub struct ChannelLogger {
-    subscriber: Subscriber,
+impl<'a> JsonVisitor<'a> {
+    pub fn new(level: &Level, target: &str) -> Self {
+        let mut values = BTreeMap::new();
+        values.insert("level", serde_json::Value::from(level.to_string()));
+
+        // NOTE: previous version used module_path, this is not correct and it should be _target_
+        values.insert("module_path", serde_json::Value::from(target));
+
+        JsonVisitor { values }
+    }
 }
 
-impl ChannelLogger {
-    /// Creates a new instance of a logger with the minimum log level.
-    pub fn new(level: &str, log_queries: bool, callback: ThreadsafeFunction<String>) -> Self {
-        let mut filter = EnvFilter::new(level);
-
-        if log_queries {
-            filter = filter.add_directive("quaint[{is_query}]".parse().unwrap());
-        }
-
-        let javascript_cb = EventChannel::new(callback, filter, false);
-        let subscriber = EventRegistry::new().with(javascript_cb);
-
-        let subscriber = Subscriber::Normal(subscriber);
-
-        Self { subscriber }
+impl<'a> Visit for JsonVisitor<'a> {
+    fn record_debug(&mut self, field: &Field, value: &dyn fmt::Debug) {
+        match field.name() {
+            name if name.starts_with("r#") => {
+                self.values
+                    .insert(&name[2..], serde_json::Value::from(format!("{:?}", value)));
+            }
+            name => {
+                self.values
+                    .insert(name, serde_json::Value::from(format!("{:?}", value)));
+            }
+        };
     }
 
-    /// Creates a new instance of a logger with the `trace` minimum level.
-    /// Enables tracing events to OTLP endpoint.
-    #[allow(dead_code)] // This is not ready for prime time yet!
-    pub fn new_with_telemetry(callback: ThreadsafeFunction<String>, endpoint: Option<String>) -> Self {
-        let javascript_cb = EventChannel::new(callback, EnvFilter::new("trace"), true);
-
-        global::set_text_map_propagator(TraceContextPropagator::new());
-
-        // A special parameter for Jaeger to set the service name in spans.
-        let resource = Resource::new(vec![KeyValue::new("service.name", "query-engine-node-api")]);
-        let config = Config::default().with_resource(resource);
-
-        let mut builder = opentelemetry_otlp::new_pipeline().tracing().with_trace_config(config);
-        let mut exporter = opentelemetry_otlp::new_exporter().tonic();
-
-        if let Some(endpoint) = endpoint {
-            exporter = exporter.with_endpoint(endpoint);
-        }
-
-        builder = builder.with_exporter(exporter);
-
-        let tracer = builder.install_batch(opentelemetry::runtime::Tokio).unwrap();
-
-        let telemetry_layer = tracing_opentelemetry::layer().with_tracer(tracer);
-        let registry = EventRegistry::new().with(telemetry_layer).with(javascript_cb);
-        let with_telemetry = WithTelemetry::new(registry);
-
-        let subscriber = Subscriber::WithTelemetry(with_telemetry);
-
-        Self { subscriber }
+    fn record_i64(&mut self, field: &Field, value: i64) {
+        self.values.insert(field.name(), serde_json::Value::from(value));
     }
 
-    /// Wraps a future to a logger, storing all events in the pipeline to
-    /// the channel.
-    pub async fn with_logging<F, U, T>(&self, f: F) -> crate::Result<T>
-    where
-        U: Future<Output = crate::Result<T>>,
-        F: FnOnce() -> U,
-    {
-        match self.subscriber {
-            Subscriber::Normal(ref subscriber) => f().with_subscriber(subscriber.clone()).await,
-            Subscriber::WithTelemetry(ref subscriber) => f().with_subscriber(subscriber.clone()).await,
-        }
+    fn record_u64(&mut self, field: &Field, value: u64) {
+        self.values.insert(field.name(), serde_json::Value::from(value));
+    }
+
+    fn record_bool(&mut self, field: &Field, value: bool) {
+        self.values.insert(field.name(), serde_json::Value::from(value));
+    }
+
+    fn record_str(&mut self, field: &Field, value: &str) {
+        self.values.insert(field.name(), serde_json::Value::from(value));
+    }
+}
+
+impl<'a> ToString for JsonVisitor<'a> {
+    fn to_string(&self) -> String {
+        serde_json::to_string(&self.values).unwrap()
+    }
+}
+
+#[derive(Clone)]
+pub struct CallbackLayer {
+    callback: ThreadsafeFunction<String>,
+}
+
+impl CallbackLayer {
+    pub fn new(callback: ThreadsafeFunction<String>) -> Self {
+        CallbackLayer { callback }
+    }
+}
+
+// A tracing layer for sending logs to a js callback, layers are composable, subscribers are not.
+impl<S: Subscriber> Layer<S> for CallbackLayer {
+    fn on_event(&self, event: &tracing::Event<'_>, _ctx: tracing_subscriber::layer::Context<'_, S>) {
+        let mut visitor = JsonVisitor::new(event.metadata().level(), event.metadata().target());
+        event.record(&mut visitor);
+
+        let result = visitor.to_string();
+
+        self.callback.call(Ok(result), ThreadsafeFunctionCallMode::Blocking);
     }
 }
