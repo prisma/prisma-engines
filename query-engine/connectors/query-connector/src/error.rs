@@ -89,6 +89,9 @@ impl ConnectorError {
             ErrorKind::TransactionAborted { message } => Some(KnownError::new(
                 user_facing_errors::query_engine::InteractiveTransactionError { error: message.clone() },
             )),
+            ErrorKind::MongoReplicaSetRequired => Some(KnownError::new(
+                user_facing_errors::query_engine::MongoReplicaSetRequired {},
+            )),
             _ => None,
         };
 
@@ -218,6 +221,9 @@ pub enum ErrorKind {
 
     #[error("Cannot find a fulltext index to use for the search")]
     MissingFullTextSearchIndex,
+
+    #[error("Replica Set required for Transactions")]
+    MongoReplicaSetRequired,
 }
 
 impl From<DomainError> for ConnectorError {

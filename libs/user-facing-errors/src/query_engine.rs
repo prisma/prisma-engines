@@ -305,3 +305,10 @@ pub struct QueryParameterLimitExceeded {
     message = "Cannot find a fulltext index to use for the search, try adding a @@fulltext([Fields...]) to your schema"
 )]
 pub struct MissingFullTextSearchIndex {}
+
+#[derive(Debug, UserFacingError, Serialize)]
+#[user_facing(
+    code = "P2031",
+    message = "MongoDB server needs to be run as a replica set to be able to perform transactions. https://pris.ly/d/mongdb-replica-set"
+)]
+pub struct MongoReplicaSetRequired {}
