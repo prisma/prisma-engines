@@ -39,7 +39,7 @@ impl OrderByData {
             }
         } else {
             let prefix = prefix.unwrap(); // Safe because relation hops always produce a prefix.
-            let mut stages = order_by
+            let stages = order_by
                 .path()
                 .unwrap() // Safe because relation hops always have a path.
                 .iter()
