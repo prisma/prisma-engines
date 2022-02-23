@@ -58,7 +58,7 @@ fn db_execute_happy_path_with_prisma_schema() {
             provider = "sqlite"
         }}
     "#,
-        url
+        url.replace('\\', "\\\\")
     );
     let schema_path = tmpdir.path().join("schema.prisma");
     std::fs::write(&schema_path, &prisma_schema).unwrap();

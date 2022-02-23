@@ -7,7 +7,7 @@ use crate::{api::GenericApi, commands, json_rpc::types::*, CoreResult};
 use enumflags2::BitFlags;
 use migration_connector::{ConnectorError, ConnectorHost, MigrationConnector};
 use std::{collections::HashMap, future::Future, path::Path, pin::Pin, sync::Arc};
-use tokio::sync::{mpsc::Sender, Mutex};
+use tokio::sync::{mpsc, Mutex};
 use tracing_futures::Instrument;
 
 /// The container for the state of the migration engine. It can contain one or more connectors
@@ -26,7 +26,7 @@ pub(crate) struct EngineState {
     // - a full schema
     //
     // To a channel leading to a spawned MigrationConnector.
-    connectors: Mutex<HashMap<String, Sender<ErasedConnectorRequest>>>,
+    connectors: Mutex<HashMap<String, mpsc::Sender<ErasedConnectorRequest>>>,
 }
 
 /// A request from the core to a connector, in the form of an async closure.
@@ -86,7 +86,7 @@ impl EngineState {
             None => {
                 let mut connector = crate::schema_to_connector(schema)?;
                 connector.set_host(self.host.clone());
-                let (erased_sender, mut erased_receiver) = tokio::sync::mpsc::channel::<ErasedConnectorRequest>(12);
+                let (erased_sender, mut erased_receiver) = mpsc::channel::<ErasedConnectorRequest>(12);
                 tokio::spawn(async move {
                     while let Some(req) = erased_receiver.recv().await {
                         req(connector.as_mut()).await;
@@ -124,7 +124,7 @@ impl EngineState {
             None => {
                 let mut connector = crate::connector_for_connection_string(url.clone(), None, BitFlags::default())?;
                 connector.set_host(self.host.clone());
-                let (erased_sender, mut erased_receiver) = tokio::sync::mpsc::channel::<ErasedConnectorRequest>(12);
+                let (erased_sender, mut erased_receiver) = mpsc::channel::<ErasedConnectorRequest>(12);
                 tokio::spawn(async move {
                     while let Some(req) = erased_receiver.recv().await {
                         req(connector.as_mut()).await;
