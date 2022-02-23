@@ -255,8 +255,8 @@ fn should_fail_on_native_type_decimal_when_scale_is_bigger_than_precision() {
 
     let error = parse_error(dml);
 
-    error.assert_is(DatamodelError::new_connector_error(
-        "The scale must not be larger than the precision for the Decimal(2,4) native type in MySQL.",
+    error.assert_is(DatamodelError::new(
+        "The scale must not be larger than the precision for the Decimal(2,4) native type in MySQL.".into(),
         ast::Span::new(101, 131),
     ));
 }
@@ -277,8 +277,9 @@ fn should_fail_on_incompatible_scalar_type_with_tiny_int() {
 
     let error = parse_error(dml);
 
-    error.assert_is(DatamodelError::new_connector_error(
-        "Native type TinyInt is not compatible with declared field type DateTime, expected field type Boolean or Int.",
+    error.assert_is(DatamodelError::new(
+        "Native type TinyInt is not compatible with declared field type DateTime, expected field type Boolean or Int."
+            .into(),
         ast::Span::new(172, 182),
     ));
 }

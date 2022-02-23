@@ -142,8 +142,8 @@ fn should_fail_on_native_type_with_invalid_datasource_name() {
 
     let error = parse_error(dml);
 
-    error.assert_is(DatamodelError::new_connector_error(
-        "The prefix pg is invalid. It must be equal to the name of an existing datasource e.g. db. Did you mean to use db.Integer?",
+    error.assert_is(DatamodelError::new(
+        "The prefix pg is invalid. It must be equal to the name of an existing datasource e.g. db. Did you mean to use db.Integer?".into(),
         ast::Span::new(178, 188),
     ));
 }
@@ -165,8 +165,8 @@ fn should_fail_on_native_type_with_invalid_number_of_arguments() {
 
     let error = parse_error(dml);
 
-    error.assert_is(DatamodelError::new_connector_error(
-        "Native type VarChar takes 1 optional arguments, but received 3.",
+    error.assert_is(DatamodelError::new(
+        "Native type VarChar takes 1 optional arguments, but received 3.".into(),
         ast::Span::new(216, 235),
     ));
 }
@@ -188,8 +188,8 @@ fn should_fail_on_native_type_with_unknown_type() {
 
     let error = parse_error(dml);
 
-    error.assert_is(DatamodelError::new_connector_error(
-        "Native type Numerical is not supported for postgresql connector.",
+    error.assert_is(DatamodelError::new(
+        "Native type Numerical is not supported for postgresql connector.".into(),
         ast::Span::new(178, 196),
     ));
 }
@@ -215,16 +215,17 @@ fn should_fail_on_native_type_with_incompatible_type() {
 
     error.assert_is_at(
         0,
-        DatamodelError::new_connector_error(
-            "Native type VarChar is not compatible with declared field type Boolean, expected field type String.",
+        DatamodelError::new(
+            "Native type VarChar is not compatible with declared field type Boolean, expected field type String."
+                .into(),
             ast::Span::new(179, 192),
         ),
     );
 
     error.assert_is_at(
         1,
-        DatamodelError::new_connector_error(
-            "Native type BigInt is not compatible with declared field type Int, expected field type BigInt.",
+        DatamodelError::new(
+            "Native type BigInt is not compatible with declared field type Int, expected field type BigInt.".into(),
             ast::Span::new(214, 223),
         ),
     );
@@ -246,8 +247,8 @@ fn should_fail_on_native_type_with_invalid_arguments() {
 
     let error = parse_error(dml);
 
-    error.assert_is(DatamodelError::new_connector_error(
-        "Expected a numeric value, but failed while parsing \"a\": invalid digit found in string.",
+    error.assert_is(DatamodelError::new(
+        "Expected a numeric value, but failed while parsing \"a\": invalid digit found in string.".into(),
         ast::Span::new(178, 191),
     ));
 }

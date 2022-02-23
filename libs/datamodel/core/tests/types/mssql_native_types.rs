@@ -110,8 +110,8 @@ fn should_fail_on_native_type_decimal_when_scale_is_bigger_than_precision() {
 
     let error = parse_error(dml);
 
-    error.assert_is(DatamodelError::new_connector_error(
-        "The scale must not be larger than the precision for the Decimal(2,4) native type in SQL Server.",
+    error.assert_is(DatamodelError::new(
+        "The scale must not be larger than the precision for the Decimal(2,4) native type in SQL Server.".into(),
         ast::Span::new(113, 142),
     ));
 }
@@ -177,8 +177,9 @@ fn should_fail_on_incompatible_scalar_type_with_tiny_int() {
 
     let error = parse_error(dml);
 
-    error.assert_is(DatamodelError::new_connector_error(
-        "Native type Bit is not compatible with declared field type DateTime, expected field type Boolean or Int.",
+    error.assert_is(DatamodelError::new(
+        "Native type Bit is not compatible with declared field type DateTime, expected field type Boolean or Int."
+            .into(),
         ast::Span::new(180, 186),
     ));
 }
@@ -199,8 +200,8 @@ fn should_fail_on_bad_type_params() {
 
     let error = parse_error(dml);
 
-    error.assert_is(DatamodelError::new_connector_error(
-        "Invalid argument for type NVarChar: Ma. Allowed values: a number or `Max`.",
+    error.assert_is(DatamodelError::new(
+        "Invalid argument for type NVarChar: Ma. Allowed values: a number or `Max`.".into(),
         ast::Span::new(178, 193),
     ));
 }
@@ -221,8 +222,8 @@ fn should_fail_on_too_many_type_params() {
 
     let error = parse_error(dml);
 
-    error.assert_is(DatamodelError::new_connector_error(
-        "Native type NVarChar takes 1 optional arguments, but received 2.",
+    error.assert_is(DatamodelError::new(
+        "Native type NVarChar takes 1 optional arguments, but received 2.".into(),
         ast::Span::new(178, 195),
     ));
 }

@@ -1,21 +1,15 @@
-use std::{error::Error as StdError, fmt::Display};
+use std::fmt::Display;
 use thiserror::Error;
 
 #[derive(Debug, Clone)]
 pub struct ConnectorError {
     /// The error information for internal use.
-    pub kind: ErrorKind,
+    kind: ErrorKind,
 }
 
 impl Display for ConnectorError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         Display::fmt(&self.kind, f)
-    }
-}
-
-impl StdError for ConnectorError {
-    fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
-        self.kind.source()
     }
 }
 
