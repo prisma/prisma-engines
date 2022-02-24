@@ -184,6 +184,17 @@ pub struct MigrationAssertion<'a> {
 
 impl MigrationAssertion<'_> {
     #[track_caller]
+    pub fn expect_contents(self, expected_contents: expect_test::Expect) -> Self {
+        let migration_file_path = self.path.join("migration.sql");
+        let contents: String = std::fs::read_to_string(&migration_file_path)
+            .map_err(|_| format!("Trying to read migration file at {:?}", migration_file_path))
+            .unwrap();
+
+        expected_contents.assert_eq(&contents);
+        self
+    }
+
+    #[track_caller]
     pub fn assert_contents(self, expected_contents: &str) -> Self {
         let migration_file_path = self.path.join("migration.sql");
         let contents: String = std::fs::read_to_string(&migration_file_path)
