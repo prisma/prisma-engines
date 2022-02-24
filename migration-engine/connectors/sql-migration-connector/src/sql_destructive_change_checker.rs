@@ -243,6 +243,7 @@ impl SqlMigrationConnector {
                 SqlMigrationStep::CreateIndex {
                     table_id: (Some(_), table_id),
                     index_index,
+                    from_drop_and_recreate: false,
                 } => {
                     let index = schemas.next().table_walker_at(*table_id).index_at(*index_index);
 

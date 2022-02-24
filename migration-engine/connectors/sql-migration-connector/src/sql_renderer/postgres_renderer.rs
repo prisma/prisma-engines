@@ -336,17 +336,27 @@ impl SqlRenderer for PostgresFlavour {
             return Vec::new();
         }
 
-        let alter_table = format!(
-            "ALTER TABLE {} {}",
-            self.quote(tables.previous().name()),
-            lines.join(",\n")
-        );
+        if self.is_cockroachdb() {
+            let mut out = Vec::with_capacity(before_statements.len() + after_statements.len() + lines.len());
+            out.extend(before_statements.into_iter());
+            for line in lines {
+                out.push(format!("ALTER TABLE \"{}\" {}", tables.previous().name(), line))
+            }
+            out.extend(after_statements.into_iter());
+            out
+        } else {
+            let alter_table = format!(
+                "ALTER TABLE {} {}",
+                self.quote(tables.previous().name()),
+                lines.join(",\n")
+            );
 
-        before_statements
-            .into_iter()
-            .chain(std::iter::once(alter_table))
-            .chain(after_statements.into_iter())
-            .collect()
+            before_statements
+                .into_iter()
+                .chain(std::iter::once(alter_table))
+                .chain(after_statements.into_iter())
+                .collect()
+        }
     }
 
     fn render_create_enum(&self, enm: &EnumWalker<'_>) -> Vec<String> {

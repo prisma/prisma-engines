@@ -59,6 +59,7 @@ fn push_created_table_steps(steps: &mut Vec<SqlMigrationStep>, db: &DifferDataba
                 .map(|index| SqlMigrationStep::CreateIndex {
                     table_id: (None, index.table().table_id()),
                     index_index: index.index(),
+                    from_drop_and_recreate: false,
                 });
 
             steps.extend(create_indexes_from_created_tables);
@@ -297,6 +298,7 @@ fn push_created_index_steps(steps: &mut Vec<SqlMigrationStep>, db: &DifferDataba
             steps.push(SqlMigrationStep::CreateIndex {
                 table_id: (Some(tables.previous().table_id()), tables.next().table_id()),
                 index_index: index.index(),
+                from_drop_and_recreate: false,
             })
         }
 
@@ -321,6 +323,7 @@ fn push_created_index_steps(steps: &mut Vec<SqlMigrationStep>, db: &DifferDataba
                 steps.push(SqlMigrationStep::CreateIndex {
                     table_id: (Some(tables.previous().table_id()), tables.next().table_id()),
                     index_index: index.next().index(),
+                    from_drop_and_recreate: true,
                 })
             }
         }

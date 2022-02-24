@@ -91,6 +91,7 @@ impl SqlSchemaDifferFlavour for MssqlFlavour {
             steps.push(SqlMigrationStep::CreateIndex {
                 table_id: (None, table.next().table_id()),
                 index_index: created_index.next().index(),
+                from_drop_and_recreate: false,
             })
         }
     }
