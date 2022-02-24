@@ -124,7 +124,12 @@ fn to_one_composite_filter_object(ctx: &mut BuilderContext, cf: &CompositeFieldR
     let ident = Identifier::new(format!("{}CompositeFilter", capitalize(&cf.typ.name)), PRISMA_NAMESPACE);
     return_cached_input!(ctx, &ident);
 
-    let object = Arc::new(init_input_object_type(ident.clone()));
+    let mut object = init_input_object_type(ident.clone());
+    object.require_exactly_one_field();
+    object.set_tag(ObjectTag::CompositeEnvelope);
+
+    let object = Arc::new(object);
+
     ctx.cache_input_type(ident, object.clone());
 
     let composite_where_object = filter_objects::where_object_type(ctx, &cf.typ);
@@ -154,7 +159,11 @@ fn to_many_composite_filter_object(ctx: &mut BuilderContext, cf: &CompositeField
     );
     return_cached_input!(ctx, &ident);
 
-    let object = Arc::new(init_input_object_type(ident.clone()));
+    let mut object = init_input_object_type(ident.clone());
+    object.require_exactly_one_field();
+    object.set_tag(ObjectTag::CompositeEnvelope);
+
+    let object = Arc::new(object);
     ctx.cache_input_type(ident, object.clone());
 
     let composite_where_object = filter_objects::where_object_type(ctx, &cf.typ);

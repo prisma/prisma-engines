@@ -131,6 +131,7 @@ impl AliasedCondition for Filter {
             Filter::Aggregation(filter) => filter.aliased_cond(alias),
             Filter::ScalarList(filter) => filter.aliased_cond(alias),
             Filter::Empty => ConditionTree::NoCondition,
+            Filter::Composite(_) => unimplemented!("SQL connectors do not support composites yet."),
         }
     }
 }
