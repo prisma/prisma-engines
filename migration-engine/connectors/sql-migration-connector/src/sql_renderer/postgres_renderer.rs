@@ -71,6 +71,11 @@ impl SqlRenderer for PostgresFlavour {
     }
 
     fn render_alter_enum(&self, alter_enum: &AlterEnum, schemas: &Pair<&SqlSchema>) -> Vec<String> {
+        // ALTER TYPE is much more limited on postgres than on cockroachdb.
+        //
+        // On Postgres:
+        // - Values cannot be removed.
+        // - Only one value can be added in a single transaction until postgres 11.
         if self.is_cockroachdb() {
             render_cockroach_alter_enum(alter_enum, schemas)
         } else {
@@ -776,7 +781,7 @@ fn render_cockroach_alter_enum(alter_enum: &AlterEnum, schemas: &Pair<&SqlSchema
         let mut stmt = prefix.clone();
         stmt.push_str("ADD VALUE '");
         stmt.push_str(variant);
-        stmt.push_str("'");
+        stmt.push('\'');
         stmts.push(stmt)
     }
 
@@ -784,7 +789,7 @@ fn render_cockroach_alter_enum(alter_enum: &AlterEnum, schemas: &Pair<&SqlSchema
         let mut stmt = prefix.clone();
         stmt.push_str("DROP VALUE '");
         stmt.push_str(variant);
-        stmt.push_str("'");
+        stmt.push('\'');
         stmts.push(stmt)
     }
 
