@@ -229,9 +229,9 @@ impl MigrationConnector for SqlMigrationConnector {
         apply_migration::render_script(migration, diagnostics, self.flavour())
     }
 
-    fn reset(&mut self) -> BoxFuture<'_, ConnectorResult<()>> {
-        Box::pin(async {
-            if self.flavour.reset().await.is_err() {
+    fn reset(&mut self, soft: bool) -> BoxFuture<'_, ConnectorResult<()>> {
+        Box::pin(async move {
+            if soft || self.flavour.reset().await.is_err() {
                 best_effort_reset(self.flavour.as_mut()).await?;
             }
 

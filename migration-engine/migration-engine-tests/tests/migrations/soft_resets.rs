@@ -3,7 +3,7 @@ use migration_engine_tests::multi_engine_test_api::*;
 use quaint::{prelude::Queryable, single::Quaint};
 use test_macros::test_connector;
 
-#[test_connector(tags(Postgres))]
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
 fn soft_resets_work_on_postgres(mut api: TestApi) {
     let migrations_directory = api.create_migrations_directory();
     let mut url: url::Url = api.connection_string().parse().unwrap();

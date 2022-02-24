@@ -3,15 +3,21 @@ use migration_core::{migration_connector::MigrationConnector, CoreResult};
 #[must_use = "This struct does nothing on its own. See Reset::send()"]
 pub struct Reset<'a> {
     api: &'a mut dyn MigrationConnector,
+    soft: bool,
 }
 
 impl<'a> Reset<'a> {
     pub fn new(api: &'a mut dyn MigrationConnector) -> Self {
-        Reset { api }
+        Reset { api, soft: false }
+    }
+
+    pub fn soft(mut self, value: bool) -> Self {
+        self.soft = value;
+        self
     }
 
     pub async fn send(self) -> CoreResult<ResetAssertion> {
-        self.api.reset().await?;
+        self.api.reset(self.soft).await?;
 
         Ok(ResetAssertion {})
     }

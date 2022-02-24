@@ -49,7 +49,7 @@ impl TestApi {
             let mut me = SqlMigrationConnector::new_mysql();
             me.set_params(params).unwrap();
 
-            me.reset().await.unwrap();
+            me.reset(true).await.unwrap();
 
             (
                 Quaint::new(connection_string).await.unwrap(),

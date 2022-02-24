@@ -146,7 +146,10 @@ pub trait MigrationConnector: Send + Sync + 'static {
     ) -> ConnectorResult<String>;
 
     /// Drop all database state.
-    fn reset(&mut self) -> BoxFuture<'_, ConnectorResult<()>>;
+    ///
+    /// Set the `soft` parameter to `true` to force a soft-reset, that is to say a reset that does
+    /// not drop the database.
+    fn reset(&mut self, soft: bool) -> BoxFuture<'_, ConnectorResult<()>>;
 
     /// Optionally check that the features implied by the provided datamodel are all compatible with
     /// the specific database version being used.
