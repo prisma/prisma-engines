@@ -14,9 +14,7 @@ impl MigrationPersistence for SqlMigrationConnector {
     }
 
     async fn initialize(&mut self) -> ConnectorResult<()> {
-        dbg!("here");
         let schema = self.flavour.describe_schema().await?;
-        dbg!("here");
 
         if schema
             .tables

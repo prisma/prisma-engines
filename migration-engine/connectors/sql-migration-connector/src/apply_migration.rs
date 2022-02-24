@@ -166,6 +166,7 @@ fn render_raw_sql(
         SqlMigrationStep::CreateIndex {
             table_id: (_, table_id),
             index_index,
+            from_drop_and_recreate: _,
         } => vec![renderer.render_create_index(&schemas.next().table_walker_at(*table_id).index_at(*index_index))],
         SqlMigrationStep::DropIndex { table_id, index_index } => {
             vec![renderer.render_drop_index(&schemas.previous().table_walker_at(*table_id).index_at(*index_index))]

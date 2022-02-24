@@ -281,12 +281,8 @@ impl SqlMigration {
                             }
                             TableChange::DropAndRecreateColumn { column_id, changes } => {
                                 out.push_str("  [*] Column `");
-                                write!(
-                                    out,
-                                    "{}` would be dropped and recreated",
-                                    tables.next().column_at(*column_id.next()).name(),
-                                )
-                                .unwrap();
+                                out.push_str(tables.next().column_at(*column_id.next()).name());
+                                out.push_str("` would be dropped and recreated ");
                                 render_column_changes(tables.columns(column_id), changes, &mut out);
                                 out.push('\n');
                             }
@@ -338,6 +334,7 @@ impl SqlMigration {
                 SqlMigrationStep::CreateIndex {
                     table_id: (_, table_id),
                     index_index,
+                    from_drop_and_recreate: _,
                 } => {
                     let index = self.schemas().next().table_walker_at(*table_id).index_at(*index_index);
 
@@ -458,6 +455,7 @@ pub(crate) enum SqlMigrationStep {
     CreateIndex {
         table_id: (Option<TableId>, TableId),
         index_index: usize,
+        from_drop_and_recreate: bool,
     },
     RenameForeignKey {
         table_id: Pair<TableId>,
