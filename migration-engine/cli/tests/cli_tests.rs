@@ -310,7 +310,7 @@ fn basic_jsonrpc_roundtrip_works(_api: TestApi) {
         let mut response = String::new();
         stdout.read_line(&mut response).unwrap();
 
-        assert!(response.contains("PostgreSQL"));
+        assert!(response.contains("PostgreSQL") || response.contains("CockroachDB"));
     }
 
     process.kill().unwrap();
