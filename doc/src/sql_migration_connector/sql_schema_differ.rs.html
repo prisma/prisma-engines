@@ -495,6 +495,9 @@
 <span id="494">494</span>
 <span id="495">495</span>
 <span id="496">496</span>
+<span id="497">497</span>
+<span id="498">498</span>
+<span id="499">499</span>
 </pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">column</span>;
 <span class="kw">mod</span> <span class="ident">differ_database</span>;
 <span class="kw">mod</span> <span class="ident">enums</span>;
@@ -556,6 +559,7 @@
                 .<span class="ident">map</span>(<span class="op">|</span><span class="ident">index</span><span class="op">|</span> <span class="ident">SqlMigrationStep::CreateIndex</span> {
                     <span class="ident">table_id</span>: (<span class="prelude-val">None</span>, <span class="ident">index</span>.<span class="ident">table</span>().<span class="ident">table_id</span>()),
                     <span class="ident">index_index</span>: <span class="ident">index</span>.<span class="ident">index</span>(),
+                    <span class="ident">from_drop_and_recreate</span>: <span class="bool-val">false</span>,
                 });
 
             <span class="ident">steps</span>.<span class="ident">extend</span>(<span class="ident">create_indexes_from_created_tables</span>);
@@ -794,6 +798,7 @@
             <span class="ident">steps</span>.<span class="ident">push</span>(<span class="ident">SqlMigrationStep::CreateIndex</span> {
                 <span class="ident">table_id</span>: (<span class="prelude-val">Some</span>(<span class="ident">tables</span>.<span class="ident">previous</span>().<span class="ident">table_id</span>()), <span class="ident">tables</span>.<span class="ident">next</span>().<span class="ident">table_id</span>()),
                 <span class="ident">index_index</span>: <span class="ident">index</span>.<span class="ident">index</span>(),
+                <span class="ident">from_drop_and_recreate</span>: <span class="bool-val">false</span>,
             })
         }
 
@@ -818,6 +823,7 @@
                 <span class="ident">steps</span>.<span class="ident">push</span>(<span class="ident">SqlMigrationStep::CreateIndex</span> {
                     <span class="ident">table_id</span>: (<span class="prelude-val">Some</span>(<span class="ident">tables</span>.<span class="ident">previous</span>().<span class="ident">table_id</span>()), <span class="ident">tables</span>.<span class="ident">next</span>().<span class="ident">table_id</span>()),
                     <span class="ident">index_index</span>: <span class="ident">index</span>.<span class="ident">next</span>().<span class="ident">index</span>(),
+                    <span class="ident">from_drop_and_recreate</span>: <span class="bool-val">true</span>,
                 })
             }
         }

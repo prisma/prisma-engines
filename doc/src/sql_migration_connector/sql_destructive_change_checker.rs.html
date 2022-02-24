@@ -292,6 +292,7 @@
 <span id="291">291</span>
 <span id="292">292</span>
 <span id="293">293</span>
+<span id="294">294</span>
 </pre><pre class="rust"><code><span class="doccomment">//! The SQL implementation of DestructiveChangeChecker is responsible for</span>
 <span class="doccomment">//! informing users about potentially destructive or impossible changes that</span>
 <span class="doccomment">//! their attempted migrations contain.</span>
@@ -537,6 +538,7 @@
                 <span class="ident">SqlMigrationStep::CreateIndex</span> {
                     <span class="ident">table_id</span>: (<span class="prelude-val">Some</span>(<span class="kw">_</span>), <span class="ident">table_id</span>),
                     <span class="ident">index_index</span>,
+                    <span class="ident">from_drop_and_recreate</span>: <span class="bool-val">false</span>,
                 } =&gt; {
                     <span class="kw">let</span> <span class="ident">index</span> <span class="op">=</span> <span class="ident">schemas</span>.<span class="ident">next</span>().<span class="ident">table_walker_at</span>(<span class="kw-2">*</span><span class="ident">table_id</span>).<span class="ident">index_at</span>(<span class="kw-2">*</span><span class="ident">index_index</span>);
 
