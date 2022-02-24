@@ -99,10 +99,6 @@
 <span id="98"> 98</span>
 <span id="99"> 99</span>
 <span id="100">100</span>
-<span id="101">101</span>
-<span id="102">102</span>
-<span id="103">103</span>
-<span id="104">104</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">super</span>::DatamodelError</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::warning::DatamodelWarning</span>;
 
@@ -153,10 +149,6 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">append</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">err_and_warn</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Diagnostics</span>) {
         <span class="self">self</span>.<span class="ident">errors</span>.<span class="ident">append</span>(<span class="kw-2">&amp;mut</span> <span class="ident">err_and_warn</span>.<span class="ident">errors</span>);
         <span class="self">self</span>.<span class="ident">warnings</span>.<span class="ident">append</span>(<span class="kw-2">&amp;mut</span> <span class="ident">err_and_warn</span>.<span class="ident">warnings</span>)
-    }
-
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">append_warning_vec</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">warnings</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">DatamodelWarning</span><span class="op">&gt;</span>) {
-        <span class="self">self</span>.<span class="ident">warnings</span>.<span class="ident">append</span>(<span class="kw-2">&amp;mut</span> <span class="ident">warnings</span>);
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to_result</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Diagnostics</span><span class="op">&gt;</span> {

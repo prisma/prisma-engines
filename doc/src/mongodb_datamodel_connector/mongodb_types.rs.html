@@ -107,8 +107,6 @@
 <span id="106">106</span>
 <span id="107">107</span>
 <span id="108">108</span>
-<span id="109">109</span>
-<span id="110">110</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">datamodel_connector</span>::{
     <span class="ident">connector_error</span>::{<span class="ident">ConnectorError</span>, <span class="ident">ErrorKind</span>},
     <span class="ident">NativeTypeConstructor</span>, <span class="ident">ScalarType</span>,
@@ -183,12 +181,10 @@
         <span class="ident">TIMESTAMP</span> =&gt; <span class="ident">MongoDbType::Timestamp</span>,
         <span class="ident">DECIMAL</span> =&gt; <span class="ident">MongoDbType::Decimal</span>,
         <span class="ident">name</span> =&gt; {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ConnectorError</span> {
-                <span class="ident">kind</span>: <span class="ident">ErrorKind::NativeTypeNameUnknown</span> {
-                    <span class="ident">connector_name</span>: <span class="string">&quot;MongoDB&quot;</span>.<span class="ident">to_owned</span>(),
-                    <span class="ident">native_type</span>: <span class="ident">name</span>.<span class="ident">to_owned</span>(),
-                },
-            })
+            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ConnectorError::from_kind</span>(<span class="ident">ErrorKind::NativeTypeNameUnknown</span> {
+                <span class="ident">connector_name</span>: <span class="string">&quot;MongoDB&quot;</span>.<span class="ident">to_owned</span>(),
+                <span class="ident">native_type</span>: <span class="ident">name</span>.<span class="ident">to_owned</span>(),
+            }))
         }
     };
 
