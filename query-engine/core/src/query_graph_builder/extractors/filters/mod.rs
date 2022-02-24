@@ -1,3 +1,4 @@
+mod composite;
 mod filter_fold;
 mod filter_grouping;
 mod relation;
@@ -9,10 +10,14 @@ use crate::{
     query_document::{ParsedInputMap, ParsedInputValue},
     QueryGraphBuilderError, QueryGraphBuilderResult,
 };
-use connector::{filter::Filter, QueryMode, RelationCompare, ScalarCompare, ScalarCondition, ScalarProjection};
+use connector::{
+    filter::Filter, CompositeCompare, QueryMode, RelationCompare, ScalarCompare, ScalarCondition, ScalarProjection,
+};
 use filter_fold::*;
 use filter_grouping::*;
-use prisma_models::{Field, ModelRef, PrismaValue, RelationFieldRef, ScalarFieldRef};
+use prisma_models::{
+    prelude::ParentContainer, CompositeFieldRef, Field, ModelRef, PrismaValue, RelationFieldRef, ScalarFieldRef,
+};
 use std::{collections::HashMap, convert::TryInto, str::FromStr};
 
 /// Extracts a filter for a unique selector, i.e. a filter that selects exactly one record.
@@ -68,11 +73,19 @@ fn handle_compound_field(fields: Vec<ScalarFieldRef>, value: ParsedInputValue) -
 /// | OR   | return empty list | validate single filter | validate all filters |
 /// | AND  | return all items  | validate single filter | validate all filters |
 /// | NOT  | return all items  | validate single filter | validate all filters |
-#[tracing::instrument(skip(value_map, model))]
-pub fn extract_filter(value_map: ParsedInputMap, model: &ModelRef) -> QueryGraphBuilderResult<Filter> {
+pub fn extract_filter<T>(value_map: ParsedInputMap, container: T) -> QueryGraphBuilderResult<Filter>
+where
+    T: Into<ParentContainer>,
+{
+    let container = container.into();
+
     // We define an internal function so we can track the recursion depth. Empty
     // filters at the root layer cannot always be removed.
-    fn extract_filter(value_map: ParsedInputMap, model: &ModelRef, depth: usize) -> QueryGraphBuilderResult<Filter> {
+    fn extract_filter(
+        value_map: ParsedInputMap,
+        container: &ParentContainer,
+        depth: usize,
+    ) -> QueryGraphBuilderResult<Filter> {
         let filters = value_map
             .into_iter()
             .map(|(key, value)| {
@@ -82,11 +95,13 @@ pub fn extract_filter(value_map: ParsedInputMap, model: &ModelRef) -> QueryGraph
                         let filters = match value {
                             ParsedInputValue::List(values) => values
                                 .into_iter()
-                                .map(|val| extract_filter(val.try_into()?, model, depth + 1))
+                                .map(|val| extract_filter(val.try_into()?, container, depth + 1))
                                 .collect::<QueryGraphBuilderResult<Vec<Filter>>>()?,
 
                             // Single map to vec coercion
-                            ParsedInputValue::Map(map) => extract_filter(map, model, depth + 1).map(|res| vec![res])?,
+                            ParsedInputValue::Map(map) => {
+                                extract_filter(map, container, depth + 1).map(|res| vec![res])?
+                            }
 
                             _ => unreachable!(),
                         };
@@ -118,10 +133,10 @@ pub fn extract_filter(value_map: ParsedInputMap, model: &ModelRef) -> QueryGraph
                         }
                     }
                     Err(_) => {
-                        let filters = match model.fields().find_from_all(&key)? {
-                            Field::Relation(rf) => extract_relation_filters(rf, value),
-                            Field::Scalar(sf) => extract_scalar_filters(sf, value),
-                            Field::Composite(_) => Ok(vec![]), // [Composites] todo
+                        let filters = match container.find_field(&key).expect("Invalid field passed validation.") {
+                            Field::Relation(rf) => extract_relation_filters(&rf, value),
+                            Field::Scalar(sf) => extract_scalar_filters(&sf, value),
+                            Field::Composite(cf) => extract_composite_filters(&cf, value),
                         }?;
 
                         // strip empty filters
@@ -148,7 +163,7 @@ pub fn extract_filter(value_map: ParsedInputMap, model: &ModelRef) -> QueryGraph
         }
     }
 
-    let filter = extract_filter(value_map, model, 0)?;
+    let filter = extract_filter(value_map, &container, 0)?;
     let filter = merge_search_filters(filter);
 
     Ok(filter)
@@ -297,4 +312,21 @@ fn parse_query_mode(input: ParsedInputValue) -> QueryGraphBuilderResult<QueryMod
         "insensitive" => QueryMode::Insensitive,
         _ => unreachable!(),
     })
+}
+
+/// Field is the field the filter is refering to and `value` is the passed filter. E.g. `where: { <field>: <value> }.
+/// `value` can be either a flat scalar (for shorthand filter notation) or an object (full filter syntax).
+fn extract_composite_filters(
+    field: &CompositeFieldRef,
+    value: ParsedInputValue,
+) -> QueryGraphBuilderResult<Vec<Filter>> {
+    match value {
+        ParsedInputValue::Single(val) => Ok(vec![field.equals(val)]), // Todo: Do we want to do coercions here? (list, object)
+        ParsedInputValue::List(_) => Ok(vec![field.equals(PrismaValue::List(value.try_into()?))]),
+        ParsedInputValue::Map(filter_map) => Ok(vec![composite::parse(filter_map, field, false)?]),
+        x => Err(QueryGraphBuilderError::InputError(format!(
+            "Invalid composite filter input: {:?}",
+            x
+        ))),
+    }
 }

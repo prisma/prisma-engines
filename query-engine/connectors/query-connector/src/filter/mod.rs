@@ -3,13 +3,16 @@
 //! The creation of the types should be done with
 //! [ScalarCompare](/query-connector/trait.ScalarCompare.html) and
 //! [RelationCompare](/query-connector/trait.RelationCompare.html).
+//! [CompositeCompare](/query-connector/trait.RelationCompare.html).
 
+mod composite;
 mod into_filter;
 mod json;
 mod list;
 mod relation;
 mod scalar;
 
+pub use composite::*;
 pub use into_filter::*;
 pub use json::*;
 pub use list::*;
@@ -25,6 +28,7 @@ pub enum Filter {
     ScalarList(ScalarListFilter),
     OneRelationIsNull(OneRelationIsNullFilter),
     Relation(RelationFilter),
+    Composite(CompositeFilter),
     BoolFilter(bool),
     Aggregation(AggregationFilter),
     Empty,
@@ -198,5 +202,11 @@ impl From<RelationFilter> for Filter {
 impl From<bool> for Filter {
     fn from(b: bool) -> Self {
         Filter::BoolFilter(b)
+    }
+}
+
+impl From<CompositeFilter> for Filter {
+    fn from(cf: CompositeFilter) -> Self {
+        Filter::Composite(cf)
     }
 }

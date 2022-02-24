@@ -1,7 +1,8 @@
 use crate::{error::MongoError, join::JoinStage, IntoBson};
 use connector_interface::{
-    AggregationFilter, Filter, OneRelationIsNullFilter, QueryMode, RelationCondition, RelationFilter, ScalarCompare,
-    ScalarCondition, ScalarFilter, ScalarListFilter, ScalarProjection,
+    AggregationFilter, CompositeCondition, CompositeFilter, Filter, OneRelationIsNullFilter, QueryMode,
+    RelationCondition, RelationFilter, ScalarCompare, ScalarCondition, ScalarFilter, ScalarListFilter,
+    ScalarProjection,
 };
 use mongodb::bson::{doc, Bson, Document, Regex};
 use prisma_models::{PrismaValue, ScalarFieldRef};
@@ -9,6 +10,7 @@ use prisma_models::{PrismaValue, ScalarFieldRef};
 #[derive(Debug)]
 pub(crate) enum MongoFilter {
     Scalar(Document),
+    Composite(Document),
     Relation(MongoRelationFilter),
 }
 
@@ -17,6 +19,7 @@ impl MongoFilter {
         match self {
             Self::Scalar(document) => (document, vec![]),
             Self::Relation(rf) => (rf.filter, rf.joins),
+            Self::Composite(document) => (document, vec![]),
         }
     }
 
@@ -52,9 +55,9 @@ pub(crate) fn convert_filter(filter: Filter, invert: bool, is_having_filter: boo
         Filter::ScalarList(slf) => scalar_list_filter(slf, invert)?,
         Filter::OneRelationIsNull(filter) => one_is_null(filter, invert),
         Filter::Relation(rfilter) => relation_filter(rfilter, invert)?,
-        // Filter::BoolFilter(b) => {} // Potentially not doable.
         Filter::Aggregation(filter) => aggregation_filter(filter, invert)?,
-        _ => todo!("Incomplete filter implementation."),
+        Filter::Composite(filter) => composite_filter(filter, invert)?,
+        Filter::BoolFilter(_) => unimplemented!("MongoDB boolean filter."),
     };
 
     Ok(filter_pair)
@@ -364,8 +367,14 @@ fn relation_filter(filter: RelationFilter, invert: bool) -> crate::Result<MongoF
 
     // Tmp condition check while mongo is getting fully tested.
     let is_empty = matches!(nested_filter, Filter::Empty);
-    let (nested_filter, nested_joins) =
-        convert_filter(nested_filter, requires_invert(&filter.condition), false)?.render();
+
+    // EveryRelatedRecord requires an inherent invert for Mongo.
+    let (nested_filter, nested_joins) = convert_filter(
+        nested_filter,
+        matches!(&filter.condition, RelationCondition::EveryRelatedRecord),
+        false,
+    )?
+    .render();
 
     let mut join_stage = JoinStage::new(from_field);
     join_stage.extend_nested(nested_joins);
@@ -406,11 +415,6 @@ fn relation_filter(filter: RelationFilter, invert: bool) -> crate::Result<MongoF
     }
 }
 
-/// Checks if the given relation filter condition needs an inherent invert for MongoDB.
-fn requires_invert(rf: &RelationCondition) -> bool {
-    matches!(rf, RelationCondition::EveryRelatedRecord)
-}
-
 fn aggregation_filter(filter: AggregationFilter, invert: bool) -> crate::Result<MongoFilter> {
     match filter {
         AggregationFilter::Count(filter) => aggregate_conditions("count", *filter, invert),
@@ -431,6 +435,7 @@ fn aggregate_conditions(op: &str, filter: Filter, invert: bool) -> crate::Result
         ScalarProjection::Compound(_) => {
             unimplemented!("Compound aggregate projections are unsupported.")
         }
+
         ScalarProjection::Single(field) => field.clone(),
     };
 
@@ -474,4 +479,86 @@ fn to_regex(
         ),
         options,
     }))
+}
+
+fn composite_filter(filter: CompositeFilter, invert: bool) -> crate::Result<MongoFilter> {
+    let field = filter.field;
+    let composite_name = field.db_name();
+
+    let filter_doc = match *filter.condition {
+        CompositeCondition::Every(filter) => {
+            let is_empty = matches!(filter, Filter::Empty);
+
+            // `Every` filter requires inherent invert because of how the filters are implemented on Mongo.
+            let (nested_filter, _) = convert_filter(filter, true, false)?.render();
+
+            if is_empty {
+                doc! { "$not": { "$all": [{ "$elemMatch": { "_id": { "$exists": 0 }} }] }}
+            } else {
+                doc! { "$not": { "$all": [{ "$elemMatch": nested_filter }] }}
+            }
+        }
+
+        CompositeCondition::Some(filter) => {
+            let (nested_filter, _) = convert_filter(filter, false, false)?.render();
+            doc! { "$elemMatch": nested_filter }
+        }
+
+        CompositeCondition::None(filter) => {
+            let is_empty = matches!(filter, Filter::Empty);
+            let (nested_filter, _) = convert_filter(filter, false, false)?.render();
+
+            if is_empty {
+                doc! { "$size": 0 }
+            } else {
+                doc! { "$not": { "$all": [{ "$elemMatch": nested_filter }] }}
+            }
+        }
+
+        CompositeCondition::Equals(value) => {
+            doc! { "$eq": (&field, value).into_bson()? }
+        }
+
+        CompositeCondition::Empty(should_be_empty) => {
+            if should_be_empty {
+                doc! { "$size": 0 }
+            } else {
+                doc! { "$not": { "$size": 0 }}
+            }
+        }
+
+        CompositeCondition::Is(_) => todo!(),
+    };
+
+    // let filter_doc = match filter.condition {
+    //     CompositeCondition::Every => {
+    //         if is_empty {
+    //             doc! { "$not": { "$all": [{ "$elemMatch": { "_id": { "$exists": 0 }} }] }}
+    //         } else {
+    //             doc! { "$not": { "$all": [{ "$elemMatch": nested_filter }] }}
+    //         }
+    //     }
+    //     CompositeCondition::Some => {
+    //         doc! { "$elemMatch": nested_filter }
+    //     }
+    //     CompositeCondition::None => {
+    //         if is_empty {
+    //             doc! { "$size": 0 }
+    //         } else {
+    //             doc! { "$not": { "$all": [{ "$elemMatch": nested_filter }] }}
+    //         }
+    //     }
+    //     CompositeCondition::Empty => todo!(),
+    //     CompositeCondition::Equals => todo!(),
+    //     CompositeCondition::Is => todo!(),
+    //     // CompositeCondition::ToOneRelatedRecord => {
+    //     //     doc! { "$all": [{ "$elemMatch": nested_filter }]}
+    //     // }
+    // };
+
+    if invert {
+        Ok(MongoFilter::Composite(doc! { composite_name: { "$not": filter_doc }}))
+    } else {
+        Ok(MongoFilter::Composite(doc! { composite_name: filter_doc }))
+    }
 }
