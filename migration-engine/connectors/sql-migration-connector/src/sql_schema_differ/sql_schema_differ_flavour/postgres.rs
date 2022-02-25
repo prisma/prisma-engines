@@ -141,6 +141,15 @@ impl SqlSchemaDifferFlavour for PostgresFlavour {
 fn cockroach_native_type_change_riskyness(previous: PostgresType, next: PostgresType) -> Option<ColumnTypeChange> {
     match (previous, next) {
         (PostgresType::Integer, PostgresType::Text) => Some(ColumnTypeChange::SafeCast),
+        // Timestamp defaults
+        (PostgresType::Time(None), PostgresType::Time(Some(6)))
+        | (PostgresType::Time(Some(6)), PostgresType::Time(None))
+        | (PostgresType::Timetz(None), PostgresType::Timetz(Some(6)))
+        | (PostgresType::Timetz(Some(6)), PostgresType::Timetz(None))
+        | (PostgresType::Timestamptz(None), PostgresType::Timestamptz(Some(6)))
+        | (PostgresType::Timestamptz(Some(6)), PostgresType::Timestamptz(None))
+        | (PostgresType::Timestamp(None), PostgresType::Timestamp(Some(6)))
+        | (PostgresType::Timestamp(Some(6)), PostgresType::Timestamp(None)) => None,
         (previous, next) if previous == next => None,
         _ => Some(ColumnTypeChange::NotCastable),
     }
