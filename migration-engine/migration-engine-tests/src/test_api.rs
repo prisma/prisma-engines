@@ -34,6 +34,8 @@ pub struct TestConnectorHost {
 
 impl ConnectorHost for TestConnectorHost {
     fn print(&self, message: &str) -> BoxFuture<'_, ConnectorResult<()>> {
+        // https://github.com/prisma/prisma/issues/11761
+        assert!(message.ends_with('\n'));
         self.printed_messages.lock().unwrap().push(message.to_owned());
         Box::pin(std::future::ready(Ok(())))
     }
