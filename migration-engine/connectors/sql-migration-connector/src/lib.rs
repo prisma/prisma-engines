@@ -41,6 +41,14 @@ impl SqlMigrationConnector {
         }
     }
 
+    /// Initialize a CockroachDb migration connector.
+    pub fn new_cockroach() -> Self {
+        SqlMigrationConnector {
+            flavour: Box::new(PostgresFlavour::new_cockroach()),
+            host: Arc::new(EmptyHost),
+        }
+    }
+
     /// Initialize a SQLite migration connector.
     pub fn new_sqlite() -> Self {
         SqlMigrationConnector {
