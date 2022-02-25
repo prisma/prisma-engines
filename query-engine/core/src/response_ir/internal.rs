@@ -573,10 +573,11 @@ fn convert_prisma_value(field: &OutputFieldRef, value: PrismaValue, st: &ScalarT
         (ScalarType::String, PrismaValue::Xml(s)) => PrismaValue::String(s),
 
         (st, pv) => {
-            return Err(CoreError::SerializationError(format!(
-                "Attempted to serialize scalar '{}' with incompatible type '{:?}' for field {}.",
-                pv, st, field.name
-            )))
+            return Err(crate::FieldConversionError::create(
+                field.name.clone(),
+                format!("{:?}", st),
+                format!("{}", pv),
+            ))
         }
     };
 
