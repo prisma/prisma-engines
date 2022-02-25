@@ -2,6 +2,7 @@ use query_engine_tests::*;
 
 pub mod bigint_filter;
 pub mod bytes_filter;
+pub mod composite;
 pub mod decimal_filter;
 pub mod extended_relation_filters;
 pub mod filter_regression;
