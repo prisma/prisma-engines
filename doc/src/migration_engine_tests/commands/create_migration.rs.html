@@ -196,6 +196,17 @@
 <span id="194">194</span>
 <span id="195">195</span>
 <span id="196">196</span>
+<span id="197">197</span>
+<span id="198">198</span>
+<span id="199">199</span>
+<span id="200">200</span>
+<span id="201">201</span>
+<span id="202">202</span>
+<span id="203">203</span>
+<span id="204">204</span>
+<span id="205">205</span>
+<span id="206">206</span>
+<span id="207">207</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">migration_core</span>::{
     <span class="ident">commands::create_migration</span>, <span class="ident">json_rpc::types</span>::<span class="kw-2">*</span>, <span class="ident">migration_connector::MigrationConnector</span>, <span class="ident">CoreError</span>, <span class="ident">CoreResult</span>,
 };
@@ -381,6 +392,17 @@
 }
 
 <span class="kw">impl</span> <span class="ident">MigrationAssertion</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
+    <span class="attribute">#[<span class="ident">track_caller</span>]</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">expect_contents</span>(<span class="self">self</span>, <span class="ident">expected_contents</span>: <span class="ident">expect_test::Expect</span>) -&gt; <span class="self">Self</span> {
+        <span class="kw">let</span> <span class="ident">migration_file_path</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">path</span>.<span class="ident">join</span>(<span class="string">&quot;migration.sql&quot;</span>);
+        <span class="kw">let</span> <span class="ident">contents</span>: <span class="ident">String</span> <span class="op">=</span> <span class="ident">std::fs::read_to_string</span>(<span class="kw-2">&amp;</span><span class="ident">migration_file_path</span>)
+            .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="macro">format!</span>(<span class="string">&quot;Trying to read migration file at {:?}&quot;</span>, <span class="ident">migration_file_path</span>))
+            .<span class="ident">unwrap</span>();
+
+        <span class="ident">expected_contents</span>.<span class="ident">assert_eq</span>(<span class="kw-2">&amp;</span><span class="ident">contents</span>);
+        <span class="self">self</span>
+    }
+
     <span class="attribute">#[<span class="ident">track_caller</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">assert_contents</span>(<span class="self">self</span>, <span class="ident">expected_contents</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">let</span> <span class="ident">migration_file_path</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">path</span>.<span class="ident">join</span>(<span class="string">&quot;migration.sql&quot;</span>);

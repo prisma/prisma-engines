@@ -679,7 +679,7 @@
         <span class="macro">tracing::debug!</span>(<span class="string">&quot;Resetting the database.&quot;</span>);
 
         <span class="self">self</span>.<span class="ident">with_default_connector</span>(<span class="ident">Box::new</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">connector</span><span class="op">|</span> {
-            <span class="ident">Box::pin</span>(<span class="ident">MigrationConnector::reset</span>(<span class="ident">connector</span>).<span class="ident">instrument</span>(<span class="macro">tracing::info_span!</span>(<span class="string">&quot;Reset&quot;</span>)))
+            <span class="ident">Box::pin</span>(<span class="ident">MigrationConnector::reset</span>(<span class="ident">connector</span>, <span class="bool-val">false</span>).<span class="ident">instrument</span>(<span class="macro">tracing::info_span!</span>(<span class="string">&quot;Reset&quot;</span>)))
         }))
         .<span class="kw">await</span><span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>(())

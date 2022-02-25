@@ -572,9 +572,9 @@
         <span class="ident">apply_migration::render_script</span>(<span class="ident">migration</span>, <span class="ident">diagnostics</span>, <span class="self">self</span>.<span class="ident">flavour</span>())
     }
 
-    <span class="kw">fn</span> <span class="ident">reset</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="ident">Box::pin</span>(<span class="kw">async</span> {
-            <span class="kw">if</span> <span class="self">self</span>.<span class="ident">flavour</span>.<span class="ident">reset</span>().<span class="kw">await</span>.<span class="ident">is_err</span>() {
+    <span class="kw">fn</span> <span class="ident">reset</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">soft</span>: <span class="ident">bool</span>) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span> {
+        <span class="ident">Box::pin</span>(<span class="kw">async</span> <span class="kw">move</span> {
+            <span class="kw">if</span> <span class="ident">soft</span> <span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">flavour</span>.<span class="ident">reset</span>().<span class="kw">await</span>.<span class="ident">is_err</span>() {
                 <span class="ident">best_effort_reset</span>(<span class="self">self</span>.<span class="ident">flavour</span>.<span class="ident">as_mut</span>()).<span class="kw">await</span><span class="question-mark">?</span>;
             }
 
