@@ -348,10 +348,8 @@ fn order_definitions(
         .zip(order_by_defs.iter())
         .map(|((index, order_by), order_by_def)| match order_by {
             OrderBy::Scalar(order_by) => cursor_order_def_scalar(order_by, order_by_def, index),
-            OrderBy::Aggregation(order_by) if order_by.is_scalar_aggregation() => {
-                cursor_order_def_aggregation_scalar(order_by, order_by_def, index)
-            }
-            OrderBy::Aggregation(order_by) => cursor_order_def_aggregation_rel(order_by, order_by_def, index),
+            OrderBy::ScalarAggregation(order_by) => cursor_order_def_aggregation_scalar(order_by, order_by_def, index),
+            OrderBy::ToManyAggregation(order_by) => cursor_order_def_aggregation_rel(order_by, order_by_def, index),
             OrderBy::Relevance(order_by) => cursor_order_def_relevance(order_by, order_by_def, index),
         })
         .collect_vec()
@@ -363,7 +361,7 @@ fn cursor_order_def_scalar(
     order_by_def: &OrderByDefinition,
     index: usize,
 ) -> CursorOrderDefinition {
-    // If there are any ordering hop, this finds the foreign key fields for the _last_ hop (we look for the last one because the ordering is done the last one).
+    // If there are any ordering hops, this finds the foreign key fields for the _last_ hop (we look for the last one because the ordering is done the last one).
     // These fk fields are needed to check whether they are nullable
     // cf: part #2 of the SQL query above, when a field is nullable.
     let fks = foreign_keys_from_order_path(&order_by.path, &order_by_def.joins);
@@ -391,11 +389,12 @@ fn cursor_order_def_scalar(
 
 /// Build a CursorOrderDefinition for an order by aggregation scalar
 fn cursor_order_def_aggregation_scalar(
-    order_by: &OrderByAggregation,
+    order_by: &OrderByScalarAggregation,
     order_by_def: &OrderByDefinition,
     index: usize,
 ) -> CursorOrderDefinition {
-    let field = order_by.field.as_ref().unwrap();
+    let field = &order_by.field;
+
     // Selected fields needs to be aliased in case there are two order bys on two different tables, pointing to a field of the same name.
     // eg: orderBy: [{ id: asc }, { b: { id: asc } }]
     // Without these aliases, selecting from the <ORDER_TABLE_ALIAS> cmp table would result in ambiguous field name
@@ -408,6 +407,7 @@ fn cursor_order_def_aggregation_scalar(
     );
 
     let coalesce_exprs: Vec<Expression> = vec![order_by_def.order_column.clone(), Value::integer(0).into()];
+
     // We coalesce the order column to 0 when it's compared to the cmp table since the aggregations joins
     // might return NULL on relations that have no connected records
     let order_column: Expression = coalesce(coalesce_exprs).into();
@@ -424,7 +424,7 @@ fn cursor_order_def_aggregation_scalar(
 
 /// Build a CursorOrderDefinition for an order by aggregation on relations
 fn cursor_order_def_aggregation_rel(
-    order_by: &OrderByAggregation,
+    order_by: &OrderByToManyAggregation,
     order_by_def: &OrderByDefinition,
     index: usize,
 ) -> CursorOrderDefinition {
@@ -438,7 +438,14 @@ fn cursor_order_def_aggregation_rel(
     // Without these aliases, selecting from the <ORDER_TABLE_ALIAS> cmp table would result in ambiguous field name
     let cmp_column_alias = format!(
         "aggr_{}_{}",
-        order_by.path.iter().map(|rf| rf.model().name.to_owned()).join("_"),
+        order_by
+            .path
+            .iter()
+            .map(|hop| match hop {
+                OrderByHop::Relation(rf) => rf.model().name.to_owned(),
+                OrderByHop::Composite(_) => unreachable!("SQL connectors don't have composite support."),
+            })
+            .join("_"),
         index
     );
 
@@ -480,58 +487,60 @@ fn cursor_order_def_relevance(
     }
 }
 
-fn foreign_keys_from_order_path(
-    path: &[RelationFieldRef],
-    joins: &[AliasedJoin],
-) -> Option<Vec<CursorOrderForeignKey>> {
+fn foreign_keys_from_order_path(path: &[OrderByHop], joins: &[AliasedJoin]) -> Option<Vec<CursorOrderForeignKey>> {
     let (before_last_hop, last_hop) = take_last_two_elem(&path);
 
-    last_hop.map(|rf| {
-        rf.relation_info
-            .fields
-            .iter()
-            .map(|fk_name| {
-                let fk_field = rf.model().fields().find_from_scalar(fk_name).unwrap();
+    last_hop.map(|hop| {
+        match hop {
+            OrderByHop::Relation(rf) => {
+                rf.relation_info
+                    .fields
+                    .iter()
+                    .map(|fk_name| {
+                        let fk_field = rf.model().fields().find_from_scalar(fk_name).unwrap();
 
-                // If there are _more than one_ hop, we need to refer to the fk fields using the
-                // join alias of the hop _before_ the last hop. eg:
-                //
-                // ```sql
-                // SELECT ...
-                // FROM
-                //  "public"."ModelA"
-                //   LEFT JOIN "public"."ModelB" AS "orderby_0_ModelB" ON (
-                //     "public"."ModelA"."b_id" = "orderby_0_ModelB"."id"
-                //   )
-                //   LEFT JOIN "public"."ModelC" AS "orderby_0_ModelC" ON (
-                //     "orderby_0_ModelB"."c_id" = "orderby_0_ModelC"."id"
-                //   )
-                // WHERE
-                // ( ... OR <before_last_join_alias>.<foreign_key_db_name> IS NULL )
-                // ```
-                // In the example above, <before_last_join_alias> == "orderby_0_ModelB"
-                //                          <foreign_key_db_name> == "c_id"
-                match before_last_hop {
-                    Some(_) => {
-                        let (before_last_join, _) = take_last_two_elem(joins);
-                        let before_last_join =
-                            before_last_join.expect("There should be an equal amount of order by hops and joins");
+                        // If there are _more than one_ hop, we need to refer to the fk fields using the
+                        // join alias of the hop _before_ the last hop. eg:
+                        //
+                        // ```sql
+                        // SELECT ...
+                        // FROM
+                        //  "public"."ModelA"
+                        //   LEFT JOIN "public"."ModelB" AS "orderby_0_ModelB" ON (
+                        //     "public"."ModelA"."b_id" = "orderby_0_ModelB"."id"
+                        //   )
+                        //   LEFT JOIN "public"."ModelC" AS "orderby_0_ModelC" ON (
+                        //     "orderby_0_ModelB"."c_id" = "orderby_0_ModelC"."id"
+                        //   )
+                        // WHERE
+                        // ( ... OR <before_last_join_alias>.<foreign_key_db_name> IS NULL )
+                        // ```
+                        // In the example above, <before_last_join_alias> == "orderby_0_ModelB"
+                        //                          <foreign_key_db_name> == "c_id"
+                        match before_last_hop {
+                            Some(_) => {
+                                let (before_last_join, _) = take_last_two_elem(joins);
+                                let before_last_join = before_last_join
+                                    .expect("There should be an equal amount of order by hops and joins");
 
-                        CursorOrderForeignKey {
-                            field: fk_field,
-                            alias: Some(before_last_join.alias.to_owned()),
+                                CursorOrderForeignKey {
+                                    field: fk_field,
+                                    alias: Some(before_last_join.alias.to_owned()),
+                                }
+                            }
+                            None => {
+                                // If there is not more than one hop, then there's no need to alias the fk field
+                                CursorOrderForeignKey {
+                                    field: fk_field,
+                                    alias: None,
+                                }
+                            }
                         }
-                    }
-                    None => {
-                        // If there is not more than one hop, then there's no need to alias the fk field
-                        CursorOrderForeignKey {
-                            field: fk_field,
-                            alias: None,
-                        }
-                    }
-                }
-            })
-            .collect_vec()
+                    })
+                    .collect_vec()
+            }
+            OrderByHop::Composite(_) => unreachable!("SQL connectors don't have composite support."),
+        }
     })
 }
 

@@ -2,10 +2,10 @@ use super::*;
 use input_types::fields::arguments;
 use prisma_models::{CompositeFieldRef, ScalarFieldRef};
 
-pub(crate) fn map_field(ctx: &mut BuilderContext, model_field: &ModelField) -> OutputField {
+pub(crate) fn map_output_field(ctx: &mut BuilderContext, model_field: &ModelField) -> OutputField {
     field(
         model_field.name(),
-        arguments::many_records_field_arguments(ctx, &model_field),
+        arguments::many_records_output_field_arguments(ctx, &model_field),
         map_field_output_type(ctx, &model_field),
         None,
     )

@@ -57,5 +57,10 @@ pub(crate) fn map_type(ctx: &mut BuilderContext, model: &ModelRef) -> ObjectType
 /// Computes model output type fields.
 /// Requires an initialized cache.
 fn compute_model_object_type_fields(ctx: &mut BuilderContext, model: &ModelRef) -> Vec<OutputField> {
-    model.fields().all.iter().map(|f| field::map_field(ctx, f)).collect()
+    model
+        .fields()
+        .all
+        .iter()
+        .map(|f| field::map_output_field(ctx, f))
+        .collect()
 }

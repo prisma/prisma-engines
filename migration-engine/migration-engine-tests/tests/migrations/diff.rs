@@ -176,7 +176,7 @@ fn from_schema_datamodel_to_url(mut api: TestApi) {
             moos Boolean
         }
     "#;
-    let schema_path = write_file_to_tmp(&first_schema, &tempdir, "schema.prisma");
+    let schema_path = write_file_to_tmp(first_schema, &tempdir, "schema.prisma");
     let second_url = format!("file:{}/second_db.sqlite", base_dir_str);
 
     tok(async {

@@ -1,7 +1,10 @@
+use crate::schema_builder::input_types::objects::order_by_objects::OrderByOptions;
+
 use super::*;
 use constants::args;
 use datamodel_connector::ConnectorCapability;
 use objects::*;
+use prisma_models::{prelude::ParentContainer, CompositeFieldRef};
 
 /// Builds "where" argument.
 pub(crate) fn where_argument(ctx: &mut BuilderContext, model: &ModelRef) -> InputField {
@@ -97,26 +100,40 @@ pub(crate) fn delete_many_arguments(ctx: &mut BuilderContext, model: &ModelRef) 
 }
 
 /// Builds "many records where" arguments based on the given model and field.
-pub(crate) fn many_records_field_arguments(ctx: &mut BuilderContext, field: &ModelField) -> Vec<InputField> {
+pub(crate) fn many_records_output_field_arguments(ctx: &mut BuilderContext, field: &ModelField) -> Vec<InputField> {
     match field {
         ModelField::Scalar(_) => vec![],
-        ModelField::Relation(rf) if rf.is_list() => many_records_arguments(ctx, &rf.related_model(), true),
-        ModelField::Relation(rf) if !rf.is_list() => vec![],
-        _ => vec![], // [Composites] todo
+
+        // To-many relation.
+        ModelField::Relation(rf) if rf.is_list() => relation_selection_arguments(ctx, &rf.related_model(), true),
+
+        // To-one relation.
+        ModelField::Relation(_) => vec![],
+
+        // To-many composite.
+        ModelField::Composite(cf) if cf.is_list() => composite_selection_arguments(ctx, cf),
+
+        // To-one composite.
+        ModelField::Composite(_) => vec![],
     }
 }
 
-/// Builds "many records where" arguments solely based on the given model.
-pub(crate) fn many_records_arguments(
+/// Builds "many records where" arguments for to-many relation selection sets.
+pub(crate) fn relation_selection_arguments(
     ctx: &mut BuilderContext,
     model: &ModelRef,
     include_distinct: bool,
 ) -> Vec<InputField> {
     let unique_input_type = InputType::object(filter_objects::where_unique_object_type(ctx, model));
+    let order_by_options = OrderByOptions {
+        include_relations: true,
+        include_scalar_aggregations: false,
+        include_full_text_search: ctx.can_full_text_search(),
+    };
 
     let mut args = vec![
         where_argument(ctx, &model),
-        order_by_argument(ctx, &model, true, false, ctx.can_full_text_search()),
+        order_by_argument(ctx, &model.into(), &order_by_options),
         input_field(args::CURSOR, unique_input_type, None).optional(),
         input_field(args::TAKE, InputType::int(), None).optional(),
         input_field(args::SKIP, InputType::int(), None).optional(),
@@ -136,21 +153,20 @@ pub(crate) fn many_records_arguments(
     args
 }
 
+/// Builds "many composite where" arguments for to-many composite selection sets.
+pub(crate) fn composite_selection_arguments(_ctx: &mut BuilderContext, _cf: &CompositeFieldRef) -> Vec<InputField> {
+    //vec![order_by_argument(ctx, &(&cf.typ).into(), &OrderByOptions::new())]
+
+    vec![]
+}
+
 // Builds "orderBy" argument.
 pub(crate) fn order_by_argument(
     ctx: &mut BuilderContext,
-    model: &ModelRef,
-    include_relations: bool,
-    include_scalar_aggregations: bool,
-    include_full_text_search: bool,
+    container: &ParentContainer,
+    options: &OrderByOptions,
 ) -> InputField {
-    let order_object_type = InputType::object(order_by_objects::order_by_object_type(
-        ctx,
-        model,
-        include_relations,
-        include_scalar_aggregations,
-        include_full_text_search,
-    ));
+    let order_object_type = InputType::object(order_by_objects::order_by_object_type(ctx, container, options));
 
     input_field(
         args::ORDER_BY,
@@ -165,7 +181,7 @@ pub(crate) fn group_by_arguments(ctx: &mut BuilderContext, model: &ModelRef) -> 
 
     vec![
         where_argument(ctx, &model),
-        order_by_argument(ctx, &model, false, true, false),
+        order_by_argument(ctx, &model.into(), &OrderByOptions::new().with_aggregates()),
         input_field(
             args::BY,
             vec![InputType::list(field_enum_type.clone()), field_enum_type],

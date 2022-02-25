@@ -95,24 +95,72 @@ pub fn to_many_composites() -> String {
         r#"model TestModel {
             #id(id, Int, @id)
             field String?
-            a     A[]       @map("top_a")
-            c     C[]       @map("top_c")
+            to_many_as CompositeA[] @map("top_a")
+            to_one_b   CompositeB?
         }
 
-        type A {
+        type CompositeA {
             a_1 String @default("a_1 default") @map("a1")
             a_2 Int?
-            b B[]
         }
 
-        type B {
-            b_field String   @default("b_field default")
-            a       A[]      @map("nested_a")
+        type CompositeB {
+            b_field      Int?         @default(10)
+            b_to_many_cs CompositeC[]
         }
 
-        type C {
+        type CompositeC {
+          c_field Int @default(10)
+
+          // Mostly here to test ordering multiple nested selection sets.
+          c_to_many_as CompositeA[]
+        }
+        "#
+    };
+
+    schema.to_owned()
+}
+
+/// Composites and relations mixed.
+pub fn mixed_composites() -> String {
+    let schema = indoc! {
+        r#"model TestModel {
+            #id(id, Int, @id)
+            field        String?
+            to_one_com   CompositeA?  @map("to_one_composite")
+            to_many_com  CompositeB[] @map("to_many_composite")
+
+            to_one_rel_id Int?
+            to_one_rel RelatedModel? @relation(name: "ToOne", fields: [to_one_rel_id], references: [id])
+
+            to_many_rel RelatedModel[] @relation(name: "ToMany")
+        }
+
+        type CompositeA {
+            a_1 String @default("a_1 default") @map("a1")
+            a_2 Int?
+            other_composites CompositeB[]
+        }
+
+        type CompositeB {
+            b_field        String      @default("b_field default")
+            to_other_com   CompositeC? @map("nested_c")
+        }
+
+        type CompositeC {
           c_field String @default("c_field default")
         }
+
+        model RelatedModel {
+            #id(id, Int, @id)
+
+            to_one_com   CompositeA?  @map("to_one_composite")
+            to_many_com  CompositeB[] @map("to_many_composite")
+
+            test_model TestModel? @relation(name: "ToOne")
+            many_test_model TestModel[] @relation(name: "ToMany")
+        }
+
         "#
     };
 
