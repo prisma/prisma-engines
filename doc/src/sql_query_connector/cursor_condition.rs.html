@@ -547,6 +547,15 @@
 <span id="545">545</span>
 <span id="546">546</span>
 <span id="547">547</span>
+<span id="548">548</span>
+<span id="549">549</span>
+<span id="550">550</span>
+<span id="551">551</span>
+<span id="552">552</span>
+<span id="553">553</span>
+<span id="554">554</span>
+<span id="555">555</span>
+<span id="556">556</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">join_utils::AliasedJoin</span>,
     <span class="ident">model_extensions</span>::{<span class="ident">AsColumn</span>, <span class="ident">AsColumns</span>, <span class="ident">AsTable</span>, <span class="ident">SelectionResultExt</span>},
@@ -897,10 +906,8 @@
         .<span class="ident">zip</span>(<span class="ident">order_by_defs</span>.<span class="ident">iter</span>())
         .<span class="ident">map</span>(<span class="op">|</span>((<span class="ident">index</span>, <span class="ident">order_by</span>), <span class="ident">order_by_def</span>)<span class="op">|</span> <span class="kw">match</span> <span class="ident">order_by</span> {
             <span class="ident">OrderBy::Scalar</span>(<span class="ident">order_by</span>) =&gt; <span class="ident">cursor_order_def_scalar</span>(<span class="ident">order_by</span>, <span class="ident">order_by_def</span>, <span class="ident">index</span>),
-            <span class="ident">OrderBy::Aggregation</span>(<span class="ident">order_by</span>) <span class="kw">if</span> <span class="ident">order_by</span>.<span class="ident">is_scalar_aggregation</span>() =&gt; {
-                <span class="ident">cursor_order_def_aggregation_scalar</span>(<span class="ident">order_by</span>, <span class="ident">order_by_def</span>, <span class="ident">index</span>)
-            }
-            <span class="ident">OrderBy::Aggregation</span>(<span class="ident">order_by</span>) =&gt; <span class="ident">cursor_order_def_aggregation_rel</span>(<span class="ident">order_by</span>, <span class="ident">order_by_def</span>, <span class="ident">index</span>),
+            <span class="ident">OrderBy::ScalarAggregation</span>(<span class="ident">order_by</span>) =&gt; <span class="ident">cursor_order_def_aggregation_scalar</span>(<span class="ident">order_by</span>, <span class="ident">order_by_def</span>, <span class="ident">index</span>),
+            <span class="ident">OrderBy::ToManyAggregation</span>(<span class="ident">order_by</span>) =&gt; <span class="ident">cursor_order_def_aggregation_rel</span>(<span class="ident">order_by</span>, <span class="ident">order_by_def</span>, <span class="ident">index</span>),
             <span class="ident">OrderBy::Relevance</span>(<span class="ident">order_by</span>) =&gt; <span class="ident">cursor_order_def_relevance</span>(<span class="ident">order_by</span>, <span class="ident">order_by_def</span>, <span class="ident">index</span>),
         })
         .<span class="ident">collect_vec</span>()
@@ -912,7 +919,7 @@
     <span class="ident">order_by_def</span>: <span class="kw-2">&amp;</span><span class="ident">OrderByDefinition</span>,
     <span class="ident">index</span>: <span class="ident">usize</span>,
 ) -&gt; <span class="ident">CursorOrderDefinition</span> {
-    <span class="comment">// If there are any ordering hop, this finds the foreign key fields for the _last_ hop (we look for the last one because the ordering is done the last one).</span>
+    <span class="comment">// If there are any ordering hops, this finds the foreign key fields for the _last_ hop (we look for the last one because the ordering is done the last one).</span>
     <span class="comment">// These fk fields are needed to check whether they are nullable</span>
     <span class="comment">// cf: part #2 of the SQL query above, when a field is nullable.</span>
     <span class="kw">let</span> <span class="ident">fks</span> <span class="op">=</span> <span class="ident">foreign_keys_from_order_path</span>(<span class="kw-2">&amp;</span><span class="ident">order_by</span>.<span class="ident">path</span>, <span class="kw-2">&amp;</span><span class="ident">order_by_def</span>.<span class="ident">joins</span>);
@@ -940,11 +947,12 @@
 
 <span class="doccomment">/// Build a CursorOrderDefinition for an order by aggregation scalar</span>
 <span class="kw">fn</span> <span class="ident">cursor_order_def_aggregation_scalar</span>(
-    <span class="ident">order_by</span>: <span class="kw-2">&amp;</span><span class="ident">OrderByAggregation</span>,
+    <span class="ident">order_by</span>: <span class="kw-2">&amp;</span><span class="ident">OrderByScalarAggregation</span>,
     <span class="ident">order_by_def</span>: <span class="kw-2">&amp;</span><span class="ident">OrderByDefinition</span>,
     <span class="ident">index</span>: <span class="ident">usize</span>,
 ) -&gt; <span class="ident">CursorOrderDefinition</span> {
-    <span class="kw">let</span> <span class="ident">field</span> <span class="op">=</span> <span class="ident">order_by</span>.<span class="ident">field</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>();
+    <span class="kw">let</span> <span class="ident">field</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">order_by</span>.<span class="ident">field</span>;
+
     <span class="comment">// Selected fields needs to be aliased in case there are two order bys on two different tables, pointing to a field of the same name.</span>
     <span class="comment">// eg: orderBy: [{ id: asc }, { b: { id: asc } }]</span>
     <span class="comment">// Without these aliases, selecting from the &lt;ORDER_TABLE_ALIAS&gt; cmp table would result in ambiguous field name</span>
@@ -957,6 +965,7 @@
     );
 
     <span class="kw">let</span> <span class="ident">coalesce_exprs</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Expression</span><span class="op">&gt;</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="ident">order_by_def</span>.<span class="ident">order_column</span>.<span class="ident">clone</span>(), <span class="ident">Value::integer</span>(<span class="number">0</span>).<span class="ident">into</span>()];
+
     <span class="comment">// We coalesce the order column to 0 when it&#39;s compared to the cmp table since the aggregations joins</span>
     <span class="comment">// might return NULL on relations that have no connected records</span>
     <span class="kw">let</span> <span class="ident">order_column</span>: <span class="ident">Expression</span> <span class="op">=</span> <span class="ident">coalesce</span>(<span class="ident">coalesce_exprs</span>).<span class="ident">into</span>();
@@ -973,7 +982,7 @@
 
 <span class="doccomment">/// Build a CursorOrderDefinition for an order by aggregation on relations</span>
 <span class="kw">fn</span> <span class="ident">cursor_order_def_aggregation_rel</span>(
-    <span class="ident">order_by</span>: <span class="kw-2">&amp;</span><span class="ident">OrderByAggregation</span>,
+    <span class="ident">order_by</span>: <span class="kw-2">&amp;</span><span class="ident">OrderByToManyAggregation</span>,
     <span class="ident">order_by_def</span>: <span class="kw-2">&amp;</span><span class="ident">OrderByDefinition</span>,
     <span class="ident">index</span>: <span class="ident">usize</span>,
 ) -&gt; <span class="ident">CursorOrderDefinition</span> {
@@ -987,7 +996,14 @@
     <span class="comment">// Without these aliases, selecting from the &lt;ORDER_TABLE_ALIAS&gt; cmp table would result in ambiguous field name</span>
     <span class="kw">let</span> <span class="ident">cmp_column_alias</span> <span class="op">=</span> <span class="macro">format!</span>(
         <span class="string">&quot;aggr_{}_{}&quot;</span>,
-        <span class="ident">order_by</span>.<span class="ident">path</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">rf</span><span class="op">|</span> <span class="ident">rf</span>.<span class="ident">model</span>().<span class="ident">name</span>.<span class="ident">to_owned</span>()).<span class="ident">join</span>(<span class="string">&quot;_&quot;</span>),
+        <span class="ident">order_by</span>
+            .<span class="ident">path</span>
+            .<span class="ident">iter</span>()
+            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">hop</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">hop</span> {
+                <span class="ident">OrderByHop::Relation</span>(<span class="ident">rf</span>) =&gt; <span class="ident">rf</span>.<span class="ident">model</span>().<span class="ident">name</span>.<span class="ident">to_owned</span>(),
+                <span class="ident">OrderByHop::Composite</span>(<span class="kw">_</span>) =&gt; <span class="macro">unreachable!</span>(<span class="string">&quot;SQL connectors don&#39;t have composite support.&quot;</span>),
+            })
+            .<span class="ident">join</span>(<span class="string">&quot;_&quot;</span>),
         <span class="ident">index</span>
     );
 
@@ -1029,58 +1045,60 @@
     }
 }
 
-<span class="kw">fn</span> <span class="ident">foreign_keys_from_order_path</span>(
-    <span class="ident">path</span>: <span class="kw-2">&amp;</span>[<span class="ident">RelationFieldRef</span>],
-    <span class="ident">joins</span>: <span class="kw-2">&amp;</span>[<span class="ident">AliasedJoin</span>],
-) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">CursorOrderForeignKey</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">foreign_keys_from_order_path</span>(<span class="ident">path</span>: <span class="kw-2">&amp;</span>[<span class="ident">OrderByHop</span>], <span class="ident">joins</span>: <span class="kw-2">&amp;</span>[<span class="ident">AliasedJoin</span>]) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">CursorOrderForeignKey</span><span class="op">&gt;</span><span class="op">&gt;</span> {
     <span class="kw">let</span> (<span class="ident">before_last_hop</span>, <span class="ident">last_hop</span>) <span class="op">=</span> <span class="ident">take_last_two_elem</span>(<span class="kw-2">&amp;</span><span class="ident">path</span>);
 
-    <span class="ident">last_hop</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">rf</span><span class="op">|</span> {
-        <span class="ident">rf</span>.<span class="ident">relation_info</span>
-            .<span class="ident">fields</span>
-            .<span class="ident">iter</span>()
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">fk_name</span><span class="op">|</span> {
-                <span class="kw">let</span> <span class="ident">fk_field</span> <span class="op">=</span> <span class="ident">rf</span>.<span class="ident">model</span>().<span class="ident">fields</span>().<span class="ident">find_from_scalar</span>(<span class="ident">fk_name</span>).<span class="ident">unwrap</span>();
+    <span class="ident">last_hop</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">hop</span><span class="op">|</span> {
+        <span class="kw">match</span> <span class="ident">hop</span> {
+            <span class="ident">OrderByHop::Relation</span>(<span class="ident">rf</span>) =&gt; {
+                <span class="ident">rf</span>.<span class="ident">relation_info</span>
+                    .<span class="ident">fields</span>
+                    .<span class="ident">iter</span>()
+                    .<span class="ident">map</span>(<span class="op">|</span><span class="ident">fk_name</span><span class="op">|</span> {
+                        <span class="kw">let</span> <span class="ident">fk_field</span> <span class="op">=</span> <span class="ident">rf</span>.<span class="ident">model</span>().<span class="ident">fields</span>().<span class="ident">find_from_scalar</span>(<span class="ident">fk_name</span>).<span class="ident">unwrap</span>();
 
-                <span class="comment">// If there are _more than one_ hop, we need to refer to the fk fields using the</span>
-                <span class="comment">// join alias of the hop _before_ the last hop. eg:</span>
-                <span class="comment">//</span>
-                <span class="comment">// ```sql</span>
-                <span class="comment">// SELECT ...</span>
-                <span class="comment">// FROM</span>
-                <span class="comment">//  &quot;public&quot;.&quot;ModelA&quot;</span>
-                <span class="comment">//   LEFT JOIN &quot;public&quot;.&quot;ModelB&quot; AS &quot;orderby_0_ModelB&quot; ON (</span>
-                <span class="comment">//     &quot;public&quot;.&quot;ModelA&quot;.&quot;b_id&quot; = &quot;orderby_0_ModelB&quot;.&quot;id&quot;</span>
-                <span class="comment">//   )</span>
-                <span class="comment">//   LEFT JOIN &quot;public&quot;.&quot;ModelC&quot; AS &quot;orderby_0_ModelC&quot; ON (</span>
-                <span class="comment">//     &quot;orderby_0_ModelB&quot;.&quot;c_id&quot; = &quot;orderby_0_ModelC&quot;.&quot;id&quot;</span>
-                <span class="comment">//   )</span>
-                <span class="comment">// WHERE</span>
-                <span class="comment">// ( ... OR &lt;before_last_join_alias&gt;.&lt;foreign_key_db_name&gt; IS NULL )</span>
-                <span class="comment">// ```</span>
-                <span class="comment">// In the example above, &lt;before_last_join_alias&gt; == &quot;orderby_0_ModelB&quot;</span>
-                <span class="comment">//                          &lt;foreign_key_db_name&gt; == &quot;c_id&quot;</span>
-                <span class="kw">match</span> <span class="ident">before_last_hop</span> {
-                    <span class="prelude-val">Some</span>(<span class="kw">_</span>) =&gt; {
-                        <span class="kw">let</span> (<span class="ident">before_last_join</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="ident">take_last_two_elem</span>(<span class="ident">joins</span>);
-                        <span class="kw">let</span> <span class="ident">before_last_join</span> <span class="op">=</span>
-                            <span class="ident">before_last_join</span>.<span class="ident">expect</span>(<span class="string">&quot;There should be an equal amount of order by hops and joins&quot;</span>);
+                        <span class="comment">// If there are _more than one_ hop, we need to refer to the fk fields using the</span>
+                        <span class="comment">// join alias of the hop _before_ the last hop. eg:</span>
+                        <span class="comment">//</span>
+                        <span class="comment">// ```sql</span>
+                        <span class="comment">// SELECT ...</span>
+                        <span class="comment">// FROM</span>
+                        <span class="comment">//  &quot;public&quot;.&quot;ModelA&quot;</span>
+                        <span class="comment">//   LEFT JOIN &quot;public&quot;.&quot;ModelB&quot; AS &quot;orderby_0_ModelB&quot; ON (</span>
+                        <span class="comment">//     &quot;public&quot;.&quot;ModelA&quot;.&quot;b_id&quot; = &quot;orderby_0_ModelB&quot;.&quot;id&quot;</span>
+                        <span class="comment">//   )</span>
+                        <span class="comment">//   LEFT JOIN &quot;public&quot;.&quot;ModelC&quot; AS &quot;orderby_0_ModelC&quot; ON (</span>
+                        <span class="comment">//     &quot;orderby_0_ModelB&quot;.&quot;c_id&quot; = &quot;orderby_0_ModelC&quot;.&quot;id&quot;</span>
+                        <span class="comment">//   )</span>
+                        <span class="comment">// WHERE</span>
+                        <span class="comment">// ( ... OR &lt;before_last_join_alias&gt;.&lt;foreign_key_db_name&gt; IS NULL )</span>
+                        <span class="comment">// ```</span>
+                        <span class="comment">// In the example above, &lt;before_last_join_alias&gt; == &quot;orderby_0_ModelB&quot;</span>
+                        <span class="comment">//                          &lt;foreign_key_db_name&gt; == &quot;c_id&quot;</span>
+                        <span class="kw">match</span> <span class="ident">before_last_hop</span> {
+                            <span class="prelude-val">Some</span>(<span class="kw">_</span>) =&gt; {
+                                <span class="kw">let</span> (<span class="ident">before_last_join</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="ident">take_last_two_elem</span>(<span class="ident">joins</span>);
+                                <span class="kw">let</span> <span class="ident">before_last_join</span> <span class="op">=</span> <span class="ident">before_last_join</span>
+                                    .<span class="ident">expect</span>(<span class="string">&quot;There should be an equal amount of order by hops and joins&quot;</span>);
 
-                        <span class="ident">CursorOrderForeignKey</span> {
-                            <span class="ident">field</span>: <span class="ident">fk_field</span>,
-                            <span class="ident">alias</span>: <span class="prelude-val">Some</span>(<span class="ident">before_last_join</span>.<span class="ident">alias</span>.<span class="ident">to_owned</span>()),
+                                <span class="ident">CursorOrderForeignKey</span> {
+                                    <span class="ident">field</span>: <span class="ident">fk_field</span>,
+                                    <span class="ident">alias</span>: <span class="prelude-val">Some</span>(<span class="ident">before_last_join</span>.<span class="ident">alias</span>.<span class="ident">to_owned</span>()),
+                                }
+                            }
+                            <span class="prelude-val">None</span> =&gt; {
+                                <span class="comment">// If there is not more than one hop, then there&#39;s no need to alias the fk field</span>
+                                <span class="ident">CursorOrderForeignKey</span> {
+                                    <span class="ident">field</span>: <span class="ident">fk_field</span>,
+                                    <span class="ident">alias</span>: <span class="prelude-val">None</span>,
+                                }
+                            }
                         }
-                    }
-                    <span class="prelude-val">None</span> =&gt; {
-                        <span class="comment">// If there is not more than one hop, then there&#39;s no need to alias the fk field</span>
-                        <span class="ident">CursorOrderForeignKey</span> {
-                            <span class="ident">field</span>: <span class="ident">fk_field</span>,
-                            <span class="ident">alias</span>: <span class="prelude-val">None</span>,
-                        }
-                    }
-                }
-            })
-            .<span class="ident">collect_vec</span>()
+                    })
+                    .<span class="ident">collect_vec</span>()
+            }
+            <span class="ident">OrderByHop::Composite</span>(<span class="kw">_</span>) =&gt; <span class="macro">unreachable!</span>(<span class="string">&quot;SQL connectors don&#39;t have composite support.&quot;</span>),
+        }
     })
 }
 

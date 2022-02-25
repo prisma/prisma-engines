@@ -225,6 +225,8 @@
 <span id="223">223</span>
 <span id="224">224</span>
 <span id="225">225</span>
+<span id="226">226</span>
+<span id="227">227</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::filter::Filter</span>;
 <span class="kw">use</span> <span class="ident">prisma_models</span>::<span class="kw-2">*</span>;
 
@@ -301,17 +303,16 @@
         <span class="self">self</span>.<span class="ident">cursor</span>.<span class="ident">is_some</span>()
             <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">order_by</span>.<span class="ident">iter</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">o</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">o</span> {
                 <span class="ident">OrderBy::Scalar</span>(<span class="ident">o</span>) =&gt; <span class="op">!</span><span class="ident">o</span>.<span class="ident">field</span>.<span class="ident">is_required</span>(),
-                <span class="ident">OrderBy::Aggregation</span>(<span class="kw">_</span>) =&gt; <span class="bool-val">false</span>,
-                <span class="ident">OrderBy::Relevance</span>(<span class="kw">_</span>) =&gt; <span class="bool-val">false</span>,
+                <span class="kw">_</span> =&gt; <span class="bool-val">false</span>,
             })
     }
 
     <span class="doccomment">/// Checks if the orderBy provided is guaranteeing a stable ordering of records for the model.</span>
     <span class="doccomment">/// For that purpose we need to distinguish orderings on the source model, i.e. the model that</span>
     <span class="doccomment">/// we&#39;re sorting on the top level (where orderBys are located that are done without relations)</span>
-    <span class="doccomment">/// and orderings that require a relation hop. Scalar orderings that require a relation hop are</span>
-    <span class="doccomment">/// only guarantee stable ordering if they are strictly over 1:1 relations. As soon as there&#39;s</span>
-    <span class="doccomment">/// a m:1 (or m:n for later implementations) relation involved a unique on the to-one side can&#39;t</span>
+    <span class="doccomment">/// and orderings that require a relation or composite hop. Scalar orderings that require a hop are</span>
+    <span class="doccomment">/// only guaranteed stable ordering if they are strictly over 1:1. As soon as there&#39;s</span>
+    <span class="doccomment">/// a m:1 (or m:n for later implementations) hop involved a unique on the to-one side can&#39;t</span>
     <span class="doccomment">/// be considered unique anymore for the purpose of ordering records, as many left hand records</span>
     <span class="doccomment">/// (the many side) can have the one side. A simple example would be a User &lt;&gt; Post relation</span>
     <span class="doccomment">/// where a post can have only one author but an author (User) can have many posts. If posts</span>
@@ -329,28 +330,27 @@
     <span class="doccomment">///      * no orderings are done, or ...</span>
     <span class="doccomment">///      * at least one unique field is present on the source model `orderBy`, or ...</span>
     <span class="doccomment">///      * source model contains a combination of fields that is marked as unique, or ...</span>
-    <span class="doccomment">///      * a relation orderBy contains a unique and is done solely over 1:1 relations.</span>
+    <span class="doccomment">///      * an orderBy hop contains a unique and is done solely over 1:1 relations.</span>
     <span class="doccomment">/// - `false` otherwise.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_stable_ordering</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">order_by</span>.<span class="ident">is_empty</span>() {
             <span class="kw">return</span> <span class="bool-val">true</span>;
         }
 
-        <span class="comment">// We&#39;re filtering order bys aggregation &amp; relevance since they will never lead to stable ordering anyway.</span>
-        <span class="kw">let</span> <span class="ident">maybe_stable_order_bys</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="self">self</span>
+        <span class="comment">// We&#39;re filtering order by aggregation &amp; relevance since they will never lead to stable ordering anyway.</span>
+        <span class="kw">let</span> <span class="ident">stable_candidates</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="self">self</span>
             .<span class="ident">order_by</span>
             .<span class="ident">iter</span>()
             .<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">o</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">o</span> {
                 <span class="ident">OrderBy::Scalar</span>(<span class="ident">o</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">o</span>),
-                <span class="ident">OrderBy::Aggregation</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
-                <span class="ident">OrderBy::Relevance</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
+                <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
             })
             .<span class="ident">collect</span>();
 
-        <span class="comment">// Partition into orderings on the same model and ones that require relation hops.</span>
+        <span class="comment">// Partition into orderings on the same model and ones that require hops.</span>
         <span class="comment">// Note: One ordering is always on one scalar in the end.</span>
         <span class="kw">let</span> (<span class="ident">on_model</span>, <span class="ident">on_relation</span>): (<span class="ident">Vec</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">OrderByScalar</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">OrderByScalar</span><span class="op">&gt;</span>) <span class="op">=</span>
-            <span class="ident">maybe_stable_order_bys</span>.<span class="ident">iter</span>().<span class="ident">partition</span>(<span class="op">|</span><span class="ident">o</span><span class="op">|</span> <span class="ident">o</span>.<span class="ident">path</span>.<span class="ident">is_empty</span>());
+            <span class="ident">stable_candidates</span>.<span class="ident">iter</span>().<span class="ident">partition</span>(<span class="op">|</span><span class="ident">o</span><span class="op">|</span> <span class="ident">o</span>.<span class="ident">path</span>.<span class="ident">is_empty</span>());
 
         <span class="comment">// Indicates whether or not a combination of contained fields is on the source model (we don&#39;t check for relations for now).</span>
         <span class="kw">let</span> <span class="ident">order_by_contains_unique_index</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">model</span>.<span class="ident">unique_indexes</span>().<span class="ident">into_iter</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">index</span><span class="op">|</span> {
@@ -361,15 +361,23 @@
         });
 
         <span class="kw">let</span> <span class="ident">source_contains_unique</span> <span class="op">=</span> <span class="ident">on_model</span>.<span class="ident">iter</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">o</span><span class="op">|</span> <span class="ident">o</span>.<span class="ident">field</span>.<span class="ident">unique</span>());
-        <span class="kw">let</span> <span class="ident">relations_contain_1to1_unique</span> <span class="op">=</span> <span class="ident">on_relation</span>
-            .<span class="ident">iter</span>()
-            .<span class="ident">any</span>(<span class="op">|</span><span class="ident">o</span><span class="op">|</span> <span class="ident">o</span>.<span class="ident">field</span>.<span class="ident">unique</span>() <span class="op">&amp;&amp;</span> <span class="ident">o</span>.<span class="ident">path</span>.<span class="ident">iter</span>().<span class="ident">all</span>(<span class="op">|</span><span class="ident">r</span><span class="op">|</span> <span class="ident">r</span>.<span class="ident">relation</span>().<span class="ident">is_one_to_one</span>()));
+        <span class="kw">let</span> <span class="ident">relations_contain_1to1_unique</span> <span class="op">=</span> <span class="ident">on_relation</span>.<span class="ident">iter</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">o</span><span class="op">|</span> {
+            <span class="ident">o</span>.<span class="ident">field</span>.<span class="ident">unique</span>()
+                <span class="op">&amp;&amp;</span> <span class="ident">o</span>.<span class="ident">path</span>.<span class="ident">iter</span>().<span class="ident">all</span>(<span class="op">|</span><span class="ident">hop</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">hop</span> {
+                    <span class="ident">OrderByHop::Relation</span>(<span class="ident">rf</span>) =&gt; <span class="ident">rf</span>.<span class="ident">relation</span>().<span class="ident">is_one_to_one</span>(),
+                    <span class="ident">OrderByHop::Composite</span>(<span class="kw">_</span>) =&gt; <span class="bool-val">false</span>, <span class="comment">// Composites do not have uniques, as such they can&#39;t fulfill uniqueness requirement even if they&#39;re 1:1.</span>
+                })
+        });
 
-        <span class="kw">let</span> <span class="ident">has_optional_relation</span> <span class="op">=</span> <span class="ident">on_relation</span>
-            .<span class="ident">iter</span>()
-            .<span class="ident">any</span>(<span class="op">|</span><span class="ident">o</span><span class="op">|</span> <span class="ident">o</span>.<span class="ident">path</span>.<span class="ident">iter</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">r</span><span class="op">|</span> <span class="ident">r</span>.<span class="ident">arity</span> <span class="op">==</span> <span class="ident">dml::FieldArity::Optional</span>));
+        <span class="kw">let</span> <span class="ident">has_optional_hop</span> <span class="op">=</span> <span class="ident">on_relation</span>.<span class="ident">iter</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">o</span><span class="op">|</span> {
+            <span class="ident">o</span>.<span class="ident">path</span>.<span class="ident">iter</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">hop</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">hop</span> {
+                <span class="ident">OrderByHop::Relation</span>(<span class="ident">rf</span>) =&gt; <span class="ident">rf</span>.<span class="ident">arity</span> <span class="op">==</span> <span class="ident">dml::FieldArity::Optional</span>,
+                <span class="ident">OrderByHop::Composite</span>(<span class="ident">cf</span>) =&gt; <span class="op">!</span><span class="ident">cf</span>.<span class="ident">is_required</span>(),
+            })
+        });
 
-        <span class="kw">if</span> <span class="ident">has_optional_relation</span> {
+        <span class="comment">// [Dom] I&#39;m not entirely sure why we&#39;re doing this, but I assume that optionals introduce NULLs that make the ordering inherently unstable?</span>
+        <span class="kw">if</span> <span class="ident">has_optional_hop</span> {
             <span class="kw">return</span> <span class="bool-val">false</span>;
         }
 
@@ -381,11 +389,7 @@
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">has_unbatchable_ordering</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">order_by</span>.<span class="ident">iter</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">o</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">o</span> {
-            <span class="ident">OrderBy::Scalar</span>(<span class="kw">_</span>) =&gt; <span class="bool-val">false</span>,
-            <span class="ident">OrderBy::Aggregation</span>(<span class="kw">_</span>) =&gt; <span class="bool-val">true</span>,
-            <span class="ident">OrderBy::Relevance</span>(<span class="kw">_</span>) =&gt; <span class="bool-val">true</span>,
-        })
+        <span class="self">self</span>.<span class="ident">order_by</span>.<span class="ident">iter</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">o</span><span class="op">|</span> <span class="op">!</span><span class="macro">matches!</span>(<span class="ident">o</span>, <span class="ident">OrderBy::Scalar</span>(<span class="kw">_</span>)))
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">has_unbatchable_filters</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {

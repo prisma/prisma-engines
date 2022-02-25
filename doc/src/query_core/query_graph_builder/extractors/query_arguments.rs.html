@@ -297,6 +297,36 @@
 <span id="295">295</span>
 <span id="296">296</span>
 <span id="297">297</span>
+<span id="298">298</span>
+<span id="299">299</span>
+<span id="300">300</span>
+<span id="301">301</span>
+<span id="302">302</span>
+<span id="303">303</span>
+<span id="304">304</span>
+<span id="305">305</span>
+<span id="306">306</span>
+<span id="307">307</span>
+<span id="308">308</span>
+<span id="309">309</span>
+<span id="310">310</span>
+<span id="311">311</span>
+<span id="312">312</span>
+<span id="313">313</span>
+<span id="314">314</span>
+<span id="315">315</span>
+<span id="316">316</span>
+<span id="317">317</span>
+<span id="318">318</span>
+<span id="319">319</span>
+<span id="320">320</span>
+<span id="321">321</span>
+<span id="322">322</span>
+<span id="323">323</span>
+<span id="324">324</span>
+<span id="325">325</span>
+<span id="326">326</span>
+<span id="327">327</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">constants</span>::{<span class="ident">aggregations</span>, <span class="ident">args</span>, <span class="ident">ordering</span>},
@@ -333,7 +363,7 @@
                     }),
 
                     <span class="ident">args::ORDER_BY</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">QueryArguments</span> {
-                        <span class="ident">order_by</span>: <span class="ident">extract_order_by</span>(<span class="ident">model</span>, <span class="ident">arg</span>.<span class="ident">value</span>)<span class="question-mark">?</span>,
+                        <span class="ident">order_by</span>: <span class="ident">extract_order_by</span>(<span class="kw-2">&amp;</span><span class="ident">model</span>.<span class="ident">into</span>(), <span class="ident">arg</span>.<span class="ident">value</span>)<span class="question-mark">?</span>,
                         ..<span class="ident">res</span>
                     }),
 
@@ -365,18 +395,18 @@
 }
 
 <span class="doccomment">/// Extracts order by conditions in order of appearance.</span>
-<span class="kw">fn</span> <span class="ident">extract_order_by</span>(<span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>, <span class="ident">value</span>: <span class="ident">ParsedInputValue</span>) -&gt; <span class="ident">QueryGraphBuilderResult</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">OrderBy</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">extract_order_by</span>(<span class="ident">container</span>: <span class="kw-2">&amp;</span><span class="ident">ParentContainer</span>, <span class="ident">value</span>: <span class="ident">ParsedInputValue</span>) -&gt; <span class="ident">QueryGraphBuilderResult</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">OrderBy</span><span class="op">&gt;</span><span class="op">&gt;</span> {
     <span class="kw">match</span> <span class="ident">value</span> {
         <span class="ident">ParsedInputValue::List</span>(<span class="ident">list</span>) =&gt; <span class="ident">list</span>
             .<span class="ident">into_iter</span>()
             .<span class="ident">map</span>(<span class="op">|</span><span class="ident">list_value</span><span class="op">|</span> {
                 <span class="kw">let</span> <span class="ident">object</span>: <span class="ident">ParsedInputMap</span> <span class="op">=</span> <span class="ident">list_value</span>.<span class="ident">try_into</span>()<span class="question-mark">?</span>;
-                <span class="prelude-val">Ok</span>(<span class="ident">process_order_object</span>(<span class="ident">model</span>, <span class="ident">object</span>, <span class="macro">vec!</span>[], <span class="prelude-val">None</span>)<span class="question-mark">?</span>)
+                <span class="prelude-val">Ok</span>(<span class="ident">process_order_object</span>(<span class="ident">container</span>, <span class="ident">object</span>, <span class="macro">vec!</span>[], <span class="prelude-val">None</span>)<span class="question-mark">?</span>)
             })
             .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">QueryGraphBuilderResult</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>()
             .<span class="ident">map</span>(<span class="op">|</span><span class="ident">results</span><span class="op">|</span> <span class="ident">results</span>.<span class="ident">into_iter</span>().<span class="ident">flatten</span>().<span class="ident">collect</span>()),
 
-        <span class="ident">ParsedInputValue::Map</span>(<span class="ident">map</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="kw">match</span> <span class="ident">process_order_object</span>(<span class="ident">model</span>, <span class="ident">map</span>, <span class="macro">vec!</span>[], <span class="prelude-val">None</span>)<span class="question-mark">?</span> {
+        <span class="ident">ParsedInputValue::Map</span>(<span class="ident">map</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="kw">match</span> <span class="ident">process_order_object</span>(<span class="ident">container</span>, <span class="ident">map</span>, <span class="macro">vec!</span>[], <span class="prelude-val">None</span>)<span class="question-mark">?</span> {
             <span class="prelude-val">Some</span>(<span class="ident">order</span>) =&gt; <span class="macro">vec!</span>[<span class="ident">order</span>],
             <span class="prelude-val">None</span> =&gt; <span class="macro">vec!</span>[],
         }),
@@ -385,11 +415,10 @@
     }
 }
 
-<span class="attribute">#[<span class="ident">tracing::instrument</span>(<span class="ident">skip</span>(<span class="ident">model</span>, <span class="ident">object</span>, <span class="ident">path</span>))]</span>
 <span class="kw">fn</span> <span class="ident">process_order_object</span>(
-    <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>,
+    <span class="ident">container</span>: <span class="kw-2">&amp;</span><span class="ident">ParentContainer</span>,
     <span class="ident">object</span>: <span class="ident">ParsedInputMap</span>,
-    <span class="kw-2">mut</span> <span class="ident">path</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">RelationFieldRef</span><span class="op">&gt;</span>,
+    <span class="kw-2">mut</span> <span class="ident">path</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">OrderByHop</span><span class="op">&gt;</span>,
     <span class="ident">parent_sort_aggregation</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">SortAggregation</span><span class="op">&gt;</span>,
 ) -&gt; <span class="ident">QueryGraphBuilderResult</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">OrderBy</span><span class="op">&gt;</span><span class="op">&gt;</span> {
     <span class="kw">match</span> <span class="ident">object</span>.<span class="ident">into_iter</span>().<span class="ident">next</span>() {
@@ -398,42 +427,47 @@
             <span class="kw">if</span> <span class="ident">field_name</span>.<span class="ident">as_str</span>() <span class="op">==</span> <span class="ident">ordering::UNDERSCORE_RELEVANCE</span> {
                 <span class="kw">let</span> <span class="ident">object</span>: <span class="ident">ParsedInputMap</span> <span class="op">=</span> <span class="ident">field_value</span>.<span class="ident">try_into</span>()<span class="question-mark">?</span>;
 
-                <span class="kw">return</span> <span class="ident">extract_order_by_relevance</span>(<span class="ident">model</span>, <span class="ident">object</span>);
+                <span class="kw">return</span> <span class="ident">extract_order_by_relevance</span>(<span class="ident">container</span>, <span class="ident">object</span>);
             }
 
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">sort_aggr</span>) <span class="op">=</span> <span class="ident">extract_sort_aggregation</span>(<span class="ident">field_name</span>.<span class="ident">as_str</span>()) {
+            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">sort_aggr</span>) <span class="op">=</span> <span class="ident">extract_sort_aggregation</span>(<span class="ident">field_name</span>.<span class="ident">as_str</span>()) {
                 <span class="kw">let</span> <span class="ident">object</span>: <span class="ident">ParsedInputMap</span> <span class="op">=</span> <span class="ident">field_value</span>.<span class="ident">try_into</span>()<span class="question-mark">?</span>;
 
-                <span class="kw">return</span> <span class="ident">process_order_object</span>(<span class="ident">model</span>, <span class="ident">object</span>, <span class="ident">path</span>, <span class="prelude-val">Some</span>(<span class="ident">sort_aggr</span>));
+                <span class="kw">return</span> <span class="ident">process_order_object</span>(<span class="ident">container</span>, <span class="ident">object</span>, <span class="ident">path</span>, <span class="prelude-val">Some</span>(<span class="ident">sort_aggr</span>));
             }
 
-            <span class="kw">let</span> <span class="ident">field</span> <span class="op">=</span> <span class="ident">model</span>.<span class="ident">fields</span>().<span class="ident">find_from_all</span>(<span class="kw-2">&amp;</span><span class="ident">field_name</span>)<span class="question-mark">?</span>;
+            <span class="kw">let</span> <span class="ident">field</span> <span class="op">=</span> <span class="ident">container</span>
+                .<span class="ident">find_field</span>(<span class="kw-2">&amp;</span><span class="ident">field_name</span>)
+                .<span class="ident">expect</span>(<span class="string">&quot;Fields must be valid after validation passed.&quot;</span>);
 
             <span class="kw">match</span> <span class="ident">field</span> {
                 <span class="ident">Field::Relation</span>(<span class="ident">rf</span>) <span class="kw">if</span> <span class="ident">rf</span>.<span class="ident">is_list</span>() =&gt; {
                     <span class="kw">let</span> <span class="ident">object</span>: <span class="ident">ParsedInputMap</span> <span class="op">=</span> <span class="ident">field_value</span>.<span class="ident">try_into</span>()<span class="question-mark">?</span>;
 
-                    <span class="ident">path</span>.<span class="ident">push</span>(<span class="ident">rf</span>.<span class="ident">clone</span>());
+                    <span class="ident">path</span>.<span class="ident">push</span>(<span class="ident">rf</span>.<span class="ident">into</span>());
 
                     <span class="kw">let</span> (<span class="ident">inner_field_name</span>, <span class="ident">inner_field_value</span>) <span class="op">=</span> <span class="ident">object</span>.<span class="ident">into_iter</span>().<span class="ident">next</span>().<span class="ident">unwrap</span>();
-                    <span class="kw">let</span> <span class="ident">sort_aggregation</span> <span class="op">=</span> <span class="ident">extract_sort_aggregation</span>(<span class="ident">inner_field_name</span>.<span class="ident">as_str</span>())<span class="question-mark">?</span>;
-                    <span class="kw">let</span> <span class="ident">sort_order</span> <span class="op">=</span> <span class="ident">extract_sort_order</span>(<span class="ident">inner_field_value</span>)<span class="question-mark">?</span>;
+                    <span class="kw">let</span> <span class="ident">sort_aggregation</span> <span class="op">=</span> <span class="ident">extract_sort_aggregation</span>(<span class="ident">inner_field_name</span>.<span class="ident">as_str</span>())
+                        .<span class="ident">expect</span>(<span class="string">&quot;To-many relation orderBy must be an aggregation ordering.&quot;</span>);
 
-                    <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">OrderBy::aggregation</span>(<span class="prelude-val">None</span>, <span class="ident">path</span>, <span class="ident">sort_order</span>, <span class="ident">sort_aggregation</span>)))
+                    <span class="kw">let</span> <span class="ident">sort_order</span> <span class="op">=</span> <span class="ident">extract_sort_order</span>(<span class="ident">inner_field_value</span>)<span class="question-mark">?</span>;
+                    <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">OrderBy::to_many_aggregation</span>(<span class="ident">path</span>, <span class="ident">sort_order</span>, <span class="ident">sort_aggregation</span>)))
                 }
+
                 <span class="ident">Field::Relation</span>(<span class="ident">rf</span>) =&gt; {
                     <span class="kw">let</span> <span class="ident">object</span>: <span class="ident">ParsedInputMap</span> <span class="op">=</span> <span class="ident">field_value</span>.<span class="ident">try_into</span>()<span class="question-mark">?</span>;
+                    <span class="ident">path</span>.<span class="ident">push</span>((<span class="kw-2">&amp;</span><span class="ident">rf</span>).<span class="ident">into</span>());
 
-                    <span class="ident">path</span>.<span class="ident">push</span>(<span class="ident">rf</span>.<span class="ident">clone</span>());
-
-                    <span class="ident">process_order_object</span>(<span class="kw-2">&amp;</span><span class="ident">rf</span>.<span class="ident">related_model</span>(), <span class="ident">object</span>, <span class="ident">path</span>, <span class="prelude-val">None</span>)
+                    <span class="ident">process_order_object</span>(<span class="kw-2">&amp;</span><span class="ident">rf</span>.<span class="ident">related_model</span>().<span class="ident">into</span>(), <span class="ident">object</span>, <span class="ident">path</span>, <span class="prelude-val">None</span>)
                 }
+
                 <span class="ident">Field::Scalar</span>(<span class="ident">sf</span>) =&gt; {
                     <span class="kw">let</span> <span class="ident">sort_order</span> <span class="op">=</span> <span class="ident">extract_sort_order</span>(<span class="ident">field_value</span>)<span class="question-mark">?</span>;
 
                     <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">sort_aggr</span>) <span class="op">=</span> <span class="ident">parent_sort_aggregation</span> {
-                        <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">OrderBy::aggregation</span>(
-                            <span class="prelude-val">Some</span>(<span class="ident">sf</span>.<span class="ident">clone</span>()),
+                        <span class="comment">// If the parent is a sort aggregation then this scalar is part of that one.</span>
+                        <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">OrderBy::scalar_aggregation</span>(
+                            <span class="ident">sf</span>.<span class="ident">clone</span>(),
                             <span class="macro">vec!</span>[],
                             <span class="ident">sort_order</span>,
                             <span class="ident">sort_aggr</span>,
@@ -442,13 +476,35 @@
                         <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">OrderBy::scalar</span>(<span class="ident">sf</span>.<span class="ident">clone</span>(), <span class="ident">path</span>, <span class="ident">sort_order</span>)))
                     }
                 }
-                <span class="ident">Field::Composite</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>), <span class="comment">// [Composites] todo</span>
+
+                <span class="ident">Field::Composite</span>(<span class="ident">cf</span>) <span class="kw">if</span> <span class="ident">cf</span>.<span class="ident">is_list</span>() =&gt; {
+                    <span class="kw">let</span> <span class="ident">object</span>: <span class="ident">ParsedInputMap</span> <span class="op">=</span> <span class="ident">field_value</span>.<span class="ident">try_into</span>()<span class="question-mark">?</span>;
+
+                    <span class="ident">path</span>.<span class="ident">push</span>(<span class="ident">cf</span>.<span class="ident">into</span>());
+
+                    <span class="kw">let</span> (<span class="ident">inner_field_name</span>, <span class="ident">inner_field_value</span>) <span class="op">=</span> <span class="ident">object</span>.<span class="ident">into_iter</span>().<span class="ident">next</span>().<span class="ident">unwrap</span>();
+                    <span class="kw">let</span> <span class="ident">sort_aggregation</span> <span class="op">=</span> <span class="ident">extract_sort_aggregation</span>(<span class="ident">inner_field_name</span>.<span class="ident">as_str</span>())
+                        .<span class="ident">expect</span>(<span class="string">&quot;To-many composite orderBy must be an aggregation ordering.&quot;</span>);
+
+                    <span class="kw">let</span> <span class="ident">sort_order</span> <span class="op">=</span> <span class="ident">extract_sort_order</span>(<span class="ident">inner_field_value</span>)<span class="question-mark">?</span>;
+                    <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">OrderBy::to_many_aggregation</span>(<span class="ident">path</span>, <span class="ident">sort_order</span>, <span class="ident">sort_aggregation</span>)))
+                }
+
+                <span class="ident">Field::Composite</span>(<span class="ident">cf</span>) =&gt; {
+                    <span class="kw">let</span> <span class="ident">object</span>: <span class="ident">ParsedInputMap</span> <span class="op">=</span> <span class="ident">field_value</span>.<span class="ident">try_into</span>()<span class="question-mark">?</span>;
+                    <span class="ident">path</span>.<span class="ident">push</span>((<span class="kw-2">&amp;</span><span class="ident">cf</span>).<span class="ident">into</span>());
+
+                    <span class="ident">process_order_object</span>(<span class="kw-2">&amp;</span><span class="ident">cf</span>.<span class="ident">typ</span>.<span class="ident">clone</span>().<span class="ident">into</span>(), <span class="ident">object</span>, <span class="ident">path</span>, <span class="prelude-val">None</span>)
+                }
             }
         }
     }
 }
 
-<span class="kw">fn</span> <span class="ident">extract_order_by_relevance</span>(<span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>, <span class="ident">object</span>: <span class="ident">ParsedInputMap</span>) -&gt; <span class="ident">QueryGraphBuilderResult</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">OrderBy</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">extract_order_by_relevance</span>(
+    <span class="ident">container</span>: <span class="kw-2">&amp;</span><span class="ident">ParentContainer</span>,
+    <span class="ident">object</span>: <span class="ident">ParsedInputMap</span>,
+) -&gt; <span class="ident">QueryGraphBuilderResult</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">OrderBy</span><span class="op">&gt;</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">sort_order</span> <span class="op">=</span> <span class="ident">extract_sort_order</span>(<span class="ident">object</span>.<span class="ident">get</span>(<span class="ident">ordering::SORT</span>).<span class="ident">unwrap</span>().<span class="ident">clone</span>())<span class="question-mark">?</span>;
     <span class="kw">let</span> <span class="ident">search</span>: <span class="ident">PrismaValue</span> <span class="op">=</span> <span class="ident">object</span>.<span class="ident">get</span>(<span class="ident">ordering::SEARCH</span>).<span class="ident">unwrap</span>().<span class="ident">clone</span>().<span class="ident">try_into</span>()<span class="question-mark">?</span>;
     <span class="kw">let</span> <span class="ident">search</span> <span class="op">=</span> <span class="ident">search</span>.<span class="ident">into_string</span>().<span class="ident">unwrap</span>();
@@ -467,22 +523,26 @@
     <span class="kw">let</span> <span class="ident">fields</span> <span class="op">=</span> <span class="ident">fields</span>
         .<span class="ident">into_iter</span>()
         .<span class="ident">map</span>(<span class="op">|</span><span class="ident">pv</span><span class="op">|</span> <span class="ident">pv</span>.<span class="ident">into_string</span>().<span class="ident">unwrap</span>())
-        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">field_name</span><span class="op">|</span> <span class="ident">model</span>.<span class="ident">fields</span>().<span class="ident">find_from_scalar</span>(<span class="kw-2">&amp;</span><span class="ident">field_name</span>))
+        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">field_name</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">container</span>.<span class="ident">find_field</span>(<span class="kw-2">&amp;</span><span class="ident">field_name</span>) {
+            <span class="prelude-val">Some</span>(<span class="ident">Field::Scalar</span>(<span class="ident">sf</span>)) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">sf</span>),
+            <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">QueryGraphBuilderError::InputError</span>(<span class="macro">format!</span>(
+                <span class="string">&quot;Invalid order-by reference input: Field {} is not a valid scalar field.&quot;</span>,
+                <span class="ident">field_name</span>
+            ))),
+        })
         .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ScalarFieldRef</span><span class="op">&gt;</span>, <span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>()<span class="question-mark">?</span>;
 
     <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">OrderBy::relevance</span>(<span class="ident">fields</span>, <span class="ident">search</span>, <span class="ident">sort_order</span>)))
 }
 
-<span class="kw">fn</span> <span class="ident">extract_sort_aggregation</span>(<span class="ident">field_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">QueryGraphBuilderResult</span><span class="op">&lt;</span><span class="ident">SortAggregation</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">extract_sort_aggregation</span>(<span class="ident">field_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">SortAggregation</span><span class="op">&gt;</span> {
     <span class="kw">match</span> <span class="ident">field_name</span> {
-        <span class="ident">aggregations::UNDERSCORE_COUNT</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">SortAggregation::Count</span>),
-        <span class="ident">aggregations::UNDERSCORE_AVG</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">SortAggregation::Avg</span>),
-        <span class="ident">aggregations::UNDERSCORE_SUM</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">SortAggregation::Sum</span>),
-        <span class="ident">aggregations::UNDERSCORE_MIN</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">SortAggregation::Min</span>),
-        <span class="ident">aggregations::UNDERSCORE_MAX</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">SortAggregation::Max</span>),
-        <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">QueryGraphBuilderError::InputError</span>(
-            <span class="string">&quot;No aggregation operation could be found. This should not happen&quot;</span>.<span class="ident">to_string</span>(),
-        )),
+        <span class="ident">aggregations::UNDERSCORE_COUNT</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">SortAggregation::Count</span>),
+        <span class="ident">aggregations::UNDERSCORE_AVG</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">SortAggregation::Avg</span>),
+        <span class="ident">aggregations::UNDERSCORE_SUM</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">SortAggregation::Sum</span>),
+        <span class="ident">aggregations::UNDERSCORE_MIN</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">SortAggregation::Min</span>),
+        <span class="ident">aggregations::UNDERSCORE_MAX</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">SortAggregation::Max</span>),
+        <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
     }
 }
 

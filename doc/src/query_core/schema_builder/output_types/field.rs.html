@@ -140,10 +140,10 @@
 <span class="kw">use</span> <span class="ident">input_types::fields::arguments</span>;
 <span class="kw">use</span> <span class="ident">prisma_models</span>::{<span class="ident">CompositeFieldRef</span>, <span class="ident">ScalarFieldRef</span>};
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">map_field</span>(<span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BuilderContext</span>, <span class="ident">model_field</span>: <span class="kw-2">&amp;</span><span class="ident">ModelField</span>) -&gt; <span class="ident">OutputField</span> {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">map_output_field</span>(<span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BuilderContext</span>, <span class="ident">model_field</span>: <span class="kw-2">&amp;</span><span class="ident">ModelField</span>) -&gt; <span class="ident">OutputField</span> {
     <span class="ident">field</span>(
         <span class="ident">model_field</span>.<span class="ident">name</span>(),
-        <span class="ident">arguments::many_records_field_arguments</span>(<span class="ident">ctx</span>, <span class="kw-2">&amp;</span><span class="ident">model_field</span>),
+        <span class="ident">arguments::many_records_output_field_arguments</span>(<span class="ident">ctx</span>, <span class="kw-2">&amp;</span><span class="ident">model_field</span>),
         <span class="ident">map_field_output_type</span>(<span class="ident">ctx</span>, <span class="kw-2">&amp;</span><span class="ident">model_field</span>),
         <span class="prelude-val">None</span>,
     )

@@ -207,6 +207,7 @@
 <span id="205">205</span>
 <span id="206">206</span>
 <span id="207">207</span>
+<span id="208">208</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">DomainError</span>, <span class="ident">FieldSelection</span>, <span class="ident">ModelProjection</span>, <span class="ident">OrderBy</span>, <span class="ident">PrismaValue</span>, <span class="ident">SelectionResult</span>, <span class="ident">SortOrder</span>};
 <span class="kw">use</span> <span class="ident">itertools::Itertools</span>;
 <span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
@@ -280,8 +281,9 @@
                         <span class="ident">SortOrder::Descending</span> =&gt; <span class="ident">b</span>.<span class="ident">values</span>[<span class="ident">index</span>].<span class="ident">cmp</span>(<span class="kw-2">&amp;</span><span class="ident">a</span>.<span class="ident">values</span>[<span class="ident">index</span>]),
                     }
                 }
-                <span class="ident">OrderBy::Aggregation</span>(<span class="kw">_</span>) =&gt; <span class="macro">todo!</span>(),
-                <span class="ident">OrderBy::Relevance</span>(<span class="kw">_</span>) =&gt; <span class="macro">todo!</span>(),
+                <span class="ident">OrderBy::ScalarAggregation</span>(<span class="kw">_</span>) =&gt; <span class="macro">unimplemented!</span>(),
+                <span class="ident">OrderBy::ToManyAggregation</span>(<span class="kw">_</span>) =&gt; <span class="macro">unimplemented!</span>(),
+                <span class="ident">OrderBy::Relevance</span>(<span class="kw">_</span>) =&gt; <span class="macro">unimplemented!</span>(),
             });
 
             <span class="ident">orderings</span>
