@@ -769,7 +769,7 @@ fn prisma_type(native_type: &str) -> &str {
     TYPE_MAPS.get(kind).unwrap()
 }
 
-#[test_connector(tags(Postgres))]
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
 fn safe_casts_with_existing_data_should_work(api: TestApi) {
     let connector = sql_datamodel_connector::POSTGRES;
 
@@ -859,7 +859,7 @@ fn safe_casts_with_existing_data_should_work(api: TestApi) {
     }
 }
 
-#[test_connector(tags(Postgres))]
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
 fn risky_casts_with_existing_data_should_warn(api: TestApi) {
     let connector = sql_datamodel_connector::POSTGRES;
 
@@ -958,7 +958,7 @@ fn risky_casts_with_existing_data_should_warn(api: TestApi) {
     }
 }
 
-#[test_connector(tags(Postgres))]
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
 fn not_castable_with_existing_data_should_warn(api: TestApi) {
     let connector = sql_datamodel_connector::POSTGRES;
     let mut warnings = Vec::new();
@@ -1144,7 +1144,7 @@ static SAFE_CASTS_NON_LIST_TO_STRING: CastList = Lazy::new(|| {
     ]
 });
 
-#[test_connector(tags(Postgres))]
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
 fn safe_casts_from_array_with_existing_data_should_work(api: TestApi) {
     let connector = sql_datamodel_connector::POSTGRES;
 
