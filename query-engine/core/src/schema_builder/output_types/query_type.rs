@@ -8,7 +8,7 @@ pub(crate) fn build(ctx: &mut BuilderContext) -> (OutputType, ObjectTypeStrongRe
         .internal_data_model
         .models_cloned()
         .into_iter()
-        .map(|model| {
+        .flat_map(|model| {
             let mut vec = vec![
                 find_first_field(ctx, &model),
                 all_items_field(ctx, &model),
@@ -25,7 +25,6 @@ pub(crate) fn build(ctx: &mut BuilderContext) -> (OutputType, ObjectTypeStrongRe
 
             vec
         })
-        .flatten()
         .collect();
 
     let ident = Identifier::new("Query".to_owned(), PRISMA_NAMESPACE);

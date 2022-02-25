@@ -459,12 +459,7 @@ impl<'a> Renderer<'a> {
 
     fn render_str(target: &mut dyn LineWriteable, param: &str) {
         target.write("\"");
-        target.write(
-            &param
-                .replace(r#"\"#, r#"\\"#)
-                .replace(r#"""#, r#"\""#)
-                .replace("\n", "\\n"),
-        );
+        target.write(&param.replace('\\', r#"\\"#).replace('"', r#"\""#).replace('\n', "\\n"));
         target.write("\"");
     }
 }

@@ -32,8 +32,8 @@ pub fn fmt_query_raw(query: &str, params: Vec<PrismaValue>) -> String {
 
     format!(
         r#"mutation {{ queryRaw(query: "{}", parameters: "{}") }}"#,
-        query.replace("\"", "\\\""),
-        params.replace("\"", "\\\"")
+        query.replace('"', "\\\""),
+        params.replace('"', "\\\"")
     )
 }
 
@@ -53,7 +53,7 @@ pub fn fmt_execute_raw(query: &str, params: Vec<PrismaValue>) -> String {
 
     format!(
         r#"mutation {{ executeRaw(query: "{}", parameters: "{}") }}"#,
-        query.replace("\"", "\\\""),
-        params.replace("\"", "\\\"")
+        query.replace('"', "\\\""),
+        params.replace('"', "\\\"")
     )
 }

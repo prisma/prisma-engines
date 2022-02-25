@@ -50,7 +50,7 @@ impl ScalarField {
     }
 
     pub fn db_name(&self) -> &str {
-        self.db_name.as_deref().unwrap_or_else(|| self.name.as_str())
+        self.db_name.as_deref().unwrap_or(self.name.as_str())
     }
 
     pub fn type_identifier_with_arity(&self) -> (TypeIdentifier, FieldArity) {

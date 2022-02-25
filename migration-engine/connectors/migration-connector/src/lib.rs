@@ -70,7 +70,9 @@ pub trait ConnectorHost: Sync + Send + 'static {
 pub struct EmptyHost;
 
 impl ConnectorHost for EmptyHost {
-    fn print(&self, _text: &str) -> BoxFuture<'_, ConnectorResult<()>> {
+    fn print(&self, text: &str) -> BoxFuture<'_, ConnectorResult<()>> {
+        // https://github.com/prisma/prisma/issues/11761
+        assert!(text.ends_with('\n'));
         Box::pin(std::future::ready(Ok(())))
     }
 }

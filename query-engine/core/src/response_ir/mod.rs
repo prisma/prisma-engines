@@ -52,7 +52,7 @@ impl List {
 
             let key = keys
                 .iter()
-                .map(|key| inner.get(&key.to_string()).unwrap().clone().into_value().unwrap())
+                .map(|key| inner.get(key).unwrap().clone().into_value().unwrap())
                 .map(QueryValue::from)
                 .collect();
 
@@ -124,7 +124,7 @@ impl Item {
     pub fn into_map(self) -> Option<Map> {
         match self {
             Self::Map(m) => Some(m),
-            Self::Ref(r) => Arc::try_unwrap(r).ok().map(|r| r.into_map()).flatten(),
+            Self::Ref(r) => Arc::try_unwrap(r).ok().and_then(|r| r.into_map()),
             _ => None,
         }
     }
@@ -132,7 +132,7 @@ impl Item {
     pub fn into_value(self) -> Option<PrismaValue> {
         match self {
             Self::Value(pv) => Some(pv),
-            Self::Ref(r) => Arc::try_unwrap(r).ok().map(|r| r.into_value()).flatten(),
+            Self::Ref(r) => Arc::try_unwrap(r).ok().and_then(|r| r.into_value()),
             _ => None,
         }
     }
@@ -140,7 +140,7 @@ impl Item {
     pub fn into_list(self) -> Option<List> {
         match self {
             Self::List(l) => Some(l),
-            Self::Ref(r) => Arc::try_unwrap(r).ok().map(|r| r.into_list()).flatten(),
+            Self::Ref(r) => Arc::try_unwrap(r).ok().and_then(|r| r.into_list()),
             _ => None,
         }
     }

@@ -194,7 +194,7 @@ impl SqlFamilyTrait for IntrospectionContext {
             "sqlite" => SqlFamily::Sqlite,
             "sqlserver" => SqlFamily::Mssql,
             "mysql" => SqlFamily::Mysql,
-            name => unreachable!(format!("The name `{}` for the datamodel connector is not known", name)),
+            name => unreachable!("The name `{}` for the datamodel connector is not known", name),
         }
     }
 }

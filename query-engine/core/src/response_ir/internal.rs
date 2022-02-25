@@ -203,7 +203,7 @@ fn find_nested_aggregate_output_field(
     let nested_field = object_type.find_field(nested_obj_name).unwrap();
     let nested_object_type = match nested_field.field_type.borrow() {
         OutputType::Object(obj) => obj.into_arc(),
-        _ => unreachable!(format!("{} output must be an object.", nested_obj_name)),
+        _ => unreachable!("{} output must be an object.", nested_obj_name),
     };
 
     nested_object_type.find_field(nested_field_name).unwrap()
