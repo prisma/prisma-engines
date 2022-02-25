@@ -91,14 +91,15 @@ impl SqlSchemaDifferFlavour for PostgresFlavour {
         let next_type: Option<PostgresType> = differ.next.column_native_type();
 
         match (previous_type, next_type) {
-            // https://go.crdb.dev/issue-v/49329/v22.1
-            (prev, next) if prev != next && self.is_cockroachdb() => Some(NotCastable),
             (_, Some(PostgresType::Text)) if from_list_to_scalar => Some(SafeCast),
             (_, Some(PostgresType::VarChar(None))) if from_list_to_scalar => Some(SafeCast),
             (_, Some(PostgresType::VarChar(_))) if from_list_to_scalar => Some(RiskyCast),
             (_, Some(PostgresType::Char(_))) if from_list_to_scalar => Some(RiskyCast),
             (_, _) if from_scalar_to_list || from_list_to_scalar => Some(NotCastable),
-            (Some(previous), Some(next)) => native_type_change_riskyness(previous, next),
+            (Some(previous), Some(next)) if self.is_cockroachdb() => {
+                cockroach_native_type_change_riskyness(previous, next)
+            }
+            (Some(previous), Some(next)) => postgres_native_type_change_riskyness(previous, next),
             // Unsupported types will have None as Native type
             (None, Some(_)) => Some(RiskyCast),
             (Some(_), None) => Some(RiskyCast),
@@ -136,7 +137,16 @@ impl SqlSchemaDifferFlavour for PostgresFlavour {
     }
 }
 
-fn native_type_change_riskyness(previous: PostgresType, next: PostgresType) -> Option<ColumnTypeChange> {
+// https://go.crdb.dev/issue-v/49329/v22.1
+fn cockroach_native_type_change_riskyness(previous: PostgresType, next: PostgresType) -> Option<ColumnTypeChange> {
+    match (previous, next) {
+        (PostgresType::Integer, PostgresType::Text) => Some(ColumnTypeChange::SafeCast),
+        (previous, next) if previous == next => None,
+        _ => Some(ColumnTypeChange::NotCastable),
+    }
+}
+
+fn postgres_native_type_change_riskyness(previous: PostgresType, next: PostgresType) -> Option<ColumnTypeChange> {
     use native_types::PostgresType::*;
     use ColumnTypeChange::*;
 
