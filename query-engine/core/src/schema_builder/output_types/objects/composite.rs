@@ -1,3 +1,5 @@
+#![allow(clippy::unnecessary_to_owned)]
+
 use super::*;
 use prisma_models::CompositeTypeRef;
 

@@ -10,7 +10,7 @@ pub(crate) fn build(ctx: &mut BuilderContext) -> (OutputType, ObjectTypeStrongRe
         .internal_data_model
         .models_cloned()
         .into_iter()
-        .map(|model| {
+        .flat_map(|model| {
             let mut vec = vec![];
 
             if model.supports_create_operation {
@@ -28,7 +28,6 @@ pub(crate) fn build(ctx: &mut BuilderContext) -> (OutputType, ObjectTypeStrongRe
 
             vec
         })
-        .flatten()
         .collect();
 
     create_nested_inputs(ctx);
@@ -156,7 +155,7 @@ fn create_mongodb_run_command_raw() -> OutputField {
 
 /// Builds a create mutation field (e.g. createUser) for given model.
 fn create_item_field(ctx: &mut BuilderContext, model: &ModelRef) -> OutputField {
-    let args = arguments::create_one_arguments(ctx, model).unwrap_or_else(Vec::new);
+    let args = arguments::create_one_arguments(ctx, model).unwrap_or_default();
     let field_name = ctx.pluralize_internal(format!("create{}", model.name), format!("createOne{}", model.name));
 
     field(

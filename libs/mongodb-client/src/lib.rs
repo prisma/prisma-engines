@@ -232,7 +232,11 @@ mod tests {
 
     #[test]
     fn only_host() {
-        let MongoConnectionString { user, hosts, database } = "mongodb://localhost/test".parse().unwrap();
+        let MongoConnectionString {
+            user,
+            hosts,
+            database: _,
+        } = "mongodb://localhost/test".parse().unwrap();
 
         assert_eq!(None, user.as_deref());
         assert_eq!(vec![(String::from("localhost"), None)], hosts);
@@ -240,7 +244,11 @@ mod tests {
 
     #[test]
     fn srv_host() {
-        let MongoConnectionString { user, hosts, database } = "mongodb+srv://localhost/test".parse().unwrap();
+        let MongoConnectionString {
+            user,
+            hosts,
+            database: _,
+        } = "mongodb+srv://localhost/test".parse().unwrap();
 
         assert_eq!(None, user.as_deref());
         assert_eq!(vec![(String::from("localhost"), None)], hosts);
@@ -248,7 +256,11 @@ mod tests {
 
     #[test]
     fn host_and_port() {
-        let MongoConnectionString { user, hosts, database } = "mongodb://localhost:1234/test".parse().unwrap();
+        let MongoConnectionString {
+            user,
+            hosts,
+            database: _,
+        } = "mongodb://localhost:1234/test".parse().unwrap();
 
         assert_eq!(None, user.as_deref());
         assert_eq!(vec![(String::from("localhost"), Some(1234))], hosts);
@@ -256,8 +268,11 @@ mod tests {
 
     #[test]
     fn username() {
-        let MongoConnectionString { user, hosts, database } =
-            "mongodb://username:password@localhost/test".parse().unwrap();
+        let MongoConnectionString {
+            user,
+            hosts,
+            database: _,
+        } = "mongodb://username:password@localhost/test".parse().unwrap();
 
         assert_eq!(Some("username"), user.as_deref());
         assert_eq!(vec![(String::from("localhost"), None)], hosts);

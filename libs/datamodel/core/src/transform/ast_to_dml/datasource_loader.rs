@@ -45,7 +45,7 @@ impl DatasourceLoader {
         if sources.len() > 1 {
             for src in ast_schema.sources() {
                 diagnostics.push_error(DatamodelError::new_source_validation_error(
-                    &"You defined more than one datasource. This is not allowed yet because support for multiple databases has not been implemented yet.".to_string(),
+                    "You defined more than one datasource. This is not allowed yet because support for multiple databases has not been implemented yet.",
                     &src.name.name,
                     src.span,
                 ));

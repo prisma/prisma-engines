@@ -1,3 +1,5 @@
+#![allow(clippy::unnecessary_to_owned)]
+
 use super::*;
 use crate::constants::aggregations::*;
 use std::convert::identity;
