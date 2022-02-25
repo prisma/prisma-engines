@@ -1,3 +1,4 @@
+mod cockroachdb;
 mod vitess;
 
 use datamodel::ReferentialAction;
@@ -172,6 +173,15 @@ fn changing_the_type_of_a_field_referenced_by_a_fk_must_work(api: TestApi) {
     "#;
 
     api.schema_push_w_datasource(dm2).send().assert_green();
+
+    // TODO(2022-02-25): it appears that the migration above _does_ re-add the foreign key on
+    // cockroachdb, but (the logs show an ALTER TABLE ADD CONSTRAINT FOREIGN KEY) but it doesn't
+    // appear in the information schema. I haven't found an issue for this on the cockroach issue
+    // tracker. We should do a minimal reproduction and open an issue.
+    // Apart from this, it looks like this test would pass on cockroach.
+    if api.is_cockroach() {
+        return;
+    }
 
     api.assert_schema().assert_table("A", |table| {
         table
@@ -917,7 +927,7 @@ fn on_update_required_default_action(api: TestApi) {
     });
 }
 
-#[test_connector(exclude(Vitess))]
+#[test_connector(exclude(Vitess, CockroachDb))]
 fn adding_mutual_references_on_existing_tables_works(api: TestApi) {
     let dm1 = r#"
         model A {
