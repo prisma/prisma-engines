@@ -558,6 +558,9 @@ where
 
                     if schema_exists_result.get(0).and_then(|row| row.at(1)).and_then(|v| v.to_string()).map(|version| version.contains("CockroachDB")).unwrap_or(false) {
                         circumstances |= Circumstances::IsCockroachDb;
+                        // https://www.cockroachlabs.com/docs/stable/experimental-features.html
+                        connection.raw_cmd("SET enable_experimental_alter_column_type_general = true").await?;
+
                     }
 
                     if let Some(true) = schema_exists_result

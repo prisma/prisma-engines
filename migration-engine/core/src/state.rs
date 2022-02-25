@@ -331,7 +331,7 @@ impl GenericApi for EngineState {
         tracing::debug!("Resetting the database.");
 
         self.with_default_connector(Box::new(move |connector| {
-            Box::pin(MigrationConnector::reset(connector).instrument(tracing::info_span!("Reset")))
+            Box::pin(MigrationConnector::reset(connector, false).instrument(tracing::info_span!("Reset")))
         }))
         .await?;
         Ok(())

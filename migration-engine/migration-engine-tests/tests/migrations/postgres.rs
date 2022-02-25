@@ -317,7 +317,8 @@ fn postgres_apply_migrations_errors_give_precise_location_at_the_beginning_of_fi
     expectation.assert_eq(first_segment)
 }
 
-#[test_connector(tags(Postgres))]
+// exclude: CITEXT does not exist on cockroachdb at this point in time.
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
 fn citext_to_text_and_back_works(api: TestApi) {
     api.raw_cmd("CREATE EXTENSION citext;");
 

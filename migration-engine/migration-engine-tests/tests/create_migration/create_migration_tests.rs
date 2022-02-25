@@ -982,8 +982,7 @@ fn alter_constraint_name(mut api: TestApi) {
         .assert_migration_directories_count(2)
         .assert_migration("custom",move |migration| {
             let expected_script = if is_mssql {
-                indoc! {
-                     r#"
+                expect![[r#"
                     BEGIN TRY
 
                     BEGIN TRAN;
@@ -1021,10 +1020,9 @@ fn alter_constraint_name(mut api: TestApi) {
                     THROW
 
                     END CATCH
-                 "#
-                 }
+                 "#]]
             } else if is_cockroach {
-                indoc! {r#"
+                expect![[r#"
                     -- AlterTable
                     ALTER TABLE "A" RENAME CONSTRAINT "A_pkey" TO "CustomId";
 
@@ -1038,16 +1036,16 @@ fn alter_constraint_name(mut api: TestApi) {
                     ALTER INDEX "A_a_idx" RENAME TO "CustomIndex";
 
                     -- RenameIndex
-                    ALTER INDEX "A_a_b_key" RENAME TO "CustomCompoundUnique";
-
-                    -- RenameIndex
                     ALTER INDEX "A_name_key" RENAME TO "CustomUnique";
 
                     -- RenameIndex
+                    ALTER INDEX "A_a_b_key" RENAME TO "CustomCompoundUnique";
+
+                    -- RenameIndex
                     ALTER INDEX "B_a_b_idx" RENAME TO "AnotherCustomIndex";
-                "#}
+                "#]]
             } else if is_postgres {
-                indoc! {
+                expect![[
                      r#"
                 -- AlterTable
                 ALTER TABLE "A" RENAME CONSTRAINT "A_pkey" TO "CustomId";
@@ -1069,10 +1067,9 @@ fn alter_constraint_name(mut api: TestApi) {
 
                 -- RenameIndex
                 ALTER INDEX "B_a_b_idx" RENAME TO "AnotherCustomIndex";
-                "#
-              }
-            } else if is_mysql_5_6 || is_mariadb{
-                indoc! {
+                "#]]
+            } else if is_mysql_5_6 || is_mariadb {
+                expect![[
                      r#"
                  -- DropForeignKey
                  ALTER TABLE `B` DROP FOREIGN KEY `B_aId_fkey`;
@@ -1095,12 +1092,9 @@ fn alter_constraint_name(mut api: TestApi) {
                  -- RedefineIndex
                  CREATE INDEX `AnotherCustomIndex` ON `B`(`a`, `b`);
                  DROP INDEX `B_a_b_idx` ON `B`;
-                 "#
-                 }
-            }
-            else if is_mysql{
-                indoc! {
-                     r#"
+                 "#]]
+            } else if is_mysql{
+                expect![[r#"
                  -- DropForeignKey
                  ALTER TABLE `B` DROP FOREIGN KEY `B_aId_fkey`;
 
@@ -1118,10 +1112,9 @@ fn alter_constraint_name(mut api: TestApi) {
 
                  -- RenameIndex
                  ALTER TABLE `B` RENAME INDEX `B_a_b_idx` TO `AnotherCustomIndex`;
-                 "#
-                 }
-            }else if is_sqlite{
-                indoc!{r#"
+                 "#]]
+            } else if is_sqlite {
+                expect![[r#"
                  -- RedefineIndex
                  DROP INDEX "A_a_b_key";
                  CREATE UNIQUE INDEX "CustomCompoundUnique" ON "A"("a", "b");
@@ -1137,11 +1130,11 @@ fn alter_constraint_name(mut api: TestApi) {
                  -- RedefineIndex
                  DROP INDEX "B_a_b_idx";
                  CREATE INDEX "AnotherCustomIndex" ON "B"("a", "b");
-                 "#
-             }} else {
-                ""
+                 "#]]
+            } else {
+                panic!()
             };
 
-            migration.assert_contents(expected_script)
+            migration.expect_contents(expected_script)
         });
 }
