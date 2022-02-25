@@ -121,7 +121,7 @@ impl SqlFlavour for MssqlFlavour {
     }
 
     fn connector_type(&self) -> &'static str {
-        "sqlserver"
+        "mssql"
     }
 
     fn create_database(&mut self) -> BoxFuture<'_, ConnectorResult<String>> {
