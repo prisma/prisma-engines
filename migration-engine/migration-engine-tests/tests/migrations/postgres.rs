@@ -152,66 +152,6 @@ fn native_type_columns_can_be_created(api: TestApi) {
     api.schema_push_w_datasource(dm).send().assert_green().assert_no_steps();
 }
 
-#[test_connector(tags(CockroachDb))]
-fn native_type_columns_can_be_created_cockroach(api: TestApi) {
-    let types = &[
-        ("smallint", "Int", "SmallInt", "int2"),
-        ("int", "Int", "Integer", "int4"),
-        ("bigint", "BigInt", "BigInt", "int8"),
-        ("decimal", "Decimal", "Decimal(4, 2)", "numeric"),
-        ("decimaldefault", "Decimal", "Decimal", "numeric"),
-        ("real", "Float", "Real", "float4"),
-        ("doublePrecision", "Float", "DoublePrecision", "float8"),
-        ("varChar", "String", "VarChar(200)", "varchar"),
-        ("char", "String", "Char(200)", "bpchar"),
-        ("text", "String", "Text", "text"),
-        ("bytea", "Bytes", "ByteA", "bytea"),
-        ("ts", "DateTime", "Timestamp(0)", "timestamp"),
-        ("tsdefault", "DateTime", "Timestamp", "timestamp"),
-        ("tstz", "DateTime", "Timestamptz", "timestamptz"),
-        ("date", "DateTime", "Date", "date"),
-        ("time", "DateTime", "Time(2)", "time"),
-        ("timedefault", "DateTime", "Time", "time"),
-        ("timetz", "DateTime", "Timetz(2)", "timetz"),
-        ("timetzdefault", "DateTime", "Timetz", "timetz"),
-        ("bool", "Boolean", "Boolean", "bool"),
-        ("bit", "String", "Bit(1)", "bit"),
-        ("varbit", "String", "VarBit(1)", "varbit"),
-        ("uuid", "String", "Uuid", "uuid"),
-        // ("xml", "String", "Xml", "xml"),
-        // ("json", "Json", "Json", "json"),
-        ("jsonb", "Json", "JsonB", "jsonb"),
-        // ("money", "Decimal", "Money", "money"),
-        ("inet", "String", "Inet", "inet"),
-        // ("oid", "Int", "Oid", "oid"),
-    ];
-
-    let mut dm = r#"
-        model A {
-            id Int @id
-    "#
-    .to_string();
-
-    for (field_name, prisma_type, native_type, _) in types {
-        writeln!(&mut dm, "    {} {} @db.{}", field_name, prisma_type, native_type).unwrap();
-    }
-
-    dm.push_str("}\n");
-
-    api.schema_push_w_datasource(&dm).send().assert_green();
-
-    api.assert_schema().assert_table("A", |table| {
-        types.iter().fold(
-            table,
-            |table, (field_name, _prisma_type, _native_type, database_type)| {
-                table.assert_column(field_name, |col| col.assert_full_data_type(database_type))
-            },
-        )
-    });
-
-    api.schema_push_w_datasource(dm).send().assert_green().assert_no_steps();
-}
-
 #[test_connector(tags(Postgres))]
 fn uuids_do_not_generate_drift_issue_5282(api: TestApi) {
     if !api.is_cockroach() {
@@ -263,7 +203,7 @@ fn functions_with_schema_prefix_in_dbgenerated_are_idempotent(api: TestApi) {
     api.schema_push_w_datasource(dm).send().assert_green().assert_no_steps();
 }
 
-#[test_connector(tags(Postgres))]
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
 fn postgres_apply_migrations_errors_give_precise_location(api: TestApi) {
     let dm = "";
     let migrations_directory = api.create_migrations_directory();
@@ -322,7 +262,7 @@ fn postgres_apply_migrations_errors_give_precise_location(api: TestApi) {
     expectation.assert_eq(first_segment)
 }
 
-#[test_connector(tags(Postgres))]
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
 fn postgres_apply_migrations_errors_give_precise_location_at_the_beginning_of_files(api: TestApi) {
     let dm = "";
     let migrations_directory = api.create_migrations_directory();
