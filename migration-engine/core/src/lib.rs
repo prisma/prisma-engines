@@ -15,6 +15,7 @@ mod rpc;
 mod state;
 
 pub use self::{api::GenericApi, core_error::*, rpc::rpc_api};
+use datamodel::common::provider_names::COCKROACHDB_SOURCE_NAME;
 pub use migration_connector;
 
 use datamodel::ValidatedSchema;
@@ -149,6 +150,7 @@ fn schema_to_connector(schema: &str) -> CoreResult<Box<dyn migration_connector::
 fn connector_for_provider(provider: &str) -> CoreResult<Box<dyn migration_connector::MigrationConnector>> {
     match provider {
         POSTGRES_SOURCE_NAME => Ok(Box::new(SqlMigrationConnector::new_postgres())),
+        COCKROACHDB_SOURCE_NAME => Ok(Box::new(SqlMigrationConnector::new_cockroach())),
         MYSQL_SOURCE_NAME => Ok(Box::new(SqlMigrationConnector::new_mysql())),
         SQLITE_SOURCE_NAME => Ok(Box::new(SqlMigrationConnector::new_sqlite())),
         MSSQL_SOURCE_NAME => Ok(Box::new(SqlMigrationConnector::new_mssql())),

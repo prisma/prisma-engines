@@ -2,7 +2,7 @@ use migration_engine_tests::test_api::*;
 use prisma_value::PrismaValue;
 use sql_schema_describer::ColumnTypeFamily;
 
-#[test_connector(tags(Postgres))]
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
 fn adding_an_unsupported_type_must_work(api: TestApi) {
     let dm = r#"
         model Post {
@@ -47,13 +47,58 @@ fn adding_an_unsupported_type_must_work(api: TestApi) {
     });
 }
 
+#[test_connector(tags(CockroachDb))]
+fn adding_an_unsupported_type_must_work_cockroach(api: TestApi) {
+    let dm = r#"
+        model Post {
+            id            Int                     @id @default(autoincrement())
+            /// This type is currently not supported.
+            user_ip  Unsupported("interval")
+            User          User                    @relation(fields: [user_ip], references: [balance])
+        }
+
+        model User {
+            id            Int                     @id @default(autoincrement())
+            /// This type is currently not supported.
+            balance       Unsupported("interval")  @unique
+            Post          Post[]
+        }
+    "#;
+
+    api.schema_push_w_datasource(dm).send().assert_green();
+
+    api.assert_schema().assert_table("Post", |table| {
+        table
+            .assert_columns_count(2)
+            .assert_column("id", |c| {
+                c.assert_is_required().assert_type_family(ColumnTypeFamily::Int)
+            })
+            .assert_column("user_ip", |c| {
+                c.assert_is_required()
+                    .assert_type_family(ColumnTypeFamily::Unsupported("interval".to_string()))
+            })
+    });
+
+    api.assert_schema().assert_table("User", |table| {
+        table
+            .assert_columns_count(2)
+            .assert_column("id", |c| {
+                c.assert_is_required().assert_type_family(ColumnTypeFamily::Int)
+            })
+            .assert_column("balance", |c| {
+                c.assert_is_required()
+                    .assert_type_family(ColumnTypeFamily::Unsupported("interval".to_string()))
+            })
+    });
+}
+
 #[test_connector(tags(Postgres))]
 fn switching_an_unsupported_type_to_supported_must_work(api: TestApi) {
     let dm1 = r#"
         model Post {
             id            Int                     @id @default(autoincrement())
-            user_home  Unsupported("point")
-            user_location  Unsupported("point")
+            user_home  Unsupported("interval")
+            user_location  Unsupported("interval")
         }
     "#;
 
@@ -67,11 +112,11 @@ fn switching_an_unsupported_type_to_supported_must_work(api: TestApi) {
             })
             .assert_column("user_home", |c| {
                 c.assert_is_required()
-                    .assert_type_family(ColumnTypeFamily::Unsupported("point".to_string()))
+                    .assert_type_family(ColumnTypeFamily::Unsupported("interval".to_string()))
             })
             .assert_column("user_location", |c| {
                 c.assert_is_required()
-                    .assert_type_family(ColumnTypeFamily::Unsupported("point".to_string()))
+                    .assert_type_family(ColumnTypeFamily::Unsupported("interval".to_string()))
             })
     });
 
@@ -100,7 +145,7 @@ fn switching_an_unsupported_type_to_supported_must_work(api: TestApi) {
     });
 }
 
-#[test_connector(tags(Postgres))]
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
 fn adding_and_removing_properties_on_unsupported_should_work(api: TestApi) {
     let dm1 = r#"
         model Post {
@@ -202,6 +247,8 @@ fn adding_and_removing_properties_on_unsupported_should_work(api: TestApi) {
 fn using_unsupported_and_ignore_should_work(api: TestApi) {
     let unsupported_type = if api.is_sqlite() {
         "some random string"
+    } else if api.is_cockroach() {
+        "interval"
     } else if api.is_postgres() {
         "macaddr"
     } else if api.is_mysql() {
