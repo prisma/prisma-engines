@@ -312,3 +312,15 @@ pub struct MissingFullTextSearchIndex {}
     message = "Prisma needs to perform transactions, which requires your MongoDB server to be run as a replica set. https://pris.ly/d/mongodb-replica-set"
 )]
 pub struct MongoReplicaSetRequired {}
+
+#[derive(Debug, UserFacingError, Serialize)]
+#[user_facing(
+    code = "P2032",
+    message = "Error converting field \"{field}\" of expected non-nullable type \"{expected_type}\", found incompatible value of \"{found}\"."
+)]
+
+pub struct MissingFieldsInModel {
+    pub field: String,
+    pub expected_type: String,
+    pub found: String,
+}
