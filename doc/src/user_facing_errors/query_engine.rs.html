@@ -314,6 +314,18 @@
 <span id="312">312</span>
 <span id="313">313</span>
 <span id="314">314</span>
+<span id="315">315</span>
+<span id="316">316</span>
+<span id="317">317</span>
+<span id="318">318</span>
+<span id="319">319</span>
+<span id="320">320</span>
+<span id="321">321</span>
+<span id="322">322</span>
+<span id="323">323</span>
+<span id="324">324</span>
+<span id="325">325</span>
+<span id="326">326</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">serde::Serialize</span>;
 <span class="kw">use</span> <span class="ident">std::fmt</span>;
 <span class="kw">use</span> <span class="ident">user_facing_error_macros</span>::<span class="kw-2">*</span>;
@@ -628,6 +640,18 @@
     <span class="ident">message</span> <span class="op">=</span> <span class="string">&quot;Prisma needs to perform transactions, which requires your MongoDB server to be run as a replica set. https://pris.ly/d/mongodb-replica-set&quot;</span>
 )]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">MongoReplicaSetRequired</span> {}
+
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">UserFacingError</span>, <span class="ident">Serialize</span>)]</span>
+<span class="attribute">#[<span class="ident">user_facing</span>(
+    <span class="ident">code</span> <span class="op">=</span> <span class="string">&quot;P2032&quot;</span>,
+    <span class="ident">message</span> <span class="op">=</span> <span class="string">&quot;Error converting field \&quot;{field}\&quot; of expected non-nullable type \&quot;{expected_type}\&quot;, found incompatible value of \&quot;{found}\&quot;.&quot;</span>
+)]</span>
+
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">MissingFieldsInModel</span> {
+    <span class="kw">pub</span> <span class="ident">field</span>: <span class="ident">String</span>,
+    <span class="kw">pub</span> <span class="ident">expected_type</span>: <span class="ident">String</span>,
+    <span class="kw">pub</span> <span class="ident">found</span>: <span class="ident">String</span>,
+}
 </code></pre></div>
 </section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="user_facing_errors" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.59.0 (9d1b2106e 2022-02-23)" ></div>
 </body></html>

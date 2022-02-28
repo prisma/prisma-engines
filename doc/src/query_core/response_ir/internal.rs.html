@@ -608,6 +608,7 @@
 <span id="606">606</span>
 <span id="607">607</span>
 <span id="608">608</span>
+<span id="609">609</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">constants</span>::{<span class="ident">aggregations</span>::<span class="kw-2">*</span>, <span class="ident">output_fields</span>::<span class="kw-2">*</span>},
@@ -1183,10 +1184,11 @@
         (<span class="ident">ScalarType::String</span>, <span class="ident">PrismaValue::Xml</span>(<span class="ident">s</span>)) =&gt; <span class="ident">PrismaValue::String</span>(<span class="ident">s</span>),
 
         (<span class="ident">st</span>, <span class="ident">pv</span>) =&gt; {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">CoreError::SerializationError</span>(<span class="macro">format!</span>(
-                <span class="string">&quot;Attempted to serialize scalar &#39;{}&#39; with incompatible type &#39;{:?}&#39; for field {}.&quot;</span>,
-                <span class="ident">pv</span>, <span class="ident">st</span>, <span class="ident">field</span>.<span class="ident">name</span>
-            )))
+            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident"><span class="kw">crate</span>::FieldConversionError::create</span>(
+                <span class="ident">field</span>.<span class="ident">name</span>.<span class="ident">clone</span>(),
+                <span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="ident">st</span>),
+                <span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">pv</span>),
+            ))
         }
     };
 
