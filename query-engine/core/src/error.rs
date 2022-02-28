@@ -6,6 +6,27 @@ use connector::error::ConnectorError;
 use prisma_models::DomainError;
 use thiserror::Error;
 
+#[derive(Debug, Error)]
+#[error(
+    "Error converting field \"{field}\" of expected non-nullable type \"{expected_type}\", found incompatible value of \"{found}\"."
+)]
+
+pub struct FieldConversionError {
+    pub field: String,
+    pub expected_type: String,
+    pub found: String,
+}
+
+impl FieldConversionError {
+    pub fn create(field: String, expected_type: String, found: String) -> CoreError {
+        CoreError::FieldConversionError(Self {
+            field,
+            expected_type,
+            found,
+        })
+    }
+}
+
 // TODO: Cleanup unused errors after refactorings.
 #[derive(Debug, Error)]
 pub enum CoreError {
@@ -41,6 +62,9 @@ pub enum CoreError {
 
     #[error("{}", _0)]
     TransactionError(#[from] TransactionError),
+
+    #[error("{}", _0)]
+    FieldConversionError(#[from] FieldConversionError),
 }
 
 impl CoreError {
@@ -206,6 +230,16 @@ impl From<CoreError> for user_facing_errors::Error {
                     .into(),
                 }
             }
+            CoreError::FieldConversionError(FieldConversionError {
+                field,
+                expected_type,
+                found,
+            }) => user_facing_errors::KnownError::new(user_facing_errors::query_engine::MissingFieldsInModel {
+                field,
+                expected_type,
+                found,
+            })
+            .into(),
             _ => user_facing_errors::Error::from_dyn_error(&err),
         }
     }
