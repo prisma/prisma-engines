@@ -20,7 +20,7 @@ fn views_can_be_described(api: TestApi) {
 }
 
 #[test_connector(tags(CockroachDb))]
-fn all_postgres_column_types_must_work(api: TestApi) {
+fn all_cockroach_column_types_must_work(api: TestApi) {
     let migration = r#"
         CREATE TYPE "mood" AS ENUM ('sad', 'ok', 'happy');
 
@@ -265,4 +265,29 @@ fn cockroach_multi_field_indexes_must_be_inferred_in_the_right_order(api: TestAp
             },
         ]
     );
+}
+
+#[test_connector(tags(CockroachDb))]
+fn escaped_characters_in_string_defaults(api: TestApi) {
+    // https://www.postgresql.org/docs/current/sql-syntax-lexical.html
+    let init = r#"
+        CREATE TABLE "Fruit" (
+            id              SERIAL PRIMARY KEY,
+            seasonality     TEXT DEFAULT '"summer"',
+            contains        TEXT DEFAULT '''potassium''',
+            "sideNames"     TEXT DEFAULT E'top\ndown'
+        );
+    "#;
+    api.raw_cmd(&init);
+    let schema = api.describe();
+    let table = schema.table_bang("Fruit");
+
+    let expect_col = |name: &str, expected: &str| {
+        let col = table.column_bang(name);
+        let default = col.default.as_ref().unwrap().as_value().unwrap().as_string().unwrap();
+        assert_eq!(default, expected);
+    };
+    expect_col("seasonality", r#""summer""#);
+    expect_col("contains", r#"'potassium'"#);
+    expect_col("sideNames", "top\ndown");
 }
