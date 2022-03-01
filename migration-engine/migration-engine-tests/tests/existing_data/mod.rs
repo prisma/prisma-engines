@@ -787,7 +787,8 @@ fn set_default_current_timestamp_on_existing_column_works(api: TestApi) {
     });
 }
 
-#[test_connector(preview_features("referentialIntegrity"))]
+// exclude: there is a cockroach-specific test. It's unexecutable there.
+#[test_connector(preview_features("referentialIntegrity"), exclude(CockroachDb))]
 fn primary_key_migrations_do_not_cause_data_loss(api: TestApi) {
     let dm1 = r#"
         model Dog {
@@ -866,72 +867,4 @@ fn primary_key_migrations_do_not_cause_data_loss(api: TestApi) {
         puppy_row,
         &[Value::text("12345"), Value::text("Marnie"), Value::text("8000")]
     );
-}
-
-#[test_connector(tags(Postgres))]
-fn failing_enum_migrations_should_not_be_partially_applied(api: TestApi) {
-    let dm1 = r#"
-        model Cat {
-            id String @id
-            mood Mood
-        }
-
-        enum Mood {
-            HAPPY
-            HUNGRY
-        }
-    "#;
-
-    api.schema_push_w_datasource(dm1)
-        .migration_id(Some("initial-setup"))
-        .send()
-        .assert_green();
-
-    {
-        let cat_inserts = quaint::ast::Insert::multi_into(api.render_table_name("Cat"), &["id", "mood"])
-            .values((Value::text("felix"), Value::enum_variant("HUNGRY")))
-            .values((Value::text("mittens"), Value::enum_variant("HAPPY")));
-
-        api.query(cat_inserts.into());
-    }
-
-    let dm2 = r#"
-        model Cat {
-            id   String @id
-            mood Mood
-        }
-
-        enum Mood {
-            HUNGRY
-        }
-    "#;
-
-    api.schema_push_w_datasource(dm2)
-        .migration_id(Some("remove-used-variant"))
-        .force(true)
-        .send_unwrap_err();
-
-    // Assertions
-    {
-        api.raw_cmd("ROLLBACK");
-
-        let cat_data = api.dump_table("Cat");
-        let cat_data: Vec<Vec<quaint::ast::Value>> =
-            cat_data.into_iter().map(|row| row.into_iter().collect()).collect();
-
-        let expected_cat_data = vec![
-            vec![Value::text("felix"), Value::enum_variant("HUNGRY")],
-            vec![Value::text("mittens"), Value::enum_variant("HAPPY")],
-        ];
-
-        assert_eq!(cat_data, expected_cat_data);
-
-        if api.is_mysql() {
-            api.assert_schema()
-                .assert_enum("Cat_mood", |enm| enm.assert_values(&["HAPPY", "HUNGRY"]));
-        } else {
-            api.assert_schema()
-                .assert_enum("Mood", |enm| enm.assert_values(&["HAPPY", "HUNGRY"]));
-        };
-    }
 }

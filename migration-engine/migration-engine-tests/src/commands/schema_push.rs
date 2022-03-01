@@ -153,4 +153,9 @@ impl SchemaPushAssertion {
 
         self
     }
+
+    pub fn expect_unexecutable(self, expectation: expect_test::Expect) -> Self {
+        expectation.assert_debug_eq(&self.result.unexecutable);
+        self
+    }
 }
