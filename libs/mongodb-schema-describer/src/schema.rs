@@ -1,28 +1,28 @@
+use mongodb::bson::Bson;
+use serde::{Deserialize, Serialize};
 use std::{
     collections::BTreeMap,
     fmt::{self, Debug},
     ops,
 };
 
-use mongodb::bson::Bson;
-
 use crate::{CollectionWalker, IndexWalker};
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
 /// An id of a collection in the schema.
 pub struct CollectionId(usize);
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
 /// An id of an index in the schema.
 pub struct IndexId(usize);
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 /// All the information we can fetch per collection.
 pub struct CollectionData {
     pub(crate) name: String,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq)]
+#[derive(Debug, Clone, Copy, PartialEq, Serialize, Deserialize)]
 /// The type of an index.
 pub enum IndexType {
     /// Mapped as `@@index`.
@@ -47,7 +47,7 @@ impl IndexData {
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 /// All the information we can scrape per index.
 pub struct IndexData {
     /// The name of the index.
@@ -60,7 +60,7 @@ pub struct IndexData {
     pub collection_id: CollectionId,
 }
 
-#[derive(Debug, Default, Clone)]
+#[derive(Debug, Default, Clone, Serialize, Deserialize)]
 /// All the possible information we should scrape out from a MongoDB database.
 pub struct MongoSchema {
     collections: Vec<CollectionData>,
@@ -171,7 +171,7 @@ impl ops::Index<IndexId> for MongoSchema {
     }
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 /// A field that is part of an index.
 pub struct IndexField {
     /// The name of the field.
@@ -198,7 +198,7 @@ impl fmt::Display for IndexField {
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq)]
+#[derive(Debug, Clone, Copy, PartialEq, Serialize, Deserialize)]
 /// Defines the property in the field that is part of an index.
 pub enum IndexFieldProperty {
     /// Defines a full-text index.

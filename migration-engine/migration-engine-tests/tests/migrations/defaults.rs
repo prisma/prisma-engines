@@ -175,9 +175,7 @@ fn default_dbgenerated_should_work_cockroach(api: TestApi) {
     api.schema_push_w_datasource(dm).send().assert_green();
 
     api.assert_schema().assert_table("A", |table| {
-        table.assert_column("id", |col| {
-            col.assert_default(Some(DefaultValue::db_generated("now():::TIMESTAMP")))
-        })
+        table.assert_column("id", |col| col.assert_default(Some(DefaultValue::now())))
     });
 }
 

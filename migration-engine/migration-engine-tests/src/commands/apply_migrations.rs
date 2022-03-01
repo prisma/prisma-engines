@@ -1,63 +1,50 @@
-use migration_core::{json_rpc::types::*, CoreError, CoreResult, GenericApi};
+use migration_core::{
+    commands::apply_migrations, json_rpc::types::*, migration_connector::MigrationConnector, CoreError, CoreResult,
+};
 use tempfile::TempDir;
 
 #[must_use = "This struct does nothing on its own. See ApplyMigrations::send()"]
 pub struct ApplyMigrations<'a> {
-    api: &'a dyn GenericApi,
+    api: &'a mut dyn MigrationConnector,
     migrations_directory: &'a TempDir,
-    rt: Option<&'a tokio::runtime::Runtime>,
 }
 
 impl<'a> ApplyMigrations<'a> {
-    pub fn new(api: &'a dyn GenericApi, migrations_directory: &'a TempDir) -> Self {
+    pub fn new(api: &'a mut dyn MigrationConnector, migrations_directory: &'a TempDir) -> Self {
         ApplyMigrations {
             api,
             migrations_directory,
-            rt: None,
-        }
-    }
-
-    pub fn new_sync(
-        api: &'a dyn GenericApi,
-        migrations_directory: &'a TempDir,
-        rt: &'a tokio::runtime::Runtime,
-    ) -> Self {
-        ApplyMigrations {
-            api,
-            migrations_directory,
-            rt: Some(rt),
         }
     }
 
     pub async fn send(self) -> CoreResult<ApplyMigrationsAssertion<'a>> {
-        let output = self
-            .api
-            .apply_migrations(ApplyMigrationsInput {
+        let output = apply_migrations(
+            ApplyMigrationsInput {
                 migrations_directory_path: self.migrations_directory.path().to_str().unwrap().to_owned(),
-            })
-            .await?;
+            },
+            self.api,
+        )
+        .await?;
 
         Ok(ApplyMigrationsAssertion {
             output,
-            _api: self.api,
             _migrations_directory: self.migrations_directory,
         })
     }
 
     #[track_caller]
     pub fn send_sync(self) -> ApplyMigrationsAssertion<'a> {
-        self.rt.unwrap().block_on(self.send()).unwrap()
+        test_setup::runtime::run_with_thread_local_runtime(self.send()).unwrap()
     }
 
     #[track_caller]
     pub fn send_unwrap_err(self) -> CoreError {
-        self.rt.unwrap().block_on(self.send()).unwrap_err()
+        test_setup::runtime::run_with_thread_local_runtime(self.send()).unwrap_err()
     }
 }
 
 pub struct ApplyMigrationsAssertion<'a> {
     output: ApplyMigrationsOutput,
-    _api: &'a dyn GenericApi,
     _migrations_directory: &'a TempDir,
 }
 

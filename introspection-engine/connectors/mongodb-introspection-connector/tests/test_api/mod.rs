@@ -150,3 +150,67 @@ where
 {
     introspect_depth(CompositeTypeDepth::Infinite, init_database)
 }
+
+pub(super) fn get_database_description<F, U>(init_database: F) -> String
+where
+    F: FnOnce(Database) -> U,
+    U: Future<Output = mongodb::error::Result<()>>,
+{
+    let mut names = Generator::default();
+
+    let database_name = names.next().unwrap().replace('-', "");
+    let mut connection_string: url::Url = CONN_STR.parse().unwrap();
+    connection_string.set_path(&format!(
+        "/{}{}",
+        database_name,
+        connection_string.path().trim_start_matches('/')
+    ));
+    let connection_string = connection_string.to_string();
+
+    RT.block_on(async move {
+        let client = mongodb_client::create(&connection_string).await.unwrap();
+        let database = client.database(&database_name);
+        let connector = MongoDbIntrospectionConnector::new(&connection_string).await.unwrap();
+
+        if init_database(database.clone()).await.is_err() {
+            database.drop(None).await.unwrap();
+        }
+
+        let res = connector.get_database_description().await;
+        database.drop(None).await.unwrap();
+
+        res.unwrap()
+    })
+}
+
+pub(super) fn get_database_version<F, U>(init_database: F) -> String
+where
+    F: FnOnce(Database) -> U,
+    U: Future<Output = mongodb::error::Result<()>>,
+{
+    let mut names = Generator::default();
+
+    let database_name = names.next().unwrap().replace('-', "");
+    let mut connection_string: url::Url = CONN_STR.parse().unwrap();
+    connection_string.set_path(&format!(
+        "/{}{}",
+        database_name,
+        connection_string.path().trim_start_matches('/')
+    ));
+    let connection_string = connection_string.to_string();
+
+    RT.block_on(async move {
+        let client = mongodb_client::create(&connection_string).await.unwrap();
+        let database = client.database(&database_name);
+        let connector = MongoDbIntrospectionConnector::new(&connection_string).await.unwrap();
+
+        if init_database(database.clone()).await.is_err() {
+            database.drop(None).await.unwrap();
+        }
+
+        let res = connector.get_database_version().await;
+        database.drop(None).await.unwrap();
+
+        res.unwrap()
+    })
+}

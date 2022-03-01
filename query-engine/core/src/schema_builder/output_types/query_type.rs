@@ -1,4 +1,5 @@
 use super::*;
+use input_types::fields::arguments;
 
 /// Builds the root `Query` type.
 #[tracing::instrument(name = "build_query_type", skip(ctx))]
@@ -7,7 +8,7 @@ pub(crate) fn build(ctx: &mut BuilderContext) -> (OutputType, ObjectTypeStrongRe
         .internal_data_model
         .models_cloned()
         .into_iter()
-        .map(|model| {
+        .flat_map(|model| {
             let mut vec = vec![
                 find_first_field(ctx, &model),
                 all_items_field(ctx, &model),
@@ -24,7 +25,6 @@ pub(crate) fn build(ctx: &mut BuilderContext) -> (OutputType, ObjectTypeStrongRe
 
             vec
         })
-        .flatten()
         .collect();
 
     let ident = Identifier::new("Query".to_owned(), PRISMA_NAMESPACE);
@@ -42,7 +42,7 @@ fn find_unique_field(ctx: &mut BuilderContext, model: &ModelRef) -> Option<Outpu
         field(
             field_name,
             vec![arg],
-            OutputType::object(output_objects::map_model_object_type(ctx, &model)),
+            OutputType::object(objects::model::map_type(ctx, &model)),
             Some(QueryInfo {
                 model: Some(Arc::clone(&model)),
                 tag: QueryTag::FindUnique,
@@ -54,13 +54,13 @@ fn find_unique_field(ctx: &mut BuilderContext, model: &ModelRef) -> Option<Outpu
 
 /// Builds a find first item field for given model.
 fn find_first_field(ctx: &mut BuilderContext, model: &ModelRef) -> OutputField {
-    let args = arguments::many_records_arguments(ctx, &model, true);
+    let args = arguments::relation_selection_arguments(ctx, &model, true);
     let field_name = format!("findFirst{}", model.name);
 
     field(
         field_name,
         args,
-        OutputType::object(output_objects::map_model_object_type(ctx, &model)),
+        OutputType::object(objects::model::map_type(ctx, &model)),
         Some(QueryInfo {
             model: Some(Arc::clone(&model)),
             tag: QueryTag::FindFirst,
@@ -71,9 +71,9 @@ fn find_first_field(ctx: &mut BuilderContext, model: &ModelRef) -> OutputField {
 
 /// Builds a "multiple" query arity items field (e.g. "users", "posts", ...) for given model.
 fn all_items_field(ctx: &mut BuilderContext, model: &ModelRef) -> OutputField {
-    let args = arguments::many_records_arguments(ctx, &model, true);
+    let args = arguments::relation_selection_arguments(ctx, &model, true);
     let field_name = ctx.pluralize_internal(camel_case(pluralize(&model.name)), format!("findMany{}", model.name));
-    let object_type = output_objects::map_model_object_type(ctx, &model);
+    let object_type = objects::model::map_type(ctx, &model);
 
     field(
         field_name,
@@ -90,7 +90,7 @@ fn all_items_field(ctx: &mut BuilderContext, model: &ModelRef) -> OutputField {
 fn plain_aggregation_field(ctx: &mut BuilderContext, model: &ModelRef) -> OutputField {
     field(
         format!("aggregate{}", model.name),
-        arguments::many_records_arguments(ctx, &model, false),
+        arguments::relation_selection_arguments(ctx, &model, false),
         OutputType::object(aggregation::plain::aggregation_object_type(ctx, &model)),
         Some(QueryInfo {
             model: Some(Arc::clone(&model)),

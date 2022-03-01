@@ -584,11 +584,7 @@ fn common_index_validations(index_data: &mut IndexAttribute, model_id: ast::Mode
                         unresolvable_fields.join(", "),
                     );
                     let model_name = ctx.ast[model_id].name();
-                    DatamodelError::ModelValidationError {
-                        message: String::from(message),
-                        model_name: String::from(model_name),
-                        span: current_attribute.span,
-                    }
+                    DatamodelError::new_model_validation_error(message, model_name, current_attribute.span)
                 });
             }
 

@@ -1,7 +1,7 @@
+use super::fields::data_input_mapper::*;
 use super::*;
-use constants::{args, operations};
+use constants::args;
 use datamodel_connector::ConnectorCapability;
-use prisma_models::dml::DefaultValue;
 
 #[tracing::instrument(skip(ctx, model, parent_field))]
 pub(crate) fn update_one_input_types(
@@ -38,14 +38,11 @@ fn checked_update_one_input_type(
     let input_object = Arc::new(init_input_object_type(ident.clone()));
     ctx.cache_input_type(ident, input_object.clone());
 
-    // Compute input fields for scalar fields.
-    let mut fields = scalar_input_fields_for_checked_update(ctx, model);
+    let filtered_fields = filter_checked_update_fields(ctx, model, parent_field);
+    let field_mapper = UpdateDataInputFieldMapper::new_checked();
+    let input_fields = field_mapper.map_all(ctx, &filtered_fields);
 
-    // Compute input fields for relational fields.
-    let mut relational_fields = relation_input_fields_for_checked_update_one(ctx, model, parent_field);
-    fields.append(&mut relational_fields);
-
-    input_object.set_fields(fields);
+    input_object.set_fields(input_fields);
     Arc::downgrade(&input_object)
 }
 
@@ -71,38 +68,67 @@ fn unchecked_update_one_input_type(
     let input_object = Arc::new(init_input_object_type(ident.clone()));
     ctx.cache_input_type(ident, input_object.clone());
 
-    // Compute input fields for scalar fields.
-    let mut fields = scalar_input_fields_for_unchecked_update(ctx, model, parent_field);
+    let filtered_fields = filter_unchecked_update_fields(ctx, model, parent_field);
+    let field_mapper = UpdateDataInputFieldMapper::new_unchecked();
+    let input_fields = field_mapper.map_all(ctx, &filtered_fields);
 
-    // Compute input fields for relational fields.
-    let mut relational_fields = relation_input_fields_for_unchecked_update_one(ctx, model, parent_field);
-    fields.append(&mut relational_fields);
-
-    input_object.set_fields(fields);
+    input_object.set_fields(input_fields);
     Arc::downgrade(&input_object)
 }
 
-#[tracing::instrument(skip(ctx, model))]
-pub(super) fn scalar_input_fields_for_checked_update(ctx: &mut BuilderContext, model: &ModelRef) -> Vec<InputField> {
-    input_fields::scalar_input_fields(
-        ctx,
-        model
-            .fields()
-            .scalar_writable()
-            .filter(|sf| field_should_be_kept_for_checked_update_input_type(ctx, sf))
-            .collect(),
-        |ctx, f: ScalarFieldRef, default| non_list_scalar_update_field_mapper(ctx, &f, default),
-        |ctx, f, _| input_fields::scalar_list_input_field_mapper(ctx, model.name.clone(), "Update", f, false),
-        false,
-    )
+/// Filters the given model's fields down to the allowed ones for checked update.
+pub(super) fn filter_checked_update_fields(
+    ctx: &BuilderContext,
+    model: &ModelRef,
+    parent_field: Option<&RelationFieldRef>,
+) -> Vec<ModelField> {
+    model
+        .fields()
+        .all
+        .iter()
+        .filter(|field| {
+            match field {
+                ModelField::Scalar(sf) => {
+                    // We forbid updating auto-increment integer unique fields as this can create problems with the
+                    // underlying sequences (checked inputs only).
+                    let is_not_autoinc = !sf.is_auto_generated_int_id
+                        && !matches!(
+                            (&sf.type_identifier, sf.unique(), sf.is_autoincrement),
+                            (TypeIdentifier::Int, true, true)
+                        );
+
+                    let model_id = sf.container.as_model().unwrap().primary_identifier();
+                    let is_not_disallowed_id = if model_id.contains(&sf.name) {
+                        // Is part of the id, connector must allow updating ID fields.
+                        ctx.capabilities.contains(ConnectorCapability::UpdateableId)
+                    } else {
+                        true
+                    };
+
+                    !sf.is_read_only() && is_not_autoinc && is_not_disallowed_id
+                }
+
+                // If the relation field `rf` is the one that was traversed to by the parent relation field `parent_field`,
+                // then exclude it for checked inputs - this prevents endless nested type circles that are useless to offer as API.
+                ModelField::Relation(rf) => {
+                    let field_was_traversed_to = parent_field.filter(|pf| pf.related_field().name == rf.name).is_some();
+                    !field_was_traversed_to
+                }
+
+                // Always keep composites
+                ModelField::Composite(_) => true,
+            }
+        })
+        .map(Clone::clone)
+        .collect()
 }
 
-#[tracing::instrument(skip(ctx, model, parent_field))]
-pub(super) fn scalar_input_fields_for_unchecked_update(
+/// Filters the given model's fields down to the allowed ones for unchecked update.
+pub(super) fn filter_unchecked_update_fields(
     ctx: &mut BuilderContext,
     model: &ModelRef,
     parent_field: Option<&RelationFieldRef>,
-) -> Vec<InputField> {
+) -> Vec<ModelField> {
     let linking_fields = if let Some(parent_field) = parent_field {
         let child_field = parent_field.related_field();
         if child_field.is_inlined_on_enclosing_model() {
@@ -118,115 +144,45 @@ pub(super) fn scalar_input_fields_for_unchecked_update(
     };
 
     let id_fields = model.fields().id().map(|pk| pk.fields());
-    let scalar_fields: Vec<ScalarFieldRef> = model
+    model
         .fields()
-        .scalar()
-        .into_iter()
-        .filter(|sf| !linking_fields.contains(sf))
-        .filter(|sf| {
-            if let Some(ref id_fields) = &id_fields {
-                // Exclude @@id or @id fields if not updatable
-                if id_fields.contains(sf) {
-                    ctx.capabilities.contains(ConnectorCapability::UpdateableId)
-                } else {
-                    true
-                }
-            } else {
-                true
+        .all
+        .iter()
+        .filter(|field| match field {
+            // 1) In principle, all scalars are writable for unchecked inputs. However, it still doesn't make any sense to be able to write the scalars that
+            // link the model to the parent record in case of a nested unchecked create, as this would introduce complexities we don't want to deal with right now.
+            // 2) Exclude @@id or @id fields if not updatable
+            ModelField::Scalar(sf) => {
+                !linking_fields.contains(sf)
+                    && if let Some(ref id_fields) = &id_fields {
+                        // Exclude @@id or @id fields if not updatable
+                        if id_fields.contains(sf) {
+                            ctx.capabilities.contains(ConnectorCapability::UpdateableId)
+                        } else {
+                            true
+                        }
+                    } else {
+                        true
+                    }
             }
+
+            // If the relation field `rf` is the one that was traversed to by the parent relation field `parent_field`,
+            // then exclude it for checked inputs - this prevents endless nested type circles that are useless to offer as API.
+            //
+            // Additionally, only relations that point to other models and are NOT inlined on the currently in scope model are allowed in the unchecked input, because if they are
+            // inlined, they are written only as scalars for unchecked, not via the relation API (`connect`, nested `create`, etc.).
+            ModelField::Relation(rf) => {
+                let is_not_inlined = !rf.is_inlined_on_enclosing_model();
+                let field_was_not_traversed_to = parent_field.filter(|pf| pf.related_field().name == rf.name).is_none();
+
+                field_was_not_traversed_to && is_not_inlined
+            }
+
+            // Always keep composites
+            ModelField::Composite(_) => true,
         })
-        .collect();
-
-    input_fields::scalar_input_fields(
-        ctx,
-        scalar_fields,
-        |ctx, f: ScalarFieldRef, default| non_list_scalar_update_field_mapper(ctx, &f, default),
-        |ctx, f, _| input_fields::scalar_list_input_field_mapper(ctx, model.name.clone(), "Update", f, false),
-        false,
-    )
-}
-
-#[tracing::instrument(skip(ctx, field, default))]
-fn non_list_scalar_update_field_mapper(
-    ctx: &mut BuilderContext,
-    field: &ScalarFieldRef,
-    default: Option<DefaultValue>,
-) -> InputField {
-    let base_update_type = match &field.type_identifier {
-        TypeIdentifier::Float => InputType::object(operations_object_type(ctx, "Float", field, true)),
-        TypeIdentifier::Decimal => InputType::object(operations_object_type(ctx, "Decimal", field, true)),
-        TypeIdentifier::Int => InputType::object(operations_object_type(ctx, "Int", field, true)),
-        TypeIdentifier::BigInt => InputType::object(operations_object_type(ctx, "BigInt", field, true)),
-        TypeIdentifier::String => InputType::object(operations_object_type(ctx, "String", field, false)),
-        TypeIdentifier::Boolean => InputType::object(operations_object_type(ctx, "Bool", field, false)),
-        TypeIdentifier::Enum(e) => InputType::object(operations_object_type(ctx, &format!("Enum{}", e), field, false)),
-        TypeIdentifier::Json => map_scalar_input_type_for_field(ctx, field),
-        TypeIdentifier::DateTime => InputType::object(operations_object_type(ctx, "DateTime", field, false)),
-        TypeIdentifier::UUID => InputType::object(operations_object_type(ctx, "Uuid", field, false)),
-        TypeIdentifier::Xml => InputType::object(operations_object_type(ctx, "Xml", field, false)),
-        TypeIdentifier::Bytes => InputType::object(operations_object_type(ctx, "Bytes", field, false)),
-        TypeIdentifier::Unsupported => unreachable!("No unsupported field should reach that path"),
-    };
-
-    let has_adv_json = ctx.has_capability(ConnectorCapability::AdvancedJsonNullability);
-    match &field.type_identifier {
-        TypeIdentifier::Json if has_adv_json => {
-            let enum_type = json_null_input_enum(!field.is_required());
-            let input_field = input_field(
-                field.name.clone(),
-                vec![InputType::Enum(enum_type), base_update_type],
-                default,
-            );
-
-            input_field.optional()
-        }
-
-        _ => {
-            let types = vec![map_scalar_input_type_for_field(ctx, field), base_update_type];
-
-            let input_field = input_field(field.name.clone(), types, default);
-            input_field.optional().nullable_if(!field.is_required())
-        }
-    }
-}
-
-#[tracing::instrument(skip(ctx, prefix, field, with_number_operators))]
-fn operations_object_type(
-    ctx: &mut BuilderContext,
-    prefix: &str,
-    field: &ScalarFieldRef,
-    with_number_operators: bool,
-) -> InputObjectTypeWeakRef {
-    // Nullability is important for the `set` operation, so we need to
-    // construct and cache different objects to reflect that.
-    let nullable = if field.is_required() { "" } else { "Nullable" };
-    let ident = Identifier::new(
-        format!("{}{}FieldUpdateOperationsInput", nullable, prefix),
-        PRISMA_NAMESPACE,
-    );
-    return_cached_input!(ctx, &ident);
-
-    let mut obj = init_input_object_type(ident.clone());
-    obj.require_exactly_one_field();
-
-    let obj = Arc::new(obj);
-    ctx.cache_input_type(ident, obj.clone());
-
-    let typ = map_scalar_input_type_for_field(ctx, field);
-    let mut fields = vec![input_field(operations::SET, typ.clone(), None)
-        .optional()
-        .nullable_if(!field.is_required())];
-
-    if with_number_operators {
-        fields.push(input_field(operations::INCREMENT, typ.clone(), None).optional());
-        fields.push(input_field(operations::DECREMENT, typ.clone(), None).optional());
-        fields.push(input_field(operations::MULTIPLY, typ.clone(), None).optional());
-        fields.push(input_field(operations::DIVIDE, typ, None).optional());
-    }
-
-    obj.set_fields(fields);
-
-    Arc::downgrade(&obj)
+        .map(Clone::clone)
+        .collect()
 }
 
 /// For update input types only. Compute input fields for checked relational fields.
@@ -379,24 +335,4 @@ pub(crate) fn update_one_where_combination_object(
 
     input_object.set_fields(fields);
     Arc::downgrade(&input_object)
-}
-
-fn field_should_be_kept_for_checked_update_input_type(ctx: &BuilderContext, field: &ScalarFieldRef) -> bool {
-    // We forbid updating auto-increment integer unique fields as this can create problems with the
-    // underlying sequences (checked inputs only).
-    let is_not_autoinc = !field.is_auto_generated_int_id
-        && !matches!(
-            (&field.type_identifier, field.unique(), field.is_autoincrement),
-            (TypeIdentifier::Int, true, true)
-        );
-
-    let model_id = field.container.as_model().unwrap().primary_identifier();
-    let is_not_disallowed_id = if model_id.contains(&field.name) {
-        // Is part of the id, connector must allow updating ID fields.
-        ctx.capabilities.contains(ConnectorCapability::UpdateableId)
-    } else {
-        true
-    };
-
-    is_not_autoinc && is_not_disallowed_id
 }

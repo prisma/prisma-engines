@@ -30,7 +30,7 @@ fn shadow_db_url_can_be_configured_on_postgres(api: TestApi) {
     // Create the database, a first migration and the test user.
     {
         {
-            let engine = api.new_engine();
+            let mut engine = api.new_engine();
 
             engine
                 .create_migration("01initcats", dm1, &migrations_directory)
@@ -52,9 +52,9 @@ fn shadow_db_url_can_be_configured_on_postgres(api: TestApi) {
         let mut shadow_db_url = url.clone();
         shadow_db_url.set_path("testshadowdb0001");
 
-        let shadow_db_connection = api.block_on(Quaint::new(&shadow_db_url.to_string())).unwrap();
+        let shadow_db_connection = tok(Quaint::new(&shadow_db_url.to_string())).unwrap();
 
-        api.block_on(shadow_db_connection.raw_cmd(
+        tok(shadow_db_connection.raw_cmd(
             "CREATE SCHEMA \"prisma-tests\"; GRANT USAGE, CREATE ON SCHEMA \"prisma-tests\" TO shadowdbconfigtestuser",
         ))
         .unwrap();
@@ -73,18 +73,17 @@ fn shadow_db_url_can_be_configured_on_postgres(api: TestApi) {
 
     // Check that the test user can't drop databases.
     {
-        let test_user_connection = api.block_on(Quaint::new(&test_user_connection_string)).unwrap();
+        let test_user_connection = tok(Quaint::new(&test_user_connection_string)).unwrap();
 
-        let err = api
-            .block_on(test_user_connection.raw_cmd("CREATE DATABASE shadowdburltest83429"))
-            .unwrap_err();
+        let err = tok(test_user_connection.raw_cmd("CREATE DATABASE shadowdburltest83429")).unwrap_err();
 
         assert_eq!(err.original_code().unwrap(), "42501"); // insufficient_privilege (https://www.postgresql.org/docs/current/errcodes-appendix.html)
     }
 
     // Check that commands using the shadow database work.
     {
-        let engine = api.new_engine_with_connection_strings(test_user_connection_string, Some(custom_shadow_db_url));
+        let mut engine =
+            api.new_engine_with_connection_strings(test_user_connection_string, Some(custom_shadow_db_url));
 
         engine
             .apply_migrations(&migrations_directory)
@@ -121,7 +120,7 @@ fn shadow_db_url_must_not_match_main_url(api: TestApi) {
 
     // URLs match -> error
     {
-        let engine = api.new_engine_with_connection_strings(
+        let mut engine = api.new_engine_with_connection_strings(
             api.connection_string().to_owned(),
             Some(api.connection_string().to_owned()),
         );
@@ -142,7 +141,8 @@ fn shadow_db_url_must_not_match_main_url(api: TestApi) {
         let mut url: url::Url = api.connection_string().parse().unwrap();
         url.set_path("/testshadowdb0002");
 
-        let engine = api.new_engine_with_connection_strings(api.connection_string().to_owned(), Some(url.to_string()));
+        let mut engine =
+            api.new_engine_with_connection_strings(api.connection_string().to_owned(), Some(url.to_string()));
 
         engine
             .create_migration("01init", schema, &migrations_directory)
@@ -165,7 +165,7 @@ fn shadow_db_not_reachable_error_must_have_the_right_connection_info(api: TestAp
     let mut url: url::Url = api.connection_string().parse().unwrap();
     url.set_port(Some(39824)).unwrap(); // let's assume no database is running on that port
 
-    let engine = api.new_engine_with_connection_strings(api.connection_string().to_owned(), Some(url.to_string()));
+    let mut engine = api.new_engine_with_connection_strings(api.connection_string().to_owned(), Some(url.to_string()));
 
     let err = engine
         .create_migration("01init", schema, &migrations_directory)

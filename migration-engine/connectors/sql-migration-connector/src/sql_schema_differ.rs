@@ -10,16 +10,17 @@ pub(crate) use sql_schema_differ_flavour::SqlSchemaDifferFlavour;
 
 use self::differ_database::DifferDatabase;
 use crate::{
+    database_schema::SqlDatabaseSchema,
     pair::Pair,
     sql_migration::{self, AlterColumn, AlterTable, RedefineTable, SqlMigrationStep, TableChange},
-    SqlFlavour, SqlSchema,
+    SqlFlavour,
 };
 use column::ColumnTypeChange;
 use sql_schema_describer::{walkers::ForeignKeyWalker, ColumnId, TableId};
 use std::collections::HashSet;
 use table::TableDiffer;
 
-pub(crate) fn calculate_steps(schemas: Pair<&SqlSchema>, flavour: &dyn SqlFlavour) -> Vec<SqlMigrationStep> {
+pub(crate) fn calculate_steps(schemas: Pair<&SqlDatabaseSchema>, flavour: &dyn SqlFlavour) -> Vec<SqlMigrationStep> {
     let db = DifferDatabase::new(schemas, flavour);
     let mut steps: Vec<SqlMigrationStep> = Vec::new();
 
@@ -58,6 +59,7 @@ fn push_created_table_steps(steps: &mut Vec<SqlMigrationStep>, db: &DifferDataba
                 .map(|index| SqlMigrationStep::CreateIndex {
                     table_id: (None, index.table().table_id()),
                     index_index: index.index(),
+                    from_drop_and_recreate: false,
                 });
 
             steps.extend(create_indexes_from_created_tables);
@@ -177,6 +179,10 @@ fn added_columns(differ: &TableDiffer<'_, '_>, changes: &mut Vec<TableChange>) {
     for column in differ.added_columns() {
         changes.push(TableChange::AddColumn {
             column_id: column.column_id(),
+            has_virtual_default: next_column_has_virtual_default(
+                (column.table().table_id(), column.column_id()),
+                differ.db,
+            ),
         })
     }
 }
@@ -292,6 +298,7 @@ fn push_created_index_steps(steps: &mut Vec<SqlMigrationStep>, db: &DifferDataba
             steps.push(SqlMigrationStep::CreateIndex {
                 table_id: (Some(tables.previous().table_id()), tables.next().table_id()),
                 index_index: index.index(),
+                from_drop_and_recreate: false,
             })
         }
 
@@ -316,6 +323,7 @@ fn push_created_index_steps(steps: &mut Vec<SqlMigrationStep>, db: &DifferDataba
                 steps.push(SqlMigrationStep::CreateIndex {
                     table_id: (Some(tables.previous().table_id()), tables.next().table_id()),
                     index_index: index.next().index(),
+                    from_drop_and_recreate: true,
                 })
             }
         }
@@ -381,6 +389,11 @@ fn push_redefined_table_steps(steps: &mut Vec<SqlMigrationStep>, db: &DifferData
                 table_ids: differ.tables.as_ref().map(|t| t.table_id()),
                 dropped_primary_key: dropped_primary_key(&differ).is_some(),
                 added_columns: differ.added_columns().map(|col| col.column_id()).collect(),
+                added_columns_with_virtual_defaults: differ
+                    .added_columns()
+                    .filter(|col| next_column_has_virtual_default((col.table().table_id(), col.column_id()), differ.db))
+                    .map(|col| col.column_id())
+                    .collect(),
                 dropped_columns: differ.dropped_columns().map(|col| col.column_id()).collect(),
                 column_pairs,
             }
@@ -475,4 +488,12 @@ fn push_foreign_key_pair_changes(
             })
         }
     }
+}
+
+fn next_column_has_virtual_default((table_id, column_id): (TableId, ColumnId), db: &DifferDatabase<'_>) -> bool {
+    db.schemas()
+        .next()
+        .prisma_level_defaults
+        .binary_search(&(table_id.0, column_id.0))
+        .is_ok()
 }

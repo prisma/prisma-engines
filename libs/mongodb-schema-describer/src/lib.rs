@@ -103,3 +103,21 @@ pub async fn describe(client: &mongodb::Client, db_name: &str) -> mongodb::error
 
     Ok(schema)
 }
+/// Get the version.
+pub async fn version(client: &mongodb::Client, db_name: &str) -> mongodb::error::Result<String> {
+    let database = client.database(db_name);
+    use mongodb::bson::doc;
+    let version_cmd = doc! {"buildInfo": 1};
+    let res = database.run_command(version_cmd, None).await?;
+    let version = res
+        .get("versionArray")
+        .unwrap()
+        .as_array()
+        .unwrap()
+        .iter()
+        .map(|s| s.as_i32().unwrap().to_string())
+        .collect::<Vec<String>>()
+        .join(".");
+
+    Ok(version)
+}

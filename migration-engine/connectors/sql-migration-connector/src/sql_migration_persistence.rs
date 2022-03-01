@@ -7,15 +7,14 @@ use uuid::Uuid;
 
 #[async_trait::async_trait]
 impl MigrationPersistence for SqlMigrationConnector {
-    async fn baseline_initialize(&self) -> ConnectorResult<()> {
-        let conn = self.conn().await?;
-        self.flavour.create_migrations_table(conn).await?;
+    async fn baseline_initialize(&mut self) -> ConnectorResult<()> {
+        self.flavour.create_migrations_table().await?;
 
         Ok(())
     }
 
-    async fn initialize(&self) -> ConnectorResult<()> {
-        let schema = self.describe_schema().await?;
+    async fn initialize(&mut self) -> ConnectorResult<()> {
+        let schema = self.flavour.describe_schema().await?;
 
         if schema
             .tables
@@ -31,20 +30,16 @@ impl MigrationPersistence for SqlMigrationConnector {
                 .any(|t| !self.flavour().table_should_be_ignored(t.name()))
         {
             return Err(ConnectorError::user_facing(
-                user_facing_errors::migration_engine::DatabaseSchemaNotEmpty {
-                    database_name: self.connection_info.database_location(),
-                },
+                user_facing_errors::migration_engine::DatabaseSchemaNotEmpty,
             ));
         }
 
-        let conn = self.conn().await?;
-        self.flavour.create_migrations_table(conn).await?;
+        self.flavour.create_migrations_table().await?;
 
         Ok(())
     }
 
-    async fn mark_migration_applied_impl(&self, migration_name: &str, checksum: &str) -> ConnectorResult<String> {
-        let conn = self.conn().await?;
+    async fn mark_migration_applied_impl(&mut self, migration_name: &str, checksum: &str) -> ConnectorResult<String> {
         let id = Uuid::new_v4().to_string();
         let now = chrono::Utc::now();
 
@@ -56,25 +51,22 @@ impl MigrationPersistence for SqlMigrationConnector {
             .value("finished_at", now)
             .value("migration_name", migration_name);
 
-        conn.query(insert).await?;
+        self.flavour.query(insert.into()).await?;
 
         Ok(id)
     }
 
-    async fn mark_migration_rolled_back_by_id(&self, migration_id: &str) -> ConnectorResult<()> {
-        let conn = self.conn().await?;
-
+    async fn mark_migration_rolled_back_by_id(&mut self, migration_id: &str) -> ConnectorResult<()> {
         let update = Update::table(self.flavour().migrations_table())
             .so_that(Column::from("id").equals(migration_id))
             .set("rolled_back_at", chrono::Utc::now());
 
-        conn.query(update).await?;
+        self.flavour.query(update.into()).await?;
 
         Ok(())
     }
 
-    async fn record_migration_started_impl(&self, migration_name: &str, checksum: &str) -> ConnectorResult<String> {
-        let conn = self.conn().await?;
+    async fn record_migration_started_impl(&mut self, migration_name: &str, checksum: &str) -> ConnectorResult<String> {
         let id = Uuid::new_v4().to_string();
         let now = chrono::Utc::now();
 
@@ -84,12 +76,12 @@ impl MigrationPersistence for SqlMigrationConnector {
             .value("started_at", now)
             .value("migration_name", migration_name);
 
-        conn.query(insert).await?;
+        self.flavour.query(insert.into()).await?;
 
         Ok(id)
     }
 
-    async fn record_successful_step(&self, id: &str) -> ConnectorResult<()> {
+    async fn record_successful_step(&mut self, id: &str) -> ConnectorResult<()> {
         use quaint::ast::*;
 
         let update = Update::table(self.flavour().migrations_table())
@@ -99,33 +91,35 @@ impl MigrationPersistence for SqlMigrationConnector {
                 Expression::from(Column::from("applied_steps_count")) + Expression::from(1),
             );
 
-        self.conn().await?.query(update).await?;
+        self.flavour.query(update.into()).await?;
 
         Ok(())
     }
 
-    async fn record_failed_step(&self, id: &str, logs: &str) -> ConnectorResult<()> {
+    async fn record_failed_step(&mut self, id: &str, logs: &str) -> ConnectorResult<()> {
         let update = Update::table(self.flavour().migrations_table())
             .so_that(Column::from("id").equals(id))
             .set("logs", logs);
 
-        self.conn().await?.query(update).await?;
+        self.flavour.query(update.into()).await?;
 
         Ok(())
     }
 
-    async fn record_migration_finished(&self, id: &str) -> ConnectorResult<()> {
+    async fn record_migration_finished(&mut self, id: &str) -> ConnectorResult<()> {
         let update = Update::table(self.flavour().migrations_table())
             .so_that(Column::from("id").equals(id))
             .set("finished_at", chrono::Utc::now()); // TODO maybe use a database generated timestamp
 
-        self.conn().await?.query(update).await?;
+        self.flavour.query(update.into()).await?;
 
         Ok(())
     }
 
     #[tracing::instrument(skip(self))]
-    async fn list_migrations(&self) -> ConnectorResult<Result<Vec<MigrationRecord>, PersistenceNotInitializedError>> {
+    async fn list_migrations(
+        &mut self,
+    ) -> ConnectorResult<Result<Vec<MigrationRecord>, PersistenceNotInitializedError>> {
         let select = Select::from_table(self.flavour().migrations_table())
             .column("id")
             .column("checksum")
@@ -137,7 +131,7 @@ impl MigrationPersistence for SqlMigrationConnector {
             .column("applied_steps_count")
             .order_by("started_at".ascend());
 
-        let rows = match self.conn().await?.query(select).await {
+        let rows = match self.flavour.query(select.into()).await {
             Ok(result) => result,
             Err(err)
                 if err.is_user_facing_error::<user_facing_errors::query_engine::TableDoesNotExist>()

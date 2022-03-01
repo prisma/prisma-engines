@@ -3,8 +3,8 @@ use migration_engine_tests::multi_engine_test_api::*;
 use quaint::{prelude::Queryable, single::Quaint};
 use test_macros::test_connector;
 
-#[test_connector(tags(Postgres))]
-fn soft_resets_work_on_postgres(api: TestApi) {
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
+fn soft_resets_work_on_postgres(mut api: TestApi) {
     let migrations_directory = api.create_migrations_directory();
     let mut url: url::Url = api.connection_string().parse().unwrap();
 
@@ -39,18 +39,15 @@ fn soft_resets_work_on_postgres(api: TestApi) {
 
     // Check that the test user can't drop databases.
     {
-        let test_user_connection = api.block_on(Quaint::new(&test_user_connection_string)).unwrap();
-
-        let err = api
-            .block_on(test_user_connection.raw_cmd(&format!(r#"DROP DATABASE {}"#, api.test_fn_name())))
-            .unwrap_err();
+        let test_user_connection = tok(Quaint::new(&test_user_connection_string)).unwrap();
+        let err = tok(test_user_connection.raw_cmd(&format!(r#"DROP DATABASE {}"#, api.test_fn_name()))).unwrap_err();
 
         assert_eq!(err.original_code().unwrap(), "42501"); // insufficient_privilege (https://www.postgresql.org/docs/current/errcodes-appendix.html)
     }
 
     // Check that the soft reset works with migrations, then with schema push.
     {
-        let engine = api.new_engine_with_connection_strings(test_user_connection_string, None);
+        let mut engine = api.new_engine_with_connection_strings(test_user_connection_string, None);
 
         engine
             .apply_migrations(&migrations_directory)
@@ -144,11 +141,8 @@ fn soft_resets_work_on_sql_server(api: TestApi) {
 
     // Check that the test user can't drop databases.
     {
-        let test_user_connection = api.block_on(Quaint::new(&test_user_connection_string)).unwrap();
-
-        let err = api
-            .block_on(test_user_connection.raw_cmd(&format!(r#"DROP DATABASE {}"#, api.test_fn_name())))
-            .unwrap_err();
+        let test_user_connection = tok(Quaint::new(&test_user_connection_string)).unwrap();
+        let err = tok(test_user_connection.raw_cmd(&format!(r#"DROP DATABASE {}"#, api.test_fn_name()))).unwrap_err();
 
         // insufficent privilege
         // https://docs.microsoft.com/en-us/sql/relational-databases/errors-events/database-engine-events-and-errors
@@ -157,7 +151,7 @@ fn soft_resets_work_on_sql_server(api: TestApi) {
 
     // Check that the soft reset works with migrations, then with schema push.
     {
-        let engine = api.new_engine_with_connection_strings(test_user_connection_string, None);
+        let mut engine = api.new_engine_with_connection_strings(test_user_connection_string, None);
 
         let create_schema = format!("CREATE SCHEMA [{}];", engine.schema_name());
         engine.raw_cmd(&create_schema);
@@ -220,7 +214,7 @@ fn soft_resets_work_on_mysql(api: TestApi) {
     "#;
 
     {
-        let engine = api.new_engine();
+        let mut engine = api.new_engine();
 
         engine.create_migration("01init", dm, &migrations_directory).send_sync();
 
@@ -260,11 +254,8 @@ fn soft_resets_work_on_mysql(api: TestApi) {
 
     // Check that the test user can't drop databases.
     {
-        let test_user_connection = api.block_on(Quaint::new(&test_user_connection_string)).unwrap();
-
-        let err = api
-            .block_on(test_user_connection.raw_cmd(&format!(r#"DROP DATABASE `{}`"#, api.test_fn_name())))
-            .unwrap_err();
+        let test_user_connection = tok(Quaint::new(&test_user_connection_string)).unwrap();
+        let err = tok(test_user_connection.raw_cmd(&format!(r#"DROP DATABASE `{}`"#, api.test_fn_name()))).unwrap_err();
 
         // insufficient_privilege
         // https://docs.oracle.com/cd/E19078-01/mysql/mysql-refman-5.1/error-handling.html
@@ -273,7 +264,7 @@ fn soft_resets_work_on_mysql(api: TestApi) {
 
     // Check that the soft reset works with migrations, then with schema push.
     {
-        let engine = api.new_engine_with_connection_strings(test_user_connection_string, None);
+        let mut engine = api.new_engine_with_connection_strings(test_user_connection_string, None);
 
         engine.reset().send_sync();
         engine.assert_schema().assert_tables_count(0);

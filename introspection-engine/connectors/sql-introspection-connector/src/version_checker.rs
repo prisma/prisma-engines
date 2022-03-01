@@ -103,6 +103,7 @@ impl VersionChecker {
         }
     }
 
+    #[allow(clippy::nonminimal_bool)] // more readable this way
     pub fn uses_on_delete(&mut self, fk: &ForeignKey, table: &Table) {
         if !(fk.on_delete_action == ForeignKeyAction::NoAction || fk.on_delete_action == ForeignKeyAction::SetNull)
             && !is_prisma_1_or_11_list_table(table)

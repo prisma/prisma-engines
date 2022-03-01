@@ -16,8 +16,8 @@ pub fn connectors_to_test(only: &OnlyConnectorTags, exclude: &ExcludeConnectorTa
         if !exclude.is_empty() {
             return only
                 .tags()
-                .to_vec()
-                .into_iter()
+                .iter()
+                .cloned()
                 .filter(|tag| !exclude.tags().contains(tag))
                 .collect();
         }

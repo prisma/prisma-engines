@@ -29,16 +29,6 @@ pub struct ScalarField {
 }
 
 impl ScalarField {
-    // pub fn container(&self) -> &ParentContainer {
-    //     &self.container
-    // }
-
-    // pub fn model(&self) -> ModelRef {
-    //     self.model
-    //         .upgrade()
-    //         .expect("Model does not exist anymore. Parent model got deleted without deleting the child.")
-    // }
-
     pub fn internal_data_model(&self) -> InternalDataModelRef {
         self.container.internal_data_model()
     }
@@ -60,7 +50,7 @@ impl ScalarField {
     }
 
     pub fn db_name(&self) -> &str {
-        self.db_name.as_deref().unwrap_or_else(|| self.name.as_str())
+        self.db_name.as_deref().unwrap_or(self.name.as_str())
     }
 
     pub fn type_identifier_with_arity(&self) -> (TypeIdentifier, FieldArity) {
@@ -73,6 +63,10 @@ impl ScalarField {
 
     pub fn is_numeric(&self) -> bool {
         self.type_identifier.is_numeric()
+    }
+
+    pub fn container(&self) -> &ParentContainer {
+        &self.container
     }
 }
 

@@ -79,13 +79,6 @@ impl Model {
             .upgrade()
             .expect("InternalDataModel does not exist anymore. Parent internal_data_model is deleted without deleting the child internal_data_model.")
     }
-
-    pub fn map_scalar_db_field_name(&self, name: &str) -> Option<ScalarFieldRef> {
-        self.fields()
-            .scalar()
-            .into_iter()
-            .find_map(|field| (field.db_name() == name).then(|| field))
-    }
 }
 
 impl Debug for Model {

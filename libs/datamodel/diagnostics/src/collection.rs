@@ -50,10 +50,6 @@ impl Diagnostics {
         self.warnings.append(&mut err_and_warn.warnings)
     }
 
-    pub fn append_warning_vec(&mut self, mut warnings: Vec<DatamodelWarning>) {
-        self.warnings.append(&mut warnings);
-    }
-
     pub fn to_result(&self) -> Result<(), Diagnostics> {
         if self.has_errors() {
             Err(self.clone())

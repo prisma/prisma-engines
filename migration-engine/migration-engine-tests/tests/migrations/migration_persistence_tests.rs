@@ -6,15 +6,13 @@ use pretty_assertions::assert_eq;
 fn starting_a_migration_works(api: TestApi) {
     let persistence = api.migration_persistence();
 
-    api.block_on(persistence.initialize()).unwrap();
+    tok(persistence.initialize()).unwrap();
 
     let script = "CREATE ENUM MyBoolean ( \"TRUE\", \"FALSE\" )";
 
-    let id = api
-        .block_on(persistence.record_migration_started("initial_migration", script))
-        .unwrap();
+    let id = tok(persistence.record_migration_started("initial_migration", script)).unwrap();
 
-    let migrations = api.block_on(persistence.list_migrations()).unwrap().unwrap();
+    let migrations = tok(persistence.list_migrations()).unwrap().unwrap();
 
     assert_eq!(migrations.len(), 1);
 
@@ -41,16 +39,14 @@ fn starting_a_migration_works(api: TestApi) {
 fn finishing_a_migration_works(api: TestApi) {
     let persistence = api.migration_persistence();
 
-    api.block_on(persistence.initialize()).unwrap();
+    tok(persistence.initialize()).unwrap();
 
     let script = "CREATE ENUM MyBoolean ( \"TRUE\", \"FALSE\" )";
 
-    let id = api
-        .block_on(persistence.record_migration_started("initial_migration", script))
-        .unwrap();
-    api.block_on(persistence.record_migration_finished(&id)).unwrap();
+    let id = tok(persistence.record_migration_started("initial_migration", script)).unwrap();
+    tok(persistence.record_migration_finished(&id)).unwrap();
 
-    let migrations = api.block_on(persistence.list_migrations()).unwrap().unwrap();
+    let migrations = tok(persistence.list_migrations()).unwrap().unwrap();
 
     assert_eq!(migrations.len(), 1);
 
@@ -80,17 +76,15 @@ fn finishing_a_migration_works(api: TestApi) {
 fn updating_then_finishing_a_migration_works(api: TestApi) {
     let persistence = api.migration_persistence();
 
-    api.block_on(persistence.initialize()).unwrap();
+    tok(persistence.initialize()).unwrap();
 
     let script = "CREATE ENUM MyBoolean ( \"TRUE\", \"FALSE\" )";
 
-    let id = api
-        .block_on(persistence.record_migration_started("initial_migration", script))
-        .unwrap();
-    api.block_on(persistence.record_successful_step(&id)).unwrap();
-    api.block_on(persistence.record_migration_finished(&id)).unwrap();
+    let id = tok(persistence.record_migration_started("initial_migration", script)).unwrap();
+    tok(persistence.record_successful_step(&id)).unwrap();
+    tok(persistence.record_migration_finished(&id)).unwrap();
 
-    let migrations = api.block_on(persistence.list_migrations()).unwrap().unwrap();
+    let migrations = tok(persistence.list_migrations()).unwrap().unwrap();
 
     assert_eq!(migrations.len(), 1);
 
@@ -120,25 +114,21 @@ fn updating_then_finishing_a_migration_works(api: TestApi) {
 fn multiple_successive_migrations_work(api: TestApi) {
     let persistence = api.migration_persistence();
 
-    api.block_on(persistence.initialize()).unwrap();
+    tok(persistence.initialize()).unwrap();
 
     let script_1 = "CREATE ENUM MyBoolean ( \"TRUE\", \"FALSE\" )";
 
-    let id_1 = api
-        .block_on(persistence.record_migration_started("initial_migration", script_1))
-        .unwrap();
-    api.block_on(persistence.record_successful_step(&id_1)).unwrap();
-    api.block_on(persistence.record_migration_finished(&id_1)).unwrap();
+    let id_1 = tok(persistence.record_migration_started("initial_migration", script_1)).unwrap();
+    tok(persistence.record_successful_step(&id_1)).unwrap();
+    tok(persistence.record_migration_finished(&id_1)).unwrap();
 
     std::thread::sleep(std::time::Duration::from_millis(10));
 
     let script_2 = "DROP ENUM MyBoolean";
-    let id_2 = api
-        .block_on(persistence.record_migration_started("second_migration", script_2))
-        .unwrap();
-    api.block_on(persistence.record_successful_step(&id_2)).unwrap();
+    let id_2 = tok(persistence.record_migration_started("second_migration", script_2)).unwrap();
+    tok(persistence.record_successful_step(&id_2)).unwrap();
 
-    let migrations = api.block_on(persistence.list_migrations()).unwrap().unwrap();
+    let migrations = tok(persistence.list_migrations()).unwrap().unwrap();
 
     assert_eq!(migrations.len(), 2);
 

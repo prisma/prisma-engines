@@ -8,19 +8,6 @@ use std::{
 pub type CompositeTypeRef = Arc<CompositeType>;
 pub type CompositeTypeWeakRef = Weak<CompositeType>;
 
-// #[derive(Debug)]
-// pub struct CompositeTypeTemplate {
-//     pub name: String,
-//     pub fields: Vec<FieldTemplate>,
-//     // pub dml_model: datamodel::Model,
-// }
-
-// impl CompositeTypeTemplate {
-//     pub fn build(self) -> CompositeTypeRef {
-//         todo!()
-//     }
-// }
-
 #[derive(Debug)]
 pub struct CompositeType {
     /// Then name of the composite type.
@@ -40,6 +27,21 @@ impl CompositeType {
         self.internal_data_model
             .upgrade()
             .expect("Invalid back-reference to internal data model.")
+    }
+
+    pub fn fields(&self) -> &[Field] {
+        self.fields
+            .get()
+            .ok_or_else(|| String::from("Composite fields must be set."))
+            .unwrap()
+    }
+
+    pub fn find_field(&self, prisma_name: &str) -> Option<&Field> {
+        self.fields().iter().find(|f| f.name() == prisma_name)
+    }
+
+    pub fn find_field_by_db_name(&self, db_name: &str) -> Option<&Field> {
+        self.fields().iter().find(|f| f.db_name() == db_name)
     }
 }
 

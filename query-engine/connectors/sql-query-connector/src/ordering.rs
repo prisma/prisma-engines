@@ -32,10 +32,10 @@ pub fn build(
         .enumerate()
         .map(|(index, order_by)| match order_by {
             OrderBy::Scalar(order_by) => build_order_scalar(order_by, base_model, needs_reversed_order, index),
-            OrderBy::Aggregation(order_by) if order_by.is_scalar_aggregation() => {
-                build_order_aggr_scalar(order_by, needs_reversed_order)
+            OrderBy::ScalarAggregation(order_by) => build_order_aggr_scalar(order_by, needs_reversed_order),
+            OrderBy::ToManyAggregation(order_by) => {
+                build_order_aggr_rel(order_by, base_model, needs_reversed_order, index)
             }
-            OrderBy::Aggregation(order_by) => build_order_aggr_rel(order_by, base_model, needs_reversed_order, index),
             OrderBy::Relevance(order_by) => build_order_relevance(order_by, needs_reversed_order),
         })
         .collect_vec()
@@ -71,9 +71,9 @@ fn build_order_relevance(order_by: &OrderByRelevance, needs_reversed_order: bool
     }
 }
 
-fn build_order_aggr_scalar(order_by: &OrderByAggregation, needs_reversed_order: bool) -> OrderByDefinition {
+fn build_order_aggr_scalar(order_by: &OrderByScalarAggregation, needs_reversed_order: bool) -> OrderByDefinition {
     let order: Option<Order> = Some(order_by.sort_order.into_order(needs_reversed_order));
-    let order_column = order_by.field.as_ref().unwrap().as_column();
+    let order_column = order_by.field.as_column();
     let order_definition: OrderDefinition = match order_by.sort_aggregation {
         SortAggregation::Count => (count(order_column.clone()).into(), order),
         SortAggregation::Avg => (avg(order_column.clone()).into(), order),
@@ -90,7 +90,7 @@ fn build_order_aggr_scalar(order_by: &OrderByAggregation, needs_reversed_order: 
 }
 
 fn build_order_aggr_rel(
-    order_by: &OrderByAggregation,
+    order_by: &OrderByToManyAggregation,
     base_model: &ModelRef,
     needs_reversed_order: bool,
     index: usize,
@@ -116,7 +116,7 @@ fn build_order_aggr_rel(
 }
 
 pub fn compute_joins_aggregation(
-    order_by: &OrderByAggregation,
+    order_by: &OrderByToManyAggregation,
     order_by_index: usize,
     base_model: &ModelRef,
 ) -> (Vec<AliasedJoin>, Column<'static>) {
@@ -125,23 +125,27 @@ pub fn compute_joins_aggregation(
         .path
         .split_last()
         .expect("An order by relation aggregation has to have at least one hop");
+
+    // Unwraps are safe because the SQL connector doesn't yet support any other type of orderBy hop but the relation hop.
     let mut joins = rest_hops
         .iter()
-        .map(|rf| compute_one2m_join(base_model, rf, join_prefix.as_str()))
+        .map(|hop| compute_one2m_join(base_model, hop.into_relation_hop().unwrap(), join_prefix.as_str()))
         .collect_vec();
 
     let aggregation_type = match order_by.sort_aggregation {
         SortAggregation::Count => AggregationType::Count,
         _ => unreachable!("Order by relation aggregation other than count are not supported"),
     };
+
     // We perform the aggregation on the last join
     let last_aggr_join = compute_aggr_join(
-        last_hop,
+        last_hop.into_relation_hop().unwrap(),
         aggregation_type,
         ORDER_AGGREGATOR_ALIAS,
         join_prefix.as_str(),
         joins.last(),
     );
+
     // This is the final column identifier to be used for the scalar field to order by.
     // `{last_join_alias}.{ORDER_AGGREGATOR_ALIAS}`
     let order_by_column = Column::from((last_aggr_join.alias.to_owned(), ORDER_AGGREGATOR_ALIAS.to_owned()));
@@ -160,8 +164,9 @@ pub fn compute_joins_scalar(
     let joins = order_by
         .path
         .iter()
-        .map(|rf| compute_one2m_join(base_model, rf, join_prefix.as_str()))
+        .map(|hop| compute_one2m_join(base_model, hop.into_relation_hop().unwrap(), join_prefix.as_str()))
         .collect_vec();
+
     // This is the final column identifier to be used for the scalar field to order by.
     // - If we order by a scalar field on the base model, we simply use the model's scalar field. eg:
     //   `{modelTable}.{field}`

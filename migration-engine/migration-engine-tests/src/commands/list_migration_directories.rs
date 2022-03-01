@@ -1,34 +1,33 @@
-use migration_core::{json_rpc::types::*, GenericApi};
+use migration_core::json_rpc::types::*;
+use std::path::Path;
 use tempfile::TempDir;
 
 #[must_use = "This struct does nothing on its own. See ListMigrationDirectories::send()"]
 pub struct ListMigrationDirectories<'a> {
-    api: &'a dyn GenericApi,
     migrations_directory: &'a TempDir,
-    rt: &'a tokio::runtime::Runtime,
 }
 
 impl<'a> ListMigrationDirectories<'a> {
-    pub fn new(api: &'a dyn GenericApi, migrations_directory: &'a TempDir, rt: &'a tokio::runtime::Runtime) -> Self {
-        ListMigrationDirectories {
-            api,
-            migrations_directory,
-            rt,
-        }
+    pub fn new(migrations_directory: &'a TempDir) -> Self {
+        ListMigrationDirectories { migrations_directory }
     }
 
     #[track_caller]
     pub fn send(self) -> ListMigrationDirectoriesAssertion<'a> {
-        let output = self
-            .rt
-            .block_on(self.api.list_migration_directories(ListMigrationDirectoriesInput {
-                migrations_directory_path: self.migrations_directory.path().to_str().unwrap().to_owned(),
-            }))
-            .unwrap();
+        let migrations_from_filesystem = migration_core::migration_connector::migrations_directory::list_migrations(
+            Path::new(self.migrations_directory.path()),
+        )
+        .unwrap();
+
+        let migrations = migrations_from_filesystem
+            .iter()
+            .map(|migration| migration.migration_name().to_string())
+            .collect();
+
+        let output = ListMigrationDirectoriesOutput { migrations };
 
         ListMigrationDirectoriesAssertion {
             output,
-            _api: self.api,
             _migrations_directory: self.migrations_directory,
         }
     }
@@ -36,7 +35,6 @@ impl<'a> ListMigrationDirectories<'a> {
 
 pub struct ListMigrationDirectoriesAssertion<'a> {
     output: ListMigrationDirectoriesOutput,
-    _api: &'a dyn GenericApi,
     _migrations_directory: &'a TempDir,
 }
 

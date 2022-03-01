@@ -8,7 +8,7 @@ use bigdecimal::ToPrimitive;
 use connector::{AggregationResult, RelAggregationResult, RelAggregationRow};
 use indexmap::IndexMap;
 use itertools::Itertools;
-use prisma_models::{PrismaValue, SelectionResult};
+use prisma_models::{CompositeFieldRef, Field, PrismaValue, SelectionResult};
 use std::{borrow::Borrow, collections::HashMap};
 
 /// A grouping of items to their parent record.
@@ -203,7 +203,7 @@ fn find_nested_aggregate_output_field(
     let nested_field = object_type.find_field(nested_obj_name).unwrap();
     let nested_object_type = match nested_field.field_type.borrow() {
         OutputType::Object(obj) => obj.into_arc(),
-        _ => unreachable!(format!("{} output must be an object.", nested_obj_name)),
+        _ => unreachable!("{} output must be an object.", nested_obj_name),
     };
 
     nested_object_type.find_field(nested_field_name).unwrap()
@@ -299,32 +299,40 @@ fn serialize_objects(
 
     // Finally, serialize the objects based on the selected fields.
     let mut object_mapping = UncheckedItemsWithParents::with_capacity(result.scalars.records.len());
-    let scalar_db_field_names = result.scalars.field_names;
+    let db_field_names = result.scalars.field_names;
     let model = result.model;
 
-    let field_names: Vec<_> = scalar_db_field_names
+    let fields: Vec<_> = db_field_names
         .iter()
-        .filter_map(|f| model.map_scalar_db_field_name(f).map(|x| x.name.clone()))
+        .filter_map(|f| model.fields().find_from_all_by_db_name(f).ok())
         .collect();
 
     // Write all fields, nested and list fields unordered into a map, afterwards order all into the final order.
     // If nothing is written to the object, write null instead.
     for (r_index, record) in result.scalars.records.into_iter().enumerate() {
-        let record_id = Some(record.extract_selection_result(&scalar_db_field_names, &model.primary_identifier())?);
+        let record_id = Some(record.extract_selection_result(&db_field_names, &model.primary_identifier())?);
 
         if !object_mapping.contains_key(&record.parent_id) {
             object_mapping.insert(record.parent_id.clone(), Vec::new());
         }
 
-        // Write scalars, but skip objects and lists, which while they are in the selection, are handled separately.
+        // Write scalars and composites, but skip objects (relations) and scalar lists, which while they are in the selection, are handled separately.
         let values = record.values;
         let mut object = HashMap::with_capacity(values.len());
 
-        for (val, scalar_field_name) in values.into_iter().zip(field_names.iter()) {
-            let field = typ.find_field(scalar_field_name).unwrap();
+        for (val, field) in values.into_iter().zip(fields.iter()) {
+            let out_field = typ.find_field(field.name()).unwrap();
 
-            if !field.field_type.is_object() {
-                object.insert(scalar_field_name.to_owned(), serialize_scalar(&field, val)?);
+            match field {
+                Field::Composite(cf) => {
+                    object.insert(field.name().to_owned(), serialize_composite(cf, &out_field, val)?);
+                }
+
+                _ if !out_field.field_type.is_object() => {
+                    object.insert(field.name().to_owned(), serialize_scalar(&out_field, val)?);
+                }
+
+                _ => (),
             }
         }
 
@@ -431,6 +439,69 @@ fn process_nested_results(
     Ok(nested_mapping)
 }
 
+// Problem: order of selections
+fn serialize_composite(cf: &CompositeFieldRef, out_field: &OutputFieldRef, value: PrismaValue) -> crate::Result<Item> {
+    match value {
+        PrismaValue::Null if !cf.is_required() => Ok(Item::Value(PrismaValue::Null)),
+
+        PrismaValue::List(values) if cf.is_list() => {
+            let values = values
+                .into_iter()
+                .map(|value| serialize_composite(cf, out_field, value))
+                .collect::<crate::Result<Vec<_>>>();
+
+            Ok(Item::List(values?.into()))
+        }
+
+        PrismaValue::Object(pairs) => {
+            let mut map = Map::new();
+            let object_type = out_field
+                .field_type
+                .as_object_type()
+                .expect("Composite output field is not an object.");
+
+            let composite_type = &cf.typ;
+
+            for (field_name, value) in pairs {
+                // The field on the composite type.
+                // This will cause clashes if one field has an @map("name") and the other field is named "field" directly.
+                let inner_field = composite_type
+                    .find_field(&field_name)
+                    .or(composite_type.find_field_by_db_name(&field_name))
+                    .unwrap();
+
+                // The field on the output object type. Used for the actual serialization process.
+                let inner_out_field = object_type.find_field(inner_field.name()).unwrap();
+
+                match inner_field {
+                    Field::Composite(cf) => {
+                        map.insert(
+                            inner_field.name().to_owned(),
+                            serialize_composite(cf, &inner_out_field, value)?,
+                        );
+                    }
+
+                    _ if !inner_out_field.field_type.is_object() => {
+                        map.insert(
+                            inner_field.name().to_owned(),
+                            serialize_scalar(&inner_out_field, value)?,
+                        );
+                    }
+
+                    _ => (),
+                }
+            }
+
+            Ok(Item::Map(map))
+        }
+
+        val => Err(CoreError::SerializationError(format!(
+            "Attempted to serialize '{}' with non-composite compatible type '{:?}' for field {}.",
+            val, cf.typ.name, cf.name
+        ))),
+    }
+}
+
 fn serialize_scalar(field: &OutputFieldRef, value: PrismaValue) -> crate::Result<Item> {
     match (&value, field.field_type.as_ref()) {
         (PrismaValue::Null, _) if field.is_nullable => Ok(Item::Value(PrismaValue::Null)),
@@ -502,10 +573,11 @@ fn convert_prisma_value(field: &OutputFieldRef, value: PrismaValue, st: &ScalarT
         (ScalarType::String, PrismaValue::Xml(s)) => PrismaValue::String(s),
 
         (st, pv) => {
-            return Err(CoreError::SerializationError(format!(
-                "Attempted to serialize scalar '{}' with incompatible type '{:?}' for field {}.",
-                pv, st, field.name
-            )))
+            return Err(crate::FieldConversionError::create(
+                field.name.clone(),
+                format!("{:?}", st),
+                format!("{}", pv),
+            ))
         }
     };
 
