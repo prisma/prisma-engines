@@ -71,7 +71,7 @@ impl<'a> Statistics<'a> {
         let mut indices = self.indices;
         let (mut models, types) = populate_fields(&self.models, self.samples, warnings);
 
-        add_indices_to_models(&mut models, &mut indices);
+        add_indices_to_models(&mut models, &mut indices, warnings);
         add_missing_ids_to_models(&mut models);
 
         for (_, model) in models.into_iter() {
@@ -567,18 +567,51 @@ fn filter_out_empty_types(
     }
 }
 
-fn add_indices_to_models(models: &mut BTreeMap<String, Model>, indices: &mut BTreeMap<String, Vec<IndexWalker<'_>>>) {
+fn add_indices_to_models(
+    models: &mut BTreeMap<String, Model>,
+    indices: &mut BTreeMap<String, Vec<IndexWalker<'_>>>,
+    warnings: &mut Vec<Warning>,
+) {
+    let mut fields_with_unknown_type = Vec::new();
+
     for (model_name, model) in models.iter_mut() {
         for index in indices.remove(model_name).into_iter().flat_map(|i| i.into_iter()) {
             let defined_on_field = index.fields().len() == 1;
 
-            if !index.fields().all(|indf| {
-                model
-                    .fields
-                    .iter()
-                    .any(|mf| mf.name() == indf.name() || mf.database_name() == Some(indf.name()))
-            }) {
-                continue;
+            let missing_fields: Vec<_> = index
+                .fields()
+                .filter(|indf| {
+                    !model
+                        .fields
+                        .iter()
+                        .any(|mf| mf.name() == indf.name() || mf.database_name() == Some(indf.name()))
+                })
+                .cloned()
+                .collect();
+
+            for field in missing_fields {
+                let docs = String::from("Field referred in an index, but found no data to define the type.");
+                fields_with_unknown_type.push((Name::Model(model_name.to_owned()), field.name.clone()));
+
+                let (name, database_name) = match sanitize_string(field.name()) {
+                    Some(name) => (name, Some(field.name)),
+                    None => (field.name, None),
+                };
+
+                let sf = ScalarField {
+                    name,
+                    field_type: FieldType::Json.into(),
+                    arity: datamodel::FieldArity::Optional,
+                    database_name,
+                    default_value: None,
+                    documentation: Some(docs),
+                    is_generated: false,
+                    is_updated_at: false,
+                    is_commented_out: false,
+                    is_ignored: false,
+                };
+
+                model.fields.push(Field::ScalarField(sf));
             }
 
             let fields = index
@@ -609,6 +642,10 @@ fn add_indices_to_models(models: &mut BTreeMap<String, Model>, indices: &mut BTr
                 algorithm: None,
             });
         }
+    }
+
+    if !fields_with_unknown_type.is_empty() {
+        warnings.push(crate::warnings::fields_with_unknown_types(&fields_with_unknown_type));
     }
 }
 

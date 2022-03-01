@@ -6,6 +6,7 @@ use mongodb::{
     options::IndexOptions,
     IndexModel,
 };
+use serde_json::json;
 
 #[test]
 fn single_column_normal_index() {
@@ -781,7 +782,7 @@ fn partial_indices_should_be_ignored() {
 }
 
 #[test]
-fn skip_index_pointing_to_non_existing_field() {
+fn index_pointing_to_non_existing_field_should_add_the_field() {
     let res = introspect(|db| async move {
         db.create_collection("A", None).await?;
         let collection = db.collection("A");
@@ -805,8 +806,236 @@ fn skip_index_pointing_to_non_existing_field() {
         model A {
           id   String @id @default(auto()) @map("_id") @db.ObjectId
           name String
+          /// Field referred in an index, but found no data to define the type.
+          age  Json?
+
+          @@index([age], map: "age_1")
         }
     "#]];
 
     expected.assert_eq(res.datamodel());
+
+    res.assert_warning("Could not determine the types for the following fields.");
+    res.assert_warning_code(103);
+    res.assert_warning_affected(&json!([{
+        "model": "A",
+        "field": "age"
+    }]));
+}
+
+#[test]
+fn index_pointing_to_mapped_non_existing_field_should_add_the_mapped_field() {
+    let res = introspect(|db| async move {
+        db.create_collection("A", None).await?;
+        let collection = db.collection("A");
+        let docs = vec![doc! {"name": "Musti"}];
+
+        collection.insert_many(docs, None).await.unwrap();
+
+        let options = IndexOptions::builder().unique(Some(false)).build();
+
+        let model = IndexModel::builder()
+            .keys(doc! { "_age": 1 })
+            .options(Some(options))
+            .build();
+
+        collection.create_index(model, None).await?;
+
+        Ok(())
+    });
+
+    let expected = expect![[r#"
+        model A {
+          id   String @id @default(auto()) @map("_id") @db.ObjectId
+          name String
+          /// Field referred in an index, but found no data to define the type.
+          age  Json?  @map("_age")
+
+          @@index([age], map: "_age_1")
+        }
+    "#]];
+
+    expected.assert_eq(res.datamodel());
+
+    res.assert_warning("Could not determine the types for the following fields.");
+    res.assert_warning_code(103);
+    res.assert_warning_affected(&json!([{
+        "model": "A",
+        "field": "_age"
+    }]));
+}
+
+#[test]
+fn compound_index_pointing_to_non_existing_field_should_add_the_field() {
+    let res = introspect(|db| async move {
+        db.create_collection("A", None).await?;
+        let collection = db.collection("A");
+        let docs = vec![doc! {"name": "Musti"}];
+
+        collection.insert_many(docs, None).await.unwrap();
+
+        let options = IndexOptions::builder().unique(Some(false)).build();
+
+        let model = IndexModel::builder()
+            .keys(doc! { "age": 1, "play": 1 })
+            .options(Some(options))
+            .build();
+
+        collection.create_index(model, None).await?;
+
+        Ok(())
+    });
+
+    let expected = expect![[r#"
+        model A {
+          id   String @id @default(auto()) @map("_id") @db.ObjectId
+          name String
+          /// Field referred in an index, but found no data to define the type.
+          age  Json?
+          /// Field referred in an index, but found no data to define the type.
+          play Json?
+
+          @@index([age, play], map: "age_1_play_1")
+        }
+    "#]];
+
+    expected.assert_eq(res.datamodel());
+
+    res.assert_warning("Could not determine the types for the following fields.");
+    res.assert_warning_code(103);
+    res.assert_warning_affected(&json!([
+        {
+            "model": "A",
+            "field": "age"
+        },
+        {
+            "model": "A",
+            "field": "play"
+        },
+    ]));
+}
+
+#[test]
+fn compound_index_with_one_existing_fild_pointing_to_non_existing_field_should_add_the_field() {
+    let res = introspect(|db| async move {
+        db.create_collection("A", None).await?;
+        let collection = db.collection("A");
+        let docs = vec![doc! {"name": "Musti", "age": 9}];
+
+        collection.insert_many(docs, None).await.unwrap();
+
+        let options = IndexOptions::builder().unique(Some(false)).build();
+
+        let model = IndexModel::builder()
+            .keys(doc! { "age": 1, "play": 1 })
+            .options(Some(options))
+            .build();
+
+        collection.create_index(model, None).await?;
+
+        Ok(())
+    });
+
+    let expected = expect![[r#"
+        model A {
+          id   String @id @default(auto()) @map("_id") @db.ObjectId
+          age  Int
+          name String
+          /// Field referred in an index, but found no data to define the type.
+          play Json?
+
+          @@index([age, play], map: "age_1_play_1")
+        }
+    "#]];
+
+    expected.assert_eq(res.datamodel());
+
+    res.assert_warning("Could not determine the types for the following fields.");
+    res.assert_warning_code(103);
+    res.assert_warning_affected(&json!([
+        {
+            "model": "A",
+            "field": "play"
+        },
+    ]));
+}
+
+#[test]
+fn unique_index_pointing_to_non_existing_field_should_add_the_field() {
+    let res = introspect(|db| async move {
+        db.create_collection("A", None).await?;
+        let collection = db.collection("A");
+        let docs = vec![doc! {"name": "Musti"}];
+
+        collection.insert_many(docs, None).await.unwrap();
+
+        let options = IndexOptions::builder().unique(Some(true)).build();
+
+        let model = IndexModel::builder()
+            .keys(doc! { "age": 1 })
+            .options(Some(options))
+            .build();
+
+        collection.create_index(model, None).await?;
+
+        Ok(())
+    });
+
+    let expected = expect![[r#"
+        model A {
+          id   String @id @default(auto()) @map("_id") @db.ObjectId
+          name String
+          /// Field referred in an index, but found no data to define the type.
+          age  Json?  @unique(map: "age_1")
+        }
+    "#]];
+
+    expected.assert_eq(res.datamodel());
+
+    res.assert_warning("Could not determine the types for the following fields.");
+    res.assert_warning_code(103);
+    res.assert_warning_affected(&json!([{
+        "model": "A",
+        "field": "age"
+    }]));
+}
+
+#[test]
+fn fulltext_index_pointing_to_non_existing_field_should_add_the_field() {
+    let res = introspect(|db| async move {
+        db.create_collection("A", None).await?;
+        let collection = db.collection("A");
+        let docs = vec![doc! {"name": "Musti"}];
+
+        collection.insert_many(docs, None).await.unwrap();
+
+        let options = IndexOptions::builder().unique(Some(true)).build();
+
+        let model = IndexModel::builder()
+            .keys(doc! { "age": 1 })
+            .options(Some(options))
+            .build();
+
+        collection.create_index(model, None).await?;
+
+        Ok(())
+    });
+
+    let expected = expect![[r#"
+        model A {
+          id   String @id @default(auto()) @map("_id") @db.ObjectId
+          name String
+          /// Field referred in an index, but found no data to define the type.
+          age  Json?  @unique(map: "age_1")
+        }
+    "#]];
+
+    expected.assert_eq(res.datamodel());
+
+    res.assert_warning("Could not determine the types for the following fields.");
+    res.assert_warning_code(103);
+    res.assert_warning_affected(&json!([{
+        "model": "A",
+        "field": "age"
+    }]));
 }
