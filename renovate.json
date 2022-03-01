@@ -12,5 +12,11 @@
     "after 10pm every weekday",
     "before 5am every weekday",
     "every weekend"
-  ]
+  ],
+  "separateMinorPatch": true,
+  "packageRules": [{
+    "matchFiles": ["docker-compose.yml"],
+    "matchUpdateTypes": ["minor", "major"],
+    "enabled": false
+  }]
 }
