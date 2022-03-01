@@ -83,6 +83,24 @@ impl SqlRenderer for PostgresFlavour {
         }
     }
 
+    fn render_alter_primary_key(&self, tables: Pair<TableWalker<'_>>) -> Vec<String> {
+        render_step(&mut |step| {
+            step.render_statement(&mut |stmt| {
+                stmt.push_str("ALTER TABLE ");
+                stmt.push_display(&Quoted::postgres_ident(tables.previous.name()));
+                stmt.push_str(" ALTER PRIMARY KEY USING COLUMNS (");
+                let column_names = tables
+                    .next()
+                    .primary_key()
+                    .unwrap() // safe because there is a primary key to alter
+                    .column_names()
+                    .map(Quoted::postgres_ident);
+                stmt.join(", ", column_names);
+                stmt.push_str(")");
+            })
+        })
+    }
+
     fn render_rename_index(&self, indexes: Pair<&IndexWalker<'_>>) -> Vec<String> {
         vec![format!(
             "ALTER INDEX {} RENAME TO {}",
@@ -794,4 +812,52 @@ fn render_cockroach_alter_enum(alter_enum: &AlterEnum, schemas: &Pair<&SqlSchema
     }
 
     stmts
+}
+
+#[derive(Default)]
+struct StepRenderer {
+    stmts: Vec<String>,
+}
+
+impl StepRenderer {
+    fn render_statement(&mut self, f: &mut dyn FnMut(&mut StatementRenderer)) {
+        let mut stmt_renderer = Default::default();
+        f(&mut stmt_renderer);
+        self.stmts.push(stmt_renderer.statement);
+    }
+}
+
+#[derive(Default)]
+struct StatementRenderer {
+    statement: String,
+}
+
+impl StatementRenderer {
+    fn join<I, T>(&mut self, separator: &str, iter: I)
+    where
+        I: Iterator<Item = T>,
+        T: std::fmt::Display,
+    {
+        let mut iter = iter.peekable();
+        while let Some(item) = iter.next() {
+            self.push_display(&item);
+            if iter.peek().is_some() {
+                self.push_str(separator)
+            }
+        }
+    }
+
+    fn push_str(&mut self, s: &str) {
+        self.statement.push_str(s)
+    }
+
+    fn push_display(&mut self, d: &dyn std::fmt::Display) {
+        std::fmt::Write::write_fmt(&mut self.statement, format_args!("{}", d)).unwrap();
+    }
+}
+
+fn render_step(f: &mut dyn FnMut(&mut StepRenderer)) -> Vec<String> {
+    let mut renderer = Default::default();
+    f(&mut renderer);
+    renderer.stmts
 }
