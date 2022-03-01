@@ -144,8 +144,6 @@ pub async fn routes(state: State, req: Request<Body>) -> Result<Response<Body>, 
             .unwrap(),
     };
 
-    info!("Started query engine http server on {}", listener);
-    listener.accept().await?;
     let elapsed = Instant::now().duration_since(start).as_micros() as u64;
     res.headers_mut().insert("x-elapsed", elapsed.into());
 
