@@ -353,11 +353,13 @@ impl SqlRenderer for PostgresFlavour {
             for index in tables.previous().indexes() {
                 result.push(self.render_drop_index(&index));
             }
-            let column_names = columns.join(",");
 
-            result.push(format!(
-                r#"INSERT INTO "{temporary_table_name}" ({column_names}) SELECT {column_names} FROM "{table}""#
-            ));
+            if !columns.is_empty() {
+                let column_names = columns.join(",");
+                result.push(format!(
+                    r#"INSERT INTO "{temporary_table_name}" ({column_names}) SELECT {column_names} FROM "{table}""#
+                ));
+            }
 
             result.push(
                 ddl::DropTable {

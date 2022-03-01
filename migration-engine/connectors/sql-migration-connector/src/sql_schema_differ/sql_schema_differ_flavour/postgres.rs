@@ -133,7 +133,7 @@ impl SqlSchemaDifferFlavour for PostgresFlavour {
                     let is_id = columns.previous.is_single_primary_key();
 
                     is_id && matches!(type_change, Some(ColumnTypeChange::NotCastable))
-                })
+                }) || tables.dropped_columns().any(|col| col.is_single_primary_key())
             })
             .map(|t| t.table_ids());
 

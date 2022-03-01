@@ -89,7 +89,13 @@ impl SqlMigration {
                         idx,
                     ));
                 }
-                SqlMigrationStep::AlterPrimaryKey(_) => todo!(),
+                SqlMigrationStep::AlterPrimaryKey(table_id) => {
+                    drift_items.insert((
+                        DriftType::ChangedTable,
+                        self.before.table_walker_at(table_id.previous).name(),
+                        idx,
+                    ));
+                }
                 SqlMigrationStep::DropIndex { table_id, .. } => {
                     drift_items.insert((
                         DriftType::ChangedTable,
@@ -216,7 +222,12 @@ impl SqlMigration {
                         out.push_str("`\n");
                     }
                 }
-                SqlMigrationStep::AlterPrimaryKey(_table_id) => todo!(),
+                SqlMigrationStep::AlterPrimaryKey(table_id) => {
+                    let table_name = self.schemas().previous().table_walker_at(table_id.previous).name();
+                    out.push_str("   [*] Changed the primary key for `");
+                    out.push_str(table_name);
+                    out.push_str("`\n");
+                }
                 SqlMigrationStep::DropForeignKey {
                     foreign_key_index,
                     table_id,
