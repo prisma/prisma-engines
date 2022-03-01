@@ -119,16 +119,11 @@ impl<'a> ColumnWalker<'a> {
         self.column().auto_increment
     }
 
-    /// Is this column indexed?
-    pub fn is_covered_by_index(&self) -> bool {
+    /// Is this column indexed by a secondary index??
+    pub fn is_part_of_secondary_index(&self) -> bool {
         let table = self.table();
         let name = self.name();
-
         table.indexes().any(|idx| idx.contains_column(name))
-            || table
-                .primary_key()
-                .map(|pk| pk.column_names().any(|c_name| c_name == name))
-                .unwrap_or(false)
     }
 
     /// Is this column a part of the table's primary key?

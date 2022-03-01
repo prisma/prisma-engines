@@ -147,7 +147,10 @@ fn cockroach_native_type_change_riskyness(
     next: PostgresType,
     columns: Pair<ColumnWalker<'_>>,
 ) -> Option<ColumnTypeChange> {
-    let covered_by_index = columns.map(|col| col.is_covered_by_index()).as_tuple() == (&true, &true);
+    let covered_by_index = columns
+        .map(|col| col.is_part_of_secondary_index() || col.is_part_of_primary_key())
+        .as_tuple()
+        == (&true, &true);
 
     match (previous, next) {
         (PostgresType::Integer, PostgresType::Text) if !covered_by_index => Some(ColumnTypeChange::SafeCast),

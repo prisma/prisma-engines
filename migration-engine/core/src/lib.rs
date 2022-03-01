@@ -15,7 +15,6 @@ mod rpc;
 mod state;
 
 pub use self::{api::GenericApi, core_error::*, rpc::rpc_api};
-use datamodel::common::provider_names::COCKROACHDB_SOURCE_NAME;
 pub use migration_connector;
 
 use datamodel::ValidatedSchema;
@@ -23,7 +22,8 @@ use datamodel::{
     common::{
         preview_features::PreviewFeature,
         provider_names::{
-            MONGODB_SOURCE_NAME, MSSQL_SOURCE_NAME, MYSQL_SOURCE_NAME, POSTGRES_SOURCE_NAME, SQLITE_SOURCE_NAME,
+            COCKROACHDB_SOURCE_NAME, MONGODB_SOURCE_NAME, MSSQL_SOURCE_NAME, MYSQL_SOURCE_NAME, POSTGRES_SOURCE_NAME,
+            SQLITE_SOURCE_NAME,
         },
     },
     Datasource,
