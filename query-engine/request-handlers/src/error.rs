@@ -3,13 +3,17 @@ use query_core::CoreError;
 use thiserror::Error;
 
 #[derive(Debug, Error)]
+#[allow(clippy::large_enum_variant)]
 pub enum HandlerError {
     #[error("{}", _0)]
-    Core(CoreError),
+    Core(#[from] CoreError),
+
     #[error("{}", _0)]
     Configuration(String),
+
     #[error("{}", _0)]
     QueryConversion(String),
+
     #[error("Unsupported feature: {}. {}", feature_name, message)]
     UnsupportedFeature {
         feature_name: &'static str,

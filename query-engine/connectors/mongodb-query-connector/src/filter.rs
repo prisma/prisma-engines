@@ -1,7 +1,7 @@
-use crate::{join::JoinStage, IntoBson};
+use crate::{error::MongoError, join::JoinStage, IntoBson};
 use connector_interface::{
-    AggregationFilter, Filter, OneRelationIsNullFilter, QueryMode, RelationCondition, RelationFilter, ScalarCondition,
-    ScalarFilter, ScalarListFilter, ScalarProjection,
+    AggregationFilter, Filter, OneRelationIsNullFilter, QueryMode, RelationCondition, RelationFilter, ScalarCompare,
+    ScalarCondition, ScalarFilter, ScalarListFilter, ScalarProjection,
 };
 use mongodb::bson::{doc, Bson, Document, Regex};
 use prisma_models::{PrismaValue, ScalarFieldRef};
@@ -35,18 +35,19 @@ pub(crate) struct MongoRelationFilter {
 }
 
 /// Builds a MongoDB query filter from a Prisma filter.
-pub(crate) fn convert_filter(filter: Filter, invert: bool) -> crate::Result<MongoFilter> {
+pub(crate) fn convert_filter(filter: Filter, invert: bool, is_having_filter: bool) -> crate::Result<MongoFilter> {
+    let filter = fold_compounds(filter);
     let filter_pair = match filter {
-        Filter::And(filters) if invert => coerce_empty(false, "$or", filters, invert)?,
-        Filter::And(filters) => coerce_empty(true, "$and", filters, invert)?,
+        Filter::And(filters) if invert => coerce_empty(false, "$or", filters, invert, is_having_filter)?,
+        Filter::And(filters) => coerce_empty(true, "$and", filters, invert, is_having_filter)?,
 
-        Filter::Or(filters) if invert => coerce_empty(true, "$and", filters, invert)?,
-        Filter::Or(filters) => coerce_empty(false, "$or", filters, invert)?,
+        Filter::Or(filters) if invert => coerce_empty(true, "$and", filters, invert, is_having_filter)?,
+        Filter::Or(filters) => coerce_empty(false, "$or", filters, invert, is_having_filter)?,
 
-        Filter::Not(filters) if invert => coerce_empty(false, "$or", filters, !invert)?,
-        Filter::Not(filters) => coerce_empty(true, "$and", filters, !invert)?,
+        Filter::Not(filters) if invert => coerce_empty(false, "$or", filters, !invert, is_having_filter)?,
+        Filter::Not(filters) => coerce_empty(true, "$and", filters, !invert, is_having_filter)?,
 
-        Filter::Scalar(sf) => scalar_filter(sf, invert, true)?,
+        Filter::Scalar(sf) => scalar_filter(sf, invert, true, is_having_filter)?,
         Filter::Empty => MongoFilter::Scalar(doc! {}),
         Filter::ScalarList(slf) => scalar_list_filter(slf, invert)?,
         Filter::OneRelationIsNull(filter) => one_is_null(filter, invert),
@@ -59,28 +60,65 @@ pub(crate) fn convert_filter(filter: Filter, invert: bool) -> crate::Result<Mong
     Ok(filter_pair)
 }
 
-fn coerce_empty(truthy: bool, operation: &str, filters: Vec<Filter>, invert: bool) -> crate::Result<MongoFilter> {
+fn fold_compounds(filter: Filter) -> Filter {
+    match filter {
+        Filter::Scalar(ScalarFilter {
+            projection: ScalarProjection::Compound(fields),
+            condition: ScalarCondition::In(value_tuples),
+            mode: _,
+        }) if fields.len() > 1 => {
+            let mut filters = vec![];
+
+            for tuple in value_tuples {
+                let values = tuple.into_list().expect("Compounds must have associated value lists.");
+
+                let equality_filters: Vec<_> = values
+                    .into_iter()
+                    .zip(fields.iter())
+                    .map(|(value, field)| field.equals(value))
+                    .collect();
+
+                filters.push(Filter::And(equality_filters));
+            }
+
+            Filter::Or(filters)
+        }
+        _ => filter,
+    }
+}
+
+fn coerce_empty(
+    truthy: bool,
+    operation: &str,
+    filters: Vec<Filter>,
+    invert: bool,
+    is_having_filter: bool,
+) -> crate::Result<MongoFilter> {
     if filters.is_empty() {
         // We need to create a truthy or falsey expression for empty AND / OR queries.
         // _id always exists. So matching on exist/not exists creates our truthy/falsey expressions.
 
-        let doc = match (truthy, invert) {
-            (true, _) => doc! { "_id": { "$exists": 1 }},
-            (false, _) => doc! { "_id": { "$exists": 0 }},
-            // (true, true) => doc! { "_id": { "$exists": 0 }},
-            // (false, true) => doc! { "_id": { "$exists": 1 }},
+        let doc = if truthy {
+            doc! { "_id": { "$exists": 1 }}
+        } else {
+            doc! { "_id": { "$exists": 0 }}
         };
 
         Ok(MongoFilter::Scalar(doc))
     } else {
-        compound_filter(operation, filters, invert)
+        fold_filters(operation, filters, invert, is_having_filter)
     }
 }
 
-fn compound_filter(operation: &str, filters: Vec<Filter>, invert: bool) -> crate::Result<MongoFilter> {
+fn fold_filters(
+    operation: &str,
+    filters: Vec<Filter>,
+    invert: bool,
+    is_having_filter: bool,
+) -> crate::Result<MongoFilter> {
     let filters = filters
         .into_iter()
-        .map(|f| Ok(convert_filter(f, invert)?.render()))
+        .map(|f| Ok(convert_filter(f, invert, is_having_filter)?.render()))
         .collect::<crate::Result<Vec<_>>>()?;
 
     let (filters, joins) = fold_nested(filters);
@@ -98,12 +136,20 @@ fn fold_nested(nested: Vec<(Document, Vec<JoinStage>)>) -> (Vec<Document>, Vec<J
     })
 }
 
-fn scalar_filter(filter: ScalarFilter, invert: bool, include_field_wrapper: bool) -> crate::Result<MongoFilter> {
-    // Todo: Find out what Compound cases are really. (Guess: Relation fields with multi-field FK?)
+fn scalar_filter(
+    filter: ScalarFilter,
+    invert: bool,
+    include_field_wrapper: bool,
+    is_having_filter: bool,
+) -> crate::Result<MongoFilter> {
     let field = match filter.projection {
         connector_interface::ScalarProjection::Single(sf) => sf,
         connector_interface::ScalarProjection::Compound(mut c) if c.len() == 1 => c.pop().unwrap(),
-        connector_interface::ScalarProjection::Compound(_) => unimplemented!("Compound filter case."),
+        connector_interface::ScalarProjection::Compound(_) => {
+            unreachable!(
+                "Multi-field compound filter case hit when it should have been folded into normal filters previously."
+            )
+        }
     };
 
     let filter = match filter.mode {
@@ -111,8 +157,17 @@ fn scalar_filter(filter: ScalarFilter, invert: bool, include_field_wrapper: bool
         QueryMode::Insensitive => insensitive_scalar_filter(&field, filter.condition.invert(invert))?,
     };
 
+    // Explanation: Having filters can only appear in group by queries.
+    // All group by fields go into the _id key of the result document.
+    // As it is the only point where the flat scalars are contained for the group,
+    // we need to refer to the object.
+    let field_name = match is_having_filter {
+        true => format!("_id.{}", field.db_name()),
+        false => field.db_name().to_string(),
+    };
+
     if include_field_wrapper {
-        Ok(MongoFilter::Scalar(doc! { field.db_name(): filter }))
+        Ok(MongoFilter::Scalar(doc! { field_name: filter }))
     } else {
         Ok(MongoFilter::Scalar(filter))
     }
@@ -169,27 +224,27 @@ fn default_scalar_filter(field: &ScalarFieldRef, condition: ScalarCondition) -> 
             }
             _ => unimplemented!("Only equality JSON filtering is supported on MongoDB."),
         },
+        ScalarCondition::Search(_, _) => unimplemented!("Full-text search is not supported yet on MongoDB"),
+        ScalarCondition::NotSearch(_, _) => unimplemented!("Full-text search is not supported yet on MongoDB"),
     })
 }
 
 /// Insensitive filters are only reachable with TypeIdentifier::String (or UUID, which is string as well for us).
 fn insensitive_scalar_filter(field: &ScalarFieldRef, condition: ScalarCondition) -> crate::Result<Document> {
-    Ok(match condition {
-        ScalarCondition::Equals(val) => doc! { "$regex": to_regex(field, "^", val, "$", true)? },
-        ScalarCondition::NotEquals(val) => {
-            doc! { "$not": { "$regex": to_regex(field, "^", val, "$", true)? }}
-        }
+    match condition {
+        ScalarCondition::Equals(val) => Ok(doc! { "$regex": to_regex(field, "^", val, "$", true)? }),
+        ScalarCondition::NotEquals(val) => Ok(doc! { "$not": { "$regex": to_regex(field, "^", val, "$", true)? }}),
 
-        ScalarCondition::Contains(val) => doc! { "$regex": to_regex(field, ".*", val, ".*", true)? },
-        ScalarCondition::NotContains(val) => doc! { "$not": { "$regex": to_regex(field, ".*", val, ".*", true)? }},
-        ScalarCondition::StartsWith(val) => doc! { "$regex": to_regex(field, "^", val, "", true)?  },
-        ScalarCondition::NotStartsWith(val) => doc! { "$not": { "$regex": to_regex(field, "^", val, "", true)? }},
-        ScalarCondition::EndsWith(val) => doc! { "$regex": to_regex(field, "", val, "$", true)? },
-        ScalarCondition::NotEndsWith(val) => doc! { "$not": { "$regex": to_regex(field, "", val, "$", true)? }},
-        ScalarCondition::LessThan(val) => doc! { "$lt": (field, val).into_bson()? },
-        ScalarCondition::LessThanOrEquals(val) => doc! { "$lte": (field, val).into_bson()? },
-        ScalarCondition::GreaterThan(val) => doc! { "$gt": (field, val).into_bson()? },
-        ScalarCondition::GreaterThanOrEquals(val) => doc! { "$gte": (field, val).into_bson()? },
+        ScalarCondition::Contains(val) => Ok(doc! { "$regex": to_regex(field, ".*", val, ".*", true)? }),
+        ScalarCondition::NotContains(val) => Ok(doc! { "$not": { "$regex": to_regex(field, ".*", val, ".*", true)? }}),
+        ScalarCondition::StartsWith(val) => Ok(doc! { "$regex": to_regex(field, "^", val, "", true)?  }),
+        ScalarCondition::NotStartsWith(val) => Ok(doc! { "$not": { "$regex": to_regex(field, "^", val, "", true)? }}),
+        ScalarCondition::EndsWith(val) => Ok(doc! { "$regex": to_regex(field, "", val, "$", true)? }),
+        ScalarCondition::NotEndsWith(val) => Ok(doc! { "$not": { "$regex": to_regex(field, "", val, "$", true)? }}),
+        ScalarCondition::LessThan(val) => Ok(doc! { "$lt": (field, val).into_bson()? }),
+        ScalarCondition::LessThanOrEquals(val) => Ok(doc! { "$lte": (field, val).into_bson()? }),
+        ScalarCondition::GreaterThan(val) => Ok(doc! { "$gt": (field, val).into_bson()? }),
+        ScalarCondition::GreaterThanOrEquals(val) => Ok(doc! { "$gte": (field, val).into_bson()? }),
         // Todo: The nested list unpack looks like a bug somewhere.
         //       Likely join code mistakenly repacks a list into a list of PrismaValue somewhere in the core.
         ScalarCondition::In(vals) => match vals.split_first() {
@@ -203,16 +258,19 @@ fn insensitive_scalar_filter(field: &ScalarFieldRef, condition: ScalarCondition)
                     }
                 }
 
-                doc! { "$in": bson_values }
+                Ok(doc! { "$in": bson_values })
             }
 
-            _ => doc! { "$in": to_regex_list(field, "^", vals, "$", true)? },
+            _ => Ok(doc! { "$in": to_regex_list(field, "^", vals, "$", true)? }),
         },
-        ScalarCondition::NotIn(vals) => {
-            doc! { "$nin": to_regex_list(field, "^", vals, "$", true)? }
-        }
-        ScalarCondition::JsonCompare(_) => unimplemented!("JSON filtering is not yet supported on MongoDB"),
-    })
+        ScalarCondition::NotIn(vals) => Ok(doc! { "$nin": to_regex_list(field, "^", vals, "$", true)? }),
+        ScalarCondition::JsonCompare(_) => Err(MongoError::Unsupported(
+            "JSON filtering is not yet supported on MongoDB".to_string(),
+        )),
+        ScalarCondition::Search(_, _) | ScalarCondition::NotSearch(_, _) => Err(MongoError::Unsupported(
+            "Full-text search is not supported yet on MongoDB".to_string(),
+        )),
+    }
 }
 
 /// Filters available on list fields.
@@ -306,7 +364,8 @@ fn relation_filter(filter: RelationFilter, invert: bool) -> crate::Result<MongoF
 
     // Tmp condition check while mongo is getting fully tested.
     let is_empty = matches!(nested_filter, Filter::Empty);
-    let (nested_filter, nested_joins) = convert_filter(nested_filter, requires_invert(&filter.condition))?.render();
+    let (nested_filter, nested_joins) =
+        convert_filter(nested_filter, requires_invert(&filter.condition), false)?.render();
 
     let mut join_stage = JoinStage::new(from_field);
     join_stage.extend_nested(nested_joins);
@@ -375,7 +434,7 @@ fn aggregate_conditions(op: &str, filter: Filter, invert: bool) -> crate::Result
         ScalarProjection::Single(field) => field.clone(),
     };
 
-    let (filter, _) = scalar_filter(sf, invert, false)?.render();
+    let (filter, _) = scalar_filter(sf, invert, false, false)?.render();
 
     Ok(MongoFilter::Scalar(
         doc! { format!("{}_{}", op, field.db_name()): filter },

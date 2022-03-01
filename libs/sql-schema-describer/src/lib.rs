@@ -2,16 +2,6 @@
 #![allow(clippy::trivial_regex)] // this is allowed, because we want to do CoW replaces and these regexes will grow.
 #![allow(clippy::match_bool)] // we respectfully disagree that it makes the code less readable.
 
-pub use error::{DescriberError, DescriberErrorKind, DescriberResult};
-
-use once_cell::sync::Lazy;
-use prisma_value::PrismaValue;
-use regex::Regex;
-use serde::{Deserialize, Serialize};
-use std::fmt::Debug;
-use walkers::{EnumWalker, TableWalker, UserDefinedTypeWalker, ViewWalker};
-
-pub mod getters;
 pub mod mssql;
 pub mod mysql;
 pub mod postgres;
@@ -20,7 +10,19 @@ pub mod walkers;
 
 pub(crate) mod common;
 mod error;
+mod getters;
+mod ids;
 mod parsers;
+
+use once_cell::sync::Lazy;
+use prisma_value::PrismaValue;
+use regex::Regex;
+use serde::{Deserialize, Serialize};
+use std::fmt::{self, Debug};
+use walkers::{EnumWalker, TableWalker, UserDefinedTypeWalker, ViewWalker};
+
+pub use error::{DescriberError, DescriberErrorKind, DescriberResult};
+pub use ids::{ColumnId, TableId};
 
 /// A database description connector.
 #[async_trait::async_trait]
@@ -51,13 +53,13 @@ pub struct SqlSchema {
     /// The schema's enums.
     pub enums: Vec<Enum>,
     /// The schema's sequences, unique to Postgres.
-    pub sequences: Vec<Sequence>,
+    sequences: Vec<Sequence>,
     /// The schema's views,
-    pub views: Vec<View>,
+    views: Vec<View>,
     /// The stored procedures.
-    pub procedures: Vec<Procedure>,
+    procedures: Vec<Procedure>,
     /// The user-defined types procedures.
-    pub user_defined_types: Vec<UserDefinedType>,
+    user_defined_types: Vec<UserDefinedType>,
 }
 
 impl SqlSchema {
@@ -101,6 +103,20 @@ impl SqlSchema {
         )
     }
 
+    pub fn iter_tables(&self) -> impl Iterator<Item = (TableId, &Table)> {
+        self.tables
+            .iter()
+            .enumerate()
+            .map(|(table_index, table)| (TableId(table_index as u32), table))
+    }
+
+    pub fn iter_tables_mut(&mut self) -> impl Iterator<Item = (TableId, &mut Table)> {
+        self.tables
+            .iter_mut()
+            .enumerate()
+            .map(|(table_index, table)| (TableId(table_index as u32), table))
+    }
+
     pub fn table(&self, name: &str) -> core::result::Result<&Table, String> {
         match self.tables.iter().find(|t| t.name == name) {
             Some(t) => Ok(t),
@@ -109,7 +125,7 @@ impl SqlSchema {
     }
 
     pub fn table_bang(&self, name: &str) -> &Table {
-        self.table(&name).unwrap()
+        self.table(name).unwrap()
     }
 
     /// Get a sequence.
@@ -122,7 +138,7 @@ impl SqlSchema {
     }
 
     pub fn table_walkers(&self) -> impl Iterator<Item = TableWalker<'_>> {
-        (0..self.tables.len()).map(move |table_index| TableWalker::new(self, table_index))
+        (0..self.tables.len()).map(move |table_index| TableWalker::new(self, TableId(table_index as u32)))
     }
 
     pub fn view_walkers(&self) -> impl Iterator<Item = ViewWalker<'_>> {
@@ -182,23 +198,21 @@ impl Table {
 
     pub fn is_part_of_primary_key(&self, column: &str) -> bool {
         match &self.primary_key {
-            Some(pk) => pk.columns.contains(&column.to_string()),
+            Some(pk) => pk.columns.iter().any(|c| c.name() == column),
             None => false,
         }
     }
 
-    pub fn primary_key_columns(&self) -> Vec<String> {
+    pub fn primary_key_columns(&self) -> impl Iterator<Item = &PrimaryKeyColumn> + '_ {
         match &self.primary_key {
-            Some(pk) => pk.columns.clone(),
-            None => Vec::new(),
+            Some(pk) => pk.columns.iter(),
+            None => [].iter(),
         }
     }
 
     pub fn is_column_unique(&self, column_name: &str) -> bool {
         self.indices.iter().any(|index| {
-            index.tpe == IndexType::Unique
-                && index.columns.len() == 1
-                && index.columns.contains(&column_name.to_owned())
+            index.is_unique() && index.columns.len() == 1 && index.columns.iter().any(|c| c.name() == column_name)
         })
     }
 
@@ -211,17 +225,92 @@ impl Table {
 }
 
 /// The type of an index.
-#[derive(Serialize, Deserialize, PartialEq, Debug, Clone)]
+#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, Copy)]
 pub enum IndexType {
     /// Unique type.
     Unique,
     /// Normal type.
     Normal,
+    /// Fulltext type.
+    Fulltext,
 }
 
 impl IndexType {
     pub fn is_unique(&self) -> bool {
         matches!(self, IndexType::Unique)
+    }
+}
+
+#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, Copy)]
+pub enum SQLIndexAlgorithm {
+    BTree,
+    Hash,
+}
+
+impl AsRef<str> for SQLIndexAlgorithm {
+    fn as_ref(&self) -> &str {
+        match self {
+            Self::BTree => "BTREE",
+            Self::Hash => "HASH",
+        }
+    }
+}
+
+impl fmt::Display for SQLIndexAlgorithm {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.write_str(self.as_ref())
+    }
+}
+
+/// The sort order of an index.
+#[derive(Serialize, Deserialize, PartialEq, Debug, Copy, Clone)]
+pub enum SQLSortOrder {
+    Asc,
+    Desc,
+}
+
+impl Default for SQLSortOrder {
+    fn default() -> Self {
+        Self::Asc
+    }
+}
+
+impl AsRef<str> for SQLSortOrder {
+    fn as_ref(&self) -> &str {
+        match self {
+            SQLSortOrder::Asc => "ASC",
+            SQLSortOrder::Desc => "DESC",
+        }
+    }
+}
+
+impl fmt::Display for SQLSortOrder {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.write_str(self.as_ref())
+    }
+}
+
+#[derive(Default, Serialize, Deserialize, PartialEq, Debug, Clone)]
+pub struct IndexColumn {
+    pub name: String,
+    pub sort_order: Option<SQLSortOrder>,
+    pub length: Option<u32>,
+}
+
+impl IndexColumn {
+    pub fn new(name: impl ToString) -> Self {
+        Self {
+            name: name.to_string(),
+            ..Default::default()
+        }
+    }
+
+    pub fn name(&self) -> &str {
+        &self.name
+    }
+
+    pub fn set_sort_order(&mut self, sort_order: SQLSortOrder) {
+        self.sort_order = Some(sort_order);
     }
 }
 
@@ -231,14 +320,24 @@ pub struct Index {
     /// Index name.
     pub name: String,
     /// Index columns.
-    pub columns: Vec<String>,
+    pub columns: Vec<IndexColumn>,
     /// Type of index.
     pub tpe: IndexType,
+    /// BTree or Hash
+    pub algorithm: Option<SQLIndexAlgorithm>,
 }
 
 impl Index {
     pub fn is_unique(&self) -> bool {
         self.tpe == IndexType::Unique
+    }
+
+    pub fn is_fulltext(&self) -> bool {
+        self.tpe == IndexType::Fulltext
+    }
+
+    pub fn column_names(&self) -> impl ExactSizeIterator<Item = &str> + '_ {
+        self.columns.iter().map(|c| c.name())
     }
 }
 
@@ -260,11 +359,35 @@ pub struct UserDefinedType {
     pub definition: Option<String>,
 }
 
+#[derive(Default, Serialize, Deserialize, Debug, PartialEq, Clone)]
+pub struct PrimaryKeyColumn {
+    pub name: String,
+    pub length: Option<u32>,
+    pub sort_order: Option<SQLSortOrder>,
+}
+
+impl PrimaryKeyColumn {
+    pub fn new(name: impl ToString) -> Self {
+        Self {
+            name: name.to_string(),
+            ..Default::default()
+        }
+    }
+
+    pub fn name(&self) -> &str {
+        &self.name
+    }
+
+    pub fn set_sort_order(&mut self, sort_order: SQLSortOrder) {
+        self.sort_order = Some(sort_order);
+    }
+}
+
 /// The primary key of a table.
 #[derive(Serialize, Deserialize, PartialEq, Debug, Clone)]
 pub struct PrimaryKey {
     /// Columns.
-    pub columns: Vec<String>,
+    pub columns: Vec<PrimaryKeyColumn>,
     /// The sequence optionally seeding this primary key.
     pub sequence: Option<Sequence>,
     /// The name of the primary key constraint, when available.
@@ -273,7 +396,11 @@ pub struct PrimaryKey {
 
 impl PrimaryKey {
     pub fn is_single_primary_key(&self, column: &str) -> bool {
-        self.columns.len() == 1 && self.columns.iter().any(|col| col == column)
+        self.columns.len() == 1 && self.columns.iter().any(|col| col.name() == column)
+    }
+
+    pub fn column_names(&self) -> impl ExactSizeIterator<Item = &str> + '_ {
+        self.columns.iter().map(|c| c.name())
     }
 }
 
@@ -521,8 +648,8 @@ pub enum DefaultKind {
 }
 
 impl DefaultValue {
-    pub fn db_generated(val: impl ToString) -> Self {
-        Self::new(DefaultKind::DbGenerated(val.to_string()))
+    pub fn db_generated(val: impl Into<String>) -> Self {
+        Self::new(DefaultKind::DbGenerated(val.into()))
     }
 
     pub fn now() -> Self {
@@ -546,6 +673,10 @@ impl DefaultValue {
 
     pub fn kind(&self) -> &DefaultKind {
         &self.kind
+    }
+
+    pub fn into_kind(self) -> DefaultKind {
+        self.kind
     }
 
     pub fn set_constraint_name(&mut self, name: impl ToString) {
@@ -577,6 +708,11 @@ impl DefaultValue {
 
     pub fn is_db_generated(&self) -> bool {
         matches!(self.kind, DefaultKind::DbGenerated(_))
+    }
+
+    pub fn with_constraint_name(mut self, constraint_name: Option<String>) -> Self {
+        self.constraint_name = constraint_name;
+        self
     }
 }
 

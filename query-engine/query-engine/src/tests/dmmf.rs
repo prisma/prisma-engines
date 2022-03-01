@@ -4,7 +4,7 @@ use crate::{
     PrismaResult,
 };
 use datamodel_connector::ConnectorCapabilities;
-use prisma_models::DatamodelConverter;
+use prisma_models::InternalDataModelBuilder;
 use query_core::{schema_builder, BuildMode, QuerySchema};
 use serial_test::serial;
 use std::sync::Arc;
@@ -12,21 +12,21 @@ use std::sync::Arc;
 pub fn get_query_schema(datamodel_string: &str) -> (QuerySchema, datamodel::dml::Datamodel) {
     let config = datamodel::parse_configuration(datamodel_string).unwrap();
     let dm = datamodel::parse_datamodel(datamodel_string).unwrap().subject;
+    let datasource = config.subject.datasources.first();
 
-    let capabilities = match config.subject.datasources.first() {
-        Some(ds) => ds.capabilities(),
-        None => ConnectorCapabilities::empty(),
-    };
+    let capabilities = datasource
+        .map(|ds| ds.capabilities())
+        .unwrap_or_else(ConnectorCapabilities::empty);
+    let referential_integrity = datasource.map(|ds| ds.referential_integrity()).unwrap_or_default();
 
-    let internal_dm_template = DatamodelConverter::convert(&dm);
-    let internal_ref = internal_dm_template.build("db".to_owned());
-
+    let internal_ref = InternalDataModelBuilder::from(&dm).build("db".to_owned());
     let schema = schema_builder::build(
         internal_ref,
         BuildMode::Modern,
         false,
         capabilities,
-        config.subject.preview_features().cloned().collect(),
+        config.subject.preview_features().iter().collect(),
+        referential_integrity,
     );
 
     (schema, dm)
@@ -117,7 +117,8 @@ fn test_dmmf_cli_command(schema: &str) -> PrismaResult<()> {
 
     let cli_cmd = CliCommand::from_opt(&prisma_opt)?.unwrap();
 
-    let result = test_setup::runtime::run_with_tokio(cli_cmd.execute());
+    let runtime = tokio::runtime::Runtime::new().unwrap();
+    let result = runtime.block_on(cli_cmd.execute());
     result?;
 
     Ok(())

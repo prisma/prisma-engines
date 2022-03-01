@@ -1,4 +1,4 @@
-use crate::common::{Indented, IteratorJoin, SQL_INDENTATION};
+use crate::common::{Indented, IndexColumn, IteratorJoin, SQL_INDENTATION};
 use std::{borrow::Cow, fmt::Display};
 
 struct Ident<'a>(&'a str);
@@ -111,7 +111,7 @@ impl<'a> Display for ForeignKey<'a> {
 #[derive(Debug)]
 pub enum ForeignKeyAction {
     Cascade,
-    DoNothing,
+    NoAction,
     Restrict,
     SetDefault,
     SetNull,
@@ -122,7 +122,7 @@ impl Display for ForeignKeyAction {
         let s = match self {
             ForeignKeyAction::Cascade => "CASCADE",
             ForeignKeyAction::Restrict => "RESTRICT",
-            ForeignKeyAction::DoNothing => "DO NOTHING",
+            ForeignKeyAction::NoAction => "NO ACTION",
             ForeignKeyAction::SetNull => "SET NULL",
             ForeignKeyAction::SetDefault => "SET DEFAULT",
         };
@@ -150,6 +150,8 @@ impl Display for Column<'_> {
 
         if self.not_null {
             f.write_str(" NOT NULL")?;
+        } else {
+            f.write_str(" NULL")?;
         }
 
         if self.auto_increment {
@@ -176,22 +178,45 @@ impl Display for Column<'_> {
 
 #[derive(Debug, Default)]
 pub struct CreateIndex<'a> {
-    pub unique: bool,
+    pub r#type: IndexType,
     pub index_name: Cow<'a, str>,
-    pub on: (Cow<'a, str>, Vec<Cow<'a, str>>),
+    pub on: (Cow<'a, str>, Vec<IndexColumn<'a>>),
 }
 
 impl Display for CreateIndex<'_> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(
-            f,
-            "CREATE {maybe_unique}INDEX `{index_name}` ON `{table_name}`(",
-            maybe_unique = if self.unique { "UNIQUE " } else { "" },
-            index_name = self.index_name,
-            table_name = self.on.0,
-        )?;
+        f.write_str("CREATE ")?;
 
-        self.on.1.iter().map(|s| Ident(s)).join(", ", f)?;
+        match self.r#type {
+            IndexType::Normal => (),
+            IndexType::Unique => f.write_str("UNIQUE ")?,
+            IndexType::Fulltext => f.write_str("FULLTEXT ")?,
+        }
+
+        f.write_str("INDEX `")?;
+        f.write_str(&self.index_name)?;
+        f.write_str("` ON `")?;
+        f.write_str(&self.on.0)?;
+        f.write_str("`(")?;
+
+        self.on
+            .1
+            .iter()
+            .map(|s| {
+                let mut rendered = Ident(&s.name).to_string();
+
+                if let Some(length) = s.length {
+                    rendered.push_str(&format!("({})", length));
+                }
+
+                if let Some(sort_order) = s.sort_order {
+                    rendered.push(' ');
+                    rendered.push_str(sort_order.as_ref());
+                }
+
+                rendered
+            })
+            .join(", ", f)?;
 
         write!(f, ")")
     }
@@ -202,7 +227,7 @@ pub struct CreateTable<'a> {
     pub table_name: Cow<'a, str>,
     pub columns: Vec<Column<'a>>,
     pub indexes: Vec<IndexClause<'a>>,
-    pub primary_key: Vec<Cow<'a, str>>,
+    pub primary_key: Vec<IndexColumn<'a>>,
     pub default_character_set: Option<Cow<'a, str>>,
     pub collate: Option<Cow<'a, str>>,
 }
@@ -228,7 +253,23 @@ impl Display for CreateTable<'_> {
             }
             f.write_str(SQL_INDENTATION)?;
             f.write_str("PRIMARY KEY (")?;
-            self.primary_key.iter().map(|col| Ident(col.as_ref())).join(", ", f)?;
+            self.primary_key
+                .iter()
+                .map(|col| {
+                    let mut rendered = format!("{}", Ident(&col.name));
+
+                    if let Some(length) = col.length {
+                        rendered.push_str(&format!("({})", length));
+                    }
+
+                    if let Some(sort_order) = col.sort_order {
+                        rendered.push(' ');
+                        rendered.push_str(sort_order.as_ref());
+                    }
+
+                    rendered
+                })
+                .join(", ", f)?;
             f.write_str(")")?;
         }
 
@@ -271,17 +312,32 @@ impl Display for DropIndex<'_> {
     }
 }
 
+#[derive(Debug, Copy, Clone)]
+pub enum IndexType {
+    Normal,
+    Unique,
+    Fulltext,
+}
+
+impl Default for IndexType {
+    fn default() -> Self {
+        Self::Normal
+    }
+}
+
 #[derive(Debug)]
 pub struct IndexClause<'a> {
     pub index_name: Option<Cow<'a, str>>,
-    pub unique: bool,
-    pub columns: Vec<Cow<'a, str>>,
+    pub r#type: IndexType,
+    pub columns: Vec<IndexColumn<'a>>,
 }
 
 impl Display for IndexClause<'_> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        if self.unique {
-            f.write_str("UNIQUE ")?;
+        match self.r#type {
+            IndexType::Normal => (),
+            IndexType::Unique => f.write_str("UNIQUE ")?,
+            IndexType::Fulltext => f.write_str("FULLTEXT ")?,
         }
 
         f.write_str("INDEX ")?;
@@ -292,7 +348,23 @@ impl Display for IndexClause<'_> {
 
         f.write_str("(")?;
 
-        self.columns.iter().map(|col| Ident(col.as_ref())).join(", ", f)?;
+        self.columns
+            .iter()
+            .map(|col| {
+                let mut rendered = format!("{}", Ident(col.name.as_ref()));
+
+                if let Some(length) = col.length {
+                    rendered.push_str(&format!("({})", length));
+                };
+
+                if let Some(sort_order) = col.sort_order {
+                    rendered.push(' ');
+                    rendered.push_str(sort_order.as_ref());
+                };
+
+                rendered
+            })
+            .join(", ", f)?;
 
         f.write_str(")")
     }
@@ -310,14 +382,14 @@ mod tests {
             changes: vec![AlterTableClause::AddForeignKey(ForeignKey {
                 constrained_columns: vec!["bestFriendId".into()],
                 constraint_name: Some("myfk".into()),
-                on_delete: Some(ForeignKeyAction::DoNothing),
+                on_delete: Some(ForeignKeyAction::NoAction),
                 on_update: Some(ForeignKeyAction::SetNull),
                 referenced_columns: vec!["id".into()],
                 referenced_table: "Dog".into(),
             })],
         };
 
-        let expected = "ALTER TABLE `Cat` ADD CONSTRAINT `myfk` FOREIGN KEY (`bestFriendId`) REFERENCES `Dog`(`id`) ON DELETE DO NOTHING ON UPDATE SET NULL";
+        let expected = "ALTER TABLE `Cat` ADD CONSTRAINT `myfk` FOREIGN KEY (`bestFriendId`) REFERENCES `Dog`(`id`) ON DELETE NO ACTION ON UPDATE SET NULL";
 
         assert_eq!(alter_table.to_string(), expected);
     }
@@ -326,15 +398,26 @@ mod tests {
     fn full_create_table() {
         let stmt = CreateTable {
             table_name: "Cat".into(),
-            columns: vec![Column {
-                column_type: "INTEGER".into(),
-                column_name: "id".into(),
-                not_null: false,
-                default: None,
-                auto_increment: true,
-                primary_key: true,
-                references: None,
-            }],
+            columns: vec![
+                Column {
+                    column_type: "INTEGER".into(),
+                    column_name: "id".into(),
+                    not_null: false,
+                    default: None,
+                    auto_increment: true,
+                    primary_key: true,
+                    references: None,
+                },
+                Column {
+                    column_type: "BINARY(16)".into(),
+                    column_name: "test".into(),
+                    not_null: true,
+                    default: Some("(uuid_to_bin(uuid()))".into()),
+                    auto_increment: false,
+                    primary_key: false,
+                    references: None,
+                },
+            ],
             indexes: vec![],
             default_character_set: Some("utf8mb4".into()),
             collate: Some("utf8mb4_unicode_ci".into()),
@@ -344,7 +427,8 @@ mod tests {
         let expected = indoc!(
             r#"
             CREATE TABLE `Cat` (
-                `id` INTEGER AUTO_INCREMENT PRIMARY KEY
+                `id` INTEGER NULL AUTO_INCREMENT PRIMARY KEY,
+                `test` BINARY(16) NOT NULL DEFAULT (uuid_to_bin(uuid()))
             ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci
             "#,
         )

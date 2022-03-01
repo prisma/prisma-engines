@@ -1,10 +1,31 @@
 use crate::{
     InterpreterError, QueryGraphBuilderError, QueryGraphError, QueryParserError, QueryParserErrorKind,
-    RelationViolation,
+    RelationViolation, TransactionError,
 };
 use connector::error::ConnectorError;
 use prisma_models::DomainError;
 use thiserror::Error;
+
+#[derive(Debug, Error)]
+#[error(
+    "Error converting field \"{field}\" of expected non-nullable type \"{expected_type}\", found incompatible value of \"{found}\"."
+)]
+
+pub struct FieldConversionError {
+    pub field: String,
+    pub expected_type: String,
+    pub found: String,
+}
+
+impl FieldConversionError {
+    pub fn create(field: String, expected_type: String, found: String) -> CoreError {
+        CoreError::FieldConversionError(Self {
+            field,
+            expected_type,
+            found,
+        })
+    }
+}
 
 // TODO: Cleanup unused errors after refactorings.
 #[derive(Debug, Error)]
@@ -38,6 +59,12 @@ pub enum CoreError {
 
     #[error("{}", _0)]
     ConfigurationError(String),
+
+    #[error("{}", _0)]
+    TransactionError(#[from] TransactionError),
+
+    #[error("{}", _0)]
+    FieldConversionError(#[from] FieldConversionError),
 }
 
 impl CoreError {
@@ -100,6 +127,12 @@ impl From<connection_string::Error> for CoreError {
 impl From<CoreError> for user_facing_errors::Error {
     fn from(err: CoreError) -> user_facing_errors::Error {
         match err {
+            CoreError::TransactionError(err) => {
+                user_facing_errors::KnownError::new(user_facing_errors::query_engine::InteractiveTransactionError {
+                    error: err.to_string(),
+                })
+                .into()
+            }
             CoreError::ConnectorError(ConnectorError {
                 user_facing_error: Some(user_facing_error),
                 ..
@@ -197,6 +230,16 @@ impl From<CoreError> for user_facing_errors::Error {
                     .into(),
                 }
             }
+            CoreError::FieldConversionError(FieldConversionError {
+                field,
+                expected_type,
+                found,
+            }) => user_facing_errors::KnownError::new(user_facing_errors::query_engine::MissingFieldsInModel {
+                field,
+                expected_type,
+                found,
+            })
+            .into(),
             _ => user_facing_errors::Error::from_dyn_error(&err),
         }
     }

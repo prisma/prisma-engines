@@ -31,13 +31,4 @@ impl NativeTypeInstance {
         );
         serde_json::from_value(self.serialized_native_type.clone()).expect(&error_msg)
     }
-
-    pub fn render(&self) -> String {
-        if self.args.is_empty() {
-            self.name.to_string()
-        } else {
-            let args_as_strings: Vec<String> = self.args.iter().map(|a| a.to_string()).collect();
-            format!("{}({})", self.name, args_as_strings.join(","))
-        }
-    }
 }

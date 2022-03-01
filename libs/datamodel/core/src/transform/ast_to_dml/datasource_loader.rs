@@ -1,52 +1,43 @@
 use super::{
     super::helpers::{ValueListValidator, ValueValidator},
     builtin_datasource_providers::{
-        MongoDbDatasourceProvider, MsSqlDatasourceProvider, MySqlDatasourceProvider, PostgresDatasourceProvider,
-        SqliteDatasourceProvider,
+        CockroachDbDatasourceProvider, MongoDbDatasourceProvider, MsSqlDatasourceProvider, MySqlDatasourceProvider,
+        PostgresDatasourceProvider, SqliteDatasourceProvider,
     },
     datasource_provider::DatasourceProvider,
 };
 use crate::{
-    ast::SourceConfig,
+    ast::{self, SourceConfig, Span},
+    common::{preview_features::PreviewFeature, provider_names::*},
+    configuration::StringFromEnvVar,
     diagnostics::{DatamodelError, Diagnostics},
-};
-use crate::{ast::Span, common::preview_features::PreviewFeature, configuration::StringFromEnvVar};
-use crate::{
-    ast::{self},
     Datasource,
 };
-use std::collections::{HashMap, HashSet};
+use datamodel_connector::ReferentialIntegrity;
+use enumflags2::BitFlags;
+use std::{borrow::Cow, collections::HashMap, convert::TryFrom};
 
 const PREVIEW_FEATURES_KEY: &str = "previewFeatures";
 const SHADOW_DATABASE_URL_KEY: &str = "shadowDatabaseUrl";
 const URL_KEY: &str = "url";
 
 /// Is responsible for loading and validating Datasources defined in an AST.
-pub struct DatasourceLoader {
-    source_definitions: Vec<Box<dyn DatasourceProvider>>,
-}
+pub(crate) struct DatasourceLoader;
 
 impl DatasourceLoader {
-    #[allow(clippy::new_without_default)]
-    pub fn new() -> Self {
-        Self {
-            source_definitions: get_builtin_datasource_providers(),
-        }
-    }
-
     /// Loads all datasources from the provided schema AST.
     /// - `ignore_datasource_urls`: datasource URLs are not parsed. They are replaced with dummy values.
     /// - `datasource_url_overrides`: datasource URLs are not parsed and overridden with the provided ones.
     pub fn load_datasources_from_ast(
         &self,
         ast_schema: &ast::SchemaAst,
-        preview_features: &HashSet<&PreviewFeature>,
+        preview_features: BitFlags<PreviewFeature>,
         diagnostics: &mut Diagnostics,
     ) -> Vec<Datasource> {
         let mut sources = Vec::new();
 
         for src in ast_schema.sources() {
-            if let Some(source) = self.lift_datasource(&src, preview_features, diagnostics) {
+            if let Some(source) = self.lift_datasource(src, preview_features, diagnostics) {
                 sources.push(source)
             }
         }
@@ -54,7 +45,7 @@ impl DatasourceLoader {
         if sources.len() > 1 {
             for src in ast_schema.sources() {
                 diagnostics.push_error(DatamodelError::new_source_validation_error(
-                    &"You defined more than one datasource. This is not allowed yet because support for multiple databases has not been implemented yet.".to_string(),
+                    "You defined more than one datasource. This is not allowed yet because support for multiple databases has not been implemented yet.",
                     &src.name.name,
                     src.span,
                 ));
@@ -67,17 +58,17 @@ impl DatasourceLoader {
     fn lift_datasource(
         &self,
         ast_source: &ast::SourceConfig,
-        preview_features: &HashSet<&PreviewFeature>,
+        preview_features: BitFlags<PreviewFeature>,
         diagnostics: &mut Diagnostics,
     ) -> Option<Datasource> {
         let source_name = &ast_source.name.name;
-        let args: HashMap<_, _> = ast_source
+        let mut args: HashMap<_, _> = ast_source
             .properties
             .iter()
-            .map(|arg| (arg.name.name.as_str(), ValueValidator::new(&arg.value)))
+            .map(|arg| (arg.name.name.as_str(), (arg.span, ValueValidator::new(&arg.value))))
             .collect();
 
-        let provider_arg = match args.get("provider") {
+        let (_, provider_arg) = match args.remove("provider") {
             Some(provider) => provider,
             None => {
                 diagnostics.push_error(DatamodelError::new_source_argument_not_found_error(
@@ -90,10 +81,8 @@ impl DatasourceLoader {
         };
 
         if provider_arg.is_from_env() {
-            diagnostics.push_error(DatamodelError::new_functional_evaluation_error(
-                &"A datasource must not use the env() function in the provider argument.".to_string(),
-                ast_source.span,
-            ));
+            let msg = Cow::Borrowed("A datasource must not use the env() function in the provider argument.");
+            diagnostics.push_error(DatamodelError::new_functional_evaluation_error(msg, ast_source.span));
             return None;
         }
 
@@ -117,7 +106,7 @@ impl DatasourceLoader {
             Some((provider, _)) => provider,
         };
 
-        let url_arg = match args.get(URL_KEY) {
+        let (_, url_arg) = match args.remove(URL_KEY) {
             Some(url_arg) => url_arg,
             None => {
                 diagnostics.push_error(DatamodelError::new_source_argument_not_found_error(
@@ -129,7 +118,7 @@ impl DatasourceLoader {
             }
         };
 
-        let url = match url_arg.as_str_from_env() {
+        let url = match StringFromEnvVar::try_from(url_arg.value) {
             Ok(str_from_env_var) => str_from_env_var,
             Err(err) => {
                 diagnostics.push_error(err);
@@ -137,18 +126,14 @@ impl DatasourceLoader {
             }
         };
 
-        let shadow_database_url_arg = args.get(SHADOW_DATABASE_URL_KEY);
+        let shadow_database_url_arg = args.remove(SHADOW_DATABASE_URL_KEY);
 
         let shadow_database_url: Option<(StringFromEnvVar, Span)> =
-            if let Some(shadow_database_url_arg) = shadow_database_url_arg.as_ref() {
-                match shadow_database_url_arg.as_str_from_env() {
+            if let Some((_, shadow_database_url_arg)) = shadow_database_url_arg.as_ref() {
+                match StringFromEnvVar::try_from(shadow_database_url_arg.value) {
                     Ok(shadow_database_url) => Some(shadow_database_url)
                         .filter(|s| !s.as_literal().map(|lit| lit.is_empty()).unwrap_or(false))
                         .map(|url| (url, shadow_database_url_arg.span())),
-
-                    // We intentionally ignore the shadow database URL if it is defined in an env var that is missing.
-                    Err(DatamodelError::EnvironmentFunctionalEvaluationError { .. }) => None,
-
                     Err(err) => {
                         diagnostics.push_error(err);
                         None
@@ -161,17 +146,63 @@ impl DatasourceLoader {
         preview_features_guardrail(&args, diagnostics);
 
         let documentation = ast_source.documentation.as_ref().map(|comment| comment.text.clone());
+        let referential_integrity = get_referential_integrity(&args, preview_features, ast_source, diagnostics);
 
-        let datasource_provider = match self.get_datasource_provider(&provider) {
-            Some(provider) => provider,
-            None => {
+        let datasource_provider: &'static dyn DatasourceProvider = match provider {
+            p if p == MYSQL_SOURCE_NAME => &MySqlDatasourceProvider,
+            p if p == POSTGRES_SOURCE_NAME || p == POSTGRES_SOURCE_NAME_HEROKU => &PostgresDatasourceProvider,
+            p if p == SQLITE_SOURCE_NAME => &SqliteDatasourceProvider,
+            p if p == MSSQL_SOURCE_NAME => &MsSqlDatasourceProvider,
+            p if p == MONGODB_SOURCE_NAME => &MongoDbDatasourceProvider,
+            p if p == COCKROACHDB_SOURCE_NAME && preview_features.contains(PreviewFeature::Cockroachdb) => {
+                &CockroachDbDatasourceProvider
+            }
+            _ => {
                 diagnostics.push_error(DatamodelError::new_datasource_provider_not_known_error(
                     provider,
                     provider_arg.span(),
                 ));
+
                 return None;
             }
         };
+
+        let active_connector = datasource_provider.connector();
+
+        if let Some(integrity) = referential_integrity {
+            if !active_connector
+                .allowed_referential_integrity_settings()
+                .contains(integrity)
+            {
+                let span = args
+                    .get("referentialIntegrity")
+                    .map(|(_, v)| v.span())
+                    .unwrap_or_else(Span::empty);
+
+                let supported_values = active_connector
+                    .allowed_referential_integrity_settings()
+                    .iter()
+                    .map(|v| format!(r#""{}""#, v))
+                    .collect::<Vec<_>>()
+                    .join(", ");
+
+                let message = format!(
+                    "Invalid referential integrity setting: \"{}\". Supported values: {}",
+                    integrity, supported_values,
+                );
+
+                let error = DatamodelError::new_source_validation_error(&message, "referentialIntegrity", span);
+
+                diagnostics.push_error(error);
+            }
+        }
+
+        // we handle these elsewhere
+        let _ = args.remove("previewFeatures");
+        let _ = args.remove("referentialIntegrity");
+        for (name, (span, _)) in args.into_iter() {
+            diagnostics.push_error(DatamodelError::new_property_not_known_error(name, span));
+        }
 
         Some(Datasource {
             name: source_name.to_string(),
@@ -180,90 +211,76 @@ impl DatasourceLoader {
             url,
             url_span: url_arg.span(),
             documentation,
-            active_connector: datasource_provider.connector(),
+            active_connector,
             shadow_database_url,
-            planet_scale_mode: get_planet_scale_mode_arg(&args, preview_features, ast_source, diagnostics),
+            referential_integrity,
         })
     }
-
-    fn get_datasource_provider(&self, provider: &str) -> Option<&dyn DatasourceProvider> {
-        self.source_definitions
-            .iter()
-            .find(|sd| sd.is_provider(provider))
-            .map(|b| b.as_ref())
-    }
 }
 
-fn get_builtin_datasource_providers() -> Vec<Box<dyn DatasourceProvider>> {
-    vec![
-        Box::new(MySqlDatasourceProvider::new()),
-        Box::new(PostgresDatasourceProvider::new()),
-        Box::new(SqliteDatasourceProvider::new()),
-        Box::new(MsSqlDatasourceProvider::new()),
-        Box::new(MongoDbDatasourceProvider::new()),
-    ]
-}
-
-const PLANET_SCALE_PREVIEW_FEATURE_ERR: &str = r#"
-The `planetScaleMode` option can only be set if the preview feature is enabled in a generator block.
+const REFERENTIAL_INTEGRITY_PREVIEW_FEATURE_ERR: &str = r#"
+The `referentialIntegrity` option can only be set if the preview feature is enabled in a generator block.
 
 Example:
 
 generator client {
     provider = "prisma-client-js"
-    previewFeatures = ["planetScaleMode"]
+    previewFeatures = ["referentialIntegrity"]
 }
 "#;
 
-fn get_planet_scale_mode_arg(
-    args: &HashMap<&str, ValueValidator>,
-    preview_features: &HashSet<&PreviewFeature>,
+fn get_referential_integrity(
+    args: &HashMap<&str, (Span, ValueValidator<'_>)>,
+    preview_features: BitFlags<PreviewFeature>,
     source: &SourceConfig,
     diagnostics: &mut Diagnostics,
-) -> bool {
-    let arg = args.get("planetScaleMode");
+) -> Option<ReferentialIntegrity> {
+    args.get("referentialIntegrity").and_then(|(span, value)| {
+        if !preview_features.contains(PreviewFeature::ReferentialIntegrity) {
+            diagnostics.push_error(DatamodelError::new_source_validation_error(
+                REFERENTIAL_INTEGRITY_PREVIEW_FEATURE_ERR,
+                &source.name.name,
+                *span,
+            ));
 
-    match arg {
-        None => false,
-        Some(value) => {
-            let mode_enabled = match value.as_bool() {
-                Ok(mode_enabled) => mode_enabled,
-                Err(err) => {
-                    diagnostics.push_error(err);
-                    false
+            None
+        } else {
+            match value.as_str() {
+                Ok("prisma") => Some(ReferentialIntegrity::Prisma),
+                Ok("foreignKeys") => Some(ReferentialIntegrity::ForeignKeys),
+                Ok(s) => {
+                    let message = format!(
+                        "Invalid referential integrity setting: \"{}\". Supported values: \"prisma\", \"foreignKeys\"",
+                        s
+                    );
+
+                    let error =
+                        DatamodelError::new_source_validation_error(&message, "referentialIntegrity", value.span());
+
+                    diagnostics.push_error(error);
+
+                    None
                 }
-            };
-
-            if mode_enabled && !preview_features.contains(&PreviewFeature::PlanetScaleMode) {
-                diagnostics.push_error(DatamodelError::new_source_validation_error(
-                    PLANET_SCALE_PREVIEW_FEATURE_ERR,
-                    &source.name.name,
-                    value.span(),
-                ));
-                return false;
+                Err(e) => {
+                    diagnostics.push_error(e);
+                    None
+                }
             }
-
-            mode_enabled
         }
-    }
+    })
 }
 
-fn preview_features_guardrail(args: &HashMap<&str, ValueValidator>, diagnostics: &mut Diagnostics) {
+fn preview_features_guardrail(args: &HashMap<&str, (Span, ValueValidator<'_>)>, diagnostics: &mut Diagnostics) {
     let arg = args.get(PREVIEW_FEATURES_KEY);
 
     if let Some(val) = arg {
-        match val.as_array().to_str_vec() {
-            Ok(features) => {
-                if features.is_empty() {
-                    return;
-                }
-
-                diagnostics.push_error(DatamodelError::new_connector_error(
-            "Preview features are only supported in the generator block. Please move this field to the generator block.",
-            val.span(),
-            ));
+        let span = val.0;
+        if let Ok(features) = val.1.as_array().to_str_vec() {
+            if features.is_empty() {
+                return;
             }
-            Err(err) => diagnostics.push_error(err),
         }
+        let msg = "Preview features are only supported in the generator block. Please move this field to the generator block.";
+        diagnostics.push_error(DatamodelError::new(std::borrow::Cow::Borrowed(msg), span));
     }
 }

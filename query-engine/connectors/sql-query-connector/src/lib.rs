@@ -1,7 +1,11 @@
 #![allow(
     clippy::wrong_self_convention,
-    clippy::clippy::upper_case_acronyms,
-    clippy::needless_question_mark
+    clippy::upper_case_acronyms,
+    clippy::needless_question_mark,
+    clippy::branches_sharing_code,
+    clippy::mem_replace_with_default,
+    clippy::needless_borrow,
+    clippy::needless_collect
 )]
 
 mod column_metadata;
@@ -10,6 +14,7 @@ mod database;
 mod error;
 mod filter_conversion;
 mod join_utils;
+mod model_extensions;
 mod nested_aggregations;
 mod ordering;
 mod query_arguments_ext;
@@ -17,6 +22,7 @@ mod query_builder;
 mod query_ext;
 mod row;
 mod sql_info;
+mod sql_trace;
 
 use column_metadata::*;
 use filter_conversion::*;

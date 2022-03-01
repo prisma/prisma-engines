@@ -5,7 +5,7 @@ use crate::{
     query_graph::{Flow, Node, NodeRef, QueryGraph, QueryGraphDependency},
     ParsedInputMap, ParsedInputValue,
 };
-use connector::{Filter, IdFilter};
+use connector::{Filter, IntoFilter};
 use prisma_models::{ModelRef, RelationFieldRef};
 use std::{convert::TryInto, sync::Arc};
 
@@ -16,6 +16,7 @@ use std::{convert::TryInto, sync::Arc};
 #[tracing::instrument(skip(graph, parent_node, parent_relation_field, value, child_model))]
 pub fn nested_connect_or_create(
     graph: &mut QueryGraph,
+    connector_ctx: &ConnectorContext,
     parent_node: NodeRef,
     parent_relation_field: &RelationFieldRef,
     value: ParsedInputValue,
@@ -25,11 +26,32 @@ pub fn nested_connect_or_create(
     let values = utils::coerce_vec(value);
 
     if relation.is_many_to_many() {
-        handle_many_to_many(graph, parent_node, parent_relation_field, values, child_model)
+        handle_many_to_many(
+            graph,
+            connector_ctx,
+            parent_node,
+            parent_relation_field,
+            values,
+            child_model,
+        )
     } else if relation.is_one_to_many() {
-        handle_one_to_many(graph, parent_node, parent_relation_field, values, child_model)
+        handle_one_to_many(
+            graph,
+            connector_ctx,
+            parent_node,
+            parent_relation_field,
+            values,
+            child_model,
+        )
     } else {
-        handle_one_to_one(graph, parent_node, parent_relation_field, values, child_model)
+        handle_one_to_one(
+            graph,
+            connector_ctx,
+            parent_node,
+            parent_relation_field,
+            values,
+            child_model,
+        )
     }
 }
 
@@ -70,6 +92,7 @@ pub fn nested_connect_or_create(
 #[tracing::instrument(skip(graph, parent_node, parent_relation_field, values, child_model))]
 fn handle_many_to_many(
     graph: &mut QueryGraph,
+    connector_ctx: &ConnectorContext,
     parent_node: NodeRef,
     parent_relation_field: &RelationFieldRef,
     values: Vec<ParsedInputValue>,
@@ -91,7 +114,7 @@ fn handle_many_to_many(
             filter,
         ));
 
-        let create_node = create::create_record_node(graph, Arc::clone(child_model), create_map)?;
+        let create_node = create::create_record_node(graph, connector_ctx, Arc::clone(child_model), create_map)?;
         let if_node = graph.create_node(Flow::default_if());
 
         let connect_exists_node =
@@ -104,7 +127,7 @@ fn handle_many_to_many(
         graph.create_edge(
             &read_node,
             &if_node,
-            QueryGraphDependency::ParentProjection(
+            QueryGraphDependency::ProjectedDataDependency(
                 child_model.primary_identifier(),
                 Box::new(|if_node, child_ids| {
                     if let Node::Flow(Flow::If(_)) = if_node {
@@ -127,15 +150,30 @@ fn handle_many_to_many(
 #[tracing::instrument(skip(graph, parent_node, parent_relation_field, values, child_model))]
 fn handle_one_to_many(
     graph: &mut QueryGraph,
+    connector_ctx: &ConnectorContext,
     parent_node: NodeRef,
     parent_relation_field: &RelationFieldRef,
     values: Vec<ParsedInputValue>,
     child_model: &ModelRef,
 ) -> QueryGraphBuilderResult<()> {
     if parent_relation_field.is_inlined_on_enclosing_model() {
-        one_to_many_inlined_parent(graph, parent_node, parent_relation_field, values, child_model)
+        one_to_many_inlined_parent(
+            graph,
+            connector_ctx,
+            parent_node,
+            parent_relation_field,
+            values,
+            child_model,
+        )
     } else {
-        one_to_many_inlined_child(graph, parent_node, parent_relation_field, values, child_model)
+        one_to_many_inlined_child(
+            graph,
+            connector_ctx,
+            parent_node,
+            parent_relation_field,
+            values,
+            child_model,
+        )
     }
 }
 
@@ -143,6 +181,7 @@ fn handle_one_to_many(
 #[tracing::instrument(skip(graph, parent_node, parent_relation_field, values, child_model))]
 fn handle_one_to_one(
     graph: &mut QueryGraph,
+    connector_ctx: &ConnectorContext,
     parent_node: NodeRef,
     parent_relation_field: &RelationFieldRef,
     mut values: Vec<ParsedInputValue>,
@@ -162,6 +201,7 @@ fn handle_one_to_one(
     if parent_relation_field.is_inlined_on_enclosing_model() {
         one_to_one_inlined_parent(
             graph,
+            connector_ctx,
             parent_node,
             parent_relation_field,
             filter,
@@ -171,6 +211,7 @@ fn handle_one_to_one(
     } else {
         one_to_one_inlined_child(
             graph,
+            connector_ctx,
             parent_node,
             parent_relation_field,
             filter,
@@ -212,6 +253,7 @@ fn handle_one_to_one(
 #[tracing::instrument(skip(graph, parent_node, parent_relation_field, values, child_model))]
 fn one_to_many_inlined_child(
     graph: &mut QueryGraph,
+    connector_ctx: &ConnectorContext,
     parent_node: NodeRef,
     parent_relation_field: &RelationFieldRef,
     values: Vec<ParsedInputValue>,
@@ -238,7 +280,7 @@ fn one_to_many_inlined_child(
 
         let if_node = graph.create_node(Flow::default_if());
         let update_child_node = utils::update_records_node_placeholder(graph, filter, Arc::clone(child_model));
-        let create_node = create::create_record_node(graph, Arc::clone(child_model), create_map)?;
+        let create_node = create::create_record_node(graph, connector_ctx, Arc::clone(child_model), create_map)?;
 
         graph.create_edge(&parent_node, &read_node, QueryGraphDependency::ExecutionOrder)?;
         graph.create_edge(&if_node, &update_child_node, QueryGraphDependency::Then)?;
@@ -246,7 +288,7 @@ fn one_to_many_inlined_child(
         graph.create_edge(
             &read_node,
             &if_node,
-            QueryGraphDependency::ParentProjection(
+            QueryGraphDependency::ProjectedDataDependency(
                 child_model.primary_identifier(),
                 Box::new(|if_node, child_ids| {
                     if let Node::Flow(Flow::If(_)) = if_node {
@@ -265,7 +307,7 @@ fn one_to_many_inlined_child(
         graph.create_edge(
             &parent_node,
             &create_node,
-            QueryGraphDependency::ParentProjection(
+            QueryGraphDependency::ProjectedDataDependency(
                 parent_link.clone(),
                 Box::new(move |mut create_node, mut parent_ids| {
                     let parent_id = match parent_ids.pop() {
@@ -277,7 +319,7 @@ fn one_to_many_inlined_child(
                     }?;
 
                     if let Node::Query(Query::Write(ref mut wq)) = create_node {
-                        wq.inject_projection_into_args(child_link.assimilate(parent_id)?);
+                        wq.inject_result_into_args(child_link.assimilate(parent_id)?);
                     }
 
                     Ok(create_node)
@@ -293,7 +335,7 @@ fn one_to_many_inlined_child(
         graph.create_edge(
             &parent_node,
             &update_child_node,
-            QueryGraphDependency::ParentProjection(
+            QueryGraphDependency::ProjectedDataDependency(
                 parent_link,
                 Box::new(move |mut update_node, mut parent_ids| {
                     let parent_id = match parent_ids.pop() {
@@ -305,7 +347,7 @@ fn one_to_many_inlined_child(
                     }?;
 
                     if let Node::Query(Query::Write(ref mut wq)) = update_node {
-                        wq.inject_projection_into_args(child_link.assimilate(parent_id)?);
+                        wq.inject_result_into_args(child_link.assimilate(parent_id)?);
                     }
 
                     Ok(update_node)
@@ -353,6 +395,7 @@ fn one_to_many_inlined_child(
 #[tracing::instrument(skip(graph, parent_node, parent_relation_field, values, child_model))]
 fn one_to_many_inlined_parent(
     graph: &mut QueryGraph,
+    connector_ctx: &ConnectorContext,
     parent_node: NodeRef,
     parent_relation_field: &RelationFieldRef,
     mut values: Vec<ParsedInputValue>,
@@ -381,14 +424,14 @@ fn one_to_many_inlined_parent(
     graph.create_edge(&parent_node, &read_node, QueryGraphDependency::ExecutionOrder)?;
 
     let if_node = graph.create_node(Flow::default_if());
-    let create_node = create::create_record_node(graph, Arc::clone(child_model), create_map)?;
+    let create_node = create::create_record_node(graph, connector_ctx, Arc::clone(child_model), create_map)?;
     let return_existing = graph.create_node(Flow::Return(None));
     let return_create = graph.create_node(Flow::Return(None));
 
     graph.create_edge(
         &read_node,
         &if_node,
-        QueryGraphDependency::ParentProjection(
+        QueryGraphDependency::ProjectedDataDependency(
             child_model.primary_identifier(),
             Box::new(|if_node, child_ids| {
                 if let Node::Flow(Flow::If(_)) = if_node {
@@ -406,12 +449,12 @@ fn one_to_many_inlined_parent(
     graph.create_edge(
         &if_node,
         &parent_node,
-        QueryGraphDependency::ParentProjection(
+        QueryGraphDependency::ProjectedDataDependency(
             child_link.clone(),
             Box::new(move |mut parent, mut child_ids| {
                 let child_id = child_ids.pop().unwrap();
                 if let Node::Query(Query::Write(ref mut wq)) = parent {
-                    wq.inject_projection_into_args(parent_link.assimilate(child_id)?);
+                    wq.inject_result_into_args(parent_link.assimilate(child_id)?);
                 }
 
                 Ok(parent)
@@ -422,7 +465,7 @@ fn one_to_many_inlined_parent(
     graph.create_edge(
         &read_node,
         &return_existing,
-        QueryGraphDependency::ParentProjection(
+        QueryGraphDependency::ProjectedDataDependency(
             child_link.clone(),
             Box::new(move |return_node, child_ids| {
                 if let Node::Flow(Flow::Return(_)) = return_node {
@@ -437,7 +480,7 @@ fn one_to_many_inlined_parent(
     graph.create_edge(
         &create_node,
         &return_create,
-        QueryGraphDependency::ParentProjection(
+        QueryGraphDependency::ProjectedDataDependency(
             child_link,
             Box::new(move |return_node, child_ids| {
                 if let Node::Flow(Flow::Return(_)) = return_node {
@@ -524,6 +567,7 @@ fn one_to_many_inlined_parent(
 #[tracing::instrument(skip(graph, parent_node, parent_relation_field, filter, create_data, child_model))]
 fn one_to_one_inlined_parent(
     graph: &mut QueryGraph,
+    connector_ctx: &ConnectorContext,
     parent_node: NodeRef,
     parent_relation_field: &RelationFieldRef,
     filter: Filter,
@@ -543,14 +587,14 @@ fn one_to_one_inlined_parent(
     graph.create_edge(&parent_node, &read_node, QueryGraphDependency::ExecutionOrder)?;
 
     let if_node = graph.create_node(Flow::default_if());
-    let create_node = create::create_record_node(graph, Arc::clone(child_model), create_data)?;
+    let create_node = create::create_record_node(graph, connector_ctx, Arc::clone(child_model), create_data)?;
     let return_existing = graph.create_node(Flow::Return(None));
     let return_create = graph.create_node(Flow::Return(None));
 
     graph.create_edge(
         &read_node,
         &if_node,
-        QueryGraphDependency::ParentProjection(
+        QueryGraphDependency::ProjectedDataDependency(
             child_model.primary_identifier(),
             Box::new(|if_node, child_ids| {
                 if let Node::Flow(Flow::If(_)) = if_node {
@@ -576,7 +620,7 @@ fn one_to_one_inlined_parent(
     graph.create_edge(
         &read_node,
         &return_existing,
-        QueryGraphDependency::ParentProjection(
+        QueryGraphDependency::ProjectedDataDependency(
             child_link.clone(),
             Box::new(move |return_node, child_ids| {
                 if let Node::Flow(Flow::Return(_)) = return_node {
@@ -593,7 +637,7 @@ fn one_to_one_inlined_parent(
     graph.create_edge(
         &create_node,
         &return_create,
-        QueryGraphDependency::ParentProjection(
+        QueryGraphDependency::ProjectedDataDependency(
             child_link.clone(),
             Box::new(move |return_node, child_ids| {
                 if let Node::Flow(Flow::Return(_)) = return_node {
@@ -610,12 +654,12 @@ fn one_to_one_inlined_parent(
         graph.create_edge(
             &if_node,
             &parent_node,
-            QueryGraphDependency::ParentProjection(
+            QueryGraphDependency::ProjectedDataDependency(
                 child_link,
                 Box::new(move |mut parent, mut child_ids| {
                     let child_id = child_ids.pop().unwrap();
                     if let Node::Query(Query::Write(ref mut wq)) = parent {
-                        wq.inject_projection_into_args(parent_link.assimilate(child_id)?);
+                        wq.inject_result_into_args(parent_link.assimilate(child_id)?);
                     }
 
                     Ok(parent)
@@ -636,7 +680,7 @@ fn one_to_one_inlined_parent(
         graph.create_edge(
             &parent_node,
             &update_parent_node,
-            QueryGraphDependency::ParentProjection(parent_model.primary_identifier(), Box::new(move |mut update_parent_node, mut parent_ids| {
+            QueryGraphDependency::ProjectedDataDependency(parent_model.primary_identifier(), Box::new(move |mut update_parent_node, mut parent_ids| {
                 let parent_id = match parent_ids.pop() {
                     Some(id) => Ok(id),
                     None => Err(QueryGraphBuilderError::RecordNotFound(format!(
@@ -660,8 +704,8 @@ fn one_to_one_inlined_parent(
         graph.create_edge(
             &if_node,
             &update_parent_node,
-            QueryGraphDependency::ParentProjection(child_link, Box::new(move |mut update_parent_node, mut child_projections| {
-                let child_projection = match child_projections.pop() {
+            QueryGraphDependency::ProjectedDataDependency(child_link, Box::new(move |mut update_parent_node, mut child_results| {
+                let child_result = match child_results.pop() {
                     Some(p) => Ok(p),
                     None => Err(QueryGraphBuilderError::RecordNotFound(format!(
                         "No '{}' record (needed to inline the relation with an update on '{}' record(s)) was found for a nested connect or create on one-to-one relation '{}'.",
@@ -670,7 +714,7 @@ fn one_to_one_inlined_parent(
                 }?;
 
                 if let Node::Query(Query::Write(ref mut wq)) = update_parent_node {
-                    wq.inject_projection_into_args(parent_link.assimilate(child_projection)?);
+                    wq.inject_result_into_args(parent_link.assimilate(child_result)?);
                 }
 
                 Ok(update_parent_node)
@@ -748,6 +792,7 @@ fn one_to_one_inlined_parent(
 #[tracing::instrument(skip(graph, parent_node, parent_relation_field, filter, create_data, child_model))]
 fn one_to_one_inlined_child(
     graph: &mut QueryGraph,
+    connector_ctx: &ConnectorContext,
     parent_node: NodeRef,
     parent_relation_field: &RelationFieldRef,
     filter: Filter,
@@ -771,12 +816,12 @@ fn one_to_one_inlined_child(
     graph.create_edge(&parent_node, &read_node, QueryGraphDependency::ExecutionOrder)?;
 
     let if_node = graph.create_node(Flow::default_if());
-    let create_node = create::create_record_node(graph, Arc::clone(child_model), create_data)?;
+    let create_node = create::create_record_node(graph, connector_ctx, Arc::clone(child_model), create_data)?;
 
     graph.create_edge(
         &read_node,
         &if_node,
-        QueryGraphDependency::ParentProjection(
+        QueryGraphDependency::ProjectedDataDependency(
             child_model.primary_identifier(),
             Box::new(|if_node, child_ids| {
                 if let Node::Flow(Flow::If(_)) = if_node {
@@ -808,7 +853,7 @@ fn one_to_one_inlined_child(
     graph.create_edge(
         &read_node,
         &update_child_node,
-        QueryGraphDependency::ParentProjection(
+        QueryGraphDependency::ProjectedDataDependency(
             child_model.primary_identifier(),
             Box::new(move |mut update_child_node, mut child_ids| {
                 let child_id = match child_ids.pop() {
@@ -835,7 +880,7 @@ fn one_to_one_inlined_child(
     graph.create_edge(
         &parent_node,
         &update_child_node,
-        QueryGraphDependency::ParentProjection(parent_link.clone(), Box::new(move |mut update_child_node, mut parent_links| {
+        QueryGraphDependency::ProjectedDataDependency(parent_link.clone(), Box::new(move |mut update_child_node, mut parent_links| {
             let parent_link = match parent_links.pop() {
                 Some(link) => Ok(link),
                 None => Err(QueryGraphBuilderError::RecordNotFound(format!(
@@ -845,7 +890,7 @@ fn one_to_one_inlined_child(
             }?;
 
             if let Node::Query(Query::Write(ref mut wq)) = update_child_node {
-                wq.inject_projection_into_args(child_link.assimilate(parent_link)?);
+                wq.inject_result_into_args(child_link.assimilate(parent_link)?);
             }
 
             Ok(update_child_node)
@@ -862,7 +907,7 @@ fn one_to_one_inlined_child(
     graph.create_edge(
         &parent_node,
         &create_node,
-        QueryGraphDependency::ParentProjection(parent_link, Box::new(move |mut update_child_node, mut parent_links| {
+        QueryGraphDependency::ProjectedDataDependency(parent_link, Box::new(move |mut update_child_node, mut parent_links| {
             let parent_link = match parent_links.pop() {
                 Some(link) => Ok(link),
                 None => Err(QueryGraphBuilderError::RecordNotFound(format!(
@@ -872,7 +917,7 @@ fn one_to_one_inlined_child(
             }?;
 
             if let Node::Query(Query::Write(ref mut wq)) = update_child_node {
-                wq.inject_projection_into_args(child_link.assimilate(parent_link)?);
+                wq.inject_result_into_args(child_link.assimilate(parent_link)?);
             }
 
             Ok(update_child_node)

@@ -1,49 +1,64 @@
 use super::helpers::*;
-use crate::ast::helper::get_sort_index_of_attribute;
-use crate::diagnostics::ValidatedMissingFields;
-use crate::{ast, ast::parser::*, ast::renderer::*};
-use pest::iterators::Pair;
-use pest::Parser;
+use crate::{Datamodel, Datasource};
+use enumflags2::BitFlags;
+use pest::{iterators::Pair, Parser};
+use schema_ast::{
+    ast::{self, SchemaAst},
+    parser::{PrismaDatamodelParser, Rule},
+    renderer::*,
+};
 
 pub struct Reformatter<'a> {
     input: &'a str,
-    missing_fields: Result<ValidatedMissingFields, crate::diagnostics::Diagnostics>,
-    missing_field_attributes: Result<Vec<MissingFieldAttribute>, crate::diagnostics::Diagnostics>,
-    missing_field_attribute_args: Result<Vec<MissingRelationAttributeArg>, crate::diagnostics::Diagnostics>,
+    missing_fields: Vec<MissingField>,
+    missing_field_attributes: Vec<MissingFieldAttribute>,
+    missing_relation_attribute_args: Vec<MissingRelationAttributeArg>,
 }
 
 impl<'a> Reformatter<'a> {
     pub fn new(input: &'a str) -> Self {
-        //todo don't run parsing and validating of the string in every step
-        let missing_fields = Self::find_all_missing_fields(&input);
-        let missing_field_attributes = Self::find_all_missing_attributes(&input);
-        let missing_relation_attribute_args = Self::find_all_missing_relation_attribute_args(&input);
+        let info = crate::parse_schema_ast(input).and_then(crate::parse_datamodel_for_formatter);
+        match info {
+            Ok((db, datamodel, mut datasources)) => {
+                let schema_ast = db.ast();
+                let datasource = datasources.pop();
+                let missing_fields = Self::find_all_missing_fields(schema_ast, &datamodel, datasource.as_ref());
+                let missing_field_attributes =
+                    Self::find_all_missing_attributes(schema_ast, &datamodel, datasource.as_ref());
+                let missing_relation_attribute_args =
+                    Self::find_all_missing_relation_attribute_args(schema_ast, &datamodel, datasource.as_ref());
 
-        Reformatter {
-            input,
-            missing_fields,
-            missing_field_attributes,
-            missing_field_attribute_args: missing_relation_attribute_args,
+                Reformatter {
+                    input,
+                    missing_fields,
+                    missing_field_attributes,
+                    missing_relation_attribute_args,
+                }
+            }
+            _ => Reformatter {
+                input,
+                missing_field_attributes: Vec::new(),
+                missing_relation_attribute_args: Vec::new(),
+                missing_fields: Vec::new(),
+            },
         }
     }
 
     // this finds all auto generated fields, that are added during auto generation AND are missing from the original input.
-    fn find_all_missing_fields(schema_string: &str) -> Result<ValidatedMissingFields, crate::diagnostics::Diagnostics> {
-        let mut diagnostics = crate::diagnostics::Diagnostics::new();
-        let schema_ast = crate::parse_schema_ast(&schema_string)?;
-        let validated_datamodel = crate::parse_datamodel_for_formatter(&schema_string)?;
-
-        let lowerer = crate::transform::dml_to_ast::LowerDmlToAst::new(None);
+    fn find_all_missing_fields(
+        schema_ast: &SchemaAst,
+        datamodel: &Datamodel,
+        datasource: Option<&Datasource>,
+    ) -> Vec<MissingField> {
+        let lowerer = crate::transform::dml_to_ast::LowerDmlToAst::new(datasource, BitFlags::empty());
         let mut result = Vec::new();
 
-        diagnostics.append_warning_vec(validated_datamodel.warnings);
-
-        for model in validated_datamodel.subject.models() {
+        for model in datamodel.models() {
             let ast_model = schema_ast.find_model(&model.name).unwrap();
 
             for field in model.fields() {
-                if ast_model.fields.iter().find(|f| f.name.name == field.name()).is_none() {
-                    let ast_field = lowerer.lower_field(&field, &validated_datamodel.subject);
+                if !ast_model.fields.iter().any(|f| f.name.name == field.name()) {
+                    let ast_field = lowerer.lower_field(model, field, datamodel);
 
                     result.push(MissingField {
                         model: model.name.clone(),
@@ -53,35 +68,28 @@ impl<'a> Reformatter<'a> {
             }
         }
 
-        Ok(ValidatedMissingFields {
-            subject: result,
-            warnings: diagnostics.warnings,
-        })
+        result
     }
 
     fn find_all_missing_attributes(
-        schema_string: &str,
-    ) -> Result<Vec<MissingFieldAttribute>, crate::diagnostics::Diagnostics> {
-        let mut diagnostics = crate::diagnostics::Diagnostics::new();
-        let schema_ast = crate::parse_schema_ast(&schema_string)?;
-        let validated_datamodel = crate::parse_datamodel_for_formatter(&schema_string)?;
-
-        diagnostics.append_warning_vec(validated_datamodel.warnings);
-        let lowerer = crate::transform::dml_to_ast::LowerDmlToAst::new(None);
+        schema_ast: &SchemaAst,
+        datamodel: &Datamodel,
+        datasource: Option<&Datasource>,
+    ) -> Vec<MissingFieldAttribute> {
+        let lowerer = crate::transform::dml_to_ast::LowerDmlToAst::new(datasource, BitFlags::empty());
 
         let mut missing_field_attributes = Vec::new();
-        for model in validated_datamodel.subject.models() {
+        for model in datamodel.models() {
             let ast_model = schema_ast.find_model(&model.name).unwrap();
             for field in model.fields() {
-                let new_ast_field = lowerer.lower_field(&field, &validated_datamodel.subject);
+                let new_ast_field = lowerer.lower_field(model, field, datamodel);
 
                 if let Some(original_field) = ast_model.fields.iter().find(|f| f.name.name == field.name()) {
                     for attribute in new_ast_field.attributes {
-                        if original_field
+                        if !original_field
                             .attributes
                             .iter()
-                            .find(|d| d.name.name == attribute.name.name)
-                            .is_none()
+                            .any(|d| d.name.name == attribute.name.name)
                         {
                             missing_field_attributes.push(MissingFieldAttribute {
                                 model: model.name.clone(),
@@ -93,24 +101,22 @@ impl<'a> Reformatter<'a> {
                 }
             }
         }
-        Ok(missing_field_attributes)
+
+        missing_field_attributes
     }
 
     fn find_all_missing_relation_attribute_args(
-        schema_string: &str,
-    ) -> Result<Vec<MissingRelationAttributeArg>, crate::diagnostics::Diagnostics> {
-        let mut diagnostics = crate::diagnostics::Diagnostics::new();
-        let schema_ast = crate::parse_schema_ast(&schema_string)?;
-        let validated_datamodel = crate::parse_datamodel_for_formatter(&schema_string)?;
-
-        diagnostics.append_warning_vec(validated_datamodel.warnings);
-        let lowerer = crate::transform::dml_to_ast::LowerDmlToAst::new(None);
+        schema_ast: &SchemaAst,
+        datamodel: &Datamodel,
+        datasource: Option<&Datasource>,
+    ) -> Vec<MissingRelationAttributeArg> {
+        let lowerer = crate::transform::dml_to_ast::LowerDmlToAst::new(datasource, BitFlags::empty());
 
         let mut missing_relation_attribute_args = Vec::new();
-        for model in validated_datamodel.subject.models() {
+        for model in datamodel.models() {
             let ast_model = schema_ast.find_model(&model.name).unwrap();
             for field in model.fields() {
-                let new_ast_field = lowerer.lower_field(&field, &validated_datamodel.subject);
+                let new_ast_field = lowerer.lower_field(model, field, datamodel);
 
                 if let Some(original_field) = ast_model.fields.iter().find(|f| f.name.name == field.name()) {
                     for attribute in new_ast_field.attributes.iter().filter(|a| a.name.name == "relation") {
@@ -119,19 +125,20 @@ impl<'a> Reformatter<'a> {
                             .iter()
                             .find(|d| d.name.name == attribute.name.name)
                         {
-                            for arg in &attribute.arguments {
-                                if !arg.name.name.is_empty()
-                                    && original_attribute
+                            for arg in &attribute.arguments.arguments {
+                                if let Some(arg_name) = &arg.name {
+                                    if !original_attribute
+                                        .arguments
                                         .arguments
                                         .iter()
-                                        .find(|d| d.name.name == arg.name.name)
-                                        .is_none()
-                                {
-                                    missing_relation_attribute_args.push(MissingRelationAttributeArg {
-                                        model: model.name.clone(),
-                                        field: field.name().to_string(),
-                                        arg: arg.to_owned(),
-                                    })
+                                        .any(|arg| arg.name.as_ref().map(|n| n.name.as_str()) == Some(&arg_name.name))
+                                    {
+                                        missing_relation_attribute_args.push(MissingRelationAttributeArg {
+                                            model: model.name.clone(),
+                                            field: field.name().to_string(),
+                                            arg: arg.to_owned(),
+                                        })
+                                    }
                                 }
                             }
                         }
@@ -139,7 +146,7 @@ impl<'a> Reformatter<'a> {
                 }
             }
         }
-        Ok(missing_relation_attribute_args)
+        missing_relation_attribute_args
     }
 
     pub fn reformat_to(&self, output: &mut dyn std::io::Write, ident_width: usize) {
@@ -152,7 +159,10 @@ impl<'a> Reformatter<'a> {
     }
 
     fn reformat_internal(&self, ident_width: usize) -> String {
-        let mut ast = PrismaDatamodelParser::parse(Rule::schema, self.input).unwrap(); // TODO: Handle error.
+        let mut ast = match PrismaDatamodelParser::parse(Rule::schema, self.input) {
+            Ok(ast) => ast,
+            Err(_) => return self.input.to_owned(),
+        };
         let mut target_string = String::with_capacity(self.input.len());
         let mut renderer = Renderer::new(&mut target_string, ident_width);
         self.reformat_top(&mut renderer, &ast.next().unwrap());
@@ -207,10 +217,21 @@ impl<'a> Reformatter<'a> {
                         comment(target, current.as_str());
                     }
                 }
-                Rule::model_declaration => self.reformat_model(target, &current),
+                Rule::model_declaration => {
+                    let keyword = current
+                        .clone()
+                        .into_inner()
+                        .find(|pair| matches!(pair.as_rule(), Rule::TYPE_KEYWORD | Rule::MODEL_KEYWORD))
+                        .expect("Expected model or type keyword");
+
+                    match keyword.as_rule() {
+                        Rule::TYPE_KEYWORD => self.reformat_composite_type(target, &current),
+                        Rule::MODEL_KEYWORD => self.reformat_model(target, &current),
+                        _ => unreachable!(),
+                    };
+                }
                 Rule::enum_declaration => self.reformat_enum(target, &current),
-                Rule::source_block => self.reformat_datasource(target, &current),
-                Rule::generator_block => self.reformat_generator(target, &current),
+                Rule::config_block => self.reformat_config_block(target, &current),
                 Rule::type_alias => {
                     if !types_mode {
                         panic!("Renderer not in type mode.");
@@ -232,29 +253,21 @@ impl<'a> Reformatter<'a> {
         target.write("");
     }
 
-    fn reformat_datasource(&self, target: &mut Renderer<'_>, token: &Token<'_>) {
-        self.reformat_block_element(
-            "datasource",
-            target,
-            token,
-            Box::new(|table, _, token, _| match token.as_rule() {
-                Rule::key_value => Self::reformat_key_value(table, &token),
-                _ => Self::reformat_generic_token(table, &token),
-            }),
-        );
-    }
+    fn reformat_config_block(&self, target: &mut Renderer<'_>, token: &Token<'_>) {
+        let keyword = token
+            .clone()
+            .into_inner()
+            .find(|p| [Rule::GENERATOR_KEYWORD, Rule::DATASOURCE_KEYWORD].contains(&p.as_rule()))
+            .map(|tok| tok.as_str())
+            .unwrap();
 
-    fn reformat_generator(&self, target: &mut Renderer<'_>, token: &Token<'_>) {
         self.reformat_block_element(
-            "generator",
+            keyword,
             target,
             token,
-            Box::new(|table, _, token, _| {
-                //
-                match token.as_rule() {
-                    Rule::key_value => Self::reformat_key_value(table, &token),
-                    _ => Self::reformat_generic_token(table, &token),
-                }
+            &(|table, _, token, _| match token.as_rule() {
+                Rule::key_value => Self::reformat_key_value(table, token),
+                _ => Self::reformat_generic_token(table, token),
             }),
         );
     }
@@ -281,51 +294,68 @@ impl<'a> Reformatter<'a> {
         self.reformat_block_element_internal(
             "model",
             target,
-            &token,
-            Box::new(|table, renderer, token, model_name| {
+            token,
+            &(|table, renderer, token, model_name| {
                 match token.as_rule() {
                     Rule::block_level_attribute => {
                         // model level attributes reset the table. -> .render() does that
                         table.render(renderer);
-                        Self::reformat_attribute(renderer, &token, "@@", vec![]);
+                        Self::reformat_attribute(renderer, token, "@@", vec![]);
                     }
-                    Rule::field_declaration => self.reformat_field(table, &token, model_name),
-                    _ => Self::reformat_generic_token(table, &token),
+                    Rule::field_declaration => self.reformat_field(table, token, model_name),
+                    _ => Self::reformat_generic_token(table, token),
                 }
             }),
-            Box::new(|table, _, model_name| {
-                // TODO: what is the right thing to do on error?
-                if let Ok(missing_fields) = self.missing_fields.as_ref() {
-                    for missing_back_relation_field in missing_fields.subject.iter() {
-                        if missing_back_relation_field.model.as_str() == model_name {
-                            Renderer::render_field(table, &missing_back_relation_field.field, false);
-                        }
+            &(|table, _, model_name| {
+                for missing_back_relation_field in &self.missing_fields {
+                    if missing_back_relation_field.model.as_str() == model_name {
+                        Renderer::render_field(table, &missing_back_relation_field.field, false);
                     }
                 }
             }),
         );
     }
 
+    fn reformat_composite_type(&self, target: &mut Renderer<'_>, token: &Token<'_>) {
+        self.reformat_block_element_internal(
+            "type",
+            target,
+            token,
+            &(|table, renderer, token, model_name| {
+                match token.as_rule() {
+                    Rule::block_level_attribute => {
+                        // model level attributes reset the table. -> .render() does that
+                        table.render(renderer);
+                        Self::reformat_attribute(renderer, token, "@@", vec![]);
+                    }
+                    Rule::field_declaration => self.reformat_field(table, token, model_name),
+                    _ => Self::reformat_generic_token(table, token),
+                }
+            }),
+            &(|_, _, _| ()),
+        );
+    }
+
     fn reformat_block_element(
         &self,
-        block_type: &'static str,
+        block_type: &'a str,
         renderer: &'a mut Renderer<'_>,
         token: &'a Token<'_>,
-        the_fn: Box<dyn Fn(&mut TableFormat, &mut Renderer<'_>, &Token<'_>, &str) + 'a>,
+        the_fn: &(dyn Fn(&mut TableFormat, &mut Renderer<'_>, &Token<'_>, &str) + 'a),
     ) {
         self.reformat_block_element_internal(block_type, renderer, token, the_fn, {
             // a no op
-            Box::new(|_, _, _| ())
+            &(|_, _, _| ())
         })
     }
 
     fn reformat_block_element_internal(
         &self,
-        block_type: &'static str,
+        block_type: &'a str,
         renderer: &'a mut Renderer<'_>,
         token: &'a Token<'_>,
-        the_fn: Box<dyn Fn(&mut TableFormat, &mut Renderer<'_>, &Token<'_>, &str) + 'a>,
-        after_fn: Box<dyn Fn(&mut TableFormat, &mut Renderer<'_>, &str) + 'a>,
+        the_fn: &(dyn Fn(&mut TableFormat, &mut Renderer<'_>, &Token<'_>, &str) + 'a),
+        after_fn: &(dyn Fn(&mut TableFormat, &mut Renderer<'_>, &str) + 'a),
     ) {
         let mut table = TableFormat::new();
         let mut block_name = "";
@@ -339,6 +369,7 @@ impl<'a> Reformatter<'a> {
 
         for current in token.clone().into_inner() {
             match current.as_rule() {
+                Rule::MODEL_KEYWORD | Rule::TYPE_KEYWORD | Rule::GENERATOR_KEYWORD | Rule::DATASOURCE_KEYWORD => (),
                 Rule::BLOCK_OPEN => {
                     block_has_opened = true;
                 }
@@ -352,7 +383,7 @@ impl<'a> Reformatter<'a> {
                     }
 
                     for d in &attributes {
-                        the_fn(&mut table, renderer, &d, block_name);
+                        the_fn(&mut table, renderer, d, block_name);
                         // New line after each block attribute
                         table.render(renderer);
                         table = TableFormat::new();
@@ -417,7 +448,7 @@ impl<'a> Reformatter<'a> {
             "enum",
             target,
             token,
-            Box::new(|table, target, token, _| {
+            &(|table, target, token, _| {
                 //
                 match token.as_rule() {
                     Rule::block_level_attribute => {
@@ -497,23 +528,19 @@ impl<'a> Reformatter<'a> {
                 Rule::field_type => {
                     target.write(&Self::reformat_field_type(&current));
                 }
-                //todo special case field attribute to pass model and field name and probably attribute name  and down to the args
                 Rule::attribute => {
-                    if let Ok(missing_field_attribute_args) = self.missing_field_attribute_args.as_ref() {
-                        let missing_relation_args: Vec<&MissingRelationAttributeArg> = missing_field_attribute_args
-                            .iter()
-                            .filter(|arg| arg.model == model_name && arg.field == *field_name)
-                            .collect();
+                    let missing_relation_args: Vec<&MissingRelationAttributeArg> = self
+                        .missing_relation_attribute_args
+                        .iter()
+                        .filter(|arg| arg.model == model_name && arg.field == *field_name)
+                        .collect();
 
-                        Self::reformat_attribute(
-                            &mut target.column_locked_writer_for(2),
-                            &current,
-                            "@",
-                            missing_relation_args,
-                        )
-                    } else {
-                        Self::reformat_attribute(&mut target.column_locked_writer_for(2), &current, "@", vec![])
-                    }
+                    Self::reformat_attribute(
+                        &mut target.column_locked_writer_for(2),
+                        &current,
+                        "@",
+                        missing_relation_args,
+                    )
                 }
                 // This is a comment at the end of a field.
                 Rule::doc_comment | Rule::comment => target.append_suffix_to_current_row(current.as_str()),
@@ -524,14 +551,12 @@ impl<'a> Reformatter<'a> {
             }
         }
 
-        if let Ok(missing_field_attributes) = self.missing_field_attributes.as_ref() {
-            for missing_field_attribute in missing_field_attributes.iter() {
-                if missing_field_attribute.field == field_name && missing_field_attribute.model.as_str() == model_name {
-                    Renderer::render_field_attribute(
-                        &mut target.column_locked_writer_for(2),
-                        &missing_field_attribute.attribute,
-                    )
-                }
+        for missing_field_attribute in &self.missing_field_attributes {
+            if missing_field_attribute.field == field_name && missing_field_attribute.model.as_str() == model_name {
+                Renderer::render_field_attribute(
+                    &mut target.column_locked_writer_for(2),
+                    &missing_field_attribute.attribute,
+                )
             }
         }
 
@@ -551,7 +576,7 @@ impl<'a> Reformatter<'a> {
                     target.write("type");
                     target.write(&identifier.clone().expect("Unknown field identifier."));
                     target.write("=");
-                    target.write(&Self::get_identifier(current));
+                    target.write(Self::get_identifier(current));
                 }
                 Rule::attribute => {
                     Self::reformat_attribute(&mut target.column_locked_writer_for(4), &current, "@", vec![]);
@@ -573,14 +598,14 @@ impl<'a> Reformatter<'a> {
         for current in token.clone().into_inner() {
             match current.as_rule() {
                 Rule::optional_type => {
-                    builder.write(&Self::get_identifier(current));
+                    builder.write(Self::get_identifier(current));
                     builder.write("?");
                 }
                 Rule::base_type => {
-                    builder.write(&Self::get_identifier(current));
+                    builder.write(Self::get_identifier(current));
                 }
                 Rule::list_type => {
-                    builder.write(&Self::get_identifier(current));
+                    builder.write(Self::get_identifier(current));
                     builder.write("[]");
                 }
                 _ => Self::reformat_generic_token(&mut builder, &current),
@@ -631,11 +656,11 @@ impl<'a> Reformatter<'a> {
                 Rule::doc_comment | Rule::doc_comment_and_new_line => {
                     panic!("Comments inside attributes not supported yet.")
                 }
-                Rule::attribute_arguments => {
+                Rule::arguments_list => {
                     if is_relation {
-                        Self::reformat_attribute_args(target, &current, missing_args.clone())
+                        Self::reformat_arguments_list(target, &current, missing_args.as_slice())
                     } else {
-                        Self::reformat_attribute_args(target, &current, vec![])
+                        Self::reformat_arguments_list(target, &current, &[])
                     }
                 }
                 Rule::NEWLINE => {}
@@ -658,31 +683,36 @@ impl<'a> Reformatter<'a> {
         }
     }
 
-    fn reformat_attribute_args(
+    fn reformat_arguments_list(
         target: &mut dyn LineWriteable,
         token: &Token<'_>,
-        missing_args: Vec<&MissingRelationAttributeArg>,
+        missing_args: &[&MissingRelationAttributeArg],
     ) {
+        debug_assert_eq!(token.as_rule(), Rule::arguments_list);
+
         let mut builder = StringBuilder::new();
 
         for current in token.clone().into_inner() {
             match current.as_rule() {
                 // This is a named arg.
-                Rule::argument => {
+                Rule::named_argument => {
                     if !builder.line_empty() {
                         builder.write(", ");
                     }
                     Self::reformat_attribute_arg(&mut builder, &current);
                 }
                 // This is a an unnamed arg.
-                Rule::argument_value => {
+                Rule::expression => {
                     if !builder.line_empty() {
                         builder.write(", ");
                     }
-                    Self::reformat_arg_value(&mut builder, &current);
+                    Self::reformat_expression(&mut builder, &current);
                 }
-                Rule::doc_comment | Rule::doc_comment_and_new_line => {
-                    panic!("Comments inside attribute argument list not supported yet.")
+                Rule::empty_argument => {
+                    if !builder.line_empty() {
+                        builder.write(", ");
+                    }
+                    Self::reformat_attribute_arg(&mut builder, &current);
                 }
                 _ => Self::reformat_generic_token(target, &current),
             };
@@ -693,64 +723,68 @@ impl<'a> Reformatter<'a> {
                 if !builder.line_empty() {
                     builder.write(", ");
                 }
-                builder.write(&arg.arg.name.name);
-                builder.write(&": ");
+                if let Some(arg_name) = &arg.arg.name {
+                    builder.write(&arg_name.name);
+                    builder.write(": ");
+                }
                 Self::render_value(&mut builder, &arg.arg.value);
             }
         }
 
-        if !builder.line_empty() {
-            target.write("(");
-            target.write(&builder.to_string());
-            target.write(")");
-        }
+        target.write("(");
+        target.write(&builder.to_string());
+        target.write(")");
     }
 
     //duplicated from renderer -.-
     fn render_value(target: &mut StringBuilder, val: &ast::Expression) {
         match val {
-            ast::Expression::Array(vals, _) => Self::render_array(target, &vals),
-            ast::Expression::BooleanValue(val, _) => target.write(&val),
-            ast::Expression::ConstantValue(val, _) => target.write(&val),
-            ast::Expression::NumericValue(val, _) => target.write(&val),
-            ast::Expression::StringValue(val, _) => Self::render_str(target, &val),
-            ast::Expression::Function(name, args, _) => Self::render_func(target, &name, &args),
+            ast::Expression::Array(vals, _) => Self::render_expression_array(target, vals),
+            ast::Expression::ConstantValue(val, _) => target.write(val),
+            ast::Expression::NumericValue(val, _) => target.write(val),
+            ast::Expression::StringValue(val, _) => Self::render_str(target, val),
+            ast::Expression::Function(name, args, _) => Self::render_func(target, name, args),
         };
     }
-    fn render_array(target: &mut StringBuilder, vals: &[ast::Expression]) {
-        target.write(&"[");
+
+    fn render_argument(target: &mut StringBuilder, arg: &ast::Argument) {
+        if let Some(arg_name) = &arg.name {
+            target.write(&arg_name.name);
+            target.write(": ");
+        }
+
+        Self::render_value(target, &arg.value);
+    }
+
+    fn render_expression_array(target: &mut StringBuilder, vals: &[ast::Expression]) {
+        target.write("[");
         for (idx, arg) in vals.iter().enumerate() {
             if idx > 0 {
-                target.write(&", ");
+                target.write(", ");
             }
             Self::render_value(target, arg);
         }
-        target.write(&"]");
+        target.write("]");
     }
-    fn render_func(target: &mut StringBuilder, name: &str, vals: &[ast::Expression]) {
+
+    fn render_func(target: &mut StringBuilder, name: &str, args: &ast::ArgumentsList) {
         target.write(name);
         target.write("(");
-        for (idx, val) in vals.iter().enumerate() {
+        for (idx, arg) in args.arguments.iter().enumerate() {
             if idx > 0 {
                 target.write(", ");
             }
 
-            Self::render_value(target, val);
+            Self::render_argument(target, arg);
         }
         target.write(")");
     }
 
     fn render_str(target: &mut StringBuilder, param: &str) {
         target.write("\"");
-        target.write(
-            &param
-                .replace(r#"\"#, r#"\\"#)
-                .replace(r#"""#, r#"\""#)
-                .replace("\n", "\\n"),
-        );
+        target.write(&param.replace('\\', r#"\\"#).replace('"', r#"\""#).replace('\n', "\\n"));
         target.write("\"");
     }
-    //duplicated from renderer -.-
 
     fn reformat_attribute_arg(target: &mut dyn LineWriteable, token: &Token<'_>) {
         for current in token.clone().into_inner() {
@@ -759,21 +793,9 @@ impl<'a> Reformatter<'a> {
                     target.write(current.as_str());
                     target.write(": ");
                 }
-                Rule::argument_value => Self::reformat_arg_value(target, &current),
-                Rule::doc_comment | Rule::doc_comment_and_new_line => {
-                    panic!("Comments inside attribute argument not supported yet.")
-                }
-                _ => Self::reformat_generic_token(target, &current),
-            };
-        }
-    }
-
-    fn reformat_arg_value(target: &mut dyn LineWriteable, token: &Token<'_>) {
-        for current in token.clone().into_inner() {
-            match current.as_rule() {
                 Rule::expression => Self::reformat_expression(target, &current),
                 Rule::doc_comment | Rule::doc_comment_and_new_line => {
-                    panic!("Comments inside attributes not supported yet.")
+                    panic!("Comments inside attribute argument not supported yet.")
                 }
                 _ => Self::reformat_generic_token(target, &current),
             };
@@ -786,7 +808,6 @@ impl<'a> Reformatter<'a> {
             match current.as_rule() {
                 Rule::numeric_literal => target.write(current.as_str()),
                 Rule::string_literal => target.write(current.as_str()),
-                Rule::boolean_literal => target.write(current.as_str()),
                 Rule::constant_literal => target.write(current.as_str()),
                 Rule::function => Self::reformat_function_expression(target, &current),
                 Rule::array_expression => Self::reformat_array_expression(target, &current),
@@ -822,33 +843,18 @@ impl<'a> Reformatter<'a> {
     }
 
     fn reformat_function_expression(target: &mut dyn LineWriteable, token: &Token<'_>) {
-        let mut has_seen_one_argument = false;
-
         for current in token.clone().into_inner() {
             match current.as_rule() {
-                Rule::non_empty_identifier | Rule::maybe_empty_identifier => {
+                Rule::non_empty_identifier => {
                     target.write(current.as_str());
-                    target.write("(");
                 }
-                Rule::expression => {
-                    if has_seen_one_argument {
-                        target.write(", ");
-                    }
-                    Self::reformat_expression(target, &current);
-                    has_seen_one_argument = true;
-                }
-                Rule::doc_comment | Rule::doc_comment_and_new_line => {
-                    panic!("Comments inside expressions not supported yet.")
-                }
+                Rule::arguments_list => Self::reformat_arguments_list(target, &current, &[]),
                 _ => Self::reformat_generic_token(target, &current),
             }
         }
-
-        target.write(")");
     }
 
     fn reformat_generic_token(target: &mut dyn LineWriteable, token: &Token<'_>) {
-        //        println!("generic token: |{:?}|", token.as_str());
         match token.as_rule() {
             Rule::NEWLINE => target.end_line(),
             Rule::comment_block => {

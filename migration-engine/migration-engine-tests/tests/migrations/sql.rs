@@ -1,4 +1,4 @@
-use migration_engine_tests::sync_test_api::*;
+use migration_engine_tests::test_api::*;
 
 #[test_connector]
 fn can_handle_reserved_sql_keywords_for_model_name(api: TestApi) {
@@ -9,7 +9,7 @@ fn can_handle_reserved_sql_keywords_for_model_name(api: TestApi) {
         }
     "#;
 
-    api.schema_push(dm1).send_sync().assert_green_bang();
+    api.schema_push_w_datasource(dm1).send().assert_green();
     api.assert_schema()
         .assert_table("Group", |t| t.assert_column("field", |c| c.assert_type_is_string()));
 
@@ -20,7 +20,7 @@ fn can_handle_reserved_sql_keywords_for_model_name(api: TestApi) {
         }
     "#;
 
-    api.schema_push(dm2).send_sync().assert_green_bang();
+    api.schema_push_w_datasource(dm2).send().assert_green();
     api.assert_schema()
         .assert_table("Group", |t| t.assert_column("field", |c| c.assert_type_is_int()));
 }
@@ -34,7 +34,7 @@ fn can_handle_reserved_sql_keywords_for_field_name(api: TestApi) {
         }
     "#;
 
-    api.schema_push(dm1).send_sync().assert_green_bang();
+    api.schema_push_w_datasource(dm1).send().assert_green();
     api.assert_schema()
         .assert_table("Test", |t| t.assert_column("Group", |c| c.assert_type_is_string()));
 
@@ -45,7 +45,7 @@ fn can_handle_reserved_sql_keywords_for_field_name(api: TestApi) {
         }
     "#;
 
-    api.schema_push(dm2).send_sync().assert_green_bang();
+    api.schema_push_w_datasource(dm2).send().assert_green();
     api.assert_schema()
         .assert_table("Test", |t| t.assert_column("Group", |c| c.assert_type_is_int()));
 }
@@ -62,7 +62,7 @@ fn creating_tables_without_primary_key_must_work(api: TestApi) {
         }
     "#;
 
-    api.schema_push(dm).send_sync().assert_green_bang();
+    api.schema_push_w_datasource(dm).send().assert_green();
 
     api.assert_schema().assert_table("Pair", |table| {
         table
@@ -71,7 +71,7 @@ fn creating_tables_without_primary_key_must_work(api: TestApi) {
     });
 }
 
-#[test_connector]
+#[test_connector(exclude(Vitess))]
 fn relations_to_models_without_a_primary_key_work(api: TestApi) {
     let dm = r#"
         model Pair {
@@ -91,7 +91,7 @@ fn relations_to_models_without_a_primary_key_work(api: TestApi) {
         }
     "#;
 
-    api.schema_push(dm).send_sync().assert_green_bang();
+    api.schema_push_w_datasource(dm).send().assert_green();
 
     api.assert_schema()
         .assert_table("Pair", |table| table.assert_has_no_pk())
@@ -104,7 +104,7 @@ fn relations_to_models_without_a_primary_key_work(api: TestApi) {
         });
 }
 
-#[test_connector]
+#[test_connector(exclude(Vitess))]
 fn relations_to_models_with_no_pk_and_a_single_unique_required_field_work(api: TestApi) {
     let dm = r#"
         model Pair {
@@ -121,7 +121,7 @@ fn relations_to_models_with_no_pk_and_a_single_unique_required_field_work(api: T
         }
     "#;
 
-    api.schema_push(dm).send_sync().assert_green_bang();
+    api.schema_push_w_datasource(dm).send().assert_green();
 
     api.assert_schema()
         .assert_table("Pair", |table| table.assert_has_no_pk())
@@ -130,6 +130,25 @@ fn relations_to_models_with_no_pk_and_a_single_unique_required_field_work(api: T
                 .assert_pk(|pk| pk.assert_columns(&["id"]))
                 .assert_fk_on_columns(&["pweight"], |fk| fk.assert_references("Pair", &["weight"]))
         });
+}
+
+#[test_connector(exclude(Vitess))]
+fn reserved_sql_keywords_must_work(api: TestApi) {
+    // Group is a reserved keyword
+    let dm = r#"
+        model Group {
+            id          String  @id @default(cuid())
+            parent_id   String?
+            parent      Group? @relation(name: "ChildGroups", fields: [parent_id], references: id, onDelete: NoAction, onUpdate: NoAction)
+            childGroups Group[] @relation(name: "ChildGroups")
+        }
+    "#;
+
+    api.schema_push_w_datasource(dm).send().assert_green();
+
+    api.assert_schema().assert_table("Group", |table| {
+        table.assert_fk_on_columns(&["parent_id"], |fk| fk.assert_references("Group", &["id"]))
+    });
 }
 
 #[test_connector(capabilities(Enums))]
@@ -146,10 +165,10 @@ fn enum_value_with_database_names_must_work(api: TestApi) {
         }
     "##;
 
-    api.schema_push(dm)
+    api.schema_push_w_datasource(dm)
         .migration_id(Some("initial"))
-        .send_sync()
-        .assert_green_bang();
+        .send()
+        .assert_green();
 
     if api.is_mysql() {
         api.assert_schema()
@@ -174,14 +193,14 @@ fn enum_value_with_database_names_must_work(api: TestApi) {
     "##;
 
     if api.is_mysql() {
-        api.schema_push(dm).force(true).send_sync().assert_warnings(&["The values [hongry] on the enum `Cat_mood` will be removed. If these variants are still used in the database, this will fail.".into()]);
+        api.schema_push_w_datasource(dm).force(true).send().assert_warnings(&["The values [hongry] on the enum `Cat_mood` will be removed. If these variants are still used in the database, this will fail.".into()]);
 
         api.assert_schema()
             .assert_enum(&api.normalize_identifier("Cat_mood"), |enm| {
                 enm.assert_values(&["ANGRY", "hongery"])
             });
     } else {
-        api.schema_push(dm).force(true).send_sync().assert_warnings(&["The values [hongry] on the enum `CatMood` will be removed. If these variants are still used in the database, this will fail.".into()]);
+        api.schema_push_w_datasource(dm).force(true).send().assert_warnings(&["The values [hongry] on the enum `CatMood` will be removed. If these variants are still used in the database, this will fail.".into()]);
         api.assert_schema()
             .assert_enum("CatMood", |enm| enm.assert_values(&["ANGRY", "hongery"]));
     }
@@ -202,10 +221,10 @@ fn enum_defaults_must_work(api: TestApi) {
         }
     "##;
 
-    api.schema_push(dm)
+    api.schema_push_w_datasource(dm)
         .migration_id(Some("initial"))
-        .send_sync()
-        .assert_green_bang();
+        .send()
+        .assert_green();
 
     let insert = quaint::ast::Insert::single_into(api.render_table_name("Cat")).value("id", "the-id");
     api.query(insert.into());
@@ -240,7 +259,7 @@ fn enum_defaults_must_work(api: TestApi) {
     );
 }
 
-#[test_connector]
+#[test_connector(exclude(Vitess))]
 fn id_as_part_of_relation_must_work(api: TestApi) {
     let dm = r##"
         model Cat {
@@ -254,7 +273,7 @@ fn id_as_part_of_relation_must_work(api: TestApi) {
         }
     "##;
 
-    api.schema_push(dm).send_sync().assert_green_bang();
+    api.schema_push_w_datasource(dm).send().assert_green();
 
     api.assert_schema().assert_table("Cat", |table| {
         table
@@ -263,7 +282,7 @@ fn id_as_part_of_relation_must_work(api: TestApi) {
     });
 }
 
-#[test_connector]
+#[test_connector(exclude(Vitess))]
 fn multi_field_id_as_part_of_relation_must_work(api: TestApi) {
     let dm = r##"
         model Cat {
@@ -284,7 +303,7 @@ fn multi_field_id_as_part_of_relation_must_work(api: TestApi) {
         }
     "##;
 
-    api.schema_push(dm).send_sync().assert_green_bang();
+    api.schema_push_w_datasource(dm).send().assert_green();
 
     api.assert_schema().assert_table("Cat", |table| {
         table
@@ -295,7 +314,7 @@ fn multi_field_id_as_part_of_relation_must_work(api: TestApi) {
     });
 }
 
-#[test_connector]
+#[test_connector(exclude(Vitess))]
 fn remapped_multi_field_id_as_part_of_relation_must_work(api: TestApi) {
     let dm = r##"
         model Cat {
@@ -315,7 +334,7 @@ fn remapped_multi_field_id_as_part_of_relation_must_work(api: TestApi) {
         }
     "##;
 
-    api.schema_push(dm).send_sync().assert_green_bang();
+    api.schema_push_w_datasource(dm).send().assert_green();
 
     api.assert_schema().assert_table("Cat", |table| {
         table
@@ -326,7 +345,7 @@ fn remapped_multi_field_id_as_part_of_relation_must_work(api: TestApi) {
     });
 }
 
-#[test_connector]
+#[test_connector(preview_features("referentialIntegrity"))]
 fn unique_constraints_on_composite_relation_fields(api: TestApi) {
     let dm = r##"
         model Parent {
@@ -348,14 +367,14 @@ fn unique_constraints_on_composite_relation_fields(api: TestApi) {
         }
     "##;
 
-    api.schema_push(dm).send_sync().assert_green_bang();
+    api.schema_push_w_datasource(dm).send().assert_green();
 
     api.assert_schema().assert_table("Parent", |table| {
         table.assert_index_on_columns(&["chiid", "chic"], |idx| idx.assert_is_unique())
     });
 }
 
-#[test_connector]
+#[test_connector(preview_features("referentialIntegrity"))]
 fn indexes_on_composite_relation_fields(api: TestApi) {
     let dm = r##"
         model User {
@@ -377,22 +396,22 @@ fn indexes_on_composite_relation_fields(api: TestApi) {
         }
     "##;
 
-    api.schema_push(dm).send_sync().assert_green_bang();
+    api.schema_push_w_datasource(dm).send().assert_green();
 
     api.assert_schema().assert_table("SpamList", |table| {
         table.assert_index_on_columns(&["ufn", "uln"], |idx| idx.assert_is_not_unique())
     });
 }
 
-#[test_connector(exclude(Mssql))]
+#[test_connector(exclude(Vitess), preview_features("referentialIntegrity"))]
 fn dropping_mutually_referencing_tables_works(api: TestApi) {
     let dm1 = r#"
     model A {
         id Int @id
         b_id Int
-        ab B @relation("AtoB", fields: [b_id], references: [id])
+        ab B @relation("AtoB", fields: [b_id], references: [id], onUpdate: NoAction)
         c_id Int
-        ac C @relation("AtoC", fields: [c_id], references: [id])
+        ac C @relation("AtoC", fields: [c_id], references: [id], onUpdate: NoAction)
         b  B[] @relation("BtoA")
         c  C[] @relation("CtoA")
     }
@@ -400,7 +419,7 @@ fn dropping_mutually_referencing_tables_works(api: TestApi) {
     model B {
         id Int @id
         a_id Int
-        ba A @relation("BtoA", fields: [a_id], references: [id])
+        ba A @relation("BtoA", fields: [a_id], references: [id], onUpdate: NoAction)
         c_id Int
         bc C @relation("BtoC", fields: [c_id], references: [id])
         a  A[] @relation("AtoB")
@@ -410,17 +429,17 @@ fn dropping_mutually_referencing_tables_works(api: TestApi) {
     model C {
         id Int @id
         a_id Int
-        ca A @relation("CtoA", fields: [a_id], references: [id])
+        ca A @relation("CtoA", fields: [a_id], references: [id], onUpdate: NoAction)
         b_id Int
-        cb B @relation("CtoB", fields: [b_id], references: [id])
+        cb B @relation("CtoB", fields: [b_id], references: [id], onUpdate: NoAction)
         b  B[] @relation("BtoC")
         a  A[] @relation("AtoC")
     }
     "#;
 
-    api.schema_push(dm1).send_sync().assert_green_bang();
+    api.schema_push_w_datasource(dm1).send().assert_green();
     api.assert_schema().assert_tables_count(3);
 
-    api.schema_push("").send_sync().assert_green_bang();
+    api.schema_push_w_datasource("").send().assert_green();
     api.assert_schema().assert_tables_count(0);
 }

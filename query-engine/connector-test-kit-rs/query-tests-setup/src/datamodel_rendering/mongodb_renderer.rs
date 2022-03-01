@@ -26,20 +26,27 @@ impl DatamodelRenderer for MongoDbSchemaRenderer {
 
     // Currently just an accepted hack for MongoDB
     fn render_m2m(&self, m2m: M2mFragment) -> String {
+        let M2mFragment {
+            field_name,
+            field_type,
+            opposing_name,
+            opposing_type,
+            relation_name,
+        } = m2m;
+
         // Add an array field for mongo, name: "<rel_field_name>_ids <Opposing type>[]"
-        let fk_field_name = format!("{}_ids", m2m.field_name);
-        let additional_fk_field = format!("{} {}[]", fk_field_name, m2m.opposing_type);
+        let fk_field_name = format!("{field_name}_ids");
+        let additional_fk_field = format!("{fk_field_name} {opposing_type}[]");
 
         // Add @relation directive that specifies the local array to hold the FKs.
-        let relation_directive = match m2m.relation_name {
-            Some(name) => format!(r#"@relation(name: "{}", fields: [{}])"#, name, fk_field_name),
-            None => format!(r#"@relation(fields: [{}])"#, fk_field_name),
+        let relation_directive = match relation_name {
+            Some(name) => {
+                format!(r#"@relation(name: "{name}", fields: [{fk_field_name}], references: [{opposing_name}])"#,)
+            }
+            None => format!(r#"@relation(fields: [{fk_field_name}], references: [{opposing_name}])"#),
         };
 
-        format!(
-            "{}\n{} {} {}",
-            additional_fk_field, m2m.field_name, m2m.field_type, relation_directive,
-        )
+        format!("{additional_fk_field}\n{field_name} {field_type} {relation_directive}")
     }
 }
 
@@ -81,6 +88,7 @@ mod mongo_render_tests {
         let fragment = M2mFragment {
             field_name: "posts".to_owned(),
             field_type: "Post[]".to_owned(),
+            opposing_name: "id".to_owned(),
             opposing_type: "String".to_owned(),
             relation_name: Some("test".to_owned()),
         };
@@ -90,7 +98,7 @@ mod mongo_render_tests {
 
         assert_eq!(
             rendered.trim(),
-            "posts_ids String[]\nposts Post[] @relation(name: \"test\", fields: [posts_ids])"
+            "posts_ids String[]\nposts Post[] @relation(name: \"test\", fields: [posts_ids], references: [id])"
         )
     }
 }

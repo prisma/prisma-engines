@@ -2,7 +2,7 @@
 use super::FilteredQuery;
 use connector::{filter::Filter, DatasourceFieldName, RecordFilter, WriteArgs};
 use prisma_models::prelude::*;
-use std::sync::Arc;
+use std::{collections::HashMap, sync::Arc};
 
 #[derive(Debug, Clone)]
 pub enum WriteQuery {
@@ -19,11 +19,10 @@ pub enum WriteQuery {
 }
 
 impl WriteQuery {
-    #[tracing::instrument(skip(self, projection))]
-    pub fn inject_projection_into_args(&mut self, projection: RecordProjection) {
-        let keys: Vec<_> = projection.fields().map(|sf| sf.db_name().to_owned()).collect();
-        let values: Vec<_> = projection.values().collect();
-
+    /// Takes a SelectionResult and writes its contents into the write arguments of the underlying query.
+    #[tracing::instrument(skip(self, result))]
+    pub fn inject_result_into_args(&mut self, result: SelectionResult) {
+        let model = self.model();
         let args = match self {
             Self::CreateRecord(ref mut x) => &mut x.args,
             Self::UpdateRecord(x) => &mut x.args,
@@ -31,18 +30,19 @@ impl WriteQuery {
             _ => return,
         };
 
-        let model = projection.model().expect("Model was not found");
-
-        keys.into_iter()
-            .zip(values)
-            .for_each(|(key, value)| args.insert(DatasourceFieldName(key), value));
+        for (selected_field, value) in result {
+            args.insert(
+                DatasourceFieldName(selected_field.db_name().to_owned()),
+                (&selected_field, value),
+            )
+        }
 
         args.update_datetimes(model);
     }
 
-    #[tracing::instrument(skip(self, projection))]
-    pub fn returns(&self, projection: &ModelProjection) -> bool {
-        let returns_id = &self.model().primary_identifier() == projection;
+    #[tracing::instrument(skip(self, field_selection))]
+    pub fn returns(&self, field_selection: &FieldSelection) -> bool {
+        let returns_id = &self.model().primary_identifier() == field_selection;
 
         // Write operations only return IDs at the moment, so anything different
         // from the primary ID is automatically not returned.
@@ -115,8 +115,8 @@ impl std::fmt::Display for WriteQuery {
             Self::DeleteManyRecords(q) => write!(f, "DeleteManyRecords: {}", q.model.name),
             Self::ConnectRecords(_) => write!(f, "ConnectRecords"),
             Self::DisconnectRecords(_) => write!(f, "DisconnectRecords"),
-            Self::ExecuteRaw(r) => write!(f, "ExecuteRaw: {} ({:?})", r.query, r.parameters),
-            Self::QueryRaw(r) => write!(f, "QueryRaw: {} ({:?})", r.query, r.parameters),
+            Self::ExecuteRaw(r) => write!(f, "ExecuteRaw: {:?}", r.inputs),
+            Self::QueryRaw(r) => write!(f, "QueryRaw: {:?}", r.inputs),
         }
     }
 }
@@ -135,17 +135,15 @@ pub struct CreateManyRecords {
 }
 
 impl CreateManyRecords {
-    #[tracing::instrument(skip(self, projection))]
-    pub fn inject_all(&mut self, projection: RecordProjection) {
-        let keys: Vec<_> = projection.fields().map(|sf| sf.db_name().to_owned()).collect();
-        let values: Vec<_> = projection.values().collect();
-
-        let zipped = keys.into_iter().zip(values);
-
-        for arg in self.args.iter_mut() {
-            zipped
-                .clone()
-                .for_each(|(key, value)| arg.insert(DatasourceFieldName(key), value));
+    #[tracing::instrument(skip(self, result))]
+    pub fn inject_result_into_all(&mut self, result: SelectionResult) {
+        for (selected_field, value) in result {
+            for args in self.args.iter_mut() {
+                args.insert(
+                    DatasourceFieldName(selected_field.db_name().to_owned()),
+                    (&selected_field, value.clone()),
+                )
+            }
         }
     }
 }
@@ -178,22 +176,26 @@ pub struct DeleteManyRecords {
 
 #[derive(Debug, Clone)]
 pub struct ConnectRecords {
-    pub parent_id: Option<RecordProjection>,
-    pub child_ids: Vec<RecordProjection>,
+    pub parent_id: Option<SelectionResult>,
+    pub child_ids: Vec<SelectionResult>,
     pub relation_field: RelationFieldRef,
 }
 
 #[derive(Debug, Clone)]
 pub struct DisconnectRecords {
-    pub parent_id: Option<RecordProjection>,
-    pub child_ids: Vec<RecordProjection>,
+    pub parent_id: Option<SelectionResult>,
+    pub child_ids: Vec<SelectionResult>,
     pub relation_field: RelationFieldRef,
 }
 
 #[derive(Debug, Clone)]
 pub struct RawQuery {
-    pub query: String,
-    pub parameters: Vec<PrismaValue>,
+    /// Model associated with the raw query, if one is necessary
+    pub model: Option<ModelRef>,
+    /// Map of query arguments and their values
+    pub inputs: HashMap<String, PrismaValue>,
+    /// Hint as to what kind of query is being executed
+    pub query_type: Option<String>,
 }
 
 impl FilteredQuery for UpdateRecord {

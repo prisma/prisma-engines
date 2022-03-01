@@ -1,5 +1,6 @@
 use crate::test_api::*;
 use barrel::{types, Migration};
+use indoc::indoc;
 use native_types::{MySqlType, NativeType};
 use pretty_assertions::assert_eq;
 use sql_schema_describer::*;
@@ -584,7 +585,7 @@ fn all_mysql_column_types_must_work(api: TestApi) {
             columns: expected_columns,
             indices: vec![],
             primary_key: Some(PrimaryKey {
-                columns: vec!["primary_col".to_string()],
+                columns: vec![PrimaryKeyColumn::new("primary_col")],
                 sequence: None,
                 constraint_name: None,
             }),
@@ -1114,7 +1115,7 @@ fn all_mysql_8_column_types_must_work(api: TestApi) {
             columns: expected_columns,
             indices: vec![],
             primary_key: Some(PrimaryKey {
-                columns: vec!["primary_col".to_string()],
+                columns: vec![PrimaryKeyColumn::new("primary_col")],
                 sequence: None,
                 constraint_name: None,
             }),
@@ -1169,7 +1170,7 @@ fn mysql_foreign_key_on_delete_must_be_handled(api: TestApi) {
     });
 }
 
-#[test_connector(tags(Mysql))]
+#[test_connector(tags(Mysql8))]
 fn mysql_multi_field_indexes_must_be_inferred(api: TestApi) {
     let mut migration = Migration::new().schema(api.db_name());
     migration.create_table("Employee", move |t| {
@@ -1184,12 +1185,65 @@ fn mysql_multi_field_indexes_must_be_inferred(api: TestApi) {
     let result = api.describe();
     let table = result.get_table("Employee").expect("couldn't get Employee table");
 
+    let columns = vec![
+        IndexColumn {
+            name: "name".into(),
+            sort_order: Some(SQLSortOrder::Asc),
+            length: None,
+        },
+        IndexColumn {
+            name: "age".into(),
+            sort_order: Some(SQLSortOrder::Asc),
+            length: None,
+        },
+    ];
+
     assert_eq!(
         table.indices,
         &[Index {
             name: "age_and_name_index".into(),
-            columns: vec!["name".to_owned(), "age".to_owned()],
+            columns,
             tpe: IndexType::Unique,
+            algorithm: None,
+        }]
+    );
+}
+
+#[test_connector(tags(Mysql), exclude(Mysql8))]
+fn old_mysql_multi_field_indexes_must_be_inferred(api: TestApi) {
+    let mut migration = Migration::new().schema(api.db_name());
+    migration.create_table("Employee", move |t| {
+        t.add_column("id", types::primary());
+        t.add_column("age", types::integer());
+        t.add_column("name", types::varchar(200));
+        t.add_index("age_and_name_index", types::index(vec!["name", "age"]).unique(true));
+    });
+
+    let full_sql = migration.make::<barrel::backend::MySql>();
+    api.raw_cmd(&full_sql);
+    let result = api.describe();
+    let table = result.get_table("Employee").expect("couldn't get Employee table");
+
+    let columns = vec![
+        IndexColumn {
+            name: "name".into(),
+            sort_order: Some(SQLSortOrder::Asc),
+            length: None,
+        },
+        IndexColumn {
+            name: "age".into(),
+            sort_order: Some(SQLSortOrder::Asc),
+            length: None,
+        },
+    ];
+
+    assert_eq!(
+        table.indices,
+        &[Index {
+            name: "age_and_name_index".into(),
+            columns,
+            tpe: IndexType::Unique,
+            algorithm: None,
         }]
     );
 }
@@ -1245,7 +1299,7 @@ fn constraints_from_other_databases_should_not_be_introspected(api: TestApi) {
     let full_sql = other_migration.make::<barrel::backend::MySql>();
     api.raw_cmd(&full_sql);
 
-    let schema = api.describe_with_schema(&"other_schema");
+    let schema = api.describe_with_schema("other_schema");
     let table = schema.table_bang("Post");
 
     let fks = &table.foreign_keys;
@@ -1304,7 +1358,7 @@ fn mysql_introspected_default_strings_should_be_unescaped(api: TestApi) {
         )
     "#;
 
-    api.raw_cmd(&create_table);
+    api.raw_cmd(create_table);
     let schema = api.describe();
 
     let expected_default = prisma_value::PrismaValue::String(
@@ -1379,7 +1433,7 @@ fn escaped_backslashes_in_string_literals_must_be_unescaped(api: TestApi) {
         )
     "#;
 
-    api.raw_cmd(&create_table);
+    api.raw_cmd(create_table);
 
     let schema = api.describe();
 
@@ -1418,7 +1472,7 @@ fn function_expression_defaults_are_described_as_dbgenerated(api: TestApi) {
         );
     "#;
 
-    api.raw_cmd(&create_table);
+    api.raw_cmd(create_table);
 
     let schema = api.describe();
 
@@ -1478,4 +1532,60 @@ fn dangling_foreign_keys_are_filtered_out(api: TestApi) {
         "{:#?}",
         table.foreign_keys
     );
+}
+
+#[test_connector(tags(Mysql8))]
+fn primary_key_length_is_handled(api: TestApi) {
+    let sql = indoc! {r#"
+        CREATE TABLE `A` (
+            id TEXT NOT NULL,
+            CONSTRAINT PRIMARY KEY (id (255))
+        );
+    "#};
+
+    api.raw_cmd(sql);
+
+    let schema = api.describe();
+    let table = schema.table_walkers().next().unwrap();
+
+    assert_eq!(1, table.primary_key_columns().len());
+
+    let columns = table.primary_key_columns().collect::<Vec<_>>();
+
+    assert_eq!("id", columns[0].as_column().name());
+    assert_eq!(Some(255), columns[0].length());
+}
+
+#[test_connector(tags(Mysql8))]
+fn index_length_and_sorting_is_handled(api: TestApi) {
+    let sql = indoc! {r#"
+        CREATE TABLE `A` (
+            id INT PRIMARY KEY,
+            a  TEXT NOT NULL,
+            b  TEXT NOT NULL
+        );
+
+        CREATE INDEX foo ON `A` (a (10) ASC, b (20) DESC);
+    "#};
+
+    api.raw_cmd(sql);
+
+    let schema = api.describe();
+    let table = schema.table_walkers().next().unwrap();
+
+    assert_eq!(1, table.indexes_count());
+
+    let index = table.indexes().next().unwrap();
+    let columns = index.columns().collect::<Vec<_>>();
+
+    assert_eq!(2, columns.len());
+
+    assert_eq!("a", columns[0].as_column().name());
+    assert_eq!("b", columns[1].as_column().name());
+
+    assert_eq!(Some(SQLSortOrder::Asc), columns[0].sort_order());
+    assert_eq!(Some(SQLSortOrder::Desc), columns[1].sort_order());
+
+    assert_eq!(Some(10), columns[0].length());
+    assert_eq!(Some(20), columns[1].length());
 }

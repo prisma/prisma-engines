@@ -1,10 +1,6 @@
-use std::{fmt::Display, str::FromStr};
-
-use datamodel_connector::Connector;
-use sql_datamodel_connector::MySqlDatamodelConnector;
-
 use super::*;
 use crate::{SqlDatamodelRenderer, TestResult};
+use std::{fmt::Display, str::FromStr};
 
 #[derive(Debug, Default, Clone)]
 pub struct VitessConnectorTag {
@@ -23,8 +19,8 @@ impl ConnectorTagInterface for VitessConnectorTag {
 
     fn connection_string(&self, _database: &str, _is_ci: bool) -> String {
         match self.version {
-            Some(VitessVersion::V5_7) => "mysql://root@localhost:33577/test?connection_limit=1".into(),
-            Some(VitessVersion::V8_0) => "mysql://root@localhost:33807/test?connection_limit=1".into(),
+            Some(VitessVersion::V5_7) => "mysql://root@localhost:33577/test".into(),
+            Some(VitessVersion::V8_0) => "mysql://root@localhost:33807/test".into(),
             None => unreachable!("A versioned connector must have a concrete version to run."),
         }
     }
@@ -40,6 +36,10 @@ impl ConnectorTagInterface for VitessConnectorTag {
 
     fn is_versioned(&self) -> bool {
         true
+    }
+
+    fn referential_integrity(&self) -> &'static str {
+        "prisma"
     }
 }
 
@@ -77,6 +77,11 @@ impl VitessConnectorTag {
             },
         ]
     }
+
+    /// Get a reference to the vitess connector tag's version.
+    pub fn version(&self) -> Option<VitessVersion> {
+        self.version
+    }
 }
 
 impl PartialEq for VitessConnectorTag {
@@ -112,6 +117,5 @@ impl Display for VitessVersion {
 }
 
 fn vitess_capabilities() -> Vec<ConnectorCapability> {
-    let dm_connector = MySqlDatamodelConnector::new();
-    dm_connector.capabilities().to_owned()
+    sql_datamodel_connector::MYSQL.capabilities().to_owned()
 }

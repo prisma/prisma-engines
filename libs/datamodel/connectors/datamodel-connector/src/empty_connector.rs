@@ -1,4 +1,7 @@
-use crate::{connector_error::ConnectorError, Connector, ConnectorCapability};
+use crate::{
+    connector_error::ConnectorError, Connector, ConnectorCapability, NativeTypeInstance, ReferentialAction, ScalarType,
+};
+use enumflags2::BitFlags;
 
 /// A [Connector](/trait.Connector.html) implementor meant to
 /// be used as a default when no datasource is defined.
@@ -9,50 +12,49 @@ impl Connector for EmptyDatamodelConnector {
         std::any::type_name::<EmptyDatamodelConnector>()
     }
 
-    fn capabilities(&self) -> &[ConnectorCapability] {
+    fn referential_actions(&self, _referential_integrity: &crate::ReferentialIntegrity) -> BitFlags<ReferentialAction> {
+        BitFlags::all()
+    }
+
+    fn capabilities(&self) -> &'static [ConnectorCapability] {
+        &[
+            ConnectorCapability::AutoIncrement,
+            ConnectorCapability::CompoundIds,
+            ConnectorCapability::Enums,
+            ConnectorCapability::Json,
+            ConnectorCapability::ImplicitManyToManyRelation,
+        ]
+    }
+
+    fn max_identifier_length(&self) -> usize {
+        usize::MAX
+    }
+
+    fn available_native_type_constructors(&self) -> &'static [crate::native_type_constructor::NativeTypeConstructor] {
         &[]
     }
 
-    fn validate_field(&self, _field: &dml::field::Field) -> Result<(), ConnectorError> {
-        Ok(())
+    fn scalar_type_for_native_type(&self, _native_type: serde_json::Value) -> ScalarType {
+        ScalarType::String
     }
 
-    fn validate_model(&self, _model: &dml::model::Model) -> Result<(), ConnectorError> {
-        Ok(())
-    }
-
-    fn available_native_type_constructors(&self) -> &[dml::native_type_constructor::NativeTypeConstructor] {
-        &[]
-    }
-
-    fn scalar_type_for_native_type(&self, _native_type: serde_json::Value) -> dml::scalars::ScalarType {
-        dml::scalars::ScalarType::String
-    }
-
-    fn default_native_type_for_scalar_type(&self, _scalar_type: &dml::scalars::ScalarType) -> serde_json::Value {
+    fn default_native_type_for_scalar_type(&self, _scalar_type: &ScalarType) -> serde_json::Value {
         serde_json::Value::Null
     }
 
     fn native_type_is_default_for_scalar_type(
         &self,
         _native_type: serde_json::Value,
-        _scalar_type: &dml::scalars::ScalarType,
+        _scalar_type: &ScalarType,
     ) -> bool {
         false
     }
 
-    fn parse_native_type(
-        &self,
-        name: &str,
-        _args: Vec<String>,
-    ) -> Result<dml::native_type_instance::NativeTypeInstance, ConnectorError> {
+    fn parse_native_type(&self, name: &str, _args: Vec<String>) -> Result<NativeTypeInstance, ConnectorError> {
         Err(ConnectorError::new_native_type_parser_error(name))
     }
 
-    fn introspect_native_type(
-        &self,
-        _native_type: serde_json::Value,
-    ) -> Result<dml::native_type_instance::NativeTypeInstance, ConnectorError> {
+    fn introspect_native_type(&self, _native_type: serde_json::Value) -> Result<NativeTypeInstance, ConnectorError> {
         unreachable!("introspect_native_type on EmptyDatamodelConnector")
     }
 

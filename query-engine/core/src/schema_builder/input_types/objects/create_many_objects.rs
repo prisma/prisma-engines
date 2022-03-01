@@ -1,6 +1,6 @@
+use super::fields::data_input_mapper::*;
 use super::*;
 use datamodel_connector::ConnectorCapability;
-use prisma_models::dml::DefaultValue;
 
 /// Create many data input type.
 /// Input type allows to write all scalar fields except if in a nested case,
@@ -23,10 +23,27 @@ pub(crate) fn create_many_object_type(
     let input_object = Arc::new(init_input_object_type(ident.clone()));
     ctx.cache_input_type(ident, input_object.clone());
 
+    let filtered_fields = filter_create_many_fields(ctx, model, parent_field);
+    let field_mapper = CreateDataInputFieldMapper::new_checked();
+    let input_fields = field_mapper.map_all(ctx, &filtered_fields);
+
+    input_object.set_fields(input_fields);
+    Arc::downgrade(&input_object)
+}
+
+/// Filters the given model's fields down to the allowed ones for checked create.
+fn filter_create_many_fields(
+    ctx: &BuilderContext,
+    model: &ModelRef,
+    parent_field: Option<&RelationFieldRef>,
+) -> Vec<ModelField> {
     let linking_fields = if let Some(parent_field) = parent_field {
         let child_field = parent_field.related_field();
         if child_field.is_inlined_on_enclosing_model() {
-            child_field.linking_fields().scalar_fields().collect()
+            child_field
+                .linking_fields()
+                .as_scalar_fields()
+                .expect("Expected linking fields to be scalar.")
         } else {
             vec![]
         }
@@ -36,36 +53,24 @@ pub(crate) fn create_many_object_type(
 
     // 1) Filter out parent links.
     // 2) Only allow writing autoincrement fields if the connector supports it.
-    let scalar_fields: Vec<ScalarFieldRef> = model
+    model
         .fields()
-        .scalar()
-        .into_iter()
-        .filter(|sf| {
-            if linking_fields.contains(sf) {
-                false
-            } else if sf.is_autoincrement {
-                ctx.capabilities
-                    .contains(ConnectorCapability::CreateManyWriteableAutoIncId)
-            } else {
-                true
+        .all
+        .iter()
+        .filter(|field| match field {
+            ModelField::Scalar(sf) => {
+                if linking_fields.contains(sf) {
+                    false
+                } else if sf.is_autoincrement {
+                    ctx.capabilities
+                        .contains(ConnectorCapability::CreateManyWriteableAutoIncId)
+                } else {
+                    true
+                }
             }
+            ModelField::Composite(_) => true,
+            _ => false,
         })
-        .collect();
-
-    let fields = input_fields::scalar_input_fields(
-        ctx,
-        scalar_fields,
-        |ctx, f: ScalarFieldRef, default: Option<DefaultValue>| {
-            let typ = map_scalar_input_type_for_field(ctx, &f);
-
-            input_field(f.name.clone(), typ, default)
-                .optional_if(!f.is_required || f.default_value.is_some() || f.is_created_at() || f.is_updated_at())
-                .nullable_if(!f.is_required)
-        },
-        |ctx, f, _| input_fields::scalar_list_input_field_mapper(ctx, model.name.clone(), "CreateMany", f, true),
-        true,
-    );
-
-    input_object.set_fields(fields);
-    Arc::downgrade(&input_object)
+        .map(Clone::clone)
+        .collect()
 }

@@ -1,9 +1,10 @@
-use crate::field::{Field, FieldType, RelationField, ScalarField};
+use crate::composite_type::CompositeType;
+use crate::field::{Field, RelationField, ScalarField};
 use crate::model::Model;
 use crate::r#enum::Enum;
 use crate::relation_info::RelationInfo;
 
-/// Entities in the datamodel can be flagged as `is_commented_out`. This let's the renderer
+/// Entities in the datamodel can be flagged as `is_commented_out`. This lets the renderer
 /// know that introspection encountered unsupported names or features and these are supposed
 /// to be rendered as comments. Since the parser will not set these flags when reading a schema
 /// string, only introspection and the lowering of the datamodel to the ast care about these flags.
@@ -13,6 +14,7 @@ use crate::relation_info::RelationInfo;
 pub struct Datamodel {
     pub enums: Vec<Enum>,
     pub models: Vec<Model>,
+    pub composite_types: Vec<CompositeType>,
 }
 
 impl Datamodel {
@@ -40,6 +42,11 @@ impl Datamodel {
         self.models.iter()
     }
 
+    /// Gets an iterator over all composite types.
+    pub fn composite_types(&self) -> std::slice::Iter<CompositeType> {
+        self.composite_types.iter()
+    }
+
     /// Gets an iterator over all enums.
     pub fn enums(&self) -> std::slice::Iter<Enum> {
         self.enums.iter()
@@ -60,6 +67,11 @@ impl Datamodel {
         self.models().find(|model| model.name == name)
     }
 
+    /// Finds a composite type by name.
+    pub fn find_composite_type(&self, name: &str) -> Option<&CompositeType> {
+        self.composite_types().find(|composite| composite.name == name)
+    }
+
     /// Finds a model by database name. This will only find models with a name
     /// remapped to the provided `db_name`.
     pub fn find_model_db_name(&self, db_name: &str) -> Option<&Model> {
@@ -69,7 +81,7 @@ impl Datamodel {
 
     /// Finds parent  model for a field reference.
     pub fn find_model_by_relation_field_ref(&self, field: &RelationField) -> Option<&Model> {
-        self.find_model(&self.find_related_field_bang(&field).1.relation_info.to)
+        self.find_model(&self.find_related_field_bang(field).1.relation_info.to)
     }
 
     /// Finds a mutable field reference by a model and field name.
@@ -84,6 +96,7 @@ impl Datamodel {
     }
 
     /// Finds a mutable relation field reference by a model and field name.
+    #[track_caller]
     pub fn find_relation_field_mut(&mut self, model: &str, field: &str) -> &mut RelationField {
         self.find_model_mut(model).find_relation_field_mut(field)
     }
@@ -117,7 +130,7 @@ impl Datamodel {
         let mut fields = vec![];
         for model in self.models() {
             for field in model.scalar_fields() {
-                if FieldType::Enum(enum_name.to_owned()) == field.field_type {
+                if field.field_type.is_enum(enum_name) {
                     fields.push((model.name.clone(), field.name.clone()))
                 }
             }

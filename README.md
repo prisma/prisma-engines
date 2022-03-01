@@ -2,6 +2,7 @@
 
 [![Query Engine](https://github.com/prisma/prisma-engines/actions/workflows/query-engine.yml/badge.svg)](https://github.com/prisma/prisma-engines/actions/workflows/query-engine.yml)
 [![Introspection Engine + Migration Engine + sql_schema_describer](https://github.com/prisma/prisma-engines/actions/workflows/migration-engine.yml/badge.svg)](https://github.com/prisma/prisma-engines/actions/workflows/migration-engine.yml)
+[![Cargo docs](https://github.com/prisma/prisma-engines/actions/workflows/cargo-doc.yml/badge.svg)](https://github.com/prisma/prisma-engines/actions/workflows/cargo-doc.yml)
 
 This repository contains a collection of engines that power the core stack for
 [Prisma](https://github.com/prisma/prisma), most prominently [Prisma
@@ -10,21 +11,28 @@ Migrate](https://www.prisma.io/migrate).
 
 The engines and their respective binary crates are:
 - Query engine: `query-engine`
-- Migration engine: `migration-engine`
+- Migration engine: `migration-engine-cli`
 - Introspection engine: `introspection-engine`
 - Prisma Format: `prisma-fmt`
+
+## Documentation
+
+The [API docs (cargo doc)](https://prisma.github.io/prisma-engines/) are
+published on the repo GitHub pages.
 
 ## Building Prisma Engines
 
 **Prerequisites:**
-- Installed the stable Rust toolchain, at least version 1.48.0. You can get the
+- Installed the stable Rust toolchain, at least version 1.52.0. You can get the
   toolchain at [rustup](https://rustup.rs/) or the package manager of your
   choice.
 - Linux only: OpenSSL is required to be installed.
 - Installed [direnv](https://github.com/direnv/direnv), then `direnv allow` on
-  the repository root.
+  the repository root. 
+    - Make sure direnv is [hooked](https://direnv.net/docs/hook.html) into your shell
     - Alternatively: Load the defined environment in `./.envrc` manually in your
       shell.
+- **For m1 users**: Install [Protocol Buffers](https://grpc.io/docs/protoc-installation/)
 
 **How to build:**
 
@@ -116,80 +124,69 @@ The prisma version hash is the latest git commit at the time the binary was buil
 
 ## Testing
 
-There are two test suites for the engines: Unit tests ("Cargo tests") and
-integration tests ("Connector TestKit").
+There are two test suites for the engines: Unit tests and
+integration tests.
 
-The Unit tests are implemented in the Rust code. They test internal
+- **Unit tests**: They test internal
 functionality of individual crates and components.
 
-The Connector TestKit is a separate Scala project found at
-`./query-engine/connector-test-kit` that runs GraphQL queries against isolated
-instances of the query engine and asserts that the responses are correct.
+  You can find them across the whole codebase, usually in `./tests` folders at the root of modules. 
 
-### Set up & run integration tests:
+- **Integration tests**: They run GraphQL queries against isolated
+instances of the Query Engine and asserts that the responses are correct.
+
+  You can find them at `./query-engine/connector-test-kit-rs`.
+
+### Set up & run tests:
 
 **Prerequisites:**
 - Installed Rust toolchain.
 - Installed Docker and Docker-Compose.
-- Installed Java, Scala, SBT (Scala Build Tool).
 - Installed `direnv`, then `direnv allow` on the repository root.
     - Alternatively: Load the defined environment in `./.envrc` manually in your shell.
 
 **Setup:**
 There are helper `make` commands to set up a test environment for a specific
 database connector you want to test. The commands set up a container (if needed)
-and write the `current_connector` file, which is picked up by the integration
+and write the `.test_config` file, which is picked up by the integration
 tests:
 
 - `make dev-mysql`: MySQL 5.7
 - `make dev-mysql8`: MySQL 8
 - `make dev-postgres`: PostgreSQL 10
 - `make dev-sqlite`: SQLite
-
-As an optional but recommended step, you can run the tests by setting up an
-IntelliJ project for `./query-engine/connector-test-kit`, which makes test
-results much more accessible. You need to install the Scala plugin for Intellij
-if you want to do so.
-
-Remember to set IntelliJ to use the version 8 of OpenJDK distribution.
+- `make dev-mongodb5`: MongoDB 5
 
 **On windows:*
 If not using WSL, `make` is not available and you should just see what your
 command does and do it manually. Basically this means editing the
-`current_connector` file and starting the needed Docker containers.
+`.test_config` file and starting the needed Docker containers.
 
 To actually get the tests working, read the contents of `.envrc`. Then `Edit
 environment variables for your account` from Windows settings, and add at least
 the correct values for the following variables:
 
-- `SERVER ROOT` should point to the root directory of `prisma-engines` project.
+- `WORKSPACE_ROOT` should point to the root directory of `prisma-engines` project.
 - `PRISMA_BINARY_PATH` is usually
-  `%SERVER_ROOT%\target\release\query-engine.exe`.
+  `%WORKSPACE_ROOT%\target\release\query-engine.exe`.
 - `MIGRATION_ENGINE_BINARY_PATH` should be
-  `%SERVER_ROOT%\target\release\migration-engine.exe`.
+  `%WORKSPACE_ROOT%\target\release\migration-engine.exe`.
 
 Other variables may or may not be useful.
 
 **Run:**
-If you're using Intellij, you can run all tests by right-clicking
-`src/test/scala` > `Run ScalaTests`.
 
-If you want to use the command line, start `sbt` in
-`./query-engine/connector-test-kit`, then execute `test` in the sbt shell.
-
-### Set up & run cargo tests:
-
-**Prerequisites:**
-- Installed Rust toolchain.
-- Installed Docker and Docker-Compose.
-- Start all test databases with `make all-dbs`.
-
-**Run:**
 Run `cargo test` in the repository root.
 
-## WIP Coding Guidelines
-- Prevent compiler warnings
-- Use Rust formatting (`cargo fmt`)
+## Parallel rust-analyzer builds
+
+When rust-analzyer runs `cargo check` it will lock the build directory and stop any cargo commands from running until it has completed. This makes the build process feel a lot longer. It is possible to avoid this by setting a different build path for 
+rust-analyzer. To avoid this. Open VSCode settings and search for `Check on Save: Extra Args`. Look for the `Rust-analyzer › Check On Save: Extra Args` settings and add a new directory for rust-analyzer. Something like:
+
+```
+--target-dir:/tmp/rust-analyzer-check
+```
+
 
 ## Security
 

@@ -3,13 +3,14 @@ use std::fmt::Debug;
 
 /// Diffable things
 pub enum DiffTarget<'a> {
-    /// A Prisma schema
-    Datamodel((&'a datamodel::Configuration, &'a datamodel::Datamodel)),
-    /// A migrations folder. What is diffable is the state of the database schema at the end of the migrations history.
+    /// A Prisma schema.
+    Datamodel(&'a str),
+    /// A migrations folder. What is diffable is the state of the database schema at the end of the
+    /// migrations history.
     Migrations(&'a [MigrationDirectory]),
     /// A live database connection string.
     Database,
-    /// Assume an empty database schema
+    /// Assume an empty database schema.
     Empty,
 }
 
@@ -26,9 +27,9 @@ impl Debug for DiffTarget<'_> {
 
 impl DiffTarget<'_> {
     /// Try interpreting the DiffTarget as a Datamodel variant.
-    pub fn as_datamodel(&self) -> Option<(&datamodel::Configuration, &datamodel::Datamodel)> {
+    pub fn as_datamodel(&self) -> Option<&str> {
         match self {
-            DiffTarget::Datamodel(schema) => Some(*schema),
+            DiffTarget::Datamodel(schema) => Some(schema),
             _ => None,
         }
     }

@@ -1,3 +1,4 @@
+mod cockroachdb;
 mod mongodb;
 mod mysql;
 mod postgres;
@@ -5,15 +6,16 @@ mod sql_server;
 mod sqlite;
 mod vitess;
 
+use cockroachdb::*;
 use datamodel_connector::ConnectorCapability;
 use enum_dispatch::enum_dispatch;
-use mongodb::*;
-use mysql::*;
-use postgres::*;
-use sql_server::*;
-use sqlite::*;
+pub use mongodb::*;
+pub use mysql::*;
+pub use postgres::*;
+pub use sql_server::*;
+pub use sqlite::*;
 use std::{convert::TryFrom, fmt};
-use vitess::*;
+pub use vitess::*;
 
 use crate::{datamodel_rendering::DatamodelRenderer, TestConfig, TestError};
 
@@ -42,6 +44,18 @@ pub trait ConnectorTagInterface {
 
     /// Must return `true` if the connector family is versioned (e.g. Postgres9, Postgres10, ...), false otherwise.
     fn is_versioned(&self) -> bool;
+
+    /// Indicates whether or not the test setup needs to explicitly tear down test databases (via `qe_teardown`).
+    fn requires_teardown(&self) -> bool {
+        false
+    }
+
+    /// Defines where relational constraints are handled:
+    ///   - "prisma" is handled in the Query Engine core
+    ///   - "foreignKeys" lets the database handle them
+    fn referential_integrity(&self) -> &'static str {
+        "foreignKeys"
+    }
 }
 
 #[enum_dispatch(ConnectorTagInterface)]
@@ -53,17 +67,75 @@ pub enum ConnectorTag {
     MongoDb(MongoDbConnectorTag),
     Sqlite(SqliteConnectorTag),
     Vitess(VitessConnectorTag),
+    Cockroach(CockroachDbConnectorTag),
+}
+
+#[derive(Debug, Clone)]
+pub enum ConnectorVersion {
+    SqlServer(Option<SqlServerVersion>),
+    Postgres(Option<PostgresVersion>),
+    MySql(Option<MySqlVersion>),
+    MongoDb(Option<MongoDbVersion>),
+    Sqlite,
+    CockroachDb,
+    Vitess(Option<VitessVersion>),
+}
+
+impl From<&ConnectorTag> for ConnectorVersion {
+    fn from(connector: &ConnectorTag) -> Self {
+        match connector {
+            ConnectorTag::SqlServer(c) => ConnectorVersion::SqlServer(c.version()),
+            ConnectorTag::Postgres(c) => ConnectorVersion::Postgres(c.version()),
+            ConnectorTag::MySql(c) => ConnectorVersion::MySql(c.version()),
+            ConnectorTag::MongoDb(c) => ConnectorVersion::MongoDb(c.version()),
+            ConnectorTag::Sqlite(_) => ConnectorVersion::Sqlite,
+            ConnectorTag::Cockroach(_) => ConnectorVersion::CockroachDb,
+            ConnectorTag::Vitess(c) => ConnectorVersion::Vitess(c.version()),
+        }
+    }
 }
 
 impl fmt::Display for ConnectorTag {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let printable = match self {
-            ConnectorTag::SqlServer(_) => "SQL Server",
-            ConnectorTag::Postgres(_) => "PostgreSQL",
-            ConnectorTag::MySql(_) => "MySQL",
-            ConnectorTag::MongoDb(_) => "MongoDB",
-            ConnectorTag::Sqlite(_) => "SQLite",
-            ConnectorTag::Vitess(_) => "Vitess",
+            Self::SqlServer(_) => "SQL Server",
+            Self::Postgres(_) => "PostgreSQL",
+            Self::MySql(_) => "MySQL",
+            Self::MongoDb(_) => "MongoDB",
+            Self::Sqlite(_) => "SQLite",
+            Self::Vitess(_) => "Vitess",
+            Self::Cockroach(_) => "CockroachDB",
+        };
+
+        write!(f, "{}", printable)
+    }
+}
+
+impl fmt::Display for ConnectorVersion {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let printable = match self {
+            Self::SqlServer(v) => match v {
+                Some(v) => format!("SQL Server ({})", v.to_string()),
+                None => "SQL Server (unknown)".to_string(),
+            },
+            Self::Postgres(v) => match v {
+                Some(v) => format!("PostgreSQL ({})", v.to_string()),
+                None => "PostgreSQL (unknown)".to_string(),
+            },
+            Self::MySql(v) => match v {
+                Some(v) => format!("MySQL ({})", v.to_string()),
+                None => "MySQL (unknown)".to_string(),
+            },
+            Self::MongoDb(v) => match v {
+                Some(v) => format!("MongoDB ({})", v.to_string()),
+                None => "MongoDB (unknown)".to_string(),
+            },
+            Self::Sqlite => "SQLite".to_string(),
+            Self::Vitess(v) => match v {
+                Some(v) => format!("Vitess ({})", v),
+                None => "Vitess (unknown)".to_string(),
+            },
+            Self::CockroachDb => "CockroachDB".to_string(),
         };
 
         write!(f, "{}", printable)
@@ -80,6 +152,7 @@ impl ConnectorTag {
             .chain(MySqlConnectorTag::all().into_iter().map(Self::MySql))
             .chain(MongoDbConnectorTag::all().into_iter().map(Self::MongoDb))
             .chain(SqliteConnectorTag::all().into_iter().map(Self::Sqlite))
+            .chain(CockroachDbConnectorTag::all().into_iter().map(Self::Cockroach))
             .collect()
     }
 
@@ -129,6 +202,7 @@ impl TryFrom<(&str, Option<&str>)> for ConnectorTag {
         let tag = match connector.to_lowercase().as_str() {
             "sqlite" => Self::Sqlite(SqliteConnectorTag::new()),
             "sqlserver" => Self::SqlServer(SqlServerConnectorTag::new(version)?),
+            "cockroachdb" => Self::Cockroach(CockroachDbConnectorTag::new()),
             "postgres" => Self::Postgres(PostgresConnectorTag::new(version)?),
             "mysql" => Self::MySql(MySqlConnectorTag::new(version)?),
             "mongodb" => Self::MongoDb(MongoDbConnectorTag::new(version)?),

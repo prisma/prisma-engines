@@ -8,9 +8,18 @@ use quaint::{prelude::Queryable, Value};
 use serde_json::from_str;
 use std::{
     borrow::Cow,
-    collections::{BTreeMap, HashMap, HashSet},
+    collections::{BTreeMap, HashSet},
 };
 use tracing::trace;
+
+/// Matches a default value in the schema, wrapped single quotes.
+///
+/// Example:
+///
+/// ```ignore
+/// 'this is a test'
+/// ```
+static DEFAULT_QUOTES: Lazy<Regex> = Lazy::new(|| Regex::new(r"'(.*)'").unwrap());
 
 fn is_mariadb(version: &str) -> bool {
     version.contains("MariaDB")
@@ -42,8 +51,8 @@ impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber<'_> {
     }
 
     async fn get_metadata(&self, schema: &str) -> DescriberResult<SqlMetadata> {
-        let table_count = self.get_table_names(&schema).await?.len();
-        let size_in_bytes = self.get_size(&schema).await?;
+        let table_count = self.get_table_names(schema).await?.len();
+        let size_in_bytes = self.get_size(schema).await?;
 
         Ok(SqlMetadata {
             table_count,
@@ -62,7 +71,7 @@ impl super::SqlSchemaDescriberBackend for SqlSchemaDescriber<'_> {
         let table_names = self.get_table_names(schema).await?;
         let mut tables = Vec::with_capacity(table_names.len());
         let mut columns = Self::get_all_columns(self.conn, schema, &flavour).await?;
-        let mut indexes = Self::get_all_indexes(self.conn, schema).await?;
+        let mut indexes = self.get_all_indexes(schema).await?;
         let mut fks = Self::get_foreign_keys(self.conn, schema).await?;
 
         let mut enums = vec![];
@@ -205,9 +214,9 @@ impl<'a> SqlSchemaDescriber<'a> {
     fn get_table(
         &self,
         name: &str,
-        columns: &mut HashMap<String, (Vec<Column>, Vec<Enum>)>,
-        indexes: &mut HashMap<String, (BTreeMap<String, Index>, Option<PrimaryKey>)>,
-        foreign_keys: &mut HashMap<String, Vec<ForeignKey>>,
+        columns: &mut BTreeMap<String, (Vec<Column>, Vec<Enum>)>,
+        indexes: &mut BTreeMap<String, (BTreeMap<String, Index>, Option<PrimaryKey>)>,
+        foreign_keys: &mut BTreeMap<String, Vec<ForeignKey>>,
     ) -> (Table, Vec<Enum>) {
         let (columns, enums) = columns.remove(name).unwrap_or((vec![], vec![]));
         let (indices, primary_key) = indexes.remove(name).unwrap_or_else(|| (BTreeMap::new(), None));
@@ -230,7 +239,7 @@ impl<'a> SqlSchemaDescriber<'a> {
         conn: &dyn Queryable,
         schema_name: &str,
         flavour: &Flavour,
-    ) -> DescriberResult<HashMap<String, (Vec<Column>, Vec<Enum>)>> {
+    ) -> DescriberResult<BTreeMap<String, (Vec<Column>, Vec<Enum>)>> {
         // We alias all the columns because MySQL column names are case-insensitive in queries, but the
         // information schema column names became upper-case in MySQL 8, causing the code fetching
         // the result values by column name below to fail.
@@ -252,7 +261,7 @@ impl<'a> SqlSchemaDescriber<'a> {
             ORDER BY ordinal_position
         ";
 
-        let mut map = HashMap::new();
+        let mut map = BTreeMap::new();
 
         let rows = conn.query_raw(sql, &[schema_name.into()]).await?;
 
@@ -321,24 +330,29 @@ impl<'a> SqlSchemaDescriber<'a> {
                         Some(match &tpe.family {
                             ColumnTypeFamily::Int => match Self::parse_int(&default_string) {
                                 Some(int_value) => DefaultValue::value(int_value),
-                                None => Self::db_generated(&default_string, default_expression),
+                                None if default_expression => Self::dbgenerated_expression(&default_string),
+                                None => DefaultValue::db_generated(default_string),
                             },
                             ColumnTypeFamily::BigInt => match Self::parse_big_int(&default_string) {
                                 Some(int_value) => DefaultValue::value(int_value),
-                                None => Self::db_generated(&default_string, default_expression),
+                                None if default_expression => Self::dbgenerated_expression(&default_string),
+                                None => DefaultValue::db_generated(default_string),
                             },
                             ColumnTypeFamily::Float => match Self::parse_float(&default_string) {
                                 Some(float_value) => DefaultValue::value(float_value),
-                                None => Self::db_generated(&default_string, default_expression),
+                                None if default_expression => Self::dbgenerated_expression(&default_string),
+                                None => DefaultValue::db_generated(default_string),
                             },
                             ColumnTypeFamily::Decimal => match Self::parse_float(&default_string) {
                                 Some(float_value) => DefaultValue::value(float_value),
-                                None => Self::db_generated(&default_string, default_expression),
+                                None if default_expression => Self::dbgenerated_expression(&default_string),
+                                None => DefaultValue::db_generated(default_string),
                             },
                             ColumnTypeFamily::Boolean => match Self::parse_int(&default_string) {
                                 Some(PrismaValue::Int(1)) => DefaultValue::value(true),
                                 Some(PrismaValue::Int(0)) => DefaultValue::value(false),
-                                _ => Self::db_generated(&default_string, default_expression),
+                                _ if default_expression => Self::dbgenerated_expression(&default_string),
+                                _ => DefaultValue::db_generated(default_string),
                             },
                             ColumnTypeFamily::String => {
                                 // See https://dev.mysql.com/doc/refman/8.0/en/information-schema-columns-table.html
@@ -357,11 +371,24 @@ impl<'a> SqlSchemaDescriber<'a> {
                             //todo check other now() definitions
                             ColumnTypeFamily::DateTime => match Self::default_is_current_timestamp(&default_string) {
                                 true => DefaultValue::now(),
-                                _ => Self::db_generated(&default_string, default_expression),
+                                _ if default_expression => Self::dbgenerated_expression(&default_string),
+                                _ if DEFAULT_QUOTES.is_match(&default_string) => {
+                                    DefaultValue::db_generated(default_string)
+                                }
+                                _ => DefaultValue::db_generated(format!("'{default_string}'")),
                             },
-                            ColumnTypeFamily::Binary => Self::db_generated(&default_string, default_expression),
-                            ColumnTypeFamily::Json => Self::db_generated(&default_string, default_expression),
-                            ColumnTypeFamily::Uuid => Self::db_generated(&default_string, default_expression),
+                            ColumnTypeFamily::Binary => match default_expression {
+                                true => Self::dbgenerated_expression(&default_string),
+                                false => DefaultValue::db_generated(default_string),
+                            },
+                            ColumnTypeFamily::Json => match default_expression {
+                                true => Self::dbgenerated_expression(&default_string),
+                                false => DefaultValue::db_generated(default_string),
+                            },
+                            ColumnTypeFamily::Uuid => match default_expression {
+                                true => Self::dbgenerated_expression(&default_string),
+                                false => DefaultValue::db_generated(default_string),
+                            },
                             ColumnTypeFamily::Enum(_) => {
                                 if default_generated
                                     || (maria_db && !matches!(default_string.chars().next(), Some('\'')))
@@ -373,7 +400,10 @@ impl<'a> SqlSchemaDescriber<'a> {
                                     )))
                                 }
                             }
-                            ColumnTypeFamily::Unsupported(_) => Self::db_generated(&default_string, default_generated),
+                            ColumnTypeFamily::Unsupported(_) => match default_expression {
+                                true => Self::dbgenerated_expression(&default_string),
+                                false => DefaultValue::db_generated(default_string),
+                            },
                         })
                     }
                 },
@@ -392,33 +422,24 @@ impl<'a> SqlSchemaDescriber<'a> {
         Ok(map)
     }
 
-    fn db_generated(default_string: &str, default_generated: bool) -> DefaultValue {
-        if default_generated {
-            Self::dbgenerated_expression(default_string)
-        } else {
-            DefaultValue::db_generated(default_string)
-        }
-    }
-
     fn dbgenerated_expression(default_string: &str) -> DefaultValue {
         if matches!(default_string.chars().next(), Some('(')) {
-            DefaultValue::db_generated(default_string)
+            DefaultValue::db_generated(default_string.to_owned())
         } else {
             let mut introspected_default = String::with_capacity(default_string.len());
             introspected_default.push('(');
-            introspected_default.push_str(&default_string);
+            introspected_default.push_str(default_string);
             introspected_default.push(')');
             DefaultValue::db_generated(introspected_default)
         }
     }
 
     async fn get_all_indexes(
-        conn: &dyn Queryable,
+        &self,
         schema_name: &str,
-    ) -> DescriberResult<HashMap<String, (BTreeMap<String, Index>, Option<PrimaryKey>)>> {
-        let mut map = HashMap::new();
+    ) -> DescriberResult<BTreeMap<String, (BTreeMap<String, Index>, Option<PrimaryKey>)>> {
+        let mut map = BTreeMap::new();
         let mut indexes_with_expressions: HashSet<(String, String)> = HashSet::new();
-        let mut indexes_with_partially_covered_columns: HashSet<(String, String)> = HashSet::new();
 
         // We alias all the columns because MySQL column names are case-insensitive in queries, but the
         // information schema column names became upper-case in MySQL 8, causing the code fetching
@@ -430,20 +451,27 @@ impl<'a> SqlSchemaDescriber<'a> {
                 Binary column_name AS column_name,
                 seq_in_index AS seq_in_index,
                 Binary table_name AS table_name,
-                sub_part AS partial
+                sub_part AS partial,
+                Binary collation AS column_order,
+                Binary index_type AS index_type
             FROM INFORMATION_SCHEMA.STATISTICS
             WHERE table_schema = ?
             ORDER BY index_name, seq_in_index
             ";
-        let rows = conn.query_raw(sql, &[schema_name.into()]).await?;
+        let rows = self.conn.query_raw(sql, &[schema_name.into()]).await?;
 
         for row in rows {
             trace!("Got index row: {:#?}", row);
             let table_name = row.get_expect_string("table_name");
             let index_name = row.get_expect_string("index_name");
-            if row.get_u32("partial").is_some() {
-                indexes_with_partially_covered_columns.insert((table_name.clone(), index_name.clone()));
-            };
+            let length = row.get_u32("partial");
+
+            let sort_order = row.get_string("column_order").map(|v| match v.as_ref() {
+                "A" => SQLSortOrder::Asc,
+                "D" => SQLSortOrder::Desc,
+                misc => panic!("Unexpected sort order `{}`, collation should be A, D or Null", misc),
+            });
+
             match row.get_string("column_name") {
                 Some(column_name) => {
                     let seq_in_index = row.get_expect_i64("seq_in_index");
@@ -462,9 +490,14 @@ impl<'a> SqlSchemaDescriber<'a> {
                         match primary_key {
                             Some(pk) => {
                                 if pk.columns.len() < (pos + 1) as usize {
-                                    pk.columns.resize((pos + 1) as usize, "".to_string());
+                                    pk.columns.resize((pos + 1) as usize, PrimaryKeyColumn::default());
                                 }
-                                pk.columns[pos as usize] = column_name;
+
+                                let mut column = PrimaryKeyColumn::new(column_name);
+                                column.length = length;
+
+                                pk.columns[pos as usize] = column;
+
                                 trace!(
                                     "The primary key has already been created, added column to it: {:?}",
                                     pk.columns
@@ -473,8 +506,11 @@ impl<'a> SqlSchemaDescriber<'a> {
                             None => {
                                 trace!("Instantiating primary key");
 
+                                let mut column = PrimaryKeyColumn::new(column_name);
+                                column.length = length;
+
                                 primary_key.replace(PrimaryKey {
-                                    columns: vec![column_name],
+                                    columns: vec![column],
                                     sequence: None,
                                     constraint_name: None,
                                 });
@@ -482,18 +518,30 @@ impl<'a> SqlSchemaDescriber<'a> {
                         };
                     } else if indexes_map.contains_key(&index_name) {
                         if let Some(index) = indexes_map.get_mut(&index_name) {
-                            index.columns.push(column_name);
+                            let mut column = IndexColumn::new(column_name);
+                            column.length = length;
+                            column.sort_order = sort_order;
+
+                            index.columns.push(column);
                         }
                     } else {
+                        let mut column = IndexColumn::new(column_name);
+                        column.length = length;
+                        column.sort_order = sort_order;
+
+                        let tpe = match (is_unique, row.get_string("index_type").as_deref()) {
+                            (true, _) => IndexType::Unique,
+                            (_, Some("FULLTEXT")) => IndexType::Fulltext,
+                            _ => IndexType::Normal,
+                        };
+
                         indexes_map.insert(
                             index_name.clone(),
                             Index {
                                 name: index_name,
-                                columns: vec![column_name],
-                                tpe: match is_unique {
-                                    true => IndexType::Unique,
-                                    false => IndexType::Normal,
-                                },
+                                columns: vec![column],
+                                tpe,
+                                algorithm: None,
                             },
                         );
                     }
@@ -510,11 +558,6 @@ impl<'a> SqlSchemaDescriber<'a> {
                     index_map.remove(index_name);
                 }
             }
-            for (tble, index_name) in &indexes_with_partially_covered_columns {
-                if tble == table {
-                    index_map.remove(index_name);
-                }
-            }
         }
 
         Ok(map)
@@ -523,10 +566,10 @@ impl<'a> SqlSchemaDescriber<'a> {
     async fn get_foreign_keys(
         conn: &dyn Queryable,
         schema_name: &str,
-    ) -> DescriberResult<HashMap<String, Vec<ForeignKey>>> {
+    ) -> DescriberResult<BTreeMap<String, Vec<ForeignKey>>> {
         // Foreign keys covering multiple columns will return multiple rows, which we need to
         // merge.
-        let mut map: HashMap<String, HashMap<String, ForeignKey>> = HashMap::new();
+        let mut map: BTreeMap<String, BTreeMap<String, ForeignKey>> = BTreeMap::new();
 
         // XXX: Is constraint_name unique? Need a way to uniquely associate rows with foreign keys
         // One should think it's unique since it's used to join information_schema.key_column_usage
@@ -775,7 +818,7 @@ impl<'a> SqlSchemaDescriber<'a> {
     fn extract_enum_values(full_data_type: &&str) -> Vec<String> {
         let len = &full_data_type.len() - 1;
         let vals = &full_data_type[5..len];
-        vals.split(',').map(|v| unquote_string(v)).collect()
+        vals.split(',').map(unquote_string).collect()
     }
 
     // See https://dev.mysql.com/doc/refman/8.0/en/string-literals.html

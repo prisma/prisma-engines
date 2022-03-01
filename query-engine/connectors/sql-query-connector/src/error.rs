@@ -139,6 +139,15 @@ pub enum SqlError {
 
     #[error("Server terminated the connection.")]
     ConnectionClosed,
+
+    #[error("{}", _0)]
+    TransactionAlreadyClosed(String),
+
+    #[error("Query parameter limit exceeded error: {0}.")]
+    QueryParameterLimitExceeded(String),
+
+    #[error("Cannot find a fulltext index to use for the search")]
+    MissingFullTextSearchIndex,
 }
 
 impl SqlError {
@@ -213,7 +222,7 @@ impl SqlError {
                         message: message.clone(),
                     },
                 )),
-                kind: ErrorKind::RawError { code, message },
+                kind: ErrorKind::RawDatabaseError { code, message },
             },
             SqlError::ConnectionClosed => ConnectorError {
                 user_facing_error: Some(user_facing_errors::KnownError::new(
@@ -221,6 +230,18 @@ impl SqlError {
                 )),
                 kind: ErrorKind::ConnectionClosed,
             },
+            SqlError::TransactionAlreadyClosed(message) => ConnectorError {
+                user_facing_error: Some(user_facing_errors::KnownError::new(
+                    user_facing_errors::common::TransactionAlreadyClosed {
+                        message: message.clone(),
+                    },
+                )),
+                kind: ErrorKind::TransactionAlreadyClosed { message },
+            },
+            SqlError::QueryParameterLimitExceeded(e) => {
+                ConnectorError::from_kind(ErrorKind::QueryParameterLimitExceeded(e))
+            }
+            SqlError::MissingFullTextSearchIndex => ConnectorError::from_kind(ErrorKind::MissingFullTextSearchIndex),
         }
     }
 }
@@ -249,17 +270,21 @@ impl From<quaint::error::Error> for SqlError {
                 constraint: constraint.into(),
             },
 
+            QuaintKind::MissingFullTextSearchIndex => Self::MissingFullTextSearchIndex,
+
             e @ QuaintKind::ConnectionError(_) => Self::ConnectionError(e),
             QuaintKind::ColumnReadFailure(e) => Self::ColumnReadFailure(e),
             QuaintKind::ColumnNotFound { column } => SqlError::ColumnDoesNotExist(format!("{}", column)),
             QuaintKind::TableDoesNotExist { table } => SqlError::TableDoesNotExist(format!("{}", table)),
             QuaintKind::ConnectionClosed => SqlError::ConnectionClosed,
+            e @ QuaintKind::TransactionAlreadyClosed(_) => SqlError::TransactionAlreadyClosed(format!("{}", e)),
             e @ QuaintKind::IncorrectNumberOfParameters { .. } => SqlError::QueryError(e.into()),
             e @ QuaintKind::ConversionError(_) => SqlError::ConversionError(e.into()),
             e @ QuaintKind::ResultIndexOutOfBounds { .. } => SqlError::QueryError(e.into()),
             e @ QuaintKind::ResultTypeMismatch { .. } => SqlError::QueryError(e.into()),
             e @ QuaintKind::LengthMismatch { .. } => SqlError::QueryError(e.into()),
             e @ QuaintKind::ValueOutOfRange { .. } => SqlError::QueryError(e.into()),
+            e @ QuaintKind::UUIDError(_) => SqlError::ConversionError(e.into()),
             e @ QuaintKind::DatabaseUrlIsInvalid { .. } => SqlError::ConnectionError(e),
             e @ QuaintKind::DatabaseDoesNotExist { .. } => SqlError::ConnectionError(e),
             e @ QuaintKind::AuthenticationFailed { .. } => SqlError::ConnectionError(e),

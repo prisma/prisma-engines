@@ -1,38 +1,13 @@
-use crate::{parse_schema, CoreError, CoreResult};
+use crate::{json_rpc::types::*, CoreError, CoreResult};
 use migration_connector::{migrations_directory::*, DiffTarget, MigrationConnector};
-use serde::{Deserialize, Serialize};
 use std::path::Path;
 use user_facing_errors::migration_engine::MigrationNameTooLong;
 
-/// The input to the `createMigration` command.
-#[derive(Deserialize, Debug)]
-#[serde(rename_all = "camelCase")]
-pub struct CreateMigrationInput {
-    /// The filesystem path of the migrations directory to use.
-    pub migrations_directory_path: String,
-    /// The current prisma schema to use as a target for the generated migration.
-    pub prisma_schema: String,
-    /// The user-given name for the migration. This will be used in the migration directory.
-    pub migration_name: String,
-    /// If true, always generate a migration, but do not apply.
-    pub draft: bool,
-}
-
-/// The output of the `createMigration` command.
-#[derive(Serialize, Debug)]
-#[serde(rename_all = "camelCase")]
-pub struct CreateMigrationOutput {
-    /// The name of the newly generated migration directory, if any.
-    pub generated_migration_name: Option<String>,
-}
-
 /// Create a new migration.
 pub async fn create_migration(
-    input: &CreateMigrationInput,
-    connector: &dyn MigrationConnector,
+    input: CreateMigrationInput,
+    connector: &mut dyn MigrationConnector,
 ) -> CoreResult<CreateMigrationOutput> {
-    let applier = connector.database_migration_step_applier();
-    let checker = connector.destructive_change_checker();
     let connector_type = connector.connector_type();
 
     if input.migration_name.len() > 200 {
@@ -43,15 +18,15 @@ pub async fn create_migration(
     error_on_changed_provider(&input.migrations_directory_path, connector_type)?;
 
     // Infer the migration.
-    let previous_migrations = list_migrations(&Path::new(&input.migrations_directory_path))?;
-    let target_schema = parse_schema(&input.prisma_schema)?;
+    let previous_migrations = list_migrations(Path::new(&input.migrations_directory_path))?;
 
-    let migration = connector
-        .diff(
-            DiffTarget::Migrations(&previous_migrations),
-            DiffTarget::Datamodel((&target_schema.0, &target_schema.1)),
-        )
+    let from = connector
+        .database_schema_from_diff_target(DiffTarget::Migrations(&previous_migrations), None)
         .await?;
+    let to = connector
+        .database_schema_from_diff_target(DiffTarget::Datamodel(&input.prisma_schema), None)
+        .await?;
+    let migration = connector.diff(from, to)?;
 
     if connector.migration_is_empty(&migration) && !input.draft {
         tracing::info!("Database is up-to-date, returning without creating new migration.");
@@ -61,12 +36,12 @@ pub async fn create_migration(
         });
     }
 
-    let destructive_change_diagnostics = checker.pure_check(&migration);
+    let destructive_change_diagnostics = connector.destructive_change_checker().pure_check(&migration);
 
-    let migration_script = applier.render_script(&migration, &destructive_change_diagnostics);
+    let migration_script = connector.render_script(&migration, &destructive_change_diagnostics)?;
 
     // Write the migration script to a file.
-    let directory = create_migration_directory(&Path::new(&input.migrations_directory_path), &input.migration_name)
+    let directory = create_migration_directory(Path::new(&input.migrations_directory_path), &input.migration_name)
         .map_err(|_| CoreError::from_msg("Failed to create a new migration directory.".into()))?;
 
     directory

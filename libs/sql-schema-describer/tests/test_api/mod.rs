@@ -30,12 +30,7 @@ impl TestApi {
             let (db_name, q, _) = rt.block_on(args.create_postgres_database());
             (db_name, q)
         } else if tags.contains(Tags::Mssql) {
-            let (q, _cs) = rt
-                .block_on(test_setup::init_mssql_database(
-                    args.database_url(),
-                    args.test_function_name(),
-                ))
-                .unwrap();
+            let (q, _cs) = rt.block_on(args.create_mssql_database());
             (args.test_function_name(), q)
         } else if tags.contains(Tags::Sqlite) {
             let url = sqlite_test_url(args.test_function_name());
@@ -80,7 +75,7 @@ impl TestApi {
         match self.sql_family() {
             SqlFamily::Postgres => Box::new(sql_schema_describer::postgres::SqlSchemaDescriber::new(
                 connection,
-                if self.tags.contains(Tags::Cockroach) {
+                if self.tags.contains(Tags::CockroachDb) {
                     Circumstances::Cockroach.into()
                 } else {
                     Default::default()
@@ -113,16 +108,20 @@ impl TestApi {
         self.rt.block_on(self.database.raw_cmd(&full_sql)).unwrap();
     }
 
-    pub(crate) fn is_cockroach(&self) -> bool {
-        self.tags.contains(Tags::Cockroach)
-    }
-
     pub(crate) fn is_mariadb(&self) -> bool {
         self.tags.contains(Tags::Mariadb)
     }
 
     pub(crate) fn is_mssql(&self) -> bool {
         self.tags.contains(Tags::Mssql)
+    }
+
+    pub(crate) fn is_postgres(&self) -> bool {
+        self.tags.contains(Tags::Postgres)
+    }
+
+    pub(crate) fn is_cockroach(&self) -> bool {
+        self.tags.contains(Tags::CockroachDb)
     }
 
     pub(crate) fn schema_name(&self) -> &str {
@@ -219,7 +218,16 @@ impl TableAssertion<'_> {
         columns: &[&str],
         assertions: impl for<'i> FnOnce(&'i IndexAssertion<'i>) -> &'i IndexAssertion<'i>,
     ) -> &Self {
-        let index = self.table.indexes().find(|idx| idx.column_names() == columns).unwrap();
+        let index = self
+            .table
+            .indexes()
+            .find(|i| {
+                let lengths_match = i.columns().len() == columns.len();
+                let columns_match = i.columns().zip(columns.iter()).all(|(a, b)| a.get().name() == *b);
+
+                lengths_match && columns_match
+            })
+            .unwrap();
 
         assertions(&IndexAssertion { index });
 
@@ -232,7 +240,17 @@ impl TableAssertion<'_> {
     }
 
     pub fn assert_pk_on_columns(&self, columns: &[&str]) -> &Self {
-        assert_eq!(self.table.primary_key().unwrap().columns, columns);
+        let pk_columns = self
+            .table
+            .primary_key()
+            .unwrap()
+            .columns
+            .iter()
+            .map(|c| c.name())
+            .collect::<Vec<_>>();
+
+        assert_eq!(pk_columns, columns);
+
         self
     }
 }

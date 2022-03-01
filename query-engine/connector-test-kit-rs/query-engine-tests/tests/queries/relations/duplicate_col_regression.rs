@@ -11,7 +11,7 @@ mod dup_col_regr {
               #id(id, String, @id)
               competencies     TranscriberCompetency[]
             }
-            
+
             model TranscriberCompetency {
               #id(id, String, @id)
               transcriber   Transcriber @relation(fields: [transcriberId], references: [id])
@@ -20,7 +20,7 @@ mod dup_col_regr {
               competencyId  String
               @@unique([transcriberId, competencyId])
             }
-            
+
             model Competency {
               #id(id, String, @id)
               transcriberCompetencies     TranscriberCompetency[]
@@ -32,9 +32,9 @@ mod dup_col_regr {
 
     // "Querying a scalarfield that would already be included since it backs a relationfield" should "only request the underlying column once"
     #[connector_test]
-    async fn test_1(runner: &Runner) -> TestResult<()> {
+    async fn test_1(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation {
+          run_query!(&runner, r#"mutation {
             createOneTranscriber(data: { id: "one", competencies: { create: { id: "one_trans", competency: {create:{ id: "one_comp"}}} } }){
               id
               competencies{
@@ -43,7 +43,7 @@ mod dup_col_regr {
               competency
                {id}
               }
-          
+
             }
           }"#),
           @r###"{"data":{"createOneTranscriber":{"id":"one","competencies":[{"id":"one_trans","transcriberId":"one","competency":{"id":"one_comp"}}]}}}"###

@@ -1,42 +1,46 @@
 use super::*;
-use crate::{filter::convert_filter, output_meta, vacuum_cursor, IntoBson};
+use crate::{
+    filter::{convert_filter, MongoFilter},
+    output_meta,
+    query_builder::MongoReadQueryBuilder,
+    root_queries::raw::{MongoCommand, MongoOperation},
+    IntoBson,
+};
 use connector_interface::*;
 use mongodb::{
     bson::{doc, Document},
     error::ErrorKind,
-    options::{FindOptions, InsertManyOptions},
-    Database,
+    options::InsertManyOptions,
+    ClientSession, Collection, Database,
 };
-use prisma_models::{ModelRef, PrismaValue, RecordProjection};
-use std::convert::TryInto;
+use prisma_models::{ModelRef, PrismaValue, SelectionResult};
+use std::{collections::HashMap, convert::TryInto};
+use update_utils::{IntoUpdateDocumentExtension, IntoUpdateOperationExtension};
 
 /// Create a single record to the database resulting in a
 /// `RecordProjection` as an identifier pointing to the just-created document.
-pub async fn create_record(
+pub async fn create_record<'conn>(
     database: &Database,
+    session: &mut ClientSession,
     model: &ModelRef,
     mut args: WriteArgs,
-) -> crate::Result<RecordProjection> {
+) -> crate::Result<SelectionResult> {
     let coll = database.collection::<Document>(model.db_name());
-
-    // Mongo only allows a singular ID.
-    let mut id_fields = model.primary_identifier().scalar_fields().collect::<Vec<_>>();
-    assert!(id_fields.len() == 1);
-
-    let id_field = id_fields.pop().unwrap();
+    let id_field = pick_singular_id(model);
 
     // Fields to write to the document.
     // Todo: Do we need to write null for everything? There's something with nulls and exists that might impact
     //       query capability (e.g. query for field: null may need to check for exist as well?)
     let fields: Vec<_> = model
         .fields()
-        .scalar()
-        .into_iter()
-        .filter(|field| args.has_arg_for(&field.db_name()))
+        .all
+        .iter()
+        .filter(|field| args.has_arg_for(field.db_name()))
+        .map(Clone::clone)
         .collect();
 
     let mut doc = Document::new();
-    let id_meta = output_meta::from_field(&id_field);
+    let id_meta = output_meta::from_scalar_field(&id_field);
 
     for field in fields {
         let db_name = field.db_name();
@@ -49,21 +53,28 @@ pub async fn create_record(
         doc.insert(field.db_name().to_owned(), bson);
     }
 
-    let insert_result = coll.insert_one(doc, None).await?;
+    let insert_result = coll.insert_one_with_session(doc, None, session).await?;
     let id_value = value_from_bson(insert_result.inserted_id, &id_meta)?;
 
-    Ok(RecordProjection::from((id_field, id_value)))
+    Ok(SelectionResult::from((id_field, id_value)))
 }
 
-pub async fn create_records(
+pub async fn create_records<'conn>(
     database: &Database,
+    session: &mut ClientSession,
     model: &ModelRef,
     args: Vec<WriteArgs>,
     skip_duplicates: bool,
 ) -> crate::Result<usize> {
     let coll = database.collection::<Document>(model.db_name());
     let num_records = args.len();
-    let fields = model.fields().scalar();
+    let fields: Vec<_> = model
+        .fields()
+        .all
+        .iter()
+        .filter(|field| matches!(field, Field::Scalar(_) | Field::Composite(_)))
+        .map(Clone::clone)
+        .collect();
 
     let docs = args
         .into_iter()
@@ -89,7 +100,7 @@ pub async fn create_records(
     // the operation and throw an error afterwards that we must handle.
     let options = Some(InsertManyOptions::builder().ordered(!skip_duplicates).build());
 
-    match coll.insert_many(docs, options).await {
+    match coll.insert_many_with_session(docs, options, session).await {
         Ok(insert_result) => Ok(insert_result.inserted_ids.len()),
         Err(err) if skip_duplicates => match err.kind.as_ref() {
             ErrorKind::BulkWrite(ref failure) => match failure.write_errors {
@@ -104,12 +115,13 @@ pub async fn create_records(
     }
 }
 
-pub async fn update_records(
+pub async fn update_records<'conn>(
     database: &Database,
+    session: &mut ClientSession,
     model: &ModelRef,
     record_filter: RecordFilter,
-    args: WriteArgs,
-) -> crate::Result<Vec<RecordProjection>> {
+    mut args: WriteArgs,
+) -> crate::Result<Vec<SelectionResult>> {
     let coll = database.collection::<Document>(model.db_name());
 
     // We need to load ids of documents to be updated first because Mongo doesn't
@@ -118,26 +130,16 @@ pub async fn update_records(
     //
     // Mongo can only have singular IDs (always `_id`), hence the unwraps. Since IDs are immutable, we also don't
     // need to merge back id changes into the result set as with SQL.
-    let id_field = model.primary_identifier().scalar_fields().next().unwrap();
-    let id_meta = output_meta::from_field(&id_field);
-
+    let id_field = pick_singular_id(model);
+    let id_meta = output_meta::from_scalar_field(&id_field);
     let ids: Vec<Bson> = if let Some(selectors) = record_filter.selectors {
         selectors
             .into_iter()
             .map(|p| (&id_field, p.values().next().unwrap()).into_bson())
             .collect::<crate::Result<Vec<_>>>()?
     } else {
-        let (filter, _joins) = convert_filter(record_filter.filter, false)?.render();
-        let find_options = FindOptions::builder()
-            .projection(doc! { id_field.db_name(): 1 })
-            .build();
-
-        let cursor = coll.find(Some(filter), Some(find_options)).await?;
-        let docs = vacuum_cursor(cursor).await?;
-
-        docs.into_iter()
-            .map(|mut doc| doc.remove(id_field.db_name()).unwrap())
-            .collect()
+        let filter = convert_filter(record_filter.filter, false, false)?;
+        find_ids(coll.clone(), session, model, filter).await?
     };
 
     if ids.is_empty() {
@@ -145,35 +147,34 @@ pub async fn update_records(
     }
 
     let filter = doc! { id_field.db_name(): { "$in": ids.clone() } };
-    let mut update_doc = Document::new();
-    let fields = model.fields().scalar();
+    let fields: Vec<_> = model
+        .fields()
+        .all
+        .iter()
+        .filter_map(|field| {
+            args.take_field_value(field.db_name())
+                .map(|write_op| (field.clone(), write_op))
+        })
+        .collect();
 
-    for (field_name, write_expr) in args.args {
-        let DatasourceFieldName(name) = field_name;
-        // Todo: This is inefficient.
-        let field = fields.iter().find(|f| f.db_name() == name).unwrap();
+    let mut update_docs: Vec<Document> = vec![];
 
-        let (op_key, val) = match write_expr {
-            WriteExpression::Field(_) => unimplemented!(),
-            WriteExpression::Value(rhs) => ("$set", (field, rhs).into_bson()?),
-            WriteExpression::Add(rhs) => ("$inc", (field, rhs).into_bson()?),
-            WriteExpression::Substract(rhs) => ("$inc", (field, (rhs * PrismaValue::Int(-1))).into_bson()?),
-            WriteExpression::Multiply(rhs) => ("$mul", (field, rhs).into_bson()?),
-            WriteExpression::Divide(rhs) => ("$mul", (field, (PrismaValue::new_float(1.0) / rhs)).into_bson()?),
-        };
+    for (field, write_op) in fields {
+        let field_path = FieldPath::new_from_segment(&field);
+        let update_ops = write_op.into_update_ops(&field, field_path)?.into_update_docs()?;
 
-        let entry = update_doc.entry(op_key.to_owned()).or_insert(Document::new().into());
-        entry.as_document_mut().unwrap().insert(name, val);
+        update_docs.extend(update_ops);
     }
 
-    if !update_doc.is_empty() {
-        coll.update_many(filter, update_doc, None).await?;
+    if !update_docs.is_empty() {
+        coll.update_many_with_session(filter, update_docs, None, session)
+            .await?;
     }
 
     let ids = ids
         .into_iter()
         .map(|bson_id| {
-            Ok(RecordProjection::from((
+            Ok(SelectionResult::from((
                 id_field.clone(),
                 value_from_bson(bson_id, &id_meta)?,
             )))
@@ -183,38 +184,70 @@ pub async fn update_records(
     Ok(ids)
 }
 
-// todo joins
-pub async fn delete_records(
+pub async fn delete_records<'conn>(
     database: &Database,
+    session: &mut ClientSession,
     model: &ModelRef,
     record_filter: RecordFilter,
 ) -> crate::Result<usize> {
     let coll = database.collection::<Document>(model.db_name());
+    let id_field = pick_singular_id(model);
 
-    let filter = if let Some(selectors) = record_filter.selectors {
-        let id_field = model.primary_identifier().scalar_fields().next().unwrap();
-        let ids = selectors
+    let ids = if let Some(selectors) = record_filter.selectors {
+        selectors
             .into_iter()
             .map(|p| (&id_field, p.values().next().unwrap()).into_bson())
-            .collect::<crate::Result<Vec<_>>>()?;
-
-        doc! { id_field.db_name(): { "$in": ids } }
+            .collect::<crate::Result<Vec<_>>>()?
     } else {
-        let (filter, _joins) = convert_filter(record_filter.filter, false)?.render();
-        filter
+        let filter = convert_filter(record_filter.filter, false, false)?;
+        find_ids(coll.clone(), session, model, filter).await?
     };
 
-    let delete_result = coll.delete_many(filter, None).await?;
+    if ids.is_empty() {
+        return Ok(0);
+    }
+
+    let filter = doc! { id_field.db_name(): { "$in": ids } };
+    let delete_result = coll.delete_many_with_session(filter, None, session).await?;
+
     Ok(delete_result.deleted_count as usize)
+}
+
+/// Retrives document ids based on the given filter.
+async fn find_ids(
+    collection: Collection<Document>,
+    session: &mut ClientSession,
+    model: &ModelRef,
+    filter: MongoFilter,
+) -> crate::Result<Vec<Bson>> {
+    let id_field = model.primary_identifier();
+    let mut builder = MongoReadQueryBuilder::new(model.clone());
+
+    // If a filter comes with joins, it needs to be run _after_ the initial filter query / $matches.
+    let (filter, filter_joins) = filter.render();
+    if !filter_joins.is_empty() {
+        builder.joins = filter_joins;
+        builder.join_filters.push(filter);
+    } else {
+        builder.query = Some(filter);
+    };
+
+    let builder = builder.with_model_projection(id_field)?;
+    let query = builder.build()?;
+    let docs = query.execute(collection, session).await?;
+    let ids = docs.into_iter().map(|mut doc| doc.remove("_id").unwrap()).collect();
+
+    Ok(ids)
 }
 
 /// Connect relations defined in `child_ids` to a parent defined in `parent_id`.
 /// The relation information is in the `RelationFieldRef`.
-pub async fn m2m_connect(
+pub async fn m2m_connect<'conn>(
     database: &Database,
+    session: &mut ClientSession,
     field: &RelationFieldRef,
-    parent_id: &RecordProjection,
-    child_ids: &[RecordProjection],
+    parent_id: &SelectionResult,
+    child_ids: &[SelectionResult],
 ) -> crate::Result<()> {
     let parent_model = field.model();
     let child_model = field.related_model();
@@ -223,7 +256,8 @@ pub async fn m2m_connect(
     let child_coll = database.collection::<Document>(child_model.db_name());
 
     let parent_id = parent_id.values().next().unwrap();
-    let parent_id_field = parent_model.primary_identifier().scalar_fields().next().unwrap();
+    let parent_id_field = pick_singular_id(&parent_model);
+
     let parent_ids_scalar_field_name = field.relation_info.fields.get(0).unwrap();
     let parent_id = (&parent_id_field, parent_id).into_bson()?;
 
@@ -231,30 +265,36 @@ pub async fn m2m_connect(
     let child_ids = child_ids
         .iter()
         .map(|child_id| {
-            let (field, value) = child_id.pairs.get(0).unwrap();
-            (field, value.clone()).into_bson()
+            let (selection, value) = child_id.pairs.get(0).unwrap();
+            (selection, value.clone()).into_bson()
         })
         .collect::<crate::Result<Vec<_>>>()?;
 
     let parent_update = doc! { "$addToSet": { parent_ids_scalar_field_name: { "$each": child_ids.clone() } } };
 
     // First update the parent and add all child IDs to the m:n scalar field.
-    parent_coll.update_one(parent_filter, parent_update, None).await?;
+    parent_coll
+        .update_one_with_session(parent_filter, parent_update, None, session)
+        .await?;
 
     // Then update all children and add the parent
     let child_filter = doc! { "_id": { "$in": child_ids } };
     let child_ids_scalar_field_name = field.related_field().relation_info.fields.get(0).unwrap().clone();
     let child_update = doc! { "$addToSet": { child_ids_scalar_field_name: parent_id } };
 
-    child_coll.update_many(child_filter, child_update, None).await?;
+    child_coll
+        .update_many_with_session(child_filter, child_update, None, session)
+        .await?;
+
     Ok(())
 }
 
-pub async fn m2m_disconnect(
+pub async fn m2m_disconnect<'conn>(
     database: &Database,
+    session: &mut ClientSession,
     field: &RelationFieldRef,
-    parent_id: &RecordProjection,
-    child_ids: &[RecordProjection],
+    parent_id: &SelectionResult,
+    child_ids: &[SelectionResult],
 ) -> crate::Result<()> {
     let parent_model = field.model();
     let child_model = field.related_model();
@@ -263,7 +303,8 @@ pub async fn m2m_disconnect(
     let child_coll = database.collection::<Document>(child_model.db_name());
 
     let parent_id = parent_id.values().next().unwrap();
-    let parent_id_field = parent_model.primary_identifier().scalar_fields().next().unwrap();
+    let parent_id_field = pick_singular_id(&parent_model);
+
     let parent_ids_scalar_field_name = field.relation_info.fields.get(0).unwrap();
     let parent_id = (&parent_id_field, parent_id).into_bson()?;
 
@@ -279,14 +320,74 @@ pub async fn m2m_disconnect(
     let parent_update = doc! { "$pullAll": { parent_ids_scalar_field_name: child_ids.clone() } };
 
     // First update the parent and remove all child IDs to the m:n scalar field.
-    parent_coll.update_one(parent_filter, parent_update, None).await?;
+    parent_coll
+        .update_one_with_session(parent_filter, parent_update, None, session)
+        .await?;
 
     // Then update all children and add the parent
     let child_filter = doc! { "_id": { "$in": child_ids } };
     let child_ids_scalar_field_name = field.related_field().relation_info.fields.get(0).unwrap().clone();
 
     let child_update = doc! { "$pull": { child_ids_scalar_field_name: parent_id } };
-    child_coll.update_many(child_filter, child_update, None).await?;
+    child_coll
+        .update_many_with_session(child_filter, child_update, None, session)
+        .await?;
 
     Ok(())
+}
+
+/// Execute raw is not implemented on MongoDB
+pub async fn execute_raw<'conn>(
+    _database: &Database,
+    _session: &mut ClientSession,
+    _inputs: HashMap<String, PrismaValue>,
+) -> crate::Result<usize> {
+    unimplemented!()
+}
+
+/// Execute a plain MongoDB query, returning the answer as a JSON `Value`.
+#[tracing::instrument(skip(database, session, model, inputs, query_type))]
+pub async fn query_raw<'conn>(
+    database: &Database,
+    session: &mut ClientSession,
+    model: Option<&ModelRef>,
+    inputs: HashMap<String, PrismaValue>,
+    query_type: Option<String>,
+) -> crate::Result<serde_json::Value> {
+    let mongo_command = MongoCommand::from_raw_query(model, inputs, query_type)?;
+
+    let json_result = match mongo_command {
+        MongoCommand::Raw { cmd } => {
+            let mut result = database.run_command_with_session(cmd, None, session).await?;
+
+            // Removes unnecessary properties from raw response
+            // See https://docs.mongodb.com/v5.0/reference/method/db.runCommand
+            result.remove("operationTime");
+            result.remove("$clusterTime");
+            result.remove("opTime");
+            result.remove("electionId");
+
+            let json_result: serde_json::Value = Bson::Document(result).into();
+
+            json_result
+        }
+        MongoCommand::Handled { collection, operation } => {
+            let coll = database.collection::<Document>(collection.as_str());
+
+            match operation {
+                MongoOperation::Find(filter, options) => {
+                    let cursor = coll.find_with_session(filter, options, session).await?;
+
+                    raw::cursor_to_json(cursor, session).await?
+                }
+                MongoOperation::Aggregate(pipeline, options) => {
+                    let cursor = coll.aggregate_with_session(pipeline, options, session).await?;
+
+                    raw::cursor_to_json(cursor, session).await?
+                }
+            }
+        }
+    };
+
+    Ok(json_result)
 }

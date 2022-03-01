@@ -71,13 +71,15 @@ fn verify_selections(selectors: &[AggregationSelection], group_by: &[ScalarField
 }
 
 /// Cross checks that the requested order-bys of the request are valid with regard to the requested group bys.
-/// Every ordered field must be present in the group by as well, except aggregation orderings, which are always valid.
+/// Every ordered field must be present in the group by as well, except aggregation & relevance orderings, which are always valid.
 fn verify_orderings(orderings: &[OrderBy], group_by: &[ScalarFieldRef]) -> QueryGraphBuilderResult<()> {
     let mut missing_fields = vec![];
 
     for ordering in orderings {
-        if !group_by.contains(&ordering.field) && ordering.sort_aggregation.is_none() {
-            missing_fields.push(ordering.field.name.clone());
+        if let OrderBy::Scalar(by_scalar) = ordering {
+            if !group_by.contains(&by_scalar.field) {
+                missing_fields.push(by_scalar.field.name.clone());
+            }
         }
     }
 
@@ -130,9 +132,9 @@ fn verify_having(having: Option<&Filter>, selectors: &[AggregationSelection]) ->
 /// Collects all flat scalar fields that are used in the having filter.
 fn collect_scalar_fields(filter: &Filter) -> Vec<&ScalarFieldRef> {
     match filter {
-        Filter::And(inner) => inner.iter().flat_map(|f| collect_scalar_fields(f)).collect(),
-        Filter::Or(inner) => inner.iter().flat_map(|f| collect_scalar_fields(f)).collect(),
-        Filter::Not(inner) => inner.iter().flat_map(|f| collect_scalar_fields(f)).collect(),
+        Filter::And(inner) => inner.iter().flat_map(collect_scalar_fields).collect(),
+        Filter::Or(inner) => inner.iter().flat_map(collect_scalar_fields).collect(),
+        Filter::Not(inner) => inner.iter().flat_map(collect_scalar_fields).collect(),
         Filter::Scalar(sf) => sf.projection.scalar_fields(),
         Filter::Aggregation(_) => vec![], // Aggregations have no effect here.
         _ => unreachable!(),

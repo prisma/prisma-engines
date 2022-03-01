@@ -2,11 +2,12 @@ mod cockroach_describer_tests;
 
 use crate::test_api::*;
 use barrel::{types, Migration};
+use indoc::indoc;
 use native_types::{NativeType, PostgresType};
 use pretty_assertions::assert_eq;
 use sql_schema_describer::*;
 
-#[test_connector(tags(Postgres), exclude(Cockroach))]
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
 fn views_can_be_described(api: TestApi) {
     let full_sql = r#"
         CREATE TABLE a (a_id int);
@@ -14,7 +15,7 @@ fn views_can_be_described(api: TestApi) {
         CREATE VIEW ab AS SELECT a_id FROM a UNION ALL SELECT b_id FROM b;
     "#;
 
-    api.raw_cmd(&full_sql);
+    api.raw_cmd(full_sql);
     let result = api.describe();
     let view = result.get_view("ab").expect("couldn't get ab view").to_owned();
 
@@ -24,7 +25,7 @@ fn views_can_be_described(api: TestApi) {
     assert_eq!(expected_sql, view.definition.unwrap());
 }
 
-#[test_connector(tags(Postgres), exclude(Cockroach))]
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
 fn all_postgres_column_types_must_work(api: TestApi) {
     let mut migration = Migration::new().schema(api.schema_name());
     migration.create_table("User", move |t| {
@@ -564,11 +565,16 @@ fn all_postgres_column_types_must_work(api: TestApi) {
             columns: expected_columns,
             indices: vec![Index {
                 name: "User_uuid_col_key".into(),
-                columns: vec!["uuid_col".into(),],
+                columns: vec![IndexColumn {
+                    name: "uuid_col".to_string(),
+                    sort_order: Some(SQLSortOrder::Asc),
+                    length: None,
+                }],
                 tpe: IndexType::Unique,
+                algorithm: Some(SQLIndexAlgorithm::BTree),
             },],
             primary_key: Some(PrimaryKey {
-                columns: vec!["primary_col".into()],
+                columns: vec![PrimaryKeyColumn::new("primary_col")],
                 sequence: Some(Sequence {
                     name: "User_primary_col_seq".into(),
                 },),
@@ -598,11 +604,7 @@ fn postgres_cross_schema_references_are_not_allowed(api: TestApi) {
     api.raw_cmd(&sql);
 
     let err = api.describe_error();
-    let fk_name = if api.is_cockroach() {
-        "fk_city_ref_City"
-    } else {
-        "User_city_fkey"
-    };
+    let fk_name = "User_city_fkey";
 
     assert_eq!(
         format!("Illegal cross schema reference from `prisma-tests.User` to `prisma-tests_2.City` in constraint `{}`. Foreign keys between database schemas are not supported in Prisma. Please follow the GitHub ticket: https://github.com/prisma/prisma/issues/1175", fk_name),
@@ -685,7 +687,7 @@ fn postgres_sequences_must_work(api: TestApi) {
     assert_eq!(got_seq, &Sequence { name: "test".into() },);
 }
 
-#[test_connector(tags(Postgres))]
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
 fn postgres_multi_field_indexes_must_be_inferred_in_the_right_order(api: TestApi) {
     let schema = format!(
         r##"
@@ -707,13 +709,41 @@ fn postgres_multi_field_indexes_must_be_inferred_in_the_right_order(api: TestApi
     let table = schema.table_bang("indexes_test");
     let index = &table.indices[0];
 
-    assert_eq!(&index.columns, &["name", "age"]);
+    assert_eq!(
+        &index.columns,
+        &[
+            IndexColumn {
+                name: "name".to_string(),
+                sort_order: Some(SQLSortOrder::Asc),
+                length: None
+            },
+            IndexColumn {
+                name: "age".to_string(),
+                sort_order: Some(SQLSortOrder::Asc),
+                length: None
+            },
+        ]
+    );
     assert!(index.tpe.is_unique());
 
     let index = &table.indices[1];
 
     assert!(!index.tpe.is_unique());
-    assert_eq!(&index.columns, &["age", "name"]);
+    assert_eq!(
+        &index.columns,
+        &[
+            IndexColumn {
+                name: "age".to_string(),
+                sort_order: Some(SQLSortOrder::Asc),
+                length: None
+            },
+            IndexColumn {
+                name: "name".to_string(),
+                sort_order: Some(SQLSortOrder::Asc),
+                length: None
+            },
+        ]
+    );
 }
 
 #[test_connector(tags(Postgres))]
@@ -770,7 +800,7 @@ fn escaped_backslashes_in_string_literals_must_be_unescaped(api: TestApi) {
         )
     "#;
 
-    api.raw_cmd(&create_table);
+    api.raw_cmd(create_table);
 
     let schema = api.describe();
 
@@ -788,4 +818,86 @@ fn escaped_backslashes_in_string_literals_must_be_unescaped(api: TestApi) {
         .unwrap();
 
     assert_eq!(default, r#"xyz\Datasource\Model"#);
+}
+
+#[test_connector(tags(Postgres))]
+fn index_sort_order_is_handled(api: TestApi) {
+    let sql = indoc! {r#"
+        CREATE TABLE A (
+            id INT PRIMARY KEY,
+            a  INT NOT NULL
+        );
+
+        CREATE INDEX foo ON A (a DESC);
+    "#};
+
+    api.raw_cmd(sql);
+
+    let schema = api.describe();
+    let table = schema.table_walkers().next().unwrap();
+    let index = table.index_at(0);
+
+    let columns = index.columns().collect::<Vec<_>>();
+
+    assert_eq!(1, columns.len());
+    assert_eq!("a", columns[0].as_column().name());
+    assert_eq!(Some(SQLSortOrder::Desc), columns[0].sort_order());
+}
+
+#[test_connector(tags(Postgres))]
+fn index_sort_order_composite_type_desc_desc_is_handled(api: TestApi) {
+    let sql = indoc! {r#"
+        CREATE TABLE A (
+            id INT PRIMARY KEY,
+            a  INT NOT NULL,
+            b  INT NOT NULL
+        );
+
+        CREATE INDEX foo ON A (a DESC, b DESC);
+    "#};
+
+    api.raw_cmd(sql);
+
+    let schema = api.describe();
+    let table = schema.table_walkers().next().unwrap();
+    let index = table.index_at(0);
+
+    let columns = index.columns().collect::<Vec<_>>();
+
+    assert_eq!(2, columns.len());
+
+    assert_eq!("a", columns[0].as_column().name());
+    assert_eq!("b", columns[1].as_column().name());
+
+    assert_eq!(Some(SQLSortOrder::Desc), columns[0].sort_order());
+    assert_eq!(Some(SQLSortOrder::Desc), columns[1].sort_order());
+}
+
+#[test_connector(tags(Postgres))]
+fn index_sort_order_composite_type_asc_desc_is_handled(api: TestApi) {
+    let sql = indoc! {r#"
+        CREATE TABLE A (
+            id INT PRIMARY KEY,
+            a  INT NOT NULL,
+            b  INT NOT NULL
+        );
+
+        CREATE INDEX foo ON A (a ASC, b DESC);
+    "#};
+
+    api.raw_cmd(sql);
+
+    let schema = api.describe();
+    let table = schema.table_walkers().next().unwrap();
+    let index = table.index_at(0);
+
+    let columns = index.columns().collect::<Vec<_>>();
+
+    assert_eq!(2, columns.len());
+
+    assert_eq!("a", columns[0].as_column().name());
+    assert_eq!("b", columns[1].as_column().name());
+
+    assert_eq!(Some(SQLSortOrder::Asc), columns[0].sort_order());
+    assert_eq!(Some(SQLSortOrder::Desc), columns[1].sort_order());
 }

@@ -1,15 +1,34 @@
-use datamodel::parse_schema;
 use expect_test::{expect, Expect};
+use migration_engine_tests::test_api::*;
+use std::sync::Arc;
 
 fn check(from: &str, to: &str, expectation: Expect) {
-    let (ref from_config, ref from_datamodel) = parse_schema(from).unwrap();
-    let (ref to_config, ref to_datamodel) = parse_schema(to).unwrap();
-    let migration = sql_migration_connector::SqlMigrationConnector::migration_from_schemas(
-        (from_config, from_datamodel),
-        (to_config, to_datamodel),
-    );
+    let tmpdir = tempfile::tempdir().unwrap();
+    let from_schema = write_file_to_tmp(from, &tmpdir, "from.prisma");
+    let to_schema = write_file_to_tmp(to, &tmpdir, "to.prisma");
+    let params = DiffParams {
+        from: migration_core::json_rpc::types::DiffTarget::SchemaDatamodel(SchemaContainer {
+            schema: from_schema.to_str().unwrap().to_owned(),
+        }),
+        script: false,
+        shadow_database_url: None,
+        to: migration_core::json_rpc::types::DiffTarget::SchemaDatamodel(SchemaContainer {
+            schema: to_schema.to_str().unwrap().to_owned(),
+        }),
+    };
 
-    expectation.assert_eq(&migration.drift_summary())
+    let host = Arc::new(TestConnectorHost::default());
+    let api = migration_core::migration_api(None, Some(host.clone())).unwrap();
+    test_setup::runtime::run_with_tokio(api.diff(params)).unwrap();
+    let printed_messages = host.printed_messages.lock().unwrap();
+    assert!(printed_messages.len() == 1, "{:?}", printed_messages);
+    expectation.assert_eq(&printed_messages[0]);
+}
+
+fn write_file_to_tmp(contents: &str, tempdir: &tempfile::TempDir, name: &str) -> std::path::PathBuf {
+    let tempfile_path = tempdir.path().join(name);
+    std::fs::write(&tempfile_path, contents.as_bytes()).unwrap();
+    tempfile_path
 }
 
 #[test]
@@ -21,8 +40,15 @@ fn empty_schemas() {
             url = "file:test.db"
         }
         "#,
-        "",
-        expect![[""]],
+        r#"
+        datasource db {
+            provider = "postgresql"
+            url = env("TEST_DATABASE_URL")
+        }
+        "#,
+        expect![[r#"
+            No difference detected.
+        "#]],
     )
 }
 
@@ -260,7 +286,7 @@ fn deletions_column() {
         "#,
         r#"
         datasource db {
-            provider = "sqlite"
+            provider = "mysql"
             url = "mysql://localhost/testdb"
         }
 

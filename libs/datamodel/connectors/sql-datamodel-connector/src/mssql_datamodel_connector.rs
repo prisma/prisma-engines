@@ -1,14 +1,16 @@
-use datamodel_connector::connector_error::ConnectorError;
-use datamodel_connector::helper::{arg_vec_from_opt, args_vec_from_opt, parse_one_opt_u32, parse_two_opt_u32};
-use datamodel_connector::{Connector, ConnectorCapability};
-use dml::field::{Field, FieldType};
-use dml::model::{IndexType, Model};
-use dml::native_type_constructor::NativeTypeConstructor;
-use dml::native_type_instance::NativeTypeInstance;
-use dml::scalars::ScalarType;
-use native_types::{MsSqlType, MsSqlTypeParameter};
+use datamodel_connector::{
+    connector_error::{ConnectorError, ErrorKind},
+    helper::{arg_vec_from_opt, args_vec_from_opt, parse_one_opt_u32, parse_two_opt_u32},
+    parser_database::{self, ScalarType},
+    walker_ext_traits::*,
+    Connector, ConnectorCapability, ConstraintScope, DatamodelError, Diagnostics, NativeTypeConstructor,
+    NativeTypeInstance, ReferentialAction, ReferentialIntegrity,
+};
+use enumflags2::BitFlags;
+use native_types::{MsSqlType, MsSqlTypeParameter, NativeType};
 use once_cell::sync::Lazy;
 use std::borrow::Cow;
+
 use MsSqlType::*;
 use MsSqlTypeParameter::*;
 
@@ -41,61 +43,63 @@ const IMAGE_TYPE_NAME: &str = "Image";
 const XML_TYPE_NAME: &str = "Xml";
 const UNIQUE_IDENTIFIER_TYPE_NAME: &str = "UniqueIdentifier";
 
-pub struct MsSqlDatamodelConnector {
-    capabilities: Vec<ConnectorCapability>,
-    constructors: Vec<NativeTypeConstructor>,
-}
+const NATIVE_TYPE_CONSTRUCTORS: &[NativeTypeConstructor] = &[
+    NativeTypeConstructor::without_args(TINY_INT_TYPE_NAME, &[ScalarType::Int]),
+    NativeTypeConstructor::without_args(SMALL_INT_TYPE_NAME, &[ScalarType::Int]),
+    NativeTypeConstructor::without_args(INT_TYPE_NAME, &[ScalarType::Int]),
+    NativeTypeConstructor::without_args(BIG_INT_TYPE_NAME, &[ScalarType::BigInt]),
+    NativeTypeConstructor::with_optional_args(DECIMAL_TYPE_NAME, 2, &[ScalarType::Decimal]),
+    NativeTypeConstructor::with_optional_args(NUMERIC_TYPE_NAME, 2, &[ScalarType::Decimal]),
+    NativeTypeConstructor::without_args(MONEY_TYPE_NAME, &[ScalarType::Float]),
+    NativeTypeConstructor::without_args(SMALL_MONEY_TYPE_NAME, &[ScalarType::Float]),
+    NativeTypeConstructor::without_args(BIT_TYPE_NAME, &[ScalarType::Boolean, ScalarType::Int]),
+    NativeTypeConstructor::with_optional_args(FLOAT_TYPE_NAME, 1, &[ScalarType::Float]),
+    NativeTypeConstructor::without_args(REAL_TYPE_NAME, &[ScalarType::Float]),
+    NativeTypeConstructor::without_args(DATE_TYPE_NAME, &[ScalarType::DateTime]),
+    NativeTypeConstructor::without_args(TIME_TYPE_NAME, &[ScalarType::DateTime]),
+    NativeTypeConstructor::without_args(DATETIME_TYPE_NAME, &[ScalarType::DateTime]),
+    NativeTypeConstructor::without_args(DATETIME2_TYPE_NAME, &[ScalarType::DateTime]),
+    NativeTypeConstructor::without_args(DATETIME_OFFSET_TYPE_NAME, &[ScalarType::DateTime]),
+    NativeTypeConstructor::without_args(SMALL_DATETIME_TYPE_NAME, &[ScalarType::DateTime]),
+    NativeTypeConstructor::with_optional_args(CHAR_TYPE_NAME, 1, &[ScalarType::String]),
+    NativeTypeConstructor::with_optional_args(NCHAR_TYPE_NAME, 1, &[ScalarType::String]),
+    NativeTypeConstructor::with_optional_args(VARCHAR_TYPE_NAME, 1, &[ScalarType::String]),
+    NativeTypeConstructor::without_args(TEXT_TYPE_NAME, &[ScalarType::String]),
+    NativeTypeConstructor::with_optional_args(NVARCHAR_TYPE_NAME, 1, &[ScalarType::String]),
+    NativeTypeConstructor::without_args(NTEXT_TYPE_NAME, &[ScalarType::String]),
+    NativeTypeConstructor::with_optional_args(BINARY_TYPE_NAME, 1, &[ScalarType::Bytes]),
+    NativeTypeConstructor::with_optional_args(VAR_BINARY_TYPE_NAME, 1, &[ScalarType::Bytes]),
+    NativeTypeConstructor::without_args(IMAGE_TYPE_NAME, &[ScalarType::Bytes]),
+    NativeTypeConstructor::without_args(XML_TYPE_NAME, &[ScalarType::String]),
+    NativeTypeConstructor::without_args(UNIQUE_IDENTIFIER_TYPE_NAME, &[ScalarType::String]),
+];
+
+const CONSTRAINT_SCOPES: &[ConstraintScope] = &[
+    ConstraintScope::GlobalPrimaryKeyForeignKeyDefault,
+    ConstraintScope::ModelPrimaryKeyKeyIndex,
+];
+
+const CAPABILITIES: &[ConnectorCapability] = &[
+    ConnectorCapability::AnyId,
+    ConnectorCapability::AutoIncrement,
+    ConnectorCapability::AutoIncrementAllowedOnNonId,
+    ConnectorCapability::AutoIncrementMultipleAllowed,
+    ConnectorCapability::AutoIncrementNonIndexedAllowed,
+    ConnectorCapability::CompoundIds,
+    ConnectorCapability::CreateMany,
+    ConnectorCapability::NamedDefaultValues,
+    ConnectorCapability::NamedForeignKeys,
+    ConnectorCapability::NamedPrimaryKeys,
+    ConnectorCapability::SqlQueryRaw,
+    ConnectorCapability::ReferenceCycleDetection,
+    ConnectorCapability::UpdateableId,
+    ConnectorCapability::PrimaryKeySortOrderDefinition,
+    ConnectorCapability::ImplicitManyToManyRelation,
+];
+
+pub struct MsSqlDatamodelConnector;
 
 impl MsSqlDatamodelConnector {
-    pub fn new() -> MsSqlDatamodelConnector {
-        let capabilities = vec![
-            ConnectorCapability::AutoIncrementAllowedOnNonId,
-            ConnectorCapability::AutoIncrementMultipleAllowed,
-            ConnectorCapability::AutoIncrementNonIndexedAllowed,
-            ConnectorCapability::CreateMany,
-            ConnectorCapability::UpdateableId,
-            ConnectorCapability::MultipleIndexesWithSameName,
-            ConnectorCapability::AutoIncrement,
-            ConnectorCapability::CompoundIds,
-        ];
-
-        let constructors: Vec<NativeTypeConstructor> = vec![
-            NativeTypeConstructor::without_args(TINY_INT_TYPE_NAME, vec![ScalarType::Int]),
-            NativeTypeConstructor::without_args(SMALL_INT_TYPE_NAME, vec![ScalarType::Int]),
-            NativeTypeConstructor::without_args(INT_TYPE_NAME, vec![ScalarType::Int]),
-            NativeTypeConstructor::without_args(BIG_INT_TYPE_NAME, vec![ScalarType::BigInt]),
-            NativeTypeConstructor::with_optional_args(DECIMAL_TYPE_NAME, 2, vec![ScalarType::Decimal]),
-            NativeTypeConstructor::with_optional_args(NUMERIC_TYPE_NAME, 2, vec![ScalarType::Decimal]),
-            NativeTypeConstructor::without_args(MONEY_TYPE_NAME, vec![ScalarType::Float]),
-            NativeTypeConstructor::without_args(SMALL_MONEY_TYPE_NAME, vec![ScalarType::Float]),
-            NativeTypeConstructor::without_args(BIT_TYPE_NAME, vec![ScalarType::Boolean, ScalarType::Int]),
-            NativeTypeConstructor::with_optional_args(FLOAT_TYPE_NAME, 1, vec![ScalarType::Float]),
-            NativeTypeConstructor::without_args(REAL_TYPE_NAME, vec![ScalarType::Float]),
-            NativeTypeConstructor::without_args(DATE_TYPE_NAME, vec![ScalarType::DateTime]),
-            NativeTypeConstructor::without_args(TIME_TYPE_NAME, vec![ScalarType::DateTime]),
-            NativeTypeConstructor::without_args(DATETIME_TYPE_NAME, vec![ScalarType::DateTime]),
-            NativeTypeConstructor::without_args(DATETIME2_TYPE_NAME, vec![ScalarType::DateTime]),
-            NativeTypeConstructor::without_args(DATETIME_OFFSET_TYPE_NAME, vec![ScalarType::DateTime]),
-            NativeTypeConstructor::without_args(SMALL_DATETIME_TYPE_NAME, vec![ScalarType::DateTime]),
-            NativeTypeConstructor::with_optional_args(CHAR_TYPE_NAME, 1, vec![ScalarType::String]),
-            NativeTypeConstructor::with_optional_args(NCHAR_TYPE_NAME, 1, vec![ScalarType::String]),
-            NativeTypeConstructor::with_optional_args(VARCHAR_TYPE_NAME, 1, vec![ScalarType::String]),
-            NativeTypeConstructor::without_args(TEXT_TYPE_NAME, vec![ScalarType::String]),
-            NativeTypeConstructor::with_optional_args(NVARCHAR_TYPE_NAME, 1, vec![ScalarType::String]),
-            NativeTypeConstructor::without_args(NTEXT_TYPE_NAME, vec![ScalarType::String]),
-            NativeTypeConstructor::with_optional_args(BINARY_TYPE_NAME, 1, vec![ScalarType::Bytes]),
-            NativeTypeConstructor::with_optional_args(VAR_BINARY_TYPE_NAME, 1, vec![ScalarType::Bytes]),
-            NativeTypeConstructor::without_args(IMAGE_TYPE_NAME, vec![ScalarType::Bytes]),
-            NativeTypeConstructor::without_args(XML_TYPE_NAME, vec![ScalarType::String]),
-            NativeTypeConstructor::without_args(UNIQUE_IDENTIFIER_TYPE_NAME, vec![ScalarType::String]),
-        ];
-
-        MsSqlDatamodelConnector {
-            capabilities,
-            constructors,
-        }
-    }
-
     fn parse_mssql_type_parameter(
         &self,
         r#type: &str,
@@ -106,8 +110,8 @@ impl MsSqlDatamodelConnector {
 
         match args {
             [] => Ok(None),
-            [s] if MAX_REGEX.is_match(&s) => Ok(Some(MsSqlTypeParameter::Max)),
-            [s] if NUM_REGEX.is_match(&s) => Ok(s.trim().parse().map(MsSqlTypeParameter::Number).ok()),
+            [s] if MAX_REGEX.is_match(s) => Ok(Some(MsSqlTypeParameter::Max)),
+            [s] if NUM_REGEX.is_match(s) => Ok(s.trim().parse().map(MsSqlTypeParameter::Number).ok()),
             s => Err(self
                 .native_str_error(r#type)
                 .native_type_invalid_param("a number or `Max`", &s.join(","))),
@@ -138,8 +142,18 @@ impl Connector for MsSqlDatamodelConnector {
         "SQL Server"
     }
 
-    fn capabilities(&self) -> &[ConnectorCapability] {
-        &self.capabilities
+    fn capabilities(&self) -> &'static [ConnectorCapability] {
+        CAPABILITIES
+    }
+
+    fn max_identifier_length(&self) -> usize {
+        128
+    }
+
+    fn referential_actions(&self, referential_integrity: &ReferentialIntegrity) -> BitFlags<ReferentialAction> {
+        use ReferentialAction::*;
+
+        referential_integrity.allowed_referential_actions(NoAction | Cascade | SetNull | SetDefault)
     }
 
     fn scalar_type_for_native_type(&self, native_type: serde_json::Value) -> ScalarType {
@@ -208,90 +222,101 @@ impl Connector for MsSqlDatamodelConnector {
         Cow::Borrowed(url)
     }
 
-    fn validate_field(&self, field: &Field) -> Result<(), ConnectorError> {
-        match field.field_type() {
-            FieldType::NativeType(_, native_type) => {
-                let r#type: MsSqlType = native_type.deserialize_native_type();
-                let error = self.native_instance_error(native_type);
+    fn validate_native_type_arguments(
+        &self,
+        native_type: &NativeTypeInstance,
+        _scalar_type: &ScalarType,
+        errors: &mut Vec<ConnectorError>,
+    ) {
+        let r#type: MsSqlType = serde_json::from_value(native_type.serialized_native_type.clone()).unwrap();
+        let error = self.native_instance_error(native_type);
 
-                match r#type {
-                    Decimal(Some((precision, scale))) if scale > precision => {
-                        error.new_scale_larger_than_precision_error()
-                    }
-                    Decimal(Some((prec, _))) if prec == 0 || prec > 38 => {
-                        error.new_argument_m_out_of_range_error("Precision can range from 1 to 38.")
-                    }
-                    Decimal(Some((_, scale))) if scale > 38 => {
-                        error.new_argument_m_out_of_range_error("Scale can range from 0 to 38.")
-                    }
-                    Float(Some(bits)) if bits == 0 || bits > 53 => {
-                        error.new_argument_m_out_of_range_error("Bits can range from 1 to 53.")
-                    }
-                    typ if heap_allocated_types().contains(&typ) && field.is_unique() => {
-                        error.new_incompatible_native_type_with_unique()
-                    }
-                    typ if heap_allocated_types().contains(&typ) && field.is_id() => {
-                        error.new_incompatible_native_type_with_id()
-                    }
-                    NVarChar(Some(Number(p))) if p > 4000 => error.new_argument_m_out_of_range_error(
-                        "Length can range from 1 to 4000. For larger sizes, use the `Max` variant.",
-                    ),
-                    VarChar(Some(Number(p))) | VarBinary(Some(Number(p))) if p > 8000 => error
-                        .new_argument_m_out_of_range_error(
-                            r#"Length can range from 1 to 8000. For larger sizes, use the `Max` variant."#,
-                        ),
-                    NChar(Some(p)) if p > 4000 => {
-                        error.new_argument_m_out_of_range_error("Length can range from 1 to 4000.")
-                    }
-                    Char(Some(p)) | Binary(Some(p)) if p > 8000 => {
-                        error.new_argument_m_out_of_range_error("Length can range from 1 to 8000.")
-                    }
-                    _ => Ok(()),
-                }
+        match r#type {
+            Decimal(Some((precision, scale))) if scale > precision => {
+                errors.push(error.new_scale_larger_than_precision_error());
             }
-            _ => Ok(()),
+            Decimal(Some((prec, _))) if prec == 0 || prec > 38 => {
+                errors.push(error.new_argument_m_out_of_range_error("Precision can range from 1 to 38."));
+            }
+            Decimal(Some((_, scale))) if scale > 38 => {
+                errors.push(error.new_argument_m_out_of_range_error("Scale can range from 0 to 38."))
+            }
+            Float(Some(bits)) if bits == 0 || bits > 53 => {
+                errors.push(error.new_argument_m_out_of_range_error("Bits can range from 1 to 53."))
+            }
+            NVarChar(Some(Number(p))) if p > 4000 => errors.push(error.new_argument_m_out_of_range_error(
+                "Length can range from 1 to 4000. For larger sizes, use the `Max` variant.",
+            )),
+            VarChar(Some(Number(p))) | VarBinary(Some(Number(p))) if p > 8000 => {
+                errors.push(error.new_argument_m_out_of_range_error(
+                    r#"Length can range from 1 to 8000. For larger sizes, use the `Max` variant."#,
+                ))
+            }
+            NChar(Some(p)) if p > 4000 => {
+                errors.push(error.new_argument_m_out_of_range_error("Length can range from 1 to 4000."))
+            }
+            Char(Some(p)) | Binary(Some(p)) if p > 8000 => {
+                errors.push(error.new_argument_m_out_of_range_error("Length can range from 1 to 8000."))
+            }
+            _ => (),
         }
     }
 
-    fn validate_model(&self, model: &Model) -> Result<(), ConnectorError> {
-        for index_definition in model.indices.iter() {
-            let fields = index_definition.fields.iter().map(|f| model.find_field(f).unwrap());
+    fn validate_model(&self, model: parser_database::walkers::ModelWalker<'_>, errors: &mut Diagnostics) {
+        let mut push_error = |err: ConnectorError| {
+            errors.push_error(DatamodelError::new_connector_error(err, model.ast_model().span));
+        };
 
-            for field in fields {
-                if let FieldType::NativeType(_, native_type) = field.field_type() {
-                    let r#type: MsSqlType = native_type.deserialize_native_type();
-                    let error = self.native_instance_error(native_type);
+        for index in model.indexes() {
+            for field in index.fields() {
+                if let Some(native_type) = field.native_type_instance(self) {
+                    let r#type: MsSqlType = serde_json::from_value(native_type.serialized_native_type.clone()).unwrap();
+                    let error = self.native_instance_error(&native_type);
 
                     if heap_allocated_types().contains(&r#type) {
-                        return if index_definition.tpe == IndexType::Unique {
-                            error.new_incompatible_native_type_with_unique()
+                        if index.is_unique() {
+                            push_error(error.new_incompatible_native_type_with_unique(""))
                         } else {
-                            error.new_incompatible_native_type_with_index()
+                            push_error(error.new_incompatible_native_type_with_index(""))
                         };
+                        break;
                     }
                 }
             }
         }
 
-        for id_field in model.id_fields.iter() {
-            let field = model.find_field(id_field).unwrap();
+        if let Some(pk) = model.primary_key() {
+            for id_field in pk.fields() {
+                if let Some(native_type) = id_field.native_type_instance(self) {
+                    let r#type: MsSqlType = serde_json::from_value(native_type.serialized_native_type.clone()).unwrap();
 
-            if let FieldType::NativeType(_, native_type) = field.field_type() {
-                let r#type: MsSqlType = native_type.deserialize_native_type();
+                    if heap_allocated_types().contains(&r#type) {
+                        push_error(
+                            self.native_instance_error(&native_type)
+                                .new_incompatible_native_type_with_id(""),
+                        );
+                        break;
+                    }
+                }
 
-                if heap_allocated_types().contains(&r#type) {
-                    return self
-                        .native_instance_error(native_type)
-                        .new_incompatible_native_type_with_id();
+                if let Some(ScalarType::Bytes) = id_field.scalar_type() {
+                    let kind = ErrorKind::InvalidModelError {
+                        message: String::from("Using Bytes type is not allowed in the model's id."),
+                    };
+
+                    push_error(ConnectorError::from_kind(kind));
+                    break;
                 }
             }
         }
-
-        Ok(())
     }
 
-    fn available_native_type_constructors(&self) -> &[NativeTypeConstructor] {
-        &self.constructors
+    fn constraint_violation_scopes(&self) -> &'static [ConstraintScope] {
+        CONSTRAINT_SCOPES
+    }
+
+    fn available_native_type_constructors(&self) -> &'static [NativeTypeConstructor] {
+        NATIVE_TYPE_CONSTRUCTORS
     }
 
     fn parse_native_type(&self, name: &str, args: Vec<String>) -> Result<NativeTypeInstance, ConnectorError> {
@@ -327,7 +352,7 @@ impl Connector for MsSqlDatamodelConnector {
             _ => return Err(ConnectorError::new_native_type_parser_error(name)),
         };
 
-        Ok(NativeTypeInstance::new(name, cloned_args, &native_type))
+        Ok(NativeTypeInstance::new(name, cloned_args, native_type.to_json()))
     }
 
     fn introspect_native_type(&self, native_type: serde_json::Value) -> Result<NativeTypeInstance, ConnectorError> {
@@ -366,12 +391,12 @@ impl Connector for MsSqlDatamodelConnector {
         if let Some(constructor) = self.find_native_type_constructor(constructor_name) {
             let stringified_args = args.iter().map(|arg| arg.to_string()).collect();
             Ok(NativeTypeInstance::new(
-                constructor.name.as_str(),
+                constructor.name,
                 stringified_args,
-                &native_type,
+                native_type.to_json(),
             ))
         } else {
-            self.native_str_error(constructor_name).native_type_name_unknown()
+            Err(self.native_str_error(constructor_name).native_type_name_unknown())
         }
     }
 
@@ -384,14 +409,10 @@ impl Connector for MsSqlDatamodelConnector {
     }
 }
 
-impl Default for MsSqlDatamodelConnector {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-static HEAP_ALLOCATED: Lazy<Vec<MsSqlType>> = Lazy::new(|| {
-    vec![
+/// A collection of types stored outside of the row to the heap, having
+/// certain properties such as not allowed in keys or normal indices.
+pub fn heap_allocated_types() -> &'static [MsSqlType] {
+    &[
         Text,
         NText,
         Image,
@@ -400,12 +421,6 @@ static HEAP_ALLOCATED: Lazy<Vec<MsSqlType>> = Lazy::new(|| {
         VarChar(Some(Max)),
         NVarChar(Some(Max)),
     ]
-});
-
-/// A collection of types stored outside of the row to the heap, having
-/// certain properties such as not allowed in keys or normal indices.
-pub fn heap_allocated_types() -> &'static [MsSqlType] {
-    &*HEAP_ALLOCATED
 }
 
 fn arg_vec_for_type_param(type_param: Option<MsSqlTypeParameter>) -> Vec<String> {

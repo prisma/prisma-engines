@@ -1,6 +1,9 @@
 //! Private module for common code shared by multiple dialects.
 
-use std::fmt::{self, Display, Formatter};
+use std::{
+    borrow::Cow,
+    fmt::{self, Display, Formatter},
+};
 
 /// The indentation used throughout the crate. Four spaces.
 pub const SQL_INDENTATION: &str = "    ";
@@ -35,5 +38,48 @@ where
         }
 
         Ok(())
+    }
+}
+
+#[derive(Debug, Clone, Copy)]
+pub enum SortOrder {
+    Asc,
+    Desc,
+}
+
+impl Default for SortOrder {
+    fn default() -> Self {
+        Self::Asc
+    }
+}
+
+impl Display for SortOrder {
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+        f.write_str(self.as_ref())
+    }
+}
+
+impl AsRef<str> for SortOrder {
+    fn as_ref(&self) -> &str {
+        match self {
+            SortOrder::Asc => "ASC",
+            SortOrder::Desc => "DESC",
+        }
+    }
+}
+
+#[derive(Debug, Default)]
+pub struct IndexColumn<'a> {
+    pub name: Cow<'a, str>,
+    pub length: Option<u32>,
+    pub sort_order: Option<SortOrder>,
+}
+
+impl<'a> IndexColumn<'a> {
+    pub fn new(name: &'a str) -> Self {
+        Self {
+            name: name.into(),
+            ..Default::default()
+        }
     }
 }

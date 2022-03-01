@@ -1,6 +1,5 @@
-use std::fmt::Display;
 use thiserror::Error;
-use user_facing_errors::{common::InvalidDatabaseString, KnownError};
+use user_facing_errors::KnownError;
 
 #[derive(Debug, Error)]
 #[error("{}", kind)]
@@ -16,16 +15,6 @@ impl ConnectorError {
         ConnectorError {
             user_facing_error: None,
             kind,
-        }
-    }
-
-    pub fn url_parse_error(err: impl Display) -> Self {
-        let details = user_facing_errors::quaint::invalid_url_description(&err.to_string());
-        let known = KnownError::new(InvalidDatabaseString { details });
-
-        ConnectorError {
-            user_facing_error: Some(known),
-            kind: ErrorKind::InvalidDatabaseUrl(format!("{} in database URL", err)),
         }
     }
 
@@ -81,4 +70,7 @@ pub enum ErrorKind {
 
     #[error("Error opening a TLS connection. {}", message)]
     TlsError { message: String },
+
+    #[error("Preview feature not enabled: {}", _0)]
+    PreviewFeatureNotEnabled(&'static str),
 }

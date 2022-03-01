@@ -3,11 +3,10 @@ use crate::{
     opt::{CliOpt, PrismaOpt, Subcommand},
     PrismaResult,
 };
-
-use datamodel::diagnostics::ValidatedConfiguration;
+use datamodel::ValidatedConfiguration;
 use datamodel::{Configuration, Datamodel};
 use datamodel_connector::ConnectorCapabilities;
-use prisma_models::DatamodelConverter;
+use prisma_models::InternalDataModelBuilder;
 use query_core::{schema::QuerySchemaRef, schema_builder, BuildMode};
 use request_handlers::{dmmf, GraphQlHandler};
 use std::{env, sync::Arc};
@@ -40,7 +39,7 @@ pub enum CliCommand {
 
 impl CliCommand {
     /// Create a CLI command from a `PrismaOpt` instance.
-    pub(crate) fn from_opt(opts: &PrismaOpt) -> crate::PrismaResult<Option<CliCommand>> {
+    pub fn from_opt(opts: &PrismaOpt) -> crate::PrismaResult<Option<CliCommand>> {
         let subcommand = opts.subcommand.as_ref();
         let subcommand = match subcommand {
             Some(cmd) => cmd,
@@ -87,21 +86,21 @@ impl CliCommand {
     }
 
     async fn dmmf(request: DmmfRequest) -> PrismaResult<()> {
-        let template = DatamodelConverter::convert(&request.datamodel);
-
-        let capabilities = match request.config.datasources.first() {
-            Some(datasource) => datasource.capabilities(),
-            None => ConnectorCapabilities::empty(),
-        };
+        let datasource = request.config.datasources.first();
+        let capabilities = datasource
+            .map(|ds| ds.capabilities())
+            .unwrap_or_else(ConnectorCapabilities::empty);
+        let referential_integrity = datasource.map(|ds| ds.referential_integrity()).unwrap_or_default();
 
         // temporary code duplication
-        let internal_data_model = template.build("".into());
+        let internal_data_model = InternalDataModelBuilder::from(&request.datamodel).build("".into());
         let query_schema: QuerySchemaRef = Arc::new(schema_builder::build(
             internal_data_model,
             request.build_mode,
             request.enable_raw_queries,
             capabilities,
-            request.config.preview_features().cloned().collect(),
+            request.config.preview_features().iter().collect(),
+            referential_integrity,
         ));
 
         let dmmf = dmmf::render_dmmf(&request.datamodel, query_schema);
@@ -121,7 +120,7 @@ impl CliCommand {
                 .resolve_datasource_urls_from_env(&[], |key| env::var(key).ok())?;
         }
 
-        let json = datamodel::json::mcf::config_to_mcf_json_value(&config);
+        let json = datamodel::json::mcf::config_to_mcf_json_value(config);
         let serialized = serde_json::to_string(&json)?;
 
         println!("{}", serialized);
@@ -144,7 +143,9 @@ impl CliCommand {
         let cx = Arc::new(cx);
 
         let handler = GraphQlHandler::new(&*cx.executor, cx.query_schema());
-        let res = handler.handle(serde_json::from_str(&decoded_request)?).await;
+        let res = handler
+            .handle(serde_json::from_str(&decoded_request)?, None, None)
+            .await;
         let res = serde_json::to_string(&res).unwrap();
 
         let encoded_response = base64::encode(&res);

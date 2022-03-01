@@ -1,0 +1,10 @@
+ model User {
+     id Int @id
+     firstName String @map("fst_name")
+     lastName String @map("lst_name")
+     age Int
+
+    @@index([firstName, lastName, age])
+    @@map("users")
+ }
+

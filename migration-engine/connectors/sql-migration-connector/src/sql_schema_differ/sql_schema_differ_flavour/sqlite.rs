@@ -1,15 +1,24 @@
-use sql_schema_describer::ColumnTypeFamily;
-
 use super::SqlSchemaDifferFlavour;
 use crate::{
-    flavour::SqliteFlavour,
-    sql_schema_differ::column::{ColumnDiffer, ColumnTypeChange},
-    sql_schema_differ::SqlSchemaDiffer,
+    flavour::SqliteFlavour, pair::Pair, sql_schema_differ::column::ColumnTypeChange,
+    sql_schema_differ::differ_database::DifferDatabase,
 };
-use std::collections::HashSet;
+use sql_schema_describer::{walkers::ColumnWalker, ColumnTypeFamily};
 
 impl SqlSchemaDifferFlavour for SqliteFlavour {
-    fn column_type_change(&self, differ: &ColumnDiffer<'_>) -> Option<ColumnTypeChange> {
+    fn can_rename_foreign_key(&self) -> bool {
+        false
+    }
+
+    fn can_redefine_tables_with_inbound_foreign_keys(&self) -> bool {
+        true
+    }
+
+    fn can_rename_index(&self) -> bool {
+        false
+    }
+
+    fn column_type_change(&self, differ: Pair<ColumnWalker<'_>>) -> Option<ColumnTypeChange> {
         match (differ.previous.column_type_family(), differ.next.column_type_family()) {
             (a, b) if a == b => None,
             (_, ColumnTypeFamily::String) => Some(ColumnTypeChange::SafeCast),
@@ -21,22 +30,20 @@ impl SqlSchemaDifferFlavour for SqliteFlavour {
         true
     }
 
-    fn tables_to_redefine(&self, differ: &SqlSchemaDiffer<'_>) -> HashSet<String> {
-        differ
+    fn set_tables_to_redefine(&self, differ: &mut DifferDatabase<'_>) {
+        differ.tables_to_redefine = differ
             .table_pairs()
             .filter(|differ| {
                 differ.created_primary_key().is_some()
                     || differ.dropped_primary_key().is_some()
                     || differ.dropped_columns().next().is_some()
                     || differ.added_columns().any(|col| col.arity().is_required())
-                    || differ.column_pairs().any(|columns| columns.all_changes().0.differs_in_something())
-                    // ALTER INDEX does not exist on SQLite
-                    || differ.index_pairs().any(|pair| self.index_should_be_renamed(&pair))
+                    || differ.any_column_changed()
                     || differ.created_foreign_keys().next().is_some()
                     || differ.dropped_foreign_keys().next().is_some()
             })
-            .map(|table| table.next().name().to_owned())
-            .collect()
+            .map(|table| table.table_ids())
+            .collect();
     }
 
     fn should_drop_foreign_keys_from_dropped_tables(&self) -> bool {
@@ -45,5 +52,9 @@ impl SqlSchemaDifferFlavour for SqliteFlavour {
 
     fn should_push_foreign_keys_from_created_tables(&self) -> bool {
         false
+    }
+
+    fn has_unnamed_foreign_keys(&self) -> bool {
+        true
     }
 }

@@ -1,13 +1,5 @@
 use migration_connector::ConnectorError;
-use quaint::{error::Error as QuaintError, prelude::ConnectionInfo};
-use user_facing_errors::{migration_engine::MigrateSystemDatabase, quaint::render_quaint_error};
-
-pub(crate) fn quaint_error_to_connector_error(error: QuaintError, connection_info: &ConnectionInfo) -> ConnectorError {
-    match render_quaint_error(error.kind(), connection_info) {
-        Some(user_facing_error) => user_facing_error.into(),
-        None => ConnectorError::from_source(error, "Database error"),
-    }
-}
+use user_facing_errors::migration_engine::MigrateSystemDatabase;
 
 #[derive(Debug)]
 pub(crate) struct SystemDatabase(pub(crate) String);

@@ -18,10 +18,6 @@ pub mod args {
     pub const BY: &str = "by";
     pub const HAVING: &str = "having";
 
-    // raw specific args
-    pub const QUERY: &str = "query";
-    pub const PARAMETERS: &str = "parameters";
-
     pub const DISTINCT: &str = "distinct";
 
     // createMany-specific args
@@ -29,7 +25,7 @@ pub mod args {
 }
 
 pub mod operations {
-    // nested operations
+    // nested operations and composites
     pub const CONNECT: &str = "connect";
     pub const CREATE: &str = "create";
     pub const CREATE_MANY: &str = "createMany";
@@ -42,8 +38,9 @@ pub mod operations {
     pub const UPSERT: &str = "upsert";
     pub const SET: &str = "set";
 
-    // scalar lists
+    // scalar lists and composites
     pub const PUSH: &str = "push";
+    pub const UNSET: &str = "unset";
 
     // numbers
     pub const INCREMENT: &str = "increment";
@@ -63,6 +60,7 @@ pub mod filters {
     pub const GREATER_THAN: &str = "gt";
     pub const GREATER_THAN_OR_EQUAL: &str = "gte";
     pub const IN: &str = "in";
+    pub const SEARCH: &str = "search";
 
     // legacy filter
     pub const NOT_IN: &str = "notIn";
@@ -125,13 +123,31 @@ pub mod ordering {
     pub const SORT_ORDER: &str = "SortOrder";
     pub const ASC: &str = "asc";
     pub const DESC: &str = "desc";
+
+    // Full-text-search specifics
+    pub const UNDERSCORE_RELEVANCE: &str = "_relevance";
+    pub const SEARCH: &str = "search";
+    pub const SORT: &str = "sort";
+    pub const FIELDS: &str = "fields";
+}
+
+pub mod json_null {
+    /// Name of the enum used for filter inputs.
+    pub const FILTER_ENUM_NAME: &str = "JsonNullValueFilter";
+
+    /// Name of the enum used for write inputs.
+    pub const INPUT_ENUM_NAME: &str = "JsonNullValueInput";
+
+    /// Name of the enum used for write inputs, nullable field.
+    pub const NULLABLE_INPUT_ENUM_NAME: &str = "NullableJsonNullValueInput";
+
+    pub const DB_NULL: &str = "DbNull";
+    pub const JSON_NULL: &str = "JsonNull";
+    pub const ANY_NULL: &str = "AnyNull";
 }
 
 pub mod output_fields {
     pub const AFFECTED_COUNT: &str = "count";
 }
 
-pub mod deprecation {
-    pub const AGGR_DEPRECATION: &str =
-        "Aggregation keywords got unified to use underscore as prefix to prevent field clashes.";
-}
+pub mod deprecation {}

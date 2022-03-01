@@ -22,13 +22,12 @@ impl ReadQuery {
         }
     }
 
-    pub fn returns(&self, projection: &ModelProjection) -> bool {
-        let db_names = projection.db_names();
-
+    /// Checks whether or not this query returns a specific set of fields from the underlying data source model.
+    pub fn returns(&self, field_selection: &FieldSelection) -> bool {
         match self {
-            ReadQuery::RecordQuery(x) => x.selected_fields.contains_all_db_names(db_names),
-            ReadQuery::ManyRecordsQuery(x) => x.selected_fields.contains_all_db_names(db_names),
-            ReadQuery::RelatedRecordsQuery(x) => x.selected_fields.contains_all_db_names(db_names),
+            ReadQuery::RecordQuery(x) => x.selected_fields.is_superset_of(field_selection),
+            ReadQuery::ManyRecordsQuery(x) => x.selected_fields.is_superset_of(field_selection),
+            ReadQuery::RelatedRecordsQuery(x) => x.selected_fields.is_superset_of(field_selection),
             ReadQuery::AggregateRecordsQuery(_x) => false,
         }
     }
@@ -67,17 +66,12 @@ impl Display for ReadQuery {
             Self::RecordQuery(q) => write!(
                 f,
                 "RecordQuery(name: '{}', filter: {:?}, selection: {:?})",
-                q.name,
-                q.filter,
-                q.selected_fields.names().collect::<Vec<_>>()
+                q.name, q.filter, q.selected_fields,
             ),
             Self::ManyRecordsQuery(q) => write!(
                 f,
                 "ManyRecordsQuery(name: '{}', model: {}, args: {:?}, selection: {:?})",
-                q.name,
-                q.model.name,
-                q.args,
-                q.selected_fields.names().collect::<Vec<_>>()
+                q.name, q.model.name, q.args, q.selected_fields
             ),
             Self::RelatedRecordsQuery(q) => write!(
                 f,
@@ -85,7 +79,7 @@ impl Display for ReadQuery {
                 q.name,
                 q.parent_field.model().name,
                 q.parent_field.name,
-                q.selected_fields.names().collect::<Vec<_>>()
+                q.selected_fields
             ),
             Self::AggregateRecordsQuery(q) => write!(f, "AggregateRecordsQuery: {}", q.name),
         }
@@ -98,7 +92,7 @@ pub struct RecordQuery {
     pub alias: Option<String>,
     pub model: ModelRef,
     pub filter: Option<Filter>,
-    pub selected_fields: ModelProjection,
+    pub selected_fields: FieldSelection,
     pub nested: Vec<ReadQuery>,
     pub selection_order: Vec<String>,
     pub aggregation_selections: Vec<RelAggregationSelection>,
@@ -110,7 +104,7 @@ pub struct ManyRecordsQuery {
     pub alias: Option<String>,
     pub model: ModelRef,
     pub args: QueryArguments,
-    pub selected_fields: ModelProjection,
+    pub selected_fields: FieldSelection,
     pub nested: Vec<ReadQuery>,
     pub selection_order: Vec<String>,
     pub aggregation_selections: Vec<RelAggregationSelection>,
@@ -122,14 +116,14 @@ pub struct RelatedRecordsQuery {
     pub alias: Option<String>,
     pub parent_field: RelationFieldRef,
     pub args: QueryArguments,
-    pub selected_fields: ModelProjection,
+    pub selected_fields: FieldSelection,
     pub nested: Vec<ReadQuery>,
     pub selection_order: Vec<String>,
     pub aggregation_selections: Vec<RelAggregationSelection>,
 
     /// Fields and values of the parent to satisfy the relation query without
     /// relying on the parent result passed by the interpreter.
-    pub parent_projections: Option<Vec<RecordProjection>>,
+    pub parent_results: Option<Vec<SelectionResult>>,
 }
 
 #[derive(Debug, Clone)]

@@ -1,9 +1,12 @@
 use once_cell::sync::Lazy;
 use serde::{Serialize, Serializer};
+use std::fmt;
 use PreviewFeature::*;
 
 macro_rules! features {
     ($( $variant:ident $(,)? ),*) => {
+        #[enumflags2::bitflags]
+        #[repr(u32)]
         #[derive(Debug, Copy, Clone, PartialEq, Eq, Hash)]
         pub enum PreviewFeature {
             $(
@@ -21,11 +24,11 @@ macro_rules! features {
             }
         }
 
-        impl ToString for PreviewFeature {
-            fn to_string(&self) -> String {
+        impl fmt::Display for PreviewFeature {
+            fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
                 match self {
                     $(
-                        Self::$variant => decapitalize(stringify!($variant)),
+                        Self::$variant => write!(f, "{}", decapitalize(stringify!($variant))),
                     )*
                 }
             }
@@ -52,7 +55,16 @@ features!(
     SelectRelationCount,
     OrderByAggregateGroup,
     FilterJson,
-    PlanetScaleMode,
+    ReferentialIntegrity,
+    ReferentialActions,
+    InteractiveTransactions,
+    NamedConstraints,
+    FullTextSearch,
+    FullTextIndex,
+    DataProxy,
+    ExtendedIndexes,
+    Cockroachdb,
+    Tracing,
 );
 
 // Mapping of which active, deprecated and hidden
@@ -62,19 +74,22 @@ features!(
 pub static GENERATOR: Lazy<FeatureMap> = Lazy::new(|| {
     FeatureMap::default()
         .with_active(vec![
-            MicrosoftSqlServer,
-            OrderByRelation,
-            NApi,
-            SelectRelationCount,
-            OrderByAggregateGroup,
             FilterJson,
-            PlanetScaleMode,
+            ReferentialIntegrity,
+            MongoDb,
+            InteractiveTransactions,
+            FullTextSearch,
+            FullTextIndex,
+            DataProxy,
+            ExtendedIndexes,
+            Cockroachdb,
+            Tracing,
         ])
-        .with_hidden(vec![MongoDb])
         .with_deprecated(vec![
             AtomicNumberOperations,
             AggregateApi,
             Middlewares,
+            NamedConstraints,
             NativeTypes,
             Distinct,
             ConnectOrCreate,
@@ -82,11 +97,14 @@ pub static GENERATOR: Lazy<FeatureMap> = Lazy::new(|| {
             UncheckedScalarInputs,
             GroupBy,
             CreateMany,
+            MicrosoftSqlServer,
+            SelectRelationCount,
+            OrderByAggregateGroup,
+            OrderByRelation,
+            ReferentialActions,
+            NApi,
         ])
 });
-
-/// Datasource preview features.
-pub static DATASOURCE: Lazy<FeatureMap> = Lazy::new(FeatureMap::default);
 
 #[derive(Debug, Default)]
 pub struct FeatureMap {
@@ -115,6 +133,7 @@ impl FeatureMap {
         self
     }
 
+    #[allow(dead_code)]
     fn with_hidden(mut self, hidden: Vec<PreviewFeature>) -> Self {
         self.hidden = hidden;
         self
@@ -145,7 +164,7 @@ impl Serialize for PreviewFeature {
 
 /// Lowercases first character.
 /// Assumes 1-byte characters!
-pub fn decapitalize(s: &str) -> String {
+fn decapitalize(s: &str) -> String {
     let first_char = s.chars().next().unwrap();
     format!("{}{}", first_char.to_lowercase(), &s[1..])
 }

@@ -6,7 +6,7 @@ mod distinct {
     use query_engine_tests::assert_query;
 
     #[connector_test]
-    async fn empty_database(runner: &Runner) -> TestResult<()> {
+    async fn empty_database(runner: Runner) -> TestResult<()> {
         assert_query!(
             runner,
             "query { findManyUser(distinct: [first_name, last_name]) { id, first_name, last_name } }",
@@ -18,9 +18,9 @@ mod distinct {
 
     /// Regression test for not selecting the fields the distinct is performed on: https://github.com/prisma/prisma/issues/5969
     #[connector_test]
-    async fn no_panic(runner: &Runner) -> TestResult<()> {
-        test_user(runner, r#"{ id: 1, first_name: "Joe", last_name: "Doe", email: "1" }"#).await?;
-        test_user(runner, r#"{ id: 2, first_name: "Doe", last_name: "Joe", email: "2" }"#).await?;
+    async fn no_panic(runner: Runner) -> TestResult<()> {
+        test_user(&runner, r#"{ id: 1, first_name: "Joe", last_name: "Doe", email: "1" }"#).await?;
+        test_user(&runner, r#"{ id: 2, first_name: "Doe", last_name: "Joe", email: "2" }"#).await?;
 
         assert_query!(
             runner,
@@ -32,14 +32,14 @@ mod distinct {
     }
 
     #[connector_test]
-    async fn with_duplicates(runner: &Runner) -> TestResult<()> {
-        test_user(runner, r#"{ id: 1, first_name: "Joe", last_name: "Doe", email: "1" }"#).await?;
+    async fn with_duplicates(runner: Runner) -> TestResult<()> {
+        test_user(&runner, r#"{ id: 1, first_name: "Joe", last_name: "Doe", email: "1" }"#).await?;
         test_user(
-            runner,
+            &runner,
             r#"{ id: 2, first_name: "Hans", last_name: "Wurst", email: "2" }"#,
         )
         .await?;
-        test_user(runner, r#"{ id: 3, first_name: "Joe", last_name: "Doe", email: "3" }"#).await?;
+        test_user(&runner, r#"{ id: 3, first_name: "Joe", last_name: "Doe", email: "3" }"#).await?;
 
         assert_query!(
             runner,
@@ -51,14 +51,14 @@ mod distinct {
     }
 
     #[connector_test]
-    async fn with_skip(runner: &Runner) -> TestResult<()> {
-        test_user(runner, r#"{ id: 1, first_name: "Joe", last_name: "Doe", email: "1" }"#).await?;
+    async fn with_skip(runner: Runner) -> TestResult<()> {
+        test_user(&runner, r#"{ id: 1, first_name: "Joe", last_name: "Doe", email: "1" }"#).await?;
         test_user(
-            runner,
+            &runner,
             r#"{ id: 2, first_name: "Hans", last_name: "Wurst", email: "2" }"#,
         )
         .await?;
-        test_user(runner, r#"{ id: 3, first_name: "Joe", last_name: "Doe", email: "3" }"#).await?;
+        test_user(&runner, r#"{ id: 3, first_name: "Joe", last_name: "Doe", email: "3" }"#).await?;
 
         assert_query!(
             runner,
@@ -70,14 +70,14 @@ mod distinct {
     }
 
     #[connector_test]
-    async fn with_skip_orderby(runner: &Runner) -> TestResult<()> {
-        test_user(runner, r#"{ id: 1, first_name: "Joe", last_name: "Doe", email: "1" }"#).await?;
+    async fn with_skip_orderby(runner: Runner) -> TestResult<()> {
+        test_user(&runner, r#"{ id: 1, first_name: "Joe", last_name: "Doe", email: "1" }"#).await?;
         test_user(
-            runner,
+            &runner,
             r#"{ id: 2, first_name: "Hans", last_name: "Wurst", email: "2" }"#,
         )
         .await?;
-        test_user(runner, r#"{ id: 3, first_name: "Joe", last_name: "Doe", email: "3" }"#).await?;
+        test_user(&runner, r#"{ id: 3, first_name: "Joe", last_name: "Doe", email: "3" }"#).await?;
 
         assert_query!(
             runner,
@@ -89,14 +89,14 @@ mod distinct {
     }
 
     #[connector_test]
-    async fn with_skip_orderby_nondistinct(runner: &Runner) -> TestResult<()> {
-        test_user(runner, r#"{ id: 1, first_name: "Joe", last_name: "Doe", email: "1" }"#).await?;
+    async fn with_skip_orderby_nondistinct(runner: Runner) -> TestResult<()> {
+        test_user(&runner, r#"{ id: 1, first_name: "Joe", last_name: "Doe", email: "1" }"#).await?;
         test_user(
-            runner,
+            &runner,
             r#"{ id: 2, first_name: "Hans", last_name: "Wurst", email: "2" }"#,
         )
         .await?;
-        test_user(runner, r#"{ id: 3, first_name: "Joe", last_name: "Doe", email: "3" }"#).await?;
+        test_user(&runner, r#"{ id: 3, first_name: "Joe", last_name: "Doe", email: "3" }"#).await?;
 
         assert_query!(
             runner,
@@ -109,8 +109,8 @@ mod distinct {
 
     /// Mut return only distinct records for top record, and only for those the distinct relation records.
     #[connector_test]
-    async fn nested_distinct(runner: &Runner) -> TestResult<()> {
-        nested_dataset(runner).await?;
+    async fn nested_distinct(runner: Runner) -> TestResult<()> {
+        nested_dataset(&runner).await?;
 
         // Returns Users 1, 3, 4, 5 top
         // 1 => ["3", "1", "2"]
@@ -135,8 +135,8 @@ mod distinct {
 
     /// Mut return only distinct records for top record, and only for those the distinct relation records. Both orderings reversed.
     #[connector_test]
-    async fn nested_distinct_reversed(runner: &Runner) -> TestResult<()> {
-        nested_dataset(runner).await?;
+    async fn nested_distinct_reversed(runner: Runner) -> TestResult<()> {
+        nested_dataset(&runner).await?;
 
         // Returns Users 1, 3, 4, 5 top
         // 5 => ["2", "3"]

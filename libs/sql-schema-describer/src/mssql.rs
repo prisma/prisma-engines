@@ -1,7 +1,7 @@
 use crate::{
     getters::Getter, parsers::Parser, Column, ColumnArity, ColumnType, ColumnTypeFamily, DefaultValue, DescriberError,
-    DescriberErrorKind, DescriberResult, ForeignKey, ForeignKeyAction, Index, IndexType, PrimaryKey, Procedure,
-    SqlMetadata, SqlSchema, Table, UserDefinedType, View,
+    DescriberErrorKind, DescriberResult, ForeignKey, ForeignKeyAction, Index, IndexColumn, IndexType, PrimaryKey,
+    PrimaryKeyColumn, Procedure, SQLSortOrder, SqlMetadata, SqlSchema, Table, UserDefinedType, View,
 };
 use indoc::indoc;
 use native_types::{MsSqlType, MsSqlTypeParameter, NativeType};
@@ -12,7 +12,7 @@ use regex::Regex;
 use std::{
     any::type_name,
     borrow::Cow,
-    collections::{BTreeMap, HashMap, HashSet},
+    collections::{BTreeMap, HashSet},
     convert::TryInto,
 };
 use tracing::{debug, trace};
@@ -220,9 +220,9 @@ impl<'a> SqlSchemaDescriber<'a> {
     fn get_table(
         &self,
         name: &str,
-        columns: &mut HashMap<String, Vec<Column>>,
-        indexes: &mut HashMap<String, (BTreeMap<String, Index>, Option<PrimaryKey>)>,
-        foreign_keys: &mut HashMap<String, Vec<ForeignKey>>,
+        columns: &mut BTreeMap<String, Vec<Column>>,
+        indexes: &mut BTreeMap<String, (BTreeMap<String, Index>, Option<PrimaryKey>)>,
+        foreign_keys: &mut BTreeMap<String, Vec<ForeignKey>>,
     ) -> Table {
         let columns = columns.remove(name).unwrap_or_default();
         let (indices, primary_key) = indexes.remove(name).unwrap_or_else(|| (BTreeMap::new(), None));
@@ -238,7 +238,7 @@ impl<'a> SqlSchemaDescriber<'a> {
         }
     }
 
-    async fn get_all_columns(&self, schema: &str) -> DescriberResult<HashMap<String, Vec<Column>>> {
+    async fn get_all_columns(&self, schema: &str) -> DescriberResult<BTreeMap<String, Vec<Column>>> {
         let sql = indoc! {r#"
             SELECT c.name                                                       AS column_name,
                 CASE typ.is_assembly_type
@@ -265,7 +265,7 @@ impl<'a> SqlSchemaDescriber<'a> {
             ORDER BY COLUMNPROPERTY(c.object_id, c.name, 'ordinal');
         "#};
 
-        let mut map = HashMap::new();
+        let mut map = BTreeMap::new();
         let rows = self.conn.query_raw(sql, &[schema.into()]).await?;
 
         for col in rows {
@@ -372,8 +372,8 @@ impl<'a> SqlSchemaDescriber<'a> {
     async fn get_all_indices(
         &self,
         schema: &str,
-    ) -> DescriberResult<HashMap<String, (BTreeMap<String, Index>, Option<PrimaryKey>)>> {
-        let mut map = HashMap::new();
+    ) -> DescriberResult<BTreeMap<String, (BTreeMap<String, Index>, Option<PrimaryKey>)>> {
+        let mut map = BTreeMap::new();
         let mut indexes_with_expressions: HashSet<(String, String)> = HashSet::new();
 
         let sql = indoc! {r#"
@@ -383,6 +383,7 @@ impl<'a> SqlSchemaDescriber<'a> {
                 ind.is_primary_key AS is_primary_key,
                 col.name AS column_name,
                 ic.key_ordinal AS seq_in_index,
+                ic.is_descending_key AS is_descending,
                 t.name AS table_name
             FROM
                 sys.indexes ind
@@ -396,7 +397,12 @@ impl<'a> SqlSchemaDescriber<'a> {
                 AND t.is_ms_shipped = 0
                 AND ind.filter_definition IS NULL
                 AND ind.name IS NOT NULL
-
+                AND ind.type_desc IN (
+                    'CLUSTERED',
+                    'NONCLUSTERED',
+                    'CLUSTERED COLUMNSTORE',
+                    'NONCLUSTERED COLUMNSTORE'
+                )
             ORDER BY index_name, seq_in_index
         "#};
 
@@ -407,6 +413,11 @@ impl<'a> SqlSchemaDescriber<'a> {
 
             let table_name = row.get_expect_string("table_name");
             let index_name = row.get_expect_string("index_name");
+
+            let sort_order = match row.get_expect_bool("is_descending") {
+                true => SQLSortOrder::Desc,
+                false => SQLSortOrder::Asc,
+            };
 
             match row.get("column_name").and_then(|x| x.to_string()) {
                 Some(column_name) => {
@@ -428,10 +439,11 @@ impl<'a> SqlSchemaDescriber<'a> {
                         match primary_key {
                             Some(pk) => {
                                 if pk.columns.len() < (pos + 1) as usize {
-                                    pk.columns.resize((pos + 1) as usize, "".to_string());
+                                    pk.columns.resize((pos + 1) as usize, PrimaryKeyColumn::default());
                                 }
 
-                                pk.columns[pos as usize] = column_name;
+                                pk.columns[pos as usize] = PrimaryKeyColumn::new(column_name);
+                                pk.columns[pos as usize].set_sort_order(sort_order);
 
                                 debug!(
                                     "The primary key has already been created, added column to it: {:?}",
@@ -441,8 +453,11 @@ impl<'a> SqlSchemaDescriber<'a> {
                             None => {
                                 debug!("Instantiating primary key");
 
+                                let mut column = PrimaryKeyColumn::new(column_name);
+                                column.set_sort_order(sort_order);
+
                                 primary_key.replace(PrimaryKey {
-                                    columns: vec![column_name],
+                                    columns: vec![column],
                                     sequence: None,
                                     constraint_name: Some(index_name),
                                 });
@@ -450,18 +465,25 @@ impl<'a> SqlSchemaDescriber<'a> {
                         };
                     } else if indexes_map.contains_key(&index_name) {
                         if let Some(index) = indexes_map.get_mut(&index_name) {
-                            index.columns.push(column_name);
+                            let mut column = IndexColumn::new(column_name);
+                            column.set_sort_order(sort_order);
+
+                            index.columns.push(column);
                         }
                     } else {
+                        let mut column = IndexColumn::new(column_name);
+                        column.set_sort_order(sort_order);
+
                         indexes_map.insert(
                             index_name.clone(),
                             Index {
                                 name: index_name,
-                                columns: vec![column_name],
+                                columns: vec![column],
                                 tpe: match is_unique {
                                     true => IndexType::Unique,
                                     false => IndexType::Normal,
                                 },
+                                algorithm: None,
                             },
                         );
                     }
@@ -565,10 +587,10 @@ impl<'a> SqlSchemaDescriber<'a> {
         Ok(types)
     }
 
-    async fn get_foreign_keys(&self, schema: &str) -> DescriberResult<HashMap<String, Vec<ForeignKey>>> {
+    async fn get_foreign_keys(&self, schema: &str) -> DescriberResult<BTreeMap<String, Vec<ForeignKey>>> {
         // Foreign keys covering multiple columns will return multiple rows, which we need to
         // merge.
-        let mut map: HashMap<String, HashMap<String, ForeignKey>> = HashMap::new();
+        let mut map: BTreeMap<String, BTreeMap<String, ForeignKey>> = BTreeMap::new();
 
         let sql = indoc! {r#"
             SELECT OBJECT_NAME(fkc.constraint_object_id) AS constraint_name,

@@ -1,0 +1,14 @@
+ model User {
+     id Int @id
+     firstName String
+     lastName String
+     age Int
+
+    @@index([firstName], map: "UserExistingIndex")
+ }
+
+ model Post {
+     id Int @id
+     title String
+ }
+

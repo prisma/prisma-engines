@@ -34,9 +34,9 @@ impl ConnectorError {
                 }))
             }
             ErrorKind::InvalidDatabaseUrl { details, url: _ } => {
-                let details = user_facing_errors::quaint::invalid_url_description(details);
+                let details = user_facing_errors::quaint::invalid_connection_string_description(details);
 
-                Some(KnownError::new(user_facing_errors::common::InvalidDatabaseString {
+                Some(KnownError::new(user_facing_errors::common::InvalidConnectionString {
                     details,
                 }))
             }
@@ -77,7 +77,21 @@ impl ConnectorError {
                     actual: *actual,
                 },
             )),
+            ErrorKind::QueryParameterLimitExceeded(message) => Some(KnownError::new(
+                user_facing_errors::query_engine::QueryParameterLimitExceeded {
+                    message: message.clone(),
+                },
+            )),
 
+            ErrorKind::MissingFullTextSearchIndex => Some(KnownError::new(
+                user_facing_errors::query_engine::MissingFullTextSearchIndex {},
+            )),
+            ErrorKind::TransactionAborted { message } => Some(KnownError::new(
+                user_facing_errors::query_engine::InteractiveTransactionError { error: message.clone() },
+            )),
+            ErrorKind::MongoReplicaSetRequired => Some(KnownError::new(
+                user_facing_errors::query_engine::MongoReplicaSetRequired {},
+            )),
             _ => None,
         };
 
@@ -172,7 +186,10 @@ pub enum ErrorKind {
     AuthenticationFailed { user: String },
 
     #[error("Database error. error code: {}, error message: {}", code, message)]
-    RawError { code: String, message: String },
+    RawDatabaseError { code: String, message: String },
+
+    #[error("Raw API error: {0}")]
+    RawApiError(String),
 
     #[error("{}", details)]
     InvalidDatabaseUrl { details: String, url: String },
@@ -192,6 +209,21 @@ pub enum ErrorKind {
 
     #[error("Server terminated the connection.")]
     ConnectionClosed,
+
+    #[error("Transaction aborted: {}", message)]
+    TransactionAborted { message: String },
+
+    #[error("{}", message)]
+    TransactionAlreadyClosed { message: String },
+
+    #[error("The query parameter limit supported by your database is exceeded: {0}.")]
+    QueryParameterLimitExceeded(String),
+
+    #[error("Cannot find a fulltext index to use for the search")]
+    MissingFullTextSearchIndex,
+
+    #[error("Replica Set required for Transactions")]
+    MongoReplicaSetRequired,
 }
 
 impl From<DomainError> for ConnectorError {

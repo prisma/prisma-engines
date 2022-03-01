@@ -1,90 +1,138 @@
 //! The MongoDB migration connector.
+//!
+//! It is intentionally structured after sql-migration-connector and implements the same
+//! [MigrationConnector](/trait.MigrationConnector.html) API.
 
-mod error;
-mod mongodb_destructive_change_checker;
-mod mongodb_migration;
-mod mongodb_migration_persistence;
-mod mongodb_migration_step_applier;
+mod client_wrapper;
+mod destructive_change_checker;
+mod differ;
+mod migration;
+mod migration_persistence;
+mod migration_step_applier;
+mod schema_calculator;
 
-use error::IntoConnectorResult;
-use migration_connector::{ConnectorError, ConnectorResult, DiffTarget, Migration, MigrationConnector};
-use mongodb::{
-    options::{ClientOptions, WriteConcern},
-    Client,
-};
-use mongodb_migration::*;
-use url::Url;
+use client_wrapper::Client;
+use datamodel::common::preview_features::PreviewFeature;
+use enumflags2::BitFlags;
+use migration::MongoDbMigration;
+use migration_connector::{migrations_directory::MigrationDirectory, *};
+use mongodb_schema_describer::MongoSchema;
+use std::{future, sync::Arc};
+use tokio::sync::OnceCell;
 
 /// The top-level MongoDB migration connector.
 pub struct MongoDbMigrationConnector {
-    client: Client,
-    db_name: String,
+    connection_string: String,
+    client: OnceCell<Client>,
+    preview_features: BitFlags<PreviewFeature>,
+    host: Arc<dyn ConnectorHost>,
 }
 
 impl MongoDbMigrationConnector {
-    /// Construct and initialize the SQL migration connector.
-    pub async fn new(database_str: &str) -> ConnectorResult<Self> {
-        let (client, db_name) = Self::create_client(database_str).await?;
-
-        Ok(Self { client, db_name })
+    pub fn new(params: ConnectorParams) -> Self {
+        Self {
+            connection_string: params.connection_string,
+            preview_features: params.preview_features,
+            client: OnceCell::new(),
+            host: Arc::new(EmptyHost),
+        }
     }
 
-    /// Set up the database for connector-test-kit, without initializing the connector.
-    pub async fn qe_setup(database_str: &str) -> ConnectorResult<()> {
-        let (client, db_name) = Self::create_client(database_str).await?;
+    async fn client(&self) -> ConnectorResult<&Client> {
+        let client: &Client = self
+            .client
+            .get_or_try_init(move || {
+                Box::pin(async move { Client::connect(&self.connection_string, self.preview_features).await })
+            })
+            .await?;
 
-        // Drop database. Creation is automatically done when collections are created.
-        client
-            .database(&db_name)
-            .drop(Some(
-                mongodb::options::DropDatabaseOptions::builder()
-                    .write_concern(WriteConcern::builder().journal(true).build())
-                    .build(),
-            ))
-            .await
-            .into_connector_result()?;
-
-        Ok(())
+        Ok(client)
     }
 
-    async fn create_client(database_str: &str) -> ConnectorResult<(Client, String)> {
-        let url = Url::parse(database_str).map_err(ConnectorError::url_parse_error)?;
-        let db_name = url.path().trim_start_matches('/').to_string();
-
-        let client_options = ClientOptions::parse(database_str).await.into_connector_result()?;
-        Ok((Client::with_options(client_options).into_connector_result()?, db_name))
+    async fn mongodb_schema_from_diff_target(&self, target: DiffTarget<'_>) -> ConnectorResult<MongoSchema> {
+        match target {
+            DiffTarget::Datamodel(schema) => {
+                let validated_schema =
+                    datamodel::parse_schema_parserdb(schema).map_err(ConnectorError::new_schema_parser_error)?;
+                Ok(schema_calculator::calculate(&validated_schema))
+            }
+            DiffTarget::Database => self.client().await?.describe().await,
+            DiffTarget::Migrations(_) => Err(unsupported_command_error()),
+            DiffTarget::Empty => Ok(MongoSchema::default()),
+        }
     }
 }
 
-#[async_trait::async_trait]
 impl MigrationConnector for MongoDbMigrationConnector {
+    fn connection_string(&self) -> Option<&str> {
+        Some(&self.connection_string)
+    }
+
+    fn database_schema_from_diff_target<'a>(
+        &'a mut self,
+        diff_target: DiffTarget<'a>,
+        _shadow_database_connection_string: Option<String>,
+    ) -> BoxFuture<'a, ConnectorResult<DatabaseSchema>> {
+        Box::pin(async {
+            let schema = self.mongodb_schema_from_diff_target(diff_target).await?;
+            Ok(DatabaseSchema::new(schema))
+        })
+    }
+
+    fn host(&self) -> &Arc<dyn ConnectorHost> {
+        &self.host
+    }
+
+    fn apply_migration<'a>(&'a mut self, migration: &'a Migration) -> BoxFuture<'a, ConnectorResult<u32>> {
+        Box::pin(self.apply_migration_impl(migration))
+    }
+
+    fn apply_script(&mut self, _migration_name: &str, _script: &str) -> BoxFuture<ConnectorResult<()>> {
+        Box::pin(future::ready(Err(crate::unsupported_command_error())))
+    }
+
     fn connector_type(&self) -> &'static str {
         "mongodb"
     }
 
-    async fn version(&self) -> migration_connector::ConnectorResult<String> {
-        Ok("4".to_owned())
+    fn create_database(&mut self) -> BoxFuture<'_, ConnectorResult<String>> {
+        Box::pin(async {
+            let name = self.client().await?.db_name();
+            tracing::warn!("MongoDB database will be created on first use.");
+            Ok(name.into())
+        })
     }
 
-    async fn diff(&self, from: DiffTarget<'_>, to: DiffTarget<'_>) -> ConnectorResult<Migration> {
-        match (from, to) {
-            (DiffTarget::Empty, DiffTarget::Datamodel((_, datamodel))) => {
-                let steps = datamodel
-                    .models()
-                    .map(|model| {
-                        let name = model.database_name.as_ref().unwrap_or(&model.name).to_owned();
-                        MongoDbMigrationStep::CreateCollection(name)
-                    })
-                    .collect();
+    fn db_execute(&mut self, _script: String) -> BoxFuture<'_, ConnectorResult<()>> {
+        Box::pin(future::ready(Err(ConnectorError::from_msg(
+            "dbExecute is not supported on MongoDB".to_owned(),
+        ))))
+    }
 
-                Ok(Migration::new(MongoDbMigration { steps }))
-            }
-            _ => todo!(),
-        }
+    fn empty_database_schema(&self) -> DatabaseSchema {
+        DatabaseSchema::new(MongoSchema::default())
+    }
+
+    fn ensure_connection_validity(&mut self) -> BoxFuture<'_, ConnectorResult<()>> {
+        Box::pin(future::ready(Ok(())))
+    }
+
+    fn version(&mut self) -> BoxFuture<'_, migration_connector::ConnectorResult<String>> {
+        Box::pin(future::ready(Ok("4 or 5".to_owned())))
+    }
+
+    fn diff(&self, from: DatabaseSchema, to: DatabaseSchema) -> ConnectorResult<Migration> {
+        let from: Box<MongoSchema> = from.downcast();
+        let to: Box<MongoSchema> = to.downcast();
+        Ok(Migration::new(differ::diff(from, to)))
+    }
+
+    fn drop_database(&mut self) -> BoxFuture<'_, ConnectorResult<()>> {
+        Box::pin(async { self.client().await?.drop_database().await })
     }
 
     fn migration_file_extension(&self) -> &'static str {
-        "mongo"
+        unreachable!("migration_file_extension")
     }
 
     fn migration_len(&self, migration: &Migration) -> usize {
@@ -95,34 +143,53 @@ impl MigrationConnector for MongoDbMigrationConnector {
         migration.downcast_ref::<MongoDbMigration>().summary()
     }
 
-    async fn reset(&self) -> migration_connector::ConnectorResult<()> {
-        self.client
-            .database(&self.db_name)
-            .drop(None)
-            .await
-            .into_connector_result()
+    fn reset(&mut self, _soft: bool) -> BoxFuture<'_, migration_connector::ConnectorResult<()>> {
+        Box::pin(async { self.client().await?.drop_database().await })
     }
 
-    fn migration_persistence(&self) -> &dyn migration_connector::MigrationPersistence {
+    fn migration_persistence(&mut self) -> &mut dyn migration_connector::MigrationPersistence {
         self
     }
 
-    fn database_migration_step_applier(&self) -> &dyn migration_connector::DatabaseMigrationStepApplier {
+    fn destructive_change_checker(&mut self) -> &mut dyn migration_connector::DestructiveChangeChecker {
         self
     }
 
-    fn destructive_change_checker(&self) -> &dyn migration_connector::DestructiveChangeChecker {
-        self
+    fn acquire_lock(&mut self) -> BoxFuture<'_, ConnectorResult<()>> {
+        Box::pin(future::ready(Ok(())))
     }
 
-    async fn acquire_lock(&self) -> ConnectorResult<()> {
-        todo!()
-    }
-
-    async fn validate_migrations(
+    fn render_script(
         &self,
-        _migrations: &[migration_connector::migrations_directory::MigrationDirectory],
-    ) -> migration_connector::ConnectorResult<()> {
+        _migration: &Migration,
+        _diagnostics: &DestructiveChangeDiagnostics,
+    ) -> ConnectorResult<String> {
+        Err(ConnectorError::from_msg(
+            "Rendering to a script is not supported on MongoDB.".to_owned(),
+        ))
+    }
+
+    fn set_params(&mut self, params: ConnectorParams) -> ConnectorResult<()> {
+        self.connection_string = params.connection_string;
+        self.preview_features = params.preview_features;
         Ok(())
     }
+
+    fn set_host(&mut self, host: Arc<dyn migration_connector::ConnectorHost>) {
+        self.host = host;
+    }
+
+    fn validate_migrations<'a>(
+        &'a mut self,
+        _migrations: &'a [MigrationDirectory],
+    ) -> BoxFuture<'a, ConnectorResult<()>> {
+        Box::pin(future::ready(Ok(())))
+    }
+}
+
+fn unsupported_command_error() -> ConnectorError {
+    ConnectorError::from_msg(
+"The \"mongodb\" provider is not supported with this command. For more info see https://www.prisma.io/docs/concepts/database-connectors/mongodb".to_owned()
+
+        )
 }

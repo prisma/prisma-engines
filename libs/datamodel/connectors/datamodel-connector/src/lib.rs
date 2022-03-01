@@ -1,33 +1,112 @@
-pub mod connector_error;
+#![deny(rust_2018_idioms, unsafe_code)]
+
+//! The interface implemented by connectors for Prisma schema validation and interpretation.
+
+/// Connector capabilities
+pub mod capabilities;
+/// Constraint name defaults.
+pub mod constraint_names;
+/// Helpers for implementors of `Connector`.
 pub mod helper;
+/// Extensions for parser database walkers with context from the connector.
+pub mod walker_ext_traits;
 
 mod empty_connector;
+mod native_type_constructor;
+mod native_type_instance;
+mod referential_integrity;
 
+pub use self::{
+    capabilities::{ConnectorCapabilities, ConnectorCapability},
+    native_type_instance::NativeTypeInstance,
+};
+pub use diagnostics::{connector_error, DatamodelError, Diagnostics};
 pub use empty_connector::EmptyDatamodelConnector;
+pub use native_type_constructor::NativeTypeConstructor;
+pub use parser_database::{self, ReferentialAction, ScalarType};
+pub use referential_integrity::ReferentialIntegrity;
 
 use crate::connector_error::{ConnectorError, ConnectorErrorFactory, ErrorKind};
-use dml::{
-    field::Field, model::Model, native_type_constructor::NativeTypeConstructor,
-    native_type_instance::NativeTypeInstance, scalars::ScalarType,
-};
+use enumflags2::BitFlags;
 use std::{borrow::Cow, collections::BTreeMap};
 
+/// The datamodel connector API.
 pub trait Connector: Send + Sync {
+    /// The name of the connector. Can be used in error messages.
     fn name(&self) -> &str;
 
-    fn capabilities(&self) -> &[ConnectorCapability];
+    // Capabilities
 
+    /// The static list of capabilities for the connector.
+    fn capabilities(&self) -> &'static [ConnectorCapability];
+
+    /// Does the connector have this capability?
     fn has_capability(&self, capability: ConnectorCapability) -> bool {
         self.capabilities().contains(&capability)
     }
 
-    fn validate_field(&self, field: &Field) -> Result<(), ConnectorError>;
+    /// The maximum length of constraint names in bytes. Connectors without a
+    /// limit should return usize::MAX.
+    fn max_identifier_length(&self) -> usize;
 
-    fn validate_model(&self, model: &Model) -> Result<(), ConnectorError>;
+    // Referential integrity
+
+    /// The referential integrity modes that can be set through the referentialIntegrity datasource
+    /// argument.
+    fn allowed_referential_integrity_settings(&self) -> BitFlags<ReferentialIntegrity> {
+        use ReferentialIntegrity::*;
+
+        ForeignKeys | Prisma
+    }
+
+    /// The default referential integrity mode to assume for this connector.
+    fn default_referential_integrity(&self) -> ReferentialIntegrity {
+        ReferentialIntegrity::ForeignKeys
+    }
+
+    /// The referential actions supported by the connector.
+    fn referential_actions(&self, referential_integrity: &ReferentialIntegrity) -> BitFlags<ReferentialAction>;
+
+    fn supports_composite_types(&self) -> bool {
+        self.has_capability(ConnectorCapability::CompositeTypes)
+    }
+
+    fn supports_named_primary_keys(&self) -> bool {
+        self.has_capability(ConnectorCapability::NamedPrimaryKeys)
+    }
+
+    fn supports_named_foreign_keys(&self) -> bool {
+        self.has_capability(ConnectorCapability::NamedForeignKeys)
+    }
+
+    fn supports_named_default_values(&self) -> bool {
+        self.has_capability(ConnectorCapability::NamedDefaultValues)
+    }
+
+    fn supports_referential_action(&self, integrity: &ReferentialIntegrity, action: ReferentialAction) -> bool {
+        self.referential_actions(integrity).contains(action)
+    }
+
+    /// Validate that the arguments passed to a native type attribute are valid.
+    fn validate_native_type_arguments(
+        &self,
+        _native_type: &NativeTypeInstance,
+        _scalar_type: &ScalarType,
+        _: &mut Vec<ConnectorError>,
+    ) {
+    }
+
+    fn validate_model(&self, _model: parser_database::walkers::ModelWalker<'_>, _: &mut diagnostics::Diagnostics) {}
+
+    /// The scopes in which a constraint name should be validated. If empty, doesn't check for name
+    /// clashes in the validation phase.
+    fn constraint_violation_scopes(&self) -> &'static [ConstraintScope] {
+        &[]
+    }
 
     /// Returns all available native type constructors available through this connector.
-    /// Powers the auto completion of the vs code plugin.
-    fn available_native_type_constructors(&self) -> &[NativeTypeConstructor];
+    /// Powers the auto completion of the VSCode plugin.
+    fn available_native_type_constructors(&self) -> &'static [NativeTypeConstructor];
 
     /// Returns the Scalar Type for the given native type
     fn scalar_type_for_native_type(&self, native_type: serde_json::Value) -> ScalarType;
@@ -42,21 +121,13 @@ pub trait Connector: Send + Sync {
     fn find_native_type_constructor(&self, name: &str) -> Option<&NativeTypeConstructor> {
         self.available_native_type_constructors()
             .iter()
-            .find(|constructor| constructor.name.as_str() == name)
+            .find(|constructor| constructor.name == name)
     }
 
     /// This function is used during Schema parsing to calculate the concrete native type.
-    /// This powers the use of native types for QE + ME.
     fn parse_native_type(&self, name: &str, args: Vec<String>) -> Result<NativeTypeInstance, ConnectorError>;
 
-    /// This function is used in ME for error messages
-    fn render_native_type(&self, native_type: serde_json::Value) -> String {
-        let instance = self.introspect_native_type(native_type).unwrap();
-        instance.render()
-    }
-
     /// This function is used during introspection to turn an introspected native type into an instance that can be put into the Prisma schema.
-    /// powers IE
     fn introspect_native_type(&self, native_type: serde_json::Value) -> Result<NativeTypeInstance, ConnectorError>;
 
     fn set_config_dir<'a>(&self, config_dir: &std::path::Path, url: &'a str) -> Cow<'a, str> {
@@ -70,7 +141,10 @@ pub trait Connector: Send + Sync {
             }
         };
 
-        let mut url = url::Url::parse(url).unwrap();
+        let mut url = match url::Url::parse(url) {
+            Ok(url) => url,
+            Err(_) => return Cow::from(url), // bail
+        };
 
         let mut params: BTreeMap<String, String> =
             url.query_pairs().map(|(k, v)| (k.to_string(), v.to_string())).collect();
@@ -96,10 +170,6 @@ pub trait Connector: Send + Sync {
         self.has_capability(ConnectorCapability::ScalarLists)
     }
 
-    fn supports_multiple_indexes_with_same_name(&self) -> bool {
-        self.has_capability(ConnectorCapability::MultipleIndexesWithSameName)
-    }
-
     fn supports_relations_over_non_unique_criteria(&self) -> bool {
         self.has_capability(ConnectorCapability::RelationsOverNonUniqueCriteria)
     }
@@ -110,6 +180,10 @@ pub trait Connector: Send + Sync {
 
     fn supports_json(&self) -> bool {
         self.has_capability(ConnectorCapability::Json)
+    }
+
+    fn supports_json_lists(&self) -> bool {
+        self.has_capability(ConnectorCapability::JsonLists)
     }
 
     fn supports_auto_increment(&self) -> bool {
@@ -136,10 +210,10 @@ pub trait Connector: Send + Sync {
         self.has_capability(ConnectorCapability::RelationFieldsInArbitraryOrder)
     }
 
-    fn native_instance_error(&self, instance: NativeTypeInstance) -> ConnectorErrorFactory {
+    fn native_instance_error(&self, instance: &NativeTypeInstance) -> ConnectorErrorFactory {
         ConnectorErrorFactory {
             connector: self.name().to_owned(),
-            native_type: instance.render(),
+            native_type: instance.to_string(),
         }
     }
 
@@ -161,51 +235,56 @@ pub trait Connector: Send + Sync {
     fn validate_url(&self, url: &str) -> Result<(), String>;
 }
 
-/// Not all Databases are created equal. Hence connectors for our datasources support different capabilities.
-/// These are used during schema validation. E.g. if a connector does not support enums an error will be raised.
-#[derive(Debug, Clone, Copy, PartialEq)]
-pub enum ConnectorCapability {
-    // start of General Schema Capabilities
-    ScalarLists,
-    RelationsOverNonUniqueCriteria,
-    MultipleIndexesWithSameName,
-    Enums,
-    Json,
-    AutoIncrement,
-    AutoIncrementAllowedOnNonId,
-    AutoIncrementMultipleAllowed,
-    AutoIncrementNonIndexedAllowed,
-    RelationFieldsInArbitraryOrder,
-
-    // start of Query Engine Capabilities
-    InsensitiveFilters,
-    CreateMany,
-    CreateManyWriteableAutoIncId,
-    WritableAutoincField,
-    CreateSkipDuplicates,
-    UpdateableId,
-    JsonFiltering,
-    JsonFilteringJsonPath,
-    JsonFilteringArrayPath,
-    CompoundIds,
+#[derive(Debug, Clone, Copy, Eq, PartialEq, Ord, PartialOrd)]
+pub enum ConstraintType {
+    PrimaryKey,
+    ForeignKey,
+    KeyOrIdx,
+    Default,
 }
 
-/// Contains all capabilities that the connector is able to serve.
-#[derive(Debug)]
-pub struct ConnectorCapabilities {
-    capabilities: Vec<ConnectorCapability>,
+/// A scope where a constraint name must be unique.
+#[derive(Debug, Eq, PartialEq, Ord, PartialOrd, Hash, Clone, Copy)]
+pub enum ConstraintScope {
+    /// Globally indices and unique constraints
+    GlobalKeyIndex,
+    /// Globally foreign keys
+    GlobalForeignKey,
+    /// Globally primary keys, indices and unique constraints
+    GlobalPrimaryKeyKeyIndex,
+    /// Globally primary keys, foreign keys and default constraints
+    GlobalPrimaryKeyForeignKeyDefault,
+    /// Per model indices and unique constraints
+    ModelKeyIndex,
+    /// Per model primary keys, indices and unique constraints
+    ModelPrimaryKeyKeyIndex,
+    /// Per model primary keys, foreign keys, indices and unique constraints
+    ModelPrimaryKeyKeyIndexForeignKey,
 }
 
-impl ConnectorCapabilities {
-    pub fn empty() -> Self {
-        Self { capabilities: vec![] }
-    }
-
-    pub fn new(capabilities: Vec<ConnectorCapability>) -> Self {
-        Self { capabilities }
-    }
-
-    pub fn contains(&self, capability: ConnectorCapability) -> bool {
-        self.capabilities.contains(&capability)
+impl ConstraintScope {
+    /// A beefed-up display for errors.
+    pub fn description(self, model_name: &str) -> Cow<'static, str> {
+        match self {
+            ConstraintScope::GlobalKeyIndex => Cow::from("global for indexes and unique constraints"),
+            ConstraintScope::GlobalForeignKey => Cow::from("global for foreign keys"),
+            ConstraintScope::GlobalPrimaryKeyKeyIndex => {
+                Cow::from("global for primary key, indexes and unique constraints")
+            }
+            ConstraintScope::GlobalPrimaryKeyForeignKeyDefault => {
+                Cow::from("global for primary keys, foreign keys and default constraints")
+            }
+            ConstraintScope::ModelKeyIndex => {
+                Cow::from(format!("on model `{}` for indexes and unique constraints", model_name))
+            }
+            ConstraintScope::ModelPrimaryKeyKeyIndex => Cow::from(format!(
+                "on model `{}` for primary key, indexes and unique constraints",
+                model_name
+            )),
+            ConstraintScope::ModelPrimaryKeyKeyIndexForeignKey => Cow::from(format!(
+                "on model `{}` for primary key, indexes, unique constraints and foreign keys",
+                model_name
+            )),
+        }
     }
 }

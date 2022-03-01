@@ -29,7 +29,7 @@ pub fn test_tracing_subscriber(log_config: String) -> Sub {
 /// It is used from test_macros.
 pub struct PrintWriter;
 
-impl tracing_subscriber::fmt::MakeWriter for PrintWriter {
+impl tracing_subscriber::fmt::MakeWriter<'_> for PrintWriter {
     type Writer = PrintWriter;
 
     fn make_writer(&self) -> Self::Writer {

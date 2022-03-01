@@ -1,6 +1,6 @@
 use query_engine_tests::*;
 
-#[test_suite]
+#[test_suite(capabilities(CreateMany))]
 mod create_many {
     use indoc::indoc;
     use query_engine_tests::{assert_error, run_query};
@@ -18,10 +18,10 @@ mod create_many {
         schema.to_owned()
     }
 
-    #[connector_test(schema(schema_1), exclude(Sqlite))]
-    async fn basic_create_many(runner: &Runner) -> TestResult<()> {
+    #[connector_test(schema(schema_1))]
+    async fn basic_create_many(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation {
+          run_query!(&runner, r#"mutation {
             createManyTest(data: [
               { id: 1, str1: "1", str2: "1", str3: "1"},
               { id: 2, str1: "2",            str3: null},
@@ -49,11 +49,11 @@ mod create_many {
         schema.to_owned()
     }
 
-    // Covers: AutoIncrement ID working with basic functionality.
-    #[connector_test(schema(schema_2), exclude(Sqlite, SqlServer, MongoDb))]
-    async fn basic_create_many_autoincrement(runner: &Runner) -> TestResult<()> {
+    // Covers: AutoIncrement ID working with basic autonincrement functionality.
+    #[connector_test(schema(schema_2), capabilities(CreateManyWriteableAutoIncId))]
+    async fn basic_create_many_autoincrement(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation {
+          run_query!(&runner, r#"mutation {
             createManyTest(data: [
               { id: 123, str1: "1", str2: "1", str3: "1"},
               { id: 321, str1: "2",            str3: null},
@@ -80,11 +80,11 @@ mod create_many {
     }
 
     // "createMany" should "correctly use defaults and nulls"
-    #[connector_test(schema(schema_3), exclude(Sqlite))]
-    async fn create_many_defaults_nulls(runner: &Runner) -> TestResult<()> {
+    #[connector_test(schema(schema_3))]
+    async fn create_many_defaults_nulls(runner: Runner) -> TestResult<()> {
         // Not providing a value must provide the default, providing null must result in null.
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation {
+          run_query!(&runner, r#"mutation {
             createManyTest(data: [
               { id: 1 },
               { id: 2, str: null }
@@ -96,7 +96,7 @@ mod create_many {
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{
+          run_query!(&runner, r#"{
             findManyTest {
               id
               str
@@ -119,12 +119,10 @@ mod create_many {
     }
 
     // "createMany" should "error on duplicates by default"
-    // TODO(dom): Not working on mongo. Has the right error but the wrong error code. 2002 expected, got 2027
-    // TODO(dom): 'Expected error with code `P2002` and message `Unique constraint failed on the fields: (`id`)`, got: `{"errors":[{"error":"Error occurred during query execution:\nConnectorError(ConnectorError { user_facing_error: Some(KnownError { message: \"Multiple errors occurred on the database during query execution: 1) Unique constraint failed: constraint: `_id_`\", meta: Object({\"errors\": String(\"1) Unique constraint failed: constraint: `_id_`\")}), error_code: \"P2027\" }), kind: MultiError(MultiError { errors: [UniqueConstraintViolation { constraint: Index(\"_id_\") }] }) })","user_facing_error":{"is_panic":false,"message":"Multiple errors occurred on the database during query execution: 1) Unique constraint failed: constraint: `_id_`","meta":{"errors":"1) Unique constraint failed: constraint: `_id_`"},"error_code":"P2027"}}]}`'
-    #[connector_test(schema(schema_4), exclude(Sqlite, MongoDb))]
-    async fn create_many_error_dups(runner: &Runner) -> TestResult<()> {
+    #[connector_test(schema(schema_4))]
+    async fn create_many_error_dups(runner: Runner) -> TestResult<()> {
         assert_error!(
-            runner,
+            &runner,
             r#"mutation {
             createManyTest(data: [
               { id: 1 },
@@ -141,10 +139,10 @@ mod create_many {
     }
 
     // "createMany" should "not error on duplicates with skipDuplicates true"
-    #[connector_test(schema(schema_4), exclude(Sqlite, SqlServer))]
-    async fn create_many_no_error_skip_dup(runner: &Runner) -> TestResult<()> {
+    #[connector_test(schema(schema_4), capabilities(CreateMany, CreateSkipDuplicates))]
+    async fn create_many_no_error_skip_dup(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation {
+          run_query!(&runner, r#"mutation {
             createManyTest(skipDuplicates: true, data: [
               { id: 1 },
               { id: 1 }
@@ -163,8 +161,8 @@ mod create_many {
     // Covers: Batching by row number.
     // Each DB allows a certain amount of params per single query, and a certain number of rows.
     // Each created row has 1 param and we create 1000 records.
-    #[connector_test(schema(schema_4), exclude(Sqlite))]
-    async fn large_num_records_horizontal(runner: &Runner) -> TestResult<()> {
+    #[connector_test(schema(schema_4))]
+    async fn large_num_records_horizontal(runner: Runner) -> TestResult<()> {
         let mut records: Vec<String> = vec![];
 
         for i in 1..=1000 {
@@ -172,7 +170,7 @@ mod create_many {
         }
 
         insta::assert_snapshot!(
-          run_query!(runner, format!(r#"mutation {{
+          run_query!(&runner, format!(r#"mutation {{
             createManyTest(data: [{}]) {{
               count
             }}
@@ -201,8 +199,8 @@ mod create_many {
     // Covers: Batching by row number.
     // Each DB allows a certain amount of params per single query, and a certain number of rows.
     // Each created row has 4 params and we create 1000 rows.
-    #[connector_test(schema(schema_5), exclude(Sqlite))]
-    async fn large_num_records_vertical(runner: &Runner) -> TestResult<()> {
+    #[connector_test(schema(schema_5))]
+    async fn large_num_records_vertical(runner: Runner) -> TestResult<()> {
         let mut records: Vec<String> = vec![];
 
         for i in 1..=2000 {
@@ -210,29 +208,12 @@ mod create_many {
         }
 
         insta::assert_snapshot!(
-          run_query!(runner, format!(r#"mutation {{
+          run_query!(&runner, format!(r#"mutation {{
               createManyTest(data: [{}]) {{
                 count
               }}
             }}"#, records.join(", "))),
           @r###"{"data":{"createManyTest":{"count":2000}}}"###
-        );
-
-        Ok(())
-    }
-
-    // "createMany" should "not be available on SQLite"
-    #[connector_test(schema(schema_4), only(Sqlite))]
-    async fn not_available_sqlite(runner: &Runner) -> TestResult<()> {
-        assert_error!(
-            runner,
-            r#"mutation {
-            createManyTest(data: []) {
-              count
-            }
-          }"#,
-            2009,
-            "`Field does not exist on enclosing type.` at `Mutation.createManyTest`"
         );
 
         Ok(())
@@ -251,10 +232,10 @@ mod create_many {
         schema.to_owned()
     }
 
-    #[connector_test(schema(schema_6), exclude(Sqlite))]
-    async fn create_many_map_behavior(runner: &Runner) -> TestResult<()> {
+    #[connector_test(schema(schema_6))]
+    async fn create_many_map_behavior(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
-          run_query!(runner, format!(r#"mutation {{
+          run_query!(&runner, format!(r#"mutation {{
               createManyTestModel(data: [
                 {{ id: 1, updatedAt: "{}" }},
                 {{ id: 2, updatedAt: "{}" }}
@@ -263,6 +244,100 @@ mod create_many {
               }}
             }}"#, date_iso_string(2009, 8, 1), now())),
           @r###"{"data":{"createManyTestModel":{"count":2}}}"###
+        );
+
+        Ok(())
+    }
+}
+
+#[test_suite(schema(json_opt), exclude(MySql(5.6)), capabilities(CreateMany, Json))]
+mod json_create_many {
+    use query_engine_tests::{assert_error, run_query};
+
+    #[connector_test(only(MongoDb))]
+    async fn create_many_json(runner: Runner) -> TestResult<()> {
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"mutation {
+              createManyTestModel(data: [
+                { id: 1, json: "{}" },
+                { id: 2, json: "null" },
+                { id: 3, json: null },
+                { id: 4 },
+              ]) {
+                count
+              }
+            }"#),
+          @r###"{"data":{"createManyTestModel":{"count":4}}}"###
+        );
+
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"{
+              findManyTestModel {
+                id
+                json
+              }
+            }"#),
+          @r###"{"data":{"findManyTestModel":[{"id":1,"json":"{}"},{"id":2,"json":null},{"id":3,"json":null},{"id":4,"json":null}]}}"###
+        );
+
+        Ok(())
+    }
+
+    #[connector_test(capabilities(AdvancedJsonNullability))]
+    async fn create_many_json_adv(runner: Runner) -> TestResult<()> {
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"mutation {
+              createManyTestModel(data: [
+                { id: 1, json: "{}" },
+                { id: 2, json: JsonNull },
+                { id: 3, json: DbNull },
+                { id: 4 },
+              ]) {
+                count
+              }
+            }"#),
+          @r###"{"data":{"createManyTestModel":{"count":4}}}"###
+        );
+
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"{
+              findManyTestModel {
+                id
+                json
+              }
+            }"#),
+          @r###"{"data":{"findManyTestModel":[{"id":1,"json":"{}"},{"id":2,"json":"null"},{"id":3,"json":null},{"id":4,"json":null}]}}"###
+        );
+
+        Ok(())
+    }
+
+    #[connector_test(capabilities(AdvancedJsonNullability))]
+    async fn create_many_json_errors(runner: Runner) -> TestResult<()> {
+        assert_error!(
+            &runner,
+            r#"mutation {
+                  createManyTestModel(data: [
+                    { id: 1, json: null },
+                  ]) {
+                    count
+                  }
+                }"#,
+            2009,
+            "A value is required but not set."
+        );
+
+        assert_error!(
+            &runner,
+            r#"mutation {
+                createManyTestModel(data: [
+                  { id: 1, json: AnyNull },
+                ]) {
+                  count
+                }
+              }"#,
+            2009,
+            "Value types mismatch. Have: Enum(\"AnyNull\")"
         );
 
         Ok(())

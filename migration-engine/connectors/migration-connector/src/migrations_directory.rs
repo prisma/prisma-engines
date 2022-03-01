@@ -5,8 +5,7 @@
 //! It also contains multiple subfolders, named after the migration id, and each containing:
 //! - A migration script
 
-use crate::{ConnectorError, ConnectorResult, FormatChecksum, CHECKSUM_STR_LEN};
-use sha2::{Digest, Sha256, Sha512};
+use crate::{checksum, ConnectorError, ConnectorResult};
 use std::{
     error::Error,
     fmt::Display,
@@ -87,24 +86,31 @@ pub fn error_on_changed_provider(migrations_directory_path: &str, provider: &str
     }
 }
 
-/// Check whether provider matches.
+/// Check whether provider matches. `None` means there was no migration_lock.toml file.
 #[tracing::instrument]
 fn match_provider_in_lock_file(migrations_directory_path: &str, provider: &str) -> Option<Result<(), String>> {
+    read_provider_from_lock_file(migrations_directory_path).map(|found_provider| {
+        if found_provider == provider {
+            Ok(())
+        } else {
+            Err(found_provider)
+        }
+    })
+}
+
+/// Read the provider from the migration_lock.toml. `None` means there was no migration_lock.toml
+/// file in the directory.
+pub fn read_provider_from_lock_file(migrations_directory_path: &str) -> Option<String> {
     let directory_path = Path::new(migrations_directory_path);
     let file_path = directory_path.join("migration_lock.toml");
 
     std::fs::read_to_string(file_path).ok().map(|content| {
-        let found_provider = content
+        content
             .lines()
             .find(|line| line.starts_with("provider"))
             .map(|line| line.trim_start_matches("provider = ").trim_matches('"'))
-            .unwrap_or("<PROVIDER NOT FOUND>");
-
-        if found_provider == provider {
-            Ok(())
-        } else {
-            Err(found_provider.to_owned())
-        }
+            .unwrap_or("<PROVIDER NOT FOUND>")
+            .to_owned()
     })
 }
 
@@ -201,40 +207,11 @@ impl MigrationDirectory {
             .expect("Migration directory name is not valid UTF-8.")
     }
 
-    /// Write the checksum of the migration script file to `buf`.
-    pub fn checksum(&mut self, buf: &mut Vec<u8>) -> Result<(), ReadMigrationScriptError> {
-        let script = self.read_migration_script()?;
-        let mut hasher = Sha512::new();
-        hasher.update(&script);
-        let bytes = hasher.finalize();
-
-        buf.clear();
-        buf.extend_from_slice(bytes.as_ref());
-
-        Ok(())
-    }
-
     /// Check whether the checksum of the migration script matches the provided one.
     #[tracing::instrument]
     pub fn matches_checksum(&self, checksum_str: &str) -> Result<bool, ReadMigrationScriptError> {
         let filesystem_script = self.read_migration_script()?;
-        let mut hasher = Sha256::new();
-        hasher.update(&filesystem_script);
-        let filesystem_script_checksum: [u8; 32] = hasher.finalize().into();
-
-        // Due to an omission in a previous version of the migration engine,
-        // some migrations tables will have old migrations with checksum strings
-        // that have not been zero-padded.
-        //
-        // Corresponding issue:
-        // https://github.com/prisma/prisma-engines/issues/1887
-        let filesystem_script_checksum_str = if !checksum_str.is_empty() && checksum_str.len() != CHECKSUM_STR_LEN {
-            filesystem_script_checksum.format_checksum_old()
-        } else {
-            filesystem_script_checksum.format_checksum()
-        };
-
-        Ok(checksum_str == filesystem_script_checksum_str)
+        Ok(checksum::script_matches_checksum(&filesystem_script, checksum_str))
     }
 
     /// Write the migration script to the directory.
@@ -256,7 +233,7 @@ impl MigrationDirectory {
     #[tracing::instrument]
     pub fn read_migration_script(&self) -> Result<String, ReadMigrationScriptError> {
         let path = self.path.join("migration.sql"); // todo why is it hardcoded here?
-        Ok(std::fs::read_to_string(&path).map_err(|ioerr| ReadMigrationScriptError::new(ioerr, &path))?)
+        std::fs::read_to_string(&path).map_err(|ioerr| ReadMigrationScriptError::new(ioerr, &path))
     }
 
     /// The filesystem path to the directory.

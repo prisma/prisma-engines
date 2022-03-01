@@ -1,7 +1,10 @@
 //! Top level queries to satisfy the connector interface operations.
 pub mod aggregate;
+mod raw;
 pub mod read;
 pub mod write;
+
+mod update_utils;
 
 use crate::{output_meta::OutputMetaMapping, value::value_from_bson};
 use mongodb::bson::Bson;
@@ -21,4 +24,15 @@ fn document_to_record(mut doc: Document, fields: &[String], meta_mapping: &Outpu
     }
 
     Ok(Record::new(values))
+}
+
+/// We currently only allow a singular ID for Mongo, this helps extracting it.
+fn pick_singular_id(model: &ModelRef) -> ScalarFieldRef {
+    model
+        .primary_identifier()
+        .as_scalar_fields()
+        .expect("ID contains non-scalars")
+        .into_iter()
+        .next()
+        .unwrap()
 }

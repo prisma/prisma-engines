@@ -1,7 +1,7 @@
 mod alter_table;
 
 use super::{
-    common::{self, render_on_delete},
+    common::{self, render_referential_action},
     IteratorJoin, Quoted, SqlRenderer,
 };
 use crate::{
@@ -9,9 +9,9 @@ use crate::{
     pair::Pair,
     sql_migration::{AlterEnum, AlterTable, RedefineTable},
 };
-use indoc::formatdoc;
+use datamodel::PrismaValue;
+use indoc::{formatdoc, indoc};
 use native_types::{MsSqlType, MsSqlTypeParameter};
-use prisma_value::PrismaValue;
 use sql_schema_describer::{
     walkers::{
         ColumnWalker, EnumWalker, ForeignKeyWalker, IndexWalker, TableWalker, UserDefinedTypeWalker, ViewWalker,
@@ -47,7 +47,7 @@ impl MssqlFlavour {
         let column_name = self.quote(column.name());
 
         let r#type = render_column_type(column);
-        let nullability = common::render_nullability(&column);
+        let nullability = common::render_nullability(column);
 
         let default = if column.is_autoincrement() {
             Cow::Borrowed(" IDENTITY(1,1)")
@@ -55,7 +55,12 @@ impl MssqlFlavour {
             column
                 .default()
                 .map(|default| {
-                    let constraint_name = format!("DF__{}__{}", column.table().name(), column.name());
+                    // named constraints
+                    let constraint_name = default
+                        .constraint_name()
+                        .map(Cow::from)
+                        // .. or legacy
+                        .unwrap_or_else(|| Cow::from(format!("DF__{}__{}", column.table().name(), column.name())));
 
                     Cow::Owned(format!(
                         " CONSTRAINT {} DEFAULT {}",
@@ -77,10 +82,11 @@ impl MssqlFlavour {
             .join(",");
 
         format!(
-            " REFERENCES {}({}) {} ON UPDATE CASCADE",
-            self.quote_with_schema(&foreign_key.referenced_table().name()),
+            " REFERENCES {}({}) ON DELETE {} ON UPDATE {}",
+            self.quote_with_schema(foreign_key.referenced_table().name()),
             cols,
-            render_on_delete(&foreign_key.on_delete_action()),
+            render_referential_action(foreign_key.on_delete_action()),
+            render_referential_action(foreign_key.on_update_action()),
         )
     }
 }
@@ -91,17 +97,20 @@ impl SqlRenderer for MssqlFlavour {
     }
 
     fn render_alter_table(&self, alter_table: &AlterTable, schemas: &Pair<&SqlSchema>) -> Vec<String> {
-        let AlterTable { table_index, changes } = alter_table;
+        let AlterTable {
+            table_ids: table_index,
+            changes,
+        } = alter_table;
         let tables = schemas.tables(table_index);
 
-        alter_table::create_statements(&self, tables, changes)
+        alter_table::create_statements(self, tables, changes)
     }
 
     fn render_alter_enum(&self, _: &AlterEnum, _: &Pair<&SqlSchema>) -> Vec<String> {
         unreachable!("render_alter_enum on Microsoft SQL Server")
     }
 
-    fn render_alter_index(&self, indexes: Pair<&IndexWalker<'_>>) -> Vec<String> {
+    fn render_rename_index(&self, indexes: Pair<&IndexWalker<'_>>) -> Vec<String> {
         let index_with_table = format!(
             "{}.{}.{}",
             self.schema_name(),
@@ -124,13 +133,22 @@ impl SqlRenderer for MssqlFlavour {
         let index_type = match index.index_type() {
             IndexType::Unique => "UNIQUE ",
             IndexType::Normal => "",
+            IndexType::Fulltext => unreachable!("Fulltext index on SQL Server"),
         };
 
-        let index_name = index.name().replace('.', "_");
-        let index_name = self.quote(&index_name);
+        let index_name = self.quote(index.name());
         let table_reference = self.quote_with_schema(index.table().name()).to_string();
 
-        let columns = index.columns().map(|c| self.quote(c.name()));
+        let columns = index.columns().map(|c| {
+            let mut rendered = format!("{}", self.quote(c.get().name()));
+
+            if let Some(sort_order) = c.sort_order() {
+                rendered.push(' ');
+                rendered.push_str(sort_order.as_ref());
+            }
+
+            rendered
+        });
 
         format!(
             "CREATE {index_type}INDEX {index_name} ON {table_reference}({columns})",
@@ -147,15 +165,25 @@ impl SqlRenderer for MssqlFlavour {
             .map(|column| self.render_column(&column))
             .join(",\n    ");
 
-        let primary_columns = table.primary_key_column_names();
+        let primary_key = if let Some(pk) = table.primary_key() {
+            let column_names = pk
+                .columns
+                .iter()
+                .map(|col| {
+                    let mut rendered = format!("{}", self.quote(col.name()));
 
-        let primary_key = if let Some(primary_columns) = primary_columns.as_ref().filter(|cols| !cols.is_empty()) {
-            let index_name = format!("PK__{}__{}", table.name(), primary_columns.iter().join("_"));
-            let column_names = primary_columns.iter().map(|col| self.quote(&col)).join(",");
+                    if let Some(sort_order) = col.sort_order {
+                        rendered.push(' ');
+                        rendered.push_str(sort_order.as_ref());
+                    }
+
+                    rendered
+                })
+                .join(",");
 
             format!(
                 ",\n    CONSTRAINT {} PRIMARY KEY ({})",
-                self.quote(&index_name),
+                self.quote(pk.constraint_name.as_ref().unwrap()),
                 column_names
             )
         } else {
@@ -171,10 +199,18 @@ impl SqlRenderer for MssqlFlavour {
             let constraints = constraints
                 .iter()
                 .map(|index| {
-                    let name = index.name().replace('.', "_");
-                    let columns = index.columns().map(|col| self.quote(col.name()));
+                    let columns = index.columns().map(|col| {
+                        let mut rendered = format!("{}", self.quote(col.get().name()));
 
-                    format!("CONSTRAINT {} UNIQUE ({})", self.quote(&name), columns.join(","))
+                        if let Some(sort_order) = col.sort_order() {
+                            rendered.push(' ');
+                            rendered.push_str(sort_order.as_ref());
+                        }
+
+                        rendered
+                    });
+
+                    format!("CONSTRAINT {} UNIQUE ({})", self.quote(index.name()), columns.join(","))
                 })
                 .join(",\n    ");
 
@@ -219,6 +255,7 @@ impl SqlRenderer for MssqlFlavour {
                 self.quote_with_schema(index.table().name()),
                 self.quote(index.name()),
             ),
+            IndexType::Fulltext => unreachable!("Fulltext index on SQL Server"),
         }
     }
 
@@ -227,7 +264,7 @@ impl SqlRenderer for MssqlFlavour {
         let mut result = vec!["BEGIN TRANSACTION".to_string()];
 
         for redefine_table in tables {
-            let tables = schemas.tables(&redefine_table.table_index);
+            let tables = schemas.tables(&redefine_table.table_ids);
             // This is a copy of our new modified table.
             let temporary_table_name = format!("_prisma_new_{}", &tables.next().name());
 
@@ -242,24 +279,10 @@ impl SqlRenderer for MssqlFlavour {
                 .column_pairs
                 .iter()
                 .map(|(column_indexes, _, _)| tables.columns(column_indexes).next().name())
-                .map(|c| self.quote(c))
-                .map(|c| format!("{}", c))
+                .map(|c| self.quote(c).to_string())
                 .collect();
 
-            let keys = tables.previous().referencing_foreign_keys().filter(|prev| {
-                tables
-                    .next()
-                    .referencing_foreign_keys()
-                    .any(|next| prev.foreign_key() == next.foreign_key())
-            });
-
-            // We must drop foreign keys pointing to this table before removing
-            // any of the table constraints.
-            for fk in keys {
-                result.push(self.render_drop_foreign_key(&fk));
-            }
-
-            // Then the indices...
+            // Drop the indexes on the table.
             for index in tables.previous().indexes() {
                 result.push(self.render_drop_index(&index));
             }
@@ -318,12 +341,7 @@ impl SqlRenderer for MssqlFlavour {
             // Rename the temporary table with the name defined in the migration.
             result.push(self.render_rename_table(&temporary_table_name, tables.next().name()));
 
-            // Recreating all foreign keys pointing to this table
-            for fk in tables.next().referencing_foreign_keys() {
-                result.push(self.render_add_foreign_key(&fk));
-            }
-
-            // Then the indices...
+            // Recreate the indexes.
             for index in tables.next().indexes().filter(|i| !i.index_type().is_unique()) {
                 result.push(self.render_create_index(&index));
             }
@@ -383,7 +401,7 @@ impl SqlRenderer for MssqlFlavour {
     }
 
     fn render_drop_table(&self, table_name: &str) -> Vec<String> {
-        vec![format!("DROP TABLE {}", self.quote_with_schema(&table_name))]
+        vec![format!("DROP TABLE {}", self.quote_with_schema(table_name))]
     }
 
     fn render_drop_view(&self, view: &ViewWalker<'_>) -> String {
@@ -391,7 +409,45 @@ impl SqlRenderer for MssqlFlavour {
     }
 
     fn render_drop_user_defined_type(&self, udt: &UserDefinedTypeWalker<'_>) -> String {
-        todo!("DROP TYPE {}", self.quote_with_schema(udt.name()))
+        format!("DROP TYPE {}", self.quote_with_schema(udt.name()))
+    }
+
+    fn render_begin_transaction(&self) -> Option<&'static str> {
+        let sql = indoc! { r#"
+            BEGIN TRY
+
+            BEGIN TRAN;
+        "#};
+
+        Some(sql)
+    }
+
+    fn render_commit_transaction(&self) -> Option<&'static str> {
+        let sql = indoc! { r#"
+            COMMIT TRAN;
+
+            END TRY
+            BEGIN CATCH
+
+            IF @@TRANCOUNT > 0
+            BEGIN
+                ROLLBACK TRAN;
+            END;
+            THROW
+
+            END CATCH
+        "# };
+
+        Some(sql)
+    }
+
+    fn render_rename_foreign_key(&self, fks: &Pair<ForeignKeyWalker<'_>>) -> String {
+        format!(
+            r#"EXEC sp_rename '{schema}.{previous}', '{next}', 'OBJECT'"#,
+            schema = self.schema_name(),
+            previous = fks.previous().constraint_name().unwrap(),
+            next = fks.next().constraint_name().unwrap(),
+        )
     }
 }
 
@@ -459,7 +515,7 @@ fn render_default(default: &DefaultValue) -> Cow<'_, str> {
     match default.kind() {
         DefaultKind::DbGenerated(val) => val.as_str().into(),
         DefaultKind::Value(PrismaValue::String(val)) | DefaultKind::Value(PrismaValue::Enum(val)) => {
-            Quoted::mssql_string(escape_string_literal(&val)).to_string().into()
+            Quoted::mssql_string(escape_string_literal(val)).to_string().into()
         }
         DefaultKind::Value(PrismaValue::Bytes(b)) => format!("0x{}", common::format_hex(b)).into(),
         DefaultKind::Now => "CURRENT_TIMESTAMP".into(),

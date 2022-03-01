@@ -1,348 +1,393 @@
-mod apply_migrations;
-mod create_migration;
-mod dev_diagnostic;
-mod diagnose_migration_history;
-mod evaluate_data_loss;
-mod list_migration_directories;
-mod mark_migration_applied;
-mod mark_migration_rolled_back;
-mod reset;
-mod schema_push;
+pub use crate::assertions::{MigrationsAssertions, ResultSetExt, SchemaAssertion};
+pub use expect_test::expect;
+pub use migration_core::json_rpc::types::{
+    DbExecuteDatasourceType, DbExecuteParams, DiffParams, DiffResult, SchemaContainer, UrlContainer,
+};
+pub use test_macros::test_connector;
+pub use test_setup::{runtime::run_with_thread_local_runtime as tok, BitFlags, Capabilities, Tags};
 
-pub use apply_migrations::ApplyMigrations;
-pub use create_migration::CreateMigration;
-pub use dev_diagnostic::DevDiagnostic;
-pub use diagnose_migration_history::DiagnoseMigrationHistory;
-pub use evaluate_data_loss::EvaluateDataLoss;
-pub use list_migration_directories::ListMigrationDirectories;
-pub use mark_migration_applied::MarkMigrationApplied;
-pub use mark_migration_rolled_back::MarkMigrationRolledBack;
-pub use reset::Reset;
-pub use schema_push::SchemaPush;
-
-use crate::assertions::SchemaAssertion;
-use migration_connector::{ConnectorError, MigrationRecord};
-use migration_core::GenericApi;
+use crate::{commands::*, multi_engine_test_api::TestApi as RootTestApi};
+use datamodel::common::preview_features::PreviewFeature;
+use migration_core::{
+    commands::diff,
+    migration_connector::{
+        BoxFuture, ConnectorHost, ConnectorResult, DiffTarget, MigrationConnector, MigrationPersistence,
+    },
+};
 use quaint::{
-    prelude::{ConnectionInfo, Queryable, SqlFamily},
-    single::Quaint,
+    prelude::{ConnectionInfo, ResultSet},
+    Value,
 };
 use sql_migration_connector::SqlMigrationConnector;
-use std::{borrow::Cow, fmt::Write as _};
+use sql_schema_describer::SqlSchema;
+use std::{
+    borrow::Cow,
+    fmt::{Display, Write},
+};
 use tempfile::TempDir;
-use test_setup::{sqlite_test_url, BitFlags, DatasourceBlock, Tags, TestApiArgs};
+use test_setup::{DatasourceBlock, TestApiArgs};
 
-/// A handle to all the context needed for end-to-end testing of the migration engine across
-/// connectors.
+#[derive(Debug, Default)]
+pub struct TestConnectorHost {
+    pub printed_messages: std::sync::Mutex<Vec<String>>,
+}
+
+impl ConnectorHost for TestConnectorHost {
+    fn print(&self, message: &str) -> BoxFuture<'_, ConnectorResult<()>> {
+        // https://github.com/prisma/prisma/issues/11761
+        assert!(message.ends_with('\n'));
+        self.printed_messages.lock().unwrap().push(message.to_owned());
+        Box::pin(std::future::ready(Ok(())))
+    }
+}
+
 pub struct TestApi {
-    api: SqlMigrationConnector,
-    args: TestApiArgs,
-    connection_string: String,
+    root: RootTestApi,
+    pub connector: SqlMigrationConnector,
 }
 
 impl TestApi {
-    pub async fn new(args: TestApiArgs) -> Self {
-        let tags = args.tags();
+    /// Initializer, called by the test macros.
+    pub fn new(args: TestApiArgs) -> Self {
+        let root = RootTestApi::new(args);
+        let connector = root.new_engine().connector;
 
-        let connection_string = if tags.contains(Tags::Mysql | Tags::Vitess) {
-            let connector =
-                SqlMigrationConnector::new(args.database_url(), args.shadow_database_url().map(String::from))
-                    .await
-                    .unwrap();
-            connector.reset().await.unwrap();
-
-            args.database_url().to_owned()
-        } else if tags.contains(Tags::Mysql) {
-            args.create_mysql_database().await.1
-        } else if tags.contains(Tags::Postgres) {
-            args.create_postgres_database().await.2
-        } else if tags.contains(Tags::Mssql) {
-            test_setup::init_mssql_database(args.database_url(), args.test_function_name())
-                .await
-                .unwrap()
-                .1
-        } else if tags.contains(Tags::Sqlite) {
-            sqlite_test_url(args.test_function_name())
-        } else {
-            unreachable!()
-        };
-
-        let api = SqlMigrationConnector::new(&connection_string, args.shadow_database_url().map(String::from))
-            .await
-            .unwrap();
-
-        if tags.contains(Tags::Vitess) {
-            api.reset().await.unwrap()
-        }
-
-        let mut circumstances = BitFlags::empty();
-
-        if tags.contains(Tags::Mysql) {
-            let val = api
-                .quaint()
-                .query_raw("SELECT @@lower_case_table_names", &[])
-                .await
-                .ok()
-                .and_then(|row| row.into_single().ok())
-                .and_then(|row| row.at(0).and_then(|col| col.as_i64()))
-                .filter(|val| *val == 1);
-
-            if val.is_some() {
-                circumstances |= Tags::LowerCasesTableNames;
-            }
-        }
-
-        TestApi {
-            api,
-            args,
-            connection_string,
-        }
+        TestApi { root, connector }
     }
 
-    pub fn schema_name(&self) -> &str {
-        self.connection_info().schema_name()
+    pub fn args(&self) -> &TestApiArgs {
+        &self.root.args
     }
 
-    pub fn database(&self) -> &Quaint {
-        &self.api.quaint()
+    /// Plan an `applyMigrations` command
+    pub fn apply_migrations<'a>(&'a mut self, migrations_directory: &'a TempDir) -> ApplyMigrations<'a> {
+        ApplyMigrations::new(&mut self.connector, migrations_directory)
     }
 
-    pub fn is_sqlite(&self) -> bool {
-        self.tags().contains(Tags::Sqlite)
+    pub fn connection_string(&self) -> &str {
+        self.root.connection_string()
     }
 
-    pub fn is_mssql(&self) -> bool {
-        self.tags().contains(Tags::Mssql)
+    pub fn connection_info(&self) -> ConnectionInfo {
+        self.root.connection_info()
     }
 
-    pub fn is_mysql(&self) -> bool {
-        self.tags().contains(Tags::Mysql)
+    pub fn ensure_connection_validity(&mut self) -> ConnectorResult<()> {
+        tok(self.connector.ensure_connection_validity())
     }
 
-    pub fn is_mysql_8(&self) -> bool {
-        self.tags().contains(Tags::Mysql8)
+    pub fn schema_name(&self) -> String {
+        self.connection_info().schema_name().to_owned()
     }
 
-    pub fn is_mariadb(&self) -> bool {
-        self.tags().contains(Tags::Mariadb)
-    }
-
-    pub fn lower_case_identifiers(&self) -> bool {
-        self.tags().contains(Tags::LowerCasesTableNames)
-    }
-
-    pub fn is_mysql_5_6(&self) -> bool {
-        self.tags().contains(Tags::Mysql56)
-    }
-
-    pub fn is_postgres(&self) -> bool {
-        self.tags().contains(Tags::Postgres)
-    }
-
-    pub fn connection_info(&self) -> &ConnectionInfo {
-        &self.database().connection_info()
-    }
-
-    pub fn sql_family(&self) -> SqlFamily {
-        self.connection_info().sql_family()
-    }
-
-    pub fn tags(&self) -> BitFlags<Tags> {
-        self.args.tags()
-    }
-
-    pub fn datasource(&self) -> DatasourceBlock<'_> {
-        self.args.datasource_block(&self.connection_string, &[])
-    }
-
-    /// Render a table name with the required prefixing for use with quaint query building.
-    pub fn render_table_name<'a>(&'a self, table_name: &'a str) -> quaint::ast::Table<'a> {
-        if self.is_sqlite() {
-            table_name.into()
-        } else {
-            (self.connection_info().schema_name(), table_name).into()
-        }
-    }
-
-    pub fn display_migrations(&self, migrations_directory: &TempDir) -> std::io::Result<()> {
-        for entry in std::fs::read_dir(migrations_directory.path())? {
-            let entry = entry?;
-            if entry.file_type()?.is_dir() {
-                for file in std::fs::read_dir(&entry.path())? {
-                    let entry = file?;
-
-                    if entry.file_type()?.is_dir() {
-                        continue;
-                    }
-
-                    let s = std::fs::read_to_string(entry.path())?;
-                    tracing::info!(path = ?entry.path(), contents = ?s);
-                }
-            } else {
-                let s = std::fs::read_to_string(entry.path())?;
-                tracing::info!(path = ?entry.path(), contents = ?s);
-            }
-        }
-
-        Ok(())
-    }
-
-    /// Convenient builder and assertions for the CreateMigration command.
+    /// Plan a `createMigration` command
     pub fn create_migration<'a>(
-        &'a self,
+        &'a mut self,
         name: &'a str,
-        prisma_schema: &'a str,
+        schema: &'a str,
         migrations_directory: &'a TempDir,
     ) -> CreateMigration<'a> {
-        CreateMigration::new(&self.api, name, prisma_schema, migrations_directory)
+        CreateMigration::new(&mut self.connector, name, schema, migrations_directory)
     }
 
-    pub fn schema_push(&self, dm: impl Into<String>) -> SchemaPush<'_> {
-        SchemaPush::new(&self.api, dm.into())
+    /// Create a temporary directory to serve as a test migrations directory.
+    pub fn create_migrations_directory(&self) -> TempDir {
+        self.root.create_migrations_directory()
     }
 
-    pub async fn assert_schema(&self) -> Result<SchemaAssertion, ConnectorError> {
-        let schema = self.api.describe_schema().await?;
-        Ok(SchemaAssertion::new(schema, self.tags()))
+    /// Builder and assertions to call the `devDiagnostic` command.
+    pub fn dev_diagnostic<'a>(&'a mut self, migrations_directory: &'a TempDir) -> DevDiagnostic<'a> {
+        DevDiagnostic::new(&mut self.connector, migrations_directory)
     }
 
-    pub async fn dump_table(&self, table_name: &str) -> Result<quaint::prelude::ResultSet, quaint::error::Error> {
+    pub fn diagnose_migration_history<'a>(
+        &'a mut self,
+        migrations_directory: &'a TempDir,
+    ) -> DiagnoseMigrationHistory<'a> {
+        DiagnoseMigrationHistory::new(&mut self.connector, migrations_directory)
+    }
+
+    pub fn diff(&self, params: DiffParams) -> ConnectorResult<DiffResult> {
+        test_setup::runtime::run_with_thread_local_runtime(diff(params, self.connector.host().clone()))
+    }
+
+    pub fn dump_table(&mut self, table_name: &str) -> ResultSet {
         let select_star =
             quaint::ast::Select::from_table(self.render_table_name(table_name)).value(quaint::ast::asterisk());
 
-        self.database().query(select_star.into()).await
+        self.query(select_star.into())
     }
 
-    pub fn insert<'a>(&'a self, table_name: &'a str) -> SingleRowInsert<'a> {
+    pub fn evaluate_data_loss<'a>(
+        &'a mut self,
+        migrations_directory: &'a TempDir,
+        schema: String,
+    ) -> EvaluateDataLoss<'a> {
+        EvaluateDataLoss::new(&mut self.connector, migrations_directory, schema)
+    }
+
+    /// Returns true only when testing on MSSQL.
+    pub fn is_mssql(&self) -> bool {
+        self.root.is_mssql()
+    }
+
+    /// Returns true only when testing on MariaDB.
+    pub fn is_mariadb(&self) -> bool {
+        self.root.is_mysql_mariadb()
+    }
+
+    /// Returns true only when testing on MySQL.
+    pub fn is_mysql(&self) -> bool {
+        self.root.is_mysql()
+    }
+
+    /// Returns true only when testing on MariaDB.
+    pub fn is_mysql_mariadb(&self) -> bool {
+        self.root.is_mysql_mariadb()
+    }
+
+    /// Returns true only when testing on MySQL 5.6.
+    pub fn is_mysql_5_6(&self) -> bool {
+        self.root.is_mysql_5_6()
+    }
+
+    /// Returns true only when testing on MySQL 8.
+    pub fn is_mysql_8(&self) -> bool {
+        self.root.is_mysql_8()
+    }
+
+    /// Returns true only when testing on postgres.
+    pub fn is_postgres(&self) -> bool {
+        self.root.is_postgres()
+    }
+
+    /// Returns true only when testing on cockroach.
+    pub fn is_cockroach(&self) -> bool {
+        self.root.is_cockroach()
+    }
+
+    /// Returns true only when testing on sqlite.
+    pub fn is_sqlite(&self) -> bool {
+        self.root.is_sqlite()
+    }
+
+    /// Returns true only when testing on vitess.
+    pub fn is_vitess(&self) -> bool {
+        self.root.is_vitess()
+    }
+
+    /// Insert test values
+    pub fn insert<'a>(&'a mut self, table_name: &'a str) -> SingleRowInsert<'a> {
         SingleRowInsert {
             insert: quaint::ast::Insert::single_into(self.render_table_name(table_name)),
             api: self,
         }
     }
 
-    pub fn select<'a>(&'a self, table_name: &'a str) -> TestApiSelect<'_> {
-        TestApiSelect {
-            select: quaint::ast::Select::from_table(self.render_table_name(table_name)),
-            api: self,
-        }
+    pub fn list_migration_directories<'a>(
+        &'a mut self,
+        migrations_directory: &'a TempDir,
+    ) -> ListMigrationDirectories<'a> {
+        ListMigrationDirectories::new(migrations_directory)
     }
 
-    pub fn write_native_types_datamodel_header(&self, buf: &mut String) {
-        indoc::writedoc!(
-            buf,
-            r#"
-            datasource test_db {{
-                provider = "{provider}"
-                url      = "{provider}://localhost:666"
-              }}
-
-            "#,
-            provider = self.args.provider()
-        )
-        .unwrap();
+    pub fn lower_cases_table_names(&self) -> bool {
+        self.root.lower_cases_table_names()
     }
 
-    pub fn native_types_datamodel(&self, schema: &str) -> String {
-        let mut out = String::with_capacity(320 + schema.len());
+    pub fn mark_migration_applied<'a>(
+        &'a mut self,
+        migration_name: impl Into<String>,
+        migrations_directory: &'a TempDir,
+    ) -> MarkMigrationApplied<'a> {
+        MarkMigrationApplied::new(&mut self.connector, migration_name.into(), migrations_directory)
+    }
 
-        self.write_native_types_datamodel_header(&mut out);
-        out.push_str(schema);
+    pub fn mark_migration_rolled_back(&mut self, migration_name: impl Into<String>) -> MarkMigrationRolledBack<'_> {
+        MarkMigrationRolledBack::new(&mut self.connector, migration_name.into())
+    }
 
-        out
+    pub fn migration_persistence<'a>(&'a mut self) -> &mut (dyn MigrationPersistence + 'a) {
+        &mut self.connector
+    }
+
+    /// Assert facts about the database schema
+    #[track_caller]
+    pub fn assert_schema(&mut self) -> SchemaAssertion {
+        let schema: SqlSchema = tok(self.connector.describe_schema()).unwrap();
+        SchemaAssertion::new(schema, self.root.args.tags())
+    }
+
+    /// Render a valid datasource block, including database URL.
+    pub fn datasource_block(&self) -> DatasourceBlock<'_> {
+        self.root.datasource_block()
+    }
+
+    pub fn datasource_block_with<'a>(&'a self, params: &'a [(&'a str, &'a str)]) -> DatasourceBlock<'a> {
+        self.root.args.datasource_block(self.root.connection_string(), params)
+    }
+
+    /// Generate a migration script using `MigrationConnector::diff()`.
+    pub fn connector_diff(&mut self, from: DiffTarget<'_>, to: DiffTarget<'_>) -> String {
+        let from = tok(self.connector.database_schema_from_diff_target(from, None)).unwrap();
+        let to = tok(self.connector.database_schema_from_diff_target(to, None)).unwrap();
+        let migration = self.connector.diff(from, to).unwrap();
+        self.connector.render_script(&migration, &Default::default()).unwrap()
     }
 
     pub fn normalize_identifier<'a>(&self, identifier: &'a str) -> Cow<'a, str> {
-        if self.lower_case_identifiers() {
+        if self.lower_cases_table_names() {
             identifier.to_ascii_lowercase().into()
         } else {
             identifier.into()
         }
     }
+
+    /// Like quaint::Queryable::query()
+    #[track_caller]
+    pub fn query(&mut self, q: quaint::ast::Query<'_>) -> ResultSet {
+        tok(self.connector.query(q)).unwrap()
+    }
+
+    /// Like quaint::Queryable::query_raw()
+    #[track_caller]
+    pub fn query_raw(&mut self, q: &str, params: &[Value<'static>]) -> ResultSet {
+        tok(self.connector.query_raw(q, params)).unwrap()
+    }
+
+    /// Send a SQL command to the database, and expect it to succeed.
+    #[track_caller]
+    pub fn raw_cmd(&mut self, sql: &str) {
+        tok(self.connector.raw_cmd(sql)).unwrap()
+    }
+
+    /// Render a table name with the required prefixing for use with quaint query building.
+    pub fn render_table_name(&self, table_name: &str) -> quaint::ast::Table<'static> {
+        if self.root.is_sqlite() {
+            table_name.to_owned().into()
+        } else {
+            (self.connection_info().schema_name().to_owned(), table_name.to_owned()).into()
+        }
+    }
+
+    /// Plan a `reset` command
+    pub fn reset(&mut self) -> Reset<'_> {
+        Reset::new(&mut self.connector)
+    }
+
+    /// Plan a `schemaPush` command adding the datasource
+    pub fn schema_push_w_datasource(&mut self, dm: impl Into<String>) -> SchemaPush<'_> {
+        let schema = self.datamodel_with_provider(&dm.into());
+        SchemaPush::new(&mut self.connector, schema)
+    }
+
+    /// Plan a `schemaPush` command
+    pub fn schema_push(&mut self, dm: impl Into<String>) -> SchemaPush<'_> {
+        SchemaPush::new(&mut self.connector, dm.into())
+    }
+
+    pub fn tags(&self) -> BitFlags<Tags> {
+        self.root.args.tags()
+    }
+
+    /// Render a valid datasource block, including database URL.
+    pub fn write_datasource_block(&self, out: &mut dyn std::fmt::Write) {
+        let no_foreign_keys = self.is_vitess()
+            && self
+                .root
+                .preview_features()
+                .contains(PreviewFeature::ReferentialIntegrity);
+
+        let params = if no_foreign_keys {
+            vec![("referentialIntegrity", r#""prisma""#)]
+        } else {
+            Vec::new()
+        };
+
+        write!(
+            out,
+            "{}",
+            self.root.args.datasource_block(self.root.args.database_url(), &params)
+        )
+        .unwrap()
+    }
+
+    fn generator_block(&self) -> String {
+        let preview_feature_string = if self.root.preview_features().is_empty() {
+            "".to_string()
+        } else {
+            let features = self
+                .root
+                .preview_features()
+                .iter()
+                .map(|f| format!(r#""{}""#, f))
+                .join(", ");
+
+            format!("\npreviewFeatures = [{}]", features)
+        };
+
+        let generator_block = format!(
+            r#"generator client {{
+                 provider = "prisma-client-js"{}
+               }}"#,
+            preview_feature_string
+        );
+        generator_block
+    }
+
+    pub fn datamodel_with_provider(&self, schema: &str) -> String {
+        let mut out = String::with_capacity(320 + schema.len());
+
+        self.write_datasource_block(&mut out);
+        out.push('\n');
+        out.push_str(&self.generator_block());
+        out.push_str(schema);
+
+        out
+    }
 }
 
 pub struct SingleRowInsert<'a> {
     insert: quaint::ast::SingleRowInsert<'a>,
-    api: &'a TestApi,
+    api: &'a mut TestApi,
 }
 
 impl<'a> SingleRowInsert<'a> {
+    /// Add a value to the row
     pub fn value(mut self, name: &'a str, value: impl Into<quaint::ast::Expression<'a>>) -> Self {
         self.insert = self.insert.value(name, value);
 
         self
     }
 
-    pub async fn result_raw(self) -> Result<quaint::connector::ResultSet, quaint::error::Error> {
-        self.api.database().query(self.insert.into()).await
+    /// Execute the request and return the result set.
+    pub fn result_raw(self) -> quaint::connector::ResultSet {
+        self.api.query(self.insert.into())
     }
 }
 
-pub struct TestApiSelect<'a> {
-    select: quaint::ast::Select<'a>,
-    api: &'a TestApi,
+pub(crate) trait IteratorJoin {
+    fn join(self, sep: &str) -> String;
 }
 
-impl<'a> TestApiSelect<'a> {
-    pub fn column(mut self, name: &'a str) -> Self {
-        self.select = self.select.column(name);
+impl<T, I> IteratorJoin for T
+where
+    T: Iterator<Item = I>,
+    I: Display,
+{
+    fn join(mut self, sep: &str) -> String {
+        let (lower_bound, _) = self.size_hint();
+        let mut out = String::with_capacity(sep.len() * lower_bound);
 
-        self
-    }
+        if let Some(first_item) = self.next() {
+            write!(out, "{}", first_item).unwrap();
+        }
 
-    /// This is deprecated. Used row assertions instead with the ResultSetExt trait.
-    pub async fn send_debug(self) -> Result<Vec<Vec<String>>, quaint::error::Error> {
-        let rows = self.send().await?;
+        for item in self {
+            out.push_str(sep);
+            write!(out, "{}", item).unwrap();
+        }
 
-        let rows: Vec<Vec<String>> = rows
-            .into_iter()
-            .map(|row| row.into_iter().map(|col| format!("{:?}", col)).collect())
-            .collect();
-
-        Ok(rows)
-    }
-
-    pub async fn send(self) -> Result<quaint::prelude::ResultSet, quaint::error::Error> {
-        Ok(self.api.database().query(self.select.into()).await?)
-    }
-}
-
-pub trait MigrationsAssertions: Sized {
-    fn assert_applied_steps_count(self, count: u32) -> Self;
-    fn assert_checksum(self, expected: &str) -> Self;
-    fn assert_failed(self) -> Self;
-    fn assert_logs(self, expected: &str) -> Self;
-    fn assert_migration_name(self, expected: &str) -> Self;
-    fn assert_success(self) -> Self;
-}
-
-impl MigrationsAssertions for MigrationRecord {
-    fn assert_checksum(self, expected: &str) -> Self {
-        assert_eq!(self.checksum, expected);
-        self
-    }
-
-    fn assert_migration_name(self, expected: &str) -> Self {
-        assert_eq!(&self.migration_name[15..], expected);
-        self
-    }
-
-    fn assert_logs(self, expected: &str) -> Self {
-        assert_eq!(self.logs.as_deref(), Some(expected));
-        self
-    }
-
-    fn assert_applied_steps_count(self, count: u32) -> Self {
-        assert_eq!(self.applied_steps_count, count);
-        self
-    }
-
-    fn assert_success(self) -> Self {
-        assert!(self.finished_at.is_some());
-        self
-    }
-
-    fn assert_failed(self) -> Self {
-        assert!(self.finished_at.is_none() && self.rolled_back_at.is_none());
-        self
+        out
     }
 }

@@ -1,6 +1,6 @@
 use super::DestructiveChangeCheckerFlavour;
 use crate::{
-    flavour::PostgresFlavour,
+    flavour::{PostgresFlavour, SqlFlavour},
     pair::Pair,
     sql_destructive_change_checker::{
         destructive_check_plan::DestructiveCheckPlan, unexecutable_step_check::UnexecutableStepCheck,
@@ -9,10 +9,9 @@ use crate::{
     sql_migration::{AlterColumn, ColumnTypeChange},
     sql_schema_differ::ColumnChanges,
 };
-use datamodel_connector::Connector;
-use sql_datamodel_connector::SqlDatamodelConnectors;
 use sql_schema_describer::walkers::ColumnWalker;
 
+#[async_trait::async_trait]
 impl DestructiveChangeCheckerFlavour for PostgresFlavour {
     fn check_alter_column(
         &self,
@@ -22,7 +21,7 @@ impl DestructiveChangeCheckerFlavour for PostgresFlavour {
         step_index: usize,
     ) {
         let AlterColumn {
-            column_index: _,
+            column_id: _,
             changes,
             type_change,
         } = alter_column;
@@ -47,16 +46,8 @@ impl DestructiveChangeCheckerFlavour for PostgresFlavour {
             )
         }
 
-        let datamodel_connector = SqlDatamodelConnectors::postgres();
-        let previous_type = match &columns.previous().column_type().native_type {
-            Some(tpe) => datamodel_connector.render_native_type(tpe.clone()),
-            _ => format!("{:?}", columns.previous().column_type_family()),
-        };
-
-        let next_type = match &columns.next().column_type().native_type {
-            Some(tpe) => datamodel_connector.render_native_type(tpe.clone()),
-            _ => format!("{:?}", columns.next().column_type_family()),
-        };
+        let previous_type = super::display_column_type(columns.previous, self.datamodel_connector());
+        let next_type = super::display_column_type(columns.next, self.datamodel_connector());
 
         match type_change {
             None | Some(ColumnTypeChange::SafeCast) => (),
@@ -123,5 +114,20 @@ impl DestructiveChangeCheckerFlavour for PostgresFlavour {
                 step_index,
             )
         }
+    }
+
+    async fn count_rows_in_table(&mut self, table_name: &str) -> migration_connector::ConnectorResult<i64> {
+        let query = format!("SELECT COUNT(*) FROM \"{}\"", table_name);
+        let result_set = self.query_raw(&query, &[]).await?;
+        super::extract_table_rows_count(table_name, result_set)
+    }
+
+    async fn count_values_in_column(
+        &mut self,
+        (table, column): (&str, &str),
+    ) -> migration_connector::ConnectorResult<i64> {
+        let query = format!("SELECT COUNT(*) FROM \"{}\" WHERE \"{}\" IS NOT NULL", table, column);
+        let result_set = self.query_raw(&query, &[]).await?;
+        super::extract_column_values_count(result_set)
     }
 }

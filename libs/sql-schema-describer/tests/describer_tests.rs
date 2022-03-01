@@ -12,7 +12,6 @@ use sql_schema_describer::*;
 
 fn int_full_data_type(api: &TestApi) -> &'static str {
     match api.sql_family() {
-        SqlFamily::Postgres if api.is_cockroach() => "int8",
         SqlFamily::Postgres => "int4",
         SqlFamily::Sqlite => "INTEGER",
         SqlFamily::Mysql if api.connector_tags().contains(Tags::Mysql8) => "int",
@@ -23,7 +22,6 @@ fn int_full_data_type(api: &TestApi) -> &'static str {
 
 fn int_native_type(api: &TestApi) -> Option<Value> {
     match api.sql_family() {
-        SqlFamily::Postgres if api.is_cockroach() => Some(PostgresType::BigInt.to_json()),
         SqlFamily::Postgres => Some(PostgresType::Integer.to_json()),
         SqlFamily::Sqlite => None,
         SqlFamily::Mysql if api.connector_tags().contains(Tags::Mysql8) => Some(MySqlType::Int.to_json()),
@@ -209,11 +207,7 @@ fn composite_primary_keys_must_work(api: TestApi) {
             name: "id".to_string(),
             tpe: ColumnType {
                 full_data_type: int_full_data_type(&api).into(),
-                family: if api.is_cockroach() {
-                    ColumnTypeFamily::BigInt
-                } else {
-                    ColumnTypeFamily::Int
-                },
+                family: ColumnTypeFamily::Int,
                 arity: ColumnArity::Required,
                 native_type: int_native_type(&api),
             },
@@ -234,6 +228,23 @@ fn composite_primary_keys_must_work(api: TestApi) {
     ];
     expected_columns.sort_unstable_by_key(|c| c.name.to_owned());
 
+    let columns = if api.sql_family().is_mssql() {
+        vec![
+            PrimaryKeyColumn {
+                name: "id".to_string(),
+                sort_order: Some(SQLSortOrder::Asc),
+                length: None,
+            },
+            PrimaryKeyColumn {
+                name: "name".to_string(),
+                sort_order: Some(SQLSortOrder::Asc),
+                length: None,
+            },
+        ]
+    } else {
+        vec![PrimaryKeyColumn::new("id"), PrimaryKeyColumn::new("name")]
+    };
+
     assert_eq!(
         table,
         &Table {
@@ -241,10 +252,9 @@ fn composite_primary_keys_must_work(api: TestApi) {
             columns: expected_columns,
             indices: vec![],
             primary_key: Some(PrimaryKey {
-                columns: vec!["id".to_string(), "name".to_string()],
+                columns,
                 sequence: None,
                 constraint_name: match api.sql_family() {
-                    SqlFamily::Postgres if api.is_cockroach() => Some("primary".into()),
                     SqlFamily::Postgres => Some("User_pkey".into()),
                     SqlFamily::Mssql => Some("PK_User".into()),
                     _ => None,
@@ -267,7 +277,6 @@ fn indices_must_work(api: TestApi) {
     let result = api.describe();
     let user_table = result.get_table("User").expect("getting User table");
     let default = match api.sql_family() {
-        SqlFamily::Postgres if api.is_cockroach() => Some(DefaultValue::db_generated("unique_rowid()")),
         SqlFamily::Postgres => Some(DefaultValue::sequence("User_id_seq".to_string())),
         _ => None,
     };
@@ -276,11 +285,7 @@ fn indices_must_work(api: TestApi) {
             name: "id".to_string(),
             tpe: ColumnType {
                 full_data_type: int_full_data_type(&api).into(),
-                family: if api.is_cockroach() {
-                    ColumnTypeFamily::BigInt
-                } else {
-                    ColumnTypeFamily::Int
-                },
+                family: ColumnTypeFamily::Int,
                 arity: ColumnArity::Required,
                 native_type: int_native_type(&api),
             },
@@ -292,11 +297,7 @@ fn indices_must_work(api: TestApi) {
             name: "count".to_string(),
             tpe: ColumnType {
                 full_data_type: int_full_data_type(&api).into(),
-                family: if api.is_cockroach() {
-                    ColumnTypeFamily::BigInt
-                } else {
-                    ColumnTypeFamily::Int
-                },
+                family: ColumnTypeFamily::Int,
                 arity: ColumnArity::Required,
                 native_type: int_native_type(&api),
             },
@@ -304,8 +305,8 @@ fn indices_must_work(api: TestApi) {
             auto_increment: false,
         },
     ];
+
     let pk_sequence = match api.sql_family() {
-        SqlFamily::Postgres if api.is_cockroach() => None,
         SqlFamily::Postgres => Some(Sequence {
             name: "User_id_seq".to_string(),
         }),
@@ -315,11 +316,22 @@ fn indices_must_work(api: TestApi) {
     assert_eq!("User", user_table.name);
     assert_eq!(expected_columns, user_table.columns);
 
+    let algorithm = if api.is_postgres() && !api.is_cockroach() {
+        Some(SQLIndexAlgorithm::BTree)
+    } else {
+        None
+    };
+
     assert_eq!(
         vec![Index {
             name: "count".to_string(),
-            columns: vec!["count".to_string()],
+            columns: vec![IndexColumn {
+                name: "count".into(),
+                sort_order: Some(SQLSortOrder::Asc),
+                length: None,
+            }],
             tpe: IndexType::Normal,
+            algorithm
         }],
         user_table.indices
     );
@@ -329,11 +341,20 @@ fn indices_must_work(api: TestApi) {
 
     let pk = user_table.primary_key.as_ref().unwrap();
 
-    assert_eq!(pk.columns, &["id"]);
+    let pk_col = if api.sql_family().is_mssql() {
+        PrimaryKeyColumn {
+            name: "id".to_string(),
+            length: None,
+            sort_order: Some(SQLSortOrder::Asc),
+        }
+    } else {
+        PrimaryKeyColumn::new("id")
+    };
+
+    assert_eq!(pk.columns, &[pk_col]);
     assert_eq!(pk_sequence, pk.sequence);
 
     match api.sql_family() {
-        SqlFamily::Postgres if api.is_cockroach() => assert_eq!(Some("primary"), pk.constraint_name.as_deref()),
         SqlFamily::Postgres => assert_eq!(Some("User_pkey"), pk.constraint_name.as_deref()),
         SqlFamily::Mssql => assert!(pk
             .constraint_name
@@ -409,23 +430,16 @@ fn defaults_must_work(api: TestApi) {
     assert_eq!("User", &user_table.name);
     assert_eq!(Vec::<Index>::new(), user_table.indices);
     assert_eq!(Vec::<ForeignKey>::new(), user_table.foreign_keys);
-
-    if !api.is_cockroach() {
-        assert_eq!(None, user_table.primary_key);
-    }
+    assert_eq!(None, user_table.primary_key);
 
     let id = user_table.columns.first().unwrap();
 
     assert_eq!("id", &id.name);
-    assert_eq!(false, id.auto_increment);
+    assert!(!id.auto_increment);
 
     let expected_type = ColumnType {
         full_data_type: int_full_data_type(&api).into(),
-        family: if api.is_cockroach() {
-            ColumnTypeFamily::BigInt
-        } else {
-            ColumnTypeFamily::Int
-        },
+        family: ColumnTypeFamily::Int,
         arity: ColumnArity::Nullable,
         native_type: int_native_type(&api),
     };
@@ -438,9 +452,5 @@ fn defaults_must_work(api: TestApi) {
         assert!(default.constraint_name().unwrap().starts_with("DF__User__id__"));
     }
 
-    if api.is_cockroach() {
-        assert_eq!(&DefaultKind::Value(PrismaValue::BigInt(1)), default.kind());
-    } else {
-        assert_eq!(&DefaultKind::Value(PrismaValue::Int(1)), default.kind());
-    }
+    assert_eq!(&DefaultKind::Value(PrismaValue::Int(1)), default.kind());
 }

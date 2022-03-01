@@ -13,17 +13,17 @@ mod paging_one2m_stable_order {
               #id(id, Int, @id)
               related RelatedTestModel[]
             }
-            
+
             model RelatedTestModel {
               #id(id, Int, @id)
               fieldA String
               fieldB String
               fieldC String
               fieldD String
-            
+
               parent_id Int
               parent TestModel @relation(fields: [parent_id], references: [id])
-            
+
               @@unique([fieldA, fieldB, fieldC, fieldD])
             }
             "#
@@ -33,8 +33,8 @@ mod paging_one2m_stable_order {
     }
 
     #[connector_test]
-    async fn take_first_child_each_parent(runner: &Runner) -> TestResult<()> {
-        create_test_data(runner).await?;
+    async fn take_first_child_each_parent(runner: Runner) -> TestResult<()> {
+        create_test_data(&runner).await?;
 
         // Ordered: desc, ASC, ASC, DESC
         // 1 => 2 B B B B <- take
@@ -45,7 +45,7 @@ mod paging_one2m_stable_order {
         // 3 => 6 A C D C
         // Makes: [1 => 2, 2 => 3, 3 => 5]
         insta::assert_snapshot!(
-          run_query!(runner, r#"query {
+          run_query!(&runner, r#"query {
             findManyTestModel {
               id
               related(take: 1, orderBy: [{ fieldA: desc }, {fieldB: asc }, { fieldC: asc }, { fieldD: desc }]) {
@@ -60,8 +60,8 @@ mod paging_one2m_stable_order {
     }
 
     #[connector_test]
-    async fn take_last_child_each_parent(runner: &Runner) -> TestResult<()> {
-        create_test_data(runner).await?;
+    async fn take_last_child_each_parent(runner: Runner) -> TestResult<()> {
+        create_test_data(&runner).await?;
 
         // Ordered: desc, ASC, ASC, DESC
         // 1 => 2 B B B B
@@ -72,7 +72,7 @@ mod paging_one2m_stable_order {
         // 3 => 6 A C D C <- take
         // Makes: [1 => 1, 2 => 4, 3 => 6]
         insta::assert_snapshot!(
-          run_query!(runner, r#"query {
+          run_query!(&runner, r#"query {
             findManyTestModel {
               id
               related(take: -1, orderBy: [{ fieldA: desc }, { fieldB: asc }, { fieldC: asc }, { fieldD: desc }]) {
@@ -87,8 +87,8 @@ mod paging_one2m_stable_order {
     }
 
     #[connector_test]
-    async fn cursor_child_3(runner: &Runner) -> TestResult<()> {
-        create_test_data(runner).await?;
+    async fn cursor_child_3(runner: Runner) -> TestResult<()> {
+        create_test_data(&runner).await?;
 
         // Ordered: desc, ASC, ASC, DESC
         // 1 => 2 B B B B
@@ -99,7 +99,7 @@ mod paging_one2m_stable_order {
         // 3 => 6 A C D C
         // Makes: [1 => [], 2 => [3, 4], 3 => []]
         insta::assert_snapshot!(
-          run_query!(runner, r#"query {
+          run_query!(&runner, r#"query {
             findManyTestModel {
               id
               related(cursor: { id: 3 }, orderBy: [{ fieldA: desc }, { fieldB: asc }, { fieldC: asc }, { fieldD: desc }]) {
@@ -144,7 +144,6 @@ mod paging_one2m_stable_order {
 #[test_suite(schema(schema))]
 mod paging_one2m_unstable_order {
     use indoc::indoc;
-    use query_engine_tests::assert_query_many;
 
     fn schema() -> String {
         let schema = indoc! {
@@ -153,14 +152,14 @@ mod paging_one2m_unstable_order {
               #id(id, Int, @id)
               related RelatedTestModel[]
             }
-            
+
             model RelatedTestModel {
               #id(id, Int, @id)
               fieldA String
               fieldB String
               fieldC String
               fieldD String
-            
+
               parent_id Int
               parent TestModel @relation(fields: [parent_id], references: [id])
             }
@@ -171,8 +170,8 @@ mod paging_one2m_unstable_order {
     }
 
     #[connector_test]
-    async fn take_first_child_each_parent(runner: &Runner) -> TestResult<()> {
-        create_test_data(runner).await?;
+    async fn take_first_child_each_parent(runner: Runner) -> TestResult<()> {
+        create_test_data(&runner).await?;
 
         // Ordered: desc, ASC, ASC, DESC
         // 1 => 2 B B B B <- take
@@ -182,28 +181,26 @@ mod paging_one2m_unstable_order {
         // 3 => 5 C C B A <- take
         // 3 => 6 A C D C
         // Makes: [1 => 2, 2 => 3 | 4, 3 => 5]
-        assert_query_many!(
-            runner,
-            r#"query {
+        insta::assert_snapshot!(
+        run_query!(
+          &runner,
+          r#"query {
             findManyTestModel {
               id
               related(take: 1, orderBy: [{ fieldA: desc }, {fieldB: asc }, { fieldC: asc }, { fieldD: desc }]) {
                 id
               }
             }
-          }"#,
-            vec![
-                r#"{"data":{"findManyTestModel":[{"id":1,"related":[{"id":2}]},{"id":2,"related":[{"id":3}]},{"id":3,"related":[{"id":5}]}]}}"#,
-                r#"{"data":{"findManyTestModel":[{"id":1,"related":[{"id":2}]},{"id":2,"related":[{"id":4}]},{"id":3,"related":[{"id":5}]}]}}"#
-            ]
+          }"#),
+          @r###"{"data":{"findManyTestModel":[{"id":1,"related":[{"id":2}]},{"id":2,"related":[{"id":3}]},{"id":3,"related":[{"id":5}]}]}}"###
         );
 
         Ok(())
     }
 
     #[connector_test]
-    async fn take_last_child_each_parent(runner: &Runner) -> TestResult<()> {
-        create_test_data(runner).await?;
+    async fn take_last_child_each_parent(runner: Runner) -> TestResult<()> {
+        create_test_data(&runner).await?;
 
         // Ordered: desc, ASC, ASC, DESC
         // 1 => 2 B B B B
@@ -213,28 +210,26 @@ mod paging_one2m_unstable_order {
         // 3 => 5 C C B A
         // 3 => 6 A C D C <- take
         // Makes: [1 => 1, 2 => 4, 3 => 6]
-        assert_query_many!(
-            runner,
-            r#"query {
-            findManyTestModel {
-              id
-              related(take: -1, orderBy: [{ fieldA: desc }, { fieldB: asc }, { fieldC: asc }, { fieldD: desc }]) {
-                id
-              }
-            }
-          }"#,
-            vec![
-                r#"{"data":{"findManyTestModel":[{"id":1,"related":[{"id":1}]},{"id":2,"related":[{"id":3}]},{"id":3,"related":[{"id":6}]}]}}"#,
-                r#"{"data":{"findManyTestModel":[{"id":1,"related":[{"id":1}]},{"id":2,"related":[{"id":4}]},{"id":3,"related":[{"id":6}]}]}}"#
-            ]
+        insta::assert_snapshot!(
+          run_query!(
+              &runner,
+              r#"query {
+                findManyTestModel {
+                  id
+                  related(take: -1, orderBy: [{ fieldA: desc }, { fieldB: asc }, { fieldC: asc }, { fieldD: desc }]) {
+                    id
+                  }
+                }
+              }"#),
+          @r###"{"data":{"findManyTestModel":[{"id":1,"related":[{"id":1}]},{"id":2,"related":[{"id":3}]},{"id":3,"related":[{"id":6}]}]}}"###
         );
 
         Ok(())
     }
 
     #[connector_test]
-    async fn cursor_child_3(runner: &Runner) -> TestResult<()> {
-        create_test_data(runner).await?;
+    async fn cursor_child_3(runner: Runner) -> TestResult<()> {
+        create_test_data(&runner).await?;
 
         // Ordered: desc, ASC, ASC, DESC
         // 1 => 2 B B B B
@@ -244,22 +239,18 @@ mod paging_one2m_unstable_order {
         // 3 => 5 C C B A
         // 3 => 6 A C D C
         // Makes: [1 => [], 2 => [3, 4] | [4, 3] | [3] | [4], 3 => []]
-        assert_query_many!(
-            runner,
+        insta::assert_snapshot!(
+          run_query!(
+            &runner,
             r#"query {
-            findManyTestModel {
-              id
-              related(cursor: { id: 3 }, orderBy: [{ fieldA: desc }, { fieldB: asc }, { fieldC: asc }, { fieldD: desc }]) {
+              findManyTestModel {
                 id
+                related(cursor: { id: 3 }, orderBy: [{ fieldA: desc }, { fieldB: asc }, { fieldC: asc }, { fieldD: desc }]) {
+                  id
+                }
               }
-            }
-          }"#,
-            vec![
-                r#"{"data":{"findManyTestModel":[{"id":1,"related":[]},{"id":2,"related":[{"id":3},{"id":4}]},{"id":3,"related":[]}]}}"#,
-                r#"{"data":{"findManyTestModel":[{"id":1,"related":[]},{"id":2,"related":[{"id":4},{"id":3}]},{"id":3,"related":[]}]}}"#,
-                r#"{"data":{"findManyTestModel":[{"id":1,"related":[]},{"id":2,"related":[{"id":3}]},{"id":3,"related":[]}]}}"#,
-                r#"{"data":{"findManyTestModel":[{"id":1,"related":[]},{"id":2,"related":[{"id":4}]},{"id":3,"related":[]}]}}"#
-            ]
+            }"#),
+          @r###"{"data":{"findManyTestModel":[{"id":1,"related":[]},{"id":2,"related":[{"id":3},{"id":4}]},{"id":3,"related":[]}]}}"###
         );
 
         Ok(())

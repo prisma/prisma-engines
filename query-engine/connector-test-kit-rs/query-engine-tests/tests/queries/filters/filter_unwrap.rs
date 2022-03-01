@@ -26,7 +26,7 @@ mod filter_unwrap {
     }
 
     #[connector_test]
-    async fn many_filter(runner: &Runner) -> TestResult<()> {
+    async fn many_filter(runner: Runner) -> TestResult<()> {
         runner
             .query(indoc! {r#"
               mutation {

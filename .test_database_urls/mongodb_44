@@ -1,0 +1,2 @@
+export TEST_DATABASE_URL="mongodb://prisma:prisma@localhost:27017/?authSource=admin&retryWrites=true"
+unset TEST_SHADOW_DATABASE_URL

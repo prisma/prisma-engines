@@ -1,15 +1,16 @@
-use connector_interface::{DatasourceFieldName, WriteArgs, WriteExpression};
+use crate::model_extensions::*;
+use crate::sql_trace::SqlTraceComment;
+use connector_interface::{DatasourceFieldName, ScalarWriteOperation, WriteArgs};
 use itertools::Itertools;
 use prisma_models::*;
 use quaint::ast::*;
 use std::{collections::HashSet, convert::TryInto};
+use tracing::Span;
 
 /// `INSERT` a new record to the database. Resulting an `INSERT` ast and an
 /// optional `RecordProjection` if available from the arguments or model.
 #[tracing::instrument(skip(model, args))]
-pub fn create_record(model: &ModelRef, mut args: WriteArgs) -> (Insert<'static>, Option<RecordProjection>) {
-    let return_id = args.as_record_projection(model.primary_identifier());
-
+pub fn create_record(model: &ModelRef, mut args: WriteArgs, trace_id: Option<String>) -> Insert<'static> {
     let fields: Vec<_> = model
         .fields()
         .scalar()
@@ -29,21 +30,23 @@ pub fn create_record(model: &ModelRef, mut args: WriteArgs) -> (Insert<'static>,
             insert.value(db_name.to_owned(), field.value(value))
         });
 
-    (
-        Insert::from(insert).returning(model.primary_identifier().as_columns()),
-        return_id,
-    )
+    Insert::from(insert)
+        .returning(ModelProjection::from(model.primary_identifier()).as_columns())
+        .append_trace(&Span::current())
+        .add_trace_id(trace_id)
 }
 
 /// `INSERT` new records into the database based on the given write arguments,
 /// where each `WriteArg` in the Vec is one row.
 /// Requires `affected_fields` to be non-empty to produce valid SQL.
 #[tracing::instrument(skip(model, args, skip_duplicates))]
+#[allow(clippy::mutable_key_type)]
 pub fn create_records_nonempty(
     model: &ModelRef,
     args: Vec<WriteArgs>,
     skip_duplicates: bool,
     affected_fields: &HashSet<ScalarFieldRef>,
+    trace_id: Option<String>,
 ) -> Insert<'static> {
     // We need to bring all write args into a uniform shape.
     // The easiest way to do this is to take go over all fields of the batch and apply the following:
@@ -56,8 +59,8 @@ pub fn create_records_nonempty(
             for field in affected_fields.iter() {
                 let value = arg.take_field_value(field.db_name());
                 match value {
-                    Some(expr) => {
-                        let value: PrismaValue = expr
+                    Some(write_op) => {
+                        let value: PrismaValue = write_op
                             .try_into()
                             .expect("Create calls can only use PrismaValue write expressions (right now).");
 
@@ -76,6 +79,7 @@ pub fn create_records_nonempty(
     let insert = Insert::multi_into(model.as_table(), columns);
     let insert = values.into_iter().fold(insert, |stmt, values| stmt.values(values));
     let insert: Insert = insert.into();
+    let insert = insert.append_trace(&Span::current()).add_trace_id(trace_id);
 
     if skip_duplicates {
         insert.on_conflict(OnConflict::DoNothing)
@@ -86,8 +90,9 @@ pub fn create_records_nonempty(
 
 /// `INSERT` empty records statement.
 #[tracing::instrument(skip(model, skip_duplicates))]
-pub fn create_records_empty(model: &ModelRef, skip_duplicates: bool) -> Insert<'static> {
+pub fn create_records_empty(model: &ModelRef, skip_duplicates: bool, trace_id: Option<String>) -> Insert<'static> {
     let insert: Insert<'static> = Insert::single_into(model.as_table()).into();
+    let insert = insert.append_trace(&Span::current()).add_trace_id(trace_id);
 
     if skip_duplicates {
         insert.on_conflict(OnConflict::DoNothing)
@@ -97,7 +102,12 @@ pub fn create_records_empty(model: &ModelRef, skip_duplicates: bool) -> Insert<'
 }
 
 #[tracing::instrument(skip(model, ids, args))]
-pub fn update_many(model: &ModelRef, ids: &[&RecordProjection], args: WriteArgs) -> crate::Result<Vec<Query<'static>>> {
+pub fn update_many(
+    model: &ModelRef,
+    ids: &[&SelectionResult],
+    args: WriteArgs,
+    trace_id: Option<String>,
+) -> crate::Result<Vec<Query<'static>>> {
     if args.args.is_empty() || ids.is_empty() {
         return Ok(Vec::new());
     }
@@ -114,10 +124,10 @@ pub fn update_many(model: &ModelRef, ids: &[&RecordProjection], args: WriteArgs)
                 .find(|f| f.db_name() == name)
                 .expect("Expected field to be valid");
 
-            let value: Expression = match val {
-                WriteExpression::Field(_) => unimplemented!(),
-                WriteExpression::Value(rhs) => field.value(rhs).into(),
-                WriteExpression::Add(rhs) if field.is_list => {
+            let value: Expression = match val.try_into_scalar().unwrap() {
+                ScalarWriteOperation::Field(_) => unimplemented!(),
+                ScalarWriteOperation::Set(rhs) => field.value(rhs).into(),
+                ScalarWriteOperation::Add(rhs) if field.is_list() => {
                     let e: Expression = Column::from(name.clone()).into();
                     let vals: Vec<_> = match rhs {
                         PrismaValue::List(vals) => vals.into_iter().map(|val| field.value(val)).collect(),
@@ -127,22 +137,22 @@ pub fn update_many(model: &ModelRef, ids: &[&RecordProjection], args: WriteArgs)
                     // Postgres only
                     e.compare_raw("||", Value::array(vals)).into()
                 }
-                WriteExpression::Add(rhs) => {
+                ScalarWriteOperation::Add(rhs) => {
                     let e: Expression<'_> = Column::from(name.clone()).into();
                     e + field.value(rhs).into()
                 }
 
-                WriteExpression::Substract(rhs) => {
+                ScalarWriteOperation::Substract(rhs) => {
                     let e: Expression<'_> = Column::from(name.clone()).into();
                     e - field.value(rhs).into()
                 }
 
-                WriteExpression::Multiply(rhs) => {
+                ScalarWriteOperation::Multiply(rhs) => {
                     let e: Expression<'_> = Column::from(name.clone()).into();
                     e * field.value(rhs).into()
                 }
 
-                WriteExpression::Divide(rhs) => {
+                ScalarWriteOperation::Divide(rhs) => {
                     let e: Expression<'_> = Column::from(name.clone()).into();
                     e / field.value(rhs).into()
                 }
@@ -151,26 +161,30 @@ pub fn update_many(model: &ModelRef, ids: &[&RecordProjection], args: WriteArgs)
             acc.set(name, value)
         });
 
-    let columns: Vec<_> = model.primary_identifier().as_columns().collect();
+    let query = query.append_trace(&Span::current()).add_trace_id(trace_id);
+    let columns: Vec<_> = ModelProjection::from(model.primary_identifier()).as_columns().collect();
     let result: Vec<Query> = super::chunked_conditions(&columns, ids, |conditions| query.clone().so_that(conditions));
 
     Ok(result)
 }
 
 #[tracing::instrument(skip(model, ids))]
-pub fn delete_many(model: &ModelRef, ids: &[&RecordProjection]) -> Vec<Query<'static>> {
-    let columns: Vec<_> = model.primary_identifier().as_columns().collect();
+pub fn delete_many(model: &ModelRef, ids: &[&SelectionResult], trace_id: Option<String>) -> Vec<Query<'static>> {
+    let columns: Vec<_> = ModelProjection::from(model.primary_identifier()).as_columns().collect();
 
     super::chunked_conditions(&columns, ids, |conditions| {
-        Delete::from_table(model.as_table()).so_that(conditions)
+        Delete::from_table(model.as_table())
+            .so_that(conditions)
+            .append_trace(&Span::current())
+            .add_trace_id(trace_id.clone())
     })
 }
 
 #[tracing::instrument(skip(field, parent_id, child_ids))]
 pub fn create_relation_table_records(
     field: &RelationFieldRef,
-    parent_id: &RecordProjection,
-    child_ids: &[RecordProjection],
+    parent_id: &SelectionResult,
+    child_ids: &[SelectionResult],
 ) -> Query<'static> {
     let relation = field.relation();
 
@@ -187,14 +201,16 @@ pub fn create_relation_table_records(
         insert.values(values)
     });
 
+    // NOTE: There is no comment support for MultiRowInsert
     insert.build().on_conflict(OnConflict::DoNothing).into()
 }
 
 #[tracing::instrument(skip(parent_field, parent_id, child_ids))]
 pub fn delete_relation_table_records(
     parent_field: &RelationFieldRef,
-    parent_id: &RecordProjection,
-    child_ids: &[RecordProjection],
+    parent_id: &SelectionResult,
+    child_ids: &[SelectionResult],
+    trace_id: Option<String>,
 ) -> Delete<'static> {
     let relation = parent_field.relation();
 
@@ -210,5 +226,8 @@ pub fn delete_relation_table_records(
 
     let child_id_criteria = super::conditions(&child_columns, child_ids);
 
-    Delete::from_table(relation.as_table()).so_that(parent_id_criteria.and(child_id_criteria))
+    Delete::from_table(relation.as_table())
+        .so_that(parent_id_criteria.and(child_id_criteria))
+        .append_trace(&Span::current())
+        .add_trace_id(trace_id)
 }

@@ -15,6 +15,10 @@ use user_facing_errors::{
 #[derive(Clone)]
 pub struct ConnectorError(Box<ConnectorErrorImpl>);
 
+/// Shorthand for a [Result](https://doc.rust-lang.org/std/result/enum.Result.html) where the error
+/// variant is a [ConnectorError](/error/enum.ConnectorError.html).
+pub type ConnectorResult<T> = Result<T, ConnectorError>;
+
 #[derive(Debug, Clone)]
 struct ConnectorErrorImpl {
     /// An optional error already rendered for users in case the migration core does not handle it.
@@ -67,8 +71,8 @@ impl ConnectorError {
     }
 
     /// The user-facing error code for this error.
-    pub fn error_code(&self) -> Option<&'static str> {
-        self.0.user_facing_error.as_ref().map(|err| err.error_code)
+    pub fn error_code(&self) -> Option<&str> {
+        self.0.user_facing_error.as_ref().map(|err| err.error_code.as_ref())
     }
 
     /// Build a generic unknown error from just an error message.
@@ -78,6 +82,16 @@ impl ConnectorError {
             context: SpanTrace::capture(),
             message: Some(msg.into_boxed_str()),
             source: None,
+        }))
+    }
+
+    /// Build a generic unknown error from a source error, with some additional context.
+    pub fn from_source_with_context<E: StdError + Send + Sync + 'static>(source: E, context: Box<str>) -> Self {
+        ConnectorError(Box::new(ConnectorErrorImpl {
+            user_facing_error: None,
+            message: Some(context),
+            source: Some(Arc::new(source)),
+            context: SpanTrace::capture(),
         }))
     }
 
@@ -137,6 +151,11 @@ impl ConnectorError {
         }))
     }
 
+    /// Is this error's cause the passed in user facing error?
+    pub fn is_user_facing_error<T: UserFacingError>(&self) -> bool {
+        self.error_code() == Some(T::ERROR_CODE)
+    }
+
     /// Access the inner `user_facing_error::KnownError`.
     pub fn known_error(&self) -> Option<&KnownError> {
         self.0.user_facing_error.as_ref()
@@ -167,8 +186,8 @@ impl ConnectorError {
 
     /// Construct an UrlParseError.
     pub fn url_parse_error(err: impl Display) -> Self {
-        Self::user_facing(user_facing_errors::common::InvalidDatabaseString {
-            details: err.to_string(),
+        Self::user_facing(user_facing_errors::common::InvalidConnectionString {
+            details: invalid_connection_string_description(err),
         })
     }
 }
@@ -203,6 +222,12 @@ impl From<ListMigrationsError> for ConnectorError {
     fn from(err: ListMigrationsError) -> Self {
         ConnectorError::from_msg(err.to_string())
     }
+}
+
+fn invalid_connection_string_description(error_details: impl Display) -> String {
+    let docs = r#"https://www.prisma.io/docs/reference/database-reference/connection-urls"#;
+
+    format! {r#"{} in database URL. Please refer to the documentation in {} for constructing a correct connection string. In some cases, certain characters must be escaped. Please check the string for any illegal characters."#, error_details, docs}
 }
 
 #[cfg(test)]

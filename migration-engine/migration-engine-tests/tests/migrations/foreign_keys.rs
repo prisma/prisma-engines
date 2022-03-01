@@ -1,6 +1,7 @@
-use migration_engine_tests::sync_test_api::*;
+use migration_engine_tests::test_api::*;
+use sql_schema_describer::ForeignKeyAction;
 
-#[test_connector]
+#[test_connector(preview_features("referentialIntegrity"))]
 fn foreign_keys_of_inline_one_to_one_relations_have_a_unique_constraint(api: TestApi) {
     let dm = r#"
         model Cat {
@@ -15,15 +16,14 @@ fn foreign_keys_of_inline_one_to_one_relations_have_a_unique_constraint(api: Tes
         }
     "#;
 
-    api.schema_push(dm).send_sync().assert_green_bang();
+    api.schema_push_w_datasource(dm).send().assert_green();
     api.assert_schema().assert_table("Box", |t| {
-        t.assert_indexes_count(1).assert_index_on_columns(&["cat_id"], |idx| {
-            idx.assert_is_unique().assert_name("Box_cat_id_unique")
-        })
+        t.assert_indexes_count(1)
+            .assert_index_on_columns(&["cat_id"], |idx| idx.assert_is_unique().assert_name("Box_cat_id_key"))
     });
 }
 
-#[test_connector]
+#[test_connector(exclude(Vitess))]
 fn foreign_keys_are_added_on_existing_tables(api: TestApi) -> TestResult {
     let dm1 = r#"
         model User {
@@ -36,7 +36,7 @@ fn foreign_keys_are_added_on_existing_tables(api: TestApi) -> TestResult {
         }
     "#;
 
-    api.schema_push(dm1).send_sync().assert_green_bang();
+    api.schema_push_w_datasource(dm1).send().assert_green();
 
     api.assert_schema()
         // There should be no foreign keys yet.
@@ -56,7 +56,7 @@ fn foreign_keys_are_added_on_existing_tables(api: TestApi) -> TestResult {
         }
     "#;
 
-    api.schema_push(dm2).send_sync().assert_green_bang();
+    api.schema_push_w_datasource(dm2).send().assert_green();
 
     api.assert_schema().assert_table("Account", |table| {
         table
@@ -65,7 +65,7 @@ fn foreign_keys_are_added_on_existing_tables(api: TestApi) -> TestResult {
     });
 }
 
-#[test_connector]
+#[test_connector(exclude(Vitess))]
 fn foreign_keys_can_be_added_on_existing_columns(api: TestApi) -> TestResult {
     let dm1 = r#"
         model User {
@@ -79,7 +79,7 @@ fn foreign_keys_can_be_added_on_existing_columns(api: TestApi) -> TestResult {
         }
     "#;
 
-    api.schema_push(dm1).send_sync().assert_green_bang();
+    api.schema_push_w_datasource(dm1).send().assert_green();
 
     api.assert_schema()
         // There should be no foreign keys yet.
@@ -99,7 +99,7 @@ fn foreign_keys_can_be_added_on_existing_columns(api: TestApi) -> TestResult {
         }
     "#;
 
-    api.schema_push(dm2).send_sync().assert_green_bang();
+    api.schema_push_w_datasource(dm2).send().assert_green();
 
     api.assert_schema().assert_table("Account", |table| {
         table
@@ -108,7 +108,7 @@ fn foreign_keys_can_be_added_on_existing_columns(api: TestApi) -> TestResult {
     });
 }
 
-#[test_connector]
+#[test_connector(exclude(Vitess))]
 fn foreign_keys_can_be_dropped_on_existing_columns(api: TestApi) {
     let dm1 = r#"
         model User {
@@ -124,7 +124,7 @@ fn foreign_keys_can_be_dropped_on_existing_columns(api: TestApi) {
         }
     "#;
 
-    api.schema_push(dm1).send_sync().assert_green_bang();
+    api.schema_push_w_datasource(dm1).send().assert_green();
 
     api.assert_schema().assert_table("Account", |table| {
         table
@@ -144,13 +144,13 @@ fn foreign_keys_can_be_dropped_on_existing_columns(api: TestApi) {
         }
     "#;
 
-    api.schema_push(dm2).send_sync().assert_green_bang();
+    api.schema_push_w_datasource(dm2).send().assert_green();
 
     api.assert_schema()
         .assert_table("Account", |table| table.assert_foreign_keys_count(0));
 }
 
-#[test_connector]
+#[test_connector(exclude(Vitess))]
 fn changing_a_scalar_field_to_a_relation_field_must_work(api: TestApi) {
     let dm1 = r#"
         model A {
@@ -163,7 +163,7 @@ fn changing_a_scalar_field_to_a_relation_field_must_work(api: TestApi) {
         }
     "#;
 
-    api.schema_push(dm1).send_sync().assert_green_bang();
+    api.schema_push_w_datasource(dm1).send().assert_green();
     api.assert_schema().assert_table("A", |t| {
         t.assert_column("b", |c| c.assert_type_is_string())
             .assert_foreign_keys_count(0)
@@ -183,9 +183,9 @@ fn changing_a_scalar_field_to_a_relation_field_must_work(api: TestApi) {
         }
     "#;
 
-    api.schema_push(dm2)
+    api.schema_push_w_datasource(dm2)
         .force(true)
-        .send_sync()
+        .send()
         .assert_executable()
         .assert_has_executed_steps();
 
@@ -196,7 +196,7 @@ fn changing_a_scalar_field_to_a_relation_field_must_work(api: TestApi) {
     });
 }
 
-#[test_connector]
+#[test_connector(exclude(Vitess))]
 fn changing_a_relation_field_to_a_scalar_field_must_work(api: TestApi) {
     let dm1 = r#"
         model A {
@@ -204,20 +204,28 @@ fn changing_a_relation_field_to_a_scalar_field_must_work(api: TestApi) {
             b Int
             b_rel B @relation(fields: [b], references: [id])
         }
+
         model B {
             id Int @id
             a  A?
         }
     "#;
 
-    api.schema_push(dm1).send_sync().assert_green_bang();
+    api.schema_push_w_datasource(dm1).send().assert_green();
 
     api.assert_schema().assert_table("A", |table| {
         table
             .assert_column("b", |col| col.assert_type_is_int())
             .assert_foreign_keys_count(1)
             .assert_fk_on_columns(&["b"], |fk| {
-                fk.assert_references("B", &["id"]).assert_cascades_on_delete()
+                let on_delete = if api.is_mssql() {
+                    ForeignKeyAction::NoAction
+                } else {
+                    ForeignKeyAction::Restrict
+                };
+
+                fk.assert_references("B", &["id"])
+                    .assert_referential_action_on_delete(on_delete)
             })
     });
 
@@ -231,7 +239,7 @@ fn changing_a_relation_field_to_a_scalar_field_must_work(api: TestApi) {
         }
     "#;
 
-    api.schema_push(dm2).send_sync().assert_green_bang();
+    api.schema_push_w_datasource(dm2).send().assert_green();
 
     api.assert_schema().assert_table("A", |table| {
         table
@@ -240,7 +248,7 @@ fn changing_a_relation_field_to_a_scalar_field_must_work(api: TestApi) {
     });
 }
 
-#[test_connector]
+#[test_connector(exclude(Vitess))]
 fn changing_a_foreign_key_constrained_column_from_nullable_to_required_and_back_works(api: TestApi) {
     let dm = r#"
         model Student {
@@ -256,7 +264,7 @@ fn changing_a_foreign_key_constrained_column_from_nullable_to_required_and_back_
         }
     "#;
 
-    api.schema_push(dm).send_sync().assert_green_bang();
+    api.schema_push_w_datasource(dm).send().assert_green();
 
     let dm2 = r#"
         model Student {
@@ -272,12 +280,11 @@ fn changing_a_foreign_key_constrained_column_from_nullable_to_required_and_back_
         }
     "#;
 
-    api.schema_push(dm2).send_sync().assert_green_bang();
-    api.schema_push(dm).send_sync().assert_green_bang();
+    api.schema_push_w_datasource(dm2).send().assert_green();
+    api.schema_push_w_datasource(dm).send().assert_green();
 }
 
-// TODO: Enable SQL Server when cascading rules are in PSL.
-#[test_connector(exclude(Mssql))]
+#[test_connector(preview_features("referentialIntegrity"))]
 fn changing_all_referenced_columns_of_foreign_key_works(api: TestApi) {
     let dm1 = r#"
        model Post {
@@ -292,7 +299,7 @@ fn changing_all_referenced_columns_of_foreign_key_works(api: TestApi) {
         }
     "#;
 
-    api.schema_push(dm1).send_sync().assert_green_bang();
+    api.schema_push_w_datasource(dm1).send().assert_green();
 
     let dm2 = r#"
         model Post {
@@ -307,5 +314,5 @@ fn changing_all_referenced_columns_of_foreign_key_works(api: TestApi) {
         }
     "#;
 
-    api.schema_push(dm2).send_sync().assert_green_bang();
+    api.schema_push_w_datasource(dm2).send().assert_green();
 }

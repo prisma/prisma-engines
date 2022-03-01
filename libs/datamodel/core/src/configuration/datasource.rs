@@ -1,9 +1,9 @@
 use crate::{
     ast::Span,
+    configuration::StringFromEnvVar,
     diagnostics::{DatamodelError, Diagnostics},
-    StringFromEnvVar,
 };
-use datamodel_connector::{Connector, ConnectorCapabilities};
+use datamodel_connector::{Connector, ConnectorCapabilities, ReferentialIntegrity};
 use std::path::Path;
 
 /// a `datasource` from the prisma schema.
@@ -17,11 +17,11 @@ pub struct Datasource {
     pub url_span: Span,
     pub documentation: Option<String>,
     /// the connector of the active provider
-    pub active_connector: Box<dyn Connector>,
+    pub active_connector: &'static dyn Connector,
     /// An optional user-defined shadow database URL.
-    pub(crate) shadow_database_url: Option<(StringFromEnvVar, Span)>,
-    /// Whether planetScaleMode = true was provided
-    pub planet_scale_mode: bool,
+    pub shadow_database_url: Option<(StringFromEnvVar, Span)>,
+    /// In which layer referential actions are handled.
+    pub referential_integrity: Option<ReferentialIntegrity>,
 }
 
 impl std::fmt::Debug for Datasource {
@@ -34,6 +34,7 @@ impl std::fmt::Debug for Datasource {
             .field("documentation", &self.documentation)
             .field("active_connector", &&"...")
             .field("shadow_database_url", &self.shadow_database_url)
+            .field("referential_integrity", &self.referential_integrity)
             .finish()
     }
 }
@@ -42,6 +43,13 @@ impl Datasource {
     pub fn capabilities(&self) -> ConnectorCapabilities {
         let capabilities = self.active_connector.capabilities().to_owned();
         ConnectorCapabilities::new(capabilities)
+    }
+
+    /// The applicable referential integrity mode for this datasource.
+    #[allow(clippy::or_fun_call)] // not applicable in this case
+    pub fn referential_integrity(&self) -> ReferentialIntegrity {
+        self.referential_integrity
+            .unwrap_or(self.active_connector.default_referential_integrity())
     }
 
     /// Load the database URL, validating it and resolving env vars in the
@@ -54,7 +62,7 @@ impl Datasource {
             (Some(lit), _) if lit.trim().is_empty() => {
                 let msg = "You must provide a nonempty URL";
 
-                return Err(DatamodelError::new_source_validation_error(&msg, &self.name, self.url_span).into());
+                return Err(DatamodelError::new_source_validation_error(msg, &self.name, self.url_span).into());
             }
             (Some(lit), _) => lit.clone(),
             (None, Some(env_var)) => match env(env_var) {
@@ -96,7 +104,7 @@ impl Datasource {
     /// config_dir.
     ///
     /// This is, at the time of this writing (2021-05-05), only used in the
-    /// context of NAPI integration.
+    /// context of Node-API integration.
     ///
     /// P.S. Don't forget to add new parameters here if needed!
     pub fn load_url_with_config_dir<F>(&self, config_dir: &Path, env: F) -> Result<String, Diagnostics>

@@ -6,5 +6,5 @@ pub trait DatasourceProvider {
 
     fn canonical_name(&self) -> &str;
 
-    fn connector(&self) -> Box<dyn Connector>;
+    fn connector(&self) -> &'static dyn Connector;
 }

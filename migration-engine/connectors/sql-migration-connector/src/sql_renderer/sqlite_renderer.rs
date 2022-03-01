@@ -4,8 +4,9 @@ use crate::{
     pair::Pair,
     sql_migration::{AlterEnum, AlterTable, RedefineTable, TableChange},
 };
+use datamodel::PrismaValue;
+use indoc::formatdoc;
 use once_cell::sync::Lazy;
-use prisma_value::PrismaValue;
 use regex::Regex;
 use sql_ddl::sqlite as ddl;
 use sql_schema_describer::{walkers::*, *};
@@ -24,18 +25,41 @@ impl SqlRenderer for SqliteFlavour {
         let index_type = match index.index_type() {
             IndexType::Unique => "UNIQUE ",
             IndexType::Normal => "",
+            IndexType::Fulltext => unreachable!("Fulltext index on SQLite"),
         };
+
         let index_name = self.quote(index.name());
         let table_reference = self.quote(index.table().name());
-        let columns = index.columns().map(|c| self.quote(c.name()));
 
-        format!(
+        let columns = index.columns().map(|c| {
+            let mut rendered = format!("{}", self.quote(c.get().name()));
+
+            if let Some(sort_order) = c.sort_order() {
+                rendered.push(' ');
+                rendered.push_str(sort_order.as_ref());
+            }
+
+            rendered
+        });
+
+        let index_create = format!(
             "CREATE {index_type}INDEX {index_name} ON {table_reference}({columns})",
             index_type = index_type,
             index_name = index_name,
             table_reference = table_reference,
             columns = columns.join(", ")
-        )
+        );
+
+        if index.name().starts_with("sqlite_") {
+            formatdoc!(
+                "Pragma writable_schema=1;
+                 {};
+                 Pragma writable_schema=0",
+                index_create
+            )
+        } else {
+            index_create
+        }
     }
 
     fn render_add_foreign_key(&self, _foreign_key: &ForeignKeyWalker<'_>) -> String {
@@ -43,7 +67,10 @@ impl SqlRenderer for SqliteFlavour {
     }
 
     fn render_alter_table(&self, alter_table: &AlterTable, schemas: &Pair<&SqlSchema>) -> Vec<String> {
-        let AlterTable { changes, table_index } = alter_table;
+        let AlterTable {
+            changes,
+            table_ids: table_index,
+        } = alter_table;
 
         let tables = schemas.tables(table_index);
 
@@ -54,8 +81,11 @@ impl SqlRenderer for SqliteFlavour {
 
         for change in changes {
             match change {
-                TableChange::AddColumn { column_index } => {
-                    let column = tables.next().column_at(*column_index);
+                TableChange::AddColumn {
+                    column_id,
+                    has_virtual_default: _,
+                } => {
+                    let column = tables.next().column_at(*column_id);
                     let col_sql = render_column(&column);
 
                     statements.push(format!(
@@ -69,6 +99,7 @@ impl SqlRenderer for SqliteFlavour {
                 TableChange::DropAndRecreateColumn { .. } => unreachable!("DropAndRecreateColumn on SQLite"),
                 TableChange::DropColumn { .. } => unreachable!("DropColumn on SQLite"),
                 TableChange::DropPrimaryKey { .. } => unreachable!("DropPrimaryKey on SQLite"),
+                TableChange::RenamePrimaryKey { .. } => unreachable!("AddPrimaryKey on SQLite"),
             };
         }
 
@@ -100,7 +131,13 @@ impl SqlRenderer for SqliteFlavour {
                         ForeignKeyAction::SetNull => sql_ddl::sqlite::ForeignKeyAction::SetNull,
                         ForeignKeyAction::SetDefault => sql_ddl::sqlite::ForeignKeyAction::SetDefault,
                     }),
-                    on_update: Some(sql_ddl::sqlite::ForeignKeyAction::Cascade),
+                    on_update: Some(match fk.on_update_action() {
+                        ForeignKeyAction::NoAction => sql_ddl::sqlite::ForeignKeyAction::NoAction,
+                        ForeignKeyAction::Restrict => sql_ddl::sqlite::ForeignKeyAction::Restrict,
+                        ForeignKeyAction::Cascade => sql_ddl::sqlite::ForeignKeyAction::Cascade,
+                        ForeignKeyAction::SetNull => sql_ddl::sqlite::ForeignKeyAction::SetNull,
+                        ForeignKeyAction::SetDefault => sql_ddl::sqlite::ForeignKeyAction::SetDefault,
+                    }),
                 })
                 .collect(),
         };
@@ -108,7 +145,7 @@ impl SqlRenderer for SqliteFlavour {
         if !table.columns().any(|col| col.is_single_primary_key()) {
             create_table.primary_key = table
                 .primary_key_column_names()
-                .map(|slice| slice.iter().map(|name| name.into()).collect());
+                .map(|v| v.into_iter().map(|name| name.into()).collect());
         }
 
         create_table.to_string()
@@ -126,6 +163,13 @@ impl SqlRenderer for SqliteFlavour {
         format!("DROP INDEX {}", self.quote(index.name()))
     }
 
+    fn render_drop_and_recreate_index(&self, _indexes: Pair<&IndexWalker<'_>>) -> Vec<String> {
+        vec![
+            self.render_drop_index(*_indexes.previous()),
+            self.render_create_index(*_indexes.next()),
+        ]
+    }
+
     fn render_drop_table(&self, table_name: &str) -> Vec<String> {
         // Turning off the pragma is safe, because schema validation would forbid foreign keys
         // to a non-existent model. There appears to be no other way to deal with cyclic
@@ -133,7 +177,7 @@ impl SqlRenderer for SqliteFlavour {
         // constraints on SQLite.
         vec![
             "PRAGMA foreign_keys=off".to_string(),
-            format!("DROP TABLE {}", self.quote(&table_name)),
+            format!("DROP TABLE {}", self.quote(table_name)),
             "PRAGMA foreign_keys=on".to_string(),
         ]
     }
@@ -143,7 +187,7 @@ impl SqlRenderer for SqliteFlavour {
         let mut result = vec!["PRAGMA foreign_keys=OFF".to_string()];
 
         for redefine_table in tables {
-            let tables = schemas.tables(&redefine_table.table_index);
+            let tables = schemas.tables(&redefine_table.table_ids);
             let temporary_table_name = format!("new_{}", &tables.next().name());
 
             result.push(self.render_create_table_as(tables.next(), &temporary_table_name));
@@ -179,6 +223,10 @@ impl SqlRenderer for SqliteFlavour {
 
     fn render_drop_user_defined_type(&self, _: &UserDefinedTypeWalker<'_>) -> String {
         unreachable!("render_drop_user_defined_type on SQLite")
+    }
+
+    fn render_rename_foreign_key(&self, _fks: &Pair<ForeignKeyWalker<'_>>) -> String {
+        unreachable!("render RenameForeignKey on SQLite")
     }
 }
 
@@ -223,10 +271,10 @@ fn copy_current_table_into_new_table(
     let destination_columns = redefine_table
         .column_pairs
         .iter()
-        .map(|(column_indexes, _, _)| tables.next().column_at(*column_indexes.next()).name());
+        .map(|(column_ides, _, _)| tables.next().column_at(*column_ides.next()).name());
 
-    let source_columns = redefine_table.column_pairs.iter().map(|(column_indexes, changes, _)| {
-        let columns = tables.columns(column_indexes);
+    let source_columns = redefine_table.column_pairs.iter().map(|(column_ides, changes, _)| {
+        let columns = tables.columns(column_ides);
 
         let col_became_required_with_a_default =
             changes.arity_changed() && columns.next().arity().is_required() && columns.next().default().is_some();
@@ -264,7 +312,7 @@ fn render_column<'a>(column: &ColumnWalker<'a>) -> ddl::Column<'a> {
         default: column
             .default()
             .filter(|default| !matches!(default.kind(), DefaultKind::Sequence(_)))
-            .map(|default| render_default(default)),
+            .map(render_default),
         name: column.name().into(),
         not_null: !column.arity().is_nullable(),
         primary_key: column.is_single_primary_key(),
@@ -276,7 +324,7 @@ fn render_default(default: &DefaultValue) -> Cow<'_, str> {
     match default.kind() {
         DefaultKind::DbGenerated(val) => val.as_str().into(),
         DefaultKind::Value(PrismaValue::String(val)) | DefaultKind::Value(PrismaValue::Enum(val)) => {
-            Quoted::sqlite_string(escape_quotes(&val)).to_string().into()
+            Quoted::sqlite_string(escape_quotes(val)).to_string().into()
         }
         DefaultKind::Value(PrismaValue::Bytes(b)) => Quoted::sqlite_string(format_hex(b)).to_string().into(),
         DefaultKind::Now => "CURRENT_TIMESTAMP".into(),

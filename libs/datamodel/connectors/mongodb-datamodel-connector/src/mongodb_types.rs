@@ -1,9 +1,10 @@
-use std::collections::HashMap;
-
-use datamodel_connector::connector_error::{ConnectorError, ErrorKind};
-use dml::{native_type_constructor::NativeTypeConstructor, scalars::ScalarType};
-use lazy_static::lazy_static;
+use datamodel_connector::{
+    connector_error::{ConnectorError, ErrorKind},
+    NativeTypeConstructor, ScalarType,
+};
 use native_types::MongoDbType;
+use once_cell::sync::Lazy;
+use std::collections::HashMap;
 
 /// The names of types as they appear in the Prisma schema.
 pub mod type_names {
@@ -20,22 +21,20 @@ pub mod type_names {
     pub const DECIMAL: &str = "Decimal";
 }
 
-lazy_static! {
-    static ref DEFAULT_MAPPING: HashMap<ScalarType, MongoDbType> = {
-        vec![
-            (ScalarType::Int, MongoDbType::Int),
-            (ScalarType::BigInt, MongoDbType::Long),
-            (ScalarType::Float, MongoDbType::Double),
-            (ScalarType::Decimal, MongoDbType::Decimal),
-            (ScalarType::Boolean, MongoDbType::Bool),
-            (ScalarType::String, MongoDbType::String),
-            (ScalarType::DateTime, MongoDbType::Timestamp),
-            (ScalarType::Bytes, MongoDbType::BinData),
-        ]
-        .into_iter()
-        .collect()
-    };
-}
+static DEFAULT_MAPPING: Lazy<HashMap<ScalarType, MongoDbType>> = Lazy::new(|| {
+    vec![
+        (ScalarType::Int, MongoDbType::Int),
+        (ScalarType::BigInt, MongoDbType::Long),
+        (ScalarType::Float, MongoDbType::Double),
+        (ScalarType::Decimal, MongoDbType::Decimal),
+        (ScalarType::Boolean, MongoDbType::Bool),
+        (ScalarType::String, MongoDbType::String),
+        (ScalarType::DateTime, MongoDbType::Timestamp),
+        (ScalarType::Bytes, MongoDbType::BinData),
+    ]
+    .into_iter()
+    .collect()
+});
 
 use type_names::*;
 
@@ -45,21 +44,19 @@ pub(crate) fn default_for(scalar_type: &ScalarType) -> &MongoDbType {
         .unwrap_or_else(|| panic!("MongoDB native type mapping missing for '{:?}'", scalar_type))
 }
 
-pub(crate) fn available_types() -> Vec<NativeTypeConstructor> {
-    vec![
-        NativeTypeConstructor::without_args(STRING, vec![ScalarType::String]),
-        NativeTypeConstructor::without_args(DOUBLE, vec![ScalarType::Float]),
-        NativeTypeConstructor::without_args(LONG, vec![ScalarType::Int, ScalarType::BigInt]),
-        NativeTypeConstructor::without_args(INT, vec![ScalarType::Int]),
-        NativeTypeConstructor::without_args(BIN_DATA, vec![ScalarType::Bytes]),
-        NativeTypeConstructor::without_args(OBJECT_ID, vec![ScalarType::String, ScalarType::Bytes]),
-        NativeTypeConstructor::without_args(BOOL, vec![ScalarType::Boolean]),
-        NativeTypeConstructor::without_args(DATE, vec![ScalarType::DateTime]),
-        NativeTypeConstructor::without_args(TIMESTAMP, vec![ScalarType::DateTime]),
-        NativeTypeConstructor::without_args(DECIMAL, vec![ScalarType::Decimal]),
-        NativeTypeConstructor::with_args(ARRAY, 1, all_types()),
-    ]
-}
+pub(crate) const NATIVE_TYPE_CONSTRUCTORS: &[NativeTypeConstructor] = &[
+    NativeTypeConstructor::without_args(STRING, &[ScalarType::String]),
+    NativeTypeConstructor::without_args(DOUBLE, &[ScalarType::Float]),
+    NativeTypeConstructor::without_args(LONG, &[ScalarType::Int, ScalarType::BigInt]),
+    NativeTypeConstructor::without_args(INT, &[ScalarType::Int]),
+    NativeTypeConstructor::without_args(BIN_DATA, &[ScalarType::Bytes]),
+    NativeTypeConstructor::without_args(OBJECT_ID, &[ScalarType::String, ScalarType::Bytes]),
+    NativeTypeConstructor::without_args(BOOL, &[ScalarType::Boolean]),
+    NativeTypeConstructor::without_args(DATE, &[ScalarType::DateTime]),
+    NativeTypeConstructor::without_args(TIMESTAMP, &[ScalarType::DateTime]),
+    NativeTypeConstructor::without_args(DECIMAL, &[ScalarType::Decimal]),
+    NativeTypeConstructor::with_args(ARRAY, 1, all_types()),
+];
 
 pub(crate) fn mongo_type_from_input(name: &str, args: &[String]) -> crate::Result<MongoDbType> {
     let mongo_type = match name {
@@ -67,7 +64,7 @@ pub(crate) fn mongo_type_from_input(name: &str, args: &[String]) -> crate::Resul
         DOUBLE => MongoDbType::Double,
         LONG => MongoDbType::Long,
         INT => MongoDbType::Int,
-        ARRAY => parse_array_type(&args)?,
+        ARRAY => parse_array_type(args)?,
         BIN_DATA => MongoDbType::BinData,
         OBJECT_ID => MongoDbType::ObjectId,
         BOOL => MongoDbType::Bool,
@@ -75,20 +72,18 @@ pub(crate) fn mongo_type_from_input(name: &str, args: &[String]) -> crate::Resul
         TIMESTAMP => MongoDbType::Timestamp,
         DECIMAL => MongoDbType::Decimal,
         name => {
-            return Err(ConnectorError {
-                kind: ErrorKind::NativeTypeNameUnknown {
-                    connector_name: "MongoDB".to_owned(),
-                    native_type: name.to_owned(),
-                },
-            })
+            return Err(ConnectorError::from_kind(ErrorKind::NativeTypeNameUnknown {
+                connector_name: "MongoDB".to_owned(),
+                native_type: name.to_owned(),
+            }))
         }
     };
 
     Ok(mongo_type)
 }
 
-fn all_types() -> Vec<ScalarType> {
-    vec![
+const fn all_types() -> &'static [ScalarType] {
+    &[
         ScalarType::Int,
         ScalarType::BigInt,
         ScalarType::Float,

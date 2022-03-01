@@ -36,7 +36,7 @@ pub fn render_test_datamodel(config: &TestConfig, test_database: &str, template:
         .active_features()
         .iter()
         .chain(GENERATOR.hidden_features())
-        .map(|f| format!(r#""{}""#, f.to_string()))
+        .map(|f| format!(r#""{}""#, f))
         .join(", ");
 
     let datasource_with_generator = format!(
@@ -44,6 +44,7 @@ pub fn render_test_datamodel(config: &TestConfig, test_database: &str, template:
             datasource test {{
                 provider = "{}"
                 url = "{}"
+                referentialIntegrity = "{}"
             }}
 
             generator client {{
@@ -53,6 +54,7 @@ pub fn render_test_datamodel(config: &TestConfig, test_database: &str, template:
         "#},
         tag.datamodel_provider(),
         tag.connection_string(test_database, config.is_ci()),
+        tag.referential_integrity(),
         all_features
     );
 

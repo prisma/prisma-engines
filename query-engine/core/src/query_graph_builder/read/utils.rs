@@ -1,7 +1,7 @@
 use super::*;
-use crate::{constants::aggregations::*, FieldPair, ReadQuery};
+use crate::{constants::aggregations::*, FieldPair, ParsedField, ReadQuery};
 use connector::RelAggregationSelection;
-use prisma_models::{Field, ModelProjection, ModelRef, RecordProjection, RelationFieldRef};
+use prisma_models::prelude::*;
 use std::sync::Arc;
 
 pub fn collect_selection_order(from: &[FieldPair]) -> Vec<String> {
@@ -15,35 +15,63 @@ pub fn collect_selection_order(from: &[FieldPair]) -> Vec<String> {
         .collect()
 }
 
-/// Creates SelectedFields from a query selection.
+/// Creates a `FieldSelection` from a query selection.
 /// Automatically adds model IDs to the selected fields as well.
 /// Unwraps are safe due to query validation.
 pub fn collect_selected_fields(
-    from: &[FieldPair],
-    distinct: Option<ModelProjection>,
+    from_pairs: &[FieldPair],
+    distinct: Option<FieldSelection>,
     model: &ModelRef,
-) -> ModelProjection {
-    let selected_fields = from
-        .iter()
-        .filter_map(|pair| {
-            model
-                .fields()
-                .find_from_scalar(&pair.parsed_field.name)
-                .ok()
-                .map(|sf| sf.into())
-        })
-        .collect::<Vec<Field>>();
-
-    let selected_projection = ModelProjection::new(selected_fields);
+) -> FieldSelection {
     let model_id = model.primary_identifier();
-    let selected_fields = model_id.merge(selected_projection);
+    let selected_fields = pairs_to_selections(model, from_pairs);
+
+    let selection = FieldSelection::new(selected_fields);
+    let selection = model_id.merge(selection);
 
     // Distinct fields are always selected because we are processing them in-memory
     if let Some(distinct) = distinct {
-        selected_fields.merge(distinct)
+        selection.merge(distinct)
     } else {
-        selected_fields
+        selection
     }
+}
+
+fn pairs_to_selections<T>(parent: T, pairs: &[FieldPair]) -> Vec<SelectedField>
+where
+    T: Into<ParentContainer>,
+{
+    let parent = parent.into();
+    let fields = pairs
+        .iter()
+        .filter_map(|pair| {
+            parent
+                .find_field(&pair.parsed_field.name)
+                .map(|field| (pair.parsed_field.clone(), field))
+        })
+        .collect::<Vec<(ParsedField, Field)>>();
+
+    fields
+        .into_iter()
+        .flat_map(|field| match field {
+            (_, Field::Relation(rf)) => rf.scalar_fields().into_iter().map(Into::into).collect(),
+            (_, Field::Scalar(sf)) => vec![sf.into()],
+            (pf, Field::Composite(cf)) => vec![extract_composite_selection(pf, cf)],
+        })
+        .collect()
+}
+
+fn extract_composite_selection(pf: ParsedField, cf: CompositeFieldRef) -> SelectedField {
+    let object = pf
+        .nested_fields
+        .expect("Invalid composite query shape: Composite field selected without sub-selection.");
+
+    let typ = cf.typ.clone();
+
+    SelectedField::Composite(CompositeSelection {
+        field: cf,
+        selections: pairs_to_selections(&typ, &object.fields),
+    })
 }
 
 pub fn collect_nested_queries(from: Vec<FieldPair>, model: &ModelRef) -> QueryGraphBuilderResult<Vec<ReadQuery>> {
@@ -57,6 +85,7 @@ pub fn collect_nested_queries(from: Vec<FieldPair>, model: &ModelRef) -> QueryGr
 
             match model_field {
                 Field::Scalar(_) => None,
+                Field::Composite(_) => None,
                 Field::Relation(ref rf) => {
                     let model = rf.related_model();
                     let parent = Arc::clone(&rf);
@@ -73,10 +102,10 @@ pub fn collect_nested_queries(from: Vec<FieldPair>, model: &ModelRef) -> QueryGr
 /// A lookback on the parent is also performed to ensure that fields required for
 /// resolving the parent relation are present.
 pub fn merge_relation_selections(
-    selected_fields: ModelProjection,
+    selected_fields: FieldSelection,
     parent_relation: Option<RelationFieldRef>,
     nested_queries: &[ReadQuery],
-) -> ModelProjection {
+) -> FieldSelection {
     // Context: We are on the child model when calling this function.
     let selected_fields = if let Some(rf) = parent_relation {
         let field = rf.related_field();
@@ -96,12 +125,12 @@ pub fn merge_relation_selections(
         })
         .collect();
 
-    selected_fields.merge(ModelProjection::union(nested))
+    selected_fields.merge(FieldSelection::union(nested))
 }
 
 /// Ensures that if a cursor is provided, its fields are also selected.
 /// Necessary for post-processing of unstable orderings with cursor operations.
-pub fn merge_cursor_fields(selected_fields: ModelProjection, cursor: &Option<RecordProjection>) -> ModelProjection {
+pub fn merge_cursor_fields(selected_fields: FieldSelection, cursor: &Option<SelectionResult>) -> FieldSelection {
     match cursor {
         Some(cursor) => selected_fields.merge(cursor.into()),
         None => selected_fields,

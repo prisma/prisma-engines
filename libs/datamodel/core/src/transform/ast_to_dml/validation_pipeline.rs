@@ -1,105 +1,62 @@
-use super::db::ParserDatabase;
-use super::*;
-use crate::transform::ast_to_dml::standardise_parsing::StandardiserForParsing;
-use crate::{ast, configuration, diagnostics::Diagnostics, ValidatedDatamodel};
+mod context;
+mod validations;
 
-/// Is responsible for loading and validating the Datamodel defined in an AST.
-/// Wrapper for all lift and validation steps
-pub struct ValidationPipeline<'a> {
-    source: Option<&'a configuration::Datasource>,
-    validator: Validator<'a>,
-    standardiser_for_parsing: StandardiserForParsing,
-    standardiser_for_formatting: StandardiserForFormatting,
+use crate::{ast, common::preview_features::PreviewFeature, configuration, diagnostics::Diagnostics};
+use datamodel_connector::{Connector, EmptyDatamodelConnector, ReferentialIntegrity};
+use enumflags2::BitFlags;
+use parser_database::ParserDatabase;
+
+pub struct ValidateOutput {
+    pub(crate) db: ParserDatabase,
+    pub(crate) diagnostics: Diagnostics,
+    pub(crate) referential_integrity: ReferentialIntegrity,
+    pub(crate) connector: &'static dyn Connector,
 }
 
-impl<'a, 'b> ValidationPipeline<'a> {
-    pub fn new(sources: &'a [configuration::Datasource]) -> ValidationPipeline<'a> {
-        let source = sources.first();
-        ValidationPipeline {
-            source,
-            validator: Validator::new(source),
-            standardiser_for_formatting: StandardiserForFormatting::new(),
-            standardiser_for_parsing: StandardiserForParsing::new(),
-        }
+/// Analyze and validate a schema AST.
+///
+/// This will attempt to
+///
+/// * Resolve all attributes
+/// * Resolve and check default values
+/// * Resolve and check all field types
+/// * ...
+/// * Validate the schema
+pub(crate) fn validate(
+    ast_schema: ast::SchemaAst,
+    sources: &[configuration::Datasource],
+    preview_features: BitFlags<PreviewFeature>,
+    mut diagnostics: Diagnostics,
+) -> ValidateOutput {
+    let source = sources.first();
+    let connector = source.map(|s| s.active_connector).unwrap_or(&EmptyDatamodelConnector);
+    let referential_integrity = source.map(|s| s.referential_integrity()).unwrap_or_default();
+
+    // Make sense of the AST.
+    let db = ParserDatabase::new(ast_schema, &mut diagnostics);
+
+    let mut output = ValidateOutput {
+        db,
+        diagnostics,
+        referential_integrity,
+        connector,
+    };
+
+    // Early return so that the validator does not have to deal with invalid schemas
+    if !output.diagnostics.errors().is_empty() {
+        return output;
     }
 
-    /// Validates an AST semantically and promotes it to a datamodel/schema.
-    ///
-    /// This method will attempt to
-    /// * Resolve all attributes
-    /// * Recursively evaluate all functions
-    /// * Perform string interpolation
-    /// * Resolve and check default values
-    /// * Resolve and check all field types
-    pub fn validate(
-        &self,
-        ast_schema: &ast::SchemaAst,
-        relation_transformation_enabled: bool,
-    ) -> Result<ValidatedDatamodel, Diagnostics> {
-        let mut diagnostics = Diagnostics::new();
+    let mut context = context::Context {
+        db: &output.db,
+        datasource: source,
+        preview_features,
+        connector,
+        referential_integrity,
+        diagnostics: &mut output.diagnostics,
+    };
 
-        // Phase 0 is parsing.
-        // Phase 1 is source block loading.
+    validations::validate(&mut context);
 
-        // Phase 2: Name resolution.
-        let db = ParserDatabase::new(ast_schema, &mut diagnostics);
-
-        // Early return so that the validator does not have to deal with invalid schemas
-        if diagnostics.has_errors() {
-            return Err(diagnostics);
-        }
-
-        // Phase 3: Lift AST to DML.
-        let lifter = LiftAstToDml::new(self.source, &db);
-
-        let mut schema = match lifter.lift() {
-            Err(mut err) => {
-                // Cannot continue on lifter error.
-                diagnostics.append(&mut err);
-                return Err(diagnostics);
-            }
-            Ok(schema) => schema,
-        };
-
-        // Phase 4: Validation
-        if let Err(mut err) = self.validator.validate(&db, &mut schema) {
-            diagnostics.append(&mut err);
-        }
-
-        // Early return so that the standardiser does not have to deal with invalid schemas
-        if diagnostics.has_errors() {
-            return Err(diagnostics);
-        }
-
-        // TODO: Move consistency stuff into different module.
-        // Phase 5: Consistency fixes. These don't fail and always run, during parsing AND formatting
-        if let Err(mut err) = self.standardiser_for_parsing.standardise(&mut schema) {
-            diagnostics.append(&mut err);
-        }
-
-        // Transform phase: These only run during formatting.
-        if relation_transformation_enabled {
-            if let Err(mut err) = self.standardiser_for_formatting.standardise(ast_schema, &mut schema) {
-                diagnostics.append(&mut err);
-            }
-        }
-        // Early return so that the post validation does not have to deal with invalid schemas
-        if diagnostics.has_errors() {
-            return Err(diagnostics);
-        }
-
-        // Phase 6: Post Standardisation Validation
-        if let Err(mut err) = self.validator.post_standardisation_validate(ast_schema, &mut schema) {
-            diagnostics.append(&mut err);
-        }
-
-        if diagnostics.has_errors() {
-            Err(diagnostics)
-        } else {
-            Ok(ValidatedDatamodel {
-                subject: schema,
-                warnings: diagnostics.warnings,
-            })
-        }
-    }
+    output
 }

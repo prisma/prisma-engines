@@ -71,132 +71,180 @@
 //!</pre>
 //!
 
-#![allow(
-    clippy::module_inception,
-    clippy::suspicious_operation_groupings,
-    clippy::upper_case_acronyms
-)]
 #![deny(rust_2018_idioms, unsafe_code)]
 
 pub mod ast;
 pub mod common;
-pub mod configuration;
-pub mod diagnostics;
 pub mod dml;
 pub mod json;
-pub mod transform;
-pub mod walkers;
+
+mod configuration;
+mod transform;
 
 pub use crate::dml::*;
-pub use configuration::*;
-use diagnostics::Diagnostics;
+pub use ::dml::prisma_value;
+pub use configuration::{Configuration, Datasource, Generator, StringFromEnvVar};
+pub use datamodel_connector;
+pub use diagnostics;
+pub use parser_database;
+pub use parser_database::is_reserved_type_name;
+use parser_database::ParserDatabase;
+pub use schema_ast;
 
-use crate::diagnostics::{Validated, ValidatedConfiguration, ValidatedDatamodel};
 use crate::{ast::SchemaAst, common::preview_features::PreviewFeature};
-use std::collections::HashSet;
+use diagnostics::{Diagnostics, Validated};
+use enumflags2::BitFlags;
 use transform::{
-    ast_to_dml::{DatasourceLoader, GeneratorLoader, ValidationPipeline},
-    dml_to_ast::{DatasourceSerializer, GeneratorSerializer, LowerDmlToAst},
+    ast_to_dml::{validate, DatasourceLoader, GeneratorLoader},
+    dml_to_ast::{self, GeneratorSerializer, LowerDmlToAst},
 };
+
+pub type ValidatedDatamodel = Validated<Datamodel>;
+pub type ValidatedConfiguration = Validated<Configuration>;
 
 /// Parse and validate the whole schema
 pub fn parse_schema(schema_str: &str) -> Result<(Configuration, Datamodel), String> {
-    parse_datamodel_internal(schema_str, false)
+    parse_datamodel_internal(schema_str)
         .map_err(|err| err.to_pretty_string("schema.prisma", schema_str))
         .map(|v| v.subject)
 }
 
+pub struct ValidatedSchema {
+    pub configuration: Configuration,
+    pub db: parser_database::ParserDatabase,
+    referential_integrity: datamodel_connector::ReferentialIntegrity,
+}
+
+impl ValidatedSchema {
+    pub fn referential_integrity(&self) -> datamodel_connector::ReferentialIntegrity {
+        self.referential_integrity
+    }
+}
+
+/// Parse and validate the whole schema. This function's signature is obviously less than optimal,
+/// let's work towards something simpler.
+pub fn parse_schema_parserdb(src: &str) -> Result<ValidatedSchema, String> {
+    let mut diagnostics = Diagnostics::new();
+    diagnostics
+        .to_result()
+        .map_err(|err| err.to_pretty_string("schema.prisma", src))?;
+
+    let ast = schema_ast::parser::parse_schema(src, &mut diagnostics);
+    let generators = GeneratorLoader::load_generators_from_ast(&ast, &mut diagnostics);
+    let preview_features = preview_features(&generators);
+    let datasources = load_sources(&ast, preview_features, &mut diagnostics);
+
+    diagnostics
+        .to_result()
+        .map_err(|err| err.to_pretty_string("schema.prisma", src))?;
+
+    let out = validate(ast, &datasources, preview_features, diagnostics);
+
+    out.diagnostics
+        .to_result()
+        .map_err(|err| err.to_pretty_string("schema.prisma", src))?;
+
+    Ok(ValidatedSchema {
+        configuration: Configuration {
+            generators,
+            datasources,
+        },
+        db: out.db,
+        referential_integrity: out.referential_integrity,
+    })
+}
+
 /// Parses and validates a datamodel string, using core attributes only.
 pub fn parse_datamodel(datamodel_string: &str) -> Result<ValidatedDatamodel, diagnostics::Diagnostics> {
-    parse_datamodel_internal(datamodel_string, false).map(|validated| Validated {
+    parse_datamodel_internal(datamodel_string).map(|validated| Validated {
         subject: validated.subject.1,
         warnings: validated.warnings,
     })
 }
 
-pub fn parse_datamodel_for_formatter(datamodel_string: &str) -> Result<ValidatedDatamodel, diagnostics::Diagnostics> {
-    parse_datamodel_internal(datamodel_string, true).map(|validated| Validated {
-        subject: validated.subject.1,
-        warnings: validated.warnings,
-    })
-}
+fn parse_datamodel_for_formatter(ast: SchemaAst) -> Result<(ParserDatabase, Datamodel, Vec<Datasource>), Diagnostics> {
+    let mut diagnostics = diagnostics::Diagnostics::new();
+    let datasources = load_sources(&ast, Default::default(), &mut diagnostics);
+    let db = parser_database::ParserDatabase::new(ast, &mut diagnostics);
+    diagnostics.to_result()?;
+    let (connector, referential_integrity) = datasources
+        .get(0)
+        .map(|ds| (ds.active_connector, ds.referential_integrity()))
+        .unwrap_or((&datamodel_connector::EmptyDatamodelConnector, Default::default()));
 
-/// Parses and validates a datamodel string, using core attributes only.
-/// In case of an error, a pretty, colorful string is returned.
-pub fn parse_datamodel_or_pretty_error(datamodel_string: &str, file_name: &str) -> Result<ValidatedDatamodel, String> {
-    parse_datamodel_internal(datamodel_string, false)
-        .map_err(|err| err.to_pretty_string(file_name, datamodel_string))
-        .map(|validated| Validated {
-            subject: validated.subject.1,
-            warnings: validated.warnings,
-        })
+    let datamodel = transform::ast_to_dml::LiftAstToDml::new(&db, connector, referential_integrity).lift();
+    Ok((db, datamodel, datasources))
 }
 
 fn parse_datamodel_internal(
     datamodel_string: &str,
-    transform: bool,
 ) -> Result<Validated<(Configuration, Datamodel)>, diagnostics::Diagnostics> {
     let mut diagnostics = diagnostics::Diagnostics::new();
-    let ast = ast::parse_schema(datamodel_string)?;
+    let ast = ast::parse_schema(datamodel_string, &mut diagnostics);
 
     let generators = GeneratorLoader::load_generators_from_ast(&ast, &mut diagnostics);
     let preview_features = preview_features(&generators);
-    let datasources = load_sources(&ast, &preview_features, &mut &mut diagnostics);
-    let validator = ValidationPipeline::new(&datasources);
+    let datasources = load_sources(&ast, preview_features, &mut diagnostics);
 
     diagnostics.to_result()?;
 
-    match validator.validate(&ast, transform) {
-        Ok(mut src) => {
-            src.warnings.append(&mut diagnostics.warnings);
-            Ok(Validated {
-                subject: (
-                    Configuration {
-                        generators,
-                        datasources,
-                    },
-                    src.subject,
-                ),
-                warnings: src.warnings,
-            })
-        }
-        Err(mut err) => {
-            diagnostics.append(&mut err);
-            Err(diagnostics)
-        }
+    let out = validate(ast, &datasources, preview_features, diagnostics);
+
+    if !out.diagnostics.errors().is_empty() {
+        return Err(out.diagnostics);
     }
+
+    let datamodel = transform::ast_to_dml::LiftAstToDml::new(&out.db, out.connector, out.referential_integrity).lift();
+
+    Ok(Validated {
+        subject: (
+            Configuration {
+                generators,
+                datasources,
+            },
+            datamodel,
+        ),
+        warnings: out.diagnostics.warnings().to_vec(),
+    })
 }
 
 pub fn parse_schema_ast(datamodel_string: &str) -> Result<SchemaAst, diagnostics::Diagnostics> {
-    ast::parse_schema(datamodel_string)
+    let mut diagnostics = Diagnostics::default();
+    let schema = ast::parse_schema(datamodel_string, &mut diagnostics);
+
+    diagnostics.to_result()?;
+
+    Ok(schema)
 }
 
 /// Loads all configuration blocks from a datamodel using the built-in source definitions.
 pub fn parse_configuration(schema: &str) -> Result<ValidatedConfiguration, diagnostics::Diagnostics> {
-    let ast = ast::parse_schema(schema)?;
     let mut diagnostics = Diagnostics::default();
+    let ast = ast::parse_schema(schema, &mut diagnostics);
+
+    diagnostics.to_result()?;
+
     let generators = GeneratorLoader::load_generators_from_ast(&ast, &mut diagnostics);
     let preview_features = preview_features(&generators);
-    let datasources = load_sources(&ast, &preview_features, &mut diagnostics);
+    let datasources = load_sources(&ast, preview_features, &mut diagnostics);
 
     diagnostics.to_result()?;
 
     Ok(ValidatedConfiguration {
         subject: Configuration {
-            datasources,
             generators,
+            datasources,
         },
-        warnings: diagnostics.warnings,
+        warnings: diagnostics.warnings().to_owned(),
     })
 }
 
 fn load_sources(
     schema_ast: &SchemaAst,
-    preview_features: &HashSet<&PreviewFeature>,
+    preview_features: BitFlags<PreviewFeature>,
     diagnostics: &mut Diagnostics,
 ) -> Vec<Datasource> {
-    let source_loader = DatasourceLoader::new();
-    source_loader.load_datasources_from_ast(&schema_ast, preview_features, diagnostics)
+    DatasourceLoader.load_datasources_from_ast(schema_ast, preview_features, diagnostics)
 }
 
 //
@@ -204,9 +252,9 @@ fn load_sources(
 //
 
 /// Renders to a return string.
-pub fn render_datamodel_to_string(datamodel: &dml::Datamodel) -> String {
+pub fn render_datamodel_to_string(datamodel: &dml::Datamodel, configuration: Option<&Configuration>) -> String {
     let mut writable_string = String::with_capacity(datamodel.models.len() * 20);
-    render_datamodel_to(&mut writable_string, datamodel, None);
+    render_datamodel_to(&mut writable_string, datamodel, configuration);
     writable_string
 }
 
@@ -214,7 +262,7 @@ pub fn render_datamodel_to_string(datamodel: &dml::Datamodel) -> String {
 pub fn render_schema_ast_to_string(schema: &SchemaAst) -> String {
     let mut writable_string = String::with_capacity(schema.tops.len() * 20);
 
-    render_schema_ast_to(&mut writable_string, &schema, 2);
+    render_schema_ast_to(&mut writable_string, schema, 2);
 
     writable_string
 }
@@ -223,9 +271,27 @@ pub fn render_schema_ast_to_string(schema: &SchemaAst) -> String {
 pub fn render_datamodel_to(
     stream: &mut dyn std::fmt::Write,
     datamodel: &dml::Datamodel,
-    datasource: Option<&Datasource>,
+    configuration: Option<&Configuration>,
 ) {
-    let lowered = LowerDmlToAst::new(datasource).lower(datamodel);
+    let datasource = configuration.and_then(|c| c.datasources.first());
+
+    let preview_features = configuration
+        .map(|c| c.preview_features())
+        .unwrap_or_else(BitFlags::empty);
+
+    let lowered = LowerDmlToAst::new(datasource, preview_features).lower(datamodel);
+
+    render_schema_ast_to(stream, &lowered, 2);
+}
+
+/// Renders as a string into the stream.
+pub fn render_datamodel_to_with_preview_flags(
+    stream: &mut dyn std::fmt::Write,
+    datamodel: &dml::Datamodel,
+    datasource: Option<&Datasource>,
+    flags: BitFlags<PreviewFeature>,
+) {
+    let lowered = LowerDmlToAst::new(datasource, flags).lower(datamodel);
     render_schema_ast_to(stream, &lowered, 2);
 }
 
@@ -247,9 +313,9 @@ fn render_datamodel_and_config_to(
     datamodel: &dml::Datamodel,
     config: &configuration::Configuration,
 ) {
-    let mut lowered = LowerDmlToAst::new(config.datasources.first()).lower(datamodel);
+    let mut lowered = LowerDmlToAst::new(config.datasources.first(), config.preview_features()).lower(datamodel);
 
-    DatasourceSerializer::add_sources_to_ast(config.datasources.as_slice(), &mut lowered);
+    dml_to_ast::add_sources_to_ast(config, &mut lowered);
     GeneratorSerializer::add_generators_to_ast(&config.generators, &mut lowered);
 
     render_schema_ast_to(stream, &lowered, 2);
@@ -261,6 +327,6 @@ fn render_schema_ast_to(stream: &mut dyn std::fmt::Write, schema: &ast::SchemaAs
     renderer.render(schema);
 }
 
-fn preview_features(generators: &[Generator]) -> HashSet<&PreviewFeature> {
-    generators.iter().flat_map(|gen| gen.preview_features.iter()).collect()
+fn preview_features(generators: &[Generator]) -> BitFlags<PreviewFeature> {
+    generators.iter().map(|gen| gen.preview_features()).collect()
 }

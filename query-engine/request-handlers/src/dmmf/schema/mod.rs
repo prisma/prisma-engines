@@ -29,7 +29,7 @@ impl QuerySchemaRenderer<(DmmfSchema, DmmfOperationMappings)> for DmmfQuerySchem
         ctx.mark_to_be_rendered(&query_schema);
 
         while !ctx.next_pass.is_empty() {
-            let renderers = std::mem::replace(&mut ctx.next_pass, Vec::new());
+            let renderers = std::mem::take(&mut ctx.next_pass);
 
             for renderer in renderers {
                 renderer.render(&mut ctx)
@@ -114,7 +114,14 @@ impl RenderContext {
         if let Some(info) = operation {
             if let Some(ref model) = info.model {
                 let model_name = model.name.clone();
-                let tag_str = format!("{}", info.tag);
+                let tag_str = match &info.tag {
+                    // If it's a QueryRaw with a query_type, then use this query_type as operation name
+                    // eg: findRaw, aggregateRaw..
+                    QueryTag::QueryRaw { query_type } if query_type.is_some() => {
+                        query_type.as_ref().unwrap().to_owned()
+                    }
+                    tag => format!("{}", tag),
+                };
                 let model_op = self
                     .mappings
                     .model_operations
@@ -131,9 +138,17 @@ impl RenderContext {
                     }
                 };
             } else {
-                match info.tag {
-                    QueryTag::ExecuteRaw | QueryTag::QueryRaw => {
-                        self.mappings.other_operations.write.push(info.tag.to_string())
+                match &info.tag {
+                    // If it's a QueryRaw with a query_type, then use this query_type as operation name
+                    // eg: runCommandRaw
+                    QueryTag::QueryRaw { query_type } if query_type.is_some() => {
+                        self.mappings
+                            .other_operations
+                            .write
+                            .push(query_type.as_ref().unwrap().to_owned());
+                    }
+                    QueryTag::ExecuteRaw | QueryTag::QueryRaw { query_type: _ } => {
+                        self.mappings.other_operations.write.push(info.tag.to_string());
                     }
                     _ => unreachable!("Invalid operations mapping."),
                 }

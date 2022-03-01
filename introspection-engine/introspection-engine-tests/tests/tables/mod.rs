@@ -1,26 +1,54 @@
+mod mssql;
+mod mysql;
+mod postgres;
+mod sqlite;
+
 use barrel::{functions, types};
-use indoc::formatdoc;
-use indoc::indoc;
+use expect_test::expect;
+use indoc::{formatdoc, indoc};
 use introspection_engine_tests::test_api::*;
 use quaint::prelude::Queryable;
-use test_macros::test_connector;
+
+#[test_connector(tags(Mysql57))]
+async fn nul_default_bytes(api: &TestApi) -> TestResult {
+    let create_table = indoc! {r#"
+        CREATE TABLE nul_default_bytes
+        (
+            id  INT                  NOT NULL
+                PRIMARY KEY,
+            val BINARY(5) DEFAULT '\0\0\0\0\0' NOT NULL
+        )
+    "#};
+
+    api.database().raw_cmd(create_table).await?;
+
+    let expected = expect![[r#"
+        model nul_default_bytes {
+          id  Int   @id
+          val Bytes @default(dbgenerated()) @db.Binary(5)
+        }
+    "#]];
+
+    expected.assert_eq(&api.introspect_dml().await?);
+
+    Ok(())
+}
 
 #[test_connector]
 async fn a_simple_table_with_gql_types(api: &TestApi) -> TestResult {
     api.barrel()
-        .execute_with_schema(
-            |migration| {
-                migration.create_table("Blog", move |t| {
-                    t.add_column("bool", types::boolean());
-                    t.add_column("float", types::float());
-                    t.add_column("date", types::datetime());
-                    t.add_column("id", types::primary());
-                    t.add_column("int", types::integer());
-                    t.add_column("string", types::text());
-                });
-            },
-            api.schema_name(),
-        )
+        .execute(|migration| {
+            migration.create_table("Blog", move |t| {
+                t.add_column("bool", types::boolean());
+                t.add_column("float", types::float());
+                t.add_column("date", types::datetime());
+                t.add_column("id", types::integer().increments(true));
+                t.add_column("int", types::integer());
+                t.add_column("string", types::text());
+
+                t.add_constraint("Blog_pkey", types::primary_constraint(vec!["id"]));
+            });
+        })
         .await?;
 
     let float_native = if api.sql_family().is_mssql() {
@@ -63,44 +91,42 @@ async fn a_simple_table_with_gql_types(api: &TestApi) -> TestResult {
 #[test_connector]
 async fn should_ignore_prisma_helper_tables(api: &TestApi) -> TestResult {
     api.barrel()
-        .execute_with_schema(
-            |migration| {
-                migration.create_table("Blog", move |t| {
-                    t.add_column("id", types::primary());
-                });
+        .execute(|migration| {
+            migration.create_table("Blog", move |t| {
+                t.add_column("id", types::integer().increments(true));
+                t.add_constraint("Blog_pkey", types::primary_constraint(vec!["id"]));
+            });
 
-                migration.create_table("_RelayId", move |t| {
-                    t.add_column("id", types::primary());
-                    t.add_column("stablemodelidentifier", types::text());
-                });
+            migration.create_table("_RelayId", move |t| {
+                t.add_column("id", types::primary());
+                t.add_column("stablemodelidentifier", types::text());
+            });
 
-                migration.create_table("_Migration", move |t| {
-                    t.add_column("revision", types::text());
-                    t.add_column("name", types::text());
-                    t.add_column("datamodel", types::text());
-                    t.add_column("status", types::text());
-                    t.add_column("applied", types::text());
-                    t.add_column("rolled_back", types::text());
-                    t.add_column("datamodel_steps", types::text());
-                    t.add_column("database_migration", types::text());
-                    t.add_column("errors", types::text());
-                    t.add_column("started_at", types::text());
-                    t.add_column("finished_at", types::text());
-                });
+            migration.create_table("_Migration", move |t| {
+                t.add_column("revision", types::text());
+                t.add_column("name", types::text());
+                t.add_column("datamodel", types::text());
+                t.add_column("status", types::text());
+                t.add_column("applied", types::text());
+                t.add_column("rolled_back", types::text());
+                t.add_column("datamodel_steps", types::text());
+                t.add_column("database_migration", types::text());
+                t.add_column("errors", types::text());
+                t.add_column("started_at", types::text());
+                t.add_column("finished_at", types::text());
+            });
 
-                migration.create_table("_prisma_migrations", move |t| {
-                    t.add_column("id", types::primary());
-                    t.add_column("checksum", types::text());
-                    t.add_column("finished_at", types::text());
-                    t.add_column("migration_name", types::text());
-                    t.add_column("logs", types::text());
-                    t.add_column("rolled_back_at", types::text());
-                    t.add_column("started_at", types::text());
-                    t.add_column("applied_steps_count", types::text());
-                });
-            },
-            api.schema_name(),
-        )
+            migration.create_table("_prisma_migrations", move |t| {
+                t.add_column("id", types::primary());
+                t.add_column("checksum", types::text());
+                t.add_column("finished_at", types::text());
+                t.add_column("migration_name", types::text());
+                t.add_column("logs", types::text());
+                t.add_column("rolled_back_at", types::text());
+                t.add_column("started_at", types::text());
+                t.add_column("applied_steps_count", types::text());
+            });
+        })
         .await?;
 
     let dm = indoc! {r##"
@@ -109,7 +135,7 @@ async fn should_ignore_prisma_helper_tables(api: &TestApi) -> TestResult {
         }
     "##};
 
-    api.assert_eq_datamodels(&dm, &api.introspect().await?);
+    api.assert_eq_datamodels(dm, &api.introspect().await?);
 
     Ok(())
 }
@@ -117,16 +143,14 @@ async fn should_ignore_prisma_helper_tables(api: &TestApi) -> TestResult {
 #[test_connector]
 async fn a_table_with_compound_primary_keys(api: &TestApi) -> TestResult {
     api.barrel()
-        .execute_with_schema(
-            |migration| {
-                migration.create_table("Blog", |t| {
-                    t.add_column("id", types::integer());
-                    t.add_column("authorId", types::integer());
-                    t.set_primary_key(&["id", "authorId"]);
-                });
-            },
-            api.schema_name(),
-        )
+        .execute(|migration| {
+            migration.create_table("Blog", |t| {
+                t.add_column("id", types::integer());
+                t.add_column("authorId", types::integer());
+
+                t.add_constraint("Blog_pkey", types::primary_constraint(vec!["id", "authorId"]));
+            });
+        })
         .await?;
 
     let dm = indoc! {r##"
@@ -145,26 +169,25 @@ async fn a_table_with_compound_primary_keys(api: &TestApi) -> TestResult {
 #[test_connector]
 async fn a_table_with_unique_index(api: &TestApi) -> TestResult {
     api.barrel()
-        .execute_with_schema(
-            |migration| {
-                migration.create_table("Blog", |t| {
-                    t.add_column("id", types::primary());
-                    t.add_column("authorId", types::integer());
-                    t.add_index("test", types::index(vec!["authorId"]).unique(true));
-                });
-            },
-            api.schema_name(),
-        )
+        .execute(|migration| {
+            migration.create_table("Blog", |t| {
+                t.add_column("id", types::integer().increments(true));
+                t.add_column("authorId", types::integer());
+                t.add_index("test", types::index(vec!["authorId"]).unique(true));
+
+                t.add_constraint("Blog_pkey", types::primary_constraint(["id"]));
+            });
+        })
         .await?;
 
     let dm = indoc! {r##"
         model Blog {
             id       Int @id @default(autoincrement())
-            authorId Int @unique
+            authorId Int @unique(map: "test")
         }
     "##};
 
-    api.assert_eq_datamodels(&dm, &api.introspect().await?);
+    api.assert_eq_datamodels(dm, &api.introspect().await?);
 
     Ok(())
 }
@@ -172,17 +195,15 @@ async fn a_table_with_unique_index(api: &TestApi) -> TestResult {
 #[test_connector]
 async fn a_table_with_multi_column_unique_index(api: &TestApi) -> TestResult {
     api.barrel()
-        .execute_with_schema(
-            |migration| {
-                migration.create_table("User", |t| {
-                    t.add_column("id", types::primary());
-                    t.add_column("firstname", types::integer());
-                    t.add_column("lastname", types::integer());
-                    t.add_index("test", types::index(vec!["firstname", "lastname"]).unique(true));
-                });
-            },
-            api.schema_name(),
-        )
+        .execute(|migration| {
+            migration.create_table("User", |t| {
+                t.add_column("id", types::integer().increments(true));
+                t.add_column("firstname", types::integer());
+                t.add_column("lastname", types::integer());
+                t.add_index("test", types::index(vec!["firstname", "lastname"]).unique(true));
+                t.add_constraint("User_pkey", types::primary_constraint(vec!["id"]));
+            });
+        })
         .await?;
 
     let dm = indoc! {r##"
@@ -190,7 +211,7 @@ async fn a_table_with_multi_column_unique_index(api: &TestApi) -> TestResult {
             id      Int @id @default(autoincrement())
             firstname Int
             lastname Int
-            @@unique([firstname, lastname], name: "test")
+            @@unique([firstname, lastname], map: "test")
         }
     "##};
 
@@ -202,16 +223,15 @@ async fn a_table_with_multi_column_unique_index(api: &TestApi) -> TestResult {
 #[test_connector]
 async fn a_table_with_required_and_optional_columns(api: &TestApi) -> TestResult {
     api.barrel()
-        .execute_with_schema(
-            |migration| {
-                migration.create_table("User", |t| {
-                    t.add_column("id", types::primary());
-                    t.add_column("requiredname", types::integer().nullable(false));
-                    t.add_column("optionalname", types::integer().nullable(true));
-                });
-            },
-            api.schema_name(),
-        )
+        .execute(|migration| {
+            migration.create_table("User", |t| {
+                t.add_column("id", types::integer().increments(true));
+                t.add_column("requiredname", types::integer().nullable(false));
+                t.add_column("optionalname", types::integer().nullable(true));
+
+                t.add_constraint("User_pkey", types::primary_constraint(vec!["id"]))
+            });
+        })
         .await?;
 
     let dm = indoc! {r##"
@@ -227,22 +247,19 @@ async fn a_table_with_required_and_optional_columns(api: &TestApi) -> TestResult
     Ok(())
 }
 
-#[test_connector]
+#[test_connector(exclude(Mssql))]
 async fn a_table_with_default_values(api: &TestApi) -> TestResult {
     api.barrel()
-        .execute_with_schema(
-            |migration| {
-                migration.create_table("User", |t| {
-                    t.add_column("id", types::primary());
-                    t.add_column("bool", types::boolean().default(false));
-                    t.add_column("bool2", types::boolean().default(true));
-                    t.add_column("float", types::float().default(5.3));
-                    t.add_column("int", types::integer().default(5));
-                    t.add_column("string", types::char(4).default("Test"));
-                });
-            },
-            api.schema_name(),
-        )
+        .execute(|migration| {
+            migration.create_table("User", |t| {
+                t.add_column("id", types::primary());
+                t.add_column("bool", types::boolean().default(false));
+                t.add_column("bool2", types::boolean().default(true));
+                t.add_column("float", types::float().default(5.3));
+                t.add_column("int", types::integer().default(5));
+                t.add_column("string", types::char(4).default("Test"));
+            });
+        })
         .await?;
 
     let native_string = if !api.sql_family().is_sqlite() {
@@ -277,16 +294,15 @@ async fn a_table_with_default_values(api: &TestApi) -> TestResult {
 #[test_connector]
 async fn a_table_with_a_non_unique_index(api: &TestApi) -> TestResult {
     api.barrel()
-        .execute_with_schema(
-            |migration| {
-                migration.create_table("User", |t| {
-                    t.add_column("a", types::integer());
-                    t.add_column("id", types::primary());
-                    t.add_index("test", types::index(vec!["a"]));
-                });
-            },
-            api.schema_name(),
-        )
+        .execute(|migration| {
+            migration.create_table("User", |t| {
+                t.add_column("a", types::integer());
+                t.add_column("id", types::integer().increments(true));
+                t.add_index("test", types::index(vec!["a"]));
+
+                t.add_constraint("User_pkey", types::primary_constraint(vec!["id"]))
+            });
+        })
         .await?;
 
     let dm = indoc! {r##"
@@ -305,17 +321,16 @@ async fn a_table_with_a_non_unique_index(api: &TestApi) -> TestResult {
 #[test_connector]
 async fn a_table_with_a_multi_column_non_unique_index(api: &TestApi) -> TestResult {
     api.barrel()
-        .execute_with_schema(
-            |migration| {
-                migration.create_table("User", |t| {
-                    t.add_column("a", types::integer());
-                    t.add_column("b", types::integer());
-                    t.add_column("id", types::primary());
-                    t.add_index("test", types::index(vec!["a", "b"]));
-                });
-            },
-            api.schema_name(),
-        )
+        .execute(|migration| {
+            migration.create_table("User", |t| {
+                t.add_column("a", types::integer());
+                t.add_column("b", types::integer());
+                t.add_column("id", types::integer().increments(true));
+                t.add_index("test", types::index(vec!["a", "b"]));
+
+                t.add_constraint("User_pkey", types::primary_constraint(vec!["id"]))
+            });
+        })
         .await?;
 
     let dm = indoc! { r##"
@@ -333,18 +348,18 @@ async fn a_table_with_a_multi_column_non_unique_index(api: &TestApi) -> TestResu
 }
 
 // SQLite does not have a serial type that's not a primary key.
-#[test_connector(exclude(Sqlite))]
+#[test_connector(exclude(Sqlite, Mysql, CockroachDb))]
 async fn a_table_with_non_id_autoincrement(api: &TestApi) -> TestResult {
     api.barrel()
-        .execute_with_schema(
-            |migration| {
-                migration.create_table("Test", |t| {
-                    t.add_column("id", types::integer().primary(true));
-                    t.add_column("authorId", types::serial().unique(true));
-                });
-            },
-            api.schema_name(),
-        )
+        .execute(|migration| {
+            migration.create_table("Test", |t| {
+                t.add_column("id", types::integer());
+                t.add_column("authorId", types::serial().unique(true));
+
+                t.add_constraint("Test_pkey", types::primary_constraint(vec!["id"]));
+                t.add_constraint("Test_authorId_key", types::unique_constraint(vec!["authorId"]));
+            });
+        })
         .await?;
 
     let dm = indoc! {r#"
@@ -359,36 +374,61 @@ async fn a_table_with_non_id_autoincrement(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector]
+// Cockroach can return non-deterministic results if the UNIQUE constraint is defined twice
+// (it does not collapse similar unique constraints). This variation does not include the
+// doubly defined unique constraint.
+#[test_connector(tags(CockroachDb))]
+async fn a_table_with_non_id_autoincrement_cockroach(api: &TestApi) -> TestResult {
+    api.barrel()
+        .execute(|migration| {
+            migration.create_table("Test", |t| {
+                t.add_column("id", types::integer());
+                t.add_column("authorId", types::serial().unique(true));
+
+                t.add_constraint("Test_pkey", types::primary_constraint(vec!["id"]));
+            });
+        })
+        .await?;
+
+    let dm = indoc! {r#"
+        model Test {
+            id       Int @id
+            authorId Int @default(autoincrement()) @unique
+        }
+    "#};
+
+    api.assert_eq_datamodels(dm, &api.introspect().await?);
+
+    Ok(())
+}
+
+#[test_connector(exclude(Mssql))]
 async fn default_values(api: &TestApi) -> TestResult {
     api.barrel()
-        .execute_with_schema(
-            |migration| {
-                migration.create_table("Test", move |t| {
-                    t.add_column("id", types::primary());
-                    t.add_column(
-                        "string_static_char",
-                        types::custom("char(5)").default("test").nullable(true),
-                    );
-                    t.add_column(
-                        "string_static_char_null",
-                        types::r#char(5).default(types::null()).nullable(true),
-                    );
-                    t.add_column(
-                        "string_static_varchar",
-                        types::varchar(5).default("test").nullable(true),
-                    );
-                    t.add_column("int_static", types::integer().default(2).nullable(true));
-                    t.add_column("float_static", types::float().default(1.43).nullable(true));
-                    t.add_column("boolean_static", types::boolean().default(true).nullable(true));
-                    t.add_column(
-                        "datetime_now",
-                        types::datetime().default(functions::current_timestamp()).nullable(true),
-                    );
-                });
-            },
-            api.schema_name(),
-        )
+        .execute(|migration| {
+            migration.create_table("Test", move |t| {
+                t.add_column("id", types::primary());
+                t.add_column(
+                    "string_static_char",
+                    types::custom("char(5)").default("test").nullable(true),
+                );
+                t.add_column(
+                    "string_static_char_null",
+                    types::r#char(5).default(types::null()).nullable(true),
+                );
+                t.add_column(
+                    "string_static_varchar",
+                    types::varchar(5).default("test").nullable(true),
+                );
+                t.add_column("int_static", types::integer().default(2).nullable(true));
+                t.add_column("float_static", types::float().default(1.43).nullable(true));
+                t.add_column("boolean_static", types::boolean().default(true).nullable(true));
+                t.add_column(
+                    "datetime_now",
+                    types::datetime().default(functions::current_timestamp()).nullable(true),
+                );
+            });
+        })
         .await?;
 
     let char_native = if !api.sql_family().is_sqlite() {
@@ -435,7 +475,7 @@ async fn default_values(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(tags(Postgres), exclude(Cockroach))]
+#[test_connector(tags(Postgres), exclude(CockroachDb, Postgres14))]
 async fn pg_default_value_as_dbgenerated(api: &TestApi) -> TestResult {
     let sequence = "CREATE SEQUENCE test_seq START 1".to_string();
     api.database().execute_raw(&sequence, &[]).await?;
@@ -454,7 +494,7 @@ async fn pg_default_value_as_dbgenerated(api: &TestApi) -> TestResult {
         })
         .await?;
 
-    let dm = indoc! {r#"
+    let expected = expect![[r#"
         model Test {
           id              Int       @id @default(autoincrement())
           string_function String?   @default(dbgenerated("(('  '::text || '>'::text) || ' '::text)"))
@@ -463,10 +503,46 @@ async fn pg_default_value_as_dbgenerated(api: &TestApi) -> TestResult {
           int_sequence    Int?      @default(autoincrement())
           datetime_now    DateTime? @default(now()) @db.Timestamp(6)
           datetime_now_lc DateTime? @default(now()) @db.Timestamp(6)
-          }
-    "#};
+        }
+    "#]];
 
-    api.assert_eq_datamodels(dm, &api.introspect().await?);
+    expected.assert_eq(&api.introspect_dml().await?);
+
+    Ok(())
+}
+
+#[test_connector(tags(Postgres14))]
+async fn pg14_default_value_as_dbgenerated(api: &TestApi) -> TestResult {
+    let sequence = "CREATE SEQUENCE test_seq START 1".to_string();
+    api.database().execute_raw(&sequence, &[]).await?;
+
+    api.barrel()
+        .execute(|migration| {
+            migration.create_table("Test", |t| {
+                t.add_column("id", types::primary());
+                t.inject_custom("string_function text Default E'  ' || '>' || ' '");
+                t.inject_custom("int_serial Serial4");
+                t.inject_custom("int_function Integer DEFAULT EXTRACT(year from TIMESTAMP '2001-02-16 20:38:40')");
+                t.inject_custom("int_sequence Integer DEFAULT nextval('test_seq')");
+                t.inject_custom("datetime_now TIMESTAMP DEFAULT NOW()");
+                t.inject_custom("datetime_now_lc TIMESTAMP DEFAULT now()");
+            });
+        })
+        .await?;
+
+    let expected = expect![[r#"
+        model Test {
+          id              Int       @id @default(autoincrement())
+          string_function String?   @default(dbgenerated("(('  '::text || '>'::text) || ' '::text)"))
+          int_serial      Int       @default(autoincrement())
+          int_function    Int?      @default(dbgenerated("EXTRACT(year FROM '2001-02-16 20:38:40'::timestamp without time zone)"))
+          int_sequence    Int?      @default(autoincrement())
+          datetime_now    DateTime? @default(now()) @db.Timestamp(6)
+          datetime_now_lc DateTime? @default(now()) @db.Timestamp(6)
+        }
+    "#]];
+
+    expected.assert_eq(&api.introspect_dml().await?);
 
     Ok(())
 }
@@ -502,17 +578,14 @@ async fn my_default_value_as_dbgenerated(api: &TestApi) -> TestResult {
 #[test_connector(tags(Mysql8))]
 async fn a_table_with_an_index_that_contains_expressions_should_be_ignored(api: &TestApi) -> TestResult {
     api.barrel()
-        .execute_with_schema(
-            |migration| {
-                migration.create_table("Test", |t| {
-                    t.add_column("id", types::integer().primary(true));
-                    t.add_column("parentId", types::integer().nullable(true));
-                    t.add_column("name", types::varchar(45).nullable(true));
-                    t.inject_custom("UNIQUE KEY `SampleTableUniqueIndexName` (`name`,(ifnull(`parentId`,-(1))))");
-                });
-            },
-            api.schema_name(),
-        )
+        .execute(|migration| {
+            migration.create_table("Test", |t| {
+                t.add_column("id", types::integer().primary(true));
+                t.add_column("parentId", types::integer().nullable(true));
+                t.add_column("name", types::varchar(45).nullable(true));
+                t.inject_custom("UNIQUE KEY `SampleTableUniqueIndexName` (`name`,(ifnull(`parentId`,-(1))))");
+            });
+        })
         .await?;
 
     let dm = indoc! {r#"
@@ -550,7 +623,7 @@ async fn default_values_on_lists_should_be_ignored(api: &TestApi) -> TestResult 
 
     let result = api.introspect().await?;
 
-    api.assert_eq_datamodels(&dm, &result);
+    api.assert_eq_datamodels(dm, &result);
 
     Ok(())
 }
@@ -561,12 +634,14 @@ async fn a_table_with_partial_indexes_should_ignore_them(api: &TestApi) -> TestR
     api.barrel()
         .execute(move |migration| {
             migration.create_table("pages", move |t| {
-                t.add_column("id", types::primary());
+                t.add_column("id", types::integer().increments(true));
                 t.add_column("staticId", types::integer().nullable(false));
                 t.add_column("latest", types::integer().nullable(false));
                 t.add_column("other", types::integer().nullable(false));
                 t.add_index("full", types::index(vec!["other"]).unique(true));
                 t.add_partial_index("partial", types::index(vec!["staticId"]).unique(true), "latest = 1");
+
+                t.add_constraint("pages_pkey", types::primary_constraint(vec!["id"]));
             });
         })
         .await?;
@@ -577,17 +652,17 @@ async fn a_table_with_partial_indexes_should_ignore_them(api: &TestApi) -> TestR
             id       Int     @id @default(autoincrement())
             staticId Int
             latest   Int
-            other    Int     @unique
+            other    Int     @unique(map: "full")
         }
         "#
     };
 
-    api.assert_eq_datamodels(&dm, &api.introspect().await?);
+    api.assert_eq_datamodels(dm, &api.introspect().await?);
 
     Ok(())
 }
 
-#[test_connector(tags(Postgres))]
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
 async fn introspecting_a_table_with_json_type_must_work(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(|migration| {
@@ -607,7 +682,32 @@ async fn introspecting_a_table_with_json_type_must_work(api: &TestApi) -> TestRe
 
     let result = api.introspect().await?;
 
-    api.assert_eq_datamodels(&dm, &result);
+    api.assert_eq_datamodels(dm, &result);
+
+    Ok(())
+}
+
+#[test_connector(tags(CockroachDb))]
+async fn introspecting_a_table_with_json_type_must_work_cockroach(api: &TestApi) -> TestResult {
+    api.barrel()
+        .execute(|migration| {
+            migration.create_table("Blog", |t| {
+                t.add_column("id", types::primary());
+                t.add_column("json", types::json());
+            });
+        })
+        .await?;
+
+    let dm = indoc! {r#"
+        model Blog {
+            id      Int @id @default(autoincrement())
+            json    Json
+        }
+    "#};
+
+    let result = api.introspect().await?;
+
+    api.assert_eq_datamodels(dm, &result);
 
     Ok(())
 }
@@ -615,24 +715,17 @@ async fn introspecting_a_table_with_json_type_must_work(api: &TestApi) -> TestRe
 #[test_connector(tags(Mariadb))]
 async fn different_default_values_should_work(api: &TestApi) -> TestResult {
     api.barrel()
-        .execute_with_schema(
-            |migration| {
-                migration.create_table("Blog", move |t| {
-                    t.add_column("id", types::primary());
-                    t.inject_custom("text Text Default \"one\"");
-                    t.inject_custom(
-                        "`tinytext_string` tinytext COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT \"twelve\"",
-                    );
-                    t.inject_custom(
-                        "`tinytext_number_string` tinytext COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT \"1\"",
-                    );
-                    t.inject_custom("`tinytext_number` tinytext COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 10");
-                    t.inject_custom("`tinytext_float` tinytext COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 1.0");
-                    t.inject_custom("`tinytext_short` tinytext COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 1");
-                });
-            },
-            api.schema_name(),
-        )
+        .execute(|migration| {
+            migration.create_table("Blog", move |t| {
+                t.add_column("id", types::primary());
+                t.inject_custom("text Text Default \"one\"");
+                t.inject_custom("`tinytext_string` tinytext COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT \"twelve\"");
+                t.inject_custom("`tinytext_number_string` tinytext COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT \"1\"");
+                t.inject_custom("`tinytext_number` tinytext COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 10");
+                t.inject_custom("`tinytext_float` tinytext COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 1.0");
+                t.inject_custom("`tinytext_short` tinytext COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 1");
+            });
+        })
         .await?;
 
     let dm = indoc! {r##"
@@ -652,23 +745,20 @@ async fn different_default_values_should_work(api: &TestApi) -> TestResult {
     Ok(())
 }
 
-#[test_connector(exclude(Sqlite))]
+#[test_connector(exclude(Sqlite, Mssql))]
 async fn negative_default_values_should_work(api: &TestApi) -> TestResult {
     api.barrel()
-        .execute_with_schema(
-            |migration| {
-                migration.create_table("Blog", move |t| {
-                    t.add_column("id", types::primary());
-                    t.add_column("int", types::integer().default(1));
-                    t.add_column("neg_int", types::integer().default(-1));
-                    t.add_column("float", types::float().default(2.1));
-                    t.add_column("neg_float", types::float().default(-2.1));
-                    t.add_column("big_int", types::custom("bigint").default(3));
-                    t.add_column("neg_big_int", types::custom("bigint").default(-3));
-                });
-            },
-            api.schema_name(),
-        )
+        .execute(|migration| {
+            migration.create_table("Blog", move |t| {
+                t.add_column("id", types::primary());
+                t.add_column("int", types::integer().default(1));
+                t.add_column("neg_int", types::integer().default(-1));
+                t.add_column("float", types::float().default(2.1));
+                t.add_column("neg_float", types::float().default(-2.1));
+                t.add_column("big_int", types::custom("bigint").default(3));
+                t.add_column("neg_big_int", types::custom("bigint").default(-3));
+            });
+        })
         .await?;
 
     let float_native = if api.sql_family().is_mysql() {
@@ -699,30 +789,26 @@ async fn negative_default_values_should_work(api: &TestApi) -> TestResult {
 #[test_connector(tags(Mysql))]
 async fn partial_indexes_should_be_ignored_on_mysql(api: &TestApi) -> TestResult {
     api.barrel()
-        .execute_with_schema(
-            |migration| {
-                migration.create_table("Blog", move |t| {
-                    t.add_column("id", types::primary());
-                    t.add_column("int_col", types::integer());
-                    t.inject_custom("blob_col mediumblob");
-                    t.inject_custom("Index `partial_blob_col_index` (blob_col(10))");
-                    t.inject_custom("Index `partial_compound` (blob_col(10), int_col)");
-                });
-            },
-            api.schema_name(),
-        )
+        .execute(|migration| {
+            migration.create_table("Blog", move |t| {
+                t.add_column("id", types::primary());
+                t.add_column("int_col", types::integer());
+                t.inject_custom("blob_col mediumblob");
+                t.inject_custom("Index `partial_blob_col_index` (blob_col(10))");
+                t.inject_custom("Index `partial_compound` (blob_col(10), int_col)");
+            });
+        })
         .await?;
 
-    let dm = indoc! {r##"
+    let expected = expect![[r#"
         model Blog {
-          id                Int     @id @default(autoincrement())
-          int_col           Int
-          blob_col          Bytes?  @db.MediumBlob
+          id       Int    @id @default(autoincrement())
+          int_col  Int
+          blob_col Bytes? @db.MediumBlob
         }
-    "##};
+    "#]];
 
-    let result = &api.introspect().await?;
-    api.assert_eq_datamodels(&dm, result);
+    expected.assert_eq(&api.introspect_dml().await?);
 
     Ok(())
 }
@@ -730,27 +816,23 @@ async fn partial_indexes_should_be_ignored_on_mysql(api: &TestApi) -> TestResult
 #[test_connector(tags(Sqlite))]
 async fn expression_indexes_should_be_ignored_on_sqlite(api: &TestApi) -> TestResult {
     api.barrel()
-        .execute_with_schema(
-            |migration| {
-                migration.create_table("Blog", move |t| {
-                    t.add_column("id", types::primary());
-                    t.add_column("author", types::text());
-                });
-                migration.inject_custom("CREATE INDEX author_lowercase_index ON Blog(LOWER(author));")
-            },
-            api.schema_name(),
-        )
+        .execute(|migration| {
+            migration.create_table("Blog", move |t| {
+                t.add_column("id", types::primary());
+                t.add_column("author", types::text());
+            });
+            migration.inject_custom("CREATE INDEX author_lowercase_index ON Blog(LOWER(author));")
+        })
         .await?;
 
-    let dm = indoc! {r##"
+    let expected = expect![[r#"
         model Blog {
-          id                Int     @id @default(autoincrement())
-          author            String
+          id     Int    @id @default(autoincrement())
+          author String
         }
-    "##};
+    "#]];
 
-    let result = &api.introspect().await?;
-    api.assert_eq_datamodels(&dm, result);
+    expected.assert_eq(&api.introspect_dml().await?);
 
     Ok(())
 }
@@ -758,24 +840,21 @@ async fn expression_indexes_should_be_ignored_on_sqlite(api: &TestApi) -> TestRe
 #[test_connector(tags(Mysql))]
 async fn casing_should_not_lead_to_mix_ups(api: &TestApi) -> TestResult {
     api.barrel()
-        .execute_with_schema(
-            |migration| {
-                migration.create_table("address", move |t| {
-                    t.inject_custom("addressid INT NOT NULL");
-                    t.inject_custom("PRIMARY KEY(addressid)");
-                });
+        .execute(|migration| {
+            migration.create_table("address", move |t| {
+                t.inject_custom("addressid INT NOT NULL");
+                t.inject_custom("PRIMARY KEY(addressid)");
+            });
 
-                migration.create_table("ADDRESS", move |t| {
-                    t.inject_custom("ADDRESSID INT NOT NULL");
-                    t.inject_custom("PRIMARY KEY(ADDRESSID)");
-                });
-                migration.create_table("Address", move |t| {
-                    t.inject_custom("AddressID INT NOT NULL AUTO_INCREMENT");
-                    t.inject_custom("PRIMARY KEY(AddressID)");
-                });
-            },
-            api.schema_name(),
-        )
+            migration.create_table("ADDRESS", move |t| {
+                t.inject_custom("ADDRESSID INT NOT NULL");
+                t.inject_custom("PRIMARY KEY(ADDRESSID)");
+            });
+            migration.create_table("Address", move |t| {
+                t.inject_custom("AddressID INT NOT NULL AUTO_INCREMENT");
+                t.inject_custom("PRIMARY KEY(AddressID)");
+            });
+        })
         .await?;
 
     let dm = indoc! {r##"
@@ -793,7 +872,144 @@ async fn casing_should_not_lead_to_mix_ups(api: &TestApi) -> TestResult {
     "##};
 
     let result = &api.introspect().await?;
-    api.assert_eq_datamodels(&dm, result);
+    api.assert_eq_datamodels(dm, result);
+
+    Ok(())
+}
+
+#[test_connector(tags(Mysql), exclude(Mariadb))]
+async fn unique_and_index_on_same_field_works_mysql(api: &TestApi) -> TestResult {
+    let setup = r#"
+        CREATE TABLE users (
+            id SERIAL PRIMARY KEY NOT NULL
+        );
+    "#;
+
+    api.raw_cmd(setup).await;
+
+    let dm = indoc! {r##"
+        model users {
+          id BigInt @id @unique(map: "id") @default(autoincrement()) @db.UnsignedBigInt
+        }
+    "##};
+
+    let result = &api.introspect().await?;
+    api.assert_eq_datamodels(dm, result);
+
+    Ok(())
+}
+
+#[test_connector(tags(Mariadb))]
+async fn unique_and_index_on_same_field_works_mariadb(api: &TestApi) -> TestResult {
+    let setup = r#"
+        CREATE TABLE users (
+            id INTEGER PRIMARY KEY NOT NULL,
+            CONSTRAINT really_must_be_different UNIQUE (id)
+        );
+    "#;
+
+    api.raw_cmd(setup).await;
+
+    let dm = indoc! {r##"
+        model users {
+          id Int @id @unique(map: "really_must_be_different")
+        }
+    "##};
+
+    let result = &api.introspect().await?;
+    api.assert_eq_datamodels(dm, result);
+    Ok(())
+}
+
+#[test_connector(tags(Sqlite))]
+async fn unique_and_id_on_same_field_works_sqlite(api: &TestApi) -> TestResult {
+    let setup = r#"
+        CREATE TABLE users (
+            id INTEGER PRIMARY KEY NOT NULL UNIQUE
+        );
+    "#;
+
+    api.raw_cmd(setup).await;
+
+    let expected = expect![[r#"
+        model users {
+          id Int @id @unique(map: "sqlite_autoindex_users_1") @default(autoincrement())
+        }
+    "#]];
+
+    let introspected = api.introspect_dml().await?;
+    expected.assert_eq(&introspected);
+
+    Ok(())
+}
+
+#[test_connector(tags(Mssql))]
+async fn unique_and_id_on_same_field_works_mssql(api: &TestApi) -> TestResult {
+    let setup = format!(
+        r#"
+        CREATE TABLE [{}].users (
+            id INT IDENTITY,
+
+            CONSTRAINT users_id_key UNIQUE (id),
+            CONSTRAINT users_pkey PRIMARY KEY (id)
+        );
+        "#,
+        schema = api.schema_name(),
+    );
+
+    api.raw_cmd(&setup).await;
+
+    let dm = indoc! {r##"
+        model users {
+          id Int @id @unique @default(autoincrement())
+        }
+    "##};
+
+    let result = &api.introspect().await?;
+    api.assert_eq_datamodels(dm, result);
+
+    Ok(())
+}
+
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
+// If multiple constraints are created in the create table statement Postgres seems to collapse them
+// into the first named one. So on the db level there will be one named really_must_be_different that
+// is both unique and primary. We only render it as @id then.
+// If a later alter table statement adds another unique constraint then it is persisted as its own
+// entity and can be introspected.
+// In CockroachDB, index OIDs are statically hashed. However, the ordering means that either index
+// can be returned. As such, the test is skipped. See https://github.com/cockroachdb/cockroach/issues/71098.
+async fn unique_and_index_on_same_field_works_postgres(api: &TestApi) -> TestResult {
+    api.raw_cmd(
+        "
+        CREATE TABLE users (
+            id Integer primary key not null,
+            CONSTRAINT really_must_be_different UNIQUE (id),
+            CONSTRAINT must_be_different UNIQUE (id)
+        );",
+    )
+    .await;
+
+    let expectation = expect![[r#"
+        model users {
+          id Int @id(map: "really_must_be_different")
+        }
+    "#]];
+
+    let result = api.introspect_dml().await?;
+    expectation.assert_eq(&result);
+
+    api.raw_cmd("ALTER TABLE users ADD CONSTRAINT z_unique UNIQUE(id);")
+        .await;
+
+    let expectation = expect![[r#"
+        model users {
+          id Int @id(map: "really_must_be_different") @unique(map: "z_unique")
+        }
+    "#]];
+
+    let result = api.introspect_dml().await?;
+    expectation.assert_eq(&result);
 
     Ok(())
 }

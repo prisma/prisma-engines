@@ -1,7 +1,7 @@
 use crate::{PrismaError, PrismaResult};
 use datamodel::{Configuration, Datamodel};
-use prisma_models::DatamodelConverter;
-use query_core::{exec_loader, schema::QuerySchemaRef, schema_builder, BuildMode, QueryExecutor};
+use prisma_models::InternalDataModelBuilder;
+use query_core::{executor, schema::QuerySchemaRef, schema_builder, BuildMode, QueryExecutor};
 use std::{env, fmt, sync::Arc};
 
 /// Prisma request context containing all immutable state of the process.
@@ -47,8 +47,6 @@ impl ContextBuilder {
 impl PrismaContext {
     /// Initializes a new Prisma context.
     async fn new(config: Configuration, dm: Datamodel, legacy: bool, enable_raw_queries: bool) -> PrismaResult<Self> {
-        let template = DatamodelConverter::convert(&dm);
-
         // We only support one data source at the moment, so take the first one (default not exposed yet).
         let data_source = config
             .datasources
@@ -58,12 +56,11 @@ impl PrismaContext {
         let url = data_source.load_url(|key| env::var(key).ok())?;
 
         // Load executor
-
-        let preview_features: Vec<_> = config.preview_features().cloned().collect();
-        let (db_name, executor) = exec_loader::load(&data_source, &preview_features, &url).await?;
+        let preview_features: Vec<_> = config.preview_features().iter().collect();
+        let (db_name, executor) = executor::load(data_source, &preview_features, &url).await?;
 
         // Build internal data model
-        let internal_data_model = template.build(db_name);
+        let internal_data_model = InternalDataModelBuilder::from(&dm).build(db_name);
 
         // Construct query schema
         let build_mode = if legacy { BuildMode::Legacy } else { BuildMode::Modern };
@@ -73,6 +70,7 @@ impl PrismaContext {
             enable_raw_queries,
             data_source.capabilities(),
             preview_features,
+            data_source.referential_integrity(),
         ));
 
         let context = Self {

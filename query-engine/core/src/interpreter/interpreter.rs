@@ -14,9 +14,16 @@ use prisma_models::prelude::*;
 
 #[derive(Debug, Clone)]
 pub enum ExpressionResult {
+    /// A result from a query execution.
     Query(QueryResult),
-    RawProjections(Vec<RecordProjection>),
+
+    /// A fixed result returned in the query graph.
+    FixedResult(Vec<SelectionResult>),
+
+    /// A result from a computation in the query graph.
     Computation(ComputationResult),
+
+    /// An empty result
     Empty,
 }
 
@@ -30,21 +37,26 @@ pub enum ComputationResult {
 /// `right` contains all elements that are in B but not in A.
 #[derive(Debug, Clone)]
 pub struct DiffResult {
-    pub left: Vec<RecordProjection>,
-    pub right: Vec<RecordProjection>,
+    pub left: Vec<SelectionResult>,
+    pub right: Vec<SelectionResult>,
 }
 
 impl ExpressionResult {
-    /// Attempts to transform the result into a vector of record projections.
-    #[tracing::instrument(skip(self, model_projection))]
-    pub fn as_projections(&self, model_projection: &ModelProjection) -> InterpretationResult<Vec<RecordProjection>> {
+    /// Attempts to transform this `ExpressionResult` into a vector of `SelectionResult`s corresponding to the passed desired selection shape.
+    /// A vector is returned as some expression results return more than one result row at once.
+    #[tracing::instrument(skip(self, field_selection))]
+    pub fn as_selection_results(&self, field_selection: &FieldSelection) -> InterpretationResult<Vec<SelectionResult>> {
         let converted = match self {
             Self::Query(ref result) => match result {
                 QueryResult::Id(id) => match id {
-                    Some(id) if model_projection.matches(id) => Some(vec![id.clone()]),
+                    Some(id) if field_selection.matches(id) => Some(vec![id.clone()]),
                     None => Some(vec![]),
                     Some(id) => {
-                        trace!("RID {:?} does not match MID {:?}", id, model_projection);
+                        trace!(
+                            "Selection result {:?} does not match field selection {:?}",
+                            id,
+                            field_selection
+                        );
                         None
                     }
                 },
@@ -52,7 +64,7 @@ impl ExpressionResult {
                 // We always select IDs, the unwraps are safe.
                 QueryResult::RecordSelection(rs) => Some(
                     rs.scalars
-                        .projections(model_projection)
+                        .extract_selection_results(field_selection)
                         .expect("Expected record selection to contain required model ID fields.")
                         .into_iter()
                         .collect(),
@@ -61,10 +73,10 @@ impl ExpressionResult {
                 _ => None,
             },
 
-            Self::RawProjections(p) => p
+            Self::FixedResult(p) => p
                 .clone()
                 .into_iter()
-                .map(|p| model_projection.assimilate(p))
+                .map(|sr| field_selection.assimilate(sr))
                 .collect::<std::result::Result<Vec<_>, _>>()
                 .ok(),
 
@@ -72,7 +84,10 @@ impl ExpressionResult {
         };
 
         converted.ok_or_else(|| {
-            InterpreterError::InterpretationError("Unable to convert result into a set of projections".to_owned(), None)
+            InterpreterError::InterpretationError(
+                "Unable to convert expression result into a set of selection results".to_owned(),
+                None,
+            )
         })
     }
 
@@ -123,26 +138,23 @@ impl Env {
     }
 }
 
-pub struct QueryInterpreter<'conn, 'tx> {
-    pub(crate) conn: ConnectionLike<'conn, 'tx>,
+pub struct QueryInterpreter<'conn> {
+    pub(crate) conn: &'conn mut dyn ConnectionLike,
     log: SegQueue<String>,
 }
 
-impl<'conn, 'tx> fmt::Debug for QueryInterpreter<'conn, 'tx> {
+impl<'conn> fmt::Debug for QueryInterpreter<'conn> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.debug_struct("QueryInterpreter").finish()
     }
 }
 
-impl<'conn, 'tx> QueryInterpreter<'conn, 'tx>
-where
-    'tx: 'conn,
-{
+impl<'conn> QueryInterpreter<'conn> {
     fn log_enabled() -> bool {
         tracing::level_filters::STATIC_MAX_LEVEL == tracing::level_filters::LevelFilter::TRACE
     }
 
-    pub fn new(conn: ConnectionLike<'conn, 'tx>) -> QueryInterpreter<'conn, 'tx> {
+    pub fn new(conn: &'conn mut dyn ConnectionLike) -> QueryInterpreter {
         let log = SegQueue::new();
 
         if Self::log_enabled() {
@@ -154,16 +166,17 @@ where
 
     #[tracing::instrument(skip(self, exp, env, level))]
     pub fn interpret(
-        &'conn self,
+        &mut self,
         exp: Expression,
         env: Env,
         level: usize,
-    ) -> BoxFuture<'conn, InterpretationResult<ExpressionResult>> {
+        trace_id: Option<String>,
+    ) -> BoxFuture<'_, InterpretationResult<ExpressionResult>> {
         match exp {
             Expression::Func { func } => {
                 let expr = func(env.clone());
 
-                Box::pin(async move { self.interpret(expr?, env, level).await })
+                Box::pin(async move { self.interpret(expr?, env, level, trace_id).await })
             }
 
             Expression::Sequence { seq } if seq.is_empty() => Box::pin(async { Ok(ExpressionResult::Empty) }),
@@ -175,7 +188,7 @@ where
                     let mut results = Vec::with_capacity(seq.len());
 
                     for expr in seq {
-                        results.push(self.interpret(expr, env.clone(), level + 1).await?);
+                        results.push(self.interpret(expr, env.clone(), level + 1, trace_id.clone()).await?);
                     }
 
                     // Last result gets returned
@@ -194,7 +207,9 @@ where
                     for binding in bindings {
                         self.log_line(level + 1, || format!("bind {} ", &binding.name));
 
-                        let result = self.interpret(binding.expr, env.clone(), level + 2).await?;
+                        let result = self
+                            .interpret(binding.expr, env.clone(), level + 2, trace_id.clone())
+                            .await?;
                         inner_env.insert(binding.name, result);
                     }
 
@@ -205,7 +220,7 @@ where
                         Expression::Sequence { seq: expressions }
                     };
 
-                    self.interpret(next_expression, inner_env, level + 1).await
+                    self.interpret(next_expression, inner_env, level + 1, trace_id).await
                 })
             }
 
@@ -213,14 +228,16 @@ where
                 match *query {
                     Query::Read(read) => {
                         self.log_line(level, || format!("READ {}", read));
-                        Ok(read::execute(&self.conn, read, None)
+                        Ok(read::execute(self.conn, read, None, trace_id)
                             .await
                             .map(ExpressionResult::Query)?)
                     }
 
                     Query::Write(write) => {
                         self.log_line(level, || format!("WRITE {}", write));
-                        Ok(write::execute(&self.conn, write).await.map(ExpressionResult::Query)?)
+                        Ok(write::execute(self.conn, write, trace_id)
+                            .await
+                            .map(ExpressionResult::Query)?)
                     }
                 }
             }),
@@ -250,9 +267,11 @@ where
                 self.log_line(level, || "IF");
 
                 if func() {
-                    self.interpret(Expression::Sequence { seq: then }, env, level + 1).await
+                    self.interpret(Expression::Sequence { seq: then }, env, level + 1, trace_id)
+                        .await
                 } else {
-                    self.interpret(Expression::Sequence { seq: elze }, env, level + 1).await
+                    self.interpret(Expression::Sequence { seq: elze }, env, level + 1, trace_id)
+                        .await
                 }
             }),
 

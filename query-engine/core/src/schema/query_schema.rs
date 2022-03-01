@@ -1,4 +1,6 @@
 use super::*;
+use datamodel::common::preview_features::PreviewFeature;
+use datamodel_connector::{ConnectorCapability, ReferentialIntegrity};
 use fmt::Debug;
 use prisma_models::{InternalDataModelRef, ModelRef};
 use std::{borrow::Borrow, fmt};
@@ -18,32 +20,71 @@ use std::{borrow::Borrow, fmt};
 /// Using a QuerySchema should never involve dealing with the strong references.
 #[derive(Debug)]
 pub struct QuerySchema {
+    /// Root query object (read queries).
     pub query: OutputTypeRef,
+
+    /// Root mutation object (write queries).
     pub mutation: OutputTypeRef,
 
-    /// Stores all strong refs to the input object types.
-    input_object_types: Vec<InputObjectTypeStrongRef>,
-
-    /// Stores all strong refs to the output object types.
-    output_object_types: Vec<ObjectTypeStrongRef>,
-
+    /// Internal abstraction over the datamodel AST.
     pub internal_data_model: InternalDataModelRef,
+
+    /// Information about the connector this schema was build for.
+    pub context: ConnectorContext,
+
+    /// Internal. Stores all strong Arc refs to the input object types.
+    _input_object_types: Vec<InputObjectTypeStrongRef>,
+
+    /// Internal. Stores all strong Arc refs to the output object types.
+    _output_object_types: Vec<ObjectTypeStrongRef>,
+}
+
+/// Connector meta information, to be used in query execution if necessary.
+#[derive(Debug)]
+pub struct ConnectorContext {
+    /// Capabilities of the provider.
+    pub capabilities: Vec<ConnectorCapability>,
+
+    /// Enabled preview features.
+    pub features: Vec<PreviewFeature>,
+
+    /// Referential integrity mode of the provider
+    pub referential_integrity: ReferentialIntegrity,
+}
+
+impl ConnectorContext {
+    pub fn new(
+        capabilities: Vec<ConnectorCapability>,
+        features: Vec<PreviewFeature>,
+        referential_integrity: ReferentialIntegrity,
+    ) -> Self {
+        Self {
+            capabilities,
+            features,
+            referential_integrity,
+        }
+    }
 }
 
 impl QuerySchema {
+    #[allow(clippy::too_many_arguments)]
     pub fn new(
         query: OutputTypeRef,
         mutation: OutputTypeRef,
-        input_object_types: Vec<InputObjectTypeStrongRef>,
-        output_object_types: Vec<ObjectTypeStrongRef>,
+        _input_object_types: Vec<InputObjectTypeStrongRef>,
+        _output_object_types: Vec<ObjectTypeStrongRef>,
         internal_data_model: InternalDataModelRef,
+        capabilities: Vec<ConnectorCapability>,
+        features: Vec<PreviewFeature>,
+        referential_integrity: ReferentialIntegrity,
     ) -> Self {
         QuerySchema {
             query,
             mutation,
-            input_object_types,
-            output_object_types,
+            _input_object_types,
+            _output_object_types,
             internal_data_model,
+            context: ConnectorContext::new(capabilities, features, referential_integrity),
         }
     }
 
@@ -76,6 +117,10 @@ impl QuerySchema {
             _ => unreachable!(),
         }
     }
+
+    pub fn context(&self) -> &ConnectorContext {
+        &self.context
+    }
 }
 
 /// Designates a specific top-level operation on a corresponding model.
@@ -101,7 +146,7 @@ pub enum QueryTag {
     Aggregate,
     GroupBy,
     ExecuteRaw,
-    QueryRaw,
+    QueryRaw { query_type: Option<String> },
 }
 
 impl fmt::Display for QueryTag {
@@ -120,7 +165,7 @@ impl fmt::Display for QueryTag {
             Self::Aggregate => "aggregate",
             Self::GroupBy => "groupBy",
             Self::ExecuteRaw => "executeRaw",
-            Self::QueryRaw => "queryRaw",
+            Self::QueryRaw { query_type: _ } => "queryRaw",
         };
 
         write!(f, "{}", s)

@@ -2,19 +2,21 @@
 name = "test-cli"
 version = "0.1.0"
 authors = ["Tom Houlé <tom@tomhoule.com>"]
-edition = "2018"
-
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+edition = "2021"
 
 [dependencies]
 anyhow = "1.0.26"
-colored = "1.9.2"
+colored = "2"
 structopt = "0.3.8"
 enumflags2 = "0.7"
 migration-core = { path = "../../migration-engine/core" }
-introspection-core = { path = "../../introspection-engine/core"}
+migration-connector = { path = "../../migration-engine/connectors/migration-connector" }
+introspection-core = { path = "../../introspection-engine/core" }
+introspection-connector = { path = "../../introspection-engine/connectors/introspection-connector" }
+datamodel = { path = "../../libs/datamodel/core" }
 tokio = "1.0"
 serde_json = { version = "1.0", features = ["float_roundtrip"] }
-tracing = "0.1.15"
-tracing-subscriber = "0.2.6"
-tracing-error = "0.1.2"
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+tracing-error = "0.2"
+async-trait = "0.1.52"

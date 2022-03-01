@@ -1,9 +1,5 @@
-use datamodel_connector::Connector;
-use sql_datamodel_connector::PostgresDatamodelConnector;
-
-use crate::{datamodel_rendering::SqlDatamodelRenderer, TestError, TestResult};
-
 use super::*;
+use crate::{datamodel_rendering::SqlDatamodelRenderer, TestError, TestResult};
 
 #[derive(Debug, Default, Clone)]
 pub struct PostgresConnectorTag {
@@ -23,51 +19,42 @@ impl ConnectorTagInterface for PostgresConnectorTag {
     fn connection_string(&self, database: &str, is_ci: bool) -> String {
         match self.version {
             Some(PostgresVersion::V9) if is_ci => format!(
-                "postgresql://postgres:prisma@test-db-postgres-9:5432/db?schema={}&connection_limit=1",
+                "postgresql://postgres:prisma@test-db-postgres-9:5432/db?schema={}",
                 database
             ),
             Some(PostgresVersion::V10) if is_ci => format!(
-                "postgresql://postgres:prisma@test-db-postgres-10:5432/db?schema={}&connection_limit=1",
+                "postgresql://postgres:prisma@test-db-postgres-10:5432/db?schema={}",
                 database
             ),
             Some(PostgresVersion::V11) if is_ci => format!(
-                "postgresql://postgres:prisma@test-db-postgres-11:5432/db?schema={}&connection_limit=1",
+                "postgresql://postgres:prisma@test-db-postgres-11:5432/db?schema={}",
                 database
             ),
             Some(PostgresVersion::V12) if is_ci => format!(
-                "postgresql://postgres:prisma@test-db-postgres-12:5432/db?schema={}&connection_limit=1",
+                "postgresql://postgres:prisma@test-db-postgres-12:5432/db?schema={}",
                 database
             ),
             Some(PostgresVersion::V13) if is_ci => format!(
-                "postgresql://postgres:prisma@test-db-postgres-13:5432/db?schema={}&connection_limit=1",
+                "postgresql://postgres:prisma@test-db-postgres-13:5432/db?schema={}",
+                database
+            ),
+            Some(PostgresVersion::V14) if is_ci => format!(
+                "postgresql://postgres:prisma@test-db-postgres-14:5432/db?schema={}",
                 database
             ),
             Some(PostgresVersion::PgBouncer) if is_ci => format!(
-                "postgresql://postgres:prisma@test-db-pgbouncer:6432/db?schema={}&connection_limit=1&pgbouncer=true",
+                "postgresql://postgres:prisma@test-db-pgbouncer:6432/db?schema={}&pgbouncer=true",
                 database
             ),
-            Some(PostgresVersion::V9) => format!(
-                "postgresql://postgres:prisma@127.0.0.1:5431/db?schema={}&connection_limit=1",
-                database
-            ),
-            Some(PostgresVersion::V10) => format!(
-                "postgresql://postgres:prisma@127.0.0.1:5432/db?schema={}&connection_limit=1",
-                database
-            ),
-            Some(PostgresVersion::V11) => format!(
-                "postgresql://postgres:prisma@127.0.0.1:5433/db?schema={}&connection_limit=1",
-                database
-            ),
-            Some(PostgresVersion::V12) => format!(
-                "postgresql://postgres:prisma@127.0.0.1:5434/db?schema={}&connection_limit=1",
-                database
-            ),
-            Some(PostgresVersion::V13) => format!(
-                "postgresql://postgres:prisma@127.0.0.1:5434/db?schema={}&connection_limit=1",
-                database
-            ),
+
+            Some(PostgresVersion::V9) => format!("postgresql://postgres:prisma@127.0.0.1:5431/db?schema={}", database),
+            Some(PostgresVersion::V10) => format!("postgresql://postgres:prisma@127.0.0.1:5432/db?schema={}", database),
+            Some(PostgresVersion::V11) => format!("postgresql://postgres:prisma@127.0.0.1:5433/db?schema={}", database),
+            Some(PostgresVersion::V12) => format!("postgresql://postgres:prisma@127.0.0.1:5434/db?schema={}", database),
+            Some(PostgresVersion::V13) => format!("postgresql://postgres:prisma@127.0.0.1:5435/db?schema={}", database),
+            Some(PostgresVersion::V14) => format!("postgresql://postgres:prisma@127.0.0.1:5437/db?schema={}", database),
             Some(PostgresVersion::PgBouncer) => format!(
-                "postgresql://postgres:prisma@127.0.0.1:6432/db?schema={}&connection_limit=1&pgbouncer=true",
+                "postgresql://postgres:prisma@127.0.0.1:6432/db?schema={}&pgbouncer=true",
                 database
             ),
 
@@ -87,6 +74,10 @@ impl ConnectorTagInterface for PostgresConnectorTag {
     fn is_versioned(&self) -> bool {
         true
     }
+
+    fn requires_teardown(&self) -> bool {
+        false
+    }
 }
 
 #[derive(Debug, Clone, Copy, PartialEq)]
@@ -96,6 +87,7 @@ pub enum PostgresVersion {
     V11,
     V12,
     V13,
+    V14,
     PgBouncer,
 }
 
@@ -137,10 +129,19 @@ impl PostgresConnectorTag {
                 capabilities: capabilities.clone(),
             },
             Self {
+                version: Some(PostgresVersion::V14),
+                capabilities: capabilities.clone(),
+            },
+            Self {
                 version: Some(PostgresVersion::PgBouncer),
                 capabilities,
             },
         ]
+    }
+
+    /// Get a reference to the postgres connector tag's version.
+    pub fn version(&self) -> Option<PostgresVersion> {
+        self.version
     }
 }
 
@@ -163,6 +164,7 @@ impl TryFrom<&str> for PostgresVersion {
             "11" => Self::V11,
             "12" => Self::V12,
             "13" => Self::V13,
+            "14" => Self::V14,
             "pgbouncer" => Self::PgBouncer,
             _ => return Err(TestError::parse_error(format!("Unknown Postgres version `{}`", s))),
         };
@@ -179,6 +181,7 @@ impl ToString for PostgresVersion {
             PostgresVersion::V11 => "11",
             PostgresVersion::V12 => "12",
             PostgresVersion::V13 => "13",
+            PostgresVersion::V14 => "14",
             PostgresVersion::PgBouncer => "pgbouncer",
         }
         .to_owned()
@@ -186,6 +189,5 @@ impl ToString for PostgresVersion {
 }
 
 fn postgres_capabilities() -> Vec<ConnectorCapability> {
-    let dm_connector = PostgresDatamodelConnector::new();
-    dm_connector.capabilities().to_owned()
+    sql_datamodel_connector::POSTGRES.capabilities().to_owned()
 }

@@ -253,10 +253,11 @@ pub struct InconsistentColumnData {
 #[derive(Debug, UserFacingError, Serialize)]
 #[user_facing(
     code = "P2024",
-    message = "Timed out fetching a new connection from the connection pool. (More info: http://pris.ly/d/connection-pool, Current connection limit: {connection_limit})"
+    message = "Timed out fetching a new connection from the connection pool. More info: http://pris.ly/d/connection-pool (Current connection pool timeout: {timeout}, connection limit: {connection_limit})"
 )]
 pub struct PoolTimeout {
     pub connection_limit: u64,
+    pub timeout: u64,
 }
 
 #[derive(Debug, UserFacingError, Serialize)]
@@ -284,4 +285,42 @@ pub struct UnsupportedFeature {
 )]
 pub struct MultiError {
     pub errors: String, // Might want to change it to collection of user facing errors.
+}
+
+#[derive(Debug, UserFacingError, Serialize)]
+#[user_facing(code = "P2028", message = "Transaction API error: {error}")]
+pub struct InteractiveTransactionError {
+    pub error: String,
+}
+
+#[derive(Debug, UserFacingError, Serialize)]
+#[user_facing(code = "P2029", message = "Query parameter limit exceeded error: {message}.")]
+pub struct QueryParameterLimitExceeded {
+    pub message: String,
+}
+
+#[derive(Debug, UserFacingError, Serialize)]
+#[user_facing(
+    code = "P2030",
+    message = "Cannot find a fulltext index to use for the search, try adding a @@fulltext([Fields...]) to your schema"
+)]
+pub struct MissingFullTextSearchIndex {}
+
+#[derive(Debug, UserFacingError, Serialize)]
+#[user_facing(
+    code = "P2031",
+    message = "Prisma needs to perform transactions, which requires your MongoDB server to be run as a replica set. https://pris.ly/d/mongodb-replica-set"
+)]
+pub struct MongoReplicaSetRequired {}
+
+#[derive(Debug, UserFacingError, Serialize)]
+#[user_facing(
+    code = "P2032",
+    message = "Error converting field \"{field}\" of expected non-nullable type \"{expected_type}\", found incompatible value of \"{found}\"."
+)]
+
+pub struct MissingFieldsInModel {
+    pub field: String,
+    pub expected_type: String,
+    pub found: String,
 }

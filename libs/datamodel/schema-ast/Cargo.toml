@@ -1,0 +1,10 @@
+[package]
+name = "schema-ast"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+diagnostics = { path = "../diagnostics" }
+
+pest = "2.1.3"
+pest_derive = "2.1.0"

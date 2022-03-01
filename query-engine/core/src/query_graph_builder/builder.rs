@@ -1,11 +1,8 @@
 use std::fmt;
 
 use super::*;
-use crate::{constants::args, query_document::*, query_graph::*, schema::*, IrSerializer};
-use prisma_value::PrismaValue;
+use crate::{query_document::*, query_graph::*, schema::*, IrSerializer};
 
-// TODO: Think about if this is really necessary here, or if the whole code should move into
-// the query_document module, possibly already as part of the parser.
 pub struct QueryGraphBuilder {
     pub query_schema: QuerySchemaRef,
 }
@@ -13,35 +10,6 @@ pub struct QueryGraphBuilder {
 impl fmt::Debug for QueryGraphBuilder {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.debug_struct("QueryGraphBuilder").finish()
-    }
-}
-
-#[derive(Default)]
-struct RawArgs {
-    query: String,
-    parameters: Vec<PrismaValue>,
-}
-
-impl RawArgs {
-    fn add_arg(&mut self, arg: Option<ParsedArgument>) {
-        if let Some(arg) = arg {
-            if arg.name == args::QUERY {
-                self.query = arg.into_value().unwrap().into_string().unwrap();
-            } else {
-                self.parameters = arg.into_value().unwrap().into_list().unwrap();
-            }
-        }
-    }
-}
-
-impl From<Vec<ParsedArgument>> for RawArgs {
-    fn from(mut args: Vec<ParsedArgument>) -> Self {
-        let mut ra = Self::default();
-
-        ra.add_arg(args.pop());
-        ra.add_arg(args.pop());
-
-        ra
     }
 }
 
@@ -85,9 +53,11 @@ impl QueryGraphBuilder {
     }
 
     #[tracing::instrument(skip(self, field_pair))]
+    #[rustfmt::skip]
     fn dispatch_build(&self, field_pair: FieldPair) -> QueryGraphBuilderResult<QueryGraph> {
         let query_info = field_pair.schema_field.query_info.as_ref().unwrap();
         let parsed_field = field_pair.parsed_field;
+        let connector_ctx = self.query_schema.context();
 
         let mut graph = match (&query_info.tag, query_info.model.clone()) {
             (QueryTag::FindUnique, Some(m)) => read::find_unique(parsed_field, m).map(Into::into),
@@ -95,15 +65,15 @@ impl QueryGraphBuilder {
             (QueryTag::FindMany, Some(m)) => read::find_many(parsed_field, m).map(Into::into),
             (QueryTag::Aggregate, Some(m)) => read::aggregate(parsed_field, m).map(Into::into),
             (QueryTag::GroupBy, Some(m)) => read::group_by(parsed_field, m).map(Into::into),
-            (QueryTag::CreateOne, Some(m)) => QueryGraph::root(|g| write::create_record(g, m, parsed_field)),
-            (QueryTag::CreateMany, Some(m)) => QueryGraph::root(|g| write::create_many_records(g, m, parsed_field)),
-            (QueryTag::UpdateOne, Some(m)) => QueryGraph::root(|g| write::update_record(g, m, parsed_field)),
-            (QueryTag::UpdateMany, Some(m)) => QueryGraph::root(|g| write::update_many_records(g, m, parsed_field)),
-            (QueryTag::UpsertOne, Some(m)) => QueryGraph::root(|g| write::upsert_record(g, m, parsed_field)),
-            (QueryTag::DeleteOne, Some(m)) => QueryGraph::root(|g| write::delete_record(g, m, parsed_field)),
-            (QueryTag::DeleteMany, Some(m)) => QueryGraph::root(|g| write::delete_many_records(g, m, parsed_field)),
+            (QueryTag::CreateOne, Some(m)) => QueryGraph::root(|g| write::create_record(g, connector_ctx, m, parsed_field)),
+            (QueryTag::CreateMany, Some(m)) => QueryGraph::root(|g| write::create_many_records(g,  connector_ctx,m, parsed_field)),
+            (QueryTag::UpdateOne, Some(m)) => QueryGraph::root(|g| write::update_record(g, connector_ctx, m, parsed_field)),
+            (QueryTag::UpdateMany, Some(m)) => QueryGraph::root(|g| write::update_many_records(g, connector_ctx, m, parsed_field)),
+            (QueryTag::UpsertOne, Some(m)) => QueryGraph::root(|g| write::upsert_record(g, connector_ctx, m, parsed_field)),
+            (QueryTag::DeleteOne, Some(m)) => QueryGraph::root(|g| write::delete_record(g, connector_ctx, m, parsed_field)),
+            (QueryTag::DeleteMany, Some(m)) => QueryGraph::root(|g| write::delete_many_records(g, connector_ctx, m, parsed_field)),
             (QueryTag::ExecuteRaw, _) => QueryGraph::root(|g| write::execute_raw(g, parsed_field)),
-            (QueryTag::QueryRaw, _) => QueryGraph::root(|g| write::query_raw(g, parsed_field)),
+            (QueryTag::QueryRaw { query_type }, m) => QueryGraph::root(|g| write::query_raw(g, m, query_type, parsed_field)),
             _ => unreachable!("Query builder dispatching failed."),
         }?;
 

@@ -10,24 +10,24 @@ mod nested_pagination {
             r#"model Top {
               #id(id, Int, @id)
               t      String   @unique
-      
+
               middles Middle[]
             }
-      
+
             model Middle {
               #id(id, Int, @id)
               m       String   @unique
               top_id Int
-      
+
               top     Top      @relation(fields: [top_id], references: [id])
               bottoms Bottom[]
             }
-      
+
             model Bottom {
               #id(id, Int, @id)
               b         String @unique
               middle_id Int
-      
+
               middle Middle @relation(fields: [middle_id], references: [id])
             }"#
         };
@@ -36,11 +36,11 @@ mod nested_pagination {
     }
 
     #[connector_test]
-    async fn all_data_there(runner: &Runner) -> TestResult<()> {
-        create_test_data(runner).await?;
+    async fn all_data_there(runner: Runner) -> TestResult<()> {
+        create_test_data(&runner).await?;
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{
+          run_query!(&runner, r#"{
             findManyTop{t, middles{ m, bottoms {b}}}
           }"#),
           @r###"{"data":{"findManyTop":[{"t":"T1","middles":[{"m":"M11","bottoms":[{"b":"B111"},{"b":"B112"},{"b":"B113"}]},{"m":"M12","bottoms":[{"b":"B121"},{"b":"B122"},{"b":"B123"}]},{"m":"M13","bottoms":[{"b":"B131"},{"b":"B132"},{"b":"B133"}]}]},{"t":"T2","middles":[{"m":"M21","bottoms":[{"b":"B211"},{"b":"B212"},{"b":"B213"}]},{"m":"M22","bottoms":[{"b":"B221"},{"b":"B222"},{"b":"B223"}]},{"m":"M23","bottoms":[{"b":"B231"},{"b":"B232"},{"b":"B233"}]}]},{"t":"T3","middles":[{"m":"M31","bottoms":[{"b":"B311"},{"b":"B312"},{"b":"B313"}]},{"m":"M32","bottoms":[{"b":"B321"},{"b":"B322"},{"b":"B323"}]},{"m":"M33","bottoms":[{"b":"B331"},{"b":"B332"},{"b":"B333"}]}]}]}}"###
@@ -55,11 +55,11 @@ mod nested_pagination {
 
     // should return all items after and including the cursor and return nothing for other tops
     #[connector_test]
-    async fn mid_lvl_cursor(runner: &Runner) -> TestResult<()> {
-        create_test_data(runner).await?;
+    async fn mid_lvl_cursor(runner: Runner) -> TestResult<()> {
+        create_test_data(&runner).await?;
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{
+          run_query!(&runner, r#"{
             findManyTop{t, middles(cursor: { m: "M22" }, orderBy: { id: asc }){ m }}
           }"#),
           @r###"{"data":{"findManyTop":[{"t":"T1","middles":[]},{"t":"T2","middles":[{"m":"M22"},{"m":"M23"}]},{"t":"T3","middles":[]}]}}"###
@@ -74,11 +74,11 @@ mod nested_pagination {
 
     // should skip the first item
     #[connector_test]
-    async fn mid_lvl_skip_1(runner: &Runner) -> TestResult<()> {
-        create_test_data(runner).await?;
+    async fn mid_lvl_skip_1(runner: Runner) -> TestResult<()> {
+        create_test_data(&runner).await?;
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{
+          run_query!(&runner, r#"{
             findManyTop{t, middles(skip: 1){m}}
           }"#),
           @r###"{"data":{"findManyTop":[{"t":"T1","middles":[{"m":"M12"},{"m":"M13"}]},{"t":"T2","middles":[{"m":"M22"},{"m":"M23"}]},{"t":"T3","middles":[{"m":"M32"},{"m":"M33"}]}]}}"###
@@ -89,11 +89,11 @@ mod nested_pagination {
 
     // should "skip all items"
     #[connector_test]
-    async fn mid_lvl_skip_3(runner: &Runner) -> TestResult<()> {
-        create_test_data(runner).await?;
+    async fn mid_lvl_skip_3(runner: Runner) -> TestResult<()> {
+        create_test_data(&runner).await?;
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{
+          run_query!(&runner, r#"{
             findManyTop{t, middles(skip: 3){m}}
           }"#),
           @r###"{"data":{"findManyTop":[{"t":"T1","middles":[]},{"t":"T2","middles":[]},{"t":"T3","middles":[]}]}}"###
@@ -104,11 +104,11 @@ mod nested_pagination {
 
     // should "skip all items"
     #[connector_test]
-    async fn mid_lvl_skip_4(runner: &Runner) -> TestResult<()> {
-        create_test_data(runner).await?;
+    async fn mid_lvl_skip_4(runner: Runner) -> TestResult<()> {
+        create_test_data(&runner).await?;
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{
+          run_query!(&runner, r#"{
             findManyTop{t, middles(skip: 4){m}}
           }"#),
           @r###"{"data":{"findManyTop":[{"t":"T1","middles":[]},{"t":"T2","middles":[]},{"t":"T3","middles":[]}]}}"###
@@ -119,11 +119,11 @@ mod nested_pagination {
 
     // should "skip no items"
     #[connector_test]
-    async fn bottom_lvl_skip_0(runner: &Runner) -> TestResult<()> {
-        create_test_data(runner).await?;
+    async fn bottom_lvl_skip_0(runner: Runner) -> TestResult<()> {
+        create_test_data(&runner).await?;
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{
+          run_query!(&runner, r#"{
             findManyTop{middles{bottoms(skip: 0){b}}}
           }"#),
           @r###"{"data":{"findManyTop":[{"middles":[{"bottoms":[{"b":"B111"},{"b":"B112"},{"b":"B113"}]},{"bottoms":[{"b":"B121"},{"b":"B122"},{"b":"B123"}]},{"bottoms":[{"b":"B131"},{"b":"B132"},{"b":"B133"}]}]},{"middles":[{"bottoms":[{"b":"B211"},{"b":"B212"},{"b":"B213"}]},{"bottoms":[{"b":"B221"},{"b":"B222"},{"b":"B223"}]},{"bottoms":[{"b":"B231"},{"b":"B232"},{"b":"B233"}]}]},{"middles":[{"bottoms":[{"b":"B311"},{"b":"B312"},{"b":"B313"}]},{"bottoms":[{"b":"B321"},{"b":"B322"},{"b":"B323"}]},{"bottoms":[{"b":"B331"},{"b":"B332"},{"b":"B333"}]}]}]}}"###
@@ -134,11 +134,11 @@ mod nested_pagination {
 
     // should "skip no items"
     #[connector_test]
-    async fn bottom_lvl_skip_1(runner: &Runner) -> TestResult<()> {
-        create_test_data(runner).await?;
+    async fn bottom_lvl_skip_1(runner: Runner) -> TestResult<()> {
+        create_test_data(&runner).await?;
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{
+          run_query!(&runner, r#"{
             findManyTop{middles{bottoms(skip: 1){b}}}
           }"#),
           @r###"{"data":{"findManyTop":[{"middles":[{"bottoms":[{"b":"B112"},{"b":"B113"}]},{"bottoms":[{"b":"B122"},{"b":"B123"}]},{"bottoms":[{"b":"B132"},{"b":"B133"}]}]},{"middles":[{"bottoms":[{"b":"B212"},{"b":"B213"}]},{"bottoms":[{"b":"B222"},{"b":"B223"}]},{"bottoms":[{"b":"B232"},{"b":"B233"}]}]},{"middles":[{"bottoms":[{"b":"B312"},{"b":"B313"}]},{"bottoms":[{"b":"B322"},{"b":"B323"}]},{"bottoms":[{"b":"B332"},{"b":"B333"}]}]}]}}"###
@@ -149,11 +149,11 @@ mod nested_pagination {
 
     // should "skip no items"
     #[connector_test]
-    async fn bottom_lvl_skip_3(runner: &Runner) -> TestResult<()> {
-        create_test_data(runner).await?;
+    async fn bottom_lvl_skip_3(runner: Runner) -> TestResult<()> {
+        create_test_data(&runner).await?;
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{
+          run_query!(&runner, r#"{
                 findManyTop{middles{bottoms(skip: 3){b}}}
               }"#),
           @r###"{"data":{"findManyTop":[{"middles":[{"bottoms":[]},{"bottoms":[]},{"bottoms":[]}]},{"middles":[{"bottoms":[]},{"bottoms":[]},{"bottoms":[]}]},{"middles":[{"bottoms":[]},{"bottoms":[]},{"bottoms":[]}]}]}}"###
@@ -164,11 +164,11 @@ mod nested_pagination {
 
     // should "skip no items"
     #[connector_test]
-    async fn bottom_lvl_skip_4(runner: &Runner) -> TestResult<()> {
-        create_test_data(runner).await?;
+    async fn bottom_lvl_skip_4(runner: Runner) -> TestResult<()> {
+        create_test_data(&runner).await?;
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{
+          run_query!(&runner, r#"{
                     findManyTop{middles{bottoms(skip: 4){b}}}
                   }"#),
           @r###"{"data":{"findManyTop":[{"middles":[{"bottoms":[]},{"bottoms":[]},{"bottoms":[]}]},{"middles":[{"bottoms":[]},{"bottoms":[]},{"bottoms":[]}]},{"middles":[{"bottoms":[]},{"bottoms":[]},{"bottoms":[]}]}]}}"###
@@ -183,11 +183,11 @@ mod nested_pagination {
 
     // should return no items
     #[connector_test]
-    async fn mid_lvl_take_0(runner: &Runner) -> TestResult<()> {
-        create_test_data(runner).await?;
+    async fn mid_lvl_take_0(runner: Runner) -> TestResult<()> {
+        create_test_data(&runner).await?;
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{
+          run_query!(&runner, r#"{
             findManyTop{t, middles(take: 0){m}}
           }"#),
           @r###"{"data":{"findManyTop":[{"t":"T1","middles":[]},{"t":"T2","middles":[]},{"t":"T3","middles":[]}]}}"###
@@ -198,11 +198,11 @@ mod nested_pagination {
 
     // should "return the first item"
     #[connector_test]
-    async fn mid_lvl_take_1(runner: &Runner) -> TestResult<()> {
-        create_test_data(runner).await?;
+    async fn mid_lvl_take_1(runner: Runner) -> TestResult<()> {
+        create_test_data(&runner).await?;
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{
+          run_query!(&runner, r#"{
             findManyTop{t, middles(take: 1){m}}
           }"#),
           @r###"{"data":{"findManyTop":[{"t":"T1","middles":[{"m":"M11"}]},{"t":"T2","middles":[{"m":"M21"}]},{"t":"T3","middles":[{"m":"M31"}]}]}}"###
@@ -213,11 +213,11 @@ mod nested_pagination {
 
     // should "return all items"
     #[connector_test]
-    async fn mid_lvl_take_3(runner: &Runner) -> TestResult<()> {
-        create_test_data(runner).await?;
+    async fn mid_lvl_take_3(runner: Runner) -> TestResult<()> {
+        create_test_data(&runner).await?;
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{
+          run_query!(&runner, r#"{
                 findManyTop{t, middles(take: 3){m}}
               }"#),
           @r###"{"data":{"findManyTop":[{"t":"T1","middles":[{"m":"M11"},{"m":"M12"},{"m":"M13"}]},{"t":"T2","middles":[{"m":"M21"},{"m":"M22"},{"m":"M23"}]},{"t":"T3","middles":[{"m":"M31"},{"m":"M32"},{"m":"M33"}]}]}}"###
@@ -228,11 +228,11 @@ mod nested_pagination {
 
     // should "return all items"
     #[connector_test]
-    async fn mid_lvl_take_4(runner: &Runner) -> TestResult<()> {
-        create_test_data(runner).await?;
+    async fn mid_lvl_take_4(runner: Runner) -> TestResult<()> {
+        create_test_data(&runner).await?;
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{
+          run_query!(&runner, r#"{
                     findManyTop{t, middles(take: 4){m}}
                   }"#),
           @r###"{"data":{"findManyTop":[{"t":"T1","middles":[{"m":"M11"},{"m":"M12"},{"m":"M13"}]},{"t":"T2","middles":[{"m":"M21"},{"m":"M22"},{"m":"M23"}]},{"t":"T3","middles":[{"m":"M31"},{"m":"M32"},{"m":"M33"}]}]}}"###
@@ -243,11 +243,11 @@ mod nested_pagination {
 
     // should "return no items"
     #[connector_test]
-    async fn bottom_lvl_take_0(runner: &Runner) -> TestResult<()> {
-        create_test_data(runner).await?;
+    async fn bottom_lvl_take_0(runner: Runner) -> TestResult<()> {
+        create_test_data(&runner).await?;
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{
+          run_query!(&runner, r#"{
             findManyTop{middles{bottoms(take: 0){b}}}
           }"#),
           @r###"{"data":{"findManyTop":[{"middles":[{"bottoms":[]},{"bottoms":[]},{"bottoms":[]}]},{"middles":[{"bottoms":[]},{"bottoms":[]},{"bottoms":[]}]},{"middles":[{"bottoms":[]},{"bottoms":[]},{"bottoms":[]}]}]}}"###
@@ -258,11 +258,11 @@ mod nested_pagination {
 
     // should "return the first item"
     #[connector_test]
-    async fn bottom_lvl_take_1(runner: &Runner) -> TestResult<()> {
-        create_test_data(runner).await?;
+    async fn bottom_lvl_take_1(runner: Runner) -> TestResult<()> {
+        create_test_data(&runner).await?;
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{
+          run_query!(&runner, r#"{
             findManyTop{middles{bottoms(take:1){b}}}
           }"#),
           @r###"{"data":{"findManyTop":[{"middles":[{"bottoms":[{"b":"B111"}]},{"bottoms":[{"b":"B121"}]},{"bottoms":[{"b":"B131"}]}]},{"middles":[{"bottoms":[{"b":"B211"}]},{"bottoms":[{"b":"B221"}]},{"bottoms":[{"b":"B231"}]}]},{"middles":[{"bottoms":[{"b":"B311"}]},{"bottoms":[{"b":"B321"}]},{"bottoms":[{"b":"B331"}]}]}]}}"###
@@ -273,11 +273,11 @@ mod nested_pagination {
 
     // should "return all items"
     #[connector_test]
-    async fn bottom_lvl_take_3(runner: &Runner) -> TestResult<()> {
-        create_test_data(runner).await?;
+    async fn bottom_lvl_take_3(runner: Runner) -> TestResult<()> {
+        create_test_data(&runner).await?;
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{
+          run_query!(&runner, r#"{
                 findManyTop{middles{bottoms(take:3){b}}}
               }"#),
           @r###"{"data":{"findManyTop":[{"middles":[{"bottoms":[{"b":"B111"},{"b":"B112"},{"b":"B113"}]},{"bottoms":[{"b":"B121"},{"b":"B122"},{"b":"B123"}]},{"bottoms":[{"b":"B131"},{"b":"B132"},{"b":"B133"}]}]},{"middles":[{"bottoms":[{"b":"B211"},{"b":"B212"},{"b":"B213"}]},{"bottoms":[{"b":"B221"},{"b":"B222"},{"b":"B223"}]},{"bottoms":[{"b":"B231"},{"b":"B232"},{"b":"B233"}]}]},{"middles":[{"bottoms":[{"b":"B311"},{"b":"B312"},{"b":"B313"}]},{"bottoms":[{"b":"B321"},{"b":"B322"},{"b":"B323"}]},{"bottoms":[{"b":"B331"},{"b":"B332"},{"b":"B333"}]}]}]}}"###
@@ -288,11 +288,11 @@ mod nested_pagination {
 
     // should "return all items"
     #[connector_test]
-    async fn bottom_lvl_take_4(runner: &Runner) -> TestResult<()> {
-        create_test_data(runner).await?;
+    async fn bottom_lvl_take_4(runner: Runner) -> TestResult<()> {
+        create_test_data(&runner).await?;
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{
+          run_query!(&runner, r#"{
                         findManyTop{middles{bottoms(take:4){b}}}
                       }"#),
           @r###"{"data":{"findManyTop":[{"middles":[{"bottoms":[{"b":"B111"},{"b":"B112"},{"b":"B113"}]},{"bottoms":[{"b":"B121"},{"b":"B122"},{"b":"B123"}]},{"bottoms":[{"b":"B131"},{"b":"B132"},{"b":"B133"}]}]},{"middles":[{"bottoms":[{"b":"B211"},{"b":"B212"},{"b":"B213"}]},{"bottoms":[{"b":"B221"},{"b":"B222"},{"b":"B223"}]},{"bottoms":[{"b":"B231"},{"b":"B232"},{"b":"B233"}]}]},{"middles":[{"bottoms":[{"b":"B311"},{"b":"B312"},{"b":"B313"}]},{"bottoms":[{"b":"B321"},{"b":"B322"},{"b":"B323"}]},{"bottoms":[{"b":"B331"},{"b":"B332"},{"b":"B333"}]}]}]}}"###
@@ -303,11 +303,11 @@ mod nested_pagination {
 
     // should "return the last item"
     #[connector_test]
-    async fn mid_lvl_take_minus_1(runner: &Runner) -> TestResult<()> {
-        create_test_data(runner).await?;
+    async fn mid_lvl_take_minus_1(runner: Runner) -> TestResult<()> {
+        create_test_data(&runner).await?;
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{
+          run_query!(&runner, r#"{
             findManyTop{t, middles(take: -1, orderBy: { id: asc }){m}}
           }"#),
           @r###"{"data":{"findManyTop":[{"t":"T1","middles":[{"m":"M13"}]},{"t":"T2","middles":[{"m":"M23"}]},{"t":"T3","middles":[{"m":"M33"}]}]}}"###
@@ -318,11 +318,11 @@ mod nested_pagination {
 
     // should "return all items"
     #[connector_test]
-    async fn mid_lvl_take_minus_3(runner: &Runner) -> TestResult<()> {
-        create_test_data(runner).await?;
+    async fn mid_lvl_take_minus_3(runner: Runner) -> TestResult<()> {
+        create_test_data(&runner).await?;
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{
+          run_query!(&runner, r#"{
             findManyTop{t, middles(take: -3, orderBy: { id: asc }) {m}}
           }"#),
           @r###"{"data":{"findManyTop":[{"t":"T1","middles":[{"m":"M11"},{"m":"M12"},{"m":"M13"}]},{"t":"T2","middles":[{"m":"M21"},{"m":"M22"},{"m":"M23"}]},{"t":"T3","middles":[{"m":"M31"},{"m":"M32"},{"m":"M33"}]}]}}"###
@@ -333,11 +333,11 @@ mod nested_pagination {
 
     // should "return all items"
     #[connector_test]
-    async fn mid_lvl_take_minus_4(runner: &Runner) -> TestResult<()> {
-        create_test_data(runner).await?;
+    async fn mid_lvl_take_minus_4(runner: Runner) -> TestResult<()> {
+        create_test_data(&runner).await?;
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{
+          run_query!(&runner, r#"{
                 findManyTop{t, middles(take: -4, orderBy: { id: asc }) {m}}
               }"#),
           @r###"{"data":{"findManyTop":[{"t":"T1","middles":[{"m":"M11"},{"m":"M12"},{"m":"M13"}]},{"t":"T2","middles":[{"m":"M21"},{"m":"M22"},{"m":"M23"}]},{"t":"T3","middles":[{"m":"M31"},{"m":"M32"},{"m":"M33"}]}]}}"###
@@ -348,11 +348,11 @@ mod nested_pagination {
 
     // should "return the last item"
     #[connector_test]
-    async fn bottom_lvl_take_minus_1(runner: &Runner) -> TestResult<()> {
-        create_test_data(runner).await?;
+    async fn bottom_lvl_take_minus_1(runner: Runner) -> TestResult<()> {
+        create_test_data(&runner).await?;
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{
+          run_query!(&runner, r#"{
             findManyTop{middles{bottoms(take: -1, orderBy: { id: asc }){b}}}
           }"#),
           @r###"{"data":{"findManyTop":[{"middles":[{"bottoms":[{"b":"B113"}]},{"bottoms":[{"b":"B123"}]},{"bottoms":[{"b":"B133"}]}]},{"middles":[{"bottoms":[{"b":"B213"}]},{"bottoms":[{"b":"B223"}]},{"bottoms":[{"b":"B233"}]}]},{"middles":[{"bottoms":[{"b":"B313"}]},{"bottoms":[{"b":"B323"}]},{"bottoms":[{"b":"B333"}]}]}]}}"###
@@ -363,11 +363,11 @@ mod nested_pagination {
 
     // should "return all items"
     #[connector_test]
-    async fn bottom_lvl_take_minus_3(runner: &Runner) -> TestResult<()> {
-        create_test_data(runner).await?;
+    async fn bottom_lvl_take_minus_3(runner: Runner) -> TestResult<()> {
+        create_test_data(&runner).await?;
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{
+          run_query!(&runner, r#"{
                 findManyTop{middles{bottoms(take: -3, orderBy: { id: asc }){b}}}
               }"#),
           @r###"{"data":{"findManyTop":[{"middles":[{"bottoms":[{"b":"B111"},{"b":"B112"},{"b":"B113"}]},{"bottoms":[{"b":"B121"},{"b":"B122"},{"b":"B123"}]},{"bottoms":[{"b":"B131"},{"b":"B132"},{"b":"B133"}]}]},{"middles":[{"bottoms":[{"b":"B211"},{"b":"B212"},{"b":"B213"}]},{"bottoms":[{"b":"B221"},{"b":"B222"},{"b":"B223"}]},{"bottoms":[{"b":"B231"},{"b":"B232"},{"b":"B233"}]}]},{"middles":[{"bottoms":[{"b":"B311"},{"b":"B312"},{"b":"B313"}]},{"bottoms":[{"b":"B321"},{"b":"B322"},{"b":"B323"}]},{"bottoms":[{"b":"B331"},{"b":"B332"},{"b":"B333"}]}]}]}}"###
@@ -378,11 +378,11 @@ mod nested_pagination {
 
     // should "return all items"
     #[connector_test]
-    async fn bottom_lvl_take_minus_4(runner: &Runner) -> TestResult<()> {
-        create_test_data(runner).await?;
+    async fn bottom_lvl_take_minus_4(runner: Runner) -> TestResult<()> {
+        create_test_data(&runner).await?;
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{
+          run_query!(&runner, r#"{
                     findManyTop{middles{bottoms(take: -4, orderBy: { id: asc }){b}}}
                   }"#),
           @r###"{"data":{"findManyTop":[{"middles":[{"bottoms":[{"b":"B111"},{"b":"B112"},{"b":"B113"}]},{"bottoms":[{"b":"B121"},{"b":"B122"},{"b":"B123"}]},{"bottoms":[{"b":"B131"},{"b":"B132"},{"b":"B133"}]}]},{"middles":[{"bottoms":[{"b":"B211"},{"b":"B212"},{"b":"B213"}]},{"bottoms":[{"b":"B221"},{"b":"B222"},{"b":"B223"}]},{"bottoms":[{"b":"B231"},{"b":"B232"},{"b":"B233"}]}]},{"middles":[{"bottoms":[{"b":"B311"},{"b":"B312"},{"b":"B313"}]},{"bottoms":[{"b":"B321"},{"b":"B322"},{"b":"B323"}]},{"bottoms":[{"b":"B331"},{"b":"B332"},{"b":"B333"}]}]}]}}"###
@@ -397,11 +397,11 @@ mod nested_pagination {
 
     // should "return the second item"
     #[connector_test]
-    async fn top_lvl_skip_1_take_1(runner: &Runner) -> TestResult<()> {
-        create_test_data(runner).await?;
+    async fn top_lvl_skip_1_take_1(runner: Runner) -> TestResult<()> {
+        create_test_data(&runner).await?;
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{
+          run_query!(&runner, r#"{
             findManyTop(skip: 1, take: 1){t, middles{m}}
           }"#),
           @r###"{"data":{"findManyTop":[{"t":"T2","middles":[{"m":"M21"},{"m":"M22"},{"m":"M23"}]}]}}"###
@@ -412,11 +412,11 @@ mod nested_pagination {
 
     // should "return only the last two items"
     #[connector_test]
-    async fn top_lvl_skip_1_take_3(runner: &Runner) -> TestResult<()> {
-        create_test_data(runner).await?;
+    async fn top_lvl_skip_1_take_3(runner: Runner) -> TestResult<()> {
+        create_test_data(&runner).await?;
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{
+          run_query!(&runner, r#"{
             findManyTop(skip: 1, take: 3){t, middles{m}}
           }"#),
           @r###"{"data":{"findManyTop":[{"t":"T2","middles":[{"m":"M21"},{"m":"M22"},{"m":"M23"}]},{"t":"T3","middles":[{"m":"M31"},{"m":"M32"},{"m":"M33"}]}]}}"###
@@ -427,11 +427,11 @@ mod nested_pagination {
 
     // should "return the second"
     #[connector_test]
-    async fn mid_lvl_skip_1_take_1(runner: &Runner) -> TestResult<()> {
-        create_test_data(runner).await?;
+    async fn mid_lvl_skip_1_take_1(runner: Runner) -> TestResult<()> {
+        create_test_data(&runner).await?;
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{
+          run_query!(&runner, r#"{
             findManyTop{t, middles(skip: 1, take: 1){m}}
           }"#),
           @r###"{"data":{"findManyTop":[{"t":"T1","middles":[{"m":"M12"}]},{"t":"T2","middles":[{"m":"M22"}]},{"t":"T3","middles":[{"m":"M32"}]}]}}"###
@@ -442,11 +442,11 @@ mod nested_pagination {
 
     // should "return the last two items"
     #[connector_test]
-    async fn mid_lvl_skip_1_take_3(runner: &Runner) -> TestResult<()> {
-        create_test_data(runner).await?;
+    async fn mid_lvl_skip_1_take_3(runner: Runner) -> TestResult<()> {
+        create_test_data(&runner).await?;
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{
+          run_query!(&runner, r#"{
             findManyTop{t, middles(skip: 1, take: 3){m}}
           }"#),
           @r###"{"data":{"findManyTop":[{"t":"T1","middles":[{"m":"M12"},{"m":"M13"}]},{"t":"T2","middles":[{"m":"M22"},{"m":"M23"}]},{"t":"T3","middles":[{"m":"M32"},{"m":"M33"}]}]}}"###
@@ -457,11 +457,11 @@ mod nested_pagination {
 
     // should "return only the first two items"
     #[connector_test]
-    async fn top_lvl_skip_1_take_minus_3(runner: &Runner) -> TestResult<()> {
-        create_test_data(runner).await?;
+    async fn top_lvl_skip_1_take_minus_3(runner: Runner) -> TestResult<()> {
+        create_test_data(&runner).await?;
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{
+          run_query!(&runner, r#"{
             findManyTop(skip: 1, take: -3, orderBy: { id: asc }){t, middles{m}}
           }"#),
           @r###"{"data":{"findManyTop":[{"t":"T1","middles":[{"m":"M11"},{"m":"M12"},{"m":"M13"}]},{"t":"T2","middles":[{"m":"M21"},{"m":"M22"},{"m":"M23"}]}]}}"###
@@ -472,11 +472,11 @@ mod nested_pagination {
 
     // should "return the second"
     #[connector_test]
-    async fn mid_lvl_skip_1_take_minus_1(runner: &Runner) -> TestResult<()> {
-        create_test_data(runner).await?;
+    async fn mid_lvl_skip_1_take_minus_1(runner: Runner) -> TestResult<()> {
+        create_test_data(&runner).await?;
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{
+          run_query!(&runner, r#"{
             findManyTop{t, middles(skip: 1, take: -1, orderBy: { id: asc }){m}}
           }"#),
           @r###"{"data":{"findManyTop":[{"t":"T1","middles":[{"m":"M12"}]},{"t":"T2","middles":[{"m":"M22"}]},{"t":"T3","middles":[{"m":"M32"}]}]}}"###
@@ -487,11 +487,11 @@ mod nested_pagination {
 
     // should "return the first two items"
     #[connector_test]
-    async fn mid_lvl_skip_1_take_minus_3(runner: &Runner) -> TestResult<()> {
-        create_test_data(runner).await?;
+    async fn mid_lvl_skip_1_take_minus_3(runner: Runner) -> TestResult<()> {
+        create_test_data(&runner).await?;
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{
+          run_query!(&runner, r#"{
             findManyTop{t, middles(skip: 1, take: -3, orderBy: { id: asc }){m}}
           }"#),
           @r###"{"data":{"findManyTop":[{"t":"T1","middles":[{"m":"M11"},{"m":"M12"}]},{"t":"T2","middles":[{"m":"M21"},{"m":"M22"}]},{"t":"T3","middles":[{"m":"M31"},{"m":"M32"}]}]}}"###
@@ -506,11 +506,11 @@ mod nested_pagination {
 
     // should "return the last item"
     #[connector_test]
-    async fn mid_order_by_take_1(runner: &Runner) -> TestResult<()> {
-        create_test_data(runner).await?;
+    async fn mid_order_by_take_1(runner: Runner) -> TestResult<()> {
+        create_test_data(&runner).await?;
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{
+          run_query!(&runner, r#"{
             findManyTop{t, middles(orderBy: { m: desc }, take: 1){m}}
           }"#),
           @r###"{"data":{"findManyTop":[{"t":"T1","middles":[{"m":"M13"}]},{"t":"T2","middles":[{"m":"M23"}]},{"t":"T3","middles":[{"m":"M33"}]}]}}"###
@@ -521,11 +521,11 @@ mod nested_pagination {
 
     // should "return all items in reverse order"
     #[connector_test]
-    async fn mid_lvl_order_by_take_3(runner: &Runner) -> TestResult<()> {
-        create_test_data(runner).await?;
+    async fn mid_lvl_order_by_take_3(runner: Runner) -> TestResult<()> {
+        create_test_data(&runner).await?;
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{
+          run_query!(&runner, r#"{
             findManyTop{t, middles(orderBy: { m: desc }, take: 3){m}}
           }"#),
           @r###"{"data":{"findManyTop":[{"t":"T1","middles":[{"m":"M13"},{"m":"M12"},{"m":"M11"}]},{"t":"T2","middles":[{"m":"M23"},{"m":"M22"},{"m":"M21"}]},{"t":"T3","middles":[{"m":"M33"},{"m":"M32"},{"m":"M31"}]}]}}"###
@@ -543,9 +543,9 @@ mod nested_pagination {
     // A3
     // "A many-to-many relationship with multiple connected children" should "return all items correctly with nested cursor pagination"
     #[connector_test(schema(simple_m2m))]
-    async fn m2m_many_children_nested_cursor(runner: &Runner) -> TestResult<()> {
+    async fn m2m_many_children_nested_cursor(runner: Runner) -> TestResult<()> {
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation {
+          run_query!(&runner, r#"mutation {
               createOneModelA(
                 data: {
                   id: "A1"
@@ -569,7 +569,7 @@ mod nested_pagination {
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"
+          run_query!(&runner, r#"
             mutation {
               createOneModelA(
                 data: {
@@ -591,7 +591,7 @@ mod nested_pagination {
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"
+          run_query!(&runner, r#"
             mutation{
               createOneModelA(data: {
                 id: "A3"
@@ -607,7 +607,7 @@ mod nested_pagination {
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"
+          run_query!(&runner, r#"
             query {
               findManyModelA {
                 id
@@ -631,11 +631,11 @@ mod nested_pagination {
     // A3
     //"A many-to-many relationship with multiple connected children" should "return all items correctly with nested cursor pagination and skip / take"
     #[connector_test(schema(simple_m2m))]
-    async fn m2m_many_children_nested_cursor_skip_take(runner: &Runner) -> TestResult<()> {
+    async fn m2m_many_children_nested_cursor_skip_take(runner: Runner) -> TestResult<()> {
         // >>> Begin create test data
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation {
+          run_query!(&runner, r#"mutation {
             createOneModelA(
               data: {
                 id: "A1"
@@ -661,7 +661,7 @@ mod nested_pagination {
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation {
+          run_query!(&runner, r#"mutation {
             createOneModelA(
               data: {
                 id: "A2"
@@ -686,7 +686,7 @@ mod nested_pagination {
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"mutation{
+          run_query!(&runner, r#"mutation{
             createOneModelA(data: {
               id: "A3"
             }) {
@@ -705,7 +705,7 @@ mod nested_pagination {
         // A2 => [B3, B5, B7, B8]
         // A3 => []
         insta::assert_snapshot!(
-          run_query!(runner, r#"{
+          run_query!(&runner, r#"{
             findManyModelA {
               id
               manyB(cursor: {
@@ -723,7 +723,7 @@ mod nested_pagination {
         // A2 => [B3, B5]
         // A3 => []
         insta::assert_snapshot!(
-          run_query!(runner, r#"{
+          run_query!(&runner, r#"{
             findManyModelA {
               id
               manyB(cursor: {
@@ -741,7 +741,7 @@ mod nested_pagination {
         // A2 => [B2, B3]
         // A3 => []
         insta::assert_snapshot!(
-          run_query!(runner, r#"{
+          run_query!(&runner, r#"{
             findManyModelA {
               id
               manyB(cursor: {

@@ -1,6 +1,5 @@
 [package]
-authors = []
-edition = "2018"
+edition = "2021"
 name = "mongodb-query-connector"
 version = "0.1.0"
 
@@ -10,23 +9,26 @@ async-trait = "0.1"
 bigdecimal = "0.2"
 # bson = {version = "1.1.0", features = ["decimal128"]}
 futures = "0.3"
-itertools = "0.8"
-mongodb = { version = "2.0.0-beta.1", features = ["bson-chrono-0_4", "bson-uuid-0_8"] }
+itertools = "0.10"
+mongodb = { version = "2.1.0", features = ["bson-chrono-0_4", "bson-uuid-0_8"] }
 rand = "0.7"
 regex = "1"
 serde_json = { version = "1.0", features = ["float_roundtrip"] }
 thiserror = "1.0"
 tokio = "1.0"
-tracing = "0.1.22"
-tracing-futures = "0.2.4"
-url = "2.1.1"
+tracing = "0.1"
+tracing-futures = "0.2"
 uuid = "0.8"
+indexmap = "1.7"
 
 [dependencies.prisma-models]
-path = "../../../libs/prisma-models"
+path = "../../prisma-models"
 
 [dependencies.native-types]
 path = "../../../libs/native-types"
+
+[dependencies.mongodb-client]
+path = "../../../libs/mongodb-client"
 
 [dependencies.connector-interface]
 package = "query-connector"

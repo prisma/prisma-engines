@@ -1,11 +1,14 @@
 use super::Filter;
-use crate::{compare::ScalarCompare, JsonFilterPath, JsonTargetType, MAX_BATCH_SIZE};
-use prisma_models::{ModelProjection, PrismaListValue, PrismaValue, ScalarFieldRef};
+use crate::{compare::ScalarCompare, JsonFilterPath, JsonTargetType};
+use prisma_models::{FieldSelection, ModelProjection, PrismaListValue, PrismaValue, ScalarFieldRef};
 use std::{collections::BTreeSet, sync::Arc};
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum ScalarProjection {
+    /// A single field projection.
     Single(ScalarFieldRef),
+
+    /// A tuple projection, e.g. if (a, b) <in> ((1, 2), (1, 3), ...) is supposed to be queried.
     Compound(Vec<ScalarFieldRef>),
 }
 
@@ -24,7 +27,7 @@ impl ScalarProjection {
 ///
 /// ```graphql
 /// findManyUser(where: { id: 5 })
-/// ````
+/// ```
 ///
 /// This translates to a projection of one column `id` with a condition where
 /// the column value equals `5`.
@@ -58,21 +61,33 @@ impl ScalarFilter {
 
     /// If `true`, the filter should be split into smaller filters executed in
     /// separate queries.
-    pub fn should_batch(&self) -> bool {
-        self.len() > *MAX_BATCH_SIZE
+    pub fn should_batch(&self, chunk_size: usize) -> bool {
+        self.len() > chunk_size
+    }
+
+    pub fn can_batch(&self) -> bool {
+        !matches!(
+            self.condition,
+            ScalarCondition::NotContains(_)
+                | ScalarCondition::NotEquals(_)
+                | ScalarCondition::NotIn(_)
+                | ScalarCondition::NotSearch(..)
+                | ScalarCondition::NotStartsWith(_)
+                | ScalarCondition::NotEndsWith(_)
+        )
     }
 
     /// If possible, converts the filter into multiple smaller filters.
-    pub fn batched(self) -> Vec<ScalarFilter> {
-        fn inner(mut list: PrismaListValue) -> Vec<PrismaListValue> {
+    pub fn batched(self, chunk_size: usize) -> Vec<ScalarFilter> {
+        fn inner(mut list: PrismaListValue, chunk_size: usize) -> Vec<PrismaListValue> {
             let dedup_list: BTreeSet<_> = list.drain(..).collect();
 
-            let mut batches = Vec::with_capacity(list.len() % *MAX_BATCH_SIZE + 1);
-            batches.push(Vec::with_capacity(*MAX_BATCH_SIZE));
+            let mut batches = Vec::with_capacity(list.len() % chunk_size + 1);
+            batches.push(Vec::with_capacity(chunk_size));
 
             for (idx, item) in dedup_list.into_iter().enumerate() {
-                if idx != 0 && idx % *MAX_BATCH_SIZE == 0 {
-                    batches.push(Vec::with_capacity(*MAX_BATCH_SIZE));
+                if idx != 0 && idx % chunk_size == 0 {
+                    batches.push(Vec::with_capacity(chunk_size));
                 }
 
                 batches.last_mut().unwrap().push(item);
@@ -87,7 +102,7 @@ impl ScalarFilter {
             ScalarCondition::In(list) => {
                 let projection = self.projection;
 
-                inner(list)
+                inner(list, chunk_size)
                     .into_iter()
                     .map(|batch| ScalarFilter {
                         projection: projection.clone(),
@@ -100,7 +115,7 @@ impl ScalarFilter {
             ScalarCondition::NotIn(list) => {
                 let projection = self.projection;
 
-                inner(list)
+                inner(list, chunk_size)
                     .into_iter()
                     .map(|batch| ScalarFilter {
                         projection: projection.clone(),
@@ -131,6 +146,8 @@ pub enum ScalarCondition {
     In(PrismaListValue),
     NotIn(PrismaListValue),
     JsonCompare(JsonCondition),
+    Search(PrismaValue, Vec<ScalarProjection>),
+    NotSearch(PrismaValue, Vec<ScalarProjection>),
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -167,6 +184,8 @@ impl ScalarCondition {
                         target_type: json_compare.target_type,
                     })
                 }
+                Self::Search(v, fields) => Self::NotSearch(v, fields),
+                Self::NotSearch(v, fields) => Self::Search(v, fields),
             }
         } else {
             self
@@ -342,6 +361,28 @@ impl ScalarCompare for ScalarFieldRef {
             mode: QueryMode::Default,
         })
     }
+
+    fn search<T>(&self, val: T) -> Filter
+    where
+        T: Into<PrismaValue>,
+    {
+        Filter::from(ScalarFilter {
+            projection: ScalarProjection::Single(Arc::clone(self)),
+            condition: ScalarCondition::Search(val.into(), vec![]),
+            mode: QueryMode::Default,
+        })
+    }
+
+    fn not_search<T>(&self, val: T) -> Filter
+    where
+        T: Into<PrismaValue>,
+    {
+        Filter::from(ScalarFilter {
+            projection: ScalarProjection::Single(Arc::clone(self)),
+            condition: ScalarCondition::NotSearch(val.into(), vec![]),
+            mode: QueryMode::Default,
+        })
+    }
 }
 
 impl ScalarCompare for ModelProjection {
@@ -509,6 +550,220 @@ impl ScalarCompare for ModelProjection {
         Filter::from(ScalarFilter {
             projection: ScalarProjection::Compound(self.scalar_fields().collect()),
             condition: ScalarCondition::GreaterThanOrEquals(val.into()),
+            mode: QueryMode::Default,
+        })
+    }
+
+    fn search<T>(&self, val: T) -> Filter
+    where
+        T: Into<PrismaValue>,
+    {
+        Filter::from(ScalarFilter {
+            projection: ScalarProjection::Compound(self.scalar_fields().collect()),
+            condition: ScalarCondition::Search(val.into(), vec![]),
+            mode: QueryMode::Default,
+        })
+    }
+
+    fn not_search<T>(&self, val: T) -> Filter
+    where
+        T: Into<PrismaValue>,
+    {
+        Filter::from(ScalarFilter {
+            projection: ScalarProjection::Compound(self.scalar_fields().collect()),
+            condition: ScalarCondition::NotSearch(val.into(), vec![]),
+            mode: QueryMode::Default,
+        })
+    }
+}
+
+impl ScalarCompare for FieldSelection {
+    /// Field is in a given value
+    fn is_in<T>(&self, values: Vec<T>) -> Filter
+    where
+        T: Into<PrismaValue>,
+    {
+        Filter::from(ScalarFilter {
+            projection: ScalarProjection::Compound(self.as_scalar_fields().expect("Todo composites in filters.")),
+            condition: ScalarCondition::In(values.into_iter().map(|i| i.into()).collect()),
+            mode: QueryMode::Default,
+        })
+    }
+
+    /// Field is not in a given value
+    fn not_in<T>(&self, values: Vec<T>) -> Filter
+    where
+        T: Into<PrismaValue>,
+    {
+        Filter::from(ScalarFilter {
+            projection: ScalarProjection::Compound(self.as_scalar_fields().expect("Todo composites in filters.")),
+            condition: ScalarCondition::NotIn(values.into_iter().map(|i| i.into()).collect()),
+            mode: QueryMode::Default,
+        })
+    }
+
+    /// Field equals the given value.
+    fn equals<T>(&self, val: T) -> Filter
+    where
+        T: Into<PrismaValue>,
+    {
+        Filter::from(ScalarFilter {
+            projection: ScalarProjection::Compound(self.as_scalar_fields().expect("Todo composites in filters.")),
+            condition: ScalarCondition::Equals(val.into()),
+            mode: QueryMode::Default,
+        })
+    }
+
+    /// Field does not equal the given value.
+    fn not_equals<T>(&self, val: T) -> Filter
+    where
+        T: Into<PrismaValue>,
+    {
+        Filter::from(ScalarFilter {
+            projection: ScalarProjection::Compound(self.as_scalar_fields().expect("Todo composites in filters.")),
+            condition: ScalarCondition::NotEquals(val.into()),
+            mode: QueryMode::Default,
+        })
+    }
+
+    /// Field contains the given value.
+    fn contains<T>(&self, val: T) -> Filter
+    where
+        T: Into<PrismaValue>,
+    {
+        Filter::from(ScalarFilter {
+            projection: ScalarProjection::Compound(self.as_scalar_fields().expect("Todo composites in filters.")),
+            condition: ScalarCondition::Contains(val.into()),
+            mode: QueryMode::Default,
+        })
+    }
+
+    /// Field does not contain the given value.
+    fn not_contains<T>(&self, val: T) -> Filter
+    where
+        T: Into<PrismaValue>,
+    {
+        Filter::from(ScalarFilter {
+            projection: ScalarProjection::Compound(self.as_scalar_fields().expect("Todo composites in filters.")),
+            condition: ScalarCondition::NotContains(val.into()),
+            mode: QueryMode::Default,
+        })
+    }
+
+    /// Field starts with the given value.
+    fn starts_with<T>(&self, val: T) -> Filter
+    where
+        T: Into<PrismaValue>,
+    {
+        Filter::from(ScalarFilter {
+            projection: ScalarProjection::Compound(self.as_scalar_fields().expect("Todo composites in filters.")),
+            condition: ScalarCondition::StartsWith(val.into()),
+            mode: QueryMode::Default,
+        })
+    }
+
+    /// Field does not start with the given value.
+    fn not_starts_with<T>(&self, val: T) -> Filter
+    where
+        T: Into<PrismaValue>,
+    {
+        Filter::from(ScalarFilter {
+            projection: ScalarProjection::Compound(self.as_scalar_fields().expect("Todo composites in filters.")),
+            condition: ScalarCondition::NotStartsWith(val.into()),
+            mode: QueryMode::Default,
+        })
+    }
+
+    /// Field ends with the given value.
+    fn ends_with<T>(&self, val: T) -> Filter
+    where
+        T: Into<PrismaValue>,
+    {
+        Filter::from(ScalarFilter {
+            projection: ScalarProjection::Compound(self.as_scalar_fields().expect("Todo composites in filters.")),
+            condition: ScalarCondition::EndsWith(val.into()),
+            mode: QueryMode::Default,
+        })
+    }
+
+    /// Field does not end with the given value.
+    fn not_ends_with<T>(&self, val: T) -> Filter
+    where
+        T: Into<PrismaValue>,
+    {
+        Filter::from(ScalarFilter {
+            projection: ScalarProjection::Compound(self.as_scalar_fields().expect("Todo composites in filters.")),
+            condition: ScalarCondition::NotEndsWith(val.into()),
+            mode: QueryMode::Default,
+        })
+    }
+
+    /// Field is less than the given value.
+    fn less_than<T>(&self, val: T) -> Filter
+    where
+        T: Into<PrismaValue>,
+    {
+        Filter::from(ScalarFilter {
+            projection: ScalarProjection::Compound(self.as_scalar_fields().expect("Todo composites in filters.")),
+            condition: ScalarCondition::LessThan(val.into()),
+            mode: QueryMode::Default,
+        })
+    }
+
+    /// Field is less than or equals the given value.
+    fn less_than_or_equals<T>(&self, val: T) -> Filter
+    where
+        T: Into<PrismaValue>,
+    {
+        Filter::from(ScalarFilter {
+            projection: ScalarProjection::Compound(self.as_scalar_fields().expect("Todo composites in filters.")),
+            condition: ScalarCondition::LessThanOrEquals(val.into()),
+            mode: QueryMode::Default,
+        })
+    }
+
+    /// Field is greater than the given value.
+    fn greater_than<T>(&self, val: T) -> Filter
+    where
+        T: Into<PrismaValue>,
+    {
+        Filter::from(ScalarFilter {
+            projection: ScalarProjection::Compound(self.as_scalar_fields().expect("Todo composites in filters.")),
+            condition: ScalarCondition::GreaterThan(val.into()),
+            mode: QueryMode::Default,
+        })
+    }
+
+    /// Field is greater than or equals the given value.
+    fn greater_than_or_equals<T>(&self, val: T) -> Filter
+    where
+        T: Into<PrismaValue>,
+    {
+        Filter::from(ScalarFilter {
+            projection: ScalarProjection::Compound(self.as_scalar_fields().expect("Todo composites in filters.")),
+            condition: ScalarCondition::GreaterThanOrEquals(val.into()),
+            mode: QueryMode::Default,
+        })
+    }
+
+    fn search<T>(&self, val: T) -> Filter
+    where
+        T: Into<PrismaValue>,
+    {
+        Filter::from(ScalarFilter {
+            projection: ScalarProjection::Compound(self.as_scalar_fields().expect("Todo composites in filters.")),
+            condition: ScalarCondition::Search(val.into(), vec![]),
+            mode: QueryMode::Default,
+        })
+    }
+
+    fn not_search<T>(&self, val: T) -> Filter
+    where
+        T: Into<PrismaValue>,
+    {
+        Filter::from(ScalarFilter {
+            projection: ScalarProjection::Compound(self.as_scalar_fields().expect("Todo composites in filters.")),
+            condition: ScalarCondition::NotSearch(val.into(), vec![]),
             mode: QueryMode::Default,
         })
     }

@@ -1,18 +1,94 @@
-use crate::{error::SqlError, query_builder::write, sql_info::SqlInfo, QueryExt};
+use crate::sql_trace::SqlTraceComment;
+use crate::{error::SqlError, model_extensions::*, query_builder::write, sql_info::SqlInfo, QueryExt};
 use connector_interface::*;
 use itertools::Itertools;
 use prisma_models::*;
 use prisma_value::PrismaValue;
-use quaint::error::ErrorKind;
-use std::{collections::HashSet, convert::TryFrom, ops::Deref, usize};
+use quaint::{
+    error::ErrorKind,
+    prelude::{native_uuid, uuid_to_bin, Aliasable, Select, SqlFamily},
+};
+use std::{
+    collections::{HashMap, HashSet},
+    ops::Deref,
+    usize,
+};
 use tracing::log::trace;
 use user_facing_errors::query_engine::DatabaseConstraint;
+
+async fn generate_id(
+    conn: &dyn QueryExt,
+    primary_key: &FieldSelection,
+    trace_id: Option<String>,
+) -> crate::Result<Option<SelectionResult>> {
+    // Go through all the values and generate a select statement with the correct MySQL function
+    let (pk_select, need_select) = primary_key
+        .selections()
+        .filter_map(|field| match field {
+            SelectedField::Scalar(x) if x.default_value.is_some() => x
+                .default_value
+                .clone()
+                .unwrap()
+                .to_dbgenerated_func()
+                .map(|func| (field.db_name().to_string(), func)),
+            _ => None,
+        })
+        .fold((Select::default(), false), |(query, generated), value| {
+            let alias = value.0;
+            let func = value.1.to_lowercase().replace(' ', "");
+
+            match func.as_str() {
+                "(uuid())" => (query.value(native_uuid().alias(alias)), true),
+                "(uuid_to_bin(uuid()))" => (query.value(uuid_to_bin().alias(alias)), true),
+                _ => (query, generated),
+            }
+        });
+
+    // db generate values only if needed
+    if need_select {
+        let pk_select = pk_select.add_trace_id(trace_id);
+        let pk_result = conn.query(pk_select.into()).await?;
+        let result = try_convert(&(primary_key.into()), pk_result)?;
+
+        Ok(Some(result))
+    } else {
+        Ok(None)
+    }
+}
 
 /// Create a single record to the database defined in `conn`, resulting into a
 /// `RecordProjection` as an identifier pointing to the just-created record.
 #[tracing::instrument(skip(conn, model, args))]
-pub async fn create_record(conn: &dyn QueryExt, model: &ModelRef, args: WriteArgs) -> crate::Result<RecordProjection> {
-    let (insert, returned_id) = write::create_record(model, args);
+pub async fn create_record(
+    conn: &dyn QueryExt,
+    sql_family: &SqlFamily,
+    model: &ModelRef,
+    mut args: WriteArgs,
+    trace_id: Option<String>,
+) -> crate::Result<SelectionResult> {
+    let pk = model.primary_identifier();
+
+    let returned_id = if *sql_family == SqlFamily::Mysql {
+        generate_id(conn, &pk, trace_id.clone()).await?
+    } else {
+        args.as_record_projection(pk.clone().into())
+    };
+
+    let returned_id = returned_id.or_else(|| args.as_record_projection(pk.clone().into()));
+
+    let args = match returned_id {
+        Some(ref pk) if *sql_family == SqlFamily::Mysql => {
+            for (field, value) in pk.pairs.iter() {
+                let field = DatasourceFieldName(field.db_name().into());
+                let value = WriteOperation::scalar_set(value.clone());
+                args.insert(field, value)
+            }
+            args
+        }
+        _ => args,
+    };
+
+    let insert = write::create_record(model, args, trace_id);
 
     let result_set = match conn.insert(insert).await {
         Ok(id) => id,
@@ -62,7 +138,7 @@ pub async fn create_record(conn: &dyn QueryExt, model: &ModelRef, args: WriteArg
         (Some(identifier), _, _) if !identifier.misses_autogen_value() => Ok(identifier),
 
         // PostgreSQL with a working RETURNING statement
-        (_, n, _) if n > 0 => Ok(RecordProjection::try_from((&model.primary_identifier(), result_set))?),
+        (_, n, _) if n > 0 => Ok(try_convert(&model.primary_identifier().into(), result_set)?),
 
         // We have an auto-incremented id that we got from MySQL or SQLite
         (Some(mut identifier), _, Some(num)) if identifier.misses_autogen_value() => {
@@ -81,6 +157,7 @@ pub async fn create_records(
     model: &ModelRef,
     args: Vec<WriteArgs>,
     skip_duplicates: bool,
+    trace_id: Option<String>,
 ) -> crate::Result<usize> {
     if args.is_empty() {
         return Ok(0);
@@ -90,6 +167,7 @@ pub async fn create_records(
     let mut fields = HashSet::new();
     args.iter().for_each(|arg| fields.extend(arg.keys().into_iter()));
 
+    #[allow(clippy::mutable_key_type)]
     let affected_fields: HashSet<ScalarFieldRef> = fields
         .into_iter()
         .map(|dsfn| {
@@ -104,13 +182,14 @@ pub async fn create_records(
 
     if affected_fields.is_empty() {
         // If no fields are to be inserted (everything is DEFAULT) we need to fall back to inserting default rows `args.len()` times.
-        create_many_empty(conn, model, args.len(), skip_duplicates).await
+        create_many_empty(conn, model, args.len(), skip_duplicates, trace_id).await
     } else {
-        create_many_nonempty(conn, sql_info, model, args, skip_duplicates, affected_fields).await
+        create_many_nonempty(conn, sql_info, model, args, skip_duplicates, affected_fields, trace_id).await
     }
 }
 
 /// Standard create many records, requires `affected_fields` to be non-empty.
+#[allow(clippy::mutable_key_type)]
 async fn create_many_nonempty(
     conn: &dyn QueryExt,
     sql_info: SqlInfo,
@@ -118,6 +197,7 @@ async fn create_many_nonempty(
     args: Vec<WriteArgs>,
     skip_duplicates: bool,
     affected_fields: HashSet<ScalarFieldRef>,
+    trace_id: Option<String>,
 ) -> crate::Result<usize> {
     let batches = if let Some(max_params) = sql_info.max_bind_values {
         // We need to split inserts if they are above a parameter threshold, as well as split based on number of rows.
@@ -191,7 +271,7 @@ async fn create_many_nonempty(
 
     let mut count = 0;
     for batch in partitioned_batches {
-        let stmt = write::create_records_nonempty(model, batch, skip_duplicates, &affected_fields);
+        let stmt = write::create_records_nonempty(model, batch, skip_duplicates, &affected_fields, trace_id.clone());
         count += conn.execute(stmt.into()).await?;
     }
 
@@ -204,8 +284,9 @@ async fn create_many_empty(
     model: &ModelRef,
     num_records: usize,
     skip_duplicates: bool,
+    trace_id: Option<String>,
 ) -> crate::Result<usize> {
-    let stmt = write::create_records_empty(model, skip_duplicates);
+    let stmt = write::create_records_empty(model, skip_duplicates, trace_id);
     let mut count = 0;
 
     for _ in 0..num_records {
@@ -224,17 +305,18 @@ pub async fn update_records(
     model: &ModelRef,
     record_filter: RecordFilter,
     args: WriteArgs,
-) -> crate::Result<Vec<RecordProjection>> {
-    let ids = conn.filter_selectors(model, record_filter).await?;
-    let id_args = pick_args(&model.primary_identifier(), &args);
+    trace_id: Option<String>,
+) -> crate::Result<Vec<SelectionResult>> {
+    let ids = conn.filter_selectors(model, record_filter, trace_id.clone()).await?;
+    let id_args = pick_args(&model.primary_identifier().into(), &args);
 
     if ids.is_empty() {
         return Ok(vec![]);
     }
 
     let updates = {
-        let ids: Vec<&RecordProjection> = ids.iter().map(|id| &*id).collect();
-        write::update_many(model, ids.as_slice(), args)?
+        let ids: Vec<&SelectionResult> = ids.iter().map(|id| &*id).collect();
+        write::update_many(model, ids.as_slice(), args, trace_id)?
     };
 
     for update in updates {
@@ -250,16 +332,17 @@ pub async fn delete_records(
     conn: &dyn QueryExt,
     model: &ModelRef,
     record_filter: RecordFilter,
+    trace_id: Option<String>,
 ) -> crate::Result<usize> {
-    let ids = conn.filter_selectors(model, record_filter).await?;
-    let ids: Vec<&RecordProjection> = ids.iter().map(|id| &*id).collect();
+    let ids = conn.filter_selectors(model, record_filter, trace_id.clone()).await?;
+    let ids: Vec<&SelectionResult> = ids.iter().map(|id| &*id).collect();
     let count = ids.len();
 
     if count == 0 {
         return Ok(count);
     }
 
-    for delete in write::delete_many(model, ids.as_slice()) {
+    for delete in write::delete_many(model, ids.as_slice(), trace_id) {
         conn.query(delete).await?;
     }
 
@@ -272,8 +355,8 @@ pub async fn delete_records(
 pub async fn m2m_connect(
     conn: &dyn QueryExt,
     field: &RelationFieldRef,
-    parent_id: &RecordProjection,
-    child_ids: &[RecordProjection],
+    parent_id: &SelectionResult,
+    child_ids: &[SelectionResult],
 ) -> crate::Result<()> {
     let query = write::create_relation_table_records(field, parent_id, child_ids);
     conn.query(query).await?;
@@ -287,10 +370,11 @@ pub async fn m2m_connect(
 pub async fn m2m_disconnect(
     conn: &dyn QueryExt,
     field: &RelationFieldRef,
-    parent_id: &RecordProjection,
-    child_ids: &[RecordProjection],
+    parent_id: &SelectionResult,
+    child_ids: &[SelectionResult],
+    trace_id: Option<String>,
 ) -> crate::Result<()> {
-    let query = write::delete_relation_table_records(field, parent_id, child_ids);
+    let query = write::delete_relation_table_records(field, parent_id, child_ids, trace_id);
     conn.delete(query).await?;
 
     Ok(())
@@ -298,20 +382,18 @@ pub async fn m2m_disconnect(
 
 /// Execute a plain SQL query with the given parameters, returning the number of
 /// affected rows.
-#[tracing::instrument(skip(conn, query, parameters))]
-pub async fn execute_raw(conn: &dyn QueryExt, query: String, parameters: Vec<PrismaValue>) -> crate::Result<usize> {
-    let value = conn.raw_count(query, parameters).await?;
+#[tracing::instrument(skip(conn, inputs))]
+pub async fn execute_raw(conn: &dyn QueryExt, inputs: HashMap<String, PrismaValue>) -> crate::Result<usize> {
+    let value = conn.raw_count(inputs).await?;
+
     Ok(value)
 }
 
 /// Execute a plain SQL query with the given parameters, returning the answer as
 /// a JSON `Value`.
-#[tracing::instrument(skip(conn, query, parameters))]
-pub async fn query_raw(
-    conn: &dyn QueryExt,
-    query: String,
-    parameters: Vec<PrismaValue>,
-) -> crate::Result<serde_json::Value> {
-    let value = conn.raw_json(query, parameters).await?;
+#[tracing::instrument(skip(conn, inputs))]
+pub async fn query_raw(conn: &dyn QueryExt, inputs: HashMap<String, PrismaValue>) -> crate::Result<serde_json::Value> {
+    let value = conn.raw_json(inputs).await?;
+
     Ok(value)
 }

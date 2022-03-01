@@ -1,4 +1,5 @@
 pub mod arithmetic;
+
 mod error;
 #[cfg(feature = "sql-ext")]
 mod sql_ext;
@@ -25,6 +26,9 @@ pub enum PrismaValue {
     List(PrismaListValue),
     Json(String),
     Xml(String),
+
+    /// A collections of key-value pairs constituting an object.
+    Object(Vec<(String, PrismaValue)>),
 
     #[serde(serialize_with = "serialize_null")]
     Null,
@@ -227,6 +231,13 @@ impl PrismaValue {
     pub fn new_datetime(datetime: &str) -> PrismaValue {
         PrismaValue::DateTime(DateTime::parse_from_rfc3339(datetime).unwrap())
     }
+
+    pub fn as_boolean(&self) -> Option<&bool> {
+        match self {
+            PrismaValue::Boolean(bool) => Some(bool),
+            _ => None,
+        }
+    }
 }
 
 impl fmt::Display for PrismaValue {
@@ -248,6 +259,15 @@ impl fmt::Display for PrismaValue {
                 as_string.fmt(f)
             }
             PrismaValue::Bytes(b) => encode_bytes(b).fmt(f),
+            PrismaValue::Object(pairs) => {
+                let joined = pairs
+                    .iter()
+                    .map(|(key, value)| format!(r#""{}": {}"#, key, value))
+                    .collect::<Vec<_>>()
+                    .join(", ");
+
+                write!(f, "{{ {} }}", joined)
+            }
         }
     }
 }
@@ -317,6 +337,17 @@ impl TryFrom<PrismaValue> for i64 {
         match value {
             PrismaValue::Int(i) => Ok(i),
             _ => Err(ConversionFailure::new("PrismaValue", "i64")),
+        }
+    }
+}
+
+impl TryFrom<PrismaValue> for String {
+    type Error = ConversionFailure;
+
+    fn try_from(pv: PrismaValue) -> PrismaValueResult<String> {
+        match pv {
+            PrismaValue::String(s) => Ok(s),
+            _ => Err(ConversionFailure::new("PrismaValue", "String")),
         }
     }
 }

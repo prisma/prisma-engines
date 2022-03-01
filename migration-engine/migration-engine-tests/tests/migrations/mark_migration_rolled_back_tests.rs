@@ -1,6 +1,5 @@
-use migration_engine_tests::sync_test_api::*;
+use migration_engine_tests::test_api::*;
 use pretty_assertions::assert_eq;
-use test_macros::test_connector;
 use user_facing_errors::UserFacingError;
 
 #[test_connector]
@@ -14,7 +13,7 @@ fn mark_migration_rolled_back_on_an_empty_database_errors(api: TestApi) {
 
 #[test_connector]
 fn mark_migration_rolled_back_on_a_database_with_migrations_table_errors(api: TestApi) {
-    api.block_on(api.migration_persistence().initialize()).unwrap();
+    tok(api.migration_persistence().initialize()).unwrap();
 
     let err = api
         .mark_migration_rolled_back("anything")
@@ -36,18 +35,19 @@ fn mark_migration_rolled_back_on_a_database_with_migrations_table_errors(api: Te
 #[test_connector]
 fn mark_migration_rolled_back_with_a_failed_migration_works(api: TestApi) {
     let migrations_directory = api.create_migrations_directory();
-    let persistence = api.migration_persistence();
 
     // Create and apply a first migration
     let initial_migration_name = {
-        let dm1 = r#"
+        let dm1 = api.datamodel_with_provider(
+            r#"
             model Test {
                 id Int @id
             }
-        "#;
+        "#,
+        );
 
         let output_initial_migration = api
-            .create_migration("01init", dm1, &migrations_directory)
+            .create_migration("01init", &dm1, &migrations_directory)
             .send_sync()
             .into_output();
 
@@ -56,7 +56,8 @@ fn mark_migration_rolled_back_with_a_failed_migration_works(api: TestApi) {
 
     // Create a second migration
     let second_migration_name = {
-        let dm2 = r#"
+        let dm2 = api.datamodel_with_provider(
+            r#"
             model Test {
                 id Int @id
             }
@@ -65,10 +66,11 @@ fn mark_migration_rolled_back_with_a_failed_migration_works(api: TestApi) {
                 id Int @id
                 name String
             }
-        "#;
+        "#,
+        );
 
         let output_second_migration = api
-            .create_migration("02migration", dm2, &migrations_directory)
+            .create_migration("02migration", &dm2, &migrations_directory)
             .send_sync()
             .modify_migration(|migration| {
                 migration.clear();
@@ -83,7 +85,7 @@ fn mark_migration_rolled_back_with_a_failed_migration_works(api: TestApi) {
 
     // Check that the second migration failed.
     {
-        let applied_migrations = api.block_on(persistence.list_migrations()).unwrap().unwrap();
+        let applied_migrations = tok(api.migration_persistence().list_migrations()).unwrap().unwrap();
 
         assert_eq!(applied_migrations.len(), 2);
         assert!(
@@ -100,7 +102,7 @@ fn mark_migration_rolled_back_with_a_failed_migration_works(api: TestApi) {
 
     api.mark_migration_rolled_back(&second_migration_name).send();
 
-    let applied_migrations = api.block_on(persistence.list_migrations()).unwrap().unwrap();
+    let applied_migrations = tok(api.migration_persistence().list_migrations()).unwrap().unwrap();
 
     assert_eq!(applied_migrations.len(), 2);
     assert_eq!(&applied_migrations[0].migration_name, &initial_migration_name);
@@ -114,18 +116,19 @@ fn mark_migration_rolled_back_with_a_failed_migration_works(api: TestApi) {
 #[test_connector]
 fn mark_migration_rolled_back_with_a_successful_migration_errors(api: TestApi) {
     let migrations_directory = api.create_migrations_directory();
-    let persistence = api.migration_persistence();
 
     // Create and apply a first migration
     let initial_migration_name = {
-        let dm1 = r#"
+        let dm1 = api.datamodel_with_provider(
+            r#"
             model Test {
                 id Int @id
             }
-        "#;
+        "#,
+        );
 
         let output_initial_migration = api
-            .create_migration("01init", dm1, &migrations_directory)
+            .create_migration("01init", &dm1, &migrations_directory)
             .send_sync()
             .into_output();
 
@@ -134,7 +137,8 @@ fn mark_migration_rolled_back_with_a_successful_migration_errors(api: TestApi) {
 
     // Create a second migration
     let second_migration_name = {
-        let dm2 = r#"
+        let dm2 = api.datamodel_with_provider(
+            r#"
             model Test {
                 id Int @id
             }
@@ -143,10 +147,11 @@ fn mark_migration_rolled_back_with_a_successful_migration_errors(api: TestApi) {
                 id Int @id
                 name String
             }
-        "#;
+        "#,
+        );
 
         let output_second_migration = api
-            .create_migration("02migration", dm2, &migrations_directory)
+            .create_migration("02migration", &dm2, &migrations_directory)
             .send_sync()
             .into_output();
 
@@ -157,7 +162,7 @@ fn mark_migration_rolled_back_with_a_successful_migration_errors(api: TestApi) {
 
     // Check that the second migration succeeded.
     {
-        let applied_migrations = api.block_on(persistence.list_migrations()).unwrap().unwrap();
+        let applied_migrations = tok(api.migration_persistence().list_migrations()).unwrap().unwrap();
 
         assert_eq!(applied_migrations.len(), 2);
         assert!(applied_migrations[1].finished_at.is_some(),);
@@ -173,7 +178,7 @@ fn mark_migration_rolled_back_with_a_successful_migration_errors(api: TestApi) {
         second_migration_name
     )));
 
-    let applied_migrations = api.block_on(persistence.list_migrations()).unwrap().unwrap();
+    let applied_migrations = tok(api.migration_persistence().list_migrations()).unwrap().unwrap();
 
     assert_eq!(applied_migrations.len(), 2);
     assert_eq!(&applied_migrations[0].migration_name, &initial_migration_name);
@@ -187,18 +192,19 @@ fn mark_migration_rolled_back_with_a_successful_migration_errors(api: TestApi) {
 #[test_connector]
 fn rolling_back_applying_again_then_rolling_back_again_should_error(api: TestApi) {
     let migrations_directory = api.create_migrations_directory();
-    let persistence = api.migration_persistence();
 
     // Create and apply a first migration
     let initial_migration_name = {
-        let dm1 = r#"
+        let dm1 = api.datamodel_with_provider(
+            r#"
              model Test {
                  id Int @id
              }
-         "#;
+         "#,
+        );
 
         let output_initial_migration = api
-            .create_migration("01init", dm1, &migrations_directory)
+            .create_migration("01init", &dm1, &migrations_directory)
             .send_sync()
             .into_output();
 
@@ -206,8 +212,8 @@ fn rolling_back_applying_again_then_rolling_back_again_should_error(api: TestApi
     };
 
     // Create a second migration
-    let (second_migration_name, second_migration_assertions) = {
-        let dm2 = r#"
+    let dm2 = api.datamodel_with_provider(
+        r#"
              model Test {
                  id Int @id
              }
@@ -216,10 +222,12 @@ fn rolling_back_applying_again_then_rolling_back_again_should_error(api: TestApi
                  id Int @id
                  name String
              }
-         "#;
+         "#,
+    );
 
+    let (second_migration_name, second_migration_path) = {
         let output_second_migration = api
-            .create_migration("02migration", dm2, &migrations_directory)
+            .create_migration("02migration", &dm2, &migrations_directory)
             .send_sync()
             .modify_migration(|migration| {
                 migration.clear();
@@ -232,7 +240,7 @@ fn rolling_back_applying_again_then_rolling_back_again_should_error(api: TestApi
                 .generated_migration_name
                 .clone()
                 .unwrap(),
-            output_second_migration,
+            output_second_migration.migration_script_path(),
         )
     };
 
@@ -240,7 +248,7 @@ fn rolling_back_applying_again_then_rolling_back_again_should_error(api: TestApi
 
     // Check that the second migration failed.
     {
-        let applied_migrations = api.block_on(persistence.list_migrations()).unwrap().unwrap();
+        let applied_migrations = tok(api.migration_persistence().list_migrations()).unwrap().unwrap();
 
         assert_eq!(applied_migrations.len(), 2);
         assert!(applied_migrations[1].finished_at.is_none());
@@ -251,15 +259,12 @@ fn rolling_back_applying_again_then_rolling_back_again_should_error(api: TestApi
     api.mark_migration_rolled_back(&second_migration_name).send();
 
     // Fix the migration
-    second_migration_assertions.modify_migration(|migration| {
-        migration.clear();
-        migration.push_str("SELECT 'YOLO'");
-    });
+    std::fs::write(second_migration_path, "SELECT 'YOLO'").unwrap();
 
     // Reapply migration 2
     api.apply_migrations(&migrations_directory).send_sync();
 
-    let applied_migrations = api.block_on(persistence.list_migrations()).unwrap().unwrap();
+    let applied_migrations = tok(api.migration_persistence().list_migrations()).unwrap().unwrap();
 
     assert_eq!(applied_migrations.len(), 3);
     assert_eq!(&applied_migrations[0].migration_name, &initial_migration_name);
@@ -276,7 +281,7 @@ fn rolling_back_applying_again_then_rolling_back_again_should_error(api: TestApi
     // Try to mark the second migration as rolled back again.
     api.mark_migration_rolled_back(&second_migration_name).send();
 
-    let final_migrations = api.block_on(persistence.list_migrations()).unwrap().unwrap();
+    let final_migrations = tok(api.migration_persistence().list_migrations()).unwrap().unwrap();
 
     // Assert that the last two migration records did not change, except for things like checksums.
     assert_eq!(&final_migrations[1].migration_name, &second_migration_name);

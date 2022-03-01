@@ -10,13 +10,13 @@ use indoc::indoc;
 use native_types::{MsSqlType, MsSqlTypeParameter::*};
 
 const BLOB_TYPES: &[&str] = &["VarBinary(Max)", "Image"];
-const TEXT_TYPES: &[&str] = &["Text", "NText", "VarChar(Max)", "NVarChar(Max)"];
+const TEXT_TYPES: &[&str] = &["Text", "NText", "VarChar(Max)", "NVarChar(Max)", "Xml"];
 
 #[test]
 fn text_and_blob_data_types_should_fail_on_index() {
     fn error_msg(type_name: &str) -> String {
         format!(
-            "You can not define an index on fields with Native type {} of SQL Server.",
+            "You cannot define an index on fields with Native type {} of SQL Server.",
             type_name
         )
     }
@@ -33,7 +33,7 @@ fn text_and_blob_data_types_should_fail_on_index() {
 #[test]
 fn text_and_blob_data_types_can_not_be_unique() {
     fn error_msg(type_name: &str) -> String {
-        format!("Native type {} can not be unique in SQL Server.", type_name)
+        format!("Native type {} cannot be unique in SQL Server.", type_name)
     }
 
     for tpe in BLOB_TYPES {
@@ -51,7 +51,7 @@ fn text_and_blob_data_types_can_not_be_unique() {
 fn text_and_blob_data_types_should_fail_on_id_attribute() {
     fn error_msg(type_name: &str) -> String {
         format!(
-            "Native type {} of SQL Server can not be used on a field that is `@id` or `@@id`.",
+            "Native type {} of SQL Server cannot be used on a field that is `@id` or `@@id`.",
             type_name
         )
     }
@@ -89,7 +89,7 @@ fn test_block_attribute_support(native_type: &str, scalar_type: &str, attribute_
         attribute_name = attribute_name
     );
 
-    test_native_types_compatibility(&dml, &error_msg, MSSQL_SOURCE);
+    test_native_types_compatibility(&dml, error_msg, MSSQL_SOURCE);
 }
 
 #[test]
@@ -110,8 +110,8 @@ fn should_fail_on_native_type_decimal_when_scale_is_bigger_than_precision() {
 
     let error = parse_error(dml);
 
-    error.assert_is(DatamodelError::new_connector_error(
-        "The scale must not be larger than the precision for the Decimal(2,4) native type in SQL Server.",
+    error.assert_is(DatamodelError::new(
+        "The scale must not be larger than the precision for the Decimal(2,4) native type in SQL Server.".into(),
         ast::Span::new(113, 142),
     ));
 }
@@ -177,8 +177,9 @@ fn should_fail_on_incompatible_scalar_type_with_tiny_int() {
 
     let error = parse_error(dml);
 
-    error.assert_is(DatamodelError::new_connector_error(
-        "Native type Bit is not compatible with declared field type DateTime, expected field type Boolean or Int.",
+    error.assert_is(DatamodelError::new(
+        "Native type Bit is not compatible with declared field type DateTime, expected field type Boolean or Int."
+            .into(),
         ast::Span::new(180, 186),
     ));
 }
@@ -199,8 +200,8 @@ fn should_fail_on_bad_type_params() {
 
     let error = parse_error(dml);
 
-    error.assert_is(DatamodelError::new_connector_error(
-        "Invalid argument for type NVarChar: Ma. Allowed values: a number or `Max`.",
+    error.assert_is(DatamodelError::new(
+        "Invalid argument for type NVarChar: Ma. Allowed values: a number or `Max`.".into(),
         ast::Span::new(178, 193),
     ));
 }
@@ -221,8 +222,8 @@ fn should_fail_on_too_many_type_params() {
 
     let error = parse_error(dml);
 
-    error.assert_is(DatamodelError::new_connector_error(
-        "Native type NVarChar takes 1 optional arguments, but received 2.",
+    error.assert_is(DatamodelError::new(
+        "Native type NVarChar takes 1 optional arguments, but received 2.".into(),
         ast::Span::new(178, 195),
     ));
 }

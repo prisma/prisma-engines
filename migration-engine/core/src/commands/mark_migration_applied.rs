@@ -1,32 +1,16 @@
-use crate::{CoreError, CoreResult};
+use crate::{json_rpc::types::*, CoreError, CoreResult};
 use migration_connector::{
     migrations_directory::{error_on_changed_provider, MigrationDirectory},
     MigrationConnector,
 };
-use serde::Deserialize;
-use std::{collections::HashMap, path::Path};
+use std::path::Path;
 use user_facing_errors::migration_engine::{MigrationAlreadyApplied, MigrationToMarkAppliedNotFound};
-
-/// The input to the `markMigrationApplied` command.
-#[derive(Debug, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct MarkMigrationAppliedInput {
-    /// The name of the migration to mark applied.
-    pub migration_name: String,
-    /// The path to the root of the migrations directory.
-    pub migrations_directory_path: String,
-}
-
-/// The output of the `markMigrationApplied` command.
-pub type MarkMigrationAppliedOutput = HashMap<(), ()>;
 
 /// Mark a migration as applied.
 pub async fn mark_migration_applied(
-    input: &MarkMigrationAppliedInput,
-    connector: &dyn MigrationConnector,
+    input: MarkMigrationAppliedInput,
+    connector: &mut dyn MigrationConnector,
 ) -> CoreResult<MarkMigrationAppliedOutput> {
-    let persistence = connector.migration_persistence();
-
     error_on_changed_provider(&input.migrations_directory_path, connector.connector_type())?;
 
     connector.acquire_lock().await?;
@@ -40,13 +24,13 @@ pub async fn mark_migration_applied(
         })
     })?;
 
-    let relevant_migrations = match persistence.list_migrations().await? {
+    let relevant_migrations = match connector.migration_persistence().list_migrations().await? {
         Ok(migrations) => migrations
             .into_iter()
             .filter(|migration| migration.migration_name == input.migration_name)
             .collect(),
         Err(_) => {
-            persistence.baseline_initialize().await?;
+            connector.migration_persistence().baseline_initialize().await?;
 
             vec![]
         }
@@ -66,12 +50,16 @@ pub async fn mark_migration_applied(
         .filter(|migration| migration.finished_at.is_none() && migration.rolled_back_at.is_none());
 
     for migration in migrations_to_mark_rolled_back {
-        persistence.mark_migration_rolled_back_by_id(&migration.id).await?;
+        connector
+            .migration_persistence()
+            .mark_migration_rolled_back_by_id(&migration.id)
+            .await?;
     }
 
-    persistence
+    connector
+        .migration_persistence()
         .mark_migration_applied(migration_directory.migration_name(), &script)
         .await?;
 
-    Ok(Default::default())
+    Ok(MarkMigrationAppliedOutput {})
 }

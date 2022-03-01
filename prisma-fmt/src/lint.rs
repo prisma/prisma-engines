@@ -1,20 +1,21 @@
-use crate::{LintOpts, MiniError};
 use datamodel::diagnostics::{DatamodelError, DatamodelWarning};
-use std::io::{self, Read};
 
-pub fn run(_opts: LintOpts) {
-    let mut datamodel_string = String::new();
+#[derive(serde::Serialize)]
+pub struct MiniError {
+    start: usize,
+    end: usize,
+    text: String,
+    is_warning: bool,
+}
 
-    io::stdin()
-        .read_to_string(&mut datamodel_string)
-        .expect("Unable to read from stdin.");
-
-    let datamodel_result = datamodel::parse_datamodel(&datamodel_string);
+pub(crate) fn run(schema: &str) -> String {
+    let datamodel_result = datamodel::parse_datamodel(schema);
 
     match datamodel_result {
         Err(err) => {
             let mut mini_errors: Vec<MiniError> = err
-                .to_error_iter()
+                .errors()
+                .iter()
                 .map(|err: &DatamodelError| MiniError {
                     start: err.span().start,
                     end: err.span().end,
@@ -24,7 +25,8 @@ pub fn run(_opts: LintOpts) {
                 .collect();
 
             let mut mini_warnings: Vec<MiniError> = err
-                .to_warning_iter()
+                .warnings()
+                .iter()
                 .map(|warn: &DatamodelWarning| MiniError {
                     start: warn.span().start,
                     end: warn.span().end,
@@ -35,7 +37,7 @@ pub fn run(_opts: LintOpts) {
 
             mini_errors.append(&mut mini_warnings);
 
-            print_diagnostics(mini_errors);
+            print_diagnostics(mini_errors)
         }
         Ok(validated_datamodel) => {
             let mini_warnings: Vec<MiniError> = validated_datamodel
@@ -49,13 +51,88 @@ pub fn run(_opts: LintOpts) {
                 })
                 .collect();
 
-            print_diagnostics(mini_warnings);
+            print_diagnostics(mini_warnings)
         }
     }
 }
 
-fn print_diagnostics(diagnostics: Vec<MiniError>) {
-    let json = serde_json::to_string(&diagnostics).expect("Failed to render JSON");
+fn print_diagnostics(diagnostics: Vec<MiniError>) -> String {
+    serde_json::to_string(&diagnostics).expect("Failed to render JSON")
+}
 
-    print!("{}", json)
+#[cfg(test)]
+mod tests {
+    use expect_test::expect;
+    use indoc::indoc;
+
+    fn lint(s: &str) -> String {
+        let result = super::run(s);
+        let value: serde_json::Value = serde_json::from_str(&result).unwrap();
+
+        serde_json::to_string_pretty(&value).unwrap()
+    }
+
+    #[test]
+    fn type_aliases_should_give_a_warning() {
+        let dml = indoc! {r#"
+            datasource db {
+              provider = "postgresql"
+              url      = env("DATABASE_URL")
+            }
+
+            generator client {
+              provider = "prisma-client-js"
+            }
+
+            type MyString = String @default("A")
+
+            model Code {
+              id  String   @id
+              val MyString
+            }
+        "#};
+
+        let expected = expect![[r#"
+            [
+              {
+                "start": 132,
+                "end": 168,
+                "text": "Type aliases are an undocumented feature that is getting deprecated. Please chime in in the issue if you need it: https://github.com/prisma/prisma/issues/9939",
+                "is_warning": true
+              }
+            ]"#]];
+
+        expected.assert_eq(&lint(dml));
+    }
+
+    #[test]
+    fn deprecated_preview_features_should_give_a_warning() {
+        let dml = indoc! {r#"
+            datasource db {
+              provider = "postgresql"
+              url      = env("DATABASE_URL")
+            }
+
+            generator client {
+              provider = "prisma-client-js"
+              previewFeatures = ["createMany"]
+            }
+
+            model A {
+              id  String   @id
+            }
+        "#};
+
+        let expected = expect![[r#"
+            [
+              {
+                "start": 149,
+                "end": 163,
+                "text": "Preview feature \"createMany\" is deprecated. The functionality can be used without specifying it as a preview feature.",
+                "is_warning": true
+              }
+            ]"#]];
+
+        expected.assert_eq(&lint(dml));
+    }
 }

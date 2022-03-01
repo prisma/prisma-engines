@@ -1,6 +1,3 @@
-use datamodel_connector::Connector;
-use sql_datamodel_connector::SqliteDatamodelConnector;
-
 use super::*;
 use crate::SqlDatamodelRenderer;
 
@@ -54,6 +51,5 @@ impl SqliteConnectorTag {
 }
 
 fn sqlite_capabilities() -> Vec<ConnectorCapability> {
-    let dm_connector = SqliteDatamodelConnector::new();
-    dm_connector.capabilities().to_owned()
+    sql_datamodel_connector::SQLITE.capabilities().to_owned()
 }

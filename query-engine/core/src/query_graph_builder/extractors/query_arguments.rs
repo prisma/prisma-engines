@@ -5,10 +5,7 @@ use crate::{
     QueryGraphBuilderError, QueryGraphBuilderResult,
 };
 use connector::QueryArguments;
-use prisma_models::{
-    Field, ModelProjection, ModelRef, OrderBy, PrismaValue, RecordProjection, RelationFieldRef, ScalarFieldRef,
-    SortAggregation, SortOrder,
-};
+use prisma_models::prelude::*;
 use std::convert::TryInto;
 
 /// Expects the caller to know that it is structurally guaranteed that query arguments can be extracted,
@@ -37,7 +34,7 @@ pub fn extract_query_args(arguments: Vec<ParsedArgument>, model: &ModelRef) -> Q
                     }),
 
                     args::ORDER_BY => Ok(QueryArguments {
-                        order_by: extract_order_by(model, arg.value)?,
+                        order_by: extract_order_by(&model.into(), arg.value)?,
                         ..res
                     }),
 
@@ -69,18 +66,18 @@ pub fn extract_query_args(arguments: Vec<ParsedArgument>, model: &ModelRef) -> Q
 }
 
 /// Extracts order by conditions in order of appearance.
-fn extract_order_by(model: &ModelRef, value: ParsedInputValue) -> QueryGraphBuilderResult<Vec<OrderBy>> {
+fn extract_order_by(container: &ParentContainer, value: ParsedInputValue) -> QueryGraphBuilderResult<Vec<OrderBy>> {
     match value {
         ParsedInputValue::List(list) => list
             .into_iter()
             .map(|list_value| {
                 let object: ParsedInputMap = list_value.try_into()?;
-                Ok(process_order_object(model, object, vec![], None)?)
+                Ok(process_order_object(container, object, vec![], None)?)
             })
             .collect::<QueryGraphBuilderResult<Vec<_>>>()
             .map(|results| results.into_iter().flatten().collect()),
 
-        ParsedInputValue::Map(map) => Ok(match process_order_object(model, map, vec![], None)? {
+        ParsedInputValue::Map(map) => Ok(match process_order_object(container, map, vec![], None)? {
             Some(order) => vec![order],
             None => vec![],
         }),
@@ -89,78 +86,134 @@ fn extract_order_by(model: &ModelRef, value: ParsedInputValue) -> QueryGraphBuil
     }
 }
 
-#[tracing::instrument(skip(model, object, path))]
 fn process_order_object(
-    model: &ModelRef,
+    container: &ParentContainer,
     object: ParsedInputMap,
-    mut path: Vec<RelationFieldRef>,
+    mut path: Vec<OrderByHop>,
     parent_sort_aggregation: Option<SortAggregation>,
 ) -> QueryGraphBuilderResult<Option<OrderBy>> {
     match object.into_iter().next() {
         None => Ok(None),
         Some((field_name, field_value)) => {
-            let sort_aggregation = extract_sort_aggregation(field_name.as_str());
-
-            if let Ok(sort_aggr) = sort_aggregation {
+            if field_name.as_str() == ordering::UNDERSCORE_RELEVANCE {
                 let object: ParsedInputMap = field_value.try_into()?;
 
-                return process_order_object(model, object, path, Some(sort_aggr));
+                return extract_order_by_relevance(container, object);
             }
 
-            let field = model.fields().find_from_all(&field_name)?;
+            if let Some(sort_aggr) = extract_sort_aggregation(field_name.as_str()) {
+                let object: ParsedInputMap = field_value.try_into()?;
+
+                return process_order_object(container, object, path, Some(sort_aggr));
+            }
+
+            let field = container
+                .find_field(&field_name)
+                .expect("Fields must be valid after validation passed.");
 
             match field {
-                Field::Relation(rf) if rf.is_list => {
-                    path.push(rf.clone());
-
+                Field::Relation(rf) if rf.is_list() => {
                     let object: ParsedInputMap = field_value.try_into()?;
+
+                    path.push(rf.into());
+
                     let (inner_field_name, inner_field_value) = object.into_iter().next().unwrap();
-                    let sort_aggregation = extract_sort_aggregation(inner_field_name.as_str())?;
+                    let sort_aggregation = extract_sort_aggregation(inner_field_name.as_str())
+                        .expect("To-many relation orderBy must be an aggregation ordering.");
+
                     let sort_order = extract_sort_order(inner_field_value)?;
-                    let ids: Vec<_> = rf.related_model().primary_identifier().scalar_fields().collect();
-                    // FIXME: This is a hack to fulfil the requirement of the `OrderBy` struct to have a field to order by
-                    // In the case of aggregations, at least for now, we use AGGR(*), meaning that this field won't ever be used
-                    // This needs to be refactored when we add order by aggregations on specific fields
-                    let first_id = ids.first().unwrap();
-
-                    Ok(Some(OrderBy::new(
-                        first_id.clone(),
-                        path,
-                        sort_order,
-                        Some(sort_aggregation),
-                    )))
+                    Ok(Some(OrderBy::to_many_aggregation(path, sort_order, sort_aggregation)))
                 }
+
                 Field::Relation(rf) => {
-                    path.push(rf.clone());
-
                     let object: ParsedInputMap = field_value.try_into()?;
-                    process_order_object(&rf.related_model(), object, path, None)
+                    path.push((&rf).into());
+
+                    process_order_object(&rf.related_model().into(), object, path, None)
                 }
+
                 Field::Scalar(sf) => {
                     let sort_order = extract_sort_order(field_value)?;
 
-                    Ok(Some(OrderBy::new(
-                        sf.clone(),
-                        path,
-                        sort_order,
-                        parent_sort_aggregation,
-                    )))
+                    if let Some(sort_aggr) = parent_sort_aggregation {
+                        // If the parent is a sort aggregation then this scalar is part of that one.
+                        Ok(Some(OrderBy::scalar_aggregation(
+                            sf.clone(),
+                            vec![],
+                            sort_order,
+                            sort_aggr,
+                        )))
+                    } else {
+                        Ok(Some(OrderBy::scalar(sf.clone(), path, sort_order)))
+                    }
+                }
+
+                Field::Composite(cf) if cf.is_list() => {
+                    let object: ParsedInputMap = field_value.try_into()?;
+
+                    path.push(cf.into());
+
+                    let (inner_field_name, inner_field_value) = object.into_iter().next().unwrap();
+                    let sort_aggregation = extract_sort_aggregation(inner_field_name.as_str())
+                        .expect("To-many composite orderBy must be an aggregation ordering.");
+
+                    let sort_order = extract_sort_order(inner_field_value)?;
+                    Ok(Some(OrderBy::to_many_aggregation(path, sort_order, sort_aggregation)))
+                }
+
+                Field::Composite(cf) => {
+                    let object: ParsedInputMap = field_value.try_into()?;
+                    path.push((&cf).into());
+
+                    process_order_object(&cf.typ.clone().into(), object, path, None)
                 }
             }
         }
     }
 }
 
-fn extract_sort_aggregation(field_name: &str) -> QueryGraphBuilderResult<SortAggregation> {
+fn extract_order_by_relevance(
+    container: &ParentContainer,
+    object: ParsedInputMap,
+) -> QueryGraphBuilderResult<Option<OrderBy>> {
+    let sort_order = extract_sort_order(object.get(ordering::SORT).unwrap().clone())?;
+    let search: PrismaValue = object.get(ordering::SEARCH).unwrap().clone().try_into()?;
+    let search = search.into_string().unwrap();
+    let fields: PrismaValue = object.get(ordering::FIELDS).unwrap().clone().try_into()?;
+
+    let fields = match fields {
+        PrismaValue::String(s) => Ok(vec![PrismaValue::String(s)]),
+        PrismaValue::Enum(e) => Ok(vec![PrismaValue::String(e)]),
+        PrismaValue::List(l) => Ok(l),
+        x => Err(QueryGraphBuilderError::InputError(format!(
+            "Expected field `fields` to be of type String, Enum or List<Enum>, found: {:?}",
+            x
+        ))),
+    }?;
+
+    let fields = fields
+        .into_iter()
+        .map(|pv| pv.into_string().unwrap())
+        .map(|field_name| match container.find_field(&field_name) {
+            Some(Field::Scalar(sf)) => Ok(sf),
+            _ => Err(QueryGraphBuilderError::InputError(format!(
+                "Invalid order-by reference input: Field {} is not a valid scalar field.",
+                field_name
+            ))),
+        })
+        .collect::<Result<Vec<ScalarFieldRef>, _>>()?;
+
+    Ok(Some(OrderBy::relevance(fields, search, sort_order)))
+}
+
+fn extract_sort_aggregation(field_name: &str) -> Option<SortAggregation> {
     match field_name {
-        aggregations::COUNT | aggregations::UNDERSCORE_COUNT => Ok(SortAggregation::Count),
-        aggregations::UNDERSCORE_AVG => Ok(SortAggregation::Avg),
-        aggregations::UNDERSCORE_SUM => Ok(SortAggregation::Sum),
-        aggregations::UNDERSCORE_MIN => Ok(SortAggregation::Min),
-        aggregations::UNDERSCORE_MAX => Ok(SortAggregation::Max),
-        _ => Err(QueryGraphBuilderError::InputError(
-            "No aggregation operation could be found. This should not happen".to_string(),
-        )),
+        aggregations::UNDERSCORE_COUNT => Some(SortAggregation::Count),
+        aggregations::UNDERSCORE_AVG => Some(SortAggregation::Avg),
+        aggregations::UNDERSCORE_SUM => Some(SortAggregation::Sum),
+        aggregations::UNDERSCORE_MIN => Some(SortAggregation::Min),
+        aggregations::UNDERSCORE_MAX => Some(SortAggregation::Max),
+        _ => None,
     }
 }
 
@@ -175,8 +228,8 @@ fn extract_sort_order(field_value: ParsedInputValue) -> QueryGraphBuilderResult<
     Ok(sort_order)
 }
 
-fn extract_distinct(value: ParsedInputValue) -> QueryGraphBuilderResult<ModelProjection> {
-    let fields: Vec<Field> = match value {
+fn extract_distinct(value: ParsedInputValue) -> QueryGraphBuilderResult<FieldSelection> {
+    let selections = match value {
         ParsedInputValue::List(list) => list
             .into_iter()
             .map(|element| {
@@ -187,7 +240,7 @@ fn extract_distinct(value: ParsedInputValue) -> QueryGraphBuilderResult<ModelPro
         _ => unreachable!(),
     };
 
-    Ok(ModelProjection::new(fields))
+    Ok(FieldSelection::new(selections))
 }
 
 fn extract_skip(value: ParsedInputValue) -> QueryGraphBuilderResult<Option<i64>> {
@@ -203,7 +256,7 @@ fn extract_skip(value: ParsedInputValue) -> QueryGraphBuilderResult<Option<i64>>
     }
 }
 
-fn extract_cursor(value: ParsedInputValue, model: &ModelRef) -> QueryGraphBuilderResult<Option<RecordProjection>> {
+fn extract_cursor(value: ParsedInputValue, model: &ModelRef) -> QueryGraphBuilderResult<Option<SelectionResult>> {
     let input_map: ParsedInputMap = value.try_into()?;
     let mut pairs = vec![];
 
@@ -224,7 +277,7 @@ fn extract_cursor(value: ParsedInputValue, model: &ModelRef) -> QueryGraphBuilde
         pairs.extend(additional_pairs);
     }
 
-    Ok(Some(RecordProjection::new(pairs)))
+    Ok(Some(SelectionResult::new(pairs)))
 }
 
 fn extract_cursor_field(
@@ -262,7 +315,8 @@ fn finalize_arguments(mut args: QueryArguments, model: &ModelRef) -> QueryArgume
     if add_implicit_ordering {
         let primary_identifier = model.primary_identifier();
         let order_bys = primary_identifier.into_iter().map(|f| match f {
-            Field::Scalar(f) => f.into(),
+            // IDs can _only_ contain scalar selections.
+            SelectedField::Scalar(sf) => sf.into(),
             _ => unreachable!(),
         });
 

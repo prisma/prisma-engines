@@ -3,9 +3,9 @@ use crate::{
     query_graph::{Node, NodeRef, QueryGraph, QueryGraphDependency},
     FilteredQuery, ParsedInputMap, ParsedInputValue, Query, WriteQuery,
 };
-use connector::{Filter, IdFilter};
+use connector::{Filter, IntoFilter};
 use itertools::Itertools;
-use prisma_models::{ModelRef, PrismaValue, RelationFieldRef};
+use prisma_models::{ModelRef, PrismaValue, RelationFieldRef, SelectionResult};
 use std::convert::TryInto;
 
 /// Handles nested disconnect cases.
@@ -50,7 +50,7 @@ pub fn nested_disconnect(
         } else {
             // One-to-many specify a number of finders if the parent side is the to-one.
             // todo check if this if else is really still required.
-            if parent_relation_field.is_list {
+            if parent_relation_field.is_list() {
                 let filters = utils::coerce_vec(value)
                     .into_iter()
                     .map(|value: ParsedInputValue| {
@@ -160,7 +160,7 @@ fn handle_one_to_x(
 
     // If we're in a 1:m scenario and either relation side is required, a disconnect is impossible, as some
     // relation requirement would be violated with the disconnect.
-    if parent_relation_field.is_required || child_relation_field.is_required {
+    if parent_relation_field.is_required() || child_relation_field.is_required() {
         return Err(QueryGraphBuilderError::RelationViolation(parent_relation_field.into()));
     }
 
@@ -170,14 +170,14 @@ fn handle_one_to_x(
             // Inlined on parent
             let parent_model = parent_relation_field.model();
             let extractor_model_id = parent_model.primary_identifier();
-            let null_record_id = parent_relation_field.linking_fields().empty_record_projection();
+            let null_record_id = SelectionResult::from(&parent_relation_field.linking_fields());
 
             (parent_node, parent_model, extractor_model_id, null_record_id)
         } else {
             // Inlined on child
             let child_model = child_relation_field.model();
             let extractor_model_id = child_model.primary_identifier();
-            let null_record_id = child_relation_field.linking_fields().empty_record_projection();
+            let null_record_id = SelectionResult::from(&child_relation_field.linking_fields());
 
             (
                 &find_child_records_node,
@@ -193,7 +193,7 @@ fn handle_one_to_x(
     graph.create_edge(
         node_to_attach,
         &update_node,
-        QueryGraphDependency::ParentProjection(
+        QueryGraphDependency::ProjectedDataDependency(
             extractor_model_id,
             Box::new(move |mut update_node, links| {
                 if links.is_empty() {
@@ -203,7 +203,7 @@ fn handle_one_to_x(
                 // Handle filter & arg injection
                 if let Node::Query(Query::Write(ref mut wq @ WriteQuery::UpdateManyRecords(_))) = update_node {
                     wq.set_filter(links.filter());
-                    wq.inject_projection_into_args(null_record_id);
+                    wq.inject_result_into_args(null_record_id);
                 };
 
                 Ok(update_node)

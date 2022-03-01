@@ -11,18 +11,18 @@ mod uniq_count_rel {
               #id(id, Int, @id)
               title      String
               comments   Comment[]
-              #m2m(categories, Category[], Int)
+              #m2m(categories, Category[], id, Int)
             }
-            
+
             model Comment {
               #id(id, Int, @id)
               post    Post    @relation(fields: [postId], references: [id])
               postId  Int
             }
-            
+
             model Category {
               #id(id, Int, @id)
-              #m2m(posts, Post[], Int)
+              #m2m(posts, Post[], id, Int)
             }"#
         };
 
@@ -30,14 +30,12 @@ mod uniq_count_rel {
     }
 
     // "Counting with no records in the database" should "return 0"
-    // TODO(dom): Not working on mongo
-    // TODO(dom): {"errors":[{"error":"called `Option::unwrap()` on a `None` value","user_facing_error":{"is_panic":true,"message":"called `Option::unwrap()` on a `None` value","backtrace":null}}]}
-    #[connector_test(exclude(MongoDb))]
-    async fn no_rel_records(runner: &Runner) -> TestResult<()> {
-        create_row(runner, r#"{ id: 1, title: "a" }"#).await?;
+    #[connector_test]
+    async fn no_rel_records(runner: Runner) -> TestResult<()> {
+        create_row(&runner, r#"{ id: 1, title: "a" }"#).await?;
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"query {
+          run_query!(&runner, r#"query {
             findUniquePost(where: { id: 1 }) {
               _count { comments categories }
             }
@@ -49,11 +47,11 @@ mod uniq_count_rel {
     }
 
     //"Counting one2m and m2m records" should "work"
-    #[connector_test(exclude(MongoDb))] // TODO(dom): Not working on mongo
-    async fn count_one2m_m2m(runner: &Runner) -> TestResult<()> {
+    #[connector_test]
+    async fn count_one2m_m2m(runner: Runner) -> TestResult<()> {
         // 1 comment / 2 categories
         create_row(
-            runner,
+            &runner,
             r#"{
           id: 1,
           title: "a",
@@ -64,7 +62,7 @@ mod uniq_count_rel {
         .await?;
         // 3 comment / 4 categories
         create_row(
-            runner,
+            &runner,
             r#"{
           id: 2,
           title: "b",
@@ -75,7 +73,7 @@ mod uniq_count_rel {
         .await?;
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"query {
+          run_query!(&runner, r#"query {
             findUniquePost(where: { id: 1 }) {
               _count { comments categories }
             }
@@ -87,11 +85,11 @@ mod uniq_count_rel {
     }
 
     // "Counting with some records and filters" should "not affect the count"
-    #[connector_test(exclude(MongoDb))] // TODO(dom): Not working on mongo
-    async fn count_with_filters(runner: &Runner) -> TestResult<()> {
+    #[connector_test]
+    async fn count_with_filters(runner: Runner) -> TestResult<()> {
         // 4 comment / 4 categories
         create_row(
-            runner,
+            &runner,
             r#"{
                   id: 1,
                   title: "a",
@@ -102,7 +100,7 @@ mod uniq_count_rel {
         .await?;
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{
+          run_query!(&runner, r#"{
             findUniquePost(where: { id: 1 }) {
               comments(cursor: { id: 1 }, take: 1) { id }
               categories(cursor: { id: 1 }, take: 1) { id }
@@ -122,29 +120,29 @@ mod uniq_count_rel {
             name  String
             posts Post[]
           }
-          
+
           model Post {
             #id(id, Int, @id)
             title    String
             user     User      @relation(fields: [userId], references: [id])
             userId   Int
-            #m2m(comments, Comment[], Int)
-            #m2m(tags, Tag[], Int)
+            comments Comment[]
+            #m2m(tags, Tag[], id, Int)
           }
-          
+
           model Comment {
             #id(id, Int, @id)
             body   String
             post   Post   @relation(fields: [postId], references: [id])
             postId Int
-            #m2m(tags, Tag[], Int)
+            #m2m(tags, Tag[], id, Int)
           }
-          
+
           model Tag {
             #id(id, Int, @id)
             name     String
-            #m2m(posts, Post[], Int)
-            #m2m(comments, Comment[], Int)
+            #m2m(posts, Post[], id, Int)
+            #m2m(comments, Comment[], id, Int)
           }"#
         };
 
@@ -152,11 +150,10 @@ mod uniq_count_rel {
     }
 
     // Counting nested one2m and m2m should work
-    // TODO(dom): Not working on mongo
-    #[connector_test(schema(schema_nested), exclude(MongoDb))]
-    async fn nested_count_one2m_m2m(runner: &Runner) -> TestResult<()> {
+    #[connector_test(schema(schema_nested))]
+    async fn nested_count_one2m_m2m(runner: Runner) -> TestResult<()> {
         run_query!(
-            runner,
+            &runner,
             r#"mutation {
         createOneUser(
           data: {
@@ -186,7 +183,7 @@ mod uniq_count_rel {
         );
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{ findUniqueUser(where: { id: 1 }) {
+          run_query!(&runner, r#"{ findUniqueUser(where: { id: 1 }) {
           name
           posts {
             title

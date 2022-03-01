@@ -1,3 +1,5 @@
-pub mod configuration;
-pub mod literals;
-pub mod simplification;
+mod configuration;
+mod enums;
+mod extended_indexes;
+mod literals;
+mod simplification;

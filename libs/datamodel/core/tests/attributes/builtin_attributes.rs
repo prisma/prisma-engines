@@ -1,5 +1,5 @@
 use crate::common::*;
-use datamodel::{ast, diagnostics::DatamodelError, ScalarType};
+use datamodel::ScalarType;
 
 #[test]
 fn unique_attribute() {
@@ -16,31 +16,40 @@ fn unique_attribute() {
     test_model
         .assert_has_scalar_field("id")
         .assert_base_type(&ScalarType::Int)
-        .assert_is_unique(false)
-        .assert_is_id();
+        .assert_is_id(test_model);
+
+    assert!(!test_model.field_is_unique("id"));
+
     test_model
         .assert_has_scalar_field("unique")
-        .assert_base_type(&ScalarType::String)
-        .assert_is_unique(true);
+        .assert_base_type(&ScalarType::String);
+
+    assert!(test_model.field_is_unique("unique"));
 }
 
 #[test]
 fn duplicate_attributes_should_error() {
-    let dml = r#"
+    let dml = indoc! {r#"
         model Test {
-            id String @id
-            unique String @unique @unique
+          id String @id
+          unique String @unique @unique
         }
-    "#;
+    "#};
 
-    let error = parse_error(dml);
+    let expect = expect![[r#"
+        [1;91merror[0m: [1mAttribute "@unique" is defined twice.[0m
+          [1;94m-->[0m  [4mschema.prisma:3[0m
+        [1;94m   | [0m
+        [1;94m 2 | [0m  id String @id
+        [1;94m 3 | [0m  unique String @[1;91munique[0m @unique
+        [1;94m   | [0m
+        [1;91merror[0m: [1mAttribute "@unique" is defined twice.[0m
+          [1;94m-->[0m  [4mschema.prisma:3[0m
+        [1;94m   | [0m
+        [1;94m 2 | [0m  id String @id
+        [1;94m 3 | [0m  unique String @unique @[1;91munique[0m
+        [1;94m   | [0m
+    "#]];
 
-    error.assert_is_at(
-        0,
-        DatamodelError::new_duplicate_attribute_error("unique", ast::Span::new(75, 81)),
-    );
-    error.assert_is_at(
-        1,
-        DatamodelError::new_duplicate_attribute_error("unique", ast::Span::new(83, 89)),
-    );
+    expect.assert_eq(&datamodel::parse_schema(dml).map(drop).unwrap_err());
 }

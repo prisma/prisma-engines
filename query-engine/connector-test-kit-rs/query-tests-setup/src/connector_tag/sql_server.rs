@@ -1,6 +1,3 @@
-use datamodel_connector::Connector;
-use sql_datamodel_connector::MsSqlDatamodelConnector;
-
 use crate::{datamodel_rendering::SqlDatamodelRenderer, TestError, TestResult};
 
 use super::*;
@@ -22,10 +19,10 @@ impl ConnectorTagInterface for SqlServerConnectorTag {
 
     fn connection_string(&self, database: &str, is_ci: bool) -> String {
         match self.version {
-            Some(SqlServerVersion::V2017) if is_ci => format!("sqlserver://test-db-mssql-2017:1433;database=master;schema={};user=SA;password=<YourStrong@Passw0rd>;trustServerCertificate=true;isolationLevel=READ UNCOMMITTED", database),
+            Some(SqlServerVersion::V2017) if is_ci => format!("sqlserver://test-db-sqlserver-2017:1433;database=master;schema={};user=SA;password=<YourStrong@Passw0rd>;trustServerCertificate=true;isolationLevel=READ UNCOMMITTED", database),
             Some(SqlServerVersion::V2017) => format!("sqlserver://127.0.0.1:1434;database=master;schema={};user=SA;password=<YourStrong@Passw0rd>;trustServerCertificate=true;isolationLevel=READ UNCOMMITTED", database),
 
-            Some(SqlServerVersion::V2019) if is_ci => format!("sqlserver://test-db-mssql-2019:1433;database=master;schema={};user=SA;password=<YourStrong@Passw0rd>;trustServerCertificate=true;isolationLevel=READ UNCOMMITTED", database),
+            Some(SqlServerVersion::V2019) if is_ci => format!("sqlserver://test-db-sqlserver-2019:1433;database=master;schema={};user=SA;password=<YourStrong@Passw0rd>;trustServerCertificate=true;isolationLevel=READ UNCOMMITTED", database),
             Some(SqlServerVersion::V2019) => format!("sqlserver://127.0.0.1:1433;database=master;schema={};user=SA;password=<YourStrong@Passw0rd>;trustServerCertificate=true;isolationLevel=READ UNCOMMITTED", database),
 
             None => unreachable!("A versioned connector must have a concrete version to run."),
@@ -80,6 +77,11 @@ impl SqlServerConnectorTag {
             },
         ]
     }
+
+    /// Get a reference to the sql server connector tag's version.
+    pub fn version(&self) -> Option<SqlServerVersion> {
+        self.version
+    }
 }
 
 impl PartialEq for SqlServerConnectorTag {
@@ -116,6 +118,5 @@ impl ToString for SqlServerVersion {
 }
 
 fn sql_server_capabilities() -> Vec<ConnectorCapability> {
-    let dm_connector = MsSqlDatamodelConnector::new();
-    dm_connector.capabilities().to_owned()
+    sql_datamodel_connector::MSSQL.capabilities().to_owned()
 }

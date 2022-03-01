@@ -1,49 +1,26 @@
-use crate::{CoreError, CoreResult};
+use crate::{json_rpc::types::*, CoreError, CoreResult};
 use migration_connector::{
     migrations_directory::{error_on_changed_provider, list_migrations, MigrationDirectory},
-    ConnectorError, MigrationRecord, PersistenceNotInitializedError,
+    ConnectorError, MigrationConnector, MigrationRecord, PersistenceNotInitializedError,
 };
-use serde::{Deserialize, Serialize};
-use std::path::Path;
+use std::{path::Path, time::Instant};
 use user_facing_errors::migration_engine::FoundFailedMigrations;
 
-/// The input to the `ApplyMigrations` command.
-#[derive(Deserialize, Debug)]
-#[serde(rename_all = "camelCase")]
-pub struct ApplyMigrationsInput {
-    /// The location of the migrations directory.
-    pub migrations_directory_path: String,
-}
-
-/// The output of the `ApplyMigrations` command.
-#[derive(Serialize, Debug)]
-#[serde(rename_all = "camelCase")]
-pub struct ApplyMigrationsOutput {
-    /// The names of the migrations that were just applied. Empty if no migration was applied.
-    pub applied_migration_names: Vec<String>,
-}
-
-/// Read the contents of the migrations directory and the migrations table, and
-/// returns their relative statuses. At this stage, the migration engine only
-/// reads, it does not write to the dev database nor the migrations directory.
-pub(crate) async fn apply_migrations<C>(
-    input: &ApplyMigrationsInput,
-    connector: &C,
-) -> CoreResult<ApplyMigrationsOutput>
-where
-    C: migration_connector::MigrationConnector,
-{
-    let applier = connector.database_migration_step_applier();
-    let migration_persistence = connector.migration_persistence();
+pub async fn apply_migrations(
+    input: ApplyMigrationsInput,
+    connector: &mut dyn MigrationConnector,
+) -> CoreResult<ApplyMigrationsOutput> {
+    let start = Instant::now();
 
     error_on_changed_provider(&input.migrations_directory_path, connector.connector_type())?;
 
     connector.acquire_lock().await?;
 
-    migration_persistence.initialize().await?;
+    connector.migration_persistence().initialize().await?;
 
-    let migrations_from_filesystem = list_migrations(&Path::new(&input.migrations_directory_path))?;
-    let migrations_from_database = migration_persistence
+    let migrations_from_filesystem = list_migrations(Path::new(&input.migrations_directory_path))?;
+    let migrations_from_database = connector
+        .migration_persistence()
         .list_migrations()
         .await?
         .map_err(PersistenceNotInitializedError::into_connector_error)?;
@@ -62,7 +39,11 @@ where
         })
         .collect();
 
+    let analysis_duration_ms = Instant::now().duration_since(start).as_millis() as u64;
+    tracing::info!(analysis_duration_ms, "Analysis run in {}ms", analysis_duration_ms,);
+
     let mut applied_migration_names: Vec<String> = Vec::with_capacity(unapplied_migrations.len());
+    let apply_migrations_start = Instant::now();
 
     for unapplied_migration in unapplied_migrations {
         let span = tracing::info_span!(
@@ -70,6 +51,7 @@ where
             migration_name = unapplied_migration.migration_name(),
         );
         let _span = span.enter();
+        let migration_apply_start = Instant::now();
 
         let script = unapplied_migration
             .read_migration_script()
@@ -81,31 +63,49 @@ where
             unapplied_migration.migration_name()
         );
 
-        let migration_id = migration_persistence
+        let migration_id = connector
+            .migration_persistence()
             .record_migration_started(unapplied_migration.migration_name(), &script)
             .await?;
 
-        match applier
+        match connector
             .apply_script(unapplied_migration.migration_name(), &script)
             .await
         {
             Ok(()) => {
                 tracing::debug!("Successfully applied the script.");
-                migration_persistence.record_successful_step(&migration_id).await?;
-                migration_persistence.record_migration_finished(&migration_id).await?;
+                let p = connector.migration_persistence();
+                p.record_successful_step(&migration_id).await?;
+                p.record_migration_finished(&migration_id).await?;
                 applied_migration_names.push(unapplied_migration.migration_name().to_owned());
+                let migration_duration_ms = Instant::now().duration_since(migration_apply_start).as_millis() as u64;
+                tracing::info!(
+                    migration_duration_ms = migration_duration_ms,
+                    "Migration executed in {}ms",
+                    migration_duration_ms
+                );
             }
             Err(err) => {
                 tracing::debug!("Failed to apply the script.");
 
                 let logs = err.to_string();
 
-                migration_persistence.record_failed_step(&migration_id, &logs).await?;
+                connector
+                    .migration_persistence()
+                    .record_failed_step(&migration_id, &logs)
+                    .await?;
 
                 return Err(err);
             }
         }
     }
+
+    let apply_migrations_ms = Instant::now().duration_since(apply_migrations_start).as_millis() as u64;
+    tracing::info!(
+        apply_migrations_duration_ms = apply_migrations_ms,
+        "All the migrations executed in {}ms",
+        apply_migrations_ms
+    );
 
     Ok(ApplyMigrationsOutput {
         applied_migration_names,

@@ -2,8 +2,15 @@ name: WASM build
 on:
   push:
     branches:
-      - master
+      - main
   pull_request:
+    paths-ignore:
+      - '.buildkite/**'
+      - '*.md'
+      - 'LICENSE'
+      - 'CODEOWNERS'
+      - 'renovate.json'
+
 jobs:
   build:
     name: "WebAssembly build ${{ github.event.ref }} for commit ${{ github.event.inputs.commit }}"
@@ -29,3 +36,21 @@ jobs:
         with:
           command: build
           args: -p datamodel --release --target=wasm32-unknown-unknown
+
+      - name: Build the migration-connector crate with default features
+        uses: actions-rs/cargo@v1
+        with:
+          command: build
+          args: -p migration-connector --release --target=wasm32-unknown-unknown
+
+      # - name: Build the migration-core crate
+      #   uses: actions-rs/cargo@v1
+      #   with:
+      #     command: build
+      #     args: -p migration-core --release --target=wasm32-unknown-unknown --no-default-features
+
+      - name: Build the prisma-fmt crate
+        uses: actions-rs/cargo@v1
+        with:
+          command: build
+          args: -p prisma-fmt --lib --release --target=wasm32-unknown-unknown

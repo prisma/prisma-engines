@@ -1,4 +1,4 @@
-use migration_engine_tests::{sql::ResultSetExt, sync_test_api::*};
+use migration_engine_tests::test_api::*;
 
 #[test_connector]
 fn adding_a_unique_constraint_should_warn(api: TestApi) {
@@ -9,7 +9,7 @@ fn adding_a_unique_constraint_should_warn(api: TestApi) {
         }
     "#;
 
-    api.schema_push(dm1).send_sync().assert_green_bang();
+    api.schema_push_w_datasource(dm1).send().assert_green();
 
     {
         api.insert("Test")
@@ -30,9 +30,9 @@ fn adding_a_unique_constraint_should_warn(api: TestApi) {
         }
     "#;
 
-    api.schema_push(dm2)
+    api.schema_push_w_datasource(dm2)
         .force(false)
-        .send_sync()
+        .send()
         .assert_warnings(&["A unique constraint covering the columns `[name]` on the table `Test` will be added. If there are existing duplicate values, this will fail.".into()]);
 
     api.dump_table("Test")
@@ -60,7 +60,7 @@ fn dropping_enum_values_should_warn(api: TestApi) {
         }
     "#;
 
-    api.schema_push(dm1).send_sync().assert_green_bang();
+    api.schema_push_w_datasource(dm1).send().assert_green();
 
     {
         api.insert("Test")
@@ -87,9 +87,9 @@ fn dropping_enum_values_should_warn(api: TestApi) {
         }
     "#;
 
-    api.schema_push(dm2)
+    api.schema_push_w_datasource(dm2)
         .force(false)
-        .send_sync()
+        .send()
         .assert_warnings(&["The values [george] on the enum `Test_name` will be removed. If these variants are still used in the database, this will fail.".into()]);
 
     api.dump_table("Test")
@@ -110,7 +110,7 @@ fn adding_a_unique_constraint_when_existing_data_respects_it_works(api: TestApi)
         }
     "#;
 
-    api.schema_push(dm1).send_sync().assert_green_bang();
+    api.schema_push_w_datasource(dm1).send().assert_green();
 
     api.insert("Test")
         .value("id", "abc")
@@ -129,9 +129,9 @@ fn adding_a_unique_constraint_when_existing_data_respects_it_works(api: TestApi)
         }
     "#;
 
-    api.schema_push(dm2)
+    api.schema_push_w_datasource(dm2)
         .force(true)
-        .send_sync()
+        .send()
         .assert_warnings(&["A unique constraint covering the columns `[name]` on the table `Test` will be added. If there are existing duplicate values, this will fail.".into()]);
 
     api.dump_table("Test")

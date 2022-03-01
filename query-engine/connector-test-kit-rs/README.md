@@ -42,7 +42,7 @@ export WORKSPACE_ROOT=/path/to/engines/repository/root
 
 Test run env vars:
 ```shell
-export TEST_RUNNER="direct" # Currently only `direct`, later `napi` and `binary` as well.
+export TEST_RUNNER="direct" # Currently only `direct`, later `node-api` and `binary` as well.
 export TEST_CONNECTOR="postgres" # One of the supported providers.
 export TEST_CONNECTOR_VERSION="10" # One of the supported versions.
 ```
@@ -86,7 +86,7 @@ use query_engine_tests::*;
 #[test_suite(...)]
 mod some_spec {
     #[connector_test(...)]
-    async fn my_test(runner: &Runner) -> TestResult<()> {
+    async fn my_test(runner: Runner) -> TestResult<()> {
         // ...
         Ok(())
     }
@@ -98,13 +98,13 @@ _Option 2:_
 use query_engine_tests::*;
 
 #[connector_test(...)]
-async fn my_test(runner: &Runner) -> TestResult<()> {
+async fn my_test(runner: Runner) -> TestResult<()> {
     // ...
     Ok(())
 }
 ```
 
-Note that regardless of the shape, `connector_test` tests must _always_ have the signature of `async fn test_name(runner: &Runner) -> TestResult<()>`.
+Note that regardless of the shape, `connector_test` tests must _always_ have the signature of `async fn test_name(runner: Runner) -> TestResult<()>`.
 
 Option 1 uses a `mod` that can be used to define common attributes on all tests contained in the module. Option 2 doesn't use a `mod` and requires you to set more attributes per test (will be shown later). Option 1 produces a test like `queries::filters::some_spec::some_spec::my_test` and option 2 `queries::filters::some_spec::my_test` (note the double `some_spec`). Apart from the aesthetics in the naming, there are no other consequences for using option 1 over 2. You can also choose any `mod` name you wish, e.g. `mod my_specs` would produce `queries::filters::some_spec::my_specs::my_test`.
 
@@ -140,7 +140,7 @@ There are two special cases in that rule:
 mod some_spec {
     // Will run for everything except SQL Server 2017. The `only` of `test_suite` is not propagated!
     #[connector_test(exclude(SqlServer(2017))]
-    async fn my_test(runner: &Runner) -> TestResult<()> {
+    async fn my_test(runner: Runner) -> TestResult<()> {
         // ...
         Ok(())
     }
@@ -163,7 +163,7 @@ mod some_spec {
     }
 
     #[connector_test]
-    async fn my_test(runner: &Runner) -> TestResult<()> {
+    async fn my_test(runner: Runner) -> TestResult<()> {
         // Assertions against the models as given by the handler.
         Ok(())
     }
@@ -203,7 +203,7 @@ A minimal test example is:
 #[test_suite(schema(some_handler))]
 mod some_spec {
     #[connector_test]
-    async fn my_test(runner: &Runner) -> TestResult<()> {
+    async fn my_test(runner: Runner) -> TestResult<()> {
         // Assertions against the models as given by the handler.
         Ok(())
     }
@@ -219,8 +219,8 @@ Schemas that are used for tests that are supposed to run for all connectors must
 For this reason, schemas have template strings of the form `#name(args)` embedded in them. Connectors decide how to render schemas (see `query-tests-setup/src/datamodel_rendering` for details). Currently two templates are available:
 - `#id(field_name, field_type, directives ...)` - For defining an ID field on a model.
     - `#id(pid, Int, @id, @map("_pid"))`
-- `#m2m(field_name, field_type, opposing_type, opt_relation_name)` - For defining a many-to-many relation between two models.
-    - Example: `#m2m(posts, Post[], String, "name")`
+- `#m2m(field_name, field_type, opposing_field_name, opposing_type, opt_relation_name)` - For defining a many-to-many relation between two models.
+    - Example: `#m2m(posts, Post[], id, String, "name")`
 
 All SQL connectors render these with a standard `SqlDatamodelRenderer`, Mongo uses its own `MongoDbSchemaRenderer`.
 
@@ -248,9 +248,9 @@ We intentionally leave the expected output empty as you can see below.
 
 ```rs
 #[connector_test]
-async fn some_test(runner: &Runner) -> TestResult<()> {
+async fn some_test(runner: Runner) -> TestResult<()> {
     insta::assert_snapshot!(
-        run_query!(runner, r#"<your_query>"#),
+        run_query!(&runner, r#"<your_query>"#),
         @""
     );
 
@@ -310,3 +310,21 @@ If you dislike the interactive view, you can also run `cargo insta accept` to au
 ##### Without `cargo-insta`
 
 If you haven't installed `cargo-insta`, have a look at the error output and manually update the snapshot if the change is expected, just like when using `assert_eq!`.
+
+
+### Adding a new data store source for tests
+
+Let's say you already have connector tests for MongoDB but right now it runs only with version 4.4 and want to support version 5.0, the steps are easy but requires changes in different places to be sure we run the tests everywhere.
+
+1. Add the container image for your new data store source to the `docker-compose.yml` file, name it to something you will remember, for example `mongo5`
+2. Create a connector file in the `query-engine/connector-test-kit-rs/test-configs/` with the connector data (see other examples in that director), name it with something that makes sense, for example `mongo5`
+3. Add the credentials to access the _data store service_ from the docker compose file, this is done creating the required file in `.test_database_urls`, for example `.test_database_urls/mongo5`
+4. Make sure this image is available to build and prepare the environment in the `Makefile`, in the query engine we depend in two Make targets, `dev-` and `start-`
+   - The `start-` target (for example `start-mongo5`) will execute the _data store service_ in docker compose, for example `docker-compose -f docker-compose.yml up -d --remove-orphans mongo5`
+   - The `dev-` target (for example `dev-mongo5`) will depend on the `start-` target and copy the correct _connector file_, for example `cp $(CONFIG_PATH)/mongodb5 $(CONFIG_FILE)`
+5. Add the new test data store source to the `query-engine/connector-test-kit-rs/query-test-setup/src/connector_tag` file, if it is a completely new data store create the required file, in our case we need to modify `mongodb.rs`
+   - Add the new version to the version enum (ex. `MongoDbVersion`)
+   - Implement or amend the `try_from` function for the version enum
+   - Implement or amend the `to_string` function for the version enum
+   - Add the new source to the `connection_string` method. You need two implementations, one for the internal CI and another for the local test
+6. Add the new data source as a given capability, without this your test specific to that version won't run at all. For this you need to add the capability to the vector in the `all` function.

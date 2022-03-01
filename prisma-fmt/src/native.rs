@@ -1,29 +1,44 @@
-use std::io::{self, Read};
+use datamodel::datamodel_connector::NativeTypeConstructor;
 
-pub fn run() {
-    let mut datamodel_string = String::new();
+pub(crate) fn run(schema: &str) -> String {
+    let validated_configuration = match datamodel::parse_configuration(schema) {
+        Ok(validated_configuration) => validated_configuration,
+        Err(_) => return "[]".to_owned(),
+    };
 
-    io::stdin()
-        .read_to_string(&mut datamodel_string)
-        .expect("Unable to read from stdin.");
+    if validated_configuration.subject.datasources.len() != 1 {
+        return "[]".to_owned();
+    }
 
-    let datamodel_result = datamodel::parse_configuration(&datamodel_string);
+    let datasource = &validated_configuration.subject.datasources[0];
+    let available_native_type_constructors = datasource.active_connector.available_native_type_constructors();
+    let available_native_type_constructors: Vec<SerializableNativeTypeConstructor> =
+        available_native_type_constructors.iter().map(From::from).collect();
 
-    match datamodel_result {
-        Ok(validated_configuration) => {
-            if validated_configuration.subject.datasources.len() != 1 {
-                print!("[]")
-            } else if let Some(datasource) = validated_configuration.subject.datasources.first() {
-                let available_native_type_constructors =
-                    datasource.active_connector.available_native_type_constructors();
+    serde_json::to_string(&available_native_type_constructors).expect("Failed to render JSON")
+}
 
-                let json = serde_json::to_string(available_native_type_constructors).expect("Failed to render JSON");
+#[derive(serde::Serialize)]
+struct SerializableNativeTypeConstructor {
+    pub name: &'static str,
+    pub _number_of_args: usize,
+    pub _number_of_optional_args: usize,
+    pub prisma_types: Vec<&'static str>,
+}
 
-                print!("{}", json)
-            } else {
-                print!("[]")
-            }
+impl From<&NativeTypeConstructor> for SerializableNativeTypeConstructor {
+    fn from(nt: &NativeTypeConstructor) -> Self {
+        let NativeTypeConstructor {
+            name,
+            _number_of_args,
+            _number_of_optional_args,
+            prisma_types,
+        } = nt;
+        SerializableNativeTypeConstructor {
+            name,
+            _number_of_args: *_number_of_args,
+            _number_of_optional_args: *_number_of_optional_args,
+            prisma_types: prisma_types.iter().map(|st| st.as_str()).collect(),
         }
-        _ => print!("[]"),
     }
 }

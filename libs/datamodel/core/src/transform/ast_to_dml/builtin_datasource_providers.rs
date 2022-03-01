@@ -2,15 +2,8 @@ use super::datasource_provider::DatasourceProvider;
 use crate::common::provider_names::*;
 use datamodel_connector::Connector;
 use mongodb_datamodel_connector::MongoDbDatamodelConnector;
-use sql_datamodel_connector::SqlDatamodelConnectors;
 
-pub struct SqliteDatasourceProvider {}
-
-impl SqliteDatasourceProvider {
-    pub fn new() -> Self {
-        Self {}
-    }
-}
+pub struct SqliteDatasourceProvider;
 
 impl DatasourceProvider for SqliteDatasourceProvider {
     fn is_provider(&self, provider: &str) -> bool {
@@ -21,18 +14,28 @@ impl DatasourceProvider for SqliteDatasourceProvider {
         SQLITE_SOURCE_NAME
     }
 
-    fn connector(&self) -> Box<dyn Connector> {
-        Box::new(SqlDatamodelConnectors::sqlite())
+    fn connector(&self) -> &'static dyn Connector {
+        sql_datamodel_connector::SQLITE
     }
 }
 
-pub struct PostgresDatasourceProvider {}
+pub struct CockroachDbDatasourceProvider;
 
-impl PostgresDatasourceProvider {
-    pub fn new() -> Self {
-        Self {}
+impl DatasourceProvider for CockroachDbDatasourceProvider {
+    fn is_provider(&self, provider: &str) -> bool {
+        provider == COCKROACHDB_SOURCE_NAME
+    }
+
+    fn canonical_name(&self) -> &str {
+        COCKROACHDB_SOURCE_NAME
+    }
+
+    fn connector(&self) -> &'static dyn Connector {
+        sql_datamodel_connector::COCKROACH
     }
 }
+
+pub struct PostgresDatasourceProvider;
 
 impl DatasourceProvider for PostgresDatasourceProvider {
     fn is_provider(&self, provider: &str) -> bool {
@@ -43,18 +46,12 @@ impl DatasourceProvider for PostgresDatasourceProvider {
         POSTGRES_SOURCE_NAME
     }
 
-    fn connector(&self) -> Box<dyn Connector> {
-        Box::new(SqlDatamodelConnectors::postgres())
+    fn connector(&self) -> &'static dyn Connector {
+        sql_datamodel_connector::POSTGRES
     }
 }
 
-pub struct MySqlDatasourceProvider {}
-
-impl MySqlDatasourceProvider {
-    pub fn new() -> Self {
-        Self {}
-    }
-}
+pub struct MySqlDatasourceProvider;
 
 impl DatasourceProvider for MySqlDatasourceProvider {
     fn is_provider(&self, provider: &str) -> bool {
@@ -65,17 +62,12 @@ impl DatasourceProvider for MySqlDatasourceProvider {
         MYSQL_SOURCE_NAME
     }
 
-    fn connector(&self) -> Box<dyn Connector> {
-        Box::new(SqlDatamodelConnectors::mysql())
+    fn connector(&self) -> &'static dyn Connector {
+        sql_datamodel_connector::MYSQL
     }
 }
 
-pub struct MsSqlDatasourceProvider {}
-impl MsSqlDatasourceProvider {
-    pub fn new() -> Self {
-        Self {}
-    }
-}
+pub struct MsSqlDatasourceProvider;
 
 impl DatasourceProvider for MsSqlDatasourceProvider {
     fn is_provider(&self, provider: &str) -> bool {
@@ -86,17 +78,12 @@ impl DatasourceProvider for MsSqlDatasourceProvider {
         MSSQL_SOURCE_NAME
     }
 
-    fn connector(&self) -> Box<dyn Connector> {
-        Box::new(SqlDatamodelConnectors::mssql())
+    fn connector(&self) -> &'static dyn Connector {
+        sql_datamodel_connector::MSSQL
     }
 }
 
-pub struct MongoDbDatasourceProvider {}
-impl MongoDbDatasourceProvider {
-    pub fn new() -> Self {
-        Self {}
-    }
-}
+pub struct MongoDbDatasourceProvider;
 
 impl DatasourceProvider for MongoDbDatasourceProvider {
     fn is_provider(&self, provider: &str) -> bool {
@@ -107,7 +94,7 @@ impl DatasourceProvider for MongoDbDatasourceProvider {
         MONGODB_SOURCE_NAME
     }
 
-    fn connector(&self) -> Box<dyn Connector> {
-        Box::new(MongoDbDatamodelConnector::new())
+    fn connector(&self) -> &'static dyn Connector {
+        &MongoDbDatamodelConnector
     }
 }

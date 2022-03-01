@@ -36,7 +36,7 @@ const TYPES: &[(&str, &str)] = &[
     ("inet", "Inet"),
 ];
 
-#[test_connector(tags(Postgres), exclude(Cockroach))]
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
 async fn native_type_columns_feature_on(api: &TestApi) -> TestResult {
     let columns: Vec<String> = TYPES
         .iter()
@@ -95,12 +95,12 @@ async fn native_type_columns_feature_on(api: &TestApi) -> TestResult {
     println!("EXPECTATION: \n {:#}", types);
     println!("RESULT: \n {:#}", result);
 
-    api.assert_eq_datamodels(&types, &result);
+    api.assert_eq_datamodels(types, &result);
 
     Ok(())
 }
 
-#[test_connector(tags(Postgres), exclude(Cockroach))]
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
 async fn native_type_array_columns_feature_on(api: &TestApi) -> TestResult {
     api.barrel()
         .execute(move |migration| {

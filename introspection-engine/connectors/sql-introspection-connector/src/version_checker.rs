@@ -2,8 +2,9 @@ use crate::introspection_helpers::{
     is_old_migration_table, is_prisma_1_or_11_list_table, is_prisma_1_point_0_join_table,
     is_prisma_1_point_1_or_2_join_table, is_relay_table,
 };
+use crate::SqlFamilyTrait;
 use datamodel::{Datamodel, Model};
-use introspection_connector::{Version, Warning};
+use introspection_connector::{IntrospectionContext, Version, Warning};
 use native_types::{MySqlType, PostgresType};
 use quaint::connector::SqlFamily;
 use sql_schema_describer::{Column, ForeignKey, ForeignKeyAction, PrimaryKey, SqlSchema, Table};
@@ -49,16 +50,13 @@ const MYSQL_TYPES: &[MySqlType] = &[
 ];
 
 impl VersionChecker {
-    pub fn new(sql_family: SqlFamily, schema: &SqlSchema) -> VersionChecker {
+    pub fn new(schema: &SqlSchema, ctx: &IntrospectionContext) -> VersionChecker {
         VersionChecker {
-            sql_family,
-            has_migration_table: schema.tables.iter().any(|table| is_old_migration_table(&table)),
-            has_relay_table: schema.tables.iter().any(|table| is_relay_table(&table)),
-            has_prisma_1_join_table: schema.tables.iter().any(|table| is_prisma_1_point_0_join_table(&table)),
-            has_prisma_1_1_or_2_join_table: schema
-                .tables
-                .iter()
-                .any(|table| is_prisma_1_point_1_or_2_join_table(&table)),
+            sql_family: ctx.sql_family(),
+            has_migration_table: schema.tables.iter().any(is_old_migration_table),
+            has_relay_table: schema.tables.iter().any(is_relay_table),
+            has_prisma_1_join_table: schema.tables.iter().any(is_prisma_1_point_0_join_table),
+            has_prisma_1_1_or_2_join_table: schema.tables.iter().any(is_prisma_1_point_1_or_2_join_table),
             uses_on_delete: false,
             uses_default_values: false,
             always_has_created_at_updated_at: true,
@@ -105,6 +103,7 @@ impl VersionChecker {
         }
     }
 
+    #[allow(clippy::nonminimal_bool)] // more readable this way
     pub fn uses_on_delete(&mut self, fk: &ForeignKey, table: &Table) {
         if !(fk.on_delete_action == ForeignKeyAction::NoAction || fk.on_delete_action == ForeignKeyAction::SetNull)
             && !is_prisma_1_or_11_list_table(table)
@@ -124,7 +123,7 @@ impl VersionChecker {
         if !is_prisma_1_or_11_list_table(table) && !is_relay_table(table) {
             if let Some(PrimaryKey { columns, .. }) = &table.primary_key {
                 if columns.len() == 1 {
-                    let tpe = &table.column_bang(columns.first().unwrap()).tpe;
+                    let tpe = &table.column_bang(columns.first().unwrap().name()).tpe;
 
                     if self.sql_family == SqlFamily::Postgres {
                         if let Some(native_type) = &tpe.native_type {

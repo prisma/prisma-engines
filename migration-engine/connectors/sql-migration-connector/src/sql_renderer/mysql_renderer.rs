@@ -1,20 +1,20 @@
 use super::{common::Quoted, IteratorJoin, SqlRenderer};
 use crate::{
-    flavour::{MysqlFlavour, MYSQL_IDENTIFIER_SIZE_LIMIT},
+    flavour::MysqlFlavour,
     pair::Pair,
     sql_migration::{AlterColumn, AlterEnum, AlterTable, RedefineTable, TableChange},
     sql_schema_differ::ColumnChanges,
 };
+use datamodel::PrismaValue;
 use native_types::MySqlType;
 use once_cell::sync::Lazy;
-use prisma_value::PrismaValue;
 use regex::Regex;
-use sql_ddl::mysql as ddl;
+use sql_ddl::{mysql as ddl, IndexColumn, SortOrder};
 use sql_schema_describer::{
     walkers::{
         ColumnWalker, EnumWalker, ForeignKeyWalker, IndexWalker, TableWalker, UserDefinedTypeWalker, ViewWalker,
     },
-    ColumnTypeFamily, DefaultKind, DefaultValue, ForeignKeyAction, SqlSchema,
+    ColumnTypeFamily, DefaultKind, DefaultValue, ForeignKeyAction, SQLSortOrder, SqlSchema,
 };
 use std::borrow::Cow;
 
@@ -23,7 +23,7 @@ impl MysqlFlavour {
         ddl::Column {
             column_name: col.name().into(),
             not_null: col.arity().is_required(),
-            column_type: render_column_type(&col),
+            column_type: render_column_type(col),
             default: col
                 .default()
                 .filter(|default| {
@@ -35,7 +35,7 @@ impl MysqlFlavour {
                     // they are not supported by MySQL.
                     && !matches!(col.column_type_family(), ColumnTypeFamily::Binary)
                 })
-                .map(|default| render_default(&col, default)),
+                .map(|default| render_default(col, default)),
             auto_increment: col.is_autoincrement(),
             ..Default::default()
         }
@@ -66,14 +66,14 @@ impl SqlRenderer for MysqlFlavour {
                     .collect(),
                 on_delete: Some(match foreign_key.on_delete_action() {
                     ForeignKeyAction::Cascade => ddl::ForeignKeyAction::Cascade,
-                    ForeignKeyAction::NoAction => ddl::ForeignKeyAction::DoNothing,
+                    ForeignKeyAction::NoAction => ddl::ForeignKeyAction::NoAction,
                     ForeignKeyAction::Restrict => ddl::ForeignKeyAction::Restrict,
                     ForeignKeyAction::SetDefault => ddl::ForeignKeyAction::SetDefault,
                     ForeignKeyAction::SetNull => ddl::ForeignKeyAction::SetNull,
                 }),
                 on_update: Some(match foreign_key.on_update_action() {
                     ForeignKeyAction::Cascade => ddl::ForeignKeyAction::Cascade,
-                    ForeignKeyAction::NoAction => ddl::ForeignKeyAction::DoNothing,
+                    ForeignKeyAction::NoAction => ddl::ForeignKeyAction::NoAction,
                     ForeignKeyAction::Restrict => ddl::ForeignKeyAction::Restrict,
                     ForeignKeyAction::SetDefault => ddl::ForeignKeyAction::SetDefault,
                     ForeignKeyAction::SetNull => ddl::ForeignKeyAction::SetNull,
@@ -87,7 +87,7 @@ impl SqlRenderer for MysqlFlavour {
         unreachable!("render_alter_enum on MySQL")
     }
 
-    fn render_alter_index(&self, indexes: Pair<&IndexWalker<'_>>) -> Vec<String> {
+    fn render_rename_index(&self, indexes: Pair<&IndexWalker<'_>>) -> Vec<String> {
         vec![ddl::AlterTable {
             table_name: indexes.previous().table().name().into(),
             changes: vec![sql_ddl::mysql::AlterTableClause::RenameIndex {
@@ -99,7 +99,10 @@ impl SqlRenderer for MysqlFlavour {
     }
 
     fn render_alter_table(&self, alter_table: &AlterTable, schemas: &Pair<&SqlSchema>) -> Vec<String> {
-        let AlterTable { table_index, changes } = alter_table;
+        let AlterTable {
+            table_ids: table_index,
+            changes,
+        } = alter_table;
 
         let tables = schemas.tables(table_index);
 
@@ -108,29 +111,50 @@ impl SqlRenderer for MysqlFlavour {
         for change in changes {
             match change {
                 TableChange::DropPrimaryKey => lines.push(sql_ddl::mysql::AlterTableClause::DropPrimaryKey.to_string()),
-                TableChange::AddPrimaryKey { columns } => lines.push(format!(
+                TableChange::RenamePrimaryKey => unreachable!("No Renaming Primary Keys on Mysql"),
+                TableChange::AddPrimaryKey => lines.push(format!(
                     "ADD PRIMARY KEY ({})",
-                    columns.iter().map(|colname| self.quote(colname)).join(", ")
+                    tables
+                        .next()
+                        .primary_key_columns()
+                        .map(|c| {
+                            let mut rendered = format!("{}", self.quote(c.as_column().name()));
+
+                            if let Some(length) = c.length() {
+                                rendered.push_str(&format!("({})", length));
+                            }
+
+                            if let Some(sort_order) = c.sort_order() {
+                                rendered.push(' ');
+                                rendered.push_str(sort_order.as_ref());
+                            }
+
+                            rendered
+                        })
+                        .join(", ")
                 )),
-                TableChange::AddColumn { column_index } => {
-                    let column = tables.next().column_at(*column_index);
+                TableChange::AddColumn {
+                    column_id,
+                    has_virtual_default: _,
+                } => {
+                    let column = tables.next().column_at(*column_id);
                     let col_sql = self.render_column(&column);
 
                     lines.push(format!("ADD COLUMN {}", col_sql));
                 }
-                TableChange::DropColumn { column_index } => lines.push(
+                TableChange::DropColumn { column_id } => lines.push(
                     sql_ddl::mysql::AlterTableClause::DropColumn {
-                        column_name: tables.previous().column_at(*column_index).name().into(),
+                        column_name: tables.previous().column_at(*column_id).name().into(),
                     }
                     .to_string(),
                 ),
                 TableChange::AlterColumn(AlterColumn {
                     changes,
-                    column_index,
+                    column_id,
                     type_change: _,
                 }) => {
-                    let columns = tables.columns(column_index);
-                    let expanded = MysqlAlterColumn::new(&columns, &changes);
+                    let columns = tables.columns(column_id);
+                    let expanded = MysqlAlterColumn::new(&columns, *changes);
 
                     match expanded {
                         MysqlAlterColumn::DropDefault => lines.push(format!(
@@ -142,11 +166,8 @@ impl SqlRenderer for MysqlFlavour {
                         }
                     };
                 }
-                TableChange::DropAndRecreateColumn {
-                    column_index,
-                    changes: _,
-                } => {
-                    let columns = tables.columns(column_index);
+                TableChange::DropAndRecreateColumn { column_id, changes: _ } => {
+                    let columns = tables.columns(column_id);
                     lines.push(format!("DROP COLUMN `{}`", columns.previous().name()));
                     lines.push(format!("ADD COLUMN {}", self.render_column(columns.next())));
                 }
@@ -171,19 +192,26 @@ impl SqlRenderer for MysqlFlavour {
     }
 
     fn render_create_index(&self, index: &IndexWalker<'_>) -> String {
-        let name = index.name();
-        let name = if name.len() > MYSQL_IDENTIFIER_SIZE_LIMIT {
-            &name[0..MYSQL_IDENTIFIER_SIZE_LIMIT]
-        } else {
-            &name
-        };
-
         ddl::CreateIndex {
-            unique: index.index_type().is_unique(),
-            index_name: name.into(),
+            r#type: match index.index_type() {
+                sql_schema_describer::IndexType::Unique => ddl::IndexType::Unique,
+                sql_schema_describer::IndexType::Normal => ddl::IndexType::Normal,
+                sql_schema_describer::IndexType::Fulltext => ddl::IndexType::Fulltext,
+            },
+            index_name: index.name().into(),
             on: (
                 index.table().name().into(),
-                index.columns().map(|c| c.name().into()).collect(),
+                index
+                    .columns()
+                    .map(|c| IndexColumn {
+                        name: c.get().name().into(),
+                        length: c.length(),
+                        sort_order: c.sort_order().map(|so| match so {
+                            SQLSortOrder::Asc => SortOrder::Asc,
+                            SQLSortOrder::Desc => SortOrder::Desc,
+                        }),
+                    })
+                    .collect(),
             ),
         }
         .to_string()
@@ -196,20 +224,35 @@ impl SqlRenderer for MysqlFlavour {
             indexes: table
                 .indexes()
                 .map(move |index| ddl::IndexClause {
-                    index_name: if index.name().len() > MYSQL_IDENTIFIER_SIZE_LIMIT {
-                        Some(Cow::Borrowed(&index.name()[0..MYSQL_IDENTIFIER_SIZE_LIMIT]))
-                    } else {
-                        Some(Cow::Borrowed(&index.name()))
+                    index_name: Some(Cow::from(index.name())),
+                    r#type: match index.index_type() {
+                        sql_schema_describer::IndexType::Unique => ddl::IndexType::Unique,
+                        sql_schema_describer::IndexType::Normal => ddl::IndexType::Normal,
+                        sql_schema_describer::IndexType::Fulltext => ddl::IndexType::Fulltext,
                     },
-                    unique: index.index_type().is_unique(),
-                    columns: index.column_names().iter().map(Cow::from).collect(),
+                    columns: index
+                        .columns()
+                        .map(|c| IndexColumn {
+                            name: c.get().name().into(),
+                            length: c.length(),
+                            sort_order: c.sort_order().map(|so| match so {
+                                SQLSortOrder::Asc => SortOrder::Asc,
+                                SQLSortOrder::Desc => SortOrder::Desc,
+                            }),
+                        })
+                        .collect(),
                 })
                 .collect(),
             primary_key: table
-                .primary_key_column_names()
-                .unwrap_or_default()
-                .iter()
-                .map(|s| Cow::Borrowed(s.as_str()))
+                .primary_key_columns()
+                .map(|c| IndexColumn {
+                    name: c.as_column().name().into(),
+                    length: c.length(),
+                    sort_order: c.sort_order().map(|so| match so {
+                        SQLSortOrder::Asc => SortOrder::Asc,
+                        SQLSortOrder::Desc => SortOrder::Desc,
+                    }),
+                })
                 .collect(),
             default_character_set: Some("utf8mb4".into()),
             collate: Some("utf8mb4_unicode_ci".into()),
@@ -283,6 +326,10 @@ impl SqlRenderer for MysqlFlavour {
     fn render_drop_user_defined_type(&self, _: &UserDefinedTypeWalker<'_>) -> String {
         unreachable!("render_drop_user_defined_type on MySQL")
     }
+
+    fn render_rename_foreign_key(&self, _fks: &Pair<ForeignKeyWalker<'_>>) -> String {
+        unreachable!("render RenameForeignKey on MySQL")
+    }
 }
 
 fn render_mysql_modify(
@@ -299,10 +346,10 @@ fn render_mysql_modify(
 
     let column_type = column_type
         .map(Cow::Owned)
-        .unwrap_or_else(|| render_column_type(&next_column));
+        .unwrap_or_else(|| render_column_type(next_column));
 
     let default = new_default
-        .map(|default| render_default(&next_column, &default))
+        .map(|default| render_default(next_column, default))
         .filter(|expr| !expr.is_empty())
         .map(|expression| format!(" DEFAULT {}", expression))
         .unwrap_or_else(String::new);
@@ -314,7 +361,7 @@ fn render_mysql_modify(
         nullability = if next_column.arity().is_required() {
             " NOT NULL"
         } else {
-            ""
+            " NULL"
         },
         default = default,
         sequence = if next_column.is_autoincrement() {
@@ -329,7 +376,7 @@ fn render_column_type(column: &ColumnWalker<'_>) -> Cow<'static, str> {
     if let ColumnTypeFamily::Enum(enum_name) = column.column_type_family() {
         let r#enum = column
             .schema()
-            .get_enum(&enum_name)
+            .get_enum(enum_name)
             .unwrap_or_else(|| panic!("Could not render the variants of enum `{}`", enum_name));
 
         let variants: String = r#enum.values.iter().map(Quoted::mysql_string).join(", ");
@@ -416,7 +463,7 @@ enum MysqlAlterColumn {
 }
 
 impl MysqlAlterColumn {
-    fn new(columns: &Pair<ColumnWalker<'_>>, changes: &ColumnChanges) -> Self {
+    fn new(columns: &Pair<ColumnWalker<'_>>, changes: ColumnChanges) -> Self {
         if changes.only_default_changed() && columns.next().default().is_none() {
             return MysqlAlterColumn::DropDefault;
         }
@@ -441,10 +488,7 @@ impl MysqlAlterColumn {
             _ => columns.next().default().cloned(),
         };
 
-        MysqlAlterColumn::Modify {
-            changes: changes.clone(),
-            new_default,
-        }
+        MysqlAlterColumn::Modify { changes, new_default }
     }
 }
 
@@ -452,7 +496,7 @@ fn render_default<'a>(column: &ColumnWalker<'a>, default: &'a DefaultValue) -> C
     match default.kind() {
         DefaultKind::DbGenerated(val) => val.as_str().into(),
         DefaultKind::Value(PrismaValue::String(val)) | DefaultKind::Value(PrismaValue::Enum(val)) => {
-            Quoted::mysql_string(escape_string_literal(&val)).to_string().into()
+            Quoted::mysql_string(escape_string_literal(val)).to_string().into()
         }
         DefaultKind::Now => {
             let precision = column

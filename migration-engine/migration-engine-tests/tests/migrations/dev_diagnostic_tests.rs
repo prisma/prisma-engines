@@ -1,10 +1,26 @@
-use migration_core::{
-    commands::{CreateMigrationOutput, DevDiagnosticInput, DevDiagnosticOutput},
-    migration_api,
-};
-use migration_engine_tests::sync_test_api::*;
+use migration_core::{json_rpc::types::*, migration_api};
+use migration_engine_tests::test_api::*;
 use pretty_assertions::assert_eq;
+use std::io::Write;
 use user_facing_errors::{migration_engine::MigrationDoesNotApplyCleanly, UserFacingError};
+
+trait DevActionExt {
+    fn is_create_migration(&self) -> bool;
+    fn as_reset(&self) -> Option<&str>;
+}
+
+impl DevActionExt for DevAction {
+    fn is_create_migration(&self) -> bool {
+        matches!(self, DevAction::CreateMigration)
+    }
+
+    fn as_reset(&self) -> Option<&str> {
+        match self {
+            DevAction::Reset(rst) => Some(&rst.reason),
+            _ => None,
+        }
+    }
+}
 
 #[test_connector]
 fn dev_diagnostic_on_an_empty_database_without_migration_returns_create_migration(api: TestApi) {
@@ -18,24 +34,28 @@ fn dev_diagnostic_on_an_empty_database_without_migration_returns_create_migratio
 fn dev_diagnostic_after_two_migrations_happy_path(api: TestApi) {
     let directory = api.create_migrations_directory();
 
-    let dm1 = r#"
+    let dm1 = api.datamodel_with_provider(
+        r#"
         model Cat {
             id      Int @id
             name    String
         }
-    "#;
+    "#,
+    );
 
-    api.create_migration("initial", dm1, &directory).send_sync();
+    api.create_migration("initial", &dm1, &directory).send_sync();
 
-    let dm2 = r#"
+    let dm2 = api.datamodel_with_provider(
+        r#"
         model Cat {
             id          Int @id
             name        String
             fluffiness  Float
         }
-    "#;
+    "#,
+    );
 
-    api.create_migration("second-migration", dm2, &directory).send_sync();
+    api.create_migration("second-migration", &dm2, &directory).send_sync();
 
     api.apply_migrations(&directory)
         .send_sync()
@@ -50,14 +70,16 @@ fn dev_diagnostic_after_two_migrations_happy_path(api: TestApi) {
 fn dev_diagnostic_detects_drift(api: TestApi) {
     let directory = api.create_migrations_directory();
 
-    let dm1 = r#"
+    let dm1 = api.datamodel_with_provider(
+        r#"
         model Cat {
             id      Int @id
             name    String
         }
-    "#;
+    "#,
+    );
 
-    api.create_migration("initial", dm1, &directory).send_sync();
+    api.create_migration("initial", &dm1, &directory).send_sync();
 
     api.apply_migrations(&directory)
         .send_sync()
@@ -71,7 +93,7 @@ fn dev_diagnostic_detects_drift(api: TestApi) {
         }
     "#;
 
-    api.schema_push(dm2).send_sync();
+    api.schema_push_w_datasource(dm2).send();
 
     let DevDiagnosticOutput { action } = api.dev_diagnostic(&directory).send().into_output();
 
@@ -83,16 +105,19 @@ fn dev_diagnostic_detects_drift(api: TestApi) {
 fn dev_diagnostic_calculates_drift_in_presence_of_failed_migrations(api: TestApi) {
     let directory = api.create_migrations_directory();
 
-    let dm1 = r#"
+    let dm1 = api.datamodel_with_provider(
+        r#"
         model Cat {
             id      Int @id
             name    String
         }
-    "#;
+    "#,
+    );
 
-    api.create_migration("01_initial", dm1, &directory).send_sync();
+    api.create_migration("01_initial", &dm1, &directory).send_sync();
 
-    let dm2 = r#"
+    let dm2 = api.datamodel_with_provider(
+        r#"
         model Cat {
             id      Int @id
             name    String
@@ -102,24 +127,28 @@ fn dev_diagnostic_calculates_drift_in_presence_of_failed_migrations(api: TestApi
             id Int @id
             fluffiness Float
         }
-    "#;
+    "#,
+    );
 
-    let migration_two = api
-        .create_migration("02_add_dogs", dm2, &directory)
-        .send_sync()
-        .modify_migration(|migration| {
-            migration.push_str("\nSELECT YOLO;");
-        });
+    let mut original_migration = String::new();
+    let (migration_two_name, migration_two_path) = {
+        let out = api
+            .create_migration("02_add_dogs", &dm2, &directory)
+            .send_sync()
+            .modify_migration(|migration| {
+                original_migration.push_str(migration);
+                migration.push_str("\nSELECT YOLO;");
+            });
+        let path = out.migration_script_path();
+        (out.into_output().generated_migration_name.unwrap(), path)
+    };
 
     let err = api.apply_migrations(&directory).send_unwrap_err().to_string();
     assert!(err.contains("yolo") || err.contains("YOLO"), "{}", err);
 
-    let migration_two =
-        migration_two.modify_migration(|migration| migration.truncate(migration.len() - "SELECT YOLO;".len()));
+    std::fs::write(migration_two_path, original_migration.as_bytes()).unwrap();
 
     let DevDiagnosticOutput { action } = api.dev_diagnostic(&directory).send().into_output();
-
-    let migration_two_name = migration_two.into_output().generated_migration_name.unwrap();
 
     let expected_message = format!(
         "- The migration `{}` failed.\n- The migration `{}` was modified after it was applied.\n- Drift detected: Your database schema is not in sync with your migration history.\n",
@@ -133,28 +162,32 @@ fn dev_diagnostic_calculates_drift_in_presence_of_failed_migrations(api: TestApi
 fn dev_diagnostic_returns_create_migration_when_the_database_is_behind(api: TestApi) {
     let directory = api.create_migrations_directory();
 
-    let dm1 = r#"
+    let dm1 = api.datamodel_with_provider(
+        r#"
         model Cat {
             id      Int @id
             name    String
         }
-    "#;
+    "#,
+    );
 
-    api.create_migration("initial", dm1, &directory).send_sync();
+    api.create_migration("initial", &dm1, &directory).send_sync();
 
     api.apply_migrations(&directory)
         .send_sync()
         .assert_applied_migrations(&["initial"]);
 
-    let dm2 = r#"
+    let dm2 = api.datamodel_with_provider(
+        r#"
         model Cat {
             id          Int @id
             name        String
             fluffiness  Float
         }
-    "#;
+    "#,
+    );
 
-    api.create_migration("second-migration", dm2, &directory).send_sync();
+    api.create_migration("second-migration", &dm2, &directory).send_sync();
 
     let DevDiagnosticOutput { action } = api.dev_diagnostic(&directory).send().into_output();
 
@@ -165,25 +198,29 @@ fn dev_diagnostic_returns_create_migration_when_the_database_is_behind(api: Test
 fn dev_diagnostic_can_detect_when_the_migrations_directory_is_behind(api: TestApi) {
     let directory = api.create_migrations_directory();
 
-    let dm1 = r#"
+    let dm1 = api.datamodel_with_provider(
+        r#"
         model Cat {
             id      Int @id
             name    String
         }
-    "#;
+    "#,
+    );
 
-    api.create_migration("initial", dm1, &directory).send_sync();
+    api.create_migration("initial", &dm1, &directory).send_sync();
 
-    let dm2 = r#"
+    let dm2 = api.datamodel_with_provider(
+        r#"
         model Cat {
             id          Int @id
             name        String
             fluffiness  Float
         }
-    "#;
+    "#,
+    );
 
     let name = api
-        .create_migration("second-migration", dm2, &directory)
+        .create_migration("second-migration", &dm2, &directory)
         .send_sync()
         .into_output()
         .generated_migration_name
@@ -210,30 +247,34 @@ fn dev_diagnostic_can_detect_when_the_migrations_directory_is_behind(api: TestAp
 fn dev_diagnostic_can_detect_when_history_diverges(api: TestApi) {
     let directory = api.create_migrations_directory();
 
-    let dm1 = r#"
+    let dm1 = api.datamodel_with_provider(
+        r#"
         model Cat {
             id      Int @id
             name    String
         }
-    "#;
+    "#,
+    );
 
     let first_migration_name = api
-        .create_migration("1-initial", dm1, &directory)
+        .create_migration("1-initial", &dm1, &directory)
         .send_sync()
         .into_output()
         .generated_migration_name
         .unwrap();
 
-    let dm2 = r#"
+    let dm2 = api.datamodel_with_provider(
+        r#"
         model Cat {
             id          Int @id
             name        String
             fluffiness  Float
         }
-    "#;
+    "#,
+    );
 
     let deleted_migration_name = api
-        .create_migration("2-second-migration", dm2, &directory)
+        .create_migration("2-second-migration", &dm2, &directory)
         .send_sync()
         .into_output()
         .generated_migration_name
@@ -246,15 +287,17 @@ fn dev_diagnostic_can_detect_when_history_diverges(api: TestApi) {
     let second_migration_folder_path = directory.path().join(&deleted_migration_name);
     std::fs::remove_dir_all(&second_migration_folder_path).unwrap();
 
-    let dm3 = r#"
+    let dm3 = api.datamodel_with_provider(
+        r#"
         model Dog {
             id          Int @id
             name        String
             fluffiness  Float
         }
-    "#;
+    "#,
+    );
 
-    api.create_migration("3-create-dog", dm3, &directory)
+    api.create_migration("3-create-dog", &dm3, &directory)
         .draft(true)
         .send_sync()
         .assert_migration_directories_count(2);
@@ -271,36 +314,43 @@ fn dev_diagnostic_can_detect_when_history_diverges(api: TestApi) {
 fn dev_diagnostic_can_detect_edited_migrations(api: TestApi) {
     let directory = api.create_migrations_directory();
 
-    let dm1 = r#"
+    let dm1 = api.datamodel_with_provider(
+        r#"
         model Cat {
             id      Int @id
             name    String
         }
-    "#;
+    "#,
+    );
 
-    let initial_assertions = api.create_migration("initial", dm1, &directory).send_sync();
+    let (initial_migration_name, initial_path) = {
+        let out = api.create_migration("initial", &dm1, &directory).send_sync();
+        let path = out.migration_script_path();
+        (out.into_output().generated_migration_name.unwrap(), path)
+    };
 
-    let dm2 = r#"
+    let dm2 = api.datamodel_with_provider(
+        r#"
         model Cat {
             id          Int @id
             name        String
             fluffiness  Float
         }
-    "#;
+    "#,
+    );
 
-    api.create_migration("second-migration", dm2, &directory).send_sync();
+    api.create_migration("second-migration", &dm2, &directory).send_sync();
 
     api.apply_migrations(&directory)
         .send_sync()
         .assert_applied_migrations(&["initial", "second-migration"]);
 
-    let initial_migration_name = initial_assertions
-        .modify_migration(|script| {
-            std::mem::swap(script, &mut format!("/* test */\n{}", script));
-        })
-        .into_output()
-        .generated_migration_name
+    let mut file = std::fs::OpenOptions::new()
+        .write(true)
+        .append(true)
+        .open(initial_path)
         .unwrap();
+    file.write_all(b"-- test\nSELECT 1;").unwrap();
 
     let DevDiagnosticOutput { action } = api.dev_diagnostic(&directory).send().into_output();
 
@@ -316,36 +366,43 @@ fn dev_diagnostic_can_detect_edited_migrations(api: TestApi) {
 fn dev_diagnostic_reports_migrations_failing_to_apply_cleanly(api: TestApi) {
     let directory = api.create_migrations_directory();
 
-    let dm1 = r#"
+    let dm1 = api.datamodel_with_provider(
+        r#"
         model Cat {
             id      Int @id
             name    String
         }
-    "#;
+    "#,
+    );
 
-    let initial_assertions = api.create_migration("initial", dm1, &directory).send_sync();
+    let (initial_migration_name, initial_path) = {
+        let out = api.create_migration("initial", &dm1, &directory).send_sync();
+        let path = out.migration_script_path();
+        (out.into_output().generated_migration_name.unwrap(), path)
+    };
 
-    let dm2 = r#"
+    let dm2 = api.datamodel_with_provider(
+        r#"
         model Cat {
             id          Int @id
             name        String
             fluffiness  Float
         }
-    "#;
+    "#,
+    );
 
-    api.create_migration("second-migration", dm2, &directory).send_sync();
+    api.create_migration("second-migration", &dm2, &directory).send_sync();
 
     api.apply_migrations(&directory)
         .send_sync()
         .assert_applied_migrations(&["initial", "second-migration"]);
 
-    let initial_migration_name = initial_assertions
-        .modify_migration(|script| {
-            script.push_str("SELECT YOLO;\n");
-        })
-        .into_output()
-        .generated_migration_name
+    let mut file = std::fs::OpenOptions::new()
+        .write(true)
+        .append(true)
+        .open(initial_path)
         .unwrap();
+    file.write_all(b"SELECT YOLO;\n").unwrap();
 
     let err = api.dev_diagnostic(&directory).send_unwrap_err().to_user_facing();
 
@@ -369,16 +426,18 @@ fn dev_diagnostic_with_a_nonexistent_migrations_directory_works(api: TestApi) {
 fn with_a_failed_migration(api: TestApi) {
     let migrations_directory = api.create_migrations_directory();
 
-    let dm = r#"
+    let dm = api.datamodel_with_provider(
+        r#"
         model catsu {
             id Int @id
         }
-    "#;
+    "#,
+    );
 
     let CreateMigrationOutput {
         generated_migration_name,
     } = api
-        .create_migration("01-init", dm, &migrations_directory)
+        .create_migration("01-init", &dm, &migrations_directory)
         .send_sync()
         .assert_migration_directories_count(1)
         .modify_migration(|migration| {
@@ -417,31 +476,35 @@ fn with_a_failed_migration(api: TestApi) {
 fn with_an_invalid_unapplied_migration_should_report_it(api: TestApi) {
     let directory = api.create_migrations_directory();
 
-    let dm1 = r#"
+    let dm1 = api.datamodel_with_provider(
+        r#"
         model catcat {
             id      Int @id
             name    String
         }
-    "#;
+    "#,
+    );
 
-    api.create_migration("initial", dm1, &directory).send_sync();
+    api.create_migration("initial", &dm1, &directory).send_sync();
 
     api.apply_migrations(&directory)
         .send_sync()
         .assert_applied_migrations(&["initial"]);
 
-    let dm2 = r#"
+    let dm2 = api.datamodel_with_provider(
+        r#"
         model catcat {
             id          Int @id
             name        String
             fluffiness  Float
         }
-    "#;
+    "#,
+    );
 
     let CreateMigrationOutput {
         generated_migration_name,
     } = api
-        .create_migration("second-migration", dm2, &directory)
+        .create_migration("second-migration", &dm2, &directory)
         .send_sync()
         .modify_migration(|script| {
             *script = "CREATE BROKEN".into();
@@ -454,11 +517,13 @@ fn with_an_invalid_unapplied_migration_should_report_it(api: TestApi) {
         .to_user_facing()
         .unwrap_known();
 
-    assert_eq!(err.error_code, MigrationDoesNotApplyCleanly::ERROR_CODE);
-    assert!(err.message.starts_with(&format!(
-        "Migration `{}` failed to apply cleanly to the shadow database. \nError:",
+    let expected_msg = format!(
+        "Migration `{}` failed to apply cleanly to the shadow database. \nError",
         generated_migration_name.unwrap()
-    )));
+    );
+
+    assert_eq!(err.error_code, MigrationDoesNotApplyCleanly::ERROR_CODE);
+    assert!(err.message.starts_with(&expected_msg));
 }
 
 #[test_connector(tags(Postgres))]
@@ -479,6 +544,50 @@ fn drift_can_be_detected_without_migrations_table_dev(api: TestApi) {
 
     let expect = expect![[r#"
         Drift detected: Your database schema is not in sync with your migration history.
+
+        The following is a summary of the differences between the expected database schema given your migrations files, and the actual schema of the database.
+
+        It should be understood as the set of changes to get from the expected schema to the actual schema.
+
+        If you are running this the first time on an existing database, please make sure to read this documentation page:
+        https://www.prisma.io/docs/guides/database/developing-with-prisma-migrate/troubleshooting-development
+
+        [+] Added tables
+          - cat
+    "#]];
+
+    expect.assert_eq(action.as_reset().unwrap());
+}
+
+#[test_connector(tags(Postgres))]
+fn drift_detect_first_time_message_should_not_be_dispyed_if_migration_table_exists(api: TestApi) {
+    let directory = api.create_migrations_directory();
+
+    let dm1 = api.datamodel_with_provider(
+        r#"
+        model catcat {
+            id      Int @id
+            name    String
+        }
+    "#,
+    );
+
+    api.create_migration("initial", &dm1, &directory).send_sync();
+
+    api.apply_migrations(&directory)
+        .send_sync()
+        .assert_applied_migrations(&["initial"]);
+
+    api.raw_cmd("CREATE TABLE \"cat\" (\nid SERIAL PRIMARY KEY\n);");
+
+    let DevDiagnosticOutput { action } = api.dev_diagnostic(&directory).send().into_output();
+
+    let expect = expect![[r#"
+        Drift detected: Your database schema is not in sync with your migration history.
+
+        The following is a summary of the differences between the expected database schema given your migrations files, and the actual schema of the database.
+
+        It should be understood as the set of changes to get from the expected schema to the actual schema.
 
         [+] Added tables
           - cat
@@ -522,20 +631,19 @@ fn dev_diagnostic_shadow_database_creation_error_is_special_cased_mysql(api: Tes
         dbport = db_url.port().unwrap_or(3306),
     );
 
-    let err = api
-        .block_on(async {
-            let migration_api = migration_api(&datamodel).await.unwrap();
-            migration_api
-                .dev_diagnostic(&DevDiagnosticInput {
-                    migrations_directory_path: directory.path().as_os_str().to_string_lossy().into_owned(),
-                })
-                .await
-        })
-        .unwrap_err()
-        .to_user_facing()
-        .unwrap_known();
+    let err = tok(async {
+        let migration_api = migration_api(Some(datamodel), None).unwrap();
+        migration_api
+            .dev_diagnostic(DevDiagnosticInput {
+                migrations_directory_path: directory.path().as_os_str().to_string_lossy().into_owned(),
+            })
+            .await
+    })
+    .unwrap_err()
+    .to_user_facing()
+    .unwrap_known();
 
-    assert!(err.message.starts_with("Prisma Migrate could not create the shadow database. Please make sure the database user has permission to create databases. Read more at https://pris.ly/d/migrate-shadow"), "{:?}", err);
+    assert!(err.message.starts_with("Prisma Migrate could not create the shadow database. Please make sure the database user has permission to create databases. Read more about the shadow database (and workarounds) at https://pris.ly/d/migrate-shadow"), "{:?}", err);
 }
 
 #[test_connector(tags(Postgres12))]
@@ -571,20 +679,19 @@ fn dev_diagnostic_shadow_database_creation_error_is_special_cased_postgres(api: 
         dbport = db_url.port().unwrap(),
     );
 
-    let err = api
-        .block_on(async {
-            let migration_api = migration_api(&datamodel).await.unwrap();
-            migration_api
-                .dev_diagnostic(&DevDiagnosticInput {
-                    migrations_directory_path: directory.path().as_os_str().to_string_lossy().into_owned(),
-                })
-                .await
-        })
-        .unwrap_err()
-        .to_user_facing()
-        .unwrap_known();
+    let err = tok(async move {
+        let migration_api = migration_api(Some(datamodel), None).unwrap();
+        migration_api
+            .dev_diagnostic(DevDiagnosticInput {
+                migrations_directory_path: directory.path().as_os_str().to_string_lossy().into_owned(),
+            })
+            .await
+    })
+    .unwrap_err()
+    .to_user_facing()
+    .unwrap_known();
 
-    assert!(err.message.starts_with("Prisma Migrate could not create the shadow database. Please make sure the database user has permission to create databases. Read more at https://pris.ly/d/migrate-shadow"));
+    assert!(err.message.starts_with("Prisma Migrate could not create the shadow database. Please make sure the database user has permission to create databases. Read more about the shadow database (and workarounds) at https://pris.ly/d/migrate-shadow"));
 }
 
 // (Hopefully) Temporarily commented out because this test is flaky in CI.

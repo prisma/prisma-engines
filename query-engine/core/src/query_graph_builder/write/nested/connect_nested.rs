@@ -4,7 +4,7 @@ use crate::{
     query_graph::{Node, NodeRef, QueryGraph, QueryGraphDependency},
     ParsedInputMap, ParsedInputValue, QueryResult,
 };
-use connector::{Filter, IdFilter};
+use connector::{Filter, IntoFilter};
 use itertools::Itertools;
 use prisma_models::{ModelRef, RelationFieldRef};
 use std::convert::TryInto;
@@ -177,7 +177,7 @@ fn handle_one_to_many(
         graph.create_edge(
             &parent_node,
             &read_children_node,
-            QueryGraphDependency::ParentProjection(
+            QueryGraphDependency::ProjectedDataDependency(
                 child_link,
                 Box::new(move |mut read_children_node, mut child_links| {
                     let child_link = match child_links.pop() {
@@ -189,7 +189,7 @@ fn handle_one_to_many(
                     }?;
 
                     if let Node::Query(Query::Write(ref mut wq)) = read_children_node {
-                        wq.inject_projection_into_args(parent_link.assimilate(child_link)?);
+                        wq.inject_result_into_args(parent_link.assimilate(child_link)?);
                     }
 
                     Ok(read_children_node)
@@ -207,7 +207,7 @@ fn handle_one_to_many(
         graph.create_edge(
             &parent_node,
             &update_node,
-            QueryGraphDependency::ParentProjection(
+            QueryGraphDependency::ProjectedDataDependency(
                 parent_link,
                 Box::new(move |mut update_node, mut parent_links| {
                     let parent_link = match parent_links.pop() {
@@ -219,7 +219,7 @@ fn handle_one_to_many(
                     }?;
 
                     if let Node::Query(Query::Write(ref mut wq)) = update_node {
-                        wq.inject_projection_into_args(child_link.assimilate(parent_link)?)
+                        wq.inject_result_into_args(child_link.assimilate(parent_link)?)
                     }
 
                     Ok(update_node)
@@ -233,7 +233,7 @@ fn handle_one_to_many(
         graph.create_edge(
             &update_node,
             &check_node,
-            QueryGraphDependency::ParentResult(Box::new(move |check_node, parent_result| {
+            QueryGraphDependency::DataDependency(Box::new(move |check_node, parent_result| {
                 let query_result = parent_result.as_query_result().unwrap();
 
                 if let QueryResult::Count(c) = query_result {
@@ -329,7 +329,7 @@ fn handle_one_to_many(
 /// - The relation is inlined on the child record. Even if the child side is not required, we then need
 ///   to update the previous child to not point to the parent anymore ("disconnect").
 ///
-/// Important: We can not inject from `Read New Child` to `Parent` if `Parent` is a non-create, as it would cause
+/// Important: We cannot inject from `Read New Child` to `Parent` if `Parent` is a non-create, as it would cause
 /// the following issue (example):
 /// - Parent is an update, doesn't have a connected child on relation x.
 /// - Parent gets injected with a child on x, because that's what the connect is supposed to do.
@@ -351,8 +351,8 @@ fn handle_one_to_one(
 
     let parent_is_create = utils::node_is_create(graph, &parent_node);
     let child_relation_field = parent_relation_field.related_field();
-    let parent_side_required = parent_relation_field.is_required;
-    let child_side_required = child_relation_field.is_required;
+    let parent_side_required = parent_relation_field.is_required();
+    let child_side_required = child_relation_field.is_required();
     let relation_inlined_parent = parent_relation_field.relation_is_inlined_in_parent();
     let relation_inlined_child = !relation_inlined_parent;
 
@@ -384,7 +384,7 @@ fn handle_one_to_one(
     graph.create_edge(
         &parent_node,
         &read_new_child_node,
-        QueryGraphDependency::ParentProjection(
+        QueryGraphDependency::ProjectedDataDependency(
             child_linking_fields.clone(),
             Box::new(move |mut read_new_child_node, mut child_links| {
                 // This takes care of cases where the relation is inlined, CREATE ONLY. See doc comment for explanation.
@@ -399,7 +399,7 @@ fn handle_one_to_one(
 
 
                     if let Node::Query(Query::Write(ref mut wq)) = read_new_child_node {
-                        wq.inject_projection_into_args(parent_linking_fields.assimilate(child_link)?);
+                        wq.inject_result_into_args(parent_linking_fields.assimilate(child_link)?);
                     }
                 }
 
@@ -430,7 +430,7 @@ fn handle_one_to_one(
         graph.create_edge(
             &read_new_child_node,
             &update_children_node,
-            QueryGraphDependency::ParentProjection(
+            QueryGraphDependency::ProjectedDataDependency(
                 child_model_identifier,
                 Box::new(move |mut update_children_node, mut child_ids| {
                     let child_id = match child_ids.pop() {
@@ -457,7 +457,7 @@ fn handle_one_to_one(
         graph.create_edge(
              &parent_node,
              &update_children_node,
-             QueryGraphDependency::ParentProjection(parent_linking_fields, Box::new(move |mut update_children_node, mut parent_links| {
+             QueryGraphDependency::ProjectedDataDependency(parent_linking_fields, Box::new(move |mut update_children_node, mut parent_links| {
                  let parent_link = match parent_links.pop() {
                      Some(link) => Ok(link),
                      None => Err(QueryGraphBuilderError::RecordNotFound(format!(
@@ -469,7 +469,7 @@ fn handle_one_to_one(
                  }?;
 
                  if let Node::Query(Query::Write(ref mut wq)) = update_children_node {
-                     wq.inject_projection_into_args(child_linking_fields.assimilate(parent_link)?);
+                     wq.inject_result_into_args(child_linking_fields.assimilate(parent_link)?);
                  }
 
                  Ok(update_children_node)
@@ -488,7 +488,7 @@ fn handle_one_to_one(
         graph.create_edge(
             &read_new_child_node,
             &update_parent_node,
-            QueryGraphDependency::ParentProjection(child_linking_fields, Box::new(move |mut update_parent_node, mut child_links| {
+            QueryGraphDependency::ProjectedDataDependency(child_linking_fields, Box::new(move |mut update_parent_node, mut child_links| {
                 let child_link = match child_links.pop() {
                     Some(link) => Ok(link),
                     None => Err(QueryGraphBuilderError::RecordNotFound(format!(
@@ -500,7 +500,7 @@ fn handle_one_to_one(
                 }?;
 
                 if let Node::Query(Query::Write(ref mut wq)) = update_parent_node {
-                    wq.inject_projection_into_args(parent_linking_fields.assimilate(child_link)?);
+                    wq.inject_result_into_args(parent_linking_fields.assimilate(child_link)?);
                 }
 
                 Ok(update_parent_node)
@@ -515,7 +515,7 @@ fn handle_one_to_one(
         graph.create_edge(
             &parent_node,
             &update_parent_node,
-            QueryGraphDependency::ParentProjection(parent_model_identifier, Box::new(move |mut update_parent_node, mut parent_ids| {
+            QueryGraphDependency::ProjectedDataDependency(parent_model_identifier, Box::new(move |mut update_parent_node, mut parent_ids| {
                 let parent_id = match parent_ids.pop() {
                     Some(pid) => Ok(pid),
                     None => Err(QueryGraphBuilderError::RecordNotFound(format!(

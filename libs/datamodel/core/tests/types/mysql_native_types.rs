@@ -1,8 +1,9 @@
-use crate::common::*;
 use crate::types::helper::{
     test_native_types_compatibility, test_native_types_with_field_attribute_support,
     test_native_types_without_attributes,
 };
+use crate::{common::*, with_header, Provider};
+use datamodel::parse_schema;
 use datamodel::{ast, diagnostics::DatamodelError};
 use indoc::indoc;
 
@@ -13,7 +14,7 @@ const TEXT_TYPES: &[&str] = &["Text", "LongText", "MediumText", "TinyText"];
 fn text_and_blob_data_types_should_fail_on_index() {
     fn error_msg(type_name: &str) -> String {
         format!(
-            "You can not define an index on fields with Native type {} of MySQL.",
+            "You cannot define an index on fields with Native type {} of MySQL. If you are using the `extendedIndexes` preview feature you can add a `length` argument to allow this.",
             type_name
         )
     }
@@ -28,9 +29,95 @@ fn text_and_blob_data_types_should_fail_on_index() {
 }
 
 #[test]
+fn text_should_not_fail_on_length_prefixed_index() {
+    let dml = indoc! {r#"
+        model A {
+          id Int    @id
+          a  String @test.Text
+
+          @@index([a(length: 30)])
+        }
+    "#};
+
+    let dml = with_header(dml, Provider::Mysql, &["extendedIndexes"]);
+
+    assert!(parse_schema(&dml).is_ok());
+}
+
+#[test]
+fn text_should_not_fail_on_length_prefixed_unique() {
+    let dml = indoc! {r#"
+        model A {
+          id Int    @id
+          a  String @test.Text @unique(length: 30)
+        }
+    "#};
+
+    let dml = with_header(dml, Provider::Mysql, &["extendedIndexes"]);
+
+    assert!(parse_schema(&dml).is_ok());
+}
+
+#[test]
+fn text_should_not_fail_on_length_prefixed_pk() {
+    let dml = indoc! {r#"
+        model A {
+          id String @id(length: 30) @test.Text
+        }
+    "#};
+
+    let dml = with_header(dml, Provider::Mysql, &["extendedIndexes"]);
+
+    assert!(parse_schema(&dml).is_ok());
+}
+
+#[test]
+fn bytes_should_not_fail_on_length_prefixed_index() {
+    let dml = indoc! {r#"
+        model A {
+          id Int   @id
+          a  Bytes @test.Blob
+
+          @@index([a(length: 30)])
+        }
+    "#};
+
+    let dml = with_header(dml, Provider::Mysql, &["extendedIndexes"]);
+
+    assert!(parse_schema(&dml).is_ok());
+}
+
+#[test]
+fn bytes_should_not_fail_on_length_prefixed_unique() {
+    let dml = indoc! {r#"
+        model A {
+          id Int   @id
+          a  Bytes @test.Blob @unique(length: 30)
+        }
+    "#};
+
+    let dml = with_header(dml, Provider::Mysql, &["extendedIndexes"]);
+
+    assert!(parse_schema(&dml).is_ok());
+}
+
+#[test]
+fn bytes_should_not_fail_on_length_prefixed_pk() {
+    let dml = indoc! {r#"
+        model A {
+          id Bytes @id(length: 30) @test.Blob
+        }
+    "#};
+
+    let dml = with_header(dml, Provider::Mysql, &["extendedIndexes"]);
+
+    assert!(parse_schema(&dml).is_ok());
+}
+
+#[test]
 fn text_and_blob_data_types_can_not_be_unique() {
     fn error_msg(type_name: &str) -> String {
-        format!("Native type {} can not be unique in MySQL.", type_name)
+        format!("Native type {} cannot be unique in MySQL. If you are using the `extendedIndexes` preview feature you can add a `length` argument to allow this.", type_name)
     }
 
     for tpe in BLOB_TYPES {
@@ -48,7 +135,7 @@ fn text_and_blob_data_types_can_not_be_unique() {
 fn text_and_blob_data_types_should_fail_on_id_attribute() {
     fn error_msg(type_name: &str) -> String {
         format!(
-            "Native type {} of MySQL can not be used on a field that is `@id` or `@@id`.",
+            "Native type {} of MySQL cannot be used on a field that is `@id` or `@@id`. If you are using the `extendedIndexes` preview feature you can add a `length` argument to allow this.",
             type_name
         )
     }
@@ -85,7 +172,7 @@ fn test_block_attribute_support(native_type: &str, scalar_type: &str, attribute_
         attribute_name = attribute_name
     );
 
-    test_native_types_compatibility(&dml, &error_msg, MYSQL_SOURCE);
+    test_native_types_compatibility(&dml, error_msg, MYSQL_SOURCE);
 }
 
 #[test]
@@ -104,7 +191,7 @@ fn should_only_allow_bit_one_for_booleans() {
     let expected_error =
         "Argument M is out of range for Native type Bit(2) of MySQL: only Bit(1) can be used as Boolean.";
 
-    test_native_types_without_attributes("Bit(2)", "Boolean", &expected_error, MYSQL_SOURCE);
+    test_native_types_without_attributes("Bit(2)", "Boolean", expected_error, MYSQL_SOURCE);
 }
 
 #[test]
@@ -168,8 +255,8 @@ fn should_fail_on_native_type_decimal_when_scale_is_bigger_than_precision() {
 
     let error = parse_error(dml);
 
-    error.assert_is(DatamodelError::new_connector_error(
-        "The scale must not be larger than the precision for the Decimal(2,4) native type in MySQL.",
+    error.assert_is(DatamodelError::new(
+        "The scale must not be larger than the precision for the Decimal(2,4) native type in MySQL.".into(),
         ast::Span::new(101, 131),
     ));
 }
@@ -190,8 +277,9 @@ fn should_fail_on_incompatible_scalar_type_with_tiny_int() {
 
     let error = parse_error(dml);
 
-    error.assert_is(DatamodelError::new_connector_error(
-        "Native type TinyInt is not compatible with declared field type DateTime, expected field type Boolean or Int.",
+    error.assert_is(DatamodelError::new(
+        "Native type TinyInt is not compatible with declared field type DateTime, expected field type Boolean or Int."
+            .into(),
         ast::Span::new(172, 182),
     ));
 }

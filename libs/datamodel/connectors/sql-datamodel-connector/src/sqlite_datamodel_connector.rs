@@ -1,39 +1,42 @@
-use datamodel_connector::{connector_error::ConnectorError, Connector, ConnectorCapability};
-use dml::model::Model;
-use dml::native_type_constructor::NativeTypeConstructor;
-use dml::native_type_instance::NativeTypeInstance;
-use dml::{field::Field, scalars::ScalarType};
+use datamodel_connector::ConstraintScope;
+use datamodel_connector::{
+    connector_error::ConnectorError, parser_database::ScalarType, Connector, ConnectorCapability,
+    NativeTypeConstructor, NativeTypeInstance, ReferentialAction, ReferentialIntegrity,
+};
+use enumflags2::BitFlags;
 use std::borrow::Cow;
 
-pub struct SqliteDatamodelConnector {
-    capabilities: Vec<ConnectorCapability>,
-    constructors: Vec<NativeTypeConstructor>,
-}
+const NATIVE_TYPE_CONSTRUCTORS: &[NativeTypeConstructor] = &[];
+const CONSTRAINT_SCOPES: &[ConstraintScope] = &[ConstraintScope::GlobalKeyIndex];
+const CAPABILITIES: &[ConnectorCapability] = &[
+    ConnectorCapability::AnyId,
+    ConnectorCapability::AutoIncrement,
+    ConnectorCapability::CompoundIds,
+    ConnectorCapability::SqlQueryRaw,
+    ConnectorCapability::RelationFieldsInArbitraryOrder,
+    ConnectorCapability::UpdateableId,
+    ConnectorCapability::ImplicitManyToManyRelation,
+];
 
-impl SqliteDatamodelConnector {
-    pub fn new() -> SqliteDatamodelConnector {
-        let capabilities = vec![
-            ConnectorCapability::RelationFieldsInArbitraryOrder,
-            ConnectorCapability::UpdateableId,
-            ConnectorCapability::AutoIncrement,
-            ConnectorCapability::CompoundIds,
-        ];
-
-        let constructors: Vec<NativeTypeConstructor> = vec![];
-
-        SqliteDatamodelConnector {
-            capabilities,
-            constructors,
-        }
-    }
-}
+pub struct SqliteDatamodelConnector;
 
 impl Connector for SqliteDatamodelConnector {
     fn name(&self) -> &str {
         "sqlite"
     }
-    fn capabilities(&self) -> &[ConnectorCapability] {
-        &self.capabilities
+
+    fn capabilities(&self) -> &'static [ConnectorCapability] {
+        CAPABILITIES
+    }
+
+    fn max_identifier_length(&self) -> usize {
+        10000
+    }
+
+    fn referential_actions(&self, referential_integrity: &ReferentialIntegrity) -> BitFlags<ReferentialAction> {
+        use ReferentialAction::*;
+
+        referential_integrity.allowed_referential_actions(SetNull | SetDefault | Cascade | Restrict | NoAction)
     }
 
     fn scalar_type_for_native_type(&self, _native_type: serde_json::Value) -> ScalarType {
@@ -52,16 +55,12 @@ impl Connector for SqliteDatamodelConnector {
         false
     }
 
-    fn validate_field(&self, _field: &Field) -> Result<(), ConnectorError> {
-        Ok(())
+    fn constraint_violation_scopes(&self) -> &'static [ConstraintScope] {
+        CONSTRAINT_SCOPES
     }
 
-    fn validate_model(&self, _model: &Model) -> Result<(), ConnectorError> {
-        Ok(())
-    }
-
-    fn available_native_type_constructors(&self) -> &[NativeTypeConstructor] {
-        &self.constructors
+    fn available_native_type_constructors(&self) -> &'static [NativeTypeConstructor] {
+        NATIVE_TYPE_CONSTRUCTORS
     }
 
     fn parse_native_type(&self, _name: &str, _args: Vec<String>) -> Result<NativeTypeInstance, ConnectorError> {
@@ -83,7 +82,7 @@ impl Connector for SqliteDatamodelConnector {
             }
         };
 
-        if let Some(path) = set_root(&url.trim_start_matches("file:")) {
+        if let Some(path) = set_root(url.trim_start_matches("file:")) {
             return format!("file:{}", path).into();
         };
 
@@ -96,11 +95,5 @@ impl Connector for SqliteDatamodelConnector {
         }
 
         Ok(())
-    }
-}
-
-impl Default for SqliteDatamodelConnector {
-    fn default() -> Self {
-        Self::new()
     }
 }

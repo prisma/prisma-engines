@@ -1,24 +1,94 @@
-use crate::{output_meta::OutputMeta, IntoBson, MongoError};
+use crate::{
+    output_meta::{CompositeOutputMeta, OutputMeta, ScalarOutputMeta},
+    IntoBson, MongoError,
+};
 use bigdecimal::{BigDecimal, FromPrimitive, ToPrimitive};
 use chrono::{TimeZone, Utc};
 use itertools::Itertools;
-use mongodb::bson::{oid::ObjectId, spec::BinarySubtype, Binary, Bson, Timestamp};
+use mongodb::bson::{oid::ObjectId, spec::BinarySubtype, Binary, Bson, Document, Timestamp};
 use native_types::MongoDbType;
-use prisma_models::{PrismaValue, ScalarFieldRef, TypeIdentifier};
+use prisma_models::{CompositeFieldRef, Field, PrismaValue, ScalarFieldRef, SelectedField, TypeIdentifier};
 use serde_json::Value;
 use std::{convert::TryFrom, fmt::Display};
 
-/// Transforms a `PrismaValue` of a specific field into the BSON mapping as prescribed by the native types
-/// or as defined by the default `TypeIdentifier` to BSON mapping.
+/// Transforms a `PrismaValue` of a specific selected field into the BSON mapping as prescribed by
+/// the native types or as defined by the default `TypeIdentifier` to BSON mapping.
+impl IntoBson for (&SelectedField, PrismaValue) {
+    fn into_bson(self) -> crate::Result<Bson> {
+        let (selection, value) = self;
+
+        match selection {
+            SelectedField::Scalar(sf) => (sf, value).into_bson(),
+            SelectedField::Composite(_) => todo!(), // [Composites] todo
+        }
+    }
+}
+
+impl IntoBson for (&Field, PrismaValue) {
+    fn into_bson(self) -> crate::Result<Bson> {
+        let (selection, value) = self;
+
+        match selection {
+            Field::Scalar(sf) => (sf, value).into_bson(),
+            Field::Composite(cf) => (cf, value).into_bson(),
+            Field::Relation(_) => unreachable!("Relation fields should never hit the BSON conversion logic."),
+        }
+    }
+}
+
+impl IntoBson for (&CompositeFieldRef, PrismaValue) {
+    fn into_bson(self) -> crate::Result<Bson> {
+        let (cf, value) = self;
+
+        match value {
+            PrismaValue::Null => Ok(Bson::Null),
+            PrismaValue::Object(pairs) if cf.is_list() => Ok(Bson::Array(vec![convert_composite_object(cf, pairs)?])),
+            PrismaValue::Object(pairs) => convert_composite_object(cf, pairs),
+
+            PrismaValue::List(values) => Ok(Bson::Array(
+                values
+                    .into_iter()
+                    .map(|val| {
+                        if let PrismaValue::Object(pairs) = val {
+                            convert_composite_object(cf, pairs)
+                        } else {
+                            unreachable!("Composite lists must be objects")
+                        }
+                    })
+                    .collect::<crate::Result<Vec<_>>>()?,
+            )),
+
+            _ => unreachable!("{}", value),
+        }
+    }
+}
+
+fn convert_composite_object(cf: &CompositeFieldRef, pairs: Vec<(String, PrismaValue)>) -> crate::Result<Bson> {
+    let mut doc = Document::new();
+
+    for (field, value) in pairs {
+        let field = cf
+            .typ
+            .find_field(&field) // Todo: This is assuming a lot by only checking the prisma names, not DB names.
+            .expect("Writing unavailable composite field.");
+
+        let converted = (field, value).into_bson()?;
+
+        doc.insert(field.db_name(), converted);
+    }
+
+    Ok(Bson::Document(doc))
+}
+
 impl IntoBson for (&ScalarFieldRef, PrismaValue) {
     fn into_bson(self) -> crate::Result<Bson> {
-        let (field, value) = self;
+        let (sf, value) = self;
 
         // This is _insanely_ inefficient, but we have no real choice with the current interface.
-        let mongo_type: Option<MongoDbType> = field.native_type.as_ref().map(|nt| nt.deserialize_native_type());
+        let mongo_type: Option<MongoDbType> = sf.native_type.as_ref().map(|nt| nt.deserialize_native_type());
 
         // If we have a native type, use that one as source of truth for mapping, else use the type ident for defaults.
-        match (mongo_type, &field.type_identifier, value) {
+        match (mongo_type, &sf.type_identifier, value) {
             // We assume this is always valid if it arrives here.
             (_, _, PrismaValue::Null) => Ok(Bson::Null),
             (Some(mt), _, value) => (mt, value).into_bson(),
@@ -70,15 +140,11 @@ impl IntoBson for (MongoDbType, PrismaValue) {
             (MongoDbType::Long, PrismaValue::Float(d)) => Bson::Int64(d.to_i64().convert(expl::MONGO_I64)?),
 
             // Array
-            (MongoDbType::Array(inner), PrismaValue::List(vals)) => {
-                let inner = *inner;
-                Bson::Array(
-                    vals.into_iter()
-                        .map(|val| (inner.clone(), val).into_bson())
-                        .collect::<crate::Result<Vec<_>>>()?,
-                )
-            }
-            (MongoDbType::Array(inner), val) => Bson::Array(vec![(*inner, val).into_bson()?]),
+            (typ, PrismaValue::List(vals)) => Bson::Array(
+                vals.into_iter()
+                    .map(|val| (typ.clone(), val).into_bson())
+                    .collect::<crate::Result<Vec<_>>>()?,
+            ),
 
             // BinData
             (MongoDbType::BinData, PrismaValue::Bytes(bytes)) => Bson::Binary(Binary {
@@ -188,6 +254,13 @@ impl IntoBson for (&TypeIdentifier, PrismaValue) {
 
 // Parsing of values coming from MongoDB back to the connector / core.
 pub fn value_from_bson(bson: Bson, meta: &OutputMeta) -> crate::Result<PrismaValue> {
+    match meta {
+        OutputMeta::Scalar(scalar_meta) => read_scalar_value(bson, scalar_meta),
+        OutputMeta::Composite(composite_meta) => read_composite_value(bson, composite_meta),
+    }
+}
+
+fn read_scalar_value(bson: Bson, meta: &ScalarOutputMeta) -> crate::Result<PrismaValue> {
     let val = match (&meta.ident, bson) {
         // We expect a list to be returned.
         (type_identifier, bson) if meta.list => match bson {
@@ -195,7 +268,7 @@ pub fn value_from_bson(bson: Bson, meta: &OutputMeta) -> crate::Result<PrismaVal
 
             Bson::Array(list) => PrismaValue::List(
                 list.into_iter()
-                    .map(|list_val| value_from_bson(list_val, &meta.strip_list()))
+                    .map(|list_val| value_from_bson(list_val, &meta.strip_list().into()))
                     .collect::<crate::Result<Vec<_>>>()?,
             ),
 
@@ -228,6 +301,7 @@ pub fn value_from_bson(bson: Bson, meta: &OutputMeta) -> crate::Result<PrismaVal
         // Int
         (TypeIdentifier::Int, Bson::Int64(i)) => PrismaValue::Int(i),
         (TypeIdentifier::Int, Bson::Int32(i)) => PrismaValue::Int(i as i64),
+        (TypeIdentifier::Int, Bson::Double(i)) => PrismaValue::Int(i as i64),
 
         // BigInt
         (TypeIdentifier::BigInt, Bson::Int64(i)) => PrismaValue::BigInt(i),
@@ -269,10 +343,67 @@ pub fn value_from_bson(bson: Bson, meta: &OutputMeta) -> crate::Result<PrismaVal
         (TypeIdentifier::Json, bson) => PrismaValue::Json(serde_json::to_string(&bson.into_relaxed_extjson())?),
 
         (ident, bson) => {
-            return Err(MongoError::UnhandledError(format!(
-                "Converting BSON to type {:?}. Data: '{}'",
-                ident, bson
-            )))
+            return Err(MongoError::ConversionError {
+                from: bson.to_string(),
+                to: format!("{:?}", ident),
+            })
+        }
+    };
+
+    Ok(val)
+}
+
+fn read_composite_value(bson: Bson, meta: &CompositeOutputMeta) -> crate::Result<PrismaValue> {
+    let val = if meta.list {
+        match bson {
+            // Coerce null to empty list (Prisma doesn't have nullable lists)
+            Bson::Null => PrismaValue::List(Vec::new()),
+
+            Bson::Array(list) => PrismaValue::List(
+                list.into_iter()
+                    .map(|list_val| value_from_bson(list_val, &meta.strip_list().into()))
+                    .collect::<crate::Result<Vec<_>>>()?,
+            ),
+
+            _ => {
+                return Err(MongoError::ConversionError {
+                    from: format!("{}", bson),
+                    to: "List".to_owned(),
+                });
+            }
+        }
+    } else {
+        // Null catch-all.
+        match bson {
+            Bson::Null => PrismaValue::Null,
+            Bson::Document(mut doc) => {
+                let mut pairs = Vec::with_capacity(doc.len());
+
+                // This approach ensures that missing fields are filled,
+                // so that the serialization can decide if this is invalid or not.
+                for (field, meta) in meta.inner.iter() {
+                    match (doc.remove(field), meta) {
+                        (Some(value), _) => {
+                            let value = value_from_bson(value, meta)?;
+                            pairs.push((field.clone(), value))
+                        }
+                        // Coerce missing scalar lists as empty lists
+                        (None, OutputMeta::Composite(meta)) if meta.list => {
+                            pairs.push((field.clone(), PrismaValue::List(Vec::new())))
+                        }
+                        // Fill missing fields with nulls.
+                        (None, _) => pairs.push((field.clone(), PrismaValue::Null)),
+                    }
+                }
+
+                PrismaValue::Object(pairs)
+            }
+            bson => {
+                return Err(MongoError::ConversionError {
+                    from: format!("{:?}", bson),
+                    to: "Document".to_owned(),
+                })
+            }
         }
     };
 

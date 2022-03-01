@@ -2,7 +2,7 @@ use super::{
     expression::*, ComputationResult, DiffResult, Env, ExpressionResult, InterpretationResult, InterpreterError,
 };
 use crate::{query_graph::*, Query};
-use prisma_models::RecordProjection;
+use prisma_models::SelectionResult;
 use std::{collections::VecDeque, convert::TryInto};
 
 pub struct Expressionista;
@@ -174,8 +174,8 @@ impl Expressionista {
             Ok(Expression::Func {
                 func: Box::new(move |_| match node {
                     Node::Computation(Computation::Diff(DiffNode { left, right })) => {
-                        let left_diff: Vec<&RecordProjection> = left.difference(&right).collect();
-                        let right_diff: Vec<&RecordProjection> = right.difference(&left).collect();
+                        let left_diff: Vec<&SelectionResult> = left.difference(&right).collect();
+                        let right_diff: Vec<&SelectionResult> = right.difference(&left).collect();
 
                         Ok(Expression::Return {
                             result: Box::new(ExpressionResult::Computation(ComputationResult::Diff(DiffResult {
@@ -294,12 +294,15 @@ impl Expressionista {
         node: &NodeRef,
         parent_edges: Vec<EdgeRef>,
     ) -> InterpretationResult<Expression> {
+        let direct_children = graph.direct_child_pairs(&node);
+        let child_expressions = Self::process_children(graph, direct_children)?;
+
         let into_expr = Box::new(move |node: Node| {
             let flow: Flow = node.try_into()?;
 
             if let Flow::Return(result) = flow {
                 let result = match result {
-                    Some(r) => Box::new(ExpressionResult::RawProjections(r)),
+                    Some(r) => Box::new(ExpressionResult::FixedResult(r)),
                     None => Box::new(ExpressionResult::Empty),
                 };
 
@@ -309,8 +312,21 @@ impl Expressionista {
             }
         });
 
+        let node_binding_name = node.id();
         let node = graph.pluck_node(node);
-        Self::transform_node(graph, parent_edges, node, into_expr)
+        let expr = Self::transform_node(graph, parent_edges, node, into_expr)?;
+
+        if child_expressions.is_empty() {
+            Ok(expr)
+        } else {
+            Ok(Expression::Let {
+                bindings: vec![Binding {
+                    name: node_binding_name,
+                    expr,
+                }],
+                expressions: child_expressions,
+            })
+        }
     }
 
     /// Runs transformer functions (e.g. `ParentIdsFn`) via `Expression::Func` if necessary, or if none present,
@@ -349,11 +365,11 @@ impl Expressionista {
                                     }?;
 
                                     let res = match dependency {
-                                        QueryGraphDependency::ParentProjection(projection, f) => binding
-                                            .as_projections(&projection)
-                                            .and_then(|parent_projections| Ok(f(node, parent_projections)?)),
+                                        QueryGraphDependency::ProjectedDataDependency(selection, f) => binding
+                                            .as_selection_results(&selection)
+                                            .and_then(|parent_selections| Ok(f(node, parent_selections)?)),
 
-                                        QueryGraphDependency::ParentResult(f) => Ok(f(node, &binding)?),
+                                        QueryGraphDependency::DataDependency(f) => Ok(f(node, &binding)?),
 
                                         _ => unreachable!(),
                                     };
@@ -382,11 +398,11 @@ impl Expressionista {
         parent_edges
             .into_iter()
             .filter_map(|edge| match graph.pluck_edge(&edge) {
-                x @ QueryGraphDependency::ParentResult(_) => {
+                x @ QueryGraphDependency::DataDependency(_) => {
                     let parent_binding_name = graph.edge_source(&edge).id();
                     Some((parent_binding_name, x))
                 }
-                x @ QueryGraphDependency::ParentProjection(_, _) => {
+                x @ QueryGraphDependency::ProjectedDataDependency(_, _) => {
                     let parent_binding_name = graph.edge_source(&edge).id();
                     Some((parent_binding_name, x))
                 }

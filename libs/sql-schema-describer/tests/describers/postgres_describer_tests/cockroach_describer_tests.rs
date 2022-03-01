@@ -1,7 +1,7 @@
 use crate::test_api::*;
-use sql_schema_describer::ColumnTypeFamily;
+use sql_schema_describer::{ColumnTypeFamily, IndexColumn, SQLSortOrder};
 
-#[test_connector(tags(Cockroach))]
+#[test_connector(tags(CockroachDb))]
 fn views_can_be_described(api: TestApi) {
     let full_sql = r#"
         CREATE TABLE a (a_id int);
@@ -9,7 +9,7 @@ fn views_can_be_described(api: TestApi) {
         CREATE VIEW ab AS SELECT a_id FROM a UNION ALL SELECT b_id FROM b;
     "#;
 
-    api.raw_cmd(&full_sql);
+    api.raw_cmd(full_sql);
     let result = api.describe();
     let view = result.get_view("ab").expect("couldn't get ab view").to_owned();
 
@@ -19,7 +19,7 @@ fn views_can_be_described(api: TestApi) {
     assert_eq!(expected_sql, view.definition.unwrap());
 }
 
-#[test_connector(tags(Cockroach))]
+#[test_connector(tags(CockroachDb))]
 fn all_postgres_column_types_must_work(api: TestApi) {
     let migration = r#"
         CREATE TYPE "mood" AS ENUM ('sad', 'ok', 'happy');
@@ -91,8 +91,8 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                 .assert_is_list()
         })
         .assert_column("array_int_col", |c| {
-            c.assert_full_data_type("_int8")
-                .assert_column_type_family(ColumnTypeFamily::BigInt)
+            c.assert_full_data_type("_int4")
+                .assert_column_type_family(ColumnTypeFamily::Int)
                 .assert_is_list()
         })
         .assert_column("array_text_col", |c| {
@@ -130,8 +130,8 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                 .assert_column_type_family(ColumnTypeFamily::Float)
         })
         .assert_column("int_col", |c| {
-            c.assert_full_data_type("int8")
-                .assert_column_type_family(ColumnTypeFamily::BigInt)
+            c.assert_full_data_type("int4")
+                .assert_column_type_family(ColumnTypeFamily::Int)
         })
         .assert_column("string1_col", |c| {
             c.assert_full_data_type("text")
@@ -186,12 +186,12 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                 .assert_column_type_family(ColumnTypeFamily::Int)
         })
         .assert_column("smallserial_col", |c| {
-            c.assert_full_data_type("int8")
-                .assert_column_type_family(ColumnTypeFamily::BigInt)
+            c.assert_full_data_type("int2")
+                .assert_column_type_family(ColumnTypeFamily::Int)
         })
         .assert_column("serial_col", |c| {
-            c.assert_full_data_type("int8")
-                .assert_column_type_family(ColumnTypeFamily::BigInt)
+            c.assert_full_data_type("int4")
+                .assert_column_type_family(ColumnTypeFamily::Int)
         })
         .assert_column("json_col", |c| {
             c.assert_full_data_type("jsonb")
@@ -206,4 +206,63 @@ fn all_postgres_column_types_must_work(api: TestApi) {
                 .assert_column_type_family(ColumnTypeFamily::Uuid)
         })
     });
+}
+
+#[test_connector(tags(CockroachDb))]
+fn cockroach_multi_field_indexes_must_be_inferred_in_the_right_order(api: TestApi) {
+    let schema = format!(
+        r##"
+            CREATE TABLE "{schema_name}"."indexes_test" (
+                id TEXT PRIMARY KEY,
+                name TEXT NOT NULL,
+                age INTEGER NOT NULL
+            );
+
+            CREATE UNIQUE INDEX "my_idx" ON "{schema_name}"."indexes_test" (name, age);
+            CREATE INDEX "my_idx2" ON "{schema_name}"."indexes_test" (age, name);
+        "##,
+        schema_name = api.schema_name()
+    );
+    api.raw_cmd(&schema);
+
+    let schema = api.describe();
+
+    let table = schema.table_bang("indexes_test");
+    let index = &table.indices[1];
+
+    assert_eq!(
+        &index.columns,
+        &[
+            IndexColumn {
+                name: "name".to_string(),
+                sort_order: Some(SQLSortOrder::Asc),
+                length: None
+            },
+            IndexColumn {
+                name: "age".to_string(),
+                sort_order: Some(SQLSortOrder::Asc),
+                length: None
+            },
+        ]
+    );
+    assert!(index.tpe.is_unique());
+
+    let index = &table.indices[0];
+
+    assert!(!index.tpe.is_unique());
+    assert_eq!(
+        &index.columns,
+        &[
+            IndexColumn {
+                name: "age".to_string(),
+                sort_order: Some(SQLSortOrder::Asc),
+                length: None
+            },
+            IndexColumn {
+                name: "name".to_string(),
+                sort_order: Some(SQLSortOrder::Asc),
+                length: None
+            },
+        ]
+    );
 }

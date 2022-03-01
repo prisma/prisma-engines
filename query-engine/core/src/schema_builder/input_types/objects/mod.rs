@@ -8,4 +8,3 @@ pub(super) mod update_one_objects;
 pub(super) mod upsert_objects;
 
 use super::*;
-use prisma_models::{RelationFieldRef, ScalarFieldRef};

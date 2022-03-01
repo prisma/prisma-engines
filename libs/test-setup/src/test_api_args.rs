@@ -14,7 +14,7 @@ pub(crate) struct DbUnderTest {
 }
 
 const MISSING_TEST_DATABASE_URL_MSG: &str = r#"
-Missing TEST_DATABASE URL from environment.
+Missing TEST_DATABASE_URL from environment.
 
 If you are developing with the docker-compose based setup, you can find the environment variables under .test_database_urls at the project root.
 
@@ -61,15 +61,25 @@ static DB_UNDER_TEST: Lazy<Result<DbUnderTest, String>> = Lazy::new(|| {
                 shadow_database_url,
             })
         }
-        "postgresql" | "postgres" => Ok(DbUnderTest {
-            tags: postgres::get_postgres_tags(&database_url)?,
-            database_url,
-            capabilities: Capabilities::Enums
-                | Capabilities::Json
-                | Capabilities::ScalarLists
-                | Capabilities::CreateDatabase,
-            provider: "postgresql",
-            shadow_database_url,
+        "postgresql" | "postgres" => Ok({
+            let tags = postgres::get_postgres_tags(&database_url)?;
+
+            let provider = if tags.contains(Tags::CockroachDb) {
+                "cockroachdb"
+            } else {
+                "postgresql"
+            };
+
+            DbUnderTest {
+                tags,
+                database_url,
+                capabilities: Capabilities::Enums
+                    | Capabilities::Json
+                    | Capabilities::ScalarLists
+                    | Capabilities::CreateDatabase,
+                provider,
+                shadow_database_url,
+            }
         }),
         "sqlserver" => Ok(DbUnderTest {
             tags: mssql::get_mssql_tags(&database_url)?,
@@ -102,15 +112,24 @@ pub(crate) fn db_under_test() -> &'static DbUnderTest {
 #[derive(Debug)]
 pub struct TestApiArgs {
     test_function_name: &'static str,
+    preview_features: &'static [&'static str],
     db: &'static DbUnderTest,
 }
 
+const EMPTY_PREVIEW_FEATURES: &[&str] = &[];
+const COCKROACH_PREVIEW_FEATURES: &[&str] = &["cockroachdb"];
+
 impl TestApiArgs {
-    pub fn new(test_function_name: &'static str) -> Self {
+    pub fn new(test_function_name: &'static str, preview_features: &'static [&'static str]) -> Self {
         TestApiArgs {
             test_function_name,
+            preview_features,
             db: db_under_test(),
         }
+    }
+
+    pub fn preview_features(&self) -> &'static [&'static str] {
+        self.preview_features
     }
 
     pub fn test_function_name(&self) -> &'static str {
@@ -119,6 +138,12 @@ impl TestApiArgs {
 
     pub fn capabilities(&self) -> BitFlags<Capabilities> {
         self.db.capabilities
+    }
+
+    pub async fn create_mssql_database(&self) -> (Quaint, String) {
+        mssql::init_mssql_database(self.database_url(), self.test_function_name)
+            .await
+            .unwrap()
     }
 
     pub async fn create_mysql_database(&self) -> (&'static str, String) {
@@ -139,10 +164,17 @@ impl TestApiArgs {
     }
 
     pub fn datasource_block<'a>(&'a self, url: &'a str, params: &'a [(&'a str, &'a str)]) -> DatasourceBlock<'a> {
+        let preview_features = if self.db.provider == "cockroachdb" {
+            COCKROACH_PREVIEW_FEATURES
+        } else {
+            EMPTY_PREVIEW_FEATURES
+        };
+
         DatasourceBlock {
             provider: self.db.provider,
             url,
             params,
+            preview_features,
         }
     }
 
@@ -163,10 +195,38 @@ pub struct DatasourceBlock<'a> {
     provider: &'a str,
     url: &'a str,
     params: &'a [(&'a str, &'a str)],
+    preview_features: &'static [&'static str],
+}
+
+impl<'a> DatasourceBlock<'a> {
+    pub fn url(&self) -> &str {
+        self.url
+    }
+}
+fn generator_block(preview_features: &'static [&'static str]) -> String {
+    let preview_features: Vec<String> = preview_features.iter().map(|pf| format!(r#""{}""#, pf)).collect();
+
+    let preview_feature_string = if preview_features.is_empty() {
+        "".to_string()
+    } else {
+        format!("\npreviewFeatures = [{}]", preview_features.join(", "))
+    };
+
+    format!(
+        r#"generator generated_test_preview_flags {{
+                 provider = "prisma-client-js"{}
+               }}"#,
+        preview_feature_string
+    )
 }
 
 impl Display for DatasourceBlock<'_> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        if !self.preview_features.is_empty() {
+            f.write_str(&generator_block(self.preview_features))?;
+            f.write_str("\n")?;
+        };
+
         f.write_str("datasource db {\n    provider = \"")?;
         f.write_str(self.provider)?;
         f.write_str("\"\n    url = \"")?;

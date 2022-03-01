@@ -40,7 +40,7 @@ mod utils;
 use crate::schema::*;
 use cache::TypeRefCache;
 use datamodel::common::preview_features::PreviewFeature;
-use datamodel_connector::ConnectorCapabilities;
+use datamodel_connector::{ConnectorCapabilities, ConnectorCapability, ReferentialIntegrity};
 use prisma_models::{Field as ModelField, Index, InternalDataModelRef, ModelRef, RelationFieldRef, TypeIdentifier};
 use std::sync::Arc;
 
@@ -93,6 +93,10 @@ impl BuilderContext {
         self.preview_features.contains(feature)
     }
 
+    pub fn has_capability(&self, capability: ConnectorCapability) -> bool {
+        self.capabilities.contains(capability)
+    }
+
     // Just here for convenience, will be removed soon.
     pub fn pluralize_internal(&self, legacy: String, modern: String) -> String {
         match self.mode {
@@ -119,6 +123,12 @@ impl BuilderContext {
     /// Caches an output (object) type.
     pub fn cache_output_type(&mut self, ident: Identifier, typ: ObjectTypeStrongRef) {
         self.cache.output_types.insert(ident, typ);
+    }
+
+    pub fn can_full_text_search(&self) -> bool {
+        self.has_feature(&PreviewFeature::FullTextSearch)
+            && (self.has_capability(ConnectorCapability::FullTextSearchWithoutIndex)
+                || self.has_capability(ConnectorCapability::FullTextSearchWithIndex))
     }
 }
 
@@ -158,15 +168,17 @@ pub fn build(
     enable_raw_queries: bool,
     capabilities: ConnectorCapabilities,
     preview_features: Vec<PreviewFeature>,
+    referential_integrity: ReferentialIntegrity,
 ) -> QuerySchema {
     let mut ctx = BuilderContext::new(
         mode,
         internal_data_model,
         enable_raw_queries,
         capabilities,
-        preview_features,
+        preview_features.clone(),
     );
-    output_types::output_objects::initialize_model_object_type_cache(&mut ctx);
+
+    output_types::objects::initialize_caches(&mut ctx);
 
     let (query_type, query_object_ref) = output_types::query_type::build(&mut ctx);
     let (mutation_type, mutation_object_ref) = output_types::mutation_type::build(&mut ctx);
@@ -185,6 +197,9 @@ pub fn build(
         input_objects,
         output_objects,
         ctx.internal_data_model,
+        ctx.capabilities.capabilities,
+        preview_features,
+        referential_integrity,
     )
 }
 

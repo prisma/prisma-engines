@@ -8,7 +8,7 @@ use native_types::{NativeType, PostgresType};
 use quaint::{connector::ResultRow, prelude::Queryable};
 use regex::Regex;
 use serde_json::from_str;
-use std::{any::type_name, borrow::Cow, collections::HashMap, convert::TryInto};
+use std::{any::type_name, borrow::Cow, collections::BTreeMap, collections::HashSet, convert::TryInto};
 use tracing::trace;
 
 #[enumflags2::bitflags]
@@ -38,8 +38,8 @@ impl<'a> super::SqlSchemaDescriberBackend for SqlSchemaDescriber<'a> {
     }
 
     async fn get_metadata(&self, schema: &str) -> DescriberResult<SqlMetadata> {
-        let table_count = self.get_table_names(&schema).await?.len();
-        let size_in_bytes = self.get_size(&schema).await?;
+        let table_count = self.get_table_names(schema).await?.len();
+        let size_in_bytes = self.get_size(schema).await?;
 
         Ok(SqlMetadata {
             table_count,
@@ -57,8 +57,39 @@ impl<'a> super::SqlSchemaDescriberBackend for SqlSchemaDescriber<'a> {
         let table_names = self.get_table_names(schema).await?;
         let mut tables = Vec::with_capacity(table_names.len());
 
+        if self.is_cockroach() {
+            // Currently, we ignore all hidden columns from CockroachDB.
+            // However, these still show up from get_indices, where CockroachDB can place implicit
+            // columns in front of indexes and primary keys.
+            // For now, remove all hidden columns from the indexes and PK, removing them as an index
+            // or PK if every column is implicit.
+            for (table_name, table_indexes) in indexes.iter_mut() {
+                let mut table_columns = HashSet::new();
+                if let Some(val) = columns.get(table_name) {
+                    for c in val {
+                        table_columns.insert(c.name.to_string());
+                    }
+                }
+                let (indexes, table_pk_wrapped) = table_indexes;
+
+                let table_pk = table_pk_wrapped.as_mut().unwrap();
+
+                table_pk
+                    .columns
+                    .retain(|c| table_columns.iter().any(|tc| tc == c.name()));
+
+                if table_pk.columns.is_empty() {
+                    table_indexes.1 = None;
+                }
+                for index in indexes.iter_mut() {
+                    index.columns.retain(|c| table_columns.iter().any(|tc| tc == c.name()))
+                }
+                indexes.retain(|i| !i.columns.is_empty());
+            }
+        }
+
         for table_name in &table_names {
-            tables.push(self.get_table(&table_name, &mut columns, &mut foreign_keys, &mut indexes));
+            tables.push(self.get_table(table_name, &mut columns, &mut foreign_keys, &mut indexes));
         }
 
         let views = self.get_views(schema).await?;
@@ -80,8 +111,12 @@ impl<'a> super::SqlSchemaDescriberBackend for SqlSchemaDescriber<'a> {
     }
 }
 
-static PG_RE_NUM: Lazy<Regex> = Lazy::new(|| Regex::new(r"^'?(-?\d+)('::.*)?$").expect("compile regex"));
-static PG_RE_FLOAT: Lazy<Regex> = Lazy::new(|| Regex::new(r"^'?([^']+)('::.*)?$").expect("compile regex"));
+// Examples (postgres): 1, 1::INT, '1'::INT, -1::INT, '-1'::INT
+// Examples (CockroachDb)): 1:::INT, '1':::INT, (-1):::INT, ('-1'):::INT
+static PG_RE_NUM: Lazy<Regex> = Lazy::new(|| Regex::new(r"^\(?'?(-?\d+)'?\)?(:{2,3}.*)?$").expect("compile regex"));
+// Examples (postgres): 5.3, 5.3::FLOAT, -5.3, '-5.3'::FLOAT
+// Examples (CockroachDb)): 5.3:::FLOAT8, (-5.3):::FLOAT8
+static PG_RE_FLOAT: Lazy<Regex> = Lazy::new(|| Regex::new(r"^\(?'?([^:')]+)'?\)?(:{2,3}.*)?$").expect("compile regex"));
 
 impl Parser for SqlSchemaDescriber<'_> {
     fn re_num() -> &'static Regex {
@@ -188,12 +223,12 @@ impl<'a> SqlSchemaDescriber<'a> {
     fn get_table(
         &self,
         name: &str,
-        columns: &mut HashMap<String, Vec<Column>>,
-        foreign_keys: &mut HashMap<String, Vec<ForeignKey>>,
-        indices: &mut HashMap<String, (Vec<Index>, Option<PrimaryKey>)>,
+        columns: &mut BTreeMap<String, Vec<Column>>,
+        foreign_keys: &mut BTreeMap<String, Vec<ForeignKey>>,
+        indices: &mut BTreeMap<String, (Vec<Index>, Option<PrimaryKey>)>,
     ) -> Table {
         let (indices, primary_key) = indices.remove(name).unwrap_or_else(|| (Vec::new(), None));
-        let foreign_keys = foreign_keys.remove(name).unwrap_or_else(Vec::new);
+        let foreign_keys = foreign_keys.remove(name).unwrap_or_default();
         let columns = columns.remove(name).unwrap_or_default();
         Table {
             name: name.to_string(),
@@ -230,10 +265,17 @@ impl<'a> SqlSchemaDescriber<'a> {
         schema: &str,
         enums: &[Enum],
         sequences: &[Sequence],
-    ) -> DescriberResult<HashMap<String, Vec<Column>>> {
-        let mut columns: HashMap<String, Vec<Column>> = HashMap::new();
+    ) -> DescriberResult<BTreeMap<String, Vec<Column>>> {
+        let mut columns: BTreeMap<String, Vec<Column>> = BTreeMap::new();
 
-        let sql = r#"
+        let is_visible_clause = if self.is_cockroach() {
+            " AND info.is_hidden = 'NO'"
+        } else {
+            ""
+        };
+
+        let sql = format!(
+            r#"
             SELECT
                info.table_name,
                 info.column_name,
@@ -250,19 +292,21 @@ impl<'a> SqlSchemaDescriber<'a> {
                 info.data_type,
                 info.character_maximum_length
             FROM information_schema.columns info
-            JOIN pg_attribute  att on att.attname = info.column_name
-            And att.attrelid = (
+            JOIN pg_attribute att on att.attname = info.column_name
+            AND att.attrelid = (
             	SELECT pg_class.oid
             	FROM pg_class
             	JOIN pg_namespace on pg_namespace.oid = pg_class.relnamespace
             	WHERE relname = info.table_name
             	AND pg_namespace.nspname = $1
-            	)
-            WHERE table_schema = $1
+            )
+            WHERE table_schema = $1 {}
             ORDER BY ordinal_position;
-        "#;
+        "#,
+            is_visible_clause,
+        );
 
-        let rows = self.conn.query_raw(&sql, &[schema.into()]).await?;
+        let rows = self.conn.query_raw(sql.as_str(), &[schema.into()]).await?;
 
         for col in rows {
             trace!("Got column: {:?}", col);
@@ -362,7 +406,7 @@ impl<'a> SqlSchemaDescriber<'a> {
     }
 
     /// Returns a map from table name to foreign keys.
-    async fn get_foreign_keys(&self, schema: &str) -> DescriberResult<HashMap<String, Vec<ForeignKey>>> {
+    async fn get_foreign_keys(&self, schema: &str) -> DescriberResult<BTreeMap<String, Vec<ForeignKey>>> {
         // The `generate_subscripts` in the inner select is needed because the optimizer is free to reorganize the unnested rows if not explicitly ordered.
         let sql = r#"
             SELECT con.oid         as "con_id",
@@ -406,8 +450,8 @@ impl<'a> SqlSchemaDescriber<'a> {
         // One foreign key with multiple columns will be represented here as several
         // rows with the same ID, which we will have to combine into corresponding foreign key
         // objects.
-        let result_set = self.conn.query_raw(&sql, &[schema.into()]).await?;
-        let mut intermediate_fks: HashMap<i64, (String, ForeignKey)> = HashMap::new();
+        let result_set = self.conn.query_raw(sql, &[schema.into()]).await?;
+        let mut intermediate_fks: BTreeMap<i64, (String, ForeignKey)> = BTreeMap::new();
         for row in result_set.into_iter() {
             trace!("Got description FK row {:?}", row);
             let id = row.get_expect_i64("con_id");
@@ -468,7 +512,7 @@ impl<'a> SqlSchemaDescriber<'a> {
             };
         }
 
-        let mut fks = HashMap::new();
+        let mut fks = BTreeMap::new();
 
         for (table_name, fk) in intermediate_fks.into_iter().map(|(_k, v)| v) {
             let entry = fks.entry(table_name).or_insert_with(Vec::new);
@@ -495,59 +539,72 @@ impl<'a> SqlSchemaDescriber<'a> {
         &self,
         schema: &str,
         sequences: &[Sequence],
-    ) -> DescriberResult<HashMap<String, (Vec<Index>, Option<PrimaryKey>)>> {
-        let mut indexes_map = HashMap::new();
+    ) -> DescriberResult<BTreeMap<String, (Vec<Index>, Option<PrimaryKey>)>> {
+        let mut indexes_map = BTreeMap::new();
 
         let sql = r#"
-        SELECT
-            indexInfos.relname as name,
-            columnInfos.attname AS column_name,
-            rawIndex.indisunique AS is_unique,
-            rawIndex.indisprimary AS is_primary_key,
-            tableInfos.relname AS table_name,
-            rawIndex.indkeyidx,
-            pg_get_serial_sequence('"' || $1 || '"."' || tableInfos.relname || '"', columnInfos.attname) AS sequence_name
+        SELECT indexinfos.relname                          AS name,
+               columnInfos.attname                         AS column_name,
+               rawIndex.indisunique                        AS is_unique,
+               rawIndex.indisprimary                       AS is_primary_key,
+               tableInfos.relname                          AS table_name,
+               indexAccess.amname                          AS index_algo,
+               rawIndex.indkeyidx,
+               CASE rawIndex.sort_order & 1
+                   WHEN 1 THEN 'DESC'
+                   ELSE 'ASC'
+                   END                                     AS column_order,
+               pg_get_serial_sequence('"' || $1 || '"."' || tableInfos.relname || '"',
+                                      columnInfos.attname) AS sequence_name
         FROM
             -- pg_class stores infos about tables, indices etc: https://www.postgresql.org/docs/current/catalog-pg-class.html
             pg_class tableInfos,
             pg_class indexInfos,
             -- pg_index stores indices: https://www.postgresql.org/docs/current/catalog-pg-index.html
             (
-                SELECT
-                    indrelid,
-                    indexrelid,
-                    indisunique,
-                    indisprimary,
-                    pg_index.indkey AS indkey,
-                    generate_subscripts(pg_index.indkey, 1) AS indkeyidx
-                FROM pg_index
-                -- ignores partial indexes
-                Where indpred is Null
-                GROUP BY indrelid, indexrelid, indisunique, indisprimary, indkeyidx, indkey
-                ORDER BY indrelid, indexrelid, indkeyidx
+                SELECT i.indrelid,
+                       i.indexrelid,
+                       i.indisunique,
+                       i.indisprimary,
+                       i.indkey,
+                       o.OPTION AS sort_order,
+                       c.colnum AS sort_order_colnum,
+                       generate_subscripts(i.indkey, 1) AS indkeyidx
+                FROM pg_index i
+                         CROSS JOIN LATERAL UNNEST(indkey) WITH ordinality AS c (colnum, ordinality)
+                         LEFT JOIN LATERAL UNNEST(indoption) WITH ordinality AS o (OPTION, ordinality)
+                                   ON c.ordinality = o.ordinality
+                WHERE i.indpred IS NULL
+                GROUP BY i.indrelid, i.indexrelid, i.indisunique, i.indisprimary, indkeyidx, i.indkey, i.indoption, sort_order, sort_order_colnum
+                ORDER BY i.indrelid, i.indexrelid
             ) rawIndex,
             -- pg_attribute stores infos about columns: https://www.postgresql.org/docs/current/catalog-pg-attribute.html
             pg_attribute columnInfos,
             -- pg_namespace stores info about the schema
-            pg_namespace schemaInfo
+            pg_namespace schemaInfo,
+            -- index access methods: https://www.postgresql.org/docs/9.3/catalog-pg-am.html     
+            pg_am indexAccess
         WHERE
-            -- find table info for index
+          -- find table info for index
             tableInfos.oid = rawIndex.indrelid
-            -- find index info
-            AND indexInfos.oid = rawIndex.indexrelid
-            -- find table columns
-            AND columnInfos.attrelid = tableInfos.oid
-            AND columnInfos.attnum = rawIndex.indkey[rawIndex.indkeyidx]
-            -- we only consider ordinary tables
-            AND tableInfos.relkind = 'r'
-            -- we only consider stuff out of one specific schema
-            AND tableInfos.relnamespace = schemaInfo.oid
-            AND schemaInfo.nspname = $1
-        GROUP BY tableInfos.relname, indexInfos.relname, rawIndex.indisunique, rawIndex.indisprimary, columnInfos.attname, rawIndex.indkeyidx
-        ORDER BY rawIndex.indkeyidx
+          -- find index info
+          AND indexInfos.oid = rawIndex.indexrelid
+          -- find table columns
+          AND columnInfos.attrelid = tableInfos.oid
+          AND columnInfos.attnum = rawIndex.indkey[rawIndex.indkeyidx]
+          -- we only consider ordinary tables
+          AND tableInfos.relkind = 'r'
+          -- we only consider stuff out of one specific schema
+          AND tableInfos.relnamespace = schemaInfo.oid
+          AND schemaInfo.nspname = $1
+          AND rawIndex.sort_order_colnum = columnInfos.attnum
+          AND indexAccess.oid = indexInfos.relam
+        GROUP BY tableInfos.relname, indexInfos.relname, rawIndex.indisunique, rawIndex.indisprimary, columnInfos.attname,
+                 rawIndex.indkeyidx, column_order, index_algo
+        ORDER BY rawIndex.indkeyidx;
         "#;
 
-        let rows = self.conn.query_raw(&sql, &[schema.into()]).await?;
+        let rows = self.conn.query_raw(sql, &[schema.into()]).await?;
 
         for row in rows {
             trace!("Got index: {:?}", row);
@@ -558,13 +615,28 @@ impl<'a> SqlSchemaDescriber<'a> {
             let table_name = row.get_expect_string("table_name");
             let sequence_name = row.get_string("sequence_name");
 
+            let sort_order = row.get_string("column_order").map(|v| match v.as_ref() {
+                "ASC" => SQLSortOrder::Asc,
+                "DESC" => SQLSortOrder::Desc,
+                misc => panic!(
+                    "Unexpected sort order `{}`, collation should be ASC, DESC or Null",
+                    misc
+                ),
+            });
+
+            let algorithm = match row.get_string("index_algo").as_deref() {
+                Some("btree") => Some(SQLIndexAlgorithm::BTree),
+                Some("hash") => Some(SQLIndexAlgorithm::Hash),
+                _ => None,
+            };
+
             if is_primary_key {
                 let entry: &mut (Vec<_>, Option<PrimaryKey>) =
                     indexes_map.entry(table_name).or_insert_with(|| (Vec::new(), None));
 
                 match entry.1.as_mut() {
                     Some(pk) => {
-                        pk.columns.push(column_name);
+                        pk.columns.push(PrimaryKeyColumn::new(column_name));
                     }
                     None => {
                         let sequence = sequence_name.and_then(|sequence_name| {
@@ -577,7 +649,7 @@ impl<'a> SqlSchemaDescriber<'a> {
                         });
 
                         entry.1 = Some(PrimaryKey {
-                            columns: vec![column_name],
+                            columns: vec![PrimaryKeyColumn::new(column_name)],
                             sequence,
                             constraint_name: Some(name.clone()),
                         });
@@ -586,16 +658,20 @@ impl<'a> SqlSchemaDescriber<'a> {
             } else {
                 let entry: &mut (Vec<Index>, _) = indexes_map.entry(table_name).or_insert_with(|| (Vec::new(), None));
 
+                let mut column = IndexColumn::new(column_name);
+                column.sort_order = sort_order;
+
                 if let Some(existing_index) = entry.0.iter_mut().find(|idx| idx.name == name) {
-                    existing_index.columns.push(column_name);
+                    existing_index.columns.push(column);
                 } else {
                     entry.0.push(Index {
                         name,
-                        columns: vec![column_name],
+                        columns: vec![column],
                         tpe: match is_unique {
                             true => IndexType::Unique,
                             false => IndexType::Normal,
                         },
+                        algorithm,
                     })
                 }
             }
@@ -609,7 +685,7 @@ impl<'a> SqlSchemaDescriber<'a> {
         let sql = "SELECT sequence_name
                   FROM information_schema.sequences
                   WHERE sequence_schema = $1";
-        let rows = self.conn.query_raw(&sql, &[schema.into()]).await?;
+        let rows = self.conn.query_raw(sql, &[schema.into()]).await?;
         let sequences = rows
             .into_iter()
             .map(|seq| {
@@ -634,8 +710,8 @@ impl<'a> SqlSchemaDescriber<'a> {
             WHERE n.nspname = $1
             ORDER BY e.enumsortorder";
 
-        let rows = self.conn.query_raw(&sql, &[schema.into()]).await?;
-        let mut enum_values: HashMap<String, Vec<String>> = HashMap::new();
+        let rows = self.conn.query_raw(sql, &[schema.into()]).await?;
+        let mut enum_values: BTreeMap<String, Vec<String>> = BTreeMap::new();
 
         for row in rows.into_iter() {
             trace!("Got enum row: {:?}", row);
@@ -722,7 +798,14 @@ impl<'a> SqlSchemaDescriber<'a> {
                         },
                         ColumnTypeFamily::DateTime => {
                             match default_string.to_lowercase().as_str() {
-                                "now()" | "current_timestamp" => DefaultValue::now(),
+                                "now()"
+                                | "now():::timestamp"
+                                | "now():::timestamptz"
+                                | "now():::date"
+                                | "current_timestamp"
+                                | "current_timestamp():::timestamp"
+                                | "current_timestamp():::timestamptz"
+                                | "current_timestamp():::date" => DefaultValue::now(),
                                 _ => DefaultValue::db_generated(default_string), //todo parse values
                             }
                         }
@@ -769,7 +852,7 @@ fn get_column_type(row: &ResultRow, enums: &[Enum]) -> ColumnType {
         false => ColumnArity::Nullable,
     };
 
-    let precision = SqlSchemaDescriber::get_precision(&row);
+    let precision = SqlSchemaDescriber::get_precision(row);
     let unsupported_type = || (Unsupported(full_data_type.clone()), None);
     let enum_exists = |name| enums.iter().any(|e| e.name == name);
 
@@ -840,7 +923,7 @@ fn get_column_type(row: &ResultRow, enums: &[Enum]) -> ColumnType {
 static RE_SEQ: Lazy<Regex> = Lazy::new(|| Regex::new("^(?:.+\\.)?\"?([^.\"]+)\"?").expect("compile regex"));
 
 static AUTOINCREMENT_REGEX: Lazy<Regex> = Lazy::new(|| {
-    Regex::new(r#"nextval\((\(?)'((.+)\.)?(("(?P<sequence>.+)")|(?P<sequence2>.+))'(::text\))?::regclass\)"#)
+    Regex::new(r#"nextval\((\(?)'((.+)\.)?(("(?P<sequence>.+)")|(?P<sequence2>.+))'(::text\))?::(regclass|REGCLASS)\)"#)
         .expect("compile autoincrement regex")
 });
 
@@ -876,12 +959,15 @@ fn fetch_dbgenerated(value: &str) -> Option<String> {
 fn unsuffix_default_literal<'a, T: AsRef<str>>(literal: &'a str, expected_suffixes: &[T]) -> Option<Cow<'a, str>> {
     // Tries to match expressions of the form <expr> or <expr>::<type> or <expr>:::<type>.
     static POSTGRES_DATA_TYPE_SUFFIX_RE: Lazy<Regex> =
-        Lazy::new(|| Regex::new(r#"(?ms)^(.*?):{2,3}(\\")?(.*)(\\")?$"#).unwrap());
+        Lazy::new(|| Regex::new(r#"(?ms)^\(?(.*?)\)?:{2,3}(\\")?(.*)(\\")?$"#).unwrap());
 
     let captures = POSTGRES_DATA_TYPE_SUFFIX_RE.captures(literal)?;
     let suffix = captures.get(3).unwrap().as_str();
 
-    if !expected_suffixes.iter().any(|expected| expected.as_ref() == suffix) {
+    if !expected_suffixes
+        .iter()
+        .any(|expected| expected.as_ref().eq_ignore_ascii_case(suffix))
+    {
         return None;
     }
 

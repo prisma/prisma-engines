@@ -1,0 +1,1 @@
+export TEST_DATABASE_URL="mongodb://prisma:prisma@localhost:27018/?authSource=admin&retryWrites=true"

@@ -1,12 +1,13 @@
+use crate::SqlDatabaseSchema;
 use sql_schema_describer::{
-    walkers::{ColumnWalker, EnumWalker, IndexWalker, SqlSchemaExt, TableWalker},
-    SqlSchema,
+    walkers::{ColumnWalker, EnumWalker, ForeignKeyWalker, IndexWalker, SqlSchemaExt, TableWalker},
+    ColumnId, SqlSchema, TableId,
 };
 
-#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub(crate) struct Pair<T> {
-    previous: T,
-    next: T,
+    pub previous: T,
+    pub next: T,
 }
 
 impl<T> Pair<T> {
@@ -74,28 +75,50 @@ impl<T> Pair<Option<T>> {
     }
 }
 
-impl<'a> Pair<&'a SqlSchema> {
+impl<'a> Pair<&'a SqlDatabaseSchema> {
     pub(crate) fn enums(&self, enum_indexes: &Pair<usize>) -> Pair<EnumWalker<'a>> {
         Pair::new(
-            self.previous().enum_walker_at(enum_indexes.previous),
+            self.previous.enum_walker_at(enum_indexes.previous),
             self.next.enum_walker_at(enum_indexes.next),
         )
     }
 
-    pub(crate) fn tables(&self, table_indexes: &Pair<usize>) -> Pair<TableWalker<'a>> {
+    pub(crate) fn tables(&self, table_ids: &Pair<TableId>) -> Pair<TableWalker<'a>> {
         Pair::new(
-            self.previous().table_walker_at(*table_indexes.previous()),
-            self.next.table_walker_at(*table_indexes.next()),
+            self.previous.table_walker_at(table_ids.previous),
+            self.next.table_walker_at(table_ids.next),
+        )
+    }
+}
+
+impl<'a> Pair<&'a SqlSchema> {
+    pub(crate) fn enums(&self, enum_indexes: &Pair<usize>) -> Pair<EnumWalker<'a>> {
+        Pair::new(
+            self.previous.enum_walker_at(enum_indexes.previous),
+            self.next.enum_walker_at(enum_indexes.next),
+        )
+    }
+
+    pub(crate) fn tables(&self, table_ids: &Pair<TableId>) -> Pair<TableWalker<'a>> {
+        Pair::new(
+            self.previous.table_walker_at(table_ids.previous),
+            self.next.table_walker_at(table_ids.next),
         )
     }
 }
 
 impl<'a> Pair<TableWalker<'a>> {
-    pub(crate) fn columns(&self, column_indexes: &Pair<usize>) -> Pair<ColumnWalker<'a>> {
+    pub(crate) fn columns(&self, column_ids: &Pair<ColumnId>) -> Pair<ColumnWalker<'a>> {
         Pair::new(
-            self.previous().column_at(*column_indexes.previous()),
-            self.next().column_at(*column_indexes.next()),
+            self.previous.column_at(column_ids.previous),
+            self.next.column_at(column_ids.next),
         )
+    }
+
+    pub(crate) fn foreign_keys(&self, foreign_key_ids: &Pair<usize>) -> Pair<ForeignKeyWalker<'a>> {
+        self.as_ref()
+            .zip(foreign_key_ids.as_ref())
+            .map(|(t, fk)| t.foreign_key_at(*fk))
     }
 
     pub(crate) fn indexes(&self, index_indexes: &Pair<usize>) -> Pair<IndexWalker<'a>> {

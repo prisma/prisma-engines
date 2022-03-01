@@ -13,12 +13,12 @@ mod prisma_933_spec {
             r#"model Buyer {
                 #id(buyer_id, Int, @id)
                 name     String?
-                #m2m(sales, Sale[], Int)
+                #m2m(sales, Sale[], sale_id, Int)
               }
-              
+
               model Sale {
                 #id(sale_id, Int, @id)
-                #m2m(buyers, Buyer[], Int)
+                #m2m(buyers, Buyer[], buyer_id, Int)
               }"#
         };
 
@@ -26,11 +26,11 @@ mod prisma_933_spec {
     }
 
     #[connector_test]
-    async fn prisma_933(runner: &Runner) -> TestResult<()> {
-        create_test_data(runner).await?;
+    async fn prisma_933(runner: Runner) -> TestResult<()> {
+        create_test_data(&runner).await?;
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"query {
+          run_query!(&runner, r#"query {
             findManyBuyer {
               sales {
                 buyers {

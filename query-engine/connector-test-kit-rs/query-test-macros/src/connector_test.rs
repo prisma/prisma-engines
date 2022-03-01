@@ -1,9 +1,9 @@
-use crate::ConnectorTestArgs;
+use super::*;
+use crate::utils::quote_connector;
 use darling::FromMeta;
 use itertools::Itertools;
 use proc_macro::TokenStream;
 use proc_macro2::{Ident, Span};
-use query_tests_setup::{ConnectorTag, ConnectorTagInterface};
 use quote::quote;
 use syn::{parse_macro_input, AttributeArgs, ItemFn};
 
@@ -34,7 +34,7 @@ pub fn connector_test_impl(attr: TokenStream, input: TokenStream) -> TokenStream
     if test_function.sig.inputs.len() != 1 {
         return syn::Error::new_spanned(
             test_function.sig,
-            "connector test functions must take exactly one argument: `runner: &Runner`.",
+            "connector test functions must take exactly one argument: `runner: Runner`.",
         )
         .to_compile_error()
         .into();
@@ -50,7 +50,7 @@ pub fn connector_test_impl(attr: TokenStream, input: TokenStream) -> TokenStream
     let test_fn_ident = test_function.sig.ident.clone();
 
     // Rename original test function to run_<orig_name>.
-    let runner_fn_ident = Ident::new(&format!("run_{}", test_fn_ident.to_string()), Span::call_site());
+    let runner_fn_ident = Ident::new(&format!("run_{}", test_fn_ident), Span::call_site());
     test_function.sig.ident = runner_fn_ident.clone();
 
     // The test database name is the name used as the database for data source rendering.
@@ -89,10 +89,16 @@ pub fn connector_test_impl(attr: TokenStream, input: TokenStream) -> TokenStream
                 let connector = config.test_connector_tag().unwrap();
 
                 query_tests_setup::run_with_tokio(async move {
-                    tracing::debug!("Used datamodel:\n {}", datamodel.clone().yellow());
-                    let runner = Runner::load(config.runner(), datamodel.clone(), connector).await.unwrap();
+                    tracing::debug!("Used datamodel:\n {}", datamodel.yellow());
+
                     query_tests_setup::setup_project(&datamodel).await.unwrap();
-                    #runner_fn_ident(&runner).await.unwrap();
+
+                    let requires_teardown = connector.requires_teardown();
+                    let runner = Runner::load(config.runner(), datamodel.clone(), connector).await.unwrap();
+
+                    #runner_fn_ident(runner).await.unwrap();
+
+                    if requires_teardown { query_tests_setup::teardown_project(&datamodel).await.unwrap(); }
                 }.with_subscriber(test_tracing_subscriber(std::env::var("LOG_LEVEL").unwrap_or("info".to_string()))));
             }
         }
@@ -101,17 +107,4 @@ pub fn connector_test_impl(attr: TokenStream, input: TokenStream) -> TokenStream
     };
 
     test.into()
-}
-
-fn quote_connector(tag: ConnectorTag) -> proc_macro2::TokenStream {
-    let (connector, version) = tag.as_parse_pair();
-
-    match version {
-        Some(version) => quote! {
-            ConnectorTag::try_from((#connector, Some(#version))).unwrap()
-        },
-        None => quote! {
-            ConnectorTag::try_from(#connector).unwrap()
-        },
-    }
 }

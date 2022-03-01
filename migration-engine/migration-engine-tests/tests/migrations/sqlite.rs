@@ -1,5 +1,4 @@
-use migration_engine_tests::sync_test_api::*;
-use test_macros::test_connector;
+use migration_engine_tests::test_api::*;
 
 #[test_connector(tags(Sqlite))]
 fn sqlite_must_recreate_indexes(api: TestApi) {
@@ -12,7 +11,7 @@ fn sqlite_must_recreate_indexes(api: TestApi) {
         }
     "#;
 
-    api.schema_push(dm1).send_sync().assert_green_bang();
+    api.schema_push_w_datasource(dm1).send().assert_green();
 
     api.assert_schema().assert_table("A", |table| {
         table.assert_index_on_columns(&["field"], |idx| idx.assert_is_unique())
@@ -26,7 +25,7 @@ fn sqlite_must_recreate_indexes(api: TestApi) {
         }
     "#;
 
-    api.schema_push(dm2).send_sync().assert_green_bang();
+    api.schema_push_w_datasource(dm2).send().assert_green();
 
     api.assert_schema().assert_table("A", |table| {
         table.assert_index_on_columns(&["field"], |idx| idx.assert_is_unique())
@@ -47,7 +46,7 @@ fn sqlite_must_recreate_multi_field_indexes(api: TestApi) {
         }
     "#;
 
-    api.schema_push(dm1).send_sync().assert_green_bang();
+    api.schema_push_w_datasource(dm1).send().assert_green();
 
     api.assert_schema().assert_table("A", |table| {
         table.assert_index_on_columns(&["field", "secondField"], |idx| idx.assert_is_unique())
@@ -64,7 +63,7 @@ fn sqlite_must_recreate_multi_field_indexes(api: TestApi) {
         }
     "#;
 
-    api.schema_push(dm2).send_sync().assert_green_bang();
+    api.schema_push_w_datasource(dm2).send().assert_green();
 
     api.assert_schema().assert_table("A", |table| {
         table.assert_index_on_columns(&["field", "secondField"], |idx| idx.assert_is_unique())
@@ -80,6 +79,20 @@ fn creating_a_model_with_a_non_autoincrement_id_column_is_idempotent(api: TestAp
         }
     "#;
 
-    api.schema_push(dm).send_sync().assert_green_bang();
-    api.schema_push(dm).send_sync().assert_green_bang().assert_no_steps();
+    api.schema_push_w_datasource(dm).send().assert_green();
+    api.schema_push_w_datasource(dm).send().assert_green().assert_no_steps();
+}
+
+#[test_connector(tags(Sqlite))]
+fn treat_nullable_integer_primary_key_as_required(api: TestApi) {
+    let schema = r#"CREATE TABLE "a" ("id" INTEGER NULL, PRIMARY KEY("id"));"#;
+    api.raw_cmd(schema);
+
+    let dm = r#"
+        model a {
+          id Int @id @default(autoincrement())
+        }
+    "#;
+
+    api.schema_push_w_datasource(dm).send().assert_green().assert_no_steps();
 }

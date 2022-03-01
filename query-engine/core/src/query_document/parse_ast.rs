@@ -1,11 +1,62 @@
 //! Parsed query document tree. Naming is WIP.
 //! Structures represent parsed and validated parts of the query document, used by the query builders.
-use crate::OutputFieldRef;
+use std::ops::{Deref, DerefMut};
+
+use crate::{ObjectTag, OutputFieldRef};
 use indexmap::IndexMap;
 use prisma_models::{OrderBy, PrismaValue, ScalarFieldRef};
 
-pub type ParsedInputMap = IndexMap<String, ParsedInputValue>;
 pub type ParsedInputList = Vec<ParsedInputValue>;
+
+#[derive(Debug, Clone, Default)]
+pub struct ParsedInputMap {
+    pub tag: Option<ObjectTag>,
+    pub map: IndexMap<String, ParsedInputValue>,
+}
+
+impl ParsedInputMap {
+    pub fn set_tag(&mut self, tag: Option<ObjectTag>) {
+        self.tag = tag;
+    }
+}
+
+impl From<IndexMap<String, ParsedInputValue>> for ParsedInputMap {
+    fn from(map: IndexMap<String, ParsedInputValue>) -> Self {
+        Self { tag: None, map }
+    }
+}
+
+impl FromIterator<(String, ParsedInputValue)> for ParsedInputMap {
+    fn from_iter<T: IntoIterator<Item = (String, ParsedInputValue)>>(iter: T) -> Self {
+        Self {
+            tag: None,
+            map: iter.into_iter().collect(),
+        }
+    }
+}
+
+impl IntoIterator for ParsedInputMap {
+    type Item = (String, ParsedInputValue);
+    type IntoIter = indexmap::map::IntoIter<String, ParsedInputValue>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        self.map.into_iter()
+    }
+}
+
+impl Deref for ParsedInputMap {
+    type Target = IndexMap<String, ParsedInputValue>;
+
+    fn deref(&self) -> &Self::Target {
+        &self.map
+    }
+}
+
+impl DerefMut for ParsedInputMap {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        &mut self.map
+    }
+}
 
 #[derive(Debug, Clone)]
 pub struct ParsedObject {

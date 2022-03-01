@@ -1,4 +1,4 @@
-use migration_engine_tests::sync_test_api::*;
+use migration_engine_tests::test_api::*;
 use pretty_assertions::assert_eq;
 use user_facing_errors::{migration_engine::MigrationToMarkAppliedNotFound, UserFacingError};
 
@@ -11,10 +11,9 @@ const BASE_DM: &str = r#"
 #[test_connector]
 fn mark_migration_applied_on_an_empty_database_works(api: TestApi) {
     let migrations_directory = api.create_migrations_directory();
-    let persistence = api.migration_persistence();
 
     let output = api
-        .create_migration("01init", BASE_DM, &migrations_directory)
+        .create_migration("01init", &api.datamodel_with_provider(BASE_DM), &migrations_directory)
         .send_sync()
         .into_output();
 
@@ -23,14 +22,14 @@ fn mark_migration_applied_on_an_empty_database_works(api: TestApi) {
     api.assert_schema().assert_tables_count(0);
 
     assert!(
-        api.block_on(persistence.list_migrations()).unwrap().is_err(),
+        tok(api.migration_persistence().list_migrations()).unwrap().is_err(),
         "The migrations table should not be there yet."
     );
 
     api.mark_migration_applied(&migration_name, &migrations_directory)
         .send();
 
-    let applied_migrations = api.block_on(persistence.list_migrations()).unwrap().unwrap();
+    let applied_migrations = tok(api.migration_persistence().list_migrations()).unwrap().unwrap();
 
     assert_eq!(applied_migrations.len(), 1);
     assert_eq!(&applied_migrations[0].migration_name, &migration_name);
@@ -48,12 +47,11 @@ fn mark_migration_applied_on_an_empty_database_works(api: TestApi) {
 #[test_connector]
 fn mark_migration_applied_on_a_non_empty_database_works(api: TestApi) {
     let migrations_directory = api.create_migrations_directory();
-    let persistence = api.migration_persistence();
 
     // Create and apply a first migration
     let initial_migration_name = {
         let output_initial_migration = api
-            .create_migration("01init", BASE_DM, &migrations_directory)
+            .create_migration("01init", &api.datamodel_with_provider(BASE_DM), &migrations_directory)
             .send_sync()
             .into_output();
 
@@ -64,7 +62,8 @@ fn mark_migration_applied_on_a_non_empty_database_works(api: TestApi) {
 
     // Create a second migration
     let second_migration_name = {
-        let dm2 = r#"
+        let dm2 = api.datamodel_with_provider(
+            r#"
             model Test {
                 id Int @id
             }
@@ -73,10 +72,11 @@ fn mark_migration_applied_on_a_non_empty_database_works(api: TestApi) {
                 id Int @id
                 name String
             }
-        "#;
+        "#,
+        );
 
         let output_second_migration = api
-            .create_migration("02migration", dm2, &migrations_directory)
+            .create_migration("02migration", &dm2, &migrations_directory)
             .send_sync()
             .into_output();
 
@@ -88,7 +88,7 @@ fn mark_migration_applied_on_a_non_empty_database_works(api: TestApi) {
     api.mark_migration_applied(&second_migration_name, &migrations_directory)
         .send();
 
-    let applied_migrations = api.block_on(persistence.list_migrations()).unwrap().unwrap();
+    let applied_migrations = tok(api.migration_persistence().list_migrations()).unwrap().unwrap();
 
     assert_eq!(applied_migrations.len(), 2);
     assert_eq!(&applied_migrations[0].migration_name, &initial_migration_name);
@@ -109,12 +109,11 @@ fn mark_migration_applied_on_a_non_empty_database_works(api: TestApi) {
 #[test_connector]
 fn mark_migration_applied_when_the_migration_is_already_applied_errors(api: TestApi) {
     let migrations_directory = api.create_migrations_directory();
-    let persistence = api.migration_persistence();
 
     // Create and apply a first migration
     let initial_migration_name = {
         let output_initial_migration = api
-            .create_migration("01init", BASE_DM, &migrations_directory)
+            .create_migration("01init", &api.datamodel_with_provider(BASE_DM), &migrations_directory)
             .send_sync()
             .into_output();
 
@@ -123,7 +122,8 @@ fn mark_migration_applied_when_the_migration_is_already_applied_errors(api: Test
 
     // Create a second migration
     let second_migration_name = {
-        let dm2 = r#"
+        let dm2 = api.datamodel_with_provider(
+            r#"
             model Test {
                 id Int @id
             }
@@ -132,10 +132,11 @@ fn mark_migration_applied_when_the_migration_is_already_applied_errors(api: Test
                 id Int @id
                 name String
             }
-        "#;
+        "#,
+        );
 
         let output_second_migration = api
-            .create_migration("02migration", dm2, &migrations_directory)
+            .create_migration("02migration", &dm2, &migrations_directory)
             .send_sync()
             .into_output();
 
@@ -155,7 +156,7 @@ fn mark_migration_applied_when_the_migration_is_already_applied_errors(api: Test
         second_migration_name
     )));
 
-    let applied_migrations = api.block_on(persistence.list_migrations()).unwrap().unwrap();
+    let applied_migrations = tok(api.migration_persistence().list_migrations()).unwrap().unwrap();
 
     assert_eq!(applied_migrations.len(), 2);
     assert_eq!(&applied_migrations[0].migration_name, &initial_migration_name);
@@ -173,12 +174,11 @@ fn mark_migration_applied_when_the_migration_is_already_applied_errors(api: Test
 #[test_connector]
 fn mark_migration_applied_when_the_migration_is_failed(api: TestApi) {
     let migrations_directory = api.create_migrations_directory();
-    let persistence = api.migration_persistence();
 
     // Create and apply a first migration
     let initial_migration_name = {
         let output_initial_migration = api
-            .create_migration("01init", BASE_DM, &migrations_directory)
+            .create_migration("01init", &api.datamodel_with_provider(BASE_DM), &migrations_directory)
             .send_sync()
             .into_output();
 
@@ -187,7 +187,8 @@ fn mark_migration_applied_when_the_migration_is_failed(api: TestApi) {
 
     // Create a second migration
     let second_migration_name = {
-        let dm2 = r#"
+        let dm2 = api.datamodel_with_provider(
+            r#"
             model Test {
                 id Int @id
             }
@@ -196,10 +197,10 @@ fn mark_migration_applied_when_the_migration_is_failed(api: TestApi) {
                 id Int @id
                 name String
             }
-        "#;
-
+        "#,
+        );
         let output_second_migration = api
-            .create_migration("02migration", dm2, &migrations_directory)
+            .create_migration("02migration", &dm2, &migrations_directory)
             .send_sync()
             .modify_migration(|migration| {
                 migration.clear();
@@ -214,7 +215,7 @@ fn mark_migration_applied_when_the_migration_is_failed(api: TestApi) {
 
     // Check that the second migration failed.
     {
-        let applied_migrations = api.block_on(persistence.list_migrations()).unwrap().unwrap();
+        let applied_migrations = tok(api.migration_persistence().list_migrations()).unwrap().unwrap();
 
         assert_eq!(applied_migrations.len(), 2);
         assert!(
@@ -228,7 +229,7 @@ fn mark_migration_applied_when_the_migration_is_failed(api: TestApi) {
     api.mark_migration_applied(&second_migration_name, &migrations_directory)
         .send();
 
-    let applied_migrations = api.block_on(persistence.list_migrations()).unwrap().unwrap();
+    let applied_migrations = tok(api.migration_persistence().list_migrations()).unwrap().unwrap();
 
     assert_eq!(applied_migrations.len(), 3);
     assert_eq!(&applied_migrations[0].migration_name, &initial_migration_name);
@@ -251,20 +252,21 @@ fn mark_migration_applied_when_the_migration_is_failed(api: TestApi) {
 #[test_connector]
 fn baselining_should_work(api: TestApi) {
     let migrations_directory = api.create_migrations_directory();
-    let persistence = api.migration_persistence();
 
-    let dm1 = r#"
+    let dm1 = api.datamodel_with_provider(
+        r#"
         model test {
             id Int @id
         }
-    "#;
+    "#,
+    );
 
-    api.schema_push(dm1).send_sync();
+    api.schema_push(dm1.clone()).send();
 
     // Create a first local migration that matches the db contents
     let baseline_migration_name = {
         let output_baseline_migration = api
-            .create_migration("01baseline", dm1, &migrations_directory)
+            .create_migration("01baseline", &dm1, &migrations_directory)
             .send_sync()
             .into_output();
 
@@ -275,7 +277,7 @@ fn baselining_should_work(api: TestApi) {
     api.mark_migration_applied(&baseline_migration_name, &migrations_directory)
         .send();
 
-    let applied_migrations = api.block_on(persistence.list_migrations()).unwrap().unwrap();
+    let applied_migrations = tok(api.migration_persistence().list_migrations()).unwrap().unwrap();
 
     assert_eq!(applied_migrations.len(), 1);
     assert_eq!(&applied_migrations[0].migration_name, &baseline_migration_name);
@@ -292,7 +294,7 @@ fn must_return_helpful_error_on_migration_not_found(api: TestApi) {
     let migrations_directory = api.create_migrations_directory();
 
     let output = api
-        .create_migration("01init", BASE_DM, &migrations_directory)
+        .create_migration("01init", &api.datamodel_with_provider(BASE_DM), &migrations_directory)
         .send_sync()
         .assert_migration_directories_count(1)
         .into_output();
