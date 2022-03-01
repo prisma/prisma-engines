@@ -89,7 +89,6 @@ jobs:
             url: "postgresql://postgres:prisma@localhost:5437"
           - name: cockroach
             url: "postgresql://root@localhost:26257"
-            is_cockroach: true
           - name: sqlite
             url: sqlite
           - name: vitess_5_7
@@ -137,7 +136,6 @@ jobs:
 
       - run: cargo test -p migration-engine-tests
         if: ${{ !matrix.database.single_threaded }}
-        continue-on-error: ${{ matrix.database.is_cockroach || false }}
         env:
           CLICOLOR_FORCE: 1
           TEST_DATABASE_URL: ${{ matrix.database.url }}
