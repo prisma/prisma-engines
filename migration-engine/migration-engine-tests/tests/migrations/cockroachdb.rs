@@ -169,3 +169,71 @@ fn moving_the_pk_to_an_existing_unique_constraint_works(api: TestApi) {
         table.assert_pk(|pk| pk.assert_columns(&["a", "b", "c"]))
     });
 }
+
+#[test_connector(tags(CockroachDb))]
+fn primary_key_column_type_migrations_are_unexecutable(api: TestApi) {
+    let dm1 = r#"
+        model Dog {
+            name            String
+            passportNumber  Int
+            p               Puppy[]
+
+            @@id([name, passportNumber])
+        }
+
+        model Puppy {
+            id String @id
+            motherName String
+            motherPassportNumber Int
+            mother Dog @relation(fields: [motherName, motherPassportNumber], references: [name, passportNumber])
+        }
+    "#;
+
+    api.schema_push_w_datasource(dm1).send().assert_green();
+
+    api.insert("Dog")
+        .value("name", "Marnie")
+        .value("passportNumber", 8000)
+        .result_raw();
+
+    api.insert("Puppy")
+        .value("id", "12345")
+        .value("motherName", "Marnie")
+        .value("motherPassportNumber", 8000)
+        .result_raw();
+
+    // Make Dog#passportNumber a String.
+    let dm2 = r#"
+        model Dog {
+            name           String
+            passportNumber String
+            p              Puppy[]
+
+
+            @@id([name, passportNumber])
+        }
+
+        model Puppy {
+            id String @id
+            motherName String
+            motherPassportNumber String
+            mother Dog @relation(fields: [motherName, motherPassportNumber], references: [name, passportNumber])
+        }
+    "#;
+
+    let expected_unexecutable = expect![[r#"
+        [
+            "Changed the type of `passportNumber` on the `Dog` table. No cast exists, the column would be dropped and recreated, which cannot be done since the column is required and there is data in the table.",
+        ]
+    "#]];
+
+    api.schema_push_w_datasource(dm2)
+        .force(true)
+        .send()
+        .expect_unexecutable(expected_unexecutable)
+        .assert_warnings(&[]);
+
+    api.assert_schema().assert_table("Dog", |table| {
+        table.assert_pk(|pk| pk.assert_columns(&["name", "passportNumber"]))
+    });
+}

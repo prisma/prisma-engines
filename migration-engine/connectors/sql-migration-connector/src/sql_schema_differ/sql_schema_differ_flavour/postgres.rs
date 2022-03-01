@@ -151,6 +151,7 @@ fn cockroach_native_type_change_riskyness(
 
     match (previous, next) {
         (PostgresType::Integer, PostgresType::Text) if !covered_by_index => Some(ColumnTypeChange::SafeCast),
+        (PostgresType::BigInt, PostgresType::Integer) if !covered_by_index => Some(ColumnTypeChange::RiskyCast),
         (previous, next) if previous == next => None,
         // Timestamp default precisions
         (PostgresType::Time(None), PostgresType::Time(Some(6)))
