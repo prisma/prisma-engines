@@ -77,7 +77,9 @@ impl SqlRenderer for PostgresFlavour {
         // - Values cannot be removed.
         // - Only one value can be added in a single transaction until postgres 11.
         if self.is_cockroachdb() {
-            render_cockroach_alter_enum(alter_enum, schemas)
+            let mut renderer = StepRenderer::default();
+            render_cockroach_alter_enum(alter_enum, schemas, &mut renderer);
+            renderer.stmts
         } else {
             render_postgres_alter_enum(alter_enum, schemas)
         }
@@ -788,32 +790,53 @@ fn render_postgres_alter_enum(alter_enum: &AlterEnum, schemas: &Pair<&SqlSchema>
     stmts
 }
 
-fn render_cockroach_alter_enum(alter_enum: &AlterEnum, schemas: &Pair<&SqlSchema>) -> Vec<String> {
+fn render_cockroach_alter_enum(alter_enum: &AlterEnum, schemas: &Pair<&SqlSchema>, renderer: &mut StepRenderer) {
     let enums = schemas.enums(&alter_enum.index);
     let mut prefix = String::new();
     prefix.push_str("ALTER TYPE \"");
     prefix.push_str(enums.previous.name());
     prefix.push_str("\" ");
 
-    let mut stmts = Vec::with_capacity(alter_enum.created_variants.len() + alter_enum.dropped_variants.len());
+    // Defaults that use a dropped value will need to be recreated after the alter enum.
+    let defaults_to_drop = alter_enum
+        .previous_usages_as_default
+        .iter()
+        .filter_map(|((prev_tblidx, prev_colidx), _)| {
+            let col = schemas.previous.table_walker_at(*prev_tblidx).column_at(*prev_colidx);
+            col.default()
+                .and_then(|d| d.as_value())
+                .and_then(|v| v.as_enum_value())
+                .map(|value| (col, value))
+        })
+        .filter(|(_, value)| !enums.next.values().iter().any(|v| v == value));
+
+    for (col, _) in defaults_to_drop {
+        renderer.render_statement(&mut |stmt| {
+            stmt.push_str("ALTER TABLE ");
+            stmt.push_display(&Quoted::postgres_ident(col.table().name()));
+            stmt.push_str(" ALTER COLUMN ");
+            stmt.push_display(&Quoted::postgres_ident(col.name()));
+            stmt.push_str(" DROP DEFAULT");
+        })
+    }
 
     for variant in &alter_enum.created_variants {
-        let mut stmt = prefix.clone();
-        stmt.push_str("ADD VALUE '");
-        stmt.push_str(variant);
-        stmt.push('\'');
-        stmts.push(stmt)
+        renderer.render_statement(&mut |stmt| {
+            stmt.push_str(&prefix);
+            stmt.push_str("ADD VALUE '");
+            stmt.push_str(variant);
+            stmt.push_str("'");
+        });
     }
 
     for variant in &alter_enum.dropped_variants {
-        let mut stmt = prefix.clone();
-        stmt.push_str("DROP VALUE '");
-        stmt.push_str(variant);
-        stmt.push('\'');
-        stmts.push(stmt)
+        renderer.render_statement(&mut |stmt| {
+            stmt.push_str(&prefix);
+            stmt.push_str("DROP VALUE '");
+            stmt.push_str(variant);
+            stmt.push_str("'");
+        });
     }
-
-    stmts
 }
 
 #[derive(Default)]
