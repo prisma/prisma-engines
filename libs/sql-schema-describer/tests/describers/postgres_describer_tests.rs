@@ -794,9 +794,10 @@ fn escaped_quotes_in_string_defaults_must_be_unescaped(api: TestApi) {
 
 #[test_connector(tags(Postgres))]
 fn escaped_backslashes_in_string_literals_must_be_unescaped(api: TestApi) {
+    // https://www.postgresql.org/docs/current/sql-syntax-lexical.html
     let create_table = r#"
         CREATE TABLE test (
-            "model_name_space" VARCHAR(255) NOT NULL DEFAULT 'xyz\\Datasource\\Model'
+            "model_name_space" VARCHAR(255) NOT NULL DEFAULT e'xyz\\Datasource\\Model'
         )
     "#;
 
