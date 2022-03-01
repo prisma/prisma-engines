@@ -80,7 +80,7 @@ pub async fn listen(opts: PrismaOpt) -> PrismaResult<()> {
 
     let server = Server::bind(&addr).tcp_nodelay(true).serve(query_engine);
 
-    info!("Started http server on http://{}", addr);
+    info!("Started query engine http server on http://{}", addr);
 
     if let Err(e) = server.await {
         eprintln!("server error: {}", e);
