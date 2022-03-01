@@ -120,3 +120,52 @@ fn native_type_columns_can_be_created(api: TestApi) {
 
     api.schema_push_w_datasource(dm).send().assert_green().assert_no_steps();
 }
+
+// taken from id tests
+#[test_connector(tags(CockroachDb))]
+fn moving_the_pk_to_an_existing_unique_constraint_works(api: TestApi) {
+    let dm = r#"
+        model model1 {
+            id              String        @id @default(cuid())
+            a               String
+            b               String
+            c               String
+
+            @@unique([a, b, c])
+
+        }
+    "#;
+
+    api.schema_push_w_datasource(dm).send().assert_green();
+
+    api.assert_schema().assert_table("model1", |table| {
+        table
+            .assert_pk(|pk| pk.assert_columns(&["id"]))
+            .assert_index_on_columns(&["a", "b", "c"], |idx| idx.assert_is_unique())
+    });
+
+    api.insert("model1")
+        .value("id", "the-id")
+        .value("a", "the-a")
+        .value("b", "the-b")
+        .value("c", "the-c")
+        .result_raw();
+
+    let dm2 = r#"
+        model model1 {
+            id              String
+            a               String
+            b               String
+            c               String
+
+            @@id([a, b, c])
+
+        }
+    "#;
+
+    api.schema_push_w_datasource(dm2).force(true).send().assert_green();
+
+    api.assert_schema().assert_table("model1", |table| {
+        table.assert_pk(|pk| pk.assert_columns(&["a", "b", "c"]))
+    });
+}

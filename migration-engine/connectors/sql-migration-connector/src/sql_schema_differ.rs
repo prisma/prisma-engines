@@ -108,6 +108,8 @@ fn push_altered_table_steps(steps: &mut Vec<SqlMigrationStep>, db: &DifferDataba
             push_foreign_key_pair_changes(fk, steps, db)
         }
 
+        push_alter_primary_key(&table, steps);
+
         // Indexes.
         for i in table
             .index_pairs()
@@ -233,6 +235,14 @@ fn alter_columns(table_differ: &TableDiffer<'_, '_>) -> Vec<TableChange> {
 }
 
 fn added_primary_key(differ: &TableDiffer<'_, '_>) -> Option<TableChange> {
+    // ALTER PRIMARY KEY instead where possible (e.g. cockroachdb)
+    if differ.tables.previous.primary_key().is_some()
+        && differ.tables.next.primary_key().is_some()
+        && differ.db.flavour.can_alter_primary_keys()
+    {
+        return None;
+    }
+
     let from_psl_change = differ
         .created_primary_key()
         .filter(|pk| !pk.columns.is_empty())
@@ -262,6 +272,14 @@ fn added_primary_key(differ: &TableDiffer<'_, '_>) -> Option<TableChange> {
 fn dropped_primary_key(differ: &TableDiffer<'_, '_>) -> Option<TableChange> {
     let from_psl_change = differ.dropped_primary_key().map(|_pk| TableChange::DropPrimaryKey);
 
+    // ALTER PRIMARY KEY instead where possible (e.g. cockroachdb)
+    if differ.tables.previous.primary_key().is_some()
+        && differ.tables.next.primary_key().is_some()
+        && differ.db.flavour.can_alter_primary_keys()
+    {
+        return None;
+    }
+
     if differ.db.flavour.should_recreate_the_primary_key_on_column_recreate() {
         from_psl_change.or_else(|| {
             let from_recreate = alter_columns(differ).into_iter().any(|tc| match tc {
@@ -290,6 +308,25 @@ fn renamed_primary_key(differ: &TableDiffer<'_, '_>) -> Option<TableChange> {
         .transpose()
         .filter(|names| names.previous != names.next)
         .map(|_| TableChange::RenamePrimaryKey)
+}
+
+fn push_alter_primary_key(differ: &TableDiffer<'_, '_>, steps: &mut Vec<SqlMigrationStep>) {
+    if !differ.db.flavour.can_alter_primary_keys() {
+        return;
+    }
+
+    let (previous, next) = match differ.tables.map(|t| t.primary_key()).into_tuple() {
+        (Some(previous), Some(next)) => (previous, next),
+        _ => return,
+    };
+
+    if previous.column_names().len() == next.column_names().len()
+        && previous.column_names().zip(next.column_names()).all(|(p, n)| p == n)
+    {
+        return;
+    }
+
+    steps.push(SqlMigrationStep::AlterPrimaryKey(differ.table_ids()))
 }
 
 fn push_created_index_steps(steps: &mut Vec<SqlMigrationStep>, db: &DifferDatabase<'_>) {

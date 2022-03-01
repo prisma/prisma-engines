@@ -24,6 +24,10 @@ static POSTGIS_TABLES_OR_VIEWS: Lazy<RegexSet> = Lazy::new(|| {
 static EXTENSION_VIEWS: Lazy<RegexSet> = Lazy::new(|| RegexSet::new(&["(?i)^pg_buffercache$"]).unwrap());
 
 impl SqlSchemaDifferFlavour for PostgresFlavour {
+    fn can_alter_primary_keys(&self) -> bool {
+        self.is_cockroachdb()
+    }
+
     fn can_rename_foreign_key(&self) -> bool {
         true
     }
