@@ -454,7 +454,7 @@ fn field_type<'db>(field: &'db ast::Field, ctx: &mut Context<'db>) -> Result<Fie
 }
 
 /// The sort order of an index.
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq)]
 pub enum SortOrder {
     /// ASCending
     Asc,

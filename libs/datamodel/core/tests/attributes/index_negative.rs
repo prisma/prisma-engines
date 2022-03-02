@@ -1069,3 +1069,103 @@ fn index_without_fields_must_error() {
     let error = datamodel::parse_schema(schema).map(drop).unwrap_err();
     expected.assert_eq(&error);
 }
+
+#[test]
+fn duplicate_indices_on_the_same_fields_are_not_allowed_on_mongodb() {
+    let dml = indoc! {r#"
+        model A {
+          id   String @id @default(auto()) @map("_id") @test.ObjectId
+          data Int
+
+          @@index([data], map: "index_a")
+          @@index([data], map: "index_b")
+        }
+    "#};
+
+    let dml = with_header(dml, Provider::Mongo, &["mongoDb"]);
+    let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
+
+    let expectation = expect![[r#"
+        [1;91merror[0m: [1mError parsing attribute "@@index": Index already exists in the model.[0m
+          [1;94m-->[0m  [4mschema.prisma:15[0m
+        [1;94m   | [0m
+        [1;94m14 | [0m
+        [1;94m15 | [0m  @@[1;91mindex([data], map: "index_a")[0m
+        [1;94m   | [0m
+        [1;91merror[0m: [1mError parsing attribute "@@index": Index already exists in the model.[0m
+          [1;94m-->[0m  [4mschema.prisma:16[0m
+        [1;94m   | [0m
+        [1;94m15 | [0m  @@index([data], map: "index_a")
+        [1;94m16 | [0m  @@[1;91mindex([data], map: "index_b")[0m
+        [1;94m   | [0m
+    "#]];
+
+    expectation.assert_eq(&error)
+}
+
+#[test]
+fn duplicate_uniques_on_the_same_fields_are_not_allowed_on_mongodb() {
+    let dml = indoc! {r#"
+        model A {
+          id   String @id @default(auto()) @map("_id") @test.ObjectId
+          data Int
+          dota Int
+
+          @@unique([data, dota], map: "index_a")
+          @@unique([data, dota], map: "index_b")
+        }
+    "#};
+
+    let dml = with_header(dml, Provider::Mongo, &["mongoDb"]);
+    let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
+
+    let expectation = expect![[r#"
+        [1;91merror[0m: [1mError parsing attribute "@@unique": Index already exists in the model.[0m
+          [1;94m-->[0m  [4mschema.prisma:16[0m
+        [1;94m   | [0m
+        [1;94m15 | [0m
+        [1;94m16 | [0m  @@[1;91munique([data, dota], map: "index_a")[0m
+        [1;94m   | [0m
+        [1;91merror[0m: [1mError parsing attribute "@@unique": Index already exists in the model.[0m
+          [1;94m-->[0m  [4mschema.prisma:17[0m
+        [1;94m   | [0m
+        [1;94m16 | [0m  @@unique([data, dota], map: "index_a")
+        [1;94m17 | [0m  @@[1;91munique([data, dota], map: "index_b")[0m
+        [1;94m   | [0m
+    "#]];
+
+    expectation.assert_eq(&error)
+}
+
+#[test]
+fn duplicate_indices_on_the_same_fields_different_sort_same_name_are_not_allowed_on_mongodb() {
+    let dml = indoc! {r#"
+        model A {
+          id   String @id @default(auto()) @map("_id") @test.ObjectId
+          data Int
+
+          @@index([data(sort: Asc)])
+          @@index([data(sort: Desc)])
+        }
+    "#};
+
+    let dml = with_header(dml, Provider::Mongo, &["mongoDb", "extendedIndexes"]);
+    let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
+
+    let expectation = expect![[r#"
+        [1;91merror[0m: [1mError parsing attribute "@index": The given constraint name `A_data_idx` has to be unique in the following namespace: on model `A` for indexes and unique constraints. Please provide a different name using the `map` argument.[0m
+          [1;94m-->[0m  [4mschema.prisma:15[0m
+        [1;94m   | [0m
+        [1;94m14 | [0m
+        [1;94m15 | [0m  @@[1;91mindex([data(sort: Asc)])[0m
+        [1;94m   | [0m
+        [1;91merror[0m: [1mError parsing attribute "@index": The given constraint name `A_data_idx` has to be unique in the following namespace: on model `A` for indexes and unique constraints. Please provide a different name using the `map` argument.[0m
+          [1;94m-->[0m  [4mschema.prisma:16[0m
+        [1;94m   | [0m
+        [1;94m15 | [0m  @@index([data(sort: Asc)])
+        [1;94m16 | [0m  @@[1;91mindex([data(sort: Desc)])[0m
+        [1;94m   | [0m
+    "#]];
+
+    expectation.assert_eq(&error)
+}
