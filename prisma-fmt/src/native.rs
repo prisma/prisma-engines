@@ -30,14 +30,14 @@ impl From<&NativeTypeConstructor> for SerializableNativeTypeConstructor {
     fn from(nt: &NativeTypeConstructor) -> Self {
         let NativeTypeConstructor {
             name,
-            _number_of_args,
-            _number_of_optional_args,
+            number_of_args,
+            number_of_optional_args,
             prisma_types,
         } = nt;
         SerializableNativeTypeConstructor {
             name,
-            _number_of_args: *_number_of_args,
-            _number_of_optional_args: *_number_of_optional_args,
+            _number_of_args: *number_of_args,
+            _number_of_optional_args: *number_of_optional_args,
             prisma_types: prisma_types.iter().map(|st| st.as_str()).collect(),
         }
     }

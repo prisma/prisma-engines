@@ -252,13 +252,15 @@ fn should_fail_on_native_type_decimal_when_scale_is_bigger_than_precision() {
         }
         "#
     );
-
-    let error = parse_error(dml);
-
-    error.assert_is(DatamodelError::new(
-        "The scale must not be larger than the precision for the Decimal(2,4) native type in MySQL.".into(),
-        ast::Span::new(101, 131),
-    ));
+    let expectation = expect![[r#"
+        [1;91merror[0m: [1mThe scale must not be larger than the precision for the Decimal(2,4) native type in MySQL.[0m
+          [1;94m-->[0m  [4mschema.prisma:8[0m
+        [1;94m   | [0m
+        [1;94m 7 | [0m    id     Int  @id
+        [1;94m 8 | [0m    dec Decimal @[1;91mdb.Decimal(2, 4)[0m
+        [1;94m   | [0m
+    "#]];
+    expect_error(dml, &expectation);
 }
 
 #[test]
