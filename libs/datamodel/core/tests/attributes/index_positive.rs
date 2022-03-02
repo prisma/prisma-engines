@@ -511,6 +511,47 @@ fn fulltext_index_mongodb() {
 }
 
 #[test]
+fn duplicate_index_different_sort_order_mongodb() {
+    let dml = indoc! {r#"
+        model A {
+          id String @id @default(auto()) @map("_id") @test.ObjectId
+          a  Int
+
+          @@index([a(sort: Asc)], map: "aaa")
+          @@index([a(sort: Desc)], map: "bbb")
+        }
+    "#};
+
+    let dml = with_header(dml, Provider::Mongo, &["mongoDb", "extendedIndexes"]);
+
+    parse(&dml).assert_has_model("A").assert_has_index(IndexDefinition {
+        name: None,
+        db_name: Some("aaa".to_string()),
+        fields: vec![IndexField {
+            name: String::from("a"),
+            sort_order: Some(SortOrder::Asc),
+            length: None,
+        }],
+        tpe: IndexType::Normal,
+        algorithm: None,
+        defined_on_field: false,
+    });
+
+    parse(&dml).assert_has_model("A").assert_has_index(IndexDefinition {
+        name: None,
+        db_name: Some("bbb".to_string()),
+        fields: vec![IndexField {
+            name: String::from("a"),
+            sort_order: Some(SortOrder::Desc),
+            length: None,
+        }],
+        tpe: IndexType::Normal,
+        algorithm: None,
+        defined_on_field: false,
+    });
+}
+
+#[test]
 fn fulltext_index_sort_mongodb() {
     let dml = indoc! {r#"
         model A {
