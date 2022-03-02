@@ -915,7 +915,7 @@
 
     <span class="kw">let</span> <span class="ident">fields</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">db_field_names</span>
         .<span class="ident">iter</span>()
-        .<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">model</span>.<span class="ident">fields</span>().<span class="ident">find_from_all_by_db_name</span>(<span class="ident">f</span>).<span class="ident">ok</span>())
+        .<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">model</span>.<span class="ident">fields</span>().<span class="ident">find_from_non_virtual_by_db_name</span>(<span class="ident">f</span>).<span class="ident">ok</span>())
         .<span class="ident">collect</span>();
 
     <span class="comment">// Write all fields, nested and list fields unordered into a map, afterwards order all into the final order.</span>
