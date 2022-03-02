@@ -99,7 +99,7 @@ fn coerce_empty(
 ) -> crate::Result<MongoFilter> {
     if filters.is_empty() {
         // We need to create a truthy or falsey expression for empty AND / OR queries.
-        // _id always exists. So matching on exist/not exists creates our truthy/falsey expressions.
+        // _id always exists (for top level documents). So matching on exist/not exists creates our truthy/falsey expressions.
 
         let doc = if truthy {
             doc! { "_id": { "$exists": 1 }}
@@ -493,7 +493,7 @@ fn composite_filter(filter: CompositeFilter, invert: bool) -> crate::Result<Mong
             let (nested_filter, _) = convert_filter(filter, true, false)?.render();
 
             if is_empty {
-                doc! { "$not": { "$all": [{ "$elemMatch": { "_id": { "$exists": 0 }} }] }}
+                doc! { "$not": { "$all": [{ "$elemMatch": { "__prisma_truthy_marker": { "$exists": 1 }} }] }}
             } else {
                 doc! { "$not": { "$all": [{ "$elemMatch": nested_filter }] }}
             }
