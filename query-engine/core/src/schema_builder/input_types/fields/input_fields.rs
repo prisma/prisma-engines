@@ -7,7 +7,10 @@ pub(crate) fn filter_input_field(ctx: &mut BuilderContext, field: &ModelField, i
     let types = field_filter_types::get_field_filter_types(ctx, field, include_aggregates);
     let nullable = !field.is_required()
         && !field.is_list()
-        && !matches!(field, ModelField::Scalar(sf) if sf.type_identifier != TypeIdentifier::Json); // Not a JSON scalar field.
+        && match field {
+            ModelField::Scalar(sf) => sf.type_identifier != TypeIdentifier::Json,
+            _ => true,
+        };
 
     input_field(field.name().to_owned(), types, None)
         .optional()

@@ -98,7 +98,7 @@ pub(crate) fn where_unique_object_type(ctx: &mut BuilderContext, model: &ModelRe
     let input_object = Arc::new(x);
     ctx.cache_input_type(ident, input_object.clone());
 
-    //TODO (dom) this can probably be collapsed into just uniques and pks
+    // TODO (dom): This can probably be collapsed into just uniques and pks
     // Single unique or ID fields.
     let unique_fields: Vec<ScalarFieldRef> = model.fields().scalar().into_iter().filter(|f| f.unique()).collect();
 
