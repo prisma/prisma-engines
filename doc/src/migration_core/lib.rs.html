@@ -204,6 +204,8 @@
 <span id="202">202</span>
 <span id="203">203</span>
 <span id="204">204</span>
+<span id="205">205</span>
+<span id="206">206</span>
 </pre><pre class="rust"><code><span class="attribute">#![<span class="ident">deny</span>(<span class="ident">rust_2018_idioms</span>, <span class="ident">unsafe_code</span>, <span class="ident">missing_docs</span>)]</span>
 <span class="attribute">#![<span class="ident">allow</span>(<span class="ident">clippy::needless_collect</span>)]</span> <span class="comment">// the implementation of that rule is way too eager, it rejects necessary collects</span>
 
@@ -228,7 +230,8 @@
     <span class="ident">common</span>::{
         <span class="ident">preview_features::PreviewFeature</span>,
         <span class="ident">provider_names</span>::{
-            <span class="ident">MONGODB_SOURCE_NAME</span>, <span class="ident">MSSQL_SOURCE_NAME</span>, <span class="ident">MYSQL_SOURCE_NAME</span>, <span class="ident">POSTGRES_SOURCE_NAME</span>, <span class="ident">SQLITE_SOURCE_NAME</span>,
+            <span class="ident">COCKROACHDB_SOURCE_NAME</span>, <span class="ident">MONGODB_SOURCE_NAME</span>, <span class="ident">MSSQL_SOURCE_NAME</span>, <span class="ident">MYSQL_SOURCE_NAME</span>, <span class="ident">POSTGRES_SOURCE_NAME</span>,
+            <span class="ident">SQLITE_SOURCE_NAME</span>,
         },
     },
     <span class="ident">Datasource</span>,
@@ -355,6 +358,7 @@
 <span class="kw">fn</span> <span class="ident">connector_for_provider</span>(<span class="ident">provider</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">CoreResult</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">migration_connector::MigrationConnector</span><span class="op">&gt;</span><span class="op">&gt;</span> {
     <span class="kw">match</span> <span class="ident">provider</span> {
         <span class="ident">POSTGRES_SOURCE_NAME</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Box::new</span>(<span class="ident">SqlMigrationConnector::new_postgres</span>())),
+        <span class="ident">COCKROACHDB_SOURCE_NAME</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Box::new</span>(<span class="ident">SqlMigrationConnector::new_cockroach</span>())),
         <span class="ident">MYSQL_SOURCE_NAME</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Box::new</span>(<span class="ident">SqlMigrationConnector::new_mysql</span>())),
         <span class="ident">SQLITE_SOURCE_NAME</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Box::new</span>(<span class="ident">SqlMigrationConnector::new_sqlite</span>())),
         <span class="ident">MSSQL_SOURCE_NAME</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Box::new</span>(<span class="ident">SqlMigrationConnector::new_mssql</span>())),

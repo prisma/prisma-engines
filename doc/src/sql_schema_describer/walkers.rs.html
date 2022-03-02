@@ -765,6 +765,13 @@
 <span id="763">763</span>
 <span id="764">764</span>
 <span id="765">765</span>
+<span id="766">766</span>
+<span id="767">767</span>
+<span id="768">768</span>
+<span id="769">769</span>
+<span id="770">770</span>
+<span id="771">771</span>
+<span id="772">772</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Functions and types for conveniently traversing and querying a SqlSchema.</span>
 
 <span class="attribute">#![<span class="ident">deny</span>(<span class="ident">missing_docs</span>)]</span>
@@ -884,6 +891,13 @@
     <span class="doccomment">/// Is this column an auto-incrementing integer?</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_autoincrement</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">column</span>().<span class="ident">auto_increment</span>
+    }
+
+    <span class="doccomment">/// Is this column indexed by a secondary index??</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_part_of_secondary_index</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+        <span class="kw">let</span> <span class="ident">table</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">table</span>();
+        <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">name</span>();
+        <span class="ident">table</span>.<span class="ident">indexes</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">idx</span><span class="op">|</span> <span class="ident">idx</span>.<span class="ident">contains_column</span>(<span class="ident">name</span>))
     }
 
     <span class="doccomment">/// Is this column a part of the table&#39;s primary key?</span>

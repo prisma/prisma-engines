@@ -156,6 +156,11 @@
 <span id="154">154</span>
 <span id="155">155</span>
 <span id="156">156</span>
+<span id="157">157</span>
+<span id="158">158</span>
+<span id="159">159</span>
+<span id="160">160</span>
+<span id="161">161</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">migration_core</span>::{
     <span class="ident">commands::schema_push</span>, <span class="ident">json_rpc::types</span>::<span class="kw-2">*</span>, <span class="ident">migration_connector::MigrationConnector</span>, <span class="ident">CoreError</span>, <span class="ident">CoreResult</span>,
 };
@@ -309,6 +314,11 @@
             <span class="macro">assert_eq!</span>(<span class="ident">actual</span>, <span class="ident">expected</span>);
         }
 
+        <span class="self">self</span>
+    }
+
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">expect_unexecutable</span>(<span class="self">self</span>, <span class="ident">expectation</span>: <span class="ident">expect_test::Expect</span>) -&gt; <span class="self">Self</span> {
+        <span class="ident">expectation</span>.<span class="ident">assert_debug_eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">result</span>.<span class="ident">unexecutable</span>);
         <span class="self">self</span>
     }
 }
