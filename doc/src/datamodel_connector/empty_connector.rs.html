@@ -74,6 +74,7 @@
 <span id="72">72</span>
 <span id="73">73</span>
 <span id="74">74</span>
+<span id="75">75</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">connector_error::ConnectorError</span>, <span class="ident">Connector</span>, <span class="ident">ConnectorCapability</span>, <span class="ident">NativeTypeInstance</span>, <span class="ident">ReferentialAction</span>, <span class="ident">ScalarType</span>,
 };
@@ -99,6 +100,7 @@
             <span class="ident">ConnectorCapability::Enums</span>,
             <span class="ident">ConnectorCapability::Json</span>,
             <span class="ident">ConnectorCapability::ImplicitManyToManyRelation</span>,
+            <span class="ident">ConnectorCapability::DuplicateIndexDefinitionsToSameFields</span>,
         ]
     }
 
