@@ -1,7 +1,4 @@
-use super::{
-    common::{format_hex, render_nullability, IteratorJoin, Quoted, SQL_INDENTATION},
-    SqlRenderer,
-};
+use super::{common::*, SqlRenderer};
 use crate::{
     flavour::PostgresFlavour,
     pair::Pair,
@@ -77,9 +74,9 @@ impl SqlRenderer for PostgresFlavour {
         // - Values cannot be removed.
         // - Only one value can be added in a single transaction until postgres 11.
         if self.is_cockroachdb() {
-            let mut renderer = StepRenderer::default();
-            render_cockroach_alter_enum(alter_enum, schemas, &mut renderer);
-            renderer.stmts
+            render_step(&mut |step| {
+                render_cockroach_alter_enum(alter_enum, schemas, step);
+            })
         } else {
             render_postgres_alter_enum(alter_enum, schemas)
         }
@@ -104,11 +101,14 @@ impl SqlRenderer for PostgresFlavour {
     }
 
     fn render_rename_index(&self, indexes: Pair<&IndexWalker<'_>>) -> Vec<String> {
-        vec![format!(
-            "ALTER INDEX {} RENAME TO {}",
-            self.quote(indexes.previous().name()),
-            self.quote(indexes.next().name())
-        )]
+        render_step(&mut |step| {
+            step.render_statement(&mut |stmt| {
+                stmt.push_str("ALTER INDEX ");
+                stmt.push_display(&Quoted::postgres_ident(indexes.previous.name()));
+                stmt.push_str(" RENAME TO ");
+                stmt.push_display(&Quoted::postgres_ident(indexes.next.name()));
+            })
+        })
     }
 
     fn render_alter_table(&self, alter_table: &AlterTable, schemas: &Pair<&SqlSchema>) -> Vec<String> {
@@ -238,11 +238,14 @@ impl SqlRenderer for PostgresFlavour {
     }
 
     fn render_create_enum(&self, enm: &EnumWalker<'_>) -> Vec<String> {
-        vec![ddl::CreateEnum {
-            enum_name: enm.name().into(),
-            variants: enm.values().iter().map(|s| Cow::Borrowed(s.as_str())).collect(),
-        }
-        .to_string()]
+        render_step(&mut |step| {
+            step.render_statement(&mut |stmt| {
+                stmt.push_display(&ddl::CreateEnum {
+                    enum_name: enm.name().into(),
+                    variants: enm.values().iter().map(|s| Cow::Borrowed(s.as_str())).collect(),
+                })
+            })
+        })
     }
 
     fn render_create_index(&self, index: &IndexWalker<'_>) -> String {
@@ -297,12 +300,13 @@ impl SqlRenderer for PostgresFlavour {
     }
 
     fn render_drop_enum(&self, dropped_enum: &EnumWalker<'_>) -> Vec<String> {
-        let sql = ddl::DropType {
-            type_name: dropped_enum.name().into(),
-        }
-        .to_string();
-
-        vec![sql]
+        render_step(&mut |step| {
+            step.render_statement(&mut |stmt| {
+                stmt.push_display(&ddl::DropType {
+                    type_name: dropped_enum.name().into(),
+                })
+            })
+        })
     }
 
     fn render_drop_foreign_key(&self, foreign_key: &ForeignKeyWalker<'_>) -> String {
@@ -321,11 +325,14 @@ impl SqlRenderer for PostgresFlavour {
     }
 
     fn render_drop_table(&self, table_name: &str) -> Vec<String> {
-        vec![ddl::DropTable {
-            table_name: table_name.into(),
-            cascade: false,
-        }
-        .to_string()]
+        render_step(&mut |step| {
+            step.render_statement(&mut |stmt| {
+                stmt.push_display(&ddl::DropTable {
+                    table_name: table_name.into(),
+                    cascade: false,
+                })
+            })
+        })
     }
 
     fn render_drop_view(&self, view: &ViewWalker<'_>) -> String {
@@ -837,52 +844,4 @@ fn render_cockroach_alter_enum(alter_enum: &AlterEnum, schemas: &Pair<&SqlSchema
             stmt.push_str("'");
         });
     }
-}
-
-#[derive(Default)]
-struct StepRenderer {
-    stmts: Vec<String>,
-}
-
-impl StepRenderer {
-    fn render_statement(&mut self, f: &mut dyn FnMut(&mut StatementRenderer)) {
-        let mut stmt_renderer = Default::default();
-        f(&mut stmt_renderer);
-        self.stmts.push(stmt_renderer.statement);
-    }
-}
-
-#[derive(Default)]
-struct StatementRenderer {
-    statement: String,
-}
-
-impl StatementRenderer {
-    fn join<I, T>(&mut self, separator: &str, iter: I)
-    where
-        I: Iterator<Item = T>,
-        T: std::fmt::Display,
-    {
-        let mut iter = iter.peekable();
-        while let Some(item) = iter.next() {
-            self.push_display(&item);
-            if iter.peek().is_some() {
-                self.push_str(separator)
-            }
-        }
-    }
-
-    fn push_str(&mut self, s: &str) {
-        self.statement.push_str(s)
-    }
-
-    fn push_display(&mut self, d: &dyn std::fmt::Display) {
-        std::fmt::Write::write_fmt(&mut self.statement, format_args!("{}", d)).unwrap();
-    }
-}
-
-fn render_step(f: &mut dyn FnMut(&mut StepRenderer)) -> Vec<String> {
-    let mut renderer = Default::default();
-    f(&mut renderer);
-    renderer.stmts
 }

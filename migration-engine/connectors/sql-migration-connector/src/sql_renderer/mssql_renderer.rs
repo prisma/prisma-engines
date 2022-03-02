@@ -1,9 +1,6 @@
 mod alter_table;
 
-use super::{
-    common::{self, render_referential_action},
-    IteratorJoin, Quoted, SqlRenderer,
-};
+use super::{common::*, IteratorJoin, Quoted, SqlRenderer};
 use crate::{
     flavour::MssqlFlavour,
     pair::Pair,
@@ -47,7 +44,7 @@ impl MssqlFlavour {
         let column_name = self.quote(column.name());
 
         let r#type = render_column_type(column);
-        let nullability = common::render_nullability(column);
+        let nullability = render_nullability(column);
 
         let default = if column.is_autoincrement() {
             Cow::Borrowed(" IDENTITY(1,1)")
@@ -517,7 +514,7 @@ fn render_default(default: &DefaultValue) -> Cow<'_, str> {
         DefaultKind::Value(PrismaValue::String(val)) | DefaultKind::Value(PrismaValue::Enum(val)) => {
             Quoted::mssql_string(escape_string_literal(val)).to_string().into()
         }
-        DefaultKind::Value(PrismaValue::Bytes(b)) => format!("0x{}", common::format_hex(b)).into(),
+        DefaultKind::Value(PrismaValue::Bytes(b)) => format!("0x{}", format_hex(b)).into(),
         DefaultKind::Now => "CURRENT_TIMESTAMP".into(),
         DefaultKind::Value(PrismaValue::DateTime(val)) => Quoted::mssql_string(val).to_string().into(),
         DefaultKind::Value(PrismaValue::Boolean(val)) => Cow::from(if *val { "1" } else { "0" }),
