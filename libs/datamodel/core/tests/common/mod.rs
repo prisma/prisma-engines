@@ -498,6 +498,11 @@ pub(crate) fn parse_configuration(datamodel_string: &str) -> Configuration {
     }
 }
 
+pub(crate) fn expect_error(schema: &str, expectation: &expect_test::Expect) {
+    let err = parse_and_render_error(schema);
+    expectation.assert_eq(&err)
+}
+
 pub(crate) fn parse_and_render_error(schema: &str) -> String {
     parse_error(schema).to_pretty_string("schema.prisma", schema)
 }

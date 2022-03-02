@@ -1,8 +1,7 @@
 use datamodel_connector::{
-    connector_error::ConnectorError,
     helper::{arg_vec_from_opt, args_vec_from_opt, parse_one_opt_u32, parse_two_opt_u32},
-    parser_database, Connector, ConnectorCapability, ConstraintScope, Diagnostics, NativeTypeConstructor,
-    NativeTypeInstance, ReferentialAction, ReferentialIntegrity, ScalarType,
+    parser_database, Connector, ConnectorCapability, ConstraintScope, DatamodelError, Diagnostics,
+    NativeTypeConstructor, NativeTypeInstance, ReferentialAction, ReferentialIntegrity, ScalarType, Span,
 };
 use enumflags2::BitFlags;
 use native_types::{
@@ -189,7 +188,8 @@ impl Connector for CockroachDatamodelConnector {
         &self,
         native_type_instance: &NativeTypeInstance,
         _scalar_type: &ScalarType,
-        errors: &mut Vec<ConnectorError>,
+        span: Span,
+        errors: &mut Diagnostics,
     ) {
         let native_type: CockroachType =
             serde_json::from_value(native_type_instance.serialized_native_type.clone()).unwrap();
@@ -197,16 +197,19 @@ impl Connector for CockroachDatamodelConnector {
 
         match native_type {
             Decimal(Some((precision, scale))) if scale > precision => {
-                errors.push(error.new_scale_larger_than_precision_error())
+                errors.push_error(error.new_scale_larger_than_precision_error(span))
             }
-            Decimal(Some((prec, _))) if prec > 1000 || prec == 0 => errors.push(
-                error.new_argument_m_out_of_range_error("Precision must be positive with a maximum value of 1000."),
-            ),
+            Decimal(Some((prec, _))) if prec > 1000 || prec == 0 => {
+                errors.push_error(error.new_argument_m_out_of_range_error(
+                    "Precision must be positive with a maximum value of 1000.",
+                    span,
+                ))
+            }
             Bit(Some(0)) | VarBit(Some(0)) => {
-                errors.push(error.new_argument_m_out_of_range_error("M must be a positive integer."))
+                errors.push_error(error.new_argument_m_out_of_range_error("M must be a positive integer.", span))
             }
             Timestamp(Some(p)) | Timestamptz(Some(p)) | Time(Some(p)) | Timetz(Some(p)) if p > 6 => {
-                errors.push(error.new_argument_m_out_of_range_error("M can range from 0 to 6."))
+                errors.push_error(error.new_argument_m_out_of_range_error("M can range from 0 to 6.", span))
             }
             _ => (),
         }
@@ -222,41 +225,46 @@ impl Connector for CockroachDatamodelConnector {
         NATIVE_TYPE_CONSTRUCTORS
     }
 
-    fn parse_native_type(&self, name: &str, args: Vec<String>) -> Result<NativeTypeInstance, ConnectorError> {
+    fn parse_native_type(
+        &self,
+        name: &str,
+        args: Vec<String>,
+        span: Span,
+    ) -> Result<NativeTypeInstance, DatamodelError> {
         let cloned_args = args.clone();
 
         let native_type = match name {
             SMALL_INT_TYPE_NAME => SmallInt,
             INTEGER_TYPE_NAME => Integer,
             BIG_INT_TYPE_NAME => BigInt,
-            DECIMAL_TYPE_NAME => Decimal(parse_two_opt_u32(args, DECIMAL_TYPE_NAME)?),
+            DECIMAL_TYPE_NAME => Decimal(parse_two_opt_u32(args, DECIMAL_TYPE_NAME, span)?),
             INET_TYPE_NAME => Inet,
             CITEXT_TYPE_NAME => Citext,
             OID_TYPE_NAME => Oid,
             REAL_TYPE_NAME => Real,
             DOUBLE_PRECISION_TYPE_NAME => DoublePrecision,
-            VARCHAR_TYPE_NAME => VarChar(parse_one_opt_u32(args, VARCHAR_TYPE_NAME)?),
-            CHAR_TYPE_NAME => Char(parse_one_opt_u32(args, CHAR_TYPE_NAME)?),
+            VARCHAR_TYPE_NAME => VarChar(parse_one_opt_u32(args, VARCHAR_TYPE_NAME, span)?),
+            CHAR_TYPE_NAME => Char(parse_one_opt_u32(args, CHAR_TYPE_NAME, span)?),
             TEXT_TYPE_NAME => Text,
             BYTE_A_TYPE_NAME => ByteA,
-            TIMESTAMP_TYPE_NAME => Timestamp(parse_one_opt_u32(args, TIMESTAMP_TYPE_NAME)?),
-            TIMESTAMP_TZ_TYPE_NAME => Timestamptz(parse_one_opt_u32(args, TIMESTAMP_TZ_TYPE_NAME)?),
+            TIMESTAMP_TYPE_NAME => Timestamp(parse_one_opt_u32(args, TIMESTAMP_TYPE_NAME, span)?),
+            TIMESTAMP_TZ_TYPE_NAME => Timestamptz(parse_one_opt_u32(args, TIMESTAMP_TZ_TYPE_NAME, span)?),
             DATE_TYPE_NAME => Date,
-            TIME_TYPE_NAME => Time(parse_one_opt_u32(args, TIME_TYPE_NAME)?),
-            TIME_TZ_TYPE_NAME => Timetz(parse_one_opt_u32(args, TIME_TZ_TYPE_NAME)?),
+            TIME_TYPE_NAME => Time(parse_one_opt_u32(args, TIME_TYPE_NAME, span)?),
+            TIME_TZ_TYPE_NAME => Timetz(parse_one_opt_u32(args, TIME_TZ_TYPE_NAME, span)?),
             BOOLEAN_TYPE_NAME => Boolean,
-            BIT_TYPE_NAME => Bit(parse_one_opt_u32(args, BIT_TYPE_NAME)?),
-            VAR_BIT_TYPE_NAME => VarBit(parse_one_opt_u32(args, VAR_BIT_TYPE_NAME)?),
+            BIT_TYPE_NAME => Bit(parse_one_opt_u32(args, BIT_TYPE_NAME, span)?),
+            VAR_BIT_TYPE_NAME => VarBit(parse_one_opt_u32(args, VAR_BIT_TYPE_NAME, span)?),
             UUID_TYPE_NAME => Uuid,
             JSON_TYPE_NAME => Json,
             JSON_B_TYPE_NAME => JsonB,
-            _ => return Err(ConnectorError::new_native_type_parser_error(name)),
+            _ => return Err(DatamodelError::new_native_type_parser_error(name, span)),
         };
 
         Ok(NativeTypeInstance::new(name, cloned_args, native_type.to_json()))
     }
 
-    fn introspect_native_type(&self, native_type: serde_json::Value) -> Result<NativeTypeInstance, ConnectorError> {
+    fn introspect_native_type(&self, native_type: serde_json::Value) -> Result<NativeTypeInstance, DatamodelError> {
         let native_type: CockroachType = serde_json::from_value(native_type).unwrap();
         let (constructor_name, args) = match native_type {
             SmallInt => (SMALL_INT_TYPE_NAME, vec![]),
@@ -288,7 +296,7 @@ impl Connector for CockroachDatamodelConnector {
         if let Some(constructor) = self.find_native_type_constructor(constructor_name) {
             Ok(NativeTypeInstance::new(constructor.name, args, native_type.to_json()))
         } else {
-            Err(self.native_str_error(constructor_name).native_type_name_unknown())
+            unreachable!()
         }
     }
 

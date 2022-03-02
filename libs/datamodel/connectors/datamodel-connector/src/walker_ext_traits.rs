@@ -120,8 +120,11 @@ pub trait ScalarFieldWalkerExt {
 
 impl ScalarFieldWalkerExt for ScalarFieldWalker<'_> {
     fn native_type_instance(&self, connector: &dyn Connector) -> Option<NativeTypeInstance> {
-        self.raw_native_type()
-            .and_then(|(_, name, args, _)| connector.parse_native_type(name, args.to_owned()).ok())
+        self.raw_native_type().and_then(|(_, name, args, _)| {
+            connector
+                .parse_native_type(name, args.to_owned(), self.ast_field().span)
+                .ok()
+        })
     }
 }
 

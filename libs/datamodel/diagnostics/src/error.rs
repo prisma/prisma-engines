@@ -29,10 +29,13 @@ enum DatamodelErrorKind {
   ArgumentNotFound { argument_name: String, span: Span },
 
   #[error("Function \"{}\" takes {} arguments, but received {}.", function_name, required_count, given_count)]
-  ArgumentCountMissmatch { function_name: String, required_count: usize, given_count: usize, span: Span },
+  ArgumentCountMismatch { function_name: String, required_count: usize, given_count: usize, span: Span },
 
   #[error("Argument \"{}\" is missing in attribute \"@{}\".", argument_name, attribute_name)]
   AttributeArgumentNotFound { argument_name: String, attribute_name: String, span: Span },
+
+  #[error("Native types are not supported with {} connector", connector_name)]
+  NativeTypesNotSupported { connector_name: String, span: Span },
 
   #[error("Argument \"{}\" is missing in data source block \"{}\".", argument_name, source_name)]
   SourceArgumentNotFound { argument_name: String, source_name: String, span: Span },
@@ -48,6 +51,22 @@ enum DatamodelErrorKind {
 
   #[error("The model with database name \"{}\" could not be defined because another model with this name exists: \"{}\"", model_database_name, existing_model_name)]
   DuplicateModelDatabaseNameError { model_database_name: String, existing_model_name: String, span: Span },
+
+  #[error("Invalid Native type {}.", native_type)]
+  InvalidNativeType { native_type: String, span: Span },
+
+  #[error(
+      "Native type {} takes {} arguments, but received {}.",
+      native_type,
+      required_count,
+      given_count
+  )]
+  NativeTypeArgumentCountMismatchError {
+      native_type: String,
+      required_count: usize,
+      given_count: usize,
+      span: Span,
+  },
 
   #[error("\"{}\" is a reserved scalar type name and cannot be used.", type_name)]
   ReservedScalarTypeError { type_name: String, span: Span },
@@ -161,13 +180,13 @@ impl DatamodelError {
         .into()
     }
 
-    pub fn new_argument_count_missmatch_error(
+    pub fn new_argument_count_mismatch_error(
         function_name: &str,
         required_count: usize,
         given_count: usize,
         span: Span,
     ) -> DatamodelError {
-        DatamodelErrorKind::ArgumentCountMissmatch {
+        DatamodelErrorKind::ArgumentCountMismatch {
             function_name: String::from(function_name),
             required_count,
             given_count,
@@ -226,6 +245,46 @@ impl DatamodelError {
             span,
         }
         .into()
+    }
+
+    pub fn new_incompatible_native_type(
+        native_type: &str,
+        field_type: &str,
+        expected_types: &str,
+        span: Span,
+    ) -> DatamodelError {
+        let msg = format!(
+            "Native type {} is not compatible with declared field type {}, expected field type {}.",
+            native_type, field_type, expected_types
+        );
+        DatamodelError::new(msg.into(), span)
+    }
+
+    pub fn new_invalid_native_type_argument(
+        native_type: &str,
+        got: &str,
+        expected: &str,
+        span: Span,
+    ) -> DatamodelError {
+        let msg = format!(
+            "Invalid argument for type {}: {}. Allowed values: {}.",
+            native_type, got, expected
+        );
+        DatamodelError::new(msg.into(), span)
+    }
+
+    pub fn new_invalid_prefix_for_native_types(
+        given_prefix: &str,
+        expected_prefix: &str,
+        suggestion: &str,
+        span: Span,
+    ) -> DatamodelError {
+        let msg =  format!("The prefix {} is invalid. It must be equal to the name of an existing datasource e.g. {}. Did you mean to use {}?", given_prefix, expected_prefix, suggestion);
+        DatamodelError::new(msg.into(), span)
+    }
+
+    pub fn new_native_types_not_supported(connector_name: String, span: Span) -> DatamodelError {
+        DatamodelErrorKind::NativeTypesNotSupported { connector_name, span }.into()
     }
 
     pub fn new_reserved_scalar_type_error(type_name: &str, span: Span) -> DatamodelError {
@@ -405,8 +464,17 @@ impl DatamodelError {
         Self::new(message.into(), span)
     }
 
-    pub fn new_connector_error(err: crate::connector_error::ConnectorError, span: Span) -> DatamodelError {
-        Self::new(Cow::Owned(err.to_string()), span)
+    pub fn new_optional_argument_count_mismatch(
+        native_type: &str,
+        optional_count: usize,
+        given_count: usize,
+        span: Span,
+    ) -> DatamodelError {
+        let msg = format!(
+            "Native type {} takes {} optional arguments, but received {}.",
+            native_type, optional_count, given_count
+        );
+        DatamodelError::new(msg.into(), span)
     }
 
     pub fn new_parser_error(expected_str: String, span: Span) -> DatamodelError {
@@ -461,6 +529,10 @@ impl DatamodelError {
         .into()
     }
 
+    pub fn new_invalid_model_error(msg: &str, span: Span) -> DatamodelError {
+        DatamodelError::new(format!("Invalid model: {}", msg).into(), span)
+    }
+
     pub fn new_datasource_provider_not_known_error(provider: &str, span: Span) -> DatamodelError {
         DatamodelErrorKind::DatasourceProviderNotKnownError {
             provider: String::from(provider),
@@ -496,6 +568,37 @@ impl DatamodelError {
         .into()
     }
 
+    pub fn new_native_type_argument_count_mismatch_error(
+        native_type: &str,
+        required_count: usize,
+        given_count: usize,
+        span: Span,
+    ) -> DatamodelError {
+        DatamodelErrorKind::NativeTypeArgumentCountMismatchError {
+            native_type: String::from(native_type),
+            required_count,
+            given_count,
+            span,
+        }
+        .into()
+    }
+
+    pub fn new_native_type_name_unknown(connector_name: &str, native_type: &str, span: Span) -> DatamodelError {
+        let msg = format!(
+            "Native type {} is not supported for {} connector.",
+            native_type, connector_name
+        );
+        DatamodelError::new(msg.into(), span)
+    }
+
+    pub fn new_native_type_parser_error(native_type: &str, span: Span) -> DatamodelError {
+        DatamodelErrorKind::InvalidNativeType {
+            native_type: String::from(native_type),
+            span,
+        }
+        .into()
+    }
+
     pub fn new_type_mismatch_error(expected_type: &str, received_type: &str, raw: &str, span: Span) -> DatamodelError {
         DatamodelErrorKind::TypeMismatchError {
             expected_type: String::from(expected_type),
@@ -510,7 +613,7 @@ impl DatamodelError {
         match &self.0 {
             DatamodelErrorKind::ArgumentNotFound { span, .. } => *span,
             DatamodelErrorKind::AttributeArgumentNotFound { span, .. } => *span,
-            DatamodelErrorKind::ArgumentCountMissmatch { span, .. } => *span,
+            DatamodelErrorKind::ArgumentCountMismatch { span, .. } => *span,
             DatamodelErrorKind::SourceArgumentNotFound { span, .. } => *span,
             DatamodelErrorKind::GeneratorArgumentNotFound { span, .. } => *span,
             DatamodelErrorKind::AttributeValidationError { span, .. } => *span,
@@ -519,6 +622,7 @@ impl DatamodelError {
             DatamodelErrorKind::FunctionNotKnownError { span, .. } => *span,
             DatamodelErrorKind::DatasourceProviderNotKnownError { span, .. } => *span,
             DatamodelErrorKind::LiteralParseError { span, .. } => *span,
+            DatamodelErrorKind::NativeTypeArgumentCountMismatchError { span, .. } => *span,
             DatamodelErrorKind::TypeNotFoundError { span, .. } => *span,
             DatamodelErrorKind::ScalarTypeNotFoundError { span, .. } => *span,
             DatamodelErrorKind::ParserError { span, .. } => *span,
@@ -545,6 +649,8 @@ impl DatamodelError {
             DatamodelErrorKind::ShadowDatabaseUrlIsSameAsMainUrl { span, .. } => *span,
             DatamodelErrorKind::CompositeTypeValidationError { span, .. } => *span,
             DatamodelErrorKind::PropertyNotKnownError { span, .. } => *span,
+            DatamodelErrorKind::InvalidNativeType { span, .. } => *span,
+            DatamodelErrorKind::NativeTypesNotSupported { span, .. } => *span,
         }
     }
 

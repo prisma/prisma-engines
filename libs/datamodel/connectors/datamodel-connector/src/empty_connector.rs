@@ -1,6 +1,5 @@
-use crate::{
-    connector_error::ConnectorError, Connector, ConnectorCapability, NativeTypeInstance, ReferentialAction, ScalarType,
-};
+use crate::{Connector, ConnectorCapability, NativeTypeInstance, ReferentialAction, ScalarType};
+use diagnostics::{DatamodelError, Span};
 use enumflags2::BitFlags;
 
 /// A [Connector](/trait.Connector.html) implementor meant to
@@ -51,11 +50,11 @@ impl Connector for EmptyDatamodelConnector {
         false
     }
 
-    fn parse_native_type(&self, name: &str, _args: Vec<String>) -> Result<NativeTypeInstance, ConnectorError> {
-        Err(ConnectorError::new_native_type_parser_error(name))
+    fn parse_native_type(&self, name: &str, _: Vec<String>, span: Span) -> Result<NativeTypeInstance, DatamodelError> {
+        Err(DatamodelError::new_native_type_parser_error(name, span))
     }
 
-    fn introspect_native_type(&self, _native_type: serde_json::Value) -> Result<NativeTypeInstance, ConnectorError> {
+    fn introspect_native_type(&self, _native_type: serde_json::Value) -> Result<NativeTypeInstance, DatamodelError> {
         unreachable!("introspect_native_type on EmptyDatamodelConnector")
     }
 

@@ -58,7 +58,6 @@ fn should_fail_on_endless_recursive_type_def() {
     }
     "#;
 
-    let error = datamodel::parse_schema(dml).map(drop).unwrap_err();
     let expectation = expect![[r#"
         [1;91merror[0m: [1mError validating: Recursive type definitions are not allowed. Recursive path was: MyString -> ID -> MyStringWithDefault -> MyString.[0m
           [1;94m-->[0m  [4mschema.prisma:2[0m
@@ -79,8 +78,7 @@ fn should_fail_on_endless_recursive_type_def() {
         [1;94m 4 | [0m    type ID = [1;91mMyStringWithDefault[0m
         [1;94m   | [0m
     "#]];
-
-    expectation.assert_eq(&error);
+    expect_error(dml, &expectation);
 }
 
 #[test]
@@ -245,12 +243,15 @@ fn should_fail_on_native_type_with_invalid_arguments() {
         }
     "#;
 
-    let error = parse_error(dml);
-
-    error.assert_is(DatamodelError::new(
-        "Expected a numeric value, but failed while parsing \"a\": invalid digit found in string.".into(),
-        ast::Span::new(178, 191),
-    ));
+    let expected = expect![[r#"
+        [1;91merror[0m: [1mExpected a numeric value, but failed while parsing "a": invalid digit found in string.[0m
+          [1;94m-->[0m  [4mschema.prisma:9[0m
+        [1;94m   | [0m
+        [1;94m 8 | [0m            id     Int    @id
+        [1;94m 9 | [0m            foobar String @[1;91mpg.VarChar(a)[0m
+        [1;94m   | [0m
+    "#]];
+    expect_error(dml, &expected)
 }
 
 #[test]

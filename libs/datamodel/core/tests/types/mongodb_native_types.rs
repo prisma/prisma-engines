@@ -17,7 +17,7 @@ fn array_native_type_should_fail() {
     let error = datamodel::parse_schema(dml).map(drop).unwrap_err();
 
     let expectation = expect![[r#"
-        [1;91merror[0m: [1mError validating field 'post_ids': Native type `db.Array` is deprecated. Please use `db.ObjectId` instead.[0m
+        [1;91merror[0m: [1mError validating field `post_ids` in model `Blog`: Native type `db.Array` is deprecated. Please use `db.ObjectId` instead.[0m
           [1;94m-->[0m  [4mschema.prisma:9[0m
         [1;94m   | [0m
         [1;94m 8 | [0m            id     Int   @id @map("_id")

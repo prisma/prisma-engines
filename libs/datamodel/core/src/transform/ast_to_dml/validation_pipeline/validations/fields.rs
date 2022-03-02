@@ -15,11 +15,7 @@ use crate::{
         validation_pipeline::context::Context,
     },
 };
-use datamodel_connector::{
-    connector_error::{ConnectorError, ErrorKind},
-    walker_ext_traits::*,
-    ConnectorCapability,
-};
+use datamodel_connector::{walker_ext_traits::*, ConnectorCapability};
 
 pub(super) fn validate_client_name(field: FieldWalker<'_>, names: &Names<'_>, ctx: &mut Context<'_>) {
     let model = field.model();
@@ -135,48 +131,47 @@ pub(super) fn validate_native_type_arguments(field: ScalarFieldWalker<'_>, ctx: 
     // Validate that the attribute is scoped with the right datasource name.
     if let Some(datasource) = ctx.datasource {
         if datasource.name != attr_scope {
-            let err = ConnectorError::from_kind(ErrorKind::InvalidPrefixForNativeTypes {
-                given_prefix: attr_scope.to_owned(),
-                expected_prefix: datasource.name.clone(),
-                suggestion: [datasource.name.as_str(), type_name].join("."),
-            });
-            ctx.push_error(DatamodelError::new_connector_error(err, span));
+            let suggestion = [datasource.name.as_str(), type_name].join(".");
+            ctx.push_error(DatamodelError::new_invalid_prefix_for_native_types(
+                attr_scope,
+                &datasource.name,
+                &suggestion,
+                span,
+            ));
         }
     }
 
     let constructor = if let Some(cons) = ctx.connector.find_native_type_constructor(type_name) {
         cons
     } else {
-        let err = ConnectorError::from_kind(ErrorKind::NativeTypeNameUnknown {
-            native_type: type_name.to_owned(),
-            connector_name,
-        });
-        return ctx.push_error(DatamodelError::new_connector_error(err, span));
+        return ctx.push_error(DatamodelError::new_native_type_name_unknown(
+            &connector_name,
+            type_name,
+            span,
+        ));
     };
 
     let number_of_args = args.len();
 
-    if number_of_args < constructor._number_of_args
-        || ((number_of_args > constructor._number_of_args) && constructor._number_of_optional_args == 0)
+    if number_of_args < constructor.number_of_args
+        || ((number_of_args > constructor.number_of_args) && constructor.number_of_optional_args == 0)
     {
-        ctx.push_error(DatamodelError::new_argument_count_missmatch_error(
+        ctx.push_error(DatamodelError::new_argument_count_mismatch_error(
             type_name,
-            constructor._number_of_args,
+            constructor.number_of_args,
             number_of_args,
             span,
         ));
         return;
     }
 
-    if number_of_args > constructor._number_of_args + constructor._number_of_optional_args
-        && constructor._number_of_optional_args > 0
+    if number_of_args > constructor.number_of_args + constructor.number_of_optional_args
+        && constructor.number_of_optional_args > 0
     {
-        ctx.push_error(DatamodelError::new_connector_error(
-            ConnectorError::from_kind(ErrorKind::OptionalArgumentCountMismatchError {
-                native_type: type_name.to_owned(),
-                optional_count: constructor._number_of_optional_args,
-                given_count: number_of_args,
-            }),
+        ctx.push_error(DatamodelError::new_optional_argument_count_mismatch(
+            type_name,
+            constructor.number_of_optional_args,
+            number_of_args,
             span,
         ));
         return;
@@ -184,34 +179,24 @@ pub(super) fn validate_native_type_arguments(field: ScalarFieldWalker<'_>, ctx: 
 
     // check for compatibility with scalar type
     if !constructor.prisma_types.contains(&scalar_type) {
-        ctx.push_error(DatamodelError::new_connector_error(
-            ConnectorError::from_kind(ErrorKind::IncompatibleNativeType {
-                native_type: type_name.to_owned(),
-                field_type: scalar_type.as_str(),
-                expected_types: constructor
-                    .prisma_types
-                    .iter()
-                    .map(|s| s.as_str())
-                    .collect::<Vec<_>>()
-                    .join(" or "),
-            }),
-            span,
-        ));
+        let expected_types = constructor
+            .prisma_types
+            .iter()
+            .map(|s| s.as_str())
+            .collect::<Vec<_>>()
+            .join(" or ");
+        let err = DatamodelError::new_incompatible_native_type(type_name, scalar_type.as_str(), &expected_types, span);
+        ctx.push_error(err);
         return;
     }
 
-    match ctx.connector.parse_native_type(type_name, args.to_owned()) {
+    match ctx.connector.parse_native_type(type_name, args.to_owned(), span) {
         Ok(native_type) => {
-            let mut errors = Vec::new();
             ctx.connector
-                .validate_native_type_arguments(&native_type, &scalar_type, &mut errors);
-
-            for error in errors {
-                ctx.push_error(DatamodelError::new_connector_error(error, field.ast_field().span));
-            }
+                .validate_native_type_arguments(&native_type, &scalar_type, span, ctx.diagnostics);
         }
-        Err(connector_error) => {
-            ctx.push_error(DatamodelError::new_connector_error(connector_error, span));
+        Err(err) => {
+            ctx.push_error(err);
         }
     };
 }
@@ -315,7 +300,7 @@ pub(super) fn validate_unsupported_field_type(field: ScalarFieldWalker<'_>, ctx:
             Some(params) => params.as_str().split(',').map(|s| s.trim().to_string()).collect(),
         };
 
-        if let Ok(native_type) = connector.parse_native_type(prefix, args) {
+        if let Ok(native_type) = connector.parse_native_type(prefix, args, field.ast_field().span) {
             let prisma_type = connector.scalar_type_for_native_type(native_type.serialized_native_type.clone());
 
             let msg = format!(

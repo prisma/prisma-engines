@@ -1,8 +1,8 @@
-use datamodel_connector::ConstraintScope;
 use datamodel_connector::{
-    connector_error::ConnectorError, parser_database::ScalarType, Connector, ConnectorCapability,
-    NativeTypeConstructor, NativeTypeInstance, ReferentialAction, ReferentialIntegrity,
+    parser_database::ScalarType, Connector, ConnectorCapability, NativeTypeConstructor, NativeTypeInstance,
+    ReferentialAction, ReferentialIntegrity,
 };
+use datamodel_connector::{ConstraintScope, DatamodelError, Span};
 use enumflags2::BitFlags;
 use std::borrow::Cow;
 
@@ -64,12 +64,20 @@ impl Connector for SqliteDatamodelConnector {
         NATIVE_TYPE_CONSTRUCTORS
     }
 
-    fn parse_native_type(&self, _name: &str, _args: Vec<String>) -> Result<NativeTypeInstance, ConnectorError> {
-        self.native_types_not_supported()
+    fn parse_native_type(
+        &self,
+        _name: &str,
+        _args: Vec<String>,
+        span: Span,
+    ) -> Result<NativeTypeInstance, DatamodelError> {
+        Err(DatamodelError::new_native_types_not_supported(
+            self.name().to_owned(),
+            span,
+        ))
     }
 
-    fn introspect_native_type(&self, _native_type: serde_json::Value) -> Result<NativeTypeInstance, ConnectorError> {
-        self.native_types_not_supported()
+    fn introspect_native_type(&self, _native_type: serde_json::Value) -> Result<NativeTypeInstance, DatamodelError> {
+        unreachable!("unreachable introspect_native_type() on sqlite")
     }
 
     fn set_config_dir<'a>(&self, config_dir: &std::path::Path, url: &'a str) -> Cow<'a, str> {

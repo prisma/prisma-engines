@@ -1,7 +1,4 @@
-use datamodel_connector::{
-    connector_error::{ConnectorError, ErrorKind},
-    NativeTypeConstructor, ScalarType,
-};
+use datamodel_connector::{DatamodelError, NativeTypeConstructor, ScalarType, Span};
 use native_types::MongoDbType;
 use once_cell::sync::Lazy;
 use std::collections::HashMap;
@@ -58,25 +55,20 @@ pub(crate) const NATIVE_TYPE_CONSTRUCTORS: &[NativeTypeConstructor] = &[
     NativeTypeConstructor::with_args(ARRAY, 1, all_types()),
 ];
 
-pub(crate) fn mongo_type_from_input(name: &str, args: &[String]) -> crate::Result<MongoDbType> {
+pub(crate) fn mongo_type_from_input(name: &str, args: &[String], span: Span) -> crate::Result<MongoDbType> {
     let mongo_type = match name {
         STRING => MongoDbType::String,
         DOUBLE => MongoDbType::Double,
         LONG => MongoDbType::Long,
         INT => MongoDbType::Int,
-        ARRAY => parse_array_type(args)?,
+        ARRAY => parse_array_type(args, span)?,
         BIN_DATA => MongoDbType::BinData,
         OBJECT_ID => MongoDbType::ObjectId,
         BOOL => MongoDbType::Bool,
         DATE => MongoDbType::Date,
         TIMESTAMP => MongoDbType::Timestamp,
         DECIMAL => MongoDbType::Decimal,
-        name => {
-            return Err(ConnectorError::from_kind(ErrorKind::NativeTypeNameUnknown {
-                connector_name: "MongoDB".to_owned(),
-                native_type: name.to_owned(),
-            }))
-        }
+        name => return Err(DatamodelError::new_native_type_name_unknown("MongoDB", name, span)),
     };
 
     Ok(mongo_type)
@@ -96,13 +88,14 @@ const fn all_types() -> &'static [ScalarType] {
     ]
 }
 
-fn parse_array_type(args: &[String]) -> crate::Result<MongoDbType> {
+fn parse_array_type(args: &[String], span: Span) -> crate::Result<MongoDbType> {
     if args.len() != 1 {
-        return Err(ConnectorError::new_argument_count_mismatch_error(ARRAY, 1, args.len()));
+        let err = DatamodelError::new_argument_count_mismatch_error(ARRAY, 1, args.len(), span);
+        return Err(err);
     }
 
     let type_arg = args.iter().next().unwrap();
-    let inner_type = mongo_type_from_input(type_arg.as_str(), &[])?;
+    let inner_type = mongo_type_from_input(type_arg.as_str(), &[], span)?;
 
     Ok(MongoDbType::Array(Box::new(inner_type)))
 }

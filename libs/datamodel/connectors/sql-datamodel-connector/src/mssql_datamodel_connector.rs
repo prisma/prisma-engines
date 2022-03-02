@@ -1,10 +1,9 @@
 use datamodel_connector::{
-    connector_error::{ConnectorError, ErrorKind},
     helper::{arg_vec_from_opt, args_vec_from_opt, parse_one_opt_u32, parse_two_opt_u32},
     parser_database::{self, ScalarType},
     walker_ext_traits::*,
     Connector, ConnectorCapability, ConstraintScope, DatamodelError, Diagnostics, NativeTypeConstructor,
-    NativeTypeInstance, ReferentialAction, ReferentialIntegrity,
+    NativeTypeInstance, ReferentialAction, ReferentialIntegrity, Span,
 };
 use enumflags2::BitFlags;
 use native_types::{MsSqlType, MsSqlTypeParameter, NativeType};
@@ -105,7 +104,8 @@ impl MsSqlDatamodelConnector {
         &self,
         r#type: &str,
         args: &[String],
-    ) -> Result<Option<MsSqlTypeParameter>, ConnectorError> {
+        span: Span,
+    ) -> Result<Option<MsSqlTypeParameter>, DatamodelError> {
         static MAX_REGEX: Lazy<regex::Regex> = Lazy::new(|| regex::Regex::new(r"^(?i)max$").unwrap());
         static NUM_REGEX: Lazy<regex::Regex> = Lazy::new(|| regex::Regex::new(r"^\d+$").unwrap());
 
@@ -113,9 +113,12 @@ impl MsSqlDatamodelConnector {
             [] => Ok(None),
             [s] if MAX_REGEX.is_match(s) => Ok(Some(MsSqlTypeParameter::Max)),
             [s] if NUM_REGEX.is_match(s) => Ok(s.trim().parse().map(MsSqlTypeParameter::Number).ok()),
-            s => Err(self
-                .native_str_error(r#type)
-                .native_type_invalid_param("a number or `Max`", &s.join(","))),
+            s => Err(DatamodelError::new_invalid_native_type_argument(
+                r#type,
+                &s.join(","),
+                "a number or `Max`",
+                span,
+            )),
         }
     }
 }
@@ -227,46 +230,47 @@ impl Connector for MsSqlDatamodelConnector {
         &self,
         native_type: &NativeTypeInstance,
         _scalar_type: &ScalarType,
-        errors: &mut Vec<ConnectorError>,
+        span: Span,
+        errors: &mut Diagnostics,
     ) {
         let r#type: MsSqlType = serde_json::from_value(native_type.serialized_native_type.clone()).unwrap();
         let error = self.native_instance_error(native_type);
 
         match r#type {
             Decimal(Some((precision, scale))) if scale > precision => {
-                errors.push(error.new_scale_larger_than_precision_error());
+                errors.push_error(error.new_scale_larger_than_precision_error(span));
             }
             Decimal(Some((prec, _))) if prec == 0 || prec > 38 => {
-                errors.push(error.new_argument_m_out_of_range_error("Precision can range from 1 to 38."));
+                errors.push_error(error.new_argument_m_out_of_range_error("Precision can range from 1 to 38.", span));
             }
             Decimal(Some((_, scale))) if scale > 38 => {
-                errors.push(error.new_argument_m_out_of_range_error("Scale can range from 0 to 38."))
+                errors.push_error(error.new_argument_m_out_of_range_error("Scale can range from 0 to 38.", span))
             }
             Float(Some(bits)) if bits == 0 || bits > 53 => {
-                errors.push(error.new_argument_m_out_of_range_error("Bits can range from 1 to 53."))
+                errors.push_error(error.new_argument_m_out_of_range_error("Bits can range from 1 to 53.", span))
             }
-            NVarChar(Some(Number(p))) if p > 4000 => errors.push(error.new_argument_m_out_of_range_error(
+            NVarChar(Some(Number(p))) if p > 4000 => errors.push_error(error.new_argument_m_out_of_range_error(
                 "Length can range from 1 to 4000. For larger sizes, use the `Max` variant.",
+                span,
             )),
             VarChar(Some(Number(p))) | VarBinary(Some(Number(p))) if p > 8000 => {
-                errors.push(error.new_argument_m_out_of_range_error(
+                errors.push_error(error.new_argument_m_out_of_range_error(
                     r#"Length can range from 1 to 8000. For larger sizes, use the `Max` variant."#,
+                    span,
                 ))
             }
             NChar(Some(p)) if p > 4000 => {
-                errors.push(error.new_argument_m_out_of_range_error("Length can range from 1 to 4000."))
+                errors.push_error(error.new_argument_m_out_of_range_error("Length can range from 1 to 4000.", span))
             }
             Char(Some(p)) | Binary(Some(p)) if p > 8000 => {
-                errors.push(error.new_argument_m_out_of_range_error("Length can range from 1 to 8000."))
+                errors.push_error(error.new_argument_m_out_of_range_error("Length can range from 1 to 8000.", span))
             }
             _ => (),
         }
     }
 
     fn validate_model(&self, model: parser_database::walkers::ModelWalker<'_>, errors: &mut Diagnostics) {
-        let mut push_error = |err: ConnectorError| {
-            errors.push_error(DatamodelError::new_connector_error(err, model.ast_model().span));
-        };
+        let span = model.ast_model().span;
 
         for index in model.indexes() {
             for field in index.fields() {
@@ -276,9 +280,9 @@ impl Connector for MsSqlDatamodelConnector {
 
                     if heap_allocated_types().contains(&r#type) {
                         if index.is_unique() {
-                            push_error(error.new_incompatible_native_type_with_unique(""))
+                            errors.push_error(error.new_incompatible_native_type_with_unique("", span))
                         } else {
-                            push_error(error.new_incompatible_native_type_with_index(""))
+                            errors.push_error(error.new_incompatible_native_type_with_index("", span))
                         };
                         break;
                     }
@@ -292,20 +296,19 @@ impl Connector for MsSqlDatamodelConnector {
                     let r#type: MsSqlType = serde_json::from_value(native_type.serialized_native_type.clone()).unwrap();
 
                     if heap_allocated_types().contains(&r#type) {
-                        push_error(
+                        errors.push_error(
                             self.native_instance_error(&native_type)
-                                .new_incompatible_native_type_with_id(""),
+                                .new_incompatible_native_type_with_id("", span),
                         );
                         break;
                     }
                 }
 
                 if let Some(ScalarType::Bytes) = id_field.scalar_type() {
-                    let kind = ErrorKind::InvalidModelError {
-                        message: String::from("Using Bytes type is not allowed in the model's id."),
-                    };
-
-                    push_error(ConnectorError::from_kind(kind));
+                    errors.push_error(DatamodelError::new_invalid_model_error(
+                        "Using Bytes type is not allowed in the model's id.",
+                        span,
+                    ));
                     break;
                 }
             }
@@ -320,18 +323,23 @@ impl Connector for MsSqlDatamodelConnector {
         NATIVE_TYPE_CONSTRUCTORS
     }
 
-    fn parse_native_type(&self, name: &str, args: Vec<String>) -> Result<NativeTypeInstance, ConnectorError> {
+    fn parse_native_type(
+        &self,
+        name: &str,
+        args: Vec<String>,
+        span: Span,
+    ) -> Result<NativeTypeInstance, DatamodelError> {
         let cloned_args = args.clone();
         let native_type = match name {
             TINY_INT_TYPE_NAME => TinyInt,
             SMALL_INT_TYPE_NAME => SmallInt,
             INT_TYPE_NAME => Int,
             BIG_INT_TYPE_NAME => BigInt,
-            DECIMAL_TYPE_NAME => Decimal(parse_two_opt_u32(args, DECIMAL_TYPE_NAME)?),
+            DECIMAL_TYPE_NAME => Decimal(parse_two_opt_u32(args, DECIMAL_TYPE_NAME, span)?),
             MONEY_TYPE_NAME => Money,
             SMALL_MONEY_TYPE_NAME => SmallMoney,
             BIT_TYPE_NAME => Bit,
-            FLOAT_TYPE_NAME => Float(parse_one_opt_u32(args, FLOAT_TYPE_NAME)?),
+            FLOAT_TYPE_NAME => Float(parse_one_opt_u32(args, FLOAT_TYPE_NAME, span)?),
             REAL_TYPE_NAME => Real,
             DATE_TYPE_NAME => Date,
             TIME_TYPE_NAME => Time,
@@ -339,24 +347,24 @@ impl Connector for MsSqlDatamodelConnector {
             DATETIME2_TYPE_NAME => DateTime2,
             DATETIME_OFFSET_TYPE_NAME => DateTimeOffset,
             SMALL_DATETIME_TYPE_NAME => SmallDateTime,
-            CHAR_TYPE_NAME => Char(parse_one_opt_u32(args, CHAR_TYPE_NAME)?),
-            NCHAR_TYPE_NAME => NChar(parse_one_opt_u32(args, NCHAR_TYPE_NAME)?),
-            VARCHAR_TYPE_NAME => VarChar(self.parse_mssql_type_parameter(name, &args)?),
+            CHAR_TYPE_NAME => Char(parse_one_opt_u32(args, CHAR_TYPE_NAME, span)?),
+            NCHAR_TYPE_NAME => NChar(parse_one_opt_u32(args, NCHAR_TYPE_NAME, span)?),
+            VARCHAR_TYPE_NAME => VarChar(self.parse_mssql_type_parameter(name, &args, span)?),
             TEXT_TYPE_NAME => Text,
-            NVARCHAR_TYPE_NAME => NVarChar(self.parse_mssql_type_parameter(name, &args)?),
+            NVARCHAR_TYPE_NAME => NVarChar(self.parse_mssql_type_parameter(name, &args, span)?),
             NTEXT_TYPE_NAME => NText,
-            BINARY_TYPE_NAME => Binary(parse_one_opt_u32(args, BINARY_TYPE_NAME)?),
-            VAR_BINARY_TYPE_NAME => VarBinary(self.parse_mssql_type_parameter(name, &args)?),
+            BINARY_TYPE_NAME => Binary(parse_one_opt_u32(args, BINARY_TYPE_NAME, span)?),
+            VAR_BINARY_TYPE_NAME => VarBinary(self.parse_mssql_type_parameter(name, &args, span)?),
             IMAGE_TYPE_NAME => Image,
             XML_TYPE_NAME => Xml,
             UNIQUE_IDENTIFIER_TYPE_NAME => UniqueIdentifier,
-            _ => return Err(ConnectorError::new_native_type_parser_error(name)),
+            _ => return Err(DatamodelError::new_native_type_parser_error(name, span)),
         };
 
         Ok(NativeTypeInstance::new(name, cloned_args, native_type.to_json()))
     }
 
-    fn introspect_native_type(&self, native_type: serde_json::Value) -> Result<NativeTypeInstance, ConnectorError> {
+    fn introspect_native_type(&self, native_type: serde_json::Value) -> Result<NativeTypeInstance, DatamodelError> {
         let native_type: MsSqlType = serde_json::from_value(native_type).unwrap();
 
         let (constructor_name, args) = match native_type {
@@ -397,7 +405,7 @@ impl Connector for MsSqlDatamodelConnector {
                 native_type.to_json(),
             ))
         } else {
-            Err(self.native_str_error(constructor_name).native_type_name_unknown())
+            unreachable!()
         }
     }
 

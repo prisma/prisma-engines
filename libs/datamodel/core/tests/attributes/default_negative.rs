@@ -676,7 +676,7 @@ fn must_error_on_auto_default_on_non_native_type_on_mongodb() {
     let error = datamodel::parse_schema(schema).map(drop).unwrap_err();
 
     let expected = expect![[r#"
-        [1;91merror[0m: [1mError validating field 'nickname': MongoDB `@default(auto())` fields must have `ObjectId` native type and use the `@id` attribute.[0m
+        [1;91merror[0m: [1mError validating field `nickname` in model `User`: MongoDB `@default(auto())` fields must have `ObjectId` native type and use the `@id` attribute.[0m
           [1;94m-->[0m  [4mschema.prisma:14[0m
         [1;94m   | [0m
         [1;94m13 | [0m            id Int @id @map("_id")
@@ -710,7 +710,7 @@ fn must_error_on_auto_default_on_non_object_id_on_mongodb() {
     let error = datamodel::parse_schema(schema).map(drop).unwrap_err();
 
     let expected = expect![[r#"
-        [1;91merror[0m: [1mError validating field 'id': MongoDB `@default(auto())` fields must have `ObjectId` native type and use the `@id` attribute.[0m
+        [1;91merror[0m: [1mError validating field `id` in model `User`: MongoDB `@default(auto())` fields must have `ObjectId` native type and use the `@id` attribute.[0m
           [1;94m-->[0m  [4mschema.prisma:13[0m
         [1;94m   | [0m
         [1;94m12 | [0m        model User {
@@ -780,7 +780,7 @@ fn must_error_on_dbgenerated_default_on_mongodb() {
     let error = datamodel::parse_schema(schema).map(drop).unwrap_err();
 
     let expected = expect![[r#"
-        [1;91merror[0m: [1mError validating field 'id': The `dbgenerated()` function is not allowed with MongoDB. Please use `auto()` instead.[0m
+        [1;91merror[0m: [1mError validating field `id` in model `User`: The `dbgenerated()` function is not allowed with MongoDB. Please use `auto()` instead.[0m
           [1;94m-->[0m  [4mschema.prisma:13[0m
         [1;94m   | [0m
         [1;94m12 | [0m        model User {
@@ -954,7 +954,7 @@ fn must_error_on_auto_default_on_non_id_on_mongodb() {
     let error = datamodel::parse_schema(schema).map(drop).unwrap_err();
 
     let expected = expect![[r#"
-        [1;91merror[0m: [1mError validating field 'nickname': MongoDB `@default(auto())` fields must have `ObjectId` native type and use the `@id` attribute.[0m
+        [1;91merror[0m: [1mError validating field `nickname` in model `User`: MongoDB `@default(auto())` fields must have `ObjectId` native type and use the `@id` attribute.[0m
           [1;94m-->[0m  [4mschema.prisma:14[0m
         [1;94m   | [0m
         [1;94m13 | [0m            id Int @id @map("_id")
