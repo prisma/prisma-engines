@@ -26,6 +26,15 @@ use user_facing_errors::{
 
 const ADVISORY_LOCK_TIMEOUT: std::time::Duration = std::time::Duration::from_secs(10);
 
+/// Connection settings applied to every new connection on CockroachDB
+///
+/// https://www.cockroachlabs.com/docs/stable/experimental-features.html
+const COCKROACHDB_PRELUDE: &str = r#"
+SET enable_experimental_alter_column_type_general = true;
+SET default_int_size = 4;
+SET serial_normalization = 'sql_sequence';
+"#;
+
 type State = super::State<Params, (BitFlags<Circumstances>, Connection)>;
 
 struct Params {
@@ -576,8 +585,7 @@ where
 
                     if schema_exists_result.get(0).and_then(|row| row.at(1)).and_then(|v| v.to_string()).map(|version| version.contains("CockroachDB")).unwrap_or(false) {
                         circumstances |= Circumstances::IsCockroachDb;
-                        // https://www.cockroachlabs.com/docs/stable/experimental-features.html
-                        connection.raw_cmd("SET enable_experimental_alter_column_type_general = true").await?;
+                        connection.raw_cmd(COCKROACHDB_PRELUDE).await?;
 
                     }
 
