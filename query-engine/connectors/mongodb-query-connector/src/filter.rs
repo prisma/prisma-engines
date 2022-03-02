@@ -38,7 +38,12 @@ pub(crate) struct MongoRelationFilter {
 }
 
 /// Builds a MongoDB query filter from a Prisma filter.
-pub(crate) fn convert_filter(filter: Filter, invert: bool, is_having_filter: bool) -> crate::Result<MongoFilter> {
+pub(crate) fn convert_filter(
+    filter: Filter,
+    invert: bool,
+    is_having_filter: bool,
+    // coerce_fn: F,
+) -> crate::Result<MongoFilter> {
     let filter = fold_compounds(filter);
     let filter_pair = match filter {
         Filter::And(filters) if invert => coerce_empty(false, "$or", filters, invert, is_having_filter)?,
@@ -102,9 +107,13 @@ fn coerce_empty(
         // _id always exists (for top level documents). So matching on exist/not exists creates our truthy/falsey expressions.
 
         let doc = if truthy {
-            doc! { "_id": { "$exists": 1 }}
+            doc! { "$or": [ { "__prisma_marker": { "$exists": 1 }}, { "__prisma_marker": { "$exists": 0 }} ] }
+
+            // doc! { "_id": { "$exists": 1 }}
         } else {
-            doc! { "_id": { "$exists": 0 }}
+            doc! { "$and": [ { "__prisma_marker": { "$exists": 1 }}, { "__prisma_marker": { "$exists": 0 }} ] }
+
+            // doc! { "_id": { "$exists": 0 }}
         };
 
         Ok(MongoFilter::Scalar(doc))
