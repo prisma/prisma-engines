@@ -376,3 +376,39 @@ pub(super) fn has_fields(index: IndexWalker<'_>, ctx: &mut Context<'_>) {
         *attr.span(),
     ))
 }
+
+/// On Mongo, we can define only one index with the same parameters.
+pub(crate) fn is_not_defined_multiple_times_to_same_fields(index: IndexWalker<'_>, ctx: &mut Context<'_>) {
+    if ctx
+        .connector
+        .has_capability(ConnectorCapability::DuplicateIndexDefinitionsToSameFields)
+    {
+        return;
+    }
+
+    let attr = if let Some(attribute) = index.ast_attribute() {
+        attribute
+    } else {
+        return;
+    };
+
+    let hits = index
+        .model()
+        .indexes()
+        .filter(|i| !i.is_implicit())
+        .filter(|i| i.attribute_id() != index.attribute_id())
+        .filter(|i| i.contains_exactly_the_fields(index.scalar_field_attributes()))
+        .count();
+
+    if hits == 0 {
+        return;
+    }
+
+    let attr_name = attr.name();
+
+    ctx.push_error(DatamodelError::new_attribute_validation_error(
+        "Index already exists in the model.",
+        &format!("@{attr_name}"),
+        *attr.span(),
+    ))
+}

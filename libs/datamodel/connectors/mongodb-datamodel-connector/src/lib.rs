@@ -3,8 +3,8 @@ mod mongodb_types;
 use datamodel_connector::{
     connector_error::{ConnectorError, ErrorKind},
     parser_database::{ast::Expression, walkers::*},
-    Connector, ConnectorCapability, DatamodelError, Diagnostics, NativeTypeConstructor, NativeTypeInstance,
-    ReferentialAction, ReferentialIntegrity, ScalarType,
+    Connector, ConnectorCapability, ConstraintScope, DatamodelError, Diagnostics, NativeTypeConstructor,
+    NativeTypeInstance, ReferentialAction, ReferentialIntegrity, ScalarType,
 };
 use enumflags2::BitFlags;
 use mongodb_types::*;
@@ -110,6 +110,10 @@ impl Connector for MongoDbDatamodelConnector {
 
     fn max_identifier_length(&self) -> usize {
         127
+    }
+
+    fn constraint_violation_scopes(&self) -> &'static [ConstraintScope] {
+        &[ConstraintScope::ModelKeyIndex]
     }
 
     fn referential_actions(&self, referential_integrity: &ReferentialIntegrity) -> BitFlags<ReferentialAction> {

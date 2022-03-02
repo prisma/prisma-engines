@@ -23,6 +23,7 @@ impl Connector for EmptyDatamodelConnector {
             ConnectorCapability::Enums,
             ConnectorCapability::Json,
             ConnectorCapability::ImplicitManyToManyRelation,
+            ConnectorCapability::DuplicateIndexDefinitionsToSameFields,
         ]
     }
 
