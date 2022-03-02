@@ -524,15 +524,9 @@
 <span id="522">522</span>
 <span id="523">523</span>
 <span id="524">524</span>
-<span id="525">525</span>
-<span id="526">526</span>
-<span id="527">527</span>
 </pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">alter_table</span>;
 
-<span class="kw">use</span> <span class="kw">super</span>::{
-    <span class="ident">common</span>::{<span class="self">self</span>, <span class="ident">render_referential_action</span>},
-    <span class="ident">IteratorJoin</span>, <span class="ident">Quoted</span>, <span class="ident">SqlRenderer</span>,
-};
+<span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">common</span>::<span class="kw-2">*</span>, <span class="ident">IteratorJoin</span>, <span class="ident">Quoted</span>, <span class="ident">SqlRenderer</span>};
 <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">flavour::MssqlFlavour</span>,
     <span class="ident">pair::Pair</span>,
@@ -576,7 +570,7 @@
         <span class="kw">let</span> <span class="ident">column_name</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">quote</span>(<span class="ident">column</span>.<span class="ident">name</span>());
 
         <span class="kw">let</span> <span class="ident">r#type</span> <span class="op">=</span> <span class="ident">render_column_type</span>(<span class="ident">column</span>);
-        <span class="kw">let</span> <span class="ident">nullability</span> <span class="op">=</span> <span class="ident">common::render_nullability</span>(<span class="ident">column</span>);
+        <span class="kw">let</span> <span class="ident">nullability</span> <span class="op">=</span> <span class="ident">render_nullability</span>(<span class="ident">column</span>);
 
         <span class="kw">let</span> <span class="ident">default</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">column</span>.<span class="ident">is_autoincrement</span>() {
             <span class="ident">Cow::Borrowed</span>(<span class="string">&quot; IDENTITY(1,1)&quot;</span>)
@@ -1046,7 +1040,7 @@
         <span class="ident">DefaultKind::Value</span>(<span class="ident">PrismaValue::String</span>(<span class="ident">val</span>)) <span class="op">|</span> <span class="ident">DefaultKind::Value</span>(<span class="ident">PrismaValue::Enum</span>(<span class="ident">val</span>)) =&gt; {
             <span class="ident">Quoted::mssql_string</span>(<span class="ident">escape_string_literal</span>(<span class="ident">val</span>)).<span class="ident">to_string</span>().<span class="ident">into</span>()
         }
-        <span class="ident">DefaultKind::Value</span>(<span class="ident">PrismaValue::Bytes</span>(<span class="ident">b</span>)) =&gt; <span class="macro">format!</span>(<span class="string">&quot;0x{}&quot;</span>, <span class="ident">common::format_hex</span>(<span class="ident">b</span>)).<span class="ident">into</span>(),
+        <span class="ident">DefaultKind::Value</span>(<span class="ident">PrismaValue::Bytes</span>(<span class="ident">b</span>)) =&gt; <span class="macro">format!</span>(<span class="string">&quot;0x{}&quot;</span>, <span class="ident">format_hex</span>(<span class="ident">b</span>)).<span class="ident">into</span>(),
         <span class="ident">DefaultKind::Now</span> =&gt; <span class="string">&quot;CURRENT_TIMESTAMP&quot;</span>.<span class="ident">into</span>(),
         <span class="ident">DefaultKind::Value</span>(<span class="ident">PrismaValue::DateTime</span>(<span class="ident">val</span>)) =&gt; <span class="ident">Quoted::mssql_string</span>(<span class="ident">val</span>).<span class="ident">to_string</span>().<span class="ident">into</span>(),
         <span class="ident">DefaultKind::Value</span>(<span class="ident">PrismaValue::Boolean</span>(<span class="ident">val</span>)) =&gt; <span class="ident">Cow::from</span>(<span class="kw">if</span> <span class="kw-2">*</span><span class="ident">val</span> { <span class="string">&quot;1&quot;</span> } <span class="kw">else</span> { <span class="string">&quot;0&quot;</span> }),
