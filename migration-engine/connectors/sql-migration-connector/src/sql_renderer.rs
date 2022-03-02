@@ -33,6 +33,10 @@ pub(crate) trait SqlRenderer {
 
     fn render_alter_enum(&self, alter_enum: &AlterEnum, schemas: &Pair<&SqlSchema>) -> Vec<String>;
 
+    fn render_alter_primary_key(&self, _tables: Pair<TableWalker<'_>>) -> Vec<String> {
+        unreachable!("unreachable render_alter_primary_key()")
+    }
+
     fn render_rename_index(&self, _indexes: Pair<&IndexWalker<'_>>) -> Vec<String> {
         unreachable!("unreachable render_alter_index")
     }

@@ -1,5 +1,6 @@
 use migration_core::migration_connector::DiffTarget;
 use migration_engine_tests::test_api::*;
+use quaint::Value;
 use sql_schema_describer::ColumnTypeFamily;
 use std::fmt::Write;
 
@@ -92,7 +93,7 @@ fn existing_postgis_views_must_not_be_migrated(api: TestApi) {
     api.schema_push_w_datasource("").send().assert_green().assert_no_steps();
 }
 
-#[test_connector(tags(Postgres))]
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
 fn native_type_columns_can_be_created(api: TestApi) {
     let types = &[
         ("smallint", "Int", "SmallInt", "int2"),
@@ -203,7 +204,7 @@ fn functions_with_schema_prefix_in_dbgenerated_are_idempotent(api: TestApi) {
     api.schema_push_w_datasource(dm).send().assert_green().assert_no_steps();
 }
 
-#[test_connector(tags(Postgres))]
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
 fn postgres_apply_migrations_errors_give_precise_location(api: TestApi) {
     let dm = "";
     let migrations_directory = api.create_migrations_directory();
@@ -262,7 +263,7 @@ fn postgres_apply_migrations_errors_give_precise_location(api: TestApi) {
     expectation.assert_eq(first_segment)
 }
 
-#[test_connector(tags(Postgres))]
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
 fn postgres_apply_migrations_errors_give_precise_location_at_the_beginning_of_files(api: TestApi) {
     let dm = "";
     let migrations_directory = api.create_migrations_directory();
@@ -411,4 +412,73 @@ fn foreign_key_renaming_to_default_works(api: TestApi) {
 
     // Check that the migration is idempotent.
     api.schema_push(target_schema).send().assert_green().assert_no_steps();
+}
+
+// exclude: enum migrations work differently on cockroachdb, there is no migration
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
+fn failing_enum_migrations_should_not_be_partially_applied(api: TestApi) {
+    let dm1 = r#"
+        model Cat {
+            id String @id
+            mood Mood
+        }
+
+        enum Mood {
+            HAPPY
+            HUNGRY
+        }
+    "#;
+
+    api.schema_push_w_datasource(dm1)
+        .migration_id(Some("initial-setup"))
+        .send()
+        .assert_green();
+
+    {
+        let cat_inserts = quaint::ast::Insert::multi_into(api.render_table_name("Cat"), &["id", "mood"])
+            .values((Value::text("felix"), Value::enum_variant("HUNGRY")))
+            .values((Value::text("mittens"), Value::enum_variant("HAPPY")));
+
+        api.query(cat_inserts.into());
+    }
+
+    let dm2 = r#"
+        model Cat {
+            id   String @id
+            mood Mood
+        }
+
+        enum Mood {
+            HUNGRY
+        }
+    "#;
+
+    api.schema_push_w_datasource(dm2)
+        .migration_id(Some("remove-used-variant"))
+        .force(true)
+        .send_unwrap_err();
+
+    // Assertions
+    {
+        api.raw_cmd("ROLLBACK");
+
+        let cat_data = api.dump_table("Cat");
+        let cat_data: Vec<Vec<quaint::ast::Value>> =
+            cat_data.into_iter().map(|row| row.into_iter().collect()).collect();
+
+        let expected_cat_data = vec![
+            vec![Value::text("felix"), Value::enum_variant("HUNGRY")],
+            vec![Value::text("mittens"), Value::enum_variant("HAPPY")],
+        ];
+
+        assert_eq!(cat_data, expected_cat_data);
+
+        if api.is_mysql() {
+            api.assert_schema()
+                .assert_enum("Cat_mood", |enm| enm.assert_values(&["HAPPY", "HUNGRY"]));
+        } else {
+            api.assert_schema()
+                .assert_enum("Mood", |enm| enm.assert_values(&["HAPPY", "HUNGRY"]));
+        };
+    }
 }

@@ -21,6 +21,8 @@ pub async fn schema_push(
         .await?;
     let database_migration = connector.diff(from, to)?;
 
+    tracing::debug!(migration = connector.migration_summary(&database_migration).as_str());
+
     let checks = connector
         .destructive_change_checker()
         .check(&database_migration)

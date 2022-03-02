@@ -77,10 +77,30 @@ impl SqlRenderer for PostgresFlavour {
         // - Values cannot be removed.
         // - Only one value can be added in a single transaction until postgres 11.
         if self.is_cockroachdb() {
-            render_cockroach_alter_enum(alter_enum, schemas)
+            let mut renderer = StepRenderer::default();
+            render_cockroach_alter_enum(alter_enum, schemas, &mut renderer);
+            renderer.stmts
         } else {
             render_postgres_alter_enum(alter_enum, schemas)
         }
+    }
+
+    fn render_alter_primary_key(&self, tables: Pair<TableWalker<'_>>) -> Vec<String> {
+        render_step(&mut |step| {
+            step.render_statement(&mut |stmt| {
+                stmt.push_str("ALTER TABLE ");
+                stmt.push_display(&Quoted::postgres_ident(tables.previous.name()));
+                stmt.push_str(" ALTER PRIMARY KEY USING COLUMNS (");
+                let column_names = tables
+                    .next()
+                    .primary_key()
+                    .unwrap() // safe because there is a primary key to alter
+                    .column_names()
+                    .map(Quoted::postgres_ident);
+                stmt.join(", ", column_names);
+                stmt.push_str(")");
+            })
+        })
     }
 
     fn render_rename_index(&self, indexes: Pair<&IndexWalker<'_>>) -> Vec<String> {
@@ -335,11 +355,13 @@ impl SqlRenderer for PostgresFlavour {
             for index in tables.previous().indexes() {
                 result.push(self.render_drop_index(&index));
             }
-            let column_names = columns.join(",");
 
-            result.push(format!(
-                r#"INSERT INTO "{temporary_table_name}" ({column_names}) SELECT {column_names} FROM "{table}""#
-            ));
+            if !columns.is_empty() {
+                let column_names = columns.join(",");
+                result.push(format!(
+                    r#"INSERT INTO "{temporary_table_name}" ({column_names}) SELECT {column_names} FROM "{table}""#
+                ));
+            }
 
             result.push(
                 ddl::DropTable {
@@ -768,30 +790,99 @@ fn render_postgres_alter_enum(alter_enum: &AlterEnum, schemas: &Pair<&SqlSchema>
     stmts
 }
 
-fn render_cockroach_alter_enum(alter_enum: &AlterEnum, schemas: &Pair<&SqlSchema>) -> Vec<String> {
+fn render_cockroach_alter_enum(alter_enum: &AlterEnum, schemas: &Pair<&SqlSchema>, renderer: &mut StepRenderer) {
     let enums = schemas.enums(&alter_enum.index);
     let mut prefix = String::new();
     prefix.push_str("ALTER TYPE \"");
     prefix.push_str(enums.previous.name());
     prefix.push_str("\" ");
 
-    let mut stmts = Vec::with_capacity(alter_enum.created_variants.len() + alter_enum.dropped_variants.len());
+    // Defaults that use a dropped value will need to be recreated after the alter enum.
+    let defaults_to_drop = alter_enum
+        .previous_usages_as_default
+        .iter()
+        .filter_map(|((prev_tblidx, prev_colidx), _)| {
+            let col = schemas.previous.table_walker_at(*prev_tblidx).column_at(*prev_colidx);
+            col.default()
+                .and_then(|d| d.as_value())
+                .and_then(|v| v.as_enum_value())
+                .map(|value| (col, value))
+        })
+        .filter(|(_, value)| !enums.next.values().iter().any(|v| v == value));
+
+    for (col, _) in defaults_to_drop {
+        renderer.render_statement(&mut |stmt| {
+            stmt.push_str("ALTER TABLE ");
+            stmt.push_display(&Quoted::postgres_ident(col.table().name()));
+            stmt.push_str(" ALTER COLUMN ");
+            stmt.push_display(&Quoted::postgres_ident(col.name()));
+            stmt.push_str(" DROP DEFAULT");
+        })
+    }
 
     for variant in &alter_enum.created_variants {
-        let mut stmt = prefix.clone();
-        stmt.push_str("ADD VALUE '");
-        stmt.push_str(variant);
-        stmt.push('\'');
-        stmts.push(stmt)
+        renderer.render_statement(&mut |stmt| {
+            stmt.push_str(&prefix);
+            stmt.push_str("ADD VALUE '");
+            stmt.push_str(variant);
+            stmt.push_str("'");
+        });
     }
 
     for variant in &alter_enum.dropped_variants {
-        let mut stmt = prefix.clone();
-        stmt.push_str("DROP VALUE '");
-        stmt.push_str(variant);
-        stmt.push('\'');
-        stmts.push(stmt)
+        renderer.render_statement(&mut |stmt| {
+            stmt.push_str(&prefix);
+            stmt.push_str("DROP VALUE '");
+            stmt.push_str(variant);
+            stmt.push_str("'");
+        });
+    }
+}
+
+#[derive(Default)]
+struct StepRenderer {
+    stmts: Vec<String>,
+}
+
+impl StepRenderer {
+    fn render_statement(&mut self, f: &mut dyn FnMut(&mut StatementRenderer)) {
+        let mut stmt_renderer = Default::default();
+        f(&mut stmt_renderer);
+        self.stmts.push(stmt_renderer.statement);
+    }
+}
+
+#[derive(Default)]
+struct StatementRenderer {
+    statement: String,
+}
+
+impl StatementRenderer {
+    fn join<I, T>(&mut self, separator: &str, iter: I)
+    where
+        I: Iterator<Item = T>,
+        T: std::fmt::Display,
+    {
+        let mut iter = iter.peekable();
+        while let Some(item) = iter.next() {
+            self.push_display(&item);
+            if iter.peek().is_some() {
+                self.push_str(separator)
+            }
+        }
     }
 
-    stmts
+    fn push_str(&mut self, s: &str) {
+        self.statement.push_str(s)
+    }
+
+    fn push_display(&mut self, d: &dyn std::fmt::Display) {
+        std::fmt::Write::write_fmt(&mut self.statement, format_args!("{}", d)).unwrap();
+    }
+}
+
+fn render_step(f: &mut dyn FnMut(&mut StepRenderer)) -> Vec<String> {
+    let mut renderer = Default::default();
+    f(&mut renderer);
+    renderer.stmts
 }

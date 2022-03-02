@@ -35,11 +35,16 @@ struct Params {
 
 pub(crate) struct PostgresFlavour {
     state: State,
+    /// Should only be set in the constructor.
+    is_cockroach: bool,
 }
 
 impl Default for PostgresFlavour {
     fn default() -> Self {
-        PostgresFlavour { state: State::Initial }
+        PostgresFlavour {
+            state: State::Initial,
+            is_cockroach: false,
+        }
     }
 }
 
@@ -50,6 +55,13 @@ impl std::fmt::Debug for PostgresFlavour {
 }
 
 impl PostgresFlavour {
+    pub(crate) fn new_cockroach() -> Self {
+        PostgresFlavour {
+            state: State::Initial,
+            is_cockroach: true,
+        }
+    }
+
     fn circumstances(&self) -> Option<BitFlags<Circumstances>> {
         match &self.state {
             State::Initial | State::WithParams(_) => None,
@@ -58,15 +70,17 @@ impl PostgresFlavour {
     }
 
     pub(crate) fn is_cockroachdb(&self) -> bool {
-        self.circumstances()
-            .map(|c| c.contains(Circumstances::IsCockroachDb))
-            .unwrap_or(false)
+        self.is_cockroach
+            || self
+                .circumstances()
+                .map(|c| c.contains(Circumstances::IsCockroachDb))
+                .unwrap_or(false)
     }
 }
 
 impl SqlFlavour for PostgresFlavour {
     fn acquire_lock(&mut self) -> BoxFuture<'_, ConnectorResult<()>> {
-        with_connection(&mut self.state, move |params, circumstances, connection| async move {
+        with_connection(self, move |params, circumstances, connection| async move {
             // They do not support advisory locking:
             // https://github.com/cockroachdb/cockroach/issues/13546
             if circumstances.contains(Circumstances::IsCockroachDb) {
@@ -106,7 +120,7 @@ impl SqlFlavour for PostgresFlavour {
 
     fn describe_schema(&mut self) -> BoxFuture<'_, ConnectorResult<SqlSchema>> {
         use sql_schema_describer::{postgres as describer, DescriberErrorKind, SqlSchemaDescriberBackend};
-        with_connection(&mut self.state, |params, circumstances, conn| async move {
+        with_connection(self, |params, circumstances, conn| async move {
             let connection_info = ConnectionInfo::Postgres(params.url.clone());
             let mut describer_circumstances: BitFlags<describer::Circumstances> = Default::default();
             if circumstances.contains(Circumstances::IsCockroachDb) {
@@ -136,9 +150,7 @@ impl SqlFlavour for PostgresFlavour {
         &'a mut self,
         query: quaint::ast::Query<'a>,
     ) -> BoxFuture<'a, ConnectorResult<quaint::prelude::ResultSet>> {
-        with_connection(&mut self.state, move |_, _, conn| async move {
-            Ok(conn.query(query).await?)
-        })
+        with_connection(self, move |_, _, conn| async move { Ok(conn.query(query).await?) })
     }
 
     fn query_raw<'a>(
@@ -146,9 +158,10 @@ impl SqlFlavour for PostgresFlavour {
         sql: &'a str,
         params: &'a [quaint::Value<'a>],
     ) -> BoxFuture<'a, ConnectorResult<quaint::prelude::ResultSet>> {
-        with_connection(&mut self.state, move |_, _, conn| async move {
-            Ok(conn.query_raw(sql, params).await?)
-        })
+        with_connection(
+            self,
+            move |_, _, conn| async move { Ok(conn.query_raw(sql, params).await?) },
+        )
     }
 
     fn run_query_script<'a>(&'a mut self, sql: &'a str) -> BoxFuture<'a, ConnectorResult<()>> {
@@ -160,7 +173,7 @@ impl SqlFlavour for PostgresFlavour {
         migration_name: &'a str,
         script: &'a str,
     ) -> BoxFuture<'a, ConnectorResult<()>> {
-        with_connection(&mut self.state, move |_params, _circumstances, connection| async move {
+        with_connection(self, move |_params, _circumstances, connection| async move {
             let (client, _url) = connection.unwrap_postgres();
             let inner_client = client.client();
 
@@ -322,24 +335,24 @@ impl SqlFlavour for PostgresFlavour {
     }
 
     fn drop_migrations_table(&mut self) -> BoxFuture<'_, ConnectorResult<()>> {
-        with_connection(&mut self.state, |_, _, connection| async move {
+        with_connection(self, |_, _, connection| async move {
             connection.raw_cmd("DROP TABLE _prisma_migrations").await?;
             Ok(())
         })
     }
 
     fn ensure_connection_validity(&mut self) -> BoxFuture<'_, ConnectorResult<()>> {
-        with_connection(&mut self.state, |_, _, _| future::ready(Ok(())))
+        with_connection(self, |_, _, _| future::ready(Ok(())))
     }
 
     fn raw_cmd<'a>(&'a mut self, sql: &'a str) -> BoxFuture<'a, ConnectorResult<()>> {
-        with_connection(&mut self.state, move |_params, _circumstances, conn| async move {
+        with_connection(self, move |_params, _circumstances, conn| async move {
             Ok(conn.raw_cmd(sql).await?)
         })
     }
 
     fn reset(&mut self) -> BoxFuture<'_, ConnectorResult<()>> {
-        with_connection(&mut self.state, move |params, _circumstances, conn| async move {
+        with_connection(self, move |params, _circumstances, conn| async move {
             let schema_name = params.url.schema();
 
             conn.raw_cmd(&format!("DROP SCHEMA \"{}\" CASCADE", schema_name))
@@ -409,52 +422,49 @@ impl SqlFlavour for PostgresFlavour {
                 shadow_db::sql_schema_from_migrations_history(migrations, shadow_database).await
             }),
             None => {
-                with_connection(
-                    &mut self.state,
-                    move |params, _circumstances, main_connection| async move {
-                        let shadow_database_name = crate::new_shadow_database_name();
+                with_connection(self, move |params, _circumstances, main_connection| async move {
+                    let shadow_database_name = crate::new_shadow_database_name();
 
-                        {
-                            let create_database = format!("CREATE DATABASE \"{}\"", shadow_database_name);
-                            main_connection
-                                .raw_cmd(&create_database)
-                                .await
-                                .map_err(ConnectorError::from)
-                                .map_err(|err| err.into_shadow_db_creation_error())?;
-                        }
+                    {
+                        let create_database = format!("CREATE DATABASE \"{}\"", shadow_database_name);
+                        main_connection
+                            .raw_cmd(&create_database)
+                            .await
+                            .map_err(ConnectorError::from)
+                            .map_err(|err| err.into_shadow_db_creation_error())?;
+                    }
 
-                        let mut shadow_database_url: Url = params
-                            .connector_params
-                            .connection_string
-                            .parse()
-                            .map_err(ConnectorError::url_parse_error)?;
-                        shadow_database_url.set_path(&format!("/{}", shadow_database_name));
-                        let params = ConnectorParams {
-                            connection_string: shadow_database_url.to_string(),
-                            preview_features: params.connector_params.preview_features,
-                            shadow_database_connection_string: None,
-                        };
-                        shadow_database.set_params(params)?;
-                        tracing::debug!("Connecting to shadow database `{}`", shadow_database_name);
-                        shadow_database.ensure_connection_validity().await?;
+                    let mut shadow_database_url: Url = params
+                        .connector_params
+                        .connection_string
+                        .parse()
+                        .map_err(ConnectorError::url_parse_error)?;
+                    shadow_database_url.set_path(&format!("/{}", shadow_database_name));
+                    let params = ConnectorParams {
+                        connection_string: shadow_database_url.to_string(),
+                        preview_features: params.connector_params.preview_features,
+                        shadow_database_connection_string: None,
+                    };
+                    shadow_database.set_params(params)?;
+                    tracing::debug!("Connecting to shadow database `{}`", shadow_database_name);
+                    shadow_database.ensure_connection_validity().await?;
 
-                        // We go through the whole process without early return, then clean up
-                        // the shadow database, and only then return the result. This avoids
-                        // leaving shadow databases behind in case of e.g. faulty migrations.
-                        let ret = shadow_db::sql_schema_from_migrations_history(migrations, shadow_database).await;
+                    // We go through the whole process without early return, then clean up
+                    // the shadow database, and only then return the result. This avoids
+                    // leaving shadow databases behind in case of e.g. faulty migrations.
+                    let ret = shadow_db::sql_schema_from_migrations_history(migrations, shadow_database).await;
 
-                        let drop_database = format!("DROP DATABASE IF EXISTS \"{}\"", shadow_database_name);
-                        main_connection.raw_cmd(&drop_database).await?;
+                    let drop_database = format!("DROP DATABASE IF EXISTS \"{}\"", shadow_database_name);
+                    main_connection.raw_cmd(&drop_database).await?;
 
-                        ret
-                    },
-                )
+                    ret
+                })
             }
         }
     }
 
     fn version(&mut self) -> BoxFuture<'_, ConnectorResult<Option<String>>> {
-        with_connection(&mut self.state, |_params, _circumstances, connection| async move {
+        with_connection(self, |_params, _circumstances, connection| async move {
             Ok(connection.version().await?)
         })
     }
@@ -532,18 +542,28 @@ fn disable_postgres_statement_cache(url: &mut Url) -> ConnectorResult<()> {
     Ok(())
 }
 
-fn with_connection<'a, O, F, C>(state: &'a mut State, f: C) -> BoxFuture<'a, ConnectorResult<O>>
+fn with_connection<'a, O, F, C>(flavour: &'a mut PostgresFlavour, f: C) -> BoxFuture<'a, ConnectorResult<O>>
 where
     O: 'a,
     F: future::Future<Output = ConnectorResult<O>> + Send + 'a,
     C: (FnOnce(&'a mut Params, BitFlags<Circumstances>, &'a mut Connection) -> F) + Send + 'a,
 {
-    match state {
-        super::State::Initial => panic!("logic error: Initial"),
-        super::State::Connected(p, (circumstances, conn)) => Box::pin(f(p, *circumstances, conn)),
-        state @ super::State::WithParams(_) => Box::pin(async move {
-            state
-                .try_connect(|params| Box::pin(async move {
+    Box::pin(async move {
+        match flavour.state {
+            super::State::Initial => panic!("logic error: Initial"),
+            super::State::Connected(ref mut p, (circumstances, ref mut conn)) => {
+                return f(p, circumstances, conn).await
+            }
+            super::State::WithParams(_) => (),
+        };
+
+        let mut circumstances = BitFlags::<Circumstances>::default();
+        if flavour.is_cockroach {
+            circumstances |= Circumstances::IsCockroachDb;
+        }
+
+        flavour.state
+                .try_connect(move |params| Box::pin(async move {
                     let connection = connect(&params.connector_params.connection_string).await?;
                     let schema_name = params.url.schema();
 
@@ -553,8 +573,6 @@ where
                             &[schema_name.into()],
                         )
                         .await?;
-
-                    let mut circumstances = BitFlags::<Circumstances>::default();
 
                     if schema_exists_result.get(0).and_then(|row| row.at(1)).and_then(|v| v.to_string()).map(|version| version.contains("CockroachDB")).unwrap_or(false) {
                         circumstances |= Circumstances::IsCockroachDb;
@@ -581,9 +599,8 @@ where
 
                     Ok((circumstances, connection))
                 })).await?;
-            with_connection::<O, F, C>(state, f).await
-        }),
-    }
+        with_connection::<O, F, C>(flavour, f).await
+    })
 }
 
 #[cfg(test)]

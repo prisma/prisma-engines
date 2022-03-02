@@ -192,6 +192,7 @@ impl<'a> TableAssertion<'a> {
         self
     }
 
+    #[track_caller]
     pub fn assert_fk_on_columns<F>(self, columns: &[&str], fk_assertions: F) -> Self
     where
         F: FnOnce(ForeignKeyAssertion<'a>) -> ForeignKeyAssertion<'a>,

@@ -121,6 +121,7 @@ fn render_raw_sql(
     schemas: Pair<&SqlSchema>,
 ) -> Vec<String> {
     match step {
+        SqlMigrationStep::AlterPrimaryKey(table_id) => renderer.render_alter_primary_key(schemas.tables(table_id)),
         SqlMigrationStep::AlterEnum(alter_enum) => renderer.render_alter_enum(alter_enum, &schemas),
         SqlMigrationStep::RedefineTables(redefine_tables) => renderer.render_redefine_tables(redefine_tables, &schemas),
         SqlMigrationStep::CreateEnum { enum_index } => {

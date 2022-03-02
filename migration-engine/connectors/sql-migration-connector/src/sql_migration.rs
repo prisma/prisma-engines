@@ -89,6 +89,13 @@ impl SqlMigration {
                         idx,
                     ));
                 }
+                SqlMigrationStep::AlterPrimaryKey(table_id) => {
+                    drift_items.insert((
+                        DriftType::ChangedTable,
+                        self.before.table_walker_at(table_id.previous).name(),
+                        idx,
+                    ));
+                }
                 SqlMigrationStep::DropIndex { table_id, .. } => {
                     drift_items.insert((
                         DriftType::ChangedTable,
@@ -214,6 +221,12 @@ impl SqlMigration {
                         out.push_str(dropped);
                         out.push_str("`\n");
                     }
+                }
+                SqlMigrationStep::AlterPrimaryKey(table_id) => {
+                    let table_name = self.schemas().previous().table_walker_at(table_id.previous).name();
+                    out.push_str("   [*] Changed the primary key for `");
+                    out.push_str(table_name);
+                    out.push_str("`\n");
                 }
                 SqlMigrationStep::DropForeignKey {
                     foreign_key_index,
@@ -431,6 +444,7 @@ pub(crate) enum SqlMigrationStep {
         index_index: usize,
     },
     AlterTable(AlterTable),
+    AlterPrimaryKey(Pair<TableId>),
     // Order matters: we must drop tables before we create indexes,
     // because on Postgres and SQLite, we may create indexes whose names
     // clash with the names of indexes on the dropped tables.
@@ -484,6 +498,7 @@ impl SqlMigrationStep {
         match self {
             SqlMigrationStep::AddForeignKey { .. } => "AddForeignKey",
             SqlMigrationStep::AlterEnum(_) => "AlterEnum",
+            SqlMigrationStep::AlterPrimaryKey(_) => "AlterPrimaryKey",
             SqlMigrationStep::AlterTable(_) => "AlterTable",
             SqlMigrationStep::CreateEnum { .. } => "CreateEnum",
             SqlMigrationStep::CreateIndex { .. } => "CreateIndex",

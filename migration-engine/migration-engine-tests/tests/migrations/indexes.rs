@@ -426,7 +426,7 @@ fn new_index_with_same_name_as_index_from_dropped_table_works(api: TestApi) {
     let dm1 = r#"
         model Cat {
             id Int @id
-            ownerid String
+            ownerid Int
             owner Owner @relation(fields: [ownerid], references: id)
 
             @@index([ownerid])
@@ -434,13 +434,13 @@ fn new_index_with_same_name_as_index_from_dropped_table_works(api: TestApi) {
 
         model Other {
             id Int @id
-            ownerid String
+            ownerid Int
 
             @@index([ownerid], name: "ownerid")
         }
 
         model Owner {
-            id String @id
+            id Int @id
             c  Cat[]
         }
     "#;
@@ -454,14 +454,14 @@ fn new_index_with_same_name_as_index_from_dropped_table_works(api: TestApi) {
     let dm2 = r#"
         model Owner {
             id      Int @id
-            ownerid String
+            ownerid Int
             owner   Cat @relation(fields: [ownerid], references: id)
 
             @@index([ownerid], name: "ownerid")
         }
 
         model Cat {
-            id      String @id
+            id      Int @id
             owners  Owner[]
         }
     "#;
