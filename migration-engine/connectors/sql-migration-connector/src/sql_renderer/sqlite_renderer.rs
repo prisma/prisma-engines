@@ -163,10 +163,10 @@ impl SqlRenderer for SqliteFlavour {
         format!("DROP INDEX {}", self.quote(index.name()))
     }
 
-    fn render_drop_and_recreate_index(&self, _indexes: Pair<&IndexWalker<'_>>) -> Vec<String> {
+    fn render_drop_and_recreate_index(&self, indexes: Pair<&IndexWalker<'_>>) -> Vec<String> {
         vec![
-            self.render_drop_index(*_indexes.previous()),
-            self.render_create_index(*_indexes.next()),
+            self.render_drop_index(*indexes.previous()),
+            self.render_create_index(*indexes.next()),
         ]
     }
 
@@ -175,11 +175,18 @@ impl SqlRenderer for SqliteFlavour {
         // to a non-existent model. There appears to be no other way to deal with cyclic
         // dependencies in the dropping order of tables in the presence of foreign key
         // constraints on SQLite.
-        vec![
-            "PRAGMA foreign_keys=off".to_string(),
-            format!("DROP TABLE {}", self.quote(table_name)),
-            "PRAGMA foreign_keys=on".to_string(),
-        ]
+        render_step(&mut |step| {
+            step.render_statement(&mut |stmt| {
+                stmt.push_str("PRAGMA foreign_keys=off");
+            });
+            step.render_statement(&mut |stmt| {
+                stmt.push_str("DROP TABLE ");
+                stmt.push_display(&Quoted::sqlite_ident(table_name));
+            });
+            step.render_statement(&mut |stmt| {
+                stmt.push_str("PRAGMA foreign_keys=on");
+            });
+        })
     }
 
     fn render_redefine_tables(&self, tables: &[RedefineTable], schemas: &Pair<&SqlSchema>) -> Vec<String> {
