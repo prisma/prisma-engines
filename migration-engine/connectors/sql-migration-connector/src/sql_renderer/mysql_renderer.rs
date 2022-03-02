@@ -1,4 +1,4 @@
-use super::{common::Quoted, IteratorJoin, SqlRenderer};
+use super::{common::*, IteratorJoin, SqlRenderer};
 use crate::{
     flavour::MysqlFlavour,
     pair::Pair,
@@ -88,14 +88,17 @@ impl SqlRenderer for MysqlFlavour {
     }
 
     fn render_rename_index(&self, indexes: Pair<&IndexWalker<'_>>) -> Vec<String> {
-        vec![ddl::AlterTable {
-            table_name: indexes.previous().table().name().into(),
-            changes: vec![sql_ddl::mysql::AlterTableClause::RenameIndex {
-                previous_name: indexes.previous().name().into(),
-                next_name: indexes.next().name().into(),
-            }],
-        }
-        .to_string()]
+        render_step(&mut |step| {
+            step.render_statement(&mut |stmt| {
+                stmt.push_display(&ddl::AlterTable {
+                    table_name: indexes.previous().table().name().into(),
+                    changes: vec![sql_ddl::mysql::AlterTableClause::RenameIndex {
+                        previous_name: indexes.previous().name().into(),
+                        next_name: indexes.next().name().into(),
+                    }],
+                })
+            })
+        })
     }
 
     fn render_alter_table(&self, alter_table: &AlterTable, schemas: &Pair<&SqlSchema>) -> Vec<String> {
@@ -295,10 +298,13 @@ impl SqlRenderer for MysqlFlavour {
     }
 
     fn render_drop_table(&self, table_name: &str) -> Vec<String> {
-        vec![sql_ddl::mysql::DropTable {
-            table_name: table_name.into(),
-        }
-        .to_string()]
+        render_step(&mut |step| {
+            step.render_statement(&mut |stmt| {
+                stmt.push_display(&sql_ddl::mysql::DropTable {
+                    table_name: table_name.into(),
+                })
+            })
+        })
     }
 
     fn render_redefine_tables(&self, _names: &[RedefineTable], _schemas: &Pair<&SqlSchema>) -> Vec<String> {

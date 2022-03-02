@@ -114,3 +114,51 @@ where
         out
     }
 }
+
+#[derive(Default)]
+pub(super) struct StepRenderer {
+    stmts: Vec<String>,
+}
+
+impl StepRenderer {
+    pub(super) fn render_statement(&mut self, f: &mut dyn FnMut(&mut StatementRenderer)) {
+        let mut stmt_renderer = Default::default();
+        f(&mut stmt_renderer);
+        self.stmts.push(stmt_renderer.statement);
+    }
+}
+
+#[derive(Default)]
+pub(super) struct StatementRenderer {
+    statement: String,
+}
+
+impl StatementRenderer {
+    pub(super) fn join<I, T>(&mut self, separator: &str, iter: I)
+    where
+        I: Iterator<Item = T>,
+        T: std::fmt::Display,
+    {
+        let mut iter = iter.peekable();
+        while let Some(item) = iter.next() {
+            self.push_display(&item);
+            if iter.peek().is_some() {
+                self.push_str(separator)
+            }
+        }
+    }
+
+    pub(super) fn push_str(&mut self, s: &str) {
+        self.statement.push_str(s)
+    }
+
+    pub(super) fn push_display(&mut self, d: &dyn std::fmt::Display) {
+        std::fmt::Write::write_fmt(&mut self.statement, format_args!("{}", d)).unwrap();
+    }
+}
+
+pub(super) fn render_step(f: &mut dyn FnMut(&mut StepRenderer)) -> Vec<String> {
+    let mut renderer = Default::default();
+    f(&mut renderer);
+    renderer.stmts
+}
