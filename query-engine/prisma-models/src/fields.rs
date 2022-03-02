@@ -155,10 +155,15 @@ impl Fields {
             })
     }
 
-    pub fn find_from_all_by_db_name(&self, db_name: &str) -> crate::Result<&Field> {
+    /// Non-virtual: Fields actually existing on the database level, this (currently) excludes relations, which are
+    /// purely virtual on a model.
+    pub fn find_from_non_virtual_by_db_name(&self, db_name: &str) -> crate::Result<&Field> {
         self.all
             .iter()
-            .find(|field| field.db_name() == db_name)
+            .find(|field| match field {
+                Field::Relation(_) => false,
+                field => field.db_name() == db_name,
+            })
             .ok_or_else(|| DomainError::FieldNotFound {
                 name: db_name.to_string(),
                 container_name: self.model().name.clone(),
