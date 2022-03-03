@@ -49,7 +49,11 @@ fn fmt_query(buffer: &mut String, coll_name: &str, query: &MongoReadQuery) -> st
 }
 
 fn fmt_opts(buffer: &mut String, opts: &FindOptions, depth: usize) -> std::fmt::Result {
-    writeln!(buffer, "{{")?;
+    if cfg!(debug_assertions) {
+        writeln!(buffer, "{{")?;
+    } else {
+        write!(buffer, "{{")?;
+    }
 
     if let Some(skip) = opts.skip {
         write_indented!(buffer, depth, "skip: {},\n", skip);
@@ -62,29 +66,51 @@ fn fmt_opts(buffer: &mut String, opts: &FindOptions, depth: usize) -> std::fmt::
     if let Some(ref sort) = opts.sort {
         write_indented!(buffer, depth, "sort: ",);
         fmt_doc(buffer, sort, depth + 1)?;
-        writeln!(buffer, ",")?;
+
+        if cfg!(debug_assertions) {
+            writeln!(buffer, ",")?;
+        } else {
+            write!(buffer, ",")?;
+        }
     }
 
     if let Some(ref projection) = opts.projection {
         write_indented!(buffer, depth, "projection: ",);
         fmt_doc(buffer, projection, depth + 1)?;
-        writeln!(buffer)?;
+
+        if cfg!(debug_assertions) {
+            writeln!(buffer)?;
+        }
     }
 
     write!(buffer, "}}")
 }
 
+#[cfg(debug_assertions)]
 fn indent(depth: usize) -> String {
     " ".repeat(4 * depth)
 }
 
+#[cfg(not(debug_assertions))]
+fn indent(_: usize) -> String {
+    String::from(" ")
+}
+
 fn fmt_doc(buffer: &mut String, doc: &Document, depth: usize) -> std::fmt::Result {
-    writeln!(buffer, "{{")?;
+    if cfg!(debug_assertions) {
+        writeln!(buffer, "{{")?;
+    } else {
+        write!(buffer, "{{")?;
+    }
 
     for (key, value) in doc {
         write_indented!(buffer, depth, "{}: ", key);
         fmt_val(buffer, value, depth)?;
-        writeln!(buffer, ",")?;
+        if cfg!(debug_assertions) {
+            writeln!(buffer, ",")?;
+        } else {
+            write!(buffer, ",")?;
+        }
     }
 
     write_indented!(buffer, usize::max(depth - 1, 0), "}}",);
@@ -92,12 +118,20 @@ fn fmt_doc(buffer: &mut String, doc: &Document, depth: usize) -> std::fmt::Resul
 }
 
 fn fmt_list(buffer: &mut String, list: &[Bson], depth: usize) -> std::fmt::Result {
-    writeln!(buffer, "[")?;
+    if cfg!(debug_assertions) {
+        writeln!(buffer, "[")?;
+    } else {
+        write!(buffer, "[")?;
+    }
 
     for item in list {
         write_indented!(buffer, depth, "",);
         fmt_val(buffer, item, depth)?;
-        writeln!(buffer, ",")?;
+        if cfg!(debug_assertions) {
+            writeln!(buffer, ",")?;
+        } else {
+            write!(buffer, ",")?;
+        }
     }
 
     write_indented!(buffer, usize::max(depth - 1, 0), "]",);
