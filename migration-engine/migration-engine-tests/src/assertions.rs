@@ -463,7 +463,6 @@ impl<'a> ColumnAssertion<'a> {
     pub fn assert_native_type(self, expected: &str, connector: &dyn Connector) -> Self {
         let found = connector
             .introspect_native_type(self.column.tpe.native_type.clone().unwrap())
-            .unwrap()
             .to_string();
         assert!(
             found == expected,

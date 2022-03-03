@@ -54,7 +54,7 @@ impl Connector for EmptyDatamodelConnector {
         Err(DatamodelError::new_native_type_parser_error(name, span))
     }
 
-    fn introspect_native_type(&self, _native_type: serde_json::Value) -> Result<NativeTypeInstance, DatamodelError> {
+    fn introspect_native_type(&self, _native_type: serde_json::Value) -> NativeTypeInstance {
         unreachable!("introspect_native_type on EmptyDatamodelConnector")
     }
 

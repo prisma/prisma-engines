@@ -132,8 +132,9 @@ pub trait Connector: Send + Sync {
         span: Span,
     ) -> Result<NativeTypeInstance, DatamodelError>;
 
-    /// This function is used during introspection to turn an introspected native type into an instance that can be put into the Prisma schema.
-    fn introspect_native_type(&self, native_type: serde_json::Value) -> Result<NativeTypeInstance, DatamodelError>;
+    /// This function is used during introspection to turn an introspected native type into an
+    /// instance that can be inserted into dml.
+    fn introspect_native_type(&self, native_type: serde_json::Value) -> NativeTypeInstance;
 
     fn set_config_dir<'a>(&self, config_dir: &std::path::Path, url: &'a str) -> Cow<'a, str> {
         let set_root = |path: &str| {
