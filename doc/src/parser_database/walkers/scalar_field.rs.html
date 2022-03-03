@@ -303,6 +303,11 @@
 <span id="301">301</span>
 <span id="302">302</span>
 <span id="303">303</span>
+<span id="304">304</span>
+<span id="305">305</span>
+<span id="306">306</span>
+<span id="307">307</span>
+<span id="308">308</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">ast</span>,
     <span class="ident">types</span>::{<span class="ident">DefaultAttribute</span>, <span class="ident">FieldWithArgs</span>, <span class="ident">ScalarField</span>, <span class="ident">ScalarType</span>, <span class="ident">SortOrder</span>},
@@ -369,6 +374,11 @@
     <span class="doccomment">/// Does the field define a primary key by its own.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_single_pk</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">model</span>().<span class="ident">field_is_single_pk</span>(<span class="self">self</span>.<span class="ident">field_id</span>)
+    }
+
+    <span class="doccomment">/// Is the field part of a compound primary key.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_part_of_a_compound_pk</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="ident">model</span>().<span class="ident">field_is_part_of_a_compound_pk</span>(<span class="self">self</span>.<span class="ident">field_id</span>)
     }
 
     <span class="doccomment">/// Is there an `@ignore` attribute on the field?</span>

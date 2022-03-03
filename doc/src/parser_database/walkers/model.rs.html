@@ -277,6 +277,17 @@
 <span id="275">275</span>
 <span id="276">276</span>
 <span id="277">277</span>
+<span id="278">278</span>
+<span id="279">279</span>
+<span id="280">280</span>
+<span id="281">281</span>
+<span id="282">282</span>
+<span id="283">283</span>
+<span id="284">284</span>
+<span id="285">285</span>
+<span id="286">286</span>
+<span id="287">287</span>
+<span id="288">288</span>
 </pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">primary_key</span>;
 <span class="kw">mod</span> <span class="ident">unique_criteria</span>;
 
@@ -336,6 +347,17 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">field_is_single_pk</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">field</span>: <span class="ident">ast::FieldId</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">primary_key</span>()
             .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">pk</span><span class="op">|</span> <span class="ident">pk</span>.<span class="ident">fields</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">field_id</span>()).<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>() <span class="op">==</span> [<span class="ident">field</span>])
+            .<span class="ident">is_some</span>()
+    }
+
+    <span class="doccomment">/// Is the field part of a compound primary key.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">field_is_part_of_a_compound_pk</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">field</span>: <span class="ident">ast::FieldId</span>) -&gt; <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="ident">primary_key</span>()
+            .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">pk</span><span class="op">|</span> {
+                <span class="kw">let</span> <span class="ident">exists</span> <span class="op">=</span> <span class="ident">pk</span>.<span class="ident">fields</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">field_id</span>()).<span class="ident">any</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span> <span class="op">==</span> <span class="ident">field</span>);
+
+                <span class="ident">exists</span> <span class="op">&amp;&amp;</span> <span class="ident">pk</span>.<span class="ident">fields</span>().<span class="ident">len</span>() <span class="op">&gt;</span> <span class="number">1</span>
+            })
             .<span class="ident">is_some</span>()
     }
 

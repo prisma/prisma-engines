@@ -173,7 +173,6 @@
 <span id="171">171</span>
 <span id="172">172</span>
 <span id="173">173</span>
-<span id="174">174</span>
 </pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">autoincrement</span>;
 <span class="kw">mod</span> <span class="ident">composite_types</span>;
 <span class="kw">mod</span> <span class="ident">constraint_namespace</span>;
@@ -270,7 +269,6 @@
             <span class="ident">indexes::fulltext_column_sort_is_supported</span>(<span class="ident">index</span>, <span class="ident">ctx</span>);
             <span class="ident">indexes::fulltext_text_columns_should_be_bundled_together</span>(<span class="ident">index</span>, <span class="ident">ctx</span>);
             <span class="ident">indexes::has_valid_mapped_name</span>(<span class="ident">index</span>, <span class="ident">ctx</span>);
-            <span class="ident">indexes::is_not_defined_multiple_times_to_same_fields</span>(<span class="ident">index</span>, <span class="ident">ctx</span>);
 
             <span class="kw">for</span> <span class="ident">field_attribute</span> <span class="kw">in</span> <span class="ident">index</span>.<span class="ident">scalar_field_attributes</span>() {
                 <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="ident">index</span>
