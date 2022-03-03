@@ -94,7 +94,6 @@ pub(super) fn validate(ctx: &mut Context<'_>) {
             indexes::fulltext_column_sort_is_supported(index, ctx);
             indexes::fulltext_text_columns_should_be_bundled_together(index, ctx);
             indexes::has_valid_mapped_name(index, ctx);
-            indexes::is_not_defined_multiple_times_to_same_fields(index, ctx);
 
             for field_attribute in index.scalar_field_attributes() {
                 let span = index

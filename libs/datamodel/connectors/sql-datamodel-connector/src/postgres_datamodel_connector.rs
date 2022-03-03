@@ -100,7 +100,6 @@ const CAPABILITIES: &[ConnectorCapability] = &[
     ConnectorCapability::WritableAutoincField,
     ConnectorCapability::UsingHashIndex,
     ConnectorCapability::ImplicitManyToManyRelation,
-    ConnectorCapability::DuplicateIndexDefinitionsToSameFields,
 ];
 
 pub struct PostgresDatamodelConnector;

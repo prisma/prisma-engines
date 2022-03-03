@@ -68,7 +68,6 @@ capabilities!(
     FullTextIndex,
     SortOrderInFullTextIndex,
     MultipleFullTextAttributesPerModel,
-    DuplicateIndexDefinitionsToSameFields,
     // Start of query-engine-only Capabilities
     InsensitiveFilters,
     CreateMany,
