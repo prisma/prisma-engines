@@ -441,6 +441,7 @@ async fn migrate_diff(cmd: &MigrateDiff) -> anyhow::Result<()> {
     };
 
     let input = DiffParams {
+        exit_code: None,
         from,
         script: cmd.script,
         shadow_database_url: None, // TODO

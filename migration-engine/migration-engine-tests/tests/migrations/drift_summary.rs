@@ -7,6 +7,7 @@ fn check(from: &str, to: &str, expectation: Expect) {
     let from_schema = write_file_to_tmp(from, &tmpdir, "from.prisma");
     let to_schema = write_file_to_tmp(to, &tmpdir, "to.prisma");
     let params = DiffParams {
+        exit_code: None,
         from: migration_core::json_rpc::types::DiffTarget::SchemaDatamodel(SchemaContainer {
             schema: from_schema.to_str().unwrap().to_owned(),
         }),

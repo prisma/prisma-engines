@@ -127,6 +127,7 @@ async fn diff_and_apply(schema: &str) {
 
     // 2. create the database schema for given Prisma schema
     api.diff(DiffParams {
+        exit_code: None,
         from: DiffTarget::Empty,
         to: DiffTarget::SchemaDatamodel(SchemaContainer {
             schema: schema_file_path.to_string_lossy().into(),
