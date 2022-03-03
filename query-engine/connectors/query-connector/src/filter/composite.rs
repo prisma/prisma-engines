@@ -1,4 +1,4 @@
-use crate::{compare::CompositeCompare};
+use crate::compare::CompositeCompare;
 use crate::filter::Filter;
 use prisma_models::{CompositeFieldRef, PrismaValue};
 // use std::sync::Arc;
@@ -10,7 +10,6 @@ pub struct CompositeFilter {
 
     // /// Filter the composite need to fulfill.
     // pub nested_filter: Box<Filter>,
-
     /// Condition the composite field filter uses.
     pub condition: Box<CompositeCondition>,
 }
@@ -81,7 +80,7 @@ impl CompositeCompare for CompositeFieldRef {
         .into()
     }
 
-    fn is_empty<T>(&self, b: bool) -> Filter {
+    fn is_empty(&self, b: bool) -> Filter {
         CompositeFilter {
             field: self.clone(),
             condition: Box::new(CompositeCondition::Empty(b)),
