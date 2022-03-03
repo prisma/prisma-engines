@@ -52,7 +52,13 @@ pub async fn diff(params: DiffParams, host: Arc<dyn ConnectorHost>) -> CoreResul
         connector.host().print(&summary).await?;
     }
 
-    Ok(DiffResult { exit_code: 0 })
+    let exit_code = if params.exit_code == Some(true) && !connector.migration_is_empty(&migration) {
+        2
+    } else {
+        0
+    };
+
+    Ok(DiffResult { exit_code })
 }
 
 // `None` in case the target is empty

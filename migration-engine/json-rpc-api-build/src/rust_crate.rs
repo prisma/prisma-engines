@@ -115,7 +115,6 @@ fn generate_types_rs(mut file: impl std::io::Write, api: &Api) -> CrateResult {
             for line in description.lines() {
                 writeln!(file, "/// {}", line)?;
             }
-
         }
 
         writeln!(
