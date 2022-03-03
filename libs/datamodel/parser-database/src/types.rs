@@ -119,6 +119,7 @@ pub(crate) struct ScalarField {
     pub(crate) r#type: ScalarFieldType,
     pub(crate) is_ignored: bool,
     pub(crate) is_updated_at: bool,
+    pub(crate) comment: Option<String>,
     pub(crate) default: Option<DefaultAttribute>,
     /// @map
     pub(crate) mapped_name: Option<StringId>,
@@ -288,6 +289,7 @@ fn visit_model<'db>(model_id: ast::ModelId, ast_model: &'db ast::Model, ctx: &mu
                     is_ignored: false,
                     is_updated_at: false,
                     default: None,
+                    comment: None,
                     mapped_name: None,
                     native_type: None,
                 };

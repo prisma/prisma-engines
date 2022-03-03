@@ -237,6 +237,29 @@ fn visit_scalar_field_attributes<'db>(
         ctx.validate_visited_arguments();
     }
 
+    // @comment
+    if ctx.visit_optional_single_attr("comment") {
+        let value = match ctx.visit_default_arg_with_idx("comment") {
+            Ok((_, value)) => Some(value),
+            Err(_) => None
+        };
+
+        if let Some(value) = value {
+            match value.value {
+                ast::Expression::StringValue(value, _) => {
+                    scalar_field_data.comment = Option::from(value.clone())
+                }
+                _ => {
+                    ctx.push_attribute_validation_error("must be a string.");
+                }
+            }
+        } else {
+            ctx.push_attribute_validation_error("must be a string.");
+        }
+
+        ctx.validate_visited_arguments();
+    }
+
     if let ScalarFieldType::BuiltInScalar(_scalar_type) = scalar_field_data.r#type {
         // native type attributes
         if let Some((datasource_name, type_name, attribute_id)) = ctx.visit_datasource_scoped() {

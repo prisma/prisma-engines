@@ -194,6 +194,14 @@ impl Field {
         }
     }
 
+    pub fn comment_value(&self) -> Option<&str> {
+        match &self {
+            Field::ScalarField(sf) => sf.comment_value.as_deref(),
+            Field::RelationField(_) => None,
+            Field::CompositeField(_) => None,
+        }
+    }
+
     pub fn is_updated_at(&self) -> bool {
         match &self {
             Field::ScalarField(sf) => sf.is_updated_at,
@@ -444,6 +452,9 @@ pub struct ScalarField {
     /// The default value.
     pub default_value: Option<DefaultValue>,
 
+    /// The default value.
+    pub comment_value: Option<String>,
+
     /// Comments associated with this field.
     pub documentation: Option<String>,
 
@@ -470,6 +481,7 @@ impl ScalarField {
             field_type,
             database_name: None,
             default_value: None,
+            comment_value: None,
             documentation: None,
             is_generated: false,
             is_updated_at: false,

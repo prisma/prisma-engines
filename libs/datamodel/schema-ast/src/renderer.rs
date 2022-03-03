@@ -11,7 +11,7 @@ pub use table::TableFormat;
 pub fn get_sort_index_of_attribute(is_field_attribute: bool, attribute_name: &str) -> usize {
     // this must match the order defined for rendering in libs/datamodel/core/src/transform/attributes/mod.rs
     let correct_order: &[&str] = if is_field_attribute {
-        &["id", "unique", "default", "updatedAt", "map", "relation"]
+        &["id", "unique", "default", "updatedAt", "map", "relation", "map"]
     } else {
         &["id", "unique", "index", "fulltext", "map"]
     };

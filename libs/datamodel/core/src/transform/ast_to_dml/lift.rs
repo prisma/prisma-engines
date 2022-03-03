@@ -411,6 +411,7 @@ impl<'a> LiftAstToDml<'a> {
             field.documentation = ast_field.documentation.clone().map(|comment| comment.text);
             field.is_ignored = scalar_field.is_ignored();
             field.is_updated_at = scalar_field.is_updated_at();
+            field.comment_value = scalar_field.comment_value().map(String::from);
             field.database_name = scalar_field.mapped_name().map(String::from);
             field.default_value = scalar_field.default_value().map(|d| dml::DefaultValue {
                 kind: dml_default_kind(d.value(), scalar_field.scalar_type()),

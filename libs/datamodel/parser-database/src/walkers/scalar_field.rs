@@ -71,6 +71,11 @@ impl<'db> ScalarFieldWalker<'db> {
         self.attributes().is_ignored
     }
 
+    /// is Comment Value
+    pub fn comment_value(self) -> Option<&'db String> {
+        self.attributes().comment.as_ref()
+    }
+
     /// Is the field optional / nullable?
     pub fn is_optional(self) -> bool {
         self.ast_field().arity.is_optional()

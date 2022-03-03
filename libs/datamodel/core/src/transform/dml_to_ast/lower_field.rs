@@ -155,6 +155,15 @@ impl<'a> LowerDmlToAst<'a> {
             attributes.push(ast::Attribute::new("default", args));
         }
 
+        // @comment
+        if let Some(comment_value) = field.comment_value() {
+            let args = vec![ast::Argument::new_unnamed(LowerDmlToAst::<'a>::lower_string(
+                comment_value.clone(),
+            ))];
+
+            attributes.push(ast::Attribute::new("comment", args));
+        }
+
         // @updatedAt
         if field.is_updated_at() {
             attributes.push(ast::Attribute::new("updatedAt", Vec::new()));
