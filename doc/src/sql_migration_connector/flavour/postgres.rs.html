@@ -637,6 +637,13 @@
 <span id="635">635</span>
 <span id="636">636</span>
 <span id="637">637</span>
+<span id="638">638</span>
+<span id="639">639</span>
+<span id="640">640</span>
+<span id="641">641</span>
+<span id="642">642</span>
+<span id="643">643</span>
+<span id="644">644</span>
 </pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">shadow_db</span>;
 
 <span class="kw">use</span> <span class="kw">crate</span>::{
@@ -1206,7 +1213,8 @@ SET serial_normalization = &#39;sql_sequence&#39;;
         };
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">circumstances</span> <span class="op">=</span> <span class="ident">BitFlags</span>::<span class="op">&lt;</span><span class="ident">Circumstances</span><span class="op">&gt;</span><span class="ident">::default</span>();
-        <span class="kw">if</span> <span class="ident">flavour</span>.<span class="ident">is_cockroach</span> {
+        <span class="kw">let</span> <span class="ident">provider_is_cockroachdb</span> <span class="op">=</span> <span class="ident">flavour</span>.<span class="ident">is_cockroach</span>;
+        <span class="kw">if</span> <span class="ident">provider_is_cockroachdb</span> {
             <span class="ident">circumstances</span> <span class="op">|</span><span class="op">=</span> <span class="ident">Circumstances::IsCockroachDb</span>;
         }
 
@@ -1222,10 +1230,16 @@ SET serial_normalization = &#39;sql_sequence&#39;;
                         )
                         .<span class="kw">await</span><span class="question-mark">?</span>;
 
-                    <span class="kw">if</span> <span class="ident">schema_exists_result</span>.<span class="ident">get</span>(<span class="number">0</span>).<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">row</span><span class="op">|</span> <span class="ident">row</span>.<span class="ident">at</span>(<span class="number">1</span>)).<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">v</span>.<span class="ident">to_string</span>()).<span class="ident">map</span>(<span class="op">|</span><span class="ident">version</span><span class="op">|</span> <span class="ident">version</span>.<span class="ident">contains</span>(<span class="string">&quot;CockroachDB&quot;</span>)).<span class="ident">unwrap_or</span>(<span class="bool-val">false</span>) {
-                        <span class="ident">circumstances</span> <span class="op">|</span><span class="op">=</span> <span class="ident">Circumstances::IsCockroachDb</span>;
-                        <span class="ident">connection</span>.<span class="ident">raw_cmd</span>(<span class="ident">COCKROACHDB_PRELUDE</span>).<span class="kw">await</span><span class="question-mark">?</span>;
-
+                    <span class="kw">let</span> <span class="ident">version</span> <span class="op">=</span> <span class="ident">schema_exists_result</span>.<span class="ident">get</span>(<span class="number">0</span>).<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">row</span><span class="op">|</span> <span class="ident">row</span>.<span class="ident">at</span>(<span class="number">1</span>)).<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">v</span>.<span class="ident">to_string</span>());
+                    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">version</span>) <span class="op">=</span> <span class="ident">version</span> {
+                        <span class="kw">if</span> <span class="ident">version</span>.<span class="ident">contains</span>(<span class="string">&quot;CockroachDB&quot;</span>) {
+                            <span class="ident">circumstances</span> <span class="op">|</span><span class="op">=</span> <span class="ident">Circumstances::IsCockroachDb</span>;
+                            <span class="ident">connection</span>.<span class="ident">raw_cmd</span>(<span class="ident">COCKROACHDB_PRELUDE</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+                        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">provider_is_cockroachdb</span> {
+                            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ConnectorError::from_msg</span>(<span class="string">&quot;You are trying to connect to a postgresql database, but the provider in your Prisma schema is `cockroachdb`. Please change it to `postgresql`.&quot;</span>.<span class="ident">to_owned</span>()));
+                        }
+                    } <span class="kw">else</span> {
+                        <span class="macro">tracing::warn!</span>(<span class="string">&quot;Could not determine the version of the database.&quot;</span>)
                     }
 
                     <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="bool-val">true</span>) <span class="op">=</span> <span class="ident">schema_exists_result</span>
