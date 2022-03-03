@@ -71,7 +71,7 @@ impl<'db> ScalarFieldWalker<'db> {
         self.attributes().is_ignored
     }
 
-    /// is Comment Value
+    /// The `@comment()` AST attribute on the field, if it is a string.
     pub fn comment_value(self) -> Option<&'db String> {
         self.attributes().comment.as_ref()
     }

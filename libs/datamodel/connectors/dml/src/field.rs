@@ -452,7 +452,7 @@ pub struct ScalarField {
     /// The default value.
     pub default_value: Option<DefaultValue>,
 
-    /// The default value.
+    /// The comment value.
     pub comment_value: Option<String>,
 
     /// Comments associated with this field.
