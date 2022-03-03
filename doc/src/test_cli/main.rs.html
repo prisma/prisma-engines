@@ -471,6 +471,7 @@
 <span id="469">469</span>
 <span id="470">470</span>
 <span id="471">471</span>
+<span id="472">472</span>
 </pre><pre class="rust"><code><span class="attribute">#![<span class="ident">allow</span>(<span class="ident">clippy::print_literal</span>)]</span> <span class="comment">// it is just wrong in this case</span>
 
 <span class="kw">mod</span> <span class="ident">diagnose_migration_history</span>;
@@ -914,6 +915,7 @@
     };
 
     <span class="kw">let</span> <span class="ident">input</span> <span class="op">=</span> <span class="ident">DiffParams</span> {
+        <span class="ident">exit_code</span>: <span class="prelude-val">None</span>,
         <span class="ident">from</span>,
         <span class="ident">script</span>: <span class="ident">cmd</span>.<span class="ident">script</span>,
         <span class="ident">shadow_database_url</span>: <span class="prelude-val">None</span>, <span class="comment">// TODO</span>

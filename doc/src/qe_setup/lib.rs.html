@@ -150,6 +150,7 @@
 <span id="148">148</span>
 <span id="149">149</span>
 <span id="150">150</span>
+<span id="151">151</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Query Engine test setup.</span>
 
 <span class="kw">mod</span> <span class="ident">mongodb</span>;
@@ -279,6 +280,7 @@
 
     <span class="comment">// 2. create the database schema for given Prisma schema</span>
     <span class="ident">api</span>.<span class="ident">diff</span>(<span class="ident">DiffParams</span> {
+        <span class="ident">exit_code</span>: <span class="prelude-val">None</span>,
         <span class="ident">from</span>: <span class="ident">DiffTarget::Empty</span>,
         <span class="ident">to</span>: <span class="ident">DiffTarget::SchemaDatamodel</span>(<span class="ident">SchemaContainer</span> {
             <span class="ident">schema</span>: <span class="ident">schema_file_path</span>.<span class="ident">to_string_lossy</span>().<span class="ident">into</span>(),
