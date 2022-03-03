@@ -482,3 +482,34 @@ fn failing_enum_migrations_should_not_be_partially_applied(api: TestApi) {
         };
     }
 }
+
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
+fn connecting_to_a_postgres_database_with_the_cockroach_connector_fails(_api: TestApi) {
+    let dm = r#"
+        datasource crdb {
+            provider = "cockroachdb"
+            url = env("TEST_DATABASE_URL")
+        }
+
+        generator js {
+            provider = "prisma-client-js"
+            previewFeatures = ["cockroachdb"]
+        }
+    "#;
+
+    let engine = migration_core::migration_api(None, None).unwrap();
+    let err = tok(
+        engine.ensure_connection_validity(migration_core::json_rpc::types::EnsureConnectionValidityParams {
+            datasource: migration_core::json_rpc::types::DatasourceParam::SchemaString(SchemaContainer {
+                schema: dm.to_owned(),
+            }),
+        }),
+    )
+    .unwrap_err()
+    .to_string();
+
+    let expected_error = expect![[r#"
+        You are trying to connect to a postgresql database, but the provider in your Prisma schema is `cockroachdb`. Please change it to `postgresql`.
+    "#]];
+    expected_error.assert_eq(&err);
+}
