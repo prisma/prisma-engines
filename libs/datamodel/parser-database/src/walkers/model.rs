@@ -60,6 +60,17 @@ impl<'db> ModelWalker<'db> {
             .is_some()
     }
 
+    /// Is the field part of a compound primary key.
+    pub fn field_is_part_of_a_compound_pk(&self, field: ast::FieldId) -> bool {
+        self.primary_key()
+            .filter(|pk| {
+                let exists = pk.fields().map(|f| f.field_id()).any(|f| f == field);
+
+                exists && pk.fields().len() > 1
+            })
+            .is_some()
+    }
+
     /// The ID of the model in the db
     pub fn model_id(self) -> ast::ModelId {
         self.model_id

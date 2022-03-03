@@ -86,7 +86,6 @@ const CAPABILITIES: &[ConnectorCapability] = &[
     ConnectorCapability::UpdateableId,
     ConnectorCapability::WritableAutoincField,
     ConnectorCapability::ImplicitManyToManyRelation,
-    ConnectorCapability::DuplicateIndexDefinitionsToSameFields,
 ];
 
 const SCALAR_TYPE_DEFAULTS: &[(ScalarType, CockroachType)] = &[
