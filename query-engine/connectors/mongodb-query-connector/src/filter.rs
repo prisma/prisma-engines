@@ -103,17 +103,14 @@ fn coerce_empty(
     is_having_filter: bool,
 ) -> crate::Result<MongoFilter> {
     if filters.is_empty() {
-        // We need to create a truthy or falsey expression for empty AND / OR queries.
-        // _id always exists (for top level documents). So matching on exist/not exists creates our truthy/falsey expressions.
+        // We need to create a truthy or falsey expression for empty filter queries, e.g. AND / OR / NOT.
+        // We abuse the fact that we can create an always failing or succeeding condition with logical `and` and `or` operators,
+        // for example "a field exists or doesn't exist" is always true, "a field exists and doesn't exist" is always false.
 
         let doc = if truthy {
             doc! { "$or": [ { "__prisma_marker": { "$exists": 1 }}, { "__prisma_marker": { "$exists": 0 }} ] }
-
-            // doc! { "_id": { "$exists": 1 }}
         } else {
             doc! { "$and": [ { "__prisma_marker": { "$exists": 1 }}, { "__prisma_marker": { "$exists": 0 }} ] }
-
-            // doc! { "_id": { "$exists": 0 }}
         };
 
         Ok(MongoFilter::Scalar(doc))
