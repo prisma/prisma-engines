@@ -205,7 +205,7 @@ impl Connector for MongoDbDatamodelConnector {
         Ok(NativeTypeInstance::new(name, args, mongo_type.to_json()))
     }
 
-    fn introspect_native_type(&self, _native_type: serde_json::Value) -> Result<NativeTypeInstance> {
+    fn introspect_native_type(&self, _native_type: serde_json::Value) -> NativeTypeInstance {
         // Out of scope for MVP
         todo!()
     }

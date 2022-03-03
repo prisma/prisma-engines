@@ -76,7 +76,7 @@ impl Connector for SqliteDatamodelConnector {
         ))
     }
 
-    fn introspect_native_type(&self, _native_type: serde_json::Value) -> Result<NativeTypeInstance, DatamodelError> {
+    fn introspect_native_type(&self, _native_type: serde_json::Value) -> NativeTypeInstance {
         unreachable!("unreachable introspect_native_type() on sqlite")
     }
 

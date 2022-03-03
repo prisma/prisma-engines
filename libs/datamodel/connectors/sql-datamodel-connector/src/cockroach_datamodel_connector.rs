@@ -264,7 +264,7 @@ impl Connector for CockroachDatamodelConnector {
         Ok(NativeTypeInstance::new(name, cloned_args, native_type.to_json()))
     }
 
-    fn introspect_native_type(&self, native_type: serde_json::Value) -> Result<NativeTypeInstance, DatamodelError> {
+    fn introspect_native_type(&self, native_type: serde_json::Value) -> NativeTypeInstance {
         let native_type: CockroachType = serde_json::from_value(native_type).unwrap();
         let (constructor_name, args) = match native_type {
             SmallInt => (SMALL_INT_TYPE_NAME, vec![]),
@@ -294,7 +294,7 @@ impl Connector for CockroachDatamodelConnector {
         };
 
         if let Some(constructor) = self.find_native_type_constructor(constructor_name) {
-            Ok(NativeTypeInstance::new(constructor.name, args, native_type.to_json()))
+            NativeTypeInstance::new(constructor.name, args, native_type.to_json())
         } else {
             unreachable!()
         }

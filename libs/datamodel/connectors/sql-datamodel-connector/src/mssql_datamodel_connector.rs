@@ -364,7 +364,7 @@ impl Connector for MsSqlDatamodelConnector {
         Ok(NativeTypeInstance::new(name, cloned_args, native_type.to_json()))
     }
 
-    fn introspect_native_type(&self, native_type: serde_json::Value) -> Result<NativeTypeInstance, DatamodelError> {
+    fn introspect_native_type(&self, native_type: serde_json::Value) -> NativeTypeInstance {
         let native_type: MsSqlType = serde_json::from_value(native_type).unwrap();
 
         let (constructor_name, args) = match native_type {
@@ -399,11 +399,7 @@ impl Connector for MsSqlDatamodelConnector {
 
         if let Some(constructor) = self.find_native_type_constructor(constructor_name) {
             let stringified_args = args.iter().map(|arg| arg.to_string()).collect();
-            Ok(NativeTypeInstance::new(
-                constructor.name,
-                stringified_args,
-                native_type.to_json(),
-            ))
+            NativeTypeInstance::new(constructor.name, stringified_args, native_type.to_json())
         } else {
             unreachable!()
         }
