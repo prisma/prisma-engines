@@ -429,13 +429,15 @@
 <span id="427">427</span>
 <span id="428">428</span>
 <span id="429">429</span>
+<span id="430">430</span>
+<span id="431">431</span>
+<span id="432">432</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">datamodel_connector</span>::{
-    <span class="ident">connector_error::ConnectorError</span>,
     <span class="ident">helper</span>::{<span class="ident">args_vec_from_opt</span>, <span class="ident">parse_one_opt_u32</span>, <span class="ident">parse_one_u32</span>, <span class="ident">parse_two_opt_u32</span>},
     <span class="ident">parser_database::walkers::ModelWalker</span>,
     <span class="ident">walker_ext_traits</span>::<span class="kw-2">*</span>,
     <span class="ident">Connector</span>, <span class="ident">ConnectorCapability</span>, <span class="ident">ConstraintScope</span>, <span class="ident">DatamodelError</span>, <span class="ident">Diagnostics</span>, <span class="ident">NativeTypeConstructor</span>,
-    <span class="ident">NativeTypeInstance</span>, <span class="ident">ReferentialAction</span>, <span class="ident">ReferentialIntegrity</span>, <span class="ident">ScalarType</span>,
+    <span class="ident">NativeTypeInstance</span>, <span class="ident">ReferentialAction</span>, <span class="ident">ReferentialIntegrity</span>, <span class="ident">ScalarType</span>, <span class="ident">Span</span>,
 };
 <span class="kw">use</span> <span class="ident">enumflags2::BitFlags</span>;
 <span class="kw">use</span> <span class="ident">native_types</span>::{
@@ -658,7 +660,8 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">native_type_instance</span>: <span class="kw-2">&amp;</span><span class="ident">NativeTypeInstance</span>,
         <span class="ident">scalar_type</span>: <span class="kw-2">&amp;</span><span class="ident">ScalarType</span>,
-        <span class="ident">errors</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ConnectorError</span><span class="op">&gt;</span>,
+        <span class="ident">span</span>: <span class="ident">Span</span>,
+        <span class="ident">errors</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Diagnostics</span>,
     ) {
         <span class="kw">let</span> <span class="ident">native_type</span>: <span class="ident">MySqlType</span> <span class="op">=</span>
             <span class="ident">serde_json::from_value</span>(<span class="ident">native_type_instance</span>.<span class="ident">serialized_native_type</span>.<span class="ident">clone</span>()).<span class="ident">unwrap</span>();
@@ -666,34 +669,32 @@
 
         <span class="kw">match</span> <span class="ident">native_type</span> {
             <span class="ident">Decimal</span>(<span class="prelude-val">Some</span>((<span class="ident">precision</span>, <span class="ident">scale</span>))) <span class="kw">if</span> <span class="ident">scale</span> <span class="op">&gt;</span> <span class="ident">precision</span> =&gt; {
-                <span class="ident">errors</span>.<span class="ident">push</span>(<span class="ident">error</span>.<span class="ident">new_scale_larger_than_precision_error</span>())
+                <span class="ident">errors</span>.<span class="ident">push_error</span>(<span class="ident">error</span>.<span class="ident">new_scale_larger_than_precision_error</span>(<span class="ident">span</span>))
             }
             <span class="ident">Decimal</span>(<span class="prelude-val">Some</span>((<span class="ident">precision</span>, <span class="kw">_</span>))) <span class="kw">if</span> <span class="ident">precision</span> <span class="op">&gt;</span> <span class="number">65</span> =&gt; {
-                <span class="ident">errors</span>.<span class="ident">push</span>(<span class="ident">error</span>.<span class="ident">new_argument_m_out_of_range_error</span>(<span class="string">&quot;Precision can range from 1 to 65.&quot;</span>))
+                <span class="ident">errors</span>.<span class="ident">push_error</span>(<span class="ident">error</span>.<span class="ident">new_argument_m_out_of_range_error</span>(<span class="string">&quot;Precision can range from 1 to 65.&quot;</span>, <span class="ident">span</span>))
             }
             <span class="ident">Decimal</span>(<span class="prelude-val">Some</span>((<span class="kw">_</span>, <span class="ident">scale</span>))) <span class="kw">if</span> <span class="ident">scale</span> <span class="op">&gt;</span> <span class="number">30</span> =&gt; {
-                <span class="ident">errors</span>.<span class="ident">push</span>(<span class="ident">error</span>.<span class="ident">new_argument_m_out_of_range_error</span>(<span class="string">&quot;Scale can range from 0 to 30.&quot;</span>))
+                <span class="ident">errors</span>.<span class="ident">push_error</span>(<span class="ident">error</span>.<span class="ident">new_argument_m_out_of_range_error</span>(<span class="string">&quot;Scale can range from 0 to 30.&quot;</span>, <span class="ident">span</span>))
             }
             <span class="ident">Bit</span>(<span class="ident">length</span>) <span class="kw">if</span> <span class="ident">length</span> <span class="op">==</span> <span class="number">0</span> <span class="op">|</span><span class="op">|</span> <span class="ident">length</span> <span class="op">&gt;</span> <span class="number">64</span> =&gt; {
-                <span class="ident">errors</span>.<span class="ident">push</span>(<span class="ident">error</span>.<span class="ident">new_argument_m_out_of_range_error</span>(<span class="string">&quot;M can range from 1 to 64.&quot;</span>))
+                <span class="ident">errors</span>.<span class="ident">push_error</span>(<span class="ident">error</span>.<span class="ident">new_argument_m_out_of_range_error</span>(<span class="string">&quot;M can range from 1 to 64.&quot;</span>, <span class="ident">span</span>))
             }
             <span class="ident">Char</span>(<span class="ident">length</span>) <span class="kw">if</span> <span class="ident">length</span> <span class="op">&gt;</span> <span class="number">255</span> =&gt; {
-                <span class="ident">errors</span>.<span class="ident">push</span>(<span class="ident">error</span>.<span class="ident">new_argument_m_out_of_range_error</span>(<span class="string">&quot;M can range from 0 to 255.&quot;</span>))
+                <span class="ident">errors</span>.<span class="ident">push_error</span>(<span class="ident">error</span>.<span class="ident">new_argument_m_out_of_range_error</span>(<span class="string">&quot;M can range from 0 to 255.&quot;</span>, <span class="ident">span</span>))
             }
             <span class="ident">VarChar</span>(<span class="ident">length</span>) <span class="kw">if</span> <span class="ident">length</span> <span class="op">&gt;</span> <span class="number">65535</span> =&gt; {
-                <span class="ident">errors</span>.<span class="ident">push</span>(<span class="ident">error</span>.<span class="ident">new_argument_m_out_of_range_error</span>(<span class="string">&quot;M can range from 0 to 65,535.&quot;</span>))
+                <span class="ident">errors</span>.<span class="ident">push_error</span>(<span class="ident">error</span>.<span class="ident">new_argument_m_out_of_range_error</span>(<span class="string">&quot;M can range from 0 to 65,535.&quot;</span>, <span class="ident">span</span>))
             }
             <span class="ident">Bit</span>(<span class="ident">n</span>) <span class="kw">if</span> <span class="ident">n</span> <span class="op">&gt;</span> <span class="number">1</span> <span class="op">&amp;&amp;</span> <span class="macro">matches!</span>(<span class="ident">scalar_type</span>, <span class="ident">ScalarType::Boolean</span>) =&gt; {
-                <span class="ident">errors</span>.<span class="ident">push</span>(<span class="ident">error</span>.<span class="ident">new_argument_m_out_of_range_error</span>(<span class="string">&quot;only Bit(1) can be used as Boolean.&quot;</span>))
+                <span class="ident">errors</span>.<span class="ident">push_error</span>(<span class="ident">error</span>.<span class="ident">new_argument_m_out_of_range_error</span>(<span class="string">&quot;only Bit(1) can be used as Boolean.&quot;</span>, <span class="ident">span</span>))
             }
             <span class="kw">_</span> =&gt; (),
         }
     }
 
     <span class="kw">fn</span> <span class="ident">validate_model</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">model</span>: <span class="ident">ModelWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">errors</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Diagnostics</span>) {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">push_error</span> <span class="op">=</span> <span class="op">|</span><span class="ident">err</span>: <span class="ident">ConnectorError</span><span class="op">|</span> {
-            <span class="ident">errors</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_connector_error</span>(<span class="ident">err</span>, <span class="ident">model</span>.<span class="ident">ast_model</span>().<span class="ident">span</span>));
-        };
+        <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="ident">model</span>.<span class="ident">ast_model</span>().<span class="ident">span</span>;
 
         <span class="kw">for</span> <span class="ident">index</span> <span class="kw">in</span> <span class="ident">model</span>.<span class="ident">indexes</span>() {
             <span class="kw">for</span> <span class="ident">field</span> <span class="kw">in</span> <span class="ident">index</span>.<span class="ident">scalar_field_attributes</span>() {
@@ -709,14 +710,14 @@
                         }
 
                         <span class="kw">if</span> <span class="ident">index</span>.<span class="ident">is_unique</span>() {
-                            <span class="ident">push_error</span>(
+                            <span class="ident">errors</span>.<span class="ident">push_error</span>(
                                 <span class="self">self</span>.<span class="ident">native_instance_error</span>(<span class="kw-2">&amp;</span><span class="ident">native_type</span>)
-                                    .<span class="ident">new_incompatible_native_type_with_unique</span>(<span class="string">&quot; If you are using the `extendedIndexes` preview feature you can add a `length` argument to allow this.&quot;</span>),
+                                    .<span class="ident">new_incompatible_native_type_with_unique</span>(<span class="string">&quot; If you are using the `extendedIndexes` preview feature you can add a `length` argument to allow this.&quot;</span>, <span class="ident">span</span>),
                             )
                         } <span class="kw">else</span> {
-                            <span class="ident">push_error</span>(
+                            <span class="ident">errors</span>.<span class="ident">push_error</span>(
                                 <span class="self">self</span>.<span class="ident">native_instance_error</span>(<span class="kw-2">&amp;</span><span class="ident">native_type</span>)
-                                    .<span class="ident">new_incompatible_native_type_with_index</span>(<span class="string">&quot; If you are using the `extendedIndexes` preview feature you can add a `length` argument to allow this.&quot;</span>),
+                                    .<span class="ident">new_incompatible_native_type_with_index</span>(<span class="string">&quot; If you are using the `extendedIndexes` preview feature you can add a `length` argument to allow this.&quot;</span>, <span class="ident">span</span>),
                             )
                         };
 
@@ -737,9 +738,9 @@
                             <span class="kw">continue</span>;
                         }
 
-                        <span class="ident">push_error</span>(
+                        <span class="ident">errors</span>.<span class="ident">push_error</span>(
                             <span class="self">self</span>.<span class="ident">native_instance_error</span>(<span class="kw-2">&amp;</span><span class="ident">native_type_instance</span>)
-                                .<span class="ident">new_incompatible_native_type_with_id</span>(<span class="string">&quot; If you are using the `extendedIndexes` preview feature you can add a `length` argument to allow this.&quot;</span>),
+                                .<span class="ident">new_incompatible_native_type_with_id</span>(<span class="string">&quot; If you are using the `extendedIndexes` preview feature you can add a `length` argument to allow this.&quot;</span>, <span class="ident">span</span>),
                         );
 
                         <span class="kw">break</span>;
@@ -757,7 +758,12 @@
         <span class="ident">NATIVE_TYPE_CONSTRUCTORS</span>
     }
 
-    <span class="kw">fn</span> <span class="ident">parse_native_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">args</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">NativeTypeInstance</span>, <span class="ident">ConnectorError</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">parse_native_type</span>(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
+        <span class="ident">args</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+        <span class="ident">span</span>: <span class="ident">Span</span>,
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">NativeTypeInstance</span>, <span class="ident">DatamodelError</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">cloned_args</span> <span class="op">=</span> <span class="ident">args</span>.<span class="ident">clone</span>();
 
         <span class="kw">let</span> <span class="ident">native_type</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">name</span> {
@@ -771,14 +777,14 @@
             <span class="ident">UNSIGNED_MEDIUM_INT_TYPE_NAME</span> =&gt; <span class="ident">UnsignedMediumInt</span>,
             <span class="ident">BIG_INT_TYPE_NAME</span> =&gt; <span class="ident">BigInt</span>,
             <span class="ident">UNSIGNED_BIG_INT_TYPE_NAME</span> =&gt; <span class="ident">UnsignedBigInt</span>,
-            <span class="ident">DECIMAL_TYPE_NAME</span> =&gt; <span class="ident">Decimal</span>(<span class="ident">parse_two_opt_u32</span>(<span class="ident">args</span>, <span class="ident">DECIMAL_TYPE_NAME</span>)<span class="question-mark">?</span>),
+            <span class="ident">DECIMAL_TYPE_NAME</span> =&gt; <span class="ident">Decimal</span>(<span class="ident">parse_two_opt_u32</span>(<span class="ident">args</span>, <span class="ident">DECIMAL_TYPE_NAME</span>, <span class="ident">span</span>)<span class="question-mark">?</span>),
             <span class="ident">FLOAT_TYPE_NAME</span> =&gt; <span class="ident">Float</span>,
             <span class="ident">DOUBLE_TYPE_NAME</span> =&gt; <span class="ident">Double</span>,
-            <span class="ident">BIT_TYPE_NAME</span> =&gt; <span class="ident">Bit</span>(<span class="ident">parse_one_u32</span>(<span class="ident">args</span>, <span class="ident">BIT_TYPE_NAME</span>)<span class="question-mark">?</span>),
-            <span class="ident">CHAR_TYPE_NAME</span> =&gt; <span class="ident">Char</span>(<span class="ident">parse_one_u32</span>(<span class="ident">args</span>, <span class="ident">CHAR_TYPE_NAME</span>)<span class="question-mark">?</span>),
-            <span class="ident">VAR_CHAR_TYPE_NAME</span> =&gt; <span class="ident">VarChar</span>(<span class="ident">parse_one_u32</span>(<span class="ident">args</span>, <span class="ident">VAR_CHAR_TYPE_NAME</span>)<span class="question-mark">?</span>),
-            <span class="ident">BINARY_TYPE_NAME</span> =&gt; <span class="ident">Binary</span>(<span class="ident">parse_one_u32</span>(<span class="ident">args</span>, <span class="ident">BINARY_TYPE_NAME</span>)<span class="question-mark">?</span>),
-            <span class="ident">VAR_BINARY_TYPE_NAME</span> =&gt; <span class="ident">VarBinary</span>(<span class="ident">parse_one_u32</span>(<span class="ident">args</span>, <span class="ident">VAR_BINARY_TYPE_NAME</span>)<span class="question-mark">?</span>),
+            <span class="ident">BIT_TYPE_NAME</span> =&gt; <span class="ident">Bit</span>(<span class="ident">parse_one_u32</span>(<span class="ident">args</span>, <span class="ident">BIT_TYPE_NAME</span>, <span class="ident">span</span>)<span class="question-mark">?</span>),
+            <span class="ident">CHAR_TYPE_NAME</span> =&gt; <span class="ident">Char</span>(<span class="ident">parse_one_u32</span>(<span class="ident">args</span>, <span class="ident">CHAR_TYPE_NAME</span>, <span class="ident">span</span>)<span class="question-mark">?</span>),
+            <span class="ident">VAR_CHAR_TYPE_NAME</span> =&gt; <span class="ident">VarChar</span>(<span class="ident">parse_one_u32</span>(<span class="ident">args</span>, <span class="ident">VAR_CHAR_TYPE_NAME</span>, <span class="ident">span</span>)<span class="question-mark">?</span>),
+            <span class="ident">BINARY_TYPE_NAME</span> =&gt; <span class="ident">Binary</span>(<span class="ident">parse_one_u32</span>(<span class="ident">args</span>, <span class="ident">BINARY_TYPE_NAME</span>, <span class="ident">span</span>)<span class="question-mark">?</span>),
+            <span class="ident">VAR_BINARY_TYPE_NAME</span> =&gt; <span class="ident">VarBinary</span>(<span class="ident">parse_one_u32</span>(<span class="ident">args</span>, <span class="ident">VAR_BINARY_TYPE_NAME</span>, <span class="ident">span</span>)<span class="question-mark">?</span>),
             <span class="ident">TINY_BLOB_TYPE_NAME</span> =&gt; <span class="ident">TinyBlob</span>,
             <span class="ident">BLOB_TYPE_NAME</span> =&gt; <span class="ident">Blob</span>,
             <span class="ident">MEDIUM_BLOB_TYPE_NAME</span> =&gt; <span class="ident">MediumBlob</span>,
@@ -788,18 +794,18 @@
             <span class="ident">MEDIUM_TEXT_TYPE_NAME</span> =&gt; <span class="ident">MediumText</span>,
             <span class="ident">LONG_TEXT_TYPE_NAME</span> =&gt; <span class="ident">LongText</span>,
             <span class="ident">DATE_TYPE_NAME</span> =&gt; <span class="ident">Date</span>,
-            <span class="ident">TIME_TYPE_NAME</span> =&gt; <span class="ident">Time</span>(<span class="ident">parse_one_opt_u32</span>(<span class="ident">args</span>, <span class="ident">TIME_TYPE_NAME</span>)<span class="question-mark">?</span>),
-            <span class="ident">DATETIME_TYPE_NAME</span> =&gt; <span class="ident">DateTime</span>(<span class="ident">parse_one_opt_u32</span>(<span class="ident">args</span>, <span class="ident">DATETIME_TYPE_NAME</span>)<span class="question-mark">?</span>),
-            <span class="ident">TIMESTAMP_TYPE_NAME</span> =&gt; <span class="ident">Timestamp</span>(<span class="ident">parse_one_opt_u32</span>(<span class="ident">args</span>, <span class="ident">TIMESTAMP_TYPE_NAME</span>)<span class="question-mark">?</span>),
+            <span class="ident">TIME_TYPE_NAME</span> =&gt; <span class="ident">Time</span>(<span class="ident">parse_one_opt_u32</span>(<span class="ident">args</span>, <span class="ident">TIME_TYPE_NAME</span>, <span class="ident">span</span>)<span class="question-mark">?</span>),
+            <span class="ident">DATETIME_TYPE_NAME</span> =&gt; <span class="ident">DateTime</span>(<span class="ident">parse_one_opt_u32</span>(<span class="ident">args</span>, <span class="ident">DATETIME_TYPE_NAME</span>, <span class="ident">span</span>)<span class="question-mark">?</span>),
+            <span class="ident">TIMESTAMP_TYPE_NAME</span> =&gt; <span class="ident">Timestamp</span>(<span class="ident">parse_one_opt_u32</span>(<span class="ident">args</span>, <span class="ident">TIMESTAMP_TYPE_NAME</span>, <span class="ident">span</span>)<span class="question-mark">?</span>),
             <span class="ident">YEAR_TYPE_NAME</span> =&gt; <span class="ident">Year</span>,
             <span class="ident">JSON_TYPE_NAME</span> =&gt; <span class="ident">Json</span>,
-            <span class="kw">_</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ConnectorError::new_native_type_parser_error</span>(<span class="ident">name</span>)),
+            <span class="kw">_</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">DatamodelError::new_native_type_parser_error</span>(<span class="ident">name</span>, <span class="ident">span</span>)),
         };
 
         <span class="prelude-val">Ok</span>(<span class="ident">NativeTypeInstance::new</span>(<span class="ident">name</span>, <span class="ident">cloned_args</span>, <span class="ident">native_type</span>.<span class="ident">to_json</span>()))
     }
 
-    <span class="kw">fn</span> <span class="ident">introspect_native_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">native_type</span>: <span class="ident">serde_json::Value</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">NativeTypeInstance</span>, <span class="ident">ConnectorError</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">introspect_native_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">native_type</span>: <span class="ident">serde_json::Value</span>) -&gt; <span class="ident">NativeTypeInstance</span> {
         <span class="kw">let</span> <span class="ident">native_type</span>: <span class="ident">MySqlType</span> <span class="op">=</span> <span class="ident">serde_json::from_value</span>(<span class="ident">native_type</span>).<span class="ident">unwrap</span>();
         <span class="kw">let</span> (<span class="ident">constructor_name</span>, <span class="ident">args</span>) <span class="op">=</span> <span class="kw">match</span> <span class="ident">native_type</span> {
             <span class="ident">Int</span> =&gt; (<span class="ident">INT_TYPE_NAME</span>, <span class="macro">vec!</span>[]),
@@ -844,9 +850,9 @@
         }
 
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">constructor</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">find_native_type_constructor</span>(<span class="ident">constructor_name</span>) {
-            <span class="prelude-val">Ok</span>(<span class="ident">NativeTypeInstance::new</span>(<span class="ident">constructor</span>.<span class="ident">name</span>, <span class="ident">args</span>, <span class="ident">native_type</span>.<span class="ident">to_json</span>()))
+            <span class="ident">NativeTypeInstance::new</span>(<span class="ident">constructor</span>.<span class="ident">name</span>, <span class="ident">args</span>, <span class="ident">native_type</span>.<span class="ident">to_json</span>())
         } <span class="kw">else</span> {
-            <span class="prelude-val">Err</span>(<span class="self">self</span>.<span class="ident">native_str_error</span>(<span class="ident">constructor_name</span>).<span class="ident">native_type_name_unknown</span>())
+            <span class="macro">unreachable!</span>()
         }
     }
 

@@ -278,18 +278,6 @@
 <span id="276">276</span>
 <span id="277">277</span>
 <span id="278">278</span>
-<span id="279">279</span>
-<span id="280">280</span>
-<span id="281">281</span>
-<span id="282">282</span>
-<span id="283">283</span>
-<span id="284">284</span>
-<span id="285">285</span>
-<span id="286">286</span>
-<span id="287">287</span>
-<span id="288">288</span>
-<span id="289">289</span>
-<span id="290">290</span>
 </pre><pre class="rust"><code><span class="attribute">#![<span class="ident">deny</span>(<span class="ident">rust_2018_idioms</span>, <span class="ident">unsafe_code</span>)]</span>
 
 <span class="doccomment">//! The interface implemented by connectors for Prisma schema validation and interpretation.</span>
@@ -312,13 +300,12 @@
     <span class="ident">capabilities</span>::{<span class="ident">ConnectorCapabilities</span>, <span class="ident">ConnectorCapability</span>},
     <span class="ident">native_type_instance::NativeTypeInstance</span>,
 };
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">diagnostics</span>::{<span class="ident">connector_error</span>, <span class="ident">DatamodelError</span>, <span class="ident">Diagnostics</span>};
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">diagnostics</span>::{<span class="ident">ConnectorErrorFactory</span>, <span class="ident">DatamodelError</span>, <span class="ident">Diagnostics</span>, <span class="ident">Span</span>};
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">empty_connector::EmptyDatamodelConnector</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">native_type_constructor::NativeTypeConstructor</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">parser_database</span>::{<span class="self">self</span>, <span class="ident">ReferentialAction</span>, <span class="ident">ScalarType</span>};
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">referential_integrity::ReferentialIntegrity</span>;
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::connector_error</span>::{<span class="ident">ConnectorError</span>, <span class="ident">ConnectorErrorFactory</span>, <span class="ident">ErrorKind</span>};
 <span class="kw">use</span> <span class="ident">enumflags2::BitFlags</span>;
 <span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">borrow::Cow</span>, <span class="ident">collections::BTreeMap</span>};
 
@@ -384,7 +371,8 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">_native_type</span>: <span class="kw-2">&amp;</span><span class="ident">NativeTypeInstance</span>,
         <span class="ident">_scalar_type</span>: <span class="kw-2">&amp;</span><span class="ident">ScalarType</span>,
-        <span class="kw">_</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ConnectorError</span><span class="op">&gt;</span>,
+        <span class="ident">_span</span>: <span class="ident">Span</span>,
+        <span class="kw">_</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Diagnostics</span>,
     ) {
     }
 
@@ -417,10 +405,16 @@
     }
 
     <span class="doccomment">/// This function is used during Schema parsing to calculate the concrete native type.</span>
-    <span class="kw">fn</span> <span class="ident">parse_native_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">args</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">NativeTypeInstance</span>, <span class="ident">ConnectorError</span><span class="op">&gt;</span>;
+    <span class="kw">fn</span> <span class="ident">parse_native_type</span>(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
+        <span class="ident">args</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+        <span class="ident">span</span>: <span class="ident">Span</span>,
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">NativeTypeInstance</span>, <span class="ident">DatamodelError</span><span class="op">&gt;</span>;
 
-    <span class="doccomment">/// This function is used during introspection to turn an introspected native type into an instance that can be put into the Prisma schema.</span>
-    <span class="kw">fn</span> <span class="ident">introspect_native_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">native_type</span>: <span class="ident">serde_json::Value</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">NativeTypeInstance</span>, <span class="ident">ConnectorError</span><span class="op">&gt;</span>;
+    <span class="doccomment">/// This function is used during introspection to turn an introspected native type into an</span>
+    <span class="doccomment">/// instance that can be inserted into dml.</span>
+    <span class="kw">fn</span> <span class="ident">introspect_native_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">native_type</span>: <span class="ident">serde_json::Value</span>) -&gt; <span class="ident">NativeTypeInstance</span>;
 
     <span class="kw">fn</span> <span class="ident">set_config_dir</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">config_dir</span>: <span class="kw-2">&amp;</span><span class="ident">std::path::Path</span>, <span class="ident">url</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>) -&gt; <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">str</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">set_root</span> <span class="op">=</span> <span class="op">|</span><span class="ident">path</span>: <span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">|</span> {
@@ -503,25 +497,7 @@
     }
 
     <span class="kw">fn</span> <span class="ident">native_instance_error</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">instance</span>: <span class="kw-2">&amp;</span><span class="ident">NativeTypeInstance</span>) -&gt; <span class="ident">ConnectorErrorFactory</span> {
-        <span class="ident">ConnectorErrorFactory</span> {
-            <span class="ident">connector</span>: <span class="self">self</span>.<span class="ident">name</span>().<span class="ident">to_owned</span>(),
-            <span class="ident">native_type</span>: <span class="ident">instance</span>.<span class="ident">to_string</span>(),
-        }
-    }
-
-    <span class="kw">fn</span> <span class="ident">native_str_error</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">native_str</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">ConnectorErrorFactory</span> {
-        <span class="ident">ConnectorErrorFactory</span> {
-            <span class="ident">connector</span>: <span class="self">self</span>.<span class="ident">name</span>().<span class="ident">to_owned</span>(),
-            <span class="ident">native_type</span>: <span class="ident">native_str</span>.<span class="ident">to_string</span>(),
-        }
-    }
-
-    <span class="kw">fn</span> <span class="ident">native_types_not_supported</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">NativeTypeInstance</span>, <span class="ident">ConnectorError</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Err</span>(<span class="ident">ConnectorError::from_kind</span>(
-            <span class="ident">ErrorKind::ConnectorNotSupportedForNativeTypes</span> {
-                <span class="ident">connector_name</span>: <span class="self">self</span>.<span class="ident">name</span>().<span class="ident">to_owned</span>(),
-            },
-        ))
+        <span class="ident">ConnectorErrorFactory::new</span>(<span class="ident">instance</span>.<span class="ident">to_string</span>(), <span class="self">self</span>.<span class="ident">name</span>().<span class="ident">to_owned</span>())
     }
 
     <span class="kw">fn</span> <span class="ident">validate_url</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">url</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">String</span><span class="op">&gt;</span>;

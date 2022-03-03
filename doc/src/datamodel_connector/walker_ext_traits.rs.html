@@ -144,6 +144,9 @@
 <span id="142">142</span>
 <span id="143">143</span>
 <span id="144">144</span>
+<span id="145">145</span>
+<span id="146">146</span>
+<span id="147">147</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">constraint_names::ConstraintNames</span>, <span class="ident">Connector</span>, <span class="ident">NativeTypeInstance</span>, <span class="ident">ReferentialAction</span>, <span class="ident">ReferentialIntegrity</span>,
 };
@@ -266,8 +269,11 @@
 
 <span class="kw">impl</span> <span class="ident">ScalarFieldWalkerExt</span> <span class="kw">for</span> <span class="ident">ScalarFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
     <span class="kw">fn</span> <span class="ident">native_type_instance</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">connector</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">Connector</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">NativeTypeInstance</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">raw_native_type</span>()
-            .<span class="ident">and_then</span>(<span class="op">|</span>(<span class="kw">_</span>, <span class="ident">name</span>, <span class="ident">args</span>, <span class="kw">_</span>)<span class="op">|</span> <span class="ident">connector</span>.<span class="ident">parse_native_type</span>(<span class="ident">name</span>, <span class="ident">args</span>.<span class="ident">to_owned</span>()).<span class="ident">ok</span>())
+        <span class="self">self</span>.<span class="ident">raw_native_type</span>().<span class="ident">and_then</span>(<span class="op">|</span>(<span class="kw">_</span>, <span class="ident">name</span>, <span class="ident">args</span>, <span class="kw">_</span>)<span class="op">|</span> {
+            <span class="ident">connector</span>
+                .<span class="ident">parse_native_type</span>(<span class="ident">name</span>, <span class="ident">args</span>.<span class="ident">to_owned</span>(), <span class="self">self</span>.<span class="ident">ast_field</span>().<span class="ident">span</span>)
+                .<span class="ident">ok</span>()
+        })
     }
 }
 

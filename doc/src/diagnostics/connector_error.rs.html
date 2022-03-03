@@ -173,123 +173,12 @@
 <span id="171">171</span>
 <span id="172">172</span>
 <span id="173">173</span>
-<span id="174">174</span>
-<span id="175">175</span>
-<span id="176">176</span>
-<span id="177">177</span>
-<span id="178">178</span>
-<span id="179">179</span>
-<span id="180">180</span>
-<span id="181">181</span>
-<span id="182">182</span>
-<span id="183">183</span>
-<span id="184">184</span>
-<span id="185">185</span>
-<span id="186">186</span>
-<span id="187">187</span>
-<span id="188">188</span>
-<span id="189">189</span>
-<span id="190">190</span>
-<span id="191">191</span>
-<span id="192">192</span>
-<span id="193">193</span>
-<span id="194">194</span>
-<span id="195">195</span>
-<span id="196">196</span>
-<span id="197">197</span>
-<span id="198">198</span>
-<span id="199">199</span>
-<span id="200">200</span>
-<span id="201">201</span>
-<span id="202">202</span>
-<span id="203">203</span>
-<span id="204">204</span>
-<span id="205">205</span>
-<span id="206">206</span>
-<span id="207">207</span>
-<span id="208">208</span>
-<span id="209">209</span>
-<span id="210">210</span>
-<span id="211">211</span>
-<span id="212">212</span>
-<span id="213">213</span>
-<span id="214">214</span>
-<span id="215">215</span>
-<span id="216">216</span>
-<span id="217">217</span>
-<span id="218">218</span>
-<span id="219">219</span>
-<span id="220">220</span>
-<span id="221">221</span>
-<span id="222">222</span>
-<span id="223">223</span>
-<span id="224">224</span>
-<span id="225">225</span>
-<span id="226">226</span>
-<span id="227">227</span>
-<span id="228">228</span>
-<span id="229">229</span>
-<span id="230">230</span>
-<span id="231">231</span>
-<span id="232">232</span>
-<span id="233">233</span>
-<span id="234">234</span>
-<span id="235">235</span>
-<span id="236">236</span>
-<span id="237">237</span>
-<span id="238">238</span>
-<span id="239">239</span>
-<span id="240">240</span>
-<span id="241">241</span>
-<span id="242">242</span>
-<span id="243">243</span>
-<span id="244">244</span>
-<span id="245">245</span>
-<span id="246">246</span>
-<span id="247">247</span>
-<span id="248">248</span>
-<span id="249">249</span>
-<span id="250">250</span>
-<span id="251">251</span>
-<span id="252">252</span>
-<span id="253">253</span>
-<span id="254">254</span>
-<span id="255">255</span>
-<span id="256">256</span>
-<span id="257">257</span>
-<span id="258">258</span>
-<span id="259">259</span>
-<span id="260">260</span>
-<span id="261">261</span>
-<span id="262">262</span>
-<span id="263">263</span>
-<span id="264">264</span>
-<span id="265">265</span>
-<span id="266">266</span>
-<span id="267">267</span>
-<span id="268">268</span>
-<span id="269">269</span>
-<span id="270">270</span>
-<span id="271">271</span>
-<span id="272">272</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::fmt::Display</span>;
+</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">DatamodelError</span>, <span class="ident">Span</span>};
 <span class="kw">use</span> <span class="ident">thiserror::Error</span>;
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ConnectorError</span> {
-    <span class="doccomment">/// The error information for internal use.</span>
-    <span class="ident">kind</span>: <span class="ident">ErrorKind</span>,
-}
-
-<span class="kw">impl</span> <span class="ident">Display</span> <span class="kw">for</span> <span class="ident">ConnectorError</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">std::fmt::Result</span> {
-        <span class="ident">Display::fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">kind</span>, <span class="ident">f</span>)
-    }
-}
-
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ConnectorErrorFactory</span> {
-    <span class="kw">pub</span> <span class="ident">native_type</span>: <span class="ident">String</span>,
-    <span class="kw">pub</span> <span class="ident">connector</span>: <span class="ident">String</span>,
+    <span class="ident">native_type</span>: <span class="ident">String</span>,
+    <span class="ident">connector</span>: <span class="ident">String</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">ConnectorErrorFactory</span> {
@@ -297,160 +186,101 @@
         <span class="ident">ConnectorErrorFactory</span> { <span class="ident">native_type</span>, <span class="ident">connector</span> }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_scale_larger_than_precision_error</span>(<span class="self">self</span>) -&gt; <span class="ident">ConnectorError</span> {
-        <span class="ident">ConnectorError::from_kind</span>(<span class="ident">ErrorKind::ScaleLargerThanPrecisionError</span> {
-            <span class="ident">native_type</span>: <span class="self">self</span>.<span class="ident">native_type</span>,
-            <span class="ident">connector_name</span>: <span class="self">self</span>.<span class="ident">connector</span>,
-        })
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_scale_larger_than_precision_error</span>(<span class="self">self</span>, <span class="ident">span</span>: <span class="ident">Span</span>) -&gt; <span class="ident">DatamodelError</span> {
+        <span class="ident">DatamodelError::new</span>(
+            <span class="ident">ErrorKind::ScaleLargerThanPrecisionError</span> {
+                <span class="ident">native_type</span>: <span class="self">self</span>.<span class="ident">native_type</span>,
+                <span class="ident">connector_name</span>: <span class="self">self</span>.<span class="ident">connector</span>,
+            }
+            .<span class="ident">to_string</span>()
+            .<span class="ident">into</span>(),
+            <span class="ident">span</span>,
+        )
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_incompatible_native_type_with_index</span>(<span class="self">self</span>, <span class="ident">message</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">ConnectorError</span> {
-        <span class="ident">ConnectorError::from_kind</span>(<span class="ident">ErrorKind::IncompatibleNativeTypeWithIndexAttribute</span> {
-            <span class="ident">native_type</span>: <span class="self">self</span>.<span class="ident">native_type</span>,
-            <span class="ident">connector_name</span>: <span class="self">self</span>.<span class="ident">connector</span>,
-            <span class="ident">message</span>: <span class="ident">String::from</span>(<span class="ident">message</span>),
-        })
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_incompatible_native_type_with_index</span>(<span class="self">self</span>, <span class="ident">message</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">span</span>: <span class="ident">Span</span>) -&gt; <span class="ident">DatamodelError</span> {
+        <span class="ident">DatamodelError::new</span>(
+            <span class="ident">ErrorKind::IncompatibleNativeTypeWithIndexAttribute</span> {
+                <span class="ident">native_type</span>: <span class="self">self</span>.<span class="ident">native_type</span>,
+                <span class="ident">connector_name</span>: <span class="self">self</span>.<span class="ident">connector</span>,
+                <span class="ident">message</span>: <span class="ident">String::from</span>(<span class="ident">message</span>),
+            }
+            .<span class="ident">to_string</span>()
+            .<span class="ident">into</span>(),
+            <span class="ident">span</span>,
+        )
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_incompatible_native_type_with_unique</span>(<span class="self">self</span>, <span class="ident">message</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">ConnectorError</span> {
-        <span class="ident">ConnectorError::from_kind</span>(<span class="ident">ErrorKind::IncompatibleNativeTypeWithUniqueAttribute</span> {
-            <span class="ident">native_type</span>: <span class="self">self</span>.<span class="ident">native_type</span>,
-            <span class="ident">connector_name</span>: <span class="self">self</span>.<span class="ident">connector</span>,
-            <span class="ident">message</span>: <span class="ident">String::from</span>(<span class="ident">message</span>),
-        })
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_incompatible_native_type_with_unique</span>(<span class="self">self</span>, <span class="ident">message</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">span</span>: <span class="ident">Span</span>) -&gt; <span class="ident">DatamodelError</span> {
+        <span class="ident">DatamodelError::new</span>(
+            <span class="ident">ErrorKind::IncompatibleNativeTypeWithUniqueAttribute</span> {
+                <span class="ident">native_type</span>: <span class="self">self</span>.<span class="ident">native_type</span>,
+                <span class="ident">connector_name</span>: <span class="self">self</span>.<span class="ident">connector</span>,
+                <span class="ident">message</span>: <span class="ident">String::from</span>(<span class="ident">message</span>),
+            }
+            .<span class="ident">to_string</span>()
+            .<span class="ident">into</span>(),
+            <span class="ident">span</span>,
+        )
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_incompatible_native_type_with_id</span>(<span class="self">self</span>, <span class="ident">message</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">ConnectorError</span> {
-        <span class="ident">ConnectorError::from_kind</span>(<span class="ident">ErrorKind::IncompatibleNativeTypeWithIdAttribute</span> {
-            <span class="ident">native_type</span>: <span class="self">self</span>.<span class="ident">native_type</span>,
-            <span class="ident">connector_name</span>: <span class="self">self</span>.<span class="ident">connector</span>,
-            <span class="ident">message</span>: <span class="ident">String::from</span>(<span class="ident">message</span>),
-        })
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_incompatible_native_type_with_id</span>(<span class="self">self</span>, <span class="ident">message</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">span</span>: <span class="ident">Span</span>) -&gt; <span class="ident">DatamodelError</span> {
+        <span class="ident">DatamodelError::new</span>(
+            <span class="ident">ErrorKind::IncompatibleNativeTypeWithIdAttribute</span> {
+                <span class="ident">native_type</span>: <span class="self">self</span>.<span class="ident">native_type</span>,
+                <span class="ident">connector_name</span>: <span class="self">self</span>.<span class="ident">connector</span>,
+                <span class="ident">message</span>: <span class="ident">String::from</span>(<span class="ident">message</span>),
+            }
+            .<span class="ident">to_string</span>()
+            .<span class="ident">into</span>(),
+            <span class="ident">span</span>,
+        )
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_incompatible_sequential_type_with_static_default_value_error</span>(<span class="self">self</span>) -&gt; <span class="ident">ConnectorError</span> {
-        <span class="ident">ConnectorError::from_kind</span>(<span class="ident">ErrorKind::IncompatibleSequentialTypeWithStaticDefaultValue</span> {
-            <span class="ident">native_type</span>: <span class="self">self</span>.<span class="ident">native_type</span>,
-            <span class="ident">connector_name</span>: <span class="self">self</span>.<span class="ident">connector</span>,
-        })
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_incompatible_sequential_type_with_static_default_value_error</span>(<span class="self">self</span>, <span class="ident">span</span>: <span class="ident">Span</span>) -&gt; <span class="ident">DatamodelError</span> {
+        <span class="ident">DatamodelError::new</span>(
+            <span class="ident">ErrorKind::IncompatibleSequentialTypeWithStaticDefaultValue</span> {
+                <span class="ident">native_type</span>: <span class="self">self</span>.<span class="ident">native_type</span>,
+                <span class="ident">connector_name</span>: <span class="self">self</span>.<span class="ident">connector</span>,
+            }
+            .<span class="ident">to_string</span>()
+            .<span class="ident">into</span>(),
+            <span class="ident">span</span>,
+        )
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_argument_m_out_of_range_error</span>(<span class="self">self</span>, <span class="ident">message</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">ConnectorError</span> {
-        <span class="ident">ConnectorError::from_kind</span>(<span class="ident">ErrorKind::ArgumentOutOfRangeError</span> {
-            <span class="ident">native_type</span>: <span class="self">self</span>.<span class="ident">native_type</span>,
-            <span class="ident">connector_name</span>: <span class="self">self</span>.<span class="ident">connector</span>,
-            <span class="ident">message</span>: <span class="ident">String::from</span>(<span class="ident">message</span>),
-        })
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_argument_m_out_of_range_error</span>(<span class="self">self</span>, <span class="ident">message</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">span</span>: <span class="ident">Span</span>) -&gt; <span class="ident">DatamodelError</span> {
+        <span class="ident">DatamodelError::new</span>(
+            <span class="ident">ErrorKind::ArgumentOutOfRangeError</span> {
+                <span class="ident">native_type</span>: <span class="self">self</span>.<span class="ident">native_type</span>,
+                <span class="ident">connector_name</span>: <span class="self">self</span>.<span class="ident">connector</span>,
+                <span class="ident">message</span>: <span class="ident">String::from</span>(<span class="ident">message</span>),
+            }
+            .<span class="ident">to_string</span>()
+            .<span class="ident">into</span>(),
+            <span class="ident">span</span>,
+        )
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">native_type_name_unknown</span>(<span class="self">self</span>) -&gt; <span class="ident">ConnectorError</span> {
-        <span class="ident">ConnectorError::from_kind</span>(<span class="ident">ErrorKind::NativeTypeNameUnknown</span> {
-            <span class="ident">native_type</span>: <span class="self">self</span>.<span class="ident">native_type</span>,
-            <span class="ident">connector_name</span>: <span class="self">self</span>.<span class="ident">connector</span>,
-        })
-    }
-
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">native_type_invalid_param</span>(<span class="self">self</span>, <span class="ident">expected</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">got</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">ConnectorError</span> {
-        <span class="ident">ConnectorError::from_kind</span>(<span class="ident">ErrorKind::InvalidArgumentError</span> {
-            <span class="ident">native_type</span>: <span class="self">self</span>.<span class="ident">native_type</span>,
-            <span class="ident">expected</span>: <span class="ident">expected</span>.<span class="ident">into</span>(),
-            <span class="ident">got</span>: <span class="ident">got</span>.<span class="ident">into</span>(),
-        })
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">ConnectorError</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_kind</span>(<span class="ident">kind</span>: <span class="ident">ErrorKind</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">ConnectorError</span> { <span class="ident">kind</span> }
-    }
-
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_argument_count_mismatch_error</span>(
-        <span class="ident">native_type</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-        <span class="ident">required_count</span>: <span class="ident">usize</span>,
-        <span class="ident">given_count</span>: <span class="ident">usize</span>,
-    ) -&gt; <span class="ident">ConnectorError</span> {
-        <span class="ident">ConnectorError::from_kind</span>(<span class="ident">ErrorKind::ArgumentCountMisMatchError</span> {
-            <span class="ident">native_type</span>: <span class="ident">String::from</span>(<span class="ident">native_type</span>),
-            <span class="ident">required_count</span>,
-            <span class="ident">given_count</span>,
-        })
-    }
-
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_value_parser_error</span>(<span class="ident">expected_type</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">parser_error</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">raw</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">ConnectorError</span> {
-        <span class="ident">ConnectorError::from_kind</span>(<span class="ident">ErrorKind::ValueParserError</span> {
-            <span class="ident">expected_type</span>: <span class="ident">String::from</span>(<span class="ident">expected_type</span>),
-            <span class="ident">parser_error</span>: <span class="ident">String::from</span>(<span class="ident">parser_error</span>),
-            <span class="ident">raw</span>: <span class="ident">String::from</span>(<span class="ident">raw</span>),
-        })
-    }
-
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_native_type_parser_error</span>(<span class="ident">native_type</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">ConnectorError</span> {
-        <span class="ident">ConnectorError::from_kind</span>(<span class="ident">ErrorKind::InvalidNativeType</span> {
-            <span class="ident">native_type</span>: <span class="ident">String::from</span>(<span class="ident">native_type</span>),
-        })
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">native_type_name_unknown</span>(<span class="self">self</span>, <span class="ident">span</span>: <span class="ident">Span</span>) -&gt; <span class="ident">DatamodelError</span> {
+        <span class="ident">DatamodelError::new</span>(
+            <span class="ident">ErrorKind::NativeTypeNameUnknown</span> {
+                <span class="ident">native_type</span>: <span class="self">self</span>.<span class="ident">native_type</span>,
+                <span class="ident">connector_name</span>: <span class="self">self</span>.<span class="ident">connector</span>,
+            }
+            .<span class="ident">to_string</span>()
+            .<span class="ident">into</span>(),
+            <span class="ident">span</span>,
+        )
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Error</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ErrorKind</span> {
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Native types are not supported with {} connector&quot;</span>, <span class="ident">connector_name</span>)]</span>
-    <span class="ident">ConnectorNotSupportedForNativeTypes</span> { <span class="ident">connector_name</span>: <span class="ident">String</span> },
-
-    <span class="attribute">#[<span class="ident">error</span>(
-        <span class="string">&quot;The prefix {} is invalid. It must be equal to the name of an existing datasource e.g. {}. Did you mean to use {}?&quot;</span>,
-        <span class="ident">given_prefix</span>,
-        <span class="ident">expected_prefix</span>,
-        <span class="ident">suggestion</span>
-    )]</span>
-    <span class="ident">InvalidPrefixForNativeTypes</span> {
-        <span class="ident">given_prefix</span>: <span class="ident">String</span>,
-        <span class="ident">expected_prefix</span>: <span class="ident">String</span>,
-        <span class="ident">suggestion</span>: <span class="ident">String</span>,
-    },
-
-    <span class="attribute">#[<span class="ident">error</span>(
-        <span class="string">&quot;Native type {} is not compatible with declared field type {}, expected field type {}.&quot;</span>,
-        <span class="ident">native_type</span>,
-        <span class="ident">field_type</span>,
-        <span class="ident">expected_types</span>
-    )]</span>
-    <span class="ident">IncompatibleNativeType</span> {
-        <span class="ident">native_type</span>: <span class="ident">String</span>,
-        <span class="ident">field_type</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>,
-        <span class="ident">expected_types</span>: <span class="ident">String</span>,
-    },
-
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Attribute @{} is defined twice.&quot;</span>, <span class="ident">attribute_name</span>)]</span>
-    <span class="ident">DuplicateAttributeError</span> { <span class="ident">attribute_name</span>: <span class="ident">String</span> },
-
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Error</span>)]</span>
+<span class="kw">enum</span> <span class="ident">ErrorKind</span> {
     <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Native type {} is not supported for {} connector.&quot;</span>, <span class="ident">native_type</span>, <span class="ident">connector_name</span>)]</span>
     <span class="ident">NativeTypeNameUnknown</span> {
         <span class="ident">native_type</span>: <span class="ident">String</span>,
         <span class="ident">connector_name</span>: <span class="ident">String</span>,
-    },
-
-    <span class="attribute">#[<span class="ident">error</span>(
-        <span class="string">&quot;Native type {} takes {} arguments, but received {}.&quot;</span>,
-        <span class="ident">native_type</span>,
-        <span class="ident">required_count</span>,
-        <span class="ident">given_count</span>
-    )]</span>
-    <span class="ident">ArgumentCountMisMatchError</span> {
-        <span class="ident">native_type</span>: <span class="ident">String</span>,
-        <span class="ident">required_count</span>: <span class="ident">usize</span>,
-        <span class="ident">given_count</span>: <span class="ident">usize</span>,
-    },
-
-    <span class="attribute">#[<span class="ident">error</span>(
-        <span class="string">&quot;Native type {} takes {} optional arguments, but received {}.&quot;</span>,
-        <span class="ident">native_type</span>,
-        <span class="ident">optional_count</span>,
-        <span class="ident">given_count</span>
-    )]</span>
-    <span class="ident">OptionalArgumentCountMismatchError</span> {
-        <span class="ident">native_type</span>: <span class="ident">String</span>,
-        <span class="ident">optional_count</span>: <span class="ident">usize</span>,
-        <span class="ident">given_count</span>: <span class="ident">usize</span>,
     },
 
     <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Native type {} cannot be unique in {}.{}&quot;</span>, <span class="ident">native_type</span>, <span class="ident">connector_name</span>, <span class="ident">message</span>)]</span>
@@ -485,18 +315,6 @@
     },
 
     <span class="attribute">#[<span class="ident">error</span>(
-        <span class="string">&quot;Expected a {} value, but failed while parsing \&quot;{}\&quot;: {}.&quot;</span>,
-        <span class="ident">expected_type</span>,
-        <span class="ident">raw</span>,
-        <span class="ident">parser_error</span>
-    )]</span>
-    <span class="ident">ValueParserError</span> {
-        <span class="ident">expected_type</span>: <span class="ident">String</span>,
-        <span class="ident">parser_error</span>: <span class="ident">String</span>,
-        <span class="ident">raw</span>: <span class="ident">String</span>,
-    },
-
-    <span class="attribute">#[<span class="ident">error</span>(
         <span class="string">&quot;The scale must not be larger than the precision for the {} native type in {}.&quot;</span>,
         <span class="ident">native_type</span>,
         <span class="ident">connector_name</span>
@@ -527,22 +345,6 @@
         <span class="ident">connector_name</span>: <span class="ident">String</span>,
         <span class="ident">message</span>: <span class="ident">String</span>,
     },
-
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Invalid argument for type {}: {}. Allowed values: {}.&quot;</span>, <span class="ident">native_type</span>, <span class="ident">got</span>, <span class="ident">expected</span>)]</span>
-    <span class="ident">InvalidArgumentError</span> {
-        <span class="ident">native_type</span>: <span class="ident">String</span>,
-        <span class="ident">expected</span>: <span class="ident">String</span>,
-        <span class="ident">got</span>: <span class="ident">String</span>,
-    },
-
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Error validating field &#39;{}&#39;: {}&quot;</span>, <span class="ident">field</span>, <span class="ident">message</span>)]</span>
-    <span class="ident">FieldValidationError</span> { <span class="ident">field</span>: <span class="ident">String</span>, <span class="ident">message</span>: <span class="ident">String</span> },
-
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Invalid Native type {}.&quot;</span>, <span class="ident">native_type</span>)]</span>
-    <span class="ident">InvalidNativeType</span> { <span class="ident">native_type</span>: <span class="ident">String</span> },
-
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Invalid model: {}.&quot;</span>, <span class="ident">message</span>)]</span>
-    <span class="ident">InvalidModelError</span> { <span class="ident">message</span>: <span class="ident">String</span> },
 }
 </code></pre></div>
 </section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="diagnostics" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.59.0 (9d1b2106e 2022-02-23)" ></div>

@@ -14,19 +14,19 @@
 <span id="12">12</span>
 <span id="13">13</span>
 <span id="14">14</span>
-</pre><pre class="rust"><code><span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">connector_error</span>;
-
-<span class="kw">mod</span> <span class="ident">collection</span>;
+</pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">collection</span>;
+<span class="kw">mod</span> <span class="ident">connector_error</span>;
 <span class="kw">mod</span> <span class="ident">error</span>;
 <span class="kw">mod</span> <span class="ident">helper</span>;
 <span class="kw">mod</span> <span class="ident">span</span>;
 <span class="kw">mod</span> <span class="ident">validated</span>;
 <span class="kw">mod</span> <span class="ident">warning</span>;
 
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">collection</span>::<span class="kw-2">*</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">collection::Diagnostics</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">connector_error::ConnectorErrorFactory</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">error::DatamodelError</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">span::Span</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">validated</span>::<span class="kw-2">*</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">validated::Validated</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">warning::DatamodelWarning</span>;
 </code></pre></div>
 </section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="diagnostics" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.59.0 (9d1b2106e 2022-02-23)" ></div>

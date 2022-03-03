@@ -229,13 +229,16 @@
 <span id="227">227</span>
 <span id="228">228</span>
 <span id="229">229</span>
+<span id="230">230</span>
+<span id="231">231</span>
+<span id="232">232</span>
+<span id="233">233</span>
 </pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">mongodb_types</span>;
 
 <span class="kw">use</span> <span class="ident">datamodel_connector</span>::{
-    <span class="ident">connector_error</span>::{<span class="ident">ConnectorError</span>, <span class="ident">ErrorKind</span>},
     <span class="ident">parser_database</span>::{<span class="ident">ast::Expression</span>, <span class="ident">walkers</span>::<span class="kw-2">*</span>},
     <span class="ident">Connector</span>, <span class="ident">ConnectorCapability</span>, <span class="ident">ConstraintScope</span>, <span class="ident">DatamodelError</span>, <span class="ident">Diagnostics</span>, <span class="ident">NativeTypeConstructor</span>,
-    <span class="ident">NativeTypeInstance</span>, <span class="ident">ReferentialAction</span>, <span class="ident">ReferentialIntegrity</span>, <span class="ident">ScalarType</span>,
+    <span class="ident">NativeTypeInstance</span>, <span class="ident">ReferentialAction</span>, <span class="ident">ReferentialIntegrity</span>, <span class="ident">ScalarType</span>, <span class="ident">Span</span>,
 };
 <span class="kw">use</span> <span class="ident">enumflags2::BitFlags</span>;
 <span class="kw">use</span> <span class="ident">mongodb_types</span>::<span class="kw-2">*</span>;
@@ -260,7 +263,7 @@
     <span class="ident">ConnectorCapability::TwoWayEmbeddedManyToManyRelation</span>,
 ];
 
-<span class="kw">type</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">ConnectorError</span><span class="op">&gt;</span>;
+<span class="kw">type</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">DatamodelError</span><span class="op">&gt;</span>;
 
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">MongoDbDatamodelConnector</span>;
 
@@ -271,13 +274,13 @@
         }
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">bail</span> <span class="op">=</span> <span class="op">|</span><span class="op">|</span> {
-            <span class="kw">let</span> <span class="ident">err</span> <span class="op">=</span> <span class="ident">ConnectorError::from_kind</span>(<span class="ident">ErrorKind::FieldValidationError</span> {
-                <span class="ident">field</span>: <span class="ident">field</span>.<span class="ident">name</span>().<span class="ident">to_owned</span>(),
-                <span class="ident">message</span>:
-                    <span class="string">&quot;MongoDB `@default(auto())` fields must have `ObjectId` native type and use the `@id` attribute.&quot;</span>
-                        .<span class="ident">to_owned</span>(),
-            });
-            <span class="ident">errors</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_connector_error</span>(<span class="ident">err</span>, <span class="ident">field</span>.<span class="ident">ast_field</span>().<span class="ident">span</span>))
+            <span class="kw">let</span> <span class="ident">err</span> <span class="op">=</span> <span class="ident">DatamodelError::new_field_validation_error</span>(
+                <span class="string">&quot;MongoDB `@default(auto())` fields must have `ObjectId` native type and use the `@id` attribute.&quot;</span>,
+                <span class="ident">field</span>.<span class="ident">model</span>().<span class="ident">name</span>(),
+                <span class="ident">field</span>.<span class="ident">name</span>(),
+                <span class="ident">field</span>.<span class="ident">ast_field</span>().<span class="ident">span</span>,
+            );
+            <span class="ident">errors</span>.<span class="ident">push_error</span>(<span class="ident">err</span>);
         };
 
         <span class="kw">let</span> <span class="ident">model</span> <span class="op">=</span> <span class="ident">field</span>.<span class="ident">model</span>();
@@ -296,12 +299,13 @@
             <span class="kw">return</span>;
         }
 
-        <span class="kw">let</span> <span class="ident">err</span> <span class="op">=</span> <span class="ident">ConnectorError::from_kind</span>(<span class="ident">ErrorKind::FieldValidationError</span> {
-            <span class="ident">field</span>: <span class="ident">field</span>.<span class="ident">name</span>().<span class="ident">to_owned</span>(),
-            <span class="ident">message</span>: <span class="string">&quot;The `dbgenerated()` function is not allowed with MongoDB. Please use `auto()` instead.&quot;</span>
-                .<span class="ident">to_owned</span>(),
-        });
-        <span class="ident">errors</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_connector_error</span>(<span class="ident">err</span>, <span class="ident">field</span>.<span class="ident">ast_field</span>().<span class="ident">span</span>));
+        <span class="kw">let</span> <span class="ident">err</span> <span class="op">=</span> <span class="ident">DatamodelError::new_field_validation_error</span>(
+            <span class="string">&quot;The `dbgenerated()` function is not allowed with MongoDB. Please use `auto()` instead.&quot;</span>,
+            <span class="ident">field</span>.<span class="ident">model</span>().<span class="ident">name</span>(),
+            <span class="ident">field</span>.<span class="ident">name</span>(),
+            <span class="ident">field</span>.<span class="ident">ast_field</span>().<span class="ident">span</span>,
+        );
+        <span class="ident">errors</span>.<span class="ident">push_error</span>(<span class="ident">err</span>);
     }
 
     <span class="kw">fn</span> <span class="ident">validate_array_native_type</span>(<span class="ident">field</span>: <span class="ident">ScalarFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">errors</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Diagnostics</span>) {
@@ -317,14 +321,13 @@
         <span class="comment">// `db.Array` expects exactly 1 argument, which is validated before this code path.</span>
         <span class="kw">let</span> <span class="ident">arg</span> <span class="op">=</span> <span class="ident">args</span>.<span class="ident">get</span>(<span class="number">0</span>).<span class="ident">unwrap</span>();
 
-        <span class="ident">errors</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_connector_error</span>(
-            <span class="ident">ConnectorError::from_kind</span>(<span class="ident">ErrorKind::FieldValidationError</span> {
-                <span class="ident">field</span>: <span class="ident">field</span>.<span class="ident">name</span>().<span class="ident">to_owned</span>(),
-                <span class="ident">message</span>: <span class="macro">format!</span>(
-                    <span class="string">&quot;Native type `{ds_name}.{}` is deprecated. Please use `{ds_name}.{arg}` instead.&quot;</span>,
-                    <span class="ident">type_names::ARRAY</span>
-                ),
-            }),
+        <span class="ident">errors</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_field_validation_error</span>(
+            <span class="kw-2">&amp;</span><span class="macro">format!</span>(
+                <span class="string">&quot;Native type `{ds_name}.{}` is deprecated. Please use `{ds_name}.{arg}` instead.&quot;</span>,
+                <span class="ident">type_names::ARRAY</span>
+            ),
+            <span class="ident">field</span>.<span class="ident">model</span>().<span class="ident">name</span>(),
+            <span class="ident">field</span>.<span class="ident">name</span>(),
             <span class="ident">span</span>,
         ));
     }
@@ -358,16 +361,13 @@
             <span class="ident"><span class="self">Self</span>::validate_array_native_type</span>(<span class="ident">field</span>, <span class="ident">errors</span>);
         }
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">push_error</span> <span class="op">=</span> <span class="op">|</span><span class="ident">err</span>: <span class="ident">ConnectorError</span><span class="op">|</span> {
-            <span class="ident">errors</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_connector_error</span>(<span class="ident">err</span>, <span class="ident">model</span>.<span class="ident">ast_model</span>().<span class="ident">span</span>));
-        };
-
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">pk</span>) <span class="op">=</span> <span class="ident">model</span>.<span class="ident">primary_key</span>() {
             <span class="comment">// no compound ids</span>
             <span class="kw">if</span> <span class="ident">pk</span>.<span class="ident">fields</span>().<span class="ident">len</span>() <span class="op">&gt;</span> <span class="number">1</span> {
-                <span class="ident">push_error</span>(<span class="ident">ConnectorError::from_kind</span>(<span class="ident">ErrorKind::InvalidModelError</span> {
-                    <span class="ident">message</span>: <span class="string">&quot;MongoDB models require exactly one identity field annotated with @id&quot;</span>.<span class="ident">to_owned</span>(),
-                }));
+                <span class="ident">errors</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_invalid_model_error</span>(
+                    <span class="string">&quot;MongoDB models require exactly one identity field annotated with @id&quot;</span>,
+                    <span class="ident">model</span>.<span class="ident">ast_model</span>().<span class="ident">span</span>,
+                ));
             }
 
             <span class="comment">// singular id</span>
@@ -377,35 +377,43 @@
             <span class="kw">if</span> <span class="ident">field</span>.<span class="ident">name</span>() <span class="op">!</span><span class="op">=</span> <span class="string">&quot;_id&quot;</span> {
                 <span class="kw">match</span> <span class="ident">field</span>.<span class="ident">mapped_name</span>() {
                     <span class="prelude-val">Some</span>(<span class="string">&quot;_id&quot;</span>) =&gt; (),
-                    <span class="prelude-val">Some</span>(<span class="ident">mapped_name</span>) =&gt; <span class="ident">push_error</span>(<span class="ident">ConnectorError::from_kind</span>(<span class="ident">ErrorKind::FieldValidationError</span> {
-                        <span class="ident">field</span>: <span class="ident">field</span>.<span class="ident">name</span>().<span class="ident">to_owned</span>(),
-                        <span class="ident">message</span>: <span class="macro">format!</span>(
+                    <span class="prelude-val">Some</span>(<span class="ident">mapped_name</span>) =&gt; <span class="ident">errors</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_field_validation_error</span>(
+                        <span class="kw-2">&amp;</span><span class="macro">format!</span>(
                             <span class="string">&quot;MongoDB model IDs must have a @map(\&quot;_id\&quot;) annotation, found @map(\&quot;{}\&quot;).&quot;</span>,
                             <span class="ident">mapped_name</span>
                         ),
-                    })),
-                    <span class="prelude-val">None</span> =&gt; <span class="ident">push_error</span>(<span class="ident">ConnectorError::from_kind</span>(<span class="ident">ErrorKind::FieldValidationError</span> {
-                        <span class="ident">field</span>: <span class="ident">field</span>.<span class="ident">name</span>().<span class="ident">to_owned</span>(),
-                        <span class="ident">message</span>: <span class="string">&quot;MongoDB model IDs must have a @map(\&quot;_id\&quot;) annotations.&quot;</span>.<span class="ident">to_owned</span>(),
-                    })),
+                        <span class="ident">field</span>.<span class="ident">model</span>().<span class="ident">name</span>(),
+                        <span class="ident">field</span>.<span class="ident">name</span>(),
+                        <span class="ident">field</span>.<span class="ident">ast_field</span>().<span class="ident">span</span>,
+                    )),
+                    <span class="prelude-val">None</span> =&gt; <span class="ident">errors</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_field_validation_error</span>(
+                        <span class="string">&quot;MongoDB model IDs must have a @map(\&quot;_id\&quot;) annotations.&quot;</span>,
+                        <span class="ident">field</span>.<span class="ident">model</span>().<span class="ident">name</span>(),
+                        <span class="ident">field</span>.<span class="ident">name</span>(),
+                        <span class="ident">field</span>.<span class="ident">ast_field</span>().<span class="ident">span</span>,
+                    )),
                 };
             }
 
             <span class="kw">if</span> <span class="ident">field</span>.<span class="ident">raw_native_type</span>().<span class="ident">is_none</span>()
                 <span class="op">&amp;&amp;</span> <span class="macro">matches!</span>(<span class="ident">field</span>.<span class="ident">default_value</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">v</span>.<span class="ident">value</span>()), <span class="prelude-val">Some</span>(<span class="ident">Expression::Function</span>(<span class="ident">fn_name</span>,<span class="kw">_</span>,<span class="kw">_</span>)) <span class="kw">if</span> <span class="ident">fn_name</span> <span class="op">==</span> <span class="string">&quot;dbgenerated&quot;</span>)
             {
-                <span class="ident">push_error</span>(<span class="ident">ConnectorError::from_kind</span>(<span class="ident">ErrorKind::FieldValidationError</span> {
-                    <span class="ident">field</span>: <span class="ident">field</span>.<span class="ident">name</span>().<span class="ident">to_owned</span>(),
-                    <span class="ident">message</span>: <span class="macro">format!</span>(
+                <span class="ident">errors</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_field_validation_error</span>(
+                    <span class="kw-2">&amp;</span><span class="macro">format!</span>(
                         <span class="string">&quot;MongoDB `@default(dbgenerated())` IDs must have an `ObjectID` native type annotation. `{}` is an ID field, so you probably want `ObjectId` as your native type.&quot;</span>,
                         <span class="ident">field</span>.<span class="ident">name</span>()
-                    ),
-                }));
+                        ),
+                        <span class="ident">field</span>.<span class="ident">model</span>().<span class="ident">name</span>(),
+                        <span class="ident">field</span>.<span class="ident">name</span>(),
+                        <span class="ident">field</span>.<span class="ident">ast_field</span>().<span class="ident">span</span>,
+
+                ));
             }
         } <span class="kw">else</span> {
-            <span class="ident">push_error</span>(<span class="ident">ConnectorError::from_kind</span>(<span class="ident">ErrorKind::InvalidModelError</span> {
-                <span class="ident">message</span>: <span class="string">&quot;MongoDB models require exactly one identity field annotated with @id&quot;</span>.<span class="ident">to_owned</span>(),
-            }))
+            <span class="ident">errors</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_invalid_model_error</span>(
+                <span class="string">&quot;MongoDB models require exactly one identity field annotated with @id&quot;</span>,
+                <span class="ident">model</span>.<span class="ident">ast_model</span>().<span class="ident">span</span>,
+            ));
         }
     }
 
@@ -426,13 +434,13 @@
         <span class="kw-2">&amp;</span><span class="ident">native_type</span> <span class="op">==</span> <span class="ident">default_native_type</span>
     }
 
-    <span class="kw">fn</span> <span class="ident">parse_native_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">args</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">NativeTypeInstance</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">mongo_type</span> <span class="op">=</span> <span class="ident">mongo_type_from_input</span>(<span class="ident">name</span>, <span class="kw-2">&amp;</span><span class="ident">args</span>)<span class="question-mark">?</span>;
+    <span class="kw">fn</span> <span class="ident">parse_native_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">args</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>, <span class="ident">span</span>: <span class="ident">Span</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">NativeTypeInstance</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">mongo_type</span> <span class="op">=</span> <span class="ident">mongo_type_from_input</span>(<span class="ident">name</span>, <span class="kw-2">&amp;</span><span class="ident">args</span>, <span class="ident">span</span>)<span class="question-mark">?</span>;
 
         <span class="prelude-val">Ok</span>(<span class="ident">NativeTypeInstance::new</span>(<span class="ident">name</span>, <span class="ident">args</span>, <span class="ident">mongo_type</span>.<span class="ident">to_json</span>()))
     }
 
-    <span class="kw">fn</span> <span class="ident">introspect_native_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_native_type</span>: <span class="ident">serde_json::Value</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">NativeTypeInstance</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">introspect_native_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_native_type</span>: <span class="ident">serde_json::Value</span>) -&gt; <span class="ident">NativeTypeInstance</span> {
         <span class="comment">// Out of scope for MVP</span>
         <span class="macro">todo!</span>()
     }

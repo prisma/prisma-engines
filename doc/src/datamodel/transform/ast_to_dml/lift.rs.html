@@ -622,6 +622,10 @@
 <span id="620">620</span>
 <span id="621">621</span>
 <span id="622">622</span>
+<span id="623">623</span>
+<span id="624">624</span>
+<span id="625">625</span>
+<span id="626">626</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">ast</span>, <span class="ident">dml</span>,
     <span class="ident">transform::ast_to_dml::db</span>::{<span class="self">self</span>, <span class="ident">walkers</span>::<span class="kw-2">*</span>, <span class="ident">IndexAlgorithm</span>},
@@ -1102,9 +1106,11 @@
                 <span class="self">self</span>.<span class="ident">lift_scalar_field_type</span>(<span class="ident">alias</span>, <span class="ident">scalar_field_type</span>, <span class="ident">scalar_field</span>)
             }
             <span class="ident">db::ScalarFieldType::BuiltInScalar</span>(<span class="ident">scalar_type</span>) =&gt; {
-                <span class="kw">let</span> <span class="ident">native_type</span> <span class="op">=</span> <span class="ident">scalar_field</span>
-                    .<span class="ident">raw_native_type</span>()
-                    .<span class="ident">map</span>(<span class="op">|</span>(<span class="kw">_</span>, <span class="ident">name</span>, <span class="ident">args</span>, <span class="kw">_</span>)<span class="op">|</span> <span class="self">self</span>.<span class="ident">connector</span>.<span class="ident">parse_native_type</span>(<span class="ident">name</span>, <span class="ident">args</span>.<span class="ident">to_owned</span>()).<span class="ident">unwrap</span>());
+                <span class="kw">let</span> <span class="ident">native_type</span> <span class="op">=</span> <span class="ident">scalar_field</span>.<span class="ident">raw_native_type</span>().<span class="ident">map</span>(<span class="op">|</span>(<span class="kw">_</span>, <span class="ident">name</span>, <span class="ident">args</span>, <span class="kw">_</span>)<span class="op">|</span> {
+                    <span class="self">self</span>.<span class="ident">connector</span>
+                        .<span class="ident">parse_native_type</span>(<span class="ident">name</span>, <span class="ident">args</span>.<span class="ident">to_owned</span>(), <span class="ident">scalar_field</span>.<span class="ident">ast_field</span>().<span class="ident">span</span>)
+                        .<span class="ident">unwrap</span>()
+                });
                 <span class="ident">dml::FieldType::Scalar</span>(
                     <span class="ident">parser_database_scalar_type_to_dml_scalar_type</span>(<span class="kw-2">*</span><span class="ident">scalar_type</span>),
                     <span class="prelude-val">None</span>,
@@ -1124,9 +1130,11 @@
                 <span class="ident">CompositeTypeFieldType::CompositeType</span>(<span class="self">self</span>.<span class="ident">db</span>.<span class="ident">ast</span>()[<span class="kw-2">*</span><span class="ident">ctid</span>].<span class="ident">name</span>.<span class="ident">name</span>.<span class="ident">to_owned</span>())
             }
             <span class="ident">db::ScalarFieldType::BuiltInScalar</span>(<span class="ident">scalar_type</span>) =&gt; {
-                <span class="kw">let</span> <span class="ident">native_type</span> <span class="op">=</span> <span class="ident">composite_type_field</span>
-                    .<span class="ident">raw_native_type</span>()
-                    .<span class="ident">map</span>(<span class="op">|</span>(<span class="kw">_</span>, <span class="ident">name</span>, <span class="ident">args</span>, <span class="kw">_</span>)<span class="op">|</span> <span class="self">self</span>.<span class="ident">connector</span>.<span class="ident">parse_native_type</span>(<span class="ident">name</span>, <span class="ident">args</span>.<span class="ident">to_owned</span>()).<span class="ident">unwrap</span>());
+                <span class="kw">let</span> <span class="ident">native_type</span> <span class="op">=</span> <span class="ident">composite_type_field</span>.<span class="ident">raw_native_type</span>().<span class="ident">map</span>(<span class="op">|</span>(<span class="kw">_</span>, <span class="ident">name</span>, <span class="ident">args</span>, <span class="kw">_</span>)<span class="op">|</span> {
+                    <span class="self">self</span>.<span class="ident">connector</span>
+                        .<span class="ident">parse_native_type</span>(<span class="ident">name</span>, <span class="ident">args</span>.<span class="ident">to_owned</span>(), <span class="ident">composite_type_field</span>.<span class="ident">ast_field</span>().<span class="ident">span</span>)
+                        .<span class="ident">unwrap</span>()
+                });
 
                 <span class="ident">CompositeTypeFieldType::Scalar</span>(
                     <span class="ident">parser_database_scalar_type_to_dml_scalar_type</span>(<span class="kw-2">*</span><span class="ident">scalar_type</span>),
