@@ -66,6 +66,11 @@ impl<'db> ScalarFieldWalker<'db> {
         self.model().field_is_single_pk(self.field_id)
     }
 
+    /// Is the field part of a compound primary key.
+    pub fn is_part_of_a_compound_pk(self) -> bool {
+        self.model().field_is_part_of_a_compound_pk(self.field_id)
+    }
+
     /// Is there an `@ignore` attribute on the field?
     pub fn is_ignored(self) -> bool {
         self.attributes().is_ignored

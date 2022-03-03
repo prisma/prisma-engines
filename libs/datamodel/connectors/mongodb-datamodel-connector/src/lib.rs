@@ -1,9 +1,9 @@
 mod mongodb_types;
+mod validations;
 
 use datamodel_connector::{
-    parser_database::{ast::Expression, walkers::*},
-    Connector, ConnectorCapability, ConstraintScope, DatamodelError, Diagnostics, NativeTypeConstructor,
-    NativeTypeInstance, ReferentialAction, ReferentialIntegrity, ScalarType, Span,
+    parser_database::walkers::*, Connector, ConnectorCapability, ConstraintScope, DatamodelError, Diagnostics,
+    NativeTypeConstructor, NativeTypeInstance, ReferentialAction, ReferentialIntegrity, ScalarType, Span,
 };
 use enumflags2::BitFlags;
 use mongodb_types::*;
@@ -32,72 +32,6 @@ type Result<T> = std::result::Result<T, DatamodelError>;
 
 pub struct MongoDbDatamodelConnector;
 
-impl MongoDbDatamodelConnector {
-    fn validate_auto(field: ScalarFieldWalker<'_>, errors: &mut datamodel_connector::Diagnostics) {
-        if !field.default_value().map(|val| val.is_auto()).unwrap_or(false) {
-            return;
-        }
-
-        let mut bail = || {
-            let err = DatamodelError::new_field_validation_error(
-                "MongoDB `@default(auto())` fields must have `ObjectId` native type and use the `@id` attribute.",
-                field.model().name(),
-                field.name(),
-                field.ast_field().span,
-            );
-            errors.push_error(err);
-        };
-
-        let model = field.model();
-        let is_id = model.field_is_single_pk(field.field_id());
-
-        match field.raw_native_type() {
-            None => bail(),
-            Some((_, name, _, _)) if name != "ObjectId" => bail(),
-            _ if !is_id => bail(),
-            _ => (),
-        }
-    }
-
-    fn validate_dbgenerated(field: ScalarFieldWalker<'_>, errors: &mut datamodel_connector::Diagnostics) {
-        if !field.default_value().map(|val| val.is_dbgenerated()).unwrap_or(false) {
-            return;
-        }
-
-        let err = DatamodelError::new_field_validation_error(
-            "The `dbgenerated()` function is not allowed with MongoDB. Please use `auto()` instead.",
-            field.model().name(),
-            field.name(),
-            field.ast_field().span,
-        );
-        errors.push_error(err);
-    }
-
-    fn validate_array_native_type(field: ScalarFieldWalker<'_>, errors: &mut Diagnostics) {
-        let (ds_name, type_name, args, span) = match field.raw_native_type() {
-            Some(nt) => nt,
-            None => return,
-        };
-
-        if type_name != type_names::ARRAY {
-            return;
-        }
-
-        // `db.Array` expects exactly 1 argument, which is validated before this code path.
-        let arg = args.get(0).unwrap();
-
-        errors.push_error(DatamodelError::new_field_validation_error(
-            &format!(
-                "Native type `{ds_name}.{}` is deprecated. Please use `{ds_name}.{arg}` instead.",
-                type_names::ARRAY
-            ),
-            field.model().name(),
-            field.name(),
-            span,
-        ));
-    }
-}
-
 impl Connector for MongoDbDatamodelConnector {
     fn name(&self) -> &str {
         "MongoDB"
@@ -120,65 +54,21 @@ impl Connector for MongoDbDatamodelConnector {
     }
 
     fn validate_model(&self, model: ModelWalker<'_>, errors: &mut Diagnostics) {
-        for field in model.scalar_fields() {
-            Self::validate_auto(field, errors);
-            Self::validate_dbgenerated(field, errors);
-            Self::validate_array_native_type(field, errors);
-        }
+        validations::id_must_be_defined(model, errors);
 
         if let Some(pk) = model.primary_key() {
-            // no compound ids
-            if pk.fields().len() > 1 {
-                errors.push_error(DatamodelError::new_invalid_model_error(
-                    "MongoDB models require exactly one identity field annotated with @id",
-                    model.ast_model().span,
-                ));
-            }
+            validations::id_field_must_have_a_correct_mapped_name(pk, errors);
+        }
 
-            // singular id
-            let field = pk.fields().next().unwrap();
+        for field in model.scalar_fields() {
+            validations::objectid_type_required_with_auto_attribute(field, errors);
+            validations::auto_attribute_must_be_an_id(field, errors);
+            validations::dbgenerated_attribute_is_not_allowed(field, errors);
+            validations::disallow_array_native_types(field, errors);
+        }
 
-            // The _id name check is superfluous because it's not a valid schema field at the moment.
-            if field.name() != "_id" {
-                match field.mapped_name() {
-                    Some("_id") => (),
-                    Some(mapped_name) => errors.push_error(DatamodelError::new_field_validation_error(
-                        &format!(
-                            "MongoDB model IDs must have a @map(\"_id\") annotation, found @map(\"{}\").",
-                            mapped_name
-                        ),
-                        field.model().name(),
-                        field.name(),
-                        field.ast_field().span,
-                    )),
-                    None => errors.push_error(DatamodelError::new_field_validation_error(
-                        "MongoDB model IDs must have a @map(\"_id\") annotations.",
-                        field.model().name(),
-                        field.name(),
-                        field.ast_field().span,
-                    )),
-                };
-            }
-
-            if field.raw_native_type().is_none()
-                && matches!(field.default_value().map(|v| v.value()), Some(Expression::Function(fn_name,_,_)) if fn_name == "dbgenerated")
-            {
-                errors.push_error(DatamodelError::new_field_validation_error(
-                    &format!(
-                        "MongoDB `@default(dbgenerated())` IDs must have an `ObjectID` native type annotation. `{}` is an ID field, so you probably want `ObjectId` as your native type.",
-                        field.name()
-                        ),
-                        field.model().name(),
-                        field.name(),
-                        field.ast_field().span,
-
-                ));
-            }
-        } else {
-            errors.push_error(DatamodelError::new_invalid_model_error(
-                "MongoDB models require exactly one identity field annotated with @id",
-                model.ast_model().span,
-            ));
+        for index in model.indexes() {
+            validations::index_is_not_defined_multiple_times_to_same_fields(index, errors);
         }
     }
 

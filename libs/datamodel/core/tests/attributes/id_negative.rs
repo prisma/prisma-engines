@@ -1127,3 +1127,54 @@ fn empty_fields_must_error() {
     let error = datamodel::parse_schema(schema).map(drop).unwrap_err();
     expected.assert_eq(&error);
 }
+
+#[test]
+fn mongodb_must_be_id_if_using_auto() {
+    let schema = indoc! {r#"
+        model A {
+          og Int    @id @map("_id")
+          id String @default(auto()) @test.ObjectId
+        }
+    "#};
+
+    let dml = with_header(schema, Provider::Mongo, &["mongoDb"]);
+    let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
+
+    let expected = expect![[r#"
+        [1;91merror[0m: [1mError validating field `id` in model `A`: MongoDB `@default(auto())` fields must have the `@id` attribute.[0m
+          [1;94m-->[0m  [4mschema.prisma:13[0m
+        [1;94m   | [0m
+        [1;94m12 | [0m  og Int    @id @map("_id")
+        [1;94m13 | [0m  [1;91mid String @default(auto()) @test.ObjectId[0m
+        [1;94m14 | [0m}
+        [1;94m   | [0m
+    "#]];
+
+    expected.assert_eq(&error);
+}
+
+#[test]
+fn compound_ids_are_not_allowed_on_mongo() {
+    let schema = indoc! {r#"
+        model A {
+          id  String @map("_id") @default(auto()) @test.ObjectId
+          id2 String @default(auto()) @test.ObjectId
+
+          @@id([id, id2])
+        }
+    "#};
+
+    let dml = with_header(schema, Provider::Mongo, &["mongoDb"]);
+    let error = datamodel::parse_schema(&dml).map(drop).unwrap_err();
+
+    let expected = expect![[r#"
+        [1;91merror[0m: [1mError validating model "A": The current connector does not support compound ids.[0m
+          [1;94m-->[0m  [4mschema.prisma:15[0m
+        [1;94m   | [0m
+        [1;94m14 | [0m
+        [1;94m15 | [0m  @@[1;91mid([id, id2])[0m
+        [1;94m   | [0m
+    "#]];
+
+    expected.assert_eq(&error);
+}

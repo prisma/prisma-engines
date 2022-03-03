@@ -94,7 +94,6 @@ const CAPABILITIES: &[ConnectorCapability] = &[
     ConnectorCapability::UpdateableId,
     ConnectorCapability::PrimaryKeySortOrderDefinition,
     ConnectorCapability::ImplicitManyToManyRelation,
-    ConnectorCapability::DuplicateIndexDefinitionsToSameFields,
 ];
 
 pub struct MsSqlDatamodelConnector;
