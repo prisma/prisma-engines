@@ -1,25 +1,22 @@
 use super::extract_filter;
-use crate::{
-    constants::filters, ObjectTag, ParsedInputMap, ParsedInputValue, QueryGraphBuilderError, QueryGraphBuilderResult,
-};
+use crate::{constants::filters, ObjectTag, ParsedInputMap, QueryGraphBuilderError, QueryGraphBuilderResult};
 use connector::{CompositeCompare, Filter};
-use prisma_models::{CompositeFieldRef, RelationFieldRef};
+use prisma_models::CompositeFieldRef;
 use std::convert::TryInto;
 
-pub fn parse(
-    mut input_map: ParsedInputMap,
-    field: &CompositeFieldRef,
-    reverse: bool,
-) -> QueryGraphBuilderResult<Filter> {
+pub fn parse(input_map: ParsedInputMap, field: &CompositeFieldRef, _reverse: bool) -> QueryGraphBuilderResult<Filter> {
     let is_envelope = matches!(&input_map.tag, Some(ObjectTag::CompositeEnvelope));
 
     if is_envelope {
-        // Unwrap is safe: We require exactly one field to be present
+        // Unwrap is safe: We require exactly one field to be present on all filters.
         let (filter_key, value) = input_map.into_iter().next().unwrap();
 
         match (filter_key.as_ref(), value) {
             // To-many composite filters.
             (filters::EVERY, input) => Ok(field.every(extract_filter(input.try_into()?, &field.typ)?)),
+            (filters::SOME, input) => Ok(field.some(extract_filter(input.try_into()?, &field.typ)?)),
+            (filters::NONE, input) => Ok(field.none(extract_filter(input.try_into()?, &field.typ)?)),
+            (filters::IS_EMPTY, input) => Ok(field.is_empty(input.try_into()?)),
 
             // (filters::EVERY, Some(value)) => Ok(field.every_related(extract_filter(value, &field.related_model())?)),
             // (filters::SOME, Some(value)) => {

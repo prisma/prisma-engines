@@ -175,7 +175,7 @@ pub trait CompositeCompare {
     where
         T: Into<Filter>;
 
-    fn is_empty<T>(&self, b: bool) -> Filter;
+    fn is_empty(&self, b: bool) -> Filter;
 
     fn equals(&self, val: PrismaValue) -> Filter;
 }
