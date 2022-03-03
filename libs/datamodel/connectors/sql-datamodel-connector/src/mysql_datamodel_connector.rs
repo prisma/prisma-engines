@@ -1,10 +1,9 @@
 use datamodel_connector::{
-    connector_error::ConnectorError,
     helper::{args_vec_from_opt, parse_one_opt_u32, parse_one_u32, parse_two_opt_u32},
     parser_database::walkers::ModelWalker,
     walker_ext_traits::*,
     Connector, ConnectorCapability, ConstraintScope, DatamodelError, Diagnostics, NativeTypeConstructor,
-    NativeTypeInstance, ReferentialAction, ReferentialIntegrity, ScalarType,
+    NativeTypeInstance, ReferentialAction, ReferentialIntegrity, ScalarType, Span,
 };
 use enumflags2::BitFlags;
 use native_types::{
@@ -227,7 +226,8 @@ impl Connector for MySqlDatamodelConnector {
         &self,
         native_type_instance: &NativeTypeInstance,
         scalar_type: &ScalarType,
-        errors: &mut Vec<ConnectorError>,
+        span: Span,
+        errors: &mut Diagnostics,
     ) {
         let native_type: MySqlType =
             serde_json::from_value(native_type_instance.serialized_native_type.clone()).unwrap();
@@ -235,34 +235,32 @@ impl Connector for MySqlDatamodelConnector {
 
         match native_type {
             Decimal(Some((precision, scale))) if scale > precision => {
-                errors.push(error.new_scale_larger_than_precision_error())
+                errors.push_error(error.new_scale_larger_than_precision_error(span))
             }
             Decimal(Some((precision, _))) if precision > 65 => {
-                errors.push(error.new_argument_m_out_of_range_error("Precision can range from 1 to 65."))
+                errors.push_error(error.new_argument_m_out_of_range_error("Precision can range from 1 to 65.", span))
             }
             Decimal(Some((_, scale))) if scale > 30 => {
-                errors.push(error.new_argument_m_out_of_range_error("Scale can range from 0 to 30."))
+                errors.push_error(error.new_argument_m_out_of_range_error("Scale can range from 0 to 30.", span))
             }
             Bit(length) if length == 0 || length > 64 => {
-                errors.push(error.new_argument_m_out_of_range_error("M can range from 1 to 64."))
+                errors.push_error(error.new_argument_m_out_of_range_error("M can range from 1 to 64.", span))
             }
             Char(length) if length > 255 => {
-                errors.push(error.new_argument_m_out_of_range_error("M can range from 0 to 255."))
+                errors.push_error(error.new_argument_m_out_of_range_error("M can range from 0 to 255.", span))
             }
             VarChar(length) if length > 65535 => {
-                errors.push(error.new_argument_m_out_of_range_error("M can range from 0 to 65,535."))
+                errors.push_error(error.new_argument_m_out_of_range_error("M can range from 0 to 65,535.", span))
             }
             Bit(n) if n > 1 && matches!(scalar_type, ScalarType::Boolean) => {
-                errors.push(error.new_argument_m_out_of_range_error("only Bit(1) can be used as Boolean."))
+                errors.push_error(error.new_argument_m_out_of_range_error("only Bit(1) can be used as Boolean.", span))
             }
             _ => (),
         }
     }
 
     fn validate_model(&self, model: ModelWalker<'_>, errors: &mut Diagnostics) {
-        let mut push_error = |err: ConnectorError| {
-            errors.push_error(DatamodelError::new_connector_error(err, model.ast_model().span));
-        };
+        let span = model.ast_model().span;
 
         for index in model.indexes() {
             for field in index.scalar_field_attributes() {
@@ -278,14 +276,14 @@ impl Connector for MySqlDatamodelConnector {
                         }
 
                         if index.is_unique() {
-                            push_error(
+                            errors.push_error(
                                 self.native_instance_error(&native_type)
-                                    .new_incompatible_native_type_with_unique(" If you are using the `extendedIndexes` preview feature you can add a `length` argument to allow this."),
+                                    .new_incompatible_native_type_with_unique(" If you are using the `extendedIndexes` preview feature you can add a `length` argument to allow this.", span),
                             )
                         } else {
-                            push_error(
+                            errors.push_error(
                                 self.native_instance_error(&native_type)
-                                    .new_incompatible_native_type_with_index(" If you are using the `extendedIndexes` preview feature you can add a `length` argument to allow this."),
+                                    .new_incompatible_native_type_with_index(" If you are using the `extendedIndexes` preview feature you can add a `length` argument to allow this.", span),
                             )
                         };
 
@@ -306,9 +304,9 @@ impl Connector for MySqlDatamodelConnector {
                             continue;
                         }
 
-                        push_error(
+                        errors.push_error(
                             self.native_instance_error(&native_type_instance)
-                                .new_incompatible_native_type_with_id(" If you are using the `extendedIndexes` preview feature you can add a `length` argument to allow this."),
+                                .new_incompatible_native_type_with_id(" If you are using the `extendedIndexes` preview feature you can add a `length` argument to allow this.", span),
                         );
 
                         break;
@@ -326,7 +324,12 @@ impl Connector for MySqlDatamodelConnector {
         NATIVE_TYPE_CONSTRUCTORS
     }
 
-    fn parse_native_type(&self, name: &str, args: Vec<String>) -> Result<NativeTypeInstance, ConnectorError> {
+    fn parse_native_type(
+        &self,
+        name: &str,
+        args: Vec<String>,
+        span: Span,
+    ) -> Result<NativeTypeInstance, DatamodelError> {
         let cloned_args = args.clone();
 
         let native_type = match name {
@@ -340,14 +343,14 @@ impl Connector for MySqlDatamodelConnector {
             UNSIGNED_MEDIUM_INT_TYPE_NAME => UnsignedMediumInt,
             BIG_INT_TYPE_NAME => BigInt,
             UNSIGNED_BIG_INT_TYPE_NAME => UnsignedBigInt,
-            DECIMAL_TYPE_NAME => Decimal(parse_two_opt_u32(args, DECIMAL_TYPE_NAME)?),
+            DECIMAL_TYPE_NAME => Decimal(parse_two_opt_u32(args, DECIMAL_TYPE_NAME, span)?),
             FLOAT_TYPE_NAME => Float,
             DOUBLE_TYPE_NAME => Double,
-            BIT_TYPE_NAME => Bit(parse_one_u32(args, BIT_TYPE_NAME)?),
-            CHAR_TYPE_NAME => Char(parse_one_u32(args, CHAR_TYPE_NAME)?),
-            VAR_CHAR_TYPE_NAME => VarChar(parse_one_u32(args, VAR_CHAR_TYPE_NAME)?),
-            BINARY_TYPE_NAME => Binary(parse_one_u32(args, BINARY_TYPE_NAME)?),
-            VAR_BINARY_TYPE_NAME => VarBinary(parse_one_u32(args, VAR_BINARY_TYPE_NAME)?),
+            BIT_TYPE_NAME => Bit(parse_one_u32(args, BIT_TYPE_NAME, span)?),
+            CHAR_TYPE_NAME => Char(parse_one_u32(args, CHAR_TYPE_NAME, span)?),
+            VAR_CHAR_TYPE_NAME => VarChar(parse_one_u32(args, VAR_CHAR_TYPE_NAME, span)?),
+            BINARY_TYPE_NAME => Binary(parse_one_u32(args, BINARY_TYPE_NAME, span)?),
+            VAR_BINARY_TYPE_NAME => VarBinary(parse_one_u32(args, VAR_BINARY_TYPE_NAME, span)?),
             TINY_BLOB_TYPE_NAME => TinyBlob,
             BLOB_TYPE_NAME => Blob,
             MEDIUM_BLOB_TYPE_NAME => MediumBlob,
@@ -357,18 +360,18 @@ impl Connector for MySqlDatamodelConnector {
             MEDIUM_TEXT_TYPE_NAME => MediumText,
             LONG_TEXT_TYPE_NAME => LongText,
             DATE_TYPE_NAME => Date,
-            TIME_TYPE_NAME => Time(parse_one_opt_u32(args, TIME_TYPE_NAME)?),
-            DATETIME_TYPE_NAME => DateTime(parse_one_opt_u32(args, DATETIME_TYPE_NAME)?),
-            TIMESTAMP_TYPE_NAME => Timestamp(parse_one_opt_u32(args, TIMESTAMP_TYPE_NAME)?),
+            TIME_TYPE_NAME => Time(parse_one_opt_u32(args, TIME_TYPE_NAME, span)?),
+            DATETIME_TYPE_NAME => DateTime(parse_one_opt_u32(args, DATETIME_TYPE_NAME, span)?),
+            TIMESTAMP_TYPE_NAME => Timestamp(parse_one_opt_u32(args, TIMESTAMP_TYPE_NAME, span)?),
             YEAR_TYPE_NAME => Year,
             JSON_TYPE_NAME => Json,
-            _ => return Err(ConnectorError::new_native_type_parser_error(name)),
+            _ => return Err(DatamodelError::new_native_type_parser_error(name, span)),
         };
 
         Ok(NativeTypeInstance::new(name, cloned_args, native_type.to_json()))
     }
 
-    fn introspect_native_type(&self, native_type: serde_json::Value) -> Result<NativeTypeInstance, ConnectorError> {
+    fn introspect_native_type(&self, native_type: serde_json::Value) -> NativeTypeInstance {
         let native_type: MySqlType = serde_json::from_value(native_type).unwrap();
         let (constructor_name, args) = match native_type {
             Int => (INT_TYPE_NAME, vec![]),
@@ -413,9 +416,9 @@ impl Connector for MySqlDatamodelConnector {
         }
 
         if let Some(constructor) = self.find_native_type_constructor(constructor_name) {
-            Ok(NativeTypeInstance::new(constructor.name, args, native_type.to_json()))
+            NativeTypeInstance::new(constructor.name, args, native_type.to_json())
         } else {
-            Err(self.native_str_error(constructor_name).native_type_name_unknown())
+            unreachable!()
         }
     }
 

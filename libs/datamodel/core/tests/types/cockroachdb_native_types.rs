@@ -1,5 +1,4 @@
 use crate::{common::*, types::helper::test_native_types_without_attributes};
-use datamodel::{ast, diagnostics::DatamodelError};
 
 #[test]
 fn should_fail_on_invalid_precision_for_decimal_type() {
@@ -65,10 +64,13 @@ fn should_fail_on_native_type_decimal_when_scale_is_bigger_than_precision() {
         }
     "#;
 
-    let error = parse_error(dml);
-
-    error.assert_is(DatamodelError::new(
-        "The scale must not be larger than the precision for the Decimal(2,4) native type in CockroachDB.".into(),
-        ast::Span::new(299, 329),
-    ));
+    let expectation = expect![[r#"
+        [1;91merror[0m: [1mThe scale must not be larger than the precision for the Decimal(2,4) native type in CockroachDB.[0m
+          [1;94m-->[0m  [4mschema.prisma:14[0m
+        [1;94m   | [0m
+        [1;94m13 | [0m            id     Int   @id
+        [1;94m14 | [0m            dec Decimal @[1;91mdb.Decimal(2, 4)[0m
+        [1;94m   | [0m
+    "#]];
+    expect_error(dml, &expectation);
 }

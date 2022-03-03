@@ -40,7 +40,7 @@ fn display_column_type(
     connector: &dyn datamodel::datamodel_connector::Connector,
 ) -> String {
     match &column.column_type().native_type {
-        Some(tpe) => connector.introspect_native_type(tpe.clone()).unwrap().to_string(),
+        Some(tpe) => connector.introspect_native_type(tpe.clone()).to_string(),
         _ => format!("{:?}", column.column_type_family()),
     }
 }

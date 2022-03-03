@@ -1,66 +1,71 @@
-use crate::connector_error::ConnectorError;
+use diagnostics::{DatamodelError, Span};
 use std::error;
 
 pub fn wrap_error_from_result<T, E: error::Error>(
     result: Result<T, E>,
     expected_type: &str,
     raw: &str,
-) -> Result<T, ConnectorError> {
+    span: Span,
+) -> Result<T, DatamodelError> {
     match result {
         Ok(val) => Ok(val),
-        Err(err) => Err(ConnectorError::new_value_parser_error(
+        Err(err) => Err(DatamodelError::new_value_parser_error(
             expected_type,
-            format!("{}", err).as_ref(),
+            &err.to_string(),
             raw,
+            span,
         )),
     }
 }
 
-pub fn parse_one_u32(args: Vec<String>, type_name: &str) -> Result<u32, ConnectorError> {
+pub fn parse_one_u32(args: Vec<String>, type_name: &str, span: Span) -> Result<u32, DatamodelError> {
     let number_of_args = args.len();
 
-    match parse_u32_arguments(args)?.as_slice() {
+    match parse_u32_arguments(args, span)?.as_slice() {
         [x] => Ok(*x),
-        _ => Err(ConnectorError::new_argument_count_mismatch_error(
+        _ => Err(DatamodelError::new_native_type_argument_count_mismatch_error(
             type_name,
             1,
             number_of_args,
+            span,
         )),
     }
 }
 
-pub fn parse_one_opt_u32(args: Vec<String>, type_name: &str) -> Result<Option<u32>, ConnectorError> {
+pub fn parse_one_opt_u32(args: Vec<String>, type_name: &str, span: Span) -> Result<Option<u32>, DatamodelError> {
     let number_of_args = args.len();
 
-    match parse_u32_arguments(args)?.as_slice() {
+    match parse_u32_arguments(args, span)?.as_slice() {
         [x] => Ok(Some(*x)),
         [] => Ok(None),
-        _ => Err(ConnectorError::new_argument_count_mismatch_error(
+        _ => Err(DatamodelError::new_native_type_argument_count_mismatch_error(
             type_name,
             1,
             number_of_args,
+            span,
         )),
     }
 }
 
-pub fn parse_two_opt_u32(args: Vec<String>, type_name: &str) -> Result<Option<(u32, u32)>, ConnectorError> {
+pub fn parse_two_opt_u32(args: Vec<String>, type_name: &str, span: Span) -> Result<Option<(u32, u32)>, DatamodelError> {
     let number_of_args = args.len();
 
-    match parse_u32_arguments(args)?.as_slice() {
+    match parse_u32_arguments(args, span)?.as_slice() {
         [x, y] => Ok(Some((*x, *y))),
         [] => Ok(None),
-        _ => Err(ConnectorError::new_argument_count_mismatch_error(
+        _ => Err(DatamodelError::new_native_type_argument_count_mismatch_error(
             type_name,
             2,
             number_of_args,
+            span,
         )),
     }
 }
 
-fn parse_u32_arguments(args: Vec<String>) -> Result<Vec<u32>, ConnectorError> {
+fn parse_u32_arguments(args: Vec<String>, span: Span) -> Result<Vec<u32>, DatamodelError> {
     let res = args
         .iter()
-        .map(|arg| wrap_error_from_result(arg.parse::<i64>(), "numeric", arg))
+        .map(|arg| wrap_error_from_result(arg.parse::<i64>(), "numeric", arg, span))
         .collect::<Vec<_>>();
 
     if let Some(error) = res.iter().find(|arg| arg.is_err()) {

@@ -438,11 +438,7 @@ pub(crate) fn calculate_scalar_field_type_with_native_types(column: &Column, ctx
         FieldType::Scalar(scal_type, _, _) => match &column.tpe.native_type {
             None => scalar_type,
             Some(native_type) => {
-                let native_type_instance = ctx
-                    .source
-                    .active_connector
-                    .introspect_native_type(native_type.clone())
-                    .unwrap();
+                let native_type_instance = ctx.source.active_connector.introspect_native_type(native_type.clone());
                 FieldType::Scalar(
                     scal_type,
                     None,

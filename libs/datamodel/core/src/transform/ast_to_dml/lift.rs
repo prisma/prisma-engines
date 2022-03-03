@@ -478,9 +478,11 @@ impl<'a> LiftAstToDml<'a> {
                 self.lift_scalar_field_type(alias, scalar_field_type, scalar_field)
             }
             db::ScalarFieldType::BuiltInScalar(scalar_type) => {
-                let native_type = scalar_field
-                    .raw_native_type()
-                    .map(|(_, name, args, _)| self.connector.parse_native_type(name, args.to_owned()).unwrap());
+                let native_type = scalar_field.raw_native_type().map(|(_, name, args, _)| {
+                    self.connector
+                        .parse_native_type(name, args.to_owned(), scalar_field.ast_field().span)
+                        .unwrap()
+                });
                 dml::FieldType::Scalar(
                     parser_database_scalar_type_to_dml_scalar_type(*scalar_type),
                     None,
@@ -500,9 +502,11 @@ impl<'a> LiftAstToDml<'a> {
                 CompositeTypeFieldType::CompositeType(self.db.ast()[*ctid].name.name.to_owned())
             }
             db::ScalarFieldType::BuiltInScalar(scalar_type) => {
-                let native_type = composite_type_field
-                    .raw_native_type()
-                    .map(|(_, name, args, _)| self.connector.parse_native_type(name, args.to_owned()).unwrap());
+                let native_type = composite_type_field.raw_native_type().map(|(_, name, args, _)| {
+                    self.connector
+                        .parse_native_type(name, args.to_owned(), composite_type_field.ast_field().span)
+                        .unwrap()
+                });
 
                 CompositeTypeFieldType::Scalar(
                     parser_database_scalar_type_to_dml_scalar_type(*scalar_type),
