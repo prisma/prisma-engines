@@ -1,6 +1,9 @@
-use datamodel::ast::reformat::Reformatter;
 use expect_test::expect;
 use indoc::indoc;
+
+fn reformat(input: &str) -> String {
+    datamodel::reformat(input, 2).unwrap_or_else(|_| input.to_owned())
+}
 
 #[test]
 fn native_types_in_missing_back_relation_fields() {
@@ -52,8 +55,7 @@ fn native_types_in_missing_back_relation_fields() {
         }
     "#]];
 
-    let result = Reformatter::new(input).reformat_to_string();
-    expected.assert_eq(&result);
+    expected.assert_eq(&reformat(input));
 }
 
 #[test]
@@ -96,8 +98,7 @@ fn back_relation_fields_must_be_added() {
         }
     "#]];
 
-    let result = Reformatter::new(input).reformat_to_string();
-    expected.assert_eq(&result);
+    expected.assert_eq(&reformat(input));
 }
 
 #[test]
@@ -127,8 +128,7 @@ fn back_relation_fields_and_attribute_must_be_added_even_when_attribute_is_missi
         }
     "#]];
 
-    let result = Reformatter::new(input).reformat_to_string();
-    expected.assert_eq(&result);
+    expected.assert_eq(&reformat(input));
 }
 
 #[test]
@@ -169,8 +169,7 @@ fn back_relation_fields_missing_attributes_should_not_add_attributes_multiple_ti
         }
     "#]];
 
-    let result = Reformatter::new(input).reformat_to_string();
-    expected.assert_eq(&result);
+    expected.assert_eq(&reformat(input));
 }
 
 #[test]
@@ -200,8 +199,7 @@ fn back_relations_must_be_added_when_attribute_is_present_with_no_arguments() {
         }
     "#]];
 
-    let result = Reformatter::new(input).reformat_to_string();
-    expected.assert_eq(&result);
+    expected.assert_eq(&reformat(input));
 }
 
 #[test]
@@ -231,8 +229,7 @@ fn back_relations_must_be_added_when_attribute_is_present_with_only_one_argument
         }
     "#]];
 
-    let result = Reformatter::new(input).reformat_to_string();
-    expected.assert_eq(&result);
+    expected.assert_eq(&reformat(input));
 }
 
 #[test]
@@ -263,8 +260,7 @@ fn back_relations_must_be_added_when_attribute_is_present_with_both_arguments() 
         }
     "#]];
 
-    let result = Reformatter::new(input).reformat_to_string();
-    expected.assert_eq(&result);
+    expected.assert_eq(&reformat(input));
 }
 
 #[test]
@@ -295,8 +291,7 @@ fn scalar_field_and_attribute_must_be_added_even_when_attribute_is_missing_and_b
         }
     "#]];
 
-    let result = Reformatter::new(input).reformat_to_string();
-    expected.assert_eq(&result);
+    expected.assert_eq(&reformat(input));
 }
 
 #[test]
@@ -338,8 +333,7 @@ fn scalar_field_and_attribute_must_be_added_even_when_attribute_is_missing_and_o
         }
     "#]];
 
-    let result = Reformatter::new(input).reformat_to_string();
-    expected.assert_eq(&result);
+    expected.assert_eq(&reformat(input));
 }
 
 #[test]
@@ -370,8 +364,7 @@ fn back_relations_must_be_added_even_when_attribute_is_missing_for_one_to_one() 
         }
     "#]];
 
-    let result = Reformatter::new(input).reformat_to_string();
-    expected.assert_eq(&result);
+    expected.assert_eq(&reformat(input));
 }
 
 #[test]
@@ -402,8 +395,7 @@ fn back_relations_and_attribute_must_be_added_even_when_attribute_is_missing_for
         }
     "#]];
 
-    let result = Reformatter::new(input).reformat_to_string();
-    expected.assert_eq(&result);
+    expected.assert_eq(&reformat(input));
 }
 
 #[test]
@@ -433,8 +425,7 @@ fn relation_attribute_must_not_be_added_for_many_to_many() {
         }
     "#]];
 
-    let result = Reformatter::new(input).reformat_to_string();
-    expected.assert_eq(&result);
+    expected.assert_eq(&reformat(input));
 }
 
 #[test]
@@ -466,8 +457,7 @@ fn must_add_relation_attribute_to_an_existing_field() {
         }
     "#]];
 
-    let result = Reformatter::new(input).reformat_to_string();
-    expected.assert_eq(&result);
+    expected.assert_eq(&reformat(input));
 }
 
 #[test]
@@ -496,8 +486,7 @@ fn forward_relation_fields_must_be_added() {
         }
     "#]];
 
-    let result = Reformatter::new(input).reformat_to_string();
-    expected.assert_eq(&result);
+    expected.assert_eq(&reformat(input));
 }
 
 #[test]
@@ -526,8 +515,7 @@ fn must_add_back_relation_fields_for_given_list_field() {
         }
     "#]];
 
-    let result = Reformatter::new(input).reformat_to_string();
-    expected.assert_eq(&result);
+    expected.assert_eq(&reformat(input));
 }
 
 #[test]
@@ -557,8 +545,7 @@ fn must_add_back_relation_fields_for_given_singular_field() {
         }
     "#]];
 
-    let result = Reformatter::new(input).reformat_to_string();
-    expected.assert_eq(&result);
+    expected.assert_eq(&reformat(input));
 }
 
 #[test]
@@ -580,8 +567,7 @@ fn must_add_back_relation_fields_for_self_relations() {
         }
     "#]];
 
-    let result = Reformatter::new(input).reformat_to_string();
-    expected.assert_eq(&result);
+    expected.assert_eq(&reformat(input));
 }
 
 #[test]
@@ -610,8 +596,7 @@ fn should_camel_case_back_relation_field_name() {
         }
     "#]];
 
-    let result = Reformatter::new(input).reformat_to_string();
-    expected.assert_eq(&result);
+    expected.assert_eq(&reformat(input));
 }
 
 #[test]
@@ -646,8 +631,7 @@ fn add_backrelation_for_unambiguous_self_relations_in_presence_of_unrelated_othe
         }
     "#]];
 
-    let result = Reformatter::new(input).reformat_to_string();
-    expected.assert_eq(&result);
+    expected.assert_eq(&reformat(input));
 }
 
 #[test]
@@ -680,8 +664,7 @@ fn must_succeed_when_fields_argument_is_missing_for_one_to_many() {
         }
     "#]];
 
-    let result = Reformatter::new(input).reformat_to_string();
-    expected.assert_eq(&result);
+    expected.assert_eq(&reformat(input));
 }
 
 #[test]
@@ -711,8 +694,7 @@ fn must_add_referenced_fields_for_one_to_many_relations() {
         }
     "#]];
 
-    let result = Reformatter::new(input).reformat_to_string();
-    expected.assert_eq(&result);
+    expected.assert_eq(&reformat(input));
 }
 
 #[test]
@@ -742,8 +724,7 @@ fn must_add_referenced_fields_for_one_to_many_relations_reverse() {
         }
     "#]];
 
-    let result = Reformatter::new(input).reformat_to_string();
-    expected.assert_eq(&result);
+    expected.assert_eq(&reformat(input));
 }
 
 #[test]
@@ -796,8 +777,7 @@ fn must_add_referenced_fields_on_the_right_side_for_one_to_one_relations() {
         }
     "#]];
 
-    let result = Reformatter::new(input).reformat_to_string();
-    expected.assert_eq(&result);
+    expected.assert_eq(&reformat(input));
 }
 
 #[test]
@@ -827,8 +807,7 @@ fn must_handle_conflicts_with_existing_fields_if_types_are_compatible() {
         }
     "#]];
 
-    let result = Reformatter::new(input).reformat_to_string();
-    expected.assert_eq(&result);
+    expected.assert_eq(&reformat(input));
 }
 
 #[test]
@@ -858,8 +837,7 @@ fn forward_relation_field_generation_picks_up_types_of_existing_underlying_scala
         }
     "#]];
 
-    let result = Reformatter::new(input).reformat_to_string();
-    expected.assert_eq(&result);
+    expected.assert_eq(&reformat(input));
 }
 
 #[test]
@@ -932,8 +910,7 @@ fn should_add_back_relations_for_more_complex_cases() {
         }
     "#]];
 
-    let result = Reformatter::new(input).reformat_to_string();
-    expected.assert_eq(&result);
+    expected.assert_eq(&reformat(input));
 }
 
 #[test]
@@ -955,8 +932,7 @@ fn should_add_missing_embed_ids_on_self_relations() {
         }
     "#]];
 
-    let result = Reformatter::new(input).reformat_to_string();
-    expected.assert_eq(&result);
+    expected.assert_eq(&reformat(input));
 }
 
 #[test]
@@ -986,8 +962,7 @@ fn should_add_referenced_fields_on_the_correct_side_list() {
         }
     "#]];
 
-    let result = Reformatter::new(input).reformat_to_string();
-    expected.assert_eq(&result);
+    expected.assert_eq(&reformat(input));
 }
 
 #[test]
@@ -1016,8 +991,7 @@ fn no_changes_for_many_to_many_relations() {
         }
     "#]];
 
-    let result = Reformatter::new(input).reformat_to_string();
-    expected.assert_eq(&result);
+    expected.assert_eq(&reformat(input));
 }
 
 #[test]
@@ -1047,8 +1021,7 @@ fn should_add_referenced_fields_on_the_correct_side_tie_breaker() {
         }
     "#]];
 
-    let result = Reformatter::new(input).reformat_to_string();
-    expected.assert_eq(&result);
+    expected.assert_eq(&reformat(input));
 }
 
 #[test]
@@ -1089,8 +1062,7 @@ fn should_not_get_confused_with_complicated_self_relations() {
         }
     "#]];
 
-    let result = Reformatter::new(input).reformat_to_string();
-    expected.assert_eq(&result);
+    expected.assert_eq(&reformat(input));
 }
 
 #[test]
@@ -1129,8 +1101,7 @@ fn back_relations_must_be_added_even_when_env_vars_are_missing() {
         }
     "#]];
 
-    let result = Reformatter::new(input).reformat_to_string();
-    expected.assert_eq(&result);
+    expected.assert_eq(&reformat(input));
 }
 
 #[test]
@@ -1218,8 +1189,7 @@ fn must_add_required_relation_field_if_underlying_scalar_is_required() {
         }
     "#]];
 
-    let result = Reformatter::new(input).reformat_to_string();
-    expected.assert_eq(&result);
+    expected.assert_eq(&reformat(input));
 }
 
 // this crashed
@@ -1243,7 +1213,6 @@ fn issue_10118() {
         }
     "#;
 
-    let result = Reformatter::new(schema).reformat_to_string();
     let expected = expect![[r#"
         datasource db {
           provider = "postgres"
@@ -1262,7 +1231,7 @@ fn issue_10118() {
           userId String @db.Char(30)
         }
     "#]];
-    expected.assert_eq(&result);
+    expected.assert_eq(&reformat(schema));
 }
 
 #[test]
@@ -1311,6 +1280,5 @@ fn embedded_relations_should_not_add_anything_in_reformat() {
         }
     "#]];
 
-    let result = Reformatter::new(schema).reformat_to_string();
-    expected.assert_eq(&result);
+    expected.assert_eq(&reformat(schema));
 }
