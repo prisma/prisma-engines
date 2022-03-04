@@ -294,19 +294,6 @@
 <span id="292">292</span>
 <span id="293">293</span>
 <span id="294">294</span>
-<span id="295">295</span>
-<span id="296">296</span>
-<span id="297">297</span>
-<span id="298">298</span>
-<span id="299">299</span>
-<span id="300">300</span>
-<span id="301">301</span>
-<span id="302">302</span>
-<span id="303">303</span>
-<span id="304">304</span>
-<span id="305">305</span>
-<span id="306">306</span>
-<span id="307">307</span>
 </pre><pre class="rust"><code><span class="doccomment">//! This crate is responsible for parsing, rendering and formatting a Prisma Schema.</span>
 <span class="doccomment">//! A Prisma Schema consists out of two parts:</span>
 <span class="doccomment">//! 1. The `Datamodel` part refers to the model and enum definitions.</span>
@@ -357,22 +344,25 @@
 
 <span class="attribute">#![<span class="ident">deny</span>(<span class="ident">rust_2018_idioms</span>, <span class="ident">unsafe_code</span>)]</span>
 
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">ast</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">common</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">dml</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">json</span>;
 
 <span class="kw">mod</span> <span class="ident">configuration</span>;
+<span class="kw">mod</span> <span class="ident">reformat</span>;
 <span class="kw">mod</span> <span class="ident">transform</span>;
 
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">configuration</span>::{<span class="ident">Configuration</span>, <span class="ident">Datasource</span>, <span class="ident">Generator</span>, <span class="ident">StringFromEnvVar</span>};
+<span class="kw">pub</span> <span class="kw">use</span> <span class="kw">crate</span>::{
+    <span class="ident">configuration</span>::{<span class="ident">Configuration</span>, <span class="ident">Datasource</span>, <span class="ident">Generator</span>, <span class="ident">StringFromEnvVar</span>},
+    <span class="ident">reformat::reformat</span>,
+};
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">datamodel_connector</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">diagnostics</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">parser_database</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">parser_database::is_reserved_type_name</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">schema_ast</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">schema_ast</span>::{<span class="self">self</span>, <span class="ident">ast</span>};
 
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">ast::SchemaAst</span>, <span class="ident">common::preview_features::PreviewFeature</span>};
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::common::preview_features::PreviewFeature</span>;
 <span class="kw">use</span> <span class="ident">diagnostics</span>::{<span class="ident">Diagnostics</span>, <span class="ident">Validated</span>};
 <span class="kw">use</span> <span class="ident">enumflags2::BitFlags</span>;
 <span class="kw">use</span> <span class="ident">parser_database::ParserDatabase</span>;
@@ -444,27 +434,11 @@
     })
 }
 
-<span class="kw">fn</span> <span class="ident">parse_datamodel_for_formatter</span>(
-    <span class="ident">ast</span>: <span class="ident">SchemaAst</span>,
-) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">ParserDatabase</span>, <span class="ident">dml::Datamodel</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Datasource</span><span class="op">&gt;</span>), <span class="ident">Diagnostics</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">diagnostics</span> <span class="op">=</span> <span class="ident">diagnostics::Diagnostics::new</span>();
-    <span class="kw">let</span> <span class="ident">datasources</span> <span class="op">=</span> <span class="ident">load_sources</span>(<span class="kw-2">&amp;</span><span class="ident">ast</span>, <span class="ident">Default::default</span>(), <span class="kw-2">&amp;mut</span> <span class="ident">diagnostics</span>);
-    <span class="kw">let</span> <span class="ident">db</span> <span class="op">=</span> <span class="ident">parser_database::ParserDatabase::new</span>(<span class="ident">ast</span>, <span class="kw-2">&amp;mut</span> <span class="ident">diagnostics</span>);
-    <span class="ident">diagnostics</span>.<span class="ident">to_result</span>()<span class="question-mark">?</span>;
-    <span class="kw">let</span> (<span class="ident">connector</span>, <span class="ident">referential_integrity</span>) <span class="op">=</span> <span class="ident">datasources</span>
-        .<span class="ident">get</span>(<span class="number">0</span>)
-        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">ds</span><span class="op">|</span> (<span class="ident">ds</span>.<span class="ident">active_connector</span>, <span class="ident">ds</span>.<span class="ident">referential_integrity</span>()))
-        .<span class="ident">unwrap_or</span>((<span class="kw-2">&amp;</span><span class="ident">datamodel_connector::EmptyDatamodelConnector</span>, <span class="ident">Default::default</span>()));
-
-    <span class="kw">let</span> <span class="ident">datamodel</span> <span class="op">=</span> <span class="ident">transform::ast_to_dml::LiftAstToDml::new</span>(<span class="kw-2">&amp;</span><span class="ident">db</span>, <span class="ident">connector</span>, <span class="ident">referential_integrity</span>).<span class="ident">lift</span>();
-    <span class="prelude-val">Ok</span>((<span class="ident">db</span>, <span class="ident">datamodel</span>, <span class="ident">datasources</span>))
-}
-
 <span class="kw">fn</span> <span class="ident">parse_datamodel_internal</span>(
     <span class="ident">datamodel_string</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
 ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Validated</span><span class="op">&lt;</span>(<span class="ident">Configuration</span>, <span class="ident">dml::Datamodel</span>)<span class="op">&gt;</span>, <span class="ident">diagnostics::Diagnostics</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">diagnostics</span> <span class="op">=</span> <span class="ident">diagnostics::Diagnostics::new</span>();
-    <span class="kw">let</span> <span class="ident">ast</span> <span class="op">=</span> <span class="ident">ast::parse_schema</span>(<span class="ident">datamodel_string</span>, <span class="kw-2">&amp;mut</span> <span class="ident">diagnostics</span>);
+    <span class="kw">let</span> <span class="ident">ast</span> <span class="op">=</span> <span class="ident">schema_ast::parser::parse_schema</span>(<span class="ident">datamodel_string</span>, <span class="kw-2">&amp;mut</span> <span class="ident">diagnostics</span>);
 
     <span class="kw">let</span> <span class="ident">generators</span> <span class="op">=</span> <span class="ident">GeneratorLoader::load_generators_from_ast</span>(<span class="kw-2">&amp;</span><span class="ident">ast</span>, <span class="kw-2">&amp;mut</span> <span class="ident">diagnostics</span>);
     <span class="kw">let</span> <span class="ident">preview_features</span> <span class="op">=</span> <span class="ident">preview_features</span>(<span class="kw-2">&amp;</span><span class="ident">generators</span>);
@@ -492,9 +466,9 @@
     })
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse_schema_ast</span>(<span class="ident">datamodel_string</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">SchemaAst</span>, <span class="ident">diagnostics::Diagnostics</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse_schema_ast</span>(<span class="ident">datamodel_string</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ast::SchemaAst</span>, <span class="ident">diagnostics::Diagnostics</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">diagnostics</span> <span class="op">=</span> <span class="ident">Diagnostics::default</span>();
-    <span class="kw">let</span> <span class="ident">schema</span> <span class="op">=</span> <span class="ident">ast::parse_schema</span>(<span class="ident">datamodel_string</span>, <span class="kw-2">&amp;mut</span> <span class="ident">diagnostics</span>);
+    <span class="kw">let</span> <span class="ident">schema</span> <span class="op">=</span> <span class="ident">schema_ast::parser::parse_schema</span>(<span class="ident">datamodel_string</span>, <span class="kw-2">&amp;mut</span> <span class="ident">diagnostics</span>);
 
     <span class="ident">diagnostics</span>.<span class="ident">to_result</span>()<span class="question-mark">?</span>;
 
@@ -504,7 +478,7 @@
 <span class="doccomment">/// Loads all configuration blocks from a datamodel using the built-in source definitions.</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse_configuration</span>(<span class="ident">schema</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ValidatedConfiguration</span>, <span class="ident">diagnostics::Diagnostics</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">diagnostics</span> <span class="op">=</span> <span class="ident">Diagnostics::default</span>();
-    <span class="kw">let</span> <span class="ident">ast</span> <span class="op">=</span> <span class="ident">ast::parse_schema</span>(<span class="ident">schema</span>, <span class="kw-2">&amp;mut</span> <span class="ident">diagnostics</span>);
+    <span class="kw">let</span> <span class="ident">ast</span> <span class="op">=</span> <span class="ident">schema_ast::parser::parse_schema</span>(<span class="ident">schema</span>, <span class="kw-2">&amp;mut</span> <span class="ident">diagnostics</span>);
 
     <span class="ident">diagnostics</span>.<span class="ident">to_result</span>()<span class="question-mark">?</span>;
 
@@ -524,7 +498,7 @@
 }
 
 <span class="kw">fn</span> <span class="ident">load_sources</span>(
-    <span class="ident">schema_ast</span>: <span class="kw-2">&amp;</span><span class="ident">SchemaAst</span>,
+    <span class="ident">schema_ast</span>: <span class="kw-2">&amp;</span><span class="ident">ast::SchemaAst</span>,
     <span class="ident">preview_features</span>: <span class="ident">BitFlags</span><span class="op">&lt;</span><span class="ident">PreviewFeature</span><span class="op">&gt;</span>,
     <span class="ident">diagnostics</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Diagnostics</span>,
 ) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Datasource</span><span class="op">&gt;</span> {
@@ -543,7 +517,7 @@
 }
 
 <span class="doccomment">/// Renders an AST to a string.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">render_schema_ast_to_string</span>(<span class="ident">schema</span>: <span class="kw-2">&amp;</span><span class="ident">SchemaAst</span>) -&gt; <span class="ident">String</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">render_schema_ast_to_string</span>(<span class="ident">schema</span>: <span class="kw-2">&amp;</span><span class="ident">ast::SchemaAst</span>) -&gt; <span class="ident">String</span> {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">writable_string</span> <span class="op">=</span> <span class="ident">String::with_capacity</span>(<span class="ident">schema</span>.<span class="ident">tops</span>.<span class="ident">len</span>() <span class="op">*</span> <span class="number">20</span>);
 
     <span class="ident">render_schema_ast_to</span>(<span class="kw-2">&amp;mut</span> <span class="ident">writable_string</span>, <span class="ident">schema</span>, <span class="number">2</span>);
@@ -607,7 +581,7 @@
 
 <span class="doccomment">/// Renders as a string into the stream.</span>
 <span class="kw">fn</span> <span class="ident">render_schema_ast_to</span>(<span class="ident">stream</span>: <span class="kw-2">&amp;mut</span> <span class="kw">dyn</span> <span class="ident">std::fmt::Write</span>, <span class="ident">schema</span>: <span class="kw-2">&amp;</span><span class="ident">ast::SchemaAst</span>, <span class="ident">ident_width</span>: <span class="ident">usize</span>) {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">renderer</span> <span class="op">=</span> <span class="ident">ast::Renderer::new</span>(<span class="ident">stream</span>, <span class="ident">ident_width</span>);
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">renderer</span> <span class="op">=</span> <span class="ident">schema_ast::renderer::Renderer::new</span>(<span class="ident">stream</span>, <span class="ident">ident_width</span>);
     <span class="ident">renderer</span>.<span class="ident">render</span>(<span class="ident">schema</span>);
 }
 
