@@ -1,15 +1,52 @@
 use super::{Attribute, Comment, Identifier, Span, WithAttributes, WithDocumentation, WithIdentifier, WithSpan};
 
-/// An enum declaration.
+/// An enum declaration. Enumeration can either be in the database schema, or completely a Prisma level concept.
+///
+/// PostgreSQL stores enums in a schema, while in MySQL the information is in
+/// the table definition. On MongoDB the enumerations are handled in the Query
+/// Engine.
 #[derive(Debug, Clone)]
 pub struct Enum {
     /// The name of the enum.
+    ///
+    /// ```ignore
+    /// enum Foo { ... }
+    ///      ^^^
+    /// ```
     pub name: Identifier,
     /// The values of the enum.
+    ///
+    /// ```ignore
+    /// enum Foo {
+    ///   Value1
+    ///   ^^^^^^
+    ///   Value2
+    ///   ^^^^^^
+    /// }
+    /// ```
     pub values: Vec<EnumValue>,
     /// The attributes of this enum.
+    ///
+    /// ```ignore
+    /// enum Foo {
+    ///   Value1
+    ///   Value2
+    ///
+    ///   @@map("1Foo")
+    ///   ^^^^^^^^^^^^^
+    /// }
+    /// ```
     pub attributes: Vec<Attribute>,
     /// The comments for this enum.
+    ///
+    /// ```ignore
+    /// /// Lorem ipsum
+    ///     ^^^^^^^^^^^
+    /// enum Foo {
+    ///   Value1
+    ///   Value2
+    /// }
+    /// ```
     pub documentation: Option<Comment>,
     /// The location of this enum in the text representation.
     pub span: Span,

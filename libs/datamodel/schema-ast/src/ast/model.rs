@@ -24,12 +24,47 @@ impl std::ops::Index<FieldId> for Model {
 #[derive(Debug, Clone)]
 pub struct Model {
     /// The name of the model.
+    ///
+    /// ```ignore
+    /// model Foo { .. }
+    ///       ^^^
+    /// ```
     pub name: Identifier,
     /// The fields of the model.
+    ///
+    /// ```ignore
+    /// model Foo {
+    ///   id    Int    @id
+    ///   ^^^^^^^^^^^^^^^^
+    ///   field String
+    ///   ^^^^^^^^^^^^
+    /// }
+    /// ```
     pub fields: Vec<Field>,
     /// The attributes of this model.
+    ///
+    /// ```ignore
+    /// model Foo {
+    ///   id    Int    @id
+    ///   field String
+    ///
+    ///   @@index([field])
+    ///   ^^^^^^^^^^^^^^^^
+    ///   @@map("Bar")
+    ///   ^^^^^^^^^^^^
+    /// }
+    /// ```
     pub attributes: Vec<Attribute>,
     /// The documentation for this model.
+    ///
+    /// ```ignore
+    /// /// Lorem ipsum
+    ///     ^^^^^^^^^^^
+    /// model Foo {
+    ///   id    Int    @id
+    ///   field String
+    /// }
+    /// ```
     pub documentation: Option<Comment>,
     /// The location of this model in the text representation.
     pub span: Span,
@@ -38,7 +73,7 @@ pub struct Model {
 }
 
 impl Model {
-    pub fn iter_fields(&self) -> impl Iterator<Item = (FieldId, &Field)> {
+    pub fn iter_fields(&self) -> impl ExactSizeIterator<Item = (FieldId, &Field)> {
         self.fields
             .iter()
             .enumerate()
