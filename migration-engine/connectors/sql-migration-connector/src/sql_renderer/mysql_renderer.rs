@@ -26,7 +26,7 @@ impl MysqlFlavour {
             not_null: col.arity().is_required(),
             column_type: render_column_type(col),
             comment: if let Some(comment) = col.comment() {
-                Option::Some(Cow::Owned(self.quote(comment)))
+                Option::Some(Cow::Owned(self.quote(comment).to_string()))
             } else {
                None
             },

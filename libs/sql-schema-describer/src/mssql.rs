@@ -362,6 +362,7 @@ impl<'a> SqlSchemaDescriber<'a> {
                 name,
                 tpe,
                 default,
+                comment: None,
                 auto_increment,
             });
         }

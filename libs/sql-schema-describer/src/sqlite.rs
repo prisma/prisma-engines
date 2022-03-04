@@ -257,6 +257,7 @@ impl<'a> SqlSchemaDescriber<'a> {
                     name: row.get("name").and_then(|x| x.to_string()).expect("name"),
                     tpe,
                     default,
+                    comment: None,
                     auto_increment: false,
                 };
 

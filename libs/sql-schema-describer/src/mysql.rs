@@ -10,6 +10,7 @@ use std::{
     borrow::Cow,
     collections::{BTreeMap, HashSet},
 };
+use quaint::connector::tokio_postgres::types::IsNull::No;
 use tracing::trace;
 
 /// Matches a default value in the schema, wrapped single quotes.
@@ -413,6 +414,7 @@ impl<'a> SqlSchemaDescriber<'a> {
                 name,
                 tpe,
                 default,
+                comment: None,
                 auto_increment,
             };
 
