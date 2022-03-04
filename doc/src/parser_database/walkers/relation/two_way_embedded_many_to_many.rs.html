@@ -48,6 +48,7 @@
 <span id="46">46</span>
 <span id="47">47</span>
 <span id="48">48</span>
+<span id="49">49</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">relations</span>::{<span class="ident">Relation</span>, <span class="ident">RelationAttributes</span>},
     <span class="ident">walkers</span>::{<span class="ident">ModelWalker</span>, <span class="ident">RelationFieldWalker</span>},
@@ -55,8 +56,9 @@
 
 <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::RelationWalker</span>;
 
-<span class="doccomment">/// Describes an implicit m:n relation between two models. Neither side defines fields, attributes</span>
-<span class="doccomment">/// or referential actions, which are all inferred by Prisma.</span>
+<span class="doccomment">/// Describes an explicit m:n relation between two models. Both sides define</span>
+<span class="doccomment">/// `fields` which must be a single array scalar field, and `references` that</span>
+<span class="doccomment">/// should point to a single scalar field on the referenced model.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">TwoWayEmbeddedManyToManyRelationWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span>(<span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">RelationWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span>);
 
