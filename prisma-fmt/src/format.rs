@@ -1,8 +1,8 @@
 use crate::FormatOpts;
-use datamodel::ast::reformat::Reformatter;
+use datamodel::reformat;
 use std::{
     fs::{self, File},
-    io::{self, BufWriter, Read},
+    io::{self, BufWriter, Read, Write as _},
 };
 
 pub fn run(opts: FormatOpts) {
@@ -21,15 +21,13 @@ pub fn run(opts: FormatOpts) {
         }
     };
 
+    let reformatted = reformat(&datamodel_string, opts.tabwidth).unwrap_or_else(|err: &str| err.to_owned());
     match opts.output {
         Some(file_name) => {
             let file = File::open(&file_name).unwrap_or_else(|_| panic!("Unable to open file {}", file_name.display()));
-            let mut stream = BufWriter::new(file);
-
-            Reformatter::new(&datamodel_string).reformat_to(&mut stream, opts.tabwidth);
+            let mut file = BufWriter::new(file);
+            file.write_all(reformatted.as_bytes()).unwrap();
         }
-        None => {
-            Reformatter::new(&datamodel_string).reformat_to(&mut io::stdout().lock(), opts.tabwidth);
-        }
+        None => io::stdout().lock().write_all(reformatted.as_bytes()).unwrap(),
     }
 }
