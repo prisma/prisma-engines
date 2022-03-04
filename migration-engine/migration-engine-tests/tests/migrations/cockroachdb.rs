@@ -1,3 +1,6 @@
+/// Test cockroachdb failure modes
+mod failure_modes;
+
 use migration_engine_tests::test_api::*;
 use std::fmt::Write as _;
 
