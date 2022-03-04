@@ -77,10 +77,10 @@ fn all_postgres_column_types_must_work(api: TestApi) {
 
     let full_sql = migration.make::<barrel::backend::Pg>();
     api.raw_cmd(&full_sql);
-    let result = api.describe();
-    let mut table = result.get_table("User").expect("couldn't get User table").to_owned();
+    let mut result = api.describe();
+    let table = result.tables.iter_mut().find(|t| t.name == "User").unwrap();
     // Ensure columns are sorted as expected when comparing
-    table.columns.sort_unstable_by_key(|c| c.name.to_owned());
+    table.columns.sort_unstable_by(|a, b| a.name.cmp(&b.name));
     let mut expected_columns = vec![
         Column {
             name: "array_bin_col".into(),
@@ -560,7 +560,7 @@ fn all_postgres_column_types_must_work(api: TestApi) {
 
     assert_eq!(
         table,
-        Table {
+        &Table {
             name: "User".into(),
             columns: expected_columns,
             indices: vec![Index {

@@ -144,10 +144,10 @@ fn all_mssql_column_types_must_work(api: TestApi) {
 
     let full_sql = migration.make::<barrel::backend::MsSql>();
     api.raw_cmd(&full_sql);
-    let result = api.describe();
-    let mut table = result.get_table("User").expect("couldn't get User table").to_owned();
+    let mut result = api.describe();
+    let (_, table) = result.iter_tables_mut().find(|(_, t)| t.name == "User").unwrap();
     // Ensure columns are sorted as expected when comparing
-    table.columns.sort_unstable_by_key(|c| c.name.to_owned());
+    table.columns.sort_unstable_by(|a, b| a.name.cmp(&b.name));
     let mut expected_columns = vec![
         Column {
             name: "primary_col".to_string(),
@@ -626,13 +626,13 @@ fn mssql_foreign_key_on_delete_must_be_handled(api: TestApi) {
 
     api.raw_cmd(&sql);
 
-    let schema = api.describe();
-    let mut table = schema.get_table("User").expect("get User table").to_owned();
-    table.foreign_keys.sort_unstable_by_key(|fk| fk.columns.clone());
+    let mut schema = api.describe();
+    let table = schema.tables.iter_mut().find(|t| t.name == "User").unwrap();
+    table.foreign_keys.sort_by(|a, b| a.columns.cmp(&b.columns));
 
     assert_eq!(
         table,
-        Table {
+        &Table {
             name: "User".to_string(),
             columns: vec![
                 Column {
