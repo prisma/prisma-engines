@@ -1,10 +1,12 @@
 use crate::Dedup;
 use crate::SqlError;
-use datamodel::IndexAlgorithm;
 use datamodel::{
-    common::preview_features::PreviewFeature, common::RelationNames, Datamodel, DefaultValue as DMLDef, FieldArity,
-    FieldType, IndexDefinition, IndexField, Model, PrimaryKeyField, ReferentialAction, RelationField, RelationInfo,
-    ScalarField, ScalarType, SortOrder, ValueGenerator as VG,
+    common::{preview_features::PreviewFeature, RelationNames},
+    dml::{
+        Datamodel, DefaultValue as DMLDef, FieldArity, FieldType, IndexAlgorithm, IndexDefinition, IndexField, Model,
+        PrimaryKeyField, ReferentialAction, RelationField, RelationInfo, ScalarField, ScalarType, SortOrder,
+        ValueGenerator as VG,
+    },
 };
 use introspection_connector::IntrospectionContext;
 use sql_schema_describer::SQLIndexAlgorithm;

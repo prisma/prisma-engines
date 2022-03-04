@@ -1,5 +1,5 @@
 use crate::{flavour::SqlFlavour, pair::Pair};
-use datamodel::PrismaValue;
+use datamodel::dml::PrismaValue;
 use enumflags2::BitFlags;
 use sql_schema_describer::{walkers::ColumnWalker, DefaultKind};
 

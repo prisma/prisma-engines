@@ -1,5 +1,4 @@
 use crate::common::*;
-use indoc::indoc;
 
 #[test]
 fn map_must_error_for_relation_fields() {

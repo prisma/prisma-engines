@@ -1,5 +1,4 @@
 use crate::common::*;
-use indoc::indoc;
 
 #[test]
 fn disallow_ignore_missing_from_model_without_fields() {

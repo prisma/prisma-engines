@@ -5,7 +5,7 @@ pub use test_setup::{BitFlags, Capabilities, Tags};
 
 use crate::{BarrelMigrationExecutor, Result};
 use datamodel::common::preview_features::PreviewFeature;
-use datamodel::{Configuration, Datamodel};
+use datamodel::{dml::Datamodel, Configuration};
 use introspection_connector::{
     CompositeTypeDepth, ConnectorResult, DatabaseMetadata, IntrospectionConnector, IntrospectionContext,
     IntrospectionResult, Version,

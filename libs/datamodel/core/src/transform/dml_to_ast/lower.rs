@@ -1,5 +1,9 @@
-use crate::common::preview_features::PreviewFeature;
-use crate::{ast, dml, Datasource, IndexField, PrimaryKeyField, SortOrder};
+use crate::{
+    ast,
+    common::preview_features::PreviewFeature,
+    dml::{self, IndexField, PrimaryKeyField, SortOrder},
+    Datasource,
+};
 use enumflags2::BitFlags;
 
 pub struct LowerDmlToAst<'a> {

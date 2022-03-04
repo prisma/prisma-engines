@@ -5,7 +5,7 @@ use crate::{
     sql_migration::{AlterColumn, AlterEnum, AlterTable, RedefineTable, TableChange},
     sql_schema_differ::ColumnChanges,
 };
-use datamodel::PrismaValue;
+use datamodel::dml::PrismaValue;
 use native_types::MySqlType;
 use once_cell::sync::Lazy;
 use regex::Regex;

@@ -1,5 +1,5 @@
 use crate::{parent_container::ParentContainer, prelude::*, InternalEnum};
-use datamodel::{DefaultValue, FieldArity, NativeTypeInstance};
+use dml::{DefaultValue, FieldArity, NativeTypeInstance};
 use once_cell::sync::OnceCell;
 use std::{
     fmt::Debug,

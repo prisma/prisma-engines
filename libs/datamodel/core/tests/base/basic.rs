@@ -1,5 +1,4 @@
 use crate::common::*;
-use datamodel::ScalarType;
 use diagnostics::{DatamodelWarning, Span};
 
 #[test]

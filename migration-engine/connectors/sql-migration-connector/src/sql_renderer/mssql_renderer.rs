@@ -6,7 +6,7 @@ use crate::{
     pair::Pair,
     sql_migration::{AlterEnum, AlterTable, RedefineTable},
 };
-use datamodel::PrismaValue;
+use datamodel::dml::PrismaValue;
 use indoc::{formatdoc, indoc};
 use native_types::{MsSqlType, MsSqlTypeParameter};
 use sql_schema_describer::{

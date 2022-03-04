@@ -5,7 +5,7 @@ pub(super) use sql_schema_calculator_flavour::SqlSchemaCalculatorFlavour;
 use crate::{flavour::SqlFlavour, SqlDatabaseSchema};
 use datamodel::{
     datamodel_connector::{walker_ext_traits::*, ReferentialAction, ScalarType},
-    dml::PrismaValue,
+    dml::{prisma_value, PrismaValue},
     parser_database::{
         walkers::{ModelWalker, ScalarFieldWalker},
         IndexAlgorithm, IndexType, ScalarFieldType, SortOrder,
@@ -366,7 +366,7 @@ fn column_for_builtin_scalar_type(
                             val.parse().unwrap(),
                         )))),
                         ScalarType::Bytes => Some(sql::DefaultValue::new(sql::DefaultKind::Value(PrismaValue::Bytes(
-                            datamodel::prisma_value::decode_bytes(val).unwrap(),
+                            prisma_value::decode_bytes(val).unwrap(),
                         )))),
                         ScalarType::Decimal => Some(sql::DefaultValue::new(sql::DefaultKind::Value(
                             PrismaValue::Float(val.parse().unwrap()),

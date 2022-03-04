@@ -1,6 +1,6 @@
 use crate::warnings::{warning_default_cuid_warning, warning_default_uuid_warning, ModelAndField};
 use crate::SqlFamilyTrait;
-use datamodel::{dml, Datamodel, ValueGenerator};
+use datamodel::dml::{self, Datamodel, ValueGenerator};
 use introspection_connector::{IntrospectionContext, Version, Warning};
 use native_types::{MySqlType, PostgresType};
 use sql_schema_describer::SqlSchema;

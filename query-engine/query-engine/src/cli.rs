@@ -4,7 +4,7 @@ use crate::{
     PrismaResult,
 };
 use datamodel::ValidatedConfiguration;
-use datamodel::{Configuration, Datamodel};
+use datamodel::{dml::Datamodel, Configuration};
 use datamodel_connector::ConnectorCapabilities;
 use prisma_models::InternalDataModelBuilder;
 use query_core::{schema::QuerySchemaRef, schema_builder, BuildMode};

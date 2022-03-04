@@ -1,6 +1,4 @@
-use crate::common::*;
-use crate::{with_header, Provider};
-use indoc::indoc;
+use crate::{common::*, with_header, Provider};
 
 #[test]
 fn id_should_error_if_the_field_is_not_required() {

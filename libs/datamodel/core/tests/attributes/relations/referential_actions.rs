@@ -1,9 +1,8 @@
 mod cycle_detection;
 
 use crate::{common::*, config::parse_config};
-use datamodel::ReferentialAction::{self, *};
+use datamodel::dml::ReferentialAction::{self, *};
 use datamodel_connector::ReferentialIntegrity;
-use indoc::{formatdoc, indoc};
 
 #[test]
 fn on_delete_actions() {

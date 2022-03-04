@@ -1,7 +1,4 @@
-use expect_test::expect;
-use indoc::indoc;
-
-use crate::{with_header, Provider};
+use crate::{common::*, with_header, Provider};
 
 #[test]
 fn implicit_many_to_many_relation_fields_with_referential_actions() {

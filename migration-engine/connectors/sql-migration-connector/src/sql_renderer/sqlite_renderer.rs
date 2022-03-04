@@ -4,7 +4,7 @@ use crate::{
     pair::Pair,
     sql_migration::{AlterEnum, AlterTable, RedefineTable, TableChange},
 };
-use datamodel::PrismaValue;
+use datamodel::dml::PrismaValue;
 use indoc::formatdoc;
 use once_cell::sync::Lazy;
 use regex::Regex;

@@ -1,17 +1,17 @@
 mod name;
 
-use mongodb_schema_describer::{IndexFieldProperty, IndexWalker};
 pub(crate) use name::Name;
 
 use super::{field_type::FieldType, CompositeTypeDepth};
 use convert_case::{Case, Casing};
-use datamodel::{
-    CompositeType, CompositeTypeField, CompositeTypeFieldType, Datamodel, DefaultValue, Field, IndexDefinition,
-    IndexField, IndexType, Model, PrimaryKeyDefinition, PrimaryKeyField, ScalarField, ScalarType, SortOrder,
-    ValueGenerator, WithDatabaseName,
+use datamodel::dml::{
+    self, CompositeType, CompositeTypeField, CompositeTypeFieldType, Datamodel, DefaultValue, Field, FieldArity,
+    IndexDefinition, IndexField, IndexType, Model, PrimaryKeyDefinition, PrimaryKeyField, ScalarField, ScalarType,
+    SortOrder, ValueGenerator, WithDatabaseName,
 };
 use introspection_connector::Warning;
 use mongodb::bson::{Bson, Document};
+use mongodb_schema_describer::{IndexFieldProperty, IndexWalker};
 use once_cell::sync::Lazy;
 use regex::Regex;
 use std::{
@@ -225,8 +225,8 @@ fn add_missing_ids_to_models(models: &mut BTreeMap<String, Model>) {
 
         let field = ScalarField {
             name: String::from("id"),
-            field_type: datamodel::FieldType::from(FieldType::ObjectId),
-            arity: datamodel::FieldArity::Required,
+            field_type: dml::FieldType::from(FieldType::ObjectId),
+            arity: FieldArity::Required,
             database_name: Some(String::from("_id")),
             default_value: Some(DefaultValue::new_expression(ValueGenerator::new_auto())),
             documentation: None,
@@ -391,11 +391,11 @@ fn populate_fields(
         }
 
         let arity = if field_type.is_array() {
-            datamodel::FieldArity::List
+            FieldArity::List
         } else if doc_count > field_count || sampler.nullable {
-            datamodel::FieldArity::Optional
+            FieldArity::Optional
         } else {
-            datamodel::FieldArity::Required
+            FieldArity::Required
         };
 
         let mut documentation = if percentages.has_type_variety() {
@@ -453,7 +453,7 @@ fn populate_fields(
 
                 let mut field = ScalarField {
                     name,
-                    field_type: datamodel::FieldType::from(field_type.clone()),
+                    field_type: dml::FieldType::from(field_type.clone()),
                     arity,
                     database_name,
                     default_value: None,
@@ -535,9 +535,9 @@ fn filter_out_empty_types(
     for (model_name, model) in models.iter_mut() {
         for field in model.fields.iter_mut().filter_map(|f| f.as_scalar_field_mut()) {
             match &field.field_type {
-                datamodel::FieldType::CompositeType(ct) if empty_types.contains(ct) => {
+                dml::FieldType::CompositeType(ct) if empty_types.contains(ct) => {
                     fields_with_an_empty_type.push((Name::Model(model_name.clone()), field.name.clone()));
-                    field.field_type = datamodel::FieldType::Scalar(datamodel::ScalarType::Json, None, None);
+                    field.field_type = dml::FieldType::Scalar(ScalarType::Json, None, None);
                     field.documentation = Some(EMPTY_TYPE_DETECTED.to_owned());
                 }
                 _ => (),
@@ -601,7 +601,7 @@ fn add_indices_to_models(
                 let sf = ScalarField {
                     name,
                     field_type: FieldType::Json.into(),
-                    arity: datamodel::FieldArity::Optional,
+                    arity: FieldArity::Optional,
                     database_name,
                     default_value: None,
                     documentation: Some(docs),

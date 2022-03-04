@@ -1,6 +1,5 @@
-use crate::common::*;
-use crate::{with_header, Provider};
-use datamodel::{render_datamodel_to_string, IndexDefinition, IndexField, IndexType};
+use crate::{common::*, with_header, Provider};
+use datamodel::render_datamodel_to_string;
 
 #[test]
 fn basic_unique_index_must_work() {

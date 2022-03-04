@@ -1,5 +1,5 @@
 use crate::error::Error;
-use datamodel::{Configuration, Datamodel};
+use datamodel::{dml::Datamodel, Configuration};
 use introspection_connector::{
     CompositeTypeDepth, ConnectorResult, DatabaseMetadata, IntrospectionConnector, IntrospectionContext,
     IntrospectionResultOutput,
