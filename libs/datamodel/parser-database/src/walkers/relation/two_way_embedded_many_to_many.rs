@@ -5,8 +5,9 @@ use crate::{
 
 use super::RelationWalker;
 
-/// Describes an implicit m:n relation between two models. Neither side defines fields, attributes
-/// or referential actions, which are all inferred by Prisma.
+/// Describes an explicit m:n relation between two models. Both sides define
+/// `fields` which must be a single array scalar field, and `references` that
+/// should point to a single scalar field on the referenced model.
 #[derive(Copy, Clone)]
 pub struct TwoWayEmbeddedManyToManyRelationWalker<'db>(pub(super) RelationWalker<'db>);
 
