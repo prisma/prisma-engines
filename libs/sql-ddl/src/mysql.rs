@@ -420,7 +420,7 @@ mod tests {
                     column_name: "test".into(),
                     not_null: true,
                     default: Some("(uuid_to_bin(uuid()))".into()),
-                    comment: Some("test comment".into()),
+                    comment: Some(r#""test comment""#.into()),
                     auto_increment: false,
                     primary_key: false,
                     references: None,
@@ -436,7 +436,7 @@ mod tests {
             r#"
             CREATE TABLE `Cat` (
                 `id` INTEGER NULL AUTO_INCREMENT PRIMARY KEY,
-                `test` BINARY(16) NOT NULL DEFAULT (uuid_to_bin(uuid()))
+                `test` BINARY(16) NOT NULL DEFAULT (uuid_to_bin(uuid())) COMMENT "test comment"
             ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci
             "#,
         )
