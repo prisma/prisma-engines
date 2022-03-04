@@ -17,6 +17,7 @@ use sql_schema_describer::{
     ColumnTypeFamily, DefaultKind, DefaultValue, ForeignKeyAction, SQLSortOrder, SqlSchema,
 };
 use std::borrow::Cow;
+use datamodel::ScalarType::String;
 
 impl MysqlFlavour {
     fn render_column<'a>(&self, col: &ColumnWalker<'a>) -> ddl::Column<'a> {
@@ -24,6 +25,11 @@ impl MysqlFlavour {
             column_name: col.name().into(),
             not_null: col.arity().is_required(),
             column_type: render_column_type(col),
+            comment: if let Some(comment) = col.comment() {
+                Option::Some(Cow::Owned(self.quote(comment)))
+            } else {
+               None
+            },
             default: col
                 .default()
                 .filter(|default| {

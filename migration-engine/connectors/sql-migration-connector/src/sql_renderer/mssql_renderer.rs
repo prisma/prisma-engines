@@ -68,7 +68,13 @@ impl MssqlFlavour {
                 .unwrap_or_default()
         };
 
-        format!("{} {}{}{}", column_name, r#type, nullability, default)
+        let comment = if let Some(comment) = column.comment() {
+            Cow::Owned(format!(" COMMENT {}", self.quote(comment)))
+        } else {
+            Cow::Borrowed("")
+        };
+
+        format!("{} {}{}{}{}", column_name, r#type, nullability, default, comment)
     }
 
     fn render_references(&self, foreign_key: &ForeignKeyWalker<'_>) -> String {

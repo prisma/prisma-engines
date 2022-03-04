@@ -27,10 +27,15 @@ impl PostgresFlavour {
             .filter(|default| !default.is_empty())
             .map(|default| format!(" DEFAULT {}", default))
             .unwrap_or_else(String::new);
+        let comment = if let Some(comment) = column.comment() {
+            format!(" is {}", self.quote(comment))
+        } else {
+            String::new()
+        };
 
         format!(
-            "{}{} {}{}{}",
-            SQL_INDENTATION, column_name, tpe_str, nullability_str, default_str
+            "{}{} {}{}{}{}",
+            SQL_INDENTATION, column_name, tpe_str, nullability_str, default_str,comment
         )
     }
 }
