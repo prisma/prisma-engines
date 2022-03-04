@@ -1,6 +1,6 @@
 use crate::{
-    ast::{self, WithName},
     diagnostics::DatamodelError,
+    schema_ast::ast::{self, WithName},
     transform::ast_to_dml::{
         db::{
             walkers::{ModelWalker, RelationFieldWalker, RelationName},

@@ -1,6 +1,8 @@
-use super::helpers::*;
-use crate::{dml::Datamodel, Datasource};
+mod helpers;
+
+use crate::{dml, load_sources, Datasource, Diagnostics, ParserDatabase};
 use enumflags2::BitFlags;
+use helpers::*;
 use pest::{iterators::Pair, Parser};
 use schema_ast::{
     ast::{self, SchemaAst},
@@ -8,7 +10,29 @@ use schema_ast::{
     renderer::*,
 };
 
-pub struct Reformatter<'a> {
+/// Returns either the reformatted schema, or the original input if we can't reformat (invalid
+/// syntax, etc.).
+pub fn reformat(source: &str, indent_width: usize) -> Result<String, &str> {
+    Reformatter::new(source).reformat_internal(indent_width)
+}
+
+fn parse_datamodel_for_formatter(
+    ast: ast::SchemaAst,
+) -> Result<(ParserDatabase, dml::Datamodel, Vec<Datasource>), Diagnostics> {
+    let mut diagnostics = diagnostics::Diagnostics::new();
+    let datasources = load_sources(&ast, Default::default(), &mut diagnostics);
+    let db = parser_database::ParserDatabase::new(ast, &mut diagnostics);
+    diagnostics.to_result()?;
+    let (connector, referential_integrity) = datasources
+        .get(0)
+        .map(|ds| (ds.active_connector, ds.referential_integrity()))
+        .unwrap_or((&datamodel_connector::EmptyDatamodelConnector, Default::default()));
+
+    let datamodel = crate::transform::ast_to_dml::LiftAstToDml::new(&db, connector, referential_integrity).lift();
+    Ok((db, datamodel, datasources))
+}
+
+struct Reformatter<'a> {
     input: &'a str,
     missing_fields: Vec<MissingField>,
     missing_field_attributes: Vec<MissingFieldAttribute>,
@@ -16,8 +40,8 @@ pub struct Reformatter<'a> {
 }
 
 impl<'a> Reformatter<'a> {
-    pub fn new(input: &'a str) -> Self {
-        let info = crate::parse_schema_ast(input).and_then(crate::parse_datamodel_for_formatter);
+    fn new(input: &'a str) -> Self {
+        let info = crate::parse_schema_ast(input).and_then(parse_datamodel_for_formatter);
         match info {
             Ok((db, datamodel, mut datasources)) => {
                 let schema_ast = db.ast();
@@ -47,7 +71,7 @@ impl<'a> Reformatter<'a> {
     // this finds all auto generated fields, that are added during auto generation AND are missing from the original input.
     fn find_all_missing_fields(
         schema_ast: &SchemaAst,
-        datamodel: &Datamodel,
+        datamodel: &dml::Datamodel,
         datasource: Option<&Datasource>,
     ) -> Vec<MissingField> {
         let lowerer = crate::transform::dml_to_ast::LowerDmlToAst::new(datasource, BitFlags::empty());
@@ -73,7 +97,7 @@ impl<'a> Reformatter<'a> {
 
     fn find_all_missing_attributes(
         schema_ast: &SchemaAst,
-        datamodel: &Datamodel,
+        datamodel: &dml::Datamodel,
         datasource: Option<&Datasource>,
     ) -> Vec<MissingFieldAttribute> {
         let lowerer = crate::transform::dml_to_ast::LowerDmlToAst::new(datasource, BitFlags::empty());
@@ -107,7 +131,7 @@ impl<'a> Reformatter<'a> {
 
     fn find_all_missing_relation_attribute_args(
         schema_ast: &SchemaAst,
-        datamodel: &Datamodel,
+        datamodel: &dml::Datamodel,
         datasource: Option<&Datasource>,
     ) -> Vec<MissingRelationAttributeArg> {
         let lowerer = crate::transform::dml_to_ast::LowerDmlToAst::new(datasource, BitFlags::empty());
@@ -149,22 +173,13 @@ impl<'a> Reformatter<'a> {
         missing_relation_attribute_args
     }
 
-    pub fn reformat_to(&self, output: &mut dyn std::io::Write, ident_width: usize) {
-        let result = self.reformat_internal(ident_width);
-        write!(output, "{}", result).unwrap()
-    }
-
-    pub fn reformat_to_string(&self) -> String {
-        self.reformat_internal(2)
-    }
-
-    fn reformat_internal(&self, ident_width: usize) -> String {
+    fn reformat_internal(self, indent_width: usize) -> Result<String, &'a str> {
         let mut ast = match PrismaDatamodelParser::parse(Rule::schema, self.input) {
             Ok(ast) => ast,
-            Err(_) => return self.input.to_owned(),
+            Err(_) => return Err(self.input),
         };
         let mut target_string = String::with_capacity(self.input.len());
-        let mut renderer = Renderer::new(&mut target_string, ident_width);
+        let mut renderer = Renderer::new(&mut target_string, indent_width);
         self.reformat_top(&mut renderer, &ast.next().unwrap());
 
         // all schemas must end with a newline
@@ -172,7 +187,7 @@ impl<'a> Reformatter<'a> {
             target_string.push('\n');
         }
 
-        target_string
+        Ok(target_string)
     }
 
     fn reformat_top(&self, target: &mut Renderer<'_>, token: &Token<'_>) {
@@ -878,21 +893,21 @@ impl<'a> Reformatter<'a> {
 }
 
 #[derive(Debug)]
-pub struct MissingField {
-    pub model: String,
-    pub field: crate::ast::Field,
+struct MissingField {
+    model: String,
+    field: ast::Field,
 }
 
 #[derive(Debug)]
-pub struct MissingFieldAttribute {
-    pub model: String,
-    pub field: String,
-    pub attribute: crate::ast::Attribute,
+struct MissingFieldAttribute {
+    model: String,
+    field: String,
+    attribute: ast::Attribute,
 }
 
 #[derive(Debug)]
-pub struct MissingRelationAttributeArg {
-    pub model: String,
-    pub field: String,
-    pub arg: crate::ast::Argument,
+struct MissingRelationAttributeArg {
+    model: String,
+    field: String,
+    arg: ast::Argument,
 }

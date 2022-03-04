@@ -1,6 +1,9 @@
 use crate::common::*;
-use datamodel::ast::reformat::Reformatter;
 use indoc::indoc;
+
+fn reformat(input: &str) -> String {
+    datamodel::reformat(input, 2).unwrap_or_else(|_| input.to_owned())
+}
 
 #[test]
 fn must_add_new_line_to_end_of_schema() {
@@ -10,8 +13,7 @@ fn must_add_new_line_to_end_of_schema() {
         // a comment
     "#]];
 
-    let result = Reformatter::new(input).reformat_to_string();
-    expected.assert_eq(&result);
+    expected.assert_eq(&reformat(input));
 }
 
 #[test]
@@ -28,8 +30,7 @@ fn test_reformat_model_simple() {
         }
     "#]];
 
-    let result = Reformatter::new(input).reformat_to_string();
-    expected.assert_eq(&result);
+    expected.assert_eq(&reformat(input));
 }
 
 #[test]
@@ -56,8 +57,7 @@ fn test_reformat_model_complex() {
         }
     "#]];
 
-    let result = Reformatter::new(input).reformat_to_string();
-    expected.assert_eq(&result);
+    expected.assert_eq(&reformat(input));
 }
 
 #[test]
@@ -78,8 +78,7 @@ fn catch_all_in_a_block_must_not_influence_table_layout() {
         }
     "#]];
 
-    let result = Reformatter::new(input).reformat_to_string();
-    expected.assert_eq(&result);
+    expected.assert_eq(&reformat(input));
 }
 
 #[test]
@@ -120,8 +119,7 @@ fn format_should_enforce_order_of_field_attributes() {
         }
     "#]];
 
-    let result = Reformatter::new(input).reformat_to_string();
-    expected.assert_eq(&result);
+    expected.assert_eq(&reformat(input));
 }
 
 #[test]
@@ -178,8 +176,7 @@ fn format_should_enforce_order_of_block_attributes() {
         }
     "#]];
 
-    let result = Reformatter::new(input).reformat_to_string();
-    expected.assert_eq(&result);
+    expected.assert_eq(&reformat(input));
 }
 
 #[test]
@@ -204,8 +201,7 @@ fn format_should_put_block_attributes_to_end_of_block_with_comments() {
         }
     "#]];
 
-    let result = Reformatter::new(input).reformat_to_string();
-    expected.assert_eq(&result);
+    expected.assert_eq(&reformat(input));
 }
 
 #[test]
@@ -229,8 +225,7 @@ fn format_should_put_block_attributes_to_end_of_block_without_comments() {
         }
     "#]];
 
-    let result = Reformatter::new(input).reformat_to_string();
-    expected.assert_eq(&result);
+    expected.assert_eq(&reformat(input));
 }
 
 #[test]
@@ -253,8 +248,7 @@ fn comments_in_a_model_must_not_move() {
         }
     "#]];
 
-    let result = Reformatter::new(input).reformat_to_string();
-    expected.assert_eq(&result);
+    expected.assert_eq(&reformat(input));
 }
 
 #[test]
@@ -275,8 +269,7 @@ fn end_of_line_comments_must_not_influence_table_layout_in_models() {
         }
     "#]];
 
-    let result = Reformatter::new(input).reformat_to_string();
-    expected.assert_eq(&result);
+    expected.assert_eq(&reformat(input));
 }
 
 #[test]
@@ -295,8 +288,7 @@ fn end_of_line_comments_must_not_influence_table_layout_in_enums() {
         }
     "#]];
 
-    let result = Reformatter::new(input).reformat_to_string();
-    expected.assert_eq(&result);
+    expected.assert_eq(&reformat(input));
 }
 
 #[test]
@@ -329,8 +321,7 @@ fn commented_models_dont_get_removed() {
         // }
     "#]];
 
-    let result = Reformatter::new(input).reformat_to_string();
-    expected.assert_eq(&result);
+    expected.assert_eq(&reformat(input));
 }
 
 #[test]
@@ -351,8 +342,7 @@ fn a_comment_in_datasource_must_not_add_extra_newlines() {
         }
     "#]];
 
-    let result = Reformatter::new(input).reformat_to_string();
-    expected.assert_eq(&result);
+    expected.assert_eq(&reformat(input));
 }
 
 #[test]
@@ -371,8 +361,7 @@ fn a_comment_in_generator_must_not_add_extra_newlines() {
         }
     "#]];
 
-    let result = Reformatter::new(input).reformat_to_string();
-    expected.assert_eq(&result);
+    expected.assert_eq(&reformat(input));
 }
 
 #[test]
@@ -391,8 +380,7 @@ fn test_reformat_config() {
         }
     "#]];
 
-    let result = Reformatter::new(input).reformat_to_string();
-    expected.assert_eq(&result);
+    expected.assert_eq(&reformat(input));
 }
 
 #[test]
@@ -411,8 +399,7 @@ fn test_reformat_tabs() {
         }
     "#]];
 
-    let result = Reformatter::new(&input.replace("\\t", "\t")).reformat_to_string();
-    expected.assert_eq(&result);
+    expected.assert_eq(&reformat(&input.replace("\\t", "\t")));
 }
 
 #[test]
@@ -442,8 +429,7 @@ fn test_floating_doc_comments_1() {
         // model ok {}
     "#]];
 
-    let result = Reformatter::new(input).reformat_to_string();
-    expected.assert_eq(&result);
+    expected.assert_eq(&reformat(input));
 }
 
 #[test]
@@ -474,8 +460,7 @@ fn test_floating_doc_comments_2() {
         // ajlsdkfkjasflk
     "#]];
 
-    let result = Reformatter::new(input).reformat_to_string();
-    expected.assert_eq(&result);
+    expected.assert_eq(&reformat(input));
 }
 
 #[test]
@@ -506,8 +491,7 @@ fn reformatting_enums_must_work() {
         }
     "#]];
 
-    let result = Reformatter::new(input).reformat_to_string();
-    expected.assert_eq(&result);
+    expected.assert_eq(&reformat(input));
 }
 
 #[test]
@@ -526,8 +510,7 @@ fn reformatting_must_work_when_env_var_is_missing() {
         }
     "#]];
 
-    let result = Reformatter::new(input).reformat_to_string();
-    expected.assert_eq(&result);
+    expected.assert_eq(&reformat(input));
 }
 
 #[test]
@@ -546,8 +529,7 @@ fn invalid_lines_must_not_break_reformatting() {
         }
     "#]];
 
-    let result = Reformatter::new(input).reformat_to_string();
-    expected.assert_eq(&result);
+    expected.assert_eq(&reformat(input));
 }
 
 #[test]
@@ -568,8 +550,7 @@ fn reformatting_an_invalid_datasource_block_must_work() {
         }
     "#]];
 
-    let result = Reformatter::new(input).reformat_to_string();
-    expected.assert_eq(&result);
+    expected.assert_eq(&reformat(input));
 }
 
 #[test]
@@ -590,8 +571,7 @@ fn reformatting_an_invalid_generator_block_must_work() {
         }
     "#]];
 
-    let result = Reformatter::new(input).reformat_to_string();
-    expected.assert_eq(&result);
+    expected.assert_eq(&reformat(input));
 }
 
 #[test]
@@ -622,8 +602,7 @@ fn reformatting_a_model_with_native_type_definitions_must_work() {
         }
     "#]];
 
-    let result = Reformatter::new(input).reformat_to_string();
-    expected.assert_eq(&result);
+    expected.assert_eq(&reformat(input));
 }
 
 #[test]
@@ -646,8 +625,7 @@ fn incomplete_field_definitions_in_a_model_must_not_get_removed() {
         }
     "#]];
 
-    let result = Reformatter::new(input).reformat_to_string();
-    expected.assert_eq(&result);
+    expected.assert_eq(&reformat(input));
 }
 
 #[test]
@@ -672,8 +650,7 @@ fn new_lines_inside_block_above_field_must_stay() {
         }
     "#]];
 
-    let result = Reformatter::new(input).reformat_to_string();
-    expected.assert_eq(&result);
+    expected.assert_eq(&reformat(input));
 }
 
 #[test]
@@ -698,8 +675,7 @@ fn new_lines_inside_block_below_field_must_stay() {
         }
     "#]];
 
-    let result = Reformatter::new(input).reformat_to_string();
-    expected.assert_eq(&result);
+    expected.assert_eq(&reformat(input));
 }
 
 #[test]
@@ -724,8 +700,7 @@ fn new_lines_inside_block_in_between_fields_must_stay() {
         }
     "#]];
 
-    let result = Reformatter::new(input).reformat_to_string();
-    expected.assert_eq(&result);
+    expected.assert_eq(&reformat(input));
 }
 
 #[test]
@@ -743,8 +718,7 @@ fn new_lines_before_first_block_must_be_removed() {
         }
     "#]];
 
-    let result = Reformatter::new(input).reformat_to_string();
-    expected.assert_eq(&result);
+    expected.assert_eq(&reformat(input));
 }
 
 #[test]
@@ -770,8 +744,7 @@ fn new_lines_between_blocks_must_be_reduced_to_one_simple() {
         }
     "#]];
 
-    let result = Reformatter::new(input).reformat_to_string();
-    expected.assert_eq(&result);
+    expected.assert_eq(&reformat(input));
 }
 
 #[test]
@@ -905,8 +878,7 @@ fn multiple_new_lines_between_top_level_elements_must_be_reduced_to_a_single_one
         }
     "#]];
 
-    let result = Reformatter::new(input).reformat_to_string();
-    expected.assert_eq(&result);
+    expected.assert_eq(&reformat(input));
 }
 
 #[test]
@@ -931,8 +903,7 @@ fn model_level_attributes_reset_the_table_layout() {
         }
     "#]];
 
-    let result = Reformatter::new(input).reformat_to_string();
-    expected.assert_eq(&result);
+    expected.assert_eq(&reformat(input));
 }
 
 #[test]
@@ -954,8 +925,7 @@ fn incomplete_last_line_must_not_stop_reformatting() {
         model Bl
     "#]];
 
-    let result = Reformatter::new(input).reformat_to_string();
-    expected.assert_eq(&result);
+    expected.assert_eq(&reformat(input));
 }
 
 #[test]
@@ -978,8 +948,7 @@ fn unsupported_is_allowed() {
         }
     "#]];
 
-    let result = Reformatter::new(input).reformat_to_string();
-    expected.assert_eq(&result);
+    expected.assert_eq(&reformat(input));
 }
 
 #[test]
@@ -999,8 +968,7 @@ fn ignore_is_allowed() {
         }
     "#]];
 
-    let result = Reformatter::new(input).reformat_to_string();
-    expected.assert_eq(&result);
+    expected.assert_eq(&reformat(input));
 }
 
 #[test]
@@ -1017,8 +985,7 @@ fn db_generated_is_allowed() {
         }
     "#]];
 
-    let result = Reformatter::new(input).reformat_to_string();
-    expected.assert_eq(&result);
+    expected.assert_eq(&reformat(input));
 }
 
 #[test]
@@ -1069,8 +1036,7 @@ fn reformatting_ignore_with_relations_works() {
         }
     "#]];
 
-    let result = Reformatter::new(input).reformat_to_string();
-    expected.assert_eq(&result);
+    expected.assert_eq(&reformat(input));
 }
 
 #[test]
@@ -1087,8 +1053,7 @@ fn composite_types_are_not_reformatted_into_models() {
       }
   "#]];
 
-    let result = Reformatter::new(input).reformat_to_string();
-    expected.assert_eq(&result);
+    expected.assert_eq(&reformat(input));
 }
 
 #[test]
@@ -1161,8 +1126,7 @@ fn reformatting_extended_indexes_works() {
         }
     "#]];
 
-    let result = Reformatter::new(input).reformat_to_string();
-    expected.assert_eq(&result);
+    expected.assert_eq(&reformat(input));
 }
 
 #[test]
@@ -1211,8 +1175,7 @@ fn reformatting_with_empty_indexes() {
         }
     "#]];
 
-    let result = Reformatter::new(schema).reformat_to_string();
-    expected.assert_eq(&result);
+    expected.assert_eq(&reformat(schema));
 }
 
 #[test]
@@ -1273,8 +1236,7 @@ fn test_composite_types_in_models() {
         }
     "#]];
 
-    let result = Reformatter::new(input).reformat_to_string();
-    expected.assert_eq(&result);
+    expected.assert_eq(&reformat(input));
 }
 
 #[test]
@@ -1317,8 +1279,7 @@ fn empty_arguments_reformat_properly() {
         }
     "#]];
 
-    let result = Reformatter::new(schema).reformat_to_string();
-    expected.assert_eq(&result);
+    expected.assert_eq(&reformat(schema));
 }
 
 #[test]
@@ -1371,6 +1332,5 @@ fn composite_type_native_types_roundtrip() {
         }
     "#]];
 
-    let result = Reformatter::new(schema).reformat_to_string();
-    expected.assert_eq(&result);
+    expected.assert_eq(&reformat(schema));
 }

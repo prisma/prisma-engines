@@ -33,8 +33,6 @@ pub fn text_document_completion(schema: &str, params: &str) -> String {
 ///
 /// Of the DocumentFormattingParams, we only take into account tabSize, at the moment.
 pub fn format(schema: &str, params: &str) -> String {
-    use datamodel::ast::reformat::Reformatter;
-
     let params: lsp_types::DocumentFormattingParams = match serde_json::from_str(params) {
         Ok(params) => params,
         Err(err) => {
@@ -43,9 +41,7 @@ pub fn format(schema: &str, params: &str) -> String {
         }
     };
 
-    let mut out = Vec::with_capacity(schema.len() / 2);
-    Reformatter::new(schema).reformat_to(&mut out, params.options.tab_size as usize);
-    String::from_utf8_lossy(&out).into_owned()
+    datamodel::reformat(schema, params.options.tab_size as usize).unwrap_or_else(|err| err.to_owned())
 }
 
 pub fn lint(schema: String) -> String {

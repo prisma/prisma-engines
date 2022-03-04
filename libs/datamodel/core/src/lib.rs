@@ -48,22 +48,25 @@
 
 #![deny(rust_2018_idioms, unsafe_code)]
 
-pub mod ast;
 pub mod common;
 pub mod dml;
 pub mod json;
 
 mod configuration;
+mod reformat;
 mod transform;
 
-pub use configuration::{Configuration, Datasource, Generator, StringFromEnvVar};
+pub use crate::{
+    configuration::{Configuration, Datasource, Generator, StringFromEnvVar},
+    reformat::reformat,
+};
 pub use datamodel_connector;
 pub use diagnostics;
 pub use parser_database;
 pub use parser_database::is_reserved_type_name;
-pub use schema_ast;
+pub use schema_ast::{self, ast};
 
-use crate::{ast::SchemaAst, common::preview_features::PreviewFeature};
+use crate::common::preview_features::PreviewFeature;
 use diagnostics::{Diagnostics, Validated};
 use enumflags2::BitFlags;
 use parser_database::ParserDatabase;
@@ -135,27 +138,11 @@ pub fn parse_datamodel(datamodel_string: &str) -> Result<ValidatedDatamodel, dia
     })
 }
 
-fn parse_datamodel_for_formatter(
-    ast: SchemaAst,
-) -> Result<(ParserDatabase, dml::Datamodel, Vec<Datasource>), Diagnostics> {
-    let mut diagnostics = diagnostics::Diagnostics::new();
-    let datasources = load_sources(&ast, Default::default(), &mut diagnostics);
-    let db = parser_database::ParserDatabase::new(ast, &mut diagnostics);
-    diagnostics.to_result()?;
-    let (connector, referential_integrity) = datasources
-        .get(0)
-        .map(|ds| (ds.active_connector, ds.referential_integrity()))
-        .unwrap_or((&datamodel_connector::EmptyDatamodelConnector, Default::default()));
-
-    let datamodel = transform::ast_to_dml::LiftAstToDml::new(&db, connector, referential_integrity).lift();
-    Ok((db, datamodel, datasources))
-}
-
 fn parse_datamodel_internal(
     datamodel_string: &str,
 ) -> Result<Validated<(Configuration, dml::Datamodel)>, diagnostics::Diagnostics> {
     let mut diagnostics = diagnostics::Diagnostics::new();
-    let ast = ast::parse_schema(datamodel_string, &mut diagnostics);
+    let ast = schema_ast::parser::parse_schema(datamodel_string, &mut diagnostics);
 
     let generators = GeneratorLoader::load_generators_from_ast(&ast, &mut diagnostics);
     let preview_features = preview_features(&generators);
@@ -183,9 +170,9 @@ fn parse_datamodel_internal(
     })
 }
 
-pub fn parse_schema_ast(datamodel_string: &str) -> Result<SchemaAst, diagnostics::Diagnostics> {
+pub fn parse_schema_ast(datamodel_string: &str) -> Result<ast::SchemaAst, diagnostics::Diagnostics> {
     let mut diagnostics = Diagnostics::default();
-    let schema = ast::parse_schema(datamodel_string, &mut diagnostics);
+    let schema = schema_ast::parser::parse_schema(datamodel_string, &mut diagnostics);
 
     diagnostics.to_result()?;
 
@@ -195,7 +182,7 @@ pub fn parse_schema_ast(datamodel_string: &str) -> Result<SchemaAst, diagnostics
 /// Loads all configuration blocks from a datamodel using the built-in source definitions.
 pub fn parse_configuration(schema: &str) -> Result<ValidatedConfiguration, diagnostics::Diagnostics> {
     let mut diagnostics = Diagnostics::default();
-    let ast = ast::parse_schema(schema, &mut diagnostics);
+    let ast = schema_ast::parser::parse_schema(schema, &mut diagnostics);
 
     diagnostics.to_result()?;
 
@@ -215,7 +202,7 @@ pub fn parse_configuration(schema: &str) -> Result<ValidatedConfiguration, diagn
 }
 
 fn load_sources(
-    schema_ast: &SchemaAst,
+    schema_ast: &ast::SchemaAst,
     preview_features: BitFlags<PreviewFeature>,
     diagnostics: &mut Diagnostics,
 ) -> Vec<Datasource> {
@@ -234,7 +221,7 @@ pub fn render_datamodel_to_string(datamodel: &dml::Datamodel, configuration: Opt
 }
 
 /// Renders an AST to a string.
-pub fn render_schema_ast_to_string(schema: &SchemaAst) -> String {
+pub fn render_schema_ast_to_string(schema: &ast::SchemaAst) -> String {
     let mut writable_string = String::with_capacity(schema.tops.len() * 20);
 
     render_schema_ast_to(&mut writable_string, schema, 2);
@@ -298,7 +285,7 @@ fn render_datamodel_and_config_to(
 
 /// Renders as a string into the stream.
 fn render_schema_ast_to(stream: &mut dyn std::fmt::Write, schema: &ast::SchemaAst, ident_width: usize) {
-    let mut renderer = ast::Renderer::new(stream, ident_width);
+    let mut renderer = schema_ast::renderer::Renderer::new(stream, ident_width);
     renderer.render(schema);
 }
 
