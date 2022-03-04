@@ -143,7 +143,7 @@
 <span id="141">141</span>
 <span id="142">142</span>
 <span id="143">143</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">datamodel</span>::{<span class="ident">NativeTypeInstance</span>, <span class="ident">ScalarType</span>};
+</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">datamodel::dml</span>::{<span class="self">self</span>, <span class="ident">NativeTypeInstance</span>, <span class="ident">ScalarType</span>};
 <span class="kw">use</span> <span class="ident">mongodb::bson::Bson</span>;
 <span class="kw">use</span> <span class="ident">native_types::MongoDbType</span>;
 <span class="kw">use</span> <span class="ident">std::fmt</span>;
@@ -229,60 +229,60 @@
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">FieldType</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">datamodel::CompositeTypeFieldType</span> {
+<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">FieldType</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">dml::CompositeTypeFieldType</span> {
     <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">r#type</span>: <span class="ident">FieldType</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">match</span> <span class="ident">r#type</span> {
-            <span class="ident">FieldType::String</span> =&gt; <span class="ident">datamodel::CompositeTypeFieldType::Scalar</span>(<span class="ident">ScalarType::String</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>),
-            <span class="ident">FieldType::Double</span> =&gt; <span class="ident">datamodel::CompositeTypeFieldType::Scalar</span>(<span class="ident">ScalarType::Float</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>),
-            <span class="ident">FieldType::BinData</span> =&gt; <span class="ident">datamodel::CompositeTypeFieldType::Scalar</span>(<span class="ident">ScalarType::Bytes</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>),
-            <span class="ident">FieldType::ObjectId</span> =&gt; <span class="ident">datamodel::CompositeTypeFieldType::Scalar</span>(
+            <span class="ident">FieldType::String</span> =&gt; <span class="ident">dml::CompositeTypeFieldType::Scalar</span>(<span class="ident">ScalarType::String</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>),
+            <span class="ident">FieldType::Double</span> =&gt; <span class="ident">dml::CompositeTypeFieldType::Scalar</span>(<span class="ident">ScalarType::Float</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>),
+            <span class="ident">FieldType::BinData</span> =&gt; <span class="ident">dml::CompositeTypeFieldType::Scalar</span>(<span class="ident">ScalarType::Bytes</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>),
+            <span class="ident">FieldType::ObjectId</span> =&gt; <span class="ident">dml::CompositeTypeFieldType::Scalar</span>(
                 <span class="ident">ScalarType::String</span>,
                 <span class="prelude-val">None</span>,
                 <span class="prelude-val">Some</span>(<span class="ident">NativeTypeInstance::new</span>(<span class="string">&quot;ObjectId&quot;</span>, <span class="ident">Vec::new</span>(), <span class="kw-2">&amp;</span><span class="ident">MongoDbType::ObjectId</span>)),
             ),
-            <span class="ident">FieldType::Bool</span> =&gt; <span class="ident">datamodel::CompositeTypeFieldType::Scalar</span>(<span class="ident">ScalarType::Boolean</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>),
-            <span class="ident">FieldType::Date</span> =&gt; <span class="ident">datamodel::CompositeTypeFieldType::Scalar</span>(
+            <span class="ident">FieldType::Bool</span> =&gt; <span class="ident">dml::CompositeTypeFieldType::Scalar</span>(<span class="ident">ScalarType::Boolean</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>),
+            <span class="ident">FieldType::Date</span> =&gt; <span class="ident">dml::CompositeTypeFieldType::Scalar</span>(
                 <span class="ident">ScalarType::DateTime</span>,
                 <span class="prelude-val">None</span>,
                 <span class="prelude-val">Some</span>(<span class="ident">NativeTypeInstance::new</span>(<span class="string">&quot;Date&quot;</span>, <span class="ident">Vec::new</span>(), <span class="kw-2">&amp;</span><span class="ident">MongoDbType::Date</span>)),
             ),
-            <span class="ident">FieldType::Int32</span> =&gt; <span class="ident">datamodel::CompositeTypeFieldType::Scalar</span>(<span class="ident">ScalarType::Int</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>),
-            <span class="ident">FieldType::Timestamp</span> =&gt; <span class="ident">datamodel::CompositeTypeFieldType::Scalar</span>(<span class="ident">ScalarType::DateTime</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>),
-            <span class="ident">FieldType::Int64</span> =&gt; <span class="ident">datamodel::CompositeTypeFieldType::Scalar</span>(<span class="ident">ScalarType::BigInt</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>),
-            <span class="ident">FieldType::Decimal</span> =&gt; <span class="ident">datamodel::CompositeTypeFieldType::Scalar</span>(<span class="ident">ScalarType::Decimal</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>),
-            <span class="ident">FieldType::Json</span> =&gt; <span class="ident">datamodel::CompositeTypeFieldType::Scalar</span>(<span class="ident">ScalarType::Json</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>),
-            <span class="ident">FieldType::Document</span>(<span class="ident">name</span>) =&gt; <span class="ident">datamodel::CompositeTypeFieldType::CompositeType</span>(<span class="ident">name</span>),
-            <span class="ident">FieldType::Array</span>(<span class="ident">r#type</span>) =&gt; <span class="ident">datamodel::CompositeTypeFieldType::from</span>(<span class="kw-2">*</span><span class="ident">r#type</span>),
-            <span class="ident">FieldType::Unsupported</span>(<span class="ident">name</span>) =&gt; <span class="ident">datamodel::CompositeTypeFieldType::Unsupported</span>(<span class="ident">name</span>.<span class="ident">to_string</span>()),
+            <span class="ident">FieldType::Int32</span> =&gt; <span class="ident">dml::CompositeTypeFieldType::Scalar</span>(<span class="ident">ScalarType::Int</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>),
+            <span class="ident">FieldType::Timestamp</span> =&gt; <span class="ident">dml::CompositeTypeFieldType::Scalar</span>(<span class="ident">ScalarType::DateTime</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>),
+            <span class="ident">FieldType::Int64</span> =&gt; <span class="ident">dml::CompositeTypeFieldType::Scalar</span>(<span class="ident">ScalarType::BigInt</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>),
+            <span class="ident">FieldType::Decimal</span> =&gt; <span class="ident">dml::CompositeTypeFieldType::Scalar</span>(<span class="ident">ScalarType::Decimal</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>),
+            <span class="ident">FieldType::Json</span> =&gt; <span class="ident">dml::CompositeTypeFieldType::Scalar</span>(<span class="ident">ScalarType::Json</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>),
+            <span class="ident">FieldType::Document</span>(<span class="ident">name</span>) =&gt; <span class="ident">dml::CompositeTypeFieldType::CompositeType</span>(<span class="ident">name</span>),
+            <span class="ident">FieldType::Array</span>(<span class="ident">r#type</span>) =&gt; <span class="ident">dml::CompositeTypeFieldType::from</span>(<span class="kw-2">*</span><span class="ident">r#type</span>),
+            <span class="ident">FieldType::Unsupported</span>(<span class="ident">name</span>) =&gt; <span class="ident">dml::CompositeTypeFieldType::Unsupported</span>(<span class="ident">name</span>.<span class="ident">to_string</span>()),
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">FieldType</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">datamodel::FieldType</span> {
+<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">FieldType</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">dml::FieldType</span> {
     <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">r#type</span>: <span class="ident">FieldType</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">match</span> <span class="ident">r#type</span> {
-            <span class="ident">FieldType::String</span> =&gt; <span class="ident">datamodel::FieldType::Scalar</span>(<span class="ident">ScalarType::String</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>),
-            <span class="ident">FieldType::Double</span> =&gt; <span class="ident">datamodel::FieldType::Scalar</span>(<span class="ident">ScalarType::Float</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>),
-            <span class="ident">FieldType::BinData</span> =&gt; <span class="ident">datamodel::FieldType::Scalar</span>(<span class="ident">ScalarType::Bytes</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>),
-            <span class="ident">FieldType::ObjectId</span> =&gt; <span class="ident">datamodel::FieldType::Scalar</span>(
+            <span class="ident">FieldType::String</span> =&gt; <span class="ident">dml::FieldType::Scalar</span>(<span class="ident">ScalarType::String</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>),
+            <span class="ident">FieldType::Double</span> =&gt; <span class="ident">dml::FieldType::Scalar</span>(<span class="ident">ScalarType::Float</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>),
+            <span class="ident">FieldType::BinData</span> =&gt; <span class="ident">dml::FieldType::Scalar</span>(<span class="ident">ScalarType::Bytes</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>),
+            <span class="ident">FieldType::ObjectId</span> =&gt; <span class="ident">dml::FieldType::Scalar</span>(
                 <span class="ident">ScalarType::String</span>,
                 <span class="prelude-val">None</span>,
                 <span class="prelude-val">Some</span>(<span class="ident">NativeTypeInstance::new</span>(<span class="string">&quot;ObjectId&quot;</span>, <span class="ident">Vec::new</span>(), <span class="kw-2">&amp;</span><span class="ident">MongoDbType::ObjectId</span>)),
             ),
-            <span class="ident">FieldType::Bool</span> =&gt; <span class="ident">datamodel::FieldType::Scalar</span>(<span class="ident">ScalarType::Boolean</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>),
-            <span class="ident">FieldType::Date</span> =&gt; <span class="ident">datamodel::FieldType::Scalar</span>(
+            <span class="ident">FieldType::Bool</span> =&gt; <span class="ident">dml::FieldType::Scalar</span>(<span class="ident">ScalarType::Boolean</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>),
+            <span class="ident">FieldType::Date</span> =&gt; <span class="ident">dml::FieldType::Scalar</span>(
                 <span class="ident">ScalarType::DateTime</span>,
                 <span class="prelude-val">None</span>,
                 <span class="prelude-val">Some</span>(<span class="ident">NativeTypeInstance::new</span>(<span class="string">&quot;Date&quot;</span>, <span class="ident">Vec::new</span>(), <span class="kw-2">&amp;</span><span class="ident">MongoDbType::Date</span>)),
             ),
-            <span class="ident">FieldType::Int32</span> =&gt; <span class="ident">datamodel::FieldType::Scalar</span>(<span class="ident">ScalarType::Int</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>),
-            <span class="ident">FieldType::Timestamp</span> =&gt; <span class="ident">datamodel::FieldType::Scalar</span>(<span class="ident">ScalarType::DateTime</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>),
-            <span class="ident">FieldType::Int64</span> =&gt; <span class="ident">datamodel::FieldType::Scalar</span>(<span class="ident">ScalarType::BigInt</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>),
-            <span class="ident">FieldType::Decimal</span> =&gt; <span class="ident">datamodel::FieldType::Scalar</span>(<span class="ident">ScalarType::Decimal</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>),
-            <span class="ident">FieldType::Json</span> =&gt; <span class="ident">datamodel::FieldType::Scalar</span>(<span class="ident">ScalarType::Json</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>),
-            <span class="ident">FieldType::Document</span>(<span class="ident">name</span>) =&gt; <span class="ident">datamodel::FieldType::CompositeType</span>(<span class="ident">name</span>),
-            <span class="ident">FieldType::Array</span>(<span class="ident">r#type</span>) =&gt; <span class="ident">datamodel::FieldType::from</span>(<span class="kw-2">*</span><span class="ident">r#type</span>),
-            <span class="ident">FieldType::Unsupported</span>(<span class="ident">type_name</span>) =&gt; <span class="ident">datamodel::FieldType::Unsupported</span>(<span class="ident">type_name</span>.<span class="ident">to_string</span>()),
+            <span class="ident">FieldType::Int32</span> =&gt; <span class="ident">dml::FieldType::Scalar</span>(<span class="ident">ScalarType::Int</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>),
+            <span class="ident">FieldType::Timestamp</span> =&gt; <span class="ident">dml::FieldType::Scalar</span>(<span class="ident">ScalarType::DateTime</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>),
+            <span class="ident">FieldType::Int64</span> =&gt; <span class="ident">dml::FieldType::Scalar</span>(<span class="ident">ScalarType::BigInt</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>),
+            <span class="ident">FieldType::Decimal</span> =&gt; <span class="ident">dml::FieldType::Scalar</span>(<span class="ident">ScalarType::Decimal</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>),
+            <span class="ident">FieldType::Json</span> =&gt; <span class="ident">dml::FieldType::Scalar</span>(<span class="ident">ScalarType::Json</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>),
+            <span class="ident">FieldType::Document</span>(<span class="ident">name</span>) =&gt; <span class="ident">dml::FieldType::CompositeType</span>(<span class="ident">name</span>),
+            <span class="ident">FieldType::Array</span>(<span class="ident">r#type</span>) =&gt; <span class="ident">dml::FieldType::from</span>(<span class="kw-2">*</span><span class="ident">r#type</span>),
+            <span class="ident">FieldType::Unsupported</span>(<span class="ident">type_name</span>) =&gt; <span class="ident">dml::FieldType::Unsupported</span>(<span class="ident">type_name</span>.<span class="ident">to_string</span>()),
         }
     }
 }

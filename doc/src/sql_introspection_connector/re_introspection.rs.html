@@ -728,7 +728,7 @@
     <span class="ident">replace_index_field_names</span>, <span class="ident">replace_pk_field_names</span>, <span class="ident">replace_relation_info_field_names</span>,
 };
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">warnings</span>::<span class="kw-2">*</span>, <span class="ident">SqlFamilyTrait</span>};
-<span class="kw">use</span> <span class="ident">datamodel</span>::{<span class="ident">Datamodel</span>, <span class="ident">DefaultValue</span>, <span class="ident">Field</span>, <span class="ident">FieldType</span>, <span class="ident">Ignorable</span>, <span class="ident">ValueGenerator</span>, <span class="ident">WithName</span>};
+<span class="kw">use</span> <span class="ident">datamodel::dml</span>::{<span class="ident">Datamodel</span>, <span class="ident">DefaultValue</span>, <span class="ident">Field</span>, <span class="ident">FieldType</span>, <span class="ident">Ignorable</span>, <span class="ident">ValueGenerator</span>, <span class="ident">WithName</span>};
 <span class="kw">use</span> <span class="ident">introspection_connector</span>::{<span class="ident">IntrospectionContext</span>, <span class="ident">Warning</span>};
 <span class="kw">use</span> <span class="ident">prisma_value::PrismaValue</span>;
 <span class="kw">use</span> <span class="ident">std::cmp::Ordering</span>::{<span class="self">self</span>, <span class="ident">Equal</span>, <span class="ident">Greater</span>, <span class="ident">Less</span>};

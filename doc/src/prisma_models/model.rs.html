@@ -128,7 +128,7 @@
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">fields</span>: <span class="ident">OnceCell</span><span class="op">&lt;</span><span class="ident">Fields</span><span class="op">&gt;</span>,
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">indexes</span>: <span class="ident">OnceCell</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Index</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">primary_identifier</span>: <span class="ident">OnceCell</span><span class="op">&lt;</span><span class="ident">FieldSelection</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">dml_model</span>: <span class="ident">datamodel::Model</span>,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">dml_model</span>: <span class="ident">dml::Model</span>,
 
     <span class="kw">pub</span> <span class="ident">internal_data_model</span>: <span class="ident">InternalDataModelWeakRef</span>,
     <span class="kw">pub</span> <span class="ident">supports_create_operation</span>: <span class="ident">bool</span>,

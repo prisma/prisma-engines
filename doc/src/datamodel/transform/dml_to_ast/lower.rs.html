@@ -214,8 +214,16 @@
 <span id="212">212</span>
 <span id="213">213</span>
 <span id="214">214</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::common::preview_features::PreviewFeature</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">ast</span>, <span class="ident">dml</span>, <span class="ident">Datasource</span>, <span class="ident">IndexField</span>, <span class="ident">PrimaryKeyField</span>, <span class="ident">SortOrder</span>};
+<span id="215">215</span>
+<span id="216">216</span>
+<span id="217">217</span>
+<span id="218">218</span>
+</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{
+    <span class="ident">ast</span>,
+    <span class="ident">common::preview_features::PreviewFeature</span>,
+    <span class="ident">dml</span>::{<span class="self">self</span>, <span class="ident">IndexField</span>, <span class="ident">PrimaryKeyField</span>, <span class="ident">SortOrder</span>},
+    <span class="ident">Datasource</span>,
+};
 <span class="kw">use</span> <span class="ident">enumflags2::BitFlags</span>;
 
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">LowerDmlToAst</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {

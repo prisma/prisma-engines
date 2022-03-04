@@ -159,10 +159,10 @@
 <span class="kw">mod</span> <span class="ident">sampler</span>;
 <span class="kw">mod</span> <span class="ident">warnings</span>;
 
-<span class="kw">use</span> <span class="ident">enumflags2::BitFlags</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">error</span>::<span class="kw-2">*</span>;
 
-<span class="kw">use</span> <span class="ident">datamodel</span>::{<span class="ident">common::preview_features::PreviewFeature</span>, <span class="ident">Datamodel</span>};
+<span class="kw">use</span> <span class="ident">datamodel</span>::{<span class="ident">common::preview_features::PreviewFeature</span>, <span class="ident">dml::Datamodel</span>};
+<span class="kw">use</span> <span class="ident">enumflags2::BitFlags</span>;
 <span class="kw">use</span> <span class="ident">futures::TryStreamExt</span>;
 <span class="kw">use</span> <span class="ident">indoc::formatdoc</span>;
 <span class="kw">use</span> <span class="ident">introspection_connector</span>::{

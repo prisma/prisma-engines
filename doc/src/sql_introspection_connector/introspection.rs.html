@@ -166,7 +166,6 @@
 <span id="164">164</span>
 <span id="165">165</span>
 <span id="166">166</span>
-<span id="167">167</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::introspection_helpers</span>::{
     <span class="ident">calculate_backrelation_field</span>, <span class="ident">calculate_index</span>, <span class="ident">calculate_many_to_many_field</span>, <span class="ident">calculate_relation_field</span>,
     <span class="ident">calculate_scalar_field</span>, <span class="ident">is_new_migration_table</span>, <span class="ident">is_old_migration_table</span>, <span class="ident">is_prisma_1_point_0_join_table</span>,
@@ -174,11 +173,10 @@
 };
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::version_checker::VersionChecker</span>;
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::SqlError</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">Dedup</span>, <span class="ident">SqlFamilyTrait</span>};
+<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">Dedup</span>, <span class="ident">SqlError</span>, <span class="ident">SqlFamilyTrait</span>};
 <span class="kw">use</span> <span class="ident">datamodel</span>::{
-    <span class="ident">common::preview_features::PreviewFeature</span>, <span class="ident">dml</span>, <span class="ident">Datamodel</span>, <span class="ident">Field</span>, <span class="ident">Model</span>, <span class="ident">PrimaryKeyDefinition</span>, <span class="ident">PrimaryKeyField</span>,
-    <span class="ident">RelationField</span>, <span class="ident">SortOrder</span>,
+    <span class="ident">common::preview_features::PreviewFeature</span>,
+    <span class="ident">dml</span>::{<span class="self">self</span>, <span class="ident">Datamodel</span>, <span class="ident">Field</span>, <span class="ident">Model</span>, <span class="ident">PrimaryKeyDefinition</span>, <span class="ident">PrimaryKeyField</span>, <span class="ident">RelationField</span>, <span class="ident">SortOrder</span>},
 };
 <span class="kw">use</span> <span class="ident">introspection_connector::IntrospectionContext</span>;
 <span class="kw">use</span> <span class="ident">sql_schema_describer</span>::{<span class="ident">SQLSortOrder</span>, <span class="ident">SqlSchema</span>, <span class="ident">Table</span>};

@@ -19,19 +19,17 @@
 <span id="17">17</span>
 <span id="18">18</span>
 <span id="19">19</span>
-<span id="20">20</span>
 </pre><pre class="rust"><code><span class="kw">pub</span> <span class="kw">use</span> <span class="ident">dml::composite_type</span>::<span class="kw-2">*</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">dml::datamodel</span>::<span class="kw-2">*</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">dml::default_value</span>::<span class="kw-2">*</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">dml::field</span>::<span class="kw-2">*</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">dml::model</span>::<span class="kw-2">*</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">dml::native_type_instance</span>::<span class="kw-2">*</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">dml::prisma_value</span>::{<span class="self">self</span>, <span class="ident">PrismaValue</span>};
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">dml</span>::<span class="ident">r#enum</span>::<span class="kw-2">*</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">dml::relation_info</span>::<span class="kw-2">*</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">dml::scalars</span>::<span class="kw-2">*</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">dml::traits</span>::<span class="kw-2">*</span>;
-
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">dml::PrismaValue</span>;
 
 <span class="doccomment">/// Find the model mapping to the passed in database name.</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">find_model_by_db_name</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="ident">datamodel</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Datamodel</span>, <span class="ident">db_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Model</span><span class="op">&gt;</span> {

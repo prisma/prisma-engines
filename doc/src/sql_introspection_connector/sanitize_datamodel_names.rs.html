@@ -237,10 +237,16 @@
 <span id="235">235</span>
 <span id="236">236</span>
 <span id="237">237</span>
+<span id="238">238</span>
+<span id="239">239</span>
+<span id="240">240</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::SqlFamilyTrait</span>;
 <span class="kw">use</span> <span class="ident">datamodel</span>::{
-    <span class="ident">is_reserved_type_name</span>, <span class="ident">Datamodel</span>, <span class="ident">DefaultKind</span>, <span class="ident">DefaultValue</span>, <span class="ident">Field</span>, <span class="ident">FieldType</span>, <span class="ident">IndexField</span>, <span class="ident">Model</span>, <span class="ident">PrimaryKeyField</span>,
-    <span class="ident">ValueGenerator</span>, <span class="ident">WithDatabaseName</span>, <span class="ident">WithName</span>,
+    <span class="ident">dml</span>::{
+        <span class="ident">Datamodel</span>, <span class="ident">DefaultKind</span>, <span class="ident">DefaultValue</span>, <span class="ident">Field</span>, <span class="ident">FieldType</span>, <span class="ident">IndexField</span>, <span class="ident">Model</span>, <span class="ident">PrimaryKeyField</span>, <span class="ident">ValueGenerator</span>,
+        <span class="ident">WithDatabaseName</span>, <span class="ident">WithName</span>,
+    },
+    <span class="ident">is_reserved_type_name</span>,
 };
 <span class="kw">use</span> <span class="ident">introspection_connector::IntrospectionContext</span>;
 <span class="kw">use</span> <span class="ident">once_cell::sync::Lazy</span>;

@@ -318,9 +318,9 @@
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">ast</span>::{<span class="self">self</span>, <span class="ident">Attribute</span>, <span class="ident">Span</span>},
     <span class="ident">common</span>::{<span class="ident">constraint_names::ConstraintNames</span>, <span class="ident">preview_features::PreviewFeature</span>, <span class="ident">RelationNames</span>},
-    <span class="ident">dml</span>,
+    <span class="ident">dml</span>::{<span class="self">self</span>, <span class="ident">Field</span>, <span class="ident">Ignorable</span>, <span class="ident">SortOrder</span>},
     <span class="ident">transform::dml_to_ast::LowerDmlToAst</span>,
-    <span class="ident">Datasource</span>, <span class="ident">Field</span>, <span class="ident">Ignorable</span>, <span class="ident">SortOrder</span>,
+    <span class="ident">Datasource</span>,
 };
 <span class="kw">use</span> <span class="ident">::dml</span>::{<span class="ident">prisma_value</span>, <span class="ident">traits::WithName</span>, <span class="ident">PrismaValue</span>};
 <span class="kw">use</span> <span class="ident">datamodel_connector</span>::{<span class="ident">Connector</span>, <span class="ident">EmptyDatamodelConnector</span>};

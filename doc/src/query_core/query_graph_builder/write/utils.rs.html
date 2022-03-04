@@ -1033,7 +1033,7 @@
     <span class="ident">ConnectorContext</span>, <span class="ident">ParsedInputValue</span>, <span class="ident">QueryGraphBuilderError</span>, <span class="ident">QueryGraphBuilderResult</span>,
 };
 <span class="kw">use</span> <span class="ident">connector</span>::{<span class="ident">DatasourceFieldName</span>, <span class="ident">Filter</span>, <span class="ident">RecordFilter</span>, <span class="ident">WriteArgs</span>, <span class="ident">WriteOperation</span>};
-<span class="kw">use</span> <span class="ident">datamodel::ReferentialAction</span>;
+<span class="kw">use</span> <span class="ident">datamodel::dml::ReferentialAction</span>;
 <span class="kw">use</span> <span class="ident">indexmap::IndexMap</span>;
 <span class="kw">use</span> <span class="ident">prisma_models</span>::{<span class="ident">FieldSelection</span>, <span class="ident">ModelRef</span>, <span class="ident">PrismaValue</span>, <span class="ident">RelationFieldRef</span>, <span class="ident">SelectionResult</span>};
 <span class="kw">use</span> <span class="ident">std::sync::Arc</span>;

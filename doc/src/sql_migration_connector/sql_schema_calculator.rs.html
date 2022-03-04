@@ -441,7 +441,7 @@
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">flavour::SqlFlavour</span>, <span class="ident">SqlDatabaseSchema</span>};
 <span class="kw">use</span> <span class="ident">datamodel</span>::{
     <span class="ident">datamodel_connector</span>::{<span class="ident">walker_ext_traits</span>::<span class="kw-2">*</span>, <span class="ident">ReferentialAction</span>, <span class="ident">ScalarType</span>},
-    <span class="ident">dml::PrismaValue</span>,
+    <span class="ident">dml</span>::{<span class="ident">prisma_value</span>, <span class="ident">PrismaValue</span>},
     <span class="ident">parser_database</span>::{
         <span class="ident">walkers</span>::{<span class="ident">ModelWalker</span>, <span class="ident">ScalarFieldWalker</span>},
         <span class="ident">IndexAlgorithm</span>, <span class="ident">IndexType</span>, <span class="ident">ScalarFieldType</span>, <span class="ident">SortOrder</span>,
@@ -802,7 +802,7 @@
                             <span class="ident">val</span>.<span class="ident">parse</span>().<span class="ident">unwrap</span>(),
                         )))),
                         <span class="ident">ScalarType::Bytes</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">sql::DefaultValue::new</span>(<span class="ident">sql::DefaultKind::Value</span>(<span class="ident">PrismaValue::Bytes</span>(
-                            <span class="ident">datamodel::prisma_value::decode_bytes</span>(<span class="ident">val</span>).<span class="ident">unwrap</span>(),
+                            <span class="ident">prisma_value::decode_bytes</span>(<span class="ident">val</span>).<span class="ident">unwrap</span>(),
                         )))),
                         <span class="ident">ScalarType::Decimal</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">sql::DefaultValue::new</span>(<span class="ident">sql::DefaultKind::Value</span>(
                             <span class="ident">PrismaValue::Float</span>(<span class="ident">val</span>.<span class="ident">parse</span>().<span class="ident">unwrap</span>()),

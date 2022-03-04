@@ -200,9 +200,11 @@
 <span id="198">198</span>
 <span id="199">199</span>
 <span id="200">200</span>
+<span id="201">201</span>
 </pre><pre class="rust"><code><span class="attribute">#![<span class="ident">allow</span>(<span class="ident">clippy::vec_init_then_push</span>)]</span>
 
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">calculate_datamodel</span>; <span class="comment">// only exported to be able to unit test it</span>
+
 <span class="kw">mod</span> <span class="ident">calculate_datamodel_tests</span>;
 <span class="kw">mod</span> <span class="ident">commenting_out_guardrails</span>;
 <span class="kw">mod</span> <span class="ident">error</span>;
@@ -215,10 +217,10 @@
 <span class="kw">mod</span> <span class="ident">version_checker</span>;
 <span class="kw">mod</span> <span class="ident">warnings</span>;
 
-<span class="kw">use</span> <span class="ident">datamodel::common::preview_features::PreviewFeature</span>;
-<span class="kw">use</span> <span class="ident">datamodel::Datamodel</span>;
-<span class="kw">use</span> <span class="ident">enumflags2::BitFlags</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">error</span>::<span class="kw-2">*</span>;
+
+<span class="kw">use</span> <span class="ident">datamodel</span>::{<span class="ident">common::preview_features::PreviewFeature</span>, <span class="ident">dml::Datamodel</span>};
+<span class="kw">use</span> <span class="ident">enumflags2::BitFlags</span>;
 <span class="kw">use</span> <span class="ident">introspection_connector</span>::{
     <span class="ident">ConnectorError</span>, <span class="ident">ConnectorResult</span>, <span class="ident">DatabaseMetadata</span>, <span class="ident">ErrorKind</span>, <span class="ident">IntrospectionConnector</span>, <span class="ident">IntrospectionContext</span>,
     <span class="ident">IntrospectionResult</span>,
