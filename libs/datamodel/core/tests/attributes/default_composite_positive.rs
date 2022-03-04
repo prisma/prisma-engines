@@ -1,8 +1,6 @@
 use crate::common::*;
 use bigdecimal::{BigDecimal, FromPrimitive};
 use chrono::DateTime;
-use datamodel::{DefaultValue, ScalarType};
-use dml::prisma_value::PrismaValue;
 
 #[test]
 fn should_set_default_for_all_scalar_types() {

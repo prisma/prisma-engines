@@ -4,12 +4,11 @@ pub use dml::default_value::*;
 pub use dml::field::*;
 pub use dml::model::*;
 pub use dml::native_type_instance::*;
+pub use dml::prisma_value::{self, PrismaValue};
 pub use dml::r#enum::*;
 pub use dml::relation_info::*;
 pub use dml::scalars::*;
 pub use dml::traits::*;
-
-pub use dml::PrismaValue;
 
 /// Find the model mapping to the passed in database name.
 pub fn find_model_by_db_name<'a>(datamodel: &'a Datamodel, db_name: &str) -> Option<&'a Model> {

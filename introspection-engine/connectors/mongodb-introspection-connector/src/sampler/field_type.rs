@@ -1,4 +1,4 @@
-use datamodel::{NativeTypeInstance, ScalarType};
+use datamodel::dml::{self, NativeTypeInstance, ScalarType};
 use mongodb::bson::Bson;
 use native_types::MongoDbType;
 use std::fmt;
@@ -84,60 +84,60 @@ impl fmt::Display for FieldType {
     }
 }
 
-impl From<FieldType> for datamodel::CompositeTypeFieldType {
+impl From<FieldType> for dml::CompositeTypeFieldType {
     fn from(r#type: FieldType) -> Self {
         match r#type {
-            FieldType::String => datamodel::CompositeTypeFieldType::Scalar(ScalarType::String, None, None),
-            FieldType::Double => datamodel::CompositeTypeFieldType::Scalar(ScalarType::Float, None, None),
-            FieldType::BinData => datamodel::CompositeTypeFieldType::Scalar(ScalarType::Bytes, None, None),
-            FieldType::ObjectId => datamodel::CompositeTypeFieldType::Scalar(
+            FieldType::String => dml::CompositeTypeFieldType::Scalar(ScalarType::String, None, None),
+            FieldType::Double => dml::CompositeTypeFieldType::Scalar(ScalarType::Float, None, None),
+            FieldType::BinData => dml::CompositeTypeFieldType::Scalar(ScalarType::Bytes, None, None),
+            FieldType::ObjectId => dml::CompositeTypeFieldType::Scalar(
                 ScalarType::String,
                 None,
                 Some(NativeTypeInstance::new("ObjectId", Vec::new(), &MongoDbType::ObjectId)),
             ),
-            FieldType::Bool => datamodel::CompositeTypeFieldType::Scalar(ScalarType::Boolean, None, None),
-            FieldType::Date => datamodel::CompositeTypeFieldType::Scalar(
+            FieldType::Bool => dml::CompositeTypeFieldType::Scalar(ScalarType::Boolean, None, None),
+            FieldType::Date => dml::CompositeTypeFieldType::Scalar(
                 ScalarType::DateTime,
                 None,
                 Some(NativeTypeInstance::new("Date", Vec::new(), &MongoDbType::Date)),
             ),
-            FieldType::Int32 => datamodel::CompositeTypeFieldType::Scalar(ScalarType::Int, None, None),
-            FieldType::Timestamp => datamodel::CompositeTypeFieldType::Scalar(ScalarType::DateTime, None, None),
-            FieldType::Int64 => datamodel::CompositeTypeFieldType::Scalar(ScalarType::BigInt, None, None),
-            FieldType::Decimal => datamodel::CompositeTypeFieldType::Scalar(ScalarType::Decimal, None, None),
-            FieldType::Json => datamodel::CompositeTypeFieldType::Scalar(ScalarType::Json, None, None),
-            FieldType::Document(name) => datamodel::CompositeTypeFieldType::CompositeType(name),
-            FieldType::Array(r#type) => datamodel::CompositeTypeFieldType::from(*r#type),
-            FieldType::Unsupported(name) => datamodel::CompositeTypeFieldType::Unsupported(name.to_string()),
+            FieldType::Int32 => dml::CompositeTypeFieldType::Scalar(ScalarType::Int, None, None),
+            FieldType::Timestamp => dml::CompositeTypeFieldType::Scalar(ScalarType::DateTime, None, None),
+            FieldType::Int64 => dml::CompositeTypeFieldType::Scalar(ScalarType::BigInt, None, None),
+            FieldType::Decimal => dml::CompositeTypeFieldType::Scalar(ScalarType::Decimal, None, None),
+            FieldType::Json => dml::CompositeTypeFieldType::Scalar(ScalarType::Json, None, None),
+            FieldType::Document(name) => dml::CompositeTypeFieldType::CompositeType(name),
+            FieldType::Array(r#type) => dml::CompositeTypeFieldType::from(*r#type),
+            FieldType::Unsupported(name) => dml::CompositeTypeFieldType::Unsupported(name.to_string()),
         }
     }
 }
 
-impl From<FieldType> for datamodel::FieldType {
+impl From<FieldType> for dml::FieldType {
     fn from(r#type: FieldType) -> Self {
         match r#type {
-            FieldType::String => datamodel::FieldType::Scalar(ScalarType::String, None, None),
-            FieldType::Double => datamodel::FieldType::Scalar(ScalarType::Float, None, None),
-            FieldType::BinData => datamodel::FieldType::Scalar(ScalarType::Bytes, None, None),
-            FieldType::ObjectId => datamodel::FieldType::Scalar(
+            FieldType::String => dml::FieldType::Scalar(ScalarType::String, None, None),
+            FieldType::Double => dml::FieldType::Scalar(ScalarType::Float, None, None),
+            FieldType::BinData => dml::FieldType::Scalar(ScalarType::Bytes, None, None),
+            FieldType::ObjectId => dml::FieldType::Scalar(
                 ScalarType::String,
                 None,
                 Some(NativeTypeInstance::new("ObjectId", Vec::new(), &MongoDbType::ObjectId)),
             ),
-            FieldType::Bool => datamodel::FieldType::Scalar(ScalarType::Boolean, None, None),
-            FieldType::Date => datamodel::FieldType::Scalar(
+            FieldType::Bool => dml::FieldType::Scalar(ScalarType::Boolean, None, None),
+            FieldType::Date => dml::FieldType::Scalar(
                 ScalarType::DateTime,
                 None,
                 Some(NativeTypeInstance::new("Date", Vec::new(), &MongoDbType::Date)),
             ),
-            FieldType::Int32 => datamodel::FieldType::Scalar(ScalarType::Int, None, None),
-            FieldType::Timestamp => datamodel::FieldType::Scalar(ScalarType::DateTime, None, None),
-            FieldType::Int64 => datamodel::FieldType::Scalar(ScalarType::BigInt, None, None),
-            FieldType::Decimal => datamodel::FieldType::Scalar(ScalarType::Decimal, None, None),
-            FieldType::Json => datamodel::FieldType::Scalar(ScalarType::Json, None, None),
-            FieldType::Document(name) => datamodel::FieldType::CompositeType(name),
-            FieldType::Array(r#type) => datamodel::FieldType::from(*r#type),
-            FieldType::Unsupported(type_name) => datamodel::FieldType::Unsupported(type_name.to_string()),
+            FieldType::Int32 => dml::FieldType::Scalar(ScalarType::Int, None, None),
+            FieldType::Timestamp => dml::FieldType::Scalar(ScalarType::DateTime, None, None),
+            FieldType::Int64 => dml::FieldType::Scalar(ScalarType::BigInt, None, None),
+            FieldType::Decimal => dml::FieldType::Scalar(ScalarType::Decimal, None, None),
+            FieldType::Json => dml::FieldType::Scalar(ScalarType::Json, None, None),
+            FieldType::Document(name) => dml::FieldType::CompositeType(name),
+            FieldType::Array(r#type) => dml::FieldType::from(*r#type),
+            FieldType::Unsupported(type_name) => dml::FieldType::Unsupported(type_name.to_string()),
         }
     }
 }

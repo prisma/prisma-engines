@@ -1,7 +1,5 @@
-use crate::common::*;
-use crate::{with_header, Provider};
-use datamodel::{dml, render_datamodel_to_string, IndexDefinition, IndexField, IndexType, ScalarType};
-use indoc::indoc;
+use crate::{common::*, with_header, Provider};
+use datamodel::render_datamodel_to_string;
 
 #[test]
 fn must_add_referenced_fields_on_both_sides_for_many_to_many_relations() {

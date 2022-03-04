@@ -1,5 +1,5 @@
 use crate::common::*;
-use datamodel::Datamodel;
+use datamodel::dml::Datamodel;
 use indoc::indoc;
 use pretty_assertions::assert_eq;
 

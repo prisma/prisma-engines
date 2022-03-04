@@ -2,7 +2,7 @@ mod error;
 
 use core::fmt;
 use datamodel::common::preview_features::PreviewFeature;
-use datamodel::{Datamodel, Datasource};
+use datamodel::{dml::Datamodel, Datasource};
 use enumflags2::BitFlags;
 pub use error::{ConnectorError, ErrorKind};
 use serde::*;

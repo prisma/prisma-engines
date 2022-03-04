@@ -1,5 +1,5 @@
 use crate::{parent_container::ParentContainer, CompositeTypeRef};
-use datamodel::FieldArity;
+use datamodel::dml::FieldArity;
 use std::{
     fmt::Debug,
     hash::{Hash, Hasher},

@@ -7,7 +7,7 @@ pub use relation::*;
 pub use scalar::*;
 
 // use crate::prelude::*;
-use datamodel::ScalarType;
+use datamodel::dml::ScalarType;
 use std::{hash::Hash, sync::Arc};
 
 use crate::ModelRef;

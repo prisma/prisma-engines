@@ -2,7 +2,7 @@ use crate::introspection_helpers::{
     replace_index_field_names, replace_pk_field_names, replace_relation_info_field_names,
 };
 use crate::{warnings::*, SqlFamilyTrait};
-use datamodel::{Datamodel, DefaultValue, Field, FieldType, Ignorable, ValueGenerator, WithName};
+use datamodel::dml::{Datamodel, DefaultValue, Field, FieldType, Ignorable, ValueGenerator, WithName};
 use introspection_connector::{IntrospectionContext, Warning};
 use prisma_value::PrismaValue;
 use std::cmp::Ordering::{self, Equal, Greater, Less};

@@ -1,7 +1,4 @@
 use crate::common::*;
-use datamodel::ValueGenerator;
-use dml::default_value::DefaultValue;
-use dml::field::FieldArity;
 
 #[test]
 fn parse_unsupported_types() {

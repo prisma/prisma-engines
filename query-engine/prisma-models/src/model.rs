@@ -15,7 +15,7 @@ pub struct Model {
     pub(crate) fields: OnceCell<Fields>,
     pub(crate) indexes: OnceCell<Vec<Index>>,
     pub(crate) primary_identifier: OnceCell<FieldSelection>,
-    pub(crate) dml_model: datamodel::Model,
+    pub(crate) dml_model: dml::Model,
 
     pub internal_data_model: InternalDataModelWeakRef,
     pub supports_create_operation: bool,

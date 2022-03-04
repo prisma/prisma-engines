@@ -4,7 +4,7 @@ use crate::{
     ConnectorContext, ParsedInputValue, QueryGraphBuilderError, QueryGraphBuilderResult,
 };
 use connector::{DatasourceFieldName, Filter, RecordFilter, WriteArgs, WriteOperation};
-use datamodel::ReferentialAction;
+use datamodel::dml::ReferentialAction;
 use indexmap::IndexMap;
 use prisma_models::{FieldSelection, ModelRef, PrismaValue, RelationFieldRef, SelectionResult};
 use std::sync::Arc;

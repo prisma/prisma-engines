@@ -1,7 +1,7 @@
 mod cockroachdb;
 mod vitess;
 
-use datamodel::ReferentialAction;
+use datamodel::dml::ReferentialAction;
 use migration_engine_tests::test_api::*;
 use sql_schema_describer::{ColumnTypeFamily, ForeignKeyAction};
 

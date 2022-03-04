@@ -1,5 +1,5 @@
 use crate::prelude::*;
-use datamodel::ReferentialAction;
+use dml::ReferentialAction;
 use once_cell::sync::OnceCell;
 use std::{
     fmt::Debug,

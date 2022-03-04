@@ -1,5 +1,5 @@
 use crate::{error::MongoError, vacuum_cursor, BsonTransform};
-use datamodel::PrismaValue;
+use datamodel::dml::PrismaValue;
 use itertools::Itertools;
 use mongodb::{
     bson::{from_bson, Bson, Document},

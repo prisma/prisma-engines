@@ -3,7 +3,7 @@ use crate::introspection_helpers::{
     is_prisma_1_point_1_or_2_join_table, is_relay_table,
 };
 use crate::SqlFamilyTrait;
-use datamodel::{Datamodel, Model};
+use datamodel::dml::{Datamodel, Model};
 use introspection_connector::{IntrospectionContext, Version, Warning};
 use native_types::{MySqlType, PostgresType};
 use quaint::connector::SqlFamily;

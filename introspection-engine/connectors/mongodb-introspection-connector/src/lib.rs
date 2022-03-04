@@ -2,10 +2,10 @@ mod error;
 mod sampler;
 mod warnings;
 
-use enumflags2::BitFlags;
 pub use error::*;
 
-use datamodel::{common::preview_features::PreviewFeature, Datamodel};
+use datamodel::{common::preview_features::PreviewFeature, dml::Datamodel};
+use enumflags2::BitFlags;
 use futures::TryStreamExt;
 use indoc::formatdoc;
 use introspection_connector::{

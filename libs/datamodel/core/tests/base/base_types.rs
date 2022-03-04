@@ -1,6 +1,4 @@
-use crate::common::*;
-use crate::{with_header, Provider};
-use datamodel::{dml, ScalarType};
+use crate::{common::*, with_header, Provider};
 
 #[test]
 fn parse_scalar_types() {
