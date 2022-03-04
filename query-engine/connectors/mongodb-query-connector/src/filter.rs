@@ -511,14 +511,9 @@ fn composite_filter(filter: CompositeFilter, invert: bool) -> crate::Result<Mong
         }
 
         CompositeCondition::None(filter) => {
-            let is_empty = matches!(filter, Filter::Empty);
             let (nested_filter, _) = convert_filter(filter, false, false)?.render();
 
-            if is_empty {
-                doc! { "$size": 0 }
-            } else {
-                doc! { "$not": { "$all": [{ "$elemMatch": nested_filter }] }}
-            }
+            doc! { "$not": { "$all": [{ "$elemMatch": nested_filter }] }}
         }
 
         CompositeCondition::Equals(value) => {

@@ -1,7 +1,7 @@
 use query_engine_tests::*;
 
 #[test_suite(schema(to_many_composites), only(MongoDb))]
-mod some {
+mod none {
     #[connector_test]
     async fn basic(runner: Runner) -> TestResult<()> {
         create_test_data(&runner).await?;
@@ -10,7 +10,7 @@ mod some {
           run_query!(runner, r#"{
               findManyTestModel(where: {
                   to_many_as: {
-                      some: {
+                      none: {
                           a_2: { lt: 0 }
                       }
                   }
@@ -18,7 +18,7 @@ mod some {
                   id
               }
           }"#),
-          @r###"{"data":{"findManyTestModel":[{"id":3},{"id":4}]}}"###
+          @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2},{"id":5},{"id":6},{"id":7},{"id":8},{"id":9}]}}"###
         );
 
         Ok(())
@@ -32,26 +32,26 @@ mod some {
           run_query!(runner, r#"{
               findManyTestModel(where: {
                   to_many_as: {
-                      some: {}
+                      none: {}
                   }
               }) {
                   id
               }
           }"#),
-          @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2},{"id":3},{"id":4},{"id":5}]}}"###
+          @r###"{"data":{"findManyTestModel":[{"id":6},{"id":7},{"id":8},{"id":9}]}}"###
         );
 
         insta::assert_snapshot!(
           run_query!(runner, r#"{
                   findManyTestModel(where: {
                       NOT: [
-                          { to_many_as: { some: {} }}
+                          { to_many_as: { none: {} }}
                       ]
                   }) {
                       id
                   }
               }"#),
-          @r###"{"data":{"findManyTestModel":[{"id":6},{"id":7},{"id":8},{"id":9}]}}"###
+          @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2},{"id":3},{"id":4},{"id":5}]}}"###
         );
 
         Ok(())
@@ -64,40 +64,43 @@ mod some {
         // `AND` with empty filter returns is a truthy condition, so all records fulfill the condition by default.
         insta::assert_snapshot!(
           run_query!(runner, r#"{
-              findManyTestModel(where: { to_many_as: { some: { AND: {} } }}) {
+              findManyTestModel(where: { to_many_as: { none: { AND: {} } }}) {
                 id
               }
             }"#),
-          @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2},{"id":3},{"id":4},{"id":5}]}}"###
+          @r###"{"data":{"findManyTestModel":[{"id":6},{"id":7},{"id":8},{"id":9}]}}"###
         );
 
         // `OR` with empty filter returns is a falsey condition, so no records fulfill the condition by default.
+        // Since all false is true for `none`, it returns all records.
         insta::assert_snapshot!(
           run_query!(runner, r#"{
-            findManyTestModel(where: { to_many_as: { some: { OR: [] } }}) {
+            findManyTestModel(where: { to_many_as: { none: { OR: [] } }}) {
               id
             }
           }"#),
-          @r###"{"data":{"findManyTestModel":[]}}"###
+          @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2},{"id":3},{"id":4},{"id":5},{"id":6},{"id":7},{"id":8},{"id":9}]}}"###
         );
 
+        // All records do not fulfill this condition, so it returns all records.
         insta::assert_snapshot!(
           run_query!(runner, r#"{
-              findManyTestModel(where: { to_many_as: { some: { OR: [], NOT: [] } }}) {
+              findManyTestModel(where: { to_many_as: { none: { OR: [], NOT: [] } }}) {
                 id
               }
             }"#),
-          @r###"{"data":{"findManyTestModel":[]}}"###
+          @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2},{"id":3},{"id":4},{"id":5},{"id":6},{"id":7},{"id":8},{"id":9}]}}"###
         );
 
         // `NOT` with empty filter returns is a truthy condition, so all record fulfill the condition by default.
+        // Logically, it shouldn't return any data, but the way we structure our filters it doesn't affect empty or non-existing arrays.
         insta::assert_snapshot!(
           run_query!(runner, r#"{
-              findManyTestModel(where: { to_many_as: { some: { NOT: {} } }}) {
+              findManyTestModel(where: { to_many_as: { none: { NOT: {} } }}) {
                 id
               }
             }"#),
-          @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2},{"id":3},{"id":4},{"id":5}]}}"###
+          @r###"{"data":{"findManyTestModel":[{"id":6},{"id":7},{"id":8},{"id":9}]}}"###
         );
 
         Ok(())
@@ -112,7 +115,7 @@ mod some {
           run_query!(runner, r#"{
                 findManyTestModel(where: {
                     to_many_as: {
-                        some: {
+                        none: {
                             a_1: { contains: "oo" }
                             a_2: { lt: 0 }
                         }
@@ -121,7 +124,7 @@ mod some {
                   id
                 }
             }"#),
-          @r###"{"data":{"findManyTestModel":[{"id":3}]}}"###
+          @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2},{"id":4},{"id":5},{"id":6},{"id":7},{"id":8},{"id":9}]}}"###
         );
 
         // Explicit AND
@@ -129,7 +132,7 @@ mod some {
           run_query!(runner, r#"{
                   findManyTestModel(where: {
                       to_many_as: {
-                          some: {
+                          none: {
                               AND: [
                                   { a_1: { contains: "oo" } },
                                   { a_2: { lt: 0 } }
@@ -140,7 +143,7 @@ mod some {
                     id
                   }
               }"#),
-          @r###"{"data":{"findManyTestModel":[{"id":3}]}}"###
+          @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2},{"id":4},{"id":5},{"id":6},{"id":7},{"id":8},{"id":9}]}}"###
         );
 
         Ok(())
@@ -154,7 +157,7 @@ mod some {
           run_query!(runner, r#"{
                 findManyTestModel(where: {
                     to_many_as: {
-                        some: {
+                        none: {
                             a_1: { contains: "test", mode: insensitive }
                         }
                     }
@@ -162,7 +165,7 @@ mod some {
                     id
                 }
             }"#),
-          @r###"{"data":{"findManyTestModel":[{"id":2},{"id":4},{"id":5}]}}"###
+          @r###"{"data":{"findManyTestModel":[{"id":1},{"id":3},{"id":6},{"id":7},{"id":8},{"id":9}]}}"###
         );
 
         Ok(())
@@ -182,7 +185,7 @@ mod some {
           run_query!(runner, r#"{
                 findManyTestModel(where: {
                     to_many_as: {
-                        some: {
+                        none: {
                             OR: [
                                 { a_1: { contains: "test" } },
                                 { a_2: { lt: 0 } }
@@ -193,7 +196,7 @@ mod some {
                     id
                 }
             }"#),
-          @r###"{"data":{"findManyTestModel":[{"id":2},{"id":3},{"id":4},{"id":10}]}}"###
+          @r###"{"data":{"findManyTestModel":[{"id":1},{"id":5},{"id":6},{"id":7},{"id":8},{"id":9}]}}"###
         );
 
         Ok(())
@@ -204,10 +207,11 @@ mod some {
         create_test_data(&runner).await?;
 
         insta::assert_snapshot!(
-          run_query!(runner, r#"{
+            run_query!(runner, r#"{
                 findManyTestModel(where: {
                     to_many_as: {
-                        some: {
+                        none: {
+                            # Read as: "AND: [{ NOT: [ { a_1: { contains: "oo" }}]}, { NOT: [ { a_1: { contains: "test" }}]}]"
                             NOT: [
                                 { a_1: { contains: "oo" } },
                                 { a_1: { contains: "test" } }
@@ -218,7 +222,7 @@ mod some {
                     id
                 }
             }"#),
-          @r###"{"data":{"findManyTestModel":[{"id":3},{"id":4},{"id":5}]}}"###
+          @r###"{"data":{"findManyTestModel":[{"id":1},{"id":2},{"id":6},{"id":7},{"id":8},{"id":9}]}}"###
         );
 
         Ok(())
@@ -244,17 +248,17 @@ mod some {
     }
 
     #[connector_test]
-    async fn nested_some(runner: Runner) -> TestResult<()> {
+    async fn nested_none(runner: Runner) -> TestResult<()> {
         create_nested_test_data(&runner).await?;
 
         insta::assert_snapshot!(
           run_query!(runner, r#"{
                 findManyTestModel(where: {
                     to_many_as: {
-                        some: {
+                        none: {
                             a_to_many_bs: {
-                                some: {
-                                    b_field: { lt: 0 }
+                                none: {
+                                    b_field: { gt: 0 }
                                 }
                             }
                         }
@@ -263,7 +267,7 @@ mod some {
                     id
                 }
             }"#),
-          @r###"{"data":{"findManyTestModel":[{"id":2},{"id":3}]}}"###
+          @r###"{"data":{"findManyTestModel":[{"id":1},{"id":4},{"id":5},{"id":6},{"id":7},{"id":8},{"id":9}]}}"###
         );
 
         Ok(())
@@ -339,3 +343,12 @@ mod some {
         Ok(())
     }
 }
+
+// Some
+
+// isEmpty
+
+// None
+
+// combination module
+// over to-one etc
