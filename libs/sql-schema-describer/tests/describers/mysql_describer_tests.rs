@@ -99,8 +99,8 @@ fn all_mysql_column_types_must_work(api: TestApi) {
 
     let full_sql = migration.make::<barrel::backend::MySql>();
     api.raw_cmd(&full_sql);
-    let result = api.describe();
-    let mut table = result.get_table("User").expect("couldn't get User table").to_owned();
+    let mut result = api.describe();
+    let table = result.tables.iter_mut().find(|t| t.name == "User").unwrap();
     // Ensure columns are sorted as expected when comparing
     table.columns.sort_unstable_by_key(|c| c.name.to_owned());
     let mut expected_columns = vec![
@@ -580,7 +580,7 @@ fn all_mysql_column_types_must_work(api: TestApi) {
 
     assert_eq!(
         table,
-        Table {
+        &Table {
             name: "User".to_string(),
             columns: expected_columns,
             indices: vec![],
@@ -641,8 +641,8 @@ fn all_mysql_8_column_types_must_work(api: TestApi) {
 
     let full_sql = migration.make::<barrel::backend::MySql>();
     api.raw_cmd(&full_sql);
-    let result = api.describe();
-    let mut table = result.get_table("User").expect("couldn't get User table").to_owned();
+    let mut result = api.describe();
+    let table = result.tables.iter_mut().find(|t| t.name == "User").unwrap();
     // Ensure columns are sorted as expected when comparing
     table.columns.sort_unstable_by_key(|c| c.name.to_owned());
     let mut expected_columns = vec![
@@ -1110,7 +1110,7 @@ fn all_mysql_8_column_types_must_work(api: TestApi) {
 
     assert_eq!(
         table,
-        Table {
+        &Table {
             name: "User".to_string(),
             columns: expected_columns,
             indices: vec![],

@@ -46,7 +46,7 @@ pub struct SqlMetadata {
 }
 
 /// The result of describing a database schema.
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Default)]
+#[derive(Serialize, Deserialize, Debug, PartialEq, Default)]
 pub struct SqlSchema {
     /// The schema's tables.
     pub tables: Vec<Table>,
@@ -158,7 +158,7 @@ impl SqlSchema {
 }
 
 /// A table found in a schema.
-#[derive(Serialize, Deserialize, PartialEq, Debug, Clone)]
+#[derive(Serialize, Deserialize, PartialEq, Debug)]
 pub struct Table {
     /// The table's name.
     pub name: String,
@@ -405,7 +405,7 @@ impl PrimaryKey {
 }
 
 /// A column of a table.
-#[derive(Serialize, Deserialize, PartialEq, Clone, Debug)]
+#[derive(Serialize, Deserialize, PartialEq, Debug)]
 pub struct Column {
     /// Column name.
     pub name: String,
@@ -424,7 +424,7 @@ impl Column {
 }
 
 /// The type of a column.
-#[derive(Serialize, Deserialize, PartialEq, Clone, Debug)]
+#[derive(Serialize, Deserialize, PartialEq, Debug)]
 pub struct ColumnType {
     /// The full SQL data type, the sql string necessary to recreate the column, drawn directly from the db, used when there is no native type.
     pub full_data_type: String,
@@ -457,7 +457,7 @@ impl ColumnType {
 }
 
 /// Enumeration of column type families.
-#[derive(Serialize, Deserialize, PartialEq, Clone, Debug)]
+#[derive(Serialize, Deserialize, PartialEq, Debug)]
 // TODO: this name feels weird.
 pub enum ColumnTypeFamily {
     /// Integer types.
@@ -524,7 +524,7 @@ impl ColumnTypeFamily {
 }
 
 /// A column's arity.
-#[derive(Serialize, Deserialize, PartialEq, Clone, Debug)]
+#[derive(Serialize, Deserialize, PartialEq, Debug)]
 pub enum ColumnArity {
     /// Required column.
     Required,
