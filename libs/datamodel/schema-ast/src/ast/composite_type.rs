@@ -1,13 +1,37 @@
 use crate::ast::{Comment, Field, FieldId, Identifier, SchemaAst, Span};
 
-/// A composite type declaration.
+/// A type declaration in the data model. Defined by a type keyword and a block
+/// of fields that can be embedded in a model.
+///
+/// A composite type has no definition in the database schema, and is completely
+/// a Prisma concept. It gives type-safety to dynamic data such as JSON.
 #[derive(Debug, Clone)]
 pub struct CompositeType {
     /// The name of the type.
+    ///
+    /// ```ignore
+    /// type Foo { .. }
+    ///      ^^^
+    /// ```
     pub name: Identifier,
     /// The fields of the type.
+    ///
+    /// ```ignore
+    /// type Foo {
+    ///   bar String
+    ///   ^^^^^^^^^^
+    /// }
+    /// ```
     pub fields: Vec<Field>,
     /// The documentation for this type.
+    ///
+    /// ```ignore
+    /// /// Lorem ipsum
+    ///     ^^^^^^^^^^^
+    /// type Foo {
+    ///   bar String
+    /// }
+    /// ```
     pub documentation: Option<Comment>,
     /// The location of this type in the text representation.
     pub span: Span,

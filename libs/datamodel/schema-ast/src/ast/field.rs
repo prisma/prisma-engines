@@ -2,17 +2,39 @@ use super::{
     Attribute, Comment, Identifier, Span, WithAttributes, WithDocumentation, WithIdentifier, WithName, WithSpan,
 };
 
+/// A field definition in a model or a composite type.
 #[derive(Debug, Clone)]
 pub struct Field {
     /// The field's type.
+    ///
+    /// ```ignore
+    /// name String
+    ///      ^^^^^^
+    /// ```
     pub field_type: FieldType,
     /// The name of the field.
+    ///
+    /// ```ignore
+    /// name String
+    /// ^^^^
+    /// ```
     pub name: Identifier,
-    /// The aritiy of the field.
+    /// The arity of the field.
     pub arity: FieldArity,
     /// The attributes of this field.
+    ///
+    /// ```ignore
+    /// name String @id @default("lol")
+    ///             ^^^^^^^^^^^^^^^^^^^
+    /// ```
     pub attributes: Vec<Attribute>,
     /// The comments for this field.
+    ///
+    /// ```ignore
+    /// /// Lorem ipsum
+    ///     ^^^^^^^^^^^
+    /// name String @id @default("lol")
+    /// ```
     pub documentation: Option<Comment>,
     /// The location of this field in the text representation.
     pub span: Span,
@@ -75,10 +97,28 @@ impl WithDocumentation for Field {
     }
 }
 
+/// An arity of a data model field.
 #[derive(Copy, Debug, Clone, PartialEq)]
 pub enum FieldArity {
+    /// The field either must be in an insert statement, or the field must have
+    /// a default value for the insert to succeed.
+    ///
+    /// ```ignore
+    /// name String
+    /// ```
     Required,
+    /// The field does not need to be in an insert statement for the write to
+    /// succeed.
+    ///
+    /// ```ignore
+    /// name String?
+    /// ```
     Optional,
+    /// The field can have multiple values stored in the same column.
+    ///
+    /// ```ignore
+    /// name String[]
+    /// ```
     List,
 }
 
