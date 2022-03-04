@@ -1,5 +1,5 @@
 use crate::prelude::*;
-use datamodel::{FieldArity, ReferentialAction, RelationInfo};
+use dml::{FieldArity, ReferentialAction, RelationInfo};
 use once_cell::sync::OnceCell;
 use std::{fmt::Debug, sync::Arc};
 

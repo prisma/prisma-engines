@@ -1,5 +1,4 @@
-use datamodel::DefaultValue;
-use dml::prisma_value::PrismaValue;
+use datamodel::dml::{DefaultValue, PrismaValue};
 use indoc::indoc;
 use pretty_assertions::assert_eq;
 

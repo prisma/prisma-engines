@@ -8,7 +8,7 @@ use crate::{
     IndexType, InlineRelation, InternalDataModel, InternalDataModelRef, InternalEnum, InternalEnumValue,
     RelationLinkManifestation, RelationSide, RelationTable, TypeIdentifier,
 };
-use datamodel::{dml, CompositeTypeFieldType, Datamodel, Ignorable, WithDatabaseName};
+use datamodel::dml::{self, CompositeTypeFieldType, Datamodel, Ignorable, WithDatabaseName};
 use itertools::Itertools;
 use once_cell::sync::OnceCell;
 use std::sync::Arc;

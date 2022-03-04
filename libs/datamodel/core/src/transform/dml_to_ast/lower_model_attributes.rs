@@ -3,7 +3,7 @@ use crate::common::preview_features::PreviewFeature;
 use crate::transform::dml_to_ast::LowerDmlToAst;
 use crate::{
     ast::{self, Span},
-    dml, Ignorable, IndexDefinition, IndexType, Model, SortOrder, WithDatabaseName,
+    dml::{self, Ignorable, IndexDefinition, IndexType, Model, SortOrder, WithDatabaseName},
 };
 use ::dml::model::IndexAlgorithm;
 

@@ -5,11 +5,10 @@ use crate::introspection_helpers::{
 };
 use crate::version_checker::VersionChecker;
 
-use crate::SqlError;
-use crate::{Dedup, SqlFamilyTrait};
+use crate::{Dedup, SqlError, SqlFamilyTrait};
 use datamodel::{
-    common::preview_features::PreviewFeature, dml, Datamodel, Field, Model, PrimaryKeyDefinition, PrimaryKeyField,
-    RelationField, SortOrder,
+    common::preview_features::PreviewFeature,
+    dml::{self, Datamodel, Field, Model, PrimaryKeyDefinition, PrimaryKeyField, RelationField, SortOrder},
 };
 use introspection_connector::IntrospectionContext;
 use sql_schema_describer::{SQLSortOrder, SqlSchema, Table};

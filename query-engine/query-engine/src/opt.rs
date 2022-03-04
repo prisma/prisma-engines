@@ -1,5 +1,5 @@
 use crate::{error::PrismaError, PrismaResult};
-use datamodel::Datamodel;
+use datamodel::dml::Datamodel;
 use datamodel::ValidatedConfiguration;
 use serde::Deserialize;
 use std::env;

@@ -1,5 +1,5 @@
 use crate::test_api::*;
-use datamodel::Datamodel;
+use datamodel::dml::Datamodel;
 use introspection_connector::{IntrospectionConnector, IntrospectionContext};
 use mongodb_introspection_connector::MongoDbIntrospectionConnector;
 use url::Url;

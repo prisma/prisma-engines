@@ -1,5 +1,5 @@
 use super::helpers::*;
-use crate::{Datamodel, Datasource};
+use crate::{dml::Datamodel, Datasource};
 use enumflags2::BitFlags;
 use pest::{iterators::Pair, Parser};
 use schema_ast::{

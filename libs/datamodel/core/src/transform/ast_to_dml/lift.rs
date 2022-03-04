@@ -1,7 +1,7 @@
 use crate::{
-    ast, dml,
+    ast,
+    dml::{self, IndexField, PrimaryKeyField},
     transform::ast_to_dml::db::{self, walkers::*, IndexAlgorithm},
-    IndexField, PrimaryKeyField,
 };
 use ::dml::composite_type::{CompositeType, CompositeTypeField, CompositeTypeFieldType};
 use datamodel_connector::{walker_ext_traits::*, Connector, ReferentialIntegrity, ScalarType};

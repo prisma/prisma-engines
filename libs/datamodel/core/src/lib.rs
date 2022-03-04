@@ -45,31 +45,6 @@
 //!                 └──────────────────┘
 //!</pre>
 //!
-//! The usage dependencies between the main modules is depicted in the following diagram.
-//! The modules `error` and `common` are not shown as any module may depend on them.
-//!<pre>
-//!                       ┌──────────────────┐
-//!                       │    transform     │
-//!                       └──────────────────┘
-//!                                 │
-//!                                 │ use
-//!          ┌──────────────────────┼──────────────────────────┐
-//!          │                      │                          │
-//!          │                      │                          │
-//!          ▼                      ▼                          ▼
-//!┌──────────────────┐   ┌──────────────────┐       ┌──────────────────┐
-//!│       ast        │   │       dml        │       │  configuration   │
-//!└──────────────────┘   └──────────────────┘       └──────────────────┘
-//!                                 ▲                          ▲
-//!                                 │                          │
-//!                                 ├──────────────────────────┘
-//!                                 │ use
-//!                                 │
-//!                       ┌──────────────────┐
-//!                       │       json       │
-//!                       └──────────────────┘
-//!</pre>
-//!
 
 #![deny(rust_2018_idioms, unsafe_code)]
 
@@ -81,29 +56,27 @@ pub mod json;
 mod configuration;
 mod transform;
 
-pub use crate::dml::*;
-pub use ::dml::prisma_value;
 pub use configuration::{Configuration, Datasource, Generator, StringFromEnvVar};
 pub use datamodel_connector;
 pub use diagnostics;
 pub use parser_database;
 pub use parser_database::is_reserved_type_name;
-use parser_database::ParserDatabase;
 pub use schema_ast;
 
 use crate::{ast::SchemaAst, common::preview_features::PreviewFeature};
 use diagnostics::{Diagnostics, Validated};
 use enumflags2::BitFlags;
+use parser_database::ParserDatabase;
 use transform::{
     ast_to_dml::{validate, DatasourceLoader, GeneratorLoader},
     dml_to_ast::{self, GeneratorSerializer, LowerDmlToAst},
 };
 
-pub type ValidatedDatamodel = Validated<Datamodel>;
+pub type ValidatedDatamodel = Validated<dml::Datamodel>;
 pub type ValidatedConfiguration = Validated<Configuration>;
 
 /// Parse and validate the whole schema
-pub fn parse_schema(schema_str: &str) -> Result<(Configuration, Datamodel), String> {
+pub fn parse_schema(schema_str: &str) -> Result<(Configuration, dml::Datamodel), String> {
     parse_datamodel_internal(schema_str)
         .map_err(|err| err.to_pretty_string("schema.prisma", schema_str))
         .map(|v| v.subject)
@@ -162,7 +135,9 @@ pub fn parse_datamodel(datamodel_string: &str) -> Result<ValidatedDatamodel, dia
     })
 }
 
-fn parse_datamodel_for_formatter(ast: SchemaAst) -> Result<(ParserDatabase, Datamodel, Vec<Datasource>), Diagnostics> {
+fn parse_datamodel_for_formatter(
+    ast: SchemaAst,
+) -> Result<(ParserDatabase, dml::Datamodel, Vec<Datasource>), Diagnostics> {
     let mut diagnostics = diagnostics::Diagnostics::new();
     let datasources = load_sources(&ast, Default::default(), &mut diagnostics);
     let db = parser_database::ParserDatabase::new(ast, &mut diagnostics);
@@ -178,7 +153,7 @@ fn parse_datamodel_for_formatter(ast: SchemaAst) -> Result<(ParserDatabase, Data
 
 fn parse_datamodel_internal(
     datamodel_string: &str,
-) -> Result<Validated<(Configuration, Datamodel)>, diagnostics::Diagnostics> {
+) -> Result<Validated<(Configuration, dml::Datamodel)>, diagnostics::Diagnostics> {
     let mut diagnostics = diagnostics::Diagnostics::new();
     let ast = ast::parse_schema(datamodel_string, &mut diagnostics);
 

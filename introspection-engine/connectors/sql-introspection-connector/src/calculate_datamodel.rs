@@ -5,7 +5,7 @@ use crate::sanitize_datamodel_names::{sanitization_leads_to_duplicate_names, san
 use crate::version_checker::VersionChecker;
 use crate::SqlIntrospectionResult;
 use crate::{commenting_out_guardrails::commenting_out_guardrails, introspection::introspect};
-use datamodel::Datamodel;
+use datamodel::dml::Datamodel;
 use introspection_connector::{IntrospectionContext, IntrospectionResult};
 use sql_schema_describer::*;
 use tracing::debug;

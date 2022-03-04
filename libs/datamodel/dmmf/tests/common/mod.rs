@@ -1,4 +1,4 @@
-use datamodel::{Configuration, Datamodel};
+use datamodel::{dml::Datamodel, Configuration};
 
 pub(crate) use expect_test::expect;
 

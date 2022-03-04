@@ -1,6 +1,7 @@
 #![allow(clippy::vec_init_then_push)]
 
 pub mod calculate_datamodel; // only exported to be able to unit test it
+
 mod calculate_datamodel_tests;
 mod commenting_out_guardrails;
 mod error;
@@ -13,10 +14,10 @@ mod schema_describer_loading;
 mod version_checker;
 mod warnings;
 
-use datamodel::common::preview_features::PreviewFeature;
-use datamodel::Datamodel;
-use enumflags2::BitFlags;
 pub use error::*;
+
+use datamodel::{common::preview_features::PreviewFeature, dml::Datamodel};
+use enumflags2::BitFlags;
 use introspection_connector::{
     ConnectorError, ConnectorResult, DatabaseMetadata, ErrorKind, IntrospectionConnector, IntrospectionContext,
     IntrospectionResult,
