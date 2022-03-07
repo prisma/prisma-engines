@@ -179,6 +179,7 @@ fn to_many_composite_filter_object(ctx: &mut BuilderContext, cf: &CompositeField
         input_field(filters::EVERY, InputType::object(composite_where_object.clone()), None).optional(),
         input_field(filters::SOME, InputType::object(composite_where_object.clone()), None).optional(),
         input_field(filters::NONE, InputType::object(composite_where_object), None).optional(),
+        input_field(filters::IS_EMPTY, InputType::boolean(), None).optional(),
     ];
 
     object.set_fields(fields);
