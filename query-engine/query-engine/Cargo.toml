@@ -69,3 +69,4 @@ features = [
   "bigdecimal",
 ]
 git = "https://github.com/prisma/quaint"
+branch = "fixed-mobc"

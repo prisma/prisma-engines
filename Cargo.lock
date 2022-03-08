@@ -1588,7 +1588,7 @@ dependencies = [
  "introspection-core",
  "migration-connector",
  "pretty_assertions",
- "quaint",
+ "quaint 0.2.0-alpha.13 (git+https://github.com/prisma/quaint)",
  "serde_json",
  "sql-datamodel-connector",
  "sql-introspection-connector",
@@ -2020,7 +2020,7 @@ dependencies = [
  "json-rpc-stdio",
  "migration-connector",
  "migration-core",
- "quaint",
+ "quaint 0.2.0-alpha.13 (git+https://github.com/prisma/quaint)",
  "serde_json",
  "structopt",
  "tempfile",
@@ -2051,7 +2051,7 @@ dependencies = [
  "once_cell",
  "pretty_assertions",
  "prisma-value",
- "quaint",
+ "quaint 0.2.0-alpha.13 (git+https://github.com/prisma/quaint)",
  "serde",
  "serde_json",
  "sql-datamodel-connector",
@@ -2123,6 +2123,20 @@ name = "mobc"
 version = "0.7.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7f76d2f2e2dcbb00a8d3b2b09f026a74a82693ea52cd071647aa6cfa7f1ff37e"
+dependencies = [
+ "async-trait",
+ "futures-channel",
+ "futures-core",
+ "futures-timer",
+ "futures-util",
+ "log",
+ "tokio",
+]
+
+[[package]]
+name = "mobc"
+version = "0.7.3"
+source = "git+https://github.com/prisma/mobc?branch=fix-with-semaphore#fc48cffd260d1457339e38337fef2ee595965fa8"
 dependencies = [
  "async-trait",
  "futures-channel",
@@ -2985,7 +2999,7 @@ dependencies = [
  "itertools",
  "once_cell",
  "prisma-value",
- "quaint",
+ "quaint 0.2.0-alpha.13 (git+https://github.com/prisma/quaint)",
  "rand 0.7.3",
  "serde",
  "serde_derive",
@@ -3002,7 +3016,7 @@ dependencies = [
  "bigdecimal 0.2.2",
  "chrono",
  "once_cell",
- "quaint",
+ "quaint 0.2.0-alpha.13 (git+https://github.com/prisma/quaint)",
  "regex",
  "serde",
  "serde_derive",
@@ -3126,9 +3140,48 @@ dependencies = [
  "migration-core",
  "mongodb",
  "mongodb-client",
- "quaint",
+ "quaint 0.2.0-alpha.13 (git+https://github.com/prisma/quaint)",
  "tempfile",
  "url",
+]
+
+[[package]]
+name = "quaint"
+version = "0.2.0-alpha.13"
+source = "git+https://github.com/prisma/quaint?branch=fixed-mobc#7aadce6461a457792a332187e7a426454aadf471"
+dependencies = [
+ "async-trait",
+ "base64 0.12.3",
+ "bigdecimal 0.2.2",
+ "bit-vec",
+ "byteorder",
+ "bytes",
+ "chrono",
+ "connection-string",
+ "either",
+ "futures",
+ "hex",
+ "libsqlite3-sys",
+ "lru-cache",
+ "metrics",
+ "mobc 0.7.3 (git+https://github.com/prisma/mobc?branch=fix-with-semaphore)",
+ "mysql_async",
+ "native-tls",
+ "num_cpus",
+ "percent-encoding",
+ "postgres-native-tls",
+ "postgres-types",
+ "rusqlite",
+ "serde_json",
+ "thiserror",
+ "tiberius",
+ "tokio",
+ "tokio-postgres",
+ "tokio-util",
+ "tracing",
+ "tracing-core",
+ "url",
+ "uuid",
 ]
 
 [[package]]
@@ -3150,7 +3203,7 @@ dependencies = [
  "libsqlite3-sys",
  "lru-cache",
  "metrics",
- "mobc",
+ "mobc 0.7.3 (registry+https://github.com/rust-lang/crates.io-index)",
  "mysql_async",
  "native-tls",
  "num_cpus",
@@ -3250,7 +3303,7 @@ dependencies = [
  "opentelemetry",
  "opentelemetry-otlp",
  "prisma-models",
- "quaint",
+ "quaint 0.2.0-alpha.13 (git+https://github.com/prisma/quaint?branch=fixed-mobc)",
  "query-connector",
  "query-core",
  "rand 0.8.4",
@@ -4034,7 +4087,7 @@ dependencies = [
  "once_cell",
  "pretty_assertions",
  "prisma-value",
- "quaint",
+ "quaint 0.2.0-alpha.13 (git+https://github.com/prisma/quaint)",
  "regex",
  "serde",
  "serde_json",
@@ -4059,7 +4112,7 @@ dependencies = [
  "migration-connector",
  "native-types",
  "once_cell",
- "quaint",
+ "quaint 0.2.0-alpha.13 (git+https://github.com/prisma/quaint)",
  "regex",
  "serde_json",
  "sql-datamodel-connector",
@@ -4089,7 +4142,7 @@ dependencies = [
  "opentelemetry",
  "prisma-models",
  "prisma-value",
- "quaint",
+ "quaint 0.2.0-alpha.13 (git+https://github.com/prisma/quaint)",
  "query-connector",
  "rand 0.7.3",
  "serde",
@@ -4116,7 +4169,7 @@ dependencies = [
  "once_cell",
  "pretty_assertions",
  "prisma-value",
- "quaint",
+ "quaint 0.2.0-alpha.13 (git+https://github.com/prisma/quaint)",
  "regex",
  "serde",
  "serde_json",
@@ -4280,7 +4333,7 @@ dependencies = [
  "connection-string",
  "enumflags2",
  "once_cell",
- "quaint",
+ "quaint 0.2.0-alpha.13 (git+https://github.com/prisma/quaint)",
  "tokio",
  "tracing",
  "tracing-error",
@@ -4909,7 +4962,7 @@ version = "0.1.0"
 dependencies = [
  "backtrace",
  "indoc",
- "quaint",
+ "quaint 0.2.0-alpha.13 (git+https://github.com/prisma/quaint)",
  "serde",
  "serde_json",
  "tracing",
