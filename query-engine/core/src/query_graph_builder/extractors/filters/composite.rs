@@ -12,6 +12,9 @@ pub fn parse(input_map: ParsedInputMap, field: &CompositeFieldRef, _reverse: boo
         let (filter_key, value) = input_map.into_iter().next().unwrap();
 
         match (filter_key.as_ref(), value) {
+            // Common composite filters.
+            (filters::EQUALS, input) => Ok(field.equals(input.try_into()?)),
+
             // To-many composite filters.
             (filters::EVERY, input) => Ok(field.every(extract_filter(input.try_into()?, &field.typ)?)),
             (filters::SOME, input) => Ok(field.some(extract_filter(input.try_into()?, &field.typ)?)),
