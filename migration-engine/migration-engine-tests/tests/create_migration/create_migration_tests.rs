@@ -17,12 +17,25 @@ fn basic_create_migration_works(api: TestApi) {
     let is_postgres = api.is_postgres();
     let is_mysql = api.is_mysql();
     let is_sqlite = api.is_sqlite();
+    let is_cockroach = api.is_cockroach();
     let is_mssql = api.is_mssql();
     api.create_migration("create-cats", &dm, &dir)
         .send_sync()
         .assert_migration_directories_count(1)
         .assert_migration("create-cats", move |migration| {
-            let expected_script = if is_postgres {
+            let expected_script = if is_cockroach {
+                indoc! {
+                    r#"
+                        -- CreateTable
+                        CREATE TABLE "Cat" (
+                            "id" INT4 NOT NULL,
+                            "name" TEXT NOT NULL,
+
+                            CONSTRAINT "Cat_pkey" PRIMARY KEY ("id")
+                        );
+                    "#
+                }
+            } else if is_postgres {
                 indoc! {
                     r#"
                         -- CreateTable
@@ -124,6 +137,7 @@ fn creating_a_second_migration_should_have_the_previous_sql_schema_as_baseline(a
     );
 
     let is_postgres = api.is_postgres();
+    let is_cockroach = api.is_cockroach();
     let is_mysql = api.is_mysql();
     let is_sqlite = api.is_sqlite();
     let is_mssql = api.is_mssql();
@@ -131,7 +145,20 @@ fn creating_a_second_migration_should_have_the_previous_sql_schema_as_baseline(a
         .send_sync()
         .assert_migration_directories_count(2)
         .assert_migration("create-dogs", |migration| {
-            let expected_script = if is_postgres
+            let expected_script = if is_cockroach {
+                    indoc! {
+                        r#"
+                        -- CreateTable
+                        CREATE TABLE "Dog" (
+                            "id" INT4 NOT NULL,
+                            "name" TEXT NOT NULL,
+
+                            CONSTRAINT "Dog_pkey" PRIMARY KEY ("id")
+                        );
+                        "#
+                    }
+                }
+                else if is_postgres
                 {
                     indoc! {
                         r#"
@@ -144,8 +171,7 @@ fn creating_a_second_migration_should_have_the_previous_sql_schema_as_baseline(a
                         );
                         "#
                     }
-                }
-                else if is_mysql {
+                } else if is_mysql {
                     indoc! {
                         r#"
                         -- CreateTable
@@ -340,12 +366,28 @@ fn create_enum_step_only_rendered_when_needed(api: TestApi) {
     let dir = api.create_migrations_directory();
 
     let is_postgres = api.is_postgres();
+    let is_cockroach = api.is_cockroach();
     let is_mysql = api.is_mysql();
     api.create_migration("create-cats", &dm, &dir)
         .send_sync()
         .assert_migration_directories_count(1)
         .assert_migration("create-cats", |migration| {
-            let expected_script = if is_postgres {
+            let expected_script = if is_cockroach {
+                indoc! {
+                    r#"
+                        -- CreateEnum
+                        CREATE TYPE "Mood" AS ENUM ('HUNGRY', 'SLEEPY');
+
+                        -- CreateTable
+                        CREATE TABLE "Cat" (
+                            "id" INT4 NOT NULL,
+                            "mood" "Mood" NOT NULL,
+
+                            CONSTRAINT "Cat_pkey" PRIMARY KEY ("id")
+                        );
+                    "#
+                }
+            } else if is_postgres {
                 indoc! {
                     r#"
                         -- CreateEnum
@@ -380,7 +422,7 @@ fn create_enum_step_only_rendered_when_needed(api: TestApi) {
         });
 }
 
-#[test_connector(tags(Postgres))]
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
 fn create_enum_renders_correctly(api: TestApi) {
     let dm = r#"
         datasource test {
@@ -433,7 +475,7 @@ fn unsupported_type_renders_correctly(api: TestApi) {
         }
 
         model Cat {
-            id      Int @id
+            id      String @id
             home    Unsupported("point")
         }
     "#;
@@ -448,7 +490,7 @@ fn unsupported_type_renders_correctly(api: TestApi) {
                 r#"
                         -- CreateTable
                         CREATE TABLE "Cat" (
-                            "id" INTEGER NOT NULL,
+                            "id" TEXT NOT NULL,
                             "home" point NOT NULL,
 
                             CONSTRAINT "Cat_pkey" PRIMARY KEY ("id")
@@ -460,7 +502,7 @@ fn unsupported_type_renders_correctly(api: TestApi) {
         });
 }
 
-#[test_connector(tags(Postgres))]
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
 fn no_additional_unique_created(api: TestApi) {
     let dm = r#"
         datasource test {
@@ -546,6 +588,7 @@ fn create_constraint_name_tests_w_implicit_names(api: TestApi) {
     let is_postgres = api.is_postgres();
     let is_mysql = api.is_mysql();
     let is_sqlite = api.is_sqlite();
+    let is_cockroach = api.is_cockroach();
     api.create_migration("setup", &dm, &dir)
         .send_sync()
         .assert_migration_directories_count(1)
@@ -597,6 +640,44 @@ fn create_constraint_name_tests_w_implicit_names(api: TestApi) {
                      THROW
                      
                      END CATCH
+                 "#
+                 }
+            } else if is_cockroach {
+                indoc! {
+                     r#"
+                     -- CreateTable
+                     CREATE TABLE "A" (
+                         "id" INT4 NOT NULL,
+                         "name" TEXT NOT NULL,
+                         "a" TEXT NOT NULL,
+                         "b" TEXT NOT NULL,
+                     
+                         CONSTRAINT "A_pkey" PRIMARY KEY ("id")
+                     );
+                     
+                     -- CreateTable
+                     CREATE TABLE "B" (
+                         "a" TEXT NOT NULL,
+                         "b" TEXT NOT NULL,
+                         "aId" INT4 NOT NULL,
+                 
+                         CONSTRAINT "B_pkey" PRIMARY KEY ("a","b")
+                     );
+                     
+                     -- CreateIndex
+                     CREATE UNIQUE INDEX "A_name_key" ON "A"("name");
+                     
+                     -- CreateIndex
+                     CREATE INDEX "A_a_idx" ON "A"("a");
+                     
+                     -- CreateIndex
+                     CREATE UNIQUE INDEX "A_a_b_key" ON "A"("a", "b");
+                     
+                     -- CreateIndex
+                     CREATE INDEX "B_a_b_idx" ON "B"("a", "b");
+                     
+                     -- AddForeignKey
+                     ALTER TABLE "B" ADD CONSTRAINT "B_aId_fkey" FOREIGN KEY ("aId") REFERENCES "A"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
                  "#
                  }
             } else if is_postgres {
@@ -740,6 +821,7 @@ fn create_constraint_name_tests_w_explicit_names(api: TestApi) {
     let is_mysql = api.is_mysql();
     let is_sqlite = api.is_sqlite();
     let is_postgres = api.is_postgres();
+    let is_cockroach = api.is_cockroach();
     api.create_migration("setup", &dm, &dir)
         .send_sync()
         .assert_migration_directories_count(1)
@@ -794,7 +876,48 @@ fn create_constraint_name_tests_w_explicit_names(api: TestApi) {
                      END CATCH
                  "#
                  }
-            } else if is_postgres {
+            } else if is_cockroach {
+                indoc! {
+                     r#"
+                     -- CreateTable
+                     CREATE TABLE "A" (
+                         "id" INT4 NOT NULL,
+                         "name" TEXT NOT NULL,
+                         "a" TEXT NOT NULL,
+                         "b" TEXT NOT NULL,
+                     
+                         CONSTRAINT "A_pkey" PRIMARY KEY ("id")
+                     );
+                     
+                     -- CreateTable
+                     CREATE TABLE "B" (
+                         "a" TEXT NOT NULL,
+                         "b" TEXT NOT NULL,
+                         "aId" INT4 NOT NULL,
+                     
+                         CONSTRAINT "B_pkey" PRIMARY KEY ("a","b")
+                     );
+                     
+                     -- CreateIndex
+                     CREATE UNIQUE INDEX "SingleUnique" ON "A"("name");
+                     
+                     -- CreateIndex
+                     CREATE INDEX "SingleIndex" ON "A"("a");
+                     
+                     -- CreateIndex
+                     CREATE UNIQUE INDEX "NamedCompoundUnique" ON "A"("a", "b");
+                     
+                     -- CreateIndex
+                     CREATE UNIQUE INDEX "UnNamedCompoundUnique" ON "A"("a", "b");
+                     
+                     -- CreateIndex
+                     CREATE INDEX "CompoundIndex" ON "B"("a", "b");
+                     
+                     -- AddForeignKey
+                     ALTER TABLE "B" ADD CONSTRAINT "ForeignKey" FOREIGN KEY ("aId") REFERENCES "A"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+                 "#
+                 }
+            }else if is_postgres {
                 indoc! {
                      r#"
                      -- CreateTable
