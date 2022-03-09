@@ -4,7 +4,7 @@ use crate::{
     output_meta,
     query_builder::MongoReadQueryBuilder,
     root_queries::raw::{MongoCommand, MongoOperation},
-    IntoBson, logger::{log_insert_query, log_update_query, log_delete_query},
+    IntoBson, logger
 };
 
 use connector_interface::*;
@@ -54,7 +54,7 @@ pub async fn create_record<'conn>(
         doc.insert(field.db_name().to_owned(), bson);
     }
 
-    log_insert_query(coll.name(), &doc);
+    logger::log_insert_one(coll.name(), &doc);
 
     let insert_result = coll.insert_one_with_session(doc, None, session).await?;
     let id_value = value_from_bson(insert_result.inserted_id, &id_meta)?;
@@ -101,10 +101,11 @@ pub async fn create_records<'conn>(
 
     // Ordered = false (inverse of `skip_duplicates`) will ignore errors while executing
     // the operation and throw an error afterwards that we must handle.
-    let options = Some(InsertManyOptions::builder().ordered(!skip_duplicates).build());
+    let ordered = !skip_duplicates;
+    let options = Some(InsertManyOptions::builder().ordered(ordered).build());
 
-    // TODO: Insert many
-    dbg!("Insert many...");
+    logger::log_insert_many(coll.name(), &docs, ordered);
+
     match coll.insert_many_with_session(docs, options, session).await {
         Ok(insert_result) => Ok(insert_result.inserted_ids.len()),
         Err(err) if skip_duplicates => match err.kind.as_ref() {
@@ -172,7 +173,7 @@ pub async fn update_records<'conn>(
     }
 
     if !update_docs.is_empty() {
-        log_update_query(coll.name(), &filter, &update_docs);
+        logger::log_update_many_vec(coll.name(), &filter, &update_docs);
         coll.update_many_with_session(filter, update_docs, None, session)
             .await?;
     }
@@ -214,8 +215,7 @@ pub async fn delete_records<'conn>(
     }
 
     let filter = doc! { id_field.db_name(): { "$in": ids } };
-    // TODO: delete query
-    log_delete_query(coll.name(), &filter);
+    logger::log_delete_many(coll.name(), &filter);
     let delete_result = coll.delete_many_with_session(filter, None, session).await?;
 
     Ok(delete_result.deleted_count as usize)
@@ -280,6 +280,7 @@ pub async fn m2m_connect<'conn>(
 
     let parent_update = doc! { "$addToSet": { parent_ids_scalar_field_name: { "$each": child_ids.clone() } } };
 
+    logger::log_update_one(parent_coll.name(), &parent_filter, &parent_update);
     // First update the parent and add all child IDs to the m:n scalar field.
     parent_coll
         .update_one_with_session(parent_filter, parent_update, None, session)
@@ -289,6 +290,9 @@ pub async fn m2m_connect<'conn>(
     let child_filter = doc! { "_id": { "$in": child_ids } };
     let child_ids_scalar_field_name = field.related_field().relation_info.fields.get(0).unwrap().clone();
     let child_update = doc! { "$addToSet": { child_ids_scalar_field_name: parent_id } };
+
+    // this needs work
+    logger::log_update_many(child_coll.name(), &child_filter, &child_update);
 
     child_coll
         .update_many_with_session(child_filter, child_update, None, session)
@@ -328,6 +332,7 @@ pub async fn m2m_disconnect<'conn>(
     let parent_update = doc! { "$pullAll": { parent_ids_scalar_field_name: child_ids.clone() } };
 
     // First update the parent and remove all child IDs to the m:n scalar field.
+    logger::log_update_one(parent_coll.name(), &parent_filter, &parent_update);
     parent_coll
         .update_one_with_session(parent_filter, parent_update, None, session)
         .await?;
@@ -337,6 +342,8 @@ pub async fn m2m_disconnect<'conn>(
     let child_ids_scalar_field_name = field.related_field().relation_info.fields.get(0).unwrap().clone();
 
     let child_update = doc! { "$pull": { child_ids_scalar_field_name: parent_id } };
+    logger::log_update_many(child_coll.name(), &child_filter, &child_update);
+
     child_coll
         .update_many_with_session(child_filter, child_update, None, session)
         .await?;
