@@ -122,8 +122,6 @@ pub async fn update_records<'conn>(
     record_filter: RecordFilter,
     mut args: WriteArgs,
 ) -> crate::Result<Vec<SelectionResult>> {
-    dbg!(&args);
-
     let coll = database.collection::<Document>(model.db_name());
 
     // We need to load ids of documents to be updated first because Mongo doesn't

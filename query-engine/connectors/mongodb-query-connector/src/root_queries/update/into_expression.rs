@@ -1,161 +1,111 @@
-use super::expression::*;
-use crate::*;
-use connector_interface::{CompositeWriteOperation, FieldPath, ScalarWriteOperation, WriteOperation};
-use mongodb::bson::doc;
-use prisma_models::{Field, PrismaValue};
+use crate::IntoBson;
 
-pub(crate) trait IntoUpdateExpressionExtension {
-    fn into_update_expressions(self, field: &Field, path: FieldPath) -> crate::Result<Vec<UpdateExpression>>;
+use super::{expression::*, operation::*};
+
+use mongodb::bson::{doc, Bson};
+
+pub(crate) trait IntoUpdateExpression {
+    fn into_update_expression(self) -> crate::Result<UpdateExpression>;
 }
 
-impl IntoUpdateExpressionExtension for WriteOperation {
-    fn into_update_expressions(self, field: &Field, path: FieldPath) -> crate::Result<Vec<UpdateExpression>> {
+pub(crate) trait IntoUpdateExpressions {
+    fn into_update_expressions(self) -> crate::Result<Vec<UpdateExpression>>;
+}
+
+impl IntoUpdateExpressions for UpdateOperation {
+    fn into_update_expressions(self) -> crate::Result<Vec<UpdateExpression>> {
         match self {
-            WriteOperation::Scalar(op) => op.into_update_expressions(field, path),
-            WriteOperation::Composite(op) => op.into_update_expressions(field, path),
+            UpdateOperation::Generic(generic) => Ok(vec![generic.into_update_expression()?]),
+            UpdateOperation::UpdateMany(update_many) => Ok(vec![update_many.into_update_expression()?]),
+            UpdateOperation::Upsert(upsert) => upsert.into_update_expressions(),
         }
     }
 }
 
-impl IntoUpdateExpressionExtension for ScalarWriteOperation {
-    fn into_update_expressions(self, field: &Field, field_path: FieldPath) -> crate::Result<Vec<UpdateExpression>> {
-        let dollar_field_path = field_path.dollar_path(true);
-
-        let doc = match self {
-            ScalarWriteOperation::Add(rhs) if field.is_list() => render_push_update_doc(rhs, field, field_path)?,
-            // We use $literal to enable the set of empty object, which is otherwise considered a syntax error
-            ScalarWriteOperation::Set(rhs) => {
-                UpdateExpression::set(field_path, doc! { "$literal": (field, rhs).into_bson()? })
-            }
-            ScalarWriteOperation::Add(rhs) => UpdateExpression::set(
-                field_path,
-                doc! { "$add": [dollar_field_path, (field, rhs).into_bson()?] },
-            ),
-            ScalarWriteOperation::Substract(rhs) => UpdateExpression::set(
-                field_path,
-                doc! { "$subtract": [dollar_field_path, (field, rhs).into_bson()?] },
-            ),
-            ScalarWriteOperation::Multiply(rhs) => UpdateExpression::set(
-                field_path,
-                doc! { "$multiply": [dollar_field_path, (field, rhs).into_bson()?] },
-            ),
-            ScalarWriteOperation::Divide(rhs) => UpdateExpression::set(
-                field_path,
-                doc! { "$divide": [dollar_field_path, (field, rhs).into_bson()?] },
-            ),
-            ScalarWriteOperation::Field(_) => unimplemented!(),
-        };
-
-        Ok(vec![doc])
+impl IntoUpdateExpression for GenericOperation {
+    fn into_update_expression(self) -> crate::Result<UpdateExpression> {
+        Ok(UpdateExpression::set(self.field_path, self.expression))
     }
 }
 
-impl IntoUpdateExpressionExtension for CompositeWriteOperation {
-    fn into_update_expressions(self, field: &Field, path: FieldPath) -> crate::Result<Vec<UpdateExpression>> {
-        let docs = match self {
-            // We use $literal to enable the set of empty object, which is otherwise considered a syntax error
-            CompositeWriteOperation::Set(rhs) => {
-                vec![UpdateExpression::set(
-                    path,
-                    doc! { "$literal": (field, rhs).into_bson()? },
-                )]
-            }
-            CompositeWriteOperation::Update(nested_write) => {
-                let mut update_docs = vec![];
+impl IntoUpdateExpressions for Upsert {
+    fn into_update_expressions(self) -> crate::Result<Vec<UpdateExpression>> {
+        let should_set_id = format!("__prisma_should_set__{}", &self.field_path.identifier());
+        let should_set_ref_id = format!("${}", &should_set_id);
 
-                for (write_op, field, field_path) in nested_write.unfold(field, path) {
-                    update_docs.extend(write_op.into_update_expressions(field, field_path)?);
+        let mut expressions: Vec<UpdateExpression> = vec![];
+
+        // Adds a custom field to compute whether {field_path} should be set or updated
+        expressions.push(
+            doc! { "$addFields": { &should_set_id: Upsert::render_should_set_condition(self.field_path()) }}.into(),
+        );
+
+        // Maps the `Set` expression so that it's only executed if the field should be set. eg:
+        // From: { $set: { {field_path}: {some_expression} } }
+        // To:   { $set: { $cond: { if: {cond}, then: {some_expression}, else: "${field_path}"  } } }
+        // where {cond} is the expression is the `cond` variable above
+        expressions.push(
+            Set::from(self.set)
+                .into_conditional_set(doc! { "$eq": [&should_set_ref_id, true] })
+                .into(),
+        );
+
+        let mut updates = vec![];
+
+        for op in self.updates {
+            match op {
+                UpdateOperation::Generic(generic) => {
+                    // Maps the `Set` expression so that it's only executed if the field should be updated. eg:
+                    // From: { $set: { {field_path}: {some_expression} } }
+                    // To:   { $set: { $cond: { if: {cond}, then: {some_expression}, else: "${field_path}"  } } }
+                    // where {cond} is the expression is the `cond` variable above
+                    let set = Set::from(generic).into_conditional_set(doc! { "$eq": [&should_set_ref_id, false] });
+
+                    updates.push(set.into());
                 }
-
-                update_docs
-            }
-            CompositeWriteOperation::Unset(should_unset) => {
-                let mut ops = Vec::with_capacity(1);
-
-                if should_unset {
-                    ops.push(UpdateExpression::set(path, Bson::String("$$REMOVE".to_owned())))
+                operation => {
+                    updates.extend(operation.into_update_expressions()?);
                 }
-
-                ops
             }
-            CompositeWriteOperation::Push(rhs) => {
-                vec![render_push_update_doc(rhs, field, path)?]
-            }
-            CompositeWriteOperation::Upsert { set, update } => {
-                let set = (*set)
-                    .into_update_expressions(field, path.clone())?
-                    .swap_remove(0)
-                    .try_into_set()
-                    .unwrap();
-                let updates = (*update).into_update_expressions(field, path.clone())?;
+        }
 
-                vec![UpdateExpression::upsert(path, set, updates)]
-            }
-            CompositeWriteOperation::UpdateMany { filter: _, update } => {
-                let elem_alias = format!("{}_item", path.identifier());
-                let updates = (*update).into_update_expressions(field, FieldPath::new_from_alias(&elem_alias))?;
+        expressions.extend(updates);
 
-                vec![UpdateExpression::set(
-                    path.clone(),
-                    UpdateExpression::update_many(path, elem_alias, updates),
-                )]
-            }
-        };
+        // Removes the custom field previously added
+        expressions.push(doc! { "$unset": Bson::String(should_set_id) }.into());
 
-        Ok(docs)
+        Ok(expressions)
     }
 }
 
-fn render_push_update_doc(rhs: PrismaValue, field: &Field, field_path: FieldPath) -> crate::Result<UpdateExpression> {
-    let dollar_field_path = field_path.dollar_path(true);
+impl IntoUpdateExpression for UpdateMany {
+    fn into_update_expression(self) -> crate::Result<UpdateExpression> {
+        let field_path = self.field_path.clone();
+        // The alias that will be used in the `$map` operation
+        let elem_alias = self.elem_alias.clone();
+        // A reference to that alias
+        let ref_elem_alias = format!("$${}", &elem_alias);
 
-    let doc = match rhs {
-        PrismaValue::List(vals) => {
-            let vals = vals
-                .into_iter()
-                .map(|val| (field, val).into_bson())
-                .collect::<crate::Result<Vec<_>>>()?
-                .into_iter()
-                .map(|bson| {
-                    // Strip the list from the BSON values. [Todo] This is unfortunately necessary right now due to how the
-                    // conversion is set up with native types, we should clean that up at some point (move from traits to fns?).
-                    if let Bson::Array(mut inner) = bson {
-                        inner.pop().unwrap()
-                    } else {
-                        bson
+        // Builds a `$mergeObjects` operation to perform updates on each element of the to-many embeds.
+        // The `FieldPath` used for the `$mergeObjects` is the alias constructed above, since we'll merge against
+        // each elements of the to-many embeds. eg:
+        // { "$mergeObjects": ["$$some_field_item", { ... }] }
+        let merge_doc = self.build_merge_doc()?;
+
+        let map_expr = doc! {
+            "$map": {
+                "input": field_path.dollar_path(true),
+                "as": &elem_alias,
+                "in": {
+                    "$cond": {
+                        "if": doc! { "$eq": [true, true] }, // TODO: stub predicate until read filters are done,
+                        "then": doc! { "$mergeObjects": [&ref_elem_alias, merge_doc.into_bson()?] },
+                        "else": Bson::String(ref_elem_alias)
                     }
-                })
-                .collect();
+                }
+            }
+        };
 
-            let bson_array = Bson::Array(vals);
-
-            UpdateExpression::set(
-                field_path,
-                doc! {
-                    "$ifNull": [
-                        { "$concatArrays": [dollar_field_path, bson_array.clone()] },
-                        bson_array
-                    ]
-                },
-            )
-        }
-        val => {
-            let bson_val = match (field, val).into_bson()? {
-                bson @ Bson::Array(_) => bson,
-                bson => Bson::Array(vec![bson]),
-            };
-
-            UpdateExpression::set(
-                field_path,
-                doc! {
-                    "$ifNull": [
-                        { "$concatArrays": [dollar_field_path, bson_val.clone()] },
-                        bson_val
-                    ]
-                },
-            )
-        }
-    };
-
-    Ok(doc)
+        Ok(UpdateExpression::set(field_path, map_expr))
+    }
 }

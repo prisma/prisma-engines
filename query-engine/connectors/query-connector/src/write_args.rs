@@ -196,10 +196,10 @@ impl FieldPath {
     }
 
     pub fn new_from_alias(alias: &str) -> Self {
-        let mut path = Self::default();
-        path.alias = Some(alias.to_owned());
-
-        path
+        Self {
+            alias: Some(alias.to_owned()),
+            path: vec![],
+        }
     }
 
     pub fn add_segment(&mut self, field: &Field) {
