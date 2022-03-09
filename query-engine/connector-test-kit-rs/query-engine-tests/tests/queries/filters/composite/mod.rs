@@ -1,3 +1,4 @@
+pub mod equals;
 pub mod every;
 pub mod is_empty;
 pub mod none;
