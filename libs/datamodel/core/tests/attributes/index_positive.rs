@@ -1,6 +1,5 @@
-use crate::common::*;
-use crate::{with_header, Provider};
-use datamodel::{render_datamodel_to_string, IndexAlgorithm, IndexDefinition, IndexField, IndexType, SortOrder};
+use crate::{common::*, with_header, Provider};
+use datamodel::render_datamodel_to_string;
 
 #[test]
 fn basic_index_must_work() {
@@ -505,6 +504,47 @@ fn fulltext_index_mongodb() {
         db_name: Some("A_a_b_idx".to_string()),
         fields: vec![IndexField::new("a"), IndexField::new("b")],
         tpe: IndexType::Fulltext,
+        algorithm: None,
+        defined_on_field: false,
+    });
+}
+
+#[test]
+fn duplicate_index_different_sort_order_mongodb() {
+    let dml = indoc! {r#"
+        model A {
+          id String @id @default(auto()) @map("_id") @test.ObjectId
+          a  Int
+
+          @@index([a(sort: Asc)], map: "aaa")
+          @@index([a(sort: Desc)], map: "bbb")
+        }
+    "#};
+
+    let dml = with_header(dml, Provider::Mongo, &["mongoDb", "extendedIndexes"]);
+
+    parse(&dml).assert_has_model("A").assert_has_index(IndexDefinition {
+        name: None,
+        db_name: Some("aaa".to_string()),
+        fields: vec![IndexField {
+            name: String::from("a"),
+            sort_order: Some(SortOrder::Asc),
+            length: None,
+        }],
+        tpe: IndexType::Normal,
+        algorithm: None,
+        defined_on_field: false,
+    });
+
+    parse(&dml).assert_has_model("A").assert_has_index(IndexDefinition {
+        name: None,
+        db_name: Some("bbb".to_string()),
+        fields: vec![IndexField {
+            name: String::from("a"),
+            sort_order: Some(SortOrder::Desc),
+            length: None,
+        }],
+        tpe: IndexType::Normal,
         algorithm: None,
         defined_on_field: false,
     });

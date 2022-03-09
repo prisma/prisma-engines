@@ -28,12 +28,8 @@ pub(crate) async fn postgres_setup(url: String, prisma_schema: &str) -> Connecto
             .await
             .map_err(|e| ConnectorError::from_source(e, ""))?;
     }
-    {
-        //TODO: remove this once cockroachdb is supported in migrations
-        let prisma_schema2 = prisma_schema.replace("provider = \"cockroachdb\"", "provider = \"postgres\"");
-        crate::diff_and_apply(&prisma_schema2).await;
-    };
 
+    crate::diff_and_apply(prisma_schema).await;
     Ok(())
 }
 

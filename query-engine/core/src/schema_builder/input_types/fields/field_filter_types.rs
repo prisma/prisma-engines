@@ -1,6 +1,6 @@
-use crate::constants::json_null;
-
+use super::objects::*;
 use super::*;
+use crate::constants::json_null;
 use constants::{aggregations, filters};
 use datamodel_connector::ConnectorCapability;
 use prisma_models::{dml::DefaultValue, PrismaValue};
@@ -18,7 +18,7 @@ pub(crate) fn get_field_filter_types(
             types.extend(mto1_relation_filter_shorthand_types(ctx, rf));
             types
         }
-        ModelField::Composite(_) => vec![], // [Composites] todo
+        ModelField::Composite(_) => vec![InputType::int()], // [Composites] todo
         ModelField::Scalar(sf) if field.is_list() => vec![InputType::object(scalar_list_filter_type(ctx, sf))],
         ModelField::Scalar(sf) => {
             let mut types = vec![InputType::object(full_scalar_filter_type(

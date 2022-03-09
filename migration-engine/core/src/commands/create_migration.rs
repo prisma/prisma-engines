@@ -6,10 +6,8 @@ use user_facing_errors::migration_engine::MigrationNameTooLong;
 /// Create a new migration.
 pub async fn create_migration(
     input: CreateMigrationInput,
-    connector: &dyn MigrationConnector,
+    connector: &mut dyn MigrationConnector,
 ) -> CoreResult<CreateMigrationOutput> {
-    let applier = connector.database_migration_step_applier();
-    let checker = connector.destructive_change_checker();
     let connector_type = connector.connector_type();
 
     if input.migration_name.len() > 200 {
@@ -22,12 +20,13 @@ pub async fn create_migration(
     // Infer the migration.
     let previous_migrations = list_migrations(Path::new(&input.migrations_directory_path))?;
 
-    let migration = connector
-        .diff(
-            DiffTarget::Migrations((&previous_migrations).into()),
-            DiffTarget::Datamodel((&input.prisma_schema).into()),
-        )
+    let from = connector
+        .database_schema_from_diff_target(DiffTarget::Migrations(&previous_migrations), None)
         .await?;
+    let to = connector
+        .database_schema_from_diff_target(DiffTarget::Datamodel(&input.prisma_schema), None)
+        .await?;
+    let migration = connector.diff(from, to)?;
 
     if connector.migration_is_empty(&migration) && !input.draft {
         tracing::info!("Database is up-to-date, returning without creating new migration.");
@@ -37,9 +36,9 @@ pub async fn create_migration(
         });
     }
 
-    let destructive_change_diagnostics = checker.pure_check(&migration);
+    let destructive_change_diagnostics = connector.destructive_change_checker().pure_check(&migration);
 
-    let migration_script = applier.render_script(&migration, &destructive_change_diagnostics)?;
+    let migration_script = connector.render_script(&migration, &destructive_change_diagnostics)?;
 
     // Write the migration script to a file.
     let directory = create_migration_directory(Path::new(&input.migrations_directory_path), &input.migration_name)

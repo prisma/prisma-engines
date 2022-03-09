@@ -1,5 +1,5 @@
 use crate::{PrismaError, PrismaResult};
-use datamodel::{Configuration, Datamodel};
+use datamodel::{dml::Datamodel, Configuration};
 use prisma_models::InternalDataModelBuilder;
 use query_core::{executor, schema::QuerySchemaRef, schema_builder, BuildMode, QueryExecutor};
 use std::{env, fmt, sync::Arc};

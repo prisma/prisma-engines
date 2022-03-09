@@ -178,7 +178,7 @@ pub fn build(
         preview_features.clone(),
     );
 
-    output_types::output_objects::initialize_model_object_type_cache(&mut ctx);
+    output_types::objects::initialize_caches(&mut ctx);
 
     let (query_type, query_object_ref) = output_types::query_type::build(&mut ctx);
     let (mutation_type, mutation_object_ref) = output_types::mutation_type::build(&mut ctx);

@@ -6,25 +6,24 @@ use migration_connector::{migrations_directory::*, DiffTarget, MigrationConnecto
 ///
 /// At this stage, the engine does not create or mutate anything in the database
 /// nor in the migrations directory.
-pub(crate) async fn evaluate_data_loss(
+pub async fn evaluate_data_loss(
     input: EvaluateDataLossInput,
-    connector: &dyn MigrationConnector,
+    connector: &mut dyn MigrationConnector,
 ) -> CoreResult<EvaluateDataLossOutput> {
-    let checker = connector.destructive_change_checker();
-
     error_on_changed_provider(&input.migrations_directory_path, connector.connector_type())?;
 
     let migrations_from_directory = list_migrations(input.migrations_directory_path.as_ref())?;
 
-    let migration = connector
-        .diff(
-            DiffTarget::Migrations((&migrations_from_directory).into()),
-            DiffTarget::Datamodel((&input.prisma_schema).into()),
-        )
+    let from = connector
+        .database_schema_from_diff_target(DiffTarget::Migrations(&migrations_from_directory), None)
         .await?;
+    let to = connector
+        .database_schema_from_diff_target(DiffTarget::Datamodel(&input.prisma_schema), None)
+        .await?;
+    let migration = connector.diff(from, to)?;
 
     let migration_steps = connector.migration_len(&migration) as u32;
-    let diagnostics = checker.check(&migration).await?;
+    let diagnostics = connector.destructive_change_checker().check(&migration).await?;
 
     let warnings = diagnostics
         .warnings

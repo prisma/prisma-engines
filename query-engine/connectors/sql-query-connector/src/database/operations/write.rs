@@ -35,7 +35,7 @@ async fn generate_id(
         })
         .fold((Select::default(), false), |(query, generated), value| {
             let alias = value.0;
-            let func = value.1.to_lowercase().replace(" ", "");
+            let func = value.1.to_lowercase().replace(' ', "");
 
             match func.as_str() {
                 "(uuid())" => (query.value(native_uuid().alias(alias)), true),
@@ -80,7 +80,7 @@ pub async fn create_record(
         Some(ref pk) if *sql_family == SqlFamily::Mysql => {
             for (field, value) in pk.pairs.iter() {
                 let field = DatasourceFieldName(field.db_name().into());
-                let value = WriteExpression::from(value.clone());
+                let value = WriteOperation::scalar_set(value.clone());
                 args.insert(field, value)
             }
             args

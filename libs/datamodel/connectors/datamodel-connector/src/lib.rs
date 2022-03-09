@@ -20,13 +20,12 @@ pub use self::{
     capabilities::{ConnectorCapabilities, ConnectorCapability},
     native_type_instance::NativeTypeInstance,
 };
-pub use diagnostics::{connector_error, DatamodelError, Diagnostics};
+pub use diagnostics::{ConnectorErrorFactory, DatamodelError, Diagnostics, Span};
 pub use empty_connector::EmptyDatamodelConnector;
 pub use native_type_constructor::NativeTypeConstructor;
 pub use parser_database::{self, ReferentialAction, ScalarType};
 pub use referential_integrity::ReferentialIntegrity;
 
-use crate::connector_error::{ConnectorError, ConnectorErrorFactory, ErrorKind};
 use enumflags2::BitFlags;
 use std::{borrow::Cow, collections::BTreeMap};
 
@@ -92,7 +91,8 @@ pub trait Connector: Send + Sync {
         &self,
         _native_type: &NativeTypeInstance,
         _scalar_type: &ScalarType,
-        _: &mut Vec<ConnectorError>,
+        _span: Span,
+        _: &mut Diagnostics,
     ) {
     }
 
@@ -125,10 +125,16 @@ pub trait Connector: Send + Sync {
     }
 
     /// This function is used during Schema parsing to calculate the concrete native type.
-    fn parse_native_type(&self, name: &str, args: Vec<String>) -> Result<NativeTypeInstance, ConnectorError>;
+    fn parse_native_type(
+        &self,
+        name: &str,
+        args: Vec<String>,
+        span: Span,
+    ) -> Result<NativeTypeInstance, DatamodelError>;
 
-    /// This function is used during introspection to turn an introspected native type into an instance that can be put into the Prisma schema.
-    fn introspect_native_type(&self, native_type: serde_json::Value) -> Result<NativeTypeInstance, ConnectorError>;
+    /// This function is used during introspection to turn an introspected native type into an
+    /// instance that can be inserted into dml.
+    fn introspect_native_type(&self, native_type: serde_json::Value) -> NativeTypeInstance;
 
     fn set_config_dir<'a>(&self, config_dir: &std::path::Path, url: &'a str) -> Cow<'a, str> {
         let set_root = |path: &str| {
@@ -211,25 +217,7 @@ pub trait Connector: Send + Sync {
     }
 
     fn native_instance_error(&self, instance: &NativeTypeInstance) -> ConnectorErrorFactory {
-        ConnectorErrorFactory {
-            connector: self.name().to_owned(),
-            native_type: instance.to_string(),
-        }
-    }
-
-    fn native_str_error(&self, native_str: &str) -> ConnectorErrorFactory {
-        ConnectorErrorFactory {
-            connector: self.name().to_owned(),
-            native_type: native_str.to_string(),
-        }
-    }
-
-    fn native_types_not_supported(&self) -> Result<NativeTypeInstance, ConnectorError> {
-        Err(ConnectorError::from_kind(
-            ErrorKind::ConnectorNotSupportedForNativeTypes {
-                connector_name: self.name().to_owned(),
-            },
-        ))
+        ConnectorErrorFactory::new(instance.to_string(), self.name().to_owned())
     }
 
     fn validate_url(&self, url: &str) -> Result<(), String>;

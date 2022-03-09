@@ -245,6 +245,8 @@ Prisma Migrate does not offer much help at that last stage, but this is
 something we are working on defining and prioritizing. See [this
 issue](https://github.com/prisma/prisma/issues/10127).
 
+![migrate-resolve-flow](https://user-images.githubusercontent.com/6864947/151012620-79781901-6d38-41f6-bcd1-97209ca4f76a.jpg)
+
 Also see the [public
 documentation](https://www.prisma.io/docs/guides/database/production-troubleshooting)
 on this topic.

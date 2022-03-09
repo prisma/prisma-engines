@@ -3,15 +3,11 @@ use crate::{
     migration::{MongoDbMigration, MongoDbMigrationStep},
     MongoDbMigrationConnector,
 };
-use migration_connector::{
-    ConnectorError, ConnectorResult, DatabaseMigrationStepApplier, DestructiveChangeDiagnostics, Migration,
-    MigrationConnector,
-};
+use migration_connector::{ConnectorResult, Migration, MigrationConnector};
 use mongodb::bson::{self, Bson, Document};
 
-#[async_trait::async_trait]
-impl DatabaseMigrationStepApplier for MongoDbMigrationConnector {
-    async fn apply_migration(&self, migration: &Migration) -> ConnectorResult<u32> {
+impl MongoDbMigrationConnector {
+    pub(crate) async fn apply_migration_impl(&self, migration: &Migration) -> ConnectorResult<u32> {
         let db = self.client().await?.database();
 
         if !self.migration_is_empty(migration) {
@@ -64,19 +60,5 @@ impl DatabaseMigrationStepApplier for MongoDbMigrationConnector {
         }
 
         Ok(migration.steps.len() as u32)
-    }
-
-    fn render_script(
-        &self,
-        _migration: &Migration,
-        _diagnostics: &DestructiveChangeDiagnostics,
-    ) -> ConnectorResult<String> {
-        Err(ConnectorError::from_msg(
-            "Rendering to a script is not supported on MongoDB.".to_owned(),
-        ))
-    }
-
-    async fn apply_script(&self, _migration_name: &str, _script: &str) -> ConnectorResult<()> {
-        Err(crate::unsupported_command_error())
     }
 }

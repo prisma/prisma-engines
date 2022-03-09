@@ -24,6 +24,10 @@ static POSTGIS_TABLES_OR_VIEWS: Lazy<RegexSet> = Lazy::new(|| {
 static EXTENSION_VIEWS: Lazy<RegexSet> = Lazy::new(|| RegexSet::new(&["(?i)^pg_buffercache$"]).unwrap());
 
 impl SqlSchemaDifferFlavour for PostgresFlavour {
+    fn can_alter_primary_keys(&self) -> bool {
+        self.is_cockroachdb()
+    }
+
     fn can_rename_foreign_key(&self) -> bool {
         true
     }
@@ -73,37 +77,38 @@ impl SqlSchemaDifferFlavour for PostgresFlavour {
         POSTGIS_TABLES_OR_VIEWS.is_match(table_name)
     }
 
-    fn column_type_change(&self, differ: Pair<ColumnWalker<'_>>) -> Option<ColumnTypeChange> {
+    fn column_type_change(&self, columns: Pair<ColumnWalker<'_>>) -> Option<ColumnTypeChange> {
         use ColumnTypeChange::*;
 
-        let from_list_to_scalar = differ.previous.arity().is_list() && !differ.next.arity().is_list();
-        let from_scalar_to_list = !differ.previous.arity().is_list() && differ.next.arity().is_list();
+        let from_list_to_scalar = columns.previous.arity().is_list() && !columns.next.arity().is_list();
+        let from_scalar_to_list = !columns.previous.arity().is_list() && columns.next.arity().is_list();
 
         // Handle the enum cases first.
-        match differ.map(|col| col.column_type_family().as_enum()).as_tuple() {
+        match columns.map(|col| col.column_type_family().as_enum()).as_tuple() {
             (Some(previous_enum), Some(next_enum)) if previous_enum == next_enum => return None,
             (Some(_), Some(_)) => return Some(ColumnTypeChange::NotCastable),
             (None, Some(_)) | (Some(_), None) => return Some(ColumnTypeChange::NotCastable),
             (None, None) => (),
         };
 
-        let previous_type: Option<PostgresType> = differ.previous.column_native_type();
-        let next_type: Option<PostgresType> = differ.next.column_native_type();
+        let previous_type: Option<PostgresType> = columns.previous.column_native_type();
+        let next_type: Option<PostgresType> = columns.next.column_native_type();
 
         match (previous_type, next_type) {
-            // https://go.crdb.dev/issue-v/49329/v22.1
-            (prev, next) if prev != next && self.is_cockroachdb() => Some(NotCastable),
             (_, Some(PostgresType::Text)) if from_list_to_scalar => Some(SafeCast),
             (_, Some(PostgresType::VarChar(None))) if from_list_to_scalar => Some(SafeCast),
             (_, Some(PostgresType::VarChar(_))) if from_list_to_scalar => Some(RiskyCast),
             (_, Some(PostgresType::Char(_))) if from_list_to_scalar => Some(RiskyCast),
             (_, _) if from_scalar_to_list || from_list_to_scalar => Some(NotCastable),
-            (Some(previous), Some(next)) => native_type_change_riskyness(previous, next),
+            (Some(previous), Some(next)) if self.is_cockroachdb() => {
+                cockroach_native_type_change_riskyness(previous, next, columns)
+            }
+            (Some(previous), Some(next)) => postgres_native_type_change_riskyness(previous, next),
             // Unsupported types will have None as Native type
             (None, Some(_)) => Some(RiskyCast),
             (Some(_), None) => Some(RiskyCast),
             (None, None)
-                if differ.previous.column_type().full_data_type == differ.previous.column_type().full_data_type =>
+                if columns.previous.column_type().full_data_type == columns.previous.column_type().full_data_type =>
             {
                 None
             }
@@ -128,7 +133,7 @@ impl SqlSchemaDifferFlavour for PostgresFlavour {
                     let is_id = columns.previous.is_single_primary_key();
 
                     is_id && matches!(type_change, Some(ColumnTypeChange::NotCastable))
-                })
+                }) || tables.dropped_columns().any(|col| col.is_single_primary_key())
             })
             .map(|t| t.table_ids());
 
@@ -136,7 +141,35 @@ impl SqlSchemaDifferFlavour for PostgresFlavour {
     }
 }
 
-fn native_type_change_riskyness(previous: PostgresType, next: PostgresType) -> Option<ColumnTypeChange> {
+// https://go.crdb.dev/issue-v/49329/v22.1
+fn cockroach_native_type_change_riskyness(
+    previous: PostgresType,
+    next: PostgresType,
+    columns: Pair<ColumnWalker<'_>>,
+) -> Option<ColumnTypeChange> {
+    let covered_by_index = columns
+        .map(|col| col.is_part_of_secondary_index() || col.is_part_of_primary_key())
+        .as_tuple()
+        == (&true, &true);
+
+    match (previous, next) {
+        (PostgresType::Integer, PostgresType::Text) if !covered_by_index => Some(ColumnTypeChange::SafeCast),
+        (PostgresType::BigInt, PostgresType::Integer) if !covered_by_index => Some(ColumnTypeChange::RiskyCast),
+        (previous, next) if previous == next => None,
+        // Timestamp default precisions
+        (PostgresType::Time(None), PostgresType::Time(Some(6)))
+        | (PostgresType::Time(Some(6)), PostgresType::Time(None))
+        | (PostgresType::Timetz(None), PostgresType::Timetz(Some(6)))
+        | (PostgresType::Timetz(Some(6)), PostgresType::Timetz(None))
+        | (PostgresType::Timestamptz(None), PostgresType::Timestamptz(Some(6)))
+        | (PostgresType::Timestamptz(Some(6)), PostgresType::Timestamptz(None))
+        | (PostgresType::Timestamp(None), PostgresType::Timestamp(Some(6)))
+        | (PostgresType::Timestamp(Some(6)), PostgresType::Timestamp(None)) => None,
+        _ => Some(ColumnTypeChange::NotCastable),
+    }
+}
+
+fn postgres_native_type_change_riskyness(previous: PostgresType, next: PostgresType) -> Option<ColumnTypeChange> {
     use native_types::PostgresType::*;
     use ColumnTypeChange::*;
 

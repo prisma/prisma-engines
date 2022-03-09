@@ -4,7 +4,7 @@ use crate::warnings::{
     ModelAndFieldAndType,
 };
 use crate::SqlFamilyTrait;
-use datamodel::{Datamodel, FieldType};
+use datamodel::dml::{Datamodel, FieldType};
 use introspection_connector::{IntrospectionContext, Warning};
 
 pub fn commenting_out_guardrails(datamodel: &mut Datamodel, ctx: &IntrospectionContext) -> Vec<Warning> {

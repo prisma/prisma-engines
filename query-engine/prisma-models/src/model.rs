@@ -15,7 +15,7 @@ pub struct Model {
     pub(crate) fields: OnceCell<Fields>,
     pub(crate) indexes: OnceCell<Vec<Index>>,
     pub(crate) primary_identifier: OnceCell<FieldSelection>,
-    pub(crate) dml_model: datamodel::Model,
+    pub(crate) dml_model: dml::Model,
 
     pub internal_data_model: InternalDataModelWeakRef,
     pub supports_create_operation: bool,
@@ -78,13 +78,6 @@ impl Model {
         self.internal_data_model
             .upgrade()
             .expect("InternalDataModel does not exist anymore. Parent internal_data_model is deleted without deleting the child internal_data_model.")
-    }
-
-    pub fn map_scalar_db_field_name(&self, name: &str) -> Option<ScalarFieldRef> {
-        self.fields()
-            .scalar()
-            .into_iter()
-            .find_map(|field| (field.db_name() == name).then(|| field))
     }
 }
 

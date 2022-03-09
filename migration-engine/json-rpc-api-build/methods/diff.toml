@@ -65,6 +65,16 @@ executable script, pass the `"script": true` param.
 """
 shape = "bool"
 
+[recordShapes.diffParams.fields.exitCode]
+description = """
+Whether the --exit-code param was passed.
+
+If this is set, the engine will return exitCode = 2 in the diffResult in case the diff is
+non-empty. Other than this, it does not change the behaviour of the command.
+"""
+isNullable = true
+shape = "bool"
+
 [recordShapes.diffResult]
 description = "The result type for the `diff` method."
 

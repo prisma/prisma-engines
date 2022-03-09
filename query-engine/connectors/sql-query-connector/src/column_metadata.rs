@@ -1,4 +1,4 @@
-use datamodel::FieldArity;
+use datamodel::dml::FieldArity;
 use prisma_models::TypeIdentifier;
 
 /// Helps dealing with column value conversion and possible error resolution.

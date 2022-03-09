@@ -133,7 +133,7 @@ impl ReadOperations for MongoDbConnection {
                 &mut self.session,
                 model,
                 filter,
-                &selected_fields.into(),
+                selected_fields,
                 aggr_selections,
             )
             .await
@@ -155,7 +155,7 @@ impl ReadOperations for MongoDbConnection {
                 &mut self.session,
                 model,
                 query_arguments,
-                &selected_fields.into(),
+                selected_fields,
                 aggregation_selections,
             )
             .await

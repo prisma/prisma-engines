@@ -1,6 +1,5 @@
-use datamodel::{dml, Ignorable, NativeTypeInstance};
-
 use crate::{InternalEnum, InternalEnumValue, TypeIdentifier};
+use datamodel::dml::{self, Ignorable, NativeTypeInstance};
 
 pub trait ModelConverterUtilities {
     // A model is supported if it has at least one indexed/unique field or compound index that's supported.
@@ -126,7 +125,7 @@ impl DatamodelFieldExtensions for dml::ScalarField {
 
     fn native_type(&self) -> Option<NativeTypeInstance> {
         match &self.field_type {
-            datamodel::FieldType::Scalar(_, _, nt) => nt.clone(),
+            dml::FieldType::Scalar(_, _, nt) => nt.clone(),
             _ => None,
         }
     }
@@ -135,18 +134,18 @@ impl DatamodelFieldExtensions for dml::ScalarField {
 impl DatamodelFieldExtensions for dml::CompositeTypeField {
     fn type_identifier(&self) -> TypeIdentifier {
         match &self.r#type {
-            datamodel::CompositeTypeFieldType::CompositeType(_) => {
+            dml::CompositeTypeFieldType::CompositeType(_) => {
                 unreachable!("Composite fields should not use type identifiers")
             }
-            datamodel::CompositeTypeFieldType::Scalar(scalar, _, _) => (*scalar).into(),
-            datamodel::CompositeTypeFieldType::Enum(e) => TypeIdentifier::Enum(e.clone()),
-            datamodel::CompositeTypeFieldType::Unsupported(_) => TypeIdentifier::Unsupported,
+            dml::CompositeTypeFieldType::Scalar(scalar, _, _) => (*scalar).into(),
+            dml::CompositeTypeFieldType::Enum(e) => TypeIdentifier::Enum(e.clone()),
+            dml::CompositeTypeFieldType::Unsupported(_) => TypeIdentifier::Unsupported,
         }
     }
 
     fn internal_enum(&self, datamodel: &dml::Datamodel) -> Option<InternalEnum> {
         match self.r#type {
-            datamodel::CompositeTypeFieldType::Enum(ref enum_name) => {
+            dml::CompositeTypeFieldType::Enum(ref enum_name) => {
                 datamodel.enums().find(|e| e.name == *enum_name).map(|e| InternalEnum {
                     name: e.name.clone(),
                     values: e.values().map(|v| self.internal_enum_value(v)).collect(),
@@ -165,7 +164,7 @@ impl DatamodelFieldExtensions for dml::CompositeTypeField {
 
     fn native_type(&self) -> Option<NativeTypeInstance> {
         match &self.r#type {
-            datamodel::CompositeTypeFieldType::Scalar(_, _, nt) => nt.clone(),
+            dml::CompositeTypeFieldType::Scalar(_, _, nt) => nt.clone(),
             _ => None,
         }
     }

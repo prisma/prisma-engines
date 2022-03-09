@@ -70,6 +70,10 @@ impl FieldType {
         self.scalar_type().map(|st| st.is_string()).unwrap_or(false)
     }
 
+    pub fn is_composite(&self) -> bool {
+        matches!(self, Self::CompositeType(_))
+    }
+
     pub fn is_enum(&self, name: &str) -> bool {
         matches!(self, Self::Enum(this) if this == name)
     }
@@ -113,6 +117,13 @@ impl Field {
     }
 
     pub fn as_scalar_field(&self) -> Option<&ScalarField> {
+        match self {
+            Field::ScalarField(sf) => Some(sf),
+            _ => None,
+        }
+    }
+
+    pub fn as_scalar_field_mut(&mut self) -> Option<&mut ScalarField> {
         match self {
             Field::ScalarField(sf) => Some(sf),
             _ => None,

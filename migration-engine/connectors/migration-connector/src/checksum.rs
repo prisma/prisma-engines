@@ -20,7 +20,7 @@ pub(crate) fn script_matches_checksum(script: &str, checksum: &str) -> bool {
     // https://web.archive.org/web/20150912185006/http://adaptivepatchwork.com:80/2012/03/01/mind-the-end-of-your-line/
     let mut script_checksums = once(compute_checksum(script))
         .chain(once_with(|| compute_checksum(&script.replace("\r\n", "\n"))))
-        .chain(once_with(|| compute_checksum(&script.replace("\n", "\r\n"))));
+        .chain(once_with(|| compute_checksum(&script.replace('\n', "\r\n"))));
 
     script_checksums.any(|script_checksum| {
         // Due to an omission in a previous version of the migration engine,

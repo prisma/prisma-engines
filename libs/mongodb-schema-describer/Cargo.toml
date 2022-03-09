@@ -8,3 +8,4 @@ edition = "2021"
 [dependencies]
 mongodb = "2.1.0"
 futures = "0.3"
+serde = "1"

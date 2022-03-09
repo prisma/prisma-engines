@@ -1,7 +1,6 @@
 use crate::common::*;
 use bigdecimal::{BigDecimal, FromPrimitive};
-use datamodel::{dml::ScalarType, DefaultValue, ValueGenerator};
-use dml::prisma_value::PrismaValue;
+use datamodel::dml::{DefaultValue, PrismaValue, ScalarType, ValueGenerator};
 use native_types::{MySqlType, PostgresType};
 
 #[test]

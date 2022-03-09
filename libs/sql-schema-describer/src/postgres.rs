@@ -228,7 +228,7 @@ impl<'a> SqlSchemaDescriber<'a> {
         indices: &mut BTreeMap<String, (Vec<Index>, Option<PrimaryKey>)>,
     ) -> Table {
         let (indices, primary_key) = indices.remove(name).unwrap_or_else(|| (Vec::new(), None));
-        let foreign_keys = foreign_keys.remove(name).unwrap_or_else(Vec::new);
+        let foreign_keys = foreign_keys.remove(name).unwrap_or_default();
         let columns = columns.remove(name).unwrap_or_default();
         Table {
             name: name.to_string(),
@@ -991,7 +991,37 @@ fn process_string_literal(literal: &str) -> Cow<'_, str> {
         (&COCKROACH_DEFAULT_BACKSLASH_UNESCAPE_RE, "$1"),
     ];
 
-    chain_replaces(literal, POSTGRES_STRING_DEFAULTS_PIPELINE)
+    let mut chars = literal.chars();
+    match chars.next() {
+        Some('e') | Some('E') => {
+            if !literal.contains('\\') {
+                return Cow::Borrowed(literal);
+            }
+
+            assert!(chars.next() == Some('\''));
+
+            let mut out = String::new();
+            while let Some(char) = chars.next() {
+                match char {
+                    '\\' => match chars.next() {
+                        Some('\\') => out.push('\\'),
+                        Some('n') => out.push('\n'),
+                        Some('t') => out.push('\t'),
+                        Some(other) => out.push(other),
+                        None => unreachable!("Backslash at end of E'' escaped string literal."),
+                    },
+                    '\'' => {
+                        if let Some('\'') = chars.next() {
+                            out.push('\'')
+                        } // otherwise end of string
+                    }
+                    other => out.push(other),
+                }
+            }
+            Cow::Owned(out)
+        }
+        _ => chain_replaces(literal, POSTGRES_STRING_DEFAULTS_PIPELINE),
+    }
 }
 
 fn chain_replaces<'a>(s: &'a str, replaces: &[(&Lazy<Regex>, &str)]) -> Cow<'a, str> {

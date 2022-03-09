@@ -35,7 +35,7 @@ fn authentication_failure_must_return_a_known_error_on_postgres(api: TestApi) {
         db_url
     );
 
-    let error = api.block_on(connection_error(dm));
+    let error = tok(connection_error(dm));
 
     let user = db_url.username();
     let host = db_url.host().unwrap().to_string();
@@ -70,7 +70,7 @@ fn authentication_failure_must_return_a_known_error_on_mysql(api: TestApi) {
         url
     );
 
-    let error = api.block_on(connection_error(dm));
+    let error = tok(connection_error(dm));
 
     let user = url.username();
     let host = url.host().unwrap().to_string();
@@ -105,7 +105,7 @@ fn unreachable_database_must_return_a_proper_error_on_mysql(api: TestApi) {
         url
     );
 
-    let error = api.block_on(connection_error(dm));
+    let error = tok(connection_error(dm));
 
     let port = url.port().unwrap();
     let host = url.host().unwrap().to_string();
@@ -140,7 +140,7 @@ fn unreachable_database_must_return_a_proper_error_on_postgres(api: TestApi) {
         url
     );
 
-    let error = api.block_on(connection_error(dm));
+    let error = tok(connection_error(dm));
 
     let host = url.host().unwrap().to_string();
     let port = url.port().unwrap();
@@ -176,7 +176,7 @@ fn database_does_not_exist_must_return_a_proper_error(api: TestApi) {
         url
     );
 
-    let error = api.block_on(connection_error(dm));
+    let error = tok(connection_error(dm));
 
     let json_error = serde_json::to_value(&error.to_user_facing()).unwrap();
     let expected = json!({
@@ -205,7 +205,7 @@ fn bad_datasource_url_and_provider_combinations_must_return_a_proper_error(api: 
         api.connection_string()
     );
 
-    let error = api.block_on(connection_error(dm));
+    let error = tok(connection_error(dm));
 
     let json_error = serde_json::to_value(&error.to_user_facing()).unwrap();
 
@@ -249,7 +249,7 @@ fn connections_to_system_databases_must_be_rejected(api: TestApi) {
         // "mysql" is the default in Quaint.
         let name = if name == &"" { "mysql" } else { name };
 
-        let error = api.block_on(connection_error(dm));
+        let error = tok(connection_error(dm));
         let json_error = serde_json::to_value(&error.to_user_facing()).unwrap();
 
         let expected = json!({
@@ -387,6 +387,7 @@ async fn connection_string_problems_give_a_nice_error() {
     ];
 
     for provider in providers {
+        eprintln!("Provider: {}", provider.0);
         let dm = formatdoc!(
             r#"
                 datasource db {{
@@ -421,7 +422,7 @@ async fn connection_string_problems_give_a_nice_error() {
             },
             _ => {
                 indoc!(
-                    "Error parsing connection string: invalid port number in database URL.
+                    "invalid port number in database URL.
                     Please refer to the documentation in https://www.prisma.io/docs/reference/database-reference/connection-urls
                     for constructing a correct connection string. In some cases, certain characters must be escaped.
                     Please check the string for any illegal characters.",

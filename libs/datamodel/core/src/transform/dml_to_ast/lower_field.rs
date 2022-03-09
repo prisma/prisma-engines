@@ -1,9 +1,9 @@
 use crate::{
     ast::{self, Attribute, Span},
     common::{constraint_names::ConstraintNames, preview_features::PreviewFeature, RelationNames},
-    dml,
+    dml::{self, Field, Ignorable, SortOrder},
     transform::dml_to_ast::LowerDmlToAst,
-    Datasource, Field, Ignorable, SortOrder,
+    Datasource,
 };
 use ::dml::{prisma_value, traits::WithName, PrismaValue};
 use datamodel_connector::{Connector, EmptyDatamodelConnector};

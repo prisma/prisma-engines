@@ -1,14 +1,11 @@
-use super::{
-    common::{format_hex, render_nullability, IteratorJoin, Quoted, SQL_INDENTATION},
-    SqlRenderer,
-};
+use super::{common::*, SqlRenderer};
 use crate::{
     flavour::PostgresFlavour,
     pair::Pair,
     sql_migration::{AlterColumn, AlterEnum, AlterTable, RedefineTable, TableChange},
     sql_schema_differ::{ColumnChange, ColumnChanges},
 };
-use datamodel::PrismaValue;
+use datamodel::dml::PrismaValue;
 use native_types::PostgresType;
 use once_cell::sync::Lazy;
 use regex::Regex;
@@ -71,166 +68,47 @@ impl SqlRenderer for PostgresFlavour {
     }
 
     fn render_alter_enum(&self, alter_enum: &AlterEnum, schemas: &Pair<&SqlSchema>) -> Vec<String> {
-        if alter_enum.dropped_variants.is_empty() {
-            let mut stmts: Vec<String> = alter_enum
-                .created_variants
-                .iter()
-                .map(|created_value| {
-                    format!(
-                        "ALTER TYPE {enum_name} ADD VALUE {value}",
-                        enum_name = Quoted::postgres_ident(schemas.enums(&alter_enum.index).previous().name()),
-                        value = Quoted::postgres_string(created_value)
-                    )
-                })
-                .collect();
-
-            if stmts.len() > 1 {
-                let warning = indoc::indoc! {
-                    r#"
-                    -- This migration adds more than one value to an enum.
-                    -- With PostgreSQL versions 11 and earlier, this is not possible
-                    -- in a single migration. This can be worked around by creating
-                    -- multiple migrations, each migration adding only one value to
-                    -- the enum.
-                    "#
-                };
-
-                stmts[0] = format!("{}\n\n{}", warning, stmts[0]);
-            }
-
-            return stmts;
+        // ALTER TYPE is much more limited on postgres than on cockroachdb.
+        //
+        // On Postgres:
+        // - Values cannot be removed.
+        // - Only one value can be added in a single transaction until postgres 11.
+        if self.is_cockroachdb() {
+            render_step(&mut |step| {
+                render_cockroach_alter_enum(alter_enum, schemas, step);
+            })
+        } else {
+            render_postgres_alter_enum(alter_enum, schemas)
         }
+    }
 
-        let enums = schemas.enums(&alter_enum.index);
-
-        let mut stmts = Vec::with_capacity(10);
-
-        let tmp_name = format!("{}_new", &enums.next().name());
-        let tmp_old_name = format!("{}_old", &enums.previous().name());
-
-        stmts.push("BEGIN".to_string());
-
-        // Create the new enum with tmp name
-        {
-            let create_new_enum = format!(
-                "CREATE TYPE {enum_name} AS ENUM ({variants})",
-                enum_name = Quoted::postgres_ident(&tmp_name),
-                variants = enums.next().values().iter().map(Quoted::postgres_string).join(", ")
-            );
-
-            stmts.push(create_new_enum);
-        }
-
-        // Find all usages as a default and drop them
-        {
-            for ((table_idx, colidx), _) in &alter_enum.previous_usages_as_default {
-                let table = schemas.previous().table_walker_at(*table_idx);
-
-                let drop_default = format!(
-                    r#"ALTER TABLE "{table_name}" ALTER COLUMN "{column_name}" DROP DEFAULT"#,
-                    table_name = table.name(),
-                    column_name = table.column_at(*colidx).name(),
-                );
-
-                stmts.push(drop_default);
-            }
-        }
-
-        // Alter type of the current columns to new, with a cast
-        {
-            let affected_columns = walk_columns(schemas.next()).filter(|column| matches!(&column.column_type().family, ColumnTypeFamily::Enum(name) if name.as_str() == enums.next().name()));
-
-            for column in affected_columns {
-                let array = if column.arity().is_list() { "[]" } else { "" };
-
-                let sql = format!(
-                    "ALTER TABLE {table_name} \
-                            ALTER COLUMN {column_name} TYPE {tmp_name}{array} \
-                                USING ({column_name}::text::{tmp_name}{array})",
-                    table_name = Quoted::postgres_ident(column.table().name()),
-                    column_name = Quoted::postgres_ident(column.name()),
-                    tmp_name = Quoted::postgres_ident(&tmp_name),
-                    array = array,
-                );
-
-                stmts.push(sql);
-            }
-        }
-
-        // Rename old enum
-        {
-            let sql = format!(
-                "ALTER TYPE {enum_name} RENAME TO {tmp_old_name}",
-                enum_name = Quoted::postgres_ident(enums.previous().name()),
-                tmp_old_name = Quoted::postgres_ident(&tmp_old_name)
-            );
-
-            stmts.push(sql);
-        }
-
-        // Rename new enum
-        {
-            let sql = format!(
-                "ALTER TYPE {tmp_name} RENAME TO {enum_name}",
-                tmp_name = Quoted::postgres_ident(&tmp_name),
-                enum_name = Quoted::postgres_ident(enums.next().name())
-            );
-
-            stmts.push(sql)
-        }
-
-        // Drop old enum
-        {
-            let sql = ddl::DropType {
-                type_name: tmp_old_name.as_str().into(),
-            }
-            .to_string();
-
-            stmts.push(sql)
-        }
-
-        // Reinstall dropped defaults that need to be reinstalled
-        {
-            for ((prev_tblidx, prev_colidx), (next_tblidx, next_colidx)) in alter_enum
-                .previous_usages_as_default
-                .iter()
-                .filter_map(|(prev, next)| next.map(|next| (prev, next)))
-            {
-                let columns = schemas
-                    .tables(&Pair::new(*prev_tblidx, next_tblidx))
-                    .columns(&Pair::new(*prev_colidx, next_colidx));
-
-                let table_name = columns.previous().table().name();
-                let column_name = columns.previous().name();
-                let default_str = columns
+    fn render_alter_primary_key(&self, tables: Pair<TableWalker<'_>>) -> Vec<String> {
+        render_step(&mut |step| {
+            step.render_statement(&mut |stmt| {
+                stmt.push_str("ALTER TABLE ");
+                stmt.push_display(&Quoted::postgres_ident(tables.previous.name()));
+                stmt.push_str(" ALTER PRIMARY KEY USING COLUMNS (");
+                let column_names = tables
                     .next()
-                    .default()
-                    .and_then(|default| default.as_value())
-                    .and_then(|value| value.as_enum_value())
-                    .expect("We should only be setting a changed default if there was one on the previous schema and in the next with the same enum.");
-
-                let set_default = format!(
-                    "ALTER TABLE {table_name} ALTER COLUMN {column_name} SET DEFAULT '{default}'",
-                    table_name = Quoted::postgres_ident(&table_name),
-                    column_name = Quoted::postgres_ident(&column_name),
-                    default = escape_string_literal(default_str),
-                );
-
-                stmts.push(set_default);
-            }
-        }
-
-        stmts.push("COMMIT".to_string());
-
-        stmts
+                    .primary_key()
+                    .unwrap() // safe because there is a primary key to alter
+                    .column_names()
+                    .map(Quoted::postgres_ident);
+                stmt.join(", ", column_names);
+                stmt.push_str(")");
+            })
+        })
     }
 
     fn render_rename_index(&self, indexes: Pair<&IndexWalker<'_>>) -> Vec<String> {
-        vec![format!(
-            "ALTER INDEX {} RENAME TO {}",
-            self.quote(indexes.previous().name()),
-            self.quote(indexes.next().name())
-        )]
+        render_step(&mut |step| {
+            step.render_statement(&mut |stmt| {
+                stmt.push_str("ALTER INDEX ");
+                stmt.push_display(&Quoted::postgres_ident(indexes.previous.name()));
+                stmt.push_str(" RENAME TO ");
+                stmt.push_display(&Quoted::postgres_ident(indexes.next.name()));
+            })
+        })
     }
 
     fn render_alter_table(&self, alter_table: &AlterTable, schemas: &Pair<&SqlSchema>) -> Vec<String> {
@@ -292,7 +170,10 @@ impl SqlRenderer for PostgresFlavour {
                             .join(", ")
                     )
                 }),
-                TableChange::AddColumn { column_id } => {
+                TableChange::AddColumn {
+                    column_id,
+                    has_virtual_default: _,
+                } => {
                     let column = tables.next().column_at(*column_id);
                     let col_sql = self.render_column(&column);
 
@@ -333,25 +214,38 @@ impl SqlRenderer for PostgresFlavour {
             return Vec::new();
         }
 
-        let alter_table = format!(
-            "ALTER TABLE {} {}",
-            self.quote(tables.previous().name()),
-            lines.join(",\n")
-        );
+        if self.is_cockroachdb() {
+            let mut out = Vec::with_capacity(before_statements.len() + after_statements.len() + lines.len());
+            out.extend(before_statements.into_iter());
+            for line in lines {
+                out.push(format!("ALTER TABLE \"{}\" {}", tables.previous().name(), line))
+            }
+            out.extend(after_statements.into_iter());
+            out
+        } else {
+            let alter_table = format!(
+                "ALTER TABLE {} {}",
+                self.quote(tables.previous().name()),
+                lines.join(",\n")
+            );
 
-        before_statements
-            .into_iter()
-            .chain(std::iter::once(alter_table))
-            .chain(after_statements.into_iter())
-            .collect()
+            before_statements
+                .into_iter()
+                .chain(std::iter::once(alter_table))
+                .chain(after_statements.into_iter())
+                .collect()
+        }
     }
 
     fn render_create_enum(&self, enm: &EnumWalker<'_>) -> Vec<String> {
-        vec![ddl::CreateEnum {
-            enum_name: enm.name().into(),
-            variants: enm.values().iter().map(|s| Cow::Borrowed(s.as_str())).collect(),
-        }
-        .to_string()]
+        render_step(&mut |step| {
+            step.render_statement(&mut |stmt| {
+                stmt.push_display(&ddl::CreateEnum {
+                    enum_name: enm.name().into(),
+                    variants: enm.values().iter().map(|s| Cow::Borrowed(s.as_str())).collect(),
+                })
+            })
+        })
     }
 
     fn render_create_index(&self, index: &IndexWalker<'_>) -> String {
@@ -406,12 +300,13 @@ impl SqlRenderer for PostgresFlavour {
     }
 
     fn render_drop_enum(&self, dropped_enum: &EnumWalker<'_>) -> Vec<String> {
-        let sql = ddl::DropType {
-            type_name: dropped_enum.name().into(),
-        }
-        .to_string();
-
-        vec![sql]
+        render_step(&mut |step| {
+            step.render_statement(&mut |stmt| {
+                stmt.push_display(&ddl::DropType {
+                    type_name: dropped_enum.name().into(),
+                })
+            })
+        })
     }
 
     fn render_drop_foreign_key(&self, foreign_key: &ForeignKeyWalker<'_>) -> String {
@@ -430,11 +325,14 @@ impl SqlRenderer for PostgresFlavour {
     }
 
     fn render_drop_table(&self, table_name: &str) -> Vec<String> {
-        vec![ddl::DropTable {
-            table_name: table_name.into(),
-            cascade: false,
-        }
-        .to_string()]
+        render_step(&mut |step| {
+            step.render_statement(&mut |stmt| {
+                stmt.push_display(&ddl::DropTable {
+                    table_name: table_name.into(),
+                    cascade: false,
+                })
+            })
+        })
     }
 
     fn render_drop_view(&self, view: &ViewWalker<'_>) -> String {
@@ -464,11 +362,13 @@ impl SqlRenderer for PostgresFlavour {
             for index in tables.previous().indexes() {
                 result.push(self.render_drop_index(&index));
             }
-            let column_names = columns.join(",");
 
-            result.push(format!(
-                r#"INSERT INTO "{temporary_table_name}" ({column_names}) SELECT {column_names} FROM "{table}""#
-            ));
+            if !columns.is_empty() {
+                let column_names = columns.join(",");
+                result.push(format!(
+                    r#"INSERT INTO "{temporary_table_name}" ({column_names}) SELECT {column_names} FROM "{table}""#
+                ));
+            }
 
             result.push(
                 ddl::DropTable {
@@ -739,5 +639,209 @@ fn render_default(default: &DefaultValue) -> Cow<'_, str> {
         }
         DefaultKind::Value(val) => val.to_string().into(),
         DefaultKind::Sequence(_) => Default::default(),
+    }
+}
+
+fn render_postgres_alter_enum(alter_enum: &AlterEnum, schemas: &Pair<&SqlSchema>) -> Vec<String> {
+    if alter_enum.dropped_variants.is_empty() {
+        let mut stmts: Vec<String> = alter_enum
+            .created_variants
+            .iter()
+            .map(|created_value| {
+                format!(
+                    "ALTER TYPE {enum_name} ADD VALUE {value}",
+                    enum_name = Quoted::postgres_ident(schemas.enums(&alter_enum.index).previous().name()),
+                    value = Quoted::postgres_string(created_value)
+                )
+            })
+            .collect();
+
+        if stmts.len() > 1 {
+            let warning = indoc::indoc! {
+                r#"
+                    -- This migration adds more than one value to an enum.
+                    -- With PostgreSQL versions 11 and earlier, this is not possible
+                    -- in a single migration. This can be worked around by creating
+                    -- multiple migrations, each migration adding only one value to
+                    -- the enum.
+                    "#
+            };
+
+            stmts[0] = format!("{}\n\n{}", warning, stmts[0]);
+        }
+
+        return stmts;
+    }
+
+    let enums = schemas.enums(&alter_enum.index);
+
+    let mut stmts = Vec::with_capacity(10);
+
+    let tmp_name = format!("{}_new", &enums.next().name());
+    let tmp_old_name = format!("{}_old", &enums.previous().name());
+
+    stmts.push("BEGIN".to_string());
+
+    // Create the new enum with tmp name
+    {
+        let create_new_enum = format!(
+            "CREATE TYPE {enum_name} AS ENUM ({variants})",
+            enum_name = Quoted::postgres_ident(&tmp_name),
+            variants = enums.next().values().iter().map(Quoted::postgres_string).join(", ")
+        );
+
+        stmts.push(create_new_enum);
+    }
+
+    // Find all usages as a default and drop them
+    {
+        for ((table_idx, colidx), _) in &alter_enum.previous_usages_as_default {
+            let table = schemas.previous().table_walker_at(*table_idx);
+
+            let drop_default = format!(
+                r#"ALTER TABLE "{table_name}" ALTER COLUMN "{column_name}" DROP DEFAULT"#,
+                table_name = table.name(),
+                column_name = table.column_at(*colidx).name(),
+            );
+
+            stmts.push(drop_default);
+        }
+    }
+
+    // Alter type of the current columns to new, with a cast
+    {
+        let affected_columns = walk_columns(schemas.next()).filter(|column| matches!(&column.column_type().family, ColumnTypeFamily::Enum(name) if name.as_str() == enums.next().name()));
+
+        for column in affected_columns {
+            let array = if column.arity().is_list() { "[]" } else { "" };
+
+            let sql = format!(
+                "ALTER TABLE {table_name} \
+                            ALTER COLUMN {column_name} TYPE {tmp_name}{array} \
+                                USING ({column_name}::text::{tmp_name}{array})",
+                table_name = Quoted::postgres_ident(column.table().name()),
+                column_name = Quoted::postgres_ident(column.name()),
+                tmp_name = Quoted::postgres_ident(&tmp_name),
+                array = array,
+            );
+
+            stmts.push(sql);
+        }
+    }
+
+    // Rename old enum
+    {
+        let sql = format!(
+            "ALTER TYPE {enum_name} RENAME TO {tmp_old_name}",
+            enum_name = Quoted::postgres_ident(enums.previous().name()),
+            tmp_old_name = Quoted::postgres_ident(&tmp_old_name)
+        );
+
+        stmts.push(sql);
+    }
+
+    // Rename new enum
+    {
+        let sql = format!(
+            "ALTER TYPE {tmp_name} RENAME TO {enum_name}",
+            tmp_name = Quoted::postgres_ident(&tmp_name),
+            enum_name = Quoted::postgres_ident(enums.next().name())
+        );
+
+        stmts.push(sql)
+    }
+
+    // Drop old enum
+    {
+        let sql = ddl::DropType {
+            type_name: tmp_old_name.as_str().into(),
+        }
+        .to_string();
+
+        stmts.push(sql)
+    }
+
+    // Reinstall dropped defaults that need to be reinstalled
+    {
+        for ((prev_tblidx, prev_colidx), (next_tblidx, next_colidx)) in alter_enum
+            .previous_usages_as_default
+            .iter()
+            .filter_map(|(prev, next)| next.map(|next| (prev, next)))
+        {
+            let columns = schemas
+                .tables(&Pair::new(*prev_tblidx, next_tblidx))
+                .columns(&Pair::new(*prev_colidx, next_colidx));
+
+            let table_name = columns.previous().table().name();
+            let column_name = columns.previous().name();
+            let default_str = columns
+                    .next()
+                    .default()
+                    .and_then(|default| default.as_value())
+                    .and_then(|value| value.as_enum_value())
+                    .expect("We should only be setting a changed default if there was one on the previous schema and in the next with the same enum.");
+
+            let set_default = format!(
+                "ALTER TABLE {table_name} ALTER COLUMN {column_name} SET DEFAULT '{default}'",
+                table_name = Quoted::postgres_ident(&table_name),
+                column_name = Quoted::postgres_ident(&column_name),
+                default = escape_string_literal(default_str),
+            );
+
+            stmts.push(set_default);
+        }
+    }
+
+    stmts.push("COMMIT".to_string());
+
+    stmts
+}
+
+fn render_cockroach_alter_enum(alter_enum: &AlterEnum, schemas: &Pair<&SqlSchema>, renderer: &mut StepRenderer) {
+    let enums = schemas.enums(&alter_enum.index);
+    let mut prefix = String::new();
+    prefix.push_str("ALTER TYPE \"");
+    prefix.push_str(enums.previous.name());
+    prefix.push_str("\" ");
+
+    // Defaults that use a dropped value will need to be recreated after the alter enum.
+    let defaults_to_drop = alter_enum
+        .previous_usages_as_default
+        .iter()
+        .filter_map(|((prev_tblidx, prev_colidx), _)| {
+            let col = schemas.previous.table_walker_at(*prev_tblidx).column_at(*prev_colidx);
+            col.default()
+                .and_then(|d| d.as_value())
+                .and_then(|v| v.as_enum_value())
+                .map(|value| (col, value))
+        })
+        .filter(|(_, value)| !enums.next.values().iter().any(|v| v == value));
+
+    for (col, _) in defaults_to_drop {
+        renderer.render_statement(&mut |stmt| {
+            stmt.push_str("ALTER TABLE ");
+            stmt.push_display(&Quoted::postgres_ident(col.table().name()));
+            stmt.push_str(" ALTER COLUMN ");
+            stmt.push_display(&Quoted::postgres_ident(col.name()));
+            stmt.push_str(" DROP DEFAULT");
+        })
+    }
+
+    for variant in &alter_enum.created_variants {
+        renderer.render_statement(&mut |stmt| {
+            stmt.push_str(&prefix);
+            stmt.push_str("ADD VALUE '");
+            stmt.push_str(variant);
+            stmt.push_str("'");
+        });
+    }
+
+    for variant in &alter_enum.dropped_variants {
+        renderer.render_statement(&mut |stmt| {
+            stmt.push_str(&prefix);
+            stmt.push_str("DROP VALUE '");
+            stmt.push_str(variant);
+            stmt.push_str("'");
+        });
     }
 }

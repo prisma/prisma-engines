@@ -2,7 +2,7 @@ use crate::{column_metadata::ColumnMetadata, error::SqlError};
 use bigdecimal::{BigDecimal, FromPrimitive};
 use chrono::{DateTime, NaiveDate, Utc};
 use connector_interface::{coerce_null_to_zero_value, AggregationResult, AggregationSelection};
-use datamodel::FieldArity;
+use datamodel::dml::FieldArity;
 use prisma_models::{PrismaValue, Record, TypeIdentifier};
 use quaint::{
     ast::{Expression, Value},

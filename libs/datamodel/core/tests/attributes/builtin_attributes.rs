@@ -1,5 +1,4 @@
 use crate::common::*;
-use datamodel::ScalarType;
 
 #[test]
 fn unique_attribute() {

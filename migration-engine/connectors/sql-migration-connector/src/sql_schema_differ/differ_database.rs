@@ -1,8 +1,8 @@
 use super::{column, enums::EnumDiffer, table::TableDiffer};
-use crate::{flavour::SqlFlavour, pair::Pair};
+use crate::{flavour::SqlFlavour, pair::Pair, SqlDatabaseSchema};
 use sql_schema_describer::{
     walkers::{ColumnWalker, EnumWalker, SqlSchemaExt, TableWalker},
-    ColumnId, SqlSchema, TableId,
+    ColumnId, TableId,
 };
 use std::{
     borrow::Cow,
@@ -13,7 +13,7 @@ use std::{
 pub(crate) struct DifferDatabase<'a> {
     pub(super) flavour: &'a dyn SqlFlavour,
     /// The schemas being diffed
-    schemas: Pair<&'a SqlSchema>,
+    schemas: Pair<&'a SqlDatabaseSchema>,
     /// Table name -> table indexes.
     tables: HashMap<Cow<'a, str>, Pair<Option<TableId>>>,
     /// (table_idxs, column_name) -> column_idxs. BTreeMap because we want range
@@ -27,8 +27,8 @@ pub(crate) struct DifferDatabase<'a> {
 }
 
 impl<'a> DifferDatabase<'a> {
-    pub(crate) fn new(schemas: Pair<&'a SqlSchema>, flavour: &'a dyn SqlFlavour) -> Self {
-        let table_count_lb = std::cmp::max(schemas.previous().tables.len(), schemas.next().tables.len());
+    pub(crate) fn new(schemas: Pair<&'a SqlDatabaseSchema>, flavour: &'a dyn SqlFlavour) -> Self {
+        let table_count_lb = std::cmp::max(schemas.previous.tables().len(), schemas.next.tables().len());
         let mut db = DifferDatabase {
             flavour,
             schemas,
@@ -44,7 +44,8 @@ impl<'a> DifferDatabase<'a> {
 
         // First insert all tables from the previous schema.
         for table in schemas
-            .previous()
+            .previous
+            .describer_schema
             .table_walkers()
             .filter(|t| !table_is_ignored(t.name()))
         {
@@ -58,7 +59,12 @@ impl<'a> DifferDatabase<'a> {
 
         // Then insert all tables from the next schema. Since we have all the
         // relevant tables, we can fill in columns at this step.
-        for table in schemas.next().table_walkers().filter(|t| !table_is_ignored(t.name())) {
+        for table in schemas
+            .next
+            .describer_schema
+            .table_walkers()
+            .filter(|t| !table_is_ignored(t.name()))
+        {
             let table_name = if flavour.lower_cases_table_names() {
                 table.name().to_ascii_lowercase().into()
             } else {
@@ -198,14 +204,14 @@ impl<'a> DifferDatabase<'a> {
     }
 
     fn previous_enums(&self) -> impl Iterator<Item = EnumWalker<'a>> {
-        self.schemas.previous().enum_walkers()
+        self.schemas.previous().describer_schema.enum_walkers()
     }
 
     fn next_enums(&self) -> impl Iterator<Item = EnumWalker<'a>> {
-        self.schemas.next().enum_walkers()
+        self.schemas.next().describer_schema.enum_walkers()
     }
 
-    pub(crate) fn schemas(&self) -> Pair<&SqlSchema> {
+    pub(crate) fn schemas(&self) -> Pair<&SqlDatabaseSchema> {
         self.schemas
     }
 }

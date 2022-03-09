@@ -1,6 +1,6 @@
 use crate::model_extensions::*;
 use crate::sql_trace::SqlTraceComment;
-use connector_interface::{DatasourceFieldName, WriteArgs, WriteExpression};
+use connector_interface::{DatasourceFieldName, ScalarWriteOperation, WriteArgs};
 use itertools::Itertools;
 use prisma_models::*;
 use quaint::ast::*;
@@ -59,8 +59,8 @@ pub fn create_records_nonempty(
             for field in affected_fields.iter() {
                 let value = arg.take_field_value(field.db_name());
                 match value {
-                    Some(expr) => {
-                        let value: PrismaValue = expr
+                    Some(write_op) => {
+                        let value: PrismaValue = write_op
                             .try_into()
                             .expect("Create calls can only use PrismaValue write expressions (right now).");
 
@@ -124,10 +124,10 @@ pub fn update_many(
                 .find(|f| f.db_name() == name)
                 .expect("Expected field to be valid");
 
-            let value: Expression = match val {
-                WriteExpression::Field(_) => unimplemented!(),
-                WriteExpression::Value(rhs) => field.value(rhs).into(),
-                WriteExpression::Add(rhs) if field.is_list() => {
+            let value: Expression = match val.try_into_scalar().unwrap() {
+                ScalarWriteOperation::Field(_) => unimplemented!(),
+                ScalarWriteOperation::Set(rhs) => field.value(rhs).into(),
+                ScalarWriteOperation::Add(rhs) if field.is_list() => {
                     let e: Expression = Column::from(name.clone()).into();
                     let vals: Vec<_> = match rhs {
                         PrismaValue::List(vals) => vals.into_iter().map(|val| field.value(val)).collect(),
@@ -137,22 +137,22 @@ pub fn update_many(
                     // Postgres only
                     e.compare_raw("||", Value::array(vals)).into()
                 }
-                WriteExpression::Add(rhs) => {
+                ScalarWriteOperation::Add(rhs) => {
                     let e: Expression<'_> = Column::from(name.clone()).into();
                     e + field.value(rhs).into()
                 }
 
-                WriteExpression::Substract(rhs) => {
+                ScalarWriteOperation::Substract(rhs) => {
                     let e: Expression<'_> = Column::from(name.clone()).into();
                     e - field.value(rhs).into()
                 }
 
-                WriteExpression::Multiply(rhs) => {
+                ScalarWriteOperation::Multiply(rhs) => {
                     let e: Expression<'_> = Column::from(name.clone()).into();
                     e * field.value(rhs).into()
                 }
 
-                WriteExpression::Divide(rhs) => {
+                ScalarWriteOperation::Divide(rhs) => {
                     let e: Expression<'_> = Column::from(name.clone()).into();
                     e / field.value(rhs).into()
                 }

@@ -790,23 +790,22 @@ impl<'a> SqlSchemaDescriber<'a> {
             _ => (ColumnTypeFamily::Unsupported(full_data_type.into()), None),
         };
 
+        let enm = match &family {
+            ColumnTypeFamily::Enum(name) => Some(Enum {
+                name: name.clone(),
+                values: Self::extract_enum_values(&full_data_type),
+            }),
+            _ => None,
+        };
+
         let tpe = ColumnType {
             full_data_type: full_data_type.to_owned(),
-            family: family.clone(),
+            family,
             arity,
             native_type: native_type.map(|x| x.to_json()),
         };
 
-        match &family {
-            ColumnTypeFamily::Enum(name) => (
-                tpe,
-                Some(Enum {
-                    name: name.clone(),
-                    values: Self::extract_enum_values(&full_data_type),
-                }),
-            ),
-            _ => (tpe, None),
-        }
+        (tpe, enm)
     }
 
     fn extract_precision(input: &str) -> Option<u32> {

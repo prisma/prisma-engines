@@ -1,5 +1,4 @@
-use crate::common::{parse, DatamodelAsserts, ModelAsserts};
-use datamodel::{IndexDefinition, IndexField, IndexType};
+use crate::common::*;
 
 #[test]
 fn multiple_indexes_with_same_name_on_different_models_are_supported_by_mysql() {

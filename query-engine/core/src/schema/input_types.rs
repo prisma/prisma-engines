@@ -9,6 +9,14 @@ pub struct InputObjectType {
     pub identifier: Identifier,
     pub constraints: InputObjectTypeConstraints,
     pub fields: OnceCell<Vec<InputFieldRef>>,
+    pub tag: Option<ObjectTag>,
+}
+
+/// Object tags help differentiating objects during parsing / raw input data processing,
+/// especially if complex object unions are present.
+#[derive(Debug, PartialEq, Copy, Clone)]
+pub enum ObjectTag {
+    CompositeEnvelope,
 }
 
 #[derive(Debug, Default, PartialEq)]
@@ -38,7 +46,7 @@ impl InputObjectType {
     pub fn set_fields(&self, fields: Vec<InputField>) {
         self.fields
             .set(fields.into_iter().map(Arc::new).collect())
-            .expect("InputObjectType::set_fields");
+            .unwrap_or_else(|_| panic!("Fields of {:?} are already set", self.identifier));
     }
 
     /// True if fields are empty, false otherwise.
@@ -75,6 +83,10 @@ impl InputObjectType {
     pub fn set_min_fields(&mut self, min: usize) {
         self.constraints.min_num_fields = Some(min);
     }
+
+    pub fn set_tag(&mut self, tag: ObjectTag) {
+        self.tag = Some(tag);
+    }
 }
 
 #[derive(Debug, PartialEq)]
@@ -95,6 +107,12 @@ impl InputField {
     /// Sets the field as optional (not required to be present on the input).
     pub fn optional(mut self) -> Self {
         self.is_required = false;
+        self
+    }
+
+    /// Sets the field as optional (not required to be present on the input).
+    pub fn required(mut self) -> Self {
+        self.is_required = true;
         self
     }
 

@@ -1,7 +1,7 @@
 use datamodel::common::preview_features::PreviewFeature;
 use enumflags2::BitFlags;
 use futures::TryStreamExt;
-use migration_connector::{DiffTarget, MigrationConnector};
+use migration_connector::{ConnectorParams, DiffTarget, MigrationConnector};
 use mongodb::bson::{self, doc};
 use mongodb_migration_connector::MongoDbMigrationConnector;
 use once_cell::sync::Lazy;
@@ -33,7 +33,7 @@ async fn client() -> &'static mongodb::Client {
     static CLIENT: OnceCell<mongodb::Client> = OnceCell::const_new();
 
     CLIENT
-        .get_or_init(|| async move { mongodb::Client::with_uri_str(CONN_STR.as_str()).await.unwrap() })
+        .get_or_init(|| async move { mongodb_client::create(CONN_STR.as_str()).await.unwrap() })
         .await
 }
 
@@ -71,10 +71,12 @@ fn new_connector(preview_features: BitFlags<PreviewFeature>) -> (String, MongoDb
     let db_name = fresh_db_name();
     let mut url: url::Url = CONN_STR.parse().unwrap();
     url.set_path(&db_name);
-    (
-        db_name,
-        MongoDbMigrationConnector::new(url.to_string(), preview_features),
-    )
+    let params = ConnectorParams {
+        connection_string: url.to_string(),
+        preview_features,
+        shadow_database_connection_string: None,
+    };
+    (db_name, MongoDbMigrationConnector::new(params))
 }
 
 async fn get_state(db: &mongodb::Database) -> State {
@@ -154,34 +156,35 @@ pub(crate) fn test_scenario(scenario_name: &str) {
         State { collections }
     };
 
-    let expected_result = {
+    let mut expected_result = {
         path.clear();
         write!(path, "{}/{}/result", SCENARIOS_PATH, scenario_name).unwrap();
         std::fs::read_to_string(&path).unwrap()
     };
 
-    // let state: State = serde_json::from_str(state).unwrap();
+    if cfg!(target_os = "windows") {
+        expected_result.retain(|c| c != '\r');
+    }
+
     RT.block_on(async move {
         let parsed_schema = datamodel::parse_schema_parserdb(&schema).unwrap();
-        let (db_name, connector) = new_connector(parsed_schema.configuration.preview_features());
+        let (db_name, mut connector) = new_connector(parsed_schema.configuration.preview_features());
         let client = client().await;
         let db = client.database(&db_name);
         db.drop(None).await.unwrap();
         apply_state(&db, state).await;
 
-        let migration = connector
-            .diff(
-                DiffTarget::Database(connector.connection_string().into()),
-                DiffTarget::Datamodel((&schema).into()),
-            )
+        let from = connector
+            .database_schema_from_diff_target(DiffTarget::Database, None)
             .await
             .unwrap();
+        let to = connector
+            .database_schema_from_diff_target(DiffTarget::Datamodel(&schema), None)
+            .await
+            .unwrap();
+        let migration = connector.diff(from, to).unwrap();
 
-        connector
-            .database_migration_step_applier()
-            .apply_migration(&migration)
-            .await
-            .unwrap();
+        connector.apply_migration(&migration).await.unwrap();
 
         let state = get_state(&db).await;
 
@@ -213,13 +216,15 @@ Snapshot comparison failed. Run the test again with UPDATE_EXPECT=1 in the envir
         }
 
         // Check that the migration is idempotent.
-        let migration = connector
-            .diff(
-                DiffTarget::Database(connector.connection_string().into()),
-                DiffTarget::Datamodel((&schema).into()),
-            )
+        let from = connector
+            .database_schema_from_diff_target(DiffTarget::Database, None)
             .await
             .unwrap();
+        let to = connector
+            .database_schema_from_diff_target(DiffTarget::Datamodel(&schema), None)
+            .await
+            .unwrap();
+        let migration = connector.diff(from, to).unwrap();
 
         assert!(
             connector.migration_is_empty(&migration),

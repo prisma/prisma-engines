@@ -14,10 +14,6 @@ use std::{collections::BTreeSet, fmt::Write as _};
 pub struct SqlMigration {
     pub(crate) before: SqlSchema,
     pub(crate) after: SqlSchema,
-    /// (table_id, column_id) for columns with a prisma-level default
-    /// (cuid() or uuid()) in the `after` schema that aren't present in the
-    /// `before` schema.
-    pub(crate) added_columns_with_virtual_defaults: Vec<(TableId, ColumnId)>,
     pub(crate) steps: Vec<SqlMigrationStep>,
 }
 
@@ -90,6 +86,13 @@ impl SqlMigration {
                     drift_items.insert((
                         DriftType::ChangedTable,
                         self.schemas().previous().table_walker_at(*table_id).name(),
+                        idx,
+                    ));
+                }
+                SqlMigrationStep::AlterPrimaryKey(table_id) => {
+                    drift_items.insert((
+                        DriftType::ChangedTable,
+                        self.before.table_walker_at(table_id.previous).name(),
                         idx,
                     ));
                 }
@@ -219,6 +222,12 @@ impl SqlMigration {
                         out.push_str("`\n");
                     }
                 }
+                SqlMigrationStep::AlterPrimaryKey(table_id) => {
+                    let table_name = self.schemas().previous().table_walker_at(table_id.previous).name();
+                    out.push_str("   [*] Changed the primary key for `");
+                    out.push_str(table_name);
+                    out.push_str("`\n");
+                }
                 SqlMigrationStep::DropForeignKey {
                     foreign_key_index,
                     table_id,
@@ -255,7 +264,10 @@ impl SqlMigration {
 
                     for change in &alter_table.changes {
                         match change {
-                            TableChange::AddColumn { column_id } => {
+                            TableChange::AddColumn {
+                                column_id,
+                                has_virtual_default: _,
+                            } => {
                                 out.push_str("  [+] Added column `");
                                 out.push_str(tables.next().column_at(*column_id).name());
                                 out.push_str("`\n");
@@ -282,12 +294,8 @@ impl SqlMigration {
                             }
                             TableChange::DropAndRecreateColumn { column_id, changes } => {
                                 out.push_str("  [*] Column `");
-                                write!(
-                                    out,
-                                    "{}` would be dropped and recreated",
-                                    tables.next().column_at(*column_id.next()).name(),
-                                )
-                                .unwrap();
+                                out.push_str(tables.next().column_at(*column_id.next()).name());
+                                out.push_str("` would be dropped and recreated ");
                                 render_column_changes(tables.columns(column_id), changes, &mut out);
                                 out.push('\n');
                             }
@@ -339,6 +347,7 @@ impl SqlMigration {
                 SqlMigrationStep::CreateIndex {
                     table_id: (_, table_id),
                     index_index,
+                    from_drop_and_recreate: _,
                 } => {
                     let index = self.schemas().next().table_walker_at(*table_id).index_at(*index_index);
 
@@ -435,6 +444,7 @@ pub(crate) enum SqlMigrationStep {
         index_index: usize,
     },
     AlterTable(AlterTable),
+    AlterPrimaryKey(Pair<TableId>),
     // Order matters: we must drop tables before we create indexes,
     // because on Postgres and SQLite, we may create indexes whose names
     // clash with the names of indexes on the dropped tables.
@@ -459,6 +469,7 @@ pub(crate) enum SqlMigrationStep {
     CreateIndex {
         table_id: (Option<TableId>, TableId),
         index_index: usize,
+        from_drop_and_recreate: bool,
     },
     RenameForeignKey {
         table_id: Pair<TableId>,
@@ -483,24 +494,11 @@ pub(crate) enum SqlMigrationStep {
 }
 
 impl SqlMigrationStep {
-    pub(crate) fn as_alter_table(&self) -> Option<&AlterTable> {
-        match self {
-            SqlMigrationStep::AlterTable(alter_table) => Some(alter_table),
-            _ => None,
-        }
-    }
-
-    pub(crate) fn as_redefine_tables(&self) -> Option<&[RedefineTable]> {
-        match self {
-            SqlMigrationStep::RedefineTables(redefines) => Some(redefines),
-            _ => None,
-        }
-    }
-
     pub(crate) fn description(&self) -> &'static str {
         match self {
             SqlMigrationStep::AddForeignKey { .. } => "AddForeignKey",
             SqlMigrationStep::AlterEnum(_) => "AlterEnum",
+            SqlMigrationStep::AlterPrimaryKey(_) => "AlterPrimaryKey",
             SqlMigrationStep::AlterTable(_) => "AlterTable",
             SqlMigrationStep::CreateEnum { .. } => "CreateEnum",
             SqlMigrationStep::CreateIndex { .. } => "CreateIndex",
@@ -529,6 +527,7 @@ pub(crate) struct AlterTable {
 pub(crate) enum TableChange {
     AddColumn {
         column_id: ColumnId,
+        has_virtual_default: bool,
     },
     AlterColumn(AlterColumn),
     DropColumn {
@@ -542,15 +541,6 @@ pub(crate) enum TableChange {
     DropPrimaryKey,
     AddPrimaryKey,
     RenamePrimaryKey,
-}
-
-impl TableChange {
-    pub(crate) fn as_add_column(&self) -> Option<ColumnId> {
-        match self {
-            TableChange::AddColumn { column_id } => Some(*column_id),
-            _ => None,
-        }
-    }
 }
 
 #[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord)]
@@ -616,6 +606,7 @@ impl AlterEnum {
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
 pub(crate) struct RedefineTable {
     pub added_columns: Vec<ColumnId>,
+    pub added_columns_with_virtual_defaults: Vec<ColumnId>,
     pub dropped_columns: Vec<ColumnId>,
     pub dropped_primary_key: bool,
     pub column_pairs: Vec<(Pair<ColumnId>, ColumnChanges, Option<ColumnTypeChange>)>,

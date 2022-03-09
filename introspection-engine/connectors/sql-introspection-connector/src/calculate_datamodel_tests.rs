@@ -2,9 +2,13 @@
 mod tests {
     use crate::calculate_datamodel::calculate_datamodel;
     use datamodel::{
-        ast::Span, dml, Datamodel, Datasource, DefaultValue as DMLDefault, Field, FieldArity, FieldType,
-        IndexDefinition, IndexField, Model, NativeTypeInstance, PrimaryKeyDefinition, PrimaryKeyField,
-        ReferentialAction, RelationField, RelationInfo, ScalarField, ScalarType, StringFromEnvVar, ValueGenerator,
+        ast::Span,
+        dml::{
+            self, Datamodel, DefaultValue as DMLDefault, Field, FieldArity, FieldType, IndexDefinition, IndexField,
+            Model, NativeTypeInstance, PrimaryKeyDefinition, PrimaryKeyField, ReferentialAction, RelationField,
+            RelationInfo, ScalarField, ScalarType, ValueGenerator,
+        },
+        Datasource, StringFromEnvVar,
     };
     use enumflags2::BitFlags;
     use expect_test::expect;

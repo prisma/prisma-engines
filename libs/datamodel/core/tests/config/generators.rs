@@ -1,6 +1,5 @@
-use datamodel::Datamodel;
-
 use crate::common::*;
+use datamodel::dml::Datamodel;
 
 #[test]
 fn serialize_generators_to_cmf() {

@@ -1,39 +1,37 @@
-use migration_core::{json_rpc::types::*, CoreResult, GenericApi};
+use migration_core::{
+    commands::evaluate_data_loss, json_rpc::types::*, migration_connector::MigrationConnector, CoreResult,
+};
 use std::borrow::Cow;
 use tempfile::TempDir;
 
 #[must_use = "This struct does nothing on its own. See EvaluateDataLoss::send()"]
 pub struct EvaluateDataLoss<'a> {
-    api: &'a dyn GenericApi,
+    api: &'a mut dyn MigrationConnector,
     migrations_directory: &'a TempDir,
     prisma_schema: String,
-    rt: &'a tokio::runtime::Runtime,
 }
 
 impl<'a> EvaluateDataLoss<'a> {
-    pub fn new(
-        api: &'a dyn GenericApi,
-        migrations_directory: &'a TempDir,
-        prisma_schema: String,
-        rt: &'a tokio::runtime::Runtime,
-    ) -> Self {
+    pub fn new(api: &'a mut dyn MigrationConnector, migrations_directory: &'a TempDir, prisma_schema: String) -> Self {
         EvaluateDataLoss {
             api,
             migrations_directory,
             prisma_schema,
-            rt,
         }
     }
 
     fn send_impl(self) -> CoreResult<EvaluateDataLossAssertion<'a>> {
-        let output = self.rt.block_on(self.api.evaluate_data_loss(EvaluateDataLossInput {
-            migrations_directory_path: self.migrations_directory.path().to_str().unwrap().to_owned(),
-            prisma_schema: self.prisma_schema,
-        }))?;
+        let fut = evaluate_data_loss(
+            EvaluateDataLossInput {
+                migrations_directory_path: self.migrations_directory.path().to_str().unwrap().to_owned(),
+                prisma_schema: self.prisma_schema,
+            },
+            self.api,
+        );
+        let output = test_setup::runtime::run_with_thread_local_runtime(fut)?;
 
         Ok(EvaluateDataLossAssertion {
             output,
-            _api: self.api,
             _migrations_directory: self.migrations_directory,
         })
     }
@@ -46,7 +44,6 @@ impl<'a> EvaluateDataLoss<'a> {
 
 pub struct EvaluateDataLossAssertion<'a> {
     output: EvaluateDataLossOutput,
-    _api: &'a dyn GenericApi,
     _migrations_directory: &'a TempDir,
 }
 

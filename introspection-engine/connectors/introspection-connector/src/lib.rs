@@ -2,7 +2,7 @@ mod error;
 
 use core::fmt;
 use datamodel::common::preview_features::PreviewFeature;
-use datamodel::{Datamodel, Datasource};
+use datamodel::{dml::Datamodel, Datasource};
 use enumflags2::BitFlags;
 pub use error::{ConnectorError, ErrorKind};
 use serde::*;
@@ -53,7 +53,7 @@ pub struct IntrospectionResult {
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Warning {
-    pub code: i8,
+    pub code: i16,
     pub message: String,
     pub affected: Value,
 }

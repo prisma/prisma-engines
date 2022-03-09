@@ -1,10 +1,9 @@
 mod mongodb_types;
+mod validations;
 
 use datamodel_connector::{
-    connector_error::{ConnectorError, ErrorKind},
-    parser_database::{ast::Expression, walkers::*},
-    Connector, ConnectorCapability, Diagnostics, NativeTypeConstructor, NativeTypeInstance, ReferentialAction,
-    ReferentialIntegrity, ScalarType,
+    parser_database::walkers::*, Connector, ConnectorCapability, ConstraintScope, DatamodelError, Diagnostics,
+    NativeTypeConstructor, NativeTypeInstance, ReferentialAction, ReferentialIntegrity, ScalarType, Span,
 };
 use enumflags2::BitFlags;
 use mongodb_types::*;
@@ -29,80 +28,9 @@ const CAPABILITIES: &[ConnectorCapability] = &[
     ConnectorCapability::TwoWayEmbeddedManyToManyRelation,
 ];
 
-type Result<T> = std::result::Result<T, ConnectorError>;
+type Result<T> = std::result::Result<T, DatamodelError>;
 
 pub struct MongoDbDatamodelConnector;
-
-impl MongoDbDatamodelConnector {
-    fn validate_auto(field: ScalarFieldWalker<'_>, errors: &mut datamodel_connector::Diagnostics) {
-        if !field.default_value().map(|val| val.is_auto()).unwrap_or(false) {
-            return;
-        }
-
-        let mut bail = || {
-            errors.push_error(datamodel_connector::DatamodelError::ConnectorError {
-                    message: ConnectorError::from_kind(ErrorKind::FieldValidationError {
-                        field: field.name().to_owned(),
-                        message: "MongoDB `@default(auto())` fields must have `ObjectId` native type and use the `@id` attribute.".to_owned(),
-                    })
-                    .to_string(),
-                    span: field.ast_field().span,
-                });
-        };
-
-        let model = field.model();
-        let is_id = model.field_is_single_pk(field.field_id());
-
-        match field.raw_native_type() {
-            None => bail(),
-            Some((_, name, _, _)) if name != "ObjectId" => bail(),
-            _ if !is_id => bail(),
-            _ => (),
-        }
-    }
-
-    fn validate_dbgenerated(field: ScalarFieldWalker<'_>, errors: &mut datamodel_connector::Diagnostics) {
-        if !field.default_value().map(|val| val.is_dbgenerated()).unwrap_or(false) {
-            return;
-        }
-
-        errors.push_error(datamodel_connector::DatamodelError::ConnectorError {
-            message: ConnectorError::from_kind(ErrorKind::FieldValidationError {
-                field: field.name().to_owned(),
-                message: "The `dbgenerated()` function is not allowed with MongoDB. Please use `auto()` instead."
-                    .to_owned(),
-            })
-            .to_string(),
-            span: field.ast_field().span,
-        });
-    }
-
-    fn validate_array_native_type(field: ScalarFieldWalker<'_>, errors: &mut Diagnostics) {
-        let (ds_name, type_name, args, span) = match field.raw_native_type() {
-            Some(nt) => nt,
-            None => return,
-        };
-
-        if type_name != type_names::ARRAY {
-            return;
-        }
-
-        // `db.Array` expects exactly 1 argument, which is validated before this code path.
-        let arg = args.get(0).unwrap();
-
-        errors.push_error(datamodel_connector::DatamodelError::ConnectorError {
-            message: ConnectorError::from_kind(ErrorKind::FieldValidationError {
-                field: field.name().to_owned(),
-                message: format!(
-                    "Native type `{ds_name}.{}` is deprecated. Please use `{ds_name}.{arg}` instead.",
-                    type_names::ARRAY
-                ),
-            })
-            .to_string(),
-            span,
-        });
-    }
-}
 
 impl Connector for MongoDbDatamodelConnector {
     fn name(&self) -> &str {
@@ -117,68 +45,30 @@ impl Connector for MongoDbDatamodelConnector {
         127
     }
 
+    fn constraint_violation_scopes(&self) -> &'static [ConstraintScope] {
+        &[ConstraintScope::ModelKeyIndex]
+    }
+
     fn referential_actions(&self, referential_integrity: &ReferentialIntegrity) -> BitFlags<ReferentialAction> {
         referential_integrity.allowed_referential_actions(BitFlags::empty())
     }
 
     fn validate_model(&self, model: ModelWalker<'_>, errors: &mut Diagnostics) {
-        for field in model.scalar_fields() {
-            Self::validate_auto(field, errors);
-            Self::validate_dbgenerated(field, errors);
-            Self::validate_array_native_type(field, errors);
-        }
-
-        let mut push_error = |err: ConnectorError| {
-            errors.push_error(datamodel_connector::DatamodelError::ConnectorError {
-                message: err.to_string(),
-                span: model.ast_model().span,
-            });
-        };
+        validations::id_must_be_defined(model, errors);
 
         if let Some(pk) = model.primary_key() {
-            // no compound ids
-            if pk.fields().len() > 1 {
-                push_error(ConnectorError::from_kind(ErrorKind::InvalidModelError {
-                    message: "MongoDB models require exactly one identity field annotated with @id".to_owned(),
-                }));
-            }
+            validations::id_field_must_have_a_correct_mapped_name(pk, errors);
+        }
 
-            // singular id
-            let field = pk.fields().next().unwrap();
+        for field in model.scalar_fields() {
+            validations::objectid_type_required_with_auto_attribute(field, errors);
+            validations::auto_attribute_must_be_an_id(field, errors);
+            validations::dbgenerated_attribute_is_not_allowed(field, errors);
+            validations::disallow_array_native_types(field, errors);
+        }
 
-            // The _id name check is superfluous because it's not a valid schema field at the moment.
-            if field.name() != "_id" {
-                match field.mapped_name() {
-                    Some("_id") => (),
-                    Some(mapped_name) => push_error(ConnectorError::from_kind(ErrorKind::FieldValidationError {
-                        field: field.name().to_owned(),
-                        message: format!(
-                            "MongoDB model IDs must have a @map(\"_id\") annotation, found @map(\"{}\").",
-                            mapped_name
-                        ),
-                    })),
-                    None => push_error(ConnectorError::from_kind(ErrorKind::FieldValidationError {
-                        field: field.name().to_owned(),
-                        message: "MongoDB model IDs must have a @map(\"_id\") annotations.".to_owned(),
-                    })),
-                };
-            }
-
-            if field.raw_native_type().is_none()
-                && matches!(field.default_value().map(|v| v.value()), Some(Expression::Function(fn_name,_,_)) if fn_name == "dbgenerated")
-            {
-                push_error(ConnectorError::from_kind(ErrorKind::FieldValidationError {
-                    field: field.name().to_owned(),
-                    message: format!(
-                        "MongoDB `@default(dbgenerated())` IDs must have an `ObjectID` native type annotation. `{}` is an ID field, so you probably want `ObjectId` as your native type.",
-                        field.name()
-                    ),
-                }));
-            }
-        } else {
-            push_error(ConnectorError::from_kind(ErrorKind::InvalidModelError {
-                message: "MongoDB models require exactly one identity field annotated with @id".to_owned(),
-            }))
+        for index in model.indexes() {
+            validations::index_is_not_defined_multiple_times_to_same_fields(index, errors);
         }
     }
 
@@ -199,13 +89,13 @@ impl Connector for MongoDbDatamodelConnector {
         &native_type == default_native_type
     }
 
-    fn parse_native_type(&self, name: &str, args: Vec<String>) -> Result<NativeTypeInstance> {
-        let mongo_type = mongo_type_from_input(name, &args)?;
+    fn parse_native_type(&self, name: &str, args: Vec<String>, span: Span) -> Result<NativeTypeInstance> {
+        let mongo_type = mongo_type_from_input(name, &args, span)?;
 
         Ok(NativeTypeInstance::new(name, args, mongo_type.to_json()))
     }
 
-    fn introspect_native_type(&self, _native_type: serde_json::Value) -> Result<NativeTypeInstance> {
+    fn introspect_native_type(&self, _native_type: serde_json::Value) -> NativeTypeInstance {
         // Out of scope for MVP
         todo!()
     }

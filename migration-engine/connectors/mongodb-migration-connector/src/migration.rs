@@ -2,8 +2,8 @@ use mongodb_schema_describer::{CollectionId, IndexId, IndexType, MongoSchema};
 
 #[derive(Debug)]
 pub(crate) struct MongoDbMigration {
-    pub(crate) previous: MongoSchema,
-    pub(crate) next: MongoSchema,
+    pub(crate) previous: Box<MongoSchema>,
+    pub(crate) next: Box<MongoSchema>,
     pub(crate) steps: Vec<MongoDbMigrationStep>,
 }
 

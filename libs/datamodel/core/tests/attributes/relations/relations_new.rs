@@ -1,6 +1,4 @@
 use crate::common::*;
-use datamodel::dml;
-use indoc::indoc;
 
 #[test]
 fn relation_happy_path() {

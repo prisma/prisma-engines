@@ -1,13 +1,15 @@
 use crate::error::{ConnectorError, ErrorKind};
 use chrono::Utc;
 use indexmap::{map::Keys, IndexMap};
-use prisma_models::{ModelProjection, ModelRef, PrismaValue, ScalarFieldRef, SelectionResult};
+use prisma_models::{
+    CompositeFieldRef, Field, ModelProjection, ModelRef, PrismaValue, ScalarFieldRef, SelectedField, SelectionResult,
+};
 use std::{borrow::Borrow, convert::TryInto, ops::Deref};
 
 /// WriteArgs represent data to be written to an underlying data source.
 #[derive(Debug, PartialEq, Clone, Default)]
 pub struct WriteArgs {
-    pub args: IndexMap<DatasourceFieldName, WriteExpression>,
+    pub args: IndexMap<DatasourceFieldName, WriteOperation>,
 }
 
 /// Wrapper struct to force a bit of a reflection whether or not the string passed
@@ -36,15 +38,104 @@ impl From<&ScalarFieldRef> for DatasourceFieldName {
     }
 }
 
+impl From<&CompositeFieldRef> for DatasourceFieldName {
+    fn from(cf: &CompositeFieldRef) -> Self {
+        DatasourceFieldName(cf.db_name().to_owned())
+    }
+}
+
 /// A WriteExpression allows to express more complex operations on how the data is written,
 /// like field or inter-field arithmetic.
 #[derive(Debug, PartialEq, Clone)]
-pub enum WriteExpression {
-    /// Reference to another field on the same model.
+pub enum WriteOperation {
+    Scalar(ScalarWriteOperation),
+    Composite(CompositeWriteOperation),
+}
+
+impl WriteOperation {
+    pub fn scalar_set(pv: PrismaValue) -> Self {
+        Self::Scalar(ScalarWriteOperation::Set(pv))
+    }
+
+    pub fn scalar_add(pv: PrismaValue) -> Self {
+        Self::Scalar(ScalarWriteOperation::Add(pv))
+    }
+
+    pub fn scalar_substract(pv: PrismaValue) -> Self {
+        Self::Scalar(ScalarWriteOperation::Substract(pv))
+    }
+
+    pub fn scalar_multiply(pv: PrismaValue) -> Self {
+        Self::Scalar(ScalarWriteOperation::Multiply(pv))
+    }
+
+    pub fn scalar_divide(pv: PrismaValue) -> Self {
+        Self::Scalar(ScalarWriteOperation::Divide(pv))
+    }
+
+    pub fn composite_set(pv: PrismaValue) -> Self {
+        Self::Composite(CompositeWriteOperation::Set(pv))
+    }
+
+    pub fn composite_unset(should_unset: bool) -> Self {
+        Self::Composite(CompositeWriteOperation::Unset(should_unset))
+    }
+
+    pub fn composite_update(writes: Vec<(DatasourceFieldName, WriteOperation)>) -> Self {
+        Self::Composite(CompositeWriteOperation::Update(NestedWrite { writes }))
+    }
+
+    pub fn composite_push(pv: PrismaValue) -> Self {
+        Self::Composite(CompositeWriteOperation::Push(pv))
+    }
+
+    pub fn composite_upsert(set: CompositeWriteOperation, update: CompositeWriteOperation) -> Self {
+        Self::Composite(CompositeWriteOperation::Upsert {
+            set: Box::new(set),
+            update: Box::new(update),
+        })
+    }
+
+    pub fn as_scalar(&self) -> Option<&ScalarWriteOperation> {
+        if let Self::Scalar(v) = self {
+            Some(v)
+        } else {
+            None
+        }
+    }
+
+    pub fn as_composite(&self) -> Option<&CompositeWriteOperation> {
+        if let Self::Composite(v) = self {
+            Some(v)
+        } else {
+            None
+        }
+    }
+
+    pub fn try_into_scalar(self) -> Option<ScalarWriteOperation> {
+        if let Self::Scalar(v) = self {
+            Some(v)
+        } else {
+            None
+        }
+    }
+
+    pub fn try_into_composite(self) -> Option<CompositeWriteOperation> {
+        if let Self::Composite(v) = self {
+            Some(v)
+        } else {
+            None
+        }
+    }
+}
+
+#[derive(Debug, PartialEq, Clone)]
+pub enum ScalarWriteOperation {
+    /// Reference to another field on the same model (unused at the moment).
     Field(DatasourceFieldName),
 
     /// Write plain value to field.
-    Value(PrismaValue),
+    Set(PrismaValue),
 
     /// Add value to field.
     Add(PrismaValue),
@@ -59,18 +150,131 @@ pub enum WriteExpression {
     Divide(PrismaValue),
 }
 
-impl From<PrismaValue> for WriteExpression {
-    fn from(pv: PrismaValue) -> Self {
-        WriteExpression::Value(pv)
+#[derive(Debug, PartialEq, Clone)]
+pub enum CompositeWriteOperation {
+    Set(PrismaValue),
+    Push(PrismaValue),
+    Unset(bool),
+    Update(NestedWrite),
+    Upsert {
+        set: Box<CompositeWriteOperation>,
+        update: Box<CompositeWriteOperation>,
+    },
+}
+
+#[derive(Debug, PartialEq, Clone)]
+pub struct NestedWrite {
+    pub writes: Vec<(DatasourceFieldName, WriteOperation)>,
+}
+
+#[derive(Debug, Clone, Default)]
+pub struct FieldPath {
+    path: Vec<String>,
+}
+
+impl FieldPath {
+    pub fn new_from_segment(field: &Field) -> Self {
+        let mut path = Self::default();
+        path.add_segment(field);
+
+        path
+    }
+
+    pub fn add_segment(&mut self, field: &Field) {
+        self.path.push(field.db_name().to_owned());
+    }
+
+    pub fn path(&self) -> String {
+        self.path.join(".")
+    }
+
+    pub fn dollar_path(&self) -> String {
+        format!("${}", self.path())
+    }
+
+    pub fn identifier(&self) -> String {
+        self.path.join("_")
     }
 }
 
-impl TryInto<PrismaValue> for WriteExpression {
+impl NestedWrite {
+    /// Unfolds nested writes into a flat list of `WriteOperation`s.
+    ///
+    /// Given the following `NestedWrite`:
+    /// ```text
+    /// Vec [(
+    ///       "field_a",
+    ///       WriteOperation::Composite(Update(Vec[("field_b", WriteOperation::Composite(Set("3")))]))
+    ///     )]
+    /// ```
+    /// `unfold` will roughly return:
+    /// ```text
+    /// Vec[(Set("3"), Field("field_b"), "field_a.field_b")]
+    /// ```
+    /// where:
+    ///  - `Set("3")` is the write operation to execute
+    ///  - `Field("field_b")` is the field on which to execute the write operation
+    /// - `"field_a.field_b"` is the path for MongoDB to access the nested field
+    pub fn unfold(self, field: &Field, field_path: FieldPath) -> Vec<(WriteOperation, &Field, FieldPath)> {
+        self.unfold_internal(field, field_path)
+    }
+
+    fn unfold_internal(self, field: &'_ Field, field_path: FieldPath) -> Vec<(WriteOperation, &'_ Field, FieldPath)> {
+        let mut nested_writes: Vec<(WriteOperation, &Field, FieldPath)> = vec![];
+
+        for (DatasourceFieldName(db_name), write) in self.writes {
+            let nested_field = field
+                .as_composite()
+                .unwrap()
+                .typ
+                .find_field_by_db_name(&db_name)
+                .unwrap();
+            let mut new_path = field_path.clone();
+
+            new_path.add_segment(nested_field);
+
+            match write {
+                WriteOperation::Composite(CompositeWriteOperation::Update(nested_write)) => {
+                    nested_writes.extend(nested_write.unfold_internal(nested_field, new_path));
+                }
+                _ => {
+                    nested_writes.push((write, nested_field, new_path));
+                }
+            }
+        }
+
+        nested_writes
+    }
+}
+
+impl From<(&ScalarFieldRef, PrismaValue)> for WriteOperation {
+    fn from((_, pv): (&ScalarFieldRef, PrismaValue)) -> Self {
+        WriteOperation::scalar_set(pv)
+    }
+}
+
+impl From<(&CompositeFieldRef, PrismaValue)> for WriteOperation {
+    fn from((_, pv): (&CompositeFieldRef, PrismaValue)) -> Self {
+        WriteOperation::composite_set(pv)
+    }
+}
+
+impl From<(&SelectedField, PrismaValue)> for WriteOperation {
+    fn from((selection, pv): (&SelectedField, PrismaValue)) -> Self {
+        match selection {
+            SelectedField::Scalar(sf) => (sf, pv).into(),
+            SelectedField::Composite(cs) => (&cs.field, pv).into(),
+        }
+    }
+}
+
+impl TryInto<PrismaValue> for WriteOperation {
     type Error = ConnectorError;
 
     fn try_into(self) -> Result<PrismaValue, Self::Error> {
         match self {
-            WriteExpression::Value(pv) => Ok(pv),
+            WriteOperation::Scalar(ScalarWriteOperation::Set(pv)) => Ok(pv),
+            WriteOperation::Composite(CompositeWriteOperation::Set(pv)) => Ok(pv),
             x => Err(ConnectorError::from_kind(ErrorKind::InternalConversionError(format!(
                 "Unable to convert write expression {:?} into prisma value.",
                 x
@@ -79,30 +283,14 @@ impl TryInto<PrismaValue> for WriteExpression {
     }
 }
 
-impl From<IndexMap<DatasourceFieldName, PrismaValue>> for WriteArgs {
-    fn from(args: IndexMap<DatasourceFieldName, PrismaValue>) -> Self {
-        Self {
-            args: args.into_iter().map(|(k, v)| (k, WriteExpression::Value(v))).collect(),
-        }
-    }
-}
-
-impl From<IndexMap<DatasourceFieldName, WriteExpression>> for WriteArgs {
-    fn from(args: IndexMap<DatasourceFieldName, WriteExpression>) -> Self {
+impl From<IndexMap<DatasourceFieldName, WriteOperation>> for WriteArgs {
+    fn from(args: IndexMap<DatasourceFieldName, WriteOperation>) -> Self {
         Self { args }
     }
 }
 
-impl From<Vec<(DatasourceFieldName, PrismaValue)>> for WriteArgs {
-    fn from(pairs: Vec<(DatasourceFieldName, PrismaValue)>) -> Self {
-        Self {
-            args: pairs.into_iter().map(|(k, v)| (k, WriteExpression::Value(v))).collect(),
-        }
-    }
-}
-
-impl From<Vec<(DatasourceFieldName, WriteExpression)>> for WriteArgs {
-    fn from(pairs: Vec<(DatasourceFieldName, WriteExpression)>) -> Self {
+impl From<Vec<(DatasourceFieldName, WriteOperation)>> for WriteArgs {
+    fn from(pairs: Vec<(DatasourceFieldName, WriteOperation)>) -> Self {
         Self {
             args: pairs.into_iter().collect(),
         }
@@ -117,7 +305,7 @@ impl WriteArgs {
     pub fn insert<T, V>(&mut self, key: T, arg: V)
     where
         T: Into<DatasourceFieldName>,
-        V: Into<WriteExpression>,
+        V: Into<WriteOperation>,
     {
         self.args.insert(key.into(), arg.into());
     }
@@ -126,15 +314,15 @@ impl WriteArgs {
         self.args.contains_key(field)
     }
 
-    pub fn get_field_value(&self, field: &str) -> Option<&WriteExpression> {
+    pub fn get_field_value(&self, field: &str) -> Option<&WriteOperation> {
         self.args.get(field)
     }
 
-    pub fn take_field_value(&mut self, field: &str) -> Option<WriteExpression> {
+    pub fn take_field_value(&mut self, field: &str) -> Option<WriteOperation> {
         self.args.remove(field)
     }
 
-    pub fn keys(&self) -> Keys<DatasourceFieldName, WriteExpression> {
+    pub fn keys(&self) -> Keys<DatasourceFieldName, WriteOperation> {
         self.args.keys()
     }
 
@@ -152,7 +340,7 @@ impl WriteArgs {
 
         if let Some(f) = updated_at_field {
             if self.args.get(f.db_name()).is_none() {
-                self.args.insert(f.into(), now.into());
+                self.args.insert(f.into(), WriteOperation::scalar_set(now));
             }
         }
     }
@@ -161,8 +349,9 @@ impl WriteArgs {
         if !self.args.is_empty() {
             if let Some(field) = model.fields().updated_at() {
                 if self.args.get(field.db_name()).is_none() {
-                    self.args
-                        .insert(field.into(), PrismaValue::DateTime(Utc::now().into()).into());
+                    let now = PrismaValue::DateTime(Utc::now().into());
+
+                    self.args.insert(field.into(), WriteOperation::scalar_set(now));
                 }
             }
         }
@@ -217,7 +406,7 @@ pub fn merge_write_args(loaded_ids: Vec<SelectionResult>, incoming_args: WriteAr
     }
 
     // Contains all positions that need to be updated with the given expression.
-    let positions: IndexMap<usize, &WriteExpression> = loaded_ids
+    let positions: IndexMap<usize, &WriteOperation> = loaded_ids
         .first()
         .unwrap()
         .pairs
@@ -229,9 +418,10 @@ pub fn merge_write_args(loaded_ids: Vec<SelectionResult>, incoming_args: WriteAr
     loaded_ids
         .into_iter()
         .map(|mut id| {
-            for (position, expr) in positions.iter() {
+            for (position, write_op) in positions.iter() {
                 let current_val = id.pairs[position.to_owned()].1.clone();
-                id.pairs[position.to_owned()].1 = apply_expression(current_val, (*expr).clone());
+                id.pairs[position.to_owned()].1 =
+                    apply_expression(current_val, (*write_op.as_scalar().unwrap()).clone());
             }
 
             id
@@ -239,13 +429,13 @@ pub fn merge_write_args(loaded_ids: Vec<SelectionResult>, incoming_args: WriteAr
         .collect()
 }
 
-pub fn apply_expression(val: PrismaValue, expr: WriteExpression) -> PrismaValue {
-    match expr {
-        WriteExpression::Field(_) => unimplemented!(),
-        WriteExpression::Value(pv) => pv,
-        WriteExpression::Add(rhs) => val + rhs,
-        WriteExpression::Substract(rhs) => val - rhs,
-        WriteExpression::Multiply(rhs) => val * rhs,
-        WriteExpression::Divide(rhs) => val / rhs,
+pub fn apply_expression(val: PrismaValue, scalar_write: ScalarWriteOperation) -> PrismaValue {
+    match scalar_write {
+        ScalarWriteOperation::Field(_) => unimplemented!(),
+        ScalarWriteOperation::Set(pv) => pv,
+        ScalarWriteOperation::Add(rhs) => val + rhs,
+        ScalarWriteOperation::Substract(rhs) => val - rhs,
+        ScalarWriteOperation::Multiply(rhs) => val * rhs,
+        ScalarWriteOperation::Divide(rhs) => val / rhs,
     }
 }

@@ -1,13 +1,9 @@
-use datamodel::{
-    diagnostics::*,
-    dml::{self, ScalarType},
-    Configuration, Datamodel, IndexDefinition, Model, NativeTypeInstance, PrimaryKeyDefinition, StringFromEnvVar,
-};
-use pretty_assertions::assert_eq;
+pub use datamodel::{dml, dml::*};
+pub use expect_test::expect;
+pub use indoc::{formatdoc, indoc};
 
-pub(crate) use expect_test::expect;
-pub(crate) use indoc::formatdoc;
-pub(crate) use indoc::indoc;
+use datamodel::{diagnostics::*, Configuration, StringFromEnvVar};
+use pretty_assertions::assert_eq;
 
 pub(crate) trait DatasourceAsserts {
     fn assert_name(&self, name: &str) -> &Self;
@@ -496,6 +492,11 @@ pub(crate) fn parse_configuration(datamodel_string: &str) -> Configuration {
             )
         }
     }
+}
+
+pub(crate) fn expect_error(schema: &str, expectation: &expect_test::Expect) {
+    let err = parse_and_render_error(schema);
+    expectation.assert_eq(&err)
 }
 
 pub(crate) fn parse_and_render_error(schema: &str) -> String {

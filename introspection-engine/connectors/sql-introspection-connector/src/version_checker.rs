@@ -3,7 +3,7 @@ use crate::introspection_helpers::{
     is_prisma_1_point_1_or_2_join_table, is_relay_table,
 };
 use crate::SqlFamilyTrait;
-use datamodel::{Datamodel, Model};
+use datamodel::dml::{Datamodel, Model};
 use introspection_connector::{IntrospectionContext, Version, Warning};
 use native_types::{MySqlType, PostgresType};
 use quaint::connector::SqlFamily;
@@ -103,6 +103,7 @@ impl VersionChecker {
         }
     }
 
+    #[allow(clippy::nonminimal_bool)] // more readable this way
     pub fn uses_on_delete(&mut self, fk: &ForeignKey, table: &Table) {
         if !(fk.on_delete_action == ForeignKeyAction::NoAction || fk.on_delete_action == ForeignKeyAction::SetNull)
             && !is_prisma_1_or_11_list_table(table)

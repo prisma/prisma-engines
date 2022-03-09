@@ -1,22 +1,23 @@
 mod name;
 
-use mongodb_schema_describer::{IndexFieldProperty, IndexWalker};
 pub(crate) use name::Name;
 
 use super::{field_type::FieldType, CompositeTypeDepth};
 use convert_case::{Case, Casing};
-use datamodel::{
-    CompositeType, CompositeTypeField, Datamodel, DefaultValue, Field, IndexDefinition, IndexField, IndexType, Model,
-    PrimaryKeyDefinition, PrimaryKeyField, ScalarField, SortOrder, ValueGenerator, WithDatabaseName,
+use datamodel::dml::{
+    self, CompositeType, CompositeTypeField, CompositeTypeFieldType, Datamodel, DefaultValue, Field, FieldArity,
+    IndexDefinition, IndexField, IndexType, Model, PrimaryKeyDefinition, PrimaryKeyField, ScalarField, ScalarType,
+    SortOrder, ValueGenerator, WithDatabaseName,
 };
 use introspection_connector::Warning;
 use mongodb::bson::{Bson, Document};
+use mongodb_schema_describer::{IndexFieldProperty, IndexWalker};
 use once_cell::sync::Lazy;
 use regex::Regex;
 use std::{
     borrow::Cow,
     cmp::Ordering,
-    collections::{BTreeMap, HashMap},
+    collections::{BTreeMap, HashMap, HashSet},
     fmt,
 };
 
@@ -24,6 +25,7 @@ pub(super) const SAMPLE_SIZE: i32 = 1000;
 
 static RESERVED_NAMES: &[&str] = &["PrismaClient"];
 static COMMENTED_OUT_FIELD: &str = "This field was commented out because of an invalid name. Please provide a valid one that matches [a-zA-Z][a-zA-Z0-9_]*";
+static EMPTY_TYPE_DETECTED: &str = "Nested objects had no data in the sample dataset to introspect a nested type.";
 
 /// Statistical data from a MongoDB database for determining a Prisma data
 /// model.
@@ -69,7 +71,7 @@ impl<'a> Statistics<'a> {
         let mut indices = self.indices;
         let (mut models, types) = populate_fields(&self.models, self.samples, warnings);
 
-        add_indices_to_models(&mut models, &mut indices);
+        add_indices_to_models(&mut models, &mut indices, warnings);
         add_missing_ids_to_models(&mut models);
 
         for (_, model) in models.into_iter() {
@@ -193,12 +195,9 @@ impl<'a> Statistics<'a> {
 
             match FieldType::from_bson(val, compound_name) {
                 // We cannot have arrays of arrays, so multi-dimensional arrays
-                // are introspected as `Json[]`.
-                Some(_) if found_composite && array_layers > 1 => {
-                    let counter = sampler
-                        .types
-                        .entry(FieldType::Array(Box::new(FieldType::Json)))
-                        .or_default();
+                // are introspected as `Json`.
+                Some(_) if array_layers > 1 => {
+                    let counter = sampler.types.entry(FieldType::Json).or_default();
                     *counter += 1;
                 }
                 // Counting the types.
@@ -226,8 +225,8 @@ fn add_missing_ids_to_models(models: &mut BTreeMap<String, Model>) {
 
         let field = ScalarField {
             name: String::from("id"),
-            field_type: datamodel::FieldType::from(FieldType::ObjectId),
-            arity: datamodel::FieldArity::Required,
+            field_type: dml::FieldType::from(FieldType::ObjectId),
+            arity: FieldArity::Required,
             database_name: Some(String::from("_id")),
             default_value: Some(DefaultValue::new_expression(ValueGenerator::new_auto())),
             documentation: None,
@@ -392,11 +391,11 @@ fn populate_fields(
         }
 
         let arity = if field_type.is_array() {
-            datamodel::FieldArity::List
+            FieldArity::List
         } else if doc_count > field_count || sampler.nullable {
-            datamodel::FieldArity::Optional
+            FieldArity::Optional
         } else {
-            datamodel::FieldArity::Required
+            FieldArity::Required
         };
 
         let mut documentation = if percentages.has_type_variety() {
@@ -454,7 +453,7 @@ fn populate_fields(
 
                 let mut field = ScalarField {
                     name,
-                    field_type: datamodel::FieldType::from(field_type.clone()),
+                    field_type: dml::FieldType::from(field_type.clone()),
                     arity,
                     database_name,
                     default_value: None,
@@ -508,21 +507,111 @@ fn populate_fields(
         warnings.push(crate::warnings::fields_with_unknown_types(&unknown_types));
     }
 
+    filter_out_empty_types(&mut models, &mut types, warnings);
+
     (models, types)
 }
 
-fn add_indices_to_models(models: &mut BTreeMap<String, Model>, indices: &mut BTreeMap<String, Vec<IndexWalker<'_>>>) {
+/// From the resulting data model, remove all types with no fields and change
+/// the field types to Json.
+fn filter_out_empty_types(
+    models: &mut BTreeMap<String, Model>,
+    types: &mut BTreeMap<String, CompositeType>,
+    warnings: &mut Vec<Warning>,
+) {
+    let mut fields_with_an_empty_type = Vec::new();
+
+    // 1. remove all types that have no fields.
+    let empty_types: HashSet<_> = types
+        .iter()
+        .filter(|(_, r#type)| r#type.fields.is_empty())
+        .map(|(name, _)| name.to_owned())
+        .collect();
+
+    // https://github.com/rust-lang/rust/issues/70530
+    types.retain(|_, r#type| !r#type.fields.is_empty());
+
+    // 2. change all fields in models that point to a non-existing type to Json.
+    for (model_name, model) in models.iter_mut() {
+        for field in model.fields.iter_mut().filter_map(|f| f.as_scalar_field_mut()) {
+            match &field.field_type {
+                dml::FieldType::CompositeType(ct) if empty_types.contains(ct) => {
+                    fields_with_an_empty_type.push((Name::Model(model_name.clone()), field.name.clone()));
+                    field.field_type = dml::FieldType::Scalar(ScalarType::Json, None, None);
+                    field.documentation = Some(EMPTY_TYPE_DETECTED.to_owned());
+                }
+                _ => (),
+            }
+        }
+    }
+
+    // 3. change all fields in types that point to a non-existing type to Json.
+    for (type_name, r#type) in types.iter_mut() {
+        for field in r#type.fields.iter_mut() {
+            match &field.r#type {
+                CompositeTypeFieldType::CompositeType(name) if empty_types.contains(name) => {
+                    fields_with_an_empty_type.push((Name::CompositeType(type_name.clone()), field.name.clone()));
+                    field.r#type = CompositeTypeFieldType::Scalar(ScalarType::Json, None, None);
+                    field.documentation = Some(EMPTY_TYPE_DETECTED.to_owned());
+                }
+                _ => (),
+            }
+        }
+    }
+
+    // 4. add warnings in the end to reduce spam
+    if !fields_with_an_empty_type.is_empty() {
+        warnings.push(crate::warnings::fields_pointing_to_an_empty_type(
+            &fields_with_an_empty_type,
+        ));
+    }
+}
+
+fn add_indices_to_models(
+    models: &mut BTreeMap<String, Model>,
+    indices: &mut BTreeMap<String, Vec<IndexWalker<'_>>>,
+    warnings: &mut Vec<Warning>,
+) {
+    let mut fields_with_unknown_type = Vec::new();
+
     for (model_name, model) in models.iter_mut() {
         for index in indices.remove(model_name).into_iter().flat_map(|i| i.into_iter()) {
             let defined_on_field = index.fields().len() == 1;
 
-            if !index.fields().all(|indf| {
-                model
-                    .fields
-                    .iter()
-                    .any(|mf| mf.name() == indf.name() || mf.database_name() == Some(indf.name()))
-            }) {
-                continue;
+            let missing_fields: Vec<_> = index
+                .fields()
+                .filter(|indf| {
+                    !model
+                        .fields
+                        .iter()
+                        .any(|mf| mf.name() == indf.name() || mf.database_name() == Some(indf.name()))
+                })
+                .cloned()
+                .collect();
+
+            for field in missing_fields {
+                let docs = String::from("Field referred in an index, but found no data to define the type.");
+                fields_with_unknown_type.push((Name::Model(model_name.to_owned()), field.name.clone()));
+
+                let (name, database_name) = match sanitize_string(field.name()) {
+                    Some(name) => (name, Some(field.name)),
+                    None => (field.name, None),
+                };
+
+                let sf = ScalarField {
+                    name,
+                    field_type: FieldType::Json.into(),
+                    arity: FieldArity::Optional,
+                    database_name,
+                    default_value: None,
+                    documentation: Some(docs),
+                    is_generated: false,
+                    is_updated_at: false,
+                    is_commented_out: false,
+                    is_ignored: false,
+                };
+
+                model.fields.push(Field::ScalarField(sf));
             }
 
             let fields = index
@@ -553,6 +642,10 @@ fn add_indices_to_models(models: &mut BTreeMap<String, Model>, indices: &mut BTr
                 algorithm: None,
             });
         }
+    }
+
+    if !fields_with_unknown_type.is_empty() {
+        warnings.push(crate::warnings::fields_with_unknown_types(&fields_with_unknown_type));
     }
 }
 

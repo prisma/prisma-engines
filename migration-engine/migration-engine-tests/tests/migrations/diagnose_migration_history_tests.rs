@@ -1,3 +1,5 @@
+use std::io::Write;
+
 use migration_core::{
     commands::{DiagnoseMigrationHistoryInput, DiagnoseMigrationHistoryOutput, DriftDiagnostic, HistoryDiagnostic},
     json_rpc::types::CreateMigrationOutput,
@@ -183,17 +185,20 @@ fn diagnose_migration_history_calculates_drift_in_presence_of_failed_migrations(
     "#,
     );
 
+    let mut original_migration = String::new();
     let migration_two = api
         .create_migration("02_add_dogs", &dm2, &directory)
         .send_sync()
         .modify_migration(|migration| {
+            original_migration.push_str(migration);
             migration.push_str("\nSELECT YOLO;");
-        });
+        })
+        .migration_script_path();
 
     let err = api.apply_migrations(&directory).send_unwrap_err().to_string();
     assert!(err.contains("yolo") || err.contains("YOLO"), "{}", err);
 
-    migration_two.modify_migration(|migration| migration.truncate(migration.len() - "SELECT YOLO;".len()));
+    std::fs::write(migration_two, original_migration.as_bytes()).unwrap();
 
     let DiagnoseMigrationHistoryOutput {
         drift,
@@ -446,7 +451,12 @@ fn diagnose_migrations_history_can_detect_edited_migrations(api: TestApi) {
     "#,
     );
 
-    let initial_assertions = api.create_migration("initial", &dm1, &directory).send_sync();
+    let (initial_migration_output, initial_migration_path) = {
+        let initial_assertions = api.create_migration("initial", &dm1, &directory).send_sync();
+        let path = initial_assertions.migration_script_path();
+        (initial_assertions.into_output(), path)
+    };
+    let initial_migration_name = initial_migration_output.generated_migration_name.unwrap();
 
     let dm2 = api.datamodel_with_provider(
         r#"
@@ -464,13 +474,12 @@ fn diagnose_migrations_history_can_detect_edited_migrations(api: TestApi) {
         .send_sync()
         .assert_applied_migrations(&["initial", "second-migration"]);
 
-    let initial_migration_name = initial_assertions
-        .modify_migration(|script| {
-            std::mem::swap(script, &mut format!("/* test */\n{}", script));
-        })
-        .into_output()
-        .generated_migration_name
+    let mut file = std::fs::OpenOptions::new()
+        .write(true)
+        .append(true)
+        .open(initial_migration_path)
         .unwrap();
+    file.write_all(b"/* test */").unwrap();
 
     let DiagnoseMigrationHistoryOutput {
         drift,
@@ -502,7 +511,11 @@ fn diagnose_migrations_history_reports_migrations_failing_to_apply_cleanly(api: 
     "#,
     );
 
-    let initial_assertions = api.create_migration("initial", &dm1, &directory).send_sync();
+    let (initial_migration_name, initial_path) = {
+        let out = api.create_migration("initial", &dm1, &directory).send_sync();
+        let path = out.migration_script_path();
+        (out.into_output().generated_migration_name.unwrap(), path)
+    };
 
     let dm2 = api.datamodel_with_provider(
         r#"
@@ -520,13 +533,12 @@ fn diagnose_migrations_history_reports_migrations_failing_to_apply_cleanly(api: 
         .send_sync()
         .assert_applied_migrations(&["initial", "second-migration"]);
 
-    let initial_migration_name = initial_assertions
-        .modify_migration(|script| {
-            script.push_str("SELECT YOLO;\n");
-        })
-        .into_output()
-        .generated_migration_name
+    let mut file = std::fs::OpenOptions::new()
+        .write(true)
+        .append(true)
+        .open(initial_path)
         .unwrap();
+    file.write_all(b"SELECT YOLO;\n").unwrap();
 
     let DiagnoseMigrationHistoryOutput {
         failed_migration_names,
@@ -810,12 +822,11 @@ fn shadow_database_creation_error_is_special_cased_mysql(api: TestApi) {
 
     let migration_api = migration_api(Some(datamodel), None).unwrap();
 
-    let output = api
-        .block_on(migration_api.diagnose_migration_history(DiagnoseMigrationHistoryInput {
-            migrations_directory_path: directory.path().as_os_str().to_string_lossy().into_owned(),
-            opt_in_to_shadow_database: true,
-        }))
-        .unwrap();
+    let output = tok(migration_api.diagnose_migration_history(DiagnoseMigrationHistoryInput {
+        migrations_directory_path: directory.path().as_os_str().to_string_lossy().into_owned(),
+        opt_in_to_shadow_database: true,
+    }))
+    .unwrap();
 
     assert!(
         matches!(output.drift, Some(DriftDiagnostic::MigrationFailedToApply { error }) if error.to_user_facing().as_known().unwrap().error_code == ShadowDbCreationError::ERROR_CODE)
@@ -855,17 +866,16 @@ fn shadow_database_creation_error_is_special_cased_postgres(api: TestApi) {
         dbport = api.connection_info().port().unwrap_or(5432),
     );
 
-    let output = api
-        .block_on(async {
-            migration_api(Some(datamodel.clone()), None)
-                .unwrap()
-                .diagnose_migration_history(DiagnoseMigrationHistoryInput {
-                    migrations_directory_path: directory.path().as_os_str().to_string_lossy().into_owned(),
-                    opt_in_to_shadow_database: true,
-                })
-                .await
-        })
-        .unwrap();
+    let output = tok(async {
+        migration_api(Some(datamodel.clone()), None)
+            .unwrap()
+            .diagnose_migration_history(DiagnoseMigrationHistoryInput {
+                migrations_directory_path: directory.path().as_os_str().to_string_lossy().into_owned(),
+                opt_in_to_shadow_database: true,
+            })
+            .await
+    })
+    .unwrap();
 
     assert!(
         matches!(output.drift, Some(DriftDiagnostic::MigrationFailedToApply { error }) if error.to_user_facing().as_known().unwrap().error_code == ShadowDbCreationError::ERROR_CODE)
@@ -928,12 +938,11 @@ fn shadow_database_creation_error_is_special_cased_mssql(api: TestApi) {
         }
     };
 
-    let output = api
-        .block_on(migration_api.diagnose_migration_history(DiagnoseMigrationHistoryInput {
-            migrations_directory_path: directory.path().as_os_str().to_string_lossy().into_owned(),
-            opt_in_to_shadow_database: true,
-        }))
-        .unwrap();
+    let output = tok(migration_api.diagnose_migration_history(DiagnoseMigrationHistoryInput {
+        migrations_directory_path: directory.path().as_os_str().to_string_lossy().into_owned(),
+        opt_in_to_shadow_database: true,
+    }))
+    .unwrap();
 
     assert!(
         matches!(output.drift, Some(DriftDiagnostic::MigrationFailedToApply { error }) if error.to_user_facing().as_known().unwrap().error_code == ShadowDbCreationError::ERROR_CODE)

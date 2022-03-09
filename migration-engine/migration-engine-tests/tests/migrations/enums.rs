@@ -470,6 +470,9 @@ fn changing_all_values_of_enums_used_in_defaults_works(api: TestApi) {
     api.assert_schema().assert_table("Cat", |table| {
         table.assert_column("eveningMood", |col| col.assert_enum_default("MEOWMEOW"))
     });
+
+    // Check that the migration is idempotent.
+    api.schema_push_w_datasource(dm2).force(true).send().assert_no_steps();
 }
 
 #[test_connector(tags(Postgres))]

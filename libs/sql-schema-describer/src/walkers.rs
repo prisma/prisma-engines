@@ -119,6 +119,13 @@ impl<'a> ColumnWalker<'a> {
         self.column().auto_increment
     }
 
+    /// Is this column indexed by a secondary index??
+    pub fn is_part_of_secondary_index(&self) -> bool {
+        let table = self.table();
+        let name = self.name();
+        table.indexes().any(|idx| idx.contains_column(name))
+    }
+
     /// Is this column a part of the table's primary key?
     pub fn is_part_of_primary_key(&self) -> bool {
         self.table().table().is_part_of_primary_key(self.name())

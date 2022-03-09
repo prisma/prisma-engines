@@ -74,17 +74,16 @@ impl QueryArguments {
         self.cursor.is_some()
             && self.order_by.iter().any(|o| match o {
                 OrderBy::Scalar(o) => !o.field.is_required(),
-                OrderBy::Aggregation(_) => false,
-                OrderBy::Relevance(_) => false,
+                _ => false,
             })
     }
 
     /// Checks if the orderBy provided is guaranteeing a stable ordering of records for the model.
     /// For that purpose we need to distinguish orderings on the source model, i.e. the model that
     /// we're sorting on the top level (where orderBys are located that are done without relations)
-    /// and orderings that require a relation hop. Scalar orderings that require a relation hop are
-    /// only guarantee stable ordering if they are strictly over 1:1 relations. As soon as there's
-    /// a m:1 (or m:n for later implementations) relation involved a unique on the to-one side can't
+    /// and orderings that require a relation or composite hop. Scalar orderings that require a hop are
+    /// only guaranteed stable ordering if they are strictly over 1:1. As soon as there's
+    /// a m:1 (or m:n for later implementations) hop involved a unique on the to-one side can't
     /// be considered unique anymore for the purpose of ordering records, as many left hand records
     /// (the many side) can have the one side. A simple example would be a User <> Post relation
     /// where a post can have only one author but an author (User) can have many posts. If posts
@@ -102,28 +101,27 @@ impl QueryArguments {
     ///      * no orderings are done, or ...
     ///      * at least one unique field is present on the source model `orderBy`, or ...
     ///      * source model contains a combination of fields that is marked as unique, or ...
-    ///      * a relation orderBy contains a unique and is done solely over 1:1 relations.
+    ///      * an orderBy hop contains a unique and is done solely over 1:1 relations.
     /// - `false` otherwise.
     pub fn is_stable_ordering(&self) -> bool {
         if self.order_by.is_empty() {
             return true;
         }
 
-        // We're filtering order bys aggregation & relevance since they will never lead to stable ordering anyway.
-        let maybe_stable_order_bys: Vec<_> = self
+        // We're filtering order by aggregation & relevance since they will never lead to stable ordering anyway.
+        let stable_candidates: Vec<_> = self
             .order_by
             .iter()
             .filter_map(|o| match o {
                 OrderBy::Scalar(o) => Some(o),
-                OrderBy::Aggregation(_) => None,
-                OrderBy::Relevance(_) => None,
+                _ => None,
             })
             .collect();
 
-        // Partition into orderings on the same model and ones that require relation hops.
+        // Partition into orderings on the same model and ones that require hops.
         // Note: One ordering is always on one scalar in the end.
         let (on_model, on_relation): (Vec<&OrderByScalar>, Vec<&OrderByScalar>) =
-            maybe_stable_order_bys.iter().partition(|o| o.path.is_empty());
+            stable_candidates.iter().partition(|o| o.path.is_empty());
 
         // Indicates whether or not a combination of contained fields is on the source model (we don't check for relations for now).
         let order_by_contains_unique_index = self.model.unique_indexes().into_iter().any(|index| {
@@ -134,15 +132,23 @@ impl QueryArguments {
         });
 
         let source_contains_unique = on_model.iter().any(|o| o.field.unique());
-        let relations_contain_1to1_unique = on_relation
-            .iter()
-            .any(|o| o.field.unique() && o.path.iter().all(|r| r.relation().is_one_to_one()));
+        let relations_contain_1to1_unique = on_relation.iter().any(|o| {
+            o.field.unique()
+                && o.path.iter().all(|hop| match hop {
+                    OrderByHop::Relation(rf) => rf.relation().is_one_to_one(),
+                    OrderByHop::Composite(_) => false, // Composites do not have uniques, as such they can't fulfill uniqueness requirement even if they're 1:1.
+                })
+        });
 
-        let has_optional_relation = on_relation
-            .iter()
-            .any(|o| o.path.iter().any(|r| r.arity == dml::FieldArity::Optional));
+        let has_optional_hop = on_relation.iter().any(|o| {
+            o.path.iter().any(|hop| match hop {
+                OrderByHop::Relation(rf) => rf.arity == dml::FieldArity::Optional,
+                OrderByHop::Composite(cf) => !cf.is_required(),
+            })
+        });
 
-        if has_optional_relation {
+        // [Dom] I'm not entirely sure why we're doing this, but I assume that optionals introduce NULLs that make the ordering inherently unstable?
+        if has_optional_hop {
             return false;
         }
 
@@ -154,11 +160,7 @@ impl QueryArguments {
     }
 
     pub fn has_unbatchable_ordering(&self) -> bool {
-        self.order_by.iter().any(|o| match o {
-            OrderBy::Scalar(_) => false,
-            OrderBy::Aggregation(_) => true,
-            OrderBy::Relevance(_) => true,
-        })
+        self.order_by.iter().any(|o| !matches!(o, OrderBy::Scalar(_)))
     }
 
     pub fn has_unbatchable_filters(&self) -> bool {

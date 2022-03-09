@@ -1,34 +1,32 @@
-use migration_core::{json_rpc::types::*, CoreError, CoreResult, GenericApi};
+use migration_core::{
+    commands::dev_diagnostic, json_rpc::types::*, migration_connector::MigrationConnector, CoreError, CoreResult,
+};
 use tempfile::TempDir;
 
 #[must_use = "This struct does nothing on its own. See DevDiagnostic::send()"]
 pub struct DevDiagnostic<'a> {
-    api: &'a dyn GenericApi,
+    api: &'a mut dyn MigrationConnector,
     migrations_directory: &'a TempDir,
-    rt: &'a tokio::runtime::Runtime,
 }
 
 impl<'a> DevDiagnostic<'a> {
-    pub(crate) fn new(
-        api: &'a dyn GenericApi,
-        migrations_directory: &'a TempDir,
-        rt: &'a tokio::runtime::Runtime,
-    ) -> Self {
+    pub(crate) fn new(api: &'a mut dyn MigrationConnector, migrations_directory: &'a TempDir) -> Self {
         DevDiagnostic {
             api,
             migrations_directory,
-            rt,
         }
     }
 
     fn send_impl(self) -> CoreResult<DevDiagnosticAssertions<'a>> {
-        let output = self.rt.block_on(self.api.dev_diagnostic(DevDiagnosticInput {
-            migrations_directory_path: self.migrations_directory.path().to_str().unwrap().to_owned(),
-        }))?;
-
+        let fut = dev_diagnostic(
+            DevDiagnosticInput {
+                migrations_directory_path: self.migrations_directory.path().to_str().unwrap().to_owned(),
+            },
+            self.api,
+        );
+        let output = test_setup::runtime::run_with_thread_local_runtime(fut)?;
         Ok(DevDiagnosticAssertions {
             output,
-            _api: self.api,
             _migrations_directory: self.migrations_directory,
         })
     }
@@ -46,7 +44,6 @@ impl<'a> DevDiagnostic<'a> {
 
 pub struct DevDiagnosticAssertions<'a> {
     output: DevDiagnosticOutput,
-    _api: &'a dyn GenericApi,
     _migrations_directory: &'a TempDir,
 }
 

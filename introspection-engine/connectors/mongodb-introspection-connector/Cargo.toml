@@ -7,6 +7,7 @@ edition = "2021"
 mongodb = { version = "2.1.0", features = ["bson-chrono-0_4", "bson-uuid-0_8"] }
 thiserror = "1.0"
 async-trait = "0.1"
+mongodb-client = { path = "../../../libs/mongodb-client" }
 datamodel = { path = "../../../libs/datamodel/core" }
 mongodb-datamodel-connector = { path = "../../../libs/datamodel/connectors/mongodb-datamodel-connector" }
 datamodel-connector = { path = "../../../libs/datamodel/connectors/datamodel-connector" }
@@ -15,7 +16,6 @@ user-facing-errors = { path = "../../../libs/user-facing-errors" }
 native-types = { path = "../../../libs/native-types" }
 mongodb-schema-describer = { path = "../../../libs/mongodb-schema-describer" }
 enumflags2 = "0.7"
-url = "2"
 indoc = "1"
 futures = "0.3"
 serde_json = "1"
@@ -27,3 +27,4 @@ convert_case = "0.4"
 tokio = { version = "1", features = ["rt-multi-thread"] }
 names = { version = "0.12", default-features = false }
 expect-test = "1"
+url = "2"

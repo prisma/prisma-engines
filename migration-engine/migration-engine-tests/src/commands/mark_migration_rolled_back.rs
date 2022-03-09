@@ -1,35 +1,31 @@
-use migration_core::{json_rpc::types::*, CoreError, CoreResult, GenericApi};
+use migration_core::{
+    commands::mark_migration_rolled_back, json_rpc::types::*, migration_connector::MigrationConnector, CoreError,
+    CoreResult,
+};
 
 #[must_use = "This struct does nothing on its own. See MarkMigrationRolledBack::send()"]
 pub struct MarkMigrationRolledBack<'a> {
-    api: &'a dyn GenericApi,
+    api: &'a mut dyn MigrationConnector,
     migration_name: String,
-    rt: &'a tokio::runtime::Runtime,
 }
 
 impl<'a> MarkMigrationRolledBack<'a> {
-    pub fn new(api: &'a dyn GenericApi, migration_name: String, rt: &'a tokio::runtime::Runtime) -> Self {
-        MarkMigrationRolledBack {
-            api,
-            migration_name,
-            rt,
-        }
+    pub fn new(api: &'a mut dyn MigrationConnector, migration_name: String) -> Self {
+        MarkMigrationRolledBack { api, migration_name }
     }
 
-    fn send_impl(self) -> CoreResult<MarkMigrationRolledBackAssertion<'a>> {
-        let output = self
-            .rt
-            .block_on(self.api.mark_migration_rolled_back(MarkMigrationRolledBackInput {
+    fn send_impl(self) -> CoreResult<MarkMigrationRolledBackAssertion> {
+        let output = test_setup::runtime::run_with_thread_local_runtime(mark_migration_rolled_back(
+            MarkMigrationRolledBackInput {
                 migration_name: self.migration_name,
-            }))?;
+            },
+            self.api,
+        ))?;
 
-        Ok(MarkMigrationRolledBackAssertion {
-            _output: output,
-            _api: self.api,
-        })
+        Ok(MarkMigrationRolledBackAssertion { _output: output })
     }
 
-    pub fn send(self) -> MarkMigrationRolledBackAssertion<'a> {
+    pub fn send(self) -> MarkMigrationRolledBackAssertion {
         self.send_impl().unwrap()
     }
 
@@ -38,12 +34,11 @@ impl<'a> MarkMigrationRolledBack<'a> {
     }
 }
 
-pub struct MarkMigrationRolledBackAssertion<'a> {
+pub struct MarkMigrationRolledBackAssertion {
     _output: MarkMigrationRolledBackOutput,
-    _api: &'a dyn GenericApi,
 }
 
-impl std::fmt::Debug for MarkMigrationRolledBackAssertion<'_> {
+impl std::fmt::Debug for MarkMigrationRolledBackAssertion {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "MarkMigrationRolledBackAssertion {{ .. }}")
     }

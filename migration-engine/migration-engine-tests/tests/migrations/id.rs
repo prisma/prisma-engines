@@ -233,7 +233,8 @@ fn altering_descending_primary_key(api: TestApi) {
     });
 }
 
-#[test_connector(exclude(Vitess))]
+// TODO: ignore because not possible on cockroachdb. We would need a multi-step process there.
+#[test_connector(exclude(Vitess), exclude(CockroachDb))]
 fn changing_the_type_of_an_id_field_must_work(api: TestApi) {
     let dm1 = r#"
         model A {
@@ -642,7 +643,8 @@ fn flipping_autoincrement_on_and_off_works(api: TestApi) {
 }
 
 // Ignoring sqlite is OK, because sqlite integer primary keys are always auto-incrementing.
-#[test_connector(exclude(Sqlite))]
+// Ignoring cockroachdb, because literal defaults on PKs on cockroachdb do not work.
+#[test_connector(exclude(Sqlite, CockroachDb))]
 fn making_an_autoincrement_default_an_expression_then_autoincrement_again_works(api: TestApi) {
     let dm1 = r#"
         model Post {
@@ -689,7 +691,7 @@ fn making_an_autoincrement_default_an_expression_then_autoincrement_again_works(
     });
 }
 
-#[test_connector]
+#[test_connector(exclude(CockroachDb))]
 fn migrating_a_unique_constraint_to_a_primary_key_works(api: TestApi) {
     let dm = r#"
         model model1 {

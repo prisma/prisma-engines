@@ -2,10 +2,10 @@ mod error;
 mod sampler;
 mod warnings;
 
-use enumflags2::BitFlags;
 pub use error::*;
 
-use datamodel::{common::preview_features::PreviewFeature, Datamodel};
+use datamodel::{common::preview_features::PreviewFeature, dml::Datamodel};
+use enumflags2::BitFlags;
 use futures::TryStreamExt;
 use indoc::formatdoc;
 use introspection_connector::{
@@ -14,7 +14,6 @@ use introspection_connector::{
 };
 use mongodb::{Client, Database};
 use mongodb_schema_describer::MongoSchema;
-use url::Url;
 use user_facing_errors::{
     common::{InvalidConnectionString, UnsupportedFeatureError},
     KnownError,
@@ -28,7 +27,7 @@ pub struct MongoDbIntrospectionConnector {
 
 impl MongoDbIntrospectionConnector {
     pub async fn new(connection_string: &str) -> ConnectorResult<Self> {
-        let url = Url::parse(connection_string).map_err(|err| {
+        let error_f = |err: mongodb_client::Error| {
             let docs = r#"https://www.prisma.io/docs/reference/database-reference/connection-urls"#;
 
             let details = formatdoc!(
@@ -47,15 +46,21 @@ impl MongoDbIntrospectionConnector {
                 user_facing_error: Some(known),
                 kind: introspection_connector::ErrorKind::InvalidDatabaseUrl(format!("{} in database URL", err)),
             }
-        })?;
+        };
 
-        let connection = Client::with_uri_str(connection_string)
+        let url = connection_string.parse().map_err(error_f)?;
+
+        let connection = mongodb_client::create(connection_string)
             .await
-            .map_err(|err| error::map_connection_errors(err, &url))?;
+            .map_err(|err| match err.kind {
+                mongodb_client::ErrorKind::InvalidArgument { .. } => error_f(err),
+                mongodb_client::ErrorKind::Other(err) => error::map_connection_errors(err, &url),
+            })?;
 
-        let database = url.path().trim_start_matches('/').to_string();
-
-        Ok(Self { connection, database })
+        Ok(Self {
+            connection,
+            database: url.database,
+        })
     }
 
     fn database(&self) -> Database {
@@ -76,6 +81,14 @@ impl MongoDbIntrospectionConnector {
         }
 
         Ok(schema)
+    }
+
+    async fn version(&self) -> ConnectorResult<String> {
+        let version = mongodb_schema_describer::version(&self.connection, &self.database)
+            .await
+            .map_err(crate::Error::from)?;
+
+        Ok(version)
     }
 }
 
@@ -108,11 +121,13 @@ impl IntrospectionConnector for MongoDbIntrospectionConnector {
     }
 
     async fn get_database_description(&self) -> ConnectorResult<String> {
-        Ok(Default::default())
+        let mongo_schema = self.describe(BitFlags::all()).await?;
+        let description = serde_json::to_string_pretty(&mongo_schema).unwrap();
+        Ok(description)
     }
 
     async fn get_database_version(&self) -> ConnectorResult<String> {
-        Ok(Default::default())
+        Ok(self.version().await.unwrap())
     }
 
     async fn introspect(

@@ -35,6 +35,11 @@ impl<'db> IndexWalker<'db> {
         }
     }
 
+    /// The id of the index, if explicitly defined.
+    pub fn attribute_id(self) -> Option<ast::AttributeId> {
+        self.index
+    }
+
     /// The index type.
     pub fn index_type(self) -> crate::types::IndexType {
         self.attribute().r#type
@@ -91,6 +96,24 @@ impl<'db> IndexWalker<'db> {
             })
     }
 
+    /// True if the field contains exactly the same fields in the same order,
+    /// and with the same attributes.
+    pub fn contains_exactly_the_fields(
+        self,
+        fields: impl ExactSizeIterator<Item = ScalarFieldAttributeWalker<'db>> + 'db,
+    ) -> bool {
+        if self.scalar_field_attributes().len() != fields.len() {
+            return false;
+        }
+
+        self.scalar_field_attributes().zip(fields).all(|(a, b)| {
+            let same_name = a.as_scalar_field().name() == b.as_scalar_field().name();
+            let same_attributes = a.sort_order() == b.sort_order() && a.length() == b.length();
+
+            same_name && same_attributes
+        })
+    }
+
     /// Whether the index is defined on a single field (otherwise: on the model).
     pub fn is_defined_on_field(self) -> bool {
         self.index_attribute.source_field.is_some()
@@ -104,6 +127,11 @@ impl<'db> IndexWalker<'db> {
     /// Is this an `@@fulltext`?
     pub fn is_fulltext(self) -> bool {
         self.index_attribute.is_fulltext()
+    }
+
+    /// True if it's our implicit unique index.
+    pub fn is_implicit(self) -> bool {
+        self.index.is_none()
     }
 
     /// The model the index is defined on.

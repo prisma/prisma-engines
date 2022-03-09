@@ -1,4 +1,5 @@
 use migration_core::{
+    commands::diff,
     json_rpc::types::{DiffTarget, PathContainer},
     migration_connector::MigrationConnector,
 };
@@ -48,6 +49,7 @@ fn diffing_postgres_schemas_when_initialized_on_sqlite(mut api: TestApi) {
     let to_file = write_file_to_tmp(to, &tempdir, "to");
 
     api.diff(DiffParams {
+        exit_code: None,
         from: DiffTarget::SchemaDatamodel(SchemaContainer {
             schema: from_file.to_string_lossy().into_owned(),
         }),
@@ -60,6 +62,7 @@ fn diffing_postgres_schemas_when_initialized_on_sqlite(mut api: TestApi) {
     .unwrap();
 
     api.diff(DiffParams {
+        exit_code: None,
         from: DiffTarget::SchemaDatamodel(SchemaContainer {
             schema: from_file.to_string_lossy().into_owned(),
         }),
@@ -74,7 +77,7 @@ fn diffing_postgres_schemas_when_initialized_on_sqlite(mut api: TestApi) {
     let expected_printed_messages = expect![[r#"
         [
             "-- AlterTable\nALTER TABLE \"TestModel\" DROP COLUMN \"names\",\nADD COLUMN     \"names\" TEXT[];\n\n-- CreateTable\nCREATE TABLE \"TestModel2\" (\n    \"id\" SERIAL NOT NULL,\n\n    CONSTRAINT \"TestModel2_pkey\" PRIMARY KEY (\"id\")\n);\n",
-            "\n[+] Added tables\n  - TestModel2\n\n[*] Changed the `TestModel` table\n  [*] Column `names` would be dropped and recreated(changed from Required to List, type changed)\n",
+            "\n[+] Added tables\n  - TestModel2\n\n[*] Changed the `TestModel` table\n  [*] Column `names` would be dropped and recreated (changed from Required to List, type changed)\n",
         ]
     "#]];
 
@@ -83,8 +86,6 @@ fn diffing_postgres_schemas_when_initialized_on_sqlite(mut api: TestApi) {
 
 #[test_connector(tags(Postgres))]
 fn from_empty_to_migrations_directory(mut api: TestApi) {
-    let host = Arc::new(TestConnectorHost::default());
-    api.connector.set_host(host.clone());
     let base_dir = tempfile::TempDir::new().unwrap();
     let first_migration_directory_path = base_dir.path().join("01firstmigration");
     let first_migration_file_path = first_migration_directory_path.join("migration.sql");
@@ -102,6 +103,7 @@ fn from_empty_to_migrations_directory(mut api: TestApi) {
     .unwrap();
 
     let params = DiffParams {
+        exit_code: None,
         from: DiffTarget::Empty,
         to: DiffTarget::Migrations(PathContainer {
             path: base_dir.path().to_string_lossy().into_owned(),
@@ -110,7 +112,8 @@ fn from_empty_to_migrations_directory(mut api: TestApi) {
         shadow_database_url: Some(api.connection_string().to_owned()),
     };
 
-    api.diff(params).unwrap();
+    let host = Arc::new(TestConnectorHost::default());
+    tok(diff(params, host.clone())).unwrap();
 
     let expected_printed_messages = expect![[r#"
         [
@@ -141,6 +144,7 @@ fn from_empty_to_migrations_folder_without_shadow_db_url_must_error(mut api: Tes
     .unwrap();
 
     let params = DiffParams {
+        exit_code: None,
         from: DiffTarget::Empty,
         to: DiffTarget::Migrations(PathContainer {
             path: base_dir.path().to_string_lossy().into_owned(),
@@ -176,10 +180,10 @@ fn from_schema_datamodel_to_url(mut api: TestApi) {
             moos Boolean
         }
     "#;
-    let schema_path = write_file_to_tmp(&first_schema, &tempdir, "schema.prisma");
+    let schema_path = write_file_to_tmp(first_schema, &tempdir, "schema.prisma");
     let second_url = format!("file:{}/second_db.sqlite", base_dir_str);
 
-    api.block_on(async {
+    tok(async {
         let q = quaint::single::Quaint::new(&second_url).await.unwrap();
         q.raw_cmd("CREATE TABLE cats ( id INTEGER PRIMARY KEY, meows BOOLEAN DEFAULT true );")
             .await
@@ -187,6 +191,7 @@ fn from_schema_datamodel_to_url(mut api: TestApi) {
     });
 
     let input = DiffParams {
+        exit_code: None,
         from: DiffTarget::SchemaDatamodel(SchemaContainer {
             schema: schema_path.to_string_lossy().into_owned(),
         }),
@@ -216,14 +221,14 @@ fn from_schema_datasource_to_url(mut api: TestApi) {
     let first_url = format!("file:{}/first_db.sqlite", base_dir_str);
     let second_url = format!("file:{}/second_db.sqlite", base_dir_str);
 
-    api.block_on(async {
+    tok(async {
         let q = quaint::single::Quaint::new(&first_url).await.unwrap();
         q.raw_cmd("CREATE TABLE cows ( id INTEGER PRIMARY KEY, moos BOOLEAN DEFAULT true );")
             .await
             .unwrap();
     });
 
-    api.block_on(async {
+    tok(async {
         let q = quaint::single::Quaint::new(&second_url).await.unwrap();
         q.raw_cmd("CREATE TABLE cats ( id INTEGER PRIMARY KEY, meows BOOLEAN DEFAULT true );")
             .await
@@ -242,6 +247,7 @@ fn from_schema_datasource_to_url(mut api: TestApi) {
     let schema_path = write_file_to_tmp(&schema_content, &tempdir, "schema.prisma");
 
     let input = DiffParams {
+        exit_code: None,
         from: DiffTarget::SchemaDatasource(SchemaContainer {
             schema: schema_path.to_string_lossy().into_owned(),
         }),
@@ -270,14 +276,14 @@ fn from_url_to_url(mut api: TestApi) {
     let first_url = format!("file:{}/first_db.sqlite", base_dir_str);
     let second_url = format!("file:{}/second_db.sqlite", base_dir_str);
 
-    api.block_on(async {
+    tok(async {
         let q = quaint::single::Quaint::new(&first_url).await.unwrap();
         q.raw_cmd("CREATE TABLE cows ( id INTEGER PRIMARY KEY, moos BOOLEAN DEFAULT true );")
             .await
             .unwrap();
     });
 
-    api.block_on(async {
+    tok(async {
         let q = quaint::single::Quaint::new(&second_url).await.unwrap();
         q.raw_cmd("CREATE TABLE cats ( id INTEGER PRIMARY KEY, meows BOOLEAN DEFAULT true );")
             .await
@@ -285,6 +291,7 @@ fn from_url_to_url(mut api: TestApi) {
     });
 
     let input = DiffParams {
+        exit_code: None,
         from: DiffTarget::Url(UrlContainer { url: first_url }),
         script: true,
         shadow_database_url: None,
@@ -351,6 +358,7 @@ fn diffing_mongo_schemas_to_script_returns_a_nice_error() {
     let to_file = write_file_to_tmp(to, &tempdir, "to");
 
     let params = DiffParams {
+        exit_code: None,
         from: DiffTarget::SchemaDatamodel(SchemaContainer {
             schema: from_file.to_string_lossy().into_owned(),
         }),
@@ -417,6 +425,7 @@ fn diffing_mongo_schemas_works() {
     let to_file = write_file_to_tmp(to, &tempdir, "to");
 
     let params = DiffParams {
+        exit_code: None,
         from: DiffTarget::SchemaDatamodel(SchemaContainer {
             schema: from_file.to_string_lossy().into_owned(),
         }),
@@ -444,6 +453,7 @@ fn with_missing_prisma_schema_should_return_helpful_error() {
     // We want to test for both --schema-datamodel and --schema-datasource
     let test_with_from_target = |from_target: DiffTarget| {
         let params = DiffParams {
+            exit_code: None,
             from: from_target,
             script: false,
             shadow_database_url: None,
@@ -476,6 +486,126 @@ fn with_missing_prisma_schema_should_return_helpful_error() {
     }));
 }
 
+#[test]
+fn diffing_two_schema_datamodels_with_missing_datasource_env_vars() {
+    for provider in ["sqlite", "postgresql", "postgres", "mysql", "sqlserver"] {
+        let schema_a = format!(
+            r#"
+            datasource db {{
+                provider = "{provider}"
+                url = env("HELLO_THIS_ENV_VAR_IS_NOT_D3F1N3D")
+            }}
+        "#
+        );
+
+        let schema_b = format!(
+            r#"
+            datasource db {{
+                provider = "{provider}"
+                url = env("THIS_ENV_VAR_DO3S_N0T_EXiST_EITHER")
+            }}
+
+            model Particle {{
+                id Int @id
+            }}
+        "#
+        );
+
+        let tmpdir = tempfile::tempdir().unwrap();
+        let schema_a = write_file_to_tmp(&schema_a, &tmpdir, "schema_a");
+        let schema_b = write_file_to_tmp(&schema_b, &tmpdir, "schema_b");
+
+        let expected = expect![[r#"
+
+            [+] Added tables
+              - Particle
+        "#]];
+        expected.assert_eq(&diff_output(DiffParams {
+            exit_code: None,
+            from: DiffTarget::SchemaDatamodel(SchemaContainer {
+                schema: schema_a.to_str().unwrap().to_owned(),
+            }),
+            script: false,
+            shadow_database_url: None,
+            to: DiffTarget::SchemaDatamodel(SchemaContainer {
+                schema: schema_b.to_str().unwrap().to_owned(),
+            }),
+        }))
+    }
+}
+
+#[test]
+fn diff_with_exit_code_and_empty_diff_returns_zero() {
+    let schema = r#"
+        datasource db {
+            provider = "sqlite"
+            url = "file:dev.db"
+        }
+
+        model Puppy {
+            id Int @id
+            name String
+        }
+    "#;
+
+    let tmpdir = tempfile::tempdir().unwrap();
+    let path = write_file_to_tmp(schema, &tmpdir, "schema.prisma");
+
+    let (result, diff) = diff_result(DiffParams {
+        exit_code: Some(true),
+        from: DiffTarget::SchemaDatamodel(SchemaContainer {
+            schema: path.to_str().unwrap().to_owned(),
+        }),
+        to: DiffTarget::SchemaDatamodel(SchemaContainer {
+            schema: path.to_str().unwrap().to_owned(),
+        }),
+        script: false,
+        shadow_database_url: None,
+    });
+
+    assert_eq!(result.exit_code, 0);
+    let expected_diff = expect![[r#"
+        No difference detected.
+    "#]];
+    expected_diff.assert_eq(&diff);
+}
+
+#[test]
+fn diff_with_exit_code_and_non_empty_diff_returns_two() {
+    let schema = r#"
+        datasource db {
+            provider = "sqlite"
+            url = "file:dev.db"
+        }
+
+        model Puppy {
+            id Int @id
+            name String
+        }
+    "#;
+
+    let tmpdir = tempfile::tempdir().unwrap();
+    let path = write_file_to_tmp(schema, &tmpdir, "schema.prisma");
+
+    let (result, diff) = diff_result(DiffParams {
+        exit_code: Some(true),
+        from: DiffTarget::Empty,
+        to: DiffTarget::SchemaDatamodel(SchemaContainer {
+            schema: path.to_str().unwrap().to_owned(),
+        }),
+        script: false,
+        shadow_database_url: None,
+    });
+
+    assert_eq!(result.exit_code, 2);
+    let expected_diff = expect![[r#"
+
+        [+] Added tables
+          - Puppy
+    "#]];
+    expected_diff.assert_eq(&diff);
+}
+
 // Call diff, and expect it to error. Return the error.
 fn diff_error(params: DiffParams) -> String {
     let api = migration_core::migration_api(None, None).unwrap();
@@ -483,14 +613,19 @@ fn diff_error(params: DiffParams) -> String {
     result.unwrap_err().to_string()
 }
 
-// Call diff, and expect it to succeed. Return what would be printed to stdout.
-fn diff_output(params: DiffParams) -> String {
+// Call diff, and expect it to succeed. Return the result and what would be printed to stdout.
+fn diff_result(params: DiffParams) -> (DiffResult, String) {
     let host = Arc::new(TestConnectorHost::default());
     let api = migration_core::migration_api(None, Some(host.clone())).unwrap();
-    test_setup::runtime::run_with_tokio(api.diff(params)).unwrap();
+    let result = test_setup::runtime::run_with_tokio(api.diff(params)).unwrap();
     let printed_messages = host.printed_messages.lock().unwrap();
     assert!(printed_messages.len() == 1, "{:?}", printed_messages);
-    printed_messages[0].clone()
+    (result, printed_messages[0].clone())
+}
+
+// Call diff, and expect it to succeed. Return what would be printed to stdout.
+fn diff_output(params: DiffParams) -> String {
+    diff_result(params).1
 }
 
 fn write_file_to_tmp(contents: &str, tempdir: &tempfile::TempDir, name: &str) -> std::path::PathBuf {

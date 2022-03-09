@@ -72,6 +72,15 @@ fn generate_types_rs(mut file: impl std::io::Write, api: &Api) -> CrateResult {
             }
         }
 
+        if let Some(example) = &record_type.example {
+            file.write_all(b"/// ### Example\n///\n/// ```ignore")?;
+            for line in example.lines() {
+                file.write_all(b"\n/// ")?;
+                file.write_all(line.as_bytes())?;
+            }
+            file.write_all(b"\n/// ```\n")?;
+        }
+
         writeln!(
             file,
             "#[derive(Serialize, Deserialize, Debug)]\npub struct {} {{",
@@ -107,6 +116,7 @@ fn generate_types_rs(mut file: impl std::io::Write, api: &Api) -> CrateResult {
                 writeln!(file, "/// {}", line)?;
             }
         }
+
         writeln!(
             file,
             "#[derive(Serialize, Deserialize, Debug)]\n#[serde(tag = \"tag\")]\npub enum {} {{",

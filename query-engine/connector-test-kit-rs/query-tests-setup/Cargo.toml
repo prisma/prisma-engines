@@ -21,7 +21,7 @@ datamodel = { path = "../../../libs/datamodel/core" }
 user-facing-errors = { path = "../../../libs/user-facing-errors" }
 thiserror = "1.0"
 async-trait = "0.1"
-nom = "6"
+nom = "7.1"
 itertools = "0.10"
 regex = "1"
 serde = "1.0"
@@ -37,4 +37,4 @@ indexmap = { version = "1.0", features = ["serde-1"] }
 
 # Only this version is vetted, upgrade only after going through the code,
 # as this is a small crate with little user base.
-parse-hyperlinks = "0.19.6"
+parse-hyperlinks = "0.23.3"

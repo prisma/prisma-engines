@@ -28,7 +28,9 @@ use crate::{
     SqlMigration, SqlMigrationConnector,
 };
 use destructive_check_plan::DestructiveCheckPlan;
-use migration_connector::{ConnectorResult, DestructiveChangeChecker, DestructiveChangeDiagnostics, Migration};
+use migration_connector::{
+    BoxFuture, ConnectorResult, DestructiveChangeChecker, DestructiveChangeDiagnostics, Migration,
+};
 use sql_schema_describer::{
     walkers::{ColumnWalker, SqlSchemaExt},
     ColumnArity,
@@ -65,9 +67,9 @@ impl SqlMigrationConnector {
     fn check_add_column(
         &self,
         column: &ColumnWalker<'_>,
+        has_virtual_default: bool,
         plan: &mut DestructiveCheckPlan,
         step_index: usize,
-        migration: &SqlMigration,
     ) {
         let column_is_required_without_default = column.arity().is_required() && column.default().is_none();
 
@@ -75,14 +77,6 @@ impl SqlMigrationConnector {
         if !column_is_required_without_default {
             return;
         }
-
-        let has_virtual_default =
-            migration
-                .added_columns_with_virtual_defaults
-                .iter()
-                .any(|(table_idx, column_idx)| {
-                    *table_idx == column.table().table_id() && *column_idx == column.column_id()
-                });
 
         let typed_unexecutable = if has_virtual_default {
             UnexecutableStepCheck::AddedRequiredFieldToTableWithPrismaLevelDefault {
@@ -127,10 +121,13 @@ impl SqlMigrationConnector {
                                 self.flavour()
                                     .check_alter_column(alter_column, &columns, &mut plan, step_index)
                             }
-                            TableChange::AddColumn { column_id } => {
+                            TableChange::AddColumn {
+                                column_id,
+                                has_virtual_default,
+                            } => {
                                 let column = tables.next().column_at(*column_id);
 
-                                self.check_add_column(&column, &mut plan, step_index, migration)
+                                self.check_add_column(&column, *has_virtual_default, &mut plan, step_index)
                             }
                             TableChange::DropPrimaryKey { .. } => plan.push_warning(
                                 SqlMigrationWarningCheck::PrimaryKeyChange {
@@ -164,7 +161,10 @@ impl SqlMigrationConnector {
 
                         for added_column_idx in &redefine_table.added_columns {
                             let column = tables.next().column_at(*added_column_idx);
-                            self.check_add_column(&column, &mut plan, step_index, migration);
+                            let has_virtual_default = redefine_table
+                                .added_columns_with_virtual_defaults
+                                .contains(added_column_idx);
+                            self.check_add_column(&column, has_virtual_default, &mut plan, step_index);
                         }
 
                         for dropped_column_idx in &redefine_table.dropped_columns {
@@ -243,6 +243,7 @@ impl SqlMigrationConnector {
                 SqlMigrationStep::CreateIndex {
                     table_id: (Some(_), table_id),
                     index_index,
+                    from_drop_and_recreate: false,
                 } => {
                     let index = schemas.next().table_walker_at(*table_id).index_at(*index_index);
 
@@ -276,13 +277,13 @@ impl SqlMigrationConnector {
     }
 }
 
-#[async_trait::async_trait]
 impl DestructiveChangeChecker for SqlMigrationConnector {
-    async fn check(&self, migration: &Migration) -> ConnectorResult<DestructiveChangeDiagnostics> {
+    fn check<'a>(
+        &'a mut self,
+        migration: &'a Migration,
+    ) -> BoxFuture<'a, ConnectorResult<DestructiveChangeDiagnostics>> {
         let plan = self.plan(migration.downcast_ref());
-        let conn = self.conn().await?;
-
-        plan.execute(self.flavour(), conn).await
+        Box::pin(async move { plan.execute(self.flavour.as_mut()).await })
     }
 
     fn pure_check(&self, migration: &Migration) -> DestructiveChangeDiagnostics {

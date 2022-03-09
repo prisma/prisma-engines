@@ -1,4 +1,4 @@
-use crate::{ConnectorResult, Migration};
+use crate::{BoxFuture, ConnectorResult, Migration};
 
 /// Implementors of this trait are responsible for checking whether a migration
 /// could lead to data loss, or if it would be potentially unexecutable.
@@ -6,10 +6,12 @@ use crate::{ConnectorResult, Migration};
 /// The type parameter is the connector's
 /// [DatabaseMigration](trait.MigrationConnector.html#associatedtype.DatabaseMigration)
 /// type.
-#[async_trait::async_trait]
 pub trait DestructiveChangeChecker: Send + Sync {
     /// Check destructive changes resulting of applying the provided migration.
-    async fn check(&self, migration: &Migration) -> ConnectorResult<DestructiveChangeDiagnostics>;
+    fn check<'a>(
+        &'a mut self,
+        migration: &'a Migration,
+    ) -> BoxFuture<'a, ConnectorResult<DestructiveChangeDiagnostics>>;
 
     /// Check the migration for destructive or unexecutable steps
     /// without performing any IO.

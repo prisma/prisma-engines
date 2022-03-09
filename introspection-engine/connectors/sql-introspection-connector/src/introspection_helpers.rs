@@ -1,10 +1,12 @@
 use crate::Dedup;
 use crate::SqlError;
-use datamodel::IndexAlgorithm;
 use datamodel::{
-    common::preview_features::PreviewFeature, common::RelationNames, Datamodel, DefaultValue as DMLDef, FieldArity,
-    FieldType, IndexDefinition, IndexField, Model, PrimaryKeyField, ReferentialAction, RelationField, RelationInfo,
-    ScalarField, ScalarType, SortOrder, ValueGenerator as VG,
+    common::{preview_features::PreviewFeature, RelationNames},
+    dml::{
+        Datamodel, DefaultValue as DMLDef, FieldArity, FieldType, IndexAlgorithm, IndexDefinition, IndexField, Model,
+        PrimaryKeyField, ReferentialAction, RelationField, RelationInfo, ScalarField, ScalarType, SortOrder,
+        ValueGenerator as VG,
+    },
 };
 use introspection_connector::IntrospectionContext;
 use sql_schema_describer::SQLIndexAlgorithm;
@@ -438,11 +440,7 @@ pub(crate) fn calculate_scalar_field_type_with_native_types(column: &Column, ctx
         FieldType::Scalar(scal_type, _, _) => match &column.tpe.native_type {
             None => scalar_type,
             Some(native_type) => {
-                let native_type_instance = ctx
-                    .source
-                    .active_connector
-                    .introspect_native_type(native_type.clone())
-                    .unwrap();
+                let native_type_instance = ctx.source.active_connector.introspect_native_type(native_type.clone());
                 FieldType::Scalar(
                     scal_type,
                     None,

@@ -15,7 +15,7 @@ use crate::{
 };
 use datamodel_connector::ReferentialIntegrity;
 use enumflags2::BitFlags;
-use std::{collections::HashMap, convert::TryFrom};
+use std::{borrow::Cow, collections::HashMap, convert::TryFrom};
 
 const PREVIEW_FEATURES_KEY: &str = "previewFeatures";
 const SHADOW_DATABASE_URL_KEY: &str = "shadowDatabaseUrl";
@@ -45,7 +45,7 @@ impl DatasourceLoader {
         if sources.len() > 1 {
             for src in ast_schema.sources() {
                 diagnostics.push_error(DatamodelError::new_source_validation_error(
-                    &"You defined more than one datasource. This is not allowed yet because support for multiple databases has not been implemented yet.".to_string(),
+                    "You defined more than one datasource. This is not allowed yet because support for multiple databases has not been implemented yet.",
                     &src.name.name,
                     src.span,
                 ));
@@ -81,10 +81,8 @@ impl DatasourceLoader {
         };
 
         if provider_arg.is_from_env() {
-            diagnostics.push_error(DatamodelError::new_functional_evaluation_error(
-                &"A datasource must not use the env() function in the provider argument.".to_string(),
-                ast_source.span,
-            ));
+            let msg = Cow::Borrowed("A datasource must not use the env() function in the provider argument.");
+            diagnostics.push_error(DatamodelError::new_functional_evaluation_error(msg, ast_source.span));
             return None;
         }
 
@@ -136,10 +134,6 @@ impl DatasourceLoader {
                     Ok(shadow_database_url) => Some(shadow_database_url)
                         .filter(|s| !s.as_literal().map(|lit| lit.is_empty()).unwrap_or(false))
                         .map(|url| (url, shadow_database_url_arg.span())),
-
-                    // We intentionally ignore the shadow database URL if it is defined in an env var that is missing.
-                    Err(DatamodelError::EnvironmentFunctionalEvaluationError { .. }) => None,
-
                     Err(err) => {
                         diagnostics.push_error(err);
                         None
@@ -287,6 +281,6 @@ fn preview_features_guardrail(args: &HashMap<&str, (Span, ValueValidator<'_>)>, 
             }
         }
         let msg = "Preview features are only supported in the generator block. Please move this field to the generator block.";
-        diagnostics.push_error(DatamodelError::new_connector_error(msg, span));
+        diagnostics.push_error(DatamodelError::new(std::borrow::Cow::Borrowed(msg), span));
     }
 }

@@ -119,6 +119,21 @@ impl SchemaAssertion {
         self
     }
 
+    #[track_caller]
+    pub fn assert_views_count(self, expected_count: usize) -> Self {
+        let actual_count = self.schema.view_walkers().count();
+
+        assert_eq!(
+            actual_count, expected_count,
+            "Assertion failed. Expected the schema to have {expected_count} views, found {actual_count}. ({table_names:?})",
+            expected_count = expected_count,
+            actual_count = actual_count,
+            table_names = self.schema.view_walkers().map(|t| t.name()).collect::<Vec<&str>>(),
+        );
+
+        self
+    }
+
     pub fn debug_print(self) -> Self {
         println!("{:?}", &self.schema);
 
@@ -177,6 +192,7 @@ impl<'a> TableAssertion<'a> {
         self
     }
 
+    #[track_caller]
     pub fn assert_fk_on_columns<F>(self, columns: &[&str], fk_assertions: F) -> Self
     where
         F: FnOnce(ForeignKeyAssertion<'a>) -> ForeignKeyAssertion<'a>,
@@ -447,7 +463,6 @@ impl<'a> ColumnAssertion<'a> {
     pub fn assert_native_type(self, expected: &str, connector: &dyn Connector) -> Self {
         let found = connector
             .introspect_native_type(self.column.tpe.native_type.clone().unwrap())
-            .unwrap()
             .to_string();
         assert!(
             found == expected,

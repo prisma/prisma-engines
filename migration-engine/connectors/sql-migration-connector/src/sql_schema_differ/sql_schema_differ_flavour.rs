@@ -12,6 +12,10 @@ mod sqlite;
 
 /// Trait to specialize SQL schema diffing (resulting in migration steps) by SQL backend.
 pub(crate) trait SqlSchemaDifferFlavour {
+    fn can_alter_primary_keys(&self) -> bool {
+        false
+    }
+
     fn can_redefine_tables_with_inbound_foreign_keys(&self) -> bool {
         false
     }

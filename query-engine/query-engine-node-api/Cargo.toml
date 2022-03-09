@@ -29,7 +29,7 @@ serde_json = { version = "1", features = ["preserve_order", "float_roundtrip"] }
 serde = "1"
 
 tracing = "0.1"
-tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+tracing-subscriber = { version = "0.3" }
 tracing-futures = "0.2"
 tracing-opentelemetry = "0.16"
 datamodel-connector = { path = "../../libs/datamodel/connectors/datamodel-connector" }

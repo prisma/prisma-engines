@@ -492,6 +492,7 @@ impl QueryDocumentParser {
             return Err(QueryParserError::new(path, error_kind));
         }
 
+        map.set_tag(schema_object.tag);
         Ok(map)
     }
 }

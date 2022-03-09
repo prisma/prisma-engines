@@ -80,7 +80,7 @@ pub async fn listen(opts: PrismaOpt) -> PrismaResult<()> {
 
     let server = Server::bind(&addr).tcp_nodelay(true).serve(query_engine);
 
-    info!("Started http server on http://{}", addr);
+    info!("Started query engine http server on http://{}", addr);
 
     if let Err(e) = server.await {
         eprintln!("server error: {}", e);
@@ -293,7 +293,7 @@ fn get_transaction_id_from_header(req: &Request<Body>) -> Option<TxId> {
     match req.headers().get(TRANSACTION_ID_HEADER) {
         Some(id_header) => {
             let msg = format!("{} has not been correctly set.", TRANSACTION_ID_HEADER);
-            let id = id_header.to_str().unwrap_or_else(|_| msg.as_str());
+            let id = id_header.to_str().unwrap_or(msg.as_str());
             Some(TxId::from(id))
         }
 

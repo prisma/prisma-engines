@@ -1,5 +1,4 @@
 use crate::common::*;
-use indoc::indoc;
 
 #[test]
 fn cascading_on_delete_self_relations() {

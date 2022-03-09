@@ -1,6 +1,5 @@
 use crate::common::*;
 use datamodel::render_datamodel_to_with_preview_flags;
-use indoc::indoc;
 
 #[test]
 fn constraint_names() {

@@ -17,11 +17,12 @@ chrono = "0.4"
 connection-string = "0.1"
 connector = { path = "../connectors/query-connector", package = "query-connector" }
 crossbeam-queue = "0.2"
+mongodb-client = { path = "../../libs/mongodb-client/" }
 datamodel = { path = "../../libs/datamodel/core" }
 datamodel-connector = { path = "../../libs/datamodel/connectors/datamodel-connector" }
 futures = "0.3"
 im = "13.0"
-indexmap = { version = "1.0", features = ["serde-1"] }
+indexmap = { version = "1.7", features = ["serde-1"] }
 itertools = "0.10"
 mongodb-connector = { path = "../connectors/mongodb-query-connector", package = "mongodb-query-connector", optional = true }
 once_cell = "1.3"
@@ -41,3 +42,4 @@ user-facing-errors = { path = "../../libs/user-facing-errors" }
 uuid = "0.8"
 cuid = { git = "https://github.com/prisma/cuid-rust" }
 pin-utils = "0.1"
+lazy_static = "1.4"
