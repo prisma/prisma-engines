@@ -15,7 +15,7 @@ use mongodb::{
 };
 use prisma_models::{ModelRef, PrismaValue, SelectionResult};
 use std::{collections::HashMap, convert::TryInto};
-use update_utils::IntoUpdateDocumentExtension;
+use update::IntoUpdateDocumentExtension;
 
 /// Create a single record to the database resulting in a
 /// `RecordProjection` as an identifier pointing to the just-created document.
@@ -122,6 +122,8 @@ pub async fn update_records<'conn>(
     record_filter: RecordFilter,
     mut args: WriteArgs,
 ) -> crate::Result<Vec<SelectionResult>> {
+    dbg!(&args);
+
     let coll = database.collection::<Document>(model.db_name());
 
     // We need to load ids of documents to be updated first because Mongo doesn't
@@ -164,6 +166,9 @@ pub async fn update_records<'conn>(
 
         update_docs.extend(write_op.into_update_docs(&field, field_path)?);
     }
+
+    println!("--------- Update documents ---------");
+    println!("{}", serde_json::to_string_pretty(&update_docs)?);
 
     if !update_docs.is_empty() {
         coll.update_many_with_session(filter, update_docs, None, session)

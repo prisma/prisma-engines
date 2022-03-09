@@ -183,7 +183,8 @@ pub struct NestedWrite {
 
 #[derive(Debug, Clone, Default)]
 pub struct FieldPath {
-    path: Vec<String>,
+    pub alias: Option<String>,
+    pub path: Vec<String>,
 }
 
 impl FieldPath {
@@ -194,20 +195,56 @@ impl FieldPath {
         path
     }
 
+    pub fn new_from_alias(alias: &str) -> Self {
+        let mut path = Self::default();
+        path.alias = Some(alias.to_owned());
+
+        path
+    }
+
     pub fn add_segment(&mut self, field: &Field) {
         self.path.push(field.db_name().to_owned());
     }
 
-    pub fn path(&self) -> String {
-        self.path.join(".")
+    /// Removes the nth first segments of the path
+    pub fn drain(&mut self, n: usize) {
+        self.path.drain(0..n);
     }
 
-    pub fn dollar_path(&self) -> String {
-        format!("${}", self.path())
+    pub fn path(&self, include_alias: bool) -> String {
+        let rendered_path = self.path.join(".");
+
+        if !include_alias {
+            return rendered_path;
+        }
+
+        if let Some(alias) = &self.alias {
+            if self.path.is_empty() {
+                alias.to_owned()
+            } else {
+                format!("${}.{}", alias, rendered_path)
+            }
+        } else {
+            rendered_path
+        }
+    }
+
+    pub fn dollar_path(&self, include_alias: bool) -> String {
+        format!("${}", self.path(include_alias))
     }
 
     pub fn identifier(&self) -> String {
-        self.path.join("_")
+        let rendered_path = self.path.join("_");
+
+        if let Some(alias) = &self.alias {
+            if self.path.is_empty() {
+                alias.to_owned()
+            } else {
+                format!("{}_{}", alias, rendered_path)
+            }
+        } else {
+            rendered_path
+        }
     }
 }
 
