@@ -1,8 +1,10 @@
 mod helpers;
 
 use crate::{dml, load_sources, Datasource, Diagnostics, ParserDatabase};
+use datamodel_connector::Span;
 use enumflags2::BitFlags;
 use helpers::*;
+use parser_database::walkers;
 use pest::{iterators::Pair, Parser};
 use schema_ast::{
     ast::{self, SchemaAst},
@@ -49,8 +51,7 @@ impl<'a> Reformatter<'a> {
                 let missing_fields = Self::find_all_missing_fields(schema_ast, &datamodel, datasource.as_ref());
                 let missing_field_attributes =
                     Self::find_all_missing_attributes(schema_ast, &datamodel, datasource.as_ref());
-                let missing_relation_attribute_args =
-                    Self::find_all_missing_relation_attribute_args(schema_ast, &datamodel, datasource.as_ref());
+                let missing_relation_attribute_args = find_all_missing_relation_attribute_args(&db);
 
                 Reformatter {
                     input,
@@ -127,50 +128,6 @@ impl<'a> Reformatter<'a> {
         }
 
         missing_field_attributes
-    }
-
-    fn find_all_missing_relation_attribute_args(
-        schema_ast: &SchemaAst,
-        datamodel: &dml::Datamodel,
-        datasource: Option<&Datasource>,
-    ) -> Vec<MissingRelationAttributeArg> {
-        let lowerer = crate::transform::dml_to_ast::LowerDmlToAst::new(datasource, BitFlags::empty());
-
-        let mut missing_relation_attribute_args = Vec::new();
-        for model in datamodel.models() {
-            let ast_model = schema_ast.find_model(&model.name).unwrap();
-            for field in model.fields() {
-                let new_ast_field = lowerer.lower_field(model, field, datamodel);
-
-                if let Some(original_field) = ast_model.fields.iter().find(|f| f.name.name == field.name()) {
-                    for attribute in new_ast_field.attributes.iter().filter(|a| a.name.name == "relation") {
-                        if let Some(original_attribute) = original_field
-                            .attributes
-                            .iter()
-                            .find(|d| d.name.name == attribute.name.name)
-                        {
-                            for arg in &attribute.arguments.arguments {
-                                if let Some(arg_name) = &arg.name {
-                                    if !original_attribute
-                                        .arguments
-                                        .arguments
-                                        .iter()
-                                        .any(|arg| arg.name.as_ref().map(|n| n.name.as_str()) == Some(&arg_name.name))
-                                    {
-                                        missing_relation_attribute_args.push(MissingRelationAttributeArg {
-                                            model: model.name.clone(),
-                                            field: field.name().to_string(),
-                                            arg: arg.to_owned(),
-                                        })
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        missing_relation_attribute_args
     }
 
     fn reformat_internal(self, indent_width: usize) -> Result<String, &'a str> {
@@ -910,4 +867,71 @@ struct MissingRelationAttributeArg {
     model: String,
     field: String,
     arg: ast::Argument,
+}
+
+fn find_all_missing_relation_attribute_args(db: &ParserDatabase) -> Vec<MissingRelationAttributeArg> {
+    let mut missing_relation_attribute_args = Vec::new();
+
+    for relation in db.walk_relations() {
+        match relation.refine() {
+            walkers::RefinedRelationWalker::Inline(inline_relation) => {
+                push_inline_relation_missing_arguments(inline_relation, &mut missing_relation_attribute_args)
+            }
+            walkers::RefinedRelationWalker::ImplicitManyToMany(_) => (),
+            walkers::RefinedRelationWalker::TwoWayEmbeddedManyToMany(_) => (),
+        }
+    }
+
+    missing_relation_attribute_args
+}
+
+fn push_inline_relation_missing_arguments(
+    inline_relation: walkers::InlineRelationWalker<'_>,
+    args: &mut Vec<MissingRelationAttributeArg>,
+) {
+    if let Some(forward) = inline_relation.forward_relation_field() {
+        // the `fields: [...]` argument.
+        match inline_relation.referencing_fields() {
+            walkers::ReferencingFields::Concrete(_) => (),
+            walkers::ReferencingFields::NA => (), // error somewhere else
+            walkers::ReferencingFields::Inferred(fields) => {
+                let missing_arg = MissingRelationAttributeArg {
+                    model: forward.model().name().to_owned(),
+                    field: forward.ast_field().name.name.to_owned(),
+                    arg: ast::Argument {
+                        name: Some(ast::Identifier::new("fields")),
+                        value: ast::Expression::Array(
+                            fields
+                                .into_iter()
+                                .map(|f| ast::Expression::ConstantValue(f.name, Span::empty()))
+                                .collect(),
+                            Span::empty(),
+                        ),
+                        span: Span::empty(),
+                    },
+                };
+                args.push(missing_arg);
+            }
+        }
+
+        // the `references: [...]` argument
+        if forward.referenced_fields().is_none() {
+            let missing_arg = MissingRelationAttributeArg {
+                model: forward.model().name().to_owned(),
+                field: forward.ast_field().name.name.to_owned(),
+                arg: ast::Argument {
+                    name: Some(ast::Identifier::new("references")),
+                    value: ast::Expression::Array(
+                        inline_relation
+                            .referenced_fields()
+                            .map(|f| ast::Expression::ConstantValue(f.name().to_owned(), Span::empty()))
+                            .collect(),
+                        Span::empty(),
+                    ),
+                    span: Span::empty(),
+                },
+            };
+            args.push(missing_arg);
+        }
+    }
 }
