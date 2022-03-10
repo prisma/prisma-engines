@@ -31,7 +31,6 @@ const ADVISORY_LOCK_TIMEOUT: std::time::Duration = std::time::Duration::from_sec
 /// https://www.cockroachlabs.com/docs/stable/experimental-features.html
 const COCKROACHDB_PRELUDE: &str = r#"
 SET enable_experimental_alter_column_type_general = true;
-SET default_int_size = 4;
 SET serial_normalization = 'sql_sequence';
 "#;
 

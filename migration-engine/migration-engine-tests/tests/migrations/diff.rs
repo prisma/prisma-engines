@@ -84,7 +84,7 @@ fn diffing_postgres_schemas_when_initialized_on_sqlite(mut api: TestApi) {
     expected_printed_messages.assert_debug_eq(&host.printed_messages.lock().unwrap());
 }
 
-#[test_connector(tags(Postgres))]
+#[test_connector(tags(Postgres), exclude(CockroachDb))]
 fn from_empty_to_migrations_directory(mut api: TestApi) {
     let base_dir = tempfile::TempDir::new().unwrap();
     let first_migration_directory_path = base_dir.path().join("01firstmigration");

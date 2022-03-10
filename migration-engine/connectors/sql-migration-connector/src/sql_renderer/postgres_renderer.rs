@@ -19,7 +19,7 @@ use std::borrow::Cow;
 impl PostgresFlavour {
     fn render_column(&self, column: &ColumnWalker<'_>) -> String {
         let column_name = self.quote(column.name());
-        let tpe_str = render_column_type(column);
+        let tpe_str = render_column_type(column, self);
         let nullability_str = render_nullability(column);
         let default_str = column
             .default()
@@ -196,6 +196,7 @@ impl SqlRenderer for PostgresFlavour {
                         &mut before_statements,
                         &mut lines,
                         &mut after_statements,
+                        self,
                     );
                 }
                 TableChange::DropAndRecreateColumn { column_id, changes: _ } => {
@@ -414,7 +415,7 @@ impl SqlRenderer for PostgresFlavour {
     }
 }
 
-pub(crate) fn render_column_type(col: &ColumnWalker<'_>) -> Cow<'static, str> {
+fn render_column_type(col: &ColumnWalker<'_>, flavour: &PostgresFlavour) -> Cow<'static, str> {
     let t = col.column_type();
     let is_autoincrement = col.is_autoincrement();
 
@@ -452,7 +453,13 @@ pub(crate) fn render_column_type(col: &ColumnWalker<'_>) -> Cow<'static, str> {
         PostgresType::SmallInt if is_autoincrement => "SMALLSERIAL".into(),
         PostgresType::SmallInt => "SMALLINT".into(),
         PostgresType::Integer if is_autoincrement => "SERIAL".into(),
-        PostgresType::Integer => "INTEGER".into(),
+        PostgresType::Integer => {
+            if flavour.is_cockroachdb() {
+                "INT4".into()
+            } else {
+                "INTEGER".into()
+            }
+        }
         PostgresType::BigInt if is_autoincrement => "BIGSERIAL".into(),
         PostgresType::BigInt => "BIGINT".into(),
         PostgresType::Decimal(precision) => format!("DECIMAL{}", render_decimal(precision)).into(),
@@ -495,6 +502,7 @@ fn render_alter_column(
     before_statements: &mut Vec<String>,
     clauses: &mut Vec<String>,
     after_statements: &mut Vec<String>,
+    flavour: &PostgresFlavour,
 ) {
     let steps = expand_alter_column(columns, column_changes);
     let table_name = Quoted::postgres_ident(columns.previous().table().name());
@@ -526,7 +534,7 @@ fn render_alter_column(
             PostgresAlterColumn::SetType => clauses.push(format!(
                 "{} SET DATA TYPE {}",
                 &alter_column_prefix,
-                render_column_type(columns.next())
+                render_column_type(columns.next(), flavour)
             )),
             PostgresAlterColumn::AddSequence => {
                 // We imitate the sequence that would be automatically created on a `SERIAL` column.
