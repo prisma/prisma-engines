@@ -847,6 +847,14 @@
 <span id="845">845</span>
 <span id="846">846</span>
 <span id="847">847</span>
+<span id="848">848</span>
+<span id="849">849</span>
+<span id="850">850</span>
+<span id="851">851</span>
+<span id="852">852</span>
+<span id="853">853</span>
+<span id="854">854</span>
+<span id="855">855</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">common</span>::<span class="kw-2">*</span>, <span class="ident">SqlRenderer</span>};
 <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">flavour::PostgresFlavour</span>,
@@ -868,7 +876,7 @@
 <span class="kw">impl</span> <span class="ident">PostgresFlavour</span> {
     <span class="kw">fn</span> <span class="ident">render_column</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">column</span>: <span class="kw-2">&amp;</span><span class="ident">ColumnWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">String</span> {
         <span class="kw">let</span> <span class="ident">column_name</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">quote</span>(<span class="ident">column</span>.<span class="ident">name</span>());
-        <span class="kw">let</span> <span class="ident">tpe_str</span> <span class="op">=</span> <span class="ident">render_column_type</span>(<span class="ident">column</span>);
+        <span class="kw">let</span> <span class="ident">tpe_str</span> <span class="op">=</span> <span class="ident">render_column_type</span>(<span class="ident">column</span>, <span class="self">self</span>);
         <span class="kw">let</span> <span class="ident">nullability_str</span> <span class="op">=</span> <span class="ident">render_nullability</span>(<span class="ident">column</span>);
         <span class="kw">let</span> <span class="ident">default_str</span> <span class="op">=</span> <span class="ident">column</span>
             .<span class="ident">default</span>()
@@ -1045,6 +1053,7 @@
                         <span class="kw-2">&amp;mut</span> <span class="ident">before_statements</span>,
                         <span class="kw-2">&amp;mut</span> <span class="ident">lines</span>,
                         <span class="kw-2">&amp;mut</span> <span class="ident">after_statements</span>,
+                        <span class="self">self</span>,
                     );
                 }
                 <span class="ident">TableChange::DropAndRecreateColumn</span> { <span class="ident">column_id</span>, <span class="ident">changes</span>: <span class="kw">_</span> } =&gt; {
@@ -1263,7 +1272,7 @@
     }
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">render_column_type</span>(<span class="ident">col</span>: <span class="kw-2">&amp;</span><span class="ident">ColumnWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, <span class="ident">str</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">render_column_type</span>(<span class="ident">col</span>: <span class="kw-2">&amp;</span><span class="ident">ColumnWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">flavour</span>: <span class="kw-2">&amp;</span><span class="ident">PostgresFlavour</span>) -&gt; <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, <span class="ident">str</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">t</span> <span class="op">=</span> <span class="ident">col</span>.<span class="ident">column_type</span>();
     <span class="kw">let</span> <span class="ident">is_autoincrement</span> <span class="op">=</span> <span class="ident">col</span>.<span class="ident">is_autoincrement</span>();
 
@@ -1301,7 +1310,13 @@
         <span class="ident">PostgresType::SmallInt</span> <span class="kw">if</span> <span class="ident">is_autoincrement</span> =&gt; <span class="string">&quot;SMALLSERIAL&quot;</span>.<span class="ident">into</span>(),
         <span class="ident">PostgresType::SmallInt</span> =&gt; <span class="string">&quot;SMALLINT&quot;</span>.<span class="ident">into</span>(),
         <span class="ident">PostgresType::Integer</span> <span class="kw">if</span> <span class="ident">is_autoincrement</span> =&gt; <span class="string">&quot;SERIAL&quot;</span>.<span class="ident">into</span>(),
-        <span class="ident">PostgresType::Integer</span> =&gt; <span class="string">&quot;INTEGER&quot;</span>.<span class="ident">into</span>(),
+        <span class="ident">PostgresType::Integer</span> =&gt; {
+            <span class="kw">if</span> <span class="ident">flavour</span>.<span class="ident">is_cockroachdb</span>() {
+                <span class="string">&quot;INT4&quot;</span>.<span class="ident">into</span>()
+            } <span class="kw">else</span> {
+                <span class="string">&quot;INTEGER&quot;</span>.<span class="ident">into</span>()
+            }
+        }
         <span class="ident">PostgresType::BigInt</span> <span class="kw">if</span> <span class="ident">is_autoincrement</span> =&gt; <span class="string">&quot;BIGSERIAL&quot;</span>.<span class="ident">into</span>(),
         <span class="ident">PostgresType::BigInt</span> =&gt; <span class="string">&quot;BIGINT&quot;</span>.<span class="ident">into</span>(),
         <span class="ident">PostgresType::Decimal</span>(<span class="ident">precision</span>) =&gt; <span class="macro">format!</span>(<span class="string">&quot;DECIMAL{}&quot;</span>, <span class="ident">render_decimal</span>(<span class="ident">precision</span>)).<span class="ident">into</span>(),
@@ -1344,6 +1359,7 @@
     <span class="ident">before_statements</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
     <span class="ident">clauses</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
     <span class="ident">after_statements</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+    <span class="ident">flavour</span>: <span class="kw-2">&amp;</span><span class="ident">PostgresFlavour</span>,
 ) {
     <span class="kw">let</span> <span class="ident">steps</span> <span class="op">=</span> <span class="ident">expand_alter_column</span>(<span class="ident">columns</span>, <span class="ident">column_changes</span>);
     <span class="kw">let</span> <span class="ident">table_name</span> <span class="op">=</span> <span class="ident">Quoted::postgres_ident</span>(<span class="ident">columns</span>.<span class="ident">previous</span>().<span class="ident">table</span>().<span class="ident">name</span>());
@@ -1375,7 +1391,7 @@
             <span class="ident">PostgresAlterColumn::SetType</span> =&gt; <span class="ident">clauses</span>.<span class="ident">push</span>(<span class="macro">format!</span>(
                 <span class="string">&quot;{} SET DATA TYPE {}&quot;</span>,
                 <span class="kw-2">&amp;</span><span class="ident">alter_column_prefix</span>,
-                <span class="ident">render_column_type</span>(<span class="ident">columns</span>.<span class="ident">next</span>())
+                <span class="ident">render_column_type</span>(<span class="ident">columns</span>.<span class="ident">next</span>(), <span class="ident">flavour</span>)
             )),
             <span class="ident">PostgresAlterColumn::AddSequence</span> =&gt; {
                 <span class="comment">// We imitate the sequence that would be automatically created on a `SERIAL` column.</span>
