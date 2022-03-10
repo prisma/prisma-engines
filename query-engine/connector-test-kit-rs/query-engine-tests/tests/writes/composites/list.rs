@@ -493,7 +493,7 @@ mod update {
         Ok(())
     }
 
-    fn mixed_composites() -> String {
+    fn mixed_to_one_to_many() -> String {
         let schema = indoc! {
             r#"model TestModel {
               #id(id, Int, @id)
@@ -514,7 +514,7 @@ mod update {
         schema.to_owned()
     }
 
-    #[connector_test(schema(mixed_composites))]
+    #[connector_test(schema(mixed_to_one_to_many))]
     async fn update_push_explicit_nested(runner: Runner) -> TestResult<()> {
         create_row(
             &runner,
@@ -608,7 +608,7 @@ mod update {
         Ok(())
     }
 
-    #[connector_test(schema(mixed_composites))]
+    #[connector_test(schema(mixed_to_one_to_many))]
     async fn fails_push_on_non_list_field(runner: Runner) -> TestResult<()> {
         create_row(
             &runner,
@@ -663,6 +663,162 @@ mod update {
             }"#,
             2009,
             "`Mutation.updateOneTestModel.data.TestModelUncheckedUpdateInput.to_many_as.CompositeACreateInput.unset`: Field does not exist on enclosing type."
+        );
+
+        Ok(())
+    }
+
+    #[connector_test]
+    async fn update_many_explicit(runner: Runner) -> TestResult<()> {
+        create_row(
+            &runner,
+            r#"{
+               id: 1
+               to_many_as: [
+                 {
+                   a_1: "a1_new",
+                   a_2: 0,
+                 }
+               ]
+               to_one_b: {
+                 b_field: 1,
+                 b_to_many_cs: [
+                   {
+                     c_field: 1,
+                     c_to_many_as: [
+                       { a_1: "a1_new", a_2: 0 }
+                     ]
+                    }
+                 ]
+               }
+             }"#,
+        )
+        .await?;
+
+        // Tests:
+        // updateMany within upsert
+        // updateMany with: set, push, int updates...
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"mutation {
+            updateOneTestModel(
+              where: { id: 1 }
+              data: {
+                to_one_b: {
+                  upsert: {
+                    set: {
+                      b_field: 0
+                      b_to_many_cs: { c_field: 0, c_to_many_as: { a_1: "a1_new", a_2: 0 } }
+                    }
+                    update: {
+                      b_field: { multiply: 3 }
+                      b_to_many_cs: {
+                        updateMany: {
+                          where: true
+                          data: {
+                            c_field: { decrement: 1 }
+                            c_to_many_as: { push: { a_1: "a_1_pushed", a_2: 2 } }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            ) {
+              id
+              to_one_b {
+                b_field
+                b_to_many_cs {
+                  c_field
+                  c_to_many_as {
+                    a_1
+                    a_2
+                  }
+                }
+              }
+            }
+          }
+          "#),
+          @r###"{"data":{"updateOneTestModel":{"id":1,"to_one_b":{"b_field":3,"b_to_many_cs":[{"c_field":0,"c_to_many_as":[{"a_1":"a1_new","a_2":0},{"a_1":"a_1_pushed","a_2":2}]}]}}}}"###
+        );
+
+        // Tests:
+        // updateMany
+        // Nested upsert within updateMany
+        // Nested updateMany within upsert
+        // updateMany within updateMany
+        let query = r#"mutation {
+          updateOneTestModel(
+            where: { id: 1 }
+            data: {
+              to_many_as: {
+                updateMany: {
+                  where: true
+                  data: {
+                    a_1: { set: "a1_updated" }
+                    a_2: { increment: 1 }
+                    to_one_b: {
+                      upsert: {
+                        set: {
+                          b_field: 0
+                          b_to_many_cs: [{ c_field: 0, c_to_many_as: [{ a_1: "a1_new", a_2: 0, to_one_b: { b_field: 0 } }] }]
+                        }
+                        update: {
+                          b_field: { increment: 1 }
+                          b_to_many_cs: {
+                            updateMany: {
+                              where: true
+                              data: {
+                                c_field: { increment: 2 },
+                                c_to_many_as: {
+                                  updateMany: {
+                                    where: true,
+                                    data: {
+                                      a_1: "a1_updated",
+                                      a_2: { set: 1337 },
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          ) {
+            id
+            to_many_as {
+              a_1
+              a_2
+              to_one_b {
+                b_field
+                b_to_many_cs {
+                  c_field
+                  c_to_many_as {
+                    a_1
+                    a_2
+                  }
+                }
+              }
+            }
+          }
+        }          
+        "#;
+
+        // upsert set
+        insta::assert_snapshot!(
+          run_query!(&runner, query),
+          @r###"{"data":{"updateOneTestModel":{"id":1,"to_many_as":[{"a_1":"a1_updated","a_2":1,"to_one_b":{"b_field":0,"b_to_many_cs":[{"c_field":0,"c_to_many_as":[{"a_1":"a1_new","a_2":0}]}]}}]}}}"###
+        );
+
+        // upsert update
+        insta::assert_snapshot!(
+          run_query!(&runner, query),
+          @r###"{"data":{"updateOneTestModel":{"id":1,"to_many_as":[{"a_1":"a1_updated","a_2":2,"to_one_b":{"b_field":1,"b_to_many_cs":[{"c_field":2,"c_to_many_as":[{"a_1":"a1_updated","a_2":1337}]}]}}]}}}"###
         );
 
         Ok(())
