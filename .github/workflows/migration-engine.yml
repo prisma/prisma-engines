@@ -227,10 +227,9 @@ jobs:
             target
           key: ${{ runner.os }}-cargo-${{ matrix.rust }}-${{ hashFiles('**/Cargo.lock') }}
 
-      - uses: MinoruSekine/setup-scoop@main
-
       - name: Install ${{ matrix.db.name }}
         run: |
+          iwr -useb https://raw.githubusercontent.com/ScoopInstaller/Install/master/install.ps1 | iex
           scoop install sudo
           scoop install ${{ matrix.db.name }}
           sudo mysqld --install
