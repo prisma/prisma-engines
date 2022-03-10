@@ -13,11 +13,11 @@ use std::{
     sync::Arc,
 };
 use tokio::sync::RwLock;
-use tracing::{instrument::WithSubscriber, warn, Level};
+use tracing::{instrument::WithSubscriber, warn, Dispatch, Level};
 use tracing_opentelemetry::OpenTelemetrySpanExt;
 use tracing_subscriber::{
-    filter::{filter_fn, FilterExt, Filtered, LevelFilter},
-    layer::{Filter, Layered, SubscriberExt},
+    filter::{filter_fn, FilterExt, LevelFilter},
+    layer::SubscriberExt,
     Layer, Registry,
 };
 
@@ -26,9 +26,7 @@ use tracing_subscriber::{
 #[derive(Clone)]
 pub struct QueryEngine {
     inner: Arc<RwLock<Inner>>,
-    log_queries: bool,
-    log_level: LevelFilter,
-    log_callback: ThreadsafeFunction<String>,
+    logger: Dispatch,
 }
 
 /// The state of the engine.
@@ -112,8 +110,6 @@ pub struct TelemetryOptions {
     endpoint: Option<String>,
 }
 
-type CallbackLogger = Layered<Filtered<CallbackLayer, Box<dyn Filter<Registry> + Send + Sync>, Registry>, Registry>;
-
 impl QueryEngine {
     /// Parse a validated datamodel and configuration to allow connecting later on.
     pub fn new(opts: ConstructorOptions, log_callback: ThreadsafeFunction<String>) -> crate::Result<Self> {
@@ -173,29 +169,31 @@ impl QueryEngine {
 
         Ok(Self {
             inner: Arc::new(RwLock::new(Inner::Builder(builder))),
-            log_level,
-            log_queries,
-            log_callback,
+            logger: Self::create_log_dispatch(log_queries, log_level, log_callback),
         })
     }
 
-    fn logger(&self) -> CallbackLogger {
+    pub fn create_log_dispatch(
+        log_queries: bool,
+        log_level: LevelFilter,
+        log_callback: ThreadsafeFunction<String>,
+    ) -> Dispatch {
         // We need to filter the messages to send to our callback logging mechanism
-        let filters = if self.log_queries {
+        let filters = if log_queries {
             // Filter trace query events (for query log) or based in the defined log level
             filter_fn(|meta| {
                 meta.target() == "quaint::connector::metrics" && meta.fields().iter().any(|f| f.name() == "query")
             })
-            .or(self.log_level)
+            .or(log_level)
             .boxed()
         } else {
             // Filter based in the defined log level
-            self.log_level.boxed()
+            log_level.boxed()
         };
 
-        let logger = CallbackLayer::new(self.log_callback.clone()).with_filter(filters);
+        let logger = CallbackLayer::new(log_callback).with_filter(filters);
 
-        Registry::default().with(logger)
+        Dispatch::new(Registry::default().with(logger))
     }
 
     /// Connect to the database, allow queries to be run.
@@ -244,7 +242,7 @@ impl QueryEngine {
                         env: builder.env.clone(),
                     }) as crate::Result<ConnectedEngine>
                 }
-                .with_subscriber(self.logger())
+                .with_subscriber(self.logger.clone())
                 .await?;
 
                 *inner = Inner::Connected(engine);
@@ -298,7 +296,7 @@ impl QueryEngine {
                     let handler = GraphQlHandler::new(engine.executor(), engine.query_schema());
                     Ok(handler.handle(query, tx_id.map(TxId::from), trace_id).await)
                 }
-                .with_subscriber(self.logger())
+                .with_subscriber(self.logger.clone())
                 .await
             }
             Inner::Builder(_) => Err(ApiError::NotConnected),
@@ -324,7 +322,7 @@ impl QueryEngine {
                         Err(err) => Ok(map_known_error(err)?),
                     }
                 }
-                .with_subscriber(self.logger())
+                .with_subscriber(self.logger.clone())
                 .await
             }
             Inner::Builder(_) => Err(ApiError::NotConnected),
@@ -346,7 +344,7 @@ impl QueryEngine {
                         Err(err) => Ok(map_known_error(err)?),
                     }
                 }
-                .with_subscriber(self.logger())
+                .with_subscriber(self.logger.clone())
                 .await
             }
             Inner::Builder(_) => Err(ApiError::NotConnected),
@@ -368,7 +366,7 @@ impl QueryEngine {
                         Err(err) => Ok(map_known_error(err)?),
                     }
                 }
-                .with_subscriber(self.logger())
+                .with_subscriber(self.logger.clone())
                 .await
             }
             Inner::Builder(_) => Err(ApiError::NotConnected),
