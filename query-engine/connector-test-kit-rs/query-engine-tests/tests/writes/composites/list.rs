@@ -1139,11 +1139,15 @@ mod update {
             &runner,
             r#"{
                   id: 1
-                  to_many_as: [{ a_1: "a1", a_2: 0 }, { a_1: "a1", a_2: 1 }, { a_1: "a2", a_2: 2 }]
+                  to_many_as: [{ a_1: "a1", a_2: 0 }, { a_1: "a1", a_2: 1 }, { a_1: "a2", a_2: 2 }],
+                  to_one_b: {
+                    b_to_many_cs: [{ c_field: 0 }, { c_field: 1 }, { c_field: 3 }]
+                  }
                 }"#,
         )
         .await?;
 
+        // Top-level `deleteMany`
         insta::assert_snapshot!(
           run_query!(&runner, r#"mutation {
             updateOneTestModel(where: { id: 1 }, data: {
@@ -1159,6 +1163,32 @@ mod update {
             }
           }"#),
           @r###"{"data":{"updateOneTestModel":{"id":1,"to_many_as":[]}}}"###
+        );
+
+        // `deleteMany` within `upsert`
+        insta::assert_snapshot!(
+          run_query!(&runner, r#"mutation {
+            updateOneTestModel(where: { id: 1 }, data: {
+              to_one_b: {
+                upsert: {
+                  set: {},
+                  update: {
+                    b_to_many_cs: {
+                      deleteMany: { where: true }
+                    }
+                  }
+                }
+              }
+            }) {
+              id
+              to_one_b {
+                b_to_many_cs {
+                  c_field
+                }
+              }
+            }
+          }"#),
+          @r###"{"data":{"updateOneTestModel":{"id":1,"to_one_b":{"b_to_many_cs":[]}}}}"###
         );
 
         Ok(())
