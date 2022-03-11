@@ -213,8 +213,8 @@ impl GenericApi for EngineState {
     async fn db_execute(&self, params: DbExecuteParams) -> CoreResult<()> {
         use std::io::Read;
 
-        let url = match &params.datasource_type {
-            DbExecuteDatasourceType::Url(UrlContainer { url }) => url.to_owned(),
+        let url: String = match &params.datasource_type {
+            DbExecuteDatasourceType::Url(UrlContainer { url }) => url.clone(),
             DbExecuteDatasourceType::Schema(SchemaContainer { schema: file_path }) => {
                 let mut schema_file = std::fs::File::open(&file_path)
                     .map_err(|err| ConnectorError::from_source(err, "Opening Prisma schema file."))?;
@@ -222,16 +222,21 @@ impl GenericApi for EngineState {
                 schema_file
                     .read_to_string(&mut schema_string)
                     .map_err(|err| ConnectorError::from_source(err, "Reading Prisma schema file."))?;
-                let (_, url, _, _) = crate::parse_configuration(&schema_string)?;
-                url
+                let (datasource, url, _, _) = crate::parse_configuration(&schema_string)?;
+                std::path::Path::new(file_path)
+                    .parent()
+                    .map(|config_dir| {
+                        datasource
+                            .active_connector
+                            .set_config_dir(config_dir, &url)
+                            .into_owned()
+                    })
+                    .unwrap_or(url)
             }
         };
 
-        self.with_connector_for_url(
-            url.clone(),
-            Box::new(move |connector| connector.db_execute(params.script)),
-        )
-        .await
+        self.with_connector_for_url(url, Box::new(move |connector| connector.db_execute(params.script)))
+            .await
     }
 
     async fn debug_panic(&self) -> CoreResult<()> {

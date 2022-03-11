@@ -90,11 +90,11 @@ impl Connector for SqliteDatamodelConnector {
             }
         };
 
-        if let Some(path) = set_root(url.trim_start_matches("file:")) {
-            return format!("file:{}", path).into();
+        if let Some(path) = set_root(url.trim_start_matches("file:").trim_start_matches("sqlite:")) {
+            return Cow::Owned(format!("file:{}", path));
         };
 
-        url.into()
+        Cow::Borrowed(url)
     }
 
     fn validate_url(&self, url: &str) -> Result<(), String> {

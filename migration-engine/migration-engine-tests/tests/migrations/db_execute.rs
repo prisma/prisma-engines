@@ -125,3 +125,32 @@ fn db_execute_error_path(api: TestApi) {
 
     assert!(result.is_err());
 }
+
+#[test]
+fn sqlite_db_execute_with_schema_datasource_resolves_relative_paths_correctly() {
+    let tmpdir = tempfile::tempdir().unwrap();
+    let prisma_dir = tmpdir.path().join("prisma");
+    std::fs::create_dir_all(&prisma_dir).unwrap();
+    let schema_path = prisma_dir.join("schema.prisma");
+    let schema = r#"
+        datasource sqlitedb {
+            provider = "sqlite"
+            url = "file:./dev.db"
+        }
+    "#;
+    std::fs::write(&schema_path, schema).unwrap();
+
+    let expected_sqlite_path = prisma_dir.join("dev.db");
+    assert!(!expected_sqlite_path.exists());
+
+    let api = migration_core::migration_api(None, None).unwrap();
+    tok(api.db_execute(DbExecuteParams {
+        datasource_type: DbExecuteDatasourceType::Schema(SchemaContainer {
+            schema: schema_path.to_str().unwrap().to_owned(),
+        }),
+        script: "CREATE TABLE dog ( id INTEGER PRIMARY KEY )".to_owned(),
+    }))
+    .unwrap();
+
+    assert!(expected_sqlite_path.exists());
+}
