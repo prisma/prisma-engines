@@ -4,15 +4,27 @@ use prisma_models::CompositeFieldRef;
 
 pub(crate) struct UpdateDataInputFieldMapper {
     unchecked: bool,
+    /// Whether the `unset` composite update operation should be rendered
+    with_unset_operation: bool,
 }
 
 impl UpdateDataInputFieldMapper {
     pub fn new_checked() -> Self {
-        Self { unchecked: false }
+        Self {
+            unchecked: false,
+            with_unset_operation: true,
+        }
     }
 
     pub fn new_unchecked() -> Self {
-        Self { unchecked: true }
+        Self {
+            unchecked: true,
+            with_unset_operation: true,
+        }
+    }
+
+    pub fn set_with_unset_operation(&mut self, with_unset_operation: bool) {
+        self.with_unset_operation = with_unset_operation;
     }
 }
 
@@ -142,11 +154,17 @@ impl DataInputFieldMapper for UpdateDataInputFieldMapper {
     }
 
     fn map_composite(&self, ctx: &mut BuilderContext, cf: &CompositeFieldRef) -> InputField {
+        dbg!(&cf);
+        dbg!(&self.with_unset_operation);
         // Shorthand object (equivalent to the "set" operation).
         let shorthand_type = InputType::Object(create::composite_create_object_type(ctx, cf));
 
         // Operation envelope object.
-        let envelope_type = InputType::Object(composite_update_envelope_object_type(ctx, cf));
+        let envelope_type = InputType::Object(composite_update_envelope_object_type(
+            ctx,
+            cf,
+            self.with_unset_operation,
+        ));
 
         let mut input_types = vec![envelope_type, shorthand_type.clone()];
 
@@ -207,7 +225,11 @@ fn update_operations_object_type(
 ///   ... more ops ...
 /// }
 /// ```
-fn composite_update_envelope_object_type(ctx: &mut BuilderContext, cf: &CompositeFieldRef) -> InputObjectTypeWeakRef {
+fn composite_update_envelope_object_type(
+    ctx: &mut BuilderContext,
+    cf: &CompositeFieldRef,
+    with_unset: bool,
+) -> InputObjectTypeWeakRef {
     let arity = if cf.is_optional() {
         "Nullable"
     } else if cf.is_list() {
@@ -216,7 +238,13 @@ fn composite_update_envelope_object_type(ctx: &mut BuilderContext, cf: &Composit
         ""
     };
 
-    let name = format!("{}{}UpdateEnvelopeInput", cf.typ.name, arity);
+    let without_unset = if !with_unset && cf.is_optional() {
+        "WithoutUnset"
+    } else {
+        ""
+    };
+
+    let name = format!("{}{}{}UpdateEnvelopeInput", cf.typ.name, arity, without_unset);
     let ident = Identifier::new(name, PRISMA_NAMESPACE);
 
     return_cached_input!(ctx, &ident);
@@ -230,12 +258,15 @@ fn composite_update_envelope_object_type(ctx: &mut BuilderContext, cf: &Composit
 
     let mut fields = vec![composite_set_update_input_field(ctx, cf)];
 
-    append_opt(&mut fields, composite_update_input_field(ctx, cf));
+    append_opt(&mut fields, composite_update_input_field(ctx, cf, with_unset));
     append_opt(&mut fields, composite_push_update_input_field(ctx, cf));
-    append_opt(&mut fields, composite_unset_update_input_field(cf));
-    append_opt(&mut fields, composite_upsert_update_input_field(ctx, cf));
+    append_opt(&mut fields, composite_upsert_update_input_field(ctx, cf, with_unset));
     append_opt(&mut fields, composite_update_many_update_input_field(ctx, cf));
     append_opt(&mut fields, composite_delete_many_update_input_field(ctx, cf));
+
+    if with_unset {
+        append_opt(&mut fields, composite_unset_update_input_field(cf));
+    }
 
     input_object.set_fields(fields);
 
@@ -243,8 +274,13 @@ fn composite_update_envelope_object_type(ctx: &mut BuilderContext, cf: &Composit
 }
 
 /// Builds the `update` input object type. Should be used in the envelope type.
-fn composite_update_object_type(ctx: &mut BuilderContext, cf: &CompositeFieldRef) -> InputObjectTypeWeakRef {
-    let name = format!("{}UpdateInput", cf.typ.name);
+fn composite_update_object_type(
+    ctx: &mut BuilderContext,
+    cf: &CompositeFieldRef,
+    with_unset: bool,
+) -> InputObjectTypeWeakRef {
+    let without_unset = if !with_unset { "WithoutUnset" } else { "" };
+    let name = format!("{}{}UpdateInput", cf.typ.name, without_unset);
 
     let ident = Identifier::new(name, PRISMA_NAMESPACE);
     return_cached_input!(ctx, &ident);
@@ -255,7 +291,9 @@ fn composite_update_object_type(ctx: &mut BuilderContext, cf: &CompositeFieldRef
     let input_object = Arc::new(input_object);
     ctx.cache_input_type(ident, input_object.clone());
 
-    let mapper = UpdateDataInputFieldMapper::new_checked();
+    let mut mapper = UpdateDataInputFieldMapper::new_checked();
+    mapper.set_with_unset_operation(with_unset);
+
     let fields = mapper.map_all(ctx, cf.typ.fields());
 
     input_object.set_fields(fields);
@@ -264,9 +302,13 @@ fn composite_update_object_type(ctx: &mut BuilderContext, cf: &CompositeFieldRef
 }
 
 // Builds an `update` input field. Should only be used in the envelope type.
-fn composite_update_input_field(ctx: &mut BuilderContext, cf: &CompositeFieldRef) -> Option<InputField> {
+fn composite_update_input_field(
+    ctx: &mut BuilderContext,
+    cf: &CompositeFieldRef,
+    with_unset: bool,
+) -> Option<InputField> {
     if cf.is_required() {
-        let update_object_type = composite_update_object_type(ctx, cf);
+        let update_object_type = composite_update_object_type(ctx, cf, with_unset);
 
         Some(input_field(operations::UPDATE, InputType::Object(update_object_type), None).optional())
     } else {
@@ -311,8 +353,13 @@ fn composite_push_update_input_field(ctx: &mut BuilderContext, cf: &CompositeFie
 }
 
 /// Builds the `upsert` input object type. Should only be used in the envelope type.
-fn composite_upsert_object_type(ctx: &mut BuilderContext, cf: &CompositeFieldRef) -> InputObjectTypeWeakRef {
-    let name = format!("{}UpsertInput", cf.typ.name);
+fn composite_upsert_object_type(
+    ctx: &mut BuilderContext,
+    cf: &CompositeFieldRef,
+    with_unset: bool,
+) -> InputObjectTypeWeakRef {
+    let without_unset = if !with_unset { "WithoutUnset" } else { "" };
+    let name = format!("{}{}UpsertInput", cf.typ.name, without_unset);
 
     let ident = Identifier::new(name, PRISMA_NAMESPACE);
     return_cached_input!(ctx, &ident);
@@ -324,7 +371,7 @@ fn composite_upsert_object_type(ctx: &mut BuilderContext, cf: &CompositeFieldRef
 
     ctx.cache_input_type(ident, input_object.clone());
 
-    let update_object_type = composite_update_object_type(ctx, cf);
+    let update_object_type = composite_update_object_type(ctx, cf, with_unset);
     let update_field = input_field(operations::UPDATE, InputType::Object(update_object_type), None);
     let set_field = composite_set_update_input_field(ctx, cf).required();
 
@@ -336,9 +383,13 @@ fn composite_upsert_object_type(ctx: &mut BuilderContext, cf: &CompositeFieldRef
 }
 
 // Builds an `upsert` input field. Should only be used in the envelope type.
-fn composite_upsert_update_input_field(ctx: &mut BuilderContext, cf: &CompositeFieldRef) -> Option<InputField> {
+fn composite_upsert_update_input_field(
+    ctx: &mut BuilderContext,
+    cf: &CompositeFieldRef,
+    with_unset: bool,
+) -> Option<InputField> {
     if cf.is_optional() {
-        let upsert_object_type = InputType::Object(composite_upsert_object_type(ctx, cf));
+        let upsert_object_type = InputType::Object(composite_upsert_object_type(ctx, cf, with_unset));
 
         Some(input_field(operations::UPSERT, upsert_object_type, None).optional())
     } else {
@@ -359,7 +410,8 @@ fn composite_update_many_object_type(ctx: &mut BuilderContext, cf: &CompositeFie
 
     ctx.cache_input_type(ident, input_object.clone());
 
-    let update_object_type = composite_update_object_type(ctx, cf);
+    // `unset` is removed within updateMany because we currently can't make it work
+    let update_object_type = composite_update_object_type(ctx, cf, false);
     let data_field = input_field(args::DATA, InputType::Object(update_object_type), None);
     // TODO(composite): replace stub where field with actual composite where input
     let where_field = input_field(args::WHERE, InputType::boolean(), None);
