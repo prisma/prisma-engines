@@ -60,6 +60,16 @@ impl TestApi {
             (Quaint::new(&cs).await.unwrap(), cs)
         } else if tags.contains(Tags::Postgres) {
             let (_, q, cs) = args.create_postgres_database().await;
+            if tags.contains(Tags::CockroachDb) {
+                q.raw_cmd(
+                    r#"
+                    SET default_int_size = 4;
+                    SET serial_normalization = 'sql_sequence';
+                    "#,
+                )
+                .await
+                .unwrap();
+            }
             (q, cs)
         } else if tags.contains(Tags::Mssql) {
             args.create_mssql_database().await
@@ -317,7 +327,7 @@ impl TestApi {
 
     #[track_caller]
     pub async fn raw_cmd(&self, query: &str) {
-        self.api.quaint().raw_cmd(query).await.unwrap()
+        self.database.raw_cmd(query).await.unwrap()
     }
 }
 
