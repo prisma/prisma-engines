@@ -1,8 +1,8 @@
-use super::logger::*;
 use crate::{
     cursor::{CursorBuilder, CursorData},
     filter::convert_filter,
     join::JoinStage,
+    logger::log_read_query as log_query,
     orderby::OrderByBuilder,
     vacuum_cursor, BsonTransform, IntoBson,
 };

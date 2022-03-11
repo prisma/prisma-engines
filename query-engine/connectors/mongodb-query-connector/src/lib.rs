@@ -5,6 +5,7 @@ mod error;
 mod filter;
 mod interface;
 mod join;
+mod logger;
 mod orderby;
 mod output_meta;
 mod projection;
