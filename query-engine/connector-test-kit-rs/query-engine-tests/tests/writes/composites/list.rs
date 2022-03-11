@@ -722,13 +722,13 @@ mod update {
               to_many_as {
                 a_1
                 a_2
-                to_one_b {
+                a_to_one_b {
                   b_field
                 }
               }
             }
           }"#),
-          @r###"{"data":{"updateOneTestModel":{"id":1,"to_many_as":[{"a_1":"a1_updated","a_2":1,"to_one_b":null}]}}}"###
+          @r###"{"data":{"updateOneTestModel":{"id":1,"to_many_as":[{"a_1":"a1_updated","a_2":1,"a_to_one_b":null}]}}}"###
         );
 
         // `upsert` within `updateMany`
@@ -739,7 +739,7 @@ mod update {
                 updateMany: {
                   where: true,
                   data: {
-                    to_one_b: {
+                    a_to_one_b: {
                       upsert: {
                         set: { b_field: 0 },
                         update: {
@@ -755,7 +755,7 @@ mod update {
               to_many_as {
                 a_1
                 a_2
-                to_one_b {
+                a_to_one_b {
                   b_field
                   b_to_one_c {
                     c_field
@@ -771,7 +771,7 @@ mod update {
               }
             }
           }"#),
-          @r###"{"data":{"updateOneTestModel":{"id":1,"to_many_as":[{"a_1":"a1_updated","a_2":1,"to_one_b":{"b_field":0,"b_to_one_c":null,"b_to_many_cs":[]}}]}}}"###
+          @r###"{"data":{"updateOneTestModel":{"id":1,"to_many_as":[{"a_1":"a1_updated","a_2":1,"a_to_one_b":{"b_field":0,"b_to_one_c":null,"b_to_many_cs":[]}}]}}}"###
         );
 
         // numeric updates (update & upsert) within `updateMany`
@@ -783,7 +783,7 @@ mod update {
                   where: true,
                   data: {
                     a_2: { increment: 1 },
-                    to_one_b: {
+                    a_to_one_b: {
                       upsert: {
                         set: { b_field: 0 },
                         update: {
@@ -799,13 +799,13 @@ mod update {
               to_many_as {
                 a_1
                 a_2
-                to_one_b {
+                a_to_one_b {
                   b_field
                 }
               }
             }
           }"#),
-          @r###"{"data":{"updateOneTestModel":{"id":1,"to_many_as":[{"a_1":"a1_updated","a_2":2,"to_one_b":{"b_field":1}}]}}}"###
+          @r###"{"data":{"updateOneTestModel":{"id":1,"to_many_as":[{"a_1":"a1_updated","a_2":2,"a_to_one_b":{"b_field":1}}]}}}"###
         );
 
         // `push` within `updateMany`
@@ -816,7 +816,7 @@ mod update {
                 updateMany: {
                   where: true,
                   data: {
-                    to_one_b: {
+                    a_to_one_b: {
                       upsert: {
                         set: { b_field: 0 },
                         update: {
@@ -832,7 +832,7 @@ mod update {
             }) {
               id
               to_many_as {
-                to_one_b {
+                a_to_one_b {
                   b_to_many_cs {
                     c_field
                   }
@@ -840,7 +840,7 @@ mod update {
               }
             }
           }"#),
-          @r###"{"data":{"updateOneTestModel":{"id":1,"to_many_as":[{"to_one_b":{"b_to_many_cs":[{"c_field":1},{"c_field":1}]}}]}}}"###
+          @r###"{"data":{"updateOneTestModel":{"id":1,"to_many_as":[{"a_to_one_b":{"b_to_many_cs":[{"c_field":1},{"c_field":1}]}}]}}}"###
         );
 
         // `updateMany` within `updateMany`
@@ -851,7 +851,7 @@ mod update {
                 updateMany: {
                   where: true,
                   data: {
-                    to_one_b: {
+                    a_to_one_b: {
                       upsert: {
                         set: { b_field: 0 },
                         update: {
@@ -870,7 +870,7 @@ mod update {
             }) {
               id
               to_many_as {
-                to_one_b {
+                a_to_one_b {
                   b_to_many_cs {
                     c_field
                   }
@@ -878,7 +878,7 @@ mod update {
               }
             }
           }"#),
-          @r###"{"data":{"updateOneTestModel":{"id":1,"to_many_as":[{"to_one_b":{"b_to_many_cs":[{"c_field":2},{"c_field":2}]}}]}}}"###
+          @r###"{"data":{"updateOneTestModel":{"id":1,"to_many_as":[{"a_to_one_b":{"b_to_many_cs":[{"c_field":2},{"c_field":2}]}}]}}}"###
         );
 
         // `deleteMany` within `updateMany`
@@ -889,7 +889,7 @@ mod update {
                 updateMany: {
                   where: true,
                   data: {
-                    to_one_b: {
+                    a_to_one_b: {
                       upsert: {
                         set: { b_field: 0 },
                         update: {
@@ -905,7 +905,7 @@ mod update {
             }) {
               id
               to_many_as {
-                to_one_b {
+                a_to_one_b {
                   b_to_many_cs {
                     c_field
                   }
@@ -913,7 +913,7 @@ mod update {
               }
             }
           }"#),
-          @r###"{"data":{"updateOneTestModel":{"id":1,"to_many_as":[{"to_one_b":{"b_to_many_cs":[]}}]}}}"###
+          @r###"{"data":{"updateOneTestModel":{"id":1,"to_many_as":[{"a_to_one_b":{"b_to_many_cs":[]}}]}}}"###
         );
 
         Ok(())
@@ -1008,11 +1008,11 @@ mod update {
                   data: {
                     a_1: { set: "a1_updated" }
                     a_2: { increment: 1 }
-                    to_one_b: {
+                    a_to_one_b: {
                       upsert: {
                         set: {
                           b_field: 0
-                          b_to_many_cs: [{ c_field: 0, c_to_many_as: [{ a_1: "a1_new", a_2: 0, to_one_b: { b_field: 0 } }] }]
+                          b_to_many_cs: [{ c_field: 0, c_to_many_as: [{ a_1: "a1_new", a_2: 0, a_to_one_b: { b_field: 0 } }] }]
                         }
                         update: {
                           b_field: { increment: 1 }
@@ -1045,7 +1045,7 @@ mod update {
             to_many_as {
               a_1
               a_2
-              to_one_b {
+              a_to_one_b {
                 b_field
                 b_to_many_cs {
                   c_field
@@ -1063,13 +1063,13 @@ mod update {
         // upsert set
         insta::assert_snapshot!(
           run_query!(&runner, query),
-          @r###"{"data":{"updateOneTestModel":{"id":1,"to_many_as":[{"a_1":"a1_updated","a_2":1,"to_one_b":{"b_field":0,"b_to_many_cs":[{"c_field":0,"c_to_many_as":[{"a_1":"a1_new","a_2":0}]}]}}]}}}"###
+          @r###"{"data":{"updateOneTestModel":{"id":1,"to_many_as":[{"a_1":"a1_updated","a_2":1,"a_to_one_b":{"b_field":0,"b_to_many_cs":[{"c_field":0,"c_to_many_as":[{"a_1":"a1_new","a_2":0}]}]}}]}}}"###
         );
 
         // upsert update
         insta::assert_snapshot!(
           run_query!(&runner, query),
-          @r###"{"data":{"updateOneTestModel":{"id":1,"to_many_as":[{"a_1":"a1_updated","a_2":2,"to_one_b":{"b_field":1,"b_to_many_cs":[{"c_field":2,"c_to_many_as":[{"a_1":"a1_updated","a_2":1337}]}]}}]}}}"###
+          @r###"{"data":{"updateOneTestModel":{"id":1,"to_many_as":[{"a_1":"a1_updated","a_2":2,"a_to_one_b":{"b_field":1,"b_to_many_cs":[{"c_field":2,"c_to_many_as":[{"a_1":"a1_updated","a_2":1337}]}]}}]}}}"###
         );
 
         Ok(())
@@ -1091,7 +1091,7 @@ mod update {
                   updateMany: {
                     where: true,
                     data: {
-                      to_one_b: { unset: true }
+                      a_to_one_b: { unset: true }
                     }
                   }
                 }
@@ -1099,7 +1099,7 @@ mod update {
             ) { id }
           }"#,
           2009,
-          "Mutation.updateOneTestModel.data.TestModelUpdateInput.to_many_as.CompositeAListUpdateEnvelopeInput.updateMany.CompositeAUpdateManyInput.data.CompositeAWithoutUnsetUpdateInput.to_one_b.CompositeBNullableWithoutUnsetUpdateEnvelopeInput.unset`: Field does not exist on enclosing type."
+          "Mutation.updateOneTestModel.data.TestModelUpdateInput.to_many_as.CompositeAListUpdateEnvelopeInput.updateMany.CompositeAUpdateManyInput.data.CompositeAWithoutUnsetUpdateInput.a_to_one_b.CompositeBNullableWithoutUnsetUpdateEnvelopeInput.unset`: Field does not exist on enclosing type."
         );
 
         // No unset in upsert in updateMany
@@ -1111,7 +1111,7 @@ mod update {
                 updateMany: {
                   where: true,
                   data: {
-                    to_one_b: {
+                    a_to_one_b: {
                       upsert: {
                         set: {},
                         update: {
@@ -1127,7 +1127,7 @@ mod update {
             }
           }"#,
           2009,
-          "Mutation.updateOneTestModel.data.TestModelUpdateInput.to_many_as.CompositeAListUpdateEnvelopeInput.updateMany.CompositeAUpdateManyInput.data.CompositeAWithoutUnsetUpdateInput.to_one_b.CompositeBNullableWithoutUnsetUpdateEnvelopeInput.upsert.CompositeBWithoutUnsetUpsertInput.update.CompositeBWithoutUnsetUpdateInput.b_to_one_c.CompositeCCreateInput.unset`: Field does not exist on enclosing type."
+          "Mutation.updateOneTestModel.data.TestModelUpdateInput.to_many_as.CompositeAListUpdateEnvelopeInput.updateMany.CompositeAUpdateManyInput.data.CompositeAWithoutUnsetUpdateInput.a_to_one_b.CompositeBNullableWithoutUnsetUpdateEnvelopeInput.upsert.CompositeBWithoutUnsetUpsertInput.update.CompositeBWithoutUnsetUpdateInput.b_to_one_c.CompositeCCreateInput.unset`: Field does not exist on enclosing type."
         );
 
         Ok(())
