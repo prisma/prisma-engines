@@ -1,1 +1,1 @@
-initSidebarItems({"enum":[["PreviewFeature",""]],"static":[["GENERATOR","Generator preview features"]],"struct":[["FeatureMap",""]]});
+initSidebarItems({"constant":[["GENERATOR","Generator preview features"]],"enum":[["PreviewFeature",""]],"struct":[["FeatureMap",""]]});

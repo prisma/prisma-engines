@@ -346,6 +346,11 @@
 <span id="344">344</span>
 <span id="345">345</span>
 <span id="346">346</span>
+<span id="347">347</span>
+<span id="348">348</span>
+<span id="349">349</span>
+<span id="350">350</span>
+<span id="351">351</span>
 </pre><pre class="rust"><code><span class="doccomment">//! A container to manage 0 or more migration connectors, based on request contents.</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! Why this rather than using connectors directly? We must be able to use the migration engine</span>
@@ -561,8 +566,8 @@
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">db_execute</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">params</span>: <span class="ident">DbExecuteParams</span>) -&gt; <span class="ident">CoreResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">use</span> <span class="ident">std::io::Read</span>;
 
-        <span class="kw">let</span> <span class="ident">url</span> <span class="op">=</span> <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">params</span>.<span class="ident">datasource_type</span> {
-            <span class="ident">DbExecuteDatasourceType::Url</span>(<span class="ident">UrlContainer</span> { <span class="ident">url</span> }) =&gt; <span class="ident">url</span>.<span class="ident">to_owned</span>(),
+        <span class="kw">let</span> <span class="ident">url</span>: <span class="ident">String</span> <span class="op">=</span> <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">params</span>.<span class="ident">datasource_type</span> {
+            <span class="ident">DbExecuteDatasourceType::Url</span>(<span class="ident">UrlContainer</span> { <span class="ident">url</span> }) =&gt; <span class="ident">url</span>.<span class="ident">clone</span>(),
             <span class="ident">DbExecuteDatasourceType::Schema</span>(<span class="ident">SchemaContainer</span> { <span class="ident">schema</span>: <span class="ident">file_path</span> }) =&gt; {
                 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">schema_file</span> <span class="op">=</span> <span class="ident">std::fs::File::open</span>(<span class="kw-2">&amp;</span><span class="ident">file_path</span>)
                     .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">err</span><span class="op">|</span> <span class="ident">ConnectorError::from_source</span>(<span class="ident">err</span>, <span class="string">&quot;Opening Prisma schema file.&quot;</span>))<span class="question-mark">?</span>;
@@ -570,16 +575,21 @@
                 <span class="ident">schema_file</span>
                     .<span class="ident">read_to_string</span>(<span class="kw-2">&amp;mut</span> <span class="ident">schema_string</span>)
                     .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">err</span><span class="op">|</span> <span class="ident">ConnectorError::from_source</span>(<span class="ident">err</span>, <span class="string">&quot;Reading Prisma schema file.&quot;</span>))<span class="question-mark">?</span>;
-                <span class="kw">let</span> (<span class="kw">_</span>, <span class="ident">url</span>, <span class="kw">_</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::parse_configuration</span>(<span class="kw-2">&amp;</span><span class="ident">schema_string</span>)<span class="question-mark">?</span>;
-                <span class="ident">url</span>
+                <span class="kw">let</span> (<span class="ident">datasource</span>, <span class="ident">url</span>, <span class="kw">_</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::parse_configuration</span>(<span class="kw-2">&amp;</span><span class="ident">schema_string</span>)<span class="question-mark">?</span>;
+                <span class="ident">std::path::Path::new</span>(<span class="ident">file_path</span>)
+                    .<span class="ident">parent</span>()
+                    .<span class="ident">map</span>(<span class="op">|</span><span class="ident">config_dir</span><span class="op">|</span> {
+                        <span class="ident">datasource</span>
+                            .<span class="ident">active_connector</span>
+                            .<span class="ident">set_config_dir</span>(<span class="ident">config_dir</span>, <span class="kw-2">&amp;</span><span class="ident">url</span>)
+                            .<span class="ident">into_owned</span>()
+                    })
+                    .<span class="ident">unwrap_or</span>(<span class="ident">url</span>)
             }
         };
 
-        <span class="self">self</span>.<span class="ident">with_connector_for_url</span>(
-            <span class="ident">url</span>.<span class="ident">clone</span>(),
-            <span class="ident">Box::new</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">connector</span><span class="op">|</span> <span class="ident">connector</span>.<span class="ident">db_execute</span>(<span class="ident">params</span>.<span class="ident">script</span>)),
-        )
-        .<span class="kw">await</span>
+        <span class="self">self</span>.<span class="ident">with_connector_for_url</span>(<span class="ident">url</span>, <span class="ident">Box::new</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">connector</span><span class="op">|</span> <span class="ident">connector</span>.<span class="ident">db_execute</span>(<span class="ident">params</span>.<span class="ident">script</span>)))
+            .<span class="kw">await</span>
     }
 
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">debug_panic</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">CoreResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
